@@ -151,6 +151,21 @@ export class AuditRepository {
   }
 
   /**
+   * Run19 BUG-015: attach AI analysis to an edit after the fact. The suggest
+   * endpoint responds immediately and runs Claude analysis in the background,
+   * so the admin Edits queue's "AI Analysis" column actually populates.
+   */
+  async updateResourceEditAnalysis(
+    editId: number,
+    claudeMetadata: NonNullable<ResourceEdit['claudeMetadata']>,
+  ): Promise<void> {
+    await db
+      .update(resourceEdits)
+      .set({ claudeMetadata, claudeAnalyzedAt: new Date() })
+      .where(eq(resourceEdits.id, editId));
+  }
+
+  /**
    * Get a specific resource edit by ID
    * @param id - Resource edit ID
    * @returns ResourceEdit object or undefined if not found

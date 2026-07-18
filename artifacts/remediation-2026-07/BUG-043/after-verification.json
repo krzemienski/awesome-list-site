@@ -1,0 +1,15 @@
+{
+  "bug": "BUG-043",
+  "title": "74 of 91 Community & Events resources are 'Uncategorized'",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "data-fix (dev applied, prod journaled)",
+  "fix": [
+    "all 74 uncategorized approved Community & Events resources classified: 35 -> 'Events & Conferences', 39 -> 'Community Groups'",
+    "prod journaled in scripts/run19-data-fixes-prod.ts (fixCommunitySubcategories, guarded: empty-subcategory + category match)"
+  ],
+  "evidence": {
+    "devSweep": "approved Community & Events with empty subcategory: 0 (the 5 remaining empty rows are all status=rejected, not public)",
+    "prodScriptDevValidation": "evidence/run19/data-fixes-dev.json — subcategory PUT write path 200, idempotent re-run noop"
+  }
+}

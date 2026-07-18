@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import SEOHead from "@/components/layout/SEOHead";
 import { advancedSeoTitle, advancedSeoDescription } from "@shared/seo-templates";
@@ -267,18 +268,22 @@ export default function Advanced() {
             These advanced features help you discover, analyze, and share awesome list data more effectively
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            <a 
-              href="/" 
+            {/* BUG-011 (run19): this button promised an all-resources view but
+                linked to "/" (home = category cards). /search with an empty
+                query now browses the full paginated catalog — link there. */}
+            <Link
+              href="/search"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              data-testid="link-browse-all-resources"
             >
               Browse All Resources
-            </a>
-            <a 
-              href={awesomeList.categories?.[0]?.slug ? `/category/${awesomeList.categories[0].slug}` : "/"} 
+            </Link>
+            <Link
+              href={awesomeList.categories?.[0]?.slug ? `/category/${awesomeList.categories[0].slug}` : "/"}
               className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors"
             >
               Explore Categories
-            </a>
+            </Link>
           </div>
         </CardContent>
       </Card>

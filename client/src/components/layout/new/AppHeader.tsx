@@ -95,6 +95,41 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
   ) {
     const resolved = taxonomyCrumbs(segments[0], segments[1], categories);
     if (resolved) return [...crumbs, ...resolved];
+    // BUG-029 (run19): the tree is loaded and the slug is NOT in it — this is
+    // a 404, so say "Not found" instead of title-casing the raw slug into a
+    // fake page title. (While the tree is still loading we keep the generic
+    // fallback below to avoid a "Not found" flash on valid pages.)
+    if (categories?.length) {
+      return [
+        ...crumbs,
+        { label: routeLabels[segments[0]], href: `/${segments[0]}` },
+        { label: "Not found", href: path },
+      ];
+    }
+  }
+  // BUG-029 (run19): unknown first segments render the NotFound page, so the
+  // crumb must say "Not found" — never title-case a bogus slug into a fake
+  // page title ("/this-page-does-not-exist" ≠ "This Page Does Not Exist").
+  const knownFirstSegments = new Set([
+    ...Object.keys(routeLabels),
+    "logout",
+    "register",
+    "forgot-password",
+    "reset-password",
+    "auth",
+    "signup",
+    "explore",
+    "categories",
+    "recommendations",
+    "search",
+    "subsubcategory",
+    "terms",
+    "privacy",
+    "favorites",
+    "account",
+  ]);
+  if (!knownFirstSegments.has(segments[0])) {
+    return [...crumbs, { label: "Not found", href: path }];
   }
   if (segments.length === 1) {
     crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: path });
@@ -204,7 +239,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
       {/* BUG-017 (run14): breadcrumb must stay on ONE line inside the fixed
           60px header — at 768px the wrapping chain clipped off-screen. The
           list is nowrap + overflow-hidden and every crumb truncates. */}
-      <Breadcrumb className="hidden md:flex min-w-0 shrink overflow-hidden">
+      {/* BUG-004 (run19): the nav also needs its own floor — with the search
+          trigger refusing to shrink below 200px, an unbounded-basis breadcrumb
+          absorbed ALL the flex shrink and clipped to 0px at md, hiding even
+          the "Home › …" collapse. 160px keeps Home › … › <truncated title>. */}
+      <Breadcrumb className="hidden md:flex min-w-0 md:min-w-[160px] shrink overflow-hidden">
         <BreadcrumbList className="flex-nowrap overflow-hidden">
           {crumbs.flatMap((crumb, i) => {
             const isLast = i === crumbs.length - 1;
@@ -214,11 +253,15 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
             const isRoot = i === 0;
             // Run17 BUG-023: at md–lg widths (768–1023px) there isn't room
             // for the full trail — middle crumbs compressed to unreadable
-            // 2–8px slivers. Below lg, collapse all middle crumbs into a
-            // single ellipsis so only "Home › … › Current" renders, each
-            // part readable and clickable. Full trail returns at lg+.
+            // 2–8px slivers. Collapse all middle crumbs into a single
+            // ellipsis so only "Home › … › Current" renders, each part
+            // readable and clickable.
+            // BUG-004 (run19): the same sliver pathology reproduced at
+            // exactly lg (1024px) once search kept its 200px floor — the
+            // full trail only genuinely fits from xl (1280px) up, so the
+            // ellipsis collapse now holds through lg.
             const isMiddle = !isRoot && !isLast;
-            const middleVis = "hidden lg:flex min-w-0";
+            const middleVis = "hidden xl:flex min-w-0";
             const nodes = [
               <BreadcrumbItem
                 key={`${crumb.href}-item`}
@@ -246,7 +289,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
               nodes.push(
                 <BreadcrumbSeparator
                   key={`${crumb.href}-sep`}
-                  className={isMiddle ? "hidden lg:flex" : undefined}
+                  className={isMiddle ? "hidden xl:flex" : undefined}
                 />,
               );
             }
@@ -254,11 +297,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
               nodes.push(
                 <BreadcrumbItem
                   key="crumb-ellipsis"
-                  className="lg:hidden shrink-0"
+                  className="xl:hidden shrink-0"
                 >
                   <BreadcrumbEllipsis className="h-4 w-4" />
                 </BreadcrumbItem>,
-                <BreadcrumbSeparator key="crumb-ellipsis-sep" className="lg:hidden" />,
+                <BreadcrumbSeparator key="crumb-ellipsis-sep" className="xl:hidden" />,
               );
             }
             return nodes;
@@ -266,7 +309,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex-1 min-w-0 mx-1 sm:mx-2">
+      {/* BUG-004 (run19): deep-taxonomy breadcrumbs used to flex-squeeze the
+          search trigger to a sliver. Reserve a usable floor for search at md+
+          (where the breadcrumb renders) — the breadcrumb, which truncates
+          gracefully, absorbs the shrink instead. */}
+      <div className="flex-1 min-w-0 md:min-w-[200px] mx-1 sm:mx-2">
         <button
           onClick={onSearchOpen}
           className="w-full max-w-sm flex items-center min-h-[44px] sm:min-h-0 h-11 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"

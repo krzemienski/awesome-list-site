@@ -1,0 +1,19 @@
+{
+  "bug": "BUG-012",
+  "title": "Tag filter popover shows 20 of 1,759 tags with no search",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "fixed",
+  "fix": [
+    "AdvancedFilter (the component behind every taxonomy-page tag popover): removed the slice(0,20) hard cap",
+    "added type-to-filter input (data-testid input-tag-search) over the FULL tag list",
+    "render capped at 100 rows for DOM sanity with an explicit '+N more \u2014 refine your search' hint instead of a silent cut"
+  ],
+  "evidence": {
+    "placeholder": "Search 1,602 tags\u2026 (full corpus, was top-20 cut)",
+    "unfilteredRows": 100,
+    "lateAlphabetTag": "typing 'webrtc' surfaces the webrtc tag; row click checks it (data-state=checked)",
+    "filterApplies": "header updates to 'Showing 36 matching resources across 5 categories.'",
+    "screenshots": ["tag-popover-webrtc-search.png", "tag-webrtc-selected.png"]
+  }
+}

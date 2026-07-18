@@ -1,0 +1,21 @@
+total sub-subcats: 106
+dup name groups: 18
+  Cloud Platforms x3 cloud-platforms-sc2220,cloud-platforms-sc2254,cloud-platforms
+  Subtitles & Captions x6 subtitles-captions-sc2220,subtitles-captions,subtitles-captions-sc2218,subtitles-captions-sc2239,subtitles-captions-sc2240,subtitles-captions-sc2259
+  AV1 x3 av1,av1-sc2275,av1-sc2262
+  HEVC x4 hevc,hevc-sc2277,hevc-sc2266,hevc-sc2262
+  Audio x6 audio-sc2221,audio-sc2283,audio-sc2266,audio,audio-sc2244,audio-sc2262
+  FFmpeg x10 ffmpeg-sc2221,ffmpeg,ffmpeg-sc2222,ffmpeg-sc2226,ffmpeg-sc2251,ffmpeg-sc2252,ffmpeg-sc2254,ffmpeg-sc2243,ffmpeg-sc2247,ffmpeg-sc2249
+  FFMPEG x6 ffmpeg,ffmpeg,ffmpeg,ffmpeg,ffmpeg,ffmpeg
+  Quality & Testing x8 quality-testing-sc2251,quality-testing-sc2256,quality-testing-sc2234,quality-testing,quality-testing-sc2247,quality-testing-sc2250,quality-testing-sc2249,quality-testing-sc2241
+  Roku x6 roku-sc2251,roku-sc2252,roku-sc2253,roku-sc2255,roku,roku-sc2211
+  Storage Solutions x2 storage-solutions-sc2254,storage-solutions
+  DASH x7 dash-sc2280,dash-sc2287,dash-sc2209,dash,dash-sc2238,dash-sc2239,dash-sc2257
+  HLS x11 hls-sc2280,hls-sc2287,hls-sc2229,hls-sc2235,hls-sc2269,hls-sc2270,hls-sc2212,hls,hls-sc2240,hls-sc2241,hls-sc2257
+  Android x3 android-sc2281,android,android-sc2209
+  Web Players x4 web-players-sc2205,web-players-sc2208,web-players,web-players-sc2212
+  iOS/tvOS x2 iostvos,iostvos
+  RIST x2 rist,rist-sc2261
+  Official Specs x3 official-specs-sc2257,official-specs,official-specs-sc2262
+  MPEG & Forums x3 mpeg-forums-sc2261,mpeg-forums,mpeg-forums-sc2262
+sitemap total URLs: 2520

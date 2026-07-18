@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { formatAdminDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree, RefreshCw } from "lucide-react";
 import type { Resource } from "@shared/schema";
+
+// BUG-040 (run19): the detail dialog renders whatever string is stored in
+// resource.url — only make it clickable when it is a well-formed http(s)
+// URL with no embedded whitespace.
+function isSafeHttpUrl(raw: string | null | undefined): boolean {
+  if (!raw || /\s/.test(raw)) return false;
+  try {
+    const u = new URL(raw);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 type PendingResource = Resource & { submittedByEmail?: string | null };
 
@@ -143,13 +157,11 @@ export default function PendingResources() {
     return raw.filter((t): t is string => typeof t === "string" && t.trim().length > 0);
   };
 
+  // BUG-027 (run19): delegate to the shared site-wide formatter so resource
+  // pages, admin tables, and journeys all render dates identically.
   const formatDate = (date: Date | null) => {
     if (!date) return 'Unknown';
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return formatAdminDate(date);
   };
 
   if (isLoading) {
@@ -379,15 +391,30 @@ export default function PendingResources() {
               </div>
               <div>
                 <Label className="text-sm font-semibold">URL</Label>
-                <a
-                  href={selectedResource.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline flex items-center gap-1 mt-1"
-                >
-                  {selectedResource.url}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+                {/* BUG-040 (run19): only render a live link when the stored
+                    value is actually a well-formed http(s) URL — malformed
+                    submissions render as plain text instead of a dead/unsafe
+                    clickable anchor. */}
+                {isSafeHttpUrl(selectedResource.url) ? (
+                  <a
+                    href={selectedResource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline flex items-center gap-1 mt-1"
+                    data-testid="link-detail-url"
+                  >
+                    {selectedResource.url}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ) : (
+                  <p
+                    className="text-sm mt-1 break-all text-muted-foreground"
+                    data-testid="text-detail-url-invalid"
+                  >
+                    {selectedResource.url}
+                    <span className="ml-2 text-xs">(not a valid URL)</span>
+                  </p>
+                )}
               </div>
               <div>
                 <Label className="text-sm font-semibold">Description</Label>

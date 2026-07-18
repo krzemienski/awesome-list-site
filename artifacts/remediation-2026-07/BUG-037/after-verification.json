@@ -1,0 +1,16 @@
+{
+  "bug": "BUG-037",
+  "title": "100 descriptions are shorter than 30 characters",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "data-fix (dev applied, prod journaled)",
+  "fix": [
+    "scripts/run19-enrich-short-descs.ts: Claude (claude-sonnet-4-5 via AI integration) wrote real 1-2 sentence descriptions for all 73 approved resources with 0<len<30; journaled to descriptions.json",
+    "prod replay is deterministic (no fresh LLM call): scripts/run19-data-fixes-prod.ts fixShortDescriptions replays descriptions.json, guarded to rows still <30 chars"
+  ],
+  "evidence": {
+    "devSweep": "approved resources with 0 < length(description) < 30: 0",
+    "journal": "descriptions.json (73 entries)",
+    "prodScriptDevValidation": "evidence/run19/data-fixes-dev.json — description PUT write path 200, idempotent re-run noop"
+  }
+}

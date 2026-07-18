@@ -102,7 +102,10 @@ export function processAwesomeListData(data: unknown): AwesomeList {
     { name: "Encoding & Codecs", slug: "encoding-codecs" },
     { name: "General Tools", slug: "general-tools" },
     { name: "Infrastructure & Delivery", slug: "infrastructure-delivery" },
-    { name: "Introduction & Learning", slug: "intro-learning" },
+    // BUG-025 (run19): DB-canonical name is "Intro & Learning" — the old
+    // "Introduction & Learning" label here made the category page header
+    // disagree with the sidebar (which reads the server tree).
+    { name: "Intro & Learning", slug: "intro-learning" },
     { name: "Media Tools", slug: "media-tools" },
     { name: "Players & Clients", slug: "players-clients" },
     { name: "Protocols & Transport", slug: "protocols-transport" },
@@ -214,10 +217,11 @@ function mapToTopLevelCategory(categoryName: string): string {
     "Origin Servers": "Infrastructure & Delivery",
     "Storage Solutions": "Infrastructure & Delivery",
     
-    // Introduction & Learning - Total should be 229
-    "Introduction": "Introduction & Learning",
-    "Learning Resources": "Introduction & Learning",
-    "Tutorials & Case Studies": "Introduction & Learning",
+    // Intro & Learning - Total should be 229
+    "Introduction": "Intro & Learning",
+    "Learning Resources": "Intro & Learning",
+    "Tutorials & Case Studies": "Intro & Learning",
+    "Introduction & Learning": "Intro & Learning", // legacy long-form variant
     
     // Media Tools - Total should be 317
     "Ads & QoE": "Media Tools",

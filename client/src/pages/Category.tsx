@@ -549,8 +549,11 @@ export default function Category() {
       <div className="flex flex-col gap-4 min-w-0">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          {/* BUG-035 (run19): scope the in-page search explicitly — a bare
+              "Search resources..." box under the global ⌘K reads as site-wide. */}
           <Input
-            placeholder="Search resources..."
+            placeholder={`Search in ${categoryName}...`}
+            aria-label={`Search resources in ${categoryName}`}
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
             className="pl-10"

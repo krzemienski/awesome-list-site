@@ -60,6 +60,15 @@ export async function ensureSubSubcategoryExists(
   const existingBySlug = await categoryRepo.getSubSubcategoryBySlug(slug, subcategory.id);
   if (existingBySlug) return;
 
+  // BUG-003 (run19) recurrence guard: if a same-named (case-insensitive) or
+  // same-slug row exists ANYWHERE in the taxonomy, do NOT create another copy
+  // under this subcategory — that is exactly how the per-import duplicate
+  // groups (HLS x11, FFmpeg x10) were born. The tree builder folds a resource
+  // whose subSubcategory string has no node under its own subcategory into
+  // that subcategory node, so the resource stays visible and counted.
+  const globalDup = await categoryRepo.findSubSubcategoryDuplicateGlobal(trimmedSubSub, slug);
+  if (globalDup) return;
+
   try {
     await categoryRepo.createSubSubcategory({
       name: trimmedSubSub,

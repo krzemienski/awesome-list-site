@@ -1,0 +1,11 @@
+{
+  "bug": "BUG-031",
+  "title": "The same resource appears as steps 2 and 3 of a journey",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "fixed-prior (run18 NB-027 dedup) — verified clean this run",
+  "evidence": {
+    "dbSweep": "SELECT journey_id,resource_id FROM journey_steps WHERE resource_id IS NOT NULL GROUP BY journey_id,resource_id HAVING count(*)>1 -> 0 rows (all journeys)",
+    "prodFollowUp": "run18 prod script already handles duplicate-step dedup (NB-027); prod re-check after republish"
+  }
+}

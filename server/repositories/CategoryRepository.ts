@@ -34,7 +34,7 @@ import {
   type InsertSubSubcategory,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, sql, asc } from "drizzle-orm";
+import { eq, and, or, sql, asc } from "drizzle-orm";
 
 /**
  * Repository class for category hierarchy database operations
@@ -391,6 +391,27 @@ export class CategoryRepository {
       .from(subSubcategories)
       .where(and(eq(subSubcategories.slug, slug), eq(subSubcategories.subcategoryId, subcategoryId)));
     return subSubcategory;
+  }
+
+  /**
+   * BUG-003 (run19) recurrence guard: find any sub-subcategory row ANYWHERE in
+   * the taxonomy whose name matches case-insensitively OR whose slug matches.
+   * Duplicate same-named rows under different subcategories fragment the tree
+   * into per-import copies (HLS x11, FFmpeg x10 in the run19 audit), so every
+   * create path must treat a global match as "already exists".
+   */
+  async findSubSubcategoryDuplicateGlobal(name: string, slug: string): Promise<SubSubcategory | undefined> {
+    const [row] = await db
+      .select()
+      .from(subSubcategories)
+      .where(
+        or(
+          sql`lower(${subSubcategories.name}) = lower(${name})`,
+          eq(subSubcategories.slug, slug),
+        ),
+      )
+      .limit(1);
+    return row;
   }
 
   /**

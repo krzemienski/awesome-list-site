@@ -64,7 +64,7 @@ export interface NavigationIconMap {
 export const navigationIcons: NavigationIconMap = {
   // Main Categories (9 items)
   categories: {
-    "Introduction & Learning": BookOpen,
+    "Intro & Learning": BookOpen,
     "Protocols & Transport": Radio,
     "Encoding & Codecs": Film,
     "Players & Clients": Play,

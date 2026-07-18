@@ -1,0 +1,36 @@
+{
+  "bug": "BUG-018 no loading skeleton — blank dark page while data loads",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev",
+  "fixes": [
+    "client/index.html: inline boot-skeleton script after #root — paints animated skeleton ONLY if #root has no element children (defense-in-depth for any route without server-injected content)",
+    "fixed-prior: og-middleware injects styled SSR chrome/content into #root for every route (verified on /, /admin, /submit), so users see real content, not a blank page, before React mounts",
+    "fixed-prior: Home.tsx renders in-app <Skeleton> grid while the awesome-list query isLoading"
+  ],
+  "probes": {
+    "/admin": {
+      "sawSsrContentPreReact": true,
+      "rootEverEmpty": false,
+      "replacedByApp": true
+    },
+    "/submit": {
+      "sawSsrContentPreReact": true,
+      "rootEverEmpty": false,
+      "replacedByApp": true
+    }
+  },
+  "note": "boot skeleton never fires in practice because SSR injection covers all routes; it exists as a guard if a future route ships without bodyHtml",
+  "harness": "/tmp/playwright-test-run19-fcp.js via playwright-skill run.js",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "a1-results": {
+      "skeletonAtDomContentLoaded": {
+        "pulseCount": 25,
+        "bodyText": "Skip to main content\nAwesome Video\nLoading…\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nCategories\nAbout\nToggle Sidebar\nHome\nSearch resources...\n/\nSign in\n© 2026 Awesome Video · B"
+      },
+      "afterLoad": {
+        "cards": 0
+      }
+    }
+  }
+}

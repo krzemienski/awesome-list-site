@@ -1,0 +1,95 @@
+{
+  "passed": 12,
+  "total": 12,
+  "pageErrors": [],
+  "results": [
+    {
+      "name": "P0 home renders categories (1440)",
+      "pass": true,
+      "detail": {
+        "categoryLinks": 26
+      }
+    },
+    {
+      "name": "P0 category page lists resources (1440)",
+      "pass": true,
+      "detail": {
+        "resourceLinks": 24
+      }
+    },
+    {
+      "name": "P0 resource detail renders (1440)",
+      "pass": true,
+      "detail": {
+        "h1": "AMD Advanced Media Acceleration (AMA) SDK",
+        "visitControls": 1
+      }
+    },
+    {
+      "name": "P0 search returns results (1440)",
+      "pass": true,
+      "detail": {
+        "resultLinks": 48
+      }
+    },
+    {
+      "name": "P0 journeys page renders (1440)",
+      "pass": true,
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "name": "P0 login page renders (1440)",
+      "pass": true,
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "name": "P0 anon /admin redirects to login (1440)",
+      "pass": true,
+      "detail": {
+        "status": 302,
+        "location": "/login?next=%2Fadmin"
+      }
+    },
+    {
+      "name": "P0 sitemap + awesome-list API healthy",
+      "pass": true,
+      "detail": {
+        "sitemapUrls": 1966
+      }
+    },
+    {
+      "name": "P0 unknown route shows 404 (1440)",
+      "pass": true,
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "name": "P0 mobile home renders (375)",
+      "pass": true,
+      "detail": {
+        "categoryLinks": 9,
+        "noOverflow": true
+      }
+    },
+    {
+      "name": "P0 mobile resource detail (375)",
+      "pass": true,
+      "detail": {
+        "h1": "AMD Advanced Media Acceleration (AMA) SDK",
+        "noOverflow": true
+      }
+    },
+    {
+      "name": "P0 mobile search (375)",
+      "pass": true,
+      "detail": {
+        "resultLinks": 48
+      }
+    }
+  ]
+}

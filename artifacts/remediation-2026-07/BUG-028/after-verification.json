@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-07-18",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "a2-results": {
+      "Favorite": {
+        "toast": "Sign in to favorite | Create an account or sign in to save your favorite resources. | Sign in",
+        "modalOpen": false
+      },
+      "Bookmark": {
+        "toast": "Sign in to bookmark | Create an account or sign in to save resources to your bookmarks. | Sign in",
+        "modalOpen": false
+      },
+      "Suggest Edit": {
+        "toast": "Sign in to suggest edits | Create an account or sign in to propose changes to this resource. | Sign in",
+        "modalOpen": false
+      }
+    }
+  }
+}

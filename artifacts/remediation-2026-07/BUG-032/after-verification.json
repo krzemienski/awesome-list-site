@@ -1,0 +1,15 @@
+{
+  "bug": "BUG-032",
+  "title": "Journey resources mismatched/outdated (Audacity 2019; H.264 NAL unit parsing under 'protocols')",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "data-fix (dev applied, prod journaled)",
+  "fix": [
+    "journey 6 steps 4-15 re-curated to topic-matched resources: codecs (185124/185846/186041), protocols (185018/185033/185840), players (184757/185654/185985), formats (185346/185748/186417)",
+    "prod journaled in scripts/run19-data-fixes-prod.ts (fixJourney6Curation, guarded per stepNumber)"
+  ],
+  "evidence": {
+    "devSteps": "steps 4-6 = codec intros under 'Understanding Video Codecs'; 7-9 = protocol overviews under 'Streaming Protocols Overview'; 10-12 = players under 'Players and Playback Basics'; 13-15 = container/format resources under 'Video Formats and Containers' (SQL dump in transcript)",
+    "prodScriptDevValidation": "evidence/run19/data-fixes-dev.json — step PATCH write path 200, idempotent re-run noop"
+  }
+}

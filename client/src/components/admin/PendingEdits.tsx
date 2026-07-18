@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -133,15 +134,8 @@ export default function PendingEdits() {
     return currentTime > originalTime;
   };
 
-  const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // BUG-027 (run19): shared site-wide date+time style from lib/utils.
+  const formatDate = (dateString: string | Date) => formatAdminDateTime(dateString);
 
   const renderDiff = (changes: Record<string, { old: string | number | null; new: string | number | null }>) => {
     return Object.entries(changes).map(([field, { old: oldValue, new: newValue }]) => (
@@ -234,7 +228,10 @@ export default function PendingEdits() {
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[600px]">
+          {/* BUG-030 (run19): fixed h-[600px] left a huge empty framed region
+              under the table when only a few edits are pending. max-h clamps
+              tall lists to 600px (scrollable) but lets short lists shrink. */}
+          <ScrollArea className="max-h-[600px]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -301,9 +298,13 @@ export default function PendingEdits() {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
+                        {/* Run19 BUG-014: affirmative green, matching the
+                            Approvals tab — the theme's primary is red-toned,
+                            so variant="default" read as destructive. */}
                         <Button
                           variant="default"
                           size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => handleApproveClick(edit)}
                           disabled={approveMutation.isPending}
                           data-testid={`button-approve-edit-${edit.id}`}

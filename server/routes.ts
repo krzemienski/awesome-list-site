@@ -463,7 +463,7 @@ function getCategoryTitleFromSlug(slug: string): string {
     'encoding-codecs': 'Encoding & Codecs',
     'general-tools': 'General Tools',
     'infrastructure-delivery': 'Infrastructure & Delivery',
-    'intro-learning': 'Introduction & Learning',
+    'intro-learning': 'Intro & Learning', // BUG-025: match DB-canonical name
     'media-tools': 'Media Tools',
     'players-clients': 'Players & Clients',
     'protocols-transport': 'Protocols & Transport',
@@ -702,7 +702,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const hashed = await hashPassword(password);
-      const created = await userRepo.upsertUser({ email, password: hashed, role: "user" });
+      // BUG-009 (run19): the register UI promises "your display name starts as
+      // the part before the @" (Run17 BUG-040 hint) but nothing ever stored it,
+      // so every local account had name NULL and the admin Users table showed
+      // an unidentifiable wall of "—". Derive it here so the promise is true.
+      const derivedFirstName = email.split("@")[0].slice(0, 100);
+      const created = await userRepo.upsertUser({ email, password: hashed, role: "user", firstName: derivedFirstName });
 
       // Run16 BUG-042: record account creation in the audit trail.
       auditRepo.logResourceAudit(null, 'auth.register', created.id, { email: created.email }, 'Local account created')
@@ -1450,6 +1455,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Run19 BUG-013: exact duplicate titles pollute the catalog (the audit
+      // found pairs like "Plyr" twice). Block them at submit with a clear
+      // message — the existing entry should be edited instead.
+      const existingTitle = await resourceRepo.getLiveResourceByTitle(submitValidation.data.title);
+      if (existingTitle) {
+        return res.status(409).json({
+          error: 'duplicate_title',
+          message: 'A resource with this exact title is already in the catalog. Pick a more specific title (e.g. add the platform or format) or suggest an edit to the existing entry.'
+        });
+      }
+
       const resourceData = insertResourceSchema.parse(req.body);
 
       await ensureSubSubcategoryExists(
@@ -1654,7 +1670,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         claudeMetadata: aiMetadata,
         claudeAnalyzedAt: aiMetadata ? new Date() : undefined,
       });
-      
+
+      // Run19 BUG-015: the "AI Analysis" column in the admin Edits queue was
+      // permanently "No AI" because nothing ever ran analysis for suggested
+      // edits. Kick it off in the background (never blocks the 201 response;
+      // failures just leave the column honest about having no analysis).
+      if (!aiMetadata && resource.url) {
+        claudeService
+          .analyzeURL(resource.url)
+          .then((analysis) => {
+            if (analysis) {
+              // analyzeURL's return shape matches the claudeMetadata column
+              // type (suggestedTitle/suggestedDescription/…/keyTopics).
+              return auditRepo.updateResourceEditAnalysis(edit.id, analysis);
+            }
+          })
+          .catch((error) => {
+            console.error(`Background Claude analysis for edit ${edit.id} failed:`, error);
+          });
+      }
+
       res.status(201).json(edit);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -2776,6 +2811,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT /api/admin/users/:id/role - Change user role
+  // PATCH /api/admin/users/:id/name — admin-set display name (BUG-009 run19).
+  // Exists primarily so the prod data-fix script can backfill names for
+  // accounts registered before names were derived at signup (prod DB is not
+  // agent-writable; all prod data fixes go through the live admin API).
+  app.patch('/api/admin/users/:id/name', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { firstName, lastName } = req.body ?? {};
+      const clean = (v: unknown): string | null | undefined => {
+        if (v === undefined) return undefined;
+        if (v === null) return null;
+        if (typeof v !== 'string') return undefined;
+        const t = v.trim().slice(0, 100);
+        return t.length > 0 ? t : null;
+      };
+      const first = clean(firstName);
+      const last = clean(lastName);
+      if (first === undefined && last === undefined) {
+        return res.status(400).json({ message: 'firstName or lastName (string or null) is required' });
+      }
+      const existing = await userRepo.getUser(req.params.id);
+      if (!existing) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const updated = await userRepo.updateUserProfile(req.params.id, {
+        ...(first !== undefined ? { firstName: first } : {}),
+        ...(last !== undefined ? { lastName: last } : {}),
+      });
+      const { password: _pw, ...rest } = updated;
+      res.json(rest);
+    } catch (error) {
+      console.error('Error updating user name:', error);
+      res.status(500).json({ message: 'Failed to update user name' });
+    }
+  });
+
   app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const userId = req.params.id;
@@ -3725,6 +3795,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const subcategory = await categoryRepo.getSubcategory(subcategoryId);
       if (!subcategory) {
         return res.status(404).json({ message: 'Parent subcategory not found' });
+      }
+      
+      // BUG-003 (run19): block creating a duplicate-name/slug row under a
+      // different parent — per-import copies fragment the taxonomy (HLS x11).
+      const globalDup = await categoryRepo.findSubSubcategoryDuplicateGlobal(
+        validationResult.data.name,
+        validationResult.data.slug,
+      );
+      if (globalDup) {
+        return res.status(409).json({
+          message: `A sub-subcategory named "${globalDup.name}" (slug "${globalDup.slug}") already exists (id ${globalDup.id}). Duplicate sub-subcategories fragment the taxonomy — reuse the existing one or rename it instead.`,
+        });
       }
       
       const newSubSubcategory = await categoryRepo.createSubSubcategory(validationResult.data);

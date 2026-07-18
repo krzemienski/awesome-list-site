@@ -1,0 +1,22 @@
+{
+  "bug": "BUG-013",
+  "title": "19 exact duplicate resource titles in the catalog",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "fixed (code) + data-fix (dev applied, prod journaled)",
+  "fix": [
+    "submit pipeline now rejects exact duplicate titles (case-insensitive, live statuses) with 409 duplicate_title and an actionable message; duplicate-URL 409 unchanged",
+    "scripts/run19-retitle-dup-titles.ts retitles existing duplicates via the live admin API: keeper = most-official host, others get a host disambiguator e.g. 'Plyr (GitHub)'; dynamic per-environment, idempotent",
+    "retitle chosen over delete: hard-deleting dup rows silently cascades journey steps/bookmarks (run15 lesson)"
+  ],
+  "evidence": {
+    "devDataFix": "12 duplicate-title groups found and retitled (dev; audit saw 19 on then-stale prod); second run: 0 groups; DB check: 0 duplicate approved titles",
+    "submitProbes": {
+      "duplicateTitleNewUrl": "409 duplicate_title",
+      "caseInsensitive_pLyR": "409",
+      "duplicateUrl": "409 duplicate_url (unchanged)",
+      "uniqueTitleAndUrl": "201 (probe resource deleted after)"
+    }
+  },
+  "prodFollowUp": "run scripts/run19-retitle-dup-titles.ts against prod after republish (recomputes prod's own duplicate set)"
+}

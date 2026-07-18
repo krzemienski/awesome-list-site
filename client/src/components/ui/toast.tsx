@@ -16,7 +16,10 @@ const ToastViewport = React.forwardRef<
     className={cn(
       // NB-053 (run18): stack toasts from the bottom on ALL viewports so mobile
       // toasts no longer cover the header/nav (previously `top-0` on mobile).
-      "fixed bottom-0 top-auto z-[100] flex max-h-screen w-full flex-col p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      // BUG-026 (run19): while the cookie-consent banner is visible it sets
+      // --consent-banner-h on <html>; offset the toast viewport above it so
+      // toasts never occlude the banner's Accept/Decline buttons.
+      "fixed bottom-[var(--consent-banner-h,0px)] top-auto z-[100] flex max-h-screen w-full flex-col p-4 sm:bottom-[var(--consent-banner-h,0px)] sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
       className
     )}
     {...props}

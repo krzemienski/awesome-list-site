@@ -1,0 +1,33 @@
+{
+  "verifiedAt": "2026-07-18",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "a2-results": {
+      "themeCrumb": "Home > Settings > Theme",
+      "settingsCrumbIsLink": true,
+      "afterSettingsClick": {
+        "url": "/login?next=%2Fsettings",
+        "h1": "Sign in to Awesome Video",
+        "body": "Skip to main content\nAwesome Video\n1,822 resources\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nCategories\nCommunity & Events\n80\nCommunity Groups\n40\nOnline Forums\n1\nEvents & Conferences\n40\nPodcasts & Webinars\n1\nEncoding & Codecs\n3"
+      }
+    },
+    "a3-results": {
+      "anonStatus": 200,
+      "settingsProbe": {
+        "url": "/settings",
+        "h1": "Settings",
+        "hubLinks": [
+          "link-settings-theme",
+          "link-settings-account",
+          "link-settings-security",
+          "link-settings-bookmarks",
+          "link-settings-recommendations"
+        ]
+      },
+      "crumbClick": {
+        "url": "/settings",
+        "h1": null
+      }
+    }
+  }
+}

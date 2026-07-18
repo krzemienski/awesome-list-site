@@ -145,6 +145,11 @@ function SubItem({
         <span
           className="font-mono shrink-0 tabular-nums"
           style={{ fontSize: 10, color: "var(--text-3)" }}
+          // BUG-049 (run19): bare numbers were ambiguous next to the labeled
+          // "N resources" header — give every count an explicit unit for
+          // assistive tech and a hover title for sighted users.
+          title={`${formatCount(count)} ${count === 1 ? "resource" : "resources"}`}
+          aria-label={`${formatCount(count)} ${count === 1 ? "resource" : "resources"}`}
         >
           {formatCount(count)}
         </span>
@@ -282,6 +287,10 @@ function CategoryAccordion({
           <span
             className="font-mono tabular-nums"
             style={{ fontSize: 10, color: "var(--text-3)" }}
+            // BUG-049 (run19): unit-label the category badge like the header's
+            // "N resources" so the bare number is unambiguous.
+            title={`${formatCount(totalCount)} ${totalCount === 1 ? "resource" : "resources"}`}
+            aria-label={`${formatCount(totalCount)} ${totalCount === 1 ? "resource" : "resources"}`}
           >
             {formatCount(totalCount)}
           </span>

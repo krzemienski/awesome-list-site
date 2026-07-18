@@ -1,0 +1,19 @@
+{
+  "startedAt": "2026-07-18T09:53:51.785Z",
+  "base": "http://localhost:5000",
+  "groups": [],
+  "errors": [],
+  "before": {
+    "totalSubSubcats": 26,
+    "dupGroupCount": 0,
+    "totalResources": 1822
+  },
+  "after": {
+    "totalSubSubcats": 26,
+    "dupGroupCount": 0,
+    "dupGroups": [],
+    "totalResources": 1822
+  },
+  "finishedAt": "2026-07-18T09:53:52.559Z",
+  "pass": true
+}

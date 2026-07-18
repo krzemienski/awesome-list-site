@@ -1,0 +1,17 @@
+{
+  "verifiedAt": "2026-07-18",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "a2-results": {
+      "paginationButtons": [
+        "Previous",
+        "Next"
+      ],
+      "totalText": "Showing 1–24 of 335 resources"
+    },
+    "a3-results": {
+      "paginationControls": "Previous | Page 1 of 14 | Next",
+      "showingLine": "Showing 1–24 of 335 resources"
+    }
+  }
+}

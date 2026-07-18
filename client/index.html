@@ -69,6 +69,20 @@
     </script>
 
     <script>
+      // BUG-001 (run19): kick off the awesome-list fetch before the JS bundle
+      // is even parsed. fetchStaticAwesomeList() consumes this promise (one
+      // shot) so warm loads don't serialize bundle-parse -> fetch. The catch
+      // only silences unhandled-rejection noise; consumers handle errors.
+      (function () {
+        try {
+          var p = fetch('/api/awesome-list', { credentials: 'same-origin' });
+          window.__awesomeListEarlyFetch = p;
+          p.catch(function () {});
+        } catch (e) {}
+      })();
+    </script>
+
+    <script>
       (function () {
         try {
           var isDev = location.hostname.endsWith('.replit.dev') ||
@@ -159,6 +173,28 @@
       </div>
     </noscript>
     <div id="root"><!--app-html--></div>
+    <script>
+      // BUG-018 (run19): routes without server-injected content (admin,
+      // noindex pages) used to show a blank black page until React mounted.
+      // Paint a minimal skeleton ONLY when #root is empty — injected SSR
+      // content (most public routes) already gives instant real content.
+      // React's createRoot().render() replaces this on mount.
+      (function () {
+        try {
+          var root = document.getElementById('root');
+          if (!root || root.firstElementChild) return;
+          root.innerHTML =
+            '<div aria-hidden="true" style="min-height:100vh;background:#000;padding:40px 20px;max-width:960px;margin:0 auto">' +
+            '<style>@keyframes bsk{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}.bsk{background:#1a1a22;animation:bsk 1.4s ease-in-out infinite}</style>' +
+            '<div class="bsk" style="height:2rem;width:60%;max-width:420px;margin-bottom:1rem"></div>' +
+            '<div class="bsk" style="height:1rem;width:80%;max-width:640px;margin-bottom:2rem"></div>' +
+            '<div class="bsk" style="height:8rem;width:100%;margin-bottom:1rem"></div>' +
+            '<div class="bsk" style="height:8rem;width:100%;margin-bottom:1rem"></div>' +
+            '<div class="bsk" style="height:8rem;width:100%"></div>' +
+            '</div>';
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       // The Replit dev banner is a development-only convenience. Inject it only

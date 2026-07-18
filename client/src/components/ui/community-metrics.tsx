@@ -285,14 +285,24 @@ export default function CommunityMetrics({ resources, categories, className }: C
                 <CardHeader>
                   <CardTitle className="text-lg">Recent Activity</CardTitle>
                   {/* run9 BUG-016: engagement is tracked locally per browser —
-                      say so instead of presenting 0/0/0% as broken site data. */}
+                      say so instead of presenting 0/0/0% as broken site data.
+                      BUG-045 (run19): the action is called "Favorite" on
+                      resource pages — use the same word here, not "likes". */}
                   <CardDescription>
-                    Views and likes are tracked in this browser only — counts build as you explore resources.
+                    Views and favorites are tracked in this browser only — counts build as you explore resources.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* BUG-041 (run19): never rank a 0%-engagement row "#1" — only
+                      resources with real local activity get a rank; with none,
+                      show an honest empty state instead of a fake leaderboard. */}
+                  {metrics.popularResources.filter((r) => r.score > 0).length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-4" data-testid="text-no-engagement">
+                      No local activity yet — the leaderboard fills in as you view and open resources in this browser.
+                    </p>
+                  ) : (
                   <div className="space-y-3">
-                    {metrics.popularResources.slice(0, 5).map((resource, index) => (
+                    {metrics.popularResources.filter((r) => r.score > 0).slice(0, 5).map((resource, index) => (
                       <div key={resource.resourceId} className="flex items-center justify-between p-3 border">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-2">
@@ -343,6 +353,7 @@ export default function CommunityMetrics({ resources, categories, className }: C
                       </div>
                     ))}
                   </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

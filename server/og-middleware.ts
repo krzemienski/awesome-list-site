@@ -1435,6 +1435,27 @@ export function ogInjectionMiddleware() {
       );
     }
 
+    // BUG-003 (run19): legacy per-import duplicate slugs (`hls-sc2241`,
+    // `ffmpeg-sc2226`, …) were consolidated into their canonical bare slugs.
+    // 301 any suffixed URL whose node no longer exists to the bare slug —
+    // but only when the bare-slug node is real, so unknown suffixed slugs
+    // still fall through to the soft-404.
+    const scSuffixSubSub = urlPath.match(/^\/sub-subcategory\/([^\/]+)$/);
+    if (scSuffixSubSub) {
+      const rawSlug = safeDecode(scSuffixSubSub[1]);
+      const bare = rawSlug.match(/^(.+)-sc\d+$/);
+      if (bare) {
+        try {
+          const tree = await getTreeCached();
+          if (!findSubSubcategory(tree, rawSlug) && findSubSubcategory(tree, bare[1])) {
+            return res.redirect(301, `/sub-subcategory/${encodeURIComponent(bare[1])}`);
+          }
+        } catch {
+          // tree lookup failed — fall through to the resolver's fail-open path
+        }
+      }
+    }
+
     let meta: RouteMeta;
     let notFound = false;
     let bodyHtml: string | undefined;

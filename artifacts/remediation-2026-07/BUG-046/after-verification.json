@@ -1,0 +1,11 @@
+{
+  "verifiedAt": "2026-07-18",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "c1-results": {
+      "saysHealthy": false,
+      "failedBadge": "31 failed",
+      "failureAlert": "31 of 38 recent sync jobs failed |  | Latest error: Orphaned by server restart |  | Next steps: if errors mention credentials or tokens, reconnect the GitHub connection. \"Timeout exceeded when trying to conne"
+    }
+  }
+}

@@ -68,3 +68,28 @@ export function humanizeApiError(error: unknown, fallback = "Something went wron
 
   return STATUS_FALLBACKS[status] ?? fallback;
 }
+
+/**
+ * BUG-005 (run19): extract the server's structured per-field validation
+ * messages from an ApiError so forms can render them at the offending fields
+ * instead of discarding them behind a generic toast. Returns null when the
+ * error carries no usable `fieldErrors` object (non-400, non-JSON, etc.).
+ */
+export function extractFieldErrors(error: unknown): Record<string, string> | null {
+  const raw = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  const match = raw.match(/^(\d{3}):\s*([\s\S]*)$/);
+  if (!match) return null;
+  const body = match[2].trim();
+  if (!body.startsWith("{")) return null;
+  try {
+    const parsed = JSON.parse(body) as { fieldErrors?: unknown };
+    if (!parsed.fieldErrors || typeof parsed.fieldErrors !== "object") return null;
+    const out: Record<string, string> = {};
+    for (const [key, value] of Object.entries(parsed.fieldErrors as Record<string, unknown>)) {
+      if (typeof value === "string" && value) out[key] = value;
+    }
+    return Object.keys(out).length > 0 ? out : null;
+  } catch {
+    return null;
+  }
+}

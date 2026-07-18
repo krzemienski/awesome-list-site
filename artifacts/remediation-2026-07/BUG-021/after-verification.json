@@ -1,0 +1,11 @@
+{
+  "bug": "BUG-021",
+  "title": "/admin serves its 'Access Denied' page with HTTP 200 (soft-403)",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "fixed-prior (server/index.ts anon-admin guard) — verified this run",
+  "evidence": {
+    "curl": "GET /admin (anon) -> HTTP/1.1 302 Found, Location: /login?next=%2Fadmin (admin-anon-headers.txt)",
+    "authedNonAdmin": "client AdminGuard renders access-denied for signed-in non-admins; anonymous users never receive a 200 admin shell"
+  }
+}

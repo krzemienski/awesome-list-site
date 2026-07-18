@@ -1,0 +1,39 @@
+{
+  "verifiedAt": "2026-07-18",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "b1-results": {
+      "actionButtons": [
+        {
+          "label": "Favorite",
+          "aria": "Add to favorites",
+          "w": 120,
+          "h": 44,
+          "inViewportX": true
+        },
+        {
+          "label": "Bookmark",
+          "aria": "Add bookmark",
+          "w": 134,
+          "h": 44,
+          "inViewportX": true
+        },
+        {
+          "label": "Share",
+          "aria": "Share this resource",
+          "w": 105,
+          "h": 44,
+          "inViewportX": true
+        },
+        {
+          "label": "Suggest Edit",
+          "aria": "Suggest an edit",
+          "w": 151,
+          "h": 44,
+          "inViewportX": true
+        }
+      ],
+      "horizontalOverflow": false
+    }
+  }
+}

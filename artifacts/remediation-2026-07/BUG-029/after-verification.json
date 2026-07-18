@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-07-18",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "a1-results": {
+      "breadcrumb": "Home > This Page Does Not Exist Xyz",
+      "h1": "Page Not Found"
+    },
+    "a1b-results": {
+      "unknownRouteCrumb": "Home > Not found",
+      "unknownTaxonomyCrumb": "Home > Category > Not found"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "login": {
+    "status": 200
+  },
+  "BUG-047": {
+    "approvalsBadge": "Approvals 1",
+    "statsRefetchOnFocus": 0
+  },
+  "BUG-040": {
+    "probeVisible": true,
+    "viewButton": "not found"
+  },
+  "BUG-027": {
+    "adminApprovalsTab": {
+      "mediumDates": [
+        "Jul 18, 2026"
+      ],
+      "slashDates": [],
+      "isoDates": []
+    }
+  },
+  "BUG-030": {
+    "emptyBorderedPanels": 0,
+    "emptySizes": []
+  },
+  "BUG-024": {
+    "found": false
+  },
+  "BUG-046": {
+    "saysHealthy": false,
+    "failedBadge": "31 failed",
+    "failureAlert": "31 of 38 recent sync jobs failed |  | Latest error: Orphaned by server restart |  | Next steps: if errors mention credentials or tokens, reconnect the GitHub connection. \"Timeout exceeded when trying to conne"
+  }
+}

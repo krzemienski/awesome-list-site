@@ -1,0 +1,81 @@
+{
+  "BUG-018": {
+    "skeletonAtDomContentLoaded": {
+      "pulseCount": 25,
+      "bodyText": "Skip to main content\nAwesome Video\nLoading…\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nCategories\nAbout\nToggle Sidebar\nHome\nSearch resources...\n/\nSign in\n© 2026 Awesome Video · B"
+    },
+    "afterLoad": {
+      "cards": 0
+    }
+  },
+  "BUG-049": {
+    "labeledCountSamples": [
+      {
+        "text": "80",
+        "aria": "80 resources",
+        "title": "80 resources"
+      },
+      {
+        "text": "40",
+        "aria": "40 resources",
+        "title": "40 resources"
+      },
+      {
+        "text": "1",
+        "aria": "1 resources",
+        "title": "1 resources"
+      },
+      {
+        "text": "40",
+        "aria": "40 resources",
+        "title": "40 resources"
+      },
+      {
+        "text": "1",
+        "aria": "1 resources",
+        "title": "1 resources"
+      },
+      {
+        "text": "335",
+        "aria": "335 resources",
+        "title": "335 resources"
+      },
+      {
+        "text": "2",
+        "aria": "2 resources",
+        "title": "2 resources"
+      },
+      {
+        "text": "9",
+        "aria": "9 resources",
+        "title": "9 resources"
+      }
+    ],
+    "count": 8
+  },
+  "BUG-023": {
+    "ctrlOrMetaK": true,
+    "slash": true
+  },
+  "BUG-019": {
+    "uiText": "// SEARCH\nFind resources\n\nFind video development resources in the awesome list.\n\nView all results for “<script>alert(1)</script>”\nNo results found\n\nTry different keywords or check the spelling\n\nESC\nTO CLOSE\nCancel\nClose",
+    "http403Responses": []
+  },
+  "BUG-020": {
+    "apiCallsDuringSearch": [
+      "/api/resources?search=%3Cscript%3Ealert(1)%3C%2Fscript%3E&limit=1000"
+    ],
+    "allApiDuringSearch": [
+      "/api/resources?search=%3Cscript%3Ealert(1)%3C%2Fscript%3E&limit=1000"
+    ]
+  },
+  "BUG-029": {
+    "breadcrumb": "Home > This Page Does Not Exist Xyz",
+    "h1": "Page Not Found"
+  },
+  "BUG-017": {
+    "mentionsStaticGeneration": false,
+    "mentionsSpa": true,
+    "excerpt": "The awesome-video list has become one of the most referenced open-source collections in the space, with more than 1,800 stars on GitHub. Every resource on this site is drawn from and kept in sync with that repositor"
+  }
+}

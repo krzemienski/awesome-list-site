@@ -51,9 +51,16 @@ export const subSubcategoryConfig: GenericCrudManagerProps<SubSubcategoryWithCou
     {
       key: "category",
       label: "Parent Category",
+      // BUG-006 (run19): while the parent lists are still loading (or their
+      // fetch failed — surfaced by the manager's error banner) render a
+      // neutral "—" instead of the alarming-and-wrong "Unknown" on every row.
+      // "Unknown" is reserved for a genuinely dangling parent id.
       render: (item: SubSubcategoryWithCount, parentData) => {
-        const subcategory = parentData?.subcategoryId?.find((s: any) => s.id === item.subcategoryId);
-        const category = parentData?.categoryId?.find((c: BaseEntityWithCount) => c.id === subcategory?.categoryId);
+        const subs = parentData?.subcategoryId;
+        const cats = parentData?.categoryId;
+        if (!subs?.length || !cats?.length) return '—';
+        const subcategory = subs.find((s: BaseEntityWithCount & { categoryId?: number }) => s.id === item.subcategoryId);
+        const category = cats.find((c: BaseEntityWithCount) => c.id === (subcategory as { categoryId?: number } | undefined)?.categoryId);
         return category?.name || 'Unknown';
       }
     },
@@ -61,7 +68,9 @@ export const subSubcategoryConfig: GenericCrudManagerProps<SubSubcategoryWithCou
       key: "subcategory",
       label: "Parent Subcategory",
       render: (item: SubSubcategoryWithCount, parentData) => {
-        const subcategory = parentData?.subcategoryId?.find((s: BaseEntityWithCount) => s.id === item.subcategoryId);
+        const subs = parentData?.subcategoryId;
+        if (!subs?.length) return '—';
+        const subcategory = subs.find((s: BaseEntityWithCount) => s.id === item.subcategoryId);
         return subcategory?.name || 'Unknown';
       }
     },

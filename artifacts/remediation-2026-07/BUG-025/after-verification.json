@@ -1,0 +1,17 @@
+{
+  "bug": "BUG-025",
+  "title": "Same category named 'Introduction & Learning' in one place, 'Intro & Learning' in another",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "fixed (code) + data-fix (dev applied, prod journaled)",
+  "fix": [
+    "canonical name is the DB value 'Intro & Learning' everywhere: parser.ts topLevelCategories + legacy mapping, Home.tsx icon key, navigation-icons.ts, ai-recommendations-panel AVAILABLE_CATEGORIES, server/routes.ts slug map, shared/categoryMapping.ts (both variants map to 'Intro & Learning'), claudeService.ts category list",
+    "dev DB: learning_journeys.category 'Introduction & Learning' -> 'Intro & Learning' (journey 6)",
+    "prod journaled in scripts/run19-data-fixes-prod.ts (fixJourneyCategoryNames)"
+  ],
+  "evidence": {
+    "apiTree": "GET /api/awesome-list categories contain 'Intro & Learning' only (no 'Introduction & Learning')",
+    "journeysApi": "journey 6 category now 'Intro & Learning'",
+    "prodScriptDevValidation": "evidence/run19/data-fixes-dev.json — BUG-025 write path 200, idempotent re-run noop"
+  }
+}

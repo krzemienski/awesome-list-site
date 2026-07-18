@@ -1,0 +1,33 @@
+resources in tree: 2302
+dup title groups: 19
+   "FFmpeg" 185810,185214
+   "CDN Transcode Sample" 186122,185440
+   "Transcoder" 186202,184772
+   "Av1an" 188241,186237
+   "PeerTube" 188329,186347
+   "OpenQoE" 188209,187975
+   "Ant Media Server" 185602,184871
+   "CasparCG" 186617,186511
+   "Janus WebRTC Server" 186351,186562
+   "Ad Insertion Sample" 186121,185391
+   "Web Video Text Tracks Format (WebVTT)" 186366,185938
+   "OpenColorIO" 187993,186540
+   "Natron" 187992,186344
+   "MediaInfo" 186215,185036
+   "mpv.net" 188262,186598
+   "ExoPlayer" 186578,185898
+   "DPlayer" 185599,184759
+   "Plyr" 185709,184812
+   "Opencast" 186629,186582
+desc strings repeated >=5x: 0
+descriptions <30 chars: 139
+   186185 "Video Transcoder" "AWS S3 + Lambda + Transcode. "
+   185752 "A Large-Scale Comparison of x264, x265, and libvpx" ""
+   185827 "Bento4 | Fast, Modern Tools and C++ Class Library for all your MP4 and DASH media format needs" ""
+   186123 "Openfaas Transcode" "OpenFaaS transcode pipeline. "
+   186243 "Shaka Packager – opensource.google" "Learn about all our projects."
+   185622 "Avtk" ""
+   185623 "FFmpeg Python (kkroening)" ""
+   185624 "Ffmpy" ""
+   185631 "Flowblade" ""
+   185633 "Lossless Cut" ""

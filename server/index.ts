@@ -135,19 +135,18 @@ app.use((req, res, next) => {
   const protectedPatterns = [
     /^\/admin(\/|$)/,
     /^\/bookmarks(\/|$)/,
-    /^\/settings(\/|$)/,
+    // BUG-022 (run19): /settings is a links-only hub (no account data) while
+    // its child /settings/theme was already public — a gated parent with a
+    // public child turned the Theme page's "Settings" breadcrumb into a
+    // one-click login wall. The whole /settings tree is public now; the
+    // account-specific destinations it links to (/profile, /bookmarks) keep
+    // their own gates.
     // BUG-017: /profile is a per-user page (same trust level as /bookmarks);
     // gate it server-side so anonymous deep links get 302 → /login instead of
     // the SPA shell.
     /^\/profile(\/|$)/,
   ];
-  // July 2026 audit BUG-002: /settings/theme is a public, localStorage-only
-  // appearance page (no account data) — exempt it so anonymous visitors can
-  // change the theme instead of hitting a login wall.
-  const publicExceptions = [/^\/settings\/theme(\/|$)/];
-  const isProtected =
-    protectedPatterns.some(p => p.test(req.path)) &&
-    !publicExceptions.some(p => p.test(req.path));
+  const isProtected = protectedPatterns.some(p => p.test(req.path));
   if (isProtected && !req.headers.cookie?.includes('connect.sid')) {
     // BUG-008 (run14): carry the originally requested page in ?next= so the
     // login page can return the user there after sign-in (Login already

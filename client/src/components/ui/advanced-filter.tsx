@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { SlidersHorizontal, X, ChevronDown, Search } from "lucide-react";
 
 interface AdvancedFilterProps {
   selectedTags: string[];
@@ -32,6 +33,19 @@ export default function AdvancedFilter({
 }: AdvancedFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(true);
+  // BUG-012 (run19): the popover hard-capped the list at the first 20 tags
+  // alphabetically with no way to reach the rest (1,700+ unreachable). A
+  // type-to-filter box narrows the full list; rendering is capped for DOM
+  // sanity with an explicit "refine to see more" hint instead of a silent cut.
+  const [tagQuery, setTagQuery] = useState("");
+  const TAG_RENDER_CAP = 100;
+  const matchingTags = useMemo(() => {
+    const q = tagQuery.trim().toLowerCase();
+    if (!q) return availableTags;
+    return availableTags.filter(({ tag }) => tag.toLowerCase().includes(q));
+  }, [availableTags, tagQuery]);
+  const visibleTags = matchingTags.slice(0, TAG_RENDER_CAP);
+  const hiddenCount = matchingTags.length - visibleTags.length;
 
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
@@ -115,8 +129,24 @@ export default function AdvancedFilter({
                   />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="px-4 pb-4">
-                  <div className="space-y-1 pt-1">
-                    {availableTags.slice(0, 20).map(({ tag, count }) => (
+                  <div className="relative pt-1 pb-2">
+                    <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 mt-[-1px] text-muted-foreground pointer-events-none" />
+                    <Input
+                      value={tagQuery}
+                      onChange={(e) => setTagQuery(e.target.value)}
+                      placeholder={`Search ${availableTags.length.toLocaleString()} tags…`}
+                      className="h-9 pl-8 text-sm"
+                      aria-label="Search tags"
+                      data-testid="input-tag-search"
+                    />
+                  </div>
+                  {matchingTags.length === 0 && (
+                    <p className="p-2 text-sm text-muted-foreground" data-testid="text-no-matching-tags">
+                      No tags match “{tagQuery.trim()}”
+                    </p>
+                  )}
+                  <div className="space-y-1">
+                    {visibleTags.map(({ tag, count }) => (
                       <div
                         key={tag}
                         className="flex items-center space-x-2 p-2 hover:bg-accent cursor-pointer rounded-sm min-h-[44px]"
@@ -136,6 +166,11 @@ export default function AdvancedFilter({
                       </div>
                     ))}
                   </div>
+                  {hiddenCount > 0 && (
+                    <p className="p-2 text-xs text-muted-foreground" data-testid="text-more-tags-hint">
+                      +{hiddenCount.toLocaleString()} more tag{hiddenCount === 1 ? "" : "s"} — refine your search to see them
+                    </p>
+                  )}
                 </CollapsibleContent>
               </Collapsible>
             </div>

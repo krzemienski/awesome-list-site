@@ -74,12 +74,17 @@ export default function Search() {
     // Run15: server-side pagination — fetch one 24-row page instead of a
     // 1000-row payload sliced client-side. Page is part of the cache key.
     queryKey: ["/api/resources", "search", trimmed, page],
+    // BUG-011 (run19): with an empty query the page is a paginated browse of
+    // the full approved catalog (the "Browse All Resources" destination), so
+    // omit the search param instead of gating the fetch behind 2+ characters.
     queryFn: async () =>
       apiRequest(
-        `/api/resources?search=${encodeURIComponent(trimmed)}&page=${page}&limit=${PAGE_SIZE}`,
+        trimmed.length === 0
+          ? `/api/resources?page=${page}&limit=${PAGE_SIZE}`
+          : `/api/resources?search=${encodeURIComponent(trimmed)}&page=${page}&limit=${PAGE_SIZE}`,
         { method: "GET" },
       ),
-    enabled: trimmed.length >= 2,
+    enabled: trimmed.length === 0 || trimmed.length >= 2,
     staleTime: 60 * 1000,
     // Keep the previous page's rows on screen while the next page loads.
     placeholderData: (prev) => prev,
@@ -176,13 +181,13 @@ export default function Search() {
         />
       </div>
 
-      {trimmed.length < 2 ? (
+      {trimmed.length === 1 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
             <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
               <SearchIcon className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h2 className="text-sm font-semibold">Start typing to search</h2>
+            <h2 className="text-sm font-semibold">Keep typing to search</h2>
             <p className="text-xs text-muted-foreground">Type at least 2 characters</p>
           </CardContent>
         </Card>
@@ -221,12 +226,12 @@ export default function Search() {
                 indicator states position + range, not just a total. */}
             {totalPages > 1 ? (
               <>
-                Page {safePage} of {totalPages} · showing {rangeStart}–{rangeEnd} of {total} result
-                {total === 1 ? "" : "s"} for “{trimmed}”
+                Page {safePage} of {totalPages} · showing {rangeStart}–{rangeEnd} of {total}{" "}
+                {trimmed.length === 0 ? "resources" : <>result{total === 1 ? "" : "s"} for “{trimmed}”</>}
               </>
             ) : (
               <>
-                {total} result{total === 1 ? "" : "s"} for “{trimmed}”
+                {total} {trimmed.length === 0 ? "resources" : <>result{total === 1 ? "" : "s"} for “{trimmed}”</>}
               </>
             )}
           </p>

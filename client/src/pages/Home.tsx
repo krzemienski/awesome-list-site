@@ -34,7 +34,7 @@ interface HomeProps {
 }
 
 const categoryIcons: { [key: string]: any } = {
-  "Introduction & Learning": FileText,
+  "Intro & Learning": FileText,
   "Protocols & Transport": Server,
   "Encoding & Codecs": Code,
   "Players & Clients": Play,
@@ -354,8 +354,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   <CardTitle className="font-sans font-semibold text-base tracking-tight">
                     {category.name}
                   </CardTitle>
-                  {description && (
-                    <CardDescription className="line-clamp-2 text-xs">
+                  {/* Run19 BUG-016: the teaser is one resource's blurb, not a
+                      category description — label it so it can't read as
+                      category copy. */}
+                  {description && firstResource && (
+                    <CardDescription
+                      className="line-clamp-2 text-xs"
+                      data-testid={`text-category-teaser-${category.slug}`}
+                    >
+                      <span className="font-medium text-foreground/70">
+                        Featured: {firstResource.title} —
+                      </span>{" "}
                       {description}
                     </CardDescription>
                   )}

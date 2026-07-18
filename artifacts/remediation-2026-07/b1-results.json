@@ -1,0 +1,54 @@
+{
+  "BUG-050": {
+    "actionButtons": [
+      {
+        "label": "Favorite",
+        "aria": "Add to favorites",
+        "w": 120,
+        "h": 44,
+        "inViewportX": true
+      },
+      {
+        "label": "Bookmark",
+        "aria": "Add bookmark",
+        "w": 134,
+        "h": 44,
+        "inViewportX": true
+      },
+      {
+        "label": "Share",
+        "aria": "Share this resource",
+        "w": 105,
+        "h": 44,
+        "inViewportX": true
+      },
+      {
+        "label": "Suggest Edit",
+        "aria": "Suggest an edit",
+        "w": 151,
+        "h": 44,
+        "inViewportX": true
+      }
+    ],
+    "horizontalOverflow": false
+  },
+  "BUG-041": {
+    "tabsSeen": [
+      "Awesome Video1,822 resources",
+      "Toggle Sidebar",
+      "Search resources...Search.../",
+      "Sign in",
+      "Explorer",
+      "Metrics",
+      "Export",
+      "AI Recommendations",
+      "Name",
+      "Community & Events",
+      "Community Groups (40)",
+      "Events & Conferences (40)"
+    ],
+    "emptyStateShown": "No local activity yet — the leaderboard fills in as you view and open resources in this browser.",
+    "rankOneWithZeroPercent": false,
+    "excerpt": "Track community engagement, popular resources, and contribution patterns"
+  }
+}

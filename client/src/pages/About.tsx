@@ -185,12 +185,12 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: Wind, label: "Responsive Design", desc: "Mobile-first" },
-              { icon: Rocket, label: "Fast Performance", desc: "Static generation" },
+              { icon: Rocket, label: "Fast Performance", desc: "Optimized SPA" },
               { icon: Search, label: "Fuzzy Search", desc: "Find anything" },
               { icon: Palette, label: "Multiple Themes", desc: "Customizable" },
               { icon: Accessibility, label: "Accessible", desc: "WCAG compliant" },
               { icon: Globe, label: "SEO Optimized", desc: "Discoverable" },
-              { icon: Keyboard, label: "Keyboard Shortcuts", desc: "Power user" },
+              { icon: Keyboard, label: "Keyboard Shortcuts", desc: "⌘K or / to search" },
               { icon: Component, label: "Component Library", desc: "shadcn/ui" }
             ].map((feature, idx) => (
               <Card key={feature.label}>

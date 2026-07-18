@@ -59,9 +59,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+// BUG-025 (run19): names must match resources.category in the DB verbatim —
+// profile preferences are string-matched against resource categories.
 const AVAILABLE_CATEGORIES = [
   "Encoding & Codecs",
-  "Introduction & Learning",
+  "Intro & Learning",
   "Protocols & Transport",
   "Players & Clients",
   "Media Tools",

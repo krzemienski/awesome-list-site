@@ -1,0 +1,17 @@
+{
+  "bug": "BUG-006",
+  "title": "Sub-subcategories admin table: parent column 100% Unknown",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev (localhost:5000)",
+  "status": "fixed (defensive) — does not reproduce; audit symptom = silent parent-fetch failure",
+  "fix": [
+    "GenericCrudManager: failed parent-list queries now surface a role=alert banner with Retry (data-testid alert-parent-load-failed / button-retry-parents) instead of silently rendering every parent as Unknown",
+    "subsubcategory-config: renders '\u2014' when parent lists are empty/unloaded; 'Unknown' is reserved for genuinely dangling parent ids"
+  ],
+  "evidence": {
+    "normalLoad": "0 'Unknown' cells; parent APIs 200; 0 orphan parent ids across 106 sub-subcategories",
+    "forcedFailure": "route-abort on parent APIs -> alert banner + Retry + 10 '\u2014' rows, 0 'Unknown'",
+    "retry": "clicking Retry after removing the abort recovers real parent names",
+    "screenshots": ["normal-0-unknown.png", "forced-failure-banner.png", "retry-recovered.png"]
+  }
+}

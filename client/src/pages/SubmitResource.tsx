@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { z } from "zod";
-import { Loader2, Plus, CheckCircle, AlertCircle, LogIn } from "lucide-react";
+import { Loader2, Plus, CheckCircle, AlertCircle, AlertTriangle, LogIn, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,7 +40,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { humanizeApiError } from "@/lib/apiError";
+import { humanizeApiError, extractFieldErrors } from "@/lib/apiError";
 import { redirectToLogin } from "@/lib/authUtils";
 import { trackGenerateLead } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
@@ -117,7 +117,14 @@ interface SubSubcategory {
 }
 
 export default function SubmitResource() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, error: authError, refetchAuth } = useAuth();
+  // BUG-002 (run19): a non-401 auth failure (network error, 5xx) used to leave
+  // the form silently disabled forever — useAuth keeps the query in error state
+  // (retryOnMount:false per NB-028) and isAuthenticated stays false with no UI.
+  // Surface it explicitly with a retry; 401 is the normal logged-out case.
+  const authFailed =
+    !!authError &&
+    !(typeof authError === "object" && "status" in authError && (authError as { status: number }).status === 401);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -315,10 +322,36 @@ export default function SubmitResource() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     onError: (error: Error) => {
+      // BUG-005 (run19): the server's 400 carries per-field messages in
+      // `fieldErrors` — surface each at its form field (focusing the first)
+      // instead of discarding them behind a generic toast.
+      const fieldErrors = extractFieldErrors(error);
+      const formFields = [
+        "title",
+        "url",
+        "description",
+        "category",
+        "subcategory",
+        "subSubcategory",
+        "tags",
+      ] as const;
+      let mapped = 0;
+      if (fieldErrors) {
+        for (const key of formFields) {
+          const message = fieldErrors[key];
+          if (message) {
+            form.setError(key, { type: "server", message }, { shouldFocus: mapped === 0 });
+            mapped++;
+          }
+        }
+      }
       // BUG-007 (run14): map raw "STATUS: body" API errors to friendly copy.
       toast({
         title: "Submission Failed",
-        description: humanizeApiError(error, "Failed to submit resource. Please try again."),
+        description:
+          mapped > 0
+            ? "Please fix the highlighted fields below."
+            : humanizeApiError(error, "Failed to submit resource. Please try again."),
         variant: "destructive",
       });
     },
@@ -337,17 +370,9 @@ export default function SubmitResource() {
     submitMutation.mutate(data);
   };
 
-  if (authLoading) {
-    return (
-      <div className="container max-w-2xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Loading...</span>
-        </div>
-      </div>
-    );
-  }
-
+  // BUG-002 (run19): no full-page spinner gate anymore — the form renders
+  // immediately (usable well under 500ms) with an inline labeled status while
+  // the sign-in check resolves, and an explicit error + retry if it fails.
   return (
     <>
       <SEOHead title={submitSeoTitle} description={submitSeoDescription} />
@@ -384,7 +409,36 @@ export default function SubmitResource() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              {!isAuthenticated && (
+              {authLoading ? (
+                <Alert className="mb-6" data-testid="alert-auth-loading">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <AlertTitle>Verifying sign-in…</AlertTitle>
+                  <AlertDescription>
+                    Checking your session. The form unlocks in a moment.
+                  </AlertDescription>
+                </Alert>
+              ) : authFailed ? (
+                <Alert variant="destructive" className="mb-6" data-testid="alert-auth-error">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Couldn't verify your sign-in</AlertTitle>
+                  <AlertDescription className="space-y-2">
+                    <p>
+                      The sign-in check failed, so the form is locked. This is
+                      usually a temporary network problem.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => refetchAuth()}
+                      data-testid="button-auth-retry"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Retry
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              ) : !isAuthenticated ? (
                 <Alert className="mb-6 border-yellow-500/50 bg-yellow-500/10" data-testid="alert-login-required">
                   <LogIn className="h-4 w-4 text-yellow-500" />
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
@@ -394,7 +448,7 @@ export default function SubmitResource() {
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
-              )}
+              ) : null}
               {/* Run3 audit R3-04: explicit method="post" — submission goes via
                   fetch (react-hook-form onSubmit), but if JS ever fails the
                   browser must not leak form fields into the URL as a GET. */}

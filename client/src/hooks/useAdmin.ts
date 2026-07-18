@@ -25,6 +25,12 @@ export function useAdmin() {
     },
     enabled: isAdmin, // Only fetch if user is admin
     staleTime: 30000, // 30 seconds
+    // BUG-047 (run19): the pending-approvals badge went stale until a manual
+    // reload — new submissions from other sessions never appeared. Poll on an
+    // interval and refetch on window focus so the count tracks reality;
+    // mutations still invalidate ['/api/admin/stats'] for instant updates.
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
     retry: false, // Don't retry on 403
   });
 

@@ -248,12 +248,22 @@ export class ClaudeService {
    * Initialize the Anthropic client if API key is available
    */
   private initializeClient(): void {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    // Run19 BUG-015: prefer the Replit-managed Anthropic integration (billing
+    // runs through Replit, so calls keep working when the direct
+    // ANTHROPIC_API_KEY has no credits). Fall back to the direct key.
+    const managedKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
+    const managedBase = process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL;
+    const useManaged = Boolean(managedKey && managedBase);
+    const apiKey = useManaged ? managedKey : process.env.ANTHROPIC_API_KEY;
 
     if (apiKey) {
       try {
-        this.anthropic = new Anthropic({ apiKey });
-        console.log('Claude service initialized successfully');
+        this.anthropic = new Anthropic(
+          useManaged ? { apiKey, baseURL: managedBase } : { apiKey },
+        );
+        console.log(
+          `Claude service initialized successfully (${useManaged ? 'Replit-managed integration' : 'direct API key'})`,
+        );
       } catch (error) {
         console.error('Failed to initialize Claude service:', error);
         this.anthropic = null;
@@ -695,7 +705,7 @@ export class ClaudeService {
         'Encoding & Codecs',
         'General Tools',
         'Infrastructure & Delivery',
-        'Introduction & Learning',
+        'Intro & Learning', // BUG-025: match DB-canonical category name
         'Media Tools',
         'Players & Clients',
         'Protocols & Transport',

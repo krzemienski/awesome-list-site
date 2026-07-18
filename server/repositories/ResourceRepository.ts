@@ -176,6 +176,25 @@ export class ResourceRepository {
   }
 
   /**
+   * Run19 BUG-013: exact-title duplicate check for the submit pipeline.
+   * Case-insensitive, live statuses only (approved/pending) — a rejected
+   * resource's title may be reused.
+   */
+  async getLiveResourceByTitle(title: string): Promise<Resource | undefined> {
+    const [resource] = await db
+      .select()
+      .from(resources)
+      .where(
+        and(
+          sql`lower(${resources.title}) = lower(${title.trim()})`,
+          inArray(resources.status, ['approved', 'pending']),
+        ),
+      )
+      .limit(1);
+    return resource;
+  }
+
+  /**
    * Get total count of all resources
    * @returns Total number of resources in database
    */

@@ -40,6 +40,10 @@ export default function ConsentBanner() {
       const h = bannerRef.current?.offsetHeight ?? 0;
       const pad = h > 0 ? `${h}px` : "";
       document.body.style.paddingBottom = pad;
+      // BUG-026 (run19): expose the banner height so the toast viewport can
+      // lift itself above the banner (toast z-[100] > banner z-50, so without
+      // an offset toasts cover the Accept/Decline buttons).
+      document.documentElement.style.setProperty("--consent-banner-h", pad || "0px");
       // The sidebar layout's inset column overflows body's own box (body is
       // viewport-height while the grid content scrolls past it), so body
       // padding alone never lifts the footer above the fixed banner — pad
@@ -52,6 +56,7 @@ export default function ConsentBanner() {
     return () => {
       window.removeEventListener("resize", applyPadding);
       document.body.style.paddingBottom = "";
+      document.documentElement.style.removeProperty("--consent-banner-h");
       const inset = document.querySelector("footer")?.parentElement;
       if (inset instanceof HTMLElement) inset.style.paddingBottom = "";
     };

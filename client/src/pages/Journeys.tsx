@@ -28,7 +28,21 @@ interface Journey {
 
 export default function Journeys() {
   const [, setLocation] = useLocation();
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  // BUG-033 (run19): the category filter is URL-synced (?category=...) so a
+  // filtered view survives reload and can be shared — read it on mount, write
+  // it on change (replaceState: filter tweaks shouldn't pollute history).
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("category");
+    return fromUrl && fromUrl.trim() !== "" ? fromUrl : "all";
+  });
+  const handleCategoryChange = (next: string) => {
+    setSelectedCategory(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next === "all") params.delete("category");
+    else params.set("category", next);
+    const qs = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+  };
   const { isAuthenticated } = useAuth();
 
   // Fetch all published journeys (includes enrollment and progress data)
@@ -116,7 +130,7 @@ export default function Journeys() {
       <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
           <span className="text-sm text-muted-foreground">Filter by category:</span>
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <Select value={selectedCategory} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-full sm:w-[200px]" aria-label="Filter by category" data-testid="select-category-filter">
               <SelectValue />
             </SelectTrigger>
@@ -151,7 +165,7 @@ export default function Journeys() {
             {selectedCategory !== "all" && (
               <Button 
                 variant="outline" 
-                onClick={() => setSelectedCategory("all")}
+                onClick={() => handleCategoryChange("all")}
                 data-testid="button-clear-filter"
               >
                 Clear Filter

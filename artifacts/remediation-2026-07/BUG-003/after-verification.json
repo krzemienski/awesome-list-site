@@ -1,0 +1,60 @@
+{
+  "bug": "BUG-003",
+  "title": "16 duplicate sub-subcategory groups fragment the taxonomy",
+  "verifiedAt": "2026-07-18T10:00:00Z",
+  "environment": "dev (http://localhost:5000) \u2014 prod re-run journaled for post-republish",
+  "fix": {
+    "dataConsolidation": "scripts/run19-dedupe-subsubcats.ts \u2014 groups sub-subcategory rows by normalized name (lowercase, strip non-alnum), picks canonical (bare slug > most per-node resources > lowest id), display name = most frequent exact name (FFMPEG x6 + FFmpeg x10 -> FFmpeg), re-points every group resource to the canonical triplet via PUT /api/admin/resources/:id (sequential, never Promise.all), temp-renames then deletes dup rows (delete guard counts by name globally), then normalizes surviving -scNNNN slugs to bare form when free. Idempotent; journaled.",
+    "recurrenceGuards": [
+      "server/repositories/ensureSubSubcategory.ts \u2014 global case-insensitive name OR slug match anywhere in taxonomy -> no-op (tree builder folds the resource into its subcategory node, stays visible)",
+      "server/routes.ts POST /api/admin/sub-subcategories \u2014 same global check -> 409 with pointer to the existing row",
+      "server/repositories/CategoryRepository.ts \u2014 findSubSubcategoryDuplicateGlobal(name, slug)"
+    ],
+    "redirects": "server/og-middleware.ts \u2014 /sub-subcategory/<slug>-scNNNN 301s to bare slug iff suffixed node no longer exists AND bare node exists; unknown suffixed slugs still soft-404",
+    "caseVariantPass": "scripts/run19-dedupe-subsubcats.ts final pass \u2014 scans the UNCACHED admin resources listing (all statuses) for subSubcategory strings that normalize-match a canonical row but differ in case/punctuation (FFMPEG->FFmpeg, iOStvOS->iOS/tvOS) and PUTs the canonical name; strings with no canonical match (Vendor Docs) are legitimately folded labels and left alone."
+  },
+  "evidence": {
+    "before": {
+      "devRows": 97,
+      "devDupGroups": 16,
+      "prodBaseline": "BUG-003/before-dup-groups.txt (prod 106 rows / 18 exact-name groups)",
+      "totalResources": 1822
+    },
+    "after": {
+      "devRows": 26,
+      "devDupGroups": 0,
+      "suffixedSlugsRemaining": 0,
+      "totalResources": 1822,
+      "tempRowsLeft": 0
+    },
+    "dedupeRun1": "16 groups consolidated: 210 resources re-pointed, 71 dup rows deleted (console log; journal overwritten by idempotency re-run)",
+    "idempotencyRerun": "BUG-003/dedupe-dev-idempotent-rerun.json \u2014 before/after both 0 dup groups, no-op, PASS=true",
+    "slugNormalization": "BUG-003/dedupe-dev.json \u2014 6 surviving -scNNNN slugs renamed to bare (cdn-integration, chromecast, hdr-guidelines, origin-servers, rist, smart-tvs), 0 skipped, PASS=true",
+    "redirectProbes": {
+      "deleted dup slug /sub-subcategory/hls-sc2241": "301 -> /sub-subcategory/hls",
+      "deleted dup slug /sub-subcategory/ffmpeg-sc2226": "301 -> /sub-subcategory/ffmpeg",
+      "renamed slug /sub-subcategory/rist-sc2261": "301 -> /sub-subcategory/rist",
+      "renamed slug /sub-subcategory/smart-tvs-sc2211": "301 -> /sub-subcategory/smart-tvs",
+      "unknown /sub-subcategory/nonexistent-sc9999": "404 (no redirect)",
+      "canonical /sub-subcategory/rist and /hls": "200"
+    },
+    "sitemap": {
+      "suffixedUrls": 0,
+      "subSubcategoryUrls": 26
+    },
+    "guardProbes": {
+      "POST name case-variant 'hls' under other parent": "409 \u2014 points at existing id 3620",
+      "POST fresh name with existing slug 'ffmpeg'": "409 \u2014 points at existing id 3625",
+      "PUT resource 185648 subSubcategory 'FFMPEG' (case variant, different parent)": "200, row count stayed 26 (no new row), resource reverted (200)"
+    },
+    "tscClean": true,
+    "caseVariantFixes": {
+      "run1": "32 resource rows normalized (30 via tree scan + 2 rejected iOStvOS after switching scan to admin listing)",
+      "idempotencyRerun": "count=0 on re-run (dedupe-dev.json)",
+      "sqlAfter": "only 1 row remains: rejected 'Vendor Docs' (no canonical row \u2014 by design)",
+      "journal": "BUG-003/dedupe-dev-case-variant-pass.json"
+    }
+  },
+  "prodFollowUp": "After republish: ADMIN_PASSWORD=<prod> npx tsx scripts/run19-dedupe-subsubcats.ts (writes BUG-003/dedupe-prod.json; prod baseline 106 rows / 18 groups)",
+  "status": "VERIFIED (dev); prod data run pending republish"
+}

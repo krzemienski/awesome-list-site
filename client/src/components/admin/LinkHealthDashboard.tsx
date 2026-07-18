@@ -279,10 +279,11 @@ export default function LinkHealthDashboard() {
                     {calculateHealthPercentage(latestJob)}%
                   </div>
                 </div>
+                {/* BUG-024 (run19): default themed Button — the hardcoded
+                    bg-blue-500 override was off-theme against the DS accent. */}
                 <Button
                   onClick={() => runCheckMutation.mutate()}
                   disabled={isActiveJob || runCheckMutation.isPending}
-                  className="bg-blue-500 hover:bg-blue-600"
                 >
                   {runCheckMutation.isPending ? (
                     <>
@@ -316,7 +317,6 @@ export default function LinkHealthDashboard() {
               <Button
                 onClick={() => runCheckMutation.mutate()}
                 disabled={runCheckMutation.isPending}
-                className="bg-blue-500 hover:bg-blue-600"
               >
                 {runCheckMutation.isPending ? (
                   <>

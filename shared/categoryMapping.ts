@@ -13,7 +13,7 @@ export function mapCategoryName(category: string | null): string | null {
     'Video Editing & Processing Tools': 'Media Tools',
     'Video Encoding Transcoding & Packaging Tools': 'Encoding & Codecs',
     'Transcoding Codecs & Hardware Acceleration': 'Encoding & Codecs',
-    'Learning Tutorials & Documentation': 'Introduction & Learning',
+    'Learning Tutorials & Documentation': 'Intro & Learning',
     'Media Analysis Quality Metrics & AI Tools': 'Media Tools',
     'Adaptive Streaming & Manifest Tools': 'Protocols & Transport',
     'Build Tools Deployment & Utility Libraries': 'General Tools',
@@ -27,7 +27,10 @@ export function mapCategoryName(category: string | null): string | null {
     'Encoding & Codecs': 'Encoding & Codecs',
     'General Tools': 'General Tools',
     'Infrastructure & Delivery': 'Infrastructure & Delivery',
-    'Introduction & Learning': 'Introduction & Learning',
+    // BUG-025 (run19): canonical is the DB name "Intro & Learning"; the
+    // long-form label is kept as a variant so old imports still map.
+    'Introduction & Learning': 'Intro & Learning',
+    'Intro & Learning': 'Intro & Learning',
     'Media Tools': 'Media Tools',
     'Players & Clients': 'Players & Clients',
     'Protocols & Transport': 'Protocols & Transport',

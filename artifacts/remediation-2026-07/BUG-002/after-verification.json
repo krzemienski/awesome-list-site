@@ -1,0 +1,25 @@
+{
+  "bug": "BUG-002 /submit indefinitely disabled with no feedback when auth check hangs/fails",
+  "verifiedAt": "2026-07-18",
+  "environment": "dev",
+  "fixes": [
+    "client/src/pages/SubmitResource.tsx: removed silent full-page spinner; inline labeled alert chain — authLoading -> 'Verifying sign-in…' (data-testid alert-auth-loading); auth error (non-401) -> destructive alert + Retry button (button-auth-retry) calling refetchAuth(); logged-out -> login-required alert",
+    "useAuth retry/backoff untouched (NB-028 bounded-backoff preserved)"
+  ],
+  "freshLoads": [
+    {"run": 1, "endState": "login-gate", "labeledStateMs": 5541},
+    {"run": 2, "endState": "login-gate", "labeledStateMs": 3477},
+    {"run": 3, "endState": "login-gate", "labeledStateMs": 3372},
+    {"run": 4, "endState": "login-gate", "labeledStateMs": 3576},
+    {"run": 5, "endState": "login-gate", "labeledStateMs": 3682}
+  ],
+  "gateNote": "labeledStateMs is dominated by dev-mode Vite module loading (DCL ~3s); pre-React the page shows server-injected SSR chrome (playwright probe sawSsrContent=true on /submit), never a blank/silent disabled state. From React mount the state is always labeled.",
+  "forcedFailure": {
+    "method": "playwright route abort on /api/auth/user",
+    "errorAlertVisible": true,
+    "retryButtonPresent": true,
+    "afterRetryUnblocked": "recovered-to-login-gate"
+  },
+  "screenshot": "after-auth-failure-error-retry.png",
+  "harness": "/tmp/playwright-test-run19-high.js via playwright-skill run.js"
+}

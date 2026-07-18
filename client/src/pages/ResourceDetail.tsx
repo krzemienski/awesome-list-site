@@ -33,7 +33,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { trackSelectContent, trackShare, trackResourceFavorite } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { slugify } from "@/lib/utils";
+import { slugify, formatAdminDate } from "@/lib/utils";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 
@@ -215,6 +215,21 @@ export default function ResourceDetail() {
       return;
     }
     bookmarkMutation.mutate();
+  };
+
+  // BUG-028 (run19): Suggest Edit used to open the dialog (which showed its own
+  // sign-in wall) while Favorite/Bookmark toast — one auth-gate pattern now:
+  // logged-out clicks get the same toast + Sign in action everywhere.
+  const handleSuggestEditClick = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in to suggest edits",
+        description: "Create an account or sign in to propose changes to this resource.",
+        action: signInAction,
+      });
+      return;
+    }
+    setSuggestEditOpen(true);
   };
 
   const trackInteraction = useMutation({
@@ -413,8 +428,10 @@ export default function ResourceDetail() {
             aria-pressed={isFavorite}
             aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
+            {/* BUG-050 (run19): labels stay visible at every width — icon-only
+                buttons at 375px were mystery meat for sighted mobile users. */}
             <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
-            <span className="hidden sm:inline">{isFavorite ? 'Favorited' : 'Favorite'}</span>
+            <span>{isFavorite ? 'Favorited' : 'Favorite'}</span>
           </Button>
           <Button
             variant={isBookmarked ? "default" : "outline"}
@@ -427,7 +444,7 @@ export default function ResourceDetail() {
             aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
-            <span className="hidden sm:inline">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+            <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
           </Button>
           <Button 
             variant="outline" 
@@ -438,18 +455,18 @@ export default function ResourceDetail() {
             aria-label="Share this resource"
           >
             <Share2 className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Share</span>
+            <span>Share</span>
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => setSuggestEditOpen(true)} 
+            onClick={handleSuggestEditClick} 
             data-testid="button-suggest-edit"
             className="min-h-[44px] px-4"
             aria-label="Suggest an edit"
           >
             <Edit className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Suggest Edit</span>
+            <span>Suggest Edit</span>
           </Button>
         </div>
       </div>
@@ -551,23 +568,10 @@ export default function ResourceDetail() {
                           </Badge>
                         )
                       )}
-                      {/* R4-L16: tooltip + a11y context for the status badge.
-                          BUG-019 (run10): moderation status is internal
-                          workflow state — only admins see the badge now. */}
-                      {user?.role === 'admin' && (
-                        <Badge 
-                          variant={resource.status === 'approved' ? 'default' : 'secondary'}
-                          className={resource.status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/30' : ''}
-                          title={resource.status === 'approved'
-                            ? 'Approved: this resource passed review and is publicly listed'
-                            : `Resource status: ${resource.status}`}
-                          aria-label={resource.status === 'approved'
-                            ? 'Approved: this resource passed review and is publicly listed'
-                            : `Resource status: ${resource.status}`}
-                        >
-                          {resource.status}
-                        </Badge>
-                      )}
+                      {/* BUG-044 (run19): the admin-only "approved" badge leaked
+                          internal moderation vocabulary onto the public page.
+                          Moderation state now lives only in /admin (the "Edit
+                          in Admin" button below covers the workflow jump). */}
                     </div>
                   </div>
                   
@@ -671,7 +675,9 @@ export default function ResourceDetail() {
                 {resource.createdAt && (
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>Added on {new Date(resource.createdAt).toLocaleDateString()}</span>
+                    {/* BUG-027 (run19): one site-wide date style ("Jul 18, 2026")
+                        shared with the admin tables via lib/utils. */}
+                    <span>Added on {formatAdminDate(resource.createdAt)}</span>
                   </div>
                 )}
                 {urlScraped && (
@@ -708,35 +714,10 @@ export default function ResourceDetail() {
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <ExternalLink className="h-4 w-4 text-primary" />
-                Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* BUG-032 (run13): Share/Favorite/Bookmark used to be repeated
-                  here verbatim from the top action bar. The card now carries
-                  only the primary CTA; the top bar owns the secondary
-                  actions. Label matches the top-bar "Visit Resource" so it
-                  reads as the same action, not a second one. */}
-              <Button
-                asChild
-                className="w-full min-h-[44px]"
-              >
-                <a
-                  href={resource.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={handleVisitResource}
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Visit Resource
-                </a>
-              </Button>
-            </CardContent>
-          </Card>
+          {/* BUG-034 (run19): the "Quick Actions" card was removed — it held a
+              single "Visit Resource" button duplicating the header CTA, so the
+              page offered the same P0 action twice. The header button is now
+              the one and only Visit control. */}
 
           {/* BUG-011: always render the Related section. When the related
               endpoint returns no matches, show an explicit empty state instead

@@ -1,0 +1,21 @@
+{
+  "bug": "BUG-005",
+  "title": "Submit validation failures surface as a generic toast; server field errors discarded",
+  "verifiedAt": "2026-07-18T10:40:00Z",
+  "fix": {
+    "extractor": "client/src/lib/apiError.ts extractFieldErrors() — parses the ApiError '400: {json}' message and returns the server's fieldErrors map (null when absent)",
+    "mapping": "client/src/pages/SubmitResource.tsx submit onError — each fieldErrors entry is form.setError()'d onto its field (type 'server', first error focused); toast becomes 'Please fix the highlighted fields below.'; non-field errors keep the humanizeApiError fallback"
+  },
+  "evidence": {
+    "repro": "logged in at 1440x900, title + category + 59-char description valid, url 'https://example' (passes client zod, fails server isPlausiblePublicUrl)",
+    "post": { "status": 400, "fieldErrors": { "url": "URL must have a valid hostname (e.g. https://example.com)" } },
+    "rendered": {
+      "fieldMessage": "URL must have a valid hostname (e.g. https://example.com) rendered at the URL field (FormMessage id *-form-item-message)",
+      "urlAriaInvalid": "true",
+      "focusedField": "url",
+      "toast": "Submission Failed — Please fix the highlighted fields below."
+    },
+    "screenshot": "field-errors-1440.png"
+  },
+  "status": "VERIFIED (dev); ships with republish"
+}

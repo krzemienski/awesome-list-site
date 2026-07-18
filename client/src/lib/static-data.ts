@@ -31,6 +31,21 @@ export async function fetchStaticAwesomeList(): Promise<any> {
       (window as any).__INITIAL_DATA__ = undefined;
       return data;
     }
+
+    // BUG-001 (run19): index.html starts this fetch before the bundle parses.
+    // Consume it once; on any failure fall through to the normal retry path.
+    const early: Promise<Response> | undefined = (window as any).__awesomeListEarlyFetch;
+    if (early) {
+      (window as any).__awesomeListEarlyFetch = undefined;
+      try {
+        const response = await early;
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch {
+        /* fall through to the standard fetch below */
+      }
+    }
   }
 
   const url = '/api/awesome-list';

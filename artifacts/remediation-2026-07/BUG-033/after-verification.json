@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-07-18",
+  "method": "playwright live re-repro (dev, anon 1440 / mobile 375 / admin authed)",
+  "sweeps": {
+    "a2-results": {
+      "pickedLabel": "Encoding & Codecs",
+      "urlAfterFilter": "/journeys?category=Encoding+%26+Codecs",
+      "afterReload": {
+        "url": "?category=Encoding+%26+Codecs",
+        "trigger": "Encoding & Codecs"
+      }
+    }
+  }
+}

@@ -1553,6 +1553,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     parentData[parent.fieldName] = parentQueries[index].data || [];
   });
 
+  // BUG-006 (run19): when a parent-list fetch fails, every row used to
+  // silently render "Unknown" in the parent columns — indistinguishable from
+  // a real broken join. Surface the failure loudly with a retry instead.
+  const failedParentQueries = parents
+    .map((parent, index) => ({ parent, query: parentQueries[index] }))
+    .filter(({ query }) => query.isError);
+
   // Fetch main entities with resource counts
   const { data: items, isLoading } = useQuery<T[]>({
     queryKey: [queryKey],
@@ -2574,6 +2581,26 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             ) : null}
           </p>
         ) : null}
+        {failedParentQueries.length > 0 && (
+          <div
+            role="alert"
+            className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm"
+            data-testid="alert-parent-load-failed"
+          >
+            <span>
+              Couldn't load {failedParentQueries.map(({ parent }) => parent.label.replace(/\s*\*\s*$/, "").toLowerCase()).join(" and ")}{" "}
+              — parent names can't be shown until this succeeds.
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => failedParentQueries.forEach(({ query }) => query.refetch())}
+              data-testid="button-retry-parents"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
         {isLoading ? (
           <div className="space-y-2">
             {[...Array(5)].map((_, i) => (
