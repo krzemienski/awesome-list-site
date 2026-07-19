@@ -48,8 +48,26 @@ interface RawAwesomeListData {
 /**
  * Process the raw JSON data from the API into a structured AwesomeList
  * If the server already provides categories, use those instead of recalculating
+ *
+ * Task 169 (cold-load perf): the raw payload is a single cached object in the
+ * React Query cache, but App + every category-level page called this on EVERY
+ * render, re-mapping ~2,300 resources each time. Memoize by input identity —
+ * one entry is enough since the query result object is stable.
  */
+const processedCache = new WeakMap<object, AwesomeList>();
+
 export function processAwesomeListData(data: unknown): AwesomeList {
+  if (data && typeof data === 'object') {
+    const hit = processedCache.get(data as object);
+    if (hit) return hit;
+    const result = processAwesomeListDataUncached(data);
+    processedCache.set(data as object, result);
+    return result;
+  }
+  return processAwesomeListDataUncached(data);
+}
+
+function processAwesomeListDataUncached(data: unknown): AwesomeList {
   // Type guard to validate data structure
   if (!data || typeof data !== 'object') {
     throw new Error("Invalid awesome list data format");

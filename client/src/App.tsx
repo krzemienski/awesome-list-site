@@ -10,38 +10,62 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import ForgotPassword from "@/pages/ForgotPassword";
-import ResetPassword from "@/pages/ResetPassword";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
 import SubSubcategory from "@/pages/SubSubcategory";
-import About from "@/pages/About";
-import Advanced from "@/pages/Advanced";
-import Profile from "@/pages/Profile";
-import Bookmarks from "@/pages/Bookmarks";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
-import SubmitResource from "@/pages/SubmitResource";
-import Journeys from "@/pages/Journeys";
-import JourneyDetail from "@/pages/JourneyDetail";
 import ResourceDetail from "@/pages/ResourceDetail";
-import ThemeSettings from "@/pages/ThemeSettings";
-import Recommendations from "@/pages/Recommendations";
-import Search from "@/pages/Search";
 import Categories from "@/pages/Categories";
-import Settings from "@/pages/Settings";
-import Terms from "@/pages/Terms";
-import Privacy from "@/pages/Privacy";
 import ConsentBanner from "@/components/ui/consent-banner";
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
 // chunk that regular visitors never download.
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+
+// Task 169 (cold-load perf): only the hot browse surfaces (home, the three
+// category-tree levels, resource detail, 404) stay in the entry chunk.
+// Everything else — auth forms, profile/bookmarks, submit (react-hook-form +
+// zod), journeys, settings, static/legal pages — is code-split so the first
+// parse/eval of the main bundle is smaller on cold loads of heavy category
+// pages. Each lazy route renders inside the Suspense boundary around the
+// Switch below (lightweight skeleton fallback, chrome stays mounted).
+const Login = lazy(() => import("@/pages/Login"));
+const Register = lazy(() => import("@/pages/Register"));
+const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const About = lazy(() => import("@/pages/About"));
+const Advanced = lazy(() => import("@/pages/Advanced"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const Bookmarks = lazy(() => import("@/pages/Bookmarks"));
+const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
+const Journeys = lazy(() => import("@/pages/Journeys"));
+const JourneyDetail = lazy(() => import("@/pages/JourneyDetail"));
+const ThemeSettings = lazy(() => import("@/pages/ThemeSettings"));
+const Recommendations = lazy(() => import("@/pages/Recommendations"));
+const Search = lazy(() => import("@/pages/Search"));
+const Settings = lazy(() => import("@/pages/Settings"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+
+/** Route-level Suspense fallback — mirrors the page skeletons so a code-split
+ * route paints a familiar loading state instead of a blank main region. */
+function RouteFallback() {
+  return (
+    <div className="space-y-6" data-testid="route-chunk-skeleton" aria-busy="true" aria-label="Loading page">
+      <div className="h-8 w-2/3 max-w-md rounded-none bg-muted animate-pulse" />
+      <div className="h-4 w-1/2 max-w-sm rounded-none bg-muted animate-pulse" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-36 rounded-none bg-muted animate-pulse" />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -124,26 +148,13 @@ function Router() {
     return <ErrorPage error={error} />;
   }
 
-  // BUG-009 (run14): shell-first paint. While the auth check resolves, render
-  // the real header/sidebar chrome with content skeletons instead of blocking
-  // the whole app behind a bare full-screen spinner (15s to first content on
-  // slow 3G). Route content stays deferred so auth-gated routes never flash
-  // a wrong redirect before /api/auth/user answers.
-  if (authLoading) {
-    return (
-      <MainLayout awesomeList={awesomeList} isLoading={true} user={undefined} onLogout={logout}>
-        <div className="space-y-6" data-testid="app-shell-skeleton" aria-busy="true" aria-label="Loading page">
-          <div className="h-8 w-2/3 max-w-md rounded-none bg-muted animate-pulse" />
-          <div className="h-4 w-1/2 max-w-sm rounded-none bg-muted animate-pulse" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-36 rounded-none bg-muted animate-pulse" />
-            ))}
-          </div>
-        </div>
-      </MainLayout>
-    );
-  }
+  // BUG-009 (run14) → Task 169: shell-first paint, now content-first too.
+  // Public routes render immediately while the auth check resolves — they
+  // don't depend on auth, and blocking them serialized cold loads behind
+  // /api/auth/user. Auth-gated routes are safe because AuthGuard/AdminGuard
+  // each render their own loading state while `isLoading` is true, so no
+  // wrong redirect can flash before /api/auth/user answers. The old
+  // app-wide skeleton gate is gone entirely; the guards own their loading UI.
 
   // Run15 BUG-033 (supersedes R3-29's lean standalone 404): unknown URLs keep
   // the full sidebar/header chrome so lost visitors can navigate away instead
@@ -178,6 +189,7 @@ function Router() {
           </button>
         </div>
       ) : null}
+      <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={() => {
           const q = new URLSearchParams(window.location.search).get("q");
@@ -263,6 +275,7 @@ function Router() {
           <NotFound />
         </Route>
       </Switch>
+      </Suspense>
     </MainLayout>
   );
 }

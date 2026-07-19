@@ -79,6 +79,14 @@
           window.__awesomeListEarlyFetch = p;
           p.catch(function () {});
         } catch (e) {}
+        // Task 169: same trick for the auth check — /api/auth/user used to
+        // wait for bundle-parse + React mount before firing, and header
+        // state waited on it. useAuth() consumes this promise (one shot).
+        try {
+          var a = fetch('/api/auth/user', { credentials: 'include' });
+          window.__authUserEarlyFetch = a;
+          a.catch(function () {});
+        } catch (e) {}
       })();
     </script>
 

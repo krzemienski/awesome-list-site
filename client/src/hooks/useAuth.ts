@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
+import { queryClient, ApiError } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 
 interface User {
@@ -17,9 +17,39 @@ interface AuthResponse {
   isAuthenticated: boolean;
 }
 
+/**
+ * Task 169 (cold-load perf): index.html kicks off the /api/auth/user fetch
+ * before the JS bundle is parsed (window.__authUserEarlyFetch). Consume it
+ * once here; any failure falls through to a normal fetch with the same
+ * error semantics as the default query fetcher (ApiError carrying status).
+ */
+async function fetchAuthUser(): Promise<AuthResponse> {
+  let res: Response | undefined;
+  if (typeof window !== 'undefined') {
+    const early: Promise<Response> | undefined = (window as any).__authUserEarlyFetch;
+    if (early) {
+      (window as any).__authUserEarlyFetch = undefined;
+      try {
+        res = await early;
+      } catch {
+        res = undefined; // network failure on the early attempt — refetch below
+      }
+    }
+  }
+  if (!res) {
+    res = await fetch('/api/auth/user', { credentials: 'include' });
+  }
+  if (!res.ok) {
+    const text = (await res.text()) || res.statusText;
+    throw new ApiError(res.status, text);
+  }
+  return await res.json();
+}
+
 export function useAuth() {
   const { data, isLoading, error, refetch } = useQuery<AuthResponse>({
     queryKey: ['/api/auth/user'],
+    queryFn: fetchAuthUser,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error: unknown) => {
       // Don't retry on 401 - user is simply not authenticated
