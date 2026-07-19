@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { visibleLength } from "@shared/validation";
 import SEOHead from "@/components/layout/SEOHead";
 import { useAuth } from "@/hooks/useAuth";
 import { trackSignUp } from "@/lib/analytics";
@@ -23,12 +24,13 @@ const registerSchema = z.object({
     .string()
     .min(1, "Email is required")
     .email("Please enter a valid email address"),
-  // NB-001 (run18): reject whitespace-only passwords — a string of spaces
-  // used to satisfy min(8). Server enforces the same message.
+  // NB-001 (run18) + R4-014 (run21): require 8 VISIBLE characters — spaces
+  // and zero-width characters (U+200B etc.) don't count. Server enforces the
+  // same rule via the shared validator.
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
-    .refine((v) => v.trim().length >= 8, "Password can't be spaces only"),
+    .refine((v) => visibleLength(v) >= 8, "Password must contain at least 8 visible characters"),
   // Run15 BUG-043: confirm-password field to catch typos before submit.
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {

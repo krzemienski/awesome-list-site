@@ -58,6 +58,24 @@ import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema, insertLearningJourneySchema, passwordResetTokens, type Resource } from "@shared/schema";
+import {
+  HTTPS_URL_RE,
+  WEB_URL_RE,
+  isPlausiblePublicUrl,
+  URL_HOSTNAME_MESSAGE,
+  httpsUrlSchema,
+  webUrlSchema,
+  resourceTitleSchema,
+  resourceDescriptionSchema,
+  tagSchema,
+  displayNameSchema,
+  DISPLAY_NAME_MAX,
+  TAG_MAX_LENGTH,
+  NO_HTML_RE,
+  stripInvisible,
+  hasVisibleChars,
+} from "@shared/validation";
+import { sanitizeUser } from "./validation/inputs";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
@@ -76,7 +94,7 @@ import { enrichmentService } from "./ai/enrichmentService";
 import { parseAgentConfigFromRequest, stripJobAuthSecret } from "./ai/agentRuntime";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
-import { SITE_URL } from "./og-middleware";
+import { SITE_URL, resolveOgImageMeta } from "./og-middleware";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -131,31 +149,9 @@ const isAdmin = async (req: any, res: Response, next: any) => {
 // One shared guard for every write surface that accepts a resource URL:
 // - new resources (public submit + admin create) must be https://
 // - updates/edit-suggestions may keep legacy http:// but never a non-web scheme
-const HTTPS_URL_RE = /^https:\/\//i;
-const WEB_URL_RE = /^https?:\/\//i;
-
-// BUG-018 (run18): scheme checks alone let "https://qaverify" (dotless
-// hostname) and URLs containing literal spaces reach the DB verbatim. A
-// catalog URL must parse, carry no whitespace, and have a dotted hostname
-// with a plausible TLD (or be localhost — rejected too: never valid here).
-function isPlausiblePublicUrl(raw: string): boolean {
-  if (/\s/.test(raw)) return false;
-  try {
-    const u = new URL(raw);
-    const host = u.hostname;
-    if (!host.includes('.')) return false;
-    if (host.startsWith('.') || host.endsWith('.') || host.includes('..')) return false;
-    // Letters/digits/hyphen labels (punycode xn-- included); IPs excluded on
-    // purpose — public catalog resources are never bare IPs.
-    if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(host)) return false;
-    const tld = host.split('.').pop()!;
-    if (tld.length < 2 || /^\d+$/.test(tld)) return false;
-    return true;
-  } catch {
-    return false;
-  }
-}
-const URL_HOSTNAME_MESSAGE = 'URL must have a valid hostname (e.g. https://example.com)';
+// Run21 R4-016: the URL/title/description validators now live in
+// @shared/validation (ONE module mounted on every write path — public submit,
+// suggest-edit, admin create/edit — and reused by the client forms).
 
 function xmlEscape(value: string): string {
   return value
@@ -332,7 +328,52 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
   const xmlEscape = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-  const title = xmlEscape(truncate(pageTitle, 38));
+  // R4-024: instead of hard-truncating at 38 chars, auto-fit the title —
+  // wrap on word boundaries and step the font size down (78 → 60 → 46px)
+  // until the full title fits; only ellipsize past 3 lines at the smallest
+  // size. Long resource titles now render completely on the card.
+  const wrapWords = (s: string, cpl: number): string[] => {
+    const words = s.split(/\s+/).filter(Boolean);
+    const lines: string[] = [];
+    let cur = '';
+    for (let w of words) {
+      while (w.length > cpl) {
+        if (cur) { lines.push(cur); cur = ''; }
+        lines.push(w.slice(0, cpl - 1) + '-');
+        w = w.slice(cpl - 1);
+      }
+      if (!cur) cur = w;
+      else if (cur.length + 1 + w.length <= cpl) cur += ' ' + w;
+      else { lines.push(cur); cur = w; }
+    }
+    if (cur) lines.push(cur);
+    return lines.length ? lines : [''];
+  };
+  const fitTitle = (t: string): { lines: string[]; fontSize: number; letterSpacing: number } => {
+    const budgets = [
+      { size: 78, cpl: 26, max: 2, ls: -2 },
+      { size: 60, cpl: 34, max: 2, ls: -1.5 },
+      { size: 46, cpl: 44, max: 3, ls: -1 },
+    ];
+    for (const b of budgets) {
+      const lines = wrapWords(t, b.cpl);
+      if (lines.length <= b.max) return { lines, fontSize: b.size, letterSpacing: b.ls };
+    }
+    const last = budgets[budgets.length - 1];
+    const lines = wrapWords(t, last.cpl).slice(0, last.max);
+    lines[last.max - 1] = truncate(lines[last.max - 1], last.cpl);
+    return { lines, fontSize: last.size, letterSpacing: last.ls };
+  };
+
+  const fit = fitTitle((pageTitle || 'Awesome Video').trim() || 'Awesome Video');
+  const lineHeight = Math.round(fit.fontSize * 1.16);
+  const titleFirstY = 178 + Math.round(fit.fontSize * 1.13);
+  const titleLastY = titleFirstY + (fit.lines.length - 1) * lineHeight;
+  const subtitleY = titleLastY + Math.max(52, Math.round(fit.fontSize * 0.85));
+  const titleTspans = fit.lines
+    .map((ln, i) => `<tspan x="104" ${i === 0 ? `y="${titleFirstY}"` : `dy="${lineHeight}"`}>${xmlEscape(ln)}</tspan>`)
+    .join('');
+
   const subtitle = xmlEscape(category ? truncate(category, 44) : 'Curated video development resources');
   const eyebrow = category ? 'Category · Awesome Video' : 'Index · Awesome Video';
   const stat = xmlEscape(`${count} resources`);
@@ -366,13 +407,13 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
   <!-- Crimson hairline divider under eyebrow -->
   <rect x="104" y="178" width="64" height="2" fill="#ff3d52" />
 
-  <!-- Primary title: Inter bold, warm off-white -->
-  <text x="104" y="266" font-family="'Inter','Helvetica Neue',sans-serif"
-        font-size="78" font-weight="800" fill="#f4f3ee"
-        letter-spacing="-2">${title}</text>
+  <!-- Primary title: Inter bold, warm off-white; auto-fit multi-line -->
+  <text font-family="'Inter','Helvetica Neue',sans-serif"
+        font-size="${fit.fontSize}" font-weight="800" fill="#f4f3ee"
+        letter-spacing="${fit.letterSpacing}">${titleTspans}</text>
 
   <!-- Secondary line: Fraunces italic accent (matches About/Home hero) -->
-  <text x="104" y="332" font-family="'Fraunces','Times New Roman',serif"
+  <text x="104" y="${subtitleY}" font-family="'Fraunces','Times New Roman',serif"
         font-size="36" font-style="italic" font-weight="500"
         fill="#a8a4a0">${subtitle}</text>
 
@@ -405,27 +446,46 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
 </svg>`;
 }
 
-async function resolveOgParams(req: any) {
-  const { title, category, resourceCount } = req.query as Record<string, string | undefined>;
-  let pageTitle = title;
-  let count = resourceCount;
-  if (!pageTitle || !count) {
-    try {
-      const data = await legacyRepo.getAwesomeListFromDatabase();
-      if (!pageTitle) pageTitle = 'Awesome Video';
-      if (!count) count = `${data?.resources?.length ?? 2000}+`;
-    } catch {
-      pageTitle = pageTitle || 'Awesome Video';
-      count = count || '2000+';
+type OgParams =
+  | { ok: true; pageTitle: string; category?: string; count: string }
+  | { ok: false; status: number; message: string };
+
+async function resolveOgParams(req: any): Promise<OgParams> {
+  // T007: the card text is resolved SERVER-SIDE from the route path. Legacy
+  // caller-supplied ?title=/?category=/?resourceCount= text params are ignored
+  // (those URLs render the brand default card), so attacker text can never be
+  // painted onto an awesome.video-branded image.
+  const rawPath = (req.query as Record<string, unknown>).path;
+  let pageTitle = 'Awesome Video';
+  let category: string | undefined;
+  if (rawPath !== undefined) {
+    if (
+      typeof rawPath !== 'string' ||
+      !rawPath.startsWith('/') ||
+      rawPath.length > 512 ||
+      /[\u0000-\u001f\u007f]/.test(rawPath)
+    ) {
+      return { ok: false, status: 400, message: 'Invalid path parameter' };
+    }
+    const meta = await resolveOgImageMeta(rawPath.split('?')[0]);
+    if (meta) {
+      pageTitle = meta.pageTitle;
+      category = meta.category;
     }
   }
-  return { pageTitle: pageTitle!, category, count: count! };
+  let count = '2000+';
+  try {
+    const data = await legacyRepo.getAwesomeListFromDatabase();
+    count = `${data?.resources?.length ?? 2000}+`;
+  } catch {}
+  return { ok: true, pageTitle, category, count };
 }
 
 async function generateOpenGraphImage(req: any, res: any) {
   try {
-    const { pageTitle, category, count } = await resolveOgParams(req);
-    const svg = buildOgSvg(pageTitle, category, count);
+    const params = await resolveOgParams(req);
+    if (!params.ok) return res.status(params.status).send(params.message);
+    const svg = buildOgSvg(params.pageTitle, params.category, params.count);
     res.set('Content-Type', 'image/svg+xml');
     res.set('Cache-Control', 'public, max-age=86400');
     res.send(svg);
@@ -443,8 +503,9 @@ async function generateOpenGraphImage(req: any, res: any) {
  */
 async function generateOpenGraphImagePng(req: any, res: any) {
   try {
-    const { pageTitle, category, count } = await resolveOgParams(req);
-    const svg = buildOgSvg(pageTitle, category, count);
+    const params = await resolveOgParams(req);
+    if (!params.ok) return res.status(params.status).send(params.message);
+    const svg = buildOgSvg(params.pageTitle, params.category, params.count);
     const sharp = (await import('sharp')).default;
     const png = await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();
     res.set('Content-Type', 'image/png');
@@ -706,7 +767,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // the part before the @" (Run17 BUG-040 hint) but nothing ever stored it,
       // so every local account had name NULL and the admin Users table showed
       // an unidentifiable wall of "—". Derive it here so the promise is true.
-      const derivedFirstName = email.split("@")[0].slice(0, 100);
+      // Run21 R4-050: ONE display-name cap everywhere (register derivation,
+      // profile editor, admin name endpoint) — DISPLAY_NAME_MAX from the
+      // shared validation module, so a derived name can always be re-saved.
+      const derivedFirstName = stripInvisible(email.split("@")[0]).slice(0, DISPLAY_NAME_MAX);
       const created = await userRepo.upsertUser({ email, password: hashed, role: "user", firstName: derivedFirstName });
 
       // Run16 BUG-042: record account creation in the audit trail.
@@ -1387,32 +1451,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // BUG-009 (run10): reject raw HTML/script markup in text fields. React
       // escapes on render so this is defense-in-depth, not an XSS patch —
       // markup in titles/descriptions is never legitimate catalog content.
-      const NO_HTML = /<[a-z!/][^>]*>/i;
+      // Run21 R4-015/016/047/048/076: ALL content rules come from the shared
+      // validation module (same schemas the client mounts via zodResolver):
+      // - title: visible chars required (ZWSP/whitespace-only → 400), ≤200, no HTML
+      // - url: https-only, ≤2048, no userinfo/control chars, dotted hostname
+      // - description: required 10–1000 visible chars (mirrors the client rule)
       const submitSchema = z.object({
-        // Run15 BUG-037: trim before validating — a trailing space after a
-        // pasted URL is never meaningful and used to fail .url() confusingly.
-        url: z.string().trim().min(1).url('Invalid URL format')
-          // Run16 BUG-001: enforce the https-only contract the UI promises.
-          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL')
-          // BUG-018 (run18): dotted-hostname / no-whitespace sanity.
-          .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE),
-        title: z.string().min(1).max(200, 'Title must be 1-200 characters')
-          .refine((v) => !NO_HTML.test(v), 'Title must not contain HTML tags'),
+        url: httpsUrlSchema,
+        title: resourceTitleSchema,
         category: z.string().min(1, 'Category is required'),
-        description: z.string()
-          .refine((v) => !NO_HTML.test(v), 'Description must not contain HTML tags')
-          .optional(),
+        description: resourceDescriptionSchema,
         subcategory: z.string().optional(),
         subSubcategory: z.string().optional(),
-        // BUG-029 (run14): tags reach the DB via metadata.tags and were the
-        // one text surface the run10 NO_HTML guard missed. Same rule: markup
-        // is never legitimate tag content. Also cap count/length server-side
-        // (the client's 10-tag slice is advisory only).
+        // BUG-029 (run14): tags reach the DB via metadata.tags. Markup is
+        // never legitimate tag content; cap count/length server-side.
         metadata: z.object({
-          tags: z.array(
-            z.string().max(50, 'Tags must be at most 50 characters')
-              .refine((v) => !NO_HTML.test(v), 'Tags must not contain HTML tags')
-          ).max(10, 'At most 10 tags allowed').optional(),
+          tags: z.array(tagSchema).max(10, 'At most 10 tags allowed').optional(),
         }).passthrough().optional(),
       });
       const submitValidation = submitSchema.safeParse(req.body);
@@ -1466,14 +1520,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const resourceData = insertResourceSchema.parse(req.body);
+      // Use the NORMALIZED values (trimmed/zero-width-stripped) from the
+      // shared validators — never the raw body — so " title " and ZWSP
+      // padding can't reach the DB (R4-015/069).
+      const resourceData = {
+        ...insertResourceSchema.parse(req.body),
+        title: submitValidation.data.title,
+        url: submitValidation.data.url,
+        description: submitValidation.data.description,
+        metadata: submitValidation.data.metadata,
+      };
 
-      await ensureSubSubcategoryExists(
+      // Run21 R4-037: if the label can't be contained under the resource's
+      // own category > subcategory chain, store null instead of an orphan.
+      const submitContained = await ensureSubSubcategoryExists(
         categoryRepo,
         resourceData.category,
         resourceData.subcategory,
         resourceData.subSubcategory,
       );
+      if (!submitContained) resourceData.subSubcategory = null;
 
       // BUG-012: unique-constraint safety net (Postgres error code 23505)
       try {
@@ -1614,23 +1680,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // SECURITY FIX: Validate field sizes (ISSUE 5)
-      if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
-        return res.status(400).json({ message: 'Title too long (max 200 characters)' });
-      }
-      
-      if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
-        return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
+      // Run21 R4-015/016: suggest-edit is a WRITE PATH — approved edits land
+      // verbatim on the live resource, so it mounts the SAME shared validators
+      // as submit (visible title, bounded description, sane URL, clean tags).
+      if (sanitizedProposedData.title !== undefined) {
+        const parsedTitle = resourceTitleSchema.safeParse(String(sanitizedProposedData.title));
+        if (!parsedTitle.success) {
+          return res.status(400).json({ message: parsedTitle.error.issues[0]?.message || 'Invalid title' });
+        }
+        sanitizedProposedData.title = parsedTitle.data;
       }
 
-      // Run16 BUG-001: a proposed URL change must stay a web URL — the edit
-      // approval path writes it straight onto the live resource.
-      if (sanitizedProposedData.url !== undefined && !WEB_URL_RE.test(String(sanitizedProposedData.url))) {
-        return res.status(400).json({ message: 'URL must start with http:// or https://' });
+      if (sanitizedProposedData.description !== undefined) {
+        const parsedDesc = resourceDescriptionSchema.safeParse(String(sanitizedProposedData.description));
+        if (!parsedDesc.success) {
+          return res.status(400).json({ message: parsedDesc.error.issues[0]?.message || 'Invalid description' });
+        }
+        sanitizedProposedData.description = parsedDesc.data;
       }
-      // BUG-018 (run18): edit-approved URLs go live too — same hostname sanity.
-      if (sanitizedProposedData.url !== undefined && !isPlausiblePublicUrl(String(sanitizedProposedData.url))) {
-        return res.status(400).json({ message: URL_HOSTNAME_MESSAGE });
+
+      // Run16 BUG-001 / BUG-018 / Run21 R4-048/076: a proposed URL change may
+      // keep a legacy http:// scheme but must be a plausible, bounded web URL
+      // with no embedded credentials.
+      if (sanitizedProposedData.url !== undefined) {
+        const parsedUrl = webUrlSchema.safeParse(String(sanitizedProposedData.url));
+        if (!parsedUrl.success) {
+          return res.status(400).json({ message: parsedUrl.error.issues[0]?.message || 'Invalid URL' });
+        }
+        sanitizedProposedData.url = parsedUrl.data;
       }
       
       // tags is stored in metadata.tags (not a column). Reject non-array shapes
@@ -1642,10 +1719,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         const normalizedTags = sanitizedProposedData.tags
           .filter((t: unknown): t is string => typeof t === 'string')
-          .map((t: string) => t.trim())
+          .map((t: string) => stripInvisible(t))
           .filter((t: string) => t.length > 0);
         if (normalizedTags.length > 20) {
           return res.status(400).json({ message: 'Too many tags (max 20)' });
+        }
+        for (const tag of normalizedTags) {
+          if (tag.length > TAG_MAX_LENGTH) {
+            return res.status(400).json({ message: `Tags must be at most ${TAG_MAX_LENGTH} characters` });
+          }
+          if (NO_HTML_RE.test(tag)) {
+            return res.status(400).json({ message: 'Tags must not contain HTML tags' });
+          }
         }
         sanitizedProposedData.tags = normalizedTags;
       }
@@ -2038,15 +2123,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/user/profile', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const NO_HTML = /<[a-z!/][^>]*>/i;
-      // Run17 BUG-012: cap at 50 (was 60) per audit; header CSS truncation is
-      // the second line of defense for anything at the cap.
-      const nameField = z
-        .string()
-        .trim()
-        .max(50, 'Name must be 50 characters or fewer')
-        .refine((v) => !NO_HTML.test(v), 'Name must not contain HTML tags')
-        .optional();
+      // Run17 BUG-012: cap at 50; Run21 R4-049: shared displayNameSchema also
+      // strips zero-width chars and rejects names with NO visible characters
+      // (a ZWSP-only name used to render as an invisible identity).
+      const nameField = displayNameSchema.optional();
       const profileSchema = z
         .object({ firstName: nameField, lastName: nameField })
         .refine((v) => v.firstName !== undefined || v.lastName !== undefined, {
@@ -2792,9 +2872,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sortDir = typeof req.query.sortDir === 'string' ? req.query.sortDir : undefined;
 
       const result = await userRepo.listUsers(page, limit, q, sortBy, sortDir);
-      // Never expose password hashes over the API, even to admins. Strip the
-      // password field from every user before sending the response.
-      const sanitizedUsers = result.users.map(({ password, ...rest }) => rest);
+      // Never expose password hashes over the API, even to admins. Run21
+      // R4-019: whitelist serializer (not destructure-strip) so any future
+      // sensitive column is safe by default.
+      const sanitizedUsers = result.users.map((u) => sanitizeUser(u));
       res.json({ ...result, users: sanitizedUsers });
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -2854,11 +2935,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/admin/users/:id/name', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { firstName, lastName } = req.body ?? {};
+      // Run21 R4-049/050: same rules as the profile editor — zero-width chars
+      // stripped, ONE shared cap (DISPLAY_NAME_MAX) so admin-set names always
+      // round-trip through the self-service editor.
       const clean = (v: unknown): string | null | undefined => {
         if (v === undefined) return undefined;
         if (v === null) return null;
         if (typeof v !== 'string') return undefined;
-        const t = v.trim().slice(0, 100);
+        const t = stripInvisible(v).slice(0, DISPLAY_NAME_MAX);
         return t.length > 0 ? t : null;
       };
       const first = clean(firstName);
@@ -2874,8 +2958,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...(first !== undefined ? { firstName: first } : {}),
         ...(last !== undefined ? { lastName: last } : {}),
       });
-      const { password: _pw, ...rest } = updated;
-      res.json(rest);
+      res.json(sanitizeUser(updated));
     } catch (error) {
       console.error('Error updating user name:', error);
       res.status(500).json({ message: 'Failed to update user name' });
@@ -2899,7 +2982,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const user = await userRepo.updateUserRole(userId, role);
-      res.json(user);
+      // Run21 R4-019: this endpoint used to serialize the FULL user row —
+      // including the bcrypt hash. Field-whitelist serializer only.
+      res.json(sanitizeUser(user));
     } catch (error) {
       console.error('Error updating user role:', error);
       res.status(500).json({ message: 'Failed to update user role' });
@@ -2934,13 +3019,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/audit-logs - List audit log entries
   app.get('/api/admin/audit-logs', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      // Run16 BUG-041: honor offset + return the REAL total (the endpoint used
-      // to ignore offset and echo total = logs.length, making pagination
-      // impossible past the first page).
-      const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 50, 1), 500);
-      const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
-      const resourceId = req.query.resourceId ? parseInt(req.query.resourceId as string) : null;
-      const rid = resourceId && !isNaN(resourceId) ? resourceId : null;
+      // Run16 BUG-041: honor offset + return the REAL total.
+      // Run21 R4-079: invalid pagination/filter params are a CLIENT error —
+      // answer 400 instead of silently clamping/ignoring them (offset=-1 and
+      // resourceId=0 used to be swallowed and return page 1 unfiltered).
+      const rawLimit = req.query.limit as string | undefined;
+      const rawOffset = req.query.offset as string | undefined;
+      const rawResourceId = req.query.resourceId as string | undefined;
+
+      let limit = 50;
+      if (rawResourceId !== undefined) {
+        const n = Number(rawResourceId);
+        if (!Number.isInteger(n) || n < 1) {
+          return res.status(400).json({ message: 'resourceId must be a positive integer' });
+        }
+      }
+      if (rawLimit !== undefined) {
+        const n = Number(rawLimit);
+        if (!Number.isInteger(n) || n < 1 || n > 500) {
+          return res.status(400).json({ message: 'limit must be an integer between 1 and 500' });
+        }
+        limit = n;
+      }
+      let offset = 0;
+      if (rawOffset !== undefined) {
+        const n = Number(rawOffset);
+        if (!Number.isInteger(n) || n < 0) {
+          return res.status(400).json({ message: 'offset must be a non-negative integer' });
+        }
+        offset = n;
+      }
+      const rid = rawResourceId !== undefined ? Number(rawResourceId) : null;
 
       const [logs, total] = await Promise.all([
         auditRepo.getResourceAuditLog(rid, limit, offset),
@@ -3092,12 +3201,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
       
+      // Run21 R4-016: the admin edit path mounts the SAME shared validators as
+      // submit — <script> titles, whitespace-only titles, 5000-char
+      // descriptions and 100k URLs all 400 here now. Updates may keep a
+      // legacy http:// scheme (webUrlSchema) but never a non-web scheme.
       const updateSchema = insertResourceSchema.partial().extend({
-        // Run16 BUG-001: updates may keep a legacy http:// URL but a NEW value
-        // must be a web URL — javascript:/ftp:/data: never reach the DB.
-        url: insertResourceSchema.shape.url.trim()
-          .refine((v) => WEB_URL_RE.test(v), 'URL must start with http:// or https://')
-          .optional(),
+        title: resourceTitleSchema.optional(),
+        description: resourceDescriptionSchema.optional(),
+        url: webUrlSchema.optional(),
       });
       const validationResult = updateSchema.safeParse(req.body);
       
@@ -3122,13 +3233,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Auto-create the implied sub_subcategories row so the resource never
       // disappears from the category drilldown (task #57). Uses the post-update
       // hierarchy values: prefer the incoming value, fall back to the resource's
-      // existing value.
-      await ensureSubSubcategoryExists(
+      // existing value. Run21 R4-037: when the label can't be contained under
+      // the effective category > subcategory chain, persist null instead of
+      // leaving an orphan label on the row.
+      const updateContained = await ensureSubSubcategoryExists(
         categoryRepo,
         updateData.category ?? resource.category,
         updateData.subcategory ?? resource.subcategory,
         updateData.subSubcategory ?? resource.subSubcategory,
       );
+      if (!updateContained && (updateData.subSubcategory ?? resource.subSubcategory)) {
+        updateData.subSubcategory = null;
+      }
 
       const updatedResource = await resourceRepo.updateResource(resourceId, updateData);
       
@@ -3327,14 +3443,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       
+      // Run16 BUG-001/BUG-031 + Run21 R4-016: admin-created resources go live
+      // immediately — full shared validation (https-only bounded URL, visible
+      // title, bounded description when provided).
       const createSchema = insertResourceSchema.extend({
-        title: insertResourceSchema.shape.title.min(1, 'Title is required'),
-        // Run16 BUG-001/BUG-031: admin-created resources go live immediately —
-        // require a real https URL, not just a non-empty string.
-        url: insertResourceSchema.shape.url.trim().min(1, 'URL is required')
-          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL')
-          // BUG-018 (run18): dotted-hostname / no-whitespace sanity.
-          .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE),
+        title: resourceTitleSchema,
+        url: httpsUrlSchema,
+        description: resourceDescriptionSchema.optional(),
       });
       
       const validationResult = createSchema.safeParse(req.body);
@@ -3350,14 +3465,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const resolvedCategory = validatedData.category || 'General Tools';
       const resolvedSubcategory = validatedData.subcategory || null;
-      const resolvedSubSubcategory = validatedData.subSubcategory || null;
+      let resolvedSubSubcategory = validatedData.subSubcategory || null;
 
-      await ensureSubSubcategoryExists(
+      // Run21 R4-037: null out labels that can't be contained under the
+      // resolved category > subcategory chain instead of storing orphans.
+      const createContained = await ensureSubSubcategoryExists(
         categoryRepo,
         resolvedCategory,
         resolvedSubcategory,
         resolvedSubSubcategory,
       );
+      if (!createContained) resolvedSubSubcategory = null;
 
       const newResource = await resourceRepo.createResource({
         title: validatedData.title,
@@ -4991,7 +5109,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   let awesomeListCache: { body: string; etag: string; builtAt: number } | null = null;
   const AWESOME_LIST_TTL_MS = 60_000;
 
-  app.get("/api/awesome-list", async (req, res) => {
+  // R4-031: the heaviest public read now shares the resource-read rate limit
+  // (100 req/min/IP, 429 + Retry-After) — the server cache + ETag/304 make
+  // real browsing cheap, so only scripted hammering ever hits the cap.
+  app.get("/api/awesome-list", resourceReadLimiter, async (req, res) => {
     try {
       // Extract query parameters for filtering
       const { category, subcategory, subSubcategory } = req.query;

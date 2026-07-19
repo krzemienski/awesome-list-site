@@ -1,0 +1,1 @@
+{"error":"validation_failed","message":"Validation failed","fieldErrors":{"description":"Description must be at least 10 characters"},"errors":[{"code":"custom","path":["description"],"message":"Description must be at least 10 characters"}]}

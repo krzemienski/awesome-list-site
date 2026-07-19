@@ -12,9 +12,48 @@
 
 const SITE_NAME = "Awesome Video";
 
+// SERP display budgets (R4-025/026) ------------------------------------------
+// Google truncates titles around 60 chars and descriptions around 160 chars.
+// Both the server (buildMetaTags) and the client (SEOHead) clamp through these
+// SAME functions at emission time, so the crawl-pass HTML and the hydrated DOM
+// always show the identical, budget-fitting string (two-pass parity).
+export const SEO_TITLE_MAX = 60;
+export const SEO_DESCRIPTION_MAX = 160;
+
+// Word-boundary truncation: cut at the budget, back up to the last full word,
+// and append a single ellipsis. Strings already inside the budget pass through
+// untouched, so existing compliant templates render byte-identically.
+function clampAtWord(s: string, max: number): string {
+  const t = (s || "").trim();
+  if (t.length <= max) return t;
+  let cut = t.slice(0, max - 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  if (lastSpace > Math.floor(max * 0.5)) cut = cut.slice(0, lastSpace);
+  return cut.replace(/[\s—–\-·,;:]+$/u, "") + "…";
+}
+
+export function clampSeoTitle(title: string): string {
+  return clampAtWord(title, SEO_TITLE_MAX);
+}
+
+export function clampSeoDescription(description: string): string {
+  return clampAtWord(description, SEO_DESCRIPTION_MAX);
+}
+
+// Social-preview image URL (R4-024 / og-image parity) -------------------------
+// ONE builder shared by server/og-middleware.ts and client SEOHead so both
+// passes emit the byte-identical og:image URL. The endpoint resolves the page
+// title/category server-side from the route path (never from caller-supplied
+// text params).
+export function ogImagePath(routePath: string): string {
+  const p = routePath && routePath.startsWith("/") ? routePath : "/";
+  return `/og-image.png?path=${encodeURIComponent(p)}`;
+}
+
 // Home ----------------------------------------------------------------------
+// Kept ≤60 chars for a 4-digit count so the SERP shows the full title.
 export function homeSeoTitle(resourceCount: number): string {
-  return `${SITE_NAME} — ${resourceCount}+ Curated Video Tools, Codecs & Streaming Resources`;
+  return `${SITE_NAME} — ${resourceCount}+ Curated Video & Streaming Resources`;
 }
 
 export function homeSeoDescription(

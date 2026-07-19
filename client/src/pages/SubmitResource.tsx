@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -41,6 +41,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError, extractFieldErrors } from "@/lib/apiError";
+import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import { redirectToLogin } from "@/lib/authUtils";
 import { trackGenerateLead } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
@@ -48,7 +49,9 @@ import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
 
 // BUG-009 (run10): reject raw HTML/script markup in text fields client-side
 // (mirrors the server-side guard — markup is never legitimate catalog content).
-const NO_HTML = /<[a-z!/][^>]*>/i;
+// Run21 R4-015/048: rules now come from the SHARED validation module so the
+// two layers can't drift (visible-char titles, 2048-char URL cap).
+import { NO_HTML_RE as NO_HTML, MAX_URL_LENGTH, hasVisibleChars } from "@shared/validation";
 
 // Form validation schema
 const submitResourceSchema = z.object({
@@ -58,12 +61,16 @@ const submitResourceSchema = z.object({
     .trim()
     .min(1, "Title is required")
     .max(200, "Title must be 200 characters or less")
+    // Run21 R4-015: zero-width-only titles render blank — require VISIBLE chars.
+    .refine(hasVisibleChars, "Title is required")
     .refine((v) => !NO_HTML.test(v), "Title must not contain HTML tags"),
   // Run16 BUG-061: an EMPTY url used to say "Please enter a valid URL" —
   // min(1) fires first so a blank field reads "URL is required".
   url: z.string()
     .trim()
     .min(1, "URL is required")
+    // Run21 R4-048: same 2048 cap the server enforces — inline error, not a 400.
+    .max(MAX_URL_LENGTH, `URL must be at most ${MAX_URL_LENGTH} characters`)
     .url("Please enter a valid URL")
     .refine((url) => url.startsWith("https://"), {
       message: "URL must use HTTPS protocol"
@@ -95,6 +102,10 @@ const submitResourceSchema = z.object({
 });
 
 type SubmitResourceFormData = z.infer<typeof submitResourceSchema>;
+
+// R4-055: localStorage key for the in-progress /submit draft so an accidental
+// refresh, tab close, or navigation no longer wipes everything the user typed.
+const DRAFT_KEY = "submit-resource-draft";
 
 interface Category {
   id: number;
@@ -263,6 +274,70 @@ export default function SubmitResource() {
 
     void checkDuplicateUrl();
   }, [debouncedUrl]);
+
+  // R4-055: draft persistence + unload guard so an accidental refresh, tab
+  // close, or navigation no longer destroys everything typed into /submit.
+  const draftRestoredRef = useRef(false);
+  const draftSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const draftHasContent = (v: Partial<SubmitResourceFormData>) =>
+    !!(v.title || v.url || v.description || v.tags || v.category);
+
+  // Restore a saved draft once on mount, before the auto-save subscription is
+  // wired (draftRestoredRef gates saving until the restore has run so we never
+  // clobber the stored draft with the empty defaults).
+  useEffect(() => {
+    const saved = safeGetItem(DRAFT_KEY);
+    if (saved) {
+      try {
+        const draft = JSON.parse(saved) as Partial<SubmitResourceFormData>;
+        if (draftHasContent(draft)) {
+          form.reset({ ...form.getValues(), ...draft });
+          toast({
+            title: "Draft restored",
+            description:
+              "We brought back your unsaved submission — pick up where you left off.",
+          });
+        }
+      } catch {
+        safeRemoveItem(DRAFT_KEY);
+      }
+    }
+    draftRestoredRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced auto-save of the in-progress form to localStorage.
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      if (!draftRestoredRef.current) return;
+      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+      draftSaveTimer.current = setTimeout(() => {
+        if (draftHasContent(values)) {
+          safeSetItem(DRAFT_KEY, JSON.stringify(values));
+        } else {
+          safeRemoveItem(DRAFT_KEY);
+        }
+      }, 600);
+    });
+    return () => {
+      subscription.unsubscribe();
+      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
+  // Warn before the browser unloads (refresh/close/hard nav) while the form has
+  // unsaved edits — a second safety net alongside the draft above.
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (!isDirty || showSuccess) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty, showSuccess]);
 
   // Submit mutation
   const submitMutation = useMutation({

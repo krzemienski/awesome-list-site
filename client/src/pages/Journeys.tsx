@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2 } from "lucide-react";
+import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import SEOHead from "@/components/layout/SEOHead";
@@ -290,8 +290,15 @@ export default function Journeys() {
                         clipped it. */}
                     {/* Run17 BUG-046: "Continue" only once real progress exists —
                         enrolled-with-zero-progress previously showed "Continue
-                        Journey" on journeys the user had never actually begun. */}
-                    {enrolled && (journey.completedStepCount || 0) > 0 ? (
+                        Journey" on journeys the user had never actually begun.
+                        Run21 R4-075: a 100%-complete journey gets its own
+                        Completed-state label instead of still saying "Continue". */}
+                    {enrolled && progressPercent === 100 ? (
+                      <>
+                        <Trophy className="h-4 w-4 mr-2 shrink-0" />
+                        <span className="truncate">Completed · Review</span>
+                      </>
+                    ) : enrolled && (journey.completedStepCount || 0) > 0 ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 mr-2 shrink-0" />
                         <span className="truncate">Continue Journey</span>

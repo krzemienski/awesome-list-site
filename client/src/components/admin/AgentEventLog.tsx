@@ -55,6 +55,23 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
   const hasDetail = (d: AgentEvent["detail"]) =>
     !!d && typeof d === "object" && Object.keys(d).length > 0;
 
+  // R4-078: event payloads can arrive as raw stderr / minified source / stack
+  // dumps. Strip ANSI colour codes + non-printable control chars so they can't
+  // smuggle escape sequences into the DOM, then clamp the length so a single
+  // huge line can't blow out the layout (full text stays in the title attr /
+  // is reachable via the expand affordance).
+  const sanitizeText = (raw: unknown): string => {
+    if (raw == null) return "";
+    const s = typeof raw === "string" ? raw : String(raw);
+    return s
+      // eslint-disable-next-line no-control-regex
+      .replace(/\x1b\[[0-9;]*m/g, "")
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "");
+  };
+  const SUMMARY_MAX = 280;
+  const DETAIL_MAX = 2000;
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -99,15 +116,24 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                     {ev.targetActor && (
                       <span className="text-purple-300 shrink-0">→ {ev.targetActor}</span>
                     )}
-                    <span className="whitespace-pre-wrap break-words flex-1 text-foreground/90">
-                      {ev.summary}
-                    </span>
+                    {(() => {
+                      const clean = sanitizeText(ev.summary);
+                      const isLong = clean.length > SUMMARY_MAX;
+                      return (
+                        <span
+                          className="whitespace-pre-wrap break-words flex-1 text-foreground/90"
+                          title={isLong ? clean : undefined}
+                        >
+                          {isLong ? `${clean.slice(0, SUMMARY_MAX)}…` : clean}
+                        </span>
+                      );
+                    })()}
                     {showDetail && (
                       <button
                         type="button"
                         onClick={() => toggle(ev.id)}
                         className="shrink-0 text-muted-foreground hover:text-foreground"
-                        aria-label={isOpen ? "Hide detail" : "Show detail"}
+                        aria-label={isOpen ? `Hide detail for event ${ev.seq}` : `Show detail for event ${ev.seq}`}
                         data-testid={`button-toggle-detail-${ev.seq}`}
                       >
                         {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
@@ -138,11 +164,20 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                     </div>
                   )}
 
-                  {showDetail && isOpen && (
-                    <pre className="pl-[72px] mt-1 text-[10px] text-muted-foreground whitespace-pre-wrap break-all">
-                      {JSON.stringify(ev.detail, null, 2)}
-                    </pre>
-                  )}
+                  {showDetail && isOpen && (() => {
+                    const raw = sanitizeText(JSON.stringify(ev.detail, null, 2));
+                    const truncated = raw.length > DETAIL_MAX;
+                    return (
+                      <pre className="pl-[72px] mt-1 text-[10px] text-muted-foreground whitespace-pre-wrap break-all">
+                        {truncated ? raw.slice(0, DETAIL_MAX) : raw}
+                        {truncated && (
+                          <span className="text-yellow-500/80">
+                            {`\n… (truncated ${(raw.length - DETAIL_MAX).toLocaleString()} more characters)`}
+                          </span>
+                        )}
+                      </pre>
+                    );
+                  })()}
                 </div>
               );
             })}

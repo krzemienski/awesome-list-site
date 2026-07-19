@@ -38,7 +38,7 @@
 
 import { GitHubClient } from "./client";
 import { parseAwesomeList, convertToDbResources } from "./parser";
-import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf } from "./importHygiene";
+import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf, ensureMinDescription } from "./importHygiene";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { CategoryRepository } from "../repositories/CategoryRepository";
 import { ResourceRepository } from "../repositories/ResourceRepository";
@@ -284,6 +284,24 @@ export class GitHubSyncService {
       const dbResources = convertToDbResources(parsedList);
       
       console.log(`Found ${dbResources.length} resources in the awesome list`);
+      
+      // Run21 R4-036: identical boilerplate descriptions on different
+      // resources ("Defines the file format and structure" x3) read as
+      // copy-paste errors. Within an import batch, only the first resource
+      // keeps a repeated description; later ones fall back to the generated
+      // title+domain description so each entry is distinct.
+      {
+        const seenDescriptions = new Map<string, number>();
+        for (const r of dbResources) {
+          const key = (r.description || "").trim().toLowerCase();
+          if (key.length === 0) continue;
+          const count = seenDescriptions.get(key) || 0;
+          seenDescriptions.set(key, count + 1);
+          if (count > 0) {
+            r.description = ensureMinDescription("", r.title as string, r.url as string);
+          }
+        }
+      }
       
       // STEP 3: Build and ensure category hierarchy exists in database
       console.log('Ensuring category hierarchy exists in database...');

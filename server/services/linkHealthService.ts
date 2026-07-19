@@ -8,6 +8,9 @@ const checks: LinkHealthCheck[] = [];
 let checkIdCounter = 0;
 
 function mapResultToStatus(result: LinkCheckResult): LinkHealthCheck['status'] {
+  // 200-at-face-value but takeover/intent-flip/parked heuristics fired:
+  // surface for review instead of counting as healthy (R4-001/023 class).
+  if (result.valid && result.suspicion) return 'suspect';
   if (result.valid) return 'healthy';
   if (result.statusText === 'Timeout') return 'timeout';
   if (result.statusText === 'DNS Not Found') return 'dns_failure';
@@ -92,23 +95,26 @@ export const linkHealthService = {
           httpStatus: result.status,
           responseTime: result.responseTime,
           redirectUrl: result.redirectUrl,
-          errorMessage: result.error,
+          finalUrl: result.finalUrl,
+          errorMessage: result.suspicionDetail || result.error,
           consecutiveFailures: status === 'healthy' ? 0 : 1,
-          flaggedForReview: status === 'broken' || status === 'dns_failure',
+          flaggedForReview: status === 'broken' || status === 'dns_failure' || status === 'suspect',
           lastCheckedAt: new Date().toISOString(),
         };
         checks.push(check);
       }
 
+      const suspectCount = report.results.filter(r => r.valid && r.suspicion).length;
       job.checkedLinks = report.totalLinks;
-      job.healthyLinks = report.validLinks;
+      job.healthyLinks = report.validLinks - suspectCount;
+      job.suspectLinks = suspectCount;
       job.brokenLinks = report.brokenLinks;
       job.redirectLinks = report.redirects;
       job.timeoutLinks = report.results.filter(r => r.statusText === 'Timeout').length;
       job.status = 'completed';
       job.completedAt = new Date().toISOString();
 
-      console.log(`[LinkHealth] Check completed: ${job.healthyLinks} healthy, ${job.brokenLinks} broken, ${job.redirectLinks} redirects, ${job.timeoutLinks} timeouts out of ${job.totalLinks} total`);
+      console.log(`[LinkHealth] Check completed: ${job.healthyLinks} healthy, ${job.suspectLinks} suspect, ${job.brokenLinks} broken, ${job.redirectLinks} redirects, ${job.timeoutLinks} timeouts out of ${job.totalLinks} total`);
     } catch (err: any) {
       job.status = 'failed';
       job.errorMessage = err.message;

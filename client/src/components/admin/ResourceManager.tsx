@@ -68,6 +68,9 @@ export default function ResourceManager() {
   const [rejectReason, setRejectReason] = useState("");
   // R2-H04 companion: bulk hard-delete needs an explicit confirmation dialog.
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  // R4-054: Bulk Approve was the only batch action firing instantly — it now
+  // confirms first (stating the exact count), matching bulk reject/delete.
+  const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
 
   const [editForm, setEditForm] = useState({
     title: "",
@@ -162,7 +165,7 @@ export default function ResourceManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       setEditDialogOpen(false);
       setSelectedResource(null);
       toast({
@@ -189,7 +192,7 @@ export default function ResourceManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setCreateDialogOpen(false);
       resetEditForm();
@@ -216,7 +219,7 @@ export default function ResourceManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setDeleteDialogOpen(false);
       setSelectedResource(null);
@@ -244,7 +247,7 @@ export default function ResourceManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setSelectedResourceIds([]);
       toast({
@@ -271,7 +274,7 @@ export default function ResourceManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setSelectedResourceIds([]);
       setRejectDialogOpen(false);
@@ -299,7 +302,7 @@ export default function ResourceManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       setSelectedResourceIds([]);
       toast({
@@ -449,6 +452,11 @@ export default function ResourceManager() {
 
   const handleBulkApprove = () => {
     if (selectedResourceIds.length === 0) return;
+    setBulkApproveDialogOpen(true);
+  };
+
+  const confirmBulkApprove = () => {
+    setBulkApproveDialogOpen(false);
     bulkApproveMutation.mutate(selectedResourceIds);
   };
 
@@ -591,7 +599,10 @@ export default function ResourceManager() {
               <Input
                 placeholder="Search by title or URL..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                /* R4-018: the query key includes `search`, so each keystroke
+                   refetches live — reset to page 1 too, or a deep page index
+                   survives into a smaller result set ("Page 101 of 11"). */
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 className="pl-10"
                 data-testid="input-search-resources"
               />
@@ -600,7 +611,7 @@ export default function ResourceManager() {
                 value=""), but the API treats a literal status/category of "all"
                 as a real filter value and matches nothing. Map "all" back to ""
                 (= param omitted) so resetting a filter actually resets it. */}
-            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v === "all" ? "" : v)}>
+            <Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v === "all" ? "" : v); setPage(1); setSelectedResourceIds([]); }}>
               <SelectTrigger className="w-full sm:w-48" aria-label="Filter by category" data-testid="select-category-filter">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
@@ -612,7 +623,7 @@ export default function ResourceManager() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v === "all" ? "" : v)}>
+            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v === "all" ? "" : v); setPage(1); setSelectedResourceIds([]); }}>
               <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
@@ -720,7 +731,7 @@ export default function ResourceManager() {
                     rows={4}
                   />
                   <p className="text-sm text-muted-foreground mt-1">
-                    {rejectReason.length}/10 characters minimum
+                    {rejectReason.trim().length}/10 characters minimum
                   </p>
                 </div>
               </div>
@@ -738,6 +749,30 @@ export default function ResourceManager() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {/* R4-054: Bulk Approve Confirmation — states the exact count so a
+              batch publish can't fire on a single misclick. */}
+          <AlertDialog open={bulkApproveDialogOpen} onOpenChange={setBulkApproveDialogOpen}>
+            <AlertDialogContent data-testid="dialog-bulk-approve">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Approve {selectedResourceIds.length} resource{selectedResourceIds.length === 1 ? '' : 's'}?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This publishes the selected resource{selectedResourceIds.length === 1 ? '' : 's'} to the
+                  live catalog immediately. You can still edit or remove {selectedResourceIds.length === 1 ? 'it' : 'them'} afterwards.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-bulk-approve-cancel">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={confirmBulkApprove}
+                  className="bg-green-600 text-white hover:bg-green-700"
+                  data-testid="button-bulk-approve-confirm"
+                >
+                  Approve {selectedResourceIds.length}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* Bulk Delete Confirmation */}
           <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
@@ -811,7 +846,7 @@ export default function ResourceManager() {
                       <Checkbox
                         checked={selectedResourceIds.includes(resource.id)}
                         onCheckedChange={() => toggleResourceSelection(resource.id)}
-                        aria-label={`Select resource ${resource.id}`}
+                        aria-label={`Select ${resource.title || `resource #${resource.id}`}`}
                       />
                     </TableCell>
                     <TableCell className="font-mono text-xs text-[var(--text-2)]">
@@ -858,7 +893,7 @@ export default function ResourceManager() {
                           variant="outline"
                           size="sm"
                           onClick={() => openEditDialog(resource)}
-                          aria-label="Edit resource"
+                          aria-label={`Edit ${resource.title || `resource #${resource.id}`}`}
                           data-testid={`button-edit-${resource.id}`}
                         >
                           <Pencil className="h-4 w-4" />
@@ -867,7 +902,7 @@ export default function ResourceManager() {
                           variant="destructive"
                           size="sm"
                           onClick={() => openDeleteDialog(resource)}
-                          aria-label="Delete resource"
+                          aria-label={`Delete ${resource.title || `resource #${resource.id}`}`}
                           data-testid={`button-delete-${resource.id}`}
                         >
                           <Trash2 className="h-4 w-4" />

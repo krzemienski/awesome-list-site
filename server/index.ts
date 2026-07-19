@@ -128,6 +128,25 @@ app.use((_req, res, next) => {
   next();
 });
 
+// R4-061: URLs with an explicit default port ("https://awesome.video:443/...")
+// serve the same document as the canonical host, creating a duplicate-host
+// variant whose on-page canonical disagrees with the address bar. 301 GET/HEAD
+// requests to the portless host. Only the DEFAULT port for the scheme is
+// stripped — a genuinely nonstandard port (e.g. dev :5000) never matches.
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  const host = req.headers.host || "";
+  const proto = (req.headers["x-forwarded-proto"] as string) || req.protocol;
+  const isDefaultPort =
+    (proto === "https" && host.endsWith(":443")) ||
+    (proto === "http" && host.endsWith(":80"));
+  if (isDefaultPort) {
+    const bareHost = host.replace(/:(443|80)$/, "");
+    return res.redirect(301, `${proto}://${bareHost}${req.originalUrl}`);
+  }
+  next();
+});
+
 // BUG-015: server-side route guard for auth-gated pages.
 // Without a connect.sid cookie, redirect to /login (302) instead of serving
 // the SPA shell (which only redirects client-side via JS).

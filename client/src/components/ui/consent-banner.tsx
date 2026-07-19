@@ -18,16 +18,37 @@ export default function ConsentBanner() {
   // NB-003 (run18): at very small widths (<360px, e.g. 320×568) the stacked
   // banner grew tall enough to sit over the /login submit button. Track a
   // compact breakpoint so we can render a single-row, reduced-copy bar there.
-  const [isCompact, setIsCompact] = useState(
-    () => typeof window !== "undefined" && window.innerWidth < 360,
-  );
+  // R4-042: ALSO go compact on short viewports (<500px tall, e.g. 812×375
+  // landscape) — the two-row banner covered the Sign-in CTA there; the compact
+  // single-row bar is short enough to leave it reachable at first paint.
+  const isCompactViewport = () =>
+    typeof window !== "undefined" &&
+    (window.innerWidth < 360 || window.innerHeight < 500);
+  const [isCompact, setIsCompact] = useState(isCompactViewport);
   const bannerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onResize = () => setIsCompact(window.innerWidth < 360);
+    const onResize = () => setIsCompact(isCompactViewport());
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  // R4-071: the banner renders last in the DOM, so keyboard users used to reach
+  // its buttons only as the final two tab stops, and Escape did nothing. Move
+  // focus to the banner as soon as it appears (so Tab lands on its controls
+  // next) and let Escape dismiss it — Escape == Decline (choice = denied, no
+  // analytics), matching the Decline button.
+  useEffect(() => {
+    if (choiceMade) return;
+    bannerRef.current?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setAnalyticsConsent("denied");
+      setChoiceMade(true);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [choiceMade]);
 
   // BUG-004 (run14): the fixed banner overlapped page content (footer links,
   // bottom pagination) until a choice was made. While visible, pad the body
@@ -81,7 +102,8 @@ export default function ConsentBanner() {
         ref={bannerRef}
         role="region"
         aria-label="Analytics consent"
-        className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg"
+        tabIndex={-1}
+        className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none"
         data-testid="consent-banner"
       >
         <div className="mx-auto flex w-full max-w-[1280px] max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
@@ -124,7 +146,8 @@ export default function ConsentBanner() {
       ref={bannerRef}
       role="region"
       aria-label="Analytics consent"
-      className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg"
+      tabIndex={-1}
+      className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none"
       data-testid="consent-banner"
     >
       {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second

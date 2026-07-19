@@ -9,11 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { visibleLength } from "@shared/validation";
 import SEOHead from "@/components/layout/SEOHead";
 
 const resetSchema = z
   .object({
-    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    // R4-014 (run21): require 8 VISIBLE characters — zero-width chars and
+    // whitespace don't count (mirrors the shared server rule).
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .refine((v) => visibleLength(v) >= 8, "Password must contain at least 8 visible characters"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {

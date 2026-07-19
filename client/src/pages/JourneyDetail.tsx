@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
 import SEOHead from "@/components/layout/SEOHead";
 
 interface JourneyStep {
@@ -98,9 +99,11 @@ export default function JourneyDetail() {
       });
     },
     onError: (error: Error) => {
+      // Run21 R4-057: map raw "STATUS: body" / 500 stringification to friendly
+      // copy — the internal error text never reaches the toast.
       toast({
         title: "Failed to Start Journey",
-        description: error.message || "Something went wrong. Please try again.",
+        description: humanizeApiError(error, "Something went wrong. Please try again."),
         variant: "destructive",
       });
     },
@@ -132,9 +135,10 @@ export default function JourneyDetail() {
       });
     },
     onError: (error: Error) => {
+      // Run21 R4-057: friendly copy instead of raw server error stringification.
       toast({
         title: "Failed to Update Progress",
-        description: error.message || "Something went wrong. Please try again.",
+        description: humanizeApiError(error, "Something went wrong. Please try again."),
         variant: "destructive",
       });
     },

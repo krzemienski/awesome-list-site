@@ -87,10 +87,43 @@ export function containsEmail(text: string): boolean {
   return new RegExp(EMAIL_REGEX.source).test(text);
 }
 
-/** R3-26 + R3-27: full description cleanup. Returns '' when nothing meaningful remains. */
+/**
+ * Run21 R4-035: WordPress page-builder shortcodes ([vc_row][vc_column]...)
+ * scraped from source pages render literally on cards — strip them (opening,
+ * closing, and attribute-bearing forms) plus the generic [caption]/[embed]
+ * wrappers WordPress emits.
+ */
+const WP_SHORTCODE_RE = /\[\/?(?:vc_[a-z0-9_]+|caption|embed|gallery|shortcode)(?:\s+[^\]]*)?\]/gi;
+
+/**
+ * Run21 R4-064: markdown residue (links, inline code, bold/italic markers,
+ * heading hashes) is neither rendered nor stripped downstream — descriptions
+ * are plain text everywhere. Reduce markdown to its readable text.
+ */
+export function stripMarkdownResidue(text: string): string {
+  if (!text) return text;
+  return (
+    text
+      // [label](url) -> label ; ![alt](url) -> alt
+      .replace(/!?\[([^\]]*)\]\(([^)]*)\)/g, "$1")
+      // `code` -> code (also naked backticks)
+      .replace(/`+([^`]*)`+/g, "$1")
+      .replace(/`/g, "")
+      // **bold** / __bold__ -> bold (word-internal underscores untouched)
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/__([^_]+)__/g, "$1")
+      // leading heading hashes / list markers at line starts
+      .replace(/(^|\n)\s*#{1,6}\s+/g, "$1")
+      .replace(/(^|\n)\s*[-*+]\s+/g, "$1")
+  );
+}
+
+/** R3-26 + R3-27 (+ Run21 R4-035/R4-064): full description cleanup. Returns '' when nothing meaningful remains. */
 export function sanitizeDescription(description: string): string {
   if (!description) return "";
   let out = decodeHtmlEntities(description);
+  out = out.replace(WP_SHORTCODE_RE, " ");
+  out = stripMarkdownResidue(out);
   out = stripEmails(out);
   out = out.replace(/\s+/g, " ").trim();
   return out;

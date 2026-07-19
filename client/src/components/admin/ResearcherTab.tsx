@@ -40,6 +40,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { formatAdminDate } from "@/lib/utils";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -99,7 +100,10 @@ export default function ResearcherTab() {
   const [prompt, setPrompt] = useState("Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms.");
   const [categoryFocus, setCategoryFocus] = useState("");
   const [maxBudget, setMaxBudget] = useState("1.00");
-  const [maxTurns, setMaxTurns] = useState(30);
+  // R4-052: keep the raw input string (like maxBudget) instead of a number so
+  // typing "5.5" or "0" is never silently rewritten to 5 / 30 — validation
+  // feedback is shown instead (see the hint below the field + handleLaunch).
+  const [maxTurns, setMaxTurns] = useState("30");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
@@ -151,8 +155,11 @@ export default function ResearcherTab() {
     },
   });
 
+  // R4-033 (run21): same cache entry as App.tsx — no second catalog download.
   const { data: categoriesData } = useQuery<any>({
-    queryKey: ['/api/awesome-list'],
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
+    staleTime: 1000 * 60 * 60,
   });
 
   const categoryNames = categoriesData?.categories
@@ -167,7 +174,7 @@ export default function ResearcherTab() {
           prompt,
           categoryFocus: categoryFocus && categoryFocus !== 'all' ? categoryFocus : undefined,
           maxBudgetUsd: maxBudget,
-          maxTurns,
+          maxTurns: Number(maxTurns),
           model: model.trim() || undefined,
           baseUrl: baseUrl.trim() || undefined,
           authToken: authToken.trim() || undefined,
@@ -196,6 +203,17 @@ export default function ResearcherTab() {
   // submission client-side, mirroring the server's min-$0.25 / 5–100 ranges
   // (Run20: no upper budget cap per user request).
   const handleLaunch = () => {
+    // R4-051: the min-length rule used to only manifest as a disabled button
+    // with no explanation — clicking a short prompt now yields explicit feedback
+    // (a hint under the field covers the before-submit case).
+    if (prompt.trim().length < 10) {
+      toast({
+        title: "Prompt too short",
+        description: "The research prompt must be at least 10 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
     const budget = Number(maxBudget);
     if (!Number.isFinite(budget) || budget < 0.25) {
       toast({
@@ -205,7 +223,10 @@ export default function ResearcherTab() {
       });
       return;
     }
-    if (!Number.isInteger(maxTurns) || maxTurns < 5 || maxTurns > 100) {
+    // R4-052: reject out-of-range / non-integer turns with a message instead of
+    // silently coercing them (5.5 → 5, 0 → 30).
+    const turns = Number(maxTurns);
+    if (maxTurns.trim() === "" || !Number.isInteger(turns) || turns < 5 || turns > 100) {
       toast({
         title: "Invalid max turns",
         description: "Max turns must be a whole number between 5 and 100.",
@@ -298,6 +319,16 @@ export default function ResearcherTab() {
                     placeholder="Describe what types of resources to search for..."
                     className="mt-1 min-h-[100px]"
                   />
+                  {/* R4-051: surface the ≥10-char rule up front instead of only
+                      as a mysteriously disabled Launch button. */}
+                  <p
+                    className={`text-xs mt-1 ${prompt.trim().length < 10 ? "text-yellow-500" : "text-muted-foreground"}`}
+                    data-testid="text-prompt-hint"
+                  >
+                    {prompt.trim().length < 10
+                      ? `At least 10 characters required (${prompt.trim().length}/10).`
+                      : `${prompt.trim().length} characters`}
+                  </p>
                 </div>
 
                 <div>
@@ -347,10 +378,27 @@ export default function ResearcherTab() {
                       type="number"
                       min={5}
                       max={100}
+                      step={1}
                       value={maxTurns}
-                      onChange={(e) => setMaxTurns(parseInt(e.target.value) || 30)}
+                      /* R4-052: store the raw text; do NOT silently coerce. */
+                      onChange={(e) => setMaxTurns(e.target.value)}
                       className="mt-1"
                     />
+                    {(() => {
+                      const t = Number(maxTurns);
+                      const invalid =
+                        maxTurns.trim() === "" || !Number.isInteger(t) || t < 5 || t > 100;
+                      return (
+                        <p
+                          className={`text-xs mt-1 ${invalid ? "text-yellow-500" : "text-muted-foreground"}`}
+                          data-testid="text-turns-hint"
+                        >
+                          {invalid
+                            ? "Enter a whole number between 5 and 100."
+                            : "Whole number, 5–100."}
+                        </p>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -423,9 +471,12 @@ export default function ResearcherTab() {
                   </AlertDescription>
                 </Alert>
 
+                {/* R4-051: NB-022 — don't hard-disable on the min-length rule
+                    (that's the "silently disabled" bug). Only the one-shot
+                    pending state disables; short prompts get a toast on click. */}
                 <Button
                   onClick={handleLaunch}
-                  disabled={startMutation.isPending || prompt.trim().length < 10}
+                  disabled={startMutation.isPending}
                   className="w-full"
                 >
                   {startMutation.isPending ? (

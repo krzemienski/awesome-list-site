@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackLogin } from "@/lib/analytics";
 import { useAuth } from "@/hooks/useAuth";
@@ -124,7 +125,11 @@ export default function Login() {
           user: result.user,
           isAuthenticated: true
         });
-        
+
+        // R4-081: tell other open tabs a session just started so they refresh
+        // their auth chrome + bookmarks/favorites without a manual reload.
+        notifyCrossTabSync();
+
         toast({
           title: "Login successful",
           description: `Welcome back, ${result.user.email}!`,

@@ -255,7 +255,7 @@ function CategoryAccordion({
           href={catPath}
           data-testid={`row-cat-${catSlug}`}
           aria-label={`Open ${cat.name} category page`}
-          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded-sm"
+          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm"
         >
           <span
             className="flex items-center justify-center shrink-0"
@@ -305,7 +305,7 @@ function CategoryAccordion({
               aria-expanded={isOpen}
               aria-controls={`accordion-body-${catSlug}`}
               data-testid={`toggle-cat-${catSlug}`}
-              className="inline-flex items-center justify-center w-6 min-w-[24px] min-h-[44px] rounded-sm text-[var(--text-3)] hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              className="inline-flex items-center justify-center w-6 min-w-[24px] min-h-[44px] rounded-sm text-[var(--text-3)] hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <ChevronRight className={cn("size-3 shrink-0 chevron-rotate", isOpen && "rotate-90")} />
             </button>

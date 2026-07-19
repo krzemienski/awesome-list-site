@@ -3,7 +3,9 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
+import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -70,6 +72,8 @@ function FavoriteButton({
       // Invalidate any queries that might need updating
       queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
       queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+      // R4-081: mirror the change into other open tabs' favorites.
+      notifyCrossTabSync();
       
       showFavoriteToast({
         description: remove ? "Removed from favorites" : "Added to favorites",
@@ -80,13 +84,37 @@ function FavoriteButton({
       // Revert optimistic update to the pre-click state
       setIsFavorited(remove);
       setFavoriteCount(initialCount);
-      
-      toast({
-        title: "Error",
-        description: "Failed to update favorite status. Please try again.",
-        variant: "destructive"
-      });
-      
+
+      // R4-056: favorite failures used to roll back silently with no feedback.
+      // A 401 (session expired / cross-tab logout — see R4-081) prompts the user
+      // to sign in again; every other failure (500/network) shows a humanized
+      // destructive toast instead of the raw "STATUS: body" error.
+      const status = error instanceof ApiError ? error.status : 0;
+      if (status === 401) {
+        showFavoriteToast({
+          title: "Sign in to favorite",
+          description: "Your session has expired. Please sign in again to save favorites.",
+          action: (
+            <ToastAction
+              altText="Sign in"
+              onClick={() =>
+                setLocation(
+                  `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+                )
+              }
+            >
+              Sign in
+            </ToastAction>
+          ),
+        });
+      } else {
+        showFavoriteToast({
+          title: "Couldn't update favorite",
+          description: humanizeApiError(error, "Failed to update favorite status. Please try again."),
+          variant: "destructive",
+        });
+      }
+
       console.error("Favorite mutation error:", error);
     }
   });

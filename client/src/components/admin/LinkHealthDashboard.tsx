@@ -53,7 +53,7 @@ export default function LinkHealthDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [statusFilter, setStatusFilter] = useState<'all' | 'broken' | 'timeout' | 'redirect'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'broken' | 'timeout' | 'redirect' | 'suspect'>('all');
   const [isPolling, setIsPolling] = useState(false);
 
   const { data: statusData, isLoading: isStatusLoading } = useQuery<LinkHealthStatusResponse>({
@@ -65,16 +65,13 @@ export default function LinkHealthDashboard() {
     queryKey: ['/api/admin/link-health/history'],
   });
 
-  // Explicit queryFn: the default queryFn only fetches queryKey[0], so the
-  // status filter was never sent to the backend.
+  // R4-044: fetch the full problem-links set once and filter client-side so the
+  // summary counters and the table rows are driven by the SAME dataset. The old
+  // server-filtered query made the counters (from the job record) reconcile
+  // against a different/stale set than the visible rows.
   const { data: brokenLinksData } = useQuery<BrokenLinksResponse>({
-    queryKey: ['/api/admin/link-health/broken-links', statusFilter],
-    queryFn: () =>
-      apiRequest(
-        statusFilter === 'all'
-          ? '/api/admin/link-health/broken-links'
-          : `/api/admin/link-health/broken-links?status=${statusFilter}`,
-      ),
+    queryKey: ['/api/admin/link-health/broken-links'],
+    queryFn: () => apiRequest('/api/admin/link-health/broken-links'),
   });
 
   const runCheckMutation = useMutation({
@@ -109,10 +106,19 @@ export default function LinkHealthDashboard() {
     new Map((historyData?.jobs ?? []).map((j) => [j.id, j])).values()
   );
   const isActiveJob = latestJob?.status === 'processing';
-  const brokenLinks = brokenLinksData?.checks ?? [];
+  // R4-043: a job can sit in 'pending' before it starts 'processing' — treat
+  // both as in-progress so the panel never presents a stale all-clear/last-run
+  // summary while a sweep is queued or running.
+  const isJobInProgress = latestJob?.status === 'processing' || latestJob?.status === 'pending';
+  // R4-044: one source of truth. The table filters this client-side; the
+  // summary counters tally the same array, so counts == rows by construction.
+  const allProblemLinks = brokenLinksData?.checks ?? [];
+  const brokenLinks = statusFilter === 'all'
+    ? allProblemLinks
+    : allProblemLinks.filter((c) => c.status === statusFilter);
 
   useEffect(() => {
-    setIsPolling(isActiveJob);
+    setIsPolling(isJobInProgress);
     if (!isActiveJob && latestJob && ['completed', 'failed', 'cancelled'].includes(latestJob.status)) {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/broken-links'] });
@@ -157,6 +163,8 @@ export default function LinkHealthDashboard() {
         return <Clock className="h-4 w-4 text-orange-500" />;
       case 'dns_failure':
         return <AlertCircle className="h-4 w-4 text-red-500" />;
+      case 'suspect':
+        return <AlertTriangle className="h-4 w-4 text-purple-500" />;
       default:
         return <Info className="h-4 w-4" />;
     }
@@ -174,6 +182,8 @@ export default function LinkHealthDashboard() {
         return 'border-orange-500 text-orange-500';
       case 'dns_failure':
         return 'border-red-500 text-red-500';
+      case 'suspect':
+        return 'border-purple-500 text-purple-500';
       default:
         return '';
     }
@@ -237,7 +247,7 @@ export default function LinkHealthDashboard() {
                 </>
               )}
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold font-mono">
                     {latestJob.totalLinks || 0}
@@ -267,6 +277,14 @@ export default function LinkHealthDashboard() {
                     {latestJob.timeoutLinks || 0}
                   </div>
                   <div className="text-xs text-muted-foreground">Timeouts</div>
+                </div>
+                <div>
+                  {/* R4-001/023: 200-OK links flagged by the takeover / intent-flip
+                      / parked-domain heuristics — need human review. */}
+                  <div className="text-2xl font-bold font-mono text-purple-500">
+                    {latestJob.suspectLinks || 0}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Suspect</div>
                 </div>
               </div>
 
@@ -415,7 +433,7 @@ export default function LinkHealthDashboard() {
           <div className="flex items-center gap-4">
             <Select
               value={statusFilter}
-              onValueChange={(value) => setStatusFilter(value as 'all' | 'broken' | 'timeout' | 'redirect')}
+              onValueChange={(value) => setStatusFilter(value as 'all' | 'broken' | 'timeout' | 'redirect' | 'suspect')}
             >
               <SelectTrigger className="w-[200px]" aria-label="Filter by link status">
                 <SelectValue />
@@ -425,6 +443,7 @@ export default function LinkHealthDashboard() {
                 <SelectItem value="broken">Broken Links</SelectItem>
                 <SelectItem value="timeout">Timeouts</SelectItem>
                 <SelectItem value="redirect">Redirects</SelectItem>
+                <SelectItem value="suspect">Suspect (takeover/parked)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -442,11 +461,15 @@ export default function LinkHealthDashboard() {
                 {/* BUG-030 (run18): reference the button by its ACTUAL label —
                     the empty-state summary button reads "Run Link Check", not
                     "Run Check Now", so the instruction now matches. */}
+                {/* R4-043: never claim an all-clear while a check is still
+                    running — results aren't in yet, so say so instead. */}
                 {!latestJob
                   ? 'No link check has been run yet. Click "Run Link Check" to scan the catalog.'
-                  : statusFilter === 'all'
-                    ? 'No problem links found. All links are healthy!'
-                    : `No ${statusFilter} links found.`
+                  : isJobInProgress
+                    ? 'Link check in progress — results will appear here when it completes.'
+                    : statusFilter === 'all'
+                      ? 'No problem links found. All links are healthy!'
+                      : `No ${statusFilter} links found.`
                 }
               </AlertDescription>
             </Alert>
@@ -481,15 +504,23 @@ export default function LinkHealthDashboard() {
                       <TableCell className="text-sm text-muted-foreground">
                         {check.resource?.category ?? '-'}
                       </TableCell>
-                      <TableCell className="text-sm font-mono max-w-md truncate">
-                        <a
-                          href={check.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline text-blue-500"
-                        >
-                          {check.url}
-                        </a>
+                      <TableCell className="text-sm font-mono max-w-md">
+                        <div className="truncate">
+                          <a
+                            href={check.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline text-blue-500"
+                          >
+                            {check.url}
+                          </a>
+                        </div>
+                        {/* Suspicion detail (why the heuristic fired) or fetch error */}
+                        {check.errorMessage && (
+                          <div className="text-xs text-muted-foreground truncate" title={check.errorMessage}>
+                            {check.errorMessage}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="text-center font-mono">
                         {check.consecutiveFailures || 0}

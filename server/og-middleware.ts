@@ -11,6 +11,9 @@ import {
   advancedSeoDescription,
   submitSeoTitle,
   submitSeoDescription,
+  clampSeoTitle,
+  clampSeoDescription,
+  ogImagePath,
 } from "@shared/seo-templates";
 import {
   renderHomeContent,
@@ -80,12 +83,12 @@ function abs(path: string) {
   return SITE_URL + (path.startsWith("/") ? path : "/" + path);
 }
 
-function ogImage(title: string, category?: string, count?: number | string) {
-  const params = new URLSearchParams();
-  if (title) params.set("title", title);
-  if (category) params.set("category", category);
-  if (count != null) params.set("resourceCount", String(count));
-  return `${SITE_URL}/og-image.png?${params.toString()}`;
+// R4-024/T007: the og-image endpoint resolves the display title/category
+// SERVER-SIDE from the route path (never from caller-supplied text params), so
+// the only parameter the URL carries is the path itself. The shared
+// ogImagePath() builder keeps this byte-identical with the client SEOHead URL.
+function ogImage(path: string) {
+  return `${SITE_URL}${ogImagePath(path)}`;
 }
 
 function defaultMeta(url: string): RouteMeta {
@@ -93,7 +96,7 @@ function defaultMeta(url: string): RouteMeta {
     title: `${SITE_NAME} — Curated video development resources`,
     description: SITE_TAGLINE,
     url: abs(url),
-    image: ogImage(SITE_NAME),
+    image: ogImage(url),
     imageAlt: `${SITE_NAME} — curated video development resources`,
     type: "website",
     keywords:
@@ -164,7 +167,7 @@ function notFoundMeta(url: string): RouteMeta {
   const m = defaultMeta(url);
   m.title = `Page Not Found — ${SITE_NAME}`;
   m.description = `The page you're looking for doesn't exist on ${SITE_NAME}. Browse the curated index of video development resources instead.`;
-  m.image = ogImage(SITE_NAME);
+  m.image = ogImage("/");
   m.type = "website";
   m.noindex = true;
   return m;
@@ -424,7 +427,7 @@ function homeShellChrome(): string {
      const categoryCount = data?.categories?.length ?? 80;
      m.title = homeSeoTitle(resourceCount);
      m.description = homeSeoDescription(resourceCount, categoryCount);
-     m.image = ogImage(SITE_NAME, "Home", resourceCount);
+     m.image = ogImage("/");
      categories = (data?.categories ?? []).map((c: any) => ({
        name: c.name,
        slug: c.slug,
@@ -569,7 +572,7 @@ function homeShellChrome(): string {
   if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[staticKey]);
-    m.image = ogImage(m.title.split(" — ")[0]);
+    m.image = ogImage(path);
     let bodyHtml: string | undefined;
     if (path === "/journeys") {
       try {
@@ -809,6 +812,17 @@ function homeShellChrome(): string {
         categories: cats,
       });
     }
+    // R4-059: every indexable static page ships at least WebPage + breadcrumb
+    // JSON-LD. Per-path branches above (about/categories/journeys) keep their
+    // richer schemas; this fallback only fills the gap for pages that would
+    // otherwise emit none (/advanced, /submit, /terms, /privacy, ...).
+    if (!m.noindex && !m.structuredData) {
+      const pageName = m.title.split(" — ")[0].trim() || SITE_NAME;
+      m.structuredData = [
+        webPageSchema({ name: pageName, description: m.description, path }),
+        breadcrumbSchema([{ name: "Home", path: "/" }, { name: pageName, path }]),
+      ];
+    }
     return { meta: m, found: true, bodyHtml };
   }
 
@@ -822,7 +836,7 @@ function homeShellChrome(): string {
         const m = defaultMeta(path);
         m.title = `${categorySeoTitleCore(found.name, slug)} — ${SITE_NAME}`;
         m.description = categorySeoDescription(found.name, slug, found.count);
-        m.image = ogImage(found.name, found.name, found.count);
+        m.image = ogImage(found.path);
         m.type = "article";
         m.structuredData = [
           collectionPageSchema({
@@ -887,7 +901,7 @@ function homeShellChrome(): string {
         const m = defaultMeta(path);
         m.title = `${found.name} — ${SITE_NAME}`;
         m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
-        m.image = ogImage(found.name, found.name, found.count);
+        m.image = ogImage(found.path);
         m.type = "article";
         m.structuredData = [
           collectionPageSchema({
@@ -957,7 +971,7 @@ function homeShellChrome(): string {
           ? `${found.name} – ${parentSubName} — ${SITE_NAME}`
           : `${found.name} — ${SITE_NAME}`;
         m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
-        m.image = ogImage(found.name, found.name, found.count);
+        m.image = ogImage(found.path);
         m.type = "article";
         m.structuredData = [
           collectionPageSchema({
@@ -1030,15 +1044,42 @@ function homeShellChrome(): string {
           m.description =
             (resource.description || "").slice(0, 280) ||
             `${resource.title} on ${SITE_NAME} — curated video development resource.`;
-          m.image = (resource as any).imageUrl || ogImage(resource.title);
+          m.image = (resource as any).imageUrl || ogImage(path);
           m.type = "article";
           const crumbs: Crumb[] = [{ name: "Home", path: "/" }];
+          // R4-027: the JSON-LD BreadcrumbList must mirror the FULL visible
+          // breadcrumb trail (category → subcategory → sub-subcategory), not
+          // just the top-level category.
           try {
             const tree = await getTreeCached();
             const cat = (tree?.categories ?? []).find(
               (c: any) => c.name === resource.category,
             );
-            if (cat) crumbs.push({ name: cat.name, path: `/category/${cat.slug}` });
+            if (cat) {
+              crumbs.push({ name: cat.name, path: `/category/${cat.slug}` });
+              const subName = (resource as any).subcategory;
+              const sub = subName
+                ? (cat.subcategories ?? []).find((s: any) => s.name === subName)
+                : null;
+              if (sub) {
+                crumbs.push({
+                  name: sub.name,
+                  path: `/subcategory/${sub.slug}`,
+                });
+                const ssName = (resource as any).subSubcategory;
+                const ss = ssName
+                  ? (sub.subSubcategories ?? []).find(
+                      (x: any) => x.name === ssName,
+                    )
+                  : null;
+                if (ss) {
+                  crumbs.push({
+                    name: ss.name,
+                    path: `/sub-subcategory/${ss.slug}`,
+                  });
+                }
+              }
+            }
           } catch {}
           crumbs.push({ name: resource.title });
           m.structuredData = [
@@ -1124,7 +1165,7 @@ function homeShellChrome(): string {
           m.description = journey.description
             ? String(journey.description).slice(0, 280)
             : `Multi-step learning journey on ${SITE_NAME}: ${journey.title}.`;
-          m.image = ogImage(journey.title, "Learning Journey");
+          m.image = ogImage(path);
           m.type = "article";
           m.structuredData = [
             webPageSchema({
@@ -1222,18 +1263,21 @@ function stampNonce(html: string, nonce: string): string {
 }
 
 export function buildMetaTags(m: RouteMeta): string {
-  const t = escapeHtml(m.title);
-  const d = escapeHtml(m.description);
+  // R4-025/026: clamp to SERP display budgets (title ≤60, description ≤160) at
+  // the single emission choke point so EVERY route complies; the client
+  // SEOHead clamps through the same shared functions (two-pass parity).
+  const t = escapeHtml(clampSeoTitle(m.title));
+  const d = escapeHtml(clampSeoDescription(m.description));
   const u = escapeHtml(m.url);
   const img = escapeHtml(m.image);
   const imgAlt = escapeHtml(m.imageAlt);
   const kw = escapeHtml(m.keywords || "");
   // Soft-404 pages must NOT self-canonicalize the invalid URL and must be
-  // explicitly excluded from indexing. Real pages keep their canonical + og:url
-  // and stay indexable (default robots behaviour, no tag needed).
+  // explicitly excluded from indexing. Real pages carry an EXPLICIT indexable
+  // robots tag (R4-058) whose value mirrors the client SEOHead string exactly.
   const robotsTag = m.noindex
     ? `\n    <meta name="robots" content="noindex, nofollow" />`
-    : "";
+    : `\n    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />`;
   const canonicalTag = m.noindex ? "" : `\n    <link rel="canonical" href="${u}" />`;
   const ogUrlTag = m.noindex ? "" : `\n    <meta property="og:url" content="${u}" />`;
   // Soft-404 pages ship no structured data — rich-result markup must only ever
@@ -1288,6 +1332,33 @@ function rewriteHead(html: string, meta: RouteMeta): string {
   return out;
 }
 
+/**
+ * T007/R4-024: server-side resolution of the OG image card text from a route
+ * path. The /og-image endpoints call this instead of trusting caller-supplied
+ * ?title=/?category= text, so the card can never be made to render attacker
+ * text for a real awesome.video URL. Returns null (→ brand default card) for
+ * unknown routes and noindex pages.
+ */
+export async function resolveOgImageMeta(
+  path: string,
+): Promise<{ pageTitle: string; category?: string } | null> {
+  try {
+    if (!path || path === "/") return { pageTitle: SITE_NAME };
+    const r = await resolveRoute(path);
+    if (!r.found || r.meta.noindex) return null;
+    const pageTitle = r.meta.title.split(" — ")[0].trim() || SITE_NAME;
+    let category: string | undefined;
+    if (path.startsWith("/category/")) category = "Category";
+    else if (path.startsWith("/sub-subcategory/")) category = "Topic";
+    else if (path.startsWith("/subcategory/")) category = "Subcategory";
+    else if (path.startsWith("/resource/")) category = "Resource";
+    else if (path.startsWith("/journey")) category = "Learning Journeys";
+    return { pageTitle, category };
+  } catch {
+    return null;
+  }
+}
+
 // Express middleware that intercepts HTML responses and rewrites <head> with
 // route-specific OG/Twitter/SEO tags. Mount BEFORE any HTML-serving middleware
 // (vite dev middlewares or static index.html fallback).
@@ -1317,6 +1388,12 @@ export function ogInjectionMiddleware() {
       return;
     }
 
+    // R4-028: /index.html is the same document as / — canonicalize before the
+    // extension-based asset skip would let it fall through as a "file".
+    if (urlPath === "/index.html" || urlPath === "/index.htm") {
+      return res.redirect(301, "/");
+    }
+
     // Skip API + Vite internals + static assets (have a file extension)
     if (
       urlPath.startsWith("/api") ||
@@ -1326,6 +1403,35 @@ export function ogInjectionMiddleware() {
       /\.[a-z0-9]+$/i.test(urlPath)
     ) {
       return next();
+    }
+
+    // R4-009 + R4-062: canonicalize URL-shape variants that render the same
+    // page — trailing slashes ("/about/") and letter-case drift ("/About",
+    // "/Category/Encoding-Codecs") 301 to the canonical lowercase, no-slash
+    // form. Case redirects only fire when the lowercased path actually
+    // resolves, so genuinely unknown mixed-case URLs still soft-404.
+    {
+      const search = (req.originalUrl || req.url).split("?")[1];
+      const suffix = search ? `?${search}` : "";
+      const trimmed =
+        urlPath.length > 1 ? urlPath.replace(/\/+$/, "") || "/" : urlPath;
+      let redirectTo: string | null = trimmed !== urlPath ? trimmed : null;
+      if (/[A-Z]/.test(trimmed)) {
+        const lower = trimmed.toLowerCase();
+        try {
+          if ((await resolveRoute(lower)).found) redirectTo = lower;
+        } catch {
+          // resolution failed — fall through without a case redirect
+        }
+      }
+      if (redirectTo) {
+        // Open-redirect guard: a request path like "//evil.com/" would emit a
+        // protocol-relative Location ("//evil.com") that browsers treat as an
+        // external host. Collapse any leading slash/backslash run to a single
+        // "/" so the Location header can only ever be same-origin.
+        redirectTo = redirectTo.replace(/^[\/\\]+/, "/");
+        return res.redirect(301, redirectTo + suffix);
+      }
     }
 
     // Tolerant redirects for URL shapes that circulate but were never routes.

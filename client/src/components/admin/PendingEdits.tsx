@@ -12,7 +12,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle, Sparkles, RefreshCw } from "lucide-react";
 import type { Resource, ResourceEdit } from "@shared/schema";
 
@@ -228,11 +227,14 @@ export default function PendingEdits() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* BUG-030 (run19): fixed h-[600px] left a huge empty framed region
-              under the table when only a few edits are pending. max-h clamps
-              tall lists to 600px (scrollable) but lets short lists shrink. */}
-          <ScrollArea className="max-h-[600px]">
-            <Table>
+          {/* R4-012 (run21): shared narrow-admin-table strategy — a native
+              overflow-auto viewport (scrolls BOTH axes) around a min-w table.
+              The prior Radix ScrollArea rendered its viewport at
+              min-width:100%, so it never scrolled horizontally and clipped the
+              Actions column ≤768px. max-h keeps short lists compact; the
+              desktop layout (table already fits, no scroll) is unchanged. */}
+          <div className="max-h-[600px] overflow-auto">
+            <Table className="min-w-[720px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Resource</TableHead>
@@ -293,7 +295,7 @@ export default function PendingEdits() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewDetails(edit)}
-                          aria-label="View edit details"
+                          aria-label={`View edit details for ${edit.resource?.title || 'resource'}`}
                           data-testid={`button-view-edit-${edit.id}`}
                         >
                           <Eye className="h-4 w-4" />
@@ -307,6 +309,7 @@ export default function PendingEdits() {
                           className="bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => handleApproveClick(edit)}
                           disabled={approveMutation.isPending}
+                          aria-label={`Approve edit for ${edit.resource?.title || 'resource'}`}
                           data-testid={`button-approve-edit-${edit.id}`}
                         >
                           <CheckCircle2 className="h-4 w-4 mr-1" />
@@ -317,6 +320,7 @@ export default function PendingEdits() {
                           size="sm"
                           onClick={() => handleRejectClick(edit)}
                           disabled={rejectMutation.isPending}
+                          aria-label={`Reject edit for ${edit.resource?.title || 'resource'}`}
                           data-testid={`button-reject-edit-${edit.id}`}
                         >
                           <XCircle className="h-4 w-4 mr-1" />
@@ -328,7 +332,7 @@ export default function PendingEdits() {
                 ))}
               </TableBody>
             </Table>
-          </ScrollArea>
+          </div>
         </CardContent>
       </Card>
 
@@ -480,7 +484,7 @@ export default function PendingEdits() {
                 data-testid="input-rejection-reason"
               />
               <p className="text-sm text-muted-foreground">
-                {rejectionReason.length} / 10 characters minimum
+                {rejectionReason.trim().length} / 10 characters minimum
               </p>
             </div>
           </div>

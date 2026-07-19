@@ -1,5 +1,10 @@
 import { Helmet } from "react-helmet";
 import { AwesomeList } from "@/types/awesome-list";
+import {
+  clampSeoTitle,
+  clampSeoDescription,
+  ogImagePath,
+} from "@shared/seo-templates";
 
 interface SEOHeadProps {
   title?: string;
@@ -63,25 +68,36 @@ export default function SEOHead({
   // page already passes a title that includes the brand.
   const withBrand = (t: string) => (t.includes(SITE_NAME) ? t : `${t} — ${SITE_NAME}`);
 
-  // Generate dynamic title based on page context
-  const pageTitle = title
-    ? withBrand(title)
-    : category
-    ? withBrand(`${category} Resources`)
-    : SITE_NAME;
+  // Generate dynamic title based on page context. R4-025: clamped to the SERP
+  // title budget through the SAME shared function the server's buildMetaTags
+  // uses, so the crawl-pass and hydrated titles stay byte-identical.
+  const pageTitle = clampSeoTitle(
+    title
+      ? withBrand(title)
+      : category
+      ? withBrand(`${category} Resources`)
+      : SITE_NAME,
+  );
 
   // Generate dynamic description — all public pages supply an explicit
   // description; these fallbacks only fire for transient loading states.
-  const pageDescription = description || (
+  // R4-026: clamped to the 160-char budget via the shared clamp (parity).
+  const pageDescription = clampSeoDescription(description || (
     category
       ? `Discover ${resourceCount || 'curated'} ${category.toLowerCase()} resources on ${SITE_NAME}. Find the best tools, libraries, and frameworks for video development.`
       : awesomeList
       ? `${awesomeList.description || SITE_TAGLINE} Explore ${awesomeList.resources?.length || '2300+'} carefully curated resources across ${awesomeList.categories?.length || '80+'} categories.`
       : SITE_TAGLINE
-  );
+  ));
 
-  // Generate social sharing image
-  const socialImage = image || `${baseUrl}/og-image.svg?title=${encodeURIComponent(pageTitle)}&category=${encodeURIComponent(category || '')}&resourceCount=${resourceCount || awesomeList?.resources?.length || ''}`;
+  // Social sharing image — the SAME path-based PNG URL the server emits
+  // (shared ogImagePath builder), so the two passes never advertise different
+  // preview images. The endpoint resolves title/category server-side.
+  const socialImage =
+    image ||
+    `${baseUrl}${ogImagePath(
+      typeof window !== "undefined" ? window.location.pathname : "/",
+    )}`;
 
   // Extract repository info for additional metadata
   const repoInfo = awesomeList?.repoUrl ? extractRepoInfo(awesomeList.repoUrl) : null;
@@ -128,10 +144,11 @@ export default function SEOHead({
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="mobile-web-app-capable" content="yes" />
 
-      {/* Favicon and Icons */}
+      {/* Favicon and Icons — apple-touch-icon must be raster PNG (R4-060):
+          iOS ignores SVG touch icons and falls back to a page screenshot. */}
       <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      <link rel="apple-touch-icon" href="/favicon.svg" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       <link rel="manifest" href="/site.webmanifest" />
 
       {/* Structured Data (JSON-LD) is emitted SERVER-SIDE by og-middleware so a

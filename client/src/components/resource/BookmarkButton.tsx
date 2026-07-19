@@ -13,7 +13,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
+import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -90,6 +92,8 @@ function BookmarkButton({
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
       queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+      // R4-081: mirror the change into other open tabs' bookmark lists.
+      notifyCrossTabSync();
       
       if (vars.remove) {
         // Run17 BUG-013: removal is one click — give the toast a working Undo
@@ -136,13 +140,37 @@ function BookmarkButton({
     onError: (error, vars) => {
       // Revert optimistic update to the pre-click state
       setIsBookmarked(vars.remove);
-      
-      toast({
-        title: "Error",
-        description: "Failed to update bookmark. Please try again.",
-        variant: "destructive"
-      });
-      
+
+      // R4-056: bookmark failures used to roll back silently with no feedback.
+      // A 401 (session expired / cross-tab logout — see R4-081) prompts the user
+      // to sign in again; every other failure (500/network) shows a humanized
+      // destructive toast instead of the raw "STATUS: body" error.
+      const status = error instanceof ApiError ? error.status : 0;
+      if (status === 401) {
+        showBookmarkToast({
+          title: "Sign in to bookmark",
+          description: "Your session has expired. Please sign in again to save resources.",
+          action: (
+            <ToastAction
+              altText="Sign in"
+              onClick={() =>
+                setLocation(
+                  `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+                )
+              }
+            >
+              Sign in
+            </ToastAction>
+          ),
+        });
+      } else {
+        showBookmarkToast({
+          title: "Couldn't update bookmark",
+          description: humanizeApiError(error, "Failed to update bookmark. Please try again."),
+          variant: "destructive",
+        });
+      }
+
       console.error("Bookmark mutation error:", error);
     }
   });

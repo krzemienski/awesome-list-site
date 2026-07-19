@@ -1,0 +1,254 @@
+{
+  "startedAt": "2026-07-19T14:15:52.944Z",
+  "base": "http://localhost:5000",
+  "actions": [
+    {
+      "finding": "R4-001",
+      "note": "parked-spam domain takeover",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-002",
+      "note": "domain takeover",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-003",
+      "note": "SSL dead; GitHub org/repo rows remain in corpus",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-004",
+      "note": "wiki TLS hard-broken; snapshot pinned",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-004",
+      "note": "wiki TLS hard-broken; snapshot pinned",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-005",
+      "note": "kurento.org now redirects to Twilio marketing",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-006",
+      "note": "SSL 525 dead, no equivalent content",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-006",
+      "note": "SSL 525 dead org site",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-006",
+      "note": "site connection-dead; project lives on GitHub",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-006",
+      "note": "site connection-dead; project lives on GitHub",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-007",
+      "note": "dead GitHub mirror host -> canonical GitHub",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-008",
+      "note": "repo moved to GitLab; GitHub discussions 404",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-008",
+      "note": "repo renamed",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-008",
+      "note": "repo deleted; snapshot pinned",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-020",
+      "note": "404, never archived",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-022",
+      "note": "real-browser 403 Forbidden (screenshot evidence)",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-022",
+      "id": 185234,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20230521170721/https://www.businesswire.com/news/home/20230516005279/en/Streaming-Video-Technology-Alliance-Introduces-New-Industry-Conference-SEGMENTS2023"
+    },
+    {
+      "finding": "R4-022",
+      "id": 185416,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20231210195321/https://www.businesswire.com/news/home/20231019229734/en/Streaming-Video-Technology-Alliance-Announces-First-Public-Open-Source-Repository-Common-Media-Library/"
+    },
+    {
+      "finding": "R4-023",
+      "note": "drift-to-root; never archived",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-023",
+      "id": 184843,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20251005160314/https://www.editframe.com/guides/integrating-ffmpeg-with-react.js-via-webassembly"
+    },
+    {
+      "finding": "R4-023",
+      "id": 184792,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20251115022642/https://theiabm.org/bamproducts/online-caption-subtitle-toolkit/"
+    },
+    {
+      "finding": "R4-023",
+      "id": 184935,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20250126100102/https://thinkbrandedmedia.com/the-best-ai-tools-for-adding-subtitles-improve-your-videos-and-retain-customers/"
+    },
+    {
+      "finding": "R4-023",
+      "id": 184942,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20250905130722/https://remoteproduction.com/the-best-resources-for-learning-remote-production-technology/"
+    },
+    {
+      "finding": "R4-023",
+      "id": 185017,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20251116092923/https://blendvision.com/en/blog/live-streaming-protocols-comparison"
+    },
+    {
+      "finding": "R4-023",
+      "id": 185053,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20260113061642/https://ultrahdforum.org/phasea-guidelines-description/"
+    },
+    {
+      "finding": "R4-023",
+      "id": 185052,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20260212223017/https://ultrahdforum.org/phaseb-guidelines-description/"
+    },
+    {
+      "finding": "R4-023",
+      "note": "UHD Forum merged into SVTA; guidelines live at successor (200)",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-023",
+      "note": "SDK page moved; codecs catalog 200",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-023",
+      "note": "drift-to-root; never archived",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-023",
+      "id": 185251,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20260508115505/https://www.harmonicinc.com/insights/blog/targeted-ads-innovations/"
+    },
+    {
+      "finding": "R4-023",
+      "note": "drift-to-root; never archived",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-023",
+      "note": "app moved to its own subdomain (200)",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-023",
+      "note": "product now IS the site root (200)",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-023",
+      "id": 186442,
+      "action": "noop-already-target",
+      "url": "https://web.archive.org/web/20230907033441/https://www.conviva.com/state-of-streaming/"
+    },
+    {
+      "finding": "R4-065",
+      "note": "host 301s http->https (verified); store https directly",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-065",
+      "note": "host 301s http->https (verified); store https directly",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-065",
+      "note": "host 301s http->https (verified); store https directly",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-065",
+      "note": "host 301s http->https (verified); store https directly",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-065",
+      "note": "host 301s http->https (verified); store https directly",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-065",
+      "note": "host 301s http->https (verified); store https directly",
+      "action": "noop",
+      "matched": 0
+    },
+    {
+      "finding": "R4-065",
+      "note": "host 301s http->https (verified); store https directly",
+      "action": "noop",
+      "matched": 0
+    }
+  ],
+  "finishedAt": "2026-07-19T14:15:53.708Z",
+  "failureCount": 0
+}

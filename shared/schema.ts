@@ -1205,6 +1205,8 @@ export interface LinkHealthJob {
   brokenLinks: number;
   redirectLinks: number;
   timeoutLinks: number;
+  /** 200-OK responses flagged by takeover/intent-flip/parked heuristics (R4-001/023 class) */
+  suspectLinks?: number;
   errorMessage?: string;
   startedAt?: string;
   completedAt?: string;
@@ -1215,10 +1217,12 @@ export interface LinkHealthCheck {
   id: number;
   resourceId: number;
   url: string;
-  status: 'healthy' | 'broken' | 'timeout' | 'redirect' | 'dns_failure';
+  status: 'healthy' | 'broken' | 'timeout' | 'redirect' | 'dns_failure' | 'suspect';
   httpStatus?: number;
   responseTime?: number;
   redirectUrl?: string;
+  /** URL after following all redirects (differs from url when the destination moved) */
+  finalUrl?: string;
   errorMessage?: string;
   consecutiveFailures: number;
   flaggedForReview: boolean;

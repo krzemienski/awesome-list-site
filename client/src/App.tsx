@@ -5,6 +5,7 @@ import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
+import { useCrossTabSync } from "./lib/crossTabSync";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
 import MainLayout from "@/components/layout/new/MainLayout";
@@ -89,6 +90,9 @@ function Logout() {
 
 function Router() {
   useAnalytics();
+  // R4-081: refresh auth + bookmarks/favorites when another tab logs in/out or
+  // toggles a bookmark/favorite (sentinel written via notifyCrossTabSync()).
+  useCrossTabSync();
   const { user, isLoading: authLoading, error: authError, refetchAuth, logout } = useAuth();
   const [location] = useLocation();
   const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((re) => re.test(location));
@@ -270,6 +274,54 @@ function App() {
     } else {
       initGA();
     }
+  }, []);
+
+  // R4-057: the server (og-middleware) injects a full crawl-time meta set into
+  // <head>; after hydration react-helmet renders its own tags (marked with
+  // data-react-helmet), leaving DUPLICATE title/description/og/twitter tags in
+  // the live DOM. One-time cleanup: remove an UNMARKED tag only when a
+  // helmet-marked counterpart with the same identity key exists, so
+  // server-only tags (og:image:type, twitter:site, JSON-LD) are untouched.
+  useEffect(() => {
+    const keyOf = (el: Element) =>
+      el.tagName === "TITLE"
+        ? "title"
+        : el.tagName === "LINK"
+          ? `link:${el.getAttribute("rel")}`
+          : `meta:${(el.getAttribute("name") || el.getAttribute("property") || "").toLowerCase()}`;
+    const dedupe = (): boolean => {
+      const head = document.head;
+      const marked = new Set<string>();
+      head
+        .querySelectorAll("[data-react-helmet]")
+        .forEach((el) => marked.add(keyOf(el)));
+      if (marked.size === 0) return false;
+      head
+        .querySelectorAll(
+          "title, meta[name], meta[property], link[rel='canonical']",
+        )
+        .forEach((el) => {
+          if (el.hasAttribute("data-react-helmet")) return;
+          if (marked.has(keyOf(el))) el.remove();
+        });
+      return true;
+    };
+    // Helmet commits asynchronously after first paint — try on the next two
+    // frames, then once more after a short delay as a backstop.
+    let cancelled = false;
+    const raf1 = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!cancelled && !dedupe()) {
+          setTimeout(() => {
+            if (!cancelled) dedupe();
+          }, 300);
+        }
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf1);
+    };
   }, []);
 
   return (

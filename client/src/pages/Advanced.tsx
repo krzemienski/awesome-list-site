@@ -11,15 +11,19 @@ import ExportTools from "@/components/ui/export-tools";
 import ResourceRecommendations from "@/components/ui/resource-recommendations";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { 
   Zap, 
   Compass, 
   BarChart3, 
   Download, 
   Lightbulb,
-  Sparkles
+  Sparkles,
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import { AwesomeList, Resource } from "@/types/awesome-list";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 
 const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
 
@@ -45,8 +49,14 @@ export default function Advanced() {
   // BUG-026 (run13): selected export format, driven by the showcase cards.
   const [exportFormat, setExportFormat] = useState<"markdown" | "json" | "csv" | "pdf" | "html" | "yaml" | undefined>();
 
-  const { data: awesomeList, isLoading } = useQuery<AwesomeList>({
-    queryKey: ['/api/awesome-list'],
+  // R4-033 (run21): share ONE catalog cache entry app-wide. App.tsx fetches
+  // under ["awesome-list-data"] via fetchStaticAwesomeList; using the raw
+  // '/api/awesome-list' key here created a second cache entry and a second
+  // full 3.1MB download on this page.
+  const { data: awesomeList, isLoading, isError, refetch, isFetching } = useQuery<AwesomeList>({
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
+    staleTime: 1000 * 60 * 60,
   });
 
   // Select a featured resource for demonstration
@@ -61,6 +71,38 @@ export default function Advanced() {
           {Array(4).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-64 w-full" />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Run21 R4-032: a failed catalog fetch (429/500/network) gets an explicit
+  // error state with a manual retry — the same treatment /search already has —
+  // instead of the ambiguous "Unable to load" dead-end that offered no recovery.
+  if (isError) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
+        <div
+          className="max-w-md mx-auto flex flex-col items-center gap-3 py-16 text-center"
+          role="alert"
+          data-testid="advanced-error"
+        >
+          <AlertCircle className="h-10 w-10 text-[var(--accent)]" />
+          <h1 className="text-xl font-bold">Couldn't load advanced features</h1>
+          <p className="text-sm text-muted-foreground">
+            We couldn't reach the catalog data. This is usually a temporary
+            network problem.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => { if (!isFetching) void refetch(); }}
+            aria-disabled={isFetching}
+            data-testid="button-advanced-retry"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? "animate-spin" : ""}`} />
+            {isFetching ? "Retrying…" : "Try again"}
+          </Button>
         </div>
       </div>
     );

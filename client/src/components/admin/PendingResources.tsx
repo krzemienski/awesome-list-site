@@ -250,22 +250,22 @@ export default function PendingResources() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Run17 BUG-001: was a Radix ScrollArea (overflow-hidden viewport) —
-              the ~2800px-wide table was CLIPPED with no horizontal scrollbar,
-              hiding Description/Submitted/Actions. Plain overflow-auto restores
-              both axes (mirrors the run16 BUG-011 admin-table pattern). */}
-          <div className="h-[600px] overflow-auto">
-            <Table>
+          {/* R4-011 (run21): shared narrow-admin-table strategy — a single
+              contained overflow-auto viewport (scrolls BOTH axes) around a
+              min-w table. The previous sticky-right Actions cell (338px) was
+              WIDER than the ≤768px scrollport and clamped over the Title cell;
+              dropping sticky + letting the whole row scroll together keeps rows
+              readable and Approve/Reject reachable at 375/768 while leaving the
+              desktop layout (table already fits, no scroll) unchanged. */}
+          <div className="max-h-[600px] overflow-auto">
+            <Table className="min-w-[720px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Submitted</TableHead>
-                  {/* BUG-001 (run18): pin Actions to the right edge so
-                      Approve/Reject stay reachable while the wide table scrolls
-                      horizontally (bg-card hides the columns sliding under it). */}
-                  <TableHead className="text-right sticky right-0 bg-card z-20 border-l border-border">Actions</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -327,12 +327,13 @@ export default function PendingResources() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right sticky right-0 bg-card z-10 border-l border-border">
+                    <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewDetails(resource)}
+                          aria-label={`View details for ${resource.title}`}
                           data-testid={`button-view-details-${resource.id}`}
                         >
                           <Eye className="h-4 w-4 mr-1" />
@@ -344,6 +345,7 @@ export default function PendingResources() {
                           className="bg-green-600 hover:bg-green-700"
                           onClick={() => handleApproveClick(resource)}
                           disabled={approveMutation.isPending}
+                          aria-label={`Approve ${resource.title}`}
                           data-testid={`button-approve-${resource.id}`}
                         >
                           <CheckCircle2 className="h-4 w-4 mr-1" />
@@ -354,6 +356,7 @@ export default function PendingResources() {
                           size="sm"
                           onClick={() => handleRejectClick(resource)}
                           disabled={rejectMutation.isPending}
+                          aria-label={`Reject ${resource.title}`}
                           data-testid={`button-reject-${resource.id}`}
                         >
                           <XCircle className="h-4 w-4 mr-1" />
@@ -366,10 +369,9 @@ export default function PendingResources() {
               </TableBody>
             </Table>
           </div>
-          {/* BUG-001 (run18): discoverability hint — the Actions column is
-              pinned right so the review buttons never require deep scrolling. */}
+          {/* R4-011 (run21): discoverability hint for the contained horizontal scroll. */}
           <p className="text-xs text-muted-foreground mt-2 sm:hidden">
-            Swipe the table sideways to see all columns — Approve/Reject stay pinned to the right.
+            Swipe the table sideways to see all columns, including Approve/Reject.
           </p>
         </CardContent>
       </Card>
@@ -544,7 +546,7 @@ export default function PendingResources() {
                   data-testid="textarea-rejection-reason"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  {rejectionReason.length}/10 characters minimum
+                  {rejectionReason.trim().length}/10 characters minimum
                 </p>
               </div>
             </div>

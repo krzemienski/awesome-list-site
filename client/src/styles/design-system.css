@@ -876,9 +876,21 @@ button { font-family: inherit; }
    so keyboard focus was undetectable on most tab stops. :where() keeps
    specificity at 0; !important is required to beat Tailwind's outline-none
    utility on the same pseudo-class. Mouse clicks are unaffected
-   (:focus-visible only matches keyboard-driven focus). */
-:where(a, button, [role="button"], [role="tab"], [role="menuitem"], input,
-    select, textarea, summary, [tabindex]):focus-visible {
+   (:focus-visible only matches keyboard-driven focus).
+
+   Run21 R4-073: the visible ring width was inconsistent (icon/destructive
+   buttons showed a 1px-looking ring vs 2px elsewhere) because the shadcn
+   box-shadow ring (ring-2 + ring-offset) and this outline are two separate
+   "tokens" that don't always line up. Make THIS 2px accent outline the single
+   authoritative indicator across every interactive element (broadened the
+   selector to cover switches/checkboxes/radios/options/combobox/contenteditable
+   too), so keyboard focus is a uniform 2px accent ring everywhere. */
+:where(
+    a, button, [role="button"], [role="link"], [role="tab"], [role="menuitem"],
+    [role="menuitemcheckbox"], [role="menuitemradio"], [role="option"],
+    [role="switch"], [role="checkbox"], [role="radio"], [role="combobox"],
+    input, select, textarea, summary, [contenteditable="true"], [tabindex]
+  ):focus-visible {
   outline: 2px solid var(--accent) !important;
   outline-offset: 2px;
 }

@@ -2685,7 +2685,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditDialog(item)}
-                              aria-label="Edit"
+                              aria-label={`Edit ${item.name}`}
                               data-testid={`button-edit-${item.id}`}
                             >
                               <Pencil className="h-4 w-4" />

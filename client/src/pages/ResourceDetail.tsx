@@ -29,11 +29,14 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
+import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { trackSelectContent, trackShare, trackResourceFavorite } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { slugify, formatAdminDate } from "@/lib/utils";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 
@@ -81,8 +84,10 @@ export default function ResourceDetail() {
       }[];
     }[];
   }>({
-    queryKey: ['/api/awesome-list'],
-    staleTime: 5 * 60 * 1000,
+    // R4-033 (run21): same cache entry as App.tsx — no second catalog download.
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
+    staleTime: 1000 * 60 * 60,
   });
 
   const taxonomySlugs = useMemo(() => {
@@ -132,10 +137,32 @@ export default function ResourceDetail() {
         trackResourceFavorite(resource.title, resource.category ?? 'uncategorized', isFavorite ? 'remove' : 'add');
       }
       queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
+      // R4-081: mirror the change into other open tabs' favorite lists.
+      notifyCrossTabSync();
       toast({
         title: isFavorite ? "Removed from favorites" : "Added to favorites",
         description: isFavorite ? "Resource removed from your favorites" : "Resource saved to your favorites"
       });
+    },
+    onError: (error) => {
+      // R4-056: favorite failures used to roll back silently with no feedback.
+      // Same pattern as BookmarkButton — 401 prompts re-sign-in, everything
+      // else shows a humanized destructive toast.
+      const status = error instanceof ApiError ? error.status : 0;
+      if (status === 401) {
+        toast({
+          title: "Sign in to favorite",
+          description: "Your session has expired. Please sign in again to save favorites.",
+          action: signInAction,
+        });
+      } else {
+        toast({
+          title: "Couldn't update favorite",
+          description: humanizeApiError(error, "Failed to update favorite. Please try again."),
+          variant: "destructive",
+        });
+      }
+      console.error("Favorite mutation error:", error);
     }
   });
 
@@ -173,6 +200,28 @@ export default function ResourceDetail() {
           description: "Resource saved to your bookmarks"
         });
       }
+      // R4-081: mirror the change into other open tabs' bookmark lists.
+      notifyCrossTabSync();
+    },
+    onError: (error) => {
+      // R4-056: bookmark failures used to roll back silently with no feedback.
+      // Same pattern as BookmarkButton — 401 prompts re-sign-in, everything
+      // else shows a humanized destructive toast.
+      const status = error instanceof ApiError ? error.status : 0;
+      if (status === 401) {
+        toast({
+          title: "Sign in to bookmark",
+          description: "Your session has expired. Please sign in again to save resources.",
+          action: signInAction,
+        });
+      } else {
+        toast({
+          title: "Couldn't update bookmark",
+          description: humanizeApiError(error, "Failed to update bookmark. Please try again."),
+          variant: "destructive",
+        });
+      }
+      console.error("Bookmark mutation error:", error);
     }
   });
 

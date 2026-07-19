@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
+import { notifyCrossTabSync } from '@/lib/crossTabSync';
 
 interface User {
   id: string;
@@ -50,6 +51,8 @@ export function useAuth() {
       // Clear auth cache and redirect to home
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
+      // R4-081: tell other open tabs to drop their authed chrome/bookmarks.
+      notifyCrossTabSync();
       window.location.href = '/';
     }
   });

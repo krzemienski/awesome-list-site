@@ -134,14 +134,25 @@ vite-plugin-checker-error-overlay {
 }
 
 /*
-  NB-021 (run18): printable stylesheet. The app is a dark, full-bleed SPA with
-  no print rules, so pages like /, /about and resource views printed as black
-  pages with unreadable low-contrast text and all the chrome baked in. These
-  rules force a light background + black text for print, drop dark full-bleed
-  backgrounds, hide non-content chrome (header, sidebar, consent banner, toasts,
-  footer), and render links as plain readable text.
+  NB-021 (run18) + R4-013/038/039/070 (run21): printable stylesheet overhaul.
+  The app is a dark, full-bleed SPA; without these rules pages printed as solid
+  black blocks with unreadable low-contrast text and every piece of interactive
+  chrome baked in. This block:
+    - forces a white page with full-opacity black body text (R4-013);
+    - neutralises every dark surface + shadow + sub-1 opacity so nothing prints
+      as a black block, including dark-variant buttons/badges/chips (R4-013);
+    - hides ALL interactive chrome — sidebar, header/search, nav, footer, toasts,
+      consent banner, form controls (inputs/selects/checkboxes/switches), sort &
+      tab controls, dialogs/popovers and every button — for a content-only
+      printout (R4-039);
+    - drops the a::after { content: attr(href) } expansion that overlapped card
+      titles and was clipped at card edges, and un-clamps line-clamped text so
+      titles/descriptions print in full (R4-038);
+    - adds break-inside: avoid to cards, list items and table rows so partially
+      filled cards no longer spill into near-blank orphan trailing pages (R4-070).
 */
 @media print {
+  /* White page, full-opacity black readable text everywhere. */
   html,
   body,
   #root,
@@ -151,24 +162,48 @@ vite-plugin-checker-error-overlay {
     color: #000 !important;
   }
 
-  /* Neutralise dark full-bleed surfaces so nothing prints as a black block. */
+  /* Neutralise dark surfaces/shadows and kill sub-1 opacity so nothing prints
+     as a black block and every piece of copy is legible (R4-013). This also
+     inverts dark-variant buttons/badges before they are hidden below. */
   *,
   *::before,
   *::after {
+    background: transparent !important;
     background-image: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
+    color: #000 !important;
+    opacity: 1 !important;
+    filter: none !important;
+    border-color: #bbb !important;
   }
 
-  /* Hide site chrome that shouldn't appear on paper. */
+  /* Hide ALL interactive chrome for a content-only printout (R4-039):
+     header/search, sidebar nav, footer, toasts, consent banner, every button,
+     and all form controls (inputs, selects, checkboxes, switches, sort/tab
+     controls, dialogs and popovers). */
   header,
   nav,
   footer,
+  button,
+  [role="button"],
+  [role="toolbar"],
+  [role="tablist"],
+  [role="checkbox"],
+  [role="switch"],
+  [role="combobox"],
+  [role="dialog"],
+  [role="menu"],
+  input,
+  select,
+  textarea,
   [data-sidebar],
   [data-testid="consent-banner"],
   [data-testid="app-header"],
   [data-sonner-toaster],
-  [role="toolbar"],
+  [cmdk-root],
+  [cmdk-overlay],
+  [data-radix-popper-content-wrapper],
   .no-print {
     display: none !important;
   }
@@ -187,15 +222,40 @@ vite-plugin-checker-error-overlay {
     color: #000 !important;
   }
 
-  /* Links stay readable as text; expose the destination for reference. */
+  /* Links stay readable as plain underlined text. The href expansion is dropped
+     (R4-038): as inline pseudo-content it overlapped titles and was clipped at
+     the card edge. */
   a {
     color: #000 !important;
     text-decoration: underline;
   }
+  a[href]::after {
+    content: none !important;
+  }
 
-  a[href^="http"]::after {
-    content: " (" attr(href) ")";
-    font-size: 0.85em;
-    word-break: break-all;
+  /* Un-clamp truncated text so titles/descriptions print in full rather than
+     being clipped at the card edge (R4-038). */
+  [class*="line-clamp"] {
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Keep cards, list items and table rows intact across page breaks so half-full
+     cards don't spill into near-blank orphan trailing pages (R4-070). */
+  article,
+  li,
+  tr,
+  [data-testid^="card-resource-"],
+  [data-testid^="row-resource-"],
+  [class*="rounded-lg"],
+  [class*="rounded-xl"] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 }

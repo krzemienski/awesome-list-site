@@ -418,8 +418,13 @@ export default function CommunityMetrics({ resources, categories, className }: C
             </TabsContent>
 
             <TabsContent value="popular" className="space-y-4">
+              {metrics.popularResources.filter((r) => r.score > 0).length === 0 ? (
+                <p className="text-sm text-muted-foreground py-8 text-center" data-testid="text-popular-empty">
+                  No popularity data yet — rankings appear as you view and open resources in this browser.
+                </p>
+              ) : (
               <div className="space-y-3">
-                {metrics.popularResources.map((resource, index) => (
+                {metrics.popularResources.filter((r) => r.score > 0).map((resource, index) => (
                   <Card key={resource.resourceId}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between">
@@ -482,6 +487,7 @@ export default function CommunityMetrics({ resources, categories, className }: C
                   </Card>
                 ))}
               </div>
+              )}
             </TabsContent>
 
             <TabsContent value="categories" className="space-y-4">

@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { hasVisibleChars } from "@shared/validation";
 import { useToast } from "@/hooks/use-toast";
 import {
   User,
@@ -186,6 +187,16 @@ export default function Profile({ user }: ProfileProps) {
   const handleSaveName = () => {
     if (!editFirstName.trim() && !editLastName.trim()) {
       setNameError("Enter at least a first or last name.");
+      return;
+    }
+    // Run21 R4-049/077: a zero-width-only name would render as an invisible
+    // identity — reject inline with an explicit message (the server enforces
+    // the same rule via the shared validator).
+    if (
+      (editFirstName.trim() !== "" && !hasVisibleChars(editFirstName)) ||
+      (editLastName.trim() !== "" && !hasVisibleChars(editLastName))
+    ) {
+      setNameError("Name must contain visible characters.");
       return;
     }
     setNameError(null);
@@ -355,7 +366,10 @@ export default function Profile({ user }: ProfileProps) {
           </AvatarFallback>
         </Avatar>
 
-        <div className="flex-1 text-center sm:text-left">
+        {/* R4-040: min-w-0 lets this column shrink (so the long name truncates)
+            instead of shoving the Settings/Logout buttons off-viewport in the
+            768–812px tablet band. */}
+        <div className="flex-1 min-w-0 text-center sm:text-left">
           <div className="eyebrow mb-2" aria-hidden>// Profile</div>
           <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
             {/* Run17 BUG-012: truncate — CSS defense for names at the 50-char cap */}
@@ -392,13 +406,17 @@ export default function Profile({ user }: ProfileProps) {
           </div>
         </div>
         
-        <div className="flex gap-2">
-          {/* Run15 BUG-005: Settings was a dead button — route it to the
-              theme/appearance settings page. */}
+        {/* R4-040: shrink-0 keeps the buttons at full size and flex-wrap lets
+            them drop below the header (never clip off-viewport) in the
+            768–812px tablet band. */}
+        <div className="flex flex-wrap gap-2 justify-center sm:justify-end shrink-0">
+          {/* Run15 BUG-005: Settings was a dead button. R4-046: route it to the
+              /settings hub (account/appearance/security) rather than dropping
+              users straight onto the theme-only page. */}
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setLocation("/settings/theme")}
+            onClick={() => setLocation("/settings")}
             data-testid="button-profile-settings"
           >
             <Settings className="h-4 w-4 mr-2" />

@@ -262,11 +262,15 @@ export default function UsersTab() {
                         <span data-testid={`text-email-${user.id}`}>
                           {revealedIds.has(user.id) ? user.email : maskEmail(user.email)}
                         </span>
+                        {/* R4-041: aria-label includes a row identifier so repeated controls
+                            have unique accessible names (masked email keeps PII out of the DOM). */}
                         <button
                           type="button"
                           onClick={() => toggleReveal(user.id)}
                           className="text-muted-foreground/70 hover:text-foreground transition-colors"
-                          aria-label={revealedIds.has(user.id) ? "Hide email" : "Reveal email"}
+                          aria-label={`${revealedIds.has(user.id) ? "Hide" : "Reveal"} email for ${
+                            `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
+                          }`}
                           data-testid={`button-toggle-email-${user.id}`}
                         >
                           {revealedIds.has(user.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}

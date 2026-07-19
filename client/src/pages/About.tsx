@@ -62,7 +62,7 @@ export default function About() {
             {MAINTAINER.bio.map((paragraph) => (
               <p
                 key={paragraph.slice(0, 32)}
-                className="text-sm text-muted-foreground leading-relaxed"
+                className="text-sm text-muted-foreground leading-relaxed max-w-prose"
               >
                 {paragraph}
               </p>
@@ -80,7 +80,7 @@ export default function About() {
             {/* NB-036 (run18): there is no support email, so point people at a
                 real, reachable channel — the awesome-video GitHub issues — for
                 questions and for account / data-deletion requests. */}
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
               Questions, corrections, or an account/data-deletion request? The
               best way to reach us is to{" "}
               <a
@@ -125,7 +125,7 @@ export default function About() {
                 </div>
                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
                 A curated list of awesome streaming video tools, frameworks, libraries, and learning
                 resources. Every resource on this site is sourced from and kept in sync with this
                 repository.
@@ -152,7 +152,7 @@ export default function About() {
                 </div>
                 <ExternalLink className="h-4 w-4 text-muted-foreground" />
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
                 The open-source platform that powers this site — it transforms any GitHub awesome list
                 into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced
                 search, and modern UI components.
@@ -313,7 +313,7 @@ export default function About() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground max-w-prose">
               This project was built with dedication using open source technologies.
               Special thanks to:
             </p>
@@ -377,7 +377,7 @@ export default function About() {
                 {/* Run15 BUG-028: h2 keeps the heading outline sequential —
                     the page's only H1 is the hero; CardTitles are divs. */}
                 <h2 className="font-semibold text-sm">{faq.question}</h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
                   {faq.answer}
                 </p>
               </div>
