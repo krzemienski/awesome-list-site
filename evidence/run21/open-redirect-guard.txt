@@ -1,0 +1,33 @@
+# Open-redirect guard verification — Run21 architect blocker fix (July 19, 2026)
+# Guard: server/og-middleware.ts canonicalization collapses leading [/\\]+ runs to a single '/' before res.redirect(301)
+
+=== GET //evil.com/ ===
+HTTP/1.1 301 Moved Permanently
+Location: /evil.com
+
+=== GET //evil.com/foo/ ===
+HTTP/1.1 301 Moved Permanently
+Location: /evil.com/foo
+
+=== GET ///evil.com/ ===
+HTTP/1.1 301 Moved Permanently
+Location: /evil.com
+
+=== GET /%5Cevil.com/ ===
+HTTP/1.1 301 Moved Permanently
+Location: /%5Cevil.com
+
+=== GET /about/ ===
+HTTP/1.1 301 Moved Permanently
+Location: /about
+
+=== GET /About ===
+HTTP/1.1 301 Moved Permanently
+Location: /about
+
+=== GET /about/?x=1 ===
+HTTP/1.1 301 Moved Permanently
+Location: /about?x=1
+
+=== GET / ===
+HTTP/1.1 200 OK
