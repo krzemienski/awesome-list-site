@@ -1,0 +1,26 @@
+{
+  "startedAt": "2026-07-19T16:38:55.327Z",
+  "base": "https://awesome.video",
+  "steps": {
+    "login": [
+      {
+        "attempt": 1,
+        "ok": true
+      }
+    ],
+    "load": [
+      {
+        "resources": 2292,
+        "categories": 9
+      }
+    ],
+    "summary-resources": [
+      {
+        "scanned": 2292,
+        "writes": 0,
+        "staleSkips": 0
+      }
+    ]
+  },
+  "finishedAt": "2026-07-19T16:38:59.142Z"
+}
