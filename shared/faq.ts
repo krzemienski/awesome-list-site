@@ -7,7 +7,7 @@ export const ABOUT_FAQS: FaqItem[] = [
   {
     question: "What is Awesome Video?",
     answer:
-      "Awesome Video (awesome.video) is a free, searchable directory of curated video development resources — encoders, players, codecs, streaming tools, specifications, and learning materials — organized across 9 top-level categories. It publishes more than 2,300 reviewed resources drawn from the open-source awesome-video list maintained by Nick Krzemienski on GitHub.",
+      "Awesome Video (awesome.video) is a free, searchable directory of curated video development resources — encoders, players, codecs, streaming tools, specifications, and learning materials — organized across 9 top-level categories. It publishes more than 2,200 reviewed resources drawn from the open-source awesome-video list maintained by Nick Krzemienski on GitHub.",
   },
   {
     question: "Is Awesome Video free to use?",
