@@ -677,7 +677,11 @@ class ResearchService {
       if (persistNow) await persist();
     };
 
-    const discoveryCap = Math.max(10, Math.min(200, Math.round(maxBudgetUsd * 5)));
+    // Discovery ceiling scales with budget (~5 discoveries per $1) so larger
+    // budgets can actually yield more resources (budgets are uncapped per user
+    // request). Safety bound of 1000 per run protects the DB/review queue from
+    // a runaway job created with an enormous budget.
+    const discoveryCap = Math.max(10, Math.min(1000, Math.round(maxBudgetUsd * 5)));
     const runCtx: ResearchRunContext = {
       jobId,
       emitter,
@@ -690,7 +694,7 @@ class ResearchService {
       addLog,
     };
 
-    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModel}, Budget: $${maxBudgetUsd}, Max turns: ${maxTurns}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
+    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModel}, Budget: $${maxBudgetUsd}, Discovery cap: ${discoveryCap}, Max turns: ${maxTurns}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
     if (categoryFocus) await addLog('system', `Focus: ${categoryFocus}`);
     await addLog('user', prompt);
 

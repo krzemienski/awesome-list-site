@@ -329,6 +329,16 @@ export default function ResearcherTab() {
                         onChange={(e) => setMaxBudget(e.target.value)}
                       />
                     </div>
+                    {(() => {
+                      const b = Number(maxBudget);
+                      if (!Number.isFinite(b) || b < 0.25) return null;
+                      const cap = Math.max(10, Math.min(1000, Math.round(b * 5)));
+                      return (
+                        <p className="text-xs text-muted-foreground mt-1" data-testid="text-discovery-cap">
+                          Up to {cap} discoveries this run{cap === 1000 ? " (maximum per run)" : ""}
+                        </p>
+                      );
+                    })()}
                   </div>
                   <div>
                     <Label htmlFor="turns">Max Turns</Label>
