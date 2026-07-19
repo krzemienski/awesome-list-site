@@ -67,6 +67,71 @@ if (window.__INITIAL_DATA__) {
 }
 
 const rootElement = document.getElementById("root")!;
+
+// Task #172 — kill the paint→blank→paint flash on slow connections.
+// og-middleware injects real SEO content (#ssr-seo-content + its scoped
+// <style>) into #root. createRoot().render() wipes #root, so on throttled
+// loads users saw content appear (~0.7s), vanish at React mount (~1.5s), and
+// reappear as cards (~1.8s). Fix: BEFORE React mounts, move the injected
+// nodes into a fixed full-viewport overlay so the pixels never disappear;
+// React mounts underneath, and the overlay is removed only once the app has
+// real content to show. We still never hydrate this markup (see
+// .agents/memory/spa-crawler-prerender.md).
+(function holdSsrContent() {
+  const ssr = rootElement.querySelector("#ssr-seo-content");
+  if (!ssr) return;
+  try {
+    const overlay = document.createElement("div");
+    overlay.id = "ssr-seo-hold";
+    overlay.setAttribute(
+      "style",
+      "position:fixed;inset:0;z-index:2147483000;background:#000;overflow:auto;overscroll-behavior:contain",
+    );
+    // Move the scoped <style> siblings too, so the overlay keeps its styling.
+    const nodes = Array.from(rootElement.childNodes);
+    for (const n of nodes) overlay.appendChild(n);
+    document.body.appendChild(overlay);
+
+    const start = Date.now();
+    let dataSettledAt = 0;
+
+    const remove = () => {
+      clearInterval(timer);
+      overlay.remove();
+    };
+    const timer = window.setInterval(() => {
+      const elapsed = Date.now() - start;
+      // Real listing content rendered → swap immediately.
+      if (rootElement.querySelector('[data-testid^="card-resource"]')) {
+        return remove();
+      }
+      // Watch the query cache directly (no body-stream races): the catalog
+      // payload lands under ["awesome-list-data"] once fully downloaded+parsed.
+      if (
+        !dataSettledAt &&
+        queryClient.getQueryData(["awesome-list-data"]) !== undefined
+      ) {
+        dataSettledAt = Date.now();
+      }
+      const reactCommitted = !!rootElement.firstElementChild;
+      // Routes without resource cards (static pages, detail views): once React
+      // has committed AND the catalog payload has landed, give one short grace
+      // period for the data-driven render, then swap.
+      if (
+        reactCommitted &&
+        dataSettledAt &&
+        Date.now() - dataSettledAt > 600 &&
+        elapsed > 600
+      ) {
+        return remove();
+      }
+      // Hard cap: never trap the user on the static overlay.
+      if (elapsed > 8000) return remove();
+    }, 100);
+  } catch {
+    // If anything goes wrong, fall back to the old behavior (React wipes #root).
+  }
+})();
 const AppComponent = (
   <ThemeProvider>
     <QueryClientProvider client={queryClient}>

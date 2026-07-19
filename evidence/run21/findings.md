@@ -77,3 +77,7 @@ node evidence/run21/measure-cold.mjs
 Expect: contentMs for all three pages comfortably < 2s (intro-learning was the worst
 at 2206ms in the original baseline); in DevTools, `/api/auth/user` should start
 within ~50ms of `/api/awesome-list` (both from inline HTML script, pre-bundle).
+
+## Task #172 — SSR-content flash eliminated (July 19, 2026)
+Fix: client/src/main.tsx moves the server-injected #ssr-seo-content (+scoped style) out of #root into a fixed overlay (#ssr-seo-hold) before React mounts; overlay removed when a real resource card renders (or data-settled+600ms grace on card-less routes; 8s hard cap). Server injection unchanged (crawler HTML identical).
+Verified throttled (100ms RTT, prod build @3001, evidence/run21/flash-trace.mjs + overlay-check.mjs): /category/intro-learning content@651ms, 0 disappearances, cards@1880ms, overlay removed @1952ms. Dev sweep: /about, /, /resource/185228 all clear overlay with real content, 0 console errors.
