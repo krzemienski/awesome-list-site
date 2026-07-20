@@ -7,6 +7,7 @@ import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
+import { cleanGithubSlugTitle } from '../lib/titleClean';
 import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
 import { DEFAULT_RESEARCH_MODEL, DEFAULT_ENRICHMENT_MODEL, resolveModel, type AgentRunConfig } from './agentRuntime';
 
@@ -469,7 +470,10 @@ class ResearchService {
     const rows = await withTimeout(
       db.insert(researchDiscoveries).values({
         jobId: ctx.jobId,
-        title: input.title,
+        // Run24 R5-041: scouts report GitHub results as "owner/repo — desc";
+        // store the cleaned title (repo name, not full_name) at the choke
+        // point every save path (direct, retry queue flush) funnels through.
+        title: cleanGithubSlugTitle(input.title),
         url: input.url,
         description: input.description || '',
         suggestedCategory: input.suggested_category || '',

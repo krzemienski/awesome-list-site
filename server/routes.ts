@@ -92,6 +92,7 @@ import { ensureMinDescription } from "./github/importHygiene";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
 import { buildRelatedResources } from "./services/relatedResources";
 import { stripInternalResourceFields } from "./lib/publicResource";
+import { buildCanonicalTagMap, canonicalizeTagArray } from "./lib/tagCanonicalize";
 import { registerPublicApiRoutes } from "./api/public";
 import { learningPathGenerator } from "./ai/learningPathGenerator";
 import { claudeService } from "./ai/claudeService";
@@ -5215,28 +5216,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // spelling: a curated brand map wins; otherwise the most frequent spelling
   // in the corpus (ties broken lexicographically) so reruns are deterministic.
   // Idempotent: second run updates 0 resources.
+  // Run24 R5-063 + NB-015: canonicalization now also folds separator variants
+  // (live streaming/live_streaming/live-streaming), merges singular/plural
+  // families, and applies the extended brand-casing map. Logic lives in
+  // server/lib/tagCanonicalize.ts.
   app.post('/api/admin/maintenance/canonicalize-tags', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const BRAND_CASING: Record<string, string> = {
-        'ffmpeg': 'FFmpeg', 'nginx': 'NGINX', 'api': 'API', 'avplayer': 'AVPlayer',
-        'aws': 'AWS', 'avi': 'AVI', 'cdn': 'CDN', 'c++': 'C++', 'apple': 'Apple',
-        'cross-platform': 'Cross-platform', 'hls': 'HLS', 'dash': 'DASH',
-        'mpeg-dash': 'MPEG-DASH', 'drm': 'DRM', 'vod': 'VOD', 'av1': 'AV1',
-        'hevc': 'HEVC', 'h264': 'H.264', 'h.264': 'H.264', 'h265': 'H.265',
-        'h.265': 'H.265', 'macos': 'macOS', 'ios': 'iOS', 'tvos': 'tvOS',
-        'android': 'Android', 'javascript': 'JavaScript', 'typescript': 'TypeScript',
-        'python': 'Python', 'rust': 'Rust', 'gpu': 'GPU', 'sdk': 'SDK',
-        'cli': 'CLI', 'rtmp': 'RTMP', 'srt': 'SRT', 'rist': 'RIST',
-        'webrtc': 'WebRTC', 'mp4': 'MP4', 'cmaf': 'CMAF', 'abr': 'ABR',
-        'qoe': 'QoE', 'vmaf': 'VMAF', 'opencv': 'OpenCV', 'obs': 'OBS',
-        'vlc': 'VLC', 'gstreamer': 'GStreamer', 'x264': 'x264', 'x265': 'x265',
-        'html5': 'HTML5', 'json': 'JSON', 'xml': 'XML', 'ai': 'AI', 'ui': 'UI',
-        'url': 'URL', 'http': 'HTTP', 'https': 'HTTPS', 'tcp': 'TCP', 'udp': 'UDP',
-        'rtp': 'RTP', 'rtsp': 'RTSP', 'scte-35': 'SCTE-35', 'id3': 'ID3',
-        'mpeg': 'MPEG', 'mpeg-ts': 'MPEG-TS', 'vp9': 'VP9', 'vvc': 'VVC',
-        'linux': 'Linux', 'windows': 'Windows', 'docker': 'Docker',
-        'kubernetes': 'Kubernetes', 'github': 'GitHub', 'youtube': 'YouTube',
-      };
       const rowsResult = await db.execute(sql`
         SELECT id, metadata->'tags' AS tags
         FROM resources
@@ -5246,49 +5231,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       const rows = rowsResult.rows as Array<{ id: number; tags: string[] }>;
 
-      // Pass 1: frequency census per case-insensitive family.
-      const familyCounts = new Map<string, Map<string, number>>();
+      const allTags: string[] = [];
       for (const r of rows) {
-        for (const t of r.tags) {
-          if (typeof t !== 'string') continue;
-          const fam = t.toLowerCase();
-          const spellings = familyCounts.get(fam) ?? new Map<string, number>();
-          spellings.set(t, (spellings.get(t) ?? 0) + 1);
-          familyCounts.set(fam, spellings);
-        }
+        for (const t of r.tags) if (typeof t === 'string') allTags.push(t);
       }
-      const canonical = new Map<string, string>();
-      let variantFamilies = 0;
-      for (const [fam, spellings] of Array.from(familyCounts.entries())) {
-        if (spellings.size > 1) variantFamilies++;
-        if (BRAND_CASING[fam]) {
-          canonical.set(fam, BRAND_CASING[fam]);
-          continue;
-        }
-        let best: string | null = null;
-        let bestCount = -1;
-        for (const [spelling, count] of Array.from(spellings.entries())) {
-          if (count > bestCount || (count === bestCount && best !== null && spelling < best)) {
-            best = spelling;
-            bestCount = count;
-          }
-        }
-        canonical.set(fam, best!);
-      }
+      const { canonicalByRaw, variantFamilies, pluralMerges } = buildCanonicalTagMap(allTags);
 
-      // Pass 2: rewrite arrays that change (canonicalize + dedupe, keep order).
+      // Rewrite arrays that change (canonicalize + dedupe, keep order).
       let resourcesUpdated = 0;
       for (const r of rows) {
-        const seen = new Set<string>();
-        const next: string[] = [];
-        for (const t of r.tags) {
-          if (typeof t !== 'string') continue;
-          const c = canonical.get(t.toLowerCase()) ?? t;
-          if (!seen.has(c)) {
-            seen.add(c);
-            next.push(c);
-          }
-        }
+        const next = canonicalizeTagArray(r.tags, canonicalByRaw);
         if (JSON.stringify(next) !== JSON.stringify(r.tags)) {
           await db.execute(sql`
             UPDATE resources
@@ -5302,10 +5254,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         null,
         'maintenance_canonicalize_tags',
         req.user.claims.sub,
-        { variantFamilies, resourcesUpdated },
-        `Canonicalized tag casing: ${variantFamilies} variant families, ${resourcesUpdated} resources rewritten`
+        { variantFamilies, pluralMerges, resourcesUpdated },
+        `Canonicalized tags: ${variantFamilies} variant families, ${pluralMerges} plural merges, ${resourcesUpdated} resources rewritten`
       );
-      res.json({ variantFamiliesFound: variantFamilies, resourcesUpdated });
+      res.json({ variantFamiliesFound: variantFamilies, pluralMerges, resourcesUpdated });
     } catch (error) {
       console.error('Error canonicalizing tags:', error);
       res.status(500).json({ message: 'Failed to canonicalize tags' });

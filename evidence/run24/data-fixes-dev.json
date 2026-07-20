@@ -1,0 +1,303 @@
+{
+  "startedAt": "2026-07-20T21:55:04.066Z",
+  "base": "http://localhost:5000",
+  "actions": [
+    {
+      "phase": "repoints"
+    },
+    {
+      "finding": "R4-021",
+      "id": 185455,
+      "action": "already-repointed-noop"
+    },
+    {
+      "finding": "R4-022",
+      "id": 185547,
+      "action": "already-repointed-noop"
+    },
+    {
+      "finding": "R4-022",
+      "id": 184940,
+      "action": "already-repointed-noop"
+    },
+    {
+      "finding": "R4-022",
+      "id": 185390,
+      "action": "already-repointed-noop"
+    },
+    {
+      "finding": "R4-023",
+      "id": 185306,
+      "action": "already-repointed-noop"
+    },
+    {
+      "finding": "R4-023",
+      "id": 186531,
+      "action": "already-repointed-noop"
+    },
+    {
+      "finding": "R5-065",
+      "id": 184935,
+      "action": "already-repointed-noop"
+    },
+    {
+      "finding": "R5-065",
+      "id": 184942,
+      "action": "already-repointed-noop"
+    },
+    {
+      "phase": "sportsvideo-verify"
+    },
+    {
+      "finding": "BUG-056",
+      "id": 184854,
+      "action": "verify-only",
+      "url": "https://svgplay.sportsvideo.org/silicon-valley-video-summit-2025",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://svgplay.sportsvideo.org/silicon-valley-video-summit-2025"
+      },
+      "verdict": "live-from-this-network (auditor 403 was a bot-block, not a dead link)"
+    },
+    {
+      "finding": "BUG-056",
+      "id": 186159,
+      "action": "verify-only",
+      "url": "https://www.sportsvideo.org/2020/03/27/riot-games-keeps-league-of-legends-esports-rolling-with-fully-cloud-based-virtualized-production-workflow/",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://www.sportsvideo.org/2020/03/27/riot-games-keeps-league-of-legends-esports-rolling-with-fully-cloud-based-virtualized-production-workflow/"
+      },
+      "verdict": "live-from-this-network (auditor 403 was a bot-block, not a dead link)"
+    },
+    {
+      "phase": "corpus-fetch"
+    },
+    {
+      "phase": "corpus-fetched",
+      "count": 1986
+    },
+    {
+      "phase": "wayback-reaudit"
+    },
+    {
+      "finding": "R4-066",
+      "id": 186442,
+      "action": "keep-wayback",
+      "origin": "https://www.conviva.com/state-of-streaming/",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://www.conviva.ai/"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185416,
+      "action": "keep-wayback",
+      "origin": "https://www.businesswire.com/news/home/20231019229734/en/Streaming-Video-Technology-Alliance-Announces-First-Public-Open-Source-Repository-Common-Media-Library/",
+      "probe": {
+        "code": 403,
+        "finalUrl": "https://www.businesswire.com/news/home/20231019229734/en/Streaming-Video-Technology-Alliance-Announces-First-Public-Open-Source-Repository-Common-Media-Library/"
+      },
+      "reason": "origin not healthy (403)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185407,
+      "action": "keep-wayback",
+      "origin": "https://dyte.io/blog/rtmp-webrtc-hls/",
+      "probe": {
+        "code": 502,
+        "finalUrl": "https://dyte.io/blog/rtmp-webrtc-hls/"
+      },
+      "reason": "origin not healthy (502)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185380,
+      "action": "keep-wayback",
+      "origin": "https://www.inetsolutions.org/how-to-stream-video-a-beginners-guide/",
+      "probe": {
+        "code": 404,
+        "finalUrl": "https://www.inetsolutions.org/how-to-stream-video-a-beginners-guide/"
+      },
+      "reason": "origin not healthy (404)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185306,
+      "action": "keep-wayback",
+      "origin": "https://support.video.ibm.com/hc/en-us/articles/207852167-Basics-of-Streaming-Video-Production",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://www.ibm.com/mysupport/s/ibm-community-support-search-results?q=video%20streaming&language=en_US"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185251,
+      "action": "keep-wayback",
+      "origin": "https://www.harmonicinc.com/insights/blog/targeted-ads-innovations/",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://www.mediakind.com/"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185234,
+      "action": "keep-wayback",
+      "origin": "https://www.businesswire.com/news/home/20230516005279/en/Streaming-Video-Technology-Alliance-Introduces-New-Industry-Conference-SEGMENTS2023",
+      "probe": {
+        "code": 403,
+        "finalUrl": "https://www.businesswire.com/news/home/20230516005279/en/Streaming-Video-Technology-Alliance-Introduces-New-Industry-Conference-SEGMENTS2023"
+      },
+      "reason": "origin not healthy (403)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185053,
+      "action": "keep-wayback",
+      "origin": "https://ultrahdforum.org/phasea-guidelines-description/",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://uhdf.svta.org/"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185052,
+      "action": "keep-wayback",
+      "origin": "https://ultrahdforum.org/phaseb-guidelines-description/",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://uhdf.svta.org/"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 185017,
+      "action": "keep-wayback",
+      "origin": "https://blendvision.com/en/blog/live-streaming-protocols-comparison",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://blendvision.com/"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 184843,
+      "action": "keep-wayback",
+      "origin": "https://www.editframe.com/guides/integrating-ffmpeg-with-react.js-via-webassembly",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://editframe.com/"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "finding": "R4-066",
+      "id": 184792,
+      "action": "keep-wayback",
+      "origin": "https://theiabm.org/bamproducts/online-caption-subtitle-toolkit/",
+      "probe": {
+        "code": 200,
+        "finalUrl": "https://theiamt.org/"
+      },
+      "reason": "origin redirects away from the article (content gone)"
+    },
+    {
+      "phase": "retitles"
+    },
+    {
+      "finding": "R5-064",
+      "id": 185994,
+      "action": "already-retitled-noop"
+    },
+    {
+      "finding": "NB-046",
+      "id": 185662,
+      "action": "already-retitled-noop"
+    },
+    {
+      "finding": "R5-033",
+      "id": 187995,
+      "action": "absent-noop"
+    },
+    {
+      "phase": "description-rewrites"
+    },
+    {
+      "finding": "R5-034",
+      "id": 185956,
+      "action": "already-clean-noop"
+    },
+    {
+      "finding": "R5-062",
+      "id": 185821,
+      "action": "already-clean-noop"
+    },
+    {
+      "finding": "NB-052",
+      "id": 185610,
+      "action": "already-clean-noop"
+    },
+    {
+      "finding": "NB-052",
+      "id": 186001,
+      "action": "already-clean-noop"
+    },
+    {
+      "finding": "NB-052",
+      "id": 186002,
+      "action": "already-clean-noop"
+    },
+    {
+      "finding": "NB-052",
+      "id": 186003,
+      "action": "already-clean-noop"
+    },
+    {
+      "finding": "NB-052",
+      "id": 186004,
+      "action": "already-clean-noop"
+    },
+    {
+      "finding": "NB-052",
+      "id": 186005,
+      "action": "already-clean-noop"
+    },
+    {
+      "phase": "corpus-scans"
+    },
+    {
+      "phase": "demuxed-dedup"
+    },
+    {
+      "finding": "R5-036",
+      "action": "no-duplicate-noop",
+      "approvedWithTitle": 1
+    },
+    {
+      "phase": "tag-canonicalization"
+    },
+    {
+      "finding": "R5-063+NB-015",
+      "action": "canonicalize-tags",
+      "status": 200,
+      "result": {
+        "variantFamiliesFound": 0,
+        "pluralMerges": 0,
+        "resourcesUpdated": 0
+      }
+    }
+  ],
+  "finishedAt": "2026-07-20T21:55:12.173Z",
+  "mutatingActionCount": 1
+}
