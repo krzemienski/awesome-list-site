@@ -173,12 +173,10 @@ export default function SEOHead({
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="mobile-web-app-capable" content="yes" />
 
-      {/* Favicon and Icons — apple-touch-icon must be raster PNG (R4-060):
-          iOS ignores SVG touch icons and falls back to a page screenshot. */}
-      <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-      <link rel="manifest" href="/site.webmanifest" />
+      {/* Favicon/apple-touch-icon/manifest links are owned by client/index.html
+          (single source — duplicating them here shipped double icon links on
+          every hydrated page). apple-touch-icon note (R4-060): must stay raster
+          PNG in index.html; iOS ignores SVG touch icons. */}
 
       {/* Structured Data (JSON-LD) is emitted SERVER-SIDE by og-middleware so a
           single route-appropriate schema is authoritative for crawlers. The
