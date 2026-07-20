@@ -121,8 +121,17 @@ export default function ResearcherTab() {
 
   // Run23 NB-039: the endpoint returns { jobs, total } so the history table
   // can say "showing latest 20 of N" instead of silently truncating.
+  // R5-011 (run24): "Load more" grows the requested window past the default
+  // 20 (server caps at 200). Key stays prefixed by '/api/researcher/jobs' so
+  // existing prefix invalidations keep working.
+  const [jobsLimit, setJobsLimit] = useState(20);
   const { data: jobsData, isLoading: jobsLoading } = useQuery<{ jobs: ResearchJob[]; total: number }>({
-    queryKey: ['/api/researcher/jobs'],
+    queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
+    queryFn: async () => {
+      const res = await fetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.json();
+    },
     refetchInterval: isPolling ? 3000 : false,
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
@@ -817,6 +826,19 @@ export default function ResearcherTab() {
                     ))}
                   </TableBody>
                 </Table>
+              )}
+              {/* R5-011 (run24): reach jobs older than the latest window. */}
+              {!jobsLoading && jobs && jobsTotal > jobs.length && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setJobsLimit((l) => Math.min(l + 20, 200))}
+                    data-testid="button-load-more-jobs"
+                  >
+                    Load more ({jobs.length} of {jobsTotal})
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>

@@ -582,7 +582,10 @@ export default function BatchEnrichmentPanel() {
               </AlertDescription>
             </Alert>
           ) : (
-            <ScrollArea className="h-[400px]">
+            // R5-004 (run24): plain two-axis overflow-auto scroller — the
+            // Radix ScrollArea viewport clipped horizontal overflow, making
+            // Processed/Success Rate/Actions unreachable at ≤768px.
+            <div className="max-h-[400px] overflow-auto" data-testid="scroller-enrichment-jobs-table">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -697,7 +700,7 @@ export default function BatchEnrichmentPanel() {
                   ))}
                 </TableBody>
               </Table>
-            </ScrollArea>
+            </div>
           )}
         </CardContent>
       </Card>

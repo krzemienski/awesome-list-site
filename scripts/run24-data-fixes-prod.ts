@@ -34,6 +34,10 @@
  *  NB-046  185662 "FFmpeg (FFmpeg)" → "FFmpeg (GitHub mirror)" (prod residual)
  *  NB-052  Kevin Staunton-Lambert talk decks: speaker-bio descriptions →
  *          topical descriptions (185610, 186001–186005)
+ *  R5-007  journey step still pointing at deleted resource 185324
+ *          (mediamtx-rtsp-simple-server dup) → surviving canonical MediaMTX
+ *          184829 (scan-driven: every journey step's resourceId is probed
+ *          against the live catalog; only the known dup gets the repoint)
  *  R5-063 + NB-015  POST /api/admin/maintenance/canonicalize-tags (endpoint
  *          upgraded: separator fold + plural fold + extended brand map)
  *
@@ -649,6 +653,68 @@ async function runDemuxedDedup(all: Row[]) {
 
 // ----------------------------------------------- tags (R5-063 + NB-015)
 
+// R5-007: journey steps must reference live catalog entries. Sweep every
+// journey's steps; any step whose resourceId 404s against the catalog is
+// repointed if it matches the known dup→survivor map, else journaled loudly.
+const STEP_REPOINTS: Record<number, number> = {
+  185324: 184829, // deleted dup → survivor (original R5-007 finding)
+  // Steps pointing at REJECTED resources are public 404s too (anon GET only
+  // sees approved). Repoint to the closest approved topical equivalent:
+  186453: 186664, // WebRTC Samples for Live Streaming → WebRTC Samples
+  184773: 184940, // Ant Media Video Streaming Tutorials → Ant Media Server Tutorials
+  186448: 185018, // Wowza Ultra Low Latency CMAF Guide → Wowza: Streaming Protocols Overview
+  185082: 186363, // XMediaDRM ("PlayReady Implementation" step) → Microsoft PlayReady Documentation
+  184980: 185151, // Otterbein Digital Video Tutorials ("Putting It All Together") → SLC Beginner's Guide to Live Streaming
+};
+
+async function runJourneyStepRepoints() {
+  const journeysRes = await api("/api/admin/journeys");
+  if (journeysRes.status !== 200) {
+    log({ action: "journey-steps-error", status: journeysRes.status });
+    return;
+  }
+  const journeys = journeysRes.body?.journeys ?? journeysRes.body ?? [];
+  for (const j of journeys) {
+    const stepsRes = await api(`/api/admin/journeys/${j.id}/steps`);
+    if (stepsRes.status !== 200) continue;
+    const steps = stepsRes.body?.steps ?? [];
+    for (const s of steps) {
+      if (!s.resourceId) continue;
+      // Probe ANONYMOUSLY (no admin cookie): the public GET 404s on rejected
+      // resources that the admin session would see as 200 — the user-facing
+      // truth is the anon view. Only a definitive 404 counts as dangling —
+      // public GETs are rate-limited (NB-026), so 429/5xx never mean "deleted".
+      let status = 0;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const r = await fetch(`${BASE}/api/resources/${s.resourceId}`);
+        status = r.status;
+        if (status === 200 || status === 404) break;
+        await new Promise((res) => setTimeout(res, 1500));
+      }
+      if (status !== 404) continue;
+      const survivor = STEP_REPOINTS[s.resourceId];
+      if (!survivor) {
+        log({ action: "journey-step-dangling-unmapped", journeyId: j.id, stepId: s.id, resourceId: s.resourceId });
+        continue;
+      }
+      const patch = await api(`/api/admin/journeys/${j.id}/steps/${s.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resourceId: survivor }),
+      });
+      log({
+        finding: "R5-007",
+        action: patch.status === 200 ? "journey-step-repointed" : "journey-step-repoint-failed",
+        journeyId: j.id,
+        stepId: s.id,
+        from: s.resourceId,
+        to: survivor,
+        status: patch.status,
+      });
+    }
+  }
+}
+
 async function runTagCanonicalization() {
   const r = await api(`/api/admin/maintenance/canonicalize-tags`, { method: "POST" });
   log({ finding: "R5-063+NB-015", action: "canonicalize-tags", status: r.status, result: r.body });
@@ -685,6 +751,9 @@ async function main() {
 
   log({ phase: "demuxed-dedup" });
   await runDemuxedDedup(all);
+
+  log({ phase: "journey-step-repoints" });
+  await runJourneyStepRepoints();
 
   log({ phase: "tag-canonicalization" });
   await runTagCanonicalization();

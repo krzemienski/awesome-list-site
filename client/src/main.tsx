@@ -152,6 +152,13 @@ const rootElement = document.getElementById("root")!;
       ) {
         dataSettledAt = Date.now();
       }
+      // R5-006 (run24): the catalog query FAILING must also lift the hold —
+      // the SPA renders its styled error card + Retry underneath, and the
+      // overlay used to sit on top of it until the hard cap, trapping users
+      // on a frozen unstyled snapshot during outages.
+      if (queryClient.getQueryState(settleKey)?.status === "error") {
+        return remove();
+      }
       const reactCommitted = !!rootElement.firstElementChild;
       // Routes without resource cards (static pages, detail views): once React
       // has committed AND the catalog payload has landed, the data-driven
@@ -165,8 +172,10 @@ const rootElement = document.getElementById("root")!;
       ) {
         return remove();
       }
-      // Hard cap: never trap the user on the static overlay.
-      if (elapsed > 8000) return remove();
+      // Hard cap: never trap the user on the static overlay. R5-006: 8s → 3s;
+      // with the error-path lift above this only fires for hung requests, and
+      // 3s of skeleton beats 8s of frozen snapshot.
+      if (elapsed > 3000) return remove();
     }, 100);
   } catch {
     // If anything goes wrong, fall back to the old behavior (React wipes #root).

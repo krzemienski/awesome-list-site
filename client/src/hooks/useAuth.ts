@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient, ApiError } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
+import { safeRemoveItem } from '@/lib/safeStorage';
 
 interface User {
   id: string;
@@ -83,6 +84,9 @@ export function useAuth() {
       // Clear auth cache and redirect to home
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
+      // R5-016: drop the private /submit draft on logout so the next visitor
+      // on this device never inherits the previous account's draft text.
+      safeRemoveItem('submit-resource-draft');
       // R4-081: tell other open tabs to drop their authed chrome/bookmarks.
       notifyCrossTabSync();
       window.location.href = '/';

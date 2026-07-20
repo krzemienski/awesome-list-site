@@ -2414,8 +2414,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   return (
     <Card className="border-0" data-testid={testIdPrefix}>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
+        {/* R5-003 (run24): the header row must WRAP — at 768/375 the rigid
+            no-wrap flex row pushed the search input + "Add" button past the
+            overflow-x-hidden clip edge, leaving the only CRUD entry point on
+            the taxonomy tabs unreachable. */}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
             <CardTitle className="flex items-center gap-2">
               <Icon className="h-5 w-5" />
               {entityNamePlural} Manager
@@ -2424,7 +2428,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {description}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 min-w-0 max-w-full">
             {/* Bulk Actions Toolbar */}
             {bulkOperationsEnabled && selectedIds.size > 0 && (
               <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg" data-testid="bulk-actions-toolbar">
@@ -2500,7 +2504,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </DropdownMenu>
             )}
             {searchEnabled && (
-              <div className="relative w-64">
+              /* R5-003: cap the search box to the available width so it never
+                 forces the row past the viewport at 375px. */
+              <div className="relative w-64 max-w-full">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder={searchPlaceholder || `Search ${entityNamePlural.toLowerCase()}...`}

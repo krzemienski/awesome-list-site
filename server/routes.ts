@@ -5604,8 +5604,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { researchService } = await import('./ai/researchService');
       // Run23 NB-039: ship the total alongside the latest-20 list so the UI
       // can say "showing latest 20 of N" instead of silently truncating.
+      // R5-011 (run24): honor a bounded ?limit so the admin UI can "Load
+      // more" past the latest 20 (still capped to keep responses sane).
+      const rawLimit = Number.parseInt(String(req.query.limit ?? ''), 10);
+      const limit = Number.isFinite(rawLimit)
+        ? Math.min(Math.max(rawLimit, 1), 200)
+        : 20;
       const [jobs, total] = await Promise.all([
-        researchService.listJobs(),
+        researchService.listJobs(limit),
         researchService.countJobs(),
       ]);
       res.json({ jobs: jobs.map(stripJobAuthSecret), total });

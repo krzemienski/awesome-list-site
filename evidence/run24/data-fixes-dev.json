@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-20T21:55:04.066Z",
+  "startedAt": "2026-07-20T23:10:22.436Z",
   "base": "http://localhost:5000",
   "actions": [
     {
@@ -75,7 +75,7 @@
     },
     {
       "phase": "corpus-fetched",
-      "count": 1986
+      "count": 1983
     },
     {
       "phase": "wayback-reaudit"
@@ -285,6 +285,9 @@
       "approvedWithTitle": 1
     },
     {
+      "phase": "journey-step-repoints"
+    },
+    {
       "phase": "tag-canonicalization"
     },
     {
@@ -298,6 +301,6 @@
       }
     }
   ],
-  "finishedAt": "2026-07-20T21:55:12.173Z",
-  "mutatingActionCount": 1
+  "finishedAt": "2026-07-20T23:11:23.482Z",
+  "mutatingActionCount": 0
 }

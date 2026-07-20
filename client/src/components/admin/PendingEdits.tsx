@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDateTime } from "@/lib/utils";
@@ -35,6 +35,25 @@ export default function PendingEdits() {
     queryKey: ['/api/admin/resource-edits'],
     refetchInterval: 10000
   });
+
+  // R5-013 (run24): same keyboard-operable scroller + right-edge gradient cue
+  // as PendingResources (R5-058) — the edits table clipped its Actions column
+  // at narrow widths with no affordance that more columns existed.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const check = () => {
+      const table = el.querySelector('table');
+      const contentWidth = table ? table.getBoundingClientRect().width : el.scrollWidth;
+      setShowSwipeHint(contentWidth > el.clientWidth + 1);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isLoading, edits.length]);
 
   const approveMutation = useMutation({
     mutationFn: async (editId: number) => {
@@ -233,7 +252,27 @@ export default function PendingEdits() {
               min-width:100%, so it never scrolled horizontally and clipped the
               Actions column ≤768px. max-h keeps short lists compact; the
               desktop layout (table already fits, no scroll) is unchanged. */}
-          <div className="max-h-[600px] overflow-auto">
+          <div className="relative">
+            {showSwipeHint && (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+                data-testid="gradient-scroll-cue-edits"
+              />
+            )}
+            <div
+              ref={scrollRef}
+              className="max-h-[600px] overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+              tabIndex={0}
+              role="region"
+              aria-label="Pending edits table, scrollable"
+              onKeyDown={(e) => {
+                const el = scrollRef.current;
+                if (!el) return;
+                if (e.key === 'ArrowRight') { el.scrollBy({ left: 80 }); e.preventDefault(); }
+                else if (e.key === 'ArrowLeft') { el.scrollBy({ left: -80 }); e.preventDefault(); }
+              }}
+            >
             <Table className="min-w-[720px]">
               <TableHeader>
                 <TableRow>
@@ -332,6 +371,12 @@ export default function PendingEdits() {
                 ))}
               </TableBody>
             </Table>
+            </div>
+            {showSwipeHint && (
+              <p className="mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
+                Swipe the table sideways to see all columns, including Approve/Reject.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

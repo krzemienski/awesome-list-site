@@ -280,35 +280,69 @@ export default function SubmitResource() {
 
   // R4-055: draft persistence + unload guard so an accidental refresh, tab
   // close, or navigation no longer destroys everything typed into /submit.
+  // R5-015 (run24): drafts are now stored as a versioned envelope
+  // { values, updatedAt } — before every write we re-read storage and skip the
+  // write when another tab has stored a NEWER draft (a stale tab can no longer
+  // clobber fresher content), and a `storage` listener hot-loads external
+  // changes into this tab's form within a second.
+  // R5-016 (run24): the draft is private state — restore ONLY when
+  // authenticated, and the logout path (useAuth) removes the key so the next
+  // (possibly different) visitor on this device never inherits it.
   const draftRestoredRef = useRef(false);
   const draftSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Timestamp of the newest draft THIS tab has loaded or written.
+  const draftSeenAtRef = useRef(0);
 
   const draftHasContent = (v: Partial<SubmitResourceFormData>) =>
     !!(v.title || v.url || v.description || v.tags || v.category);
 
-  // Restore a saved draft once on mount, before the auto-save subscription is
-  // wired (draftRestoredRef gates saving until the restore has run so we never
-  // clobber the stored draft with the empty defaults).
+  // Parse either the versioned envelope or a legacy flat draft.
+  const parseDraft = (
+    raw: string,
+  ): { values: Partial<SubmitResourceFormData>; updatedAt: number } | null => {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && "values" in parsed) {
+        return {
+          values: parsed.values as Partial<SubmitResourceFormData>,
+          updatedAt: typeof parsed.updatedAt === "number" ? parsed.updatedAt : 0,
+        };
+      }
+      return { values: parsed as Partial<SubmitResourceFormData>, updatedAt: 0 };
+    } catch {
+      return null;
+    }
+  };
+
+  // Restore a saved draft once auth has confirmed (R5-016) — before the
+  // auto-save subscription is wired (draftRestoredRef gates saving until the
+  // restore has run so we never clobber the stored draft with empty defaults).
   useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      // Anonymous visitors get a pristine form and never trigger a restore.
+      draftRestoredRef.current = true;
+      return;
+    }
+    if (draftRestoredRef.current) return;
     const saved = safeGetItem(DRAFT_KEY);
     if (saved) {
-      try {
-        const draft = JSON.parse(saved) as Partial<SubmitResourceFormData>;
-        if (draftHasContent(draft)) {
-          form.reset({ ...form.getValues(), ...draft });
-          toast({
-            title: "Draft restored",
-            description:
-              "We brought back your unsaved submission — pick up where you left off.",
-          });
-        }
-      } catch {
+      const draft = parseDraft(saved);
+      if (!draft) {
         safeRemoveItem(DRAFT_KEY);
+      } else if (draftHasContent(draft.values)) {
+        form.reset({ ...form.getValues(), ...draft.values });
+        draftSeenAtRef.current = draft.updatedAt;
+        toast({
+          title: "Draft restored",
+          description:
+            "We brought back your unsaved submission — pick up where you left off.",
+        });
       }
     }
     draftRestoredRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authLoading, isAuthenticated]);
 
   // Debounced auto-save of the in-progress form to localStorage.
   useEffect(() => {
@@ -316,8 +350,19 @@ export default function SubmitResource() {
       if (!draftRestoredRef.current) return;
       if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
       draftSaveTimer.current = setTimeout(() => {
+        // R5-015: last-write-wins with a staleness check — if another tab has
+        // written a NEWER draft since we last loaded/wrote, do NOT overwrite
+        // it with this tab's stale snapshot (the storage listener below will
+        // pull the newer content in instead).
+        const current = safeGetItem(DRAFT_KEY);
+        if (current) {
+          const stored = parseDraft(current);
+          if (stored && stored.updatedAt > draftSeenAtRef.current) return;
+        }
         if (draftHasContent(values)) {
-          safeSetItem(DRAFT_KEY, JSON.stringify(values));
+          const updatedAt = Date.now();
+          safeSetItem(DRAFT_KEY, JSON.stringify({ values, updatedAt }));
+          draftSeenAtRef.current = updatedAt;
         } else {
           safeRemoveItem(DRAFT_KEY);
         }
@@ -329,6 +374,28 @@ export default function SubmitResource() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form]);
+
+  // R5-015: live cross-tab propagation — the `storage` event fires only in
+  // OTHER tabs, so when tab B saves a newer draft (or logout removes the key),
+  // this tab reflects it without a reload.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== DRAFT_KEY) return;
+      if (e.newValue === null) {
+        // Draft cleared elsewhere (logout or emptied form): reset if we were
+        // showing draft content and have no newer local edits in flight.
+        draftSeenAtRef.current = 0;
+        return;
+      }
+      const draft = parseDraft(e.newValue);
+      if (!draft || draft.updatedAt <= draftSeenAtRef.current) return;
+      draftSeenAtRef.current = draft.updatedAt;
+      form.reset({ ...form.getValues(), ...draft.values });
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Warn before the browser unloads (refresh/close/hard nav) while the form has
   // unsaved edits — a second safety net alongside the draft above.

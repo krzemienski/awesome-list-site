@@ -42,6 +42,10 @@ export interface LinkCheckOptions {
   userAgent?: string;
   concurrent?: number; // Number of concurrent checks, default 5
   retryCount?: number; // Number of retries for failed checks, default 1
+  // R5-008 (run24): incremental progress hook — called after every completed
+  // batch with the running checked count so long sweeps can report progress
+  // instead of sitting at 0 until the final commit.
+  onProgress?: (checked: number, total: number) => void;
 }
 
 /**
@@ -146,7 +150,10 @@ export function evaluateRedirectSuspicion(
 }
 
 export class LinkChecker {
-  private options: Required<LinkCheckOptions>;
+  private options: Required<Omit<LinkCheckOptions, 'onProgress'>>;
+  // R5-008: optional incremental-progress callback (not part of the Required
+  // options bag — it has no sensible default).
+  private onProgress?: (checked: number, total: number) => void;
 
   constructor(options: LinkCheckOptions = {}) {
     this.options = {
@@ -156,6 +163,7 @@ export class LinkChecker {
       concurrent: options.concurrent || 5,
       retryCount: options.retryCount || 1
     };
+    this.onProgress = options.onProgress;
   }
 
   /**
@@ -173,6 +181,8 @@ export class LinkChecker {
         batch.map(link => this.checkSingleLink(link))
       );
       results.push(...batchResults);
+      // R5-008: surface incremental progress after each batch.
+      this.onProgress?.(results.length, links.length);
     }
 
     // Calculate statistics

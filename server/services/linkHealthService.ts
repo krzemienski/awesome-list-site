@@ -79,7 +79,13 @@ export const linkHealthService = {
       const report = await checkResourceLinks(resourcesToCheck, {
         timeout: 15000,
         concurrent: 10,
-        retryCount: 1
+        retryCount: 1,
+        // R5-008 (run24): write incremental progress onto the job record after
+        // every batch so /status reflects a moving checkedLinks count during
+        // the ~20-minute sweep instead of 0 until the final commit.
+        onProgress: (checked) => {
+          job.checkedLinks = checked;
+        }
       });
 
       checks.length = 0;

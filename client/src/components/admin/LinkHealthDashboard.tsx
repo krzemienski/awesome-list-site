@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
   Activity,
@@ -133,6 +132,12 @@ export default function LinkHealthDashboard() {
   // back to the job record's live progress counts.
   const countByStatus = (statuses: string[]) =>
     allProblemLinks.filter((c) => statuses.includes(c.status)).length;
+  // R5-009 (run24): while a check runs, the in-progress job's counters are all
+  // zero — binding the summary cards to it read as "0 healthy / 0% health" for
+  // the whole ~20-minute sweep. Keep showing the LAST COMPLETED job's results
+  // (with a "last completed" note) until the new run lands.
+  const lastCompletedJob = jobs.find((j) => j.status === 'completed');
+  const summaryJob = isJobInProgress ? lastCompletedJob : latestJob;
   const summaryCounts = !isJobInProgress && brokenLinksData
     ? {
         total: latestJob?.totalLinks || 0,
@@ -143,12 +148,12 @@ export default function LinkHealthDashboard() {
         healthy: Math.max(0, (latestJob?.totalLinks || 0) - allProblemLinks.length),
       }
     : {
-        total: latestJob?.totalLinks || 0,
-        broken: latestJob?.brokenLinks || 0,
-        redirect: latestJob?.redirectLinks || 0,
-        timeout: latestJob?.timeoutLinks || 0,
-        suspect: latestJob?.suspectLinks || 0,
-        healthy: latestJob?.healthyLinks || 0,
+        total: summaryJob?.totalLinks || 0,
+        broken: summaryJob?.brokenLinks || 0,
+        redirect: summaryJob?.redirectLinks || 0,
+        timeout: summaryJob?.timeoutLinks || 0,
+        suspect: summaryJob?.suspectLinks || 0,
+        healthy: summaryJob?.healthyLinks || 0,
       };
 
   useEffect(() => {
@@ -283,6 +288,11 @@ export default function LinkHealthDashboard() {
 
               {/* R4-044: counters come from summaryCounts (the same dataset as
                   the Problem Links table) so counts always match the rows. */}
+              {isJobInProgress && lastCompletedJob && (
+                <p className="text-xs text-muted-foreground" data-testid="text-summary-last-completed">
+                  Showing results from the last completed check ({formatAdminDateTime(lastCompletedJob.createdAt)}) while the current check runs.
+                </p>
+              )}
               <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold font-mono" data-testid="counter-total-links">
@@ -333,7 +343,7 @@ export default function LinkHealthDashboard() {
                   <div className="text-3xl font-bold font-mono">
                     {summaryCounts.total > 0
                       ? Math.round((summaryCounts.healthy / summaryCounts.total) * 100)
-                      : calculateHealthPercentage(latestJob)}%
+                      : calculateHealthPercentage(summaryJob)}%
                   </div>
                 </div>
                 {/* BUG-024 (run19): default themed Button — the hardcoded
@@ -514,7 +524,10 @@ export default function LinkHealthDashboard() {
               </AlertDescription>
             </Alert>
           ) : (
-            <ScrollArea className="h-[400px]">
+            // R5-004 (run24): plain two-axis overflow-auto scroller — the
+            // Radix ScrollArea viewport clipped horizontal overflow, making
+            // right-hand columns unreachable at ≤768px.
+            <div className="max-h-[400px] overflow-auto" data-testid="scroller-link-health-table">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -579,7 +592,7 @@ export default function LinkHealthDashboard() {
                   ))}
                 </TableBody>
               </Table>
-            </ScrollArea>
+            </div>
           )}
         </CardContent>
       </Card>

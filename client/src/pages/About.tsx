@@ -1,5 +1,5 @@
-import { Helmet } from "react-helmet";
 import { Link } from "wouter";
+import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import {
   Sparkles,
@@ -35,13 +35,15 @@ export default function About() {
   const aboutFaqs = getAboutFaqs(treeData?.resources?.length);
   return (
     <div className="container mx-auto px-4 py-8">
-      <Helmet>
-        <title>About — Awesome Video</title>
-        <meta
-          name="description"
-          content="Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it."
-        />
-      </Helmet>
+      {/* R5-005 (run24): use the shared SEOHead (canonical + robots + full
+          OG/Twitter set) — the bare Helmet block here declared only
+          title+description, so the single-head-set reconciliation stripped
+          the SSR-injected canonical/robots/og/twitter tags from the rendered
+          DOM on /about. */}
+      <SEOHead
+        title="About — Awesome Video"
+        description="Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it."
+      />
 
       <div className="mb-10 space-y-3">
         <div className="flex items-center gap-3">

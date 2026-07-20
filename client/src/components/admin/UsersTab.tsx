@@ -339,9 +339,11 @@ export default function UsersTab() {
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           onClick={() => setUserToDelete(user)}
                           aria-label={`Delete user ${
-                            /* R4-H05: keep the raw email out of the DOM unless revealed. */
+                            /* R4-H05: keep the raw email out of the DOM unless revealed.
+                               R5-012: masked emails can collide (j***@gmail.com), so the
+                               label always carries the unique user id too. */
                             user.email
-                              ? (revealedIds.has(user.id) ? user.email : maskEmail(user.email))
+                              ? `${revealedIds.has(user.id) ? user.email : maskEmail(user.email)} (${user.id})`
                               : user.id
                           }`}
                           data-testid={`button-delete-user-${user.id}`}
