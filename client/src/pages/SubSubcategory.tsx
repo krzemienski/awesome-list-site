@@ -15,6 +15,7 @@ import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { ArrowLeft, Search } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { normalizeTag } from "@/lib/tags";
+import { subSubcategorySeoTitleCore } from "@shared/seo-templates";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
@@ -285,7 +286,9 @@ export default function SubSubcategory() {
       <SEOHead
         // BUG-010 (run14): mirror og-middleware's "<name> – <parent>" template
         // exactly (two-pass parity) so same-named nodes get unique titles.
-        title={subcategoryName ? `${subSubcategoryName} – ${subcategoryName}` : subSubcategoryName}
+        // R5-049: routed through the SAME shared builder the server uses so
+        // identical child/parent names dedupe on both passes.
+        title={subSubcategorySeoTitleCore(subSubcategoryName, subcategoryName)}
         description={`Browse ${allResources.length} curated ${subSubcategoryName.toLowerCase()} resources in the ${subcategoryName} category on Awesome Video.`}
         category={subSubcategoryName}
         resourceCount={allResources.length}

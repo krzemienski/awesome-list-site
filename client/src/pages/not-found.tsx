@@ -2,19 +2,28 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Home, List, ArrowRight } from "lucide-react";
-import { Helmet } from "react-helmet";
 import { Link } from "wouter";
+import SEOHead from "@/components/layout/SEOHead";
 import { trackEvent } from "@/lib/analytics";
 import { reportDeadLink } from "@/lib/route-monitor";
 
+// Must equal the server's SITE_URL so the 404 og:url/og:image match the
+// crawl-pass head byte-for-byte (same env-override rule as SEOHead's base).
+const SITE_BASE = (import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "");
+
 interface NotFoundProps {
-  /** Override the default heading (e.g. "This page doesn't exist."). */
+  /**
+   * R5-050: the per-caller heading override ("This page doesn't exist.",
+   * "Resource Not Found") produced three different h1s for the same 404
+   * state. The prop is retained so existing call sites keep compiling, but
+   * the rendered h1 is now always "Page Not Found".
+   */
   heading?: string;
   /** Optional "Did you mean …?" suggestion link. */
   suggestion?: { label: string; href: string };
 }
 
-export default function NotFound({ heading = "Page Not Found", suggestion }: NotFoundProps) {
+export default function NotFound({ suggestion }: NotFoundProps) {
   useEffect(() => {
     const path = window.location.pathname + window.location.search;
     trackEvent("page_not_found", "navigation", path);
@@ -23,16 +32,23 @@ export default function NotFound({ heading = "Page Not Found", suggestion }: Not
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
-      <Helmet>
-        <title>404 — Page Not Found — Awesome Video</title>
-        <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
+      {/* R5-050: ONE 404 head shared by every not-found surface (unknown path,
+          unknown taxonomy slug, unknown resource) — mirrors the server's
+          notFoundMeta: same title/description/noindex, og tags kept, og:url
+          pointing at the site card (never the dead URL). */}
+      <SEOHead
+        title="Page Not Found"
+        description="The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead."
+        noindex
+        ogUrl={`${SITE_BASE}/`}
+        image={`${SITE_BASE}/og-image.png?path=%2F`}
+      />
 
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center gap-2">
             <AlertCircle className="h-6 w-6 text-[var(--accent)]" />
-            <h1 className="text-xl font-semibold leading-none tracking-tight">{heading}</h1>
+            <h1 className="text-xl font-semibold leading-none tracking-tight">Page Not Found</h1>
           </div>
         </CardHeader>
         <CardContent>

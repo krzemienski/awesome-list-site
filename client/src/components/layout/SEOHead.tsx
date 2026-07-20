@@ -22,7 +22,22 @@ interface SEOHeadProps {
    * branches so client hydration never re-asserts indexability on a dead URL.
    */
   noindex?: boolean;
+  /**
+   * R5-050: explicit og:url emitted EVEN when noindex is set. Used by the 404
+   * head so dead-link shares still carry a share target (the site card) while
+   * the invalid URL gets no self-canonical. Mirrors RouteMeta.ogUrl on the
+   * server.
+   */
+  ogUrl?: string;
 }
+
+// R5-022: on the very first client render the SSR head (stamped
+// data-react-helmet by og-middleware) is ALREADY correct for the route — a
+// transient loading-fallback head would only regress the title to
+// "Loading … — Awesome Video" / bare "Awesome Video" inside Google's render
+// window. Suppress fallback heads until the first REAL head has committed;
+// after that, soft navigations keep their neutral loading titles (BUG-031).
+let firstRealHeadCommitted = false;
 
 const SITE_NAME = "Awesome Video";
 const SITE_TAGLINE =
@@ -43,8 +58,20 @@ export default function SEOHead({
   category,
   resourceCount,
   type = "website",
-  noindex = false
+  noindex = false,
+  ogUrl
 }: SEOHeadProps) {
+  // R5-022: identify transient loading fallbacks — the "Loading …" titles the
+  // pages mount while their data fetch is in flight, and the prop-less
+  // <SEOHead /> Home renders while the tree loads.
+  const isLoadingFallback =
+    (!!title && /^Loading /.test(title)) ||
+    (!title && !description && !awesomeList && !category);
+  if (isLoadingFallback && !firstRealHeadCommitted) {
+    // First paint after SSR: keep the server-rendered head untouched.
+    return null;
+  }
+  if (!isLoadingFallback) firstRealHeadCommitted = true;
   // Generate dynamic SEO data based on the awesome list
   const baseUrl = CANONICAL_BASE;
   // Canonical/og:url must be PATH-ONLY (drop ?query) so filtered views collapse
@@ -116,7 +143,9 @@ export default function SEOHead({
       <meta property="og:type" content={type} />
       <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={pageDescription} />
-      {!noindex && <meta property="og:url" content={currentUrl} />}
+      {noindex
+        ? ogUrl && <meta property="og:url" content={ogUrl} />
+        : <meta property="og:url" content={currentUrl} />}
       <meta property="og:image" content={socialImage} />
       <meta property="og:image:alt" content={`${siteTitle} - ${pageDescription.substring(0, 100)}...`} />
       <meta property="og:image:width" content="1200" />

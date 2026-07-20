@@ -14,6 +14,7 @@ import {
   clampSeoTitle,
   clampSeoDescription,
   ogImagePath,
+  subSubcategorySeoTitleCore,
 } from "@shared/seo-templates";
 import {
   renderHomeContent,
@@ -54,6 +55,12 @@ export interface RouteMeta {
    *      an injected body because `found` is false (`!notFound` guard).
    */
   noindex?: boolean;
+  /**
+   * R5-050: explicit og:url override that is emitted EVEN on noindex pages.
+   * Used by the 404 head so social shares of dead links carry a share target
+   * (the site card) while the invalid URL still gets no self-canonical.
+   */
+  ogUrl?: string;
   /**
    * Route-appropriate JSON-LD structured data (a single schema.org object or an
    * array of them). buildMetaTags emits one `<script type="application/ld+json">`
@@ -170,6 +177,9 @@ function notFoundMeta(url: string): RouteMeta {
   m.image = ogImage("/");
   m.type = "website";
   m.noindex = true;
+  // R5-050: dead links shared socially should still preview the site card —
+  // point og:url at the home page (never a self-canonical of the bad URL).
+  m.ogUrl = SITE_URL + "/";
   return m;
 }
 
@@ -842,7 +852,7 @@ function homeShellChrome(): string {
         m.title = `${categorySeoTitleCore(found.name, slug)} — ${SITE_NAME}`;
         m.description = categorySeoDescription(found.name, slug, found.count);
         m.image = ogImage(found.path);
-        m.type = "article";
+        m.type = "website"; // R5-052: listing/detail pages are not articles
         m.structuredData = [
           collectionPageSchema({
             name: found.name,
@@ -907,7 +917,7 @@ function homeShellChrome(): string {
         m.title = `${found.name} — ${SITE_NAME}`;
         m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
         m.image = ogImage(found.path);
-        m.type = "article";
+        m.type = "website"; // R5-052: listing/detail pages are not articles
         m.structuredData = [
           collectionPageSchema({
             name: found.name,
@@ -971,13 +981,13 @@ function homeShellChrome(): string {
         // collided on byte-identical titles. Disambiguate with the parent
         // subcategory. LOCKSTEP: client SubSubcategory.tsx SEOHead passes
         // "<name> – <parent>" so both crawl passes see the same title.
+        // R5-049: shared builder also dedupes the identical child/parent case
+        // ("CDN Integration – CDN Integration" stutter).
         const parentSubName = found.crumbs[2]?.name;
-        m.title = parentSubName
-          ? `${found.name} – ${parentSubName} — ${SITE_NAME}`
-          : `${found.name} — ${SITE_NAME}`;
+        m.title = `${subSubcategorySeoTitleCore(found.name, parentSubName)} — ${SITE_NAME}`;
         m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
         m.image = ogImage(found.path);
-        m.type = "article";
+        m.type = "website"; // R5-052: listing/detail pages are not articles
         m.structuredData = [
           collectionPageSchema({
             name: found.name,
@@ -1050,7 +1060,7 @@ function homeShellChrome(): string {
             (resource.description || "").slice(0, 280) ||
             `${resource.title} on ${SITE_NAME} — curated video development resource.`;
           m.image = (resource as any).imageUrl || ogImage(path);
-          m.type = "article";
+          m.type = "website"; // R5-052: listing/detail pages are not articles
           const crumbs: Crumb[] = [{ name: "Home", path: "/" }];
           // R4-027: the JSON-LD BreadcrumbList must mirror the FULL visible
           // breadcrumb trail (category → subcategory → sub-subcategory), not
@@ -1171,7 +1181,7 @@ function homeShellChrome(): string {
             ? String(journey.description).slice(0, 280)
             : `Multi-step learning journey on ${SITE_NAME}: ${journey.title}.`;
           m.image = ogImage(path);
-          m.type = "article";
+          m.type = "website"; // R5-052: listing/detail pages are not articles
           m.structuredData = [
             webPageSchema({
               name: journey.title,
@@ -1281,39 +1291,52 @@ export function buildMetaTags(m: RouteMeta): string {
   // explicitly excluded from indexing. Real pages carry an EXPLICIT indexable
   // robots tag (R4-058) whose value mirrors the client SEOHead string exactly.
   const robotsTag = m.noindex
-    ? `\n    <meta name="robots" content="noindex, nofollow" />`
-    : `\n    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />`;
-  const canonicalTag = m.noindex ? "" : `\n    <link rel="canonical" href="${u}" />`;
-  const ogUrlTag = m.noindex ? "" : `\n    <meta property="og:url" content="${u}" />`;
+    ? `\n    <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />`
+    : `\n    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />`;
+  const canonicalTag = m.noindex
+    ? ""
+    : `\n    <link rel="canonical" href="${u}" data-react-helmet="true" />`;
+  // R5-050: a noindex page may still carry an explicit og:url (the 404 head
+  // points it at the site card); otherwise noindex pages omit og:url entirely.
+  const ogUrlValue = m.noindex ? m.ogUrl && escapeHtml(m.ogUrl) : u;
+  const ogUrlTag = ogUrlValue
+    ? `\n    <meta property="og:url" content="${ogUrlValue}" data-react-helmet="true" />`
+    : "";
   // Soft-404 pages ship no structured data — rich-result markup must only ever
   // describe a real, indexable page.
   const structuredDataTag =
     m.noindex || !m.structuredData ? "" : renderJsonLd(m.structuredData);
+  // R5-022: every title/meta/link tag is stamped data-react-helmet="true" so
+  // react-helmet adopts the SSR tags as its own on hydration — its first
+  // client render then REPLACES them synchronously (remove-old + insert-new in
+  // one task) instead of appending a duplicate set and reconciling later.
+  // JSON-LD <script> blocks are deliberately NOT stamped: the client ships no
+  // JSON-LD, and a stamped script would be garbage-collected by helmet.
   return `${META_BLOCK_MARKER}
-    <title>${t}</title>
-    <meta name="description" content="${d}" />
-    ${kw ? `<meta name="keywords" content="${kw}" />` : ""}${robotsTag}${canonicalTag}
-    <meta property="og:type" content="${m.type}" />
-    <meta property="og:site_name" content="${SITE_NAME}" />
-    <meta property="og:locale" content="en_US" />${ogUrlTag}
-    <meta property="og:title" content="${t}" />
-    <meta property="og:description" content="${d}" />
-    <meta property="og:image" content="${img}" />
-    <meta property="og:image:secure_url" content="${img}" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="${imgAlt}" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@awesome_video" />
-    <meta name="twitter:title" content="${t}" />
-    <meta name="twitter:description" content="${d}" />
-    <meta name="twitter:image" content="${img}" />
-    <meta name="twitter:image:alt" content="${imgAlt}" />
-    <meta name="theme-color" content="#ff3d52" />
-    <meta name="msapplication-TileColor" content="#ff3d52" />
-    <meta name="application-name" content="${SITE_NAME}" />
-    <meta name="apple-mobile-web-app-title" content="${SITE_NAME}" />${structuredDataTag}`;
+    <title data-react-helmet="true">${t}</title>
+    <meta name="description" content="${d}" data-react-helmet="true" />
+    ${kw ? `<meta name="keywords" content="${kw}" data-react-helmet="true" />` : ""}${robotsTag}${canonicalTag}
+    <meta property="og:type" content="${m.type}" data-react-helmet="true" />
+    <meta property="og:site_name" content="${SITE_NAME}" data-react-helmet="true" />
+    <meta property="og:locale" content="en_US" data-react-helmet="true" />${ogUrlTag}
+    <meta property="og:title" content="${t}" data-react-helmet="true" />
+    <meta property="og:description" content="${d}" data-react-helmet="true" />
+    <meta property="og:image" content="${img}" data-react-helmet="true" />
+    <meta property="og:image:secure_url" content="${img}" data-react-helmet="true" />
+    <meta property="og:image:type" content="image/png" data-react-helmet="true" />
+    <meta property="og:image:width" content="1200" data-react-helmet="true" />
+    <meta property="og:image:height" content="630" data-react-helmet="true" />
+    <meta property="og:image:alt" content="${imgAlt}" data-react-helmet="true" />
+    <meta name="twitter:card" content="summary_large_image" data-react-helmet="true" />
+    <meta name="twitter:site" content="@awesome_video" data-react-helmet="true" />
+    <meta name="twitter:title" content="${t}" data-react-helmet="true" />
+    <meta name="twitter:description" content="${d}" data-react-helmet="true" />
+    <meta name="twitter:image" content="${img}" data-react-helmet="true" />
+    <meta name="twitter:image:alt" content="${imgAlt}" data-react-helmet="true" />
+    <meta name="theme-color" content="#ff3d52" data-react-helmet="true" />
+    <meta name="msapplication-TileColor" content="#ff3d52" data-react-helmet="true" />
+    <meta name="application-name" content="${SITE_NAME}" data-react-helmet="true" />
+    <meta name="apple-mobile-web-app-title" content="${SITE_NAME}" data-react-helmet="true" />${structuredDataTag}`;
 }
 
 // Strip any existing <title>, og:*, twitter:*, name="description"/keywords, canonical
@@ -1509,9 +1532,20 @@ export function ogInjectionMiddleware() {
       // this never hijacks the /journey/:id detail route.
       return res.redirect(301, "/journeys");
     }
-    if (urlPath === "/category") {
-      // Bare /category (no slug) — send to the category overview on home.
-      return res.redirect(301, "/");
+    // R5-051: ONE bare-prefix policy — all three taxonomy prefixes without a
+    // slug 301 to the category index (/categories), not home or a 404.
+    if (
+      urlPath === "/category" ||
+      urlPath === "/subcategory" ||
+      urlPath === "/sub-subcategory"
+    ) {
+      return res.redirect(301, "/categories");
+    }
+    // R5-042: submissions moved into the profile — keep the legacy URL alive.
+    // The auth gate in server/index.ts then 302s anonymous visitors to
+    // /login?next=… exactly like a direct /profile visit.
+    if (urlPath === "/submissions") {
+      return res.redirect(301, "/profile?tab=submissions");
     }
     if (urlPath === "/favorites") {
       // Run17 BUG-055: favorites and bookmarks are different collections — the

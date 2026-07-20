@@ -391,7 +391,13 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
   // Run22 BUG-027: the kicker names the page's real context (a resource's
   // actual category, or the taxonomy level) instead of always "Category".
   const eyebrow = `${truncate(kicker || category || 'Index', 36)} · Awesome Video`;
-  const stat = xmlEscape(`${count} resources`);
+  const statRaw = `${count} resources`;
+  const stat = xmlEscape(statRaw);
+  // R5-055: pill width = estimated text width (charEm table errs wide) +
+  // 0.5px letter-spacing per gap + symmetric 24px padding each side.
+  const statPillW = Math.ceil(
+    estWidth(statRaw, 18) + Math.max(0, statRaw.length - 1) * 0.5 + 48,
+  );
 
   return `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -450,11 +456,16 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
           letter-spacing="1">awesome.video</text>
   </g>
 
-  <!-- Resource count chip on the right (matches DS .chip surface) -->
-  <g transform="translate(936, 478)">
-    <rect x="0" y="0" width="160" height="56" rx="10"
+  <!-- Resource count chip on the right (matches DS .chip surface).
+       R5-055: the pill was a FIXED 160px while "2283+ resources" renders
+       ~175px at 18px bold — the centered text underflowed the left border.
+       Size the pill from the estimated text width (+ letter-spacing) with
+       symmetric 24px padding and keep its right edge anchored at x=1096
+       (card inner right 1144 − 48 padding). -->
+  <g transform="translate(${1096 - statPillW}, 478)">
+    <rect x="0" y="0" width="${statPillW}" height="56" rx="10"
           fill="rgba(255,61,82,0.08)" stroke="#ff3d52" stroke-width="1" />
-    <text x="80" y="35" font-family="'Inter','Helvetica Neue',sans-serif"
+    <text x="${Math.round(statPillW / 2)}" y="35" font-family="'Inter','Helvetica Neue',sans-serif"
           font-size="18" font-weight="700" fill="#ff3d52"
           text-anchor="middle" letter-spacing="0.5">${stat}</text>
   </g>

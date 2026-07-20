@@ -23,13 +23,42 @@ export const SEO_DESCRIPTION_MAX = 160;
 // Word-boundary truncation: cut at the budget, back up to the last full word,
 // and append a single ellipsis. Strings already inside the budget pass through
 // untouched, so existing compliant templates render byte-identically.
+// R5-049: after a word-boundary cut, a trailing conjunction/preposition or an
+// unclosed parenthetical fragment reads as a dangling stub ("… WebRTC &…",
+// "… Tutorial (official…"). Strip such tail tokens (repeatedly, plus trailing
+// punctuation) before the ellipsis is appended.
+const DANGLING_TAIL_WORDS = new Set([
+  "&", "and", "or", "the", "a", "an", "of", "for", "with", "in", "on", "to",
+  "vs", "vs.",
+]);
+
+function stripDanglingTail(s: string): string {
+  let out = s;
+  for (;;) {
+    const trimmed = out.replace(/[\s—–\-·,;:(&]+$/u, "");
+    const m = trimmed.match(/\s(\S+)$/);
+    if (
+      m &&
+      m.index !== undefined &&
+      (DANGLING_TAIL_WORDS.has(m[1].toLowerCase()) || m[1].startsWith("("))
+    ) {
+      out = trimmed.slice(0, m.index);
+      continue;
+    }
+    out = trimmed;
+    break;
+  }
+  return out;
+}
+
 function clampAtWord(s: string, max: number): string {
   const t = (s || "").trim();
   if (t.length <= max) return t;
   let cut = t.slice(0, max - 1);
   const lastSpace = cut.lastIndexOf(" ");
   if (lastSpace > Math.floor(max * 0.5)) cut = cut.slice(0, lastSpace);
-  return cut.replace(/[\s—–\-·,;:]+$/u, "") + "…";
+  const cleaned = stripDanglingTail(cut);
+  return (cleaned || cut.replace(/[\s—–\-·,;:]+$/u, "")) + "…";
 }
 
 // R-09 (run23): never truncate THROUGH the brand. When an over-budget title
@@ -42,16 +71,39 @@ function clampAtWord(s: string, max: number): string {
 // so two-pass title parity is preserved by construction.
 const BRAND_SUFFIX = ` — ${SITE_NAME}`;
 
+// R5-049: journey titles carry the " — Learning Journey" boilerplate suffix.
+// The clamp must never cut THROUGH that suffix ("— Learning… —") and must not
+// ellipsize when only the boilerplate (not the visible title) was dropped:
+// keep the whole suffix if it fits, otherwise drop it entirely (no ellipsis
+// when the core title survives intact).
+const JOURNEY_SUFFIX = " — Learning Journey";
+
 export function clampSeoTitle(title: string): string {
   const t = (title || "").trim();
   if (t.length <= SEO_TITLE_MAX) return t;
   if (t.endsWith(BRAND_SUFFIX)) {
     const core = t.slice(0, -BRAND_SUFFIX.length);
-    return (
-      clampAtWord(core, SEO_TITLE_MAX - BRAND_SUFFIX.length) + BRAND_SUFFIX
-    );
+    const budget = SEO_TITLE_MAX - BRAND_SUFFIX.length;
+    if (core.endsWith(JOURNEY_SUFFIX)) {
+      const bare = core.slice(0, -JOURNEY_SUFFIX.length).trim();
+      if (bare.length <= budget) return bare + BRAND_SUFFIX;
+      return clampAtWord(bare, budget) + BRAND_SUFFIX;
+    }
+    return clampAtWord(core, budget) + BRAND_SUFFIX;
   }
   return clampAtWord(t, SEO_TITLE_MAX);
+}
+
+// R5-049: same-named child/parent taxonomy nodes must not stutter
+// ("CDN Integration – CDN Integration"). ONE shared builder used by both the
+// server (og-middleware) and the client (SubSubcategory.tsx) keeps the
+// two-pass titles identical while deduping the identical-name case.
+export function subSubcategorySeoTitleCore(
+  name: string,
+  parentName?: string | null,
+): string {
+  if (!parentName || parentName === name) return name;
+  return `${name} – ${parentName}`;
 }
 
 export function clampSeoDescription(description: string): string {
