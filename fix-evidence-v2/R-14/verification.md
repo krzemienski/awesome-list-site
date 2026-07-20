@@ -37,3 +37,12 @@ includeSubDomains directive only pins subdomains that already resolve.
 
 At the domain registrar: add `www` → CNAME to the Replit deployment target
 (then add `www.awesome.video` as a custom domain on the deployment), or decline.
+
+## Resolution — CLOSED AS BY-DESIGN (July 20, 2026)
+
+The owner was asked directly (Task: add www DNS record) and explicitly chose
+"Skip www support — close this as by-design." No `www` record will be added at
+the registrar. The apex `https://awesome.video` remains the sole canonical host
+(verified live 200 on July 20, 2026; www remains NXDOMAIN, so browsers never
+reach the site via www and no user-facing breakage occurs beyond the absent
+subdomain). Finding R-14 (and its Run21 predecessor R4-029) is closed.
