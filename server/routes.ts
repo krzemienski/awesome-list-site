@@ -48,7 +48,7 @@ import {
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
-import { hashPassword, comparePassword, validateEmail, validatePassword } from "./passwordUtils";
+import { hashPassword, comparePassword, validateEmail, validateNewPassword } from "./passwordUtils";
 import { checkLock, recordFailure, clearOnSuccess, allowResetRequest } from "./loginLockout";
 import { sendPasswordResetEmail } from "./email";
 import crypto from "crypto";
@@ -74,6 +74,12 @@ import {
   NO_HTML_RE,
   stripInvisible,
   hasVisibleChars,
+  visibleLength,
+  journeyTitleSchema,
+  journeyDescriptionSchema,
+  SINGLE_LINE_CONTROL_RE,
+  MULTILINE_CONTROL_RE,
+  parseIntInRange,
 } from "@shared/validation";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
 import { swaggerSpec } from "./openapi";
@@ -630,24 +636,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   setupLocalAuth();
 
+  // R4-031 (run24): express-rate-limit stores are per-process, and production
+  // autoscale runs up to MAX_LIMITER_INSTANCES concurrent instances — a
+  // client whose requests spread across instances sees an effective limit of
+  // (per-instance limit × instance count). The R4 probe (490-request burst →
+  // zero 429s) proved the old numbers could never fire under fan-out. For the
+  // expensive clusters (auth brute-force, paid AI) the per-instance limit is
+  // now ceil(intended_global / MAX_LIMITER_INSTANCES), so the worst-case
+  // effective limit stays within the intended global budget. Cheap read
+  // surfaces (resource reads, the 300/min backstop) intentionally keep their
+  // generous per-instance numbers — over-throttling real browsing is worse
+  // than the residual scrape risk there.
+  const MAX_LIMITER_INSTANCES = 3;
+  const perInstanceLimit = (intendedGlobal: number) =>
+    Math.max(1, Math.ceil(intendedGlobal / MAX_LIMITER_INSTANCES));
+
   // BUG-008 (run10): IP-based rate limiting across the auth cluster.
   // Complements the existing per-account cooldown (checkLock) which only
   // throttles a single email — this caps anonymous credential-stuffing and
   // register/forgot-password abuse per client IP.
+  // Intended global budget: 20 attempts / 15 min / IP.
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 20,
+    limit: perInstanceLimit(20), // 7/instance ⇒ ≤21 effective at 3 instances
     standardHeaders: true,
     legacyHeaders: false,
     message: { message: "Too many attempts. Please try again later." },
   });
 
   // BUG-008 (run11): strict per-minute burst limiter on login only —
-  // max 5 attempts per IP per minute, 429 + Retry-After. Layered under the
-  // 15-minute cluster limiter and the per-account cooldown (checkLock).
+  // 429 + Retry-After. Layered under the 15-minute cluster limiter and the
+  // per-account cooldown (checkLock).
+  // Intended global budget: 5 attempts / min / IP.
   const loginBurstLimiter = rateLimit({
     windowMs: 60 * 1000,
-    limit: 5,
+    limit: perInstanceLimit(5), // 2/instance ⇒ ≤6 effective at 3 instances
     standardHeaders: true,
     legacyHeaders: false,
     message: { message: "Too many login attempts. Please try again in a minute." },
@@ -668,9 +691,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // NB-002 (run23): AI-generation endpoints run paid Claude calls (~15-45s
   // each on a cache miss). Cap them hard per IP so nobody can burn tokens in
   // a loop — legitimate use is a handful of requests per session.
+  // R4-031: intended global budget 10 req / 15 min / IP (see arithmetic above).
   const aiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 10,
+    limit: perInstanceLimit(10), // 4/instance ⇒ ≤12 effective at 3 instances
     standardHeaders: true,
     legacyHeaders: false,
     message: { message: "Too many AI requests. Please try again in a few minutes." },
@@ -794,7 +818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validateEmail(email)) {
         return res.status(400).json({ message: "Invalid email format" });
       }
-      const pwCheck = validatePassword(password);
+      const pwCheck = validateNewPassword(password);
       if (!pwCheck.valid) {
         return res.status(400).json({ message: pwCheck.error || "Invalid password" });
       }
@@ -911,7 +935,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Token and new password are required" });
       }
 
-      const pwCheck = validatePassword(newPassword);
+      const pwCheck = validateNewPassword(newPassword);
       if (!pwCheck.valid) {
         return res.status(400).json({ message: pwCheck.error || "Invalid password" });
       }
@@ -1393,18 +1417,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // POST /api/telemetry/dead-link - Client-side 404 telemetry (public, fire-and-forget)
   app.post('/api/telemetry/dead-link', (req, res) => {
+    // R5-018 (run24): the client only ever sends its own location.pathname —
+    // so the server contract matches: a rooted path ≤200 chars with no
+    // protocol-relative form, no control characters; referrer must be a
+    // same-origin http(s) URL or it is dropped to null (foreign strings were
+    // an arbitrary-content log-injection channel).
     const deadLinkSchema = z.object({
-      path: z.string().min(1).max(2000),
+      path: z.string().min(1).max(200)
+        .regex(/^\/(?![/\\])/, 'path must be a rooted local path')
+        .refine((p) => !SINGLE_LINE_CONTROL_RE.test(p), 'path must not contain control characters'),
       referrer: z.string().max(2000).nullable().optional(),
-      ts: z.string().max(64).optional(),
+      ts: z.string().max(64).regex(/^[0-9TZ:.+-]*$/).optional(),
     });
     const parsed = deadLinkSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ message: 'Invalid payload' });
     }
     const { path, referrer, ts } = parsed.data;
+    let safeReferrer: string | null = null;
+    if (referrer) {
+      try {
+        const u = new URL(referrer);
+        if ((u.protocol === 'https:' || u.protocol === 'http:') && u.host === req.get('host')) {
+          safeReferrer = u.toString();
+        }
+      } catch {
+        safeReferrer = null;
+      }
+    }
     console.warn(
-      `[dead-link] path=${JSON.stringify(path)} referrer=${JSON.stringify(referrer ?? '')} ts=${ts ?? new Date().toISOString()}`
+      `[dead-link] path=${JSON.stringify(path)} referrer=${JSON.stringify(safeReferrer ?? '')} ts=${ts ?? new Date().toISOString()}`
     );
     res.status(204).end();
   });
@@ -1420,23 +1462,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'URL parameter is required' });
       }
 
-      const existingResource = await resourceRepo.getResourceByUrl(url);
-
-      if (existingResource) {
-        // BUG-025 (run10): internal moderation status is NOT included — this is
-        // a public endpoint and pending/rejected state is admin-only detail.
-        return res.json({
-          exists: true,
-          resource: {
-            id: existingResource.id,
-            title: existingResource.title,
-            category: existingResource.category,
-            subcategory: existingResource.subcategory
-          }
-        });
+      // R5-016 (run24): mirror the submit path's normalization so the
+      // pre-submit duplicate probe and the actual submit agree — probe the
+      // normalized form too (corpus is pre-normalization until Run24E).
+      let existingResource = await resourceRepo.getResourceByUrl(url);
+      if (!existingResource) {
+        const normalized = webUrlSchema.safeParse(url);
+        if (normalized.success && normalized.data !== url) {
+          existingResource = await resourceRepo.getResourceByUrl(normalized.data);
+        }
       }
 
-      res.json({ exists: false });
+      // R5-045 (run24): answer is now {exists} ONLY. The old payload returned
+      // id/title/category for ANY row — including pending and rejected
+      // submissions, which are admin-only detail (BUG-025 stripped `status`
+      // but the row's existence + title still leaked moderation-queue
+      // contents to anonymous probes).
+      res.json({ exists: !!existingResource });
     } catch (error) {
       console.error('Error checking URL:', error);
       res.status(500).json({ message: 'Failed to check URL' });
@@ -1591,7 +1633,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // BUG-012: pre-check for duplicate URL → 409
-      const existingResource = await resourceRepo.getResourceByUrl(submitValidation.data.url);
+      // R5-016 (run24): httpsUrlSchema now normalizes (tracking params
+      // stripped, punycode host) — data.url is the POST-transform form and is
+      // what gets stored. The corpus predates normalization (Run24E backfills
+      // it), so until then the dup-check probes BOTH forms: the normalized
+      // URL and the raw submitted one.
+      const rawSubmittedUrl = typeof req.body?.url === 'string' ? req.body.url.trim() : '';
+      const existingResource =
+        (await resourceRepo.getResourceByUrl(submitValidation.data.url)) ||
+        (rawSubmittedUrl && rawSubmittedUrl !== submitValidation.data.url
+          ? await resourceRepo.getResourceByUrl(rawSubmittedUrl)
+          : null);
       if (existingResource) {
         // BUG-v3-M11 (run12): no internal identifiers in the duplicate
         // response — the client only needs to know the URL already exists
@@ -1794,8 +1846,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Run16 BUG-001 / BUG-018 / Run21 R4-048/076: a proposed URL change may
       // keep a legacy http:// scheme but must be a plausible, bounded web URL
-      // with no embedded credentials.
-      if (sanitizedProposedData.url !== undefined) {
+      // with no embedded credentials. Run24 R5-016: byte-equal to the stored
+      // URL skips normalization so a no-op suggestion never churns the URL.
+      if (sanitizedProposedData.url !== undefined && String(sanitizedProposedData.url) !== resource.url) {
         const parsedUrl = webUrlSchema.safeParse(String(sanitizedProposedData.url));
         if (!parsedUrl.success) {
           return res.status(400).json({ message: parsedUrl.error.issues[0]?.message || 'Invalid URL' });
@@ -2114,7 +2167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'New password must be different from your current password' });
       }
 
-      const pwCheck = validatePassword(newPassword);
+      const pwCheck = validateNewPassword(newPassword);
       if (!pwCheck.valid) {
         return res.status(400).json({ message: pwCheck.error || 'Invalid new password' });
       }
@@ -2870,10 +2923,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Journey not found' });
       }
 
+      // R5-002 (run24): step title/description use the shared journey content
+      // rules — bare .min(1) accepted invisible-only titles and unbounded text.
       const stepSchema = insertJourneyStepSchema.omit({ journeyId: true, stepNumber: true }).extend({
-        title: z.string().min(1, 'Title is required'),
-        description: z.string().nullable().optional(),
-        resourceId: z.number().int().positive().nullable().optional(),
+        title: journeyTitleSchema,
+        description: journeyDescriptionSchema.nullable().optional(),
+        resourceId: z.number().int().positive().max(PG_INT_MAX).nullable().optional(),
         isOptional: z.boolean().optional(),
       });
       const parsed = stepSchema.parse(req.body);
@@ -2920,10 +2975,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: 'Step not found for this journey' });
         }
 
+        // R5-002 (run24): same shared journey content rules as step creation.
         const updateSchema = z.object({
-          title: z.string().min(1).optional(),
-          description: z.string().nullable().optional(),
-          resourceId: z.number().int().positive().nullable().optional(),
+          title: journeyTitleSchema.optional(),
+          description: journeyDescriptionSchema.nullable().optional(),
+          resourceId: z.number().int().positive().max(PG_INT_MAX).nullable().optional(),
           isOptional: z.boolean().optional(),
         });
         const parsed = updateSchema.parse(req.body);
@@ -3117,9 +3173,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Password hashes are never included. Cells that could be interpreted as
   // spreadsheet formulas (= + - @ prefixes) are quoted with a leading
   // apostrophe to prevent CSV-injection when opened in Excel/Sheets.
-  app.get('/api/admin/users/export', isAuthenticated, isAdmin, async (_req, res) => {
+  app.get('/api/admin/users/export', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const allUsers = await userRepo.listAllUsers();
+      // R5-029 (run24): a bulk unmasked-PII export is the highest-sensitivity
+      // admin action on the site — it must appear in the audit trail like
+      // every other privileged action. Logged BEFORE the response is sent so
+      // a failed send still leaves the access on record.
+      await auditRepo.logResourceAudit(
+        null,
+        'users.exported',
+        req.user?.claims?.sub,
+        { rowCount: allUsers.length },
+        `Admin exported ${allUsers.length} user rows (unmasked emails, CSV)`
+      );
       const csvCell = (value: unknown): string => {
         let s = value === null || value === undefined ? '' : String(value);
         if (/^[=+\-@]/.test(s)) s = `'${s}`;
@@ -3254,29 +3321,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rawOffset = req.query.offset as string | undefined;
       const rawResourceId = req.query.resourceId as string | undefined;
 
+      // R5-020 (run24): Number.isInteger(1e20) is TRUE — exponent-notation and
+      // beyond-int4 values sailed through and 500'd inside PG. parseIntInRange
+      // enforces digit-only strings bounded to int4.
       let limit = 50;
+      let rid: number | null = null;
       if (rawResourceId !== undefined) {
-        const n = Number(rawResourceId);
-        if (!Number.isInteger(n) || n < 1) {
+        rid = parseIntInRange(rawResourceId, { min: 1 });
+        if (rid === null) {
           return res.status(400).json({ message: 'resourceId must be a positive integer' });
         }
       }
       if (rawLimit !== undefined) {
-        const n = Number(rawLimit);
-        if (!Number.isInteger(n) || n < 1 || n > 500) {
+        const n = parseIntInRange(rawLimit, { min: 1, max: 500 });
+        if (n === null) {
           return res.status(400).json({ message: 'limit must be an integer between 1 and 500' });
         }
         limit = n;
       }
       let offset = 0;
       if (rawOffset !== undefined) {
-        const n = Number(rawOffset);
-        if (!Number.isInteger(n) || n < 0) {
+        const n = parseIntInRange(rawOffset, { min: 0 });
+        if (n === null) {
           return res.status(400).json({ message: 'offset must be a non-negative integer' });
         }
         offset = n;
       }
-      const rid = rawResourceId !== undefined ? Number(rawResourceId) : null;
 
       const [logs, total] = await Promise.all([
         auditRepo.getResourceAuditLog(rid, limit, offset),
@@ -3432,12 +3502,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // submit — <script> titles, whitespace-only titles, 5000-char
       // descriptions and 100k URLs all 400 here now. Updates may keep a
       // legacy http:// scheme (webUrlSchema) but never a non-web scheme.
+      // Run24 R5-016: webUrlSchema now normalizes (tracking-param strip,
+      // punycode). If the submitted URL is byte-equal to what's already
+      // stored, skip the field entirely so a no-op save can never silently
+      // rewrite a legacy URL.
+      const bodyForValidation = { ...(req.body ?? {}) };
+      if (typeof bodyForValidation.url === 'string' && bodyForValidation.url === resource.url) {
+        delete bodyForValidation.url;
+      }
       const updateSchema = insertResourceSchema.partial().extend({
         title: resourceTitleSchema.optional(),
         description: resourceDescriptionSchema.optional(),
         url: webUrlSchema.optional(),
       });
-      const validationResult = updateSchema.safeParse(req.body);
+      const validationResult = updateSchema.safeParse(bodyForValidation);
       
       if (!validationResult.success) {
         return res.status(400).json({ 
@@ -3810,9 +3888,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // stays available to any signed-in user (the suggest-edit dialog calls it),
   // but is now behind the shared aiLimiter (10 req / 15 min / IP) and caller
   // errors (missing/garbage URL) are 400s, not 500s.
-  app.post('/api/claude/analyze', isAuthenticated, aiLimiter, async (req, res) => {
+  // R5-030 (run24): additionally a PER-USER daily quota — the IP limiter
+  // alone let one registered account mint unlimited paid Claude calls for
+  // arbitrary unique URLs by rotating IPs / pacing requests.
+  const CLAUDE_ANALYZE_DAILY_LIMIT = 20;
+  const claudeAnalyzeQuota = new Map<string, { day: string; count: number }>();
+  app.post('/api/claude/analyze', isAuthenticated, aiLimiter, async (req: any, res) => {
     try {
       const { url } = req.body ?? {};
+
+      const quotaUserId = req.user?.claims?.sub;
+      if (!quotaUserId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      const today = new Date().toISOString().slice(0, 10);
+      // Lazy prune: entries from previous days are dead weight.
+      if (claudeAnalyzeQuota.size > 5000) {
+        for (const [k, v] of claudeAnalyzeQuota) {
+          if (v.day !== today) claudeAnalyzeQuota.delete(k);
+        }
+      }
+      const quota = claudeAnalyzeQuota.get(quotaUserId);
+      const used = quota && quota.day === today ? quota.count : 0;
+      if (used >= CLAUDE_ANALYZE_DAILY_LIMIT) {
+        return res.status(429).json({
+          message: `Daily AI analysis limit reached (${CLAUDE_ANALYZE_DAILY_LIMIT}/day). Try again tomorrow.`,
+        });
+      }
 
       if (!url || typeof url !== 'string' || !url.trim()) {
         return res.status(400).json({ message: 'URL is required' });
@@ -3833,7 +3935,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           available: false
         });
       }
-      
+
+      // Count the attempt BEFORE the paid call — a failed/aborted analysis
+      // still consumed a Claude request.
+      claudeAnalyzeQuota.set(quotaUserId, { day: today, count: used + 1 });
+
       const analysis = await claudeService.analyzeURL(url.trim());
       
       if (!analysis) {
@@ -3842,7 +3948,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.json(analysis);
-    } catch (error) {
+    } catch (error: any) {
+      // R5-030 (run24): caller-side failures are 4xx, never 500 — an
+      // unreachable-but-valid URL is not a server outage.
+      const msg = String(error?.message ?? '');
+      if (
+        msg === 'Invalid URL format' ||
+        msg === 'Only HTTPS URLs are allowed' ||
+        msg.includes('not in the allowlist')
+      ) {
+        return res.status(400).json({ message: msg });
+      }
+      if (msg === 'Request timeout' || msg.startsWith('URL fetch failed') || msg.includes('Content too large')) {
+        return res.status(422).json({
+          message: "Couldn't retrieve that URL — the site may be blocking automated access. You can fill in the details manually.",
+        });
+      }
       console.error('Error analyzing URL:', error);
       res.status(500).json({ message: 'Failed to analyze URL' });
     }
@@ -4392,6 +4513,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resourceIds: [],
         metadata: options
       });
+
+      // R5-029 (run24) sweep: every bulk-export-shaped admin action leaves an
+      // audit-trail entry (who, what, when) like users/export.
+      await auditRepo.logResourceAudit(
+        null,
+        'catalog.exported_github',
+        req.user?.claims?.sub,
+        { repositoryUrl, queueId: queueItem.id },
+        `Admin started GitHub export to ${repositoryUrl}`
+      );
       
       // Process immediately in background
       syncService.exportToGitHub(repositoryUrl, options)
@@ -4604,7 +4735,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate the markdown
       const markdown = formatter.generate();
-      
+
+      // R5-029 (run24) sweep: bulk-export actions are audit-logged.
+      await auditRepo.logResourceAudit(
+        null,
+        'catalog.exported',
+        req.user?.claims?.sub,
+        { rowCount: resources.length, format: 'markdown' },
+        `Admin exported ${resources.length} catalog rows as awesome-list markdown`
+      );
+
       // Set headers for file download
       res.setHeader('Content-Type', 'text/markdown');
       res.setHeader('Content-Disposition', 'attachment; filename="awesome-list.md"');
@@ -4680,6 +4820,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: u.createdAt,
         updatedAt: u.updatedAt
       }));
+
+      // R5-029 (run24) sweep: full-database backup export (includes user
+      // rows) is audit-logged like users/export.
+      await auditRepo.logResourceAudit(
+        null,
+        'database.exported',
+        (req as any).user?.claims?.sub,
+        { resources: resources.length, users: usersList.length, format: 'json' },
+        `Admin exported full database JSON backup (${resources.length} resources, ${usersList.length} users)`
+      );
 
       const exportData = {
         exportedAt: new Date().toISOString(),
@@ -5404,29 +5554,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/researcher/start', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const { researchService } = await import('./ai/researchService');
-      const { prompt, categoryFocus, maxBudgetUsd, maxTurns } = req.body;
+      const { prompt, categoryFocus, maxBudgetUsd, maxTurns } = req.body ?? {};
 
+      // R5-021 (run24): full input contract — visible prompt (invisible
+      // Unicode runs used to pass .trim()), 4000-char cap (100k-char prompts
+      // went straight into the agent context), no control characters, and
+      // NUMBER types for the numeric knobs (the old String()-coercion path
+      // accepted "5" and friends).
       if (!prompt || typeof prompt !== 'string' || prompt.trim().length < 10) {
         return res.status(400).json({ success: false, message: 'Prompt must be at least 10 characters' });
+      }
+      if (prompt.length > 4000) {
+        return res.status(400).json({ success: false, message: 'Prompt must be at most 4000 characters' });
+      }
+      if (MULTILINE_CONTROL_RE.test(prompt)) {
+        return res.status(400).json({ success: false, message: 'Prompt must not contain control characters' });
+      }
+      if (visibleLength(prompt) < 10) {
+        return res.status(400).json({ success: false, message: 'Prompt must contain at least 10 visible characters' });
+      }
+      if (categoryFocus !== undefined && categoryFocus !== null && categoryFocus !== '') {
+        if (typeof categoryFocus !== 'string' || categoryFocus.length > 200 || SINGLE_LINE_CONTROL_RE.test(categoryFocus)) {
+          return res.status(400).json({ success: false, message: 'categoryFocus must be a string of at most 200 characters' });
+        }
       }
 
       // Run16 BUG-008: server-side guardrails mirroring the launch form
       // (budget min $0.25, turns 5–100). The API used to accept any value
       // (e.g. maxTurns=301000 / $0 budgets) and silently run with it.
-      // Run20 (user request): no upper budget cap — only the $0.25 floor
-      // remains so degenerate $0 jobs can't be created.
+      // Run20 (user request): no LOW upper budget cap — but R5-021 flagged
+      // unbounded cost amplification, so a $10,000 fat-finger ceiling now
+      // applies (documented in replit.md; raise deliberately if ever needed).
       let budget = '1.00';
       if (maxBudgetUsd !== undefined && maxBudgetUsd !== null && String(maxBudgetUsd).trim() !== '') {
         const n = Number(maxBudgetUsd);
-        if (!Number.isFinite(n) || n < 0.25) {
+        if (typeof maxBudgetUsd !== 'number' || !Number.isFinite(n) || n < 0.25) {
           return res.status(400).json({ success: false, message: 'maxBudgetUsd must be a number of at least 0.25' });
+        }
+        if (n > 10000) {
+          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be at most 10000' });
         }
         budget = n.toFixed(2);
       }
       let turns = 30;
       if (maxTurns !== undefined && maxTurns !== null && String(maxTurns).trim() !== '') {
         const n = Number(maxTurns);
-        if (!Number.isInteger(n) || n < 5 || n > 100) {
+        if (typeof maxTurns !== 'number' || !Number.isInteger(n) || n < 5 || n > 100) {
           return res.status(400).json({ success: false, message: 'maxTurns must be an integer between 5 and 100' });
         }
         turns = n;
@@ -5891,16 +6064,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { resourceId, feedback, rating } = req.body ?? {};
 
-      if (!resourceId || !feedback) {
-        return res.status(400).json({ message: 'resourceId and feedback are required' });
+      // R5-019 (run24): a body userId that contradicts the session is an
+      // explicit spoof attempt — refuse loudly instead of silently ignoring.
+      if (req.body?.userId !== undefined && req.body.userId !== userId) {
+        return res.status(403).json({ message: 'userId does not match the authenticated session' });
+      }
+
+      // R5-019: full contract — bounded existing resourceId (strings/1e20/
+      // floats used to flow into PG), feedback enum, bounded integer rating.
+      const rid = parseIntInRange(resourceId, { min: 1 });
+      if (rid === null) {
+        return res.status(400).json({ message: 'resourceId must be a positive integer' });
+      }
+      if (feedback !== 'clicked' && feedback !== 'dismissed' && feedback !== 'completed') {
+        return res.status(400).json({ message: "feedback must be one of 'clicked', 'dismissed', 'completed'" });
+      }
+      if (rating !== undefined && rating !== null) {
+        if (typeof rating !== 'number' || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+          return res.status(400).json({ message: 'rating must be an integer between 1 and 5' });
+        }
+      }
+      const target = await resourceRepo.getResource(rid);
+      if (!target) {
+        return res.status(404).json({ message: 'Resource not found' });
       }
 
       // Record the feedback
       await recommendationEngine.recordFeedback(
         userId,
-        resourceId,
-        feedback as 'clicked' | 'dismissed' | 'completed',
-        rating
+        rid,
+        feedback,
+        rating ?? undefined
       );
 
       res.json({ status: 'success', message: 'Feedback recorded' });
@@ -5919,14 +6113,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Unauthorized' });
       }
 
-      const resourceId = parseInt(req.params.resourceId, 10);
-      if (isNaN(resourceId)) {
+      // R5-019/020 (run24): bound to int4 (parseInt accepted 1e20-style ids
+      // that overflow inside PG) and require the resource to exist.
+      const resourceId = parseIntInRange(req.params.resourceId, { min: 1 });
+      if (resourceId === null) {
         return res.status(400).json({ message: 'Invalid resource id' });
       }
 
-      const { feedback } = req.body;
+      const { feedback } = req.body ?? {};
       if (feedback !== 'helpful' && feedback !== 'not_helpful') {
         return res.status(400).json({ error: "feedback must be 'helpful' or 'not_helpful'" });
+      }
+
+      const target = await resourceRepo.getResource(resourceId);
+      if (!target) {
+        return res.status(404).json({ message: 'Resource not found' });
       }
 
       await recommendationEngine.recordDetailedFeedback(userId, resourceId, feedback);
@@ -6281,17 +6482,35 @@ ${rows.join('\n')}
   app.use('/api', (req, res) => {
     const fullPath = ((req.baseUrl || '') + (req.path || '')).replace(/\/+$/, '') || '/';
     const allowed = new Set<string>();
+    // R5-060 (run24): track whether EVERY route registered on this path mounts
+    // an auth guard. If so, an anonymous wrong-method probe must get the same
+    // 401 the right verb would give — the old unconditional 405 + Allow header
+    // let anyone enumerate the admin surface's route + verb map with no session.
+    let sawMatch = false;
+    let allMatchesRequireAuth = true;
     const stack: any[] = (app as any)._router?.stack ?? [];
     for (const layer of stack) {
       const route = layer?.route;
       if (!route || !layer.regexp) continue;
       if (!layer.regexp.test(fullPath) && !layer.regexp.test(fullPath + '/')) continue;
+      sawMatch = true;
+      const hasAuthGuard = (route.stack ?? []).some((h: any) => {
+        const n = h?.handle?.name || h?.name || '';
+        return n === 'isAuthenticated' || n === 'isAdmin';
+      });
+      if (!hasAuthGuard) allMatchesRequireAuth = false;
       for (const m of Object.keys(route.methods || {})) {
         if (m === '_all') continue;
         allowed.add(m.toUpperCase());
       }
     }
     if (allowed.size > 0 && !allowed.has(req.method)) {
+      const isAuthed =
+        typeof (req as any).isAuthenticated === 'function' && (req as any).isAuthenticated();
+      if (sawMatch && allMatchesRequireAuth && !isAuthed) {
+        // Uniform envelope with the real handlers' anonymous answer.
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
       if (allowed.has('GET')) allowed.add('HEAD');
       const allowHeader = Array.from(allowed).sort().join(', ');
       return res

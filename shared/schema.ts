@@ -14,6 +14,7 @@ const tsvector = customType<{ data: string }>({
 });
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { taxonomyNameSchema, slugSchema, journeyTitleSchema, journeyDescriptionSchema } from "./validation";
 
 /**
  * Session storage table for Replit Auth
@@ -369,9 +370,15 @@ export const categories = pgTable("categories", {
   slug: text("slug").notNull().unique(),
 });
 
+// R5-002 (run24): drizzle-zod only enforces column TYPES — <script> names,
+// bidi-only names, 300-char names and '../evil' slugs all persisted. Every
+// taxonomy write now routes through the shared content rules.
 export const insertCategorySchema = createInsertSchema(categories).pick({
   name: true,
   slug: true,
+}).extend({
+  name: taxonomyNameSchema,
+  slug: slugSchema,
 });
 
 export const updateCategorySchema = insertCategorySchema.partial();
@@ -415,6 +422,10 @@ export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
   name: true,
   slug: true,
   categoryId: true,
+}).extend({
+  // R5-002: same shared content rules as categories.
+  name: taxonomyNameSchema,
+  slug: slugSchema,
 });
 
 export const updateSubcategorySchema = insertSubcategorySchema.partial();
@@ -455,6 +466,10 @@ export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).p
   name: true,
   slug: true,
   subcategoryId: true,
+}).extend({
+  // R5-002: same shared content rules as categories.
+  name: taxonomyNameSchema,
+  slug: slugSchema,
 });
 
 export const updateSubSubcategorySchema = insertSubSubcategorySchema.partial();
@@ -589,6 +604,9 @@ export const learningJourneys = pgTable("learning_journeys", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// R5-002 (run24): journey title/description now share the same content rules
+// as the rest of the catalog (visible chars required, length caps, no HTML,
+// no control chars) instead of accepting any text() value.
 export const insertLearningJourneySchema = createInsertSchema(learningJourneys).pick({
   title: true,
   description: true,
@@ -598,6 +616,9 @@ export const insertLearningJourneySchema = createInsertSchema(learningJourneys).
   orderIndex: true,
   category: true,
   status: true,
+}).extend({
+  title: journeyTitleSchema,
+  description: journeyDescriptionSchema,
 });
 
 export type InsertLearningJourney = z.infer<typeof insertLearningJourneySchema>;

@@ -696,8 +696,14 @@ export class ClaudeService {
         if (fetchError.name === 'AbortError') {
           throw new Error('Request timeout');
         }
+        // R5-030 (run24): a URL we cannot retrieve must NOT silently fall
+        // through to a paid Claude call analyzing zero content (the old
+        // fallback also produced confidently-wrong metadata). Throw a
+        // recognizable error so callers map it to a 4xx.
         console.error('Error fetching URL:', fetchError);
-        pageContent = `URL: ${url}`;
+        throw new Error(
+          `URL fetch failed: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`
+        );
       }
 
       const categories = [

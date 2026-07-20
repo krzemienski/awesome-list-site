@@ -102,14 +102,37 @@ const SKILL_INDICATORS: Record<string, string[]> = {
   advanced: ['advanced', 'expert', 'deep dive', 'optimization', 'performance', 'architecture', 'complex', 'professional'],
 };
 
+const SKILL_LEVEL_ORDER = ['beginner', 'intermediate', 'advanced'] as const;
+
+// NB-007 (run24): real per-level weighting. The old scorer only counted the
+// USER's own level's indicators, so a beginner and an advanced profile scored
+// most resources identically (no indicator hits → the same flat 0.3) and
+// intermediate got an unconditional +0.05-ish bump via its flat 0.5. Now the
+// resource's own difficulty signals (across ALL levels) are weighted by
+// proximity to the user's level:
+//   distance 0 (resource signals the user's own level)      → 1.0
+//   distance 1 (adjacent level, beginner↔intermediate etc.)  → 0.55
+//   distance 2 (opposite end, beginner↔advanced)             → 0.15
+// Mixed-signal resources get the hit-weighted average; hits are capped at 2
+// per level so keyword repetition can't dominate. No difficulty signals at
+// all → neutral 0.5 for EVERY profile (unknown difficulty must not reorder
+// results between levels).
 export function calculateSkillMatch(resource: Resource, skillLevel: string): number {
   const text = `${resource.title} ${resource.description || ''}`.toLowerCase();
-  const indicators = SKILL_INDICATORS[skillLevel] || [];
-  const matches = indicators.filter(indicator => text.includes(indicator));
-  if (matches.length >= 2) return 1.0;
-  if (matches.length === 1) return 0.7;
-  if (skillLevel === 'intermediate') return 0.5; // benefits from most levels
-  return 0.3;
+  const userIdx = SKILL_LEVEL_ORDER.indexOf(skillLevel as (typeof SKILL_LEVEL_ORDER)[number]);
+  if (userIdx === -1) return 0.5; // unknown profile level → neutral
+  const DISTANCE_WEIGHT = [1.0, 0.55, 0.15];
+  let weighted = 0;
+  let totalHits = 0;
+  for (let i = 0; i < SKILL_LEVEL_ORDER.length; i++) {
+    const indicators = SKILL_INDICATORS[SKILL_LEVEL_ORDER[i]];
+    const hits = Math.min(indicators.filter(indicator => text.includes(indicator)).length, 2);
+    if (hits === 0) continue;
+    weighted += hits * DISTANCE_WEIGHT[Math.abs(i - userIdx)];
+    totalHits += hits;
+  }
+  if (totalHits === 0) return 0.5;
+  return weighted / totalHits;
 }
 
 export function calculateGoalsMatch(resource: Resource, learningGoals: string[]): number {

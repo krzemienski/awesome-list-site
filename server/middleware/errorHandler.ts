@@ -71,6 +71,26 @@ export function errorHandler(
     return;
   }
 
+  // R5-047 (run24): body-parser rejects oversize payloads with a
+  // `PayloadTooLargeError` (type "entity.too.large", status 413). It is a
+  // client error — answer 413 explicitly instead of a stack-logged 500.
+  if ((err as any)?.type === "entity.too.large" || (err as any)?.status === 413) {
+    res.status(413).json({ message: "Request body too large" });
+    console.log("Client error (413): request body too large");
+    return;
+  }
+
+  // R5-047: PostgreSQL 22021 "invalid byte sequence" — raw NUL bytes (\u0000)
+  // inside a string that reached a text column. The bytes came from the
+  // client, so this is a 400, not a server fault. NARROW backstop: only this
+  // exact SQLSTATE; every other PG error still surfaces as a 500 so real
+  // server bugs stay loud.
+  if ((err as any)?.code === "22021") {
+    res.status(400).json({ message: "Request contains invalid characters" });
+    console.log("Client error (400): invalid byte sequence for PG (22021)");
+    return;
+  }
+
   // Handle Zod validation errors
   if (err instanceof ZodError) {
     const validationError = new ValidationError(

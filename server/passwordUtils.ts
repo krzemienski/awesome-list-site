@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { visibleLength } from '@shared/validation';
+import { visibleLength, passwordVisibleCheck } from '@shared/validation';
 
 const SALT_ROUNDS = 10;
 
@@ -33,23 +33,56 @@ const COMMON_PASSWORDS = new Set([
   '1q2w3e4r', 'qazwsxedc', 'password!', 'changeme', 'whatever',
 ]);
 
-export function validatePassword(password: string): { valid: boolean; error?: string } {
-  if (!password || password.length < 8) {
-    return { valid: false, error: 'Password must be at least 8 characters long' };
+/**
+ * R5-031: fold a candidate to its canonical skeleton before the denylist
+ * lookup. NFKC maps fullwidth/mathematical/compat confusables onto their
+ * plain forms (ｐａｓｓｗｏｒｄ, 𝐩assword, passworｄ → password) and format
+ * characters (zero-widths, bidi marks) are stripped so "pass\u200Bword123"
+ * can't sneak past. Folding is for the CHECK only — the stored hash is
+ * always of the exact string the user typed.
+ */
+function foldForDenylist(password: string): string {
+  let folded: string;
+  try {
+    folded = password.normalize('NFKC');
+  } catch {
+    folded = password;
   }
-  // NB-001 (run18) + R4-014 (run21): reject passwords with fewer than 8
-  // VISIBLE characters. `.trim()` only strips \s — zero-width characters
-  // (U+200B etc.) slipped through and produced invisible passwords.
-  if (visibleLength(password) < 8) {
-    return { valid: false, error: 'Password must contain at least 8 visible characters' };
+  return folded.replace(/[\p{Cf}\p{Cs}]/gu, '').toLowerCase();
+}
+
+/**
+ * Rules for NEW passwords (register / change-password / reset). Login paths
+ * must NOT call this — existing credentials predate newer rules and would be
+ * locked out. Use validateLoginPassword there instead.
+ *
+ * - ≥8 chars and ≥8 VISIBLE chars (R4-014/R5-001: bidi overrides, blank
+ *   glyphs, combining-mark-only runs don't count),
+ * - ≤72 BYTES (R5-046: bcrypt silently truncates at 72 bytes — a "128-char"
+ *   cap let multi-byte passwords be quietly cut mid-character),
+ * - not on the common-password denylist after NFKC confusable folding (R5-031).
+ */
+export function validateNewPassword(password: string): { valid: boolean; error?: string } {
+  const base = passwordVisibleCheck(password ?? '');
+  if (!base.valid) {
+    return base;
   }
-  // BUG-015 (run13): cap length — bcrypt truncates at 72 bytes and unbounded
-  // input is a cheap DoS vector for the hashing path.
-  if (password.length > 128) {
-    return { valid: false, error: 'Password must be at most 128 characters long' };
-  }
-  if (COMMON_PASSWORDS.has(password.toLowerCase())) {
+  if (COMMON_PASSWORDS.has(foldForDenylist(password))) {
     return { valid: false, error: 'That password is too common — please choose something harder to guess' };
   }
   return { valid: true };
 }
+
+/**
+ * Login-path sanity check ONLY: type + generous length bounds. Deliberately
+ * loose — tightening it retroactively locks out users whose stored passwords
+ * were valid under older rules. bcrypt cost is bounded by the length cap.
+ */
+export function validateLoginPassword(password: unknown): boolean {
+  return typeof password === 'string' && password.length >= 1 && password.length <= 1024;
+}
+
+/** @deprecated alias for validateNewPassword — new-credential paths only. */
+export const validatePassword = validateNewPassword;
+
+export { visibleLength };

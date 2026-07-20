@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { UserRepository } from "./repositories";
-import { comparePassword, validateEmail, validatePassword } from "./passwordUtils";
+import { comparePassword, validateEmail, validateLoginPassword } from "./passwordUtils";
 
 // BUG-030 (run14): pre-computed bcrypt hash (cost 10) used to equalize timing
 // on the unknown-email path. Never matches any real password.
@@ -27,8 +27,10 @@ export function setupLocalAuth() {
           return done(null, false, { message: GENERIC });
         }
 
-        const passwordValidation = validatePassword(password);
-        if (!passwordValidation.valid) {
+        // R5-046 (run24): login uses the LOOSE check — new-password rules
+        // (72-byte cap, confusable denylist) must never lock out credentials
+        // that were valid when they were created.
+        if (!validateLoginPassword(password)) {
           return done(null, false, { message: GENERIC });
         }
 
