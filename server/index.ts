@@ -147,6 +147,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// Run23 NB-047: the iOS/tvOS sub-subcategory slug was minted as "iostvos"
+// while all metadata (display-name maps, client hierarchy) references
+// "ios-tvos" — the referenced URL 404'd. The slug row is renamed to
+// "ios-tvos" via the data-fix pass; this 301 keeps the old URL (and any
+// external links to it) alive. Query strings are preserved.
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  const m = req.path.match(/^\/(sub-subcategory|subsubcategory)\/iostvos\/?$/);
+  if (m) {
+    const qs = req.originalUrl.includes("?")
+      ? req.originalUrl.slice(req.originalUrl.indexOf("?"))
+      : "";
+    return res.redirect(301, `/sub-subcategory/ios-tvos${qs}`);
+  }
+  next();
+});
+
 // BUG-015: server-side route guard for auth-gated pages.
 // Without a connect.sid cookie, redirect to /login (302) instead of serving
 // the SPA shell (which only redirects client-side via JS).

@@ -70,10 +70,16 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
 
   // Same queryKey + fetch as the /search page, so both surfaces share one
   // cached result set and always report the same match count.
+  // NB-031 (run23): the palette used to fetch limit=1000 to render 15 rows,
+  // under a key /search never used — 1000-row payload per keystroke-settle
+  // AND a cold cache when the user landed on /search. It now fetches exactly
+  // the /search page's FIRST PAGE (same key ["/api/resources","search",q,1],
+  // same limit=24 URL), so the dropdown's fetch is dropdown-sized and "View
+  // all" lands on /search with the page-1 cache already warm (zero refetch).
   const { data, isFetching } = useQuery<{ resources: DbSearchResource[]; total: number }>({
-    queryKey: ["/api/resources", "search", trimmed],
+    queryKey: ["/api/resources", "search", trimmed, 1],
     queryFn: async () =>
-      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=1000`, {
+      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&page=1&limit=24`, {
         method: "GET",
       }),
     enabled: isOpen && trimmed.length >= 2,
@@ -96,11 +102,13 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
 
   // Track the search once the debounced query settles and results arrive —
   // one `search` event per settled query, not one per keystroke.
+  // NB-029 (run23): recent-searches are NO LONGER saved here — every settled
+  // debounce (including junk keystroke prefixes like "asdf") used to pollute
+  // the list. Saving now happens only on an explicit commit: selecting a
+  // result, choosing "View all", or Enter-fallback to /search.
   useEffect(() => {
     if (!trimmed || trimmed.length < 2 || !data) return;
     trackSearch(trimmed, data.resources.length);
-    // R2-L10: a settled (debounced) query counts as a "recent search".
-    setRecentSearches(saveRecentSearch(trimmed));
   }, [trimmed, data]);
 
   // R2-L10: load persisted recent searches whenever the dialog opens.
@@ -126,15 +134,24 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
         setIsOpen(true);
         return;
       }
-      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !inField) {
-        e.preventDefault();
-        setIsOpen(true);
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        // NB-028 (run23): while the palette is already open, '/' is a spent
+        // shortcut, not input — swallow it so it never types a literal slash
+        // into the query field.
+        if (isOpen) {
+          if (inField) e.preventDefault();
+          return;
+        }
+        if (!inField) {
+          e.preventDefault();
+          setIsOpen(true);
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setIsOpen]);
+  }, [setIsOpen, isOpen]);
 
   // Focus input when dialog opens
   useEffect(() => {
@@ -154,8 +171,19 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
 
   const openResource = (resource: DbSearchResource) => {
     trackResourceClick(resource.title, resource.url, resource.category || "");
+    // NB-029 (run23): an explicit selection is a real search — save it now.
+    if (queryTrimmed.length >= 2) setRecentSearches(saveRecentSearch(queryTrimmed));
     setIsOpen(false);
     navigate(`/resource/${resource.id}`);
+  };
+
+  // NB-029/NB-030 (run23): committing the query to the full /search page —
+  // via the "View all" row or the Enter fallback — is the other real-search
+  // signal that records a recent search.
+  const commitToSearchPage = (q: string) => {
+    if (q.length >= 2) setRecentSearches(saveRecentSearch(q));
+    setIsOpen(false);
+    navigate(`/search?q=${encodeURIComponent(q)}`);
   };
 
   return (
@@ -199,6 +227,20 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               placeholder="Search resources..."
               value={query}
               onValueChange={setQuery}
+              onKeyDown={(e) => {
+                // NB-030 (run23): before results render (debounce + fetch in
+                // flight) cmdk has no active item, so Enter used to be a dead
+                // no-op. Fall back to the full /search page for the typed
+                // query whenever nothing is keyboard-selected.
+                if (e.key !== "Enter" || queryTrimmed.length < 2) return;
+                const active = document.querySelector(
+                  '[cmdk-item][data-selected="true"], [cmdk-item][aria-selected="true"]',
+                );
+                if (!active) {
+                  e.preventDefault();
+                  commitToSearchPage(queryTrimmed);
+                }
+              }}
               className="w-full pl-10 pr-4 py-2"
             />
           </div>
@@ -228,10 +270,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                       <CommandItem
                         key="view-all-results"
                         value={`view-all-${queryTrimmed}`}
-                        onSelect={() => {
-                          setIsOpen(false);
-                          navigate(`/search?q=${encodeURIComponent(queryTrimmed)}`);
-                        }}
+                        onSelect={() => commitToSearchPage(queryTrimmed)}
                         className="flex items-center gap-2 p-3 cursor-pointer"
                         data-testid="search-view-all"
                       >

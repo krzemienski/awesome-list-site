@@ -3,7 +3,6 @@ import { useParams, Link, useLocation, useSearch, Redirect } from "wouter";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,17 +11,16 @@ import SEOHead from "@/components/layout/SEOHead";
 import { categorySeoTitleCore, categorySeoDescription } from "@shared/seo-templates";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
-import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { ArrowLeft, Search, ExternalLink, Edit } from "lucide-react";
-import { deslugify, slugify } from "@/lib/utils";
+import ResourceCard from "@/components/resource/ResourceCard";
+import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
+import { ArrowLeft, Search } from "lucide-react";
+import { deslugify } from "@/lib/utils";
 import { normalizeTag } from "@/lib/tags";
 import { Resource } from "@/types/awesome-list";
-import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
 /** Classic Levenshtein edit distance (small inputs only — slugs/tokens). */
@@ -117,10 +115,6 @@ export default function Category() {
     const p = parseInt(getSearchParams().get("page") || "1", 10);
     return Number.isFinite(p) && p > 0 ? p : 1;
   });
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [resourceToEdit, setResourceToEdit] = useState<DbResource | null>(null);
-  // Run15 BUG-022: which cards have their full tag row revealed ("+N more").
-  const [expandedTagCards, setExpandedTagCards] = useState<Set<string>>(new Set());
   
   // Run22 BUG-026: an explicit ?view=grid|list|compact wins over the saved
   // preference, and once the user toggles (or arrived with ?view=) we keep
@@ -147,7 +141,6 @@ export default function Category() {
     viewParamExplicitRef.current = true;
   };
   
-  const { toast } = useToast();
   
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
@@ -338,6 +331,12 @@ export default function Category() {
   const pushSnapshotRef = useRef("");
 
   useEffect(() => {
+    // Run23 NB-033: when Back/Forward leaves this page entirely, wouter's
+    // location change re-fires this effect ONE more time while the component
+    // is still mounted — and the write below would stamp this category's path
+    // over the DESTINATION history entry (Back looked dead; scroll restore
+    // never ran). Bail unless the browser URL still points at this page.
+    if (window.location.pathname !== `/category/${slug}`) return;
     const params = new URLSearchParams();
 
     if (searchTerm) params.set("search", searchTerm);
@@ -415,36 +414,6 @@ export default function Category() {
     if (typeof resource.id === 'number') return resource.id;
     if (idStr.startsWith('db-')) return parseInt(idStr.substring(3), 10);
     return parseInt(idStr, 10);
-  };
-  
-  const toDbResource = (resource: Resource, dbResource: any): DbResource => ({
-    id: getDbId(resource),
-    title: resource.title,
-    url: resource.url,
-    description: resource.description || "",
-    category: resource.category || categoryName,
-    subcategory: resource.subcategory || null,
-    subSubcategory: resource.subSubcategory || null,
-    status: "approved",
-    submittedBy: dbResource?.submittedBy || null,
-    approvedBy: dbResource?.approvedBy || null,
-    approvedAt: dbResource?.approvedAt || null,
-    githubSynced: dbResource?.githubSynced || false,
-    lastSyncedAt: dbResource?.lastSyncedAt || null,
-    metadata: dbResource?.metadata || {},
-    createdAt: dbResource?.createdAt || new Date(),
-    updatedAt: dbResource?.updatedAt || new Date(),
-    searchTsv: dbResource?.searchTsv ?? null,
-  });
-  
-  const handleSuggestEdit = (e: React.MouseEvent, resource: Resource) => {
-    e.stopPropagation();
-    if (!isDbResource(resource)) return;
-    
-    const dbId = getDbId(resource);
-    const dbResource = treeResources.find((r: any) => r.id === dbId);
-    setResourceToEdit(toDbResource(resource, dbResource));
-    setEditDialogOpen(true);
   };
   
   if (isLoading) {
@@ -643,302 +612,45 @@ export default function Category() {
             ? "flex flex-col gap-2 min-w-0"
             : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0"
         }>
+          {/* R-08 (run23): category pages render the SAME shared card trio as
+              /subcategory and /sub-subcategory — ResourceCard (grid, with
+              favorite/bookmark/Open Link/Suggest Edit), ResourceListRow and
+              ResourceCompactCard — instead of a bespoke inline card set, so
+              one card design exists everywhere. */}
           {pagedResources.map((resource, index) => {
-            const resourceId = `${slugify(resource.title)}-${index}`;
-            
-            const handleResourceClick = () => {
-              if (isDbResource(resource)) {
-                const dbId = getDbId(resource);
-                setLocation(`/resource/${dbId}`);
-              } else {
-                window.open(resource.url, '_blank', 'noopener,noreferrer');
-                toast({
-                  title: resource.title,
-                  description: 'Opening resource in new tab',
-                });
-              }
+            const normalized = {
+              id: isDbResource(resource) ? String(getDbId(resource)) : "",
+              title: resource.title,
+              url: resource.url,
+              description: resource.description,
             };
-            
-            // Run16 BUG-006: the open-in-new-tab action is now a REAL anchor
-            // (Button asChild) instead of a JS window.open button, so it can
-            // never silently no-op and middle-click/cmd-click work.
-
-            // Run3 audit R3-31: render the card title as a REAL anchor with a
-            // stretched-link overlay (after:inset-0) so middle-click / cmd-click /
-            // "open in new tab" and crawlers work; action buttons sit above it
-            // via relative z-10. The card onClick is kept as a fallback for the
-            // non-overlay edge but the anchor stops propagation to avoid a
-            // double navigation.
-            // BUG-003 (run22): when the title is line-clamped, the clamp MUST
-            // live on this anchor — an inline-block child inside a
-            // -webkit-box parent defeats -webkit-line-clamp (all lines
-            // render, no ellipsis). clampClass replaces inline-block so the
-            // two display values never fight; line-clamp's -webkit-box is
-            // block-level, so the run16 BUG-049 py-1/-my-1 hit-box holds.
-            const titleAnchor = (label: React.ReactNode, clampClass = "") =>
-              isDbResource(resource) ? (
-                <Link
-                  href={`/resource/${getDbId(resource)}`}
-                  /* Run16 BUG-049: inline-block + py/-my ≥24px hit-box */
-                  className={`${clampClass || "inline-block"} py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`}
-                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                  data-testid={`link-resource-${resourceId}`}
-                >
-                  {label}
-                </Link>
-              ) : (
-                <a
-                  href={resource.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${clampClass || "inline-block"} py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`}
-                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                  data-testid={`link-resource-${resourceId}`}
-                >
-                  {label}
-                </a>
-              );
-
             if (viewMode === "list") {
-              return (
-                <div
-                  key={`${resource.url}-${index}`}
-                  className="relative flex items-center gap-4 p-3 rounded-lg border border-border bg-transparent hover:border-[var(--accent)]/30 hover:shadow-md cursor-pointer transition-all min-w-0"
-                  onClick={handleResourceClick}
-                  data-testid={`card-resource-${resourceId}`}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium line-clamp-1 break-words min-w-0" title={resource.title}>{titleAnchor(resource.title)}</span>
-                      {isDbResource(resource) && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs border-[color-mix(in_srgb,var(--accent)_30%,transparent)] text-[var(--accent)]"
-                        >
-                          Details
-                        </Badge>
-                      )}
-                    </div>
-                    {resource.description && (
-                      <p className="text-sm text-muted-foreground truncate mt-0.5">
-                        {resource.description}
-                      </p>
-                    )}
-                  </div>
-                  <div className="relative z-10 flex items-center gap-1.5 flex-shrink-0">
-                    {resource.subcategory && (
-                      <Badge variant="outline" className="text-xs hidden md:inline-flex">{resource.subcategory}</Badge>
-                    )}
-                    <Button
-                      asChild
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                    >
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        data-testid={`button-external-${resourceId}`}
-                        title="Open in new tab"
-                        aria-label="Open in new tab"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
-                    {isDbResource(resource) && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                        onClick={(e) => handleSuggestEdit(e, resource)}
-                        data-testid={`button-suggest-edit-${resourceId}`}
-                        title="Suggest an edit"
-                        aria-label="Suggest an edit"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
+              return <ResourceListRow key={`${resource.url}-${index}`} resource={normalized} />;
             }
-
             if (viewMode === "compact") {
-              return (
-                <Card
-                  key={`${resource.url}-${index}`}
-                  className="relative cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card p-2.5 sm:p-3 min-w-0 touch-manipulation"
-                  onClick={handleResourceClick}
-                  data-testid={`card-resource-${resourceId}`}
-                >
-                  <div className="flex items-start gap-1.5 min-w-0">
-                    <span className="font-medium text-xs sm:text-sm flex-1 min-w-0" title={resource.title}>{titleAnchor(resource.title, "line-clamp-2 break-words")}</span>
-                    <Button
-                      asChild
-                      variant="ghost"
-                      size="sm"
-                      className="relative z-10 h-8 w-8 p-0 shrink-0 touch-manipulation min-h-[44px] min-w-[44px] -mr-1.5"
-                    >
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        data-testid={`button-external-${resourceId}`}
-                        title="Open in new tab"
-                        aria-label="Open in new tab"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    </Button>
-                  </div>
-                </Card>
-              );
+              return <ResourceCompactCard key={`${resource.url}-${index}`} resource={normalized} />;
             }
-            
             return (
-              <Card
+              <ResourceCard
                 key={`${resource.url}-${index}`}
-                className="relative cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card text-card-foreground min-w-0 flex flex-col"
-                onClick={handleResourceClick}
-                data-testid={`card-resource-${resourceId}`}
-              >
-                <CardHeader className="p-6 space-y-2">
-                  <CardTitle className="text-base sm:text-lg flex items-start gap-2">
-                    {/* BUG-v3-H02 (run12): real h2 so card titles sit under the page h1 */}
-                    {/* BUG-003 (run22): break-words + relaxed line-height so
-                        the 2-line clamp wraps at word boundaries and shows an
-                        ellipsis instead of clipping mid-word/mid-line. The
-                        clamp itself sits on the inner anchor (see titleAnchor)
-                        because a block child defeats -webkit-line-clamp. */}
-                    <h2 className="flex-1 min-w-0 text-base sm:text-lg font-semibold leading-snug tracking-tight" title={resource.title}>{titleAnchor(resource.title, "line-clamp-2 break-words")}</h2>
-                    <div className="relative z-10 flex items-center gap-0.5 flex-shrink-0">
-                      <Button
-                        asChild
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                      >
-                        <a
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          data-testid={`button-external-${resourceId}`}
-                          title="Open in new tab"
-                          aria-label="Open in new tab"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      </Button>
-                      {isDbResource(resource) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                          onClick={(e) => handleSuggestEdit(e, resource)}
-                          data-testid={`button-suggest-edit-${resourceId}`}
-                          title="Suggest an edit"
-                          aria-label="Suggest an edit"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </CardTitle>
-                  {resource.description && (
-                    <CardDescription className="text-xs sm:text-sm line-clamp-2">
-                      {resource.description}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent className="px-6 pb-3 pt-0 flex-1">
-                  <div className="flex gap-1.5 sm:gap-2 flex-wrap">
-                    {resource.subcategory && (
-                      <Badge variant="outline" className="text-xs">{resource.subcategory}</Badge>
-                    )}
-                    {resource.subSubcategory && (
-                      <Badge variant="outline" className="text-xs">{resource.subSubcategory}</Badge>
-                    )}
-                    {/* BUG-018 (run14): tag pills are real filter controls —
-                        clicking one applies that tag instead of falling through
-                        to the card's stretched title link. */}
-                    {resource.tags && (expandedTagCards.has(resourceId) ? resource.tags : resource.tags.slice(0, 3)).map((tag, tagIndex) => (
-                      <button
-                        key={tagIndex}
-                        type="button"
-                        className="relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedTags((prev) =>
-                            prev.includes(tag) ? prev : [...prev, tag]
-                          );
-                          setPage(1);
-                        }}
-                        aria-label={`Filter by tag ${tag}`}
-                        data-testid={`tag-pill-${resourceId}-${tagIndex}`}
-                      >
-                        <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
-                          {tag}
-                        </Badge>
-                      </button>
-                    ))}
-                    {/* Run15 BUG-022: "+N" is a real control — it reveals the
-                        hidden tags (and collapses them again). */}
-                    {resource.tags && resource.tags.length > 3 && (
-                      <button
-                        type="button"
-                        className="relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExpandedTagCards((prev) => {
-                            const next = new Set(prev);
-                            if (next.has(resourceId)) next.delete(resourceId);
-                            else next.add(resourceId);
-                            return next;
-                          });
-                        }}
-                        aria-expanded={expandedTagCards.has(resourceId)}
-                        aria-label={
-                          expandedTagCards.has(resourceId)
-                            ? "Show fewer tags"
-                            : `Show ${resource.tags.length - 3} more tags`
-                        }
-                        data-testid={`button-more-tags-${resourceId}`}
-                      >
-                        <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
-                          {expandedTagCards.has(resourceId) ? "Show fewer" : `+${resource.tags.length - 3} more`}
-                        </Badge>
-                      </button>
-                    )}
-                  </div>
-                </CardContent>
-                <div className="px-6 pb-4 pt-1">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleResourceClick();
-                    }}
-                    data-testid={`button-view-details-${resourceId}`}
-                    className="relative z-10 inline-flex min-h-[44px] items-center gap-1 py-2 -my-2 text-xs font-medium text-[var(--accent)] hover:underline focus:outline-none focus-visible:underline"
-                    aria-label={
-                      isDbResource(resource)
-                        ? `View details for ${resource.title}`
-                        : `Open ${resource.title}`
-                    }
-                  >
-                    {isDbResource(resource) ? "View Details" : "Open Resource"}
-                    <ExternalLink className="h-3 w-3" />
-                  </button>
-                </div>
-              </Card>
+                resource={{
+                  id: normalized.id,
+                  name: resource.title,
+                  url: resource.url,
+                  description: resource.description,
+                  category: resource.subcategory || resource.subSubcategory || undefined,
+                  tags: resource.tags,
+                }}
+                onTagClick={(tag) => {
+                  setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
+                  setPage(1);
+                }}
+              />
             );
           })}
         </div>
       )}
+
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-3 pt-6" data-testid="pagination-controls">
@@ -964,17 +676,6 @@ export default function Category() {
             Next
           </Button>
         </div>
-      )}
-      
-      {resourceToEdit && (
-        <SuggestEditDialog
-          resource={resourceToEdit}
-          open={editDialogOpen}
-          onOpenChange={(open) => {
-            setEditDialogOpen(open);
-            if (!open) setResourceToEdit(null);
-          }}
-        />
       )}
     </div>
   );

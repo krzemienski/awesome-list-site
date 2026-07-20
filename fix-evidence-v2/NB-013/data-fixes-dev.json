@@ -1,0 +1,76 @@
+{
+  "startedAt": "2026-07-20T07:48:17.865Z",
+  "base": "http://localhost:5000",
+  "actions": [
+    {
+      "finding": "NB-013",
+      "pair": "RFC 2326 (RTSP spec)",
+      "id": 185467,
+      "action": "survivor-noop"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "RFC 2326 (RTSP spec)",
+      "id": 185517,
+      "action": "twin-already-non-approved",
+      "status": "rejected"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "BOLA paper (arXiv 1601.06748)",
+      "id": 186095,
+      "action": "survivor-noop"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "BOLA paper (arXiv 1601.06748)",
+      "id": 187937,
+      "action": "twin-absent-noop"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "Shaka Player Embedded",
+      "id": 185259,
+      "action": "survivor-noop"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "Shaka Player Embedded",
+      "id": 186140,
+      "action": "twin-already-non-approved",
+      "status": "rejected"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "rtsp-simple-server → MediaMTX",
+      "id": 184829,
+      "action": "survivor-noop"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "rtsp-simple-server → MediaMTX",
+      "id": 186611,
+      "action": "twin-already-non-approved",
+      "status": "rejected"
+    },
+    {
+      "finding": "NB-013",
+      "pair": "rtsp-simple-server → MediaMTX",
+      "id": 185324,
+      "action": "twin-already-non-approved",
+      "status": "rejected"
+    },
+    {
+      "finding": "NB-014",
+      "action": "scan",
+      "truncatedCount": 0
+    },
+    {
+      "finding": "NB-014",
+      "action": "post-scan",
+      "remaining": 0,
+      "ids": []
+    }
+  ],
+  "finishedAt": "2026-07-20T07:48:19.231Z"
+}

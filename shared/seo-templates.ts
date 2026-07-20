@@ -32,8 +32,26 @@ function clampAtWord(s: string, max: number): string {
   return cut.replace(/[\s—–\-·,;:]+$/u, "") + "…";
 }
 
+// R-09 (run23): never truncate THROUGH the brand. When an over-budget title
+// carries the standard " — Awesome Video" suffix, clamp the CORE to the budget
+// that remains after the suffix and re-append the suffix intact — the SERP
+// then shows "Long Resource Name… — Awesome Video" instead of severing the
+// brand mid-word ("… — Awesome…"). Titles without the suffix (or already
+// inside the budget) behave exactly as before. Both the server
+// (og-middleware) and the client (SEOHead) clamp through this ONE function,
+// so two-pass title parity is preserved by construction.
+const BRAND_SUFFIX = ` — ${SITE_NAME}`;
+
 export function clampSeoTitle(title: string): string {
-  return clampAtWord(title, SEO_TITLE_MAX);
+  const t = (title || "").trim();
+  if (t.length <= SEO_TITLE_MAX) return t;
+  if (t.endsWith(BRAND_SUFFIX)) {
+    const core = t.slice(0, -BRAND_SUFFIX.length);
+    return (
+      clampAtWord(core, SEO_TITLE_MAX - BRAND_SUFFIX.length) + BRAND_SUFFIX
+    );
+  }
+  return clampAtWord(t, SEO_TITLE_MAX);
 }
 
 export function clampSeoDescription(description: string): string {

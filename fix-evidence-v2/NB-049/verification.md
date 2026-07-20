@@ -1,0 +1,3 @@
+# NB-049 — wrong-method answers: misleading 404s / three 405 flavors
+Fix: /api fallback upgraded — introspects app._router.stack (Express 4.21); if the path matches a registered route under other methods → uniform 405 + Allow header + {message} envelope; unknown paths keep JSON 404.
+Live probes: DELETE /api/search → 405 Allow: GET (+HEAD) "Method DELETE not allowed…"; PUT /api/journeys → 405 Allow: GET; PATCH /api/categories → 405 Allow: GET; GET /api/definitely-not-a-route → 404 {"message":"Not found"}. Pre-existing PUBLIC_METHOD_ALLOW + /api/resources/:id handlers already answered 405 for their surfaces; the fallback now covers everything else uniformly. VERIFIED.

@@ -20,6 +20,7 @@ import {
   Link2,
   AlertTriangle
 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { formatAdminDateTime, formatAdminDate } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -55,6 +56,8 @@ export default function LinkHealthDashboard() {
 
   const [statusFilter, setStatusFilter] = useState<'all' | 'broken' | 'timeout' | 'redirect' | 'suspect'>('all');
   const [isPolling, setIsPolling] = useState(false);
+  // Run23 NB-040: explicit confirmation before starting a link-check job.
+  const [confirmRun, setConfirmRun] = useState(false);
 
   const { data: statusData, isLoading: isStatusLoading } = useQuery<LinkHealthStatusResponse>({
     queryKey: ['/api/admin/link-health/status'],
@@ -300,7 +303,7 @@ export default function LinkHealthDashboard() {
                 {/* BUG-024 (run19): default themed Button — the hardcoded
                     bg-blue-500 override was off-theme against the DS accent. */}
                 <Button
-                  onClick={() => runCheckMutation.mutate()}
+                  onClick={() => setConfirmRun(true)}
                   disabled={isActiveJob || runCheckMutation.isPending}
                 >
                   {runCheckMutation.isPending ? (
@@ -333,7 +336,7 @@ export default function LinkHealthDashboard() {
                 No link health data available yet
               </p>
               <Button
-                onClick={() => runCheckMutation.mutate()}
+                onClick={() => setConfirmRun(true)}
                 disabled={runCheckMutation.isPending}
               >
                 {runCheckMutation.isPending ? (
@@ -543,6 +546,28 @@ export default function LinkHealthDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Run23 NB-040: explicit confirmation before starting a link-check job. */}
+      <AlertDialog open={confirmRun} onOpenChange={(open) => { if (!open) setConfirmRun(false); }}>
+        <AlertDialogContent data-testid="dialog-confirm-link-check">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Run link health check?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This checks every resource URL in the catalog against the live web. The job runs
+              in the background and can take several minutes to complete.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-link-check">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { setConfirmRun(false); runCheckMutation.mutate(); }}
+              data-testid="button-confirm-link-check"
+            >
+              Run check
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

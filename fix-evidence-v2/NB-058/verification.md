@@ -1,0 +1,3 @@
+# NB-058 — session fixation on login
+No code change needed — passport ^0.7 regenerates the session on login (keepSessionInfo defaults false since 0.6). Anonymous requests get NO cookie at all (saveUninitialized:false), so a fixation candidate sid only exists if the attacker forces a session write first.
+Live proof (the strong case): GET /api/login (OIDC state write) → Set-Cookie connect.sid s%3ACnbMJR8Q… (pre-login sid exists); POST /api/auth/local/login with that cookie → Set-Cookie connect.sid s%3AdvGtMXuV… (DIFFERENT sid); follow-up GET /api/auth/user with the jar → authed as admin@example.com. Pre-login sid ≠ post-login sid ⇒ regenerated on privilege change. VERIFIED (no fixation).

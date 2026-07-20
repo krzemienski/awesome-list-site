@@ -14,6 +14,7 @@ import { ResourceListRow, ResourceCompactCard } from "@/components/resource/reso
 import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { deslugify, getCategorySlug } from "@/lib/utils";
+import { normalizeTag } from "@/lib/tags";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
@@ -131,8 +132,11 @@ export default function Subcategory() {
     }
 
     if (selectedTags.length > 0) {
+      // NB-011 (run23): case-insensitive tag matching — parity with
+      // Home/Category, so ?tags=av1 and ?tags=AV1 return identical results.
+      const wanted = selectedTags.map(normalizeTag);
       results = results.filter(r =>
-        r.tags && r.tags.some(tag => selectedTags.includes(tag))
+        r.tags && r.tags.some(tag => wanted.includes(normalizeTag(tag)))
       );
     }
 
@@ -167,6 +171,10 @@ export default function Subcategory() {
   const pushSnapshotRef = useRef("");
 
   useEffect(() => {
+    // Run23 NB-033: bail when Back/Forward has already moved the browser URL
+    // off this page — otherwise this effect's final run (location dep) writes
+    // this page's path over the destination history entry.
+    if (window.location.pathname !== `/subcategory/${slug}`) return;
     const params = new URLSearchParams();
 
     if (searchTerm) params.set("search", searchTerm);

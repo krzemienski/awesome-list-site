@@ -91,18 +91,31 @@ const rootElement = document.getElementById("root")!;
     // Move the scoped <style> siblings too, so the overlay keeps its styling.
     const nodes = Array.from(rootElement.childNodes);
     for (const n of nodes) overlay.appendChild(n);
-    // Run22 BUG-009: once JS runs, React renders the page's real <h1>
-    // underneath the overlay, so the overlay's SSR <h1> would make the DOM
-    // briefly contain two H1s. Demote it to a visually-identical <div>
-    // (.ssr-h1 rule ships in the injected scoped <style>); non-JS crawlers
-    // never execute this and still see the semantic <h1> in the raw HTML.
-    const ssrH1 = overlay.querySelector("h1");
-    if (ssrH1) {
+    // Run22 BUG-009 + Run23 NB-035: once React renders the page's real <h1>
+    // underneath the overlay, the overlay's SSR <h1> would make the DOM
+    // contain two H1s — so it gets demoted to a visually-identical <div>
+    // (.ssr-h1 rule ships in the injected scoped <style>). Run22 demoted it
+    // EAGERLY at boot, which opened a zero-h1 window (~460ms; ~1s on slow-3G)
+    // between boot and React's first h1 commit. Now a MutationObserver
+    // demotes it at the exact moment React's h1 appears — observers fire as
+    // microtasks after the DOM mutation, BEFORE the next paint, so no painted
+    // frame ever shows zero or two H1s. Non-JS crawlers never execute any of
+    // this and still see the semantic <h1> in the raw HTML.
+    const demoteSsrH1 = () => {
+      const ssrH1 = overlay.querySelector("h1");
+      if (!ssrH1) return;
       const div = document.createElement("div");
       div.className = "ssr-h1";
       while (ssrH1.firstChild) div.appendChild(ssrH1.firstChild);
       ssrH1.replaceWith(div);
-    }
+    };
+    const h1Observer = new MutationObserver(() => {
+      if (rootElement.querySelector("h1")) {
+        demoteSsrH1();
+        h1Observer.disconnect();
+      }
+    });
+    h1Observer.observe(rootElement, { childList: true, subtree: true });
     document.body.appendChild(overlay);
 
     const start = Date.now();
@@ -110,12 +123,20 @@ const rootElement = document.getElementById("root")!;
 
     const remove = () => {
       clearInterval(timer);
+      h1Observer.disconnect();
       overlay.remove();
     };
     const timer = window.setInterval(() => {
       const elapsed = Date.now() - start;
-      // Real listing content rendered → swap immediately.
-      if (rootElement.querySelector('[data-testid^="card-resource"]')) {
+      // Real listing content rendered → swap immediately. Run23 NB-017: home
+      // and /categories render TaxonomyCards (link-category-* /
+      // category-card-*), not ResourceCards — match those too so the overlay
+      // lifts on first paint instead of waiting out the settle grace below.
+      if (
+        rootElement.querySelector(
+          '[data-testid^="card-resource"], [data-testid^="link-category-"], [data-testid^="category-card-"]',
+        )
+      ) {
         return remove();
       }
       // Watch the query cache directly (no body-stream races). Run22 BUG-008:
@@ -133,13 +154,14 @@ const rootElement = document.getElementById("root")!;
       }
       const reactCommitted = !!rootElement.firstElementChild;
       // Routes without resource cards (static pages, detail views): once React
-      // has committed AND the catalog payload has landed, give one short grace
-      // period for the data-driven render, then swap.
+      // has committed AND the catalog payload has landed, the data-driven
+      // render commits within a tick — swap on the next poll. Run23 NB-017:
+      // grace trimmed 600ms → 100ms (plus the 100ms poll interval) so the
+      // overlay stops eating clicks ~840ms after the app was ready.
       if (
         reactCommitted &&
         dataSettledAt &&
-        Date.now() - dataSettledAt > 600 &&
-        elapsed > 600
+        Date.now() - dataSettledAt > 100
       ) {
         return remove();
       }

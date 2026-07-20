@@ -33,6 +33,7 @@ import { storage } from "../storage";
 import { freeTierLimiter } from "../middleware/rateLimit";
 import { requireApiKey } from "../middleware/apiAuth";
 import { stripInternalResourceFields } from "../lib/publicResource";
+import { parseBoundedInt } from "../validation/inputs";
 
 /**
  * Register all public API routes
@@ -147,8 +148,26 @@ export function registerPublicApiRoutes(app: Express): void {
    */
   app.get('/api/public/resources', freeTierLimiter, async (req: Request, res: Response) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+      // NB-003/NB-004 (run23): page/limit must be validated positive ints.
+      // limit=-1 previously passed Math.min unchecked and PG treats LIMIT -1
+      // as "no limit" → full-table dump; page=-1 produced a negative OFFSET
+      // → 500. Invalid values now 400; limit is clamped to [1,100].
+      let page = 1;
+      if (req.query.page !== undefined && req.query.page !== '') {
+        const parsedPage = parseBoundedInt(req.query.page);
+        if (parsedPage === null) {
+          return res.status(400).json({ message: 'page must be a positive integer' });
+        }
+        page = parsedPage;
+      }
+      let limit = 20;
+      if (req.query.limit !== undefined && req.query.limit !== '') {
+        const parsedLimit = parseBoundedInt(req.query.limit);
+        if (parsedLimit === null) {
+          return res.status(400).json({ message: 'limit must be a positive integer between 1 and 100' });
+        }
+        limit = Math.min(parsedLimit, 100);
+      }
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
@@ -162,8 +181,15 @@ export function registerPublicApiRoutes(app: Express): void {
         search
       });
 
+      // NB-056 (run23): the OpenAPI spec (and the header comment above)
+      // promise page/limit/totalPages in the response envelope, but the
+      // storage layer only returns { resources, total } — emit the full
+      // documented contract.
       res.json({
         ...result,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil((result.total ?? 0) / limit)),
         resources: (result.resources ?? []).map(stripInternalResourceFields),
       });
     } catch (error) {
@@ -235,9 +261,11 @@ export function registerPublicApiRoutes(app: Express): void {
    */
   app.get('/api/public/resources/:id', freeTierLimiter, async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      // NB-008 (run23): bound-check — all-digit ids past int4 range used to
+      // overflow inside PG → 500.
+      const id = parseBoundedInt(req.params.id);
 
-      if (isNaN(id)) {
+      if (id === null) {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
 

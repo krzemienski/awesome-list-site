@@ -52,6 +52,28 @@ const USER_PUBLIC_FIELDS = [
   "updatedAt",
 ] as const;
 
+/**
+ * NB-008 (run23): PostgreSQL integer columns cap at 2^31−1. All-digit ids
+ * beyond that (e.g. 1e20 written out) pass \d+ regexes and parseInt fine,
+ * then overflow int4/int8 inside the query → 500. Every numeric id/query
+ * param must go through this bound check before touching the DB.
+ */
+export const PG_INT_MAX = 2147483647;
+
+/**
+ * Parse a positive integer within PostgreSQL int4 range.
+ * Returns null for anything else: non-numeric, negative, zero, fractional,
+ * unsafe-precision, or > PG_INT_MAX values.
+ */
+export function parseBoundedInt(value: unknown): number | null {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const s = String(value).trim();
+  if (!/^\d+$/.test(s)) return null;
+  const n = Number(s);
+  if (!Number.isSafeInteger(n) || n < 1 || n > PG_INT_MAX) return null;
+  return n;
+}
+
 export type SanitizedUser = Record<string, unknown>;
 
 export function sanitizeUser<T extends Record<string, any> | null | undefined>(

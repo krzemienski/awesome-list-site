@@ -93,6 +93,9 @@ export default function JourneyDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
+      // NB-018 (run23): Profile's "My Journeys" card reads /api/user/journeys —
+      // invalidate it too or it shows stale enrollment/progress until reload.
+      queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
       toast({
         title: "Journey Started!",
         description: "You've successfully enrolled in this learning journey.",
@@ -166,6 +169,8 @@ export default function JourneyDetail() {
       // Reconcile with the server truth either way (completedAt, currentStepId).
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
+      // NB-018 (run23): keep Profile's journeys card in sync with progress.
+      queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
     },
   });
 
@@ -472,7 +477,18 @@ export default function JourneyDetail() {
                                     data-testid={`link-resource-${resource.id}`}
                                   >
                                     <BookOpen className="h-4 w-4 flex-shrink-0" />
-                                    <span className="font-medium">{resource.title}</span>
+                                    {/* R-10 (run23): resource titles in journey step
+                                        rows were wrapping 4–5 lines at 375px — clamp
+                                        to two lines on the span itself (the clamp
+                                        must live on the text element, not the flex
+                                        anchor); full title stays available via the
+                                        title attribute + detail page. */}
+                                    <span
+                                      className="font-medium line-clamp-2 break-words min-w-0"
+                                      title={resource.title}
+                                    >
+                                      {resource.title}
+                                    </span>
                                   </Link>
                                   <a
                                     href={resource.url}

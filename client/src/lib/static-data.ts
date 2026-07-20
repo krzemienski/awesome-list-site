@@ -93,6 +93,8 @@ export interface AwesomeListNavNode {
   name: string;
   slug?: string;
   resourceCount: number;
+  /** Run23 R-06: first direct resource's blurb so Home cards render nav-only. */
+  teaser?: { title: string; description: string };
   subcategories?: AwesomeListNavNode[];
   subSubcategories?: AwesomeListNavNode[];
 }
@@ -110,11 +112,12 @@ export interface AwesomeListNav {
  * and the overlay settle logic in client/src/main.tsx.
  */
 export function needsCorpusRoute(pathname: string): boolean {
+  // Run23 R-06: '/' and '/categories' render from the nav tree (+ /api/tags);
+  // Home lazily pulls the corpus ONLY when a tag filter activates.
+  // Run23 NB-010: '/recommendations' removed — anonymous visitors render only
+  // /api/recommendations; the authed panel's query pulls the corpus lazily.
   return (
-    pathname === '/' ||
-    pathname === '/categories' ||
     pathname === '/advanced' ||
-    pathname === '/recommendations' ||
     pathname.startsWith('/category/') ||
     pathname.startsWith('/subcategory/') ||
     pathname.startsWith('/sub-subcategory/')

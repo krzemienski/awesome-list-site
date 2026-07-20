@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TaxonomyCard } from "@/components/ui/taxonomy-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
-import { AwesomeList, Category, Resource } from "@/types/awesome-list";
+import { Category, Resource } from "@/types/awesome-list";
+import { processAwesomeListData } from "@/lib/parser";
+import {
+  fetchStaticAwesomeList,
+  type AwesomeListNav,
+  type AwesomeListNavNode,
+} from "@/lib/static-data";
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
@@ -30,9 +37,38 @@ import {
   Clapperboard,
 } from "lucide-react";
 
+// Run23 R-06: Home renders from the ~few-KB nav tree (+ /api/tags for the
+// filter panel). The 3.1MB corpus is fetched lazily ONLY when a tag filter is
+// active (per-category match counts need per-resource tags).
 interface HomeProps {
-  awesomeList?: AwesomeList;
-  isLoading: boolean;
+  nav?: AwesomeListNav;
+  navLoading: boolean;
+}
+
+// Unified card shape whether the grid renders from the nav tree (default) or
+// the corpus (tag-filter mode).
+interface DisplayCategory {
+  name: string;
+  slug: string;
+  displayCount: number;
+  teaser?: { title: string; description: string };
+}
+
+const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
+
+function isRealCategory(name: string): boolean {
+  return (
+    name !== "Table of contents" &&
+    !name.startsWith("List of") &&
+    !EXCLUDED_CATEGORY_NAMES.includes(name)
+  );
+}
+
+function navTotalCount(node: AwesomeListNavNode): number {
+  let total = node.resourceCount || 0;
+  for (const sub of node.subcategories || []) total += navTotalCount(sub);
+  for (const ss of node.subSubcategories || []) total += navTotalCount(ss);
+  return total;
 }
 
 const categoryIcons: { [key: string]: any } = {
@@ -73,7 +109,7 @@ function getAllResources(category: Category): Resource[] {
   return all;
 }
 
-export default function Home({ awesomeList, isLoading }: HomeProps) {
+export default function Home({ nav, navLoading }: HomeProps) {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
 
@@ -138,58 +174,76 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     setSortBy(s && VALID_SORTS.includes(s) ? s : "default");
   });
 
-  const baseCategories = useMemo(() => {
-    if (!awesomeList?.categories) return [];
+  // Run23 R-06: corpus is a lazy dependency — only fetched once a tag filter
+  // activates (deep-link ?tags= or a chip click). Same query key as the
+  // listing routes, so navigating here from a category page reuses the cache.
+  const tagFilterActive = selectedTags.length > 0;
+  const {
+    data: rawCorpus,
+    isLoading: corpusLoading,
+    error: corpusError,
+  } = useQuery({
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
+    staleTime: 1000 * 60 * 60,
+    enabled: tagFilterActive,
+  });
+  const awesomeList = rawCorpus ? processAwesomeListData(rawCorpus) : undefined;
+
+  // Filter-panel tag list comes from /api/tags (same SQL normalization the
+  // old client-side fold mirrored) — no corpus needed to SHOW the panel.
+  const { data: tagsData } = useQuery<{ total: number; tags: { tag: string; count: number }[] }>({
+    queryKey: ["/api/tags"],
+    staleTime: 1000 * 60 * 5,
+  });
+  const availableTags = tagsData?.tags ?? [];
+
+  // Nav-derived categories (default, no-filter render path). Counts come from
+  // the single deduplicated tree (same source as the sidebar, category pages,
+  // and SSR) so every surface agrees.
+  const navCategories = useMemo<DisplayCategory[]>(() => {
+    if (!nav?.categories) return [];
+    return nav.categories
+      .filter((cat) => isRealCategory(cat.name) && navTotalCount(cat) > 0)
+      .map((cat) => ({
+        name: cat.name,
+        slug: cat.slug || "",
+        displayCount: navTotalCount(cat),
+        teaser: cat.teaser,
+      }));
+  }, [nav?.categories]);
+
+  // Corpus-derived categories (tag-filter render path only).
+  const corpusBaseCategories = useMemo(() => {
+    if (!awesomeList?.categories) return [] as Category[];
     return awesomeList.categories.filter(
-      (cat) =>
-        getTotalResourceCount(cat) > 0 &&
-        cat.name !== "Table of contents" &&
-        !cat.name.startsWith("List of") &&
-        !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
+      (cat) => getTotalResourceCount(cat) > 0 && isRealCategory(cat.name)
     );
   }, [awesomeList?.categories]);
 
-  const availableTags = useMemo(() => {
-    // Canonicalize tag variants ("open source" / "open_source" / "Open-Source"
-    // all fold into "open-source") so the filter panel never shows duplicates.
-    // Mirrors the /api/tags SQL normalization — keep the two in lockstep.
-    const tagCounts: Record<string, number> = {};
-    baseCategories.forEach((cat) => {
-      const allRes = getAllResources(cat);
-      allRes.forEach((r: any) => {
-        const tags = r.tags || r.metadata?.tags || [];
-        const seen = new Set<string>();
-        tags.forEach((tag: string) => {
-          const canonical = normalizeTag(tag);
-          if (!canonical || seen.has(canonical)) return;
-          seen.add(canonical);
-          tagCounts[canonical] = (tagCounts[canonical] || 0) + 1;
-        });
-      });
-    });
-    return Object.entries(tagCounts)
-      .map(([tag, count]) => ({ tag, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [baseCategories]);
-
-  const filteredCategories = useMemo(() => {
-    let cats = baseCategories.map((cat) => {
-      if (selectedTags.length === 0) {
-        // Counts come from the single deduplicated tree (same source as the
-        // sidebar, header, category pages, and SSR) so every surface agrees.
-        const displayCount = getTotalResourceCount(cat);
-        return { ...cat, displayCount };
-      }
-      const allRes = getAllResources(cat);
-      const matchCount = allRes.filter((r: any) => {
-        const tags = (r.tags || r.metadata?.tags || []).map(normalizeTag);
-        return selectedTags.some((t) => tags.includes(normalizeTag(t)));
-      }).length;
-      return { ...cat, displayCount: matchCount };
-    });
-
-    if (selectedTags.length > 0) {
-      cats = cats.filter((c) => c.displayCount > 0);
+  const filteredCategories = useMemo<DisplayCategory[]>(() => {
+    let cats: DisplayCategory[];
+    if (!tagFilterActive) {
+      cats = [...navCategories];
+    } else {
+      cats = corpusBaseCategories
+        .map((cat) => {
+          const allRes = getAllResources(cat);
+          const matchCount = allRes.filter((r: any) => {
+            const tags = (r.tags || r.metadata?.tags || []).map(normalizeTag);
+            return selectedTags.some((t) => tags.includes(normalizeTag(t)));
+          }).length;
+          const firstResource = cat.resources[0];
+          return {
+            name: cat.name,
+            slug: cat.slug || "",
+            displayCount: matchCount,
+            teaser: firstResource
+              ? { title: firstResource.title, description: firstResource.description || "" }
+              : undefined,
+          };
+        })
+        .filter((c) => c.displayCount > 0);
     }
 
     switch (sortBy) {
@@ -208,14 +262,18 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     }
 
     return cats;
-  }, [baseCategories, selectedTags, sortBy]);
+  }, [tagFilterActive, navCategories, corpusBaseCategories, selectedTags, sortBy]);
 
   // Total comes from the same deduplicated tree as the per-category counts, the
   // sidebar, and SSR — one source of truth, so the sum of the cards equals the
   // headline total (the raw resources table double-counts near-duplicate URLs).
   const totalResourceCount = useMemo(() => {
-    return baseCategories.reduce((sum, cat) => sum + getTotalResourceCount(cat), 0);
-  }, [baseCategories]);
+    return navCategories.reduce((sum, cat) => sum + cat.displayCount, 0);
+  }, [navCategories]);
+
+  // Grid busy-state: nav still loading, or a tag filter is waiting on the
+  // lazily-fetched corpus.
+  const isLoading = navLoading || (tagFilterActive && !awesomeList && corpusLoading);
 
   if (isLoading) {
     return (
@@ -236,7 +294,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     );
   }
 
-  if (!awesomeList) {
+  if (!nav || (tagFilterActive && !awesomeList && corpusError)) {
     // NB-055 (run18): the catalog error card previously surfaced raw internals
     // (the "/api/awesome-list (attempt 2/2)" fetch string). Show friendly,
     // non-technical copy plus a Retry action instead — no endpoint paths or
@@ -261,10 +319,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       {/* Home title/description counts MUST read the same flat tree arrays the
           server reads (data.resources.length / data.categories.length in
           og-middleware), NOT the filtered per-category sum (totalResourceCount) —
-          otherwise the crawl-pass and render-pass <title> could disagree. */}
+          otherwise the crawl-pass and render-pass <title> could disagree.
+          Run23 R-06: nav.totalResources IS data.resources.length and
+          nav.categories is the same unfiltered array, so parity holds. */}
       <SEOHead
-        title={homeSeoTitle(awesomeList.resources.length)}
-        description={homeSeoDescription(awesomeList.resources.length, awesomeList.categories.length)}
+        title={homeSeoTitle(nav.totalResources)}
+        description={homeSeoDescription(nav.totalResources, nav.categories.length)}
       />
 
       <div className="space-y-3 pt-2 sm:pt-4">
@@ -314,7 +374,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         {filteredCategories.map((category) => {
           const Icon = categoryIcons[category.name] || FileText;
           const totalCount = category.displayCount;
-          const firstResource = category.resources[0];
+          // Run23 R-06: teaser comes from the nav payload (default path) or
+          // the corpus (tag-filter path) — same {title, description} shape.
+          const teaser = category.teaser;
           // R2-M23: truncate on a word boundary so cards never end mid-word
           // like "faster tha...".
           const truncateAtWord = (text: string, max: number) => {
@@ -323,8 +385,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             const lastSpace = cut.lastIndexOf(" ");
             return `${(lastSpace > max * 0.5 ? cut.substring(0, lastSpace) : cut).replace(/[\s.,;:!?]+$/, "")}…`;
           };
-          const description = firstResource?.description
-            ? truncateAtWord(firstResource.description, 90)
+          const description = teaser?.description
+            ? truncateAtWord(teaser.description, 90)
             : "";
 
           return (
@@ -344,13 +406,13 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 // Run19 BUG-016: the teaser is one resource's blurb, not a
                 // category description — label it so it can't read as
                 // category copy.
-                description && firstResource ? (
+                description && teaser ? (
                   <CardDescription
                     className="line-clamp-2 text-xs"
                     data-testid={`text-category-teaser-${category.slug}`}
                   >
                     <span className="font-medium text-foreground/70">
-                      Featured: {firstResource.title} —
+                      Featured: {teaser.title} —
                     </span>{" "}
                     {description}
                   </CardDescription>
@@ -380,7 +442,11 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </div>
 
         {isAuthenticated ? (
-          <AIRecommendationsPanel resources={awesomeList.resources} showHeader={false} />
+          // Run23 R-06: no corpus prop — the panel renders each card from the
+          // full Resource object already embedded in the /api/recommendations
+          // response (rec.resource), so Home never needs the 3.1MB corpus
+          // for recommendations.
+          <AIRecommendationsPanel showHeader={false} />
         ) : (
           <Card>
             <CardHeader>

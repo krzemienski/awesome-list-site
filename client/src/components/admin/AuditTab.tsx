@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Search, RefreshCw } from "lucide-react";
+import { FileText, Search, RefreshCw, AlertCircle } from "lucide-react";
 
 interface AuditLogEntry {
   id: number;
@@ -61,7 +61,9 @@ export default function AuditTab() {
   // limit with no way to reach older entries.
   const [offset, setOffset] = useState(0);
 
-  const { data, isLoading, refetch, isFetching } = useQuery<AuditLogsResponse>({
+  // Run23 NB-041: surface fetch failures as a distinct error state instead of
+  // letting them render as the "No audit log entries found" empty state.
+  const { data, isLoading, isError, refetch, isFetching } = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
@@ -172,6 +174,33 @@ export default function AuditTab() {
           </Button>
         </form>
 
+        {/* Run23 NB-041: fetch failures render a distinct, retryable error
+            state — never the "No audit log entries found" empty state. */}
+        {isError ? (
+          <div
+            className="border border-destructive/40 bg-destructive/10 rounded p-8 text-center"
+            role="alert"
+            data-testid="alert-audit-error"
+          >
+            <AlertCircle className="h-10 w-10 mx-auto mb-3 text-destructive" />
+            <p className="font-medium mb-1">Couldn't load the audit log</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              The server returned an error while fetching entries. Your filter is still applied — try again.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              data-testid="button-audit-retry"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+              Try again
+            </Button>
+          </div>
+        ) : (
+        <>
         {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
             right-edge fade + explicit hint make the hidden columns
             discoverable instead of silently clipping them. */}
@@ -248,6 +277,8 @@ export default function AuditTab() {
         <p className="text-xs text-muted-foreground mt-2 sm:hidden">
           Swipe the table sideways to see all columns.
         </p>
+        </>
+        )}
 
         {/* Run17 BUG-010: range readout + Previous/Next through the full log. */}
         {data && data.total > 0 && (

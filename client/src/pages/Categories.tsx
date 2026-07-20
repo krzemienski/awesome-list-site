@@ -8,14 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AwesomeList, Category } from "@/types/awesome-list";
+import type { AwesomeListNav, AwesomeListNavNode } from "@/lib/static-data";
 import SEOHead from "@/components/layout/SEOHead";
 import { getCategoryIcon } from "@/config/navigation-icons";
 import { getCategorySlug } from "@/lib/utils";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
+// Run23 R-06: this page only needs names/slugs/counts — it renders from the
+// ~few-KB nav tree instead of the 3.1MB corpus.
 interface CategoriesProps {
-  awesomeList?: AwesomeList;
+  nav?: AwesomeListNav;
   isLoading: boolean;
 }
 
@@ -48,27 +50,27 @@ function normalizeSort(raw: string | null): SortValue {
   return SORT_ALIASES[lower] ?? "name-asc";
 }
 
-function getTotalResourceCount(item: any): number {
-  let total = item.resources?.length || 0;
+function getTotalResourceCount(item: AwesomeListNavNode): number {
+  let total = item.resourceCount || 0;
   if (item.subcategories) {
     total += item.subcategories.reduce(
-      (sum: number, sub: any) => sum + getTotalResourceCount(sub),
+      (sum: number, sub) => sum + getTotalResourceCount(sub),
       0,
     );
   }
   if (item.subSubcategories) {
     total += item.subSubcategories.reduce(
-      (sum: number, ss: any) => sum + getTotalResourceCount(ss),
+      (sum: number, ss) => sum + getTotalResourceCount(ss),
       0,
     );
   }
   return total;
 }
 
-export default function Categories({ awesomeList, isLoading }: CategoriesProps) {
+export default function Categories({ nav, isLoading }: CategoriesProps) {
   const baseCategories = useMemo(() => {
-    if (!awesomeList?.categories) return [] as Category[];
-    return awesomeList.categories.filter(
+    if (!nav?.categories) return [] as AwesomeListNavNode[];
+    return nav.categories.filter(
       (cat) =>
         getTotalResourceCount(cat) > 0 &&
         cat.name !== "Table of contents" &&
@@ -77,7 +79,7 @@ export default function Categories({ awesomeList, isLoading }: CategoriesProps) 
           cat.name,
         ),
     );
-  }, [awesomeList?.categories]);
+  }, [nav?.categories]);
 
   // BUG-015 (run18): seed sort from the URL (with alias support) so a fresh
   // deep-link restores the chosen option.

@@ -2,6 +2,8 @@
  * GitHub API integration for fetching awesome lists
  */
 
+import { getFallbackToken } from "./github/replitConnection";
+
 interface GitHubRepo {
   id: number;
   name: string;
@@ -96,12 +98,16 @@ export async function searchAwesomeLists(query: string, page = 1): Promise<{
 }> {
   try {
     const searchQuery = `${query} topic:awesome-list`;
+    // NB-006 (run23): authenticate the search when a token is available so
+    // this proxy stops burning the anonymous 10-req/min shared-IP quota.
+    const token = getFallbackToken();
     const response = await fetch(
       `https://api.github.com/search/repositories?q=${encodeURIComponent(searchQuery)}&sort=stars&order=desc&page=${page}&per_page=20`,
       {
         headers: {
           'Accept': 'application/vnd.github.v3+json',
           'User-Agent': 'Awesome-List-Static-Site',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
       }
     );

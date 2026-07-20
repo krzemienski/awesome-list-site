@@ -75,7 +75,8 @@ import {
   stripInvisible,
   hasVisibleChars,
 } from "@shared/validation";
-import { sanitizeUser } from "./validation/inputs";
+import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
+import { swaggerSpec } from "./openapi";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
@@ -171,51 +172,23 @@ async function generateSitemap(_req: any, res: any) {
   // visit the same public URL many times. Every <loc> must appear exactly once.
   const seenLocs = new Set<string>();
 
-  // Run16 BUG-095: <lastmod> used to be hardcoded to "today" on every URL,
-  // telling crawlers the entire site changes daily. Emit REAL per-resource
-  // updatedAt dates (taxonomy pages = max of their member resources) and OMIT
-  // lastmod where there is no real change signal (static pages) — an absent
-  // lastmod is more honest than a fabricated one.
-  // Run22 BUG-045: exclude bulk-write bursts from lastmod. Historic bulk
-  // operations (the July 2026 GitHub-export stamping, mass enrichment passes)
-  // rewrote updated_at on hundreds/thousands of rows within the same second,
-  // so those timestamps are bookkeeping artifacts, not content-change signals
-  // — the live sitemap was emitting one blanket date on 1,500+ URLs. A burst
-  // is detected as >10 approved resources sharing the same second (manual
-  // admin edits can't reach that rate; scripts always exceed it). Burst-
-  // stamped resources OMIT lastmod (spec: omit rather than invent) while
-  // individually-edited resources keep their real dates.
-  const resourceLastmod = new Map<number, string>();
-  try {
-    const result: any = await db.execute(
-      sql`SELECT id, updated_at FROM (
-            SELECT id, updated_at,
-                   count(*) OVER (PARTITION BY date_trunc('second', updated_at)) AS burst_size
-            FROM resources
-            WHERE status = 'approved' AND updated_at IS NOT NULL
-          ) t WHERE burst_size <= 10`
-    );
-    for (const row of (result.rows ?? result)) {
-      resourceLastmod.set(Number(row.id), new Date(row.updated_at).toISOString().split('T')[0]);
-    }
-  } catch (error) {
-    console.error('Error loading resource lastmod dates for sitemap:', error);
-  }
-  const maxLastmodOf = (ids: number[]): string | undefined => {
-    let max: string | undefined;
-    for (const id of ids) {
-      const d = resourceLastmod.get(id);
-      if (d && (!max || d > max)) max = d;
-    }
-    return max;
-  };
-
-  const addUrl = (path: string, changefreq: string, priority: string, lastmod?: string) => {
+  // R-12 (run23, supersedes Run16 BUG-095 + Run22 BUG-045/046): <lastmod> is
+  // now OMITTED for EVERY sitemap URL. History: Run16 replaced the hardcoded
+  // "today" stamp with per-resource updated_at; Run22 filtered per-second
+  // bulk-write bursts. The residual audit still found the surviving dates
+  // batch-clustered (419 dated URLs sharing only 8 distinct dates — 234 on a
+  // single day from mass enrichment passes), i.e. updated_at is a bookkeeping
+  // artifact for most of the corpus, not a content-change signal. The audit
+  // acceptance offers "real per-URL dates or omit for ALL"; since genuinely
+  // real per-URL dates do not exist for this corpus, the honest, uniform
+  // policy is omission everywhere — a lastmod-free sitemap is fully valid and
+  // crawlers distrust inconsistent lastmod anyway. Do NOT reintroduce dates
+  // unless a true content-change signal (not bulk-script stamping) exists.
+  const addUrl = (path: string, changefreq: string, priority: string) => {
     if (seenLocs.has(path)) return;
     seenLocs.add(path);
     urls.push(`  <url>
-    <loc>${xmlEscape(baseUrl + path)}</loc>${lastmod ? `
-    <lastmod>${lastmod}</lastmod>` : ''}
+    <loc>${xmlEscape(baseUrl + path)}</loc>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`);
@@ -242,37 +215,21 @@ async function generateSitemap(_req: any, res: any) {
       (node?.resources ?? []).map((r: any) => Number(r.id)).filter((n: number) => Number.isFinite(n));
 
     awesomeListData?.categories?.forEach(category => {
-      // Run16 BUG-095: compute each node's lastmod as the max updatedAt of
-      // every resource it (transitively) contains, so taxonomy pages carry a
-      // real change date. Children are collected first, then URLs emitted.
-      const catIds: number[] = resourceIdsOf(category);
-      const subEntries: Array<{ slug: string; lastmod?: string }> = [];
-      const ssEntries: Array<{ slug: string; lastmod?: string }> = [];
-
+      addUrl(`/category/${category.slug}`, 'weekly', '0.7');
       category.subcategories?.forEach(subcategory => {
-        const subIds: number[] = resourceIdsOf(subcategory);
-
+        addUrl(`/subcategory/${subcategory.slug}`, 'weekly', '0.6');
         subcategory.subSubcategories?.forEach(subSubcategory => {
-          const ssIds = resourceIdsOf(subSubcategory);
-          subIds.push(...ssIds);
           // BUG-053 (run14): an empty sub-subcategory renders "No resources
           // found" and has no inbound link from its parent page — keep such
           // orphans OUT of the sitemap (sitemap set == reachable content set).
-          if (ssIds.length === 0) return;
-          ssEntries.push({ slug: subSubcategory.slug, lastmod: maxLastmodOf(ssIds) });
+          if (resourceIdsOf(subSubcategory).length === 0) return;
+          addUrl(`/sub-subcategory/${subSubcategory.slug}`, 'weekly', '0.5');
         });
-
-        catIds.push(...subIds);
-        subEntries.push({ slug: subcategory.slug, lastmod: maxLastmodOf(subIds) });
       });
-
-      addUrl(`/category/${category.slug}`, 'weekly', '0.7', maxLastmodOf(catIds));
-      subEntries.forEach(e => addUrl(`/subcategory/${e.slug}`, 'weekly', '0.6', e.lastmod));
-      ssEntries.forEach(e => addUrl(`/sub-subcategory/${e.slug}`, 'weekly', '0.5', e.lastmod));
     });
 
     awesomeListData?.resources?.forEach(resource => {
-      addUrl(`/resource/${resource.id}`, 'monthly', '0.5', resourceLastmod.get(Number(resource.id)));
+      addUrl(`/resource/${resource.id}`, 'monthly', '0.5');
     });
   } catch (error) {
     console.error('Error adding category/resource URLs to sitemap:', error);
@@ -282,14 +239,9 @@ async function generateSitemap(_req: any, res: any) {
   try {
     const journeys = await learningJourneyRepo.listLearningJourneys();
     journeys?.forEach(journey => {
-      // Run22 BUG-046: journeys carry a real per-row updatedAt (individually
-      // authored/edited) — emit it so the only undated sitemap URLs are the
-      // 8 static pages, which follow the documented omission policy (no
-      // reliable change signal → omit lastmod rather than invent one).
-      const lastmod = journey.updatedAt
-        ? new Date(journey.updatedAt).toISOString().split('T')[0]
-        : undefined;
-      addUrl(`/journey/${journey.id}`, 'weekly', '0.6', lastmod);
+      // R-12 (run23): lastmod omitted here too — ONE uniform no-lastmod
+      // policy for the entire sitemap (see the R-12 comment above).
+      addUrl(`/journey/${journey.id}`, 'weekly', '0.6');
     });
   } catch (error) {
     console.error('Error adding journey URLs to sitemap:', error);
@@ -713,6 +665,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { message: "Too many requests. Please slow down and try again shortly." },
   });
 
+  // NB-002 (run23): AI-generation endpoints run paid Claude calls (~15-45s
+  // each on a cache miss). Cap them hard per IP so nobody can burn tokens in
+  // a loop — legitimate use is a handful of requests per session.
+  const aiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many AI requests. Please try again in a few minutes." },
+  });
+
+  // NB-051 (run23): TRACE/TRACK are already answered 405 + Allow by the
+  // BUG-v3-L02 unsupported-method guard in server/index.ts (registered before
+  // any route). In production the hosting edge intercepts TRACE even earlier
+  // (Google-branded 405 — platform behavior, not app-controllable).
+
+  // NB-026 (run23): default-deny rate-limit backstop — every /api endpoint
+  // registered from here on is throttled even when it has no surface-specific
+  // limiter (journeys, categories, recommendations, telemetry, …). Specific
+  // limiters keep layering on top (both count; the later, stricter limiter's
+  // RateLimit-* headers win). 300 req/min/IP is far above real browsing (a
+  // page load issues ~5 API calls) but caps unbounded scraping/abuse.
+  const apiBackstopLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many requests. Please slow down and try again shortly." },
+  });
+  app.use('/api', apiBackstopLimiter);
+
   // Local authentication routes
   app.post("/api/auth/local/login", loginBurstLimiter, authLimiter, (req, res, next) => {
     const loginEmail = typeof req.body?.email === "string" ? req.body.email : "";
@@ -742,7 +725,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // (FK to users.id), so the identity attempted lives in `changes`.
         auditRepo.logResourceAudit(null, 'auth.login_failed', undefined, { email: loginEmail }, 'Local login failed')
           .catch((e) => console.error('[audit] login_failed log error:', e));
-        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+        // NB-050 (run23): ONE generic 401 string on every login-failure path —
+        // the old fallback "Invalid credentials" differed from the strategy's
+        // "Invalid email or password", a distinguishable pair.
+        return res.status(401).json({ message: info?.message || "Invalid email or password" });
       }
       
       console.log('[local/login] User authenticated, establishing session for:', user.claims?.sub);
@@ -815,7 +801,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const existing = await userRepo.getUserByEmail(email);
       if (existing) {
-        return res.status(409).json({ message: "An account with this email already exists" });
+        // NB-048 (run23): the explicit 409 "already exists" was an
+        // account-enumeration oracle (login/forgot-password are generic, so
+        // register was the one path that confirmed an email). Burn a hash for
+        // timing parity with the success path and answer generically. Note:
+        // without an email-verification flow the 201-vs-400 status itself
+        // remains a weak oracle; the message no longer confirms anything.
+        await hashPassword(password);
+        return res.status(400).json({
+          message:
+            "Unable to create an account with these details. If you already have an account, sign in or reset your password.",
+        });
       }
 
       const hashed = await hashPassword(password);
@@ -1034,6 +1030,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // /me follows REST convention: 401 when unauthenticated, else the mapped user.
   app.get('/api/auth/me', async (req: any, res) => {
     try {
+      // NB-023 (run23): /api/auth/user is the ONE canonical identity endpoint
+      // (200 + { user, isAuthenticated } always, so the SPA can boot
+      // anonymously). This REST-style alias stays for API consumers but is
+      // formally deprecated to stop the three-contracts drift.
+      res.setHeader('Deprecation', 'true');
+      res.setHeader('Link', '</api/auth/user>; rel="successor-version"');
       // BUG-051 (run14): canonical 401 body everywhere is
       // { message: "Unauthorized" } — matches isAuthenticated middleware.
       if (!req.isAuthenticated?.() || !req.user?.claims?.sub) {
@@ -1122,6 +1124,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Run3 audit R3-10: consistent /api/auth/* surface.
   // GET /api/auth/status — lightweight session probe (no user payload).
   app.get('/api/auth/status', (req: any, res) => {
+    // NB-023 (run23): deprecated alias — see /api/auth/user (canonical).
+    res.setHeader('Deprecation', 'true');
+    res.setHeader('Link', '</api/auth/user>; rel="successor-version"');
     res.json({ authenticated: Boolean(req.isAuthenticated?.() && req.user) });
   });
   // /api/auth/login was probed by auditors and 404'd; answer with a 405 that
@@ -1178,14 +1183,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // offset<0→0). Previously page=-5 errored while page=0 clamped, and
       // limit=0 silently became the default 20 while limit=-1 became 1.
       // Run16 BUG-091: error bodies carry `message` alongside the machine code.
-      if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
-        return res.status(400).json({ error: 'invalid_offset', message: 'offset must be a number' });
+      // NB-019 (run23): strict integer forms + hard bounds. "1e20" passed the
+      // old isNaN() check and then parseInt silently read it as 1; all-digit
+      // values past Number.MAX_SAFE_INTEGER / PG int4 range overflowed inside
+      // PG (offset → 500) or produced absurd page metadata (page=1e18).
+      // Non-integer forms and out-of-bound magnitudes are caller bugs → 400.
+      const INT_RE = /^-?\d+$/;
+      const outOfBounds = (s: string) =>
+        !INT_RE.test(s) || !Number.isSafeInteger(Number(s)) || Math.abs(Number(s)) > PG_INT_MAX;
+      if (rawOffset !== undefined && outOfBounds(String(rawOffset).trim())) {
+        return res.status(400).json({ error: 'invalid_offset', message: 'offset must be an integer between 0 and 2147483647' });
       }
-      if (rawLimit !== undefined && isNaN(Number(rawLimit))) {
-        return res.status(400).json({ error: 'invalid_limit', message: 'limit must be a number' });
+      if (rawLimit !== undefined && outOfBounds(String(rawLimit).trim())) {
+        return res.status(400).json({ error: 'invalid_limit', message: 'limit must be an integer between 1 and 100' });
       }
-      if (rawPage !== undefined && !/^-?\d+$/.test(rawPage.trim())) {
-        return res.status(400).json({ error: 'invalid_page', message: 'page must be an integer' });
+      if (rawPage !== undefined && outOfBounds(rawPage.trim())) {
+        return res.status(400).json({ error: 'invalid_page', message: 'page must be an integer between 1 and 2147483647' });
       }
       // BUG-053 (run18): a negative/zero page is a caller bug, not something
       // to silently coerce to page 1 — reject it explicitly.
@@ -1338,8 +1351,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ query: q, total: 0, results: [] });
       }
       const limit = Math.min(Math.max(parseInt(firstQueryValue(req.query.limit) as string) || 100, 1), 200);
+      // NB-021 (run23): offset pagination — `total` used to promise 1,275
+      // matches for ?q=video while only the first `limit` (max 200) rows were
+      // ever retrievable. Walk the full match set via offset/nextOffset.
+      let offset = 0;
+      const rawSearchOffset = firstQueryValue(req.query.offset);
+      if (rawSearchOffset !== undefined && String(rawSearchOffset).trim() !== '') {
+        const s = String(rawSearchOffset).trim();
+        if (!/^\d+$/.test(s) || !Number.isSafeInteger(Number(s)) || Number(s) > PG_INT_MAX) {
+          return res.status(400).json({ message: 'offset must be an integer between 0 and 2147483647' });
+        }
+        offset = Number(s);
+      }
       const { resources, total } = await resourceRepo.listResources({
         page: 1,
+        offset,
         limit,
         status: 'approved',
         search: q,
@@ -1355,7 +1381,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // `total` is the true match count from the repo (post-cleanup there are no
       // URL-duplicate rows, so it equals the deduped count); `results` is this page.
       // NEW-019: strip internal `searchTsv` from each public result.
-      res.json({ query: q, total, results: results.map(toPublicResource) });
+      // NB-021: honest pagination metadata — repeat with offset=nextOffset
+      // until nextOffset is null to retrieve every promised match.
+      const nextOffset = offset + resources.length < total ? offset + resources.length : null;
+      res.json({ query: q, total, limit, offset, nextOffset, results: results.map(toPublicResource) });
     } catch (error) {
       console.error('Error searching resources:', error);
       res.status(500).json({ message: 'Failed to search resources' });
@@ -1421,8 +1450,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // /api/resource/:id (BUG-014) via a shared handler.
   const getResourceByIdHandler = async (req: any, res: any) => {
     try {
-      const id = parseInt(req.params.id);
-      if (Number.isNaN(id)) {
+      // NB-008 (run23): all-digit ids past int4 range pass the \d+ route
+      // regex and overflow inside PG → 500. Bound-check before the DB.
+      const id = parseBoundedInt(req.params.id);
+      if (id === null) {
         return res.status(404).json({ message: 'Resource not found' });
       }
       const resource = await resourceRepo.getResource(id);
@@ -1457,8 +1488,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/resources/:id/related', resourceReadLimiter, async (req, res) => {
     const empty = { similar: [], prerequisites: [], nextSteps: [], totalFound: 0 };
     try {
-      const id = parseInt(req.params.id);
-      if (Number.isNaN(id)) {
+      // NB-008 (run23): bound-check (int4 overflow → 500 otherwise).
+      const id = parseBoundedInt(req.params.id);
+      if (id === null) {
         return res.json(empty);
       }
       const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 5, 1), 10);
@@ -1915,13 +1947,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        categoryId = parseInt(validation.data);
-        
-        if (isNaN(categoryId) || categoryId < 1) {
+        // NB-008 (run23): bound-check — all-digit values past int4 range pass
+        // the regex, then overflow inside PG → 500.
+        const parsed = parseBoundedInt(validation.data);
+        if (parsed === null) {
           return res.status(400).json({ 
-            message: 'categoryId must be a positive number' 
+            message: 'categoryId must be a positive number within integer range' 
           });
         }
+        categoryId = parsed;
       }
       
       const subcategories = await categoryRepo.listSubcategories(categoryId);
@@ -1949,13 +1983,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        subcategoryId = parseInt(validation.data);
-        
-        if (isNaN(subcategoryId) || subcategoryId < 1) {
+        // NB-008 (run23): bound-check — see /api/subcategories above.
+        const parsed = parseBoundedInt(validation.data);
+        if (parsed === null) {
           return res.status(400).json({ 
-            message: 'subcategoryId must be a positive number' 
+            message: 'subcategoryId must be a positive number within integer range' 
           });
         }
+        subcategoryId = parsed;
       }
       
       const subSubcategories = await categoryRepo.listSubSubcategories(subcategoryId);
@@ -2478,6 +2513,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      // NB-018 (run23): per-user progress must never come from the browser's
+      // HTTP cache — Express's default ETag + no Cache-Control let the browser
+      // intermittently serve a stale 200 from disk cache, so progress made in
+      // another tab/session looked lost until a hard reload.
+      res.set('Cache-Control', 'no-store');
 
       // Get user's journey progress
       const journeyProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
@@ -2601,10 +2641,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/journeys/:id - Get journey details
   app.get('/api/journeys/:id', async (req: any, res) => {
     try {
-      const id = parseInt(req.params.id);
       // BUG-004 (run8): non-numeric ids (e.g. /api/journeys/some-slug) previously
       // reached the DB with NaN and threw -> 500. Treat them as not found.
-      if (isNaN(id)) {
+      // NB-008 (run23): same for all-digit ids past int4 range (overflow → 500).
+      const id = parseBoundedInt(req.params.id);
+      if (id === null) {
         return res.status(404).json({ message: 'Journey not found' });
       }
       const journey = await learningJourneyRepo.getLearningJourney(id);
@@ -3036,8 +3077,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/users - List users
   app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
+      // NB-024 (run23): validate pagination like every public surface —
+      // page=-1 previously drove a negative OFFSET into PG → 500, and
+      // limit=-1 fell through as PG "LIMIT -1" → every user in one response.
+      let page = 1;
+      if (req.query.page !== undefined && req.query.page !== '') {
+        const parsedPage = parseBoundedInt(req.query.page);
+        if (parsedPage === null) {
+          return res.status(400).json({ message: 'page must be a positive integer' });
+        }
+        page = parsedPage;
+      }
+      let limit = 20;
+      if (req.query.limit !== undefined && req.query.limit !== '') {
+        const parsedLimit = parseBoundedInt(req.query.limit);
+        if (parsedLimit === null) {
+          return res.status(400).json({ message: 'limit must be a positive integer between 1 and 100' });
+        }
+        limit = Math.min(parsedLimit, 100);
+      }
       const q = typeof req.query.q === 'string' ? req.query.q : undefined;
       // Run16 BUG-087: optional sort params (whitelisted in the repository).
       const sortBy = typeof req.query.sortBy === 'string' ? req.query.sortBy : undefined;
@@ -3068,21 +3126,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (/[",\n\r]/.test(s)) s = `"${s.replace(/"/g, '""')}"`;
         return s;
       };
-      // Run15 BUG-042: the CSV must not leak more PII than the admin UI it
-      // mirrors — mask emails exactly like UsersTab's maskEmail (first char +
-      // ••• + domain). The full address stays DB-only.
-      const maskEmail = (email: unknown): string => {
-        if (typeof email !== 'string' || !email.includes('@')) return '';
-        const [local, domain] = email.split('@');
-        return `${local.slice(0, 1)}•••@${domain}`;
-      };
+      // NB-012 (run23, supersedes Run15 BUG-042 masking): the export is an
+      // admin-only endpoint and the admin UI already has a reveal toggle that
+      // shows the real address — a masked CSV was strictly less useful than
+      // the screen it mirrors while gating nothing. Export real emails; the
+      // on-screen table stays masked by default.
       const header = ['id', 'email', 'firstName', 'lastName', 'role', 'authProvider', 'createdAt'];
       const lines = [header.join(',')];
       for (const u of allUsers) {
         const provider = u.password ? 'local' : 'replit';
         lines.push([
           csvCell(u.id),
-          csvCell(maskEmail(u.email)),
+          csvCell(u.email ?? ''),
           csvCell(u.firstName),
           csvCell(u.lastName),
           csvCell(u.role),
@@ -3751,14 +3806,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/claude/analyze - Analyze URL with Claude AI (authenticated)
-  app.post('/api/claude/analyze', isAuthenticated, async (req, res) => {
+  // NB-022 (run23): this endpoint runs a paid Claude call per request. It
+  // stays available to any signed-in user (the suggest-edit dialog calls it),
+  // but is now behind the shared aiLimiter (10 req / 15 min / IP) and caller
+  // errors (missing/garbage URL) are 400s, not 500s.
+  app.post('/api/claude/analyze', isAuthenticated, aiLimiter, async (req, res) => {
     try {
-      const { url } = req.body;
-      
-      if (!url) {
+      const { url } = req.body ?? {};
+
+      if (!url || typeof url !== 'string' || !url.trim()) {
         return res.status(400).json({ message: 'URL is required' });
       }
-      
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(url.trim());
+      } catch {
+        return res.status(400).json({ message: 'URL must be a valid absolute http(s) URL' });
+      }
+      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        return res.status(400).json({ message: 'URL must use http or https' });
+      }
+
       if (!claudeService.isAvailable()) {
         return res.status(503).json({ 
           message: 'Claude AI service is not available',
@@ -3766,10 +3834,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const analysis = await claudeService.analyzeURL(url);
+      const analysis = await claudeService.analyzeURL(url.trim());
       
       if (!analysis) {
-        return res.status(500).json({ message: 'Failed to analyze URL' });
+        // Upstream (Claude / target fetch) failure — not a server bug: 502.
+        return res.status(502).json({ message: 'Failed to analyze URL' });
       }
       
       res.json(analysis);
@@ -4364,10 +4433,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const status = req.query.status as string;
       const queueItems = await githubSyncRepo.getGithubSyncQueue(status);
-      
+
+      // Run23 NB-038: the queue list used to ship every row's full
+      // resourceIds array (thousands of ids per export row) + raw metadata —
+      // megabytes on long-lived deployments. The panel only renders summary
+      // fields; full detail stays available per-row via /sync-status/:id.
       res.json({
         total: queueItems.length,
-        items: queueItems
+        items: queueItems.map(q => ({
+          id: q.id,
+          repositoryUrl: q.repositoryUrl,
+          branch: q.branch,
+          action: q.action,
+          status: q.status,
+          errorMessage: q.errorMessage,
+          resourceCount: Array.isArray(q.resourceIds) ? q.resourceIds.length : 0,
+          createdAt: q.createdAt,
+          processedAt: q.processedAt,
+        }))
       });
     } catch (error) {
       console.error('Error fetching sync status:', error);
@@ -4439,7 +4522,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         });
 
-      res.json([...history, ...fromQueue].sort((a: any, b: any) =>
+      // Run23 NB-038: canonical history rows carry a full resource `snapshot`
+      // jsonb (2.7MB total on prod). The list view only needs summary fields;
+      // snapshots remain in the DB for on-demand use.
+      const historySummaries = history.map(h => ({
+        id: h.id,
+        repositoryUrl: h.repositoryUrl,
+        direction: h.direction,
+        commitSha: h.commitSha,
+        commitMessage: h.commitMessage,
+        commitUrl: h.commitUrl,
+        resourcesAdded: h.resourcesAdded,
+        resourcesUpdated: h.resourcesUpdated,
+        resourcesRemoved: h.resourcesRemoved,
+        totalResources: h.totalResources,
+        performedBy: h.performedBy,
+        createdAt: h.createdAt,
+      }));
+
+      res.json([...historySummaries, ...fromQueue].sort((a: any, b: any) =>
         new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
       ));
     } catch (error) {
@@ -4892,6 +4993,173 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============= Admin Maintenance Routes (Run23) =============
+
+  // Run23 NB-046: tag-coverage visibility — the July bulk import left more
+  // than half the catalog untagged and the gap was invisible in the admin.
+  // This read-only census powers a coverage line in the enrichment panel.
+  app.get('/api/admin/enrichment/coverage', isAuthenticated, isAdmin, async (_req, res) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT
+          count(*)::int AS approved_total,
+          count(*) FILTER (
+            WHERE jsonb_typeof(metadata->'tags') = 'array'
+              AND jsonb_array_length(metadata->'tags') > 0
+          )::int AS tagged
+        FROM resources
+        WHERE status = 'approved'
+      `);
+      const row = (result.rows as any[])[0];
+      const approvedTotal = row.approved_total as number;
+      const tagged = row.tagged as number;
+      res.json({
+        approvedTotal,
+        tagged,
+        untagged: approvedTotal - tagged,
+        coveragePct: approvedTotal > 0 ? Math.round((tagged / approvedTotal) * 1000) / 10 : 0,
+      });
+    } catch (error) {
+      console.error('Error computing tag coverage:', error);
+      res.status(500).json({ message: 'Failed to compute tag coverage' });
+    }
+  });
+
+  // Run23 NB-054: 2,283/2,292 approved resources carry approved_at = null
+  // (bulk imports were created already-approved without stamping the field).
+  // Backfill approved_at from created_at — the moment an imported row was
+  // created IS the moment it became approved. Idempotent: second run is a
+  // no-op (0 rows).
+  app.post('/api/admin/maintenance/backfill-approved-at', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const result = await db.execute(sql`
+        UPDATE resources
+        SET approved_at = created_at
+        WHERE status = 'approved' AND approved_at IS NULL AND created_at IS NOT NULL
+        RETURNING id
+      `);
+      const backfilled = (result.rows as any[]).length;
+      const remaining = await db.execute(sql`
+        SELECT count(*)::int AS n FROM resources
+        WHERE status = 'approved' AND approved_at IS NULL
+      `);
+      await auditRepo.logResourceAudit(
+        null,
+        'maintenance_backfill_approved_at',
+        req.user.claims.sub,
+        { backfilled },
+        `Backfilled approved_at from created_at on ${backfilled} approved resources`
+      );
+      res.json({ backfilled, remainingNull: (remaining.rows as any[])[0].n });
+    } catch (error) {
+      console.error('Error backfilling approved_at:', error);
+      res.status(500).json({ message: 'Failed to backfill approved_at' });
+    }
+  });
+
+  // Run23 NB-055: tag-value casing chaos — the same tag exists in up to three
+  // spellings (FFMPEG/FFmpeg/ffmpeg, NGINX/Nginx/nginx, ...), splitting filter
+  // facets. Canonicalize every family (grouped case-insensitively) to one
+  // spelling: a curated brand map wins; otherwise the most frequent spelling
+  // in the corpus (ties broken lexicographically) so reruns are deterministic.
+  // Idempotent: second run updates 0 resources.
+  app.post('/api/admin/maintenance/canonicalize-tags', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const BRAND_CASING: Record<string, string> = {
+        'ffmpeg': 'FFmpeg', 'nginx': 'NGINX', 'api': 'API', 'avplayer': 'AVPlayer',
+        'aws': 'AWS', 'avi': 'AVI', 'cdn': 'CDN', 'c++': 'C++', 'apple': 'Apple',
+        'cross-platform': 'Cross-platform', 'hls': 'HLS', 'dash': 'DASH',
+        'mpeg-dash': 'MPEG-DASH', 'drm': 'DRM', 'vod': 'VOD', 'av1': 'AV1',
+        'hevc': 'HEVC', 'h264': 'H.264', 'h.264': 'H.264', 'h265': 'H.265',
+        'h.265': 'H.265', 'macos': 'macOS', 'ios': 'iOS', 'tvos': 'tvOS',
+        'android': 'Android', 'javascript': 'JavaScript', 'typescript': 'TypeScript',
+        'python': 'Python', 'rust': 'Rust', 'gpu': 'GPU', 'sdk': 'SDK',
+        'cli': 'CLI', 'rtmp': 'RTMP', 'srt': 'SRT', 'rist': 'RIST',
+        'webrtc': 'WebRTC', 'mp4': 'MP4', 'cmaf': 'CMAF', 'abr': 'ABR',
+        'qoe': 'QoE', 'vmaf': 'VMAF', 'opencv': 'OpenCV', 'obs': 'OBS',
+        'vlc': 'VLC', 'gstreamer': 'GStreamer', 'x264': 'x264', 'x265': 'x265',
+        'html5': 'HTML5', 'json': 'JSON', 'xml': 'XML', 'ai': 'AI', 'ui': 'UI',
+        'url': 'URL', 'http': 'HTTP', 'https': 'HTTPS', 'tcp': 'TCP', 'udp': 'UDP',
+        'rtp': 'RTP', 'rtsp': 'RTSP', 'scte-35': 'SCTE-35', 'id3': 'ID3',
+        'mpeg': 'MPEG', 'mpeg-ts': 'MPEG-TS', 'vp9': 'VP9', 'vvc': 'VVC',
+        'linux': 'Linux', 'windows': 'Windows', 'docker': 'Docker',
+        'kubernetes': 'Kubernetes', 'github': 'GitHub', 'youtube': 'YouTube',
+      };
+      const rowsResult = await db.execute(sql`
+        SELECT id, metadata->'tags' AS tags
+        FROM resources
+        WHERE status = 'approved'
+          AND jsonb_typeof(metadata->'tags') = 'array'
+          AND jsonb_array_length(metadata->'tags') > 0
+      `);
+      const rows = rowsResult.rows as Array<{ id: number; tags: string[] }>;
+
+      // Pass 1: frequency census per case-insensitive family.
+      const familyCounts = new Map<string, Map<string, number>>();
+      for (const r of rows) {
+        for (const t of r.tags) {
+          if (typeof t !== 'string') continue;
+          const fam = t.toLowerCase();
+          const spellings = familyCounts.get(fam) ?? new Map<string, number>();
+          spellings.set(t, (spellings.get(t) ?? 0) + 1);
+          familyCounts.set(fam, spellings);
+        }
+      }
+      const canonical = new Map<string, string>();
+      let variantFamilies = 0;
+      for (const [fam, spellings] of Array.from(familyCounts.entries())) {
+        if (spellings.size > 1) variantFamilies++;
+        if (BRAND_CASING[fam]) {
+          canonical.set(fam, BRAND_CASING[fam]);
+          continue;
+        }
+        let best: string | null = null;
+        let bestCount = -1;
+        for (const [spelling, count] of Array.from(spellings.entries())) {
+          if (count > bestCount || (count === bestCount && best !== null && spelling < best)) {
+            best = spelling;
+            bestCount = count;
+          }
+        }
+        canonical.set(fam, best!);
+      }
+
+      // Pass 2: rewrite arrays that change (canonicalize + dedupe, keep order).
+      let resourcesUpdated = 0;
+      for (const r of rows) {
+        const seen = new Set<string>();
+        const next: string[] = [];
+        for (const t of r.tags) {
+          if (typeof t !== 'string') continue;
+          const c = canonical.get(t.toLowerCase()) ?? t;
+          if (!seen.has(c)) {
+            seen.add(c);
+            next.push(c);
+          }
+        }
+        if (JSON.stringify(next) !== JSON.stringify(r.tags)) {
+          await db.execute(sql`
+            UPDATE resources
+            SET metadata = jsonb_set(metadata, '{tags}', ${JSON.stringify(next)}::jsonb)
+            WHERE id = ${r.id}
+          `);
+          resourcesUpdated++;
+        }
+      }
+      await auditRepo.logResourceAudit(
+        null,
+        'maintenance_canonicalize_tags',
+        req.user.claims.sub,
+        { variantFamilies, resourcesUpdated },
+        `Canonicalized tag casing: ${variantFamilies} variant families, ${resourcesUpdated} resources rewritten`
+      );
+      res.json({ variantFamiliesFound: variantFamilies, resourcesUpdated });
+    } catch (error) {
+      console.error('Error canonicalizing tags:', error);
+      res.status(500).json({ message: 'Failed to canonicalize tags' });
+    }
+  });
+
   // ============= Enrichment API Routes =============
   
   // POST /api/enrichment/start - Start batch enrichment job
@@ -5194,8 +5462,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/researcher/jobs', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { researchService } = await import('./ai/researchService');
-      const jobs = await researchService.listJobs();
-      res.json(jobs.map(stripJobAuthSecret));
+      // Run23 NB-039: ship the total alongside the latest-20 list so the UI
+      // can say "showing latest 20 of N" instead of silently truncating.
+      const [jobs, total] = await Promise.all([
+        researchService.listJobs(),
+        researchService.countJobs(),
+      ]);
+      res.json({ jobs: jobs.map(stripJobAuthSecret), total });
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to list research jobs', error: error.message });
     }
@@ -5304,7 +5577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!data || !data.resources || data.resources.length === 0) {
         console.warn('⚠️ No resources in database - database may need seeding');
-        return res.status(500).json({ error: 'No awesome list data available' });
+        return res.status(500).json({ message: 'No awesome list data available' });
       }
 
       if (isUnfiltered) {
@@ -5360,7 +5633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(filteredData);
     } catch (error) {
       console.error('Error processing awesome list:', error);
-      res.status(500).json({ error: 'Failed to process awesome list' });
+      res.status(500).json({ message: 'Failed to process awesome list' });
     }
   });
 
@@ -5384,9 +5657,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const data = await legacyRepo.getAwesomeListFromDatabase();
       if (!data || !data.categories || data.categories.length === 0) {
-        return res.status(500).json({ error: 'No awesome list data available' });
+        return res.status(500).json({ message: 'No awesome list data available' });
       }
 
+      // Run23 R-06: each category carries a tiny teaser (first direct
+      // resource's title/description) so the Home grid renders card blurbs
+      // from the nav tree alone — without downloading the full corpus.
       const nav = {
         title: data.title,
         totalResources: (data.resources || []).length,
@@ -5394,6 +5670,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: cat.name,
           slug: cat.slug,
           resourceCount: (cat.resources || []).length,
+          teaser: cat.resources?.[0]
+            ? {
+                title: String(cat.resources[0].title || ''),
+                description: String(cat.resources[0].description || '').slice(0, 200),
+              }
+            : undefined,
           subcategories: (cat.subcategories || []).map((sub: any) => ({
             name: sub.name,
             slug: sub.slug,
@@ -5418,7 +5700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.type('application/json').send(body);
     } catch (error) {
       console.error('Error building awesome-list nav:', error);
-      res.status(500).json({ error: 'Failed to build navigation tree' });
+      res.status(500).json({ message: 'Failed to build navigation tree' });
     }
   });
 
@@ -5428,7 +5710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { rawUrl } = req.body;
       
       if (!rawUrl) {
-        return res.status(400).json({ error: 'Raw URL is required' });
+        return res.status(400).json({ message: 'Raw URL is required' });
       }
       
       console.log(`Switching to list: ${rawUrl}`);
@@ -5439,7 +5721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(data);
     } catch (error) {
       console.error('Error switching list:', error);
-      res.status(500).json({ error: 'Failed to switch list' });
+      res.status(500).json({ message: 'Failed to switch list' });
     }
   });
 
@@ -5453,24 +5735,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error) {
       console.error('Error fetching awesome lists from GitHub:', error);
-      res.status(500).json({ error: 'Failed to fetch awesome lists' });
+      res.status(500).json({ message: 'Failed to fetch awesome lists' });
     }
   });
 
-  app.get("/api/github/search", async (req, res) => {
+  // NB-006 (run23): this proxy hits GitHub's search API, which is a shared
+  // 10-req/min quota per IP when unauthenticated. It only serves the admin
+  // GitHub-import discovery surface, so require admin (anonymous → 401) and
+  // send the server-side token from searchAwesomeLists when configured.
+  app.get("/api/github/search", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const query = req.query.q as string;
-      const page = parseInt(req.query.page as string) || 1;
-      
+      const page = Math.min(Math.max(parseInt(req.query.page as string) || 1, 1), 50);
+
       if (!query) {
-        return res.status(400).json({ error: 'Search query is required' });
+        return res.status(400).json({ message: 'Search query is required' });
       }
       
       const result = await searchAwesomeLists(query, page);
       res.json(result);
     } catch (error) {
       console.error('Error searching awesome lists:', error);
-      res.status(500).json({ error: 'Failed to search awesome lists' });
+      res.status(500).json({ message: 'Failed to search awesome lists' });
     }
   });
 
@@ -5487,14 +5773,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ status: 'ready', message: 'Recommendation engine initialized' });
     } catch (error) {
       console.error('Error initializing recommendations:', error);
-      res.status(500).json({ error: 'Failed to initialize recommendations' });
+      res.status(500).json({ message: 'Failed to initialize recommendations' });
     }
   });
+
+  // NB-007/NB-015 (run23): recommendation responses embed full resource rows —
+  // they must pass the same public serializer as every other resource surface.
+  const stripRecommendationInternals = (items: any[]): any[] =>
+    (items || []).map((r) =>
+      r && typeof r === 'object' && r.resource
+        ? { ...r, resource: stripInternalResourceFields(r.resource) }
+        : r
+    );
+
+  // Learning-path payloads carry resources at the top level and inside
+  // milestones — strip both.
+  const stripPathInternals = (p: any): any => {
+    if (!p || typeof p !== 'object') return p;
+    const out: any = { ...p };
+    if (Array.isArray(out.resources)) {
+      out.resources = out.resources.map(stripInternalResourceFields);
+    }
+    if (Array.isArray(out.milestones)) {
+      out.milestones = out.milestones.map((m: any) =>
+        m && typeof m === 'object' && Array.isArray(m.resources)
+          ? { ...m, resources: m.resources.map(stripInternalResourceFields) }
+          : m
+      );
+    }
+    return out;
+  };
+
+  // NB-007 (run23): limit must be validated — ?limit=500 returned 500 rows and
+  // ?limit=-5 fell through to the entire corpus. 400 on invalid, cap at 50.
+  const parseRecommendationLimit = (raw: unknown, fallback: number): number | null => {
+    if (raw === undefined || raw === '') return fallback;
+    const parsed = parseBoundedInt(raw);
+    if (parsed === null) return null;
+    return Math.min(parsed, 50);
+  };
 
   // GET /api/recommendations - Get personalized recommendations
   app.get("/api/recommendations", async (req, res) => {
     try {
-      const limit = parseInt(req.query.limit as string) || 10;
+      const limit = parseRecommendationLimit(req.query.limit, 10);
+      if (limit === null) {
+        return res.status(400).json({ message: 'limit must be a positive integer (max 50)' });
+      }
       
       // Create a user profile for anonymous users from query params
       const userProfile: AIUserProfile = {
@@ -5519,10 +5844,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         false // learning paths aren't used by this endpoint — skip the blocking AI call
       );
 
-      res.json(result.recommendations || []);
+      // NB-015 (run23): pass embedded resources through the public serializer.
+      res.json(stripRecommendationInternals(result.recommendations || []));
     } catch (error) {
       console.error('Error generating recommendations:', error);
-      res.status(500).json({ error: 'Failed to generate recommendations' });
+      res.status(500).json({ message: 'Failed to generate recommendations' });
     }
   });
 
@@ -5530,7 +5856,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/recommendations", async (req, res) => {
     try {
       const userProfile: AIUserProfile = req.body;
-      const limit = parseInt(req.query.limit as string) || 10;
+      // NB-007 (run23): same limit validation as the GET.
+      const limit = parseRecommendationLimit(req.query.limit, 10);
+      if (limit === null) {
+        return res.status(400).json({ message: 'limit must be a positive integer (max 50)' });
+      }
       const forceRefresh = req.query.refresh === 'true';
 
       const result = await recommendationEngine.generateRecommendations(
@@ -5540,20 +5870,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         false // learning paths aren't used by this endpoint — skip the blocking AI call
       );
 
-      res.json(result.recommendations || []);
+      // NB-015 (run23): pass embedded resources through the public serializer.
+      res.json(stripRecommendationInternals(result.recommendations || []));
     } catch (error) {
       console.error('Error generating AI recommendations:', error);
-      res.status(500).json({ error: 'Failed to generate recommendations' });
+      res.status(500).json({ message: 'Failed to generate recommendations' });
     }
   });
 
   // POST /api/recommendations/feedback - Record user feedback on recommendations
-  app.post("/api/recommendations/feedback", async (req, res) => {
+  // NB-016 (run23): was an unauthenticated write with a spoofable body userId —
+  // the sibling /api/interactions was hardened in Run22 but this was missed.
+  // Require a session and derive the identity from it; body userId is ignored.
+  app.post("/api/recommendations/feedback", isAuthenticated, async (req: any, res) => {
     try {
-      const { userId, resourceId, feedback, rating } = req.body;
-      
-      if (!userId || !resourceId || !feedback) {
-        return res.status(400).json({ error: 'userId, resourceId, and feedback are required' });
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const { resourceId, feedback, rating } = req.body ?? {};
+
+      if (!resourceId || !feedback) {
+        return res.status(400).json({ message: 'resourceId and feedback are required' });
       }
 
       // Record the feedback
@@ -5567,7 +5906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {
       console.error('Error recording recommendation feedback:', error);
-      res.status(500).json({ error: 'Failed to record feedback' });
+      res.status(500).json({ message: 'Failed to record feedback' });
     }
   });
 
@@ -5582,7 +5921,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const resourceId = parseInt(req.params.resourceId, 10);
       if (isNaN(resourceId)) {
-        return res.status(400).json({ error: 'Invalid resource id' });
+        return res.status(400).json({ message: 'Invalid resource id' });
       }
 
       const { feedback } = req.body;
@@ -5595,18 +5934,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {
       console.error('Error recording recommendation feedback:', error);
-      res.status(500).json({ error: 'Failed to record feedback' });
+      res.status(500).json({ message: 'Failed to record feedback' });
     }
   });
 
   // GET /api/learning-paths/suggested - Get suggested learning paths
-  app.get("/api/learning-paths/suggested", async (req, res) => {
+  // NB-002 (run23): every distinct sanitized param combo is a generation cache
+  // key, and a miss runs ~15-45s of paid Claude calls. Anonymous requests are
+  // therefore PINNED to the boot-warmed default profile — no unauthenticated
+  // input can mint a new cache key or trigger generation. Signed-in users get
+  // personalization (bounded params) behind the strict aiLimiter.
+  app.get("/api/learning-paths/suggested", aiLimiter, async (req: any, res) => {
     try {
-      // Abuse hardening: these params feed real AI generation AND the result
-      // cache key, so clamp their cardinality — an attacker varying them freely
-      // could force endless cache misses and burn paid Claude calls.
       const rawLimit = parseInt(req.query.limit as string);
-      const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
+      const requestedLimit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
+
+      const isAuthed = typeof req.isAuthenticated === "function" && req.isAuthenticated();
+
+      if (!isAuthed) {
+        // Must mirror warmDefaultSuggestedPaths() exactly so this always hits
+        // the warmed cache entry (key: default profile + limit 5).
+        const anonProfile: AIUserProfile = {
+          userId: 'anonymous',
+          preferredCategories: [],
+          skillLevel: 'intermediate',
+          learningGoals: [],
+          preferredResourceTypes: [],
+          timeCommitment: 'flexible',
+          viewHistory: [],
+          bookmarks: [],
+          completedResources: [],
+          completedJourneys: [],
+          journeyProgress: [],
+          ratings: {}
+        };
+        const paths = await learningPathGenerator.getSuggestedPaths(anonProfile, 5);
+        // NB-015 (run23): strip internal resource fields before sending.
+        return res.json(paths.slice(0, requestedLimit).map(stripPathInternals));
+      }
 
       const skillLevels = ['beginner', 'intermediate', 'advanced'];
       const skillLevel = (skillLevels.includes(req.query.skillLevel as string)
@@ -5633,9 +5998,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .slice(0, 5)
         .map((g) => g.slice(0, 100));
 
-      // Create a basic user profile from the sanitized query params
+      // Identity comes from the session, never from the query string.
       const userProfile: AIUserProfile = {
-        userId: req.query.userId as string || 'anonymous',
+        userId: req.user?.claims?.sub || 'anonymous',
         preferredCategories,
         skillLevel,
         learningGoals,
@@ -5649,50 +6014,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ratings: {}
       };
 
-      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-      
-      res.json(paths);
+      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, requestedLimit);
+
+      // NB-015 (run23): strip internal resource fields before sending.
+      res.json(paths.map(stripPathInternals));
     } catch (error) {
       console.error('Error generating suggested learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate suggested learning paths' });
+      res.status(500).json({ message: 'Failed to generate suggested learning paths' });
     }
   });
 
+  // NB-002 (run23): shared sanitizer for body-supplied profiles on the paid
+  // generation POSTs — whitelists fields, clamps enums/arrays/lengths, and
+  // forces the identity to the session user. Raw client bodies must never
+  // reach the generator (unbounded prompt/cache-key material).
+  const sanitizeBodyProfile = (body: any, sessionUserId: string): AIUserProfile => {
+    const skillLevels = ['beginner', 'intermediate', 'advanced'];
+    const timeCommitments = ['daily', 'weekly', 'flexible'];
+    const strArr = (v: unknown, maxItems: number, maxLen: number): string[] =>
+      Array.isArray(v)
+        ? v.filter((x): x is string => typeof x === 'string')
+            .map((x) => x.trim())
+            .filter(Boolean)
+            .slice(0, maxItems)
+            .map((x) => x.slice(0, maxLen))
+        : [];
+    return {
+      userId: sessionUserId,
+      preferredCategories: strArr(body?.preferredCategories, 10, 100),
+      skillLevel: (skillLevels.includes(body?.skillLevel) ? body.skillLevel : 'intermediate'),
+      learningGoals: strArr(body?.learningGoals, 5, 100),
+      preferredResourceTypes: strArr(body?.preferredResourceTypes, 10, 50),
+      timeCommitment: (timeCommitments.includes(body?.timeCommitment) ? body.timeCommitment : 'flexible'),
+      viewHistory: [],
+      bookmarks: [],
+      completedResources: [],
+      completedJourneys: [],
+      journeyProgress: [],
+      ratings: {}
+    } as AIUserProfile;
+  };
+
   // POST /api/learning-paths/generate - Generate custom learning path
-  app.post("/api/learning-paths/generate", async (req, res) => {
+  // NB-002 (run23): was fully anonymous — any visitor could trigger a paid
+  // ~25s Claude generation with arbitrary prompt material. Now requires a
+  // signed-in session and rides the strict AI limiter.
+  app.post("/api/learning-paths/generate", isAuthenticated, aiLimiter, async (req: any, res) => {
     try {
-      const { userProfile, category, customGoals } = req.body;
-      
+      const { userProfile, category, customGoals } = req.body ?? {};
+
       if (!userProfile) {
-        return res.status(400).json({ error: 'User profile is required' });
+        return res.status(400).json({ message: 'User profile is required' });
       }
 
+      const sessionUserId = req.user?.claims?.sub;
+      const safeProfile = sanitizeBodyProfile(userProfile, sessionUserId);
+      const safeCategory = typeof category === 'string' ? category.trim().slice(0, 100) : undefined;
+      const safeGoals = Array.isArray(customGoals)
+        ? customGoals.filter((g): g is string => typeof g === 'string')
+            .map((g) => g.trim()).filter(Boolean).slice(0, 5).map((g) => g.slice(0, 100))
+        : undefined;
+
       const path = await learningPathGenerator.generateLearningPath(
-        userProfile,
-        category,
-        customGoals
+        safeProfile,
+        safeCategory,
+        safeGoals
       );
 
-      res.json(path);
+      // NB-015 (run23): strip internal resource fields before sending.
+      res.json(stripPathInternals(path));
     } catch (error) {
       console.error('Error generating custom learning path:', error);
-      res.status(500).json({ error: 'Failed to generate custom learning path' });
+      res.status(500).json({ message: 'Failed to generate custom learning path' });
     }
   });
 
   // POST /api/learning-paths - Legacy route for compatibility
-  app.post("/api/learning-paths", async (req, res) => {
+  // NB-002 (run23): auth-gated + sanitized like /generate (was: raw body
+  // straight into the generator with no auth and no limiter).
+  app.post("/api/learning-paths", isAuthenticated, aiLimiter, async (req: any, res) => {
     try {
-      const userProfile: AIUserProfile = req.body;
+      const sessionUserId = req.user?.claims?.sub;
+      const userProfile = sanitizeBodyProfile(req.body, sessionUserId);
       const rawLimit = parseInt(req.query.limit as string);
       const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
 
       const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-      
-      res.json(paths);
+
+      // NB-015 (run23): strip internal resource fields before sending.
+      res.json(paths.map(stripPathInternals));
     } catch (error) {
       console.error('Error generating AI learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate learning paths' });
+      res.status(500).json({ message: 'Failed to generate learning paths' });
     }
   });
 
@@ -5717,7 +6130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ status: "recorded" });
     } catch (error) {
       console.error('Error recording interaction:', error);
-      res.status(500).json({ error: 'Failed to record interaction' });
+      res.status(500).json({ message: 'Failed to record interaction' });
     }
   });
 
@@ -5727,13 +6140,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI service health check (documented in docs/AI-SERVICES.md).
-  // Cheap by default: reports availability + cache stats without spending an
-  // API call. Pass ?deep=1 to run a real round-trip test against Claude
-  // (costs one tiny API call — don't point automated monitors at deep mode).
-  app.get("/api/health/ai", async (req, res) => {
+  // NB-005/NB-057 (run23): anonymous callers get availability status ONLY.
+  // Internal counters (requestCount/cacheSize/cacheHitRate) are admin-only,
+  // and ?deep=1 — which spends a real paid Claude round-trip — requires an
+  // admin session (anonymous → 401, non-admin → 403). Before this, any
+  // visitor could trigger paid API calls in a loop and read internal stats.
+  app.get("/api/health/ai", async (req: any, res) => {
     try {
       const stats = claudeService.getStats();
       const deep = req.query.deep === '1' || req.query.deep === 'true';
+
+      const sessionUserId = req.user?.claims?.sub;
+      const sessionUser = sessionUserId ? await userRepo.getUser(sessionUserId) : undefined;
+      const isAdminUser = !!sessionUser && sessionUser.role === 'admin';
+
+      if (!isAdminUser) {
+        if (deep) {
+          return sessionUserId
+            ? res.status(403).json({ message: 'Forbidden: Admin access required' })
+            : res.status(401).json({ message: 'Unauthorized' });
+        }
+        // Public shape: availability only, no internal counters.
+        return res.json({ status: stats.available ? 'healthy' : 'unavailable' });
+      }
 
       if (!deep) {
         return res.json({
@@ -5792,12 +6221,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.status(405).json({ message: `Method ${req.method} not allowed. Allowed: GET` });
   });
 
-  // JSON 404 fallback for unmatched /api/* routes.
+  // NB-025 / NB-056 (run23): the OpenAPI spec (server/openapi.ts) existed but
+  // was never mounted, while docs/API.md and the /api/public/* module header
+  // pointed readers at /api/docs (404). Serve the machine-readable spec at
+  // /api/openapi.json and a CSP-safe (no external scripts) human-readable
+  // index at /api/docs.
+  app.get('/api/openapi.json', (_req, res) => {
+    res.json(swaggerSpec);
+  });
+  app.get('/api/docs', (_req, res) => {
+    const esc = (s: string) =>
+      String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const rows: string[] = [];
+    const paths = (swaggerSpec.paths ?? {}) as Record<string, Record<string, any>>;
+    for (const [p, methods] of Object.entries(paths)) {
+      for (const [method, op] of Object.entries(methods)) {
+        rows.push(
+          `<tr><td><code>${method.toUpperCase()}</code></td><td><code>${esc(p)}</code></td><td>${esc(op?.summary ?? '')}</td></tr>`
+        );
+      }
+    }
+    res
+      .status(200)
+      .type('html')
+      .send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>${esc(swaggerSpec.info?.title ?? 'Public API')} — API Documentation</title>
+<style>
+body{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0e0d0c;color:#e8e6e3;margin:2rem auto;max-width:60rem;padding:0 1rem;line-height:1.5}
+a{color:#ff3d52}table{border-collapse:collapse;width:100%;margin:1rem 0}
+td,th{border:1px solid #333;padding:.5rem;text-align:left}code{color:#5eddf2}
+</style>
+</head>
+<body>
+<h1>${esc(swaggerSpec.info?.title ?? 'Public API')}</h1>
+<p>Version ${esc(swaggerSpec.info?.version ?? '')} — machine-readable spec: <a href="/api/openapi.json">/api/openapi.json</a> (OpenAPI 3.0)</p>
+<h2>Endpoints</h2>
+<table><thead><tr><th>Method</th><th>Path</th><th>Summary</th></tr></thead><tbody>
+${rows.join('\n')}
+</tbody></table>
+<p>Authentication: optional <code>Authorization: Bearer &lt;api-key&gt;</code> header for higher rate limits. All endpoints answer JSON; errors use a <code>{ "message": string }</code> envelope. Rate-limit state is exposed via <code>RateLimit-*</code> response headers.</p>
+</body>
+</html>`);
+  });
+
+  // JSON 404/405 fallback for unmatched /api/* routes.
   // Must be registered after all other /api/* handlers so it only catches
   // requests that no real route handled. Without this, unknown /api paths
   // would fall through to Vite's HTML catch-all and return a 200 with the
   // React app's HTML, masking client routing typos.
+  // NB-049 (run23): if the PATH exists under other methods, answer a uniform
+  // 405 + Allow header (canonical {message} envelope) instead of a misleading
+  // 404 — DELETE /api/resources/1 and PUT /api/search used to claim the
+  // route didn't exist at all.
   app.use('/api', (req, res) => {
+    const fullPath = ((req.baseUrl || '') + (req.path || '')).replace(/\/+$/, '') || '/';
+    const allowed = new Set<string>();
+    const stack: any[] = (app as any)._router?.stack ?? [];
+    for (const layer of stack) {
+      const route = layer?.route;
+      if (!route || !layer.regexp) continue;
+      if (!layer.regexp.test(fullPath) && !layer.regexp.test(fullPath + '/')) continue;
+      for (const m of Object.keys(route.methods || {})) {
+        if (m === '_all') continue;
+        allowed.add(m.toUpperCase());
+      }
+    }
+    if (allowed.size > 0 && !allowed.has(req.method)) {
+      if (allowed.has('GET')) allowed.add('HEAD');
+      const allowHeader = Array.from(allowed).sort().join(', ');
+      return res
+        .status(405)
+        .set('Allow', allowHeader)
+        .json({ message: `Method Not Allowed. Allowed: ${allowHeader}` });
+    }
     res.status(404).json({ message: 'Not found' });
   });
 

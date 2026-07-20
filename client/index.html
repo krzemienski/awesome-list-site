@@ -89,11 +89,12 @@
         } catch (e) {}
         try {
           var pth = location.pathname;
+          // Run23 R-06: '/' and '/categories' are nav-only now.
+          // Run23 NB-010: '/recommendations' removed — anonymous visitors
+          // never render the corpus there; the authed panel fetches it
+          // lazily once auth resolves.
           var needsCorpus =
-            pth === '/' ||
-            pth === '/categories' ||
             pth === '/advanced' ||
-            pth === '/recommendations' ||
             pth.indexOf('/category/') === 0 ||
             pth.indexOf('/subcategory/') === 0 ||
             pth.indexOf('/sub-subcategory/') === 0;

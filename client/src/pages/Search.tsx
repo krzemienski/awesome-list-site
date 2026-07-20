@@ -143,6 +143,9 @@ export default function Search() {
     // wouter patches replaceState, that write loops back through the
     // adoption effect and permanently resets the page. Wait for data.
     if (!data) return;
+    // Run23 NB-033 class: never stamp /search over a history entry the user
+    // has already navigated away from (late data arrival after Back).
+    if (window.location.pathname !== "/search") return;
     const params = new URLSearchParams(window.location.search);
     const current = params.get("page") ?? "1";
     if (current !== String(safePage)) {

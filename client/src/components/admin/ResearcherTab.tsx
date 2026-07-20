@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -112,13 +113,20 @@ export default function ResearcherTab() {
   const [showJobDetails, setShowJobDetails] = useState(false);
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  // Run23 NB-040: launching a paid research job needs an explicit confirmation
+  // step (same AlertDialog pattern as GitHub import/export).
+  const [confirmLaunch, setConfirmLaunch] = useState(false);
 
   const [isPolling, setIsPolling] = useState(false);
 
-  const { data: jobs, isLoading: jobsLoading } = useQuery<ResearchJob[]>({
+  // Run23 NB-039: the endpoint returns { jobs, total } so the history table
+  // can say "showing latest 20 of N" instead of silently truncating.
+  const { data: jobsData, isLoading: jobsLoading } = useQuery<{ jobs: ResearchJob[]; total: number }>({
     queryKey: ['/api/researcher/jobs'],
     refetchInterval: isPolling ? 3000 : false,
   });
+  const jobs = jobsData?.jobs;
+  const jobsTotal = jobsData?.total ?? 0;
 
   const { data: selectedJob } = useQuery<ResearchJob & { isActive: boolean }>({
     queryKey: ['/api/researcher/jobs', selectedJobId],
@@ -234,7 +242,9 @@ export default function ResearcherTab() {
       });
       return;
     }
-    startMutation.mutate();
+    // Run23 NB-040: don't fire the job from the raw click — open an explicit
+    // confirmation dialog first.
+    setConfirmLaunch(true);
   };
 
   const cancelMutation = useMutation({
@@ -467,7 +477,7 @@ export default function ResearcherTab() {
                 <Alert>
                   <Zap className="w-4 h-4" />
                   <AlertDescription>
-                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens). Recent jobs have cost roughly $2.50-$27 depending on scope and duration (see Job History below). The researcher automatically deduplicates against {categoriesData?.resources?.length || '~1,950'} existing resources.
+                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens). Recent jobs have cost roughly $2.50-$27 depending on scope and duration (see Job History below). The researcher automatically deduplicates against {categoriesData?.resources?.length ? `the ${categoriesData.resources.length.toLocaleString()} existing resources` : 'the existing catalog'}.
                   </AlertDescription>
                 </Alert>
 
@@ -485,6 +495,27 @@ export default function ResearcherTab() {
                     <><Play className="w-4 h-4 mr-2" />Launch Researcher</>
                   )}
                 </Button>
+
+                {/* Run23 NB-040: explicit confirmation before starting a paid job. */}
+                <AlertDialog open={confirmLaunch} onOpenChange={(open) => { if (!open) setConfirmLaunch(false); }}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Launch research job?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This starts a Claude research agent with a budget of up to ${maxBudget} and {maxTurns} turns. The job runs in the background and incurs real API cost.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel data-testid="button-cancel-launch">Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        data-testid="button-confirm-launch"
+                        onClick={() => { setConfirmLaunch(false); startMutation.mutate(); }}
+                      >
+                        Launch
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
 
@@ -644,7 +675,13 @@ export default function ResearcherTab() {
           <Card>
             <CardHeader>
               <CardTitle>Research Job History</CardTitle>
-              <CardDescription>All past research jobs and their results</CardDescription>
+              <CardDescription data-testid="text-job-history-range">
+                {/* Run23 NB-039: say when the list is truncated instead of
+                    silently capping at the latest 20. */}
+                {jobs && jobsTotal > jobs.length
+                  ? `Showing latest ${jobs.length} of ${jobsTotal} research jobs`
+                  : 'All past research jobs and their results'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {jobsLoading ? (

@@ -869,6 +869,13 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
       .limit(limit) as any;
   }
 
+  // Run23 NB-039: total job count so the UI can label the truncated list
+  // ("showing latest 20 of N") instead of silently capping.
+  async countJobs(): Promise<number> {
+    const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(researchJobs);
+    return row?.count ?? 0;
+  }
+
   async getDiscoveries(jobId: number): Promise<ResearchDiscovery[]> {
     return db.select().from(researchDiscoveries).where(eq(researchDiscoveries.jobId, jobId)).orderBy(sql`${researchDiscoveries.createdAt} DESC`);
   }

@@ -71,12 +71,26 @@ export default function BatchEnrichmentPanel() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   // R2-H04 companion: cancel-job confirmation via AlertDialog, not confirm().
   const [jobToCancel, setJobToCancel] = useState<number | null>(null);
+  // Run23 NB-040: explicit confirmation before starting a paid enrichment job.
+  const [confirmStart, setConfirmStart] = useState(false);
 
   const [isPolling, setIsPolling] = useState(false);
 
   const { data: jobsData, isLoading } = useQuery<JobsResponse>({
     queryKey: ['/api/enrichment/jobs'],
     refetchInterval: isPolling ? 3000 : false
+  });
+
+  // Run23 NB-046: surface how much of the approved catalog actually has tags.
+  // The July bulk import left over half the corpus untagged and there was no
+  // admin surface showing the gap.
+  const { data: coverage } = useQuery<{
+    approvedTotal: number;
+    tagged: number;
+    untagged: number;
+    coveragePct: number;
+  }>({
+    queryKey: ['/api/admin/enrichment/coverage'],
   });
 
   const { data: selectedJobData } = useQuery<JobStatusResponse>({
@@ -163,6 +177,12 @@ export default function BatchEnrichmentPanel() {
       });
       return;
     }
+    // Run23 NB-040: explicit confirmation before starting a paid AI job.
+    setConfirmStart(true);
+  };
+
+  const launchEnrichment = () => {
+    setConfirmStart(false);
     startMutation.mutate({
       filter,
       batchSize,
@@ -278,6 +298,19 @@ export default function BatchEnrichmentPanel() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {coverage && (
+            <p className="text-sm text-muted-foreground" data-testid="text-tag-coverage">
+              Tag coverage: {coverage.tagged.toLocaleString()} of{' '}
+              {coverage.approvedTotal.toLocaleString()} approved resources have tags
+              ({coverage.coveragePct}%).
+              {coverage.untagged > 0 && (
+                <>
+                  {' '}Run an enrichment job with the "Unenriched Only" filter to close
+                  the {coverage.untagged.toLocaleString()}-resource gap.
+                </>
+              )}
+            </p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="filter">Filter</Label>
@@ -832,6 +865,25 @@ export default function BatchEnrichmentPanel() {
               data-testid="button-cancel-job-confirm"
             >
               Cancel job
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Run23 NB-040: explicit confirmation before starting a paid enrichment job. */}
+      <AlertDialog open={confirmStart} onOpenChange={(open) => { if (!open) setConfirmStart(false); }}>
+        <AlertDialogContent data-testid="dialog-confirm-enrichment">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Start enrichment job?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This starts a Claude AI enrichment run over {filter === 'unenriched' ? 'unenriched' : 'all'} resources
+              in batches of {batchSize}. The job runs in the background and incurs real API cost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-enrichment-start">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={launchEnrichment} data-testid="button-confirm-enrichment-start">
+              Start enrichment
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, Component, type ReactNode } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
@@ -72,6 +72,150 @@ function RouteFallback() {
       </div>
     </div>
   );
+}
+
+// NB-001 (run23): a rejected lazy-route import (deploy rotated the hashed
+// chunk filenames, or a flaky network) used to escape the Suspense boundary
+// and white-screen the whole app. This boundary keeps the chrome alive:
+// chunk-load failures trigger ONE automatic full reload (new HTML → new
+// chunk manifest); if that still fails, the visitor gets an in-app retry
+// card. Vite caches the rejected import promise, so recovery must be a full
+// reload — a soft re-render would replay the same rejection.
+const CHUNK_ERROR_RE =
+  /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|ChunkLoadError|Loading chunk [\d]+ failed/i;
+const CHUNK_RELOAD_FLAG = "route-chunk-reload-attempted";
+
+function isChunkLoadError(error: unknown): boolean {
+  return error instanceof Error && CHUNK_ERROR_RE.test(`${error.name}: ${error.message}`);
+}
+
+interface RouteErrorBoundaryProps {
+  location: string;
+  children: ReactNode;
+}
+
+interface RouteErrorBoundaryState {
+  error: Error | null;
+}
+
+class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBoundaryState> {
+  state: RouteErrorBoundaryState = { error: null };
+
+  static getDerivedStateFromError(error: Error): RouteErrorBoundaryState {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    if (isChunkLoadError(error)) {
+      // One-shot auto-reload guarded by a TIMESTAMP, not a boolean flag.
+      // A boolean cleared on "clean render" loops forever: the boundary
+      // renders error-free while Suspense is still fetching the chunk, so
+      // the flag was wiped before every failure and each page load reloaded
+      // again (verified live: 8 reloads/20s with a blocked chunk). With a
+      // timestamp, a failure within the cooldown shows the retry card, and
+      // a stale timestamp (future deploy rotation) re-arms the auto-reload
+      // without any explicit clearing.
+      let recentlyReloaded = false;
+      try {
+        const last = Number(sessionStorage.getItem(CHUNK_RELOAD_FLAG) ?? 0);
+        recentlyReloaded = Date.now() - last < 60_000;
+        if (!recentlyReloaded) sessionStorage.setItem(CHUNK_RELOAD_FLAG, String(Date.now()));
+      } catch {
+        // Storage unavailable (private mode) — skip the auto-reload guard
+        // and fall through to the manual retry card to avoid a reload loop.
+        recentlyReloaded = true;
+      }
+      if (!recentlyReloaded) {
+        window.location.reload();
+        return;
+      }
+    }
+    console.error("Route render error:", error);
+  }
+
+  componentDidUpdate(prevProps: RouteErrorBoundaryProps) {
+    // Navigating away clears the error so the next route renders normally.
+    if (this.state.error && prevProps.location !== this.props.location) {
+      this.setState({ error: null });
+    }
+  }
+
+  handleRetry = () => {
+    // Stamp (not clear) the guard: this click IS a reload attempt, so if the
+    // chunk still fails after it, the visitor lands back on this card instead
+    // of burning an extra automatic reload first.
+    try {
+      sessionStorage.setItem(CHUNK_RELOAD_FLAG, String(Date.now()));
+    } catch {
+      // ignore
+    }
+    window.location.reload();
+  };
+
+  render() {
+    const { error } = this.state;
+    if (!error) {
+      // Do NOT clear the reload timestamp here: error-free renders happen
+      // while Suspense is still fetching the chunk, so clearing on "clean
+      // render" wiped the guard before every failure and caused an infinite
+      // reload loop. The timestamp going stale (60s) re-arms auto-reload.
+      return this.props.children;
+    }
+
+    if (isChunkLoadError(error)) {
+      return (
+        <div
+          className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center"
+          role="alert"
+          data-testid="route-error-boundary"
+        >
+          <h1 className="text-xl font-semibold">This page failed to load</h1>
+          <p className="max-w-md text-sm text-muted-foreground">
+            The site was likely updated while you were browsing, so your browser
+            asked for files that no longer exist. Reloading fetches the new version.
+          </p>
+          <button
+            type="button"
+            onClick={this.handleRetry}
+            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            data-testid="button-route-retry"
+          >
+            Reload page
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center"
+        role="alert"
+        data-testid="route-error-boundary"
+      >
+        <h1 className="text-xl font-semibold">Something went wrong on this page</h1>
+        <p className="max-w-md text-sm text-muted-foreground">
+          The rest of the site still works. You can retry this page or head back home.
+        </p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={this.handleRetry}
+            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            data-testid="button-route-retry"
+          >
+            Retry
+          </button>
+          <a
+            href="/"
+            className="border border-border px-4 py-2 text-sm font-medium"
+            data-testid="link-route-error-home"
+          >
+            Go home
+          </a>
+        </div>
+      </div>
+    );
+  }
 }
 
 import { processAwesomeListData } from "@/lib/parser";
@@ -153,15 +297,17 @@ function Router() {
     staleTime: 1000 * 60 * 60,
   });
 
+  // Run23 R-06: '/' and '/categories' left needsCorpusRoute — Home/Categories
+  // render from the nav tree; Home lazily fetches the corpus itself only when
+  // a tag filter activates. This app-level query remains the warm-start for
+  // the listing routes (category/subcategory/sub-subcategory/advanced/recs).
   const corpusNeeded = needsCorpusRoute(location);
-  const { data: rawData, isLoading, error } = useQuery({
+  const { error } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
     enabled: corpusNeeded,
   });
-
-  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
 
   /* MR-DS-03 — Orphan `/` + Ctrl/Cmd+K listener removed. The header
    * advertises the `/` kbd hint on the search chip; the real listener
@@ -213,12 +359,13 @@ function Router() {
           </button>
         </div>
       ) : null}
+      <RouteErrorBoundary location={location}>
       <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={() => {
           const q = new URLSearchParams(window.location.search).get("q");
           if (q && q.trim()) return <Redirect to={`/search?q=${encodeURIComponent(q.trim())}`} replace />;
-          return <Home awesomeList={awesomeList} isLoading={isLoading} />;
+          return <Home nav={nav} navLoading={navLoading} />;
         }} />
         <Route path="/login" component={Login} />
         <Route path="/logout" component={Logout} />
@@ -245,7 +392,7 @@ function Router() {
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
         <Route path="/category/:slug" component={Category} />
-        <Route path="/categories" component={() => <Categories awesomeList={awesomeList} isLoading={isLoading} />} />
+        <Route path="/categories" component={() => <Categories nav={nav} isLoading={navLoading} />} />
         <Route path="/category">
           <Redirect to="/" replace />
         </Route>
@@ -300,6 +447,7 @@ function Router() {
         </Route>
       </Switch>
       </Suspense>
+      </RouteErrorBoundary>
     </MainLayout>
   );
 }

@@ -22,7 +22,10 @@ const SETTINGS_LINKS = [
     testid: "link-settings-account",
   },
   {
-    href: "/profile",
+    // NB-027 (run23): deep-link straight to the Security tab — Profile honors
+    // ?tab= on first render (Run17 BUG-055), so this lands on password change
+    // instead of the default Overview tab.
+    href: "/profile?tab=security",
     icon: ShieldCheck,
     title: "Security",
     description: "Change your password from the Security tab on your profile.",

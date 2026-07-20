@@ -255,7 +255,7 @@ export default function Advanced() {
                 Multi-Format Export System
               </CardTitle>
               <CardDescription>
-                Export your curated lists in multiple formats including Markdown, JSON, CSV, PDF, and HTML with advanced filtering options
+                Export your curated lists in multiple formats including Markdown, JSON, CSV, YAML, HTML, and PDF with advanced filtering options
               </CardDescription>
             </CardHeader>
             <CardContent>

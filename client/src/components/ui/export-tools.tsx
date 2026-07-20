@@ -92,6 +92,9 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
     selectedCategories: selectedCategory ? [selectedCategory] : []
   });
   const [isExporting, setIsExporting] = useState(false);
+  // NB-032 (run23): synchronous re-entry latch for handleExport (state alone
+  // is a render behind a fast double-click).
+  const exportingRef = useRef(false);
 
   // BUG-026 (run13): apply a parent-driven format selection (Advanced page
   // format showcase cards) to the local export options.
@@ -368,6 +371,13 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
   };
 
   const handleExport = async () => {
+    // NB-032 (run23): ref-based re-entry guard. The isExporting state disables
+    // the button, but state updates land a render later — a fast double-click
+    // (or Enter-key repeat) could enter this handler twice and download the
+    // same file twice. The ref flips synchronously, so the second call bails
+    // before generating anything.
+    if (exportingRef.current) return;
+    exportingRef.current = true;
     setIsExporting(true);
     
     try {
@@ -541,6 +551,15 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
       });
     } finally {
       setIsExporting(false);
+      // Synchronous formats (everything except PDF) finish INSIDE the first
+      // click's dispatch — an immediate reset would re-arm the handler before
+      // the second click of a double-click lands, downloading the file twice.
+      // Hold the latch through a short cooldown instead (longer than any OS
+      // double-click interval, short enough to never block a deliberate
+      // repeat export).
+      window.setTimeout(() => {
+        exportingRef.current = false;
+      }, 600);
     }
   };
 

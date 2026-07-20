@@ -188,10 +188,13 @@ export default function ThemeSettings() {
             return (
               <button
                 key={a.id}
+                ref={(el) => { radioRefs.current[`accent:${a.id}`] = el; }}
                 type="button"
                 role="radio"
                 aria-checked={isActive}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => handlePickAccent(a.id)}
+                onKeyDown={makeRadioKeyDown("accent", accentIds, accentId, handlePickAccent)}
                 data-testid={`accent-option-${a.id}`}
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-3 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
@@ -241,10 +244,13 @@ export default function ThemeSettings() {
             return (
               <button
                 key={f.id}
+                ref={(el) => { radioRefs.current[`font:${f.id}`] = el; }}
                 type="button"
                 role="radio"
                 aria-checked={isActive}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => handlePickFont(f.id)}
+                onKeyDown={makeRadioKeyDown("font", fontIds, fontId, handlePickFont)}
                 data-testid={`font-option-${f.id}`}
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{

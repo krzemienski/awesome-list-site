@@ -1,0 +1,4 @@
+# NB-048 — register: explicit 409 account-enumeration oracle
+Fix: duplicate email → generic 400 "Unable to create an account with these details. If you already have an account, sign in or reset your password." + hashPassword burn on the duplicate path for timing parity.
+Live probes: duplicate(admin@example.com) → 400 generic; fresh(__qa_test_run23_nb048@example.com) → 201; duplicate-of-fresh → 400 generic (identical message).
+Residual (documented, out of scope): the 201-vs-400 STATUS remains a weak oracle — full closure requires an email-verification flow ("we sent a link" for both paths), which this app doesn't have. Timing: duplicate ~88ms vs fresh ~373ms (fresh adds DB insert + audit); first-call 8.2s was cold bcrypt/module warmup, not path-dependent. Message-level oracle (the audit's repro) is closed. QA user torn down at end of run (net-zero sweep).

@@ -1,0 +1,102 @@
+[
+  {
+    "name": "desktop@1440: home renders category grid",
+    "pass": true,
+    "detail": {
+      "homeCards": 9
+    }
+  },
+  {
+    "name": "desktop@1440: category page cards",
+    "pass": true,
+    "detail": {
+      "catCards": 24
+    }
+  },
+  {
+    "name": "desktop@1440: resource detail + outbound",
+    "pass": true,
+    "detail": {
+      "h1": "AMD Advanced Media Acceleration (AMA) SD",
+      "outbound": 3
+    }
+  },
+  {
+    "name": "desktop@1440: search results",
+    "pass": true,
+    "detail": {
+      "searchLinks": 48
+    }
+  },
+  {
+    "name": "desktop@1440: submit logged-out gate",
+    "pass": true,
+    "detail": {
+      "snippet": "Submit a Resource\nSubmit a Resource\nShare a valuable resourc"
+    }
+  },
+  {
+    "name": "desktop@1440: no horizontal overflow",
+    "pass": true,
+    "detail": {
+      "overflow": 0
+    }
+  },
+  {
+    "name": "desktop@1440: zero page errors",
+    "pass": true,
+    "detail": {
+      "pageErrors": []
+    }
+  },
+  {
+    "name": "mobile@375: home renders category grid",
+    "pass": true,
+    "detail": {
+      "homeCards": 9
+    }
+  },
+  {
+    "name": "mobile@375: category page cards",
+    "pass": true,
+    "detail": {
+      "catCards": 24
+    }
+  },
+  {
+    "name": "mobile@375: resource detail + outbound",
+    "pass": true,
+    "detail": {
+      "h1": "AMD Advanced Media Acceleration (AMA) SD",
+      "outbound": 3
+    }
+  },
+  {
+    "name": "mobile@375: search results",
+    "pass": true,
+    "detail": {
+      "searchLinks": 48
+    }
+  },
+  {
+    "name": "mobile@375: submit logged-out gate",
+    "pass": true,
+    "detail": {
+      "snippet": "Submit a Resource\nSubmit a Resource\nShare a valuable resourc"
+    }
+  },
+  {
+    "name": "mobile@375: no horizontal overflow",
+    "pass": true,
+    "detail": {
+      "overflow": 0
+    }
+  },
+  {
+    "name": "mobile@375: zero page errors",
+    "pass": true,
+    "detail": {
+      "pageErrors": []
+    }
+  }
+]

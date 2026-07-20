@@ -21,6 +21,7 @@ import {
   Brain
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import { Resource } from "@/types/awesome-list";
 
 interface UserProfile {
@@ -75,6 +76,9 @@ export default function RecommendationPanel({
 }: RecommendationPanelProps) {
   const queryClient = useQueryClient();
   const [selectedPath, setSelectedPath] = useState<LearningPathSuggestion | null>(null);
+  // NB-002 (run23): AI learning-path generation is a paid, signed-in-only
+  // feature now — the query below must not fire (and 401) for guests.
+  const { user: authedUser } = useAuth();
 
   // Initialize recommendation engine
   const { data: initStatus } = useQuery({
@@ -97,18 +101,22 @@ export default function RecommendationPanel({
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Fetch learning path suggestions
+  // Fetch learning path suggestions (signed-in only — see NB-002 note above)
   const { data: learningPaths, isLoading: loadingPaths } = useQuery({
     queryKey: ["/api/learning-paths", userProfile.userId],
     queryFn: async () => {
       const response = await fetch("/api/learning-paths", {
         method: "POST",
         body: JSON.stringify(userProfile),
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       });
+      if (!response.ok) {
+        throw new Error(`Learning paths request failed (${response.status})`);
+      }
       return response.json();
     },
-    enabled: !!initStatus,
+    enabled: !!initStatus && !!authedUser,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
@@ -269,7 +277,22 @@ export default function RecommendationPanel({
             </TabsContent>
 
             <TabsContent value="learning-paths" className="space-y-4">
-              {loadingPaths ? (
+              {!authedUser ? (
+                <div
+                  className="flex flex-col items-center justify-center gap-3 py-12 px-4 text-center"
+                  data-testid="learning-paths-signin-prompt"
+                >
+                  <Route className="h-8 w-8 text-muted-foreground" />
+                  <p className="font-medium">Sign in to generate learning paths</p>
+                  <p className="text-sm text-muted-foreground max-w-sm">
+                    AI-generated learning paths are personalized to your profile and
+                    available to signed-in members.
+                  </p>
+                  <Button asChild size="sm">
+                    <a href="/login">Sign in</a>
+                  </Button>
+                </div>
+              ) : loadingPaths ? (
                 <div className="space-y-2">
                   {[...Array(2)].map((_, i) => (
                     <div key={i} className="h-24 bg-muted animate-pulse rounded" />

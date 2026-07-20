@@ -1,0 +1,6 @@
+== R-14 repro, July 20 2026 ==
+$ getent hosts www.awesome.video
+(no record — NXDOMAIN)
+
+$ curl -sI https://awesome.video/ | grep -i strict-transport
+strict-transport-security: max-age=63072000; includeSubDomains

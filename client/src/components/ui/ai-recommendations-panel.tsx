@@ -40,7 +40,12 @@ import {
 } from "lucide-react";
 
 interface AIRecommendationsPanelProps {
-  resources: Resource[];
+  /**
+   * Run23 R-06: optional — each /api/recommendations item already embeds a
+   * full Resource (rec.resource), so the corpus prop is only an enrichment
+   * for callers that happen to have it loaded (e.g. /recommendations).
+   */
+  resources?: Resource[];
   /**
    * Run16 BUG-048: pages that already render their own "Personalized
    * Recommendations" heading (Home, /recommendations) pass false so the
@@ -95,7 +100,7 @@ const RESOURCE_TYPES = [
   "Community Resources",
 ];
 
-export default function AIRecommendationsPanel({ resources, showHeader = true }: AIRecommendationsPanelProps) {
+export default function AIRecommendationsPanel({ resources = [], showHeader = true }: AIRecommendationsPanelProps) {
   const { userProfile, updateProfile, isLoaded } = useUserProfile();
   const {
     generateRecommendations,
@@ -560,7 +565,12 @@ export default function AIRecommendationsPanel({ resources, showHeader = true }:
           </Card>
 
           {recommendations.map((rec, index) => {
-            const resource = getResourceDetails(rec.resource.url);
+            // Run23 R-06: prefer the corpus lookup when a corpus was passed,
+            // but fall back to the full Resource embedded in the response —
+            // Home no longer passes the 3.1MB corpus just for this panel.
+            const resource =
+              getResourceDetails(rec.resource.url) ??
+              (rec.resource?.id ? rec.resource : undefined);
             
             // Fallback display info when resource lookup fails
             const displayTitle = resource?.title || rec.resource.title || rec.resource.url.split('/').pop()?.replace(/-/g, ' ') || rec.resource.url;
@@ -673,7 +683,7 @@ export default function AIRecommendationsPanel({ resources, showHeader = true }:
                       <div className="flex items-center justify-center gap-2 pt-2 border-t">
                         <span className="text-xs text-muted-foreground">Was this helpful?</span>
                         <RecommendationFeedback
-                          resourceId={parseInt(resource.id, 10)}
+                          resourceId={parseInt(String(resource.id), 10)}
                           userId={userProfile.userId}
                           size="sm"
                           onFeedbackChange={handleFeedbackChange}

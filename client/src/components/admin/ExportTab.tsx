@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronUp
 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDateTime } from "@/lib/utils";
@@ -32,6 +33,8 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const [isExporting, setIsExporting] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const [showWarnings, setShowWarnings] = useState(false);
+  // Run23 NB-040: explicit confirmation before starting validation/link-check jobs.
+  const [confirmAction, setConfirmAction] = useState<'validate' | 'links' | null>(null);
 
   const { data: fetchedValidationStatus } = useQuery<ValidationStatus>({
     queryKey: ['/api/admin/validation-status'],
@@ -170,7 +173,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             </Button>
 
             <Button
-              onClick={() => validateMutation.mutate()}
+              onClick={() => setConfirmAction('validate')}
               disabled={validateMutation.isPending}
               variant="outline"
             >
@@ -188,7 +191,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             </Button>
 
             <Button
-              onClick={() => checkLinksMutation.mutate()}
+              onClick={() => setConfirmAction('links')}
               disabled={checkLinksMutation.isPending}
               variant="outline"
             >
@@ -402,6 +405,36 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </CardContent>
         </Card>
       )}
+
+      {/* Run23 NB-040: explicit confirmation before starting validation/link-check jobs. */}
+      <AlertDialog open={confirmAction !== null} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
+        <AlertDialogContent data-testid="dialog-confirm-export-job">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction === 'validate' ? 'Run awesome-lint validation?' : 'Run link check?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction === 'validate'
+                ? 'This validates the exported markdown against awesome-lint rules. It runs in the background and can take a minute.'
+                : 'This checks the links in the exported markdown against the live web. It runs in the background and can take several minutes.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-export-job">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              data-testid="button-confirm-export-job"
+              onClick={() => {
+                const action = confirmAction;
+                setConfirmAction(null);
+                if (action === 'validate') validateMutation.mutate();
+                else if (action === 'links') checkLinksMutation.mutate();
+              }}
+            >
+              {confirmAction === 'validate' ? 'Run validation' : 'Run link check'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -142,7 +142,13 @@ export default function GitHubSyncPanel() {
         map.set(key, { item, count: 1 });
       }
     }
-    return Array.from(map.values());
+    // Run23 NB-037: the queue endpoint returns rows oldest-first, and the
+    // dedup map preserves insertion order — sort the collapsed entries
+    // newest→oldest so "Recent Sync Jobs" actually leads with recent jobs.
+    return Array.from(map.values()).sort((a, b) =>
+      new Date(b.item.processedAt || b.item.createdAt).getTime() -
+      new Date(a.item.processedAt || a.item.createdAt).getTime()
+    );
   }, [syncQueue]);
 
   return (
