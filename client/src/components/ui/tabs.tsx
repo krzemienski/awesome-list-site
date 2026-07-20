@@ -12,7 +12,12 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-full border border-border bg-[var(--surface)] p-1 text-muted-foreground",
+      // R5-054 (run24): rounded-full on a wrapping, auto-height list renders a
+      // giant stadium blob whose curved ends cut into the first/last tab rows
+      // (admin 15 tabs ≤1024, profile 5 tabs @768). Below xl — where tab lists
+      // can wrap — use the token card radius; the single-row pill look is
+      // preserved from xl (1280px) up.
+      "inline-flex h-10 items-center justify-center rounded-lg xl:rounded-full border border-border bg-[var(--surface)] p-1 text-muted-foreground",
       className
     )}
     {...props}

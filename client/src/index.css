@@ -134,6 +134,29 @@ vite-plugin-checker-error-overlay {
 }
 
 /*
+  R5-056 (run24): forced-colors (Windows High Contrast) strips background
+  fills, so accent-fill buttons with no border collapsed to bare text next to
+  bordered ones. Give every button/role=button a system-color border so all
+  actions keep button affordance. Forced-colors mode ignores author colors, so
+  this is a no-op outside HC and safe to apply broadly.
+*/
+@media (forced-colors: active) {
+  button,
+  [role="button"] {
+    border: 1px solid ButtonText;
+  }
+}
+
+/*
+  R5-053 (run24): print-only content — hidden on screen, shown in print.
+  Used by resource cards to print each card's destination URL (paper has no
+  buttons; without this a printed card grid is a dead-end catalog).
+*/
+.print-only {
+  display: none;
+}
+
+/*
   NB-021 (run18) + R4-013/038/039/070 (run21): printable stylesheet overhaul.
   The app is a dark, full-bleed SPA; without these rules pages printed as solid
   black blocks with unreadable low-contrast text and every piece of interactive
@@ -208,11 +231,67 @@ vite-plugin-checker-error-overlay {
     display: none !important;
   }
 
+  /* R4-070 (run24): hiding [data-sidebar] alone left the shadcn sidebar's
+     OUTER shell in flow — a full-viewport-height (h-svh) gap div plus a
+     fixed rail with a 1px border. In paged media the fixed rail repeated its
+     border down every sheet and the page-tall spacer punted the real content
+     to page 2, printing a blank leading page. Hide the whole peer wrapper
+     and the decorative grain overlay. */
+  .group.peer:has([data-sidebar="sidebar"]),
+  .grain {
+    display: none !important;
+  }
+
+  /* h-svh/min-h-svh wrappers pin layout to the SCREEN viewport height inside
+     paged media; let them size to content instead. */
+  [class*="h-svh"],
+  [class*="min-h-svh"] {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
   /* In-content semantic headers (e.g. /categories page title) are content,
      not chrome — re-show them after the blanket header hide above. */
   main header,
   [role="main"] header {
     display: block !important;
+  }
+
+  /* R5-027 (run24): the blanket button hide above amputated inline-in-copy
+     buttons mid-sentence ("Please  to start this journey"). Buttons tagged
+     print-keep-text keep their TEXT as plain inline copy so the sentence
+     stays grammatical (the control affordance is meaningless on paper). */
+  button.print-keep-text {
+    display: inline !important;
+    border: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    font: inherit !important;
+    text-decoration: none !important;
+    background: transparent !important;
+  }
+
+  /* R5-053 (run24): print-only card URLs become visible. break-all so long
+     URLs wrap inside the card instead of clipping at the edge. */
+  .print-only {
+    display: block !important;
+    word-break: break-all;
+  }
+
+  /* R4-070 (run24): fixed-height / overflow-clipped containers (admin swipe
+     tables, scroll areas, tab scrollers) keep their on-screen clip under
+     print media, so paper output was the viewport slice — and a tall clipped
+     container pushed to the next sheet printed a 100% blank page. Expand
+     every scroll window so its full content flows across pages. */
+  .admin-tab-scroller,
+  [data-radix-scroll-area-viewport],
+  [class*="overflow-x-auto"],
+  [class*="overflow-y-auto"],
+  [class*="overflow-auto"],
+  [class*="overflow-hidden"] {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
   }
 
   main,
@@ -235,7 +314,11 @@ vite-plugin-checker-error-overlay {
 
   /* Un-clamp truncated text so titles/descriptions print in full rather than
      being clipped at the card edge (R4-038). */
-  [class*="line-clamp"] {
+  /* :not(button):not([role="combobox"]) — shadcn SelectTrigger carries
+     "[&>span]:line-clamp-1" in its class string, so the bare attribute
+     selector out-specifies the `button { display:none }` hide above and
+     resurrected sort selects on paper (R5-053 regression caught in audit). */
+  [class*="line-clamp"]:not(button):not([role="combobox"]) {
     -webkit-line-clamp: unset !important;
     overflow: visible !important;
     display: block !important;
@@ -248,13 +331,15 @@ vite-plugin-checker-error-overlay {
 
   /* Keep cards, list items and table rows intact across page breaks so half-full
      cards don't spill into near-blank orphan trailing pages (R4-070). */
-  article,
+  /* R4-070 (run24): the avoid list must NOT include broad wrappers like
+     [class*="rounded-lg"] — a card wrapper taller than one sheet with
+     break-inside:avoid gets punted whole to the next page, printing a blank
+     leading page (that was the admin page-2-blank failure mode). Keep avoid
+     scoped to units that are always shorter than a page. */
   li,
   tr,
   [data-testid^="card-resource-"],
-  [data-testid^="row-resource-"],
-  [class*="rounded-lg"],
-  [class*="rounded-xl"] {
+  [data-testid^="row-resource-"] {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }

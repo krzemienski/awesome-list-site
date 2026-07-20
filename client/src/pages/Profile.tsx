@@ -394,7 +394,12 @@ export default function Profile({ user }: ProfileProps) {
         noindex
       />
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
+      {/* R5-026 (run24): in the 640–1024 band the single-row layout squeezed
+          the identity column to nothing (name invisible) and let the email
+          text run under the Settings/Logout buttons. sm:flex-wrap +
+          basis-full on the actions row gives the buttons their OWN row in
+          that band; from lg the original one-row layout returns. */}
+      <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap items-center gap-6 mb-8">
         <Avatar
           className="h-24 w-24 ring-1"
           style={{
@@ -434,9 +439,11 @@ export default function Profile({ user }: ProfileProps) {
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-sm justify-center sm:justify-start" style={{ color: 'var(--text-2)' }}>
             {user.email && (
-              <span className="flex items-center gap-1">
-                <Mail className="h-4 w-4" />
-                {user.email}
+              <span className="flex items-center gap-1 min-w-0 max-w-full">
+                <Mail className="h-4 w-4 shrink-0" />
+                {/* R5-026 (run24): long emails must wrap inside the column,
+                    never overflow under the action buttons. */}
+                <span className="break-all">{user.email}</span>
               </span>
             )}
             {user.createdAt && (
@@ -456,7 +463,7 @@ export default function Profile({ user }: ProfileProps) {
         {/* R4-040: shrink-0 keeps the buttons at full size and flex-wrap lets
             them drop below the header (never clip off-viewport) in the
             768–812px tablet band. */}
-        <div className="flex flex-wrap gap-2 justify-center sm:justify-end shrink-0">
+        <div className="flex flex-wrap gap-2 justify-center sm:justify-start lg:justify-end shrink-0 sm:basis-full lg:basis-auto">
           {/* Run15 BUG-005: Settings was a dead button. R4-046: route it to the
               /settings hub (account/appearance/security) rather than dropping
               users straight onto the theme-only page. */}

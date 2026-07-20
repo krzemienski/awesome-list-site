@@ -378,8 +378,10 @@ export default function JourneyDetail() {
             <Alert className="mt-6">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
+                {/* R5-027 (run24): print-keep-text — in print this button's
+                    text stays inline so the sentence prints grammatically. */}
                 Please <button 
-                  className="underline font-medium min-h-[44px] px-2 inline-flex items-center"
+                  className="print-keep-text underline font-medium min-h-[44px] px-2 inline-flex items-center"
                   onClick={() => setLocation('/login')}
                 >
                   log in

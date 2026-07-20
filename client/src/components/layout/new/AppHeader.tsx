@@ -281,12 +281,18 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
                       : "min-w-0"
                 }
               >
+                {/* R5-057 (run24): title attrs — truncated crumbs ("Clou…" vs
+                    "Cloud…") were ambiguous with no way to read the full
+                    label; the native tooltip disambiguates at every width. */}
                 {isLast ? (
-                  <BreadcrumbPage className="truncate">{crumb.label}</BreadcrumbPage>
+                  <BreadcrumbPage className="truncate" title={crumb.label}>
+                    {crumb.label}
+                  </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink
                     href={crumb.href}
                     className={isRoot ? "whitespace-nowrap" : "truncate"}
+                    title={crumb.label}
                   >
                     {crumb.label}
                   </BreadcrumbLink>
@@ -341,6 +347,26 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           })}
         </BreadcrumbList>
       </Breadcrumb>
+
+      {/* R5-057 (run24): below md the full trail used to be display:none —
+          deep pages had NO location cue at 375/320 (findability gap). Show a
+          compact current-page crumb on small screens; it truncates and yields
+          space to the search/actions cluster. */}
+      {crumbs.length > 1 && (
+        <nav
+          aria-label="Current page"
+          className="flex md:hidden min-w-0 shrink items-center text-sm text-muted-foreground"
+          data-testid="breadcrumb-mobile-current"
+        >
+          <span
+            aria-current="page"
+            className="truncate max-w-[38vw] text-foreground"
+            title={crumbs[crumbs.length - 1].label}
+          >
+            {crumbs[crumbs.length - 1].label}
+          </span>
+        </nav>
+      )}
 
       {/* BUG-004 (run19): deep-taxonomy breadcrumbs used to flex-squeeze the
           search trigger to a sliver. Reserve a usable floor for search at md+

@@ -127,7 +127,9 @@ export default function ThemeSettings() {
       </div>
 
       {/* System Picker — 5 cards */}
-      <section aria-label="Design system picker" data-testid="system-picker">
+      {/* R5-027 (run24): pickers are pure interactive chrome — their option
+          cards are buttons (hidden in print), which left orphan headings. */}
+      <section aria-label="Design system picker" data-testid="system-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
           <Layers className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Design System</h2>
@@ -173,7 +175,7 @@ export default function ThemeSettings() {
       </section>
 
       {/* Accent Picker — 10 swatches */}
-      <section aria-label="Accent picker" data-testid="accent-picker">
+      <section aria-label="Accent picker" data-testid="accent-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
           <Palette className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Accent</h2>
@@ -226,7 +228,7 @@ export default function ThemeSettings() {
       </section>
 
       {/* I1 — Font override picker (hybrid: keeps 5×10 picker above, adds per-system font override) */}
-      <section aria-label="Font override picker" data-testid="font-picker">
+      <section aria-label="Font override picker" data-testid="font-picker" className="no-print">
         <div className="flex items-center gap-2 mb-2">
           <Type className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
@@ -277,7 +279,10 @@ export default function ThemeSettings() {
       </section>
 
       {/* Live Preview — current system × accent applied to real shadcn primitives */}
-      <section aria-label="Live preview" data-testid="theme-preview">
+      {/* R5-027 (run24): no-print — in print the preview's buttons/inputs are
+          hidden and the token swatches lose their background fills, leaving
+          empty headings and blank bordered boxes; hide the whole preview. */}
+      <section aria-label="Live preview" data-testid="theme-preview" className="no-print">
         <div className="flex items-center gap-2 mb-4">
           <Eye className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Live Preview</h2>

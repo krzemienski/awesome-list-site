@@ -145,7 +145,7 @@ function ResourceCard({
           </h2>
           {/* R2-L09: shown to anonymous users too — the buttons themselves
               prompt sign-in on click instead of hiding the affordance. */}
-          <div className="relative z-10 flex items-center gap-1 ml-2">
+          <div className="no-print relative z-10 flex items-center gap-1 ml-2">
             <FavoriteButton
               resourceId={resource.id}
               isFavorited={resource.isFavorited}
@@ -161,6 +161,12 @@ function ResourceCard({
             />
           </div>
         </div>
+        {/* R5-053 (run24): printed card grids previously showed dead buttons
+            and never a URL. Print the destination under the title so a paper
+            catalog stays actionable (screen: hidden). */}
+        <p className="print-only text-xs text-muted-foreground" aria-hidden="true">
+          {resource.url}
+        </p>
         {resource.description && (
           <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
             {resource.description}
@@ -214,10 +220,12 @@ function ResourceCard({
           {/* BUG-012 (run14): "View Details" is a real link to the detail page
               (was a decorative Badge that swallowed clicks under the
               stretched-link overlay). */}
+          {/* R5-053 (run24): no-print — "View Details" is an anchor, not a
+              button, so the blanket print button-hide missed it. */}
           {isValidDbResource && (
             <Link
               href={`/resource/${resource.id}`}
-              className="relative z-10"
+              className="no-print relative z-10"
               data-testid={`link-view-details-${resource.id}`}
               aria-label={`View details for ${resource.name}`}
             >
@@ -292,7 +300,9 @@ function ResourceCard({
           )}
         </div>
         
-        <div className="relative z-10 flex gap-2">
+        {/* R5-053 (run24): no-print — the "Open Link" action is an anchor
+            styled as a button; on paper it printed as a dead rectangle. */}
+        <div className="no-print relative z-10 flex gap-2">
           {/* Run16 BUG-006/BUG-020: real anchor (not JS window.open) so the
               action can never silently fail and middle-click/cmd-click work */}
           <Button

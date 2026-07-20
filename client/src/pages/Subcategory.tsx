@@ -321,7 +321,7 @@ export default function Subcategory() {
             </p>
           </div>
           {/* Run22 BUG-025: badge tracks the active filter result count. */}
-          <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
+          <Badge variant="secondary" className="no-print text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
             {filteredResources.length}
           </Badge>
         </div>

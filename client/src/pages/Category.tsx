@@ -531,7 +531,7 @@ export default function Category() {
                 the unfiltered total (which the header line already shows). */}
             <Badge
               variant="secondary"
-              className="rounded-full text-sm sm:text-base px-3 sm:px-4 py-1 tabular-nums"
+              className="no-print rounded-full text-sm sm:text-base px-3 sm:px-4 py-1 tabular-nums"
               data-testid="badge-count"
             >
               {filteredResources.length}

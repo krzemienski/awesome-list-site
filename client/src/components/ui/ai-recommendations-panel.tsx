@@ -223,7 +223,10 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
       )}
 
       {/* Preference Form */}
-      <Card>
+      {/* R5-027 (run24): no-print — with checkboxes/selects hidden in print
+          this form printed as a meaningless list of dangling labels; hide the
+          whole preference-configuration card as one unit. */}
+      <Card className="no-print">
         <CardHeader>
           <CardTitle className="text-lg">Configure Your Preferences</CardTitle>
           <CardDescription>
@@ -679,8 +682,9 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
                     </Button>
 
                     {/* Feedback Buttons */}
+                    {/* R5-027 (run24): no-print hides the vote block as one unit in print. */}
                     {resource?.id && (
-                      <div className="flex items-center justify-center gap-2 pt-2 border-t">
+                      <div className="no-print flex items-center justify-center gap-2 pt-2 border-t">
                         <span className="text-xs text-muted-foreground">Was this helpful?</span>
                         <RecommendationFeedback
                           resourceId={parseInt(String(resource.id), 10)}

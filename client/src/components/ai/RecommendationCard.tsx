@@ -235,7 +235,9 @@ function RecommendationCard({
           )}
 
           {/* Feedback Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-border flex-wrap">
+          {/* R5-027 (run24): no-print hides the whole voting block as one unit
+              (label + buttons) instead of leaving an orphan question. */}
+          <div className="no-print flex items-center gap-2 pt-2 border-t border-border flex-wrap">
             <span className="text-xs text-muted-foreground mr-1">Was this helpful?</span>
             <Button
               variant="ghost"
