@@ -78,6 +78,11 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   role: text("role").default("user"), // user, admin, moderator
+  // Run22 BUG-020: private account/data-deletion channel. Set when the user
+  // requests deletion from their Profile (authenticated, no public GitHub
+  // issue needed); admins see and action the request privately. NULL = no
+  // pending request.
+  deletionRequestedAt: timestamp("deletion_requested_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

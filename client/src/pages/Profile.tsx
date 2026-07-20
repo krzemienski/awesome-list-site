@@ -252,6 +252,53 @@ export default function Profile({ user }: ProfileProps) {
     },
   });
 
+  // Run22 BUG-020: private account/data-deletion request channel — no public
+  // GitHub issue (and no personal data exposure) required.
+  const [deletionDialogOpen, setDeletionDialogOpen] = useState(false);
+
+  const requestDeletionMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("/api/user/deletion-request", { method: "POST" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setDeletionDialogOpen(false);
+      toast({
+        title: "Deletion request submitted",
+        description:
+          "A maintainer will process your request privately. You can withdraw it any time before it's processed.",
+      });
+    },
+    onError: (err: any) => {
+      setDeletionDialogOpen(false);
+      toast({
+        title: "Couldn't submit deletion request",
+        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const withdrawDeletionMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("/api/user/deletion-request", { method: "DELETE" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Deletion request withdrawn",
+        description: "Your account will not be deleted.",
+      });
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Couldn't withdraw request",
+        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Fetch favorites
   const { data: favorites, isLoading: favoritesLoading } = useQuery<Favorite[]>({
     queryKey: ['/api/favorites'],
@@ -534,11 +581,15 @@ export default function Profile({ user }: ProfileProps) {
                     </div>
                   )}
 
-                  {/* Time Spent */}
-                  {progress?.totalTimeSpent && (
+                  {/* Time Spent — Run22 BUG-043: server computes estimated
+                      learning time from journey estimated_duration × completed
+                      step fraction (no wall-clock tracking exists), so the
+                      label says "estimated" and the row hides at zero instead
+                      of pinning a hardcoded "0h 0m". */}
+                  {progress?.totalTimeSpent && progress.totalTimeSpent !== '0h 0m' && (
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span>Total time spent: {progress.totalTimeSpent}</span>
+                      <span>Estimated learning time: {progress.totalTimeSpent}</span>
                     </div>
                   )}
                 </div>
@@ -571,15 +622,24 @@ export default function Profile({ user }: ProfileProps) {
                       className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                       data-testid={`journey-${userJourney.journeyId}`}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{userJourney.journey?.title || 'Learning Journey'}</h4>
+                      {/* Run22 BUG-036: stack the badge under the title on
+                          narrow screens — side-by-side it squeezed titles to
+                          ~95px / 3 lines at 320px. Titles stay left-aligned and
+                          clamp at two lines (full text in the title tooltip). */}
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h4
+                            className="font-medium line-clamp-2 break-words"
+                            title={userJourney.journey?.title || 'Learning Journey'}
+                          >
+                            {userJourney.journey?.title || 'Learning Journey'}
+                          </h4>
                           <p className="text-sm text-muted-foreground mt-1">
                             {userJourney.journey?.description}
                           </p>
                         </div>
                         {userJourney.completedAt && (
-                          <Badge variant="default" className="bg-green-500">
+                          <Badge variant="default" className="bg-green-500 self-start flex-shrink-0">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Completed
                           </Badge>
@@ -867,7 +927,7 @@ export default function Profile({ user }: ProfileProps) {
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-medium truncate">{resource.title}</h4>
+                                <h4 className="font-medium line-clamp-1 break-words min-w-0" title={resource.title}>{resource.title}</h4>
                                 {resource.status === 'pending' && (
                                   <Badge variant="outline" className="text-yellow-500 border-yellow-500">
                                     <AlertCircle className="h-3 w-3 mr-1" />
@@ -1078,7 +1138,93 @@ export default function Profile({ user }: ProfileProps) {
 
         {/* Security Tab */}
         <TabsContent value="security" data-testid="tab-security">
-          <ChangePasswordForm />
+          <div className="space-y-6">
+            <ChangePasswordForm />
+
+            {/* Run22 BUG-020: private account/data-deletion request — no
+                public GitHub issue (or personal-data exposure) required. */}
+            <Card data-testid="card-account-deletion">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  Delete account &amp; data
+                </CardTitle>
+                <CardDescription>
+                  Request permanent deletion of your account and personal data.
+                  Requests are handled privately by a maintainer — nothing is
+                  posted publicly.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {user?.deletionRequestedAt ? (
+                  <>
+                    <p className="text-sm" data-testid="text-deletion-pending">
+                      Your deletion request from{" "}
+                      {new Date(user.deletionRequestedAt).toLocaleDateString()}{" "}
+                      is pending. A maintainer will process it privately. You
+                      can withdraw it any time before then.
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => withdrawDeletionMutation.mutate()}
+                      aria-disabled={withdrawDeletionMutation.isPending}
+                      onClickCapture={(e) => {
+                        if (withdrawDeletionMutation.isPending) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                      data-testid="button-withdraw-deletion"
+                    >
+                      {withdrawDeletionMutation.isPending
+                        ? "Withdrawing…"
+                        : "Withdraw deletion request"}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Approved resources you submitted stay in the directory
+                      but are detached from your identity.
+                    </p>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setDeletionDialogOpen(true)}
+                      data-testid="button-request-deletion"
+                    >
+                      Request account deletion
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <AlertDialog open={deletionDialogOpen} onOpenChange={setDeletionDialogOpen}>
+            <AlertDialogContent data-testid="dialog-deletion-confirm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Request account deletion?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This submits a private deletion request for your account and
+                  personal data. A maintainer will process it; you can withdraw
+                  the request any time before it's completed.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-deletion-cancel">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => requestDeletionMutation.mutate()}
+                  aria-disabled={requestDeletionMutation.isPending}
+                  data-testid="button-deletion-confirm"
+                >
+                  {requestDeletionMutation.isPending
+                    ? "Submitting…"
+                    : "Request deletion"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </TabsContent>
       </Tabs>
 

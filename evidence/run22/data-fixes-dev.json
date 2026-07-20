@@ -1,0 +1,108 @@
+{
+  "startedAt": "2026-07-20T01:30:22.655Z",
+  "base": "http://localhost:5000",
+  "actions": [
+    {
+      "finding": "BUG-028",
+      "candidates": [
+        {
+          "id": 187492,
+          "url": "https://lives-video.com"
+        },
+        {
+          "id": 186631,
+          "url": "http://slowmovideo.granjow.net/"
+        },
+        {
+          "id": 186568,
+          "url": "https://lives-video.com/"
+        },
+        {
+          "id": 186560,
+          "url": "http://www.mplayerhq.hu/"
+        },
+        {
+          "id": 186553,
+          "url": "http://infrarecorder.org/"
+        },
+        {
+          "id": 186164,
+          "url": "http://www.dranger.com/ffmpeg/"
+        },
+        {
+          "id": 185555,
+          "url": "http://www.cinepaint.org/"
+        },
+        {
+          "id": 185277,
+          "url": "http://lives-video.com/"
+        },
+        {
+          "id": 184952,
+          "url": "http://www.live555.com/liveMedia/"
+        },
+        {
+          "id": 184862,
+          "url": "http://zuggy.wz.cz"
+        }
+      ]
+    },
+    {
+      "finding": "BUG-028",
+      "id": 187492,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 186631,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 186568,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 186560,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 186553,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 186164,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 185555,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 185277,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 184952,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-028",
+      "id": 184862,
+      "action": "noop-already-applied"
+    },
+    {
+      "finding": "BUG-029",
+      "id": 184919,
+      "action": "noop-already-non-approved",
+      "status": "rejected"
+    }
+  ],
+  "finishedAt": "2026-07-20T01:30:23.567Z"
+}

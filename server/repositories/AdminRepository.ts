@@ -30,6 +30,7 @@ import {
   resources,
   categories,
   learningJourneys,
+  resourceEdits,
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
@@ -41,6 +42,7 @@ export interface AdminStats {
   totalUsers: number;
   totalResources: number;
   pendingResources: number;
+  pendingEdits: number;
   totalPublic: number;
   totalPending: number;
   totalDeleted: number;
@@ -107,6 +109,13 @@ export class AdminRepository {
       .from(resources)
       .where(eq(resources.status, 'approved'));
 
+    // BUG-041 (run22): the Edits tab had no pending badge, so waiting
+    // suggested edits were invisible until an admin clicked into the tab.
+    const [pendingEditCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resourceEdits)
+      .where(eq(resourceEdits.status, 'pending'));
+
     const [deletedCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(resources)
@@ -133,6 +142,7 @@ export class AdminRepository {
       totalUsers: userCount.count,
       totalResources: resourceCount.count,
       pendingResources: pendingCount.count,
+      pendingEdits: pendingEditCount.count,
       totalPublic: publicCount.count,
       totalPending: pendingCount.count,
       totalDeleted: deletedCount.count,

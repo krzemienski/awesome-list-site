@@ -36,7 +36,7 @@ import { trackSelectContent, trackShare, trackResourceFavorite } from "@/lib/ana
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { slugify, formatAdminDate } from "@/lib/utils";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { fetchAwesomeListNav } from "@/lib/static-data";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 
@@ -84,9 +84,11 @@ export default function ResourceDetail() {
       }[];
     }[];
   }>({
-    // R4-033 (run21): same cache entry as App.tsx — no second catalog download.
-    queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
+    // R4-033 (run21): same cache entry as App.tsx — no second download.
+    // Run22 BUG-008: slug resolution only needs names+slugs, so this now
+    // rides the ~few-KB nav tree instead of the 2.7MB corpus.
+    queryKey: ["awesome-list-nav"],
+    queryFn: fetchAwesomeListNav,
     staleTime: 1000 * 60 * 60,
   });
 
@@ -416,6 +418,10 @@ export default function ResourceDetail() {
   if (isLoading) {
     return (
       <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4" aria-busy={true} aria-live="polite">
+        {/* BUG-031 (run22): head must swap with the route, not lag behind the
+            data fetch — otherwise a soft nav briefly shows the PREVIOUS page's
+            title with no canonical. Neutral title now, real title on load. */}
+        <SEOHead title="Loading resource" description="Loading resource details on Awesome Video." />
         <h1 className="sr-only">Loading resource…</h1>
         <Skeleton className="h-10 w-32" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

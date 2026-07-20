@@ -7,6 +7,7 @@ interface AdminStats {
   resources: number;
   journeys: number;
   pendingApprovals: number;
+  pendingEdits?: number;
   totalPublic?: number;
   totalPending?: number;
   totalDeleted?: number;

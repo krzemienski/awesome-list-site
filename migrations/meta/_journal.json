@@ -50,6 +50,13 @@
       "when": 1784680000000,
       "tag": "0034_normalize_user_emails_lowercase",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1784930000000,
+      "tag": "0035_add_user_deletion_requested_at",
+      "breakpoints": true
     }
   ]
 }

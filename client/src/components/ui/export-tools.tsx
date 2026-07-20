@@ -403,74 +403,113 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           mimeType = 'text/yaml';
           break;
         case 'pdf': {
-          // NB-006 (run18): the previous hidden-iframe print branch could fail
-          // silently — if the iframe never fired `onload` (some srcdoc/print
-          // restrictions) or `print()` threw, the user got NO download, NO
-          // popup and NO feedback within 60s. Now every path gives feedback
-          // within ~2s: an immediate toast confirms we're opening the print
-          // dialog, and a load-timeout + print-failure fallback downloads the
-          // printable HTML file with an explanatory toast. Standard
-          // client-side save-as-PDF flow, no server work.
-          const htmlForPdf = generateHTML(resources);
+          // BUG-001 (run22): the previous hidden-iframe `print()` flow never
+          // produced a .pdf — print dialogs are suppressed or manual in many
+          // browsers (mobile especially), and the audit observed no request,
+          // download, blob, or error. Generate a REAL PDF client-side with
+          // jsPDF (lazy-loaded, so it never lands in the entry bundle) and
+          // download it like every other format. Failures propagate to the
+          // shared catch below → visible destructive toast.
+          const { jsPDF } = await import("jspdf");
           const baseName = awesomeList.title.toLowerCase().replace(/\s+/g, '-');
-          let settled = false;
+          const doc = new jsPDF({ unit: "pt", format: "a4" });
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+          const margin = 48;
+          const maxWidth = pageWidth - margin * 2;
+          let y = margin;
 
-          const downloadPrintableHtml = () => {
-            if (settled) return;
-            settled = true;
-            const blob = new Blob([htmlForPdf], { type: 'text/html' });
-            const dlUrl = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = dlUrl;
-            link.download = `${baseName}.html`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(dlUrl);
-            toast({
-              title: "Downloaded printable HTML",
-              description: "We couldn't open the print dialog, so we saved a printable HTML file — open it and print to PDF.",
-              variant: "default",
-            });
+          const ensureRoom = (needed: number) => {
+            if (y + needed > pageHeight - margin) {
+              doc.addPage();
+              y = margin;
+            }
+          };
+          const writeLines = (
+            text: string,
+            size: number,
+            style: "normal" | "bold",
+            gapAfter: number,
+            rgb: [number, number, number] = [20, 20, 20],
+          ) => {
+            doc.setFontSize(size);
+            doc.setFont("helvetica", style);
+            doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+            const lines = doc.splitTextToSize(String(text ?? ""), maxWidth) as string[];
+            const lineHeight = size * 1.35;
+            for (const line of lines) {
+              ensureRoom(lineHeight);
+              doc.text(line, margin, y);
+              y += lineHeight;
+            }
+            y += gapAfter;
           };
 
-          const frame = document.createElement('iframe');
-          frame.style.position = 'fixed';
-          frame.style.right = '0';
-          frame.style.bottom = '0';
-          frame.style.width = '0';
-          frame.style.height = '0';
-          frame.style.border = '0';
-          frame.setAttribute('aria-hidden', 'true');
+          writeLines(awesomeList.title, 20, "bold", 6);
+          if (exportOptions.includeDescriptions && awesomeList.description) {
+            writeLines(awesomeList.description, 11, "normal", 8, [90, 90, 90]);
+          }
+          writeLines(
+            `${resources.length} resources — exported ${new Date().toLocaleDateString()}`,
+            9,
+            "normal",
+            14,
+            [130, 130, 130],
+          );
 
-          // Fallback if the iframe never loads within a few seconds.
-          const loadTimer = window.setTimeout(() => {
-            frame.remove();
-            downloadPrintableHtml();
-          }, 3000);
+          const writeResource = (resource: Resource, showCategory: boolean) => {
+            writeLines(resource.title, 11, "bold", 0);
+            if (showCategory) {
+              writeLines(resource.category, 8, "normal", 0, [130, 130, 130]);
+            }
+            const hasDesc = exportOptions.includeDescriptions && !!resource.description;
+            writeLines(resource.url, 9, "normal", hasDesc ? 0 : 2, [0, 90, 160]);
+            if (hasDesc) {
+              writeLines(resource.description!, 9, "normal", 2, [90, 90, 90]);
+            }
+            const tags = getResourceTags(resource);
+            if (exportOptions.includeTags && tags.length) {
+              writeLines(`Tags: ${tags.join(", ")}`, 8, "normal", 2, [130, 130, 130]);
+            }
+            y += 4;
+          };
 
-          frame.onload = () => {
-            window.clearTimeout(loadTimer);
-            try {
-              frame.contentWindow?.focus();
-              frame.contentWindow?.print();
-              settled = true;
-              // Keep the frame alive while the (blocking) print dialog is up;
-              // clean it up shortly after the handler returns.
-              setTimeout(() => frame.remove(), 60_000);
-            } catch {
-              frame.remove();
-              downloadPrintableHtml();
+          // Yield to the event loop periodically so the "Exporting..." spinner
+          // keeps painting during large generations (2,000+ resources).
+          let processed = 0;
+          const maybeYield = async () => {
+            processed++;
+            if (processed % 150 === 0) {
+              await new Promise((resolve) => setTimeout(resolve, 0));
             }
           };
 
-          frame.srcdoc = htmlForPdf;
-          document.body.appendChild(frame);
+          if (exportOptions.groupByCategory) {
+            const categorizedResources = resources.reduce((acc, resource) => {
+              if (!acc[resource.category]) acc[resource.category] = [];
+              acc[resource.category].push(resource);
+              return acc;
+            }, {} as Record<string, Resource[]>);
+            for (const [category, categoryResources] of Object.entries(categorizedResources)) {
+              ensureRoom(34);
+              y += 8;
+              writeLines(category, 15, "bold", 8);
+              for (const resource of categoryResources) {
+                writeResource(resource, false);
+                await maybeYield();
+              }
+            }
+          } else {
+            for (const resource of resources) {
+              writeResource(resource, exportOptions.includeCategories);
+              await maybeYield();
+            }
+          }
 
-          // Immediate feedback (<2s) regardless of how the print flow resolves.
+          doc.save(`${baseName}.pdf`);
           toast({
-            title: "Opening print dialog",
-            description: `${resources.length} resources prepared — choose "Save as PDF" in the dialog.`,
+            title: "Export Successful",
+            description: `${resources.length} resources exported as PDF`,
             variant: "default",
           });
           return;
@@ -576,7 +615,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
+                className="h-6 w-6"
                 id="descriptions"
                 checked={exportOptions.includeDescriptions}
                 onCheckedChange={(checked) => 
@@ -587,7 +626,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
+                className="h-6 w-6"
                 id="tags"
                 checked={exportOptions.includeTags}
                 onCheckedChange={(checked) => 
@@ -598,7 +637,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
+                className="h-6 w-6"
                 id="categories"
                 checked={exportOptions.includeCategories}
                 onCheckedChange={(checked) => 
@@ -609,7 +648,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
+                className="h-6 w-6"
                 id="groupByCategory"
                 checked={exportOptions.groupByCategory}
                 onCheckedChange={(checked) => 
@@ -642,6 +681,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             {awesomeList.categories.map(category => (
               <div key={category.name} className="flex items-center space-x-2">
                 <Checkbox
+                  className="h-6 w-6"
                   id={`category-${category.name}`}
                   checked={exportOptions.selectedCategories.includes(category.name)}
                   onCheckedChange={() => toggleCategory(category.name)}

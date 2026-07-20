@@ -1,15 +1,21 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { trackApiPerformance, trackError } from "./analytics";
+import { humanizeStatusBody } from "./apiError";
 
 // NB-028 (run18): errors must carry the HTTP status as a real property —
 // retry predicates checking `'status' in error` silently failed against the
 // plain Error thrown before, so 401s retried like transient faults.
-// message keeps the legacy "<status>: <body>" shape callers parse.
+// Run22 BUG-039: `message` is now the humanized user-safe copy (many toast
+// sites render error.message directly, which used to expose raw JSON like
+// '401: {"message":"..."}'). The raw server body is preserved on `.body` for
+// structured consumers (extractFieldErrors, humanizeApiError).
 export class ApiError extends Error {
   status: number;
+  body: string;
   constructor(status: number, body: string) {
-    super(`${status}: ${body}`);
+    super(humanizeStatusBody(status, body));
     this.status = status;
+    this.body = body;
   }
 }
 

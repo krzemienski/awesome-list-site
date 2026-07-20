@@ -1,0 +1,32 @@
+=== www.cinepaint.org ===
+C0AC1D4EBF7F0000:error:8000006F:system library:BIO_connect:Connection refused:../crypto/bio/bio_sock2.c:114:calling connect()
+connect:errno=111
+=== infrarecorder.org ===
+CONNECTED(00000003)
+subject=CN = kindahl.com
+issuer=C = US, O = Let's Encrypt, CN = YR1
+Verification: OK
+=== lives-video.com ===
+CONNECTED(00000003)
+subject=CN = *.web-hosting.com
+issuer=C = GB, O = Sectigo Limited, CN = Sectigo Public Server Authentication CA DV R36
+Verification: OK
+=== www.live555.com ===
+write:errno=104
+CONNECTED(00000003)
+Verification: OK
+=== www.mplayerhq.hu ===
+CONNECTED(00000003)
+subject=CN = ffmpeg.org
+issuer=C = US, O = Let's Encrypt, CN = YR1
+Verification: OK
+=== www.dranger.com ===
+CONNECTED(00000003)
+subject=CN = *.securedata.net
+issuer=C = US, O = DigiCert Inc, OU = www.digicert.com, CN = RapidSSL TLS RSA CA G1
+Verification: OK
+=== slowmovideo.granjow.net ===
+CONNECTED(00000003)
+subject=CN = bareware.granjow.net
+issuer=C = US, O = Let's Encrypt, CN = R12
+Verification: OK

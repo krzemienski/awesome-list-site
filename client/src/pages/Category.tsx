@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SEOHead from "@/components/layout/SEOHead";
 import { categorySeoTitleCore, categorySeoDescription } from "@shared/seo-templates";
 import AdvancedFilter from "@/components/ui/advanced-filter";
-import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
+import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { ArrowLeft, Search, ExternalLink, Edit } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
@@ -122,8 +122,14 @@ export default function Category() {
   // Run15 BUG-022: which cards have their full tag row revealed ("+N more").
   const [expandedTagCards, setExpandedTagCards] = useState<Set<string>>(new Set());
   
+  // Run22 BUG-026: an explicit ?view=grid|list|compact wins over the saved
+  // preference, and once the user toggles (or arrived with ?view=) we keep
+  // writing the choice back to the URL so reload/Back/Forward preserve it.
+  // ?view=general (Category's no-subcategory bucket) keeps precedence.
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
+      const fromUrl = getSearchParams().get('view');
+      if (isLayoutViewMode(fromUrl)) return fromUrl;
       const saved = safeGetItem('awesome-list-view-mode');
       if (saved === 'grid' || saved === 'list' || saved === 'compact') {
         return saved;
@@ -131,10 +137,14 @@ export default function Category() {
     }
     return 'grid';
   });
-  
+  const viewParamExplicitRef = useRef(
+    typeof window !== 'undefined' && isLayoutViewMode(getSearchParams().get('view')),
+  );
+
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     safeSetItem('awesome-list-view-mode', mode);
+    viewParamExplicitRef.current = true;
   };
   
   const { toast } = useToast();
@@ -338,14 +348,16 @@ export default function Category() {
     // alias used on arrival is normalized away after the first sync.
     if (page > 1) params.set("page", String(page));
     // Preserve the reactive general-view flag so it survives history writes
-    // triggered by other filter changes.
+    // triggered by other filter changes. Otherwise (Run22 BUG-026) persist an
+    // explicitly chosen layout view so it survives reload/Back/Forward.
     if (isGeneralView) params.set("view", "general");
+    else if (viewParamExplicitRef.current) params.set("view", viewMode);
 
     const newSearch = params.toString();
     const newPath = `/category/${slug}${newSearch ? `?${newSearch}` : ""}`;
     const currentPath = `${window.location.pathname}${window.location.search}`;
 
-    const pushSnapshot = JSON.stringify([page, selectedSubcategory, selectedTags, sortBy, isGeneralView]);
+    const pushSnapshot = JSON.stringify([page, selectedSubcategory, selectedTags, sortBy, isGeneralView, viewMode]);
     if (currentPath !== newPath) {
       const shouldPush =
         urlSyncInitializedRef.current &&
@@ -360,7 +372,7 @@ export default function Category() {
     urlSyncInitializedRef.current = true;
     popNavigationRef.current = false;
     pushSnapshotRef.current = pushSnapshot;
-  }, [searchTerm, selectedSubcategory, selectedTags, sortBy, page, slug, location, isGeneralView]);
+  }, [searchTerm, selectedSubcategory, selectedTags, sortBy, page, slug, location, isGeneralView, viewMode]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -373,6 +385,14 @@ export default function Category() {
       setSortBy(normalizeSort(params.get("sortBy") || params.get("sort")));
       const p = parseInt(params.get("page") || "1", 10);
       setPage(Number.isFinite(p) && p > 0 ? p : 1);
+      // Run22 BUG-026: restore the layout view carried by this history entry.
+      const v = params.get("view");
+      if (isLayoutViewMode(v)) {
+        setViewMode(v);
+        viewParamExplicitRef.current = true;
+      } else {
+        viewParamExplicitRef.current = false;
+      }
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -430,6 +450,9 @@ export default function Category() {
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
+        {/* BUG-031 (run22): head swaps with the route immediately — a soft nav
+            must never leave the previous page's title/canonical up mid-load. */}
+        <SEOHead title="Loading category" description="Loading category resources on Awesome Video." />
         <div className="space-y-4">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-6 w-48" />
@@ -535,12 +558,14 @@ export default function Category() {
                 </SelectContent>
               </Select>
             )}
+            {/* Run22 BUG-025: badge tracks the ACTIVE filter result count, not
+                the unfiltered total (which the header line already shows). */}
             <Badge
               variant="secondary"
               className="rounded-full text-sm sm:text-base px-3 sm:px-4 py-1 tabular-nums"
               data-testid="badge-count"
             >
-              {allResources.length}
+              {filteredResources.length}
             </Badge>
           </div>
         </div>
@@ -610,7 +635,10 @@ export default function Category() {
         <div className={
           viewMode === "grid"
             // BUG-016 (run14): md drops to 1 col — sidebar returns at 768px.
-            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 min-w-0"
+            // BUG-003 (run22): 3 cols only from xl — at lg (1024–1279) three
+            // columns beside the pinned 256px sidebar left headings ~65px
+            // wide, clipping titles mid-word inside the line-clamp.
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 min-w-0"
             : viewMode === "list"
             ? "flex flex-col gap-2 min-w-0"
             : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0"
@@ -641,12 +669,18 @@ export default function Category() {
             // via relative z-10. The card onClick is kept as a fallback for the
             // non-overlay edge but the anchor stops propagation to avoid a
             // double navigation.
-            const titleAnchor = (label: React.ReactNode) =>
+            // BUG-003 (run22): when the title is line-clamped, the clamp MUST
+            // live on this anchor — an inline-block child inside a
+            // -webkit-box parent defeats -webkit-line-clamp (all lines
+            // render, no ellipsis). clampClass replaces inline-block so the
+            // two display values never fight; line-clamp's -webkit-box is
+            // block-level, so the run16 BUG-049 py-1/-my-1 hit-box holds.
+            const titleAnchor = (label: React.ReactNode, clampClass = "") =>
               isDbResource(resource) ? (
                 <Link
                   href={`/resource/${getDbId(resource)}`}
                   /* Run16 BUG-049: inline-block + py/-my ≥24px hit-box */
-                  className="inline-block py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
+                  className={`${clampClass || "inline-block"} py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`}
                   onClick={(e: React.MouseEvent) => e.stopPropagation()}
                   data-testid={`link-resource-${resourceId}`}
                 >
@@ -657,7 +691,7 @@ export default function Category() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
+                  className={`${clampClass || "inline-block"} py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`}
                   onClick={(e: React.MouseEvent) => e.stopPropagation()}
                   data-testid={`link-resource-${resourceId}`}
                 >
@@ -675,7 +709,7 @@ export default function Category() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium truncate">{titleAnchor(resource.title)}</span>
+                      <span className="font-medium line-clamp-1 break-words min-w-0" title={resource.title}>{titleAnchor(resource.title)}</span>
                       {isDbResource(resource) && (
                         <Badge
                           variant="outline"
@@ -740,7 +774,7 @@ export default function Category() {
                   data-testid={`card-resource-${resourceId}`}
                 >
                   <div className="flex items-start gap-1.5 min-w-0">
-                    <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0" title={resource.title}>{titleAnchor(resource.title)}</span>
+                    <span className="font-medium text-xs sm:text-sm flex-1 min-w-0" title={resource.title}>{titleAnchor(resource.title, "line-clamp-2 break-words")}</span>
                     <Button
                       asChild
                       variant="ghost"
@@ -774,7 +808,12 @@ export default function Category() {
                 <CardHeader className="p-6 space-y-2">
                   <CardTitle className="text-base sm:text-lg flex items-start gap-2">
                     {/* BUG-v3-H02 (run12): real h2 so card titles sit under the page h1 */}
-                    <h2 className="flex-1 min-w-0 line-clamp-2 text-base sm:text-lg font-semibold leading-none tracking-tight" title={resource.title}>{titleAnchor(resource.title)}</h2>
+                    {/* BUG-003 (run22): break-words + relaxed line-height so
+                        the 2-line clamp wraps at word boundaries and shows an
+                        ellipsis instead of clipping mid-word/mid-line. The
+                        clamp itself sits on the inner anchor (see titleAnchor)
+                        because a block child defeats -webkit-line-clamp. */}
+                    <h2 className="flex-1 min-w-0 text-base sm:text-lg font-semibold leading-snug tracking-tight" title={resource.title}>{titleAnchor(resource.title, "line-clamp-2 break-words")}</h2>
                     <div className="relative z-10 flex items-center gap-0.5 flex-shrink-0">
                       <Button
                         asChild

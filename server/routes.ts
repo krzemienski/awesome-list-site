@@ -176,10 +176,24 @@ async function generateSitemap(_req: any, res: any) {
   // updatedAt dates (taxonomy pages = max of their member resources) and OMIT
   // lastmod where there is no real change signal (static pages) — an absent
   // lastmod is more honest than a fabricated one.
+  // Run22 BUG-045: exclude bulk-write bursts from lastmod. Historic bulk
+  // operations (the July 2026 GitHub-export stamping, mass enrichment passes)
+  // rewrote updated_at on hundreds/thousands of rows within the same second,
+  // so those timestamps are bookkeeping artifacts, not content-change signals
+  // — the live sitemap was emitting one blanket date on 1,500+ URLs. A burst
+  // is detected as >10 approved resources sharing the same second (manual
+  // admin edits can't reach that rate; scripts always exceed it). Burst-
+  // stamped resources OMIT lastmod (spec: omit rather than invent) while
+  // individually-edited resources keep their real dates.
   const resourceLastmod = new Map<number, string>();
   try {
     const result: any = await db.execute(
-      sql`SELECT id, updated_at FROM resources WHERE status = 'approved' AND updated_at IS NOT NULL`
+      sql`SELECT id, updated_at FROM (
+            SELECT id, updated_at,
+                   count(*) OVER (PARTITION BY date_trunc('second', updated_at)) AS burst_size
+            FROM resources
+            WHERE status = 'approved' AND updated_at IS NOT NULL
+          ) t WHERE burst_size <= 10`
     );
     for (const row of (result.rows ?? result)) {
       resourceLastmod.set(Number(row.id), new Date(row.updated_at).toISOString().split('T')[0]);
@@ -268,7 +282,14 @@ async function generateSitemap(_req: any, res: any) {
   try {
     const journeys = await learningJourneyRepo.listLearningJourneys();
     journeys?.forEach(journey => {
-      addUrl(`/journey/${journey.id}`, 'weekly', '0.6');
+      // Run22 BUG-046: journeys carry a real per-row updatedAt (individually
+      // authored/edited) — emit it so the only undated sitemap URLs are the
+      // 8 static pages, which follow the documented omission policy (no
+      // reliable change signal → omit lastmod rather than invent one).
+      const lastmod = journey.updatedAt
+        ? new Date(journey.updatedAt).toISOString().split('T')[0]
+        : undefined;
+      addUrl(`/journey/${journey.id}`, 'weekly', '0.6', lastmod);
     });
   } catch (error) {
     console.error('Error adding journey URLs to sitemap:', error);
@@ -323,7 +344,7 @@ async function getPublicCatalogResources(): Promise<Resource[]> {
  * Fraunces italic accent on the secondary line — same vocabulary as the
  * Home/About/Login hero rebuild.
  */
-function buildOgSvg(pageTitle: string, category: string | undefined, count: string): string {
+function buildOgSvg(pageTitle: string, category: string | undefined, count: string, kicker?: string): string {
   const truncate = (s: string, n: number) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
   const xmlEscape = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -331,19 +352,43 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
   // R4-024: instead of hard-truncating at 38 chars, auto-fit the title —
   // wrap on word boundaries and step the font size down (78 → 60 → 46px)
   // until the full title fits; only ellipsize past 3 lines at the smallest
-  // size. Long resource titles now render completely on the card.
-  const wrapWords = (s: string, cpl: number): string[] => {
+  // size.
+  // Run22 BUG-013: the original wrap used optimistic chars-per-line budgets
+  // (26 chars @ 78px ≈ 1250px rendered), so long titles overflowed the card's
+  // right edge — sharp/librsvg rasterizes with a wide bold fallback face, not
+  // Inter. Wrap by ESTIMATED PIXEL WIDTH against the real safe area instead:
+  // title x=104, card inner right edge x=1144, right padding 48 → 992px.
+  const TITLE_MAX_W = 992;
+  // Per-char advance in em, calibrated generously for DejaVu-Sans-Bold-class
+  // fallbacks (wider than Inter) so estimates err toward wrapping early.
+  const charEm = (ch: string): number => {
+    if (/[ijl.,:;'!|()\[\]\s`]/.test(ch)) return 0.34;
+    if (/[ftrI\-"]/.test(ch)) return 0.45;
+    if (/[WMmw@%]/.test(ch)) return 0.98;
+    if (/[A-HJ-VX-Z0-9&#=+~<>?$]/.test(ch)) return 0.76;
+    return 0.62; // remaining lowercase + everything else
+  };
+  const estWidth = (s: string, fontSize: number): number => {
+    let em = 0;
+    for (const ch of s) em += charEm(ch);
+    return em * fontSize;
+  };
+  const wrapWords = (s: string, fontSize: number): string[] => {
+    const maxW = TITLE_MAX_W;
     const words = s.split(/\s+/).filter(Boolean);
     const lines: string[] = [];
     let cur = '';
     for (let w of words) {
-      while (w.length > cpl) {
+      // Hyphen-split single words wider than a whole line (URLs, long specs).
+      while (estWidth(w, fontSize) > maxW) {
         if (cur) { lines.push(cur); cur = ''; }
-        lines.push(w.slice(0, cpl - 1) + '-');
-        w = w.slice(cpl - 1);
+        let head = w.length - 1;
+        while (head > 1 && estWidth(w.slice(0, head) + '-', fontSize) > maxW) head--;
+        lines.push(w.slice(0, head) + '-');
+        w = w.slice(head);
       }
       if (!cur) cur = w;
-      else if (cur.length + 1 + w.length <= cpl) cur += ' ' + w;
+      else if (estWidth(cur + ' ' + w, fontSize) <= maxW) cur += ' ' + w;
       else { lines.push(cur); cur = w; }
     }
     if (cur) lines.push(cur);
@@ -351,17 +396,24 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
   };
   const fitTitle = (t: string): { lines: string[]; fontSize: number; letterSpacing: number } => {
     const budgets = [
-      { size: 78, cpl: 26, max: 2, ls: -2 },
-      { size: 60, cpl: 34, max: 2, ls: -1.5 },
-      { size: 46, cpl: 44, max: 3, ls: -1 },
+      { size: 78, max: 2, ls: -2 },
+      { size: 60, max: 2, ls: -1.5 },
+      { size: 46, max: 3, ls: -1 },
     ];
     for (const b of budgets) {
-      const lines = wrapWords(t, b.cpl);
+      const lines = wrapWords(t, b.size);
       if (lines.length <= b.max) return { lines, fontSize: b.size, letterSpacing: b.ls };
     }
+    // Still too long at the smallest size: keep the first `max` lines and
+    // ellipsize the last one at a word boundary that fits the pixel budget.
     const last = budgets[budgets.length - 1];
-    const lines = wrapWords(t, last.cpl).slice(0, last.max);
-    lines[last.max - 1] = truncate(lines[last.max - 1], last.cpl);
+    const lines = wrapWords(t, last.size).slice(0, last.max);
+    let tail = lines[last.max - 1];
+    while (tail && estWidth(tail + '…', last.size) > TITLE_MAX_W) {
+      const cut = tail.lastIndexOf(' ');
+      tail = cut > 0 ? tail.slice(0, cut) : tail.slice(0, -1);
+    }
+    lines[last.max - 1] = tail + '…';
     return { lines, fontSize: last.size, letterSpacing: last.ls };
   };
 
@@ -375,7 +427,9 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
     .join('');
 
   const subtitle = xmlEscape(category ? truncate(category, 44) : 'Curated video development resources');
-  const eyebrow = category ? 'Category · Awesome Video' : 'Index · Awesome Video';
+  // Run22 BUG-027: the kicker names the page's real context (a resource's
+  // actual category, or the taxonomy level) instead of always "Category".
+  const eyebrow = `${truncate(kicker || category || 'Index', 36)} · Awesome Video`;
   const stat = xmlEscape(`${count} resources`);
 
   return `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
@@ -447,7 +501,7 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
 }
 
 type OgParams =
-  | { ok: true; pageTitle: string; category?: string; count: string }
+  | { ok: true; pageTitle: string; category?: string; kicker?: string; count: string }
   | { ok: false; status: number; message: string };
 
 async function resolveOgParams(req: any): Promise<OgParams> {
@@ -458,6 +512,7 @@ async function resolveOgParams(req: any): Promise<OgParams> {
   const rawPath = (req.query as Record<string, unknown>).path;
   let pageTitle = 'Awesome Video';
   let category: string | undefined;
+  let kicker: string | undefined;
   if (rawPath !== undefined) {
     if (
       typeof rawPath !== 'string' ||
@@ -471,6 +526,7 @@ async function resolveOgParams(req: any): Promise<OgParams> {
     if (meta) {
       pageTitle = meta.pageTitle;
       category = meta.category;
+      kicker = meta.kicker;
     }
   }
   let count = '2000+';
@@ -478,14 +534,14 @@ async function resolveOgParams(req: any): Promise<OgParams> {
     const data = await legacyRepo.getAwesomeListFromDatabase();
     count = `${data?.resources?.length ?? 2000}+`;
   } catch {}
-  return { ok: true, pageTitle, category, count };
+  return { ok: true, pageTitle, category, kicker, count };
 }
 
 async function generateOpenGraphImage(req: any, res: any) {
   try {
     const params = await resolveOgParams(req);
     if (!params.ok) return res.status(params.status).send(params.message);
-    const svg = buildOgSvg(params.pageTitle, params.category, params.count);
+    const svg = buildOgSvg(params.pageTitle, params.category, params.count, params.kicker);
     res.set('Content-Type', 'image/svg+xml');
     res.set('Cache-Control', 'public, max-age=86400');
     res.send(svg);
@@ -505,7 +561,7 @@ async function generateOpenGraphImagePng(req: any, res: any) {
   try {
     const params = await resolveOgParams(req);
     if (!params.ok) return res.status(params.status).send(params.message);
-    const svg = buildOgSvg(params.pageTitle, params.category, params.count);
+    const svg = buildOgSvg(params.pageTitle, params.category, params.count, params.kicker);
     const sharp = (await import('sharp')).default;
     const png = await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();
     res.set('Content-Type', 'image/png');
@@ -952,12 +1008,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = {
         id: dbUser.id,
         email: dbUser.email,
-        name: dbUser.firstName && dbUser.lastName 
-          ? `${dbUser.firstName} ${dbUser.lastName}` 
-          : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
+        // Run22 BUG-038: join whichever name parts exist — the old
+        // `firstName && lastName` ternary dropped lastName entirely when
+        // firstName was cleared (showed the email prefix instead of "User").
+        name: [dbUser.firstName, dbUser.lastName].filter(Boolean).join(' ')
+          || dbUser.email?.split('@')[0] || 'User',
         avatar: dbUser.profileImageUrl,
         role: dbUser.role,
         createdAt: dbUser.createdAt,
+        // Run22 BUG-020: lets the Profile page show a pending private
+        // deletion request without an extra round-trip.
+        deletionRequestedAt: dbUser.deletionRequestedAt ?? null,
       };
 
       console.log('[/api/auth/user] Returning user:', user);
@@ -988,9 +1049,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         id: dbUser.id,
         email: dbUser.email,
-        name: dbUser.firstName && dbUser.lastName
-          ? `${dbUser.firstName} ${dbUser.lastName}`
-          : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
+        // Run22 BUG-038: same fix as /api/auth/user — never drop lastName.
+        name: [dbUser.firstName, dbUser.lastName].filter(Boolean).join(' ')
+          || dbUser.email?.split('@')[0] || 'User',
         avatar: dbUser.profileImageUrl,
         role: dbUser.role,
         createdAt: dbUser.createdAt,
@@ -2165,6 +2226,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/user/deletion-request — Run22 BUG-020: private account/data
+  // deletion channel. Authenticated (session), so no personal data ever has
+  // to be posted in a public GitHub issue. Idempotent: re-requesting keeps
+  // the original request timestamp. Admins see the pending marker in the
+  // users table and action it via the existing guarded delete-user flow.
+  app.post('/api/user/deletion-request', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const existing = await userRepo.getUser(userId);
+      if (!existing) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const alreadyRequested = !!existing.deletionRequestedAt;
+      const updated = alreadyRequested
+        ? existing
+        : await userRepo.setDeletionRequested(userId, true);
+      return res.status(alreadyRequested ? 200 : 201).json({
+        deletionRequestedAt: updated?.deletionRequestedAt,
+        alreadyRequested,
+        message: alreadyRequested
+          ? 'Your deletion request is already pending.'
+          : 'Deletion request received. A maintainer will process it privately.',
+      });
+    } catch (error) {
+      console.error('[POST /api/user/deletion-request] Error:', error);
+      return res.status(500).json({ message: 'Failed to submit deletion request' });
+    }
+  });
+
+  // DELETE /api/user/deletion-request — withdraw a pending deletion request.
+  app.delete('/api/user/deletion-request', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const existing = await userRepo.getUser(userId);
+      if (!existing) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (!existing.deletionRequestedAt) {
+        return res.status(409).json({ message: 'No pending deletion request to withdraw' });
+      }
+      await userRepo.setDeletionRequested(userId, false);
+      return res.json({ message: 'Deletion request withdrawn.' });
+    } catch (error) {
+      console.error('[DELETE /api/user/deletion-request] Error:', error);
+      return res.status(500).json({ message: 'Failed to withdraw deletion request' });
+    }
+  });
+
   app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -2177,13 +2286,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const journeyProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
       const completedResources = journeyProgress.filter(p => p.completedAt !== null).length;
 
-      // Get current learning path (most recently accessed journey)
+      // Get current learning path — the most recently accessed journey that
+      // is NOT yet completed. Run22 BUG-042: journeyProgress[0] used to win
+      // even when it was a finished journey, so "Current Learning Path"
+      // showed a completed path. Completed journeys are never "current"; if
+      // every enrolled journey is done, no current path is reported.
       let currentPath: string | undefined;
-      if (journeyProgress.length > 0) {
-        const latestJourney = journeyProgress[0];
-        const journey = await learningJourneyRepo.getLearningJourney(latestJourney.journeyId);
+      const activeJourneys = journeyProgress.filter(p => !p.completedAt);
+      if (activeJourneys.length > 0) {
+        const journey = await learningJourneyRepo.getLearningJourney(activeJourneys[0].journeyId);
         currentPath = journey?.title;
       }
+
+      // Run22 BUG-043: totalTimeSpent was hardcoded '0h 0m' even with real
+      // completions. Definition (no wall-clock tracking exists): estimated
+      // learning time = for each enrolled journey, the midpoint of its
+      // estimated_duration ("8-10 hours" → 9h) scaled by the fraction of step
+      // rows completed; a journey with completedAt counts in full.
+      const enrolledIds = journeyProgress.map(p => p.journeyId);
+      const stepsByJourney = await learningJourneyRepo.listJourneyStepsBatch(enrolledIds);
+      const journeyMeta = await Promise.all(
+        enrolledIds.map(id => learningJourneyRepo.getLearningJourney(id)),
+      );
+      const parseDurationHours = (text?: string | null): number => {
+        if (!text) return 0;
+        const m = text.match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?\s*(hours?|hrs?|minutes?|mins?)/i);
+        if (!m) return 0;
+        const lo = parseFloat(m[1]);
+        const hi = m[2] ? parseFloat(m[2]) : lo;
+        const mid = (lo + hi) / 2;
+        return /min/i.test(m[3]) ? mid / 60 : mid;
+      };
+      let estimatedHours = 0;
+      for (const p of journeyProgress) {
+        const journey = journeyMeta.find(j => j?.id === p.journeyId);
+        const durationHours = parseDurationHours(journey?.estimatedDuration);
+        if (!durationHours) continue;
+        const totalStepRows = (stepsByJourney.get(p.journeyId) ?? []).length;
+        const fraction = p.completedAt
+          ? 1
+          : totalStepRows > 0
+            ? Math.min(1, (p.completedSteps?.length ?? 0) / totalStepRows)
+            : 0;
+        estimatedHours += durationHours * fraction;
+      }
+      const totalMinutes = Math.round(estimatedHours * 60);
+      const totalTimeSpent = `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`;
 
       // Calculate streak days from favorites and bookmarks
       const favorites = await userFeatureRepo.getUserFavorites(userId);
@@ -2252,7 +2400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedResources,
         currentPath,
         streakDays,
-        totalTimeSpent: '0h 0m',
+        totalTimeSpent,
         skillLevel
       };
 
@@ -2526,6 +2674,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // array so a logical step (up to 3 rows per stepNumber) completes in ONE
       // request instead of one PUT per row. `completed` (optional boolean)
       // makes the write idempotent; omitted = per-id toggle (legacy contract).
+      // Run22 BUG-032: a progress write against a journey that doesn't exist
+      // must be a 404, not a 200 no-op (and not a 422 "foreign step" — that
+      // status is reserved for real journeys receiving another journey's step
+      // ids). Check existence BEFORE any validation that could write.
+      const journeyExists = await learningJourneyRepo.getLearningJourney(journeyId);
+      if (!journeyExists) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
+
       const { stepId, stepIds, completed } = req.body ?? {};
       const ids: number[] = Array.isArray(stepIds)
         ? stepIds.filter((n: unknown) => Number.isInteger(n))
@@ -2541,8 +2698,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const progress = await learningJourneyRepo.updateUserJourneyProgressBatch(
         userId, journeyId, ids, completed,
       );
+      // Run22 BUG-032 (same no-op class): the batch update only UPDATEs an
+      // existing progress row — if the user never started this journey there
+      // is no row, nothing was written, and `progress` is undefined. That must
+      // not masquerade as a 200 success.
+      if (!progress) {
+        return res.status(409).json({ message: 'Journey not started — start the journey before updating progress' });
+      }
       res.json(progress);
-    } catch (error) {
+    } catch (error: any) {
+      // Run22 BUG-006: step ids that belong to a different journey are a
+      // client error, not a server fault — reject without storing anything.
+      if (error?.code === 'FOREIGN_STEP') {
+        return res.status(422).json({
+          message: `Step ID(s) do not belong to this journey: ${(error.foreignStepIds ?? []).join(', ')}`,
+        });
+      }
       console.error('Error updating journey progress:', error);
       res.status(500).json({ message: 'Failed to update journey progress' });
     }
@@ -2851,6 +3022,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resources: stats.totalResources,
         journeys: stats.totalJourneys,
         pendingApprovals: stats.pendingResources,
+        pendingEdits: stats.pendingEdits,
         totalPublic: stats.totalPublic,
         totalPending: stats.totalPending,
         totalDeleted: stats.totalDeleted,
@@ -5192,6 +5364,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Run22 BUG-008: lightweight taxonomy/nav payload. The sidebar, header
+  // breadcrumbs, and resource-detail slug resolution only need names, slugs,
+  // and per-node counts — but every cold page load was pulling the full
+  // ~2.7MB corpus for them. This serves a ~few-KB tree with the same 60s
+  // TTL + ETag/304 discipline as the corpus route, so pages that don't
+  // render resource listings never download the corpus at all.
+  let awesomeListNavCache: { body: string; etag: string; builtAt: number } | null = null;
+  app.get("/api/awesome-list/nav", resourceReadLimiter, async (req, res) => {
+    try {
+      if (awesomeListNavCache && Date.now() - awesomeListNavCache.builtAt < AWESOME_LIST_TTL_MS) {
+        res.set('ETag', awesomeListNavCache.etag);
+        res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+        if (req.headers['if-none-match'] === awesomeListNavCache.etag) {
+          return res.status(304).end();
+        }
+        return res.type('application/json').send(awesomeListNavCache.body);
+      }
+
+      const data = await legacyRepo.getAwesomeListFromDatabase();
+      if (!data || !data.categories || data.categories.length === 0) {
+        return res.status(500).json({ error: 'No awesome list data available' });
+      }
+
+      const nav = {
+        title: data.title,
+        totalResources: (data.resources || []).length,
+        categories: (data.categories || []).map((cat: any) => ({
+          name: cat.name,
+          slug: cat.slug,
+          resourceCount: (cat.resources || []).length,
+          subcategories: (cat.subcategories || []).map((sub: any) => ({
+            name: sub.name,
+            slug: sub.slug,
+            resourceCount: (sub.resources || []).length,
+            subSubcategories: (sub.subSubcategories || []).map((ss: any) => ({
+              name: ss.name,
+              slug: ss.slug,
+              resourceCount: (ss.resources || []).length,
+            })),
+          })),
+        })),
+      };
+
+      const body = JSON.stringify(nav);
+      const etag = '"' + crypto.createHash('sha1').update(body).digest('hex') + '"';
+      awesomeListNavCache = { body, etag, builtAt: Date.now() };
+      res.set('ETag', etag);
+      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      if (req.headers['if-none-match'] === etag) {
+        return res.status(304).end();
+      }
+      return res.type('application/json').send(body);
+    } catch (error) {
+      console.error('Error building awesome-list nav:', error);
+      res.status(500).json({ error: 'Failed to build navigation tree' });
+    }
+  });
+
   // New endpoint to switch lists
   app.post("/api/switch-list", async (req, res) => {
     try {
@@ -5466,15 +5696,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Track user interaction for improving recommendations
-  app.post("/api/interactions", async (req, res) => {
+  // Track user interaction for improving recommendations.
+  // Run22 BUG-050: this write endpoint was fully anonymous — any client could
+  // POST unlimited events with an arbitrary userId. Interactions only make
+  // sense for signed-in users (both client call sites already gate on a
+  // logged-in user), so require authentication and derive the identity from
+  // the session — the spoofable body `userId` is ignored.
+  app.post("/api/interactions", isAuthenticated, async (req: any, res) => {
     try {
-      const { userId, resourceId, interactionType, interactionValue, metadata } = req.body;
-      
+      const userId = req.user?.claims?.sub;
+      const { resourceId, interactionType } = req.body ?? {};
+      if (typeof interactionType !== "string" || !interactionType.trim()) {
+        return res.status(400).json({ error: "interactionType is required" });
+      }
+
       // Store interaction data (in a real app, this would go to database)
       // For now, we'll just acknowledge the interaction
       console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
-      
+
       res.json({ status: "recorded" });
     } catch (error) {
       console.error('Error recording interaction:', error);
@@ -5530,6 +5769,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     ['/api/categories', 'GET'],
     ['/api/journeys', 'GET'],
     ['/api/awesome-list', 'GET'],
+    ['/api/awesome-list/nav', 'GET'],
   ];
   for (const [routePath, allow] of PUBLIC_METHOD_ALLOW) {
     app.all(routePath, (req, res, next) => {

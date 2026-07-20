@@ -59,7 +59,10 @@ const STYLE = [
   "#ssr-seo-content{background:#000;color:#e6e6ea;min-height:100vh;",
   "font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5}",
   "#ssr-seo-content .ssr-wrap{max-width:960px;margin:0 auto;padding:40px 20px}",
-  "#ssr-seo-content h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:#fff}",
+  // Run22 BUG-009: .ssr-h1 mirrors the h1 rule — main.tsx demotes the SSR <h1>
+  // to <div class="ssr-h1"> when it moves this block into the hold overlay, so
+  // the DOM never contains two H1s once React renders the page's real <h1>.
+  "#ssr-seo-content h1,#ssr-seo-content .ssr-h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:#fff}",
   "#ssr-seo-content h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .75rem;color:#fff}",
   "#ssr-seo-content p.ssr-lead{font-size:1.05rem;color:#b6b6c0;margin:0 0 1rem;max-width:72ch}",
   "#ssr-seo-content a{color:#ff5c7a;text-decoration:none}",

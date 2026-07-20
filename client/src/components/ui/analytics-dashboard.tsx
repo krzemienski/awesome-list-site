@@ -406,7 +406,7 @@ export default function AnalyticsDashboard({
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-medium truncate">{item.resource.title}</h4>
+                            <h4 className="font-medium line-clamp-1 break-words min-w-0" title={item.resource.title}>{item.resource.title}</h4>
                             {item.trending && (
                               <Badge variant="secondary" className="text-xs">
                                 <TrendingUp className="h-3 w-3 mr-1" />

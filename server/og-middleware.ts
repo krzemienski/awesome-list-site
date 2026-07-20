@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
-import { ABOUT_FAQS } from "@shared/faq";
+import { getAboutFaqs } from "@shared/faq";
 import { MAINTAINER } from "@shared/about-content";
 import {
   homeSeoTitle,
@@ -604,14 +604,19 @@ function homeShellChrome(): string {
       } catch {}
     } else if (path === "/about" || path === "/advanced" || path === "/submit") {
       let categories: { name: string; slug: string; count: number }[] = [];
+      // Run22 BUG-018: FAQ count claim comes from the live catalog total so
+      // schema, prerendered body, and hydrated DOM stay truthful together.
+      let aboutResourceCount: number | undefined;
       try {
         const data = await getTreeCached();
+        aboutResourceCount = data?.resources?.length;
         categories = (data?.categories ?? []).slice(0, 12).map((c: any) => ({
           name: c.name,
           slug: c.slug,
           count: countNodeResources(c),
         }));
       } catch {}
+      const aboutFaqs = getAboutFaqs(aboutResourceCount);
       if (path === "/about") {
         // GEO: FAQPage schema (+ breadcrumb) markedly improves citation rates
         // in AI answer engines. The Q&A text is shared verbatim with the
@@ -621,7 +626,7 @@ function homeShellChrome(): string {
           {
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: ABOUT_FAQS.map((f) => ({
+            mainEntity: aboutFaqs.map((f) => ({
               "@type": "Question",
               name: f.question,
               acceptedAnswer: { "@type": "Answer", text: f.answer },
@@ -690,7 +695,7 @@ function homeShellChrome(): string {
             }
           : {}),
         ...(path === "/about"
-          ? { faqs: ABOUT_FAQS, paragraphs: MAINTAINER.bio }
+          ? { faqs: aboutFaqs, paragraphs: MAINTAINER.bio }
           : {}),
         categories,
       });
@@ -1341,19 +1346,32 @@ function rewriteHead(html: string, meta: RouteMeta): string {
  */
 export async function resolveOgImageMeta(
   path: string,
-): Promise<{ pageTitle: string; category?: string } | null> {
+): Promise<{ pageTitle: string; category?: string; kicker?: string } | null> {
   try {
     if (!path || path === "/") return { pageTitle: SITE_NAME };
     const r = await resolveRoute(path);
     if (!r.found || r.meta.noindex) return null;
     const pageTitle = r.meta.title.split(" — ")[0].trim() || SITE_NAME;
     let category: string | undefined;
-    if (path.startsWith("/category/")) category = "Category";
-    else if (path.startsWith("/sub-subcategory/")) category = "Topic";
-    else if (path.startsWith("/subcategory/")) category = "Subcategory";
-    else if (path.startsWith("/resource/")) category = "Resource";
-    else if (path.startsWith("/journey")) category = "Learning Journeys";
-    return { pageTitle, category };
+    let kicker: string | undefined;
+    if (path.startsWith("/category/")) category = kicker = "Category";
+    else if (path.startsWith("/sub-subcategory/")) category = kicker = "Topic";
+    else if (path.startsWith("/subcategory/")) category = kicker = "Subcategory";
+    else if (path.startsWith("/resource/")) {
+      category = "Resource";
+      kicker = "Resource";
+      // Run22 BUG-027: the kicker reflects the resource's REAL category
+      // (server-resolved from the stored row — never caller-supplied text)
+      // instead of the generic page-type label.
+      const idNum = Number(path.split("/")[2]);
+      if (Number.isInteger(idNum) && idNum > 0) {
+        try {
+          const resource = await storage.getResource(idNum);
+          if (resource?.category) kicker = resource.category;
+        } catch {}
+      }
+    } else if (path.startsWith("/journey")) category = kicker = "Learning Journeys";
+    return { pageTitle, category, kicker };
   } catch {
     return null;
   }
@@ -1530,6 +1548,29 @@ export function ogInjectionMiddleware() {
         301,
         q && q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search",
       );
+    }
+    // Run22 BUG-007: non-canonical /resource/:id shapes — leading zeros
+    // ("/resource/0185020") and encoded whitespace ("/resource/185020%20",
+    // "%09") — previously rendered the SAME page as the canonical URL and
+    // self-canonicalized the invalid variant (duplicate-content trap). 301
+    // any segment that normalizes to a different plain integer; segments
+    // that are not numeric at all still fall through to the soft-404 path.
+    {
+      const resIdMatch = urlPath.match(/^\/resource\/([^\/]+)$/);
+      if (resIdMatch) {
+        const rawSeg = resIdMatch[1];
+        const cleaned = safeDecode(rawSeg).trim();
+        if (/^\d+$/.test(cleaned)) {
+          const normalized = String(parseInt(cleaned, 10));
+          if (rawSeg !== normalized) {
+            const qs2 = (req.originalUrl || req.url).split("?")[1];
+            return res.redirect(
+              301,
+              `/resource/${normalized}${qs2 ? `?${qs2}` : ""}`,
+            );
+          }
+        }
+      }
     }
     // BUG-008: the no-hyphen /subsubcategory/:slug 301s to the canonical
     // /sub-subcategory/:slug (a circulating URL shape that was never a route).

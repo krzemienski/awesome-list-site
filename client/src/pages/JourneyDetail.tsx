@@ -126,21 +126,46 @@ export default function JourneyDetail() {
         },
       });
     },
+    // Run22 BUG-035: optimistic toggle — flip completedSteps in the cache
+    // immediately (feedback well under 300ms instead of waiting ~1.4s for the
+    // PUT + refetch), snapshot for rollback on a real failure.
+    onMutate: async ({ stepIds, completed }: { stepIds: number[]; completed: boolean }) => {
+      await queryClient.cancelQueries({ queryKey: [`/api/journeys/${id}`] });
+      const previous = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
+      if (previous?.progress) {
+        const current = (previous.progress.completedSteps || []).map(Number);
+        const next = completed
+          ? Array.from(new Set([...current, ...stepIds]))
+          : current.filter((sid: number) => !stepIds.includes(sid));
+        queryClient.setQueryData<Journey>([`/api/journeys/${id}`], {
+          ...previous,
+          progress: { ...previous.progress, completedSteps: next },
+        });
+      }
+      return { previous };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
       toast({
         title: "Progress Updated",
         description: "Your journey progress has been saved.",
       });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _vars, context) => {
+      // Roll back the optimistic flip to the pre-mutation snapshot.
+      if (context?.previous) {
+        queryClient.setQueryData([`/api/journeys/${id}`], context.previous);
+      }
       // Run21 R4-057: friendly copy instead of raw server error stringification.
       toast({
         title: "Failed to Update Progress",
         description: humanizeApiError(error, "Something went wrong. Please try again."),
         variant: "destructive",
       });
+    },
+    onSettled: () => {
+      // Reconcile with the server truth either way (completedAt, currentStepId).
+      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
     },
   });
 
@@ -179,6 +204,9 @@ export default function JourneyDetail() {
   if (journeyLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl" aria-busy={true} aria-live="polite">
+        {/* BUG-031 (run22): swap the head with the route — never leave the
+            previous route's title/canonical up while the journey loads. */}
+        <SEOHead title="Loading journey" description="Loading learning journey on Awesome Video." />
         <Skeleton className="h-8 w-32 mb-6" />
         <Skeleton className="h-12 w-96 mb-4" />
         <Skeleton className="h-24 w-full mb-8" />
@@ -194,6 +222,9 @@ export default function JourneyDetail() {
   if (!journey) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* BUG-031 (run22): not-found state gets its own head (noindex — matches
+            the server's soft-404 contract) instead of inheriting a stale one. */}
+        <SEOHead title="Journey Not Found" description="This learning journey may have been removed or archived." noindex />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -317,7 +348,9 @@ export default function JourneyDetail() {
               <Separator className="mb-6" />
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">Your Progress</h3>
+                  {/* Run22 BUG-037: h2 — this section heading rendered before
+                      the "Learning Path" h2, so an h3 here skipped a level. */}
+                  <h2 className="text-sm font-semibold">Your Progress</h2>
                   <span className="text-sm font-medium text-primary">
                     {progressPercent}%
                   </span>

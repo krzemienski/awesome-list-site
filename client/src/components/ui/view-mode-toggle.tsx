@@ -4,6 +4,11 @@ import { cn } from "@/lib/utils";
 
 export type ViewMode = "grid" | "list" | "compact";
 
+// Run22 BUG-026: shared guard for reading ?view= from the URL.
+export function isLayoutViewMode(v: string | null): v is ViewMode {
+  return v === "grid" || v === "list" || v === "compact";
+}
+
 interface ViewModeToggleProps {
   value: ViewMode;
   onChange: (value: ViewMode) => void;

@@ -854,7 +854,7 @@ export default function ResourceManager() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="font-medium truncate max-w-[300px]" title={resource.title || ''}>
+                        <div className="font-medium line-clamp-1 break-words max-w-[300px]" title={resource.title || ''}>
                           {resource.title || 'Untitled'}
                         </div>
                         {/* Run16 BUG-036: only http(s) URLs get a live anchor —

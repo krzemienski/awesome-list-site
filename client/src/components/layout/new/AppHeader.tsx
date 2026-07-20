@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Palette, LogIn, LogOut, User, Bookmark, Shield } from "lucide-react";
+import { Search, Palette, LogIn, LogOut, User, Bookmark, Shield, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -15,7 +15,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -227,8 +226,14 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
     }
   }
 
+  // BUG-002 (run22): at 768–917px the md floors (breadcrumb 160px + search
+  // 200px + 18px gaps) summed past the 512–661px of header space left by the
+  // pinned 256px sidebar, pushing Theme + Sign in off-screen with no drawer
+  // fallback. The wide gaps and floors now only apply from lg up; md gets
+  // compact gaps and smaller floors so the right-side action cluster
+  // (shrink-0) always fits.
   return (
-    <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 md:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 lg:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
       <SidebarTrigger
         className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]"
         data-testid="mobile-drawer-trigger"
@@ -243,7 +248,10 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           trigger refusing to shrink below 200px, an unbounded-basis breadcrumb
           absorbed ALL the flex shrink and clipped to 0px at md, hiding even
           the "Home › …" collapse. 160px keeps Home › … › <truncated title>. */}
-      <Breadcrumb className="hidden md:flex min-w-0 md:min-w-[160px] shrink overflow-hidden">
+      {/* BUG-002 (run22): the 160px floor only from lg — at md it overflowed
+          the header (see header comment); 80px still fits the collapsed
+          "Home › … › current" trail without clipping to 0 (run19 BUG-004). */}
+      <Breadcrumb className="hidden md:flex min-w-0 md:min-w-[80px] lg:min-w-[160px] shrink overflow-hidden">
         <BreadcrumbList className="flex-nowrap overflow-hidden">
           {crumbs.flatMap((crumb, i) => {
             const isLast = i === crumbs.length - 1;
@@ -294,12 +302,37 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
               );
             }
             if (isRoot && crumbs.length > 2) {
+              // Run22 BUG-022: the collapsed ellipsis used to be a dead
+              // aria-hidden span — the middle crumbs it stood for were
+              // unreachable below xl. It is now a real keyboard-focusable
+              // menu button listing every hidden crumb as a navigable link.
+              const hiddenCrumbs = crumbs.slice(1, -1);
               nodes.push(
                 <BreadcrumbItem
                   key="crumb-ellipsis"
                   className="xl:hidden shrink-0"
                 >
-                  <BreadcrumbEllipsis className="h-4 w-4" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      aria-label={`Show ${hiddenCrumbs.length} hidden breadcrumb ${hiddenCrumbs.length === 1 ? "level" : "levels"}`}
+                      data-testid="button-breadcrumb-ellipsis"
+                      className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      {hiddenCrumbs.map((mid) => (
+                        <DropdownMenuItem key={mid.href} asChild>
+                          <Link
+                            href={mid.href}
+                            data-testid={`link-breadcrumb-hidden-${mid.href.split("/").pop()}`}
+                          >
+                            {mid.label}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </BreadcrumbItem>,
                 <BreadcrumbSeparator key="crumb-ellipsis-sep" className="xl:hidden" />,
               );
@@ -313,7 +346,10 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           search trigger to a sliver. Reserve a usable floor for search at md+
           (where the breadcrumb renders) — the breadcrumb, which truncates
           gracefully, absorbs the shrink instead. */}
-      <div className="flex-1 min-w-0 md:min-w-[200px] mx-1 sm:mx-2">
+      {/* BUG-002 (run22): 200px search floor only from lg; at md 110px fits
+          the short "Search..." label and returns the overflow budget to the
+          right-side controls. */}
+      <div className="flex-1 min-w-0 md:min-w-[110px] lg:min-w-[200px] mx-1 sm:mx-2">
         <button
           onClick={onSearchOpen}
           className="w-full max-w-sm flex items-center min-h-[44px] sm:min-h-0 h-11 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
@@ -326,7 +362,9 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
               short label that fits. */}
           <span className="text-muted-foreground truncate hidden lg:inline">Search resources...</span>
           <span className="text-muted-foreground truncate lg:hidden">Search...</span>
-          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] md:flex">
+          {/* BUG-002 (run22): "/" hint from lg (was md) — saves ~20px at
+              768–1023px where header space is tightest. */}
+          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] lg:flex">
             /
           </kbd>
         </button>

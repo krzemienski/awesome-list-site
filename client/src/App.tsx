@@ -9,6 +9,7 @@ import { useCrossTabSync } from "./lib/crossTabSync";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
 import MainLayout from "@/components/layout/new/MainLayout";
+import SEOHead from "@/components/layout/SEOHead";
 import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
@@ -56,6 +57,12 @@ const Privacy = lazy(() => import("@/pages/Privacy"));
 function RouteFallback() {
   return (
     <div className="space-y-6" data-testid="route-chunk-skeleton" aria-busy="true" aria-label="Loading page">
+      {/* BUG-031 (run22): while a lazy chunk loads, the head must already
+          belong to the CURRENT route (brand title + current-path canonical),
+          never linger on the previous route's metadata. The destination page
+          replaces this with its real head in the same render that swaps the
+          skeleton out. */}
+      <SEOHead />
       <div className="h-8 w-2/3 max-w-md rounded-none bg-muted animate-pulse" />
       <div className="h-4 w-1/2 max-w-sm rounded-none bg-muted animate-pulse" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -68,7 +75,12 @@ function RouteFallback() {
 }
 
 import { processAwesomeListData } from "@/lib/parser";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
+import {
+  fetchStaticAwesomeList,
+  fetchAwesomeListNav,
+  needsCorpusRoute,
+  type AwesomeListNav,
+} from "@/lib/static-data";
 
 // Run3 audit R3-29: every path pattern the Switch below can handle. Anything
 // that matches none of these is a hard 404 — rendered as a standalone lean
@@ -131,10 +143,22 @@ function Router() {
   // of the top; forward navigations still start at the top.
   useScrollRestoration(location);
 
+  // Run22 BUG-008: the chrome (sidebar/header) renders from a ~few-KB nav
+  // tree; the 2.7MB corpus is only fetched on routes whose CONTENT needs it
+  // (home/category listings/advanced/recommendations). Other pages (resource
+  // detail, journeys, profile, …) never download the corpus.
+  const { data: nav, isLoading: navLoading } = useQuery<AwesomeListNav>({
+    queryKey: ["awesome-list-nav"],
+    queryFn: fetchAwesomeListNav,
+    staleTime: 1000 * 60 * 60,
+  });
+
+  const corpusNeeded = needsCorpusRoute(location);
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
+    enabled: corpusNeeded,
   });
 
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
@@ -161,14 +185,14 @@ function Router() {
   // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
+      <MainLayout nav={nav} isLoading={navLoading} user={user ?? undefined} onLogout={logout}>
         <NotFound />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
+    <MainLayout nav={nav} isLoading={navLoading} user={user ?? undefined} onLogout={logout}>
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}
@@ -339,10 +363,14 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Router />
       {/* BUG-020 (run13): analytics consent banner — gtag loads only after
-          an explicit Accept (initGA is consent-gated). */}
+          an explicit Accept (initGA is consent-gated).
+          Run22 BUG-049: rendered BEFORE the router so it is first in DOM
+          order — after its last control, Tab continues to the skip-link
+          instead of exiting the document through a dead <body> stop (the
+          fixed positioning keeps it visually at the bottom regardless). */}
       <ConsentBanner />
+      <Router />
     </ThemeProvider>
   );
 }

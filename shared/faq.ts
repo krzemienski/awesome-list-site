@@ -3,11 +3,24 @@ export interface FaqItem {
   answer: string;
 }
 
-export const ABOUT_FAQS: FaqItem[] = [
+/**
+ * Run22 BUG-018: the resource-count claim is computed from the live catalog
+ * total — server passes the cached tree's flat resource count, the client
+ * passes the same /api/awesome-list payload's count — so the About page (and
+ * its FAQPage JSON-LD, which must match the rendered text verbatim) can never
+ * drift from reality. Falls back to a number-free phrasing when the count is
+ * momentarily unavailable.
+ */
+export function getAboutFaqs(resourceCount?: number): FaqItem[] {
+  const countClaim =
+    typeof resourceCount === "number" && resourceCount > 0
+      ? `${resourceCount.toLocaleString("en-US")} reviewed resources`
+      : "thousands of reviewed resources";
+  return [
   {
     question: "What is Awesome Video?",
     answer:
-      "Awesome Video (awesome.video) is a free, searchable directory of curated video development resources — encoders, players, codecs, streaming tools, specifications, and learning materials — organized across 9 top-level categories. It publishes more than 2,300 reviewed resources drawn from the open-source awesome-video list maintained by Nick Krzemienski on GitHub.",
+      `Awesome Video (awesome.video) is a free, searchable directory of curated video development resources — encoders, players, codecs, streaming tools, specifications, and learning materials — organized across 9 top-level categories. It publishes ${countClaim} drawn from the open-source awesome-video list maintained by Nick Krzemienski on GitHub.`,
   },
   {
     question: "Is Awesome Video free to use?",
@@ -54,4 +67,5 @@ export const ABOUT_FAQS: FaqItem[] = [
     answer:
       "A good path is to learn the fundamentals of codecs and containers, practice encoding with FFmpeg, and then experiment with an adaptive streaming player such as hls.js or Shaka Player. Awesome Video offers guided learning journeys and a curated set of courses, articles, and tools that take you from beginner streaming concepts to advanced encoding pipelines.",
   },
-];
+  ];
+}

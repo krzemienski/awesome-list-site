@@ -589,7 +589,7 @@ export default function ResearcherTab() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0 space-y-1">
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-sm truncate">{d.title}</h4>
+                              <h4 className="font-medium text-sm line-clamp-1 break-words" title={d.title}>{d.title}</h4>
                               {d.confidence && (
                                 <Badge variant="outline" className="text-xs shrink-0">
                                   {d.confidence}% confident
@@ -944,7 +944,7 @@ export default function ResearcherTab() {
                       <div key={d.id} className="flex items-center justify-between border rounded p-2 text-sm">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium truncate">{d.title}</span>
+                            <span className="font-medium line-clamp-1 break-words min-w-0" title={d.title}>{d.title}</span>
                             {getDiscoveryStatusBadge(d.status)}
                           </div>
                           <a href={d.url} target="_blank" rel="noopener noreferrer"

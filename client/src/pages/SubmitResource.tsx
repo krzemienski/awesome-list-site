@@ -77,6 +77,9 @@ const submitResourceSchema = z.object({
     }),
   description: z.string()
     .trim()
+    // Run22 BUG-021: an EMPTY description used to surface the misleading
+    // "must be at least 10 characters" — say what's actually wrong first.
+    .min(1, "Description is required")
     .min(10, "Description must be at least 10 characters")
     .max(1000, "Description must be 1000 characters or less")
     .refine((v) => !NO_HTML.test(v), "Description must not contain HTML tags"),

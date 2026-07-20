@@ -44,6 +44,10 @@ const USER_PUBLIC_FIELDS = [
   "lastName",
   "profileImageUrl",
   "role",
+  // Run22 BUG-020: pending private deletion-request marker. Only surfaces
+  // where user objects already flow (self via /api/auth/user, admins via
+  // /api/admin/users) — needed so both sides can see a request is pending.
+  "deletionRequestedAt",
   "createdAt",
   "updatedAt",
 ] as const;

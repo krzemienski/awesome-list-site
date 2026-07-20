@@ -159,8 +159,9 @@ function RecommendationCard({
           {/* Header */}
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              {/* BUG-029 (run10): full title via native tooltip on the truncated heading. */}
-              <h3 className="font-semibold text-base truncate" title={resource.name}>{resource.name}</h3>
+              {/* BUG-029 (run10): full title via native tooltip on the truncated heading.
+                  BUG-030 (run22): line-clamp-1 cuts between words instead of mid-word. */}
+              <h3 className="font-semibold text-base line-clamp-1 break-words" title={resource.name}>{resource.name}</h3>
               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                 {resource.description || "No description available"}
               </p>

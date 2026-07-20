@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
-import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { TaxonomyCard } from "@/components/ui/taxonomy-card";
 import {
   Select,
   SelectContent,
@@ -13,7 +12,7 @@ import { AwesomeList, Category } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
 import { getCategoryIcon } from "@/config/navigation-icons";
 import { getCategorySlug } from "@/lib/utils";
-import { ChevronRight } from "lucide-react";
+import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
 interface CategoriesProps {
   awesomeList?: AwesomeList;
@@ -95,16 +94,12 @@ export default function Categories({ awesomeList, isLoading }: CategoriesProps) 
     setSort(value);
     // BUG-015 (run18): write back the exact canonical slug we read, so the
     // Select stays symmetric across reloads. Default (name-asc) drops the param.
-    const params = new URLSearchParams(window.location.search);
-    if (value === "name-asc") params.delete("sort");
-    else params.set("sort", value);
-    const qs = params.toString();
-    window.history.replaceState(
-      null,
-      "",
-      `${window.location.pathname}${qs ? `?${qs}` : ""}`,
-    );
+    // Run22 BUG-016: push (not replace) so Back steps through sort changes.
+    writeFilterParams({ sort: value === "name-asc" ? null : value });
   };
+
+  // Run22 BUG-016: Back/Forward restore the sort from the URL.
+  usePopstateParams((params) => setSort(normalizeSort(params.get("sort"))));
 
   // Counts come from the single deduplicated tree (same source as the sidebar,
   // header, category pages, and SSR) so every surface agrees.
@@ -195,45 +190,18 @@ export default function Categories({ awesomeList, isLoading }: CategoriesProps) 
           {categories.map((cat) => {
             const Icon = getCategoryIcon(cat.name);
             const slug = cat.slug || getCategorySlug(cat.name);
+            // Run22 BUG-024: same shared TaxonomyCard as the Home grid —
+            // one taxonomy card design across levels (NB-037 count caption
+            // and NB-017 two-line wrapping title live inside the component).
             return (
-              <Link
+              <TaxonomyCard
                 key={cat.name}
                 href={`/category/${slug}`}
-                data-testid={`category-card-${slug}`}
-              >
-                <Card className="h-full hover:border-[var(--accent)] transition-colors cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-center justify-between gap-2">
-                      <span
-                        className="flex items-center justify-center shrink-0"
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 8,
-                          background:
-                            "color-mix(in srgb, var(--accent) 12%, transparent)",
-                          color: "var(--accent)",
-                        }}
-                      >
-                        <Icon className="size-4" />
-                      </span>
-                      {/* NB-037 (run18): the bare count badge here duplicated the
-                          labelled "N resources" caption below — dropped it and
-                          kept the clearer captioned count. */}
-                    </div>
-                    {/* NB-017 (run18): allow long category names to wrap to two
-                        lines instead of truncating mid-word at tablet widths;
-                        reserve two lines so cards stay aligned in the grid. */}
-                    <CardTitle className="text-base flex items-start justify-between gap-2 mt-2">
-                      <span className="line-clamp-2 min-h-[2.5em] leading-tight">{cat.name}</span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                    </CardTitle>
-                    <CardDescription>
-                      {cat.displayCount.toLocaleString()} resources
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              </Link>
+                name={cat.name}
+                count={cat.displayCount}
+                icon={Icon}
+                linkTestId={`category-card-${slug}`}
+              />
             );
           })}
         </div>

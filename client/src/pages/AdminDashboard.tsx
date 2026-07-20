@@ -216,7 +216,7 @@ export default function AdminDashboard() {
               Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>
             <TabsTrigger value="edits" className="whitespace-nowrap" data-testid="tab-edits">
-              Edits
+              Edits {stats?.pendingEdits ? <Badge variant="accent" className="ml-2">{stats.pendingEdits}</Badge> : null}
             </TabsTrigger>
             <TabsTrigger value="enrichment" className="whitespace-nowrap" data-testid="tab-enrichment">
               <Sparkles className="h-4 w-4 mr-1" />

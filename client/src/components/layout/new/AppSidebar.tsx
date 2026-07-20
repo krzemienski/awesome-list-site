@@ -12,7 +12,6 @@ import {
   Palette,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
-import { Category, Resource } from "@/types/awesome-list";
 import { getCategoryIcon } from "@/config/navigation-icons";
 import {
   Sidebar,
@@ -26,9 +25,24 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+/**
+ * Run22 BUG-008: the sidebar renders from the lightweight nav tree
+ * (name/slug/resourceCount, no resource arrays) so cold loads of non-listing
+ * pages never download the 2.7MB corpus. The corpus shape (resources arrays)
+ * is still accepted for compatibility.
+ */
+interface NavCategory {
+  name: string;
+  slug?: string;
+  resourceCount?: number;
+  resources?: any[];
+  subcategories?: NavCategory[];
+  subSubcategories?: NavCategory[];
+}
+
 interface AppSidebarProps {
-  categories: Category[];
-  resources: Resource[];
+  categories: NavCategory[];
+  totalResources: number;
   isLoading: boolean;
   user?: any;
 }
@@ -36,7 +50,7 @@ interface AppSidebarProps {
 /* -------- helpers -------- */
 
 function getTotalResourceCount(item: any): number {
-  let total = item.resources?.length || 0;
+  let total = item.resources ? item.resources.length : (item.resourceCount ?? 0);
   if (item.subcategories) {
     total += item.subcategories.reduce(
       (sum: number, sub: any) => sum + getTotalResourceCount(sub),
@@ -52,7 +66,7 @@ function getTotalResourceCount(item: any): number {
   return total;
 }
 
-function filterCategories(categories: Category[]) {
+function filterCategories(categories: NavCategory[]) {
   return categories
     .filter(
       (cat) =>
@@ -180,7 +194,7 @@ function CategoryAccordion({
   openSubs,
   toggleSub,
 }: {
-  cat: Category;
+  cat: NavCategory;
   isOpen: boolean;
   onToggle: () => void;
   isActive: boolean;
@@ -206,7 +220,9 @@ function CategoryAccordion({
   // and reachable on the category page, but without a "General" line the child
   // badges never sum to the category badge. Surfacing them here makes the sidebar
   // math reconcile: sum(subcategory badges) + General badge === category badge.
-  const directCount = cat.resources?.length || 0;
+  const directCount = cat.resources
+    ? cat.resources.length
+    : (cat.resourceCount ?? 0);
   const generalPath = `${catPath}?view=general`;
   const generalActive =
     activePath === catPath &&
@@ -447,7 +463,7 @@ function CategoryAccordion({
 
 export default function AppSidebar({
   categories,
-  resources,
+  totalResources,
   isLoading,
   user,
 }: AppSidebarProps) {
@@ -563,9 +579,9 @@ export default function AppSidebar({
                     color: "var(--text-3)",
                   }}
                 >
-                  {isLoading || resources.length === 0
+                  {isLoading || totalResources === 0
                     ? "Loading…"
-                    : `${resources.length.toLocaleString()} resources`}
+                    : `${totalResources.toLocaleString()} resources`}
                 </span>
               </div>
             </SidebarMenuButton>

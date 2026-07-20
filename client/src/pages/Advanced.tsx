@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { AwesomeList, Resource } from "@/types/awesome-list";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
 const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
 
@@ -37,12 +38,15 @@ export default function Advanced() {
   });
   const handleTabChange = (next: string) => {
     setTab(next);
-    const params = new URLSearchParams(window.location.search);
-    if (next === "explorer") params.delete("tab");
-    else params.set("tab", next);
-    const qs = params.toString();
-    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    // Run22 BUG-016: push (not replace) so Back steps through tab changes.
+    writeFilterParams({ tab: next === "explorer" ? null : next });
   };
+
+  // Run22 BUG-016: Back/Forward restore the tab from the URL.
+  usePopstateParams((params) => {
+    const fromUrl = params.get("tab");
+    setTab(fromUrl && VALID_ADVANCED_TABS.includes(fromUrl) ? fromUrl : "explorer");
+  });
 
   const [selectedResource, setSelectedResource] = useState<Resource | undefined>();
   const [userInterests] = useState<string[]>(["web", "api", "testing", "database"]);

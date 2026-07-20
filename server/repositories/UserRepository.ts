@@ -221,6 +221,27 @@ export class UserRepository {
   }
 
   /**
+   * Set or clear the account-deletion request marker (Run22 BUG-020).
+   * A timestamp = pending private deletion request; NULL = none. Idempotent:
+   * re-requesting keeps the ORIGINAL request time (first-come queue order),
+   * cancelling when nothing is pending is a no-op.
+   * @param userId - User ID
+   * @param requested - true to request deletion, false to withdraw
+   * @returns Updated user object (undefined if user not found)
+   */
+  async setDeletionRequested(userId: string, requested: boolean): Promise<User | undefined> {
+    const set = requested
+      ? { deletionRequestedAt: sql`COALESCE(${users.deletionRequestedAt}, NOW())`, updatedAt: new Date() }
+      : { deletionRequestedAt: null, updatedAt: new Date() };
+    const [user] = await db
+      .update(users)
+      .set(set as any)
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  /**
    * Delete a user with full FK cleanup (NEW-004: admin user deletion).
    *
    * Content is preserved: the user's submitted/approved resources are

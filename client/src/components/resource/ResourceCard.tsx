@@ -93,12 +93,16 @@ function ResourceCard({
   // Run16 BUG-049: inline-block + py-1/-my-1 lifts the anchor's own hit-box to
   // ≥24px (WCAG 2.5.8) without moving the text; the stretched after:inset-0
   // overlay still makes the whole card the effective target.
+  // BUG-003 (run22): the 2-line clamp lives on the anchor itself, not only the
+  // h2 — an inline-block child inside a -webkit-box parent defeats
+  // -webkit-line-clamp (all lines render, no ellipsis). line-clamp's box is
+  // block-level, so the BUG-049 py-1/-my-1 hit-box still holds.
   const titleContent = onClick ? (
     resource.name
   ) : isValidDbResource ? (
     <Link
       href={`/resource/${resource.id}`}
-      className="inline-block py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="line-clamp-2 break-words py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -108,7 +112,7 @@ function ResourceCard({
       href={resource.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-block py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="line-clamp-2 break-words py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}

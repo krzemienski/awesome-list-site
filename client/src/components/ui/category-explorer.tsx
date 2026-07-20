@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useLocation } from "wouter";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
+import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
 interface CategoryExplorerProps {
   categories: Category[];
@@ -73,15 +74,15 @@ function getLatestActivityTs(category: Category): number {
 const VALID_EXPLORER_SORTS = ["name", "count", "activity"];
 
 // Run16 BUG-060: /advanced explorer search + sort deep-link via ?q= & ?sort=
-// (alongside the existing ?tab= sync in Advanced.tsx). replaceState is used
-// directly because wouter's useLocation() is path-only; other params (tab=)
-// are preserved.
-function syncExplorerParam(key: string, value: string | null) {
-  const params = new URLSearchParams(window.location.search);
-  if (value) params.set(key, value);
-  else params.delete(key);
-  const qs = params.toString();
-  window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+// (alongside the existing ?tab= sync in Advanced.tsx); other params (tab=)
+// are preserved. Run22 BUG-016: discrete changes (sort) push a history entry;
+// continuous input (q keystrokes) replaces so typing doesn't flood history.
+function syncExplorerParam(
+  key: string,
+  value: string | null,
+  mode: "push" | "replace" = "push",
+) {
+  writeFilterParams({ [key]: value }, mode);
 }
 
 export default function CategoryExplorer({ categories, resources, className }: CategoryExplorerProps) {
@@ -96,12 +97,19 @@ export default function CategoryExplorer({ categories, resources, className }: C
   });
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    syncExplorerParam("q", value || null);
+    syncExplorerParam("q", value || null, "replace");
   };
   const handleSortChange = (value: string) => {
     setSortBy(value);
     syncExplorerParam("sort", value === "name" ? null : value);
   };
+
+  // Run22 BUG-016: Back/Forward restore explorer search + sort from the URL.
+  usePopstateParams((params) => {
+    setSearchTerm(params.get("q") || "");
+    const s = params.get("sort");
+    setSortBy(s && VALID_EXPLORER_SORTS.includes(s) ? s : "name");
+  });
   const [showSubcategories, setShowSubcategories] = useState(true);
   // Run16 BUG-024: the toggle used to gate only a per-card chevron whose
   // content ALSO required manual expansion, so checking/unchecking produced
@@ -235,6 +243,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
             <div className="flex items-center space-x-2">
               <Checkbox
+                className="h-6 w-6"
                 id="subcategories"
                 aria-label="Show subcategories"
                 checked={showSubcategories}
@@ -381,7 +390,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-foreground hover:text-primary transition-colors font-medium"
+                        className="inline-flex min-h-6 items-center text-foreground hover:text-primary transition-colors font-medium"
                       >
                         {resource.title}
                       </a>

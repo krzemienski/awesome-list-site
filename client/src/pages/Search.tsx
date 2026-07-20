@@ -157,7 +157,7 @@ export default function Search() {
     <div className="space-y-6">
       <SEOHead
         title={trimmed ? `Search: ${trimmed} — Awesome Video` : "Search — Awesome Video"}
-        description="Search 2,300+ curated video development tools, libraries, players, codecs, and learning resources."
+        description="Search 2,000+ curated video development tools, libraries, players, codecs, and learning resources."
         noindex
       />
 

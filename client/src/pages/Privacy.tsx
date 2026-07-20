@@ -73,14 +73,26 @@ export default function Privacy() {
                     </td>
                     <td className="py-2 align-top">Persists for 7 days</td>
                   </tr>
+                  {/* Run22 BUG-051: full GAESA disclosure — retention and
+                      user-control details match the live cookie attributes
+                      (expires ~30 days, path=/, set on the first response
+                      before any consent because it comes from the edge, not
+                      our application). */}
                   <tr className="border-b border-[var(--border)]">
                     <td className="py-2 pr-4 align-top font-mono">GAESA</td>
                     <td className="py-2 pr-4 align-top">
                       Infrastructure cookie set by our hosting edge (Google App
-                      Engine). It supports request routing — we do not use it to
-                      track you and it carries no analytics.
+                      Engine), not by this application. It supports request
+                      routing between the edge and our servers — we do not use
+                      it to track you, it carries no analytics, and we never
+                      read it. Because it comes from the hosting platform, it
+                      appears on your first visit regardless of your analytics
+                      consent choice. It applies site-wide (path "/"). You can
+                      block or delete it in your browser settings at any time —
+                      the site keeps working; the edge may simply set a fresh
+                      one on a later visit.
                     </td>
-                    <td className="py-2 align-top">Set by the hosting platform</td>
+                    <td className="py-2 align-top">About 30 days from your last visit</td>
                   </tr>
                   <tr>
                     <td className="py-2 pr-4 align-top font-mono">_ga, _ga_*</td>
@@ -114,22 +126,22 @@ export default function Privacy() {
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">5. Retention and deletion</h2>
             <p>
-              Account data is kept while your account is active. You can
-              request deletion of your account and personal data by contacting
-              the maintainer via the{" "}
-              {/* Run16 BUG-067: the copy referenced the About page without
-                  linking it. */}
+              Account data is kept while your account is active. To delete
+              your account and personal data, sign in and use{" "}
+              {/* Run22 BUG-020: private, authenticated deletion channel —
+                  replaces the old public-GitHub-issue instruction, which
+                  would have required exposing personal data publicly. */}
               <Link
-                href="/about"
+                href="/profile?tab=security"
                 className="underline underline-offset-4 hover:text-[color:var(--text)]"
-                data-testid="link-privacy-about"
+                data-testid="link-privacy-deletion"
               >
-                About page
+                Profile → Security → Delete account &amp; data
               </Link>
-              {" "}or by{" "}
-              {/* NB-036 (run18): no contact email exists, so document a real,
-                  reachable channel — open a GitHub issue on the awesome-video
-                  repo — for account/data deletion requests. */}
+              . The request is tied to your authenticated session and handled
+              privately by a maintainer — you never have to post your email or
+              any personal data in a public issue. If you can no longer sign
+              in, open a GitHub issue{" "}
               <a
                 href="https://github.com/krzemienski/awesome-video/issues"
                 target="_blank"
@@ -137,10 +149,12 @@ export default function Privacy() {
                 className="underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-privacy-github-issues"
               >
-                opening a GitHub issue
-              </a>
-              . Approved resources you submitted remain in the directory but
-              are detached from your identity.
+                on the repository
+              </a>{" "}
+              that mentions only your username — include no email or personal
+              data; the maintainer will verify ownership privately. Approved
+              resources you submitted remain in the directory but are detached
+              from your identity.
             </p>
           </section>
 

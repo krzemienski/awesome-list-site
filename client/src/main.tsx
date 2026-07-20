@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { initGA } from "./lib/analytics";
+import { needsCorpusRoute } from "./lib/static-data";
 
 // Initialize GA before React renders so window.gtag exists in time for the very
 // first page_view (React runs child effects before parent effects, so App's
@@ -90,6 +91,18 @@ const rootElement = document.getElementById("root")!;
     // Move the scoped <style> siblings too, so the overlay keeps its styling.
     const nodes = Array.from(rootElement.childNodes);
     for (const n of nodes) overlay.appendChild(n);
+    // Run22 BUG-009: once JS runs, React renders the page's real <h1>
+    // underneath the overlay, so the overlay's SSR <h1> would make the DOM
+    // briefly contain two H1s. Demote it to a visually-identical <div>
+    // (.ssr-h1 rule ships in the injected scoped <style>); non-JS crawlers
+    // never execute this and still see the semantic <h1> in the raw HTML.
+    const ssrH1 = overlay.querySelector("h1");
+    if (ssrH1) {
+      const div = document.createElement("div");
+      div.className = "ssr-h1";
+      while (ssrH1.firstChild) div.appendChild(ssrH1.firstChild);
+      ssrH1.replaceWith(div);
+    }
     document.body.appendChild(overlay);
 
     const start = Date.now();
@@ -105,11 +118,16 @@ const rootElement = document.getElementById("root")!;
       if (rootElement.querySelector('[data-testid^="card-resource"]')) {
         return remove();
       }
-      // Watch the query cache directly (no body-stream races): the catalog
-      // payload lands under ["awesome-list-data"] once fully downloaded+parsed.
+      // Watch the query cache directly (no body-stream races). Run22 BUG-008:
+      // listing routes settle on the full catalog under ["awesome-list-data"];
+      // all other routes no longer fetch the corpus, so they settle on the
+      // lightweight nav tree under ["awesome-list-nav"] instead.
+      const settleKey = needsCorpusRoute(window.location.pathname)
+        ? ["awesome-list-data"]
+        : ["awesome-list-nav"];
       if (
         !dataSettledAt &&
-        queryClient.getQueryData(["awesome-list-data"]) !== undefined
+        queryClient.getQueryData(settleKey) !== undefined
       ) {
         dataSettledAt = Date.now();
       }

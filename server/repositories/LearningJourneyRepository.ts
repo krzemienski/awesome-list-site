@@ -232,7 +232,10 @@ export class LearningJourneyRepository {
       .from(journeySteps)
       .leftJoin(resources, eq(journeySteps.resourceId, resources.id))
       .where(eq(journeySteps.journeyId, journeyId))
-      .orderBy(asc(journeySteps.stepNumber));
+      // Run22 BUG-034: deterministic within-step ordering — rows sharing a
+      // stepNumber (multi-part resources) must always come back in id order,
+      // not whatever the planner happens to emit.
+      .orderBy(asc(journeySteps.stepNumber), asc(journeySteps.id));
 
     return rows.map((r) => ({
       ...r.step,
@@ -288,7 +291,8 @@ export class LearningJourneyRepository {
       .select()
       .from(journeySteps)
       .where(inArray(journeySteps.journeyId, journeyIds))
-      .orderBy(asc(journeySteps.stepNumber));
+      // Run22 BUG-034: same deterministic tiebreaker as listJourneySteps.
+      .orderBy(asc(journeySteps.stepNumber), asc(journeySteps.id));
 
     // Group steps by journeyId
     const grouped = new Map<number, JourneyStep[]>();
@@ -352,6 +356,23 @@ export class LearningJourneyRepository {
     stepIds: number[],
     completed?: boolean,
   ): Promise<UserJourneyProgress> {
+    // Run22 BUG-006: a step id sent to journey N's progress endpoint must
+    // actually belong to journey N — otherwise a client can pollute progress
+    // with foreign step ids (breaking completion math on BOTH journeys' UIs).
+    // Validate BEFORE any write and surface a typed error for the route to
+    // map to a 4xx.
+    const allSteps = await this.listJourneySteps(journeyId);
+    const validIds = new Set(allSteps.map((s) => s.id));
+    const foreign = stepIds.filter((id) => !validIds.has(id));
+    if (foreign.length > 0) {
+      const err: any = new Error(
+        `Step id(s) ${foreign.join(', ')} do not belong to journey ${journeyId}`,
+      );
+      err.code = 'FOREIGN_STEP';
+      err.foreignStepIds = foreign;
+      throw err;
+    }
+
     // First get current progress
     const [current] = await db
       .select()
@@ -367,7 +388,12 @@ export class LearningJourneyRepository {
     // removes it so users can un-complete a step and reduce their progress.
     // With an explicit `completed` flag the ids are unioned/removed instead,
     // which is idempotent even if rows drifted into a mixed state.
-    const completedSet = new Set(current?.completedSteps ?? []);
+    // Run22 BUG-006: seed only with ids that are still valid steps of THIS
+    // journey — any orphan ids stored before this guard existed (or left
+    // behind by step deletions) are dropped on the next successful write.
+    const completedSet = new Set(
+      (current?.completedSteps ?? []).map((id) => Number(id)).filter((id) => validIds.has(id)),
+    );
     for (const stepId of stepIds) {
       if (completed === true) {
         completedSet.add(stepId);
@@ -382,7 +408,6 @@ export class LearningJourneyRepository {
     const completedSteps = Array.from(completedSet);
 
     // Check if all steps are completed
-    const allSteps = await this.listJourneySteps(journeyId);
     const allCompleted = allSteps.every(step =>
       step.isOptional || completedSet.has(step.id)
     );
@@ -423,9 +448,14 @@ export class LearningJourneyRepository {
         )
       );
 
-    // Normalize completedSteps to numbers
+    // Normalize completedSteps to numbers and exclude any orphan ids that do
+    // not belong to this journey (Run22 BUG-006: rows written before the
+    // foreign-step guard existed, or steps since deleted, must not surface).
     if (progress && progress.completedSteps) {
-      progress.completedSteps = progress.completedSteps.map(id => Number(id));
+      const validIds = new Set((await this.listJourneySteps(journeyId)).map((s) => s.id));
+      progress.completedSteps = progress.completedSteps
+        .map(id => Number(id))
+        .filter(id => validIds.has(id));
     }
 
     return progress;
@@ -443,10 +473,20 @@ export class LearningJourneyRepository {
       .where(eq(userJourneyProgress.userId, userId))
       .orderBy(desc(userJourneyProgress.lastAccessedAt));
 
-    // Normalize completedSteps to numbers for each progress entry
-    return progressList.map(progress => ({
-      ...progress,
-      completedSteps: progress.completedSteps ? progress.completedSteps.map(id => Number(id)) : []
-    }));
+    // Normalize completedSteps to numbers and exclude orphan ids that do not
+    // belong to each row's journey (Run22 BUG-006 — same exclusion as the
+    // single-journey read so every view agrees).
+    const stepsMap = await this.listJourneyStepsBatch(
+      progressList.map((p) => p.journeyId),
+    );
+    return progressList.map(progress => {
+      const validIds = new Set((stepsMap.get(progress.journeyId) ?? []).map((s) => s.id));
+      return {
+        ...progress,
+        completedSteps: progress.completedSteps
+          ? progress.completedSteps.map(id => Number(id)).filter(id => validIds.has(id))
+          : []
+      };
+    });
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { TaxonomyCard } from "@/components/ui/taxonomy-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag } from "@/lib/tags";
+import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import {
   FileText,
   Video,
@@ -109,19 +111,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   const setSelectedTags = (next: string[]) => {
     setSelectedTagsState(next);
-    const params = new URLSearchParams(window.location.search);
-    if (next.length === 0) {
-      params.delete("tags");
-    } else {
-      params.set("tags", next.join(","));
-    }
-    const qs = params.toString();
-    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    // Run22 BUG-016: push (not replace) so Back steps through filter changes.
+    writeFilterParams({ tags: next.length === 0 ? null : next.join(",") });
   };
   // R2-M25: sort survives refresh via ?sort= URL param. wouter's useLocation()
-  // is path-only, so read/write window.location.search directly and use
-  // history.replaceState (no navigation, no og-middleware impact — the server
-  // only keys off ?page=).
+  // is path-only, so read/write window.location.search directly (no
+  // navigation, no og-middleware impact — the server only keys off ?page=).
   const VALID_SORTS = ["default", "name-asc", "name-desc", "count-desc", "count-asc"];
   const [sortBy, setSortBy] = useState(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("sort");
@@ -130,15 +125,18 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   const handleSortChange = (next: string) => {
     setSortBy(next);
-    const params = new URLSearchParams(window.location.search);
-    if (next === "default") {
-      params.delete("sort");
-    } else {
-      params.set("sort", next);
-    }
-    const qs = params.toString();
-    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    // Run22 BUG-016: push (not replace) so Back steps through sort changes.
+    writeFilterParams({ sort: next === "default" ? null : next });
   };
+
+  // Run22 BUG-016: Back/Forward re-read the query into state so each history
+  // step visibly reverses/restores one tag/sort change.
+  usePopstateParams((params) => {
+    const t = params.get("tags");
+    setSelectedTagsState(t ? t.split(",").map((x) => x.trim()).filter(Boolean) : []);
+    const s = params.get("sort");
+    setSortBy(s && VALID_SORTS.includes(s) ? s : "default");
+  });
 
   const baseCategories = useMemo(() => {
     if (!awesomeList?.categories) return [];
@@ -222,6 +220,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
+        {/* BUG-031 (run22): head swaps with the route immediately — default
+            brand head while the catalog loads. */}
+        <SEOHead />
         <div className="space-y-4">
           <Skeleton className="h-10 w-80" />
           <Skeleton className="h-6 w-96" />
@@ -327,50 +328,35 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             : "";
 
           return (
-            <Link
+            <TaxonomyCard
               key={category.slug}
               // BUG-025 (run14): active tag filter survives the drill-down —
               // Category reads ?tags= on mount, so the chip journey ends on a
               // tag-filtered resource list instead of silently unfiltering.
               href={`/category/${category.slug}${selectedTags.length > 0 ? `?tags=${encodeURIComponent(selectedTags.join(","))}` : ""}`}
-              aria-label={`View ${category.name} category with ${totalCount} resources`}
-              data-testid={`link-category-${category.slug}`}
-              className="block outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
-            >
-              {/* BUG-023 (run9): hover affordance — accent border on hover,
-                  same pattern as the Categories page cards. */}
-              <Card className="h-full cursor-pointer hover:border-[var(--accent)] transition-colors">
-                <CardHeader className="p-4 space-y-1.5">
-                  <div className="flex items-start justify-between gap-3 mb-1">
-                    <Icon className="h-5 w-5 text-[var(--accent)] shrink-0" />
-                    <Badge
-                      variant="secondary"
-                      className="tabular-nums shrink-0"
-                      data-testid={`badge-count-${category.slug}`}
-                    >
-                      {totalCount}
-                    </Badge>
-                  </div>
-                  <CardTitle className="font-sans font-semibold text-base tracking-tight">
-                    {category.name}
-                  </CardTitle>
-                  {/* Run19 BUG-016: the teaser is one resource's blurb, not a
-                      category description — label it so it can't read as
-                      category copy. */}
-                  {description && firstResource && (
-                    <CardDescription
-                      className="line-clamp-2 text-xs"
-                      data-testid={`text-category-teaser-${category.slug}`}
-                    >
-                      <span className="font-medium text-foreground/70">
-                        Featured: {firstResource.title} —
-                      </span>{" "}
-                      {description}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-              </Card>
-            </Link>
+              name={category.name}
+              count={totalCount}
+              icon={Icon}
+              ariaLabel={`View ${category.name} category with ${totalCount} resources`}
+              linkTestId={`link-category-${category.slug}`}
+              countTestId={`badge-count-${category.slug}`}
+              extra={
+                // Run19 BUG-016: the teaser is one resource's blurb, not a
+                // category description — label it so it can't read as
+                // category copy.
+                description && firstResource ? (
+                  <CardDescription
+                    className="line-clamp-2 text-xs"
+                    data-testid={`text-category-teaser-${category.slug}`}
+                  >
+                    <span className="font-medium text-foreground/70">
+                      Featured: {firstResource.title} —
+                    </span>{" "}
+                    {description}
+                  </CardDescription>
+                ) : undefined
+              }
+            />
           );
         })}
       </div>

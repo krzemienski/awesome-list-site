@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet";
+import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import {
   Sparkles,
@@ -18,10 +19,20 @@ import {
   ExternalLink,
   HelpCircle
 } from "lucide-react";
-import { ABOUT_FAQS } from "@shared/faq";
+import { useQuery } from "@tanstack/react-query";
+import { getAboutFaqs } from "@shared/faq";
 import { MAINTAINER } from "@shared/about-content";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 
 export default function About() {
+  // Run22 BUG-018: FAQ resource-count claim rendered from the live catalog
+  // (same shared cache key as App/Home — no extra network round-trip).
+  const { data: treeData } = useQuery({
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
+    staleTime: 1000 * 60 * 60,
+  });
+  const aboutFaqs = getAboutFaqs(treeData?.resources?.length);
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>
@@ -77,12 +88,23 @@ export default function About() {
               {MAINTAINER.name} on GitHub
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
-            {/* NB-036 (run18): there is no support email, so point people at a
-                real, reachable channel — the awesome-video GitHub issues — for
-                questions and for account / data-deletion requests. */}
+            {/* Run22 BUG-020: account/data-deletion requests now go through
+                the private, authenticated channel (Profile → Security) — the
+                public issue tracker is only for questions and corrections. */}
             <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
-              Questions, corrections, or an account/data-deletion request? The
-              best way to reach us is to{" "}
+              Need your account or personal data deleted? Sign in and use{" "}
+              <Link
+                href="/profile?tab=security"
+                className="font-medium text-[var(--accent)] hover:underline"
+                data-testid="link-about-deletion"
+              >
+                Profile → Security → Delete account &amp; data
+              </Link>
+              {" "}— it's private and authenticated, so you never have to post
+              personal details publicly.
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
+              Questions or corrections? The best way to reach us is to{" "}
               <a
                 href="https://github.com/krzemienski/awesome-video/issues"
                 target="_blank"
@@ -372,7 +394,7 @@ export default function About() {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {ABOUT_FAQS.map((faq) => (
+            {aboutFaqs.map((faq) => (
               <div key={faq.question} className="space-y-1.5">
                 {/* Run15 BUG-028: h2 keeps the heading outline sequential —
                     the page's only H1 is the hero; CardTitles are divs. */}

@@ -17,12 +17,14 @@ export interface ViewModeResource {
   description?: string;
 }
 
-function titleAnchor(resource: ViewModeResource, testId: string) {
+function titleAnchor(resource: ViewModeResource, testId: string, clampClass = "") {
   const isDb = resource.id !== "";
-  const className =
-    // BUG-049: inline-block + py/-my so the anchor's own hit-box is ≥24px
-    // tall without shifting the text layout.
-    "inline-block py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]";
+  // BUG-049: inline-block + py/-my so the anchor's own hit-box is ≥24px
+  // tall without shifting the text layout.
+  // BUG-003 (run22): clamped callers pass clampClass (replacing inline-block)
+  // because an inline-block child inside a -webkit-box wrapper defeats
+  // -webkit-line-clamp; the clamp's block-level box keeps the hit-box.
+  const className = `${clampClass || "inline-block"} py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`;
   return isDb ? (
     <Link href={`/resource/${resource.id}`} className={className} data-testid={testId}>
       {resource.title}
@@ -95,8 +97,8 @@ export function ResourceCompactCard({ resource }: { resource: ViewModeResource }
       data-testid={`compact-resource-${resource.id || resource.url}`}
     >
       <div className="flex items-start gap-1.5 min-w-0">
-        <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0" title={resource.title}>
-          {titleAnchor(resource, `link-resource-compact-${resource.id || resource.url}`)}
+        <span className="font-medium text-xs sm:text-sm flex-1 min-w-0" title={resource.title}>
+          {titleAnchor(resource, `link-resource-compact-${resource.id || resource.url}`, "line-clamp-2 break-words")}
         </span>
         <Button
           asChild

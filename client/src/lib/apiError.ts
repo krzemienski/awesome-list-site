@@ -1,7 +1,9 @@
-// BUG-007 (run14): apiRequest throws Error("STATUS: rawBody") — surfacing that
-// raw string in toasts shows users things like '409: {"error":"duplicate"}'.
-// This shared mapper turns those errors into human-readable copy. Keep every
-// mutation toast routed through humanizeApiError() instead of error.message.
+// BUG-007 (run14): apiRequest throws errors whose raw server body — surfaced
+// straight into toasts — shows users things like '409: {"error":"duplicate"}'.
+// This shared mapper turns those errors into human-readable copy.
+// Run22 BUG-039: ApiError now humanizes its own `message` at construction
+// (via humanizeStatusBody below) and keeps the raw server body on `.body`,
+// so even toast sites that render error.message directly never show raw JSON.
 
 const STATUS_FALLBACKS: Record<number, string> = {
   400: "Some of the submitted information is invalid. Please review the form and try again.",
@@ -29,13 +31,51 @@ function looksHumanReadable(text: string): boolean {
 }
 
 /**
- * Convert an apiRequest/fetch error into a message safe to show users.
- * Handles the `"STATUS: rawBody"` format thrown by throwIfResNotOk:
+ * Run22 BUG-039: core status+body → human copy mapper. Used by ApiError's
+ * constructor (queryClient.ts) so error.message is ALWAYS user-safe, and by
+ * humanizeApiError below for legacy "STATUS: body" strings.
  * - JSON bodies: prefers `message`, then `error` when human-readable.
  * - Plain text bodies: used when human-readable.
  * - Otherwise: a friendly per-status fallback.
  */
+export function humanizeStatusBody(
+  status: number,
+  body: string,
+  fallback = "Something went wrong. Please try again.",
+): string {
+  const trimmed = (body || "").trim();
+  if (trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed) as { message?: unknown; error?: unknown };
+      const candidate =
+        (typeof parsed.message === "string" && parsed.message) ||
+        (typeof parsed.error === "string" && parsed.error) ||
+        "";
+      if (looksHumanReadable(candidate)) return candidate;
+    } catch {
+      // fall through to status fallback
+    }
+  } else if (looksHumanReadable(trimmed) && !/^[A-Za-z ]*Error/.test(trimmed)) {
+    return trimmed;
+  }
+  return STATUS_FALLBACKS[status] ?? fallback;
+}
+
+/**
+ * Convert an apiRequest/fetch error into a message safe to show users.
+ * Prefers structured ApiError props (`status` + `body`); falls back to the
+ * legacy `"STATUS: rawBody"` message format, then network-error heuristics.
+ */
 export function humanizeApiError(error: unknown, fallback = "Something went wrong. Please try again."): string {
+  // Structured path: ApiError carries status + raw body as real properties.
+  if (
+    error && typeof error === "object" &&
+    typeof (error as any).status === "number" &&
+    typeof (error as any).body === "string"
+  ) {
+    return humanizeStatusBody((error as any).status, (error as any).body, fallback);
+  }
+
   const raw = error instanceof Error ? error.message : typeof error === "string" ? error : "";
   if (!raw) return fallback;
 
@@ -48,25 +88,7 @@ export function humanizeApiError(error: unknown, fallback = "Something went wron
     return looksHumanReadable(raw) ? raw : fallback;
   }
 
-  const status = parseInt(match[1], 10);
-  const body = match[2].trim();
-
-  if (body.startsWith("{")) {
-    try {
-      const parsed = JSON.parse(body) as { message?: unknown; error?: unknown };
-      const candidate =
-        (typeof parsed.message === "string" && parsed.message) ||
-        (typeof parsed.error === "string" && parsed.error) ||
-        "";
-      if (looksHumanReadable(candidate)) return candidate;
-    } catch {
-      // fall through to status fallback
-    }
-  } else if (looksHumanReadable(body) && !/^[A-Za-z ]*Error/.test(body)) {
-    return body;
-  }
-
-  return STATUS_FALLBACKS[status] ?? fallback;
+  return humanizeStatusBody(parseInt(match[1], 10), match[2], fallback);
 }
 
 /**
@@ -76,10 +98,22 @@ export function humanizeApiError(error: unknown, fallback = "Something went wron
  * error carries no usable `fieldErrors` object (non-400, non-JSON, etc.).
  */
 export function extractFieldErrors(error: unknown): Record<string, string> | null {
-  const raw = error instanceof Error ? error.message : typeof error === "string" ? error : "";
-  const match = raw.match(/^(\d{3}):\s*([\s\S]*)$/);
-  if (!match) return null;
-  const body = match[2].trim();
+  // Run22 BUG-039: ApiError.message is humanized now — read the raw server
+  // body from the structured `.body` property first; legacy "STATUS: body"
+  // message parsing kept for non-ApiError callers.
+  let body = "";
+  if (
+    error && typeof error === "object" &&
+    typeof (error as any).status === "number" &&
+    typeof (error as any).body === "string"
+  ) {
+    body = ((error as any).body as string).trim();
+  } else {
+    const raw = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+    const match = raw.match(/^(\d{3}):\s*([\s\S]*)$/);
+    if (!match) return null;
+    body = match[2].trim();
+  }
   if (!body.startsWith("{")) return null;
   try {
     const parsed = JSON.parse(body) as { fieldErrors?: unknown };

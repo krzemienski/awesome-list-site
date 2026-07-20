@@ -10,6 +10,8 @@ interface User {
   provider?: string;
   role?: string;
   createdAt?: string;
+  // Run22 BUG-020: pending private account-deletion request (null = none).
+  deletionRequestedAt?: string | null;
 }
 
 interface AuthResponse {

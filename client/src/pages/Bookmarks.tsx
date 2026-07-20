@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
 interface BookmarkedResource {
   id: string;
@@ -34,14 +35,15 @@ export default function Bookmarks() {
 
   const handleSortChange = (value: string) => {
     setSortBy(value);
-    const params = new URLSearchParams(window.location.search);
-    params.set("sort", value);
-    window.history.replaceState(
-      {},
-      "",
-      `${window.location.pathname}?${params.toString()}`,
-    );
+    // Run22 BUG-016: push (not replace) so Back steps through sort changes.
+    writeFilterParams({ sort: value });
   };
+
+  // Run22 BUG-016: Back/Forward restore the sort from the URL.
+  usePopstateParams((params) => {
+    const s = params.get("sort");
+    setSortBy(s && VALID_SORTS.includes(s) ? s : "date-desc");
+  });
 
   const { data: bookmarks, isLoading, error } = useQuery<BookmarkedResource[]>({
     queryKey: ['/api/bookmarks'],
@@ -64,15 +66,18 @@ export default function Bookmarks() {
         return catA.localeCompare(catB);
       });
     } else if (sortBy === "date-desc") {
+      // Run22 BUG-010: "date" on the bookmarks page means when the USER
+      // bookmarked the resource (bookmarkedAt), not when the resource row was
+      // created in the catalog (createdAt).
       results.sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const dateA = a.bookmarkedAt ? new Date(a.bookmarkedAt).getTime() : 0;
+        const dateB = b.bookmarkedAt ? new Date(b.bookmarkedAt).getTime() : 0;
         return dateB - dateA;
       });
     } else if (sortBy === "date-asc") {
       results.sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const dateA = a.bookmarkedAt ? new Date(a.bookmarkedAt).getTime() : 0;
+        const dateB = b.bookmarkedAt ? new Date(b.bookmarkedAt).getTime() : 0;
         return dateA - dateB;
       });
     }

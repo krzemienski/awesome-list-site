@@ -53,6 +53,9 @@ const makeSuggestEditSchema = (originalUrl: string) => z.object({
       message: "New URLs must use HTTPS (keeping the current URL unchanged is fine)"
     }),
   description: z.string()
+    // Run22 BUG-021: an empty description should say it's required, not
+    // surface the misleading minimum-length message.
+    .min(1, "Description is required")
     .min(10, "Description must be at least 10 characters")
     .max(1000, "Description must be 1000 characters or less"),
   category: z.string().min(1, "Please select a category"),

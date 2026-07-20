@@ -25,9 +25,15 @@ export const FONT_LS_KEY = "ds-font-override";
 
 export function applyFontOverride(id: string): void {
   const opt = FONT_OPTIONS.find((f) => f.id === id) ?? FONT_OPTIONS[0];
+  // Run22 BUG-015: body text renders with `var(--font-body)` (index.css +
+  // design-system.css), NOT `--font-sans` — setting only --font-sans was a
+  // silent no-op. Override BOTH: --font-body drives the actual body/UI text,
+  // --font-sans keeps Tailwind `font-sans` utilities in agreement.
   if (opt.id === "system" || !opt.stack) {
+    document.documentElement.style.removeProperty("--font-body");
     document.documentElement.style.removeProperty("--font-sans");
   } else {
+    document.documentElement.style.setProperty("--font-body", opt.stack);
     document.documentElement.style.setProperty("--font-sans", opt.stack);
   }
 }

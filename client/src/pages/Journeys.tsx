@@ -10,6 +10,7 @@ import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy } from "
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import SEOHead from "@/components/layout/SEOHead";
+import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
 interface Journey {
   id: number;
@@ -30,19 +31,22 @@ export default function Journeys() {
   const [, setLocation] = useLocation();
   // BUG-033 (run19): the category filter is URL-synced (?category=...) so a
   // filtered view survives reload and can be shared — read it on mount, write
-  // it on change (replaceState: filter tweaks shouldn't pollute history).
+  // it on change.
   const [selectedCategory, setSelectedCategory] = useState<string>(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("category");
     return fromUrl && fromUrl.trim() !== "" ? fromUrl : "all";
   });
   const handleCategoryChange = (next: string) => {
     setSelectedCategory(next);
-    const params = new URLSearchParams(window.location.search);
-    if (next === "all") params.delete("category");
-    else params.set("category", next);
-    const qs = params.toString();
-    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    // Run22 BUG-016: push (not replace) so Back steps through filter changes.
+    writeFilterParams({ category: next === "all" ? null : next });
   };
+
+  // Run22 BUG-016: Back/Forward restore the category filter from the URL.
+  usePopstateParams((params) => {
+    const fromUrl = params.get("category");
+    setSelectedCategory(fromUrl && fromUrl.trim() !== "" ? fromUrl : "all");
+  });
   const { isAuthenticated } = useAuth();
 
   // Fetch all published journeys (includes enrollment and progress data)
@@ -99,7 +103,7 @@ export default function Journeys() {
           <Skeleton className="h-10 w-64 mb-4" />
           <Skeleton className="h-6 w-96" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array(6).fill(0).map((_, i) => (
             <Skeleton key={i} className="h-80" />
           ))}
@@ -174,7 +178,9 @@ export default function Journeys() {
           </div>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        // BUG-012 (run22): 3 columns only from xl — at lg (1024–1279) the
+        // docked sidebar left ~220px cards and the CTA labels ellipsized.
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredJourneys.map((journey) => {
             const enrolled = journey.isEnrolled || false;
             const progressPercent = journey.stepCount && journey.stepCount > 0
@@ -211,9 +217,12 @@ export default function Journeys() {
                     {/* BUG-010 (run13): journey titles are links, matching the
                         card-title-as-link pattern used on resource cards. */}
                     {/* Run17 BUG-048: ≥24px tap target. */}
+                    {/* Run22 BUG-036: readable left-aligned mobile titles capped
+                        at two lines (line-clamp-2) with word-boundary wrapping. */}
                     <Link
                       href={`/journey/${journey.id}`}
-                      className="hover:underline hover:text-[var(--accent)] transition-colors inline-flex items-center min-h-[24px]"
+                      className="hover:underline hover:text-[var(--accent)] transition-colors line-clamp-2 break-words min-h-[24px] text-left"
+                      title={journey.title}
                       data-testid={`link-journey-title-${journey.id}`}
                     >
                       {journey.title}
@@ -278,16 +287,20 @@ export default function Journeys() {
                 <CardFooter>
                   <Button 
                     className={cn(
-                      "w-full group",
+                      "w-full group h-auto min-h-9 whitespace-normal",
                       enrolled ? "bg-primary/20 hover:bg-primary/30 text-primary" : ""
                     )}
                     variant={enrolled ? "outline" : "default"}
                     onClick={() => setLocation(`/journey/${journey.id}`)}
                     data-testid={`button-view-journey-${journey.id}`}
                   >
-                    {/* BUG-037 (run14): shrink-0 icons + truncating label — at
-                        768px the flex button squeezed the leading icon and
-                        clipped it. */}
+                    {/* BUG-037 (run14): shrink-0 icons — at 768px the flex
+                        button squeezed the leading icon and clipped it. */}
+                    {/* BUG-012 (run22): never ellipsize the CTA — labels stay
+                        full at every width (whitespace-normal + h-auto lets the
+                        text wrap in the worst case instead of clipping); the
+                        decorative trailing arrow hides below 900px to keep the
+                        label on one line at 768–899px. */}
                     {/* Run17 BUG-046: "Continue" only once real progress exists —
                         enrolled-with-zero-progress previously showed "Continue
                         Journey" on journeys the user had never actually begun.
@@ -296,20 +309,20 @@ export default function Journeys() {
                     {enrolled && progressPercent === 100 ? (
                       <>
                         <Trophy className="h-4 w-4 mr-2 shrink-0" />
-                        <span className="truncate">Completed · Review</span>
+                        <span className="text-left">Completed · Review</span>
                       </>
                     ) : enrolled && (journey.completedStepCount || 0) > 0 ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 mr-2 shrink-0" />
-                        <span className="truncate">Continue Journey</span>
+                        <span className="text-left">Continue Journey</span>
                       </>
                     ) : (
                       <>
                         <Play className="h-4 w-4 mr-2 shrink-0" />
-                        <span className="truncate">Start Journey</span>
+                        <span className="text-left">Start Journey</span>
                       </>
                     )}
-                    <ArrowRight className="h-4 w-4 ml-auto shrink-0 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="hidden min-[900px]:block h-4 w-4 ml-auto shrink-0 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </CardFooter>
               </Card>

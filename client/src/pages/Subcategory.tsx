@@ -11,7 +11,7 @@ import { ArrowLeft, Search } from "lucide-react";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
-import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
+import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -42,13 +42,19 @@ export default function Subcategory() {
   });
   // Run16 BUG-050: grid/list/compact toggle, shared preference key with
   // Category so the choice follows the user across taxonomy levels.
+  // Run22 BUG-026: an explicit ?view=grid|list|compact wins over the saved
+  // preference and is persisted back to the URL (also once the user toggles).
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const fromUrl = getSearchParams().get('view');
+    if (isLayoutViewMode(fromUrl)) return fromUrl;
     const saved = safeGetItem('awesome-list-view-mode');
     return saved === 'grid' || saved === 'list' || saved === 'compact' ? saved : 'grid';
   });
+  const viewParamExplicitRef = useRef(isLayoutViewMode(getSearchParams().get('view')));
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     safeSetItem('awesome-list-view-mode', mode);
+    viewParamExplicitRef.current = true;
   };
   
   const { data: rawData, isLoading, error } = useQuery({
@@ -167,12 +173,14 @@ export default function Subcategory() {
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
     if (page > 1) params.set("page", String(page));
+    // Run22 BUG-026: persist an explicitly chosen layout view.
+    if (viewParamExplicitRef.current) params.set("view", viewMode);
 
     const newSearch = params.toString();
     const newPath = `/subcategory/${slug}${newSearch ? `?${newSearch}` : ""}`;
     const currentPath = `${window.location.pathname}${window.location.search}`;
 
-    const pushSnapshot = JSON.stringify([page, selectedTags, sortBy]);
+    const pushSnapshot = JSON.stringify([page, selectedTags, sortBy, viewMode]);
     if (currentPath !== newPath) {
       const shouldPush =
         urlSyncInitializedRef.current &&
@@ -187,7 +195,7 @@ export default function Subcategory() {
     urlSyncInitializedRef.current = true;
     popNavigationRef.current = false;
     pushSnapshotRef.current = pushSnapshot;
-  }, [searchTerm, selectedTags, sortBy, page, slug, location]);
+  }, [searchTerm, selectedTags, sortBy, page, slug, location, viewMode]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -199,6 +207,14 @@ export default function Subcategory() {
       setSortBy(params.get("sortBy") || "default");
       const p = parseInt(params.get("page") || "1", 10);
       setPage(Number.isFinite(p) && p > 0 ? p : 1);
+      // Run22 BUG-026: restore the layout view carried by this history entry.
+      const v = params.get("view");
+      if (isLayoutViewMode(v)) {
+        setViewMode(v);
+        viewParamExplicitRef.current = true;
+      } else {
+        viewParamExplicitRef.current = false;
+      }
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -214,6 +230,8 @@ export default function Subcategory() {
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
+        {/* BUG-031 (run22): head swaps with the route immediately. */}
+        <SEOHead title="Loading subcategory" description="Loading subcategory resources on Awesome Video." />
         <h1 className="sr-only">Loading subcategory…</h1>
         <div className="space-y-4">
           <Skeleton className="h-10 w-64" />
@@ -294,8 +312,9 @@ export default function Subcategory() {
               Category: {categoryName}
             </p>
           </div>
+          {/* Run22 BUG-025: badge tracks the active filter result count. */}
           <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
-            {allResources.length}
+            {filteredResources.length}
           </Badge>
         </div>
       </div>
@@ -361,7 +380,8 @@ export default function Subcategory() {
            reappears at md and a 2-col grid left ~60px titles ("Adv…"). */
         <div className={
           viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4"
+            // BUG-003 (run22): 3 cols only from xl — same lg squeeze as /category.
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4"
             : viewMode === "list"
             ? "flex flex-col gap-2 min-w-0"
             : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0"

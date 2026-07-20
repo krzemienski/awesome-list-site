@@ -227,10 +227,12 @@ mkdirSync("screenshots/verify", { recursive: true });
       await page.goto(BASE + "/", { waitUntil: "domcontentloaded" });
       await page.evaluate((id) => localStorage.setItem("ds-font-override", id), f.id);
       await page.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
+      // Run22 BUG-015: assert --font-body (the var body text actually
+      // consumes) — asserting only --font-sans previously masked a no-op.
       const applied = await page.evaluate(() =>
-        document.documentElement.style.getPropertyValue("--font-sans")
+        document.documentElement.style.getPropertyValue("--font-body")
       );
-      // "system" stack="" → boot script should leave --font-sans unset
+      // "system" stack="" → boot script should leave --font-body unset
       if (f.id === "system") {
         if (applied !== "") mismatches.push(`${f.id}: expected unset, got "${applied}"`);
       } else if (applied !== f.stack) {

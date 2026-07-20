@@ -83,6 +83,7 @@
     "input-otp": "^1.4.2",
     "js-yaml": "^4.1.0",
     "jsdom": "^27.0.0",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.453.0",
     "memoizee": "^0.4.17",
     "memorystore": "^1.6.7",

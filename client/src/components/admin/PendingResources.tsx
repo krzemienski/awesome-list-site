@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDate } from "@/lib/utils";
@@ -49,10 +49,37 @@ export default function PendingResources() {
   // Run17 BUG-027: "Check again" busy/outcome state for the empty view.
   const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked'>('idle');
 
+  // BUG-011 (run22): the swipe hint must appear whenever the table actually
+  // overflows its scrollport (which is always the case at ≤768px, where the
+  // 720px min-width table exceeds the content area) — the previous `sm:hidden`
+  // class hid it between 640–768px even though the table still scrolled.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+
   const { data, isLoading } = useQuery<PendingResourcesResponse>({
     queryKey: ['/api/admin/pending-resources'],
     refetchInterval: 10000
   });
+
+  // BUG-011 (run22): keep the hint in sync with real horizontal overflow.
+  // Deps include the loading/count flags because the scroll container only
+  // mounts once data has arrived (early returns above it).
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // The shadcn <Table> renders its own inner `overflow-auto` wrapper, so
+    // horizontal overflow lives there — compare the table's laid-out width
+    // (min-w 720px) against the visible container width.
+    const check = () => {
+      const table = el.querySelector('table');
+      const contentWidth = table ? table.getBoundingClientRect().width : el.scrollWidth;
+      setShowSwipeHint(contentWidth > el.clientWidth + 1);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isLoading, data?.total]);
 
   const approveMutation = useMutation({
     mutationFn: async (resourceId: number): Promise<unknown> => {
@@ -140,11 +167,6 @@ export default function PendingResources() {
         variant: "destructive"
       });
     }
-  };
-
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
   };
 
   // BUG-034 (run14): submissions carry tags in metadata.tags (the submit form
@@ -257,23 +279,30 @@ export default function PendingResources() {
               dropping sticky + letting the whole row scroll together keeps rows
               readable and Approve/Reject reachable at 375/768 while leaving the
               desktop layout (table already fits, no scroll) unchanged. */}
-          <div className="max-h-[600px] overflow-auto">
-            <Table className="min-w-[720px]">
+          <div ref={scrollRef} className="max-h-[600px] overflow-auto">
+            {/* BUG-011 (run22): balanced columns via table-fixed — with auto
+                layout, max-w on cells doesn't cap column width, so the table
+                grew to ~1312px and pushed Approve/Reject off-screen even at
+                1440. Fixed layout makes the table fit its container at desktop
+                (no scroll) while min-w-[960px] keeps the ≤768px scroll+hint
+                behavior (px column widths act as minimums in fixed layout).
+                Tighter py-2 keeps tablet rows compact. */}
+            <Table className="min-w-[960px] table-fixed [&_td]:py-2">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Submitted</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[170px]">Title</TableHead>
+                  <TableHead className="w-[115px]">Category</TableHead>
+                  <TableHead className="w-[220px]">Description</TableHead>
+                  <TableHead className="w-[150px]">Submitted</TableHead>
+                  <TableHead className="w-[320px] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {pendingResources.map((resource) => (
                   <TableRow key={resource.id} data-testid={`row-pending-resource-${resource.id}`}>
-                    <TableCell className="font-medium max-w-[320px]">
+                    <TableCell className="font-medium">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="truncate" title={resource.title}>{resource.title}</span>
+                        <span className="line-clamp-1 break-words min-w-0" title={resource.title}>{resource.title}</span>
                         <a
                           href={resource.url}
                           target="_blank"
@@ -286,20 +315,25 @@ export default function PendingResources() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <Badge variant="outline" className="w-fit">
-                          {resource.category}
+                      <div className="flex flex-col gap-1 min-w-0">
+                        {/* BUG-011 (run22): badge/subcategory truncate on one
+                            line (full value in tooltip) so the category cell
+                            never drives row height past the tablet budget. */}
+                        <Badge variant="outline" className="w-fit max-w-full" title={resource.category}>
+                          <span className="truncate">{resource.category}</span>
                         </Badge>
                         {resource.subcategory && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-muted-foreground truncate" title={resource.subcategory}>
                             {resource.subcategory}
                           </span>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[300px]">
-                      <p className="text-sm text-muted-foreground">
-                        {truncateText(resource.description, 80)}
+                    <TableCell>
+                      {/* BUG-011 (run22): clamp instead of hard-truncating at 80
+                          chars — up to 3 full lines, full text on hover. */}
+                      <p className="text-sm text-muted-foreground line-clamp-3" title={resource.description}>
+                        {resource.description}
                       </p>
                       {/* BUG-034 (run14): reviewers must see submitted tags —
                           approvals were previously blind to tag content. */}
@@ -320,9 +354,11 @@ export default function PendingResources() {
                           {formatDate(resource.createdAt)}
                         </span>
                         {(resource.submittedByEmail ?? resource.submittedBy) && (
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <User className="h-3 w-3" />
-                            {resource.submittedByEmail ?? resource.submittedBy}
+                          <span className="flex items-center gap-1 text-muted-foreground min-w-0">
+                            <User className="h-3 w-3 shrink-0" />
+                            <span className="truncate" title={resource.submittedByEmail ?? resource.submittedBy ?? undefined}>
+                              {resource.submittedByEmail ?? resource.submittedBy}
+                            </span>
                           </span>
                         )}
                       </div>
@@ -369,10 +405,14 @@ export default function PendingResources() {
               </TableBody>
             </Table>
           </div>
-          {/* R4-011 (run21): discoverability hint for the contained horizontal scroll. */}
-          <p className="text-xs text-muted-foreground mt-2 sm:hidden">
-            Swipe the table sideways to see all columns, including Approve/Reject.
-          </p>
+          {/* R4-011 (run21) + BUG-011 (run22): discoverability hint for the
+              contained horizontal scroll — shown whenever the table actually
+              overflows (always at ≤768px), not just below the sm breakpoint. */}
+          {showSwipeHint && (
+            <p className="text-xs text-muted-foreground mt-2" data-testid="hint-swipe-pending-table">
+              Swipe the table sideways to see all columns, including Approve/Reject.
+            </p>
+          )}
         </CardContent>
       </Card>
 

@@ -195,7 +195,7 @@ function ResourcePicker({
                 className="w-full text-left p-2 hover:bg-accent text-sm"
                 data-testid={`step-resource-option-${r.id}`}
               >
-                <div className="font-medium truncate">{r.title}</div>
+                <div className="font-medium line-clamp-1 break-words" title={r.title}>{r.title}</div>
                 <div className="text-xs text-muted-foreground truncate">{r.url}</div>
               </button>
             ))}
@@ -723,7 +723,7 @@ export default function JourneyStepsManager() {
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium truncate">{j.title}</span>
+                  <span className="font-medium line-clamp-1 break-words min-w-0" title={j.title}>{j.title}</span>
                   <Badge variant="outline">{j.category}</Badge>
                   {j.status && j.status !== "published" && (
                     <Badge variant="secondary">{j.status}</Badge>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <title>Awesome Video — Curated video development resources</title>
-    <meta name="description" content="The curated index of 2,300+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta name="description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta name="keywords" content="video development, ffmpeg, hls, dash, video players, encoders, codecs, streaming, video ai, awesome video" />
     <link rel="canonical" href="https://awesome.video/" />
     <meta property="og:type" content="website" />
@@ -12,7 +12,7 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://awesome.video/" />
     <meta property="og:title" content="Awesome Video — Curated video development resources" />
-    <meta property="og:description" content="The curated index of 2,300+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta property="og:description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta property="og:image" content="https://awesome.video/og-image.png?path=%2F" />
     <meta property="og:image:secure_url" content="https://awesome.video/og-image.png?path=%2F" />
     <meta property="og:image:type" content="image/png" />
@@ -22,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@awesome_video" />
     <meta name="twitter:title" content="Awesome Video — Curated video development resources" />
-    <meta name="twitter:description" content="The curated index of 2,300+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta name="twitter:description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta name="twitter:image" content="https://awesome.video/og-image.png?path=%2F" />
     <meta name="twitter:image:alt" content="Awesome Video — curated video development resources" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -62,6 +62,9 @@
           var fnt = null;
           try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
           if (fnt && FONT_STACKS[fnt]) {
+            // Run22 BUG-015: body text uses --font-body (not --font-sans);
+            // set both, matching applyFontOverride in font-options.ts.
+            root.style.setProperty('--font-body', FONT_STACKS[fnt]);
             root.style.setProperty('--font-sans', FONT_STACKS[fnt]);
           }
         } catch (e) {}
@@ -74,10 +77,31 @@
       // shot) so warm loads don't serialize bundle-parse -> fetch. The catch
       // only silences unhandled-rejection noise; consumers handle errors.
       (function () {
+        // Run22 BUG-008: the nav tree (~few KB) is needed by the chrome on
+        // every page, so always early-fetch it. The full 2.7MB corpus is only
+        // early-fetched on routes whose content renders resource listings —
+        // keep this route list in sync with needsCorpusRoute() in
+        // client/src/lib/static-data.ts.
         try {
-          var p = fetch('/api/awesome-list', { credentials: 'same-origin' });
-          window.__awesomeListEarlyFetch = p;
-          p.catch(function () {});
+          var n = fetch('/api/awesome-list/nav', { credentials: 'same-origin' });
+          window.__awesomeListNavEarlyFetch = n;
+          n.catch(function () {});
+        } catch (e) {}
+        try {
+          var pth = location.pathname;
+          var needsCorpus =
+            pth === '/' ||
+            pth === '/categories' ||
+            pth === '/advanced' ||
+            pth === '/recommendations' ||
+            pth.indexOf('/category/') === 0 ||
+            pth.indexOf('/subcategory/') === 0 ||
+            pth.indexOf('/sub-subcategory/') === 0;
+          if (needsCorpus) {
+            var p = fetch('/api/awesome-list', { credentials: 'same-origin' });
+            window.__awesomeListEarlyFetch = p;
+            p.catch(function () {});
+          }
         } catch (e) {}
         // Task 169: same trick for the auth check — /api/auth/user used to
         // wait for bundle-parse + React mount before firing, and header
@@ -154,7 +178,10 @@
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
     <script>
       (function () {
-        var ALT_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap';
+        // Run22 BUG-015: DM Sans + Source Sans 3 are offered by the font
+        // picker (FONT_OPTIONS) but were never loaded — picking them fell
+        // back to system-ui silently.
+        var ALT_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap';
         function loadAltFonts() {
           var link = document.createElement('link');
           link.rel = 'stylesheet';
@@ -174,8 +201,8 @@
          (A prior "noscript" match in this file was only a comment.) -->
     <noscript>
       <div style="max-width:640px;margin:80px auto;padding:24px;font-family:'JetBrains Mono',monospace;color:#e6e6e6;background:#000;border:1px solid #333;">
-        <h1 style="font-size:20px;margin:0 0 12px;">Awesome Video</h1>
-        <p style="margin:0 0 8px;">This app requires JavaScript to browse the 2,300+ curated video development resources.</p>
+        <p style="font-size:20px;font-weight:700;margin:0 0 12px;">Awesome Video</p>
+        <p style="margin:0 0 8px;">This app requires JavaScript to browse the 2,000+ curated video development resources.</p>
         <p style="margin:0;">Please enable JavaScript, or view the source list at
           <a href="https://github.com/krzemienski/awesome-video" style="color:#5eddf2;">github.com/krzemienski/awesome-video</a>.</p>
       </div>

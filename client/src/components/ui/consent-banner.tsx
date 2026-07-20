@@ -33,11 +33,13 @@ export default function ConsentBanner() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // R4-071: the banner renders last in the DOM, so keyboard users used to reach
-  // its buttons only as the final two tab stops, and Escape did nothing. Move
-  // focus to the banner as soon as it appears (so Tab lands on its controls
-  // next) and let Escape dismiss it — Escape == Decline (choice = denied, no
-  // analytics), matching the Decline button.
+  // R4-071: keyboard users used to reach the banner's buttons only as the
+  // final tab stops, and Escape did nothing. Move focus to the banner as soon
+  // as it appears (so Tab lands on its controls next) and let Escape dismiss
+  // it — Escape == Decline (choice = denied, no analytics), matching the
+  // Decline button. Run22 BUG-049: the banner is now ALSO first in DOM order
+  // (App.tsx renders it before the router), so after its last button Tab
+  // flows into the page's skip-link instead of dead-ending on <body>.
   useEffect(() => {
     if (choiceMade) return;
     bannerRef.current?.focus();

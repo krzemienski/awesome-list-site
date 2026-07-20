@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { ArrowUp } from "lucide-react";
-import { AwesomeList } from "@/types/awesome-list";
+import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
 import SearchDialog from "@/components/ui/search-dialog";
@@ -47,14 +47,16 @@ interface User {
 }
 
 interface MainLayoutProps {
-  awesomeList?: AwesomeList;
+  // Run22 BUG-008: chrome (sidebar/header) renders from the lightweight nav
+  // tree, not the 2.7MB corpus — non-listing pages never download the corpus.
+  nav?: AwesomeListNav;
   isLoading: boolean;
   children: React.ReactNode;
   user?: User;
   onLogout?: () => void;
 }
 
-export default function MainLayout({ awesomeList, isLoading, children, user, onLogout }: MainLayoutProps) {
+export default function MainLayout({ nav, isLoading, children, user, onLogout }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -71,8 +73,8 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
 
       <div className="page contents">
         <AppSidebar
-          categories={awesomeList?.categories || []}
-          resources={awesomeList?.resources || []}
+          categories={nav?.categories || []}
+          totalResources={nav?.totalResources ?? 0}
           isLoading={isLoading}
           user={user}
         />
@@ -81,7 +83,7 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           onSearchOpen={() => setSearchOpen(true)}
           user={user}
           onLogout={onLogout}
-          categories={awesomeList?.categories || []}
+          categories={nav?.categories || []}
         />
         {/*
           CC-14 (landmark half) — single <main id="main"> wrapping route content.

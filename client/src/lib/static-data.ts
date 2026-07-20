@@ -84,6 +84,66 @@ export async function fetchStaticAwesomeList(): Promise<any> {
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
+/**
+ * Run22 BUG-008 — lightweight taxonomy tree for chrome (sidebar/header) and
+ * slug resolution. Pages that don't render resource listings use this ~few-KB
+ * payload instead of the ~2.7MB corpus.
+ */
+export interface AwesomeListNavNode {
+  name: string;
+  slug?: string;
+  resourceCount: number;
+  subcategories?: AwesomeListNavNode[];
+  subSubcategories?: AwesomeListNavNode[];
+}
+
+export interface AwesomeListNav {
+  title?: string;
+  totalResources: number;
+  categories: AwesomeListNavNode[];
+}
+
+/**
+ * Routes whose CONTENT needs the full corpus (resource listings / client-side
+ * fuzzy browse). Everything else renders from the nav tree + page-scoped
+ * APIs. Keep in sync with the inline early-fetch gate in client/index.html
+ * and the overlay settle logic in client/src/main.tsx.
+ */
+export function needsCorpusRoute(pathname: string): boolean {
+  return (
+    pathname === '/' ||
+    pathname === '/categories' ||
+    pathname === '/advanced' ||
+    pathname === '/recommendations' ||
+    pathname.startsWith('/category/') ||
+    pathname.startsWith('/subcategory/') ||
+    pathname.startsWith('/sub-subcategory/')
+  );
+}
+
+export async function fetchAwesomeListNav(): Promise<AwesomeListNav> {
+  // Consume the index.html early fetch once (same pattern as the corpus).
+  if (typeof window !== 'undefined') {
+    const early: Promise<Response> | undefined = (window as any).__awesomeListNavEarlyFetch;
+    if (early) {
+      (window as any).__awesomeListNavEarlyFetch = undefined;
+      try {
+        const response = await early;
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch {
+        /* fall through to the standard fetch below */
+      }
+    }
+  }
+  const response = await fetchWithTimeout('/api/awesome-list/nav', AWESOME_LIST_TIMEOUT_MS);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} ${response.statusText || ''} from /api/awesome-list/nav`.trim());
+  }
+  return await response.json();
+}
+
 export async function fetchSitemapData(): Promise<any> {
   try {
     const response = await fetch('/data/sitemap.json');
