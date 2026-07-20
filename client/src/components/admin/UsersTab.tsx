@@ -76,6 +76,9 @@ export default function UsersTab() {
 
   const { data, isLoading } = useQuery<UsersResponse>({
     queryKey: ['/api/admin/users', page, limit, searchQuery, sortBy, sortDir],
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
       if (searchQuery) params.set('q', searchQuery);
@@ -304,9 +307,16 @@ export default function UsersTab() {
                         <SelectTrigger
                           className="w-32 h-8 text-xs"
                           aria-label={
+                            /* R4-041: include a row identifier so the 20 role
+                               selects don't share one accessible name (masked
+                               email keeps PII out of the DOM, matching the
+                               Reveal/Delete buttons). */
                             user.id === currentUser?.id
                               ? "You cannot change your own role"
-                              : "Change user role"
+                              : `Change role for ${
+                                  `${user.firstName || ''} ${user.lastName || ''}`.trim() ||
+                                  (user.email ? maskEmail(user.email) : user.id)
+                                }`
                           }
                           title={
                             user.id === currentUser?.id

@@ -66,6 +66,9 @@ export default function LinkHealthDashboard() {
 
   const { data: historyData } = useQuery<LinkHealthHistoryResponse>({
     queryKey: ['/api/admin/link-health/history'],
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   // R4-044: fetch the full problem-links set once and filter client-side so the
@@ -75,6 +78,9 @@ export default function LinkHealthDashboard() {
   const { data: brokenLinksData } = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links'],
     queryFn: () => apiRequest('/api/admin/link-health/broken-links'),
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   const runCheckMutation = useMutation({
@@ -119,6 +125,31 @@ export default function LinkHealthDashboard() {
   const brokenLinks = statusFilter === 'all'
     ? allProblemLinks
     : allProblemLinks.filter((c) => c.status === statusFilter);
+
+  // R4-044: summary counters tally the SAME array the table renders, so the
+  // numbers always reconcile with the visible rows (dns_failure folds into
+  // Broken, matching the table's badge semantics). Healthy is derived as
+  // total − problems from the same set. While a job is still running we fall
+  // back to the job record's live progress counts.
+  const countByStatus = (statuses: string[]) =>
+    allProblemLinks.filter((c) => statuses.includes(c.status)).length;
+  const summaryCounts = !isJobInProgress && brokenLinksData
+    ? {
+        total: latestJob?.totalLinks || 0,
+        broken: countByStatus(['broken', 'dns_failure']),
+        redirect: countByStatus(['redirect']),
+        timeout: countByStatus(['timeout']),
+        suspect: countByStatus(['suspect']),
+        healthy: Math.max(0, (latestJob?.totalLinks || 0) - allProblemLinks.length),
+      }
+    : {
+        total: latestJob?.totalLinks || 0,
+        broken: latestJob?.brokenLinks || 0,
+        redirect: latestJob?.redirectLinks || 0,
+        timeout: latestJob?.timeoutLinks || 0,
+        suspect: latestJob?.suspectLinks || 0,
+        healthy: latestJob?.healthyLinks || 0,
+      };
 
   useEffect(() => {
     setIsPolling(isJobInProgress);
@@ -250,42 +281,44 @@ export default function LinkHealthDashboard() {
                 </>
               )}
 
+              {/* R4-044: counters come from summaryCounts (the same dataset as
+                  the Problem Links table) so counts always match the rows. */}
               <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold font-mono">
-                    {latestJob.totalLinks || 0}
+                  <div className="text-2xl font-bold font-mono" data-testid="counter-total-links">
+                    {summaryCounts.total}
                   </div>
                   <div className="text-xs text-muted-foreground">Total Links</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-green-500">
-                    {latestJob.healthyLinks || 0}
+                  <div className="text-2xl font-bold font-mono text-green-500" data-testid="counter-healthy-links">
+                    {summaryCounts.healthy}
                   </div>
                   <div className="text-xs text-muted-foreground">Healthy</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-red-500">
-                    {latestJob.brokenLinks || 0}
+                  <div className="text-2xl font-bold font-mono text-red-500" data-testid="counter-broken-links">
+                    {summaryCounts.broken}
                   </div>
                   <div className="text-xs text-muted-foreground">Broken</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-yellow-500">
-                    {latestJob.redirectLinks || 0}
+                  <div className="text-2xl font-bold font-mono text-yellow-500" data-testid="counter-redirect-links">
+                    {summaryCounts.redirect}
                   </div>
                   <div className="text-xs text-muted-foreground">Redirects</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-orange-500">
-                    {latestJob.timeoutLinks || 0}
+                  <div className="text-2xl font-bold font-mono text-orange-500" data-testid="counter-timeout-links">
+                    {summaryCounts.timeout}
                   </div>
                   <div className="text-xs text-muted-foreground">Timeouts</div>
                 </div>
                 <div>
                   {/* R4-001/023: 200-OK links flagged by the takeover / intent-flip
                       / parked-domain heuristics — need human review. */}
-                  <div className="text-2xl font-bold font-mono text-purple-500">
-                    {latestJob.suspectLinks || 0}
+                  <div className="text-2xl font-bold font-mono text-purple-500" data-testid="counter-suspect-links">
+                    {summaryCounts.suspect}
                   </div>
                   <div className="text-xs text-muted-foreground">Suspect</div>
                 </div>
@@ -296,8 +329,11 @@ export default function LinkHealthDashboard() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <div className="text-sm text-muted-foreground">Health Percentage</div>
+                  {/* R4-044: derived from the same summaryCounts dataset. */}
                   <div className="text-3xl font-bold font-mono">
-                    {calculateHealthPercentage(latestJob)}%
+                    {summaryCounts.total > 0
+                      ? Math.round((summaryCounts.healthy / summaryCounts.total) * 100)
+                      : calculateHealthPercentage(latestJob)}%
                   </div>
                 </div>
                 {/* BUG-024 (run19): default themed Button — the hardcoded
@@ -365,7 +401,8 @@ export default function LinkHealthDashboard() {
               Link Health Trends
             </CardTitle>
             <CardDescription>
-              Health status trends across the last {trendData.length} checks
+              {/* R5-039: pluralize correctly ("1 check" vs "N checks"). */}
+              Health status trends across the last {trendData.length} {trendData.length === 1 ? 'check' : 'checks'}
             </CardDescription>
           </CardHeader>
           <CardContent>

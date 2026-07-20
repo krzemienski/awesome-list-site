@@ -84,16 +84,23 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
         { icon: GitBranch, label: "Pending Approvals", value: stats?.pendingApprovals, tab: "approvals" },
       ].map(({ icon: Icon, label, value, sublabel, testId, tab }: any) => {
         const clickable = Boolean(onNavigate && tab);
+        // Run24 (axe nested-interactive): a card that carries its own nested
+        // buttons (the pending/rejected deep-links) must NOT itself be a
+        // role=button — interactive controls can't nest. Such cards keep the
+        // mouse onClick for convenience but expose keyboard/AT access through
+        // an inner button on the title instead of the container.
+        const hasNestedControls = Boolean(sublabel);
+        const containerInteractive = clickable && !hasNestedControls;
         return (
           <Card
             key={label}
-            role={clickable ? "button" : undefined}
-            tabIndex={clickable ? 0 : undefined}
-            aria-label={clickable ? `${label} — open the ${tab} tab` : undefined}
-            title={clickable ? `Open the ${tab} tab` : undefined}
+            role={containerInteractive ? "button" : undefined}
+            tabIndex={containerInteractive ? 0 : undefined}
+            aria-label={containerInteractive ? `${label} — open the ${tab} tab` : undefined}
+            title={containerInteractive ? `Open the ${tab} tab` : undefined}
             onClick={clickable ? () => onNavigate!(tab) : undefined}
             onKeyDown={
-              clickable
+              containerInteractive
                 ? (e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
@@ -112,7 +119,22 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
             <CardHeader className="pb-2">
               <CardTitle className="eyebrow flex items-center gap-2 normal-case">
                 <Icon className="h-4 w-4 text-[var(--accent)]" />
-                {label}
+                {clickable && hasNestedControls ? (
+                  <button
+                    type="button"
+                    className="underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                    aria-label={`${label} — open the ${tab} tab`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onNavigate!(tab);
+                    }}
+                    data-testid={`stat-title-${tab}`}
+                  >
+                    {label}
+                  </button>
+                ) : (
+                  label
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>

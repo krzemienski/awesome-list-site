@@ -522,6 +522,11 @@ export default function CommunityMetrics({ resources, categories, className }: C
                             <span className="text-green-600">+{category.growthRate}%</span>
                           </div>
                           <Progress value={category.growthRate} className="h-2" />
+                          {/* NB-047: say where the number comes from instead of
+                              presenting an unsourced percentage. */}
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            Share of this category's resources added in the last 30 days
+                          </p>
                         </div>
                         
                         <div>

@@ -72,6 +72,9 @@ export default function AuditTab() {
       if (!response.ok) throw new Error('Failed to fetch audit logs');
       return response.json();
     },
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   const handleSearch = (e: React.FormEvent) => {

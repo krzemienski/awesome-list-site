@@ -1,0 +1,122 @@
+[
+  {
+    "n": "admin login",
+    "p": true,
+    "d": "200"
+  },
+  {
+    "n": "NB-020 ArrowRight moves focus to next tab",
+    "p": true,
+    "d": "Approvals 3 -> Edits sel=true"
+  },
+  {
+    "n": "NB-020 arrowed tab is selected (roving+activation)",
+    "p": true,
+    "d": "true"
+  },
+  {
+    "n": "NB-020 roving tabindex (exactly one tab tabbable)",
+    "p": true,
+    "d": "{\"total\":15,\"tab0\":1}"
+  },
+  {
+    "n": "open Resources tab",
+    "p": true,
+    "d": ""
+  },
+  {
+    "n": "BUG-049 edit inline title error",
+    "p": true,
+    "d": "Title is required"
+  },
+  {
+    "n": "BUG-049 edit inline url error",
+    "p": true,
+    "d": "URL must start with http:// or https://"
+  },
+  {
+    "n": "BUG-049 edit inline description error",
+    "p": true,
+    "d": "Description must be at least 10 characters"
+  },
+  {
+    "n": "BUG-049 aria-invalid + aria-describedby wired",
+    "p": true,
+    "d": "true/edit-url-error"
+  },
+  {
+    "n": "BUG-049 typing clears url error",
+    "p": true,
+    "d": ""
+  },
+  {
+    "n": "BUG-049 create requires https (inline error)",
+    "p": true,
+    "d": "Must be a valid HTTPS URL"
+  },
+  {
+    "n": "open Users tab",
+    "p": true,
+    "d": ""
+  },
+  {
+    "n": "axe users no serious/critical",
+    "p": true,
+    "d": "[]"
+  },
+  {
+    "n": "R4-041 role select aria-label present",
+    "p": true,
+    "d": "Change role for __qa_test_run24a_user"
+  },
+  {
+    "n": "open Approvals tab",
+    "p": true,
+    "d": ""
+  },
+  {
+    "n": "axe approvals no serious/critical",
+    "p": true,
+    "d": "[]"
+  },
+  {
+    "n": "R5-058 approvals scroller keyboard region",
+    "p": true,
+    "d": "1"
+  },
+  {
+    "n": "smoke Link Health tab renders",
+    "p": true,
+    "d": "Link Health Summary\nNo link health checks performed yet\n\nNo "
+  },
+  {
+    "n": "smoke Export tab renders",
+    "p": true,
+    "d": "Export Awesome List\nGenerate and download the awesome list i"
+  },
+  {
+    "n": "smoke Audit tab renders",
+    "p": true,
+    "d": "Audit Log\nView system activity and resource change history ("
+  },
+  {
+    "n": "smoke Enrichment tab renders",
+    "p": true,
+    "d": "Job Control\nConfigure and start a new batch enrichment job\n\n"
+  },
+  {
+    "n": "smoke Researcher tab renders",
+    "p": true,
+    "d": "Launch Research\nReview Discoveries\n13\nJob History\nNew Resear"
+  },
+  {
+    "n": "R4-044 link-health counters (one dataset or explicit no-data state)",
+    "p": true,
+    "d": "{\"noData\":true,\"total\":null,\"healthy\":null,\"broken\":null,\"redirects\":null,\"timeout\":null,\"suspect\":null}"
+  },
+  {
+    "n": "no page errors during run",
+    "p": true,
+    "d": ""
+  }
+]

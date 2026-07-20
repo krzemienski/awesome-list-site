@@ -31,6 +31,9 @@ import {
   CheckCircle2
 } from "lucide-react";
 import type { Resource, Category, Subcategory, SubSubcategory } from "@shared/schema";
+// BUG-049: client-side validation mirrors the server's shared schemas so the
+// dialog flags bad input inline instead of only failing server-side.
+import { resourceTitleSchema, resourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
 
 interface ResourcesResponse {
   resources: Resource[];
@@ -71,6 +74,10 @@ export default function ResourceManager() {
   // R4-054: Bulk Approve was the only batch action firing instantly — it now
   // confirms first (stating the exact count), matching bulk reject/delete.
   const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
+
+  // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
+  const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string }>({});
+  const [formError, setFormError] = useState<string | null>(null);
 
   const [editForm, setEditForm] = useState({
     title: "",
@@ -138,7 +145,10 @@ export default function ResourceManager() {
       if (!response.ok) throw new Error('Failed to fetch resources');
       return response.json();
     },
-    refetchInterval: 30000
+    refetchInterval: 30000,
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true
   });
 
   // Run17 BUG-028: unfiltered grand total so the header never claims
@@ -174,6 +184,9 @@ export default function ResourceManager() {
       });
     },
     onError: (error: Error) => {
+      // BUG-049: keep the dialog open and surface the server's message inline
+      // so the operator can correct the field, not just see a vanishing toast.
+      setFormError(error.message || "Failed to update resource");
       toast({
         title: "Update Failed",
         description: error.message || "Failed to update resource",
@@ -202,6 +215,8 @@ export default function ResourceManager() {
       });
     },
     onError: (error: Error) => {
+      // BUG-049: surface server-side rejection inline in the open dialog.
+      setFormError(error.message || "Failed to create resource");
       toast({
         title: "Creation Failed",
         description: error.message || "Failed to create resource",
@@ -320,6 +335,9 @@ export default function ResourceManager() {
   });
 
   const resetEditForm = () => {
+    // BUG-049: stale errors must not carry over into a fresh dialog.
+    setFieldErrors({});
+    setFormError(null);
     setEditForm({
       title: "",
       url: "",
@@ -333,6 +351,9 @@ export default function ResourceManager() {
 
   const openEditDialog = (resource: Resource) => {
     setSelectedResource(resource);
+    // BUG-049: fresh dialog, fresh error state.
+    setFieldErrors({});
+    setFormError(null);
     setEditForm({
       title: resource.title || "",
       url: resource.url || "",
@@ -398,32 +419,40 @@ export default function ResourceManager() {
     setDeleteDialogOpen(true);
   };
 
-  // Run16 BUG-012: the Edit dialog used to submit with no client-side checks
-  // (blank title/URL only failed server-side with a raw error). Both dialogs
-  // now share the same validation, mirroring the server's http(s) URL rule.
-  const validateEditForm = (): boolean => {
-    if (!editForm.title.trim() || !editForm.url.trim()) {
-      toast({
-        title: "Validation Error",
-        description: "Title and URL are required",
-        variant: "destructive"
-      });
-      return false;
+  // Run16 BUG-012 → BUG-049: both dialogs validate with the SAME shared
+  // schemas the server enforces (shared/validation.ts) and render the failures
+  // inline next to each field instead of toast-only. Edit accepts legacy
+  // http:// URLs (server PUT uses webUrlSchema); Create requires https
+  // (server POST uses httpsUrlSchema).
+  const validateEditForm = (mode: 'edit' | 'create'): boolean => {
+    const errors: { title?: string; url?: string; description?: string } = {};
+    const titleParsed = resourceTitleSchema.safeParse(editForm.title.trim());
+    if (!titleParsed.success) {
+      errors.title = titleParsed.error.issues[0]?.message || "Invalid title";
     }
-    if (!/^https?:\/\//i.test(editForm.url.trim())) {
-      toast({
-        title: "Validation Error",
-        description: "URL must start with http:// or https://",
-        variant: "destructive"
-      });
-      return false;
+    const urlSchema = mode === 'create' ? httpsUrlSchema : webUrlSchema;
+    const urlParsed = urlSchema.safeParse(editForm.url.trim());
+    if (!urlParsed.success) {
+      errors.url = urlParsed.error.issues[0]?.message || "Invalid URL";
     }
-    return true;
+    if (editForm.description.trim()) {
+      const descParsed = resourceDescriptionSchema.safeParse(editForm.description.trim());
+      if (!descParsed.success) {
+        errors.description = descParsed.error.issues[0]?.message || "Invalid description";
+      }
+    }
+    setFieldErrors(errors);
+    setFormError(null);
+    return Object.keys(errors).length === 0;
+  };
+
+  const clearFieldError = (field: 'title' | 'url' | 'description') => {
+    setFieldErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
   const handleSaveEdit = () => {
     if (!selectedResource) return;
-    if (!validateEditForm()) return;
+    if (!validateEditForm('edit')) return;
     updateMutation.mutate({
       id: selectedResource.id,
       data: editForm
@@ -431,7 +460,7 @@ export default function ResourceManager() {
   };
 
   const handleCreate = () => {
-    if (!validateEditForm()) return;
+    if (!validateEditForm('create')) return;
     // Run16 BUG-031: require a category on create so new resources never
     // land in the catalog as "Uncategorized".
     if (!editForm.category) {
@@ -1008,36 +1037,67 @@ export default function ResourceManager() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            {/* BUG-049: dialog-level banner for server-side rejections. */}
+            {formError && (
+              <div
+                role="alert"
+                className="rounded border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                data-testid="error-edit-form"
+              >
+                {formError}
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="edit-title">Title *</Label>
               <Input
                 id="edit-title"
                 value={editForm.title}
-                onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
+                onChange={(e) => { clearFieldError('title'); setEditForm(f => ({ ...f, title: e.target.value })); }}
                 className="bg-[var(--bg-2)] border-[var(--border)]"
+                aria-invalid={!!fieldErrors.title}
+                aria-describedby={fieldErrors.title ? "edit-title-error" : undefined}
                 data-testid="input-edit-title"
               />
+              {fieldErrors.title && (
+                <p id="edit-title-error" className="text-sm text-destructive" data-testid="error-edit-title">
+                  {fieldErrors.title}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-url">URL *</Label>
               <Input
                 id="edit-url"
                 value={editForm.url}
-                onChange={(e) => setEditForm(f => ({ ...f, url: e.target.value }))}
+                onChange={(e) => { clearFieldError('url'); setEditForm(f => ({ ...f, url: e.target.value })); }}
                 className="bg-[var(--bg-2)] border-[var(--border)]"
+                aria-invalid={!!fieldErrors.url}
+                aria-describedby={fieldErrors.url ? "edit-url-error" : undefined}
                 data-testid="input-edit-url"
               />
+              {fieldErrors.url && (
+                <p id="edit-url-error" className="text-sm text-destructive" data-testid="error-edit-url">
+                  {fieldErrors.url}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-description">Description</Label>
               <Textarea
                 id="edit-description"
                 value={editForm.description}
-                onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
+                onChange={(e) => { clearFieldError('description'); setEditForm(f => ({ ...f, description: e.target.value })); }}
                 className="bg-[var(--bg-2)] border-[var(--border)]"
                 rows={3}
+                aria-invalid={!!fieldErrors.description}
+                aria-describedby={fieldErrors.description ? "edit-description-error" : undefined}
                 data-testid="input-edit-description"
               />
+              {fieldErrors.description && (
+                <p id="edit-description-error" className="text-sm text-destructive" data-testid="error-edit-description">
+                  {fieldErrors.description}
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -1147,39 +1207,70 @@ export default function ResourceManager() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            {/* BUG-049: dialog-level banner for server-side rejections. */}
+            {formError && (
+              <div
+                role="alert"
+                className="rounded border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                data-testid="error-create-form"
+              >
+                {formError}
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="create-title">Title *</Label>
               <Input
                 id="create-title"
                 value={editForm.title}
-                onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
+                onChange={(e) => { clearFieldError('title'); setEditForm(f => ({ ...f, title: e.target.value })); }}
                 className="bg-[var(--bg-2)] border-[var(--border)]"
                 placeholder="e.g., Video.js Player"
+                aria-invalid={!!fieldErrors.title}
+                aria-describedby={fieldErrors.title ? "create-title-error" : undefined}
                 data-testid="input-create-title"
               />
+              {fieldErrors.title && (
+                <p id="create-title-error" className="text-sm text-destructive" data-testid="error-create-title">
+                  {fieldErrors.title}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="create-url">URL *</Label>
               <Input
                 id="create-url"
                 value={editForm.url}
-                onChange={(e) => setEditForm(f => ({ ...f, url: e.target.value }))}
+                onChange={(e) => { clearFieldError('url'); setEditForm(f => ({ ...f, url: e.target.value })); }}
                 className="bg-[var(--bg-2)] border-[var(--border)]"
                 placeholder="https://github.com/..."
+                aria-invalid={!!fieldErrors.url}
+                aria-describedby={fieldErrors.url ? "create-url-error" : undefined}
                 data-testid="input-create-url"
               />
+              {fieldErrors.url && (
+                <p id="create-url-error" className="text-sm text-destructive" data-testid="error-create-url">
+                  {fieldErrors.url}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="create-description">Description</Label>
               <Textarea
                 id="create-description"
                 value={editForm.description}
-                onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
+                onChange={(e) => { clearFieldError('description'); setEditForm(f => ({ ...f, description: e.target.value })); }}
                 className="bg-[var(--bg-2)] border-[var(--border)]"
                 rows={3}
                 placeholder="Brief description of the resource..."
+                aria-invalid={!!fieldErrors.description}
+                aria-describedby={fieldErrors.description ? "create-description-error" : undefined}
                 data-testid="input-create-description"
               />
+              {fieldErrors.description && (
+                <p id="create-description-error" className="text-sm text-destructive" data-testid="error-create-description">
+                  {fieldErrors.description}
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">

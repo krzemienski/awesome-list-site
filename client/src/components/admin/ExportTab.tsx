@@ -38,7 +38,22 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
   const { data: fetchedValidationStatus } = useQuery<ValidationStatus>({
     queryKey: ['/api/admin/validation-status'],
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
+
+  // R5-040: group lint findings by rule so 100+ repeats of the same rule read
+  // as "rule × N" with the individual lines nested under one heading.
+  const groupByRule = (items: Array<{ line: number; rule: string; message: string }>) => {
+    const groups = new Map<string, Array<{ line: number; rule: string; message: string }>>();
+    for (const item of items) {
+      const key = item.rule || 'unknown-rule';
+      const list = groups.get(key);
+      if (list) list.push(item); else groups.set(key, [item]);
+    }
+    return Array.from(groups.entries()).sort((a, b) => b[1].length - a[1].length);
+  };
 
   const validationStatus = propValidationStatus || fetchedValidationStatus;
 
@@ -260,17 +275,22 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                     Errors ({validationStatus.awesomeLint.errors.length})
                   </button>
                   {showErrors && (
+                    /* R5-040: same rule-grouping as warnings. */
                     <ScrollArea className="h-48 rounded-md border border-red-500/20 p-3">
-                      {validationStatus.awesomeLint.errors.map((error, i) => (
-                        <div key={i} className="mb-2 text-sm">
-                          <div className="flex items-start gap-2">
-                            <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                            <div>
-                              <div className="font-mono text-xs text-[var(--text-2)]">
-                                Line {error.line}: {error.rule}
+                      {groupByRule(validationStatus.awesomeLint.errors).map(([rule, items]) => (
+                        <div key={rule} className="mb-3 text-sm" data-testid={`error-group-${rule}`}>
+                          <div className="flex items-center gap-2 font-semibold text-red-400">
+                            <XCircle className="h-4 w-4 text-red-500 shrink-0" />
+                            <span className="font-mono text-xs">{rule}</span>
+                            <Badge variant="outline" className="text-[10px]">{items.length}</Badge>
+                          </div>
+                          <div className="ml-6 mt-1 space-y-1">
+                            {items.map((error, i) => (
+                              <div key={i}>
+                                <span className="font-mono text-xs text-[var(--text-2)]">Line {error.line}: </span>
+                                <span className="text-[var(--text)]">{error.message}</span>
                               </div>
-                              <div className="text-[var(--text)]">{error.message}</div>
-                            </div>
+                            ))}
                           </div>
                         </div>
                       ))}
@@ -290,17 +310,23 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                     Warnings ({validationStatus.awesomeLint.warnings.length})
                   </button>
                   {showWarnings && (
+                    /* R5-040: grouped by rule (rule × count headings) instead
+                       of a flat repeat-heavy list. */
                     <ScrollArea className="h-48 rounded-md border border-yellow-500/20 p-3">
-                      {validationStatus.awesomeLint.warnings.map((warning, i) => (
-                        <div key={i} className="mb-2 text-sm">
-                          <div className="flex items-start gap-2">
-                            <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
-                            <div>
-                              <div className="font-mono text-xs text-[var(--text-2)]">
-                                Line {warning.line}: {warning.rule}
+                      {groupByRule(validationStatus.awesomeLint.warnings).map(([rule, items]) => (
+                        <div key={rule} className="mb-3 text-sm" data-testid={`warning-group-${rule}`}>
+                          <div className="flex items-center gap-2 font-semibold text-yellow-400">
+                            <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
+                            <span className="font-mono text-xs">{rule}</span>
+                            <Badge variant="outline" className="text-[10px]">{items.length}</Badge>
+                          </div>
+                          <div className="ml-6 mt-1 space-y-1">
+                            {items.map((warning, i) => (
+                              <div key={i}>
+                                <span className="font-mono text-xs text-[var(--text-2)]">Line {warning.line}: </span>
+                                <span className="text-[var(--text)]">{warning.message}</span>
                               </div>
-                              <div className="text-[var(--text)]">{warning.message}</div>
-                            </div>
+                            ))}
                           </div>
                         </div>
                       ))}

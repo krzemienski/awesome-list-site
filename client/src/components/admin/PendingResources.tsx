@@ -279,7 +279,30 @@ export default function PendingResources() {
               dropping sticky + letting the whole row scroll together keeps rows
               readable and Approve/Reject reachable at 375/768 while leaving the
               desktop layout (table already fits, no scroll) unchanged. */}
-          <div ref={scrollRef} className="max-h-[600px] overflow-auto">
+          {/* R5-058: the scroller is keyboard-operable (tabbable region with
+              arrow-key scrolling) and shows a right-edge gradient cue while
+              more columns remain off-screen. */}
+          <div className="relative">
+            {showSwipeHint && (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+                data-testid="gradient-scroll-cue"
+              />
+            )}
+            <div
+              ref={scrollRef}
+              className="max-h-[600px] overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+              tabIndex={0}
+              role="region"
+              aria-label="Pending approvals table, scrollable"
+              onKeyDown={(e) => {
+                const el = scrollRef.current;
+                if (!el) return;
+                if (e.key === 'ArrowRight') { el.scrollBy({ left: 80 }); e.preventDefault(); }
+                else if (e.key === 'ArrowLeft') { el.scrollBy({ left: -80 }); e.preventDefault(); }
+              }}
+            >
             {/* BUG-011 (run22): balanced columns via table-fixed — with auto
                 layout, max-w on cells doesn't cap column width, so the table
                 grew to ~1312px and pushed Approve/Reject off-screen even at
@@ -308,6 +331,7 @@ export default function PendingResources() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-muted-foreground hover:text-primary"
+                          aria-label={`Open ${resource.title || resource.url} in a new tab`}
                           data-testid={`link-resource-url-${resource.id}`}
                         >
                           <ExternalLink className="h-3 w-3" />
@@ -404,6 +428,7 @@ export default function PendingResources() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           </div>
           {/* R4-011 (run21) + BUG-011 (run22): discoverability hint for the
               contained horizontal scroll — shown whenever the table actually

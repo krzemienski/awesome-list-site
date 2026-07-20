@@ -124,6 +124,9 @@ export default function ResearcherTab() {
   const { data: jobsData, isLoading: jobsLoading } = useQuery<{ jobs: ResearchJob[]; total: number }>({
     queryKey: ['/api/researcher/jobs'],
     refetchInterval: isPolling ? 3000 : false,
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
@@ -721,7 +724,13 @@ export default function ResearcherTab() {
                               annotate that it was found before cancellation. */}
                           <TableCell>
                             {job.status === 'cancelled' && (job.totalDiscoveries || 0) > 0 ? (
-                              <span title="found before cancellation">{job.totalDiscoveries}</span>
+                              /* NB-031: visible annotation (was tooltip-only). */
+                              <span title="found before cancellation">
+                                {job.totalDiscoveries}
+                                <span className="block text-[10px] text-muted-foreground whitespace-nowrap">
+                                  pre-cancel
+                                </span>
+                              </span>
                             ) : (
                               job.totalDiscoveries || 0
                             )}
@@ -751,8 +760,14 @@ export default function ResearcherTab() {
                             {job.status === 'cancelled' && (job.turnsUsed || 0) === 0 ? (
                               <span className="text-muted-foreground">—</span>
                             ) : (job.turnsUsed || 0) > (job.maxTurns || 0) ? (
+                              /* NB-032: visible continuation annotation (was
+                                 tooltip-only) — turns accrue across runs while
+                                 the cap is per-run. */
                               <span title={`used across continuation runs (cap ${job.maxTurns}/run)`}>
                                 {job.turnsUsed}/{job.maxTurns}
+                                <span className="block text-[10px] text-muted-foreground whitespace-nowrap">
+                                  over cap: continued runs
+                                </span>
                               </span>
                             ) : (
                               <>{job.turnsUsed || 0}/{job.maxTurns}</>
@@ -891,8 +906,9 @@ export default function ResearcherTab() {
                   {/* NB-032 (run18): annotate turns that exceed the per-run cap. */}
                   Turns:{' '}
                   {(selectedJob.turnsUsed || 0) > (selectedJob.maxTurns || 0) ? (
+                    /* NB-032: visible continuation annotation. */
                     <span title={`used across continuation runs (cap ${selectedJob.maxTurns}/run)`}>
-                      {selectedJob.turnsUsed}/{selectedJob.maxTurns}
+                      {selectedJob.turnsUsed}/{selectedJob.maxTurns} (continued runs; cap {selectedJob.maxTurns}/run)
                     </span>
                   ) : (
                     <>{selectedJob.turnsUsed || 0}/{selectedJob.maxTurns}</>
@@ -910,11 +926,14 @@ export default function ResearcherTab() {
                 </Label>
               </div>
 
+              {/* NB-018: min-w-0 down the flex chain so a single long unbroken
+                  log token wraps inside the dialog instead of blowing the row
+                  out to >1,600px. */}
               {selectedJob.agentLog && (selectedJob.agentLog as any[]).length > 0 ? (
-                <ScrollArea className="h-[420px] border rounded p-2 bg-black/40">
-                  <div className="space-y-1 font-mono text-xs">
+                <ScrollArea className="h-[420px] max-w-full border rounded p-2 bg-black/40">
+                  <div className="space-y-1 font-mono text-xs min-w-0 max-w-full">
                     {(selectedJob.agentLog as Array<{ role: string; content: string; timestamp: string }>).map((entry, i) => (
-                      <div key={i} className="flex gap-2 items-start">
+                      <div key={i} className="flex gap-2 items-start min-w-0 max-w-full">
                         <span className="text-muted-foreground shrink-0 w-[68px]">
                           {new Date(entry.timestamp).toLocaleTimeString()}
                         </span>
@@ -943,7 +962,7 @@ export default function ResearcherTab() {
                         </Badge>
                         <span
                           className={
-                            'whitespace-pre-wrap break-words flex-1 ' +
+                            'whitespace-pre-wrap break-words break-all flex-1 min-w-0 ' +
                             (entry.role === 'error' || entry.role === 'tool_error' ? 'text-red-400' :
                              entry.role === 'system' ? 'text-yellow-300' :
                              entry.role === 'tool_call' ? 'text-cyan-300' :

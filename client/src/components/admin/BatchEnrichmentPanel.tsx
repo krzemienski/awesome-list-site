@@ -78,7 +78,10 @@ export default function BatchEnrichmentPanel() {
 
   const { data: jobsData, isLoading } = useQuery<JobsResponse>({
     queryKey: ['/api/enrichment/jobs'],
-    refetchInterval: isPolling ? 3000 : false
+    refetchInterval: isPolling ? 3000 : false,
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true
   });
 
   // Run23 NB-046: surface how much of the approved catalog actually has tags.
@@ -91,6 +94,9 @@ export default function BatchEnrichmentPanel() {
     coveragePct: number;
   }>({
     queryKey: ['/api/admin/enrichment/coverage'],
+    // R5-037: refresh admin data when the operator returns to the tab.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   const { data: selectedJobData } = useQuery<JobStatusResponse>({
@@ -612,6 +618,14 @@ export default function BatchEnrichmentPanel() {
                           )}
                           {effectiveStatus(job)}
                         </Badge>
+                        {/* BUG-029: a job stored as "failed" even though every
+                            processed resource succeeded reads as a
+                            contradiction — say what actually happened. */}
+                        {job.status === 'failed' && (job.successfulResources || 0) > 0 && (
+                          <span className="block text-[10px] text-muted-foreground mt-1">
+                            ended in error after {job.successfulResources}/{job.processedResources || 0} succeeded
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {job.startedAt 
@@ -627,6 +641,16 @@ export default function BatchEnrichmentPanel() {
                         {job.completedAt 
                           ? formatAdminDateTime(job.completedAt)
                           : job.status === 'processing' ? 'In progress...' : '—'}
+                        {/* BUG-029: some legacy rows recorded "Ended" long after
+                            "Started" (the end was stamped when the stale job was
+                            cleaned up, not when processing stopped) — annotate
+                            instead of presenting impossible date math. */}
+                        {job.completedAt && job.startedAt &&
+                          new Date(job.completedAt).getTime() - new Date(job.startedAt).getTime() > 24 * 60 * 60 * 1000 && (
+                          <span className="block text-[10px] text-muted-foreground mt-1">
+                            end recorded at cleanup, not when processing stopped
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell className="text-center font-mono">
                         {/* BUG-029 (run18): a completed job with nothing to do
