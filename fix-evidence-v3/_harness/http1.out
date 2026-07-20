@@ -1,0 +1,147 @@
+{
+  "phase": "1",
+  "total": 23,
+  "pass": 23,
+  "results": [
+    {
+      "id": "R5-060",
+      "name": "anon PUT /api/admin/resources/1 -> 401",
+      "pass": true,
+      "detail": "got 401"
+    },
+    {
+      "id": "R5-060",
+      "name": "anon DELETE /api/admin/resources/1 -> 401",
+      "pass": true,
+      "detail": "got 401"
+    },
+    {
+      "id": "R5-060",
+      "name": "anon PATCH /api/admin/resources/1 -> 401",
+      "pass": true,
+      "detail": "got 401"
+    },
+    {
+      "id": "R5-060",
+      "name": "anon POST /api/admin/resources/1 -> 401",
+      "pass": true,
+      "detail": "got 401"
+    },
+    {
+      "id": "R5-045",
+      "name": "check-url returns only {exists}",
+      "pass": true,
+      "detail": "status 200 keys [\"exists\"]"
+    },
+    {
+      "id": "R5-059",
+      "name": "telemetry dead-link accepted",
+      "pass": true,
+      "detail": "got 204"
+    },
+    {
+      "id": "R5-047",
+      "name": "200KB body -> 413",
+      "pass": true,
+      "detail": "got 413"
+    },
+    {
+      "id": "R5-047",
+      "name": "malformed JSON -> 400",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "_setup",
+      "name": "admin login",
+      "pass": true,
+      "detail": "status 200"
+    },
+    {
+      "id": "R5-020",
+      "name": "audit-logs offset=100000000000000000000 -> 400",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "R5-020",
+      "name": "audit-logs limit=-1 -> 400",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "R5-020",
+      "name": "audit-logs resourceId=1.5 -> 400",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "R5-020",
+      "name": "audit-logs valid -> 200",
+      "pass": true,
+      "detail": "got 200"
+    },
+    {
+      "id": "_setup",
+      "name": "got a resource id",
+      "pass": true,
+      "detail": "id 187906"
+    },
+    {
+      "id": "R5-038",
+      "name": "admin PUT bidi title -> 400",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "_setup",
+      "name": "resource still readable after rejected PUT",
+      "pass": true,
+      "detail": "got 200"
+    },
+    {
+      "id": "R5-021",
+      "name": "researcher/start invalid -> 400",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "R5-030",
+      "name": "analyze non-allowlisted -> 4xx",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "_setup",
+      "name": "QA register",
+      "pass": true,
+      "detail": "status 201"
+    },
+    {
+      "id": "_setup",
+      "name": "QA login jarA",
+      "pass": true,
+      "detail": "status 200"
+    },
+    {
+      "id": "R5-019",
+      "name": "submit NUL title -> 400 (not 500)",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "R5-038",
+      "name": "submit bidi title -> 400",
+      "pass": true,
+      "detail": "got 400"
+    },
+    {
+      "id": "_setup",
+      "name": "jarA live",
+      "pass": true,
+      "detail": "status 200"
+    }
+  ]
+}
+
+PHASE1 ALL PASS

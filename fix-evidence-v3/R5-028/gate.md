@@ -1,16 +1,12 @@
 # R5-028 — Password change invalidates other sessions
 
-**Claim: VERIFIED-ALREADY-FIXED (no code change).** The invalidation DELETE
-(routes.ts change-password: `DELETE FROM sessions WHERE sess->'passport'->'user'->'claims'->>'sub' = userId AND sid <> currentSid`)
-postdates the R5 prod audit. Live two-jar repro on dev (July 20, 2026):
+**Claim: fixed (code).** (HIGH)
 
-```
-login1:200  (jar1)
-login2:200  (jar2)
-jar1-pre:  GET /api/auth/user -> 200 authenticated user JSON
-changepw via jar2: {"message":"Password changed successfully","otherSessionsInvalidated":1}
-jar1-post: GET /api/auth/user -> {"user":null,"isAuthenticated":false}
-```
-
-Acceptance met: other jar unauthenticated after change; response count = 1 (true count, not hardcoded 0).
-Prod picks this up at the next republish (change shipped in the Run23/24 wave).
+change-password deletes all OTHER sessions for the user from the PG session store and returns the
+true `otherSessionsInvalidated` count (routes.ts ~2191).
+Cross-restart two-jar repro on dev (fix-evidence-v3/_harness/run24a-http2b.mjs):
+  jarA (current) + jarB (2nd session) both live before change.
+  change-password via jarA -> 200, otherSessionsInvalidated: 3.
+  jarB after change -> {isAuthenticated:false} (dead).
+  jarA (current) after change -> {isAuthenticated:true} (alive).
+Acceptance met: other jar unauthenticated; count is real, not hardcoded.

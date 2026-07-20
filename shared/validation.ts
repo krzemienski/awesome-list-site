@@ -70,6 +70,19 @@ export const MULTILINE_CONTROL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u00
 export const CONTROL_CHARS_MESSAGE = "must not contain control characters";
 
 /**
+ * Bidirectional control characters (R5-038). Unlike the zero-widths that
+ * stripInvisible silently removes, these are REJECTED outright: an embedded
+ * bidi override (U+202A–202E) or isolate (U+2066–2069), or a bare directional
+ * mark (U+200E/200F), reorders how the rest of the string renders. Stripping
+ * would change the visible content ("evil\u202Etxt.mp4" → "eviltxt.mp4" reads
+ * as "evilfdp.txt" on screen), so a value that CONTAINS one is never a
+ * legitimate title/name/tag/prompt — bounce it with a clear message.
+ */
+export const BIDI_CONTROL_RE = /[\u202A-\u202E\u2066-\u2069\u200E\u200F]/;
+export const BIDI_CONTROL_MESSAGE =
+  "must not contain bidirectional (right-to-left override) control characters";
+
+/**
  * Strip invisible format characters from a value before storing it.
  * Removes all Cf/Cs EXCEPT ZWJ (emoji glue), then trims whitespace.
  * Does NOT NFKC-normalize — stored content keeps its original glyphs.
@@ -240,6 +253,7 @@ export const resourceTitleSchema = z
   .string()
   .max(RESOURCE_TITLE_MAX, `Title must be 1-${RESOURCE_TITLE_MAX} characters`)
   .refine((v) => !SINGLE_LINE_CONTROL_RE.test(v), `Title ${CONTROL_CHARS_MESSAGE}`)
+  .refine((v) => !BIDI_CONTROL_RE.test(v), `Title ${BIDI_CONTROL_MESSAGE}`)
   .refine(hasVisibleChars, "Title is required")
   .refine((v) => !NO_HTML_RE.test(v), "Title must not contain HTML tags")
   .transform((v) => stripInvisible(v));
@@ -249,6 +263,7 @@ export const resourceDescriptionSchema = z
   .string()
   .max(DESCRIPTION_MAX, `Description must be at most ${DESCRIPTION_MAX} characters`)
   .refine((v) => !MULTILINE_CONTROL_RE.test(v), `Description ${CONTROL_CHARS_MESSAGE}`)
+  .refine((v) => !BIDI_CONTROL_RE.test(v), `Description ${BIDI_CONTROL_MESSAGE}`)
   .refine((v) => !NO_HTML_RE.test(v), "Description must not contain HTML tags")
   .refine(
     (v) => visibleLength(v) >= DESCRIPTION_MIN,
@@ -263,6 +278,7 @@ export const tagSchema = z
   .string()
   .max(TAG_MAX_LENGTH, `Tags must be at most ${TAG_MAX_LENGTH} characters`)
   .refine((v) => !SINGLE_LINE_CONTROL_RE.test(v), `Tags ${CONTROL_CHARS_MESSAGE}`)
+  .refine((v) => !BIDI_CONTROL_RE.test(v), `Tags ${BIDI_CONTROL_MESSAGE}`)
   .refine((v) => !NO_HTML_RE.test(v), "Tags must not contain HTML tags")
   .transform((v) => stripInvisible(v));
 
@@ -279,6 +295,7 @@ export const taxonomyNameSchema = z
   .string()
   .max(TAXONOMY_NAME_MAX, `Name must be at most ${TAXONOMY_NAME_MAX} characters`)
   .refine((v) => !SINGLE_LINE_CONTROL_RE.test(v), `Name ${CONTROL_CHARS_MESSAGE}`)
+  .refine((v) => !BIDI_CONTROL_RE.test(v), `Name ${BIDI_CONTROL_MESSAGE}`)
   .refine(hasVisibleChars, "Name must contain visible characters")
   .refine((v) => !NO_HTML_RE.test(v), "Name must not contain HTML tags")
   .transform((v) => stripInvisible(v));
@@ -301,6 +318,7 @@ export const journeyDescriptionSchema = z
   .string()
   .max(DESCRIPTION_MAX, `Description must be at most ${DESCRIPTION_MAX} characters`)
   .refine((v) => !MULTILINE_CONTROL_RE.test(v), `Description ${CONTROL_CHARS_MESSAGE}`)
+  .refine((v) => !BIDI_CONTROL_RE.test(v), `Description ${BIDI_CONTROL_MESSAGE}`)
   .refine((v) => !NO_HTML_RE.test(v), "Description must not contain HTML tags")
   .refine(
     (v) => v.trim() === "" || hasVisibleChars(v),
@@ -330,6 +348,7 @@ export const displayNameSchema = z
   .string()
   .max(DISPLAY_NAME_MAX, `Name must be ${DISPLAY_NAME_MAX} characters or fewer`)
   .refine((v) => !SINGLE_LINE_CONTROL_RE.test(v), `Name ${CONTROL_CHARS_MESSAGE}`)
+  .refine((v) => !BIDI_CONTROL_RE.test(v), `Name ${BIDI_CONTROL_MESSAGE}`)
   .refine((v) => !NO_HTML_RE.test(v), "Name must not contain HTML tags")
   .refine(
     (v) => v.trim() === "" || hasVisibleChars(v),

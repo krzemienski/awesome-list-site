@@ -79,6 +79,8 @@ import {
   journeyDescriptionSchema,
   SINGLE_LINE_CONTROL_RE,
   MULTILINE_CONTROL_RE,
+  BIDI_CONTROL_RE,
+  BIDI_CONTROL_MESSAGE,
   parseIntInRange,
 } from "@shared/validation";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
@@ -5569,6 +5571,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       if (MULTILINE_CONTROL_RE.test(prompt)) {
         return res.status(400).json({ success: false, message: 'Prompt must not contain control characters' });
+      }
+      if (BIDI_CONTROL_RE.test(prompt)) {
+        return res.status(400).json({ success: false, message: `Prompt ${BIDI_CONTROL_MESSAGE}` });
       }
       if (visibleLength(prompt) < 10) {
         return res.status(400).json({ success: false, message: 'Prompt must contain at least 10 visible characters' });
