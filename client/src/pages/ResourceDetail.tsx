@@ -2,7 +2,7 @@ import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -126,24 +126,29 @@ export default function ResourceDetail() {
   const isFavorite = favorites?.some(f => f.id === numericId) ?? false;
   const isBookmarked = bookmarks?.some(b => b.id === numericId) ?? false;
 
+  // NB-024/NB-059 (run24): latest-wins refs — clicks landing while a toggle
+  // request is in flight record the newest desired state instead of being
+  // dropped; onSettled fires at most one converging follow-up request.
+  const favoriteDesiredRef = useRef<boolean | null>(null);
+  const bookmarkDesiredRef = useRef<boolean | null>(null);
+
   const favoriteMutation = useMutation({
-    mutationFn: async () => {
-      if (isFavorite) {
+    mutationFn: async (remove: boolean) => {
+      if (remove) {
         return apiRequest(`/api/favorites/${id}`, { method: 'DELETE' });
       }
       return apiRequest(`/api/favorites/${id}`, { method: 'POST' });
     },
-    onSuccess: () => {
-      // isFavorite reflects state BEFORE this toggle, so the new action is its inverse.
+    onSuccess: (_data, remove) => {
       if (resource) {
-        trackResourceFavorite(resource.title, resource.category ?? 'uncategorized', isFavorite ? 'remove' : 'add');
+        trackResourceFavorite(resource.title, resource.category ?? 'uncategorized', remove ? 'remove' : 'add');
       }
       queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
       // R4-081: mirror the change into other open tabs' favorite lists.
       notifyCrossTabSync();
       toast({
-        title: isFavorite ? "Removed from favorites" : "Added to favorites",
-        description: isFavorite ? "Resource removed from your favorites" : "Resource saved to your favorites"
+        title: remove ? "Removed from favorites" : "Added to favorites",
+        description: remove ? "Resource removed from your favorites" : "Resource saved to your favorites"
       });
     },
     onError: (error) => {
@@ -164,20 +169,35 @@ export default function ResourceDetail() {
           variant: "destructive",
         });
       }
-      console.error("Favorite mutation error:", error);
+      // BUG-038 (run24): expected auth expiry isn't an app error — keep the
+      // console clean on 401s.
+      if (status !== 401) {
+        console.error("Favorite mutation error:", error);
+      }
+    },
+    onSettled: (_data, error, remove) => {
+      // NB-024/NB-059 (run24): converge on the latest desired state with at
+      // most one follow-up request.
+      const desired = favoriteDesiredRef.current;
+      favoriteDesiredRef.current = null;
+      if (desired === null) return;
+      const finalState = error ? remove : !remove;
+      if (desired !== finalState) {
+        favoriteMutation.mutate(!desired);
+      }
     }
   });
 
   const bookmarkMutation = useMutation({
-    mutationFn: async () => {
-      if (isBookmarked) {
+    mutationFn: async (remove: boolean) => {
+      if (remove) {
         return apiRequest(`/api/bookmarks/${id}`, { method: 'DELETE' });
       }
       return apiRequest(`/api/bookmarks/${id}`, { method: 'POST' });
     },
-    onSuccess: () => {
+    onSuccess: (_data, remove) => {
       queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
-      if (isBookmarked) {
+      if (remove) {
         // Run17 BUG-013: removal is instant — offer a one-click Undo instead
         // of a confirm dialog.
         toast({
@@ -223,7 +243,22 @@ export default function ResourceDetail() {
           variant: "destructive",
         });
       }
-      console.error("Bookmark mutation error:", error);
+      // BUG-038 (run24): expected auth expiry isn't an app error — keep the
+      // console clean on 401s.
+      if (status !== 401) {
+        console.error("Bookmark mutation error:", error);
+      }
+    },
+    onSettled: (_data, error, remove) => {
+      // NB-024/NB-059 (run24): converge on the latest desired state with at
+      // most one follow-up request.
+      const desired = bookmarkDesiredRef.current;
+      bookmarkDesiredRef.current = null;
+      if (desired === null) return;
+      const finalState = error ? remove : !remove;
+      if (desired !== finalState) {
+        bookmarkMutation.mutate(!desired);
+      }
     }
   });
 
@@ -245,9 +280,6 @@ export default function ResourceDetail() {
   );
 
   const handleFavoriteClick = () => {
-    // NB-022 (run20): guard in-flight clicks here instead of the native
-    // `disabled` attribute — a disabled flip while focused drops focus to body.
-    if (favoriteMutation.isPending) return;
     if (!isAuthenticated) {
       toast({
         title: "Sign in to favorite",
@@ -256,13 +288,34 @@ export default function ResourceDetail() {
       });
       return;
     }
-    favoriteMutation.mutate();
+    // NB-024/NB-059 (run24): clicks during an in-flight toggle record the
+    // latest desired state (latest-wins) and flip the cached list
+    // optimistically; onSettled converges with at most one follow-up request.
+    // (NB-022 run20 note still applies: never use the native `disabled`
+    // attribute here — a disabled flip while focused drops focus to body.)
+    if (favoriteMutation.isPending) {
+      // Baseline is what the IN-FLIGHT request will make true (its target),
+      // not the query cache — the cache is stale until invalidation, so a
+      // 2nd rapid click computed the same target as the 1st instead of the
+      // inverse (2 clicks ended favorited instead of undone).
+      // variables=remove → in-flight target is !remove.
+      const inFlightTarget = !favoriteMutation.variables;
+      const desired = favoriteDesiredRef.current === null ? !inFlightTarget : !favoriteDesiredRef.current;
+      favoriteDesiredRef.current = desired;
+      if (resource) {
+        queryClient.setQueryData<Resource[]>(['/api/favorites'], (old) => {
+          const list = old ?? [];
+          return desired
+            ? (list.some(f => f.id === numericId) ? list : [...list, resource])
+            : list.filter(f => f.id !== numericId);
+        });
+      }
+      return;
+    }
+    favoriteMutation.mutate(isFavorite);
   };
 
   const handleBookmarkClick = () => {
-    // NB-022 (run20): same in-flight guard as favorite — keep the button
-    // enabled so keyboard focus survives the toggle.
-    if (bookmarkMutation.isPending) return;
     if (!isAuthenticated) {
       toast({
         title: "Sign in to bookmark",
@@ -271,7 +324,24 @@ export default function ResourceDetail() {
       });
       return;
     }
-    bookmarkMutation.mutate();
+    // NB-024/NB-059 (run24): same latest-wins handling as favorite.
+    if (bookmarkMutation.isPending) {
+      // Same as favorite: baseline is the in-flight request's target state
+      // (!remove), never the stale query cache.
+      const inFlightTarget = !bookmarkMutation.variables;
+      const desired = bookmarkDesiredRef.current === null ? !inFlightTarget : !bookmarkDesiredRef.current;
+      bookmarkDesiredRef.current = desired;
+      if (resource) {
+        queryClient.setQueryData<Resource[]>(['/api/bookmarks'], (old) => {
+          const list = old ?? [];
+          return desired
+            ? (list.some(b => b.id === numericId) ? list : [...list, resource])
+            : list.filter(b => b.id !== numericId);
+        });
+      }
+      return;
+    }
+    bookmarkMutation.mutate(isBookmarked);
   };
 
   // BUG-028 (run19): Suggest Edit used to open the dialog (which showed its own

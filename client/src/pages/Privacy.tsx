@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield } from "lucide-react";
+import { openCookieSettings } from "@/components/ui/consent-banner";
 
 // BUG-019 (run13): companion to Terms — see that file for the routing notes.
 export default function Privacy() {
@@ -40,6 +41,20 @@ export default function Privacy() {
               only runs after you accept it in the consent banner, and you can
               decline without losing any functionality. We do not send
               personally identifying information to analytics.
+            </p>
+            {/* R5-025 (run24): in-product consent-reset control — re-opens the
+                banner so a persisted Accept/Decline can be changed anytime. */}
+            <p>
+              Changed your mind?{" "}
+              <button
+                type="button"
+                onClick={openCookieSettings}
+                className="inline-flex items-center min-h-[24px] underline underline-offset-4 hover:text-[color:var(--text)]"
+                data-testid="button-privacy-cookie-settings"
+              >
+                Open cookie settings
+              </button>{" "}
+              to make or change your analytics choice.
             </p>
           </section>
 
@@ -133,7 +148,7 @@ export default function Privacy() {
                   would have required exposing personal data publicly. */}
               <Link
                 href="/profile?tab=security"
-                className="underline underline-offset-4 hover:text-[color:var(--text)]"
+                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-privacy-deletion"
               >
                 Profile → Security → Delete account &amp; data
@@ -146,7 +161,7 @@ export default function Privacy() {
                 href="https://github.com/krzemienski/awesome-video/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline underline-offset-4 hover:text-[color:var(--text)]"
+                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-privacy-github-issues"
               >
                 on the repository

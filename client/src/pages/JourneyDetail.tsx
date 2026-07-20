@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -117,6 +117,10 @@ export default function JourneyDetail() {
   // sharing the same stepNumber). The backend only sets completedAt once EVERY
   // non-optional row id is in completedSteps, so completing a logical step must
   // mark all of its row ids — otherwise the journey can never finalize.
+  // NB-024/NB-059 (run24): latest desired toggle recorded while a PUT is in
+  // flight; onSettled converges toward it with at most one follow-up PUT.
+  const pendingDesiredRef = useRef<{ stepIds: number[]; completed: boolean } | null>(null);
+
   // Run17 BUG-016: all row ids go in ONE PUT (stepIds + explicit completed
   // flag) instead of a sequential per-row PUT loop (3 writes per click).
   const completeStepMutation = useMutation({
@@ -165,7 +169,21 @@ export default function JourneyDetail() {
         variant: "destructive",
       });
     },
-    onSettled: () => {
+    onSettled: (_data, _error, vars) => {
+      // NB-024/NB-059 (run24): latest-wins — if clicks landed while this PUT
+      // was in flight, fire at most ONE follow-up PUT toward the latest
+      // desired state instead of dropping them or queueing one per click.
+      const desired = pendingDesiredRef.current;
+      pendingDesiredRef.current = null;
+      if (
+        desired &&
+        !(desired.completed === vars.completed &&
+          desired.stepIds.length === vars.stepIds.length &&
+          desired.stepIds.every((sid) => vars.stepIds.includes(sid)))
+      ) {
+        completeStepMutation.mutate(desired);
+        return; // reconcile after the follow-up settles instead
+      }
       // Reconcile with the server truth either way (completedAt, currentStepId).
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
@@ -181,7 +199,24 @@ export default function JourneyDetail() {
   // - NB-060: when offline, tell the user immediately and DO NOT fire the
   //   mutation (no silent queue that surprises them with a toast on reconnect).
   const handleToggleStep = (stepIds: number[], completed: boolean) => {
-    if (completeStepMutation.isPending) return;
+    // NB-024/NB-059 (run24): a click during an in-flight PUT flips the cache
+    // optimistically and records the desired final state; the mutation's
+    // onSettled converges with one follow-up PUT (latest wins).
+    if (completeStepMutation.isPending) {
+      pendingDesiredRef.current = { stepIds, completed };
+      const previous = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
+      if (previous?.progress) {
+        const current = (previous.progress.completedSteps || []).map(Number);
+        const next = completed
+          ? Array.from(new Set([...current, ...stepIds]))
+          : current.filter((sid: number) => !stepIds.includes(sid));
+        queryClient.setQueryData<Journey>([`/api/journeys/${id}`], {
+          ...previous,
+          progress: { ...previous.progress, completedSteps: next },
+        });
+      }
+      return;
+    }
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       toast({
         title: "You're offline",

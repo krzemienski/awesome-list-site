@@ -19,6 +19,10 @@ import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 interface CategoriesProps {
   nav?: AwesomeListNav;
   isLoading: boolean;
+  // R5-024 (run24): nav fetch failed — render an error card with Retry
+  // instead of the misleading empty state.
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 // BUG-015 (run18): the sort control now writes the exact slug it reads back on
@@ -67,7 +71,7 @@ function getTotalResourceCount(item: AwesomeListNavNode): number {
   return total;
 }
 
-export default function Categories({ nav, isLoading }: CategoriesProps) {
+export default function Categories({ nav, isLoading, error, onRetry }: CategoriesProps) {
   const baseCategories = useMemo(() => {
     if (!nav?.categories) return [] as AwesomeListNavNode[];
     return nav.categories.filter(
@@ -148,7 +152,10 @@ export default function Categories({ nav, isLoading }: CategoriesProps) {
           </p>
         </div>
         {/* BUG-015 (run18): sort control — value is the same canonical slug that
-            handleSortChange writes to ?sort=, so the round-trip is symmetric. */}
+            handleSortChange writes to ?sort=, so the round-trip is symmetric.
+            R5-024 (run24): hidden while loading errored or the list is empty —
+            a sort control over zero cards is dead UI. */}
+        {!error && (isLoading || categories.length > 0) && (
         <div className="flex items-center gap-2 shrink-0">
           <label
             htmlFor="categories-sort"
@@ -177,9 +184,33 @@ export default function Categories({ nav, isLoading }: CategoriesProps) {
             </SelectContent>
           </Select>
         </div>
+        )}
       </header>
 
-      {isLoading ? (
+      {error ? (
+        /* R5-024 (run24): real error card with Retry — the old code showed an
+           eternal skeleton (or a misleading "No categories") when the nav
+           fetch failed. */
+        <div
+          className="flex flex-col items-center gap-4 border border-[var(--border)] bg-[var(--surface)] px-6 py-12 text-center"
+          role="alert"
+          data-testid="categories-error-card"
+        >
+          <h2 className="text-lg font-semibold">Couldn't load categories</h2>
+          <p className="max-w-md text-sm text-muted-foreground">
+            Something went wrong while fetching the category list. Check your
+            connection and try again.
+          </p>
+          <button
+            type="button"
+            onClick={onRetry}
+            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            data-testid="button-categories-retry"
+          >
+            Retry
+          </button>
+        </div>
+      ) : isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 9 }).map((_, i) => (
             <Skeleton key={i} className="h-28 w-full bg-[var(--surface-3)]" />

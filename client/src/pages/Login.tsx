@@ -49,6 +49,40 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  // BUG-006 (run24): Replit sign-in preflight — before handing the browser to
+  // /api/login (a full-page redirect into Replit's OIDC flow), probe
+  // replit.com reachability. If it's blocked (corp firewall, DNS filter,
+  // offline), show an inline warning steering the user to email sign-in
+  // instead of stranding them on an unreachable page.
+  const [replitChecking, setReplitChecking] = useState(false);
+  const [replitUnreachable, setReplitUnreachable] = useState(false);
+
+  const handleReplitLogin = async () => {
+    if (replitChecking) return;
+    setReplitChecking(true);
+    setReplitUnreachable(false);
+    // no-cors: an opaque response resolves as long as the network path to
+    // replit.com works; DNS-block/offline rejects. 4s abort cap — a HANGING
+    // network (silently dropped packets, captive portal) must fail CLOSED:
+    // redirecting anyway would strand the user on an unreachable page, which
+    // is exactly what this preflight exists to prevent. Only an actual
+    // successful fetch proceeds to the OAuth flow.
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), 4000);
+    try {
+      await fetch("https://replit.com/favicon.ico", {
+        mode: "no-cors",
+        cache: "no-store",
+        signal: abort.signal,
+      });
+      window.location.href = "/api/login";
+    } catch {
+      setReplitChecking(false);
+      setReplitUnreachable(true);
+    } finally {
+      clearTimeout(timer);
+    }
+  };
   // Distinguishes "arrived already signed in" from "signed in via this form" —
   // the form's own success path handles its redirect (incl. the admin →
   // /admin default), so the effect below must not race it.
@@ -330,17 +364,29 @@ export default function Login() {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => {
-                window.location.href = "/api/login";
-              }}
+              onClick={handleReplitLogin}
+              aria-busy={replitChecking}
               data-testid="button-replit-login"
             >
               <SiReplit className="mr-2 h-4 w-4" />
-              Continue with Replit
+              {replitChecking ? "Checking connection..." : "Continue with Replit"}
             </Button>
-            <p className="text-center text-xs text-[color:var(--text-3)]">
-              Uses Replit&apos;s secure sign-in
-            </p>
+            {replitUnreachable ? (
+              /* BUG-006 (run24): inline warning when replit.com is unreachable
+                 — steer to email sign-in instead of a dead redirect. */
+              <p
+                className="text-center text-xs text-[color:var(--warn,#ffb84d)]"
+                role="alert"
+                data-testid="text-replit-unreachable"
+              >
+                replit.com looks unreachable from your network. Please use{" "}
+                <strong>email and password</strong> above to sign in.
+              </p>
+            ) : (
+              <p className="text-center text-xs text-[color:var(--text-3)]">
+                Uses Replit&apos;s secure sign-in
+              </p>
+            )}
           </div>
 
           <p className="text-center text-sm text-[color:var(--text-2)]">

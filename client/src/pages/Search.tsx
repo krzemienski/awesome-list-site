@@ -18,10 +18,17 @@ export default function Search() {
 
   // BUG-038 (run14): pagination state serializes to ?page= so reload/share
   // restores the same page instead of silently resetting to page 1.
+  // R5-043 (run24): clamp to int32 max — values like ?page=1e20 used to reach
+  // the API, get a 400 invalid_page, and render a dead-end "Search failed"
+  // card whose Try again replayed the same invalid request forever. Clamped
+  // pages fetch a valid (possibly empty) page, then the existing snap-back
+  // effect normalizes to the real last page and rewrites the URL.
+  const MAX_PAGE = 2147483647;
   const parsePage = (search: string) => {
     const raw = new URLSearchParams(search).get("page");
     const n = raw ? parseInt(raw, 10) : 1;
-    return Number.isFinite(n) && n > 0 ? n : 1;
+    if (!Number.isFinite(n) || n < 1) return 1;
+    return Math.min(n, MAX_PAGE);
   };
 
   const [input, setInput] = useState(urlQuery);
@@ -50,7 +57,10 @@ export default function Search() {
         ? `/search?q=${encodeURIComponent(input)}`
         : "/search";
       if (window.location.pathname + window.location.search !== target) {
-        setLocation(target, { replace: true });
+        // R5-017 (run24): a committed (debounced) query change is a discrete
+        // state the user expects Back to reverse — PUSH it. Only URL
+        // normalization (page clamping below) may replace.
+        setLocation(target);
       }
     }, 300);
     return () => clearTimeout(t);
@@ -114,11 +124,24 @@ export default function Search() {
   useEffect(() => {
     setPageJumpValue(String(safePage));
   }, [safePage]);
+  // R5-017 (run24): user-initiated page changes PUSH a history entry so Back
+  // steps page 3 → 2 → 1 instead of exiting the site. wouter patches
+  // pushState, so the adoption effect above picks the change up; the
+  // replaceState effect below stays no-op because URL and state already agree.
+  const gotoPage = (n: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (n > 1) params.set("page", String(n));
+    else params.delete("page");
+    const qs = params.toString();
+    window.history.pushState(null, "", `/search${qs ? `?${qs}` : ""}`);
+    setPage(n);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const commitPageJump = () => {
     const n = parseInt(pageJumpValue, 10);
     if (Number.isFinite(n) && n >= 1 && n <= totalPages && n !== safePage) {
-      setPage(n);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      gotoPage(n);
     } else {
       setPageJumpValue(String(safePage));
     }
@@ -259,10 +282,7 @@ export default function Search() {
                 variant="outline"
                 size="sm"
                 disabled={safePage <= 1}
-                onClick={() => {
-                  setPage(safePage - 1);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
+                onClick={() => gotoPage(safePage - 1)}
                 data-testid="button-search-prev"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
@@ -294,10 +314,7 @@ export default function Search() {
                 variant="outline"
                 size="sm"
                 disabled={safePage >= totalPages}
-                onClick={() => {
-                  setPage(safePage + 1);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
+                onClick={() => gotoPage(safePage + 1)}
                 data-testid="button-search-next"
               >
                 Next

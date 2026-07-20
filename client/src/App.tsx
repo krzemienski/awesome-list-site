@@ -96,12 +96,15 @@ interface RouteErrorBoundaryProps {
 
 interface RouteErrorBoundaryState {
   error: Error | null;
+  // R5-018 (run24): set when a retry is attempted while still offline so the
+  // card can say so instead of silently doing nothing (or dying in a reload).
+  stillOffline: boolean;
 }
 
 class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBoundaryState> {
-  state: RouteErrorBoundaryState = { error: null };
+  state: RouteErrorBoundaryState = { error: null, stillOffline: false };
 
-  static getDerivedStateFromError(error: Error): RouteErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): Partial<RouteErrorBoundaryState> {
     return { error };
   }
 
@@ -115,17 +118,34 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
       // timestamp, a failure within the cooldown shows the retry card, and
       // a stale timestamp (future deploy rotation) re-arms the auto-reload
       // without any explicit clearing.
+      // R5-018 (run24): the guard also records WHICH URL was auto-reloaded —
+      // a second failure on the SAME URL inside the cooldown means the reload
+      // didn't help, so fall through to the retry card; a failure on a
+      // DIFFERENT route gets its own one-shot reload.
       let recentlyReloaded = false;
       try {
-        const last = Number(sessionStorage.getItem(CHUNK_RELOAD_FLAG) ?? 0);
-        recentlyReloaded = Date.now() - last < 60_000;
-        if (!recentlyReloaded) sessionStorage.setItem(CHUNK_RELOAD_FLAG, String(Date.now()));
+        const raw = sessionStorage.getItem(CHUNK_RELOAD_FLAG) ?? "0";
+        const sep = raw.indexOf("|");
+        const last = Number(sep === -1 ? raw : raw.slice(0, sep));
+        const lastHref = sep === -1 ? "" : raw.slice(sep + 1);
+        recentlyReloaded =
+          Date.now() - last < 60_000 && lastHref === window.location.href;
+        if (!recentlyReloaded) {
+          sessionStorage.setItem(
+            CHUNK_RELOAD_FLAG,
+            `${Date.now()}|${window.location.href}`,
+          );
+        }
       } catch {
         // Storage unavailable (private mode) — skip the auto-reload guard
         // and fall through to the manual retry card to avoid a reload loop.
         recentlyReloaded = true;
       }
-      if (!recentlyReloaded) {
+      // R5-018 (run24): NEVER auto-reload while offline — a full document
+      // reload with no network dies on the browser's error page and destroys
+      // the whole app session. Offline chunk failures fall through to the
+      // in-app retry card, which keeps the shell (and in-memory state) alive.
+      if (!recentlyReloaded && navigator.onLine !== false) {
         window.location.reload();
         return;
       }
@@ -136,16 +156,27 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
   componentDidUpdate(prevProps: RouteErrorBoundaryProps) {
     // Navigating away clears the error so the next route renders normally.
     if (this.state.error && prevProps.location !== this.props.location) {
-      this.setState({ error: null });
+      this.setState({ error: null, stillOffline: false });
     }
   }
 
   handleRetry = () => {
+    // R5-018 (run24): while offline a reload would land on the browser's
+    // error page and kill the app session — surface an inline "still offline"
+    // notice instead and keep the card (and app state) alive.
+    if (navigator.onLine === false) {
+      this.setState({ stillOffline: true });
+      return;
+    }
     // Stamp (not clear) the guard: this click IS a reload attempt, so if the
     // chunk still fails after it, the visitor lands back on this card instead
-    // of burning an extra automatic reload first.
+    // of burning an extra automatic reload first. (NB-001: never CLEAR the
+    // timestamp — clearing re-arms the auto-reload loop.)
     try {
-      sessionStorage.setItem(CHUNK_RELOAD_FLAG, String(Date.now()));
+      sessionStorage.setItem(
+        CHUNK_RELOAD_FLAG,
+        `${Date.now()}|${window.location.href}`,
+      );
     } catch {
       // ignore
     }
@@ -163,24 +194,38 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
     }
 
     if (isChunkLoadError(error)) {
+      // R5-018 (run24): offline chunk failures get connection-specific copy;
+      // online ones keep the deploy-rotation explanation.
+      const offline = navigator.onLine === false;
       return (
         <div
           className="flex flex-col items-center justify-center gap-4 py-24 px-4 text-center"
           role="alert"
           data-testid="route-error-boundary"
         >
-          <h1 className="text-xl font-semibold">This page failed to load</h1>
+          <h1 className="text-xl font-semibold">
+            {offline ? "Couldn't load this page — you appear to be offline" : "This page failed to load"}
+          </h1>
           <p className="max-w-md text-sm text-muted-foreground">
-            The site was likely updated while you were browsing, so your browser
-            asked for files that no longer exist. Reloading fetches the new version.
+            {offline
+              ? "Check your connection, then retry. The rest of the app is still available."
+              : "The site was likely updated while you were browsing, so your browser asked for files that no longer exist. Reloading fetches the new version."}
           </p>
+          {this.state.stillOffline && (
+            <p
+              className="max-w-md text-sm font-medium text-[var(--accent)]"
+              data-testid="text-still-offline"
+            >
+              Still offline — reconnect and try again.
+            </p>
+          )}
           <button
             type="button"
             onClick={this.handleRetry}
             className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             data-testid="button-route-retry"
           >
-            Reload page
+            {offline ? "Retry" : "Reload page"}
           </button>
         </div>
       );
@@ -291,7 +336,15 @@ function Router() {
   // tree; the 2.7MB corpus is only fetched on routes whose CONTENT needs it
   // (home/category listings/advanced/recommendations). Other pages (resource
   // detail, journeys, profile, …) never download the corpus.
-  const { data: nav, isLoading: navLoading } = useQuery<AwesomeListNav>({
+  // R5-024 (run24): expose the nav query's error + refetch so /categories can
+  // render a real error card with a Retry button (instead of an eternal
+  // skeleton) and the sidebar subtitle can resolve out of "Loading…".
+  const {
+    data: nav,
+    isLoading: navLoading,
+    isError: navError,
+    refetch: refetchNav,
+  } = useQuery<AwesomeListNav>({
     queryKey: ["awesome-list-nav"],
     queryFn: fetchAwesomeListNav,
     staleTime: 1000 * 60 * 60,
@@ -331,14 +384,14 @@ function Router() {
   // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <MainLayout nav={nav} isLoading={navLoading} user={user ?? undefined} onLogout={logout}>
+      <MainLayout nav={nav} isLoading={navLoading} navError={navError} user={user ?? undefined} onLogout={logout}>
         <NotFound />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout nav={nav} isLoading={navLoading} user={user ?? undefined} onLogout={logout}>
+    <MainLayout nav={nav} isLoading={navLoading} navError={navError} user={user ?? undefined} onLogout={logout}>
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}
@@ -392,7 +445,14 @@ function Router() {
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
         <Route path="/category/:slug" component={Category} />
-        <Route path="/categories" component={() => <Categories nav={nav} isLoading={navLoading} />} />
+        <Route path="/categories" component={() => (
+          <Categories
+            nav={nav}
+            isLoading={navLoading}
+            error={navError}
+            onRetry={() => refetchNav()}
+          />
+        )} />
         <Route path="/category">
           <Redirect to="/" replace />
         </Route>

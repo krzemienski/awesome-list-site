@@ -194,7 +194,7 @@ export default function ForgotPassword() {
 
               <p className="text-center text-sm text-[color:var(--text-2)]">
                 Remembered it?{" "}
-                <Link href="/login" className="text-[color:var(--accent)] hover:underline" data-testid="link-login">
+                <Link href="/login" className="inline-flex items-center min-h-[24px] align-middle text-[color:var(--accent)] hover:underline" data-testid="link-login">
                   Sign in
                 </Link>
               </p>

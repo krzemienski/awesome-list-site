@@ -7,6 +7,14 @@ import {
   initGA,
 } from "@/lib/analytics";
 
+// R5-025 (run24): custom event that re-opens the consent banner. Dispatched
+// by the "Cookie settings" links in Footer and /privacy via
+// openCookieSettings() so users can change a persisted consent choice.
+export const OPEN_COOKIE_SETTINGS_EVENT = "open-cookie-settings";
+export function openCookieSettings() {
+  window.dispatchEvent(new CustomEvent(OPEN_COOKIE_SETTINGS_EVENT));
+}
+
 // BUG-020 (run13): analytics consent banner. Google Analytics loads ONLY
 // after an explicit "Accept" (see the consent gate inside initGA); declining
 // keeps the site fully functional with zero analytics. The choice persists in
@@ -36,21 +44,36 @@ export default function ConsentBanner() {
   // R4-071: keyboard users used to reach the banner's buttons only as the
   // final tab stops, and Escape did nothing. Move focus to the banner as soon
   // as it appears (so Tab lands on its controls next) and let Escape dismiss
-  // it — Escape == Decline (choice = denied, no analytics), matching the
-  // Decline button. Run22 BUG-049: the banner is now ALSO first in DOM order
-  // (App.tsx renders it before the router), so after its last button Tab
-  // flows into the page's skip-link instead of dead-ending on <body>.
+  // it. R5-025 (run24): Escape is now dismiss-ONLY — it hides the banner for
+  // this session without persisting any choice (the old behavior silently
+  // wrote a permanent "denied" the user never knowingly made). The banner
+  // returns on the next visit because localStorage stays null.
+  // Run22 BUG-049: the banner is also first in DOM order (App.tsx renders it
+  // before the router), so after its last button Tab flows into the page's
+  // skip-link instead of dead-ending on <body>.
   useEffect(() => {
     if (choiceMade) return;
     bannerRef.current?.focus();
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      setAnalyticsConsent("denied");
       setChoiceMade(true);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [choiceMade]);
+
+  // R5-025 (run24): consent-reset path. "Cookie settings" links (Footer,
+  // /privacy) dispatch this event to re-open the banner so a persisted choice
+  // (or an Escape dismissal) can always be revisited in-product.
+  useEffect(() => {
+    const onOpen = () => {
+      setChoiceMade(false);
+      // Re-focus after the banner re-renders.
+      setTimeout(() => bannerRef.current?.focus(), 0);
+    };
+    window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
+  }, []);
 
   // BUG-004 (run14): the fixed banner overlapped page content (footer links,
   // bottom pagination) until a choice was made. While visible, pad the body
@@ -113,7 +136,7 @@ export default function ConsentBanner() {
             Analytics cookies?{" "}
             <Link
               href="/privacy"
-              className="underline hover:text-[color:var(--text)]"
+              className="inline-flex items-center min-h-[24px] align-middle underline hover:text-[color:var(--text)]"
               data-testid="consent-privacy-link"
             >
               Privacy

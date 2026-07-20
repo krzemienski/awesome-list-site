@@ -44,6 +44,9 @@ interface AppSidebarProps {
   categories: NavCategory[];
   totalResources: number;
   isLoading: boolean;
+  // R5-024 (run24): true when the nav tree fetch failed — the header subtitle
+  // resolves to a neutral label instead of showing "Loading…" forever.
+  navError?: boolean;
   user?: any;
 }
 
@@ -465,6 +468,7 @@ export default function AppSidebar({
   categories,
   totalResources,
   isLoading,
+  navError,
   user,
 }: AppSidebarProps) {
   const [location, setLocation] = useLocation();
@@ -579,9 +583,14 @@ export default function AppSidebar({
                     color: "var(--text-3)",
                   }}
                 >
-                  {isLoading || totalResources === 0
-                    ? "Loading…"
-                    : `${totalResources.toLocaleString()} resources`}
+                  {/* R5-024 (run24): a failed nav fetch used to leave this
+                      stuck on "Loading…" forever (isLoading false, count 0).
+                      Resolve to a neutral label when the fetch has errored. */}
+                  {navError && totalResources === 0
+                    ? "Catalog unavailable"
+                    : isLoading || totalResources === 0
+                      ? "Loading…"
+                      : `${totalResources.toLocaleString()} resources`}
                 </span>
               </div>
             </SidebarMenuButton>

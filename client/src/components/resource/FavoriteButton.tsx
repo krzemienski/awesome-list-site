@@ -43,6 +43,14 @@ function FavoriteButton({
     lastToastRef.current = toast(opts);
   };
 
+  // NB-024/NB-059 (run24): latest-wins for rapid toggles. Clicks that land
+  // while a request is in flight used to be silently dropped, leaving the UI
+  // showing a state the server never received. Now an in-flight click flips
+  // the UI optimistically and records the DESIRED final state here; when the
+  // active request settles, onSettled fires at most ONE follow-up request to
+  // converge on it — one request per final state, never a queue per click.
+  const desiredRef = useRef<boolean | null>(null);
+
   // `remove` is captured at click time and passed as the mutation variable so
   // the POST/DELETE decision never depends on the optimistic state flip below
   // (reading the mutable `isFavorited` inside mutationFn caused removals to
@@ -115,7 +123,22 @@ function FavoriteButton({
         });
       }
 
-      console.error("Favorite mutation error:", error);
+      // BUG-038 (run24): a 401 is an expected signed-out/expired-session
+      // outcome already surfaced via the toast — don't log it as an error.
+      if (status !== 401) {
+        console.error("Favorite mutation error:", error);
+      }
+    },
+    onSettled: (data, error, remove) => {
+      // NB-024/NB-059 (run24): converge on the latest desired state with at
+      // most one follow-up request.
+      const desired = desiredRef.current;
+      desiredRef.current = null;
+      if (desired === null) return;
+      const finalState = error ? remove : (data?.isFavorited ?? !remove);
+      if (desired !== finalState) {
+        favoriteMutation.mutate(!desired);
+      }
     }
   });
 
@@ -125,7 +148,17 @@ function FavoriteButton({
 
     // NB-059/NB-022 (run18): guard in-flight clicks here instead of the native
     // `disabled` attribute — a disabled flip while focused drops focus to body.
-    if (favoriteMutation.isPending) return;
+    // NB-024/NB-059 (run24): instead of dropping the click, flip the UI and
+    // record the desired state — onSettled converges with one request.
+    if (favoriteMutation.isPending) {
+      if (isAuthenticated) {
+        const next = !isFavorited;
+        desiredRef.current = next;
+        setIsFavorited(next);
+        setFavoriteCount(prev => (next ? prev + 1 : Math.max(0, prev - 1)));
+      }
+      return;
+    }
 
     // R2-L09: anonymous users get a clear sign-in prompt instead of a
     // confusing failed request. BUG-044/026 (run14): the toast carries a

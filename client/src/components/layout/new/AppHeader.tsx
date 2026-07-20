@@ -425,9 +425,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" sideOffset={8}>
               <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">{user.name || user.email}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                {/* BUG-012 (run24): long names/emails used to overflow the
+                    fixed-width menu — truncate the name, wrap the email. */}
+                <div className="flex min-w-0 flex-col space-y-1">
+                  <p className="truncate text-sm font-medium">{user.name || user.email}</p>
+                  <p className="break-all text-xs text-muted-foreground">{user.email}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

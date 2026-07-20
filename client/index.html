@@ -31,6 +31,42 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <script>
+      // BUG-021 (run24): strip query params carrying obvious XSS payloads from
+      // the address bar BEFORE any other boot script runs. The app never
+      // renders raw query strings as HTML, but the payload sat in the URL bar
+      // (shareable/copyable) and flowed into analytics page_path. Runs
+      // pre-React via replaceState so no history entry keeps the payload.
+      (function () {
+        try {
+          if (!location.search || location.search.length < 2) return;
+          var XSS = /<\s*\/?\s*[a-z][^>]*>|javascript\s*:|\bon[a-z]+\s*=|data\s*:\s*text\/html/i;
+          var params = new URLSearchParams(location.search);
+          var dirty = false;
+          var names = [];
+          params.forEach(function (v, k) { names.push(k); });
+          for (var i = 0; i < names.length; i++) {
+            var k = names[i];
+            var raw = k + '=' + (params.get(k) || '');
+            var dec = raw;
+            try { dec = decodeURIComponent(raw); } catch (_) {}
+            if (XSS.test(raw) || XSS.test(dec)) {
+              params.delete(k);
+              dirty = true;
+            }
+          }
+          if (dirty) {
+            var qs = params.toString();
+            history.replaceState(
+              history.state,
+              '',
+              location.pathname + (qs ? '?' + qs : '') + location.hash
+            );
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <script>
       (function () {
         try {
           var SYSTEMS = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];

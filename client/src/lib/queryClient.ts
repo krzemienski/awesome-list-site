@@ -79,8 +79,13 @@ export const getQueryFn: <T>(options: {
       
       // Track API errors
       trackApiPerformance(url, responseTime, 0);
-      trackError('api_error', `${url}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      
+      // BUG-038 (run24): a 401 is an expected signed-out/expired-session
+      // outcome, not an application error — don't report it to analytics.
+      const is401 = error instanceof ApiError && error.status === 401;
+      if (!is401) {
+        trackError('api_error', `${url}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+
       throw error;
     }
   };

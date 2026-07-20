@@ -7,6 +7,7 @@ import AppHeader from "./AppHeader";
 import SearchDialog from "@/components/ui/search-dialog";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { openCookieSettings } from "@/components/ui/consent-banner";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
@@ -51,12 +52,15 @@ interface MainLayoutProps {
   // tree, not the 2.7MB corpus — non-listing pages never download the corpus.
   nav?: AwesomeListNav;
   isLoading: boolean;
+  // R5-024 (run24): nav tree failed to load — the sidebar resolves its
+  // "Loading…" subtitle instead of showing it forever.
+  navError?: boolean;
   children: React.ReactNode;
   user?: User;
   onLogout?: () => void;
 }
 
-export default function MainLayout({ nav, isLoading, children, user, onLogout }: MainLayoutProps) {
+export default function MainLayout({ nav, isLoading, navError, children, user, onLogout }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -76,6 +80,7 @@ export default function MainLayout({ nav, isLoading, children, user, onLogout }:
           categories={nav?.categories || []}
           totalResources={nav?.totalResources ?? 0}
           isLoading={isLoading}
+          navError={navError}
           user={user}
         />
         <SidebarInset>
@@ -131,6 +136,16 @@ export default function MainLayout({ nav, isLoading, children, user, onLogout }:
               <Link href="/privacy" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-privacy">
                 Privacy
               </Link>
+              {/* R5-025 (run24): in-product consent-reset path — re-opens the
+                  analytics consent banner so a persisted choice can be changed. */}
+              <button
+                type="button"
+                onClick={openCookieSettings}
+                className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors"
+                data-testid="footer-cookie-settings"
+              >
+                Cookie settings
+              </button>
               <a
                 href="https://github.com/krzemienski/awesome-video"
                 target="_blank"

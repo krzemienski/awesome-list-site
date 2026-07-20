@@ -95,7 +95,7 @@ export default function About() {
               Need your account or personal data deleted? Sign in and use{" "}
               <Link
                 href="/profile?tab=security"
-                className="font-medium text-[var(--accent)] hover:underline"
+                className="inline-flex items-center min-h-[24px] align-middle font-medium text-[var(--accent)] hover:underline"
                 data-testid="link-about-deletion"
               >
                 Profile → Security → Delete account &amp; data
