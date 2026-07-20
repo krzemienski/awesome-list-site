@@ -1846,12 +1846,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sanitizedProposedData.description = parsedDesc.data;
       }
 
-      // Run16 BUG-001 / BUG-018 / Run21 R4-048/076: a proposed URL change may
-      // keep a legacy http:// scheme but must be a plausible, bounded web URL
-      // with no embedded credentials. Run24 R5-016: byte-equal to the stored
-      // URL skips normalization so a no-op suggestion never churns the URL.
+      // Run16 BUG-001 / BUG-018 / Run21 R4-048/076: a proposed URL *change* must
+      // be a plausible, bounded URL with no embedded credentials. Run24 R4-016:
+      // edits must be https-only (httpsUrlSchema) — you cannot introduce/keep an
+      // http:// destination via an edit. Byte-equal to the stored URL skips
+      // validation entirely, so unrelated edits on legacy http:// rows still work.
       if (sanitizedProposedData.url !== undefined && String(sanitizedProposedData.url) !== resource.url) {
-        const parsedUrl = webUrlSchema.safeParse(String(sanitizedProposedData.url));
+        const parsedUrl = httpsUrlSchema.safeParse(String(sanitizedProposedData.url));
         if (!parsedUrl.success) {
           return res.status(400).json({ message: parsedUrl.error.issues[0]?.message || 'Invalid URL' });
         }
@@ -3502,12 +3503,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Run21 R4-016: the admin edit path mounts the SAME shared validators as
       // submit — <script> titles, whitespace-only titles, 5000-char
-      // descriptions and 100k URLs all 400 here now. Updates may keep a
-      // legacy http:// scheme (webUrlSchema) but never a non-web scheme.
-      // Run24 R5-016: webUrlSchema now normalizes (tracking-param strip,
-      // punycode). If the submitted URL is byte-equal to what's already
-      // stored, skip the field entirely so a no-op save can never silently
-      // rewrite a legacy URL.
+      // descriptions and 100k URLs all 400 here now. Run24 R4-016: a URL
+      // *change* must be https-only (httpsUrlSchema) — no http:// destination
+      // may be introduced/kept via an edit. If the submitted URL is byte-equal
+      // to what's already stored, the field is skipped entirely, so unrelated
+      // edits on legacy http:// rows still succeed and never churn the URL.
       const bodyForValidation = { ...(req.body ?? {}) };
       if (typeof bodyForValidation.url === 'string' && bodyForValidation.url === resource.url) {
         delete bodyForValidation.url;
@@ -3515,7 +3515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updateSchema = insertResourceSchema.partial().extend({
         title: resourceTitleSchema.optional(),
         description: resourceDescriptionSchema.optional(),
-        url: webUrlSchema.optional(),
+        url: httpsUrlSchema.optional(),
       });
       const validationResult = updateSchema.safeParse(bodyForValidation);
       
@@ -5587,17 +5587,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Run16 BUG-008: server-side guardrails mirroring the launch form
       // (budget min $0.25, turns 5–100). The API used to accept any value
       // (e.g. maxTurns=301000 / $0 budgets) and silently run with it.
-      // Run20 (user request): no LOW upper budget cap — but R5-021 flagged
-      // unbounded cost amplification, so a $10,000 fat-finger ceiling now
-      // applies (documented in replit.md; raise deliberately if ever needed).
+      // Run24 R5-021: unbounded cost amplification — the ceiling is now the
+      // spec-mandated $100 cap (raise deliberately in the spec if ever needed).
       let budget = '1.00';
       if (maxBudgetUsd !== undefined && maxBudgetUsd !== null && String(maxBudgetUsd).trim() !== '') {
         const n = Number(maxBudgetUsd);
         if (typeof maxBudgetUsd !== 'number' || !Number.isFinite(n) || n < 0.25) {
           return res.status(400).json({ success: false, message: 'maxBudgetUsd must be a number of at least 0.25' });
         }
-        if (n > 10000) {
-          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be at most 10000' });
+        if (n > 100) {
+          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be at most 100' });
         }
         budget = n.toFixed(2);
       }
