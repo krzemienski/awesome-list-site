@@ -714,6 +714,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { message: "Too many AI requests. Please try again in a few minutes." },
   });
 
+  // Task-178: anonymous GET /api/learning-paths/suggested only serves the
+  // boot-warmed default profile (no paid Claude call per request), but the
+  // strict aiLimiter was locking out shared-NAT visitors (offices, campuses)
+  // after 10 hits / 15 min per IP. Give the cached anonymous read its own
+  // generous limiter (60/min/IP — same order as resourceReadLimiter) and keep
+  // the strict aiLimiter for signed-in requests, whose personalized params can
+  // mint new cache keys and trigger paid generation.
+  const suggestedReadLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 60,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many requests. Please slow down and try again shortly." },
+  });
+
   // NB-051 (run23): TRACE/TRACK are already answered 405 + Allow by the
   // BUG-v3-L02 unsupported-method guard in server/index.ts (registered before
   // any route). In production the hosting edge intercepts TRACE even earlier
@@ -6133,7 +6148,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // therefore PINNED to the boot-warmed default profile — no unauthenticated
   // input can mint a new cache key or trigger generation. Signed-in users get
   // personalization (bounded params) behind the strict aiLimiter.
-  app.get("/api/learning-paths/suggested", aiLimiter, async (req: any, res) => {
+  // Task-178: split the limiter by auth — anonymous requests only ever read
+  // the warmed cache, so they get the generous suggestedReadLimiter; signed-in
+  // requests (which can trigger paid generation) stay behind the strict
+  // aiLimiter.
+  app.get("/api/learning-paths/suggested", (req: any, res, next) => {
+    const isAuthed = typeof req.isAuthenticated === "function" && req.isAuthenticated();
+    return (isAuthed ? aiLimiter : suggestedReadLimiter)(req, res, next);
+  }, async (req: any, res) => {
     try {
       const rawLimit = parseInt(req.query.limit as string);
       const requestedLimit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
