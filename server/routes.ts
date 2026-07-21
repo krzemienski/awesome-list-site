@@ -3334,6 +3334,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // resourceId=0 used to be swallowed and return page 1 unfiltered).
       const rawLimit = req.query.limit as string | undefined;
       const rawOffset = req.query.offset as string | undefined;
+      const rawPage = req.query.page as string | undefined;
       const rawResourceId = req.query.resourceId as string | undefined;
 
       // R5-020 (run24): Number.isInteger(1e20) is TRUE — exponent-notation and
@@ -3361,6 +3362,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: 'offset must be a non-negative integer' });
         }
         offset = n;
+      }
+      // Task-201: `page` used to be silently ignored — a probe sending
+      // page=1e20 got page 1 back (and on the pre-Run24 prod build, a PG
+      // bigint range error). Validate it like the other list endpoints and,
+      // when offset isn't given, translate it to an offset (capped to int4
+      // so PG never sees an out-of-range value).
+      if (rawPage !== undefined) {
+        const p = parseIntInRange(rawPage, { min: 1 });
+        if (p === null) {
+          return res.status(400).json({ message: 'page must be an integer between 1 and 2147483647' });
+        }
+        if (rawOffset === undefined) {
+          offset = Math.min((p - 1) * limit, PG_INT_MAX);
+        }
       }
 
       const [logs, total] = await Promise.all([
