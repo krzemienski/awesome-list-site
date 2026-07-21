@@ -276,3 +276,9 @@ id = "uSK-SyjlT6TOw9EaJWsrX"
 uri = "file://.local/brand-directions/logo-choices.png"
 type = "image"
 title = "Logo Mark Choices — 6 options, editorial voice locked"
+
+[[outputs]]
+id = "Om_mfWHGBimKqe9l72TDh"
+uri = "file://exports/production-readiness-audit-skill.zip"
+type = "unspecified"
+title = "Production Readiness Audit skill (zip)"
