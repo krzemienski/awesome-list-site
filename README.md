@@ -1,6 +1,6 @@
 # Awesome Video Resource Viewer
 
-A production-ready React application for browsing and discovering 2,600+ curated video development resources. Features AI-powered recommendations, admin curation tools, GitHub synchronization, and awesome-lint compliant exports.
+A production-ready React application for browsing and discovering 2,200+ curated video development resources. Features AI-powered recommendations, admin curation tools, GitHub synchronization, and awesome-lint compliant exports.
 
 [![Build Status](https://github.com/krzemienski/awesome-list-site/actions/workflows/deploy.yml/badge.svg)](https://github.com/krzemienski/awesome-list-site/actions/workflows/deploy.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
@@ -13,13 +13,13 @@ A production-ready React application for browsing and discovering 2,600+ curated
 ## Features
 
 ### For Users
-- **Resource Discovery**: Browse 2,600+ curated video development resources
+- **Resource Discovery**: Browse 2,200+ curated video development resources
 - **Advanced Search**: Fuzzy search with keyboard shortcut (⌘K)
 - **3-Level Navigation**: Categories → Subcategories → Sub-subcategories
 - **Learning Journeys**: Guided learning paths for skill development
 - **Bookmarks & Favorites**: Save resources for later
 - **Mobile-Optimized**: Responsive design with WCAG AAA touch targets
-- **Dark Theme**: Pure black cyberpunk aesthetic
+- **Theme Switcher**: 5 design systems (Editorial, Terminal, Geist, Brutalist, Swiss) × 10 accent colors at `/settings/theme`
 
 ### For Administrators
 - **Resource Curation**: Approve/reject submissions, edit resources
@@ -33,7 +33,7 @@ A production-ready React application for browsing and discovering 2,600+ curated
 
 ### Home Page & Search Interface
 ![Home page with fuzzy search (⌘K) interface showing resource discovery](docs/screenshots/home-search.png)
-*Browse 2,600+ resources with advanced fuzzy search (⌘K keyboard shortcut)*
+*Browse 2,200+ resources with advanced fuzzy search (⌘K keyboard shortcut)*
 
 ### Category Navigation
 ![3-level navigation hierarchy: Categories → Subcategories → Sub-subcategories](docs/screenshots/category-navigation.png)
@@ -92,7 +92,7 @@ npm run start
 | Document | Description |
 |----------|-------------|
 | [SETUP.md](docs/SETUP.md) | Development environment setup |
-| [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | Environment variables reference |
+| [ENVIRONMENT.md](docs/ENVIRONMENT.md) | Environment variables reference |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
 | [API.md](docs/API.md) | Complete API reference |
 | [API Documentation](/api/docs) | Interactive OpenAPI documentation |
@@ -100,19 +100,21 @@ npm run start
 | [CODE-MAP.md](docs/CODE-MAP.md) | Codebase navigation guide |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 
+See the [full documentation index](docs/README.md) for all guides (database, deployment, Docker, AI services, design system, and more).
+
 ## Project Structure
 
 ```
 ├── client/src/           # React frontend
 │   ├── components/       # Reusable UI components
-│   ├── pages/            # Route pages (17 pages)
+│   ├── pages/            # Route pages (26 pages)
 │   ├── hooks/            # Custom React hooks
 │   └── lib/              # Utilities
 ├── server/               # Express backend
 │   ├── ai/               # AI services (Claude, enrichment)
 │   ├── github/           # GitHub sync integration
 │   ├── validation/       # awesome-lint, link checking
-│   ├── routes.ts         # API endpoints (75+ routes)
+│   ├── routes.ts         # API endpoints (145 routes)
 │   └── storage.ts        # Database layer
 ├── shared/               # Shared types and schemas
 │   └── schema.ts         # Drizzle schema, Zod validation
@@ -147,7 +149,7 @@ Exports pass all awesome-lint rules except:
 
 ## Environment Variables
 
-This project requires several environment variables to run. See [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) for:
+This project requires several environment variables to run. See [ENVIRONMENT.md](docs/ENVIRONMENT.md) for:
 - Complete list of required and optional variables
 - Detailed descriptions and configuration examples
 - Platform-specific setup instructions

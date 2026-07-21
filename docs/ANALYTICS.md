@@ -162,9 +162,9 @@ and `qa-test-*` resource submissions) are purged afterward via
 ### Running it
 
 ```bash
-node scripts/vg2-ga4-validate.mjs   # writes evidence/vg2-* (report, raw, screenshots)
+node scripts/vg2-ga4-validate.mjs   # drives Chromium through real flows, asserts events
 npx tsx scripts/vg2-teardown.ts     # purge throwaway QA rows
 ```
 
-Latest evidence lives in `evidence/vg2-report.md` (event counts, per-assertion
-results, and sample decoded payloads).
+The validator prints event counts, per-assertion results, and sample decoded
+payloads to stdout (and any output paths it is configured with at run time).

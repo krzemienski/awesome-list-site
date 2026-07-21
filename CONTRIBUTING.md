@@ -116,9 +116,11 @@ npx tsx scripts/test-awesome-lint.ts
 ### Before Submitting
 
 1. Run the development server and test changes
-2. Ensure no TypeScript errors: `npx tsc --noEmit`
-3. Test on mobile viewport sizes
-4. Update documentation if needed
+2. Ensure no TypeScript errors: `npm run type-check`
+3. Lint and format: `npm run lint` and `npm run format:check`
+4. Run tests: `npm run test:unit` (plus `npm run test:integration` / `npm run test:e2e` for larger changes)
+5. Test on mobile viewport sizes
+6. Update documentation if needed
 
 ### PR Guidelines
 
@@ -142,7 +144,7 @@ For UI changes, include screenshots in your PR description to help reviewers und
 ```markdown
 ### Search Interface Updates
 ![Home page with fuzzy search (⌘K) interface showing resource discovery](docs/screenshots/home-search.png)
-*Browse 2,600+ resources with advanced fuzzy search (⌘K keyboard shortcut)*
+*Browse 2,200+ resources with advanced fuzzy search (⌘K keyboard shortcut)*
 ```
 
 **Example - Before/After Comparison:**

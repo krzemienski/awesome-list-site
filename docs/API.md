@@ -1,407 +1,287 @@
 # API Reference
 
-Complete API documentation for the Awesome Video Resource Viewer application.
+REST API for the Awesome Video Resource Viewer.
 
-**Base URL**: `http://localhost:5000/api` (development) or `https://your-domain.replit.app/api` (production)
+- **Base URL**: `http://localhost:5000/api` (dev) / `https://<your-domain>/api` (prod)
+- **Live, always-current spec**: the app serves interactive docs at **`/api/docs`**
+  and the machine-readable OpenAPI 3.0 document at **`/api/openapi.json`**.
+  Both are generated from `server/openapi.ts` and are the source of truth for the
+  **public** API. This page is a curated human overview; when in doubt, trust the
+  live spec.
 
-## Authentication
-
-The API supports two authentication methods:
-
-### Replit OAuth
-- Login: `GET /api/login` - Redirects to Replit OAuth
-- Callback: `GET /api/callback` - OAuth callback handler
-
-### Local Authentication (Development/Admin)
-- Login: `POST /api/auth/local/login`
-  - Body: `{ "email": string, "password": string }`
-  - Returns: User object with session cookie
-
-### Session Management
-- Get Current User: `GET /api/auth/user`
-  - Returns: `{ user: User | null, isAuthenticated: boolean }`
-- Logout: `POST /api/auth/logout`
-  - Returns: `{ success: true }`
+The server registers ~145 routes. This document covers the **public API** in
+full plus a verified map of the authenticated and admin surface — it does not
+enumerate every internal route. Use `/api/docs` for the exact request/response
+schemas.
 
 ---
 
-## Public Endpoints
+## Public API (`/api/public/*`)
 
-### Resources
+Read-only, rate-limited endpoints for external consumers. They work without
+authentication (free tier) or with an API key for higher limits. Only
+`approved` resources are exposed. Source: `server/api/public.ts`.
 
-#### List Resources
-```
-GET /api/resources
-```
-Query parameters:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| page | number | Page number (default: 1) |
-| limit | number | Items per page (default: 20) |
-| category | string | Filter by category name |
-| subcategory | string | Filter by subcategory name |
-| search | string | Search in title/description |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/public/resources` | List approved resources (paginated, filterable) |
+| GET | `/api/public/resources/:id` | Get one approved resource by numeric ID |
+| GET | `/api/public/categories` | List all categories |
+| GET | `/api/public/tags` | List all tags |
+| GET | `/api/public/me` | Verify an API key (requires `Authorization` header) |
 
-Response:
+### List resources — query parameters
+
+| Parameter | Type | Default | Notes |
+|-----------|------|---------|-------|
+| `page` | integer ≥ 1 | 1 | Invalid values → `400` |
+| `limit` | integer 1–100 | 20 | Clamped to 100 |
+| `category` | string | – | Filter by category name |
+| `subcategory` | string | – | Filter by subcategory name |
+| `search` | string | – | Search title/description |
+
+Response envelope:
+
 ```json
 {
-  "resources": [...],
-  "total": 1949,
+  "resources": [ /* Resource[] */ ],
+  "total": 2282,
   "page": 1,
-  "limit": 20
+  "limit": 20,
+  "totalPages": 115
 }
 ```
 
-#### Get Single Resource
-```
-GET /api/resources/:id
-```
-Returns full resource object including metadata.
+### Authentication (API keys)
 
-### Awesome List (Database-Driven)
-```
-GET /api/awesome-list
-```
-Query parameters:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| category | string | Filter by category slug |
-| subcategory | string | Filter by subcategory slug |
-| subSubcategory | string | Filter by sub-subcategory slug |
+Create a key from your account (`POST /api/user/api-keys`) and send it as a
+Bearer token:
 
-Returns hierarchical structure with categories, subcategories, and resources.
-
-### Categories
 ```
-GET /api/categories          # List all categories
-GET /api/subcategories       # List subcategories (optional: ?categoryId=)
-GET /api/sub-subcategories   # List sub-subcategories (optional: ?subcategoryId=)
+Authorization: Bearer YOUR_API_KEY
 ```
 
-### Learning Journeys
-```
-GET /api/journeys            # List all journeys (optional: ?category=)
-GET /api/journeys/:id        # Get specific journey with steps
+Unauthenticated requests are allowed but rate-limited (free tier, 60 req/hour).
+Rate-limit headers are returned on every response: `RateLimit-Limit`,
+`RateLimit-Remaining`, `RateLimit-Reset`.
+
+### Examples
+
+```bash
+# List (no auth)
+curl "http://localhost:5000/api/public/resources?limit=5"
+
+# With API key + filters
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  "http://localhost:5000/api/public/resources?category=Encoding%20%26%20Codecs&page=2"
+
+# Single resource
+curl "http://localhost:5000/api/public/resources/42"
+
+# Verify a key
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  "http://localhost:5000/api/public/me"
 ```
 
-### GitHub Discovery
-```
-GET /api/github/awesome-lists   # Browse awesome lists (?page=, ?per_page=)
-GET /api/github/search          # Search awesome lists (?q=)
-```
-
-### SEO
-```
-GET /sitemap.xml             # Dynamic sitemap
-GET /og-image.svg            # Dynamic Open Graph image
+```javascript
+const res = await fetch(
+  "http://localhost:5000/api/public/resources?search=hls",
+  { headers: { Authorization: `Bearer ${process.env.API_KEY}` } }
+);
+const { resources, total, totalPages } = await res.json();
 ```
 
-### Health Check
-```
-GET /api/health              # Returns { status: "ok" }
+```python
+import os, requests
+r = requests.get(
+    "http://localhost:5000/api/public/resources",
+    headers={"Authorization": f"Bearer {os.environ['API_KEY']}"},
+    params={"category": "Players & Clients", "limit": 50},
+)
+r.raise_for_status()
+data = r.json()
 ```
 
 ---
 
-## Authenticated Endpoints
+## Authentication endpoints
 
-These endpoints require a valid session (user must be logged in).
+Session-based auth (cookies). Local email/password auth is always available;
+Replit OAuth is enabled when `REPL_ID`/`ISSUER_URL` are configured.
 
-### Resource Submission
-```
-POST /api/resources
-```
-Body:
-```json
-{
-  "title": "Resource Title",
-  "url": "https://example.com",
-  "description": "Description",
-  "category": "General Tools",
-  "subcategory": "DRM"
-}
-```
-Status: Created as "pending" for admin review.
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/local/login` | Email/password login (rate-limited) |
+| GET | `/api/auth/user` | Current user (returns `null` when anonymous) |
+| GET | `/api/login`, `/api/callback` | Replit OAuth flow (when configured) |
 
-### Edit Suggestions
-```
-POST /api/resources/:id/edits
-```
-Body:
-```json
-{
-  "proposedChanges": { "title": { "from": "Old", "to": "New" } },
-  "proposedData": { "title": "New Title" },
-  "triggerClaudeAnalysis": true
-}
-```
-Editable fields (whitelisted): `title`, `description`, `url`, `tags`, `category`, `subcategory`, `subSubcategory`
-
-### Favorites & Bookmarks
-```
-POST /api/favorites/:resourceId      # Add favorite
-DELETE /api/favorites/:resourceId    # Remove favorite
-GET /api/favorites                   # List favorites
-
-POST /api/bookmarks/:resourceId      # Add bookmark
-DELETE /api/bookmarks/:resourceId    # Remove bookmark
-GET /api/bookmarks                   # List bookmarks
-```
-
-### User Progress & Journeys
-```
-GET /api/user/progress              # Get learning progress
-GET /api/user/submissions           # Get submitted resources
-GET /api/user/journeys              # Get started journeys
-
-POST /api/journeys/:id/start        # Start a journey
-PUT /api/journeys/:id/progress      # Update progress { stepId }
-GET /api/journeys/:id/progress      # Get journey progress
-```
-
-### AI Analysis
-```
-POST /api/claude/analyze
-```
-Body: `{ "url": "https://example.com" }`
-Returns AI-generated metadata analysis.
+> Logout is handled through the OAuth/session flow; check `/api/docs` and
+> `server/routes.ts` for the exact logout route for your auth mode.
 
 ---
 
-## Admin Endpoints
+## Content endpoints (public reads)
 
-All admin endpoints require both authentication and admin role.
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/resources` | List resources (in-app catalog) |
+| GET | `/api/resources/:id` | Single resource (numeric ID) |
+| GET | `/api/resources/:id/related` | Related resources |
+| GET | `/api/awesome-list` | Hierarchical list (categories → resources); filters: `category`, `subcategory`, `subSubcategory` |
+| GET | `/api/awesome-list/nav` | Navigation tree |
+| GET | `/api/categories` | List categories |
+| GET | `/api/subcategories` | List subcategories (`?categoryId=`) |
+| GET | `/api/sub-subcategories` | List sub-subcategories (`?subcategoryId=`) |
+| GET | `/api/journeys` | List learning journeys (`?category=`) |
+| GET | `/api/journeys/:id` | Journey with steps |
+| GET | `/api/github/awesome-lists` | Browse awesome lists (discovery) |
 
-### Dashboard & Statistics
-```
-GET /api/admin/stats
-```
-Response:
-```json
-{
-  "users": 3,
-  "resources": 1949,
-  "journeys": 0,
-  "pendingApprovals": 5
-}
-```
+### SEO / crawler endpoints (non-`/api`)
 
-### User Management
-```
-GET /api/admin/users                    # List users (?page=, ?limit=)
-PUT /api/admin/users/:id/role           # Change role { "role": "admin|user|moderator" }
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/sitemap.xml` | Dynamic sitemap |
+| GET | `/og-image.svg`, `/og-image.png` | Dynamic Open Graph images |
 
-### Resource Management
-```
-GET /api/admin/resources                # List all resources (with filters)
-POST /api/admin/resources               # Create resource
-PUT /api/admin/resources/:id            # Update resource
-DELETE /api/admin/resources/:id         # Delete resource
+### Health
 
-GET /api/admin/pending-resources        # List pending resources
-POST /api/admin/resources/:id/approve   # Approve resource
-POST /api/admin/resources/:id/reject    # Reject resource { "reason": "..." }
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health` | Liveness — returns `{ "status": "ok" }` |
+| GET | `/api/health/ai` | AI service status (deep checks are admin-only) |
 
-### Edit Suggestion Management
-```
-GET /api/admin/resource-edits                 # List pending edits
-POST /api/admin/resource-edits/:id/approve    # Approve edit
-POST /api/admin/resource-edits/:id/reject     # Reject edit { "reason": "..." }
-```
-
-### Category Management
-```
-GET /api/admin/categories                # List with resource counts
-POST /api/admin/categories               # Create category
-PATCH /api/admin/categories/:id          # Update category
-DELETE /api/admin/categories/:id         # Delete category (must be empty)
-
-GET /api/admin/subcategories             # List subcategories
-POST /api/admin/subcategories            # Create subcategory
-PATCH /api/admin/subcategories/:id       # Update subcategory
-DELETE /api/admin/subcategories/:id      # Delete subcategory
-
-GET /api/admin/sub-subcategories         # List sub-subcategories
-POST /api/admin/sub-subcategories        # Create sub-subcategory
-PATCH /api/admin/sub-subcategories/:id   # Update sub-subcategory
-DELETE /api/admin/sub-subcategories/:id  # Delete sub-subcategory
-```
-
-### GitHub Sync
-```
-POST /api/github/configure              # Configure sync { repoUrl, branch, token }
-POST /api/github/import                 # Import from GitHub
-POST /api/github/export                 # Export to GitHub
-GET /api/github/sync-status             # Get sync queue status
-GET /api/github/sync-status/:id         # Get specific sync item
-GET /api/github/sync-history            # Get sync history
-POST /api/github/process-queue          # Trigger queue processing
-```
-
-### Import/Export
-
-**Note**: All admin export endpoints require authentication and admin role. Unauthenticated requests return `{"message":"Unauthorized"}`. GET requests to POST-only endpoints return HTML (SPA fallback).
-
-```
-POST /api/admin/export                  # Export markdown (awesome-list format)
-GET /api/admin/export-json              # Export full database backup (JSON)
-POST /api/admin/import-github           # Import from GitHub URL
-POST /api/admin/seed-database           # Manual database seeding
-```
-
-### Validation
-```
-POST /api/admin/validate                # Run awesome-lint validation
-POST /api/admin/check-links             # Check all resource links
-GET /api/admin/validation-status        # Get latest validation results
-```
-
-### Enrichment (AI Batch Processing)
-```
-POST /api/enrichment/start              # Start batch enrichment job
-GET /api/enrichment/jobs                # List enrichment jobs
-GET /api/enrichment/jobs/:id            # Get job status
-DELETE /api/enrichment/jobs/:id         # Cancel job
-```
-
-### AI Researcher API
-
-AI-powered discovery of new video / streaming resources. All endpoints
-require an authenticated admin. See `RESEARCH_FEATURE.md` for an overview.
-
-#### Start Research Job
-```
-POST /api/researcher/start
-```
-
-**Request Body:**
-```json
-{
-  "prompt": "string (>= 10 chars)",
-  "categoryFocus": "optional string",
-  "maxBudgetUsd": "1.00",
-  "maxTurns": 30
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "jobId": 123,
-  "message": "Research job started"
-}
-```
-
-#### List Research Jobs
-```
-GET /api/researcher/jobs
-```
-
-Returns the list of research jobs.
-
-#### Get Job
-```
-GET /api/researcher/jobs/:id
-```
-
-Returns the job plus an `isActive` flag indicating whether the orchestrator
-is still processing it.
-
-#### Cancel Job
-```
-DELETE /api/researcher/jobs/:id
-```
-
-Cancels a running job.
-
-#### List Discoveries
-```
-GET /api/researcher/discoveries?jobId=123
-```
-
-With `jobId`, returns discoveries for that job. Without `jobId`, returns
-all pending discoveries across jobs.
-
-#### Approve Discovery
-```
-POST /api/researcher/discoveries/:id/approve
-```
-
-Approves a discovery and inserts it as a resource.
-
-#### Reject Discovery
-```
-POST /api/researcher/discoveries/:id/reject
-```
-
-**Request Body:**
-```json
-{ "reason": "optional string" }
-```
+> Note: there is **no** `/health` route — use `/api/health`.
 
 ---
 
-## AI-Powered Endpoints
+## Authenticated endpoints (logged-in user)
 
-### Recommendations
-```
-GET /api/recommendations/init           # Initialize recommendation engine
-GET /api/recommendations                # Get personalized recommendations
-POST /api/recommendations               # Get recommendations for profile
-POST /api/recommendations/feedback      # Submit feedback on recommendations
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/resources` | Submit a resource (created as `pending`) |
+| POST | `/api/resources/:id/edits` | Suggest an edit to a resource |
+| GET/POST/DELETE | `/api/favorites`, `/api/favorites/:resourceId` | Manage favorites |
+| GET/POST/DELETE | `/api/bookmarks`, `/api/bookmarks/:resourceId` | Manage bookmarks |
+| GET | `/api/user/progress` | Learning progress |
+| GET | `/api/user/submissions` | Submitted resources |
+| GET | `/api/user/journeys` | Started journeys |
+| POST | `/api/journeys/:id/start` | Start a journey |
+| PUT/GET | `/api/journeys/:id/progress` | Update / read journey progress |
+| GET/POST/DELETE | `/api/user/api-keys`, `/api/user/api-keys/:id` | Manage API keys |
+| POST | `/api/user/change-password` | Change password |
+| PATCH | `/api/user/profile` | Update profile |
+| POST | `/api/claude/analyze` | AI URL analysis (rate-limited) |
+| GET/POST | `/api/recommendations`, `/api/recommendations/feedback` | Recommendations |
+| GET/POST | `/api/learning-paths/suggested`, `/api/learning-paths/generate` | Learning paths |
+| POST | `/api/interactions` | Record a user interaction |
 
-### Learning Paths
-```
-GET /api/learning-paths/suggested       # Get suggested learning paths
-POST /api/learning-paths/generate       # Generate custom learning path
-POST /api/learning-paths                # Create learning path
-```
-
-### Interactions
-```
-POST /api/interactions                  # Record user interaction
-```
+Edit suggestions accept a whitelisted set of fields: `title`, `description`,
+`url`, `tags`, `category`, `subcategory`, `subSubcategory`.
 
 ---
 
-## Error Responses
+## Admin endpoints (`isAdmin` required)
 
-All endpoints return consistent error responses:
+All require an authenticated admin session. A representative map (see `/api/docs`
+and `server/routes.ts` for the complete set):
+
+**Dashboard & users**
+
+| Method | Path |
+|--------|------|
+| GET | `/api/admin/stats` |
+| GET | `/api/admin/users` |
+| PUT | `/api/admin/users/:id/role` |
+| PATCH | `/api/admin/users/:id/name` |
+| DELETE | `/api/admin/users/:id` |
+| GET | `/api/admin/audit-logs` |
+
+**Resources & moderation**
+
+| Method | Path |
+|--------|------|
+| GET | `/api/admin/resources`, `/api/admin/pending-resources` |
+| POST | `/api/admin/resources` |
+| PUT/DELETE | `/api/admin/resources/:id` |
+| POST | `/api/admin/resources/:id/approve` \| `/reject` \| `/unapprove` |
+| POST | `/api/admin/resources/bulk/approve` \| `/reject` \| `/delete` |
+| GET | `/api/admin/resource-edits` |
+| POST | `/api/admin/resource-edits/:id/approve` \| `/reject` |
+
+**Taxonomy** (`categories`, `subcategories`, `sub-subcategories`)
+
+| Method | Path |
+|--------|------|
+| GET | `/api/admin/categories` (with resource counts) |
+| POST | `/api/admin/categories` |
+| PATCH | `/api/admin/categories/:id` |
+| DELETE | `/api/admin/categories/:id` (must be empty) |
+
+The same GET/POST/PATCH/DELETE pattern applies to
+`/api/admin/subcategories/*` and `/api/admin/sub-subcategories/*`.
+
+**Import / export / validation**
+
+| Method | Path |
+|--------|------|
+| POST | `/api/admin/export` (markdown) |
+| GET | `/api/admin/export-json` (full backup) |
+| POST | `/api/admin/import-github`, `/api/admin/seed-database` |
+| POST | `/api/admin/validate` (awesome-lint), `/api/admin/check-links` |
+| GET | `/api/admin/validation-status`, `/api/admin/link-health/*` |
+
+**GitHub sync**
+
+| Method | Path |
+|--------|------|
+| POST | `/api/github/configure`, `/api/github/import`, `/api/github/export`, `/api/github/process-queue` |
+| GET | `/api/github/sync-status`, `/api/github/sync-status/:id`, `/api/github/sync-history`, `/api/github/search` |
+
+**AI enrichment & researcher**
+
+| Method | Path |
+|--------|------|
+| POST | `/api/enrichment/start` |
+| GET | `/api/enrichment/jobs`, `/api/enrichment/jobs/:id` |
+| DELETE | `/api/enrichment/jobs/:id` |
+| POST | `/api/researcher/start` |
+| GET | `/api/researcher/jobs`, `/api/researcher/jobs/:id`, `/api/researcher/discoveries` |
+| DELETE | `/api/researcher/jobs/:id` |
+| POST | `/api/researcher/discoveries/:id/approve` \| `/reject` |
+
+See [RESEARCH_FEATURE.md](../RESEARCH_FEATURE.md) and
+[AI-SERVICES.md](./AI-SERVICES.md) for the researcher/enrichment workflows.
+
+---
+
+## Error responses
+
+Errors are JSON with a `message` field (and optional `errors` for validation):
 
 ```json
-{
-  "message": "Error description",
-  "errors": [...]  // Optional: validation errors
-}
+{ "message": "Error description", "errors": [] }
 ```
 
-Common HTTP status codes:
-- `400` - Bad Request (validation errors)
-- `401` - Unauthorized (not logged in)
-- `403` - Forbidden (insufficient permissions)
-- `404` - Not Found
-- `409` - Conflict (duplicate entry)
-- `500` - Internal Server Error
+| Status | Meaning |
+|--------|---------|
+| 400 | Bad request / validation error |
+| 401 | Not authenticated |
+| 403 | Authenticated but not authorized (e.g. non-admin) |
+| 404 | Not found (or resource not `approved` on the public API) |
+| 409 | Conflict (duplicate) |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ---
 
-## Rate Limiting
+## Data models (summary)
 
-- Public endpoints: No explicit rate limiting
-- AI endpoints (Claude/Anthropic): Subject to Anthropic API limits
-- GitHub API: Subject to GitHub rate limits
+Authoritative types live in [`shared/schema.ts`](../shared/schema.ts); the public
+shapes are documented in `/api/openapi.json`.
 
----
-
-## Data Models
-
-### Resource
 ```typescript
-{
+// Resource (public fields; internal fields are stripped by the public API)
+interface Resource {
   id: number;
   title: string;
   url: string;
@@ -410,58 +290,20 @@ Common HTTP status codes:
   subcategory: string | null;
   subSubcategory: string | null;
   status: 'pending' | 'approved' | 'rejected';
-  submittedBy: string | null;
-  approvedBy: string | null;
-  approvedAt: Date | null;
-  metadata: {
-    tags: string[];
-    scrapedAt: string;
-    ogImage: string | null;
-    favicon: string | null;
-    // ... additional scraped metadata
-  } | null;
-  createdAt: Date;
-  updatedAt: Date;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
 }
+
+interface Category { id: number; name: string; slug: string }
+interface Tag { id: number; name: string; slug: string; createdAt: string }
 ```
 
-### User
-```typescript
-{
-  id: string;
-  email: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  profileImageUrl: string | null;
-  role: 'user' | 'admin' | 'moderator';
-  createdAt: Date;
-  updatedAt: Date;
-}
-```
+---
 
-### Category/Subcategory/SubSubcategory
-```typescript
-{
-  id: number;
-  name: string;
-  slug: string;
-  categoryId?: number;    // For subcategories
-  subcategoryId?: number; // For sub-subcategories
-}
-```
+## Rate limiting
 
-### Learning Journey
-```typescript
-{
-  id: number;
-  title: string;
-  description: string | null;
-  category: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  estimatedHours: number;
-  steps: JourneyStep[];
-  createdBy: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-```
+- Public API: free tier ≈ 60 requests/hour; API keys can raise the limit.
+- AI endpoints (`/api/claude/*`, `/api/learning-paths/generate`): additionally
+  gated by an AI rate limiter and by upstream Anthropic/OpenAI limits.
+- GitHub endpoints: subject to GitHub API limits.

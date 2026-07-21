@@ -18,11 +18,29 @@ This creates/resets the admin account with credentials displayed in console.
 
 ## Dashboard Overview
 
-The admin dashboard displays:
-- **Total Resources**: All resources in the database
-- **Pending Approvals**: Resources awaiting review
-- **Total Users**: Registered user count
-- **Learning Journeys**: Created learning paths
+The admin dashboard (`/admin`, in `client/src/pages/AdminDashboard.tsx`) is a
+tabbed interface. The tabs, in order, are:
+
+| Tab | Purpose |
+|-----|---------|
+| **Approvals** | Review pending resource submissions |
+| **Edit Suggestions** | Review user-proposed edits to existing resources |
+| **Enrichment** | Run/monitor Claude AI enrichment jobs |
+| **Researcher** | Run/monitor the AI research agent and review discoveries |
+| **Export** | Export the catalog to Markdown / JSON / GitHub |
+| **Database** | Seeding and maintenance operations |
+| **Resources** | CRUD for individual resources |
+| **Categories** | CRUD for top-level categories |
+| **Subcategories** | CRUD for subcategories |
+| **Sub-Subcats** | CRUD for sub-subcategories |
+| **Journeys** | Manage learning journeys and their steps |
+| **Users** | Manage users and roles |
+| **GitHub** | Import/export sync with GitHub repositories |
+| **Link Health** | Scan resource URLs for broken links |
+| **Audit** | Browse the admin action audit log |
+
+Summary stats (total resources, pending approvals, users, learning journeys)
+come from `GET /api/admin/stats`.
 
 ## Resource Management
 
@@ -88,16 +106,18 @@ If resource was modified after edit submission:
 
 ## Category Management
 
+The 3-level hierarchy (Category → Subcategory → Sub-subcategory) is managed
+across three separate tabs: **Categories**, **Subcategories**, and **Sub-Subcats**.
+
 ### Viewing Categories
-- Admin → Categories
-- Shows 3-level hierarchy: Category → Subcategory → Sub-subcategory
-- Resource counts per category
+- Admin → Categories / Subcategories / Sub-Subcats
+- Resource counts per entry
 
 ### Creating Categories
-1. Click "Add Category"
+1. On the relevant tab, click "Add"
 2. Enter name (slug auto-generated)
-3. For subcategory: select parent category
-4. For sub-subcategory: select parent subcategory
+3. For a subcategory: select parent category
+4. For a sub-subcategory: select parent subcategory
 
 ### Editing Categories
 1. Click Edit icon
@@ -175,26 +195,28 @@ The export system ensures compliance with awesome-lint rules:
 ## Data Validation
 
 ### awesome-lint Validation
-1. Admin → Validation → Run Validation
-2. Shows:
-   - Error count
-   - Warning count
-   - Specific issues with line numbers
-3. Fix issues and re-validate
+There is no standalone "Validation" tab. awesome-lint validation runs
+automatically as part of the **GitHub import** (rejects non-compliant lists) and
+**export** (blocks pushing non-compliant Markdown) flows. Validation errors and
+warnings — with line numbers and rule names — are surfaced in the import/export
+result. The linter lives in `server/validation/awesomeLint.ts`.
 
-### Link Checking
-1. Admin → Validation → Check Links
-2. System checks all resource URLs
+### Link Checking (Link Health tab)
+1. Admin → **Link Health**
+2. System checks resource URLs and persists results
 3. Reports:
    - Valid links
    - Broken links (4xx, 5xx)
    - Redirects (3xx)
    - Timeouts
 
+Link scans can also run on a schedule (`server/jobs/linkHealthScheduler.ts`);
+the service lives in `server/services/linkHealthService.ts`.
+
 ### Acting on Broken Links
-- Review broken link report
+- Review the broken-link report on the Link Health tab
 - Delete or update broken resources
-- Re-run check to confirm fixes
+- Re-run the scan to confirm fixes
 
 ## AI Enrichment
 
@@ -225,6 +247,38 @@ Automatically enrich resources with metadata using Claude AI.
 - Favicon
 - AI-generated tags
 - Content categorization
+
+See [AI-SERVICES.md](./AI-SERVICES.md) for the enrichment pipeline internals.
+
+## Research Agent
+
+The **Researcher** tab runs an AI research agent that discovers new candidate
+resources from the web (backed by `server/ai/researchService.ts`).
+
+### Running a Research Job
+1. Admin → **Researcher**
+2. Provide the topic/query and options, then start the job
+3. Monitor progress and the live agent event log
+
+### Reviewing Discoveries
+1. Discovered candidates appear in the discoveries list
+2. **Approve** to add a discovery into the resource catalog
+3. **Reject** to discard it
+
+Endpoints: `POST /api/researcher/start`, `GET /api/researcher/jobs`,
+`GET /api/researcher/discoveries`, `POST /api/researcher/discoveries/:id/approve|reject`.
+
+## Learning Journeys
+
+The **Journeys** tab manages curated learning journeys and their ordered steps.
+
+### Managing Journeys
+1. Admin → **Journeys**
+2. Create/edit/delete journeys (title, description, difficulty, published state)
+3. Add, reorder, or remove steps that reference resources
+
+Only **published** journeys are visible to end users on `/journeys`. Journeys can
+also be AI-generated (see `server/ai/learningPathGenerator.ts`).
 
 ## Export & Backup
 
@@ -258,8 +312,10 @@ All admin actions are logged:
 - Category changes
 - Approval/rejection decisions
 - User role changes
+- Bulk exports (Markdown/JSON/GitHub)
 
-Access via database: `resource_audit_log` table
+Browse entries in the **Audit** tab, or query the `resource_audit_log` table
+directly in the database.
 
 ## Best Practices
 

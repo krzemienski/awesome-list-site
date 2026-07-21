@@ -16,8 +16,8 @@
  *
  * USAGE:
  * - Import swaggerSpec and serve with swagger-ui-express
- * - Export as YAML for static documentation (see docs/api/openapi.yaml)
- * - Run scripts/export-openapi-yaml.mjs to regenerate YAML export
+ * - The live spec is served at /api/openapi.json (no static YAML export is
+ *   kept in the repo; scripts/export-openapi-yaml.mjs can generate one ad hoc)
  *
  * See /api/docs for interactive Swagger UI documentation.
  * ============================================================================

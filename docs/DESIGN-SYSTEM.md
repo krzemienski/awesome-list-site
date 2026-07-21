@@ -1,20 +1,99 @@
 # Design System
 
-## Overview
+> **⚠️ Accuracy / status notice (read first).**
+> This document was written for the app's **legacy single-personality theme**
+> (pure-black "cyberpunk", OKLCH tokens, JetBrains-Mono-everywhere, zero radius,
+> no shadows). **That description no longer matches the running app.** Since May
+> 2026 the app ships a **runtime design-system switcher** — see the accurate
+> "Current design system" section immediately below.
+>
+> The detailed token tables further down (OKLCH color values, "zero radius",
+> "JetBrains Mono for all text", etc.) describe the retired theme and are **not
+> accurate**. A full rewrite of the per-system/per-accent brand token catalog and
+> brand guidelines is owned by **task #222 (brand kit)** and is intentionally not
+> authored here. Until #222 lands, treat the code as the source of truth:
+> `client/src/styles/design-system.css`, `client/src/lib/design-system.ts`, and
+> the live picker at `/settings/theme`.
 
-This design system implements a **cyberpunk dark theme** with a pure black aesthetic, neon accent colors, and terminal-inspired typography. The color system uses the OKLCH color space for perceptually uniform color variations and better accessibility.
+## Current design system
 
-**Key Characteristics:**
-- **Dark Mode Only** - No light mode support
-- **Pure Black Backgrounds** - `oklch(0 0 0)` for true black
-- **Sharp Edges** - Zero border radius (`--radius: 0rem`)
-- **No Shadows** - Flat design with no box shadows
-- **Monospace Typography** - JetBrains Mono for all text
-- **Neon Accents** - High saturation pink and blue for interactive elements
+The app uses a **5-system × 10-accent runtime design-system switcher** (added
+May 2026; see `replit.md` → "Design-System scope (MR-DS-13)").
+
+- **Systems:** Editorial, Terminal, Geist, Brutalist, Swiss.
+- **Accents (10):** Crimson, Magenta, Orange, Amber, Emerald, Matrix, Cyan,
+  Violet, Lime, Rose.
+- **Default:** Editorial + Crimson (`--accent: #ff3d52`).
+- **Switcher:** `/settings/theme`. Per-system default accents follow
+  `SYSTEM_DEFAULT_ACCENT` (editorial→crimson, terminal→matrix, geist→cyan,
+  brutalist→amber, swiss→orange).
+
+**How tokens are applied.** Token blocks live in
+`client/src/styles/design-system.css` as `:root[data-system="…"]` (per system) and
+`:root[data-accent="…"]` (per accent) selectors. `applyDesignSystem(systemId,
+accentId)` in `client/src/lib/design-system.ts` only toggles the `data-system` and
+`data-accent` attributes on `<html>` and persists them to `localStorage`
+(`ds-system`, `ds-accent`). The boot script in `client/index.html` reads both keys
+pre-paint so switching is FOUC-free. The `:root` defaults carry the
+Editorial+Crimson values so the site paints correctly with no JS.
+
+**Tokens are CSS custom properties, not raw OKLCH literals.** The core token names
+are `--bg`, `--bg-2`, `--surface(-2/-3)`, `--border`, `--text`/`--text-2/3/4`,
+`--accent`, `--accent-2`, plus `--radius`/`--radius-sm`/`--radius-xs`/`--radius-pill`,
+`--shadow(-sm/-lg/-accent)`, and the font tokens below. Editorial defaults (from
+`design-system.css` `:root`) include `--bg: #000000`, `--text: #f4f3ee`,
+`--accent: #ff3d52`, `--radius: 12px`.
+
+**Fonts (Editorial default):** `--font-body: 'Inter'`, `--font-display: 'Fraunces'`
+(serif), `--font-mono: 'JetBrains Mono'`. Other systems swap these (e.g. Terminal is
+mono-first, Geist uses Geist Sans). JetBrains Mono is **not** used for all text.
+
+**Radius & shadows exist.** Editorial uses an 8px/12px radius ladder and real
+shadow tokens (`--shadow`, `--shadow-lg`, `--shadow-accent`). The old "zero radius,
+no shadows" claim is false for the current build.
+
+**shadcn ↔ DS bridge.** `client/src/index.css` (`@theme inline`) maps shadcn's
+`--color-*` tokens onto DS tokens (e.g. `--color-primary: var(--accent)`,
+`--color-card: var(--surface)`), so `bg-card`, `text-primary`, `border-input`, etc.
+resolve against the active system/accent. shadcn primitives (`Button`, `Card`,
+`Badge`, `Input`, …) replace the handoff's raw `.btn/.card/.chip/.input` classes.
+
+**Chart palette.** All recharts colors route through
+`client/src/lib/charts/palette.ts` (`CHART_PALETTE`), mirroring DS accents +
+status colors from `design-system.css`.
+
+---
+
+<!-- =====================================================================
+     ⚠️ LEGACY CONTENT BELOW — describes the retired single-personality theme.
+     OKLCH values, "zero radius", "no shadows", and "JetBrains Mono for all
+     text" are NOT accurate. Full rewrite owned by task #222 (brand kit).
+     Source of truth: design-system.css / design-system.ts / /settings/theme.
+     ===================================================================== -->
+
+## Overview (legacy theme — inaccurate, pending task #222)
+
+This section documented a **cyberpunk dark theme** with a pure black aesthetic, neon accent colors, and terminal-inspired typography using the OKLCH color space. It no longer reflects the running app (see "Current design system" above).
+
+**Legacy characteristics (retired):**
+- Dark Mode Only
+- Pure Black Backgrounds — `oklch(0 0 0)`
+- Sharp Edges — zero border radius
+- No Shadows
+- Monospace Typography — JetBrains Mono for all text
+- Neon Accents
 
 ---
 
 ## Color System
+
+> **⚠️ LEGACY — inaccurate, pending task #222.** The OKLCH values and
+> `--background`/`--foreground`/`--primary` token names in this section describe
+> the retired theme. The current build defines colors as hex/`rgba` CSS custom
+> properties (`--bg`, `--surface`, `--text`, `--accent`, …) that vary per
+> design-system/accent, bridged onto shadcn `--color-*` tokens in
+> `client/src/index.css`. See "Current design system" at the top and
+> `client/src/styles/design-system.css`.
 
 ### OKLCH Color Space
 
@@ -471,6 +550,12 @@ All color tokens are defined in:
 ---
 
 ## Typography System
+
+> **⚠️ LEGACY — inaccurate, pending task #222.** The "JetBrains Mono for all
+> text" description below is false for the current build. Real fonts are
+> **per design system** (Editorial default: `--font-body: 'Inter'`,
+> `--font-display: 'Fraunces'`, `--font-mono: 'JetBrains Mono'`). See "Current
+> design system" at the top and `client/src/styles/design-system.css`.
 
 ### Overview
 
@@ -1385,6 +1470,12 @@ The spacing system uses **Tailwind CSS's default spacing scale**, based on a **4
 ---
 
 ## Border Radius System
+
+> **⚠️ LEGACY — inaccurate, pending task #222.** The "zero border radius"
+> description below is false for the current build. The Editorial default uses a
+> real radius ladder: `--radius: 12px`, `--radius-sm: 8px`, `--radius-xs: 3px`,
+> `--radius-pill: 999px` (per-system values in `design-system.css`). See "Current
+> design system" at the top.
 
 ### Overview
 

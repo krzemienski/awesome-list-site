@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL database service
   postgres:
@@ -31,6 +29,13 @@ services:
       NODE_ENV: production
       PORT: 5000
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/awesome_list
+      # Required: express-session refuses to start without a secret.
+      # Generate one with: openssl rand -base64 32
+      SESSION_SECRET: ${SESSION_SECRET:-please-change-me-in-production}
+      # Optional but recommended: seeds/rotates the local admin account
+      # (admin@example.com) on boot. Must be at least 8 characters.
+      # Omit to skip admin creation.
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
     ports:
       - "5000:5000"
     depends_on:

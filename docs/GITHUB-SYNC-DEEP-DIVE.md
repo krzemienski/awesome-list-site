@@ -459,7 +459,16 @@ Result: UPDATE - Local title is overwritten
 
 ## Sync Queue System
 
-The sync queue is an **asynchronous job processor** for long-running GitHub operations.
+The sync queue is a **status/history record** for GitHub operations, stored in
+the `github_sync_queue` table.
+
+> **How execution actually works:** `POST /api/github/import` and
+> `POST /api/github/export` each insert a queue row **and immediately run** the
+> import/export in the background (a fire-and-forget async task in the same
+> server process), returning `{ queueId, status: "processing" }` right away.
+> There is **no** automatic background poller, cron, size threshold, or webhook
+> trigger. The queue row records the outcome so it can be inspected later via
+> `GET /api/github/sync-status`.
 
 ### Queue Lifecycle
 
@@ -476,16 +485,11 @@ Pending → Processing → Completed/Failed
 | **completed** | Successfully finished | Review results |
 | **failed** | Encountered an error | Check error message, retry if needed |
 
-### When Jobs Enter the Queue
+### When Rows Enter the Queue
 
-**Automatic queuing:**
-- Large imports (>100 resources)
-- Background scheduled syncs
-- Webhook-triggered syncs (if configured)
-
-**Manual queuing:**
-- Admin clicks "Queue Import" instead of "Import Now"
-- Batch operations across multiple repos
+Every import and export inserts one row (`action: "import" | "export"`,
+`status: "pending"`) before the background task starts. There is no separate
+"queue it for later" mode — the row and the work are created together.
 
 ### Queue Item Anatomy
 
@@ -507,25 +511,23 @@ Pending → Processing → Completed/Failed
 }
 ```
 
-### Processing Queue Items
+### Reprocessing Pending Rows
 
-**Manual Processing:**
+Because import/export run immediately, most rows never need manual processing.
+If a row is left in `pending` (e.g. the server restarted mid-run), an admin can
+drain leftover pending rows with the queue processor:
+
 ```bash
-# Trigger queue processor
-POST /api/admin/github/process-queue
+# Process any leftover pending rows (oldest-first)
+POST /api/github/process-queue
 ```
 
-**Automatic Processing:**
-- Queue processor runs every 5 minutes (configurable)
-- Picks up `pending` items oldest-first
-- Updates status to `processing`
-- Executes import/export
-- Updates status to `completed` or `failed`
+This calls `syncService.processQueue()`, which picks up `pending` rows, marks
+them `processing`, executes the import/export, and records the result.
 
 **Retry Logic:**
-- Failed items are **not** automatically retried
-- Admin can manually retry by changing status back to `pending`
-- Or delete and re-queue the operation
+- Failed rows are **not** automatically retried
+- Admin can re-run the operation, or drain pending rows via the endpoint above
 
 ### Monitoring the Queue
 
@@ -534,26 +536,15 @@ POST /api/admin/github/process-queue
 Admin → GitHub Sync → Queue Status
 ```
 
-Shows:
-- Pending items count
-- Currently processing items
-- Recent completed/failed operations
-- Error messages for failed items
+The GitHub tab lists recent rows with:
+- Repository URL, branch, and action (import/export)
+- Status (pending/processing/completed/failed)
+- Error message for failed rows
+- Affected resource count and timestamps
 
-**Queue Metrics:**
-- Average processing time
-- Success/failure rate
-- Resource throughput (resources/minute)
-
-### Queue vs Immediate Execution
-
-| Immediate | Queue |
-|-----------|-------|
-| Runs in HTTP request | Runs in background |
-| Blocks UI during execution | Returns immediately |
-| Timeout after 30 seconds | Can run for hours |
-| Good for small lists (<100) | Required for large lists |
-| Real-time progress feedback | Check status separately |
+The list endpoint (`GET /api/github/sync-status`) returns summary fields only;
+full per-row detail (including `resourceIds`) is available from
+`GET /api/github/sync-status/:id`.
 
 ---
 
@@ -900,25 +891,24 @@ Line 45: [awesome-list-item] Description should end with period
 
 ### Queue Issues
 
-#### Problem: Queue item stuck in "processing" status
+#### Problem: Queue row stuck in "processing" status
 
-**Cause:** Process crashed or server restarted mid-operation.
+**Cause:** The background task crashed or the server restarted mid-operation.
 
 **Solution:**
 1. Check server logs for errors
-2. Manually update status to `failed` or `pending`
-3. For `pending`: Queue processor will retry
-4. Or delete queue item and re-import manually
+2. Re-run the import/export from the admin UI, or
+3. Set the row back to `pending` and drain it with
+   `POST /api/github/process-queue`
 
-#### Problem: Queue processor not running
+#### Problem: A row is left in "pending" status
 
-**Cause:** Cron job disabled or background workers not started.
+**Cause:** Import/export normally runs immediately in the background; a `pending`
+row means that background task never finished (e.g. server restart).
 
 **Solution:**
-1. Manually trigger: `POST /api/admin/github/process-queue`
-2. Check cron configuration
-3. Verify background workers are enabled
-4. Check system resources (memory, CPU)
+1. Trigger the queue processor: `POST /api/github/process-queue`
+2. Check system resources (memory, CPU) if it keeps failing
 
 ### Validation Issues
 
@@ -947,19 +937,18 @@ Line 45: [awesome-list-item] Description should end with period
 **Cause:** Large list with thousands of resources.
 
 **Solution:**
-1. Use "Queue Import" instead of immediate import
-2. Increase server timeout settings
-3. Consider importing in batches (split the list)
-4. Check database performance (indexes, query optimization)
+1. Imports already run in the background — the HTTP call returns immediately and
+   the work continues server-side; watch progress on the GitHub tab
+2. Consider importing in batches (split the list)
+3. Check database performance (indexes, query optimization)
 
 #### Problem: Export timeout
 
 **Cause:** Too many resources to format.
 
 **Solution:**
-1. Use background queue for export
-2. Filter export (e.g., export by category)
-3. Optimize formatter (cache TOC generation)
+1. Exports also run in the background; check the sync-status row for completion
+2. Optimize formatter (cache TOC generation)
 
 ### Data Integrity Issues
 
@@ -990,125 +979,26 @@ Line 45: [awesome-list-item] Description should end with period
 
 ## Advanced Topics
 
-### Custom Conflict Resolution
+**Not implemented today.** The features below are recorded as future ideas — do
+not document them as if they exist:
 
-**Current:** System always uses default strategy (skip/update/create).
+- **Custom conflict resolution** — per-repository strategy overrides. Today the
+  system always uses the automatic skip / update / create logic described above.
+- **Partial imports** — importing only selected categories. `importFromGitHub`
+  currently imports the whole list; `SyncOptions` supports `dryRun`,
+  `forceOverwrite`, `createPullRequest`, `branchName`, and (import only)
+  `strictMode` — there is no `categories` filter.
+- **Scheduled syncs / cron** — there is no scheduler for GitHub sync.
+- **Webhook-triggered imports** — there is **no** `/api/webhooks/github` endpoint.
+- **Bidirectional auto-sync** — import and export are separate, admin-triggered
+  operations.
+- **Export customization / filters** — `exportToGitHub` exports all approved
+  resources; there is no per-tag / per-category / date filter option.
 
-**Future Enhancement:** Allow admins to configure per-repository:
-- Always skip existing resources
-- Always update existing resources
-- Prompt admin for each conflict
-
-### Partial Imports
-
-**Use Case:** Import only specific categories from a large list.
-
-**Implementation:**
-1. Fetch and parse full list
-2. Filter resources by category before inserting
-3. Specify categories in import options
-
-**Example:**
-```javascript
-importFromGitHub(url, {
-  categories: ["Learning Resources", "Tools"]
-})
-```
-
-### Scheduled Syncs
-
-**Use Case:** Automatically import updates from upstream repos daily.
-
-**Implementation:**
-1. Configure repos to watch
-2. Set cron schedule (e.g., "0 2 * * *" = 2 AM daily)
-3. Queue imports automatically
-4. Email admin with results
-
-**Setup:**
-```javascript
-Admin → Scheduled Syncs → Add Schedule
-  - Repository: sindresorhus/awesome-nodejs
-  - Frequency: Daily at 2 AM
-  - Action: Import with dry-run disabled
-  - Notify: admin@example.com
-```
-
-### Webhook Integration
-
-**Use Case:** Import changes immediately when upstream repo updates.
-
-**Implementation:**
-1. Set up GitHub webhook on source repository
-2. Point to: `POST /api/webhooks/github`
-3. On push event → Queue import
-4. Near real-time sync
-
-**Security:**
-- Validate webhook secret
-- Rate limit webhook endpoint
-- Queue rather than immediate import
-
-### Bidirectional Sync
-
-**Use Case:** Keep your database and GitHub repo perfectly in sync.
-
-**Strategy:**
-1. **Outbound:** Export changes to GitHub on resource update
-2. **Inbound:** Import changes from GitHub on webhook
-3. **Conflict:** Last-write-wins or prompt admin
-
-**Challenges:**
-- Circular update loops
-- Merge conflicts
-- Metadata that doesn't map (tags, enrichment data)
-
-**Best Practice:**
-- Choose one as "source of truth"
-- Sync in one direction primarily
-- Manual sync in other direction occasionally
-
-### Multi-Repo Aggregation
-
-**Use Case:** Import from multiple awesome lists into one database.
-
-**Implementation:**
-1. Import from awesome-nodejs
-2. Import from awesome-react
-3. Import from awesome-vue
-4. Resources tagged with source repo
-
-**Category Collision:**
-- "Tools" from awesome-nodejs
-- "Tools" from awesome-react
-- Both merge into same "Tools" category
-
-**Namespace Categories (Alternative):**
-- "Node.js → Tools"
-- "React → Tools"
-- Keep sources separate
-
-### Export Customization
-
-**Use Case:** Generate different awesome lists from same database.
-
-**Filters:**
-- Export only resources with specific tag
-- Export only specific categories
-- Export only resources added after date
-
-**Example:**
-```javascript
-exportToGitHub(url, {
-  filter: {
-    tags: ["beginner-friendly"],
-    categories: ["Learning Resources"],
-    addedAfter: "2024-01-01"
-  }
-})
-```
-
-**Result:** Beginner-friendly learning resources awesome list.
+What *does* work today for aggregation: importing several awesome lists into the
+same database. Categories with the same name merge into one category (matching is
+by name), so importing "Tools" from two repos yields a single shared "Tools"
+category.
 
 ---
 
@@ -1143,7 +1033,6 @@ exportToGitHub(url, {
 ## See Also
 
 - [Admin Guide - GitHub Sync UI](./ADMIN-GUIDE.md#github-synchronization) - Step-by-step UI instructions
-- [GitHub Import Production Plan](./GITHUB_IMPORT_PRODUCTION_PLAN.md) - Technical implementation details
 - [awesome-lint Documentation](https://github.com/sindresorhus/awesome-lint) - Official linter rules
 - [Awesome Manifesto](https://github.com/sindresorhus/awesome/blob/main/awesome.md) - Standards for awesome lists
 

@@ -1,38 +1,71 @@
 # Docker Deployment Guide
 
-This guide covers running the Awesome List Site using Docker and Docker Compose for local development and self-hosting.
+This is the single home for running the Awesome List Site with Docker and Docker
+Compose — for local development, self-hosting, and building images for container
+platforms (Railway, Cloud Run, ECS, etc.). It also covers **verifying** a Docker
+run and **verifying a build without the Replit environment**.
+
+> Docker cannot be executed inside Replit itself. Run these commands on your own
+> machine or CI. Every command and file reference below has been checked against
+> the real `Dockerfile`, `docker-compose.yml`, and server code in this repo.
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
+- [How the image is built](#how-the-image-is-built)
 - [Quick Start](#quick-start)
-- [Environment Setup](#environment-setup)
+- [Environment Variables](#environment-variables)
+- [Runnable local recipe](#runnable-local-recipe)
 - [Docker Commands](#docker-commands)
 - [Volume Management](#volume-management)
 - [Accessing Logs](#accessing-logs)
+- [Verifying a Docker run](#verifying-a-docker-run)
+- [Verifying a build without Replit](#verifying-a-build-without-replit)
 - [Troubleshooting](#troubleshooting)
 - [Production Deployment](#production-deployment)
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
-
 - **Docker**: Version 20.10 or higher
   - [Install Docker Desktop](https://docs.docker.com/get-docker/) (macOS/Windows)
   - [Install Docker Engine](https://docs.docker.com/engine/install/) (Linux)
-- **Docker Compose**: Version 2.0 or higher (included with Docker Desktop)
+- **Docker Compose**: v2 (included with Docker Desktop; the `docker compose`
+  subcommand). The legacy `docker-compose` v1 binary also works.
 - **Git**: For cloning the repository
 
 Verify your installation:
 
 ```bash
 docker --version
-docker-compose --version
+docker compose version
 ```
 
-## Quick Start
+## How the image is built
 
-Get the application running in three simple steps:
+The `Dockerfile` is a two-stage build that mirrors the real `npm run build`:
+
+- **Node 20** (`node:20-alpine`) in both stages — matches the project's target runtime.
+- **Builder stage**: `npm ci`, copy source, `npm run build`. That command runs
+  `vite build` (frontend → `dist/public/`) followed by `esbuild server/index.ts`
+  (server bundle → `dist/index.js`).
+- **Production stage**: `npm ci --omit=dev`, then copies `dist/`, plus `server/`,
+  `shared/`, `migrations/`, `drizzle.config.ts`, and `tsconfig.json`.
+  - `migrations/` is required: in production the server runs a **boot-time
+    migrator** (`server/migrate.ts`) before it starts listening.
+  - `drizzle.config.ts` + `tsconfig.json` let you run `npm run db:push` inside the
+    container if you ever need to.
+- `ENV NODE_ENV=production`, `EXPOSE 5000`, and a `HEALTHCHECK` that polls
+  `http://localhost:$PORT/api/health`.
+- `CMD ["node", "dist/index.js"]`.
+
+The container **listens on port 5000** by default; override with the `PORT`
+environment variable.
+
+> The image runs as `root` by default. To harden a production image, add a
+> `USER node` line before `CMD` (the `node` user exists in the base image) or run
+> the container with `--user`. See [Production Deployment](#production-deployment).
+
+## Quick Start
 
 1. **Clone the repository** (if you haven't already):
    ```bash
@@ -40,442 +73,356 @@ Get the application running in three simple steps:
    cd awesome-list-site
    ```
 
-2. **Set up environment variables** (optional for Docker Compose):
-   The docker-compose.yml includes default environment variables for local development.
-   For production or custom configuration, create a `.env` file:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
+2. **Set the required secrets.** `docker-compose.yml` ships with sane defaults for
+   `DATABASE_URL`, `NODE_ENV`, and `PORT`, and reads `SESSION_SECRET` /
+   `ADMIN_PASSWORD` from your shell or a `.env` file (see
+   [Environment Variables](#environment-variables)). Create a `.env` next to
+   `docker-compose.yml`:
+   ```env
+   SESSION_SECRET=replace-with-openssl-rand-base64-32
+   ADMIN_PASSWORD=choose-a-strong-admin-password
    ```
 
 3. **Start the application**:
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
-The application will be available at `http://localhost:5000` after the containers start (typically 30-60 seconds).
-
-To verify the application is running:
+The app is available at `http://localhost:5000` once the containers are healthy
+(typically 30–60 seconds). Verify:
 
 ```bash
 curl http://localhost:5000/api/health
+# -> {"status":"ok"}
 ```
 
-You should receive a JSON response with `status: "ok"`.
+## Environment Variables
 
-## Environment Setup
+`docker-compose.yml` sets the always-needed values and forwards two secrets from
+your environment / `.env` file:
 
-### Environment Variables
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string. Compose wires the app to its `postgres` service automatically. |
+| `NODE_ENV` | Yes | Set to `production` — this is what enables the boot migrator. |
+| `PORT` | No | Listen port (default `5000`). |
+| `SESSION_SECRET` | **Yes** | `express-session` refuses to start without it. Generate with `openssl rand -base64 32`. |
+| `ADMIN_PASSWORD` | Recommended | Seeds/rotates the local admin account (`admin@example.com`) on boot. Must be ≥ 8 characters. Omit to skip admin creation. |
 
-The docker-compose.yml includes sensible defaults for local development:
-
-```yaml
-NODE_ENV: production
-PORT: 5000
-DATABASE_URL: postgresql://postgres:postgres@postgres:5432/awesome_list
-```
-
-For custom configuration or production deployment, create a `.env` file:
+Optional feature flags (only needed if you use those features):
 
 ```env
-# Database Configuration
-DATABASE_URL=postgresql://postgres:postgres@postgres:5432/awesome_list
+# AI enrichment / recommendations (server/ai/*)
+ANTHROPIC_API_KEY=...
+OPENAI_API_KEY=...
 
-# Server Configuration
-NODE_ENV=production
-PORT=5000
-
-# Session Security
-SESSION_SECRET=your-secret-key-change-this-in-production
-
-# Optional: AI Features
-ANTHROPIC_API_KEY=your-anthropic-key
-OPENAI_API_KEY=your-openai-key
-
-# Optional: GitHub Integration
-GITHUB_TOKEN=your-github-token
-
-# Optional: Replit OAuth (not needed for Docker deployment)
-# REPL_ID=your-repl-id
-# ISSUER_URL=your-issuer-url
+# GitHub import/export (server/github/*)
+GITHUB_TOKEN=...
 ```
 
-**Important Security Notes:**
-- **Never commit your `.env` file** to version control
-- Use strong, randomly generated values for `SESSION_SECRET`
-- Generate a secure session secret: `openssl rand -base64 32`
-- Keep your API keys secure and rotate them regularly
+The complete, grep-verified list of environment variables lives in
+[ENVIRONMENT.md](./ENVIRONMENT.md).
 
-### Configuration Files
+**Security notes**
+- **Never commit your `.env`** to version control.
+- Use a strong, random `SESSION_SECRET`: `openssl rand -base64 32`.
+- Keep API keys secret and rotate them regularly.
 
-The Docker setup includes:
+## Runnable local recipe
 
-- **`Dockerfile`**: Multi-stage build for optimized production images
-  - **Builder stage**: Installs dependencies and builds the application
-  - **Production stage**: Runs with only production dependencies (Node 20 Alpine)
-  - **Health check**: Built-in health monitoring at `/api/health`
-- **`docker-compose.yml`**: Local development orchestration
-  - **PostgreSQL 16**: Database service with persistent volume
-  - **App service**: Application container with health checks
-  - **Dependency management**: App waits for database to be healthy
-- **`.dockerignore`**: Excludes unnecessary files from the Docker build context
+A complete, from-scratch local run with database, migrations, seeding, and admin
+login:
+
+```bash
+# 1. Provide the two secrets (or put them in a .env file)
+export SESSION_SECRET="$(openssl rand -base64 32)"
+export ADMIN_PASSWORD="choose-a-strong-admin-password"
+
+# 2. Build and start Postgres + the app
+docker compose up -d --build
+
+# 3. Watch the app boot. In production mode the server runs migrations and,
+#    if the database is empty, seeds categories/resources and the admin user.
+docker compose logs -f app
+#   Look for: "Running database migrations..." / "Migrations completed successfully"
+#             "🔐 ADMIN USER CREATED" (only on first, empty-DB boot)
+
+# 4. Confirm it is serving
+curl http://localhost:5000/api/health          # -> {"status":"ok"}
+open http://localhost:5000                      # homepage
+
+# 5. Log in as admin at /login with:
+#      email:    admin@example.com
+#      password: the ADMIN_PASSWORD you set above
+```
+
+Notes:
+- **Seeding is automatic** on first boot (both dev and production) *only when the
+  database is empty* (no categories and no resources). It never overwrites
+  existing data, so restarts preserve your changes.
+- If you set `ADMIN_PASSWORD` *after* the DB was already seeded, the app rotates
+  the existing admin's password on the next boot — you do not need to reseed.
+- To re-run seeding manually against a running container, use the admin API
+  (`POST /api/admin/seed-database`) or `docker compose exec app npm run db:push`
+  for schema-only sync.
 
 ## Docker Commands
 
-### Starting the Application
+### Starting / stopping
 
-Start all services in detached mode:
 ```bash
-docker-compose up -d
+docker compose up -d            # start in the background
+docker compose up               # start and stream logs
+docker compose down             # stop (keeps the database volume)
+docker compose down -v          # stop and DELETE all data
 ```
 
-Start and view logs:
+### Restarting
+
 ```bash
-docker-compose up
+docker compose restart          # all services
+docker compose restart app      # just the app
+docker compose restart postgres # just the database
 ```
 
-### Stopping the Application
+### Rebuilding after code changes
 
-Stop all services:
 ```bash
-docker-compose down
+docker compose up -d --build           # rebuild changed images and restart
+docker compose build --no-cache        # force a clean rebuild
 ```
 
-Stop and remove volumes (⚠️ **deletes all data**):
+### Status
+
 ```bash
-docker-compose down -v
-```
-
-### Restarting Services
-
-Restart all services:
-```bash
-docker-compose restart
-```
-
-Restart a specific service:
-```bash
-docker-compose restart app
-docker-compose restart postgres
-```
-
-### Rebuilding Images
-
-Rebuild and restart after code changes:
-```bash
-docker-compose up -d --build
-```
-
-Force rebuild without cache:
-```bash
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-### Service Status
-
-Check running services:
-```bash
-docker-compose ps
-```
-
-View resource usage:
-```bash
-docker stats
-```
-
-View health status:
-```bash
-docker inspect --format='{{.State.Health.Status}}' awesome-list-app
+docker compose ps                                                   # service state
+docker stats                                                        # live resource usage
+docker inspect --format='{{.State.Health.Status}}' awesome-list-app # health
 docker inspect --format='{{.State.Health.Status}}' awesome-list-db
 ```
 
 ## Volume Management
 
-### Understanding Volumes
+Docker Compose creates one persistent volume, `postgres_data`, holding the
+PostgreSQL data files (survives container restarts).
 
-Docker Compose creates persistent volumes for:
-
-- **`postgres_data`**: PostgreSQL database files (persists across container restarts)
-
-### Backing Up Data
-
-Backup the PostgreSQL database:
+### Backup / restore
 
 ```bash
-# Create a database dump
-docker-compose exec postgres pg_dump -U postgres awesome_list > backup.sql
+# Backup
+docker compose exec postgres pg_dump -U postgres awesome_list > backup.sql
 
-# With timestamp
-docker-compose exec postgres pg_dump -U postgres awesome_list > backup-$(date +%Y%m%d-%H%M%S).sql
-```
-
-### Restoring Data
-
-Restore from a backup:
-
-```bash
-# Stop the application
-docker-compose down
-
-# Start only the database
-docker-compose up -d postgres
-
-# Wait for database to be ready
+# Restore
+docker compose down
+docker compose up -d postgres
 sleep 5
-
-# Restore the dump
-docker-compose exec -T postgres psql -U postgres awesome_list < backup.sql
-
-# Start all services
-docker-compose up -d
+docker compose exec -T postgres psql -U postgres awesome_list < backup.sql
+docker compose up -d
 ```
 
-### Cleaning Up Volumes
+### Cleanup
 
-List all volumes:
 ```bash
-docker volume ls
-```
-
-Remove unused volumes:
-```bash
-docker volume prune
-```
-
-Remove project volumes (⚠️ **deletes all data**):
-```bash
-docker-compose down -v
+docker volume ls          # list volumes
+docker volume prune       # remove unused volumes
+docker compose down -v    # remove THIS project's volume (⚠️ deletes all data)
 ```
 
 ## Accessing Logs
 
-### View All Logs
-
-View logs from all services:
 ```bash
-docker-compose logs
+docker compose logs                 # all services
+docker compose logs -f              # follow
+docker compose logs app             # one service
+docker compose logs -f app          # follow one service
+docker compose logs --tail=100 app  # last 100 lines
+docker compose logs --since 30m app # last 30 minutes
 ```
 
-Follow logs in real-time:
+Debug inside the running container:
+
 ```bash
-docker-compose logs -f
+docker compose exec app sh
+docker compose exec app env
+docker compose exec app node -v
 ```
 
-### Service-Specific Logs
+## Verifying a Docker run
 
-View logs from a specific service:
+Use these steps to confirm a Docker deployment works end to end. A convenience
+script, `scripts/verify-docker-deployment.sh`, exists but predates the current
+routes — prefer the manual steps below, which target the real `/api/health`
+endpoint.
+
+1. **Clean start**
+   ```bash
+   docker compose down -v
+   docker compose up -d
+   ```
+
+2. **Both services running**
+   ```bash
+   docker compose ps      # postgres and app should show "Up"/"running"
+   ```
+
+3. **Database accepting connections**
+   ```bash
+   docker compose exec postgres pg_isready -U postgres
+   # -> /var/run/postgresql:5432 - accepting connections
+   ```
+
+4. **Health endpoint** — returns HTTP 200 with `{"status":"ok"}`:
+   ```bash
+   curl -i http://localhost:5000/api/health
+   ```
+   > The endpoint reports process liveness only; it does not include database or
+   > version fields.
+
+5. **Migrations recorded** — Drizzle keeps its journal in the `drizzle` schema:
+   ```bash
+   docker compose logs app | grep -i migration
+   docker compose exec postgres psql -U postgres -d awesome_list \
+     -c "\dt drizzle.__drizzle_migrations"
+   ```
+
+6. **Frontend loads**
+   ```bash
+   curl -s http://localhost:5000 | grep -o "<title>.*</title>"
+   ```
+
+7. **API responds**
+   ```bash
+   curl -s http://localhost:5000/api/resources | head -c 200
+   ```
+
+8. **Cleanup**
+   ```bash
+   docker compose down      # keep data
+   docker compose down -v   # wipe data
+   ```
+
+**Success criteria**
+
+- `docker compose up -d` starts both services and they report healthy.
+- `GET /api/health` returns `200` with `{"status":"ok"}`.
+- The frontend is reachable at `http://localhost:5000`.
+- `drizzle.__drizzle_migrations` exists and the app log shows no error stack traces.
+
+## Verifying a build without Replit
+
+The build and server run **without** the `REPL_ID` environment variable — the
+Replit-only Vite plugins are `optionalDependencies`, dynamically imported in
+`vite.config.ts` only when `REPL_ID` is defined, and Replit OAuth is skipped in
+`server/routes.ts` when `REPL_ID` is absent (local username/password auth is
+always set up). This is exactly the code path Docker uses.
+
+To verify a clean, non-Replit build on any machine (script equivalent:
+`scripts/verify-non-replit-build.sh`):
+
 ```bash
-docker-compose logs app
-docker-compose logs postgres
+# 1. Ensure REPL_ID is not set and start from a clean tree
+unset REPL_ID
+rm -rf dist/
+
+# 2. Build
+npm run build
+
+# 3. Confirm artifacts
+ls dist/index.js dist/public/index.html   # both must exist
+
+# 4. Run in production mode against a Postgres database
+export DATABASE_URL="postgresql://user:pass@host:5432/db"
+export SESSION_SECRET="$(openssl rand -base64 32)"
+NODE_ENV=production npm run start
+
+# 5. In another shell
+curl http://localhost:5000/api/health      # -> {"status":"ok"}
+curl -s http://localhost:5000/ | head -c 40 # HTML (<!doctype html> ...)
 ```
 
-Follow logs from a specific service:
-```bash
-docker-compose logs -f app
-```
-
-### Tail Logs
-
-View the last 100 lines:
-```bash
-docker-compose logs --tail=100 app
-```
-
-View logs since a specific time:
-```bash
-docker-compose logs --since 30m app
-```
-
-### Debug Container Issues
-
-Access a running container shell:
-```bash
-docker-compose exec app sh
-```
-
-Inspect container details:
-```bash
-docker-compose exec app env
-docker-compose exec app ps aux
-docker-compose exec app node -v
-```
+**Expected:** `npm run build` completes with no "Cannot find module
+'@replit/…'" errors, `dist/index.js` + `dist/public/` are produced, the server
+starts and serves `/api/health` and the SPA, and the login page offers local
+auth (not Replit OAuth).
 
 ## Troubleshooting
 
-### Port Already in Use
-
-**Error**: `Bind for 0.0.0.0:5000 failed: port is already allocated`
-
-**Solution**: Change the port in `docker-compose.yml` or stop the conflicting service:
+### Port already in use
 
 ```bash
-# Find what's using port 5000
-lsof -i :5000
-
-# Or change the port mapping in docker-compose.yml
-# Edit the app service:
-ports:
-  - "3000:5000"  # Map to port 3000 instead
+lsof -i :5000            # find the process
+# or remap in docker-compose.yml, e.g. "3000:5000"
 ```
 
-### Database Connection Errors
-
-**Error**: `Connection refused` or `Database connection failed`
-
-**Solution**: Ensure the database is ready:
+### Database connection errors
 
 ```bash
-# Check if postgres is running and healthy
-docker-compose ps postgres
-
-# View postgres logs
-docker-compose logs postgres
-
-# Test database connectivity
-docker-compose exec postgres pg_isready -U postgres
-
-# Restart the database
-docker-compose restart postgres
-
-# Wait for database to be ready, then restart app
-sleep 10
-docker-compose restart app
+docker compose ps postgres
+docker compose logs postgres
+docker compose exec postgres pg_isready -U postgres
+docker compose restart postgres
 ```
 
-### Permission Issues
+### App exits immediately
 
-**Error**: `EACCES: permission denied`
-
-**Solution**: Check file permissions or run with appropriate user:
+Most often a missing `SESSION_SECRET` (express-session throws on boot) or an
+unreachable `DATABASE_URL`.
 
 ```bash
-# Linux: Fix ownership
-sudo chown -R $USER:$USER .
-
-# Or add user mapping to docker-compose.yml
-user: "${UID}:${GID}"
+docker compose logs app          # read the stack trace
+docker compose exec app env | grep -E 'SESSION_SECRET|DATABASE_URL|NODE_ENV'
 ```
 
-### Out of Memory
+### Migrations didn't run
 
-**Error**: Container crashes or becomes unresponsive
-
-**Solution**: Increase Docker memory limit:
-
-- **Docker Desktop**: Settings → Resources → Memory (allocate 4GB+)
-- **Linux**: Adjust Docker daemon configuration
+The boot migrator only runs when `NODE_ENV=production`.
 
 ```bash
-# Check current memory usage
-docker stats
+docker compose exec app env | grep NODE_ENV
+docker compose exec app ls -la /app/migrations
+docker compose logs app | grep -i -E 'migration|error'
 ```
 
-### Build Failures
-
-**Error**: `npm install` fails or build errors
-
-**Solution**: Clean build and rebuild:
+### Build failures
 
 ```bash
-# Remove all containers and images
-docker-compose down --rmi all
-
-# Clear Docker cache
+docker compose down --rmi all
 docker builder prune -a
-
-# Rebuild from scratch
-docker-compose build --no-cache
-docker-compose up -d
+docker compose build --no-cache
+docker compose up -d
 ```
 
-### Health Check Failures
-
-**Error**: Container constantly restarts or shows "unhealthy"
-
-**Solution**: Check the health endpoint and logs:
+### Health check keeps failing
 
 ```bash
-# View container logs
-docker-compose logs app
-
-# Check health status
-docker-compose ps
-
-# Test health endpoint manually
+docker compose logs app
+docker compose ps
 curl http://localhost:5000/api/health
-
-# Or from inside the container
-docker-compose exec app wget -qO- http://localhost:5000/api/health
-```
-
-### Database Migration Issues
-
-**Error**: Database schema is outdated or tables don't exist
-
-**Solution**: The application runs migrations automatically on startup. If issues persist:
-
-```bash
-# View startup logs to check migration status
-docker-compose logs app
-
-# Manually run migrations
-docker-compose exec app npm run db:push
-
-# Or restart the app (migrations run on startup)
-docker-compose restart app
-```
-
-### Container Won't Start
-
-**Error**: Container exits immediately
-
-**Solution**: Check the logs and verify environment:
-
-```bash
-# View exit logs
-docker-compose logs app
-
-# Check environment variables
-docker-compose config
-
-# Verify build succeeded
-docker-compose build app
-
-# Try running without detached mode to see errors
-docker-compose up
 ```
 
 ## Production Deployment
 
-### Building Production Image
-
-Build the production image:
+### Build and push an image
 
 ```bash
 docker build -t awesome-list-site:latest .
-```
-
-Tag for registry:
-
-```bash
 docker tag awesome-list-site:latest your-registry.com/awesome-list-site:latest
-```
-
-Push to registry:
-
-```bash
 docker push your-registry.com/awesome-list-site:latest
 ```
 
-### Production Best Practices
+The same image is used by Railway (`railway.json` sets `builder: DOCKERFILE`) and
+works on any container platform (Cloud Run, ECS, Container Apps). See
+[DEPLOYMENT.md](./DEPLOYMENT.md) for platform specifics.
 
-1. **Use External Database**: Don't run PostgreSQL in the same Docker Compose for production
-   ```env
-   DATABASE_URL=postgresql://user:pass@production-db-host:5432/awesome_list
-   ```
+### Production best practices
 
-2. **Set Resource Limits**: Add to `docker-compose.yml`:
+1. **Use an external, managed PostgreSQL** rather than the bundled Compose
+   database. Set `DATABASE_URL` accordingly (append `?sslmode=require` for most
+   managed providers).
+2. **Provide secrets at runtime** — `SESSION_SECRET` (required) and
+   `ADMIN_PASSWORD` (to manage the admin account). Prefer your platform's secret
+   store or Docker secrets over baking them into the image.
+3. **Set resource limits** in `docker-compose.yml`:
    ```yaml
    services:
      app:
@@ -484,23 +431,12 @@ docker push your-registry.com/awesome-list-site:latest
            limits:
              cpus: '2'
              memory: 2G
-           reservations:
-             cpus: '1'
-             memory: 1G
    ```
-
-3. **Use Health Checks**: Already configured in Dockerfile
-   ```dockerfile
-   HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-     CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 5000) + '/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
-   ```
-
-4. **Use Secrets Management**: Use Docker secrets or environment injection
-   ```bash
-   docker secret create session_secret ./session_secret.txt
-   ```
-
-5. **Enable Structured Logging**: Configure log drivers
+4. **Run as non-root** — add `USER node` before `CMD` in the `Dockerfile`, or run
+   with `--user node`.
+5. **Configure health checks** on `/api/health` (already built into the
+   `Dockerfile` `HEALTHCHECK`; also referenced by `railway.json`).
+6. **Structured logging** via a log driver:
    ```yaml
    services:
      app:
@@ -511,56 +447,21 @@ docker push your-registry.com/awesome-list-site:latest
            max-file: "3"
    ```
 
-6. **Run as Non-Root**: Already configured in Dockerfile
-   - Uses Node.js Alpine image with non-root `node` user
-
-7. **Use Environment-Specific Configs**: Separate configs for dev, staging, production
-   ```bash
-   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-   ```
-
-### Monitoring
-
-Monitor container health:
-
-```bash
-# Health check status
-docker inspect --format='{{.State.Health.Status}}' awesome-list-app
-
-# Container metrics
-docker stats awesome-list-app awesome-list-db
-
-# Application health endpoint
-curl http://localhost:5000/api/health
-```
-
-Set up health check monitoring in your orchestration platform:
-- **Kubernetes**: Liveness and readiness probes on `/api/health`
-- **Docker Swarm**: Health check already configured
-- **AWS ECS**: Target group health checks on `/api/health`
-
 ### Scaling
 
-Scale the application (requires load balancer):
-
-```bash
-docker-compose up -d --scale app=3
-```
-
-**Note**: For horizontal scaling:
-- Use an external PostgreSQL database (not the one in docker-compose.yml)
-- Configure session storage in a shared location (Redis recommended)
-- Set up a load balancer (nginx, HAProxy, or cloud load balancer)
+The app keeps sessions in PostgreSQL (`connect-pg-simple`), so multiple replicas
+can share state as long as they share one database. For horizontal scaling use an
+external PostgreSQL plus a load balancer in front of the replicas.
 
 ## Additional Resources
 
 - [Docker Documentation](https://docs.docker.com/)
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 - [PostgreSQL Docker Image](https://hub.docker.com/_/postgres)
-- [Node.js Docker Best Practices](https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md)
 
-For deployment to cloud platforms, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+For cloud platform deployment (Replit, Railway, Vercel, other containers), see
+[DEPLOYMENT.md](./DEPLOYMENT.md).
 
-For environment variable documentation, see [ENVIRONMENT.md](./ENVIRONMENT.md).
+For the full environment-variable reference, see [ENVIRONMENT.md](./ENVIRONMENT.md).
 
-For general setup and development, see [SETUP.md](./SETUP.md).
+For general setup and local development, see [SETUP.md](./SETUP.md).

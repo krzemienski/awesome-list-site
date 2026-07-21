@@ -322,7 +322,7 @@ const response = await agent
 
 ## Writing Tests
 
-See [CONTRIBUTING_TESTS.md](../CONTRIBUTING_TESTS.md) for detailed guidelines on writing new tests.
+Follow the conventions in the existing test files under `unit/`, `integration/`, and `e2e/`, plus the general standards in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 **Quick Tips**:
 
@@ -497,7 +497,7 @@ npx playwright codegen http://localhost:5000
 If you encounter issues:
 
 1. Check this documentation
-2. Review [CONTRIBUTING_TESTS.md](../CONTRIBUTING_TESTS.md)
+2. Review [CONTRIBUTING.md](../CONTRIBUTING.md)
 3. Look at existing test files for examples
 4. Check Playwright/Vitest documentation:
    - [Vitest Docs](https://vitest.dev/)

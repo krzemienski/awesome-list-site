@@ -79,10 +79,21 @@ graph TB
 ### External Services
 | Service | Purpose |
 |---------|---------|
-| Anthropic Claude | AI analysis & enrichment |
+| Anthropic Claude | AI analysis, enrichment & agent research |
+| OpenAI | Embeddings & optional AI features |
 | GitHub API | Repository sync |
-| Replit Auth | OAuth authentication |
+| Replit Auth (OIDC) | OAuth authentication |
 | Google Analytics | Usage analytics |
+
+### Rendering & theming
+
+- **No Next.js, no React SSR.** The app is a Vite-built React SPA served by Express.
+  For crawlers, `server/og-middleware.ts` (with `server/ssr.ts`) injects a full meta/OG
+  tag set at request time ("SSR-lite"); after hydration react-helmet manages the live head.
+- **Runtime design-system switcher.** The UI ships multiple design systems selectable at
+  runtime (Editorial is the default), plus a light/dark/auto theme, managed by
+  `ThemeProvider` (`client/src/components/ui/theme-provider.tsx`) and the `use-theme` hook,
+  persisted to `localStorage`.
 
 ## Directory Structure
 
@@ -100,29 +111,48 @@ graph TB
 │   └── index.html
 ├── server/                 # Backend application
 │   ├── repositories/       # Data access layer (Repository Pattern)
-│   │   ├── resourceRepository.ts
-│   │   ├── categoryRepository.ts
-│   │   ├── userRepository.ts
-│   │   ├── enrichmentRepository.ts
-│   │   └── index.ts
-│   ├── ai/                 # AI services
+│   │   ├── ResourceRepository.ts
+│   │   ├── CategoryRepository.ts
+│   │   ├── UserRepository.ts
+│   │   ├── TagRepository.ts
+│   │   ├── LearningJourneyRepository.ts
+│   │   ├── UserFeatureRepository.ts
+│   │   ├── AuditRepository.ts
+│   │   ├── GithubSyncRepository.ts
+│   │   ├── EnrichmentRepository.ts
+│   │   ├── AdminRepository.ts
+│   │   ├── LegacyRepository.ts
+│   │   └── index.ts        # Barrel export
+│   ├── ai/                 # AI services (Claude / OpenAI, agents)
 │   │   ├── claudeService.ts
 │   │   ├── enrichmentService.ts
+│   │   ├── researchService.ts
+│   │   ├── agentRuntime.ts
 │   │   ├── recommendationEngine.ts
+│   │   ├── embeddingService.ts
+│   │   ├── configCrypto.ts
 │   │   └── urlScraper.ts
 │   ├── github/             # GitHub integration
 │   │   ├── syncService.ts
 │   │   ├── formatter.ts
-│   │   └── parser.ts
+│   │   ├── parser.ts
+│   │   └── client.ts
 │   ├── validation/         # Validation services
 │   │   ├── awesomeLint.ts
-│   │   └── linkChecker.ts
+│   │   ├── linkChecker.ts
+│   │   └── inputs.ts
+│   ├── db/                 # Drizzle connection (pg pool)
 │   ├── routes.ts           # API route definitions
+│   ├── storage.ts          # IStorage facade over repositories
+│   ├── migrate.ts          # Boot-time migration runner
 │   ├── replitAuth.ts       # OAuth configuration
 │   ├── localAuth.ts        # Local auth for dev
+│   ├── og-middleware.ts    # Crawler SSR-lite (meta injection)
 │   └── index.ts            # Server entry point
 ├── shared/                 # Shared code
-│   └── schema.ts           # Database schema & types
+│   ├── schema.ts           # Database schema & types
+│   └── validation.ts       # Shared content validation rules
+├── migrations/             # Journaled SQL migrations
 ├── scripts/                # Utility scripts
 └── docs/                   # Documentation
 ```
@@ -135,16 +165,23 @@ The backend implements the **Repository Pattern** to separate data access logic 
 
 #### Structure
 
-The repository layer is organized by domain:
+The repository layer is organized by domain (classes, PascalCase files):
 
 ```
 server/
 ├── repositories/
-│   ├── resourceRepository.ts    # Resource domain operations
-│   ├── categoryRepository.ts    # Category hierarchy operations
-│   ├── userRepository.ts        # User management operations
-│   ├── enrichmentRepository.ts  # AI enrichment operations
-│   └── index.ts                 # Centralized exports
+│   ├── ResourceRepository.ts         # Resource CRUD & approval workflow
+│   ├── CategoryRepository.ts         # 3-level category hierarchy
+│   ├── UserRepository.ts             # User accounts, roles, auth
+│   ├── TagRepository.ts              # Tags & resource tagging
+│   ├── LearningJourneyRepository.ts  # Journeys & progress
+│   ├── UserFeatureRepository.ts      # Favorites, bookmarks, preferences
+│   ├── AuditRepository.ts            # Audit log & edit suggestions
+│   ├── GithubSyncRepository.ts       # GitHub sync queue & history
+│   ├── EnrichmentRepository.ts       # AI enrichment jobs & queue
+│   ├── AdminRepository.ts            # Admin statistics
+│   ├── LegacyRepository.ts           # Hierarchical corpus builders
+│   └── index.ts                      # Barrel export
 ```
 
 #### Benefits
@@ -158,15 +195,17 @@ server/
 #### Usage Example
 
 ```typescript
-// In routes or services
-import { resourceRepository } from './repositories';
+// Option A — instantiate a domain repository directly (preferred for new code)
+import { ResourceRepository } from './repositories';
 
-// Clean, domain-focused API
-const resources = await resourceRepository.findAll();
-const resource = await resourceRepository.findById(id);
-await resourceRepository.create(data);
-await resourceRepository.update(id, changes);
-await resourceRepository.delete(id);
+const resourceRepo = new ResourceRepository();
+const resources = await resourceRepo.getResources();
+const resource = await resourceRepo.getResourceById(id);
+
+// Option B — use the unified storage facade (backward compatible)
+import { storage } from './storage';
+
+const resource = await storage.getResourceById(id);
 ```
 
 #### Architecture Diagram
@@ -185,18 +224,22 @@ graph TD
     style DB fill:#fce4ec
 ```
 
-#### Migration from storage.ts
+#### storage.ts and the repository layer
 
-The legacy `storage.ts` monolithic file has been refactored into domain-based repositories:
+`server/storage.ts` still exists, but it is now a thin **facade** implementing the
+`IStorage` interface by delegating each method to the appropriate domain repository. This
+preserves the existing `storage.*` call sites while new code can import repositories
+directly for better modularity.
 
-| Old Pattern | New Pattern |
-|-------------|-------------|
-| `import * as storage from './storage'` | `import { resourceRepository } from './repositories'` |
-| `storage.getResourceById(id)` | `resourceRepository.findById(id)` |
-| 1200+ lines in single file | ~200-300 lines per domain repository |
+| Legacy pattern | Current pattern |
+|----------------|-----------------|
+| `import { storage } from './storage'` | `import { ResourceRepository } from './repositories'` |
+| `storage.getResourceById(id)` (still works) | `new ResourceRepository().getResourceById(id)` |
+| One monolithic data-access file | One focused repository per domain + facade |
 | Mixed concerns | Single responsibility per repository |
 
-This refactoring improves code organization, maintainability, and makes the codebase more scalable for future features.
+This structure improves organization and testability while keeping backward compatibility
+through the facade.
 
 ## Component Hierarchy
 
@@ -204,19 +247,19 @@ This refactoring improves code organization, maintainability, and makes the code
 graph TD
     App["App<br/>(Root)"]
     MainLayout["MainLayout"]
-    ModernSidebar["ModernSidebar<br/>(Navigation)"]
-    TopBar["TopBar<br/>(Header)"]
-    Content["Content<br/>(Router Outlet)"]
+    AppSidebar["AppSidebar / ModernSidebar<br/>(Navigation)"]
+    AppHeader["AppHeader<br/>(Header + search)"]
+    Content["Content<br/>(Wouter Switch)"]
     Pages["Pages"]
 
     Home["Home Page<br/>(Browse Resources)"]
     Category["Category Page<br/>(Category View)"]
     ResourceDetail["ResourceDetail<br/>(Single Resource)"]
-    AdminDash["AdminDashboard<br/>(Admin Panel)"]
+    AdminDash["AdminDashboard<br/>(Admin Panel, lazy)"]
 
     App --> MainLayout
-    MainLayout --> ModernSidebar
-    MainLayout --> TopBar
+    MainLayout --> AppSidebar
+    MainLayout --> AppHeader
     MainLayout --> Content
     Content --> Pages
     Pages --> Home
@@ -374,17 +417,28 @@ flowchart TD
 **learning_journeys / journey_steps / user_journey_progress**
 - Learning path functionality
 
-**favorites / bookmarks**
-- User engagement tracking
+**user_favorites / user_bookmarks / user_preferences / user_interactions**
+- User engagement, personalization, and behavioral analytics
 
-**github_sync_queue / sync_history**
+**github_sync_queue / github_sync_history**
 - GitHub sync state management
 
-**enrichment_jobs**
-- AI batch processing tracking
+**enrichment_jobs / enrichment_queue**
+- AI batch enrichment tracking (with per-run agent config)
+
+**research_jobs / research_discoveries / agent_events**
+- Claude Agent SDK research runs and structured agent event log
+
+**link_health_jobs / link_health_checks**
+- Link-health scanning results
+
+**api_keys / password_reset_tokens**
+- Programmatic API access and self-service password reset
 
 **tags / resource_tags**
 - Tag management (many-to-many)
+
+> The full 29-table schema is documented in [DATABASE.md](./DATABASE.md).
 
 ## Security Measures
 
@@ -429,23 +483,29 @@ flowchart TD
 
 ## Environment Variables
 
+See [ENVIRONMENT.md](./ENVIRONMENT.md) for the canonical, complete list. A representative
+subset:
+
 ```bash
 # Database
 DATABASE_URL=postgresql://...
 
-# Authentication
-REPLIT_DOMAINS=...
-REPLIT_IDENTITY_TOKEN=...
+# Authentication (Replit OIDC + sessions)
+REPL_ID=...
+ISSUER_URL=https://replit.com/oidc   # default
 SESSION_SECRET=...
 
-# External Services
+# AI (managed Anthropic key preferred; ANTHROPIC_API_KEY as fallback)
 AI_INTEGRATIONS_ANTHROPIC_API_KEY=...
+CONFIG_ENCRYPTION_KEY=...            # encrypts per-run agent auth tokens
+
+# GitHub sync
 GITHUB_TOKEN=...
 GITHUB_REPO_URL=...
 
-# Optional
+# Frontend / optional
+VITE_GA_MEASUREMENT_ID=...
 NODE_ENV=development|production
-GA_TRACKING_ID=...
 ```
 
 ## Deployment

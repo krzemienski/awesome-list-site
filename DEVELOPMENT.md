@@ -504,7 +504,7 @@ If you encounter issues not covered here:
 
 ---
 
-**Last Updated:** 2024-01-31
-**ESLint Version:** 9.17.0
-**Prettier Version:** 3.8.1
+**Last Updated:** 2026-07-21
+**ESLint Version:** 9.x (see package.json)
+**Prettier Version:** 3.x (see package.json)
 **TypeScript Version:** 5.6.3

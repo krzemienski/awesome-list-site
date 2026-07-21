@@ -35,6 +35,7 @@ All endpoints require `isAuthenticated` + `isAdmin`.
 | `POST` | `/api/researcher/start` | Start a research job. Body: `{ prompt, categoryFocus?, maxBudgetUsd?, maxTurns? }`. Prompt must be at least 10 characters. Returns `{ success, jobId, message }`. |
 | `GET` | `/api/researcher/jobs` | List research jobs. |
 | `GET` | `/api/researcher/jobs/:id` | Get a single job, with an `isActive` flag indicating whether the orchestrator is still running it. |
+| `GET` | `/api/researcher/jobs/:id/events` | Stream/poll the event log for a job (progress updates shown in the Researcher tab). |
 | `DELETE` | `/api/researcher/jobs/:id` | Cancel a running job. |
 | `GET` | `/api/researcher/discoveries?jobId=` | List discoveries. With `jobId`, returns discoveries for that job; without it, returns all pending discoveries. |
 | `POST` | `/api/researcher/discoveries/:id/approve` | Approve a discovery and insert it as a resource. |

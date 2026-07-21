@@ -1,23 +1,100 @@
-# Database Schema Documentation
+# Database Reference
 
-Complete database schema documentation for the Awesome Video Resource Viewer application.
+Schema and migration reference for the Awesome Video resource platform.
+
+> **Source of truth:** [`shared/schema.ts`](../shared/schema.ts). Every table, column,
+> index, and Zod insert schema is defined there and this document mirrors it. When the
+> two disagree, `shared/schema.ts` wins — update this file to match.
 
 ## Overview
 
-The application uses **PostgreSQL** (hosted on Neon) as the primary database with **Drizzle ORM** for type-safe database operations and migrations. The schema is designed to support:
+- **Engine:** PostgreSQL (Neon-hosted in production/Replit).
+- **Driver:** `pg` (node-postgres) connection pool wired to **Drizzle ORM**
+  (`drizzle-orm/node-postgres`) in [`server/db/index.ts`](../server/db/index.ts).
+- **Schema management:** `drizzle-kit push` in development; journaled SQL migrations in
+  `migrations/` applied by a boot-time migrator in production (see
+  [Migrations & schema changes](#migrations--schema-changes)).
+- **Tables:** 29 `pgTable` definitions in `shared/schema.ts`.
 
-- **User authentication** with OAuth and local auth
-- **3-level category hierarchy** for resource organization
-- **Approval workflow** for user-submitted resources
-- **AI-powered enrichment** with batch processing
-- **GitHub synchronization** for import/export operations
-- **Complete audit trail** of all resource changes
-- **Learning journeys** with progress tracking
-- **User interactions** for analytics and recommendations
+The schema supports: user authentication (Replit OAuth + local password), a 3-level
+category taxonomy, a resource approval workflow, crowdsourced edit suggestions, a full
+audit trail, learning journeys, AI enrichment/research jobs, GitHub import/export, link
+health scanning, and API keys for programmatic access.
 
 ---
 
-## Entity Relationship Diagram
+## Table catalog
+
+All 29 tables, grouped by domain. Drizzle export name → SQL table name.
+
+**Auth & users**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `sessions` | `sessions` | Express session store (connect-pg-simple) |
+| `users` | `users` | User accounts (OAuth + local auth), roles |
+| `apiKeys` | `api_keys` | Hashed API keys for programmatic access |
+| `passwordResetTokens` | `password_reset_tokens` | Single-use hashed reset tokens |
+
+**Content & taxonomy**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `resources` | `resources` | Core curated resources (+ generated FTS column) |
+| `categories` | `categories` | Top-level taxonomy |
+| `subcategories` | `subcategories` | Second-level taxonomy |
+| `subSubcategories` | `sub_subcategories` | Third-level taxonomy |
+| `tags` | `tags` | Cross-cutting tags |
+| `resourceTags` | `resource_tags` | Resource↔tag junction |
+| `awesomeLists` | `awesome_lists` | External awesome-list sources |
+
+**Workflow & audit**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `resourceEdits` | `resource_edits` | Crowdsourced edit suggestions (+ Claude analysis) |
+| `resourceAuditLog` | `resource_audit_log` | Complete change history |
+
+**Learning journeys**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `learningJourneys` | `learning_journeys` | Curated learning paths |
+| `journeySteps` | `journey_steps` | Ordered steps within a journey |
+| `userJourneyProgress` | `user_journey_progress` | Per-user journey progress |
+
+**User engagement & personalization**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `userFavorites` | `user_favorites` | Favorited resources |
+| `userBookmarks` | `user_bookmarks` | Bookmarked resources (with notes) |
+| `userPreferences` | `user_preferences` | Recommendation preferences |
+| `userInteractions` | `user_interactions` | Behavioral analytics events |
+
+**GitHub sync**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `githubSyncQueue` | `github_sync_queue` | Queued import/export operations |
+| `githubSyncHistory` | `github_sync_history` | Completed sync operations + stats |
+
+**AI enrichment, research & agents**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `enrichmentJobs` | `enrichment_jobs` | Batch AI enrichment jobs |
+| `enrichmentQueue` | `enrichment_queue` | Per-resource enrichment tasks |
+| `researchJobs` | `research_jobs` | Claude Agent SDK research runs |
+| `researchDiscoveries` | `research_discoveries` | Candidate resources found by research |
+| `agentEvents` | `agent_events` | Structured agent run event log |
+
+**Link health**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `linkHealthJobs` | `link_health_jobs` | Link-scan job runs |
+| `linkHealthChecks` | `link_health_checks` | Per-URL scan results |
+
+---
+
+## Entity relationship diagram (core domain)
+
+The core content/user relationships. Auxiliary tables (`api_keys`,
+`password_reset_tokens`, `link_health_*`, `research_*`, `agent_events`, `sessions`,
+`awesome_lists`) are documented in the table catalog above but omitted here for clarity.
 
 ```mermaid
 erDiagram
@@ -31,6 +108,7 @@ erDiagram
     users ||--o{ resourceAuditLog : "performs"
     users ||--o{ githubSyncHistory : "performs"
     users ||--o{ enrichmentJobs : "starts"
+    users ||--o{ researchJobs : "starts"
 
     categories ||--o{ subcategories : "contains"
     subcategories ||--o{ subSubcategories : "contains"
@@ -51,1051 +129,531 @@ erDiagram
     journeySteps ||--o| userJourneyProgress : "current step"
 
     enrichmentJobs ||--o{ enrichmentQueue : "processes"
-
-    users {
-        varchar id PK "UUID"
-        varchar email UK "unique"
-        varchar password "hashed"
-        varchar firstName
-        varchar lastName
-        varchar profileImageUrl
-        text role "user|admin|moderator"
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    resources {
-        serial id PK
-        text title
-        text url UK "unique"
-        text description
-        text category
-        text subcategory
-        text subSubcategory
-        text status "pending|approved|rejected|archived"
-        varchar submittedBy FK
-        varchar approvedBy FK
-        timestamp approvedAt
-        boolean githubSynced
-        timestamp lastSyncedAt
-        jsonb metadata
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    categories {
-        serial id PK
-        text name UK
-        text slug UK
-    }
-
-    subcategories {
-        serial id PK
-        text name
-        text slug
-        integer categoryId FK
-    }
-
-    subSubcategories {
-        serial id PK
-        text name
-        text slug
-        integer subcategoryId FK
-    }
-
-    resourceEdits {
-        serial id PK
-        integer resourceId FK
-        varchar submittedBy FK
-        text status "pending|approved|rejected"
-        timestamp originalResourceUpdatedAt
-        jsonb proposedChanges
-        jsonb proposedData
-        jsonb claudeMetadata
-        timestamp claudeAnalyzedAt
-        varchar handledBy FK
-        timestamp handledAt
-        text rejectionReason
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    tags {
-        serial id PK
-        text name UK
-        text slug UK
-        timestamp createdAt
-    }
-
-    resourceTags {
-        integer resourceId FK
-        integer tagId FK
-    }
-
-    learningJourneys {
-        serial id PK
-        text title
-        text description
-        text difficulty "beginner|intermediate|advanced"
-        text estimatedDuration
-        text icon
-        integer orderIndex
-        text category
-        text status "draft|published|archived"
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    journeySteps {
-        serial id PK
-        integer journeyId FK
-        integer resourceId FK
-        integer stepNumber
-        text title
-        text description
-        boolean isOptional
-        timestamp createdAt
-    }
-
-    userFavorites {
-        varchar userId FK
-        integer resourceId FK
-        timestamp createdAt
-    }
-
-    userBookmarks {
-        varchar userId FK
-        integer resourceId FK
-        text notes
-        timestamp createdAt
-    }
-
-    userJourneyProgress {
-        serial id PK
-        varchar userId FK
-        integer journeyId FK
-        integer currentStepId FK
-        jsonb completedSteps "array of step IDs"
-        timestamp startedAt
-        timestamp lastAccessedAt
-        timestamp completedAt
-    }
-
-    userPreferences {
-        serial id PK
-        varchar userId FK
-        jsonb preferredCategories
-        text skillLevel "beginner|intermediate|advanced"
-        jsonb learningGoals
-        jsonb preferredResourceTypes
-        text timeCommitment "daily|weekly|flexible"
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    userInteractions {
-        serial id PK
-        varchar userId FK
-        integer resourceId FK
-        text interactionType "view|click|bookmark|rate|complete"
-        integer interactionValue "rating or duration"
-        jsonb metadata
-        timestamp timestamp
-    }
-
-    resourceAuditLog {
-        serial id PK
-        integer resourceId FK "SET NULL on delete"
-        integer originalResourceId "never nullified"
-        text action "created|updated|approved|rejected|synced|deleted"
-        varchar performedBy FK "SET NULL on delete"
-        jsonb changes
-        text notes
-        timestamp createdAt
-    }
-
-    githubSyncQueue {
-        serial id PK
-        text repositoryUrl
-        text branch
-        jsonb resourceIds
-        text action "import|export"
-        text status "pending|processing|completed|failed"
-        text errorMessage
-        jsonb metadata
-        timestamp createdAt
-        timestamp processedAt
-    }
-
-    githubSyncHistory {
-        serial id PK
-        text repositoryUrl
-        text direction "export|import"
-        text commitSha
-        text commitMessage
-        text commitUrl
-        integer resourcesAdded
-        integer resourcesUpdated
-        integer resourcesRemoved
-        integer totalResources
-        varchar performedBy FK
-        jsonb snapshot
-        jsonb metadata
-        timestamp createdAt
-    }
-
-    enrichmentJobs {
-        serial id PK
-        text status "pending|processing|completed|failed|cancelled"
-        text filter "all|unenriched"
-        integer batchSize
-        integer totalResources
-        integer processedResources
-        integer successfulResources
-        integer failedResources
-        integer skippedResources
-        jsonb processedResourceIds
-        jsonb failedResourceIds
-        text errorMessage
-        jsonb metadata
-        varchar startedBy FK
-        timestamp startedAt
-        timestamp completedAt
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    enrichmentQueue {
-        serial id PK
-        integer jobId FK
-        integer resourceId FK
-        text status "pending|processing|completed|failed|skipped"
-        integer retryCount
-        integer maxRetries
-        text errorMessage
-        jsonb aiMetadata
-        timestamp processedAt
-        timestamp createdAt
-        timestamp updatedAt
-    }
-
-    sessions {
-        varchar sid PK
-        jsonb sess
-        timestamp expire
-    }
-
-    awesomeLists {
-        serial id PK
-        text title
-        text description
-        text repoUrl
-        text sourceUrl
-    }
+    researchJobs ||--o{ researchDiscoveries : "produces"
 ```
 
 ---
 
-## Core Tables
+## Auth & users
 
-### Users Table
-**Purpose**: Authentication, authorization, and user management
+### sessions
+Express session storage for Passport.js (`connect-pg-simple`).
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | varchar | PK, DEFAULT gen_random_uuid() | UUID primary key |
-| email | varchar | UNIQUE | User email for login |
-| password | varchar | NULL allowed | Hashed password (bcrypt, local auth only) |
-| firstName | varchar | | User's first name |
-| lastName | varchar | | User's last name |
-| profileImageUrl | varchar | | Profile picture URL |
-| role | text | DEFAULT 'user' | Role: user, admin, moderator |
-| createdAt | timestamp | DEFAULT NOW() | Account creation time |
-| updatedAt | timestamp | DEFAULT NOW() | Last profile update |
-
-**Authentication Methods**:
-- **Replit OAuth**: email + no password
-- **Local Auth**: email + hashed password (development/admin)
-
-**Referenced By**: resources, resourceEdits, userFavorites, userBookmarks, userJourneyProgress, userPreferences, userInteractions, resourceAuditLog, githubSyncHistory, enrichmentJobs
-
----
-
-### Resources Table
-**Purpose**: Core content entity storing curated video resources
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | serial | PK | Auto-incrementing primary key |
-| title | text | NOT NULL | Resource title |
-| url | text | NOT NULL, UNIQUE | Resource URL (prevents duplicates) |
-| description | text | NOT NULL, DEFAULT '' | Resource description |
-| category | text | NOT NULL | Top-level category |
-| subcategory | text | NULL | Second-level category |
-| subSubcategory | text | NULL | Third-level category |
-| status | text | DEFAULT 'approved' | pending, approved, rejected, archived |
-| submittedBy | varchar | FK → users.id, CASCADE | User who submitted |
-| approvedBy | varchar | FK → users.id | User who approved |
-| approvedAt | timestamp | | Approval timestamp |
-| githubSynced | boolean | DEFAULT false | Synced to GitHub? |
-| lastSyncedAt | timestamp | | Last GitHub sync time |
-| metadata | jsonb | DEFAULT {} | AI enrichment data, tags |
-| createdAt | timestamp | DEFAULT NOW() | Creation time |
-| updatedAt | timestamp | DEFAULT NOW() | Last modification |
-
-**Indexes**:
-- `idx_resources_status` - Fast status filtering
-- `idx_resources_status_category` - Combined status + category queries
-- `idx_resources_category` - Category browsing
-
-**Approval Workflow**:
-1. User submits resource → status = 'pending'
-2. Admin reviews → status = 'approved' or 'rejected'
-3. If approved, resource becomes visible to public
-4. Resources can be archived without deletion
-
-**Referenced By**: resourceEdits, resourceTags, journeySteps, userFavorites, userBookmarks, userInteractions, resourceAuditLog, enrichmentQueue
-
----
-
-## 3-Level Category Hierarchy
-
-The application implements a flexible 3-level taxonomy for organizing resources:
-
-```
-Category (Top-level)
-  └── Subcategory (Second-level)
-        └── Sub-subcategory (Third-level)
-```
-
-### Categories Table
-**Purpose**: Top-level taxonomy (e.g., "Frameworks", "Languages", "Tools")
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | serial | PK | Auto-incrementing ID |
-| name | text | NOT NULL, UNIQUE | Display name |
-| slug | text | NOT NULL, UNIQUE | URL-friendly identifier |
-
-### Subcategories Table
-**Purpose**: Second-level taxonomy (e.g., "React" under "Frameworks")
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | serial | PK | Auto-incrementing ID |
-| name | text | NOT NULL | Display name |
-| slug | text | NOT NULL | URL-friendly identifier |
-| categoryId | integer | FK → categories.id, CASCADE | Parent category |
-
-**Constraints**:
-- Unique constraint on `(slug, categoryId)` prevents duplicate subcategories within same category
-- Cascades delete when parent category is deleted
-
-### Sub-subcategories Table
-**Purpose**: Third-level taxonomy (e.g., "Hooks" under "React" under "Frameworks")
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | serial | PK | Auto-incrementing ID |
-| name | text | NOT NULL | Display name |
-| slug | text | NOT NULL | URL-friendly identifier |
-| subcategoryId | integer | FK → subcategories.id, CASCADE | Parent subcategory |
-
-**Constraints**:
-- Unique constraint on `(slug, subcategoryId)` prevents duplicate sub-subcategories within same subcategory
-- Cascades delete when parent subcategory is deleted
-
-### Hierarchy Example
-
-```
-Categories:
-  - Frameworks (slug: frameworks)
-      Subcategories:
-        - React (slug: react)
-            Sub-subcategories:
-              - Hooks (slug: hooks)
-              - State Management (slug: state-management)
-        - Vue (slug: vue)
-            Sub-subcategories:
-              - Composition API (slug: composition-api)
-  - Languages (slug: languages)
-      Subcategories:
-        - JavaScript (slug: javascript)
-        - TypeScript (slug: typescript)
-```
-
-### Category Assignment in Resources
-
-Resources reference categories using **text fields** (not foreign keys):
-- `resources.category` → matches `categories.name`
-- `resources.subcategory` → matches `subcategories.name` (optional)
-- `resources.subSubcategory` → matches `subSubcategories.name` (optional)
-
-This design allows flexible categorization without enforcing referential integrity, making it easier to:
-- Import resources from external sources
-- Handle category evolution over time
-- Support legacy data with non-standard categories
-
----
-
-## Resource Edit Suggestions
-
-### Resource Edits Table
-**Purpose**: Crowdsourced edit suggestions with AI analysis
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | serial | PK | Auto-incrementing ID |
-| resourceId | integer | FK → resources.id, NOT NULL | Resource being edited |
-| submittedBy | varchar | FK → users.id, NOT NULL | User who suggested edit |
-| status | text | DEFAULT 'pending' | pending, approved, rejected |
-| originalResourceUpdatedAt | timestamp | NOT NULL | For conflict detection |
-| proposedChanges | jsonb | NOT NULL | Field-by-field changes |
-| proposedData | jsonb | NOT NULL | Complete proposed data |
-| claudeMetadata | jsonb | NULL | AI suggestions |
-| claudeAnalyzedAt | timestamp | NULL | When Claude analyzed |
-| handledBy | varchar | FK → users.id | Admin who handled edit |
-| handledAt | timestamp | | When handled |
-| rejectionReason | text | | Reason if rejected |
-| createdAt | timestamp | DEFAULT NOW() | Creation time |
-| updatedAt | timestamp | DEFAULT NOW() | Last update |
-
-**Indexes**:
-- `idx_resource_edits_resource_id` - Find edits for a resource
-- `idx_resource_edits_status` - Filter by status
-- `idx_resource_edits_submitted_by` - Track user contributions
-
-**Edit Workflow**:
-1. User submits edit suggestion
-2. Optionally trigger Claude AI analysis for quality suggestions
-3. Admin reviews edit and AI recommendations
-4. Admin approves (merges changes) or rejects (with reason)
-
-**Claude Metadata Structure**:
-```json
-{
-  "suggestedTitle": "Improved Title",
-  "suggestedDescription": "Better description...",
-  "suggestedTags": ["react", "hooks", "tutorial"],
-  "suggestedCategory": "Frameworks",
-  "suggestedSubcategory": "React",
-  "confidence": 0.95,
-  "keyTopics": ["useState", "useEffect", "custom hooks"]
-}
-```
-
----
-
-## Audit Log System
-
-### Resource Audit Log Table
-**Purpose**: Complete change history for compliance, debugging, and analytics
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | serial | PK | Auto-incrementing ID |
-| resourceId | integer | FK → resources.id, SET NULL | Current resource reference |
-| originalResourceId | integer | NOT NULL | Original resource ID (never nullified) |
-| action | text | NOT NULL | Action type |
-| performedBy | varchar | FK → users.id, SET NULL | User who performed action |
-| changes | jsonb | | Changed fields and values |
-| notes | text | | Optional notes |
-| createdAt | timestamp | DEFAULT NOW() | When action occurred |
-
-**Action Types**:
-- `created` - Resource was created
-- `updated` - Resource metadata was modified
-- `approved` - Resource was approved by admin
-- `rejected` - Resource was rejected by admin
-- `synced` - Resource was synced to/from GitHub
-- `deleted` - Resource was deleted
-
-**Design Principles**:
-
-1. **Preserves History After Deletion**
-   - `resourceId` uses `SET NULL` on delete (maintains log after resource deletion)
-   - `originalResourceId` never changes (preserves original ID for historical reference)
-   - Even if a resource is deleted, the audit log remains intact
-
-2. **User Anonymization**
-   - `performedBy` uses `SET NULL` on user delete
-   - Preserves action history even after user account deletion
-
-3. **Change Tracking**
-   - `changes` field stores JSON with old and new values:
-   ```json
-   {
-     "title": { "old": "Old Title", "new": "New Title" },
-     "status": { "old": "pending", "new": "approved" }
-   }
-   ```
-
-**Example Query - Get Resource History**:
-```sql
-SELECT
-  ral.action,
-  ral.performedBy,
-  ral.changes,
-  ral.createdAt,
-  u.firstName || ' ' || u.lastName AS performedByName
-FROM resource_audit_log ral
-LEFT JOIN users u ON ral.performedBy = u.id
-WHERE ral.originalResourceId = 123
-ORDER BY ral.createdAt DESC;
-```
-
----
-
-## AI Enrichment Queue System
-
-The enrichment system uses a **job-queue pattern** for batch AI analysis of resources.
-
-### Architecture Overview
-
-```mermaid
-graph LR
-    Admin[Admin] -->|1. Start Job| EJ[Enrichment Job]
-    EJ -->|2. Create Tasks| EQ1[Queue Item 1]
-    EJ -->|2. Create Tasks| EQ2[Queue Item 2]
-    EQ1 -->|3. Process| Claude[Claude AI]
-    EQ2 -->|3. Process| Claude
-    Claude -->|4. Return Metadata| EQ1
-    Claude -->|4. Return Metadata| EQ2
-    EQ1 -->|5. Update Resource| R1[Resource 1]
-    EQ2 -->|5. Update Resource| R2[Resource 2]
-    EQ1 -->|6. Update Stats| EJ
-    EQ2 -->|6. Update Stats| EJ
-```
-
-### Enrichment Jobs Table
-**Purpose**: Track batch enrichment operations
-
-| Column | Type | Default | Description |
-|--------|------|---------|-------------|
-| id | serial | | Job ID |
-| status | text | 'pending' | pending, processing, completed, failed, cancelled |
-| filter | text | 'all' | all, unenriched |
-| batchSize | integer | 10 | Resources per batch |
-| totalResources | integer | 0 | Total to process |
-| processedResources | integer | 0 | Count processed |
-| successfulResources | integer | 0 | Count successful |
-| failedResources | integer | 0 | Count failed |
-| skippedResources | integer | 0 | Count skipped |
-| processedResourceIds | jsonb | [] | Success IDs |
-| failedResourceIds | jsonb | [] | Failed IDs |
-| errorMessage | text | | Error if job failed |
-| metadata | jsonb | {} | Additional data |
-| startedBy | varchar | | User who started |
-| startedAt | timestamp | | Processing start |
-| completedAt | timestamp | | Processing end |
-| createdAt | timestamp | NOW() | Creation time |
-| updatedAt | timestamp | NOW() | Last update |
-
-**Indexes**:
-- `idx_enrichment_jobs_status` - Filter by status
-- `idx_enrichment_jobs_started_by` - Track jobs by user
-
-### Enrichment Queue Table
-**Purpose**: Individual resource enrichment tasks with retry logic
-
-| Column | Type | Default | Description |
-|--------|------|---------|-------------|
-| id | serial | | Queue item ID |
-| jobId | integer | | Parent job (FK) |
-| resourceId | integer | | Resource to enrich (FK) |
-| status | text | 'pending' | pending, processing, completed, failed, skipped |
-| retryCount | integer | 0 | Retry attempts made |
-| maxRetries | integer | 3 | Max retry attempts |
-| errorMessage | text | | Error if failed |
-| aiMetadata | jsonb | | Claude AI results |
-| processedAt | timestamp | | Completion time |
-| createdAt | timestamp | NOW() | Creation time |
-| updatedAt | timestamp | NOW() | Last update |
-
-**Indexes**:
-- `idx_enrichment_queue_job_id` - Find tasks in a job
-- `idx_enrichment_queue_resource_id` - Check resource status
-- `idx_enrichment_queue_status` - Filter by status
-
-**AI Metadata Structure**:
-```json
-{
-  "suggestedTitle": "React Hooks Tutorial - Complete Guide",
-  "suggestedDescription": "Comprehensive video tutorial covering useState, useEffect, and custom hooks in React.",
-  "suggestedTags": ["react", "hooks", "tutorial", "frontend"],
-  "suggestedCategory": "Frameworks",
-  "suggestedSubcategory": "React",
-  "confidence": 0.92,
-  "keyTopics": ["useState", "useEffect", "useContext", "custom hooks"]
-}
-```
-
-### Enrichment Workflow
-
-**1. Job Creation**
-```
-Admin starts enrichment job
-  ↓
-System queries resources based on filter
-  ↓
-Creates enrichmentJobs record with status='pending'
-  ↓
-Creates enrichmentQueue items for each resource
-```
-
-**2. Processing**
-```
-Job status → 'processing'
-  ↓
-For each queue item (batch processing):
-  ├─ Queue item status → 'processing'
-  ├─ Fetch resource URL
-  ├─ Call Claude AI for analysis
-  ├─ Store results in aiMetadata
-  ├─ Update resource.metadata
-  └─ Queue item status → 'completed' or 'failed'
-```
-
-**3. Retry Logic**
-```
-If enrichment fails:
-  ├─ retryCount < maxRetries?
-  │   ├─ YES: retryCount++, status='pending'
-  │   └─ NO: status='failed', store error
-```
-
-**4. Job Completion**
-```
-All queue items processed
-  ↓
-Update job statistics:
-  - processedResources = completed + failed + skipped
-  - successfulResources = completed count
-  - failedResources = failed count
-  ↓
-Job status → 'completed'
-completedAt → NOW()
-```
-
-### Monitoring Enrichment Progress
-
-**Admin Dashboard Query**:
-```sql
-SELECT
-  ej.id,
-  ej.status,
-  ej.totalResources,
-  ej.processedResources,
-  ej.successfulResources,
-  ej.failedResources,
-  ej.startedAt,
-  ej.completedAt,
-  (ej.processedResources::float / NULLIF(ej.totalResources, 0) * 100)::int AS progress_percent
-FROM enrichment_jobs ej
-WHERE ej.status IN ('pending', 'processing')
-ORDER BY ej.createdAt DESC;
-```
-
-**Failed Items Query**:
-```sql
-SELECT
-  eq.resourceId,
-  r.title,
-  r.url,
-  eq.errorMessage,
-  eq.retryCount
-FROM enrichment_queue eq
-JOIN resources r ON eq.resourceId = r.id
-WHERE eq.jobId = 123 AND eq.status = 'failed'
-ORDER BY eq.updatedAt DESC;
-```
-
----
-
-## Learning Journeys & Progress Tracking
-
-### Learning Journeys Table
-**Purpose**: Curated learning paths
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | serial | Journey ID |
-| title | text | Journey title |
-| description | text | Learning objectives |
-| difficulty | text | beginner, intermediate, advanced |
-| estimatedDuration | text | e.g., "20 hours" |
-| icon | text | Icon identifier |
-| orderIndex | integer | Display order |
-| category | text | Primary category |
-| status | text | draft, published, archived |
-| createdAt | timestamp | Creation time |
-| updatedAt | timestamp | Last update |
-
-### Journey Steps Table
-**Purpose**: Ordered steps in learning paths
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | serial | Step ID |
-| journeyId | integer | Parent journey (FK) |
-| resourceId | integer | Associated resource (FK) |
-| stepNumber | integer | Order in journey |
-| title | text | Step title |
-| description | text | Step instructions |
-| isOptional | boolean | Can be skipped? |
-| createdAt | timestamp | Creation time |
-
-**Indexes**:
-- `idx_journey_steps_journey_id` - Get all steps in a journey
-- `idx_journey_steps_resource_id` - Find journeys using a resource
-
-### User Journey Progress Table
-**Purpose**: Track user progress through learning paths
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | serial | Progress ID |
-| userId | varchar | User (FK) |
-| journeyId | integer | Journey (FK) |
-| currentStepId | integer | Current step (FK) |
-| completedSteps | jsonb | Array of step IDs |
-| startedAt | timestamp | When started |
-| lastAccessedAt | timestamp | Last access |
-| completedAt | timestamp | When finished |
-
-**Constraints**:
-- Unique on `(userId, journeyId)` - one progress record per user per journey
-
-**Indexes**:
-- `idx_user_journey_progress_user_id` - Find user's journeys
-- `idx_user_journey_progress_journey_id` - Find users in journey
-
----
-
-## User Engagement Tables
-
-### User Favorites
-**Purpose**: Quick access to favorite resources
-
-| Column | Type | Description |
-|--------|------|-------------|
-| userId | varchar | User (FK, PK) |
-| resourceId | integer | Resource (FK, PK) |
-| createdAt | timestamp | When favorited |
-
-Composite primary key prevents duplicate favorites.
-
-### User Bookmarks
-**Purpose**: Bookmarked resources with personal notes
-
-| Column | Type | Description |
-|--------|------|-------------|
-| userId | varchar | User (FK, PK) |
-| resourceId | integer | Resource (FK, PK) |
-| notes | text | Personal notes |
-| createdAt | timestamp | When bookmarked |
-
-Composite primary key prevents duplicate bookmarks.
-
-### User Preferences
-**Purpose**: Personalization for AI recommendations
-
-| Column | Type | Default | Description |
-|--------|------|---------|-------------|
-| id | serial | | Preference ID |
-| userId | varchar | | User (FK, unique) |
-| preferredCategories | jsonb | [] | Preferred categories |
-| skillLevel | text | 'beginner' | Skill level |
-| learningGoals | jsonb | [] | Learning objectives |
-| preferredResourceTypes | jsonb | [] | Content types |
-| timeCommitment | text | 'flexible' | daily, weekly, flexible |
-| createdAt | timestamp | NOW() | Creation time |
-| updatedAt | timestamp | NOW() | Last update |
-
-**Constraints**:
-- Unique on `userId` (one preferences record per user)
-
-### User Interactions
-**Purpose**: Behavioral analytics for recommendations
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | serial | Interaction ID |
-| userId | varchar | User (FK) |
-| resourceId | integer | Resource (FK) |
-| interactionType | text | view, click, bookmark, rate, complete |
-| interactionValue | integer | Rating (1-5) or duration (seconds) |
-| metadata | jsonb | Additional data |
-| timestamp | timestamp | When occurred |
-
-**Indexes**:
-- `idx_user_interactions_user_id` - User behavior analysis
-- `idx_user_interactions_resource_id` - Resource popularity
-- `idx_user_interactions_type` - Filter by interaction type
-
----
-
-## GitHub Synchronization
-
-### GitHub Sync Queue Table
-**Purpose**: Async import/export operations
-
-| Column | Type | Default | Description |
-|--------|------|---------|-------------|
-| id | serial | | Queue ID |
-| repositoryUrl | text | | GitHub repo URL |
-| branch | text | 'main' | Target branch |
-| resourceIds | jsonb | [] | Resources to sync |
-| action | text | | import, export |
-| status | text | 'pending' | pending, processing, completed, failed |
-| errorMessage | text | | Error if failed |
-| metadata | jsonb | {} | Additional data |
-| createdAt | timestamp | NOW() | Queued time |
-| processedAt | timestamp | | Completion time |
-
-**Index**: `idx_github_sync_queue_status` - Process queue efficiently
-
-### GitHub Sync History Table
-**Purpose**: Version control and rollback
-
-| Column | Type | Default | Description |
-|--------|------|---------|-------------|
-| id | serial | | History ID |
-| repositoryUrl | text | | GitHub repo |
-| direction | text | | export, import |
-| commitSha | text | | Git commit hash |
-| commitMessage | text | | Commit message |
-| commitUrl | text | | GitHub commit URL |
-| resourcesAdded | integer | 0 | Added count |
-| resourcesUpdated | integer | 0 | Updated count |
-| resourcesRemoved | integer | 0 | Removed count |
-| totalResources | integer | 0 | Total after sync |
-| performedBy | varchar | | User who synced |
-| snapshot | jsonb | {} | Resource snapshot |
-| metadata | jsonb | {} | Additional data |
-| createdAt | timestamp | NOW() | Sync time |
-
-**Indexes**:
-- `idx_github_sync_history_repo` - Track history by repo
-- `idx_github_sync_history_direction` - Filter by import/export
-
----
-
-## Supporting Tables
-
-### Tags Table
-**Purpose**: Flexible cross-cutting resource labels
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| id | serial | PK | Tag ID |
-| name | text | NOT NULL, UNIQUE | Display name |
-| slug | text | NOT NULL, UNIQUE | URL-friendly |
-| createdAt | timestamp | DEFAULT NOW() | Creation time |
-
-### Resource Tags (Junction)
-**Purpose**: Many-to-many relationship between resources and tags
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| resourceId | integer | FK → resources.id, PK | Resource |
-| tagId | integer | FK → tags.id, PK | Tag |
-
-Composite primary key on `(resourceId, tagId)`.
-
-### Awesome Lists Table
-**Purpose**: External curated list references
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | serial | List ID |
-| title | text | List name |
-| description | text | List description |
-| repoUrl | text | GitHub repo URL |
-| sourceUrl | text | Raw markdown URL |
-
-Used for importing resources from community awesome lists.
-
-### Sessions Table
-**Purpose**: HTTP session storage for Passport.js
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
 | sid | varchar | PK | Session ID |
-| sess | jsonb | NOT NULL | Session data |
-| expire | timestamp | NOT NULL | Expiration time |
+| sess | jsonb | NOT NULL | Session payload |
+| expire | timestamp | NOT NULL | Expiry (indexed: `IDX_session_expire`) |
 
-**Index**: `IDX_session_expire` - Efficient expiration cleanup
+### users
+Supports Replit OAuth (email, no password) and local auth (bcrypt password).
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | varchar | PK, default `gen_random_uuid()` | UUID |
+| email | varchar | UNIQUE | Login email |
+| password | varchar | nullable | bcrypt hash (local auth only) |
+| first_name | varchar | | |
+| last_name | varchar | | |
+| profile_image_url | varchar | | |
+| role | text | default `'user'` | `user`, `admin`, `moderator` |
+| deletion_requested_at | timestamp | nullable | Set when a user requests account/data deletion from their profile; admins action it privately. NULL = no pending request |
+| created_at | timestamp | default now | |
+| updated_at | timestamp | default now | |
+
+### api_keys
+Hashed API keys for the public/programmatic API. Only the SHA-256 hash is stored; the
+plaintext key is shown once at creation.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | varchar | PK, default uuid | |
+| user_id | varchar | FK → users.id, CASCADE, NOT NULL | Owner |
+| key | varchar | NOT NULL, UNIQUE | SHA-256 hash |
+| name | varchar | NOT NULL | User label |
+| scopes | jsonb (`string[]`) | default `[]`, NOT NULL | Permission scopes |
+| created_at | timestamp | default now, NOT NULL | |
+| last_used_at | timestamp | nullable | |
+| expires_at | timestamp | nullable | Null = non-expiring |
+| revoked_at | timestamp | nullable | Non-null = revoked |
+
+Indexes: `idx_api_keys_user_id`, `idx_api_keys_key`, `idx_api_keys_expires_at`.
+
+### password_reset_tokens
+Single-use, hashed tokens for the self-service "forgot password" flow. A token is valid
+only while `used_at IS NULL AND expires_at > now()`, and is atomically claimed at
+redemption. Cascade-deletes with the owning user.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | varchar | PK, default uuid | |
+| user_id | varchar | FK → users.id, CASCADE, NOT NULL | |
+| token_hash | varchar | NOT NULL, UNIQUE | SHA-256 hash |
+| expires_at | timestamp | NOT NULL | |
+| used_at | timestamp | nullable | |
+| created_at | timestamp | default now, NOT NULL | |
+
+Indexes: `idx_password_reset_tokens_user_id`, `idx_password_reset_tokens_expires_at`.
 
 ---
 
-## Key Database Features
+## Content & taxonomy
 
-### Indexes for Performance
+### resources
+Core content entity. Supports the 3-level taxonomy and an approval workflow.
 
-1. **Resource Queries**
-   - `idx_resources_status` - Filter approved/pending
-   - `idx_resources_status_category` - Browse by category
-   - `idx_resources_category` - Category navigation
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| title | text | NOT NULL | |
+| url | text | NOT NULL, UNIQUE | Prevents duplicates |
+| description | text | NOT NULL, default `''` | |
+| category | text | NOT NULL | Matches `categories.name` (text, not FK) |
+| subcategory | text | nullable | |
+| sub_subcategory | text | nullable | |
+| status | text | default `'approved'` | `pending`, `approved`, `rejected`, `archived` |
+| submitted_by | varchar | FK → users.id, CASCADE | |
+| approved_by | varchar | FK → users.id | |
+| approved_at | timestamp | nullable | |
+| github_synced | boolean | default false | |
+| last_synced_at | timestamp | nullable | |
+| metadata | jsonb | default `{}` | AI enrichment data, etc. |
+| created_at | timestamp | default now | |
+| updated_at | timestamp | default now | |
+| search_tsv | tsvector | GENERATED ALWAYS | Full-text index over title+description+url (BUG-018, `migrations/0029_search_fts.sql`) |
 
-2. **User Activity**
-   - `idx_user_interactions_user_id` - User analytics
-   - `idx_user_interactions_resource_id` - Resource analytics
-   - `idx_user_journey_progress_user_id` - Progress tracking
+Indexes: `idx_resources_status`, `idx_resources_status_category`, `idx_resources_category`,
+and a GIN index `idx_resources_search_tsv` on the generated `search_tsv` column.
 
-3. **Admin Operations**
-   - `idx_resource_edits_status` - Pending edits
-   - `idx_enrichment_jobs_status` - Job monitoring
-   - `idx_github_sync_queue_status` - Queue processing
+**Categories are referenced by text**, not foreign keys — `resources.category`/`subcategory`/`sub_subcategory`
+match the corresponding taxonomy row's `name`. This keeps imports and taxonomy evolution flexible.
 
-### Cascade Delete Policies
+**Approval workflow:** submissions start `pending` (public submissions) or `approved`
+(admin/import); admins move them to `approved`/`rejected`; archived rows are hidden but
+retained. Public read endpoints serve `status = 'approved'`.
 
-**CASCADE**: Child records deleted with parent
-- categories → subcategories → subSubcategories
-- learningJourneys → journeySteps
-- enrichmentJobs → enrichmentQueue
-- users → userFavorites, userBookmarks, userPreferences
+### categories
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | serial | PK |
+| name | text | NOT NULL, UNIQUE |
+| slug | text | NOT NULL, UNIQUE |
 
-**SET NULL**: Preserve history after deletion
-- resourceAuditLog.resourceId (when resource deleted)
-- resourceAuditLog.performedBy (when user deleted)
+### subcategories
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | serial | PK |
+| name | text | NOT NULL |
+| slug | text | NOT NULL |
+| category_id | integer | FK → categories.id, CASCADE |
 
-**NO ACTION**: Prevent deletion if referenced
-- resources.submittedBy (must keep user if they have resources)
+Unique constraint `subcategories_slug_category_unique` on `(slug, category_id)`.
 
-### JSONB Columns for Flexibility
+### sub_subcategories
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | serial | PK |
+| name | text | NOT NULL |
+| slug | text | NOT NULL |
+| subcategory_id | integer | FK → subcategories.id, CASCADE |
 
-| Table | Column | Purpose |
-|-------|--------|---------|
-| resources | metadata | AI enrichment data, custom fields |
-| resourceEdits | proposedChanges | Field-by-field change tracking |
-| resourceEdits | claudeMetadata | AI suggestions |
-| enrichmentQueue | aiMetadata | Claude analysis results |
-| userPreferences | preferredCategories | Category preferences |
-| userInteractions | metadata | Interaction context |
-| githubSyncHistory | snapshot | Point-in-time resource state |
+Unique constraint `sub_subcategories_slug_subcategory_unique` on `(slug, subcategory_id)`.
+
+> Taxonomy writes are additionally validated by the shared content rules in
+> [`shared/validation.ts`](../shared/validation.ts) (`taxonomyNameSchema`, `slugSchema`) —
+> Drizzle/Zod only enforce column types, so these guard against HTML/control chars,
+> over-long names, and path-like slugs.
+
+### tags / resource_tags
+`tags`: `id` serial PK, `name` text NOT NULL UNIQUE, `slug` text NOT NULL UNIQUE, `created_at`.
+
+`resource_tags` (junction): `resource_id` (FK resources, CASCADE) + `tag_id` (FK tags,
+CASCADE), composite primary key `(resource_id, tag_id)`.
+
+### awesome_lists
+External awesome-list sources for import.
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | serial | PK |
+| title | text | NOT NULL |
+| description | text | NOT NULL, default `''` |
+| repo_url | text | NOT NULL |
+| source_url | text | NOT NULL |
 
 ---
 
-## Database Migrations
+## Workflow & audit
 
-Migrations are managed using **Drizzle Kit**. For detailed migration procedures, upgrade guides, and best practices, see [DATABASE_MIGRATIONS.md](./DATABASE_MIGRATIONS.md).
+### resource_edits
+Crowdsourced edit suggestions, optionally analyzed by Claude before an admin approves/rejects.
 
-### Quick Reference
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| resource_id | integer | FK → resources.id, NOT NULL | |
+| submitted_by | varchar | FK → users.id, NOT NULL | |
+| status | text | default `'pending'`, NOT NULL | `pending`, `approved`, `rejected` |
+| original_resource_updated_at | timestamp | NOT NULL | Conflict detection |
+| proposed_changes | jsonb | NOT NULL | Field-by-field `{ old, new }` |
+| proposed_data | jsonb | NOT NULL | Full proposed resource |
+| claude_metadata | jsonb | nullable | AI suggestions |
+| claude_analyzed_at | timestamp | nullable | |
+| handled_by | varchar | FK → users.id | |
+| handled_at | timestamp | nullable | |
+| rejection_reason | text | nullable | |
+| created_at | timestamp | default now, NOT NULL | |
+| updated_at | timestamp | default now, NOT NULL | |
 
-**Push Schema Changes:**
+Indexes: `idx_resource_edits_resource_id`, `idx_resource_edits_status`, `idx_resource_edits_submitted_by`.
+
+The set of fields a user may edit is whitelisted by `EDITABLE_RESOURCE_FIELDS` in
+`shared/schema.ts` (title, description, url, tags, category, subcategory, subSubcategory).
+
+### resource_audit_log
+Complete change history. Survives resource and user deletion.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| resource_id | integer | FK → resources.id, **SET NULL** | Current reference |
+| original_resource_id | integer | nullable, never nullified | Preserves history after delete |
+| action | text | NOT NULL | `created`, `updated`, `approved`, `rejected`, `synced`, `deleted` |
+| performed_by | varchar | FK → users.id, **SET NULL** | |
+| changes | jsonb | nullable | `{ field: { old, new } }` |
+| notes | text | nullable | |
+| created_at | timestamp | default now | |
+
+Design: `resource_id`/`performed_by` use `SET NULL` on delete so the log persists;
+`original_resource_id` is denormalized and never cleared, so history stays queryable even
+after a resource is removed. (See `scripts/migrate-audit-log-original-resource-id.ts` for
+the one-off backfill.)
+
+---
+
+## Learning journeys
+
+### learning_journeys
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| title | text | NOT NULL | |
+| description | text | NOT NULL | |
+| difficulty | text | default `'beginner'` | `beginner`, `intermediate`, `advanced` |
+| estimated_duration | text | nullable | e.g. "20 hours" |
+| icon | text | nullable | |
+| order_index | integer | nullable | Sort order |
+| category | text | NOT NULL | |
+| status | text | default `'published'` | `draft`, `published`, `archived` |
+| created_at / updated_at | timestamp | default now | |
+
+### journey_steps
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | serial | PK |
+| journey_id | integer | FK → learning_journeys.id, CASCADE, NOT NULL |
+| resource_id | integer | FK → resources.id, CASCADE (optional) |
+| step_number | integer | NOT NULL |
+| title | text | NOT NULL |
+| description | text | nullable |
+| is_optional | boolean | default false |
+| created_at | timestamp | default now |
+
+Indexes: `idx_journey_steps_journey_id`, `idx_journey_steps_resource_id`.
+
+### user_journey_progress
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | serial | PK |
+| user_id | varchar | FK → users.id, CASCADE, NOT NULL |
+| journey_id | integer | FK → learning_journeys.id, CASCADE, NOT NULL |
+| current_step_id | integer | FK → journey_steps.id |
+| completed_steps | jsonb (`number[]`) | default `[]` |
+| started_at | timestamp | default now |
+| last_accessed_at | timestamp | default now |
+| completed_at | timestamp | nullable |
+
+Unique constraint `user_journey_unique` on `(user_id, journey_id)`.
+Indexes: `idx_user_journey_progress_user_id`, `idx_user_journey_progress_journey_id`.
+
+---
+
+## User engagement & personalization
+
+### user_favorites
+`user_id` (FK users, CASCADE) + `resource_id` (FK resources, CASCADE) + `created_at`.
+Composite PK `(user_id, resource_id)`.
+
+### user_bookmarks
+Same shape as `user_favorites` plus a `notes` text column. Composite PK `(user_id, resource_id)`.
+
+### user_preferences
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| user_id | varchar | FK → users.id, CASCADE, NOT NULL | Unique (`user_preferences_user_id_unique`) |
+| preferred_categories | jsonb (`string[]`) | default `[]` | |
+| skill_level | text | default `'beginner'`, NOT NULL | `beginner`, `intermediate`, `advanced` |
+| learning_goals | jsonb (`string[]`) | default `[]` | |
+| preferred_resource_types | jsonb (`string[]`) | default `[]` | |
+| time_commitment | text | default `'flexible'` | `daily`, `weekly`, `flexible` |
+| created_at / updated_at | timestamp | default now | |
+
+Index: `idx_user_preferences_user_id`.
+
+### user_interactions
+Behavioral events for analytics and recommendations.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| user_id | varchar | FK → users.id, CASCADE, NOT NULL | |
+| resource_id | integer | FK → resources.id, CASCADE, NOT NULL | |
+| interaction_type | text | NOT NULL | `view`, `click`, `bookmark`, `rate`, `complete` |
+| interaction_value | integer | nullable | Rating (1–5) or time spent |
+| metadata | jsonb | default `{}` | |
+| timestamp | timestamp | default now | |
+
+Indexes: `idx_user_interactions_user_id`, `idx_user_interactions_resource_id`, `idx_user_interactions_type`.
+
+---
+
+## GitHub sync
+
+### github_sync_queue
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| repository_url | text | NOT NULL | |
+| branch | text | default `'main'` | |
+| resource_ids | jsonb (`number[]`) | default `[]` | |
+| action | text | NOT NULL | `import`, `export` |
+| status | text | default `'pending'` | `pending`, `processing`, `completed`, `failed` |
+| error_message | text | nullable | |
+| metadata | jsonb | default `{}` | |
+| created_at / processed_at | timestamp | | |
+
+Index: `idx_github_sync_queue_status`.
+
+### github_sync_history
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| repository_url | text | NOT NULL | |
+| direction | text | NOT NULL | `export`, `import` |
+| commit_sha / commit_message / commit_url | text | nullable | |
+| resources_added / resources_updated / resources_removed / total_resources | integer | default 0 | |
+| performed_by | varchar | FK → users.id | |
+| snapshot | jsonb | default `{}` | Resource snapshot at sync time |
+| metadata | jsonb | default `{}` | |
+| created_at | timestamp | default now | |
+
+Indexes: `idx_github_sync_history_repo`, `idx_github_sync_history_direction`.
+
+---
+
+## AI enrichment, research & agents
+
+### enrichment_jobs
+Batch AI enrichment tracking. Supports a per-run Claude Agent SDK config (custom model,
+endpoint, and encrypted auth token).
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| status | text | default `'pending'`, NOT NULL | `pending`, `processing`, `completed`, `failed`, `cancelled` |
+| filter | text | default `'all'` | `all`, `unenriched` |
+| batch_size | integer | default 10 | |
+| total_resources / processed_resources / successful_resources / failed_resources / skipped_resources | integer | default 0 | |
+| processed_resource_ids / failed_resource_ids | jsonb (`number[]`) | default `[]` | |
+| error_message | text | nullable | |
+| metadata | jsonb | default `{}` | |
+| model | text | nullable | Per-run model override |
+| base_url | text | nullable | Custom endpoint |
+| auth_token_encrypted | text | nullable | AES-256-GCM `ivHex:tagHex:cipherHex`; null = platform default |
+| auth_token_last4 | text | nullable | Display hint |
+| started_by | varchar | FK → users.id | |
+| started_at / completed_at / created_at / updated_at | timestamp | | |
+
+Indexes: `idx_enrichment_jobs_status`, `idx_enrichment_jobs_started_by`.
+
+### enrichment_queue
+Per-resource enrichment tasks with retry logic.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| id | serial | PK | |
+| job_id | integer | FK → enrichment_jobs.id, CASCADE, NOT NULL | |
+| resource_id | integer | FK → resources.id, CASCADE, NOT NULL | |
+| status | text | default `'pending'`, NOT NULL | `pending`, `processing`, `completed`, `failed`, `skipped` |
+| retry_count | integer | default 0 | |
+| max_retries | integer | default 3 | |
+| error_message | text | nullable | |
+| ai_metadata | jsonb | nullable | Claude results (suggested title/description/tags/category, confidence, keyTopics) |
+| processed_at / created_at / updated_at | timestamp | | |
+
+Indexes: `idx_enrichment_queue_job_id`, `idx_enrichment_queue_resource_id`, `idx_enrichment_queue_status`.
+
+### research_jobs
+Claude Agent SDK research runs that discover new candidate resources. Shares the same
+per-run agent config (model/base_url/encrypted token) as enrichment jobs and tracks token
+usage and cost.
+
+Key columns: `status`, `prompt` (NOT NULL), `category_focus`, `max_budget_usd`
+(default `'1.00'`), `max_turns` (default 30), agent config (`model`, `base_url`,
+`auth_token_encrypted`, `auth_token_last4`), discovery counters
+(`total_discoveries`, `approved_discoveries`, `rejected_discoveries`, `duplicates_skipped`),
+token/cost accounting (`total_input_tokens`, `total_output_tokens`, `estimated_cost_usd`,
+`turns_used`), `agent_log` jsonb, `started_by` (FK users), and timestamps.
+Indexes: `idx_research_jobs_status`, `idx_research_jobs_started_by`.
+
+### research_discoveries
+Candidate resources produced by a research job, pending admin review.
+
+Key columns: `job_id` (FK research_jobs, CASCADE), `title`/`url` (NOT NULL), `description`,
+`suggested_category`/`suggested_subcategory`/`suggested_sub_subcategory`, `confidence`,
+`reasoning`, `status` (default `'pending_review'`), `approved_at`/`rejected_at`/`rejection_reason`,
+`created_resource_id` (FK resources — set when a discovery is promoted), `created_at`.
+Indexes: `idx_research_discoveries_job_id`, `idx_research_discoveries_status`,
+`idx_research_discoveries_url`, plus a **unique index** `research_discoveries_job_url_uq`
+on `(job_id, url)` (closes a save-retry double-insert race).
+
+### agent_events
+Structured, persisted log of Claude Agent SDK multi-agent runs. Polymorphic across both
+flows: `(job_type, job_id)` points at `research_jobs` or `enrichment_jobs`. Rows are
+appended in stream order (`seq`) and feed the admin log viewer and the agent communication graph.
+
+Key columns: `job_type` (`research`|`enrichment`), `job_id`, `seq`, `actor`, `actor_type`
+(`orchestrator`|`subagent`|`tool`|`system`), `event_type`
+(`lifecycle`|`message`|`thinking`|`tool_call`|`tool_result`|`delegation`|`delegation_result`|`result`|`error`),
+`model`, `target_actor`, `summary`, `detail` jsonb, token/cost/duration metrics, `ts`.
+Indexes: `idx_agent_events_job` on `(job_type, job_id)` and `idx_agent_events_job_seq` on `(job_type, job_id, seq)`.
+
+---
+
+## Link health
+
+### link_health_jobs
+Scan-run tracking. Columns: `status` (default `'pending'`), counters `total_links`,
+`checked_links`, `healthy_links`, `broken_links`, `redirect_links`, `timeout_links`,
+`suspect_links` (all NOT NULL default 0), `error_message`, `started_at`, `completed_at`,
+`created_at` (NOT NULL default now). Index: `idx_link_health_jobs_status`.
+
+### link_health_checks
+Per-URL results. Columns: `job_id` (FK link_health_jobs, CASCADE), `resource_id`
+(default 0), `url` (NOT NULL), `status` (`healthy`|`broken`|`timeout`|`redirect`|`dns_failure`|`suspect`),
+`http_status`, `response_time`, `redirect_url`, `final_url`, `error_message`,
+`consecutive_failures` (default 0), `flagged_for_review` (default false), `last_checked_at`
+(default now). Indexes: `idx_link_health_checks_job_id`, `idx_link_health_checks_status`.
+
+> The API wire shapes `LinkHealthJob`/`LinkHealthCheck` (ISO-string dates) are TypeScript
+> interfaces in `shared/schema.ts`; the persisted rows above map to them in the link-health
+> service.
+
+---
+
+## Data integrity summary
+
+**Unique constraints**
+- `users.email`
+- `resources.url`
+- `categories.name`, `categories.slug`, `tags.name`, `tags.slug`
+- `subcategories (slug, category_id)`, `sub_subcategories (slug, subcategory_id)`
+- `user_journey_progress (user_id, journey_id)`, `user_preferences.user_id`
+- `api_keys.key`, `password_reset_tokens.token_hash`
+- `research_discoveries (job_id, url)`
+
+**Cascade vs. SET NULL**
+- Most child rows `CASCADE` on parent delete (favorites, bookmarks, tags, journey steps,
+  enrichment/research children, API keys, reset tokens).
+- `resource_audit_log.resource_id` and `.performed_by` use **SET NULL** to preserve history.
+- `resources.submitted_by` cascades on user delete; `approved_by` does not (nullable ref).
+
+---
+
+## Migrations & schema changes
+
+Two mechanisms cooperate: **`drizzle-kit push` for development** and **journaled SQL
+migrations for production**. Both derive from the same `shared/schema.ts`.
+
+### Files
+| File | Role |
+|------|------|
+| `shared/schema.ts` | Single source of truth (tables, columns, indexes, Zod schemas) |
+| `drizzle.config.ts` | Drizzle Kit config (`schema: ./shared/schema.ts`, `out: ./migrations`, dialect `postgresql`) |
+| `migrations/*.sql` | Journaled, version-controlled migrations |
+| `migrations/meta/_journal.json` | Journal that pairs each `.sql` with a timestamp; the migrator only runs journaled files |
+| `server/migrate.ts` | Boot-time migrator run by `server/index.ts` in production |
+| `scripts/migrate.ts` | Standalone Drizzle migration runner (`npx tsx scripts/migrate.ts`) |
+| `scripts/check-migration-drift.ts` | Fails if `migrations/` can no longer reproduce `shared/schema.ts` |
+| `scripts/migrate-*.ts` | One-off data-migration/backfill scripts |
+
+### Available npm scripts
+Only these DB scripts exist in `package.json` (there is **no** `db:generate` or `db:migrate`):
+
 ```bash
-npm run db:push
+npm run db:push     # drizzle-kit push  — sync shared/schema.ts into the dev database
+npm run db:studio   # drizzle-kit studio — browse/edit the database in a GUI
 ```
-Pushes schema changes directly to the database (development/prototype mode).
 
-**View Schema:**
+Migration files are generated directly with Drizzle Kit:
+
 ```bash
-npm run db:studio
-```
-Opens Drizzle Studio for visual schema exploration.
-
-For production migrations, version upgrades, and troubleshooting, refer to the [Database Migrations Guide](./DATABASE_MIGRATIONS.md).
-
----
-
-## Common Queries
-
-### Get Resources with Full Category Hierarchy
-```typescript
-const resources = await db
-  .select()
-  .from(resources)
-  .where(eq(resources.status, 'approved'))
-  .orderBy(resources.category, resources.subcategory);
+npx drizzle-kit generate    # create a new migrations/*.sql from schema changes
+npx tsx scripts/migrate.ts  # apply migrations/ to $DATABASE_URL
 ```
 
-### Get User's Journey Progress
-```typescript
-const progress = await db
-  .select()
-  .from(userJourneyProgress)
-  .innerJoin(learningJourneys, eq(userJourneyProgress.journeyId, learningJourneys.id))
-  .where(eq(userJourneyProgress.userId, userId));
+### Development workflow
+1. Edit `shared/schema.ts`.
+2. Run `npm run db:push` and confirm the diff. Drizzle syncs the dev database directly —
+   no migration file is created.
+3. Restart `npm run dev`; types flow automatically from `shared/schema.ts`.
+
+Use `db:push` for fast local iteration. When your change needs to ship to production,
+also generate a migration (below) so a fresh deploy can reproduce the schema.
+
+### Production workflow (journaled migrations + boot migrator)
+1. `npx drizzle-kit generate` — writes a new `migrations/NNNN_*.sql` and updates
+   `migrations/meta/_journal.json`. Commit both.
+2. **Make the SQL idempotent** (`IF NOT EXISTS`, `DO $$ ... duplicate_object ...` guards).
+   This is mandatory: a fresh production database has an empty journal table, so the whole
+   chain re-runs at boot.
+3. On boot, `server/index.ts` calls `runMigrations()` (`server/migrate.ts`), which:
+   - locates the `migrations/` folder (it must be shipped with the build),
+   - runs the Drizzle migrator against all journaled files,
+   - then `verifyMigrationJournal()` asserts `drizzle.__drizzle_migrations` recorded every
+     journal entry, failing the boot loudly if anything was skipped.
+   There is deliberately **no** swallowing of Postgres `42P07` ("relation already exists") —
+   a non-idempotent migration fails the boot instead of starting with a partial schema.
+4. If `migrations/` is missing but the `resources` table already exists (a database
+   provisioned via `db:push`), the boot migrator logs "schema already exists" and continues.
+
+### Migration drift check
+`scripts/check-migration-drift.ts` is part of the pre-publish gate
+(`scripts/pre-publish-gate.sh`). It:
+1. verifies every `.sql` file is journaled (and vice versa), then
+2. spins up a throwaway database, runs the migrator, and runs `drizzle-kit push --force`
+   against it — requiring **"no changes detected"**. Any diff means `migrations/` no longer
+   reproduces `shared/schema.ts`, so a fresh deploy would drift. Fix by running
+   `npx drizzle-kit generate` and committing the new migration.
+
+Run it manually with:
+
+```bash
+npx tsx scripts/check-migration-drift.ts   # exit 0 = clean, 1 = drift
 ```
 
-### Get Pending Enrichment Tasks
-```typescript
-const tasks = await db
-  .select()
-  .from(enrichmentQueue)
-  .innerJoin(resources, eq(enrichmentQueue.resourceId, resources.id))
-  .where(eq(enrichmentQueue.status, 'pending'))
-  .limit(10);
-```
-
-### Audit Trail for Resource
-```typescript
-const history = await db
-  .select()
-  .from(resourceAuditLog)
-  .leftJoin(users, eq(resourceAuditLog.performedBy, users.id))
-  .where(eq(resourceAuditLog.originalResourceId, resourceId))
-  .orderBy(desc(resourceAuditLog.createdAt));
-```
+### One-off data migrations
+For data transformations (backfills, dedupe, normalization) that aren't plain schema DDL,
+add a script under `scripts/` (e.g. `scripts/migrate-audit-log-original-resource-id.ts`)
+and run it once with `npx tsx scripts/<name>.ts`. Make these idempotent — check state
+before writing and verify counts afterward.
 
 ---
 
-## Data Integrity Constraints
+## Related documentation
 
-### Unique Constraints
-- `users.email` - One account per email
-- `resources.url` - No duplicate resources
-- `categories.name`, `categories.slug` - Unique categories
-- `subcategories (slug, categoryId)` - Unique within parent
-- `subSubcategories (slug, subcategoryId)` - Unique within parent
-- `userJourneyProgress (userId, journeyId)` - One progress per journey
-- `userPreferences.userId` - One preferences per user
-
-### Foreign Key Constraints
-All foreign keys enforce referential integrity with appropriate cascade policies.
-
-### Check Constraints
-- `resources.status` ∈ {pending, approved, rejected, archived}
-- `resourceEdits.status` ∈ {pending, approved, rejected}
-- `userPreferences.skillLevel` ∈ {beginner, intermediate, advanced}
-- `learningJourneys.difficulty` ∈ {beginner, intermediate, advanced}
-
----
-
-## Performance Considerations
-
-1. **Pagination**: All list endpoints use `LIMIT` and `OFFSET` for large result sets
-2. **Eager Loading**: Use joins to avoid N+1 queries
-3. **Index Coverage**: Critical queries covered by indexes
-4. **JSONB Indexing**: Consider GIN indexes for frequently-queried JSONB fields
-5. **Connection Pooling**: Drizzle uses connection pooling for PostgreSQL
-
----
-
-## Backup & Recovery
-
-- **Automated Backups**: Neon provides automatic daily backups
-- **Point-in-Time Recovery**: Restore to any point within retention window
-- **Audit Log**: Complete change history enables manual rollback
-- **GitHub Sync**: Regular exports serve as additional backup
-
----
-
-## Schema Evolution
-
-When modifying the schema:
-1. Update `shared/schema.ts`
-2. Generate migration: `npm run db:generate`
-3. Review migration SQL in `migrations/`
-4. Test migration locally
-5. Apply to production: `npm run db:migrate`
-6. Update this documentation
-
----
-
-## Related Documentation
-
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture overview
-- [API.md](./API.md) - API endpoints reference
-- [shared/schema.ts](../shared/schema.ts) - TypeScript schema definitions
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — system architecture overview
+- [ENVIRONMENT.md](./ENVIRONMENT.md) — environment variables (incl. `DATABASE_URL`)
+- [DEPLOYMENT.md](./DEPLOYMENT.md) — production deployment & the pre-publish gate
+- [`shared/schema.ts`](../shared/schema.ts) — the authoritative schema definitions
