@@ -19,6 +19,10 @@ A production-ready React application for browsing and discovering over 2,600 cur
 - **Rate limiter (R4-031)**: kept in-memory per-instance with documented math (deploy is single-instance; limits sized so N instances still bound abuse) — no shared store added by design.
 - **Needs republish. Prod follow-ups after republish**: run `npx tsx scripts/run24-data-fixes-prod.ts` against the live admin API (idempotent, journaled; validated on dev). Expected: link + journey-step repoints, retitles/desc rewrites (incl. 38 GitHub-slug titles), share-tracking URL cleanup, tag canonicalization. Done-check: second run fully no-op (0 mutating).
 
+## Print/responsive validation harness (July 21, 2026)
+
+The Run24D print + responsive audit harnesses are now repeatable validation steps: `scripts/validation/print-audit.mjs` (49 checks — no-print/print-only pairs, shell chrome hide, print-keep-text exemption across 9 routes, PLUS a positive `content-prints` assertion (≥200 visible chars in print media) and a `pdf-not-blank` size guard on every route so a print stylesheet that blanks a page can never pass) and `scripts/validation/responsive-audit.mjs` (17 checks — profile header overlap 640–1440, wrapped tablist radius, mobile breadcrumb @375/320, forced-colors button borders). Both are registered as validation commands (`print-audit`, `responsive-audit`), wait up to 120s for the dev server on :5000 (safe to run in parallel with app startup), require `ADMIN_PASSWORD`, resolve sample resource/journey/category ids from the live API, retry admin login on 429, exit 1 on any failure, and drop evidence (PDFs/PNGs/JSON) in `/tmp/validation/<name>/`. Run them after any UI/print-stylesheet change.
+
 ## Design-System scope (MR-DS-13)
 
 The Awesome.Video DS contract documented in `docs/` + `HANDOFF.md` is implemented with three intentional, in-repo divergences from the canonical handoff. Every future Stage-5/Stage-6 DS sweep should treat these as architectural decisions, not per-occurrence violations:
