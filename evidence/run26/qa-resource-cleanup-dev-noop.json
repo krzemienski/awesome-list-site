@@ -1,0 +1,38 @@
+{
+  "startedAt": "2026-07-21T02:46:14.299Z",
+  "base": "http://localhost:5000",
+  "actions": [
+    {
+      "step": "scanned-pending",
+      "totalPending": 0,
+      "placeholderMatches": 0
+    },
+    {
+      "step": "non-pending-residue-report-only",
+      "count": 1,
+      "rows": [
+        {
+          "id": 187906,
+          "status": "approved",
+          "url": "http://example.com/x",
+          "title": "StreamPack - Multiprotocol live streaming broadcaster libraries for Android"
+        }
+      ]
+    },
+    {
+      "step": "delete",
+      "action": "no-op",
+      "reason": "no pending placeholder resources"
+    },
+    {
+      "step": "verify",
+      "pendingAfter": 0,
+      "remainingPlaceholders": 0,
+      "remainingIds": []
+    }
+  ],
+  "deletedRows": [],
+  "completedAt": "2026-07-21T02:46:15.165Z",
+  "succeeded": 0,
+  "failed": 0
+}
