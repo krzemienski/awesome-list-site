@@ -270,3 +270,9 @@ id = "ftqt7u2mW5N4VQrfKMYn3"
 uri = "file://.local/brand-directions/dirC.png"
 type = "image"
 title = "Direction C — Terminal Prompt"
+
+[[outputs]]
+id = "uSK-SyjlT6TOw9EaJWsrX"
+uri = "file://.local/brand-directions/logo-choices.png"
+type = "image"
+title = "Logo Mark Choices — 6 options, editorial voice locked"
