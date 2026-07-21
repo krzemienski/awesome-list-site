@@ -12,6 +12,12 @@
 - DB sweeps all 0: slug titles, shortcodes, missing ext-spaces, tracking URLs, IMSC acronym, speaker-bio descs; Demuxed Podcast approved count = 1.
 - tsc clean; migration-drift ✅ no drift; app serving 200.
 
+## Prod run (July 21, 2026 — post-republish)
+- Run 1 (pre-republish, 00:32Z): all repoints/retitles/desc fixes already-noop; canonicalize-tags found 0 (old endpoint still deployed) — superseded.
+- Run 2 (post-republish, ~01:10Z): 49 actions, **1 mutating** — canonicalize-tags (upgraded endpoint) fired: 84 variant families, 49 plural merges, 351 resources updated. All other phases noop as expected (fixes had landed via earlier prod scripts).
+- Run 3 (01:17Z): **full no-op** — 0 mutating; canonicalize-tags 0/0/0. Journal on disk (`data-fixes-prod.json`) is this final no-op run.
+- Spot-checks live: 185455 → https://pub.smpte.org/doc/st2084/ ✅; 187995 title "SVT-AV1 (GitLab)" ✅; exactly one approved "Demuxed Podcast" (187950) ✅.
+
 ## Prod notes (for post-republish run)
 - Prod-only rows (187995 SVT-AV1, 187950 Demuxed survivor) log absent/no-dup noops on dev — expected; on prod the retitle + dedup will fire.
 - Plural query alias for tag filters would need a client change (out of scope; client normalizeTag already folds separators).
