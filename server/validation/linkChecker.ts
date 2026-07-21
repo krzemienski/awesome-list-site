@@ -563,6 +563,77 @@ export function formatLinkCheckReport(report: LinkCheckReport): string {
 }
 
 /**
+ * Second-pass verification with a real browser User-Agent (strict dead-link
+ * policy, per .agents/memory/link-scan-false-positives.md): a datacenter-IP
+ * scan over-flags by ~100x because sites bot-block HEAD/bot-UA requests with
+ * 403/429/connect-timeouts. Only classify as dead:
+ *   - DNS ENOTFOUND
+ *   - ECONNREFUSED
+ *   - browser-UA-confirmed HTTP 404/410
+ *   - SSL certificate failures (browsers block those for humans too)
+ * Everything else (403/401/429/999, 5xx, timeouts, resets) is treated as
+ * bot-block/temporary and must NOT appear as a problem link.
+ */
+
+const BROWSER_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+
+export interface BrowserVerification {
+  /** HTTP status number, or an "ERR:<code>" string for network failures */
+  status: number | string;
+  finalUrl?: string;
+  /** true only when the strict dead-link policy confirms the link is dead */
+  confirmedDead: boolean;
+  /** true when the browser-UA GET got a 2xx/3xx (definitively alive) */
+  confirmedAlive: boolean;
+  /** human-readable classification for the errorMessage column */
+  verdict: string;
+}
+
+export function classifyBrowserVerification(status: number | string): Pick<BrowserVerification, 'confirmedDead' | 'confirmedAlive' | 'verdict'> {
+  if (typeof status === 'string') {
+    if (status.includes('ENOTFOUND')) return { confirmedDead: true, confirmedAlive: false, verdict: 'dead: DNS not found (browser-UA verified)' };
+    if (status.includes('ECONNREFUSED')) return { confirmedDead: true, confirmedAlive: false, verdict: 'dead: connection refused (browser-UA verified)' };
+    if (/CERT|LEAF_SIGNATURE|UNABLE_TO_VERIFY|SELF_SIGNED|DEPTH_ZERO/i.test(status)) {
+      return { confirmedDead: true, confirmedAlive: false, verdict: `dead: SSL failure (${status})` };
+    }
+    // Connect timeouts / resets from a datacenter IP are the classic
+    // bot-block signature (e.g. UND_ERR_CONNECT_TIMEOUT) — never dead.
+    return { confirmedDead: false, confirmedAlive: false, verdict: `likely bot-block (${status} under browser UA)` };
+  }
+  if (status >= 200 && status < 400) return { confirmedDead: false, confirmedAlive: true, verdict: `alive: ${status} under browser UA (bot-block false positive)` };
+  if (status === 404 || status === 410) return { confirmedDead: true, confirmedAlive: false, verdict: `dead: ${status} confirmed under browser UA` };
+  // 401/403/429/999, 5xx and anything else: bot-block, auth wall, or
+  // transient server trouble — alive per the strict policy.
+  return { confirmedDead: false, confirmedAlive: false, verdict: `likely bot-block/auth wall (${status} under browser UA)` };
+}
+
+export async function browserVerifyLink(url: string, timeoutMs = 15000): Promise<BrowserVerification> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const r = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+      signal: ctrl.signal,
+      headers: {
+        'User-Agent': BROWSER_UA,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+    });
+    // Drain/cancel the body so sockets are released promptly.
+    try { await (r.body as any)?.cancel?.(); } catch { /* ignore */ }
+    return { status: r.status, finalUrl: r.url, ...classifyBrowserVerification(r.status) };
+  } catch (e: any) {
+    const code = 'ERR:' + (e?.cause?.code || e?.code || e?.name || 'unknown');
+    return { status: code, ...classifyBrowserVerification(code) };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/**
  * Check links from resource objects
  */
 export async function checkResourceLinks(

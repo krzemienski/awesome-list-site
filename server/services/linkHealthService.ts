@@ -3,7 +3,7 @@ import { linkHealthJobs, linkHealthChecks } from "@shared/schema";
 import { db } from "../db";
 import { desc, eq, ne, and, inArray, lt } from "drizzle-orm";
 import { storage } from "../storage";
-import { checkResourceLinks, type LinkCheckResult } from "../validation/linkChecker";
+import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
 
 function mapResultToStatus(result: LinkCheckResult): LinkHealthCheck['status'] {
   // 200-at-face-value but takeover/intent-flip/parked heuristics fired:
@@ -182,8 +182,59 @@ export const linkHealthService = {
         return;
       }
 
+      // Second verification pass (strict dead-link policy, see
+      // .agents/memory/link-scan-false-positives.md): the pass-1 sweep from
+      // this datacenter IP over-flags bot-blocked sites (403/429/timeouts)
+      // by ~100x. Re-check every pass-1 failure with a real browser UA and
+      // only keep it as a problem link if the strict policy confirms it dead
+      // (DNS/refused/404-410/SSL). Everything else is reclassified healthy
+      // with the verification verdict recorded in errorMessage.
+      const statuses = new Map<LinkCheckResult, LinkHealthCheck['status']>();
+      for (const r of report.results) statuses.set(r, mapResultToStatus(r));
+      const toVerify = report.results.filter(r => {
+        const s = statuses.get(r)!;
+        return s === 'broken' || s === 'timeout' || s === 'dns_failure';
+      });
+      console.log(`[LinkHealth] Job ${jobId}: pass 1 flagged ${toVerify.length} link(s); starting browser-UA verification pass`);
+      const verdicts = new Map<LinkCheckResult, string>();
+      const VERIFY_CONC = 10;
+      let verified = 0;
+      for (let i = 0; i < toVerify.length; i += VERIFY_CONC) {
+        const batch = toVerify.slice(i, i + VERIFY_CONC);
+        await Promise.all(batch.map(async (r) => {
+          const v = await browserVerifyLink(r.url);
+          if (v.confirmedDead) {
+            // Keep the pass-1 status unless the browser check refined it
+            // (e.g. timeout in pass 1, 404 under browser UA -> broken).
+            if (typeof v.status === 'number') statuses.set(r, 'broken');
+            else if (String(v.status).includes('ENOTFOUND')) statuses.set(r, 'dns_failure');
+            else statuses.set(r, 'broken');
+          } else {
+            // Bot-block / auth wall / transient — alive per policy.
+            statuses.set(r, 'healthy');
+          }
+          verdicts.set(r, v.verdict);
+        }));
+        verified += batch.length;
+        // Reuse checkedLinks-style progress logging (throttled by batch).
+        if (verified % 50 < VERIFY_CONC) {
+          console.log(`[LinkHealth] Job ${jobId}: verification pass ${verified}/${toVerify.length}`);
+        }
+      }
+
+      // Re-check cancellation after the (potentially minutes-long) pass 2.
+      const [afterVerify] = await db
+        .select({ status: linkHealthJobs.status })
+        .from(linkHealthJobs)
+        .where(eq(linkHealthJobs.id, jobId));
+      if (!afterVerify || afterVerify.status !== 'processing') {
+        console.log(`[LinkHealth] Job ${jobId} is no longer processing after verification pass; discarding results`);
+        return;
+      }
+
       const checkRows = report.results.map(result => {
-        const status = mapResultToStatus(result);
+        const status = statuses.get(result)!;
+        const verdict = verdicts.get(result);
         return {
           jobId,
           resourceId: result.resourceId || 0,
@@ -193,7 +244,9 @@ export const linkHealthService = {
           responseTime: result.responseTime,
           redirectUrl: result.redirectUrl,
           finalUrl: result.finalUrl,
-          errorMessage: result.suspicionDetail || result.error,
+          errorMessage: verdict
+            ? [verdict, result.error].filter(Boolean).join(' | ')
+            : (result.suspicionDetail || result.error),
           consecutiveFailures: status === 'healthy' ? 0 : 1,
           flaggedForReview: status === 'broken' || status === 'dns_failure' || status === 'suspect',
           lastCheckedAt: new Date(),
@@ -206,16 +259,23 @@ export const linkHealthService = {
         await db.insert(linkHealthChecks).values(checkRows.slice(i, i + CHUNK));
       }
 
-      const suspectCount = report.results.filter(r => r.valid && r.suspicion).length;
+      // Counters derive from the post-verification statuses so they always
+      // match the persisted rows (R4-044: one dataset).
+      const countBy = (s: LinkHealthCheck['status']) => checkRows.filter(r => r.status === s).length;
+      const healthyCount = countBy('healthy');
+      const suspectCount = countBy('suspect');
+      const brokenCount = countBy('broken') + countBy('dns_failure');
+      const redirectCount = countBy('redirect');
+      const timeoutCount = countBy('timeout');
       await db
         .update(linkHealthJobs)
         .set({
           checkedLinks: report.totalLinks,
-          healthyLinks: report.validLinks - suspectCount,
+          healthyLinks: healthyCount,
           suspectLinks: suspectCount,
-          brokenLinks: report.brokenLinks,
-          redirectLinks: report.redirects,
-          timeoutLinks: report.results.filter(r => r.statusText === 'Timeout').length,
+          brokenLinks: brokenCount,
+          redirectLinks: redirectCount,
+          timeoutLinks: timeoutCount,
           status: 'completed',
           completedAt: new Date(),
         })
@@ -225,7 +285,7 @@ export const linkHealthService = {
       // checks are ever served, and each scan writes ~1,800 rows.
       await db.delete(linkHealthChecks).where(lt(linkHealthChecks.jobId, jobId));
 
-      console.log(`[LinkHealth] Check completed for job ${jobId}: ${report.validLinks - suspectCount} healthy, ${suspectCount} suspect, ${report.brokenLinks} broken, ${report.redirects} redirects out of ${report.totalLinks} total`);
+      console.log(`[LinkHealth] Check completed for job ${jobId}: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
     } catch (err: any) {
       await db
         .update(linkHealthJobs)
