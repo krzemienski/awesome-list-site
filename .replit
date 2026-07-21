@@ -8,7 +8,7 @@ packages = ["jq", "chromium", "glib", "nss", "nspr", "atk", "cups", "libdrm", "l
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
+build = ["bash", "scripts/pre-publish-gate.sh"]
 run = ["npm", "run", "start"]
 
 [[ports]]

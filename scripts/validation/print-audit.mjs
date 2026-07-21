@@ -120,6 +120,14 @@ async function printCheck(ctx, route, name, checks, pdfOpts = {}) {
   const page = await ctx.newPage();
   await page.goto(BASE + route, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
   await page.waitForSelector('main, [role="main"], h1', { timeout: 15000 }).catch(() => {});
+  // Wait for the SPA to actually mount meaningful content into #root — a fixed
+  // sleep flakes under CPU contention (e.g. audits running in parallel with app
+  // startup): the page can still be showing only the NOSCRIPT/skeleton text,
+  // which makes content-prints/pdf-not-blank fail spuriously (seen on /admin).
+  await page.waitForFunction(
+    () => ((document.getElementById('root')?.innerText || '').trim().length > 300),
+    null, { timeout: 30000 }
+  ).catch(() => {});
   await page.waitForTimeout(1500);
   await page.emulateMedia({ media: 'print' });
   await page.waitForTimeout(300);
