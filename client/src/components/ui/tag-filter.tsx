@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, X } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
+import { normalizeTag } from "@/lib/tags";
 
 interface TagFilterProps {
   resources: Resource[];
@@ -35,9 +36,14 @@ export default function TagFilter({ resources, selectedTags, onTagsChange }: Tag
     return counts;
   }, [resources]);
 
+  // Compare via normalizeTag so deep-linked variants (e.g. ?tags=codecs)
+  // still check/uncheck the canonical chip (codec).
+  const isSelected = (tag: string) =>
+    selectedTags.some(t => normalizeTag(t) === normalizeTag(tag));
+
   const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      onTagsChange(selectedTags.filter(t => t !== tag));
+    if (isSelected(tag)) {
+      onTagsChange(selectedTags.filter(t => normalizeTag(t) !== normalizeTag(tag)));
     } else {
       onTagsChange([...selectedTags, tag]);
     }
@@ -95,7 +101,7 @@ export default function TagFilter({ resources, selectedTags, onTagsChange }: Tag
                     {/* Run16 BUG-017: accessible name for the checkbox (WCAG 4.1.2) */}
                     <Checkbox
                       aria-label={`Filter by ${tag}`}
-                      checked={selectedTags.includes(tag)}
+                      checked={isSelected(tag)}
                       onCheckedChange={() => toggleTag(tag)}
                     />
                     <div className="flex-1 flex items-center justify-between">

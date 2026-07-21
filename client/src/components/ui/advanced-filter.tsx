@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { SlidersHorizontal, X, ChevronDown, Search } from "lucide-react";
+import { normalizeTag } from "@/lib/tags";
 
 interface AdvancedFilterProps {
   selectedTags: string[];
@@ -47,9 +48,14 @@ export default function AdvancedFilter({
   const visibleTags = matchingTags.slice(0, TAG_RENDER_CAP);
   const hiddenCount = matchingTags.length - visibleTags.length;
 
+  // Compare via normalizeTag so deep-linked variants (e.g. ?tags=codecs)
+  // still check/uncheck the canonical chip (codec).
+  const isSelected = (tag: string) =>
+    selectedTags.some((t) => normalizeTag(t) === normalizeTag(tag));
+
   const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      onTagsChange(selectedTags.filter((t) => t !== tag));
+    if (isSelected(tag)) {
+      onTagsChange(selectedTags.filter((t) => normalizeTag(t) !== normalizeTag(tag)));
     } else {
       onTagsChange([...selectedTags, tag]);
     }
@@ -154,7 +160,7 @@ export default function AdvancedFilter({
                       >
                         <Checkbox
                           aria-label={`Filter by ${tag}`}
-                          checked={selectedTags.includes(tag)}
+                          checked={isSelected(tag)}
                           onCheckedChange={() => toggleTag(tag)}
                         />
                         <div className="flex-1 flex items-center justify-between">
