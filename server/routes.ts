@@ -440,11 +440,13 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
 
   <!-- Footer row: brand mark + resource count chip -->
   <g transform="translate(104, 478)">
-    <!-- AV monogram tile -->
-    <rect x="0" y="0" width="56" height="56" rx="10" fill="#ff3d52" />
+    <!-- AV monogram tile — official Inverted Monogram (brand/): black rx16/76
+         tile, crimson border + crimson AV. 56px render of the 76-unit grid
+         (rx 16*56/76≈12, stroke 4*56/76≈3, AV 34*56/76≈25, baseline 51*56/76≈38). -->
+    <rect x="1.5" y="1.5" width="53" height="53" rx="12" fill="#000000" stroke="#ff3d52" stroke-width="3" />
     <text x="28" y="38" font-family="'Inter','Helvetica Neue',sans-serif"
-          font-size="26" font-weight="800" fill="#000000"
-          text-anchor="middle">AV</text>
+          font-size="25" font-weight="800" fill="#ff3d52"
+          text-anchor="middle" letter-spacing="-0.7">AV</text>
 
     <!-- Brand wordmark: bold Inter + Fraunces italic ".video" accent -->
     <text x="76" y="26" font-family="'Inter','Helvetica Neue',sans-serif"
