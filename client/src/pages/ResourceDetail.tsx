@@ -2,7 +2,7 @@ import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,9 +29,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest, ApiError } from "@/lib/queryClient";
-import { humanizeApiError } from "@/lib/apiError";
-import { notifyCrossTabSync } from "@/lib/crossTabSync";
+import { apiRequest } from "@/lib/queryClient";
+import { useFavoriteToggle, useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { trackSelectContent, trackShare, trackResourceFavorite } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -126,81 +125,51 @@ export default function ResourceDetail() {
   const isFavorite = favorites?.some(f => f.id === numericId) ?? false;
   const isBookmarked = bookmarks?.some(b => b.id === numericId) ?? false;
 
-  // NB-024/NB-059 (run24): latest-wins refs — clicks landing while a toggle
-  // request is in flight record the newest desired state instead of being
-  // dropped; onSettled fires at most one converging follow-up request.
-  const favoriteDesiredRef = useRef<boolean | null>(null);
-  const bookmarkDesiredRef = useRef<boolean | null>(null);
+  // Optimistic state lives in the query cache lists here (not local state):
+  // flip the cached list membership so isFavorite/isBookmarked re-derive.
+  const flipCachedList = (listKey: string, next: boolean) => {
+    if (!resource) return;
+    queryClient.setQueryData<Resource[]>([listKey], (old) => {
+      const list = old ?? [];
+      return next
+        ? (list.some(r => r.id === numericId) ? list : [...list, resource])
+        : list.filter(r => r.id !== numericId);
+    });
+  };
 
-  const favoriteMutation = useMutation({
-    mutationFn: async (remove: boolean) => {
-      if (remove) {
-        return apiRequest(`/api/favorites/${id}`, { method: 'DELETE' });
-      }
-      return apiRequest(`/api/favorites/${id}`, { method: 'POST' });
-    },
-    onSuccess: (_data, remove) => {
+  // NB-024/NB-059 (run24): latest-wins rapid-click handling, auth gate,
+  // error surfacing, invalidation and cross-tab sync all live in the shared
+  // useFavoriteToggle/useBookmarkToggle hooks (same behavior as
+  // FavoriteButton/BookmarkButton) — only toasts, Undo and analytics are
+  // page-specific here.
+  const favorite = useFavoriteToggle({
+    resourceId: id || '',
+    isActive: isFavorite,
+    onOptimistic: (next) => flipCachedList('/api/favorites', next),
+    onSuccess: (_data, vars, showToast) => {
       if (resource) {
-        trackResourceFavorite(resource.title, resource.category ?? 'uncategorized', remove ? 'remove' : 'add');
+        trackResourceFavorite(resource.title, resource.category ?? 'uncategorized', vars.remove ? 'remove' : 'add');
       }
-      queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
-      // R4-081: mirror the change into other open tabs' favorite lists.
-      notifyCrossTabSync();
-      toast({
-        title: remove ? "Removed from favorites" : "Added to favorites",
-        description: remove ? "Resource removed from your favorites" : "Resource saved to your favorites"
+      showToast({
+        title: vars.remove ? "Removed from favorites" : "Added to favorites",
+        description: vars.remove ? "Resource removed from your favorites" : "Resource saved to your favorites"
       });
     },
-    onError: (error) => {
-      // R4-056: favorite failures used to roll back silently with no feedback.
-      // Same pattern as BookmarkButton — 401 prompts re-sign-in, everything
-      // else shows a humanized destructive toast.
-      const status = error instanceof ApiError ? error.status : 0;
-      if (status === 401) {
-        toast({
-          title: "Sign in to favorite",
-          description: "Your session has expired. Please sign in again to save favorites.",
-          action: signInAction,
-        });
-      } else {
-        toast({
-          title: "Couldn't update favorite",
-          description: humanizeApiError(error, "Failed to update favorite. Please try again."),
-          variant: "destructive",
-        });
-      }
-      // BUG-038 (run24): expected auth expiry isn't an app error — keep the
-      // console clean on 401s.
-      if (status !== 401) {
-        console.error("Favorite mutation error:", error);
-      }
+    onErrorRevert: () => {
+      // Cache truth is server-side — refetch the list instead of guessing.
+      queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
     },
-    onSettled: (_data, error, remove) => {
-      // NB-024/NB-059 (run24): converge on the latest desired state with at
-      // most one follow-up request.
-      const desired = favoriteDesiredRef.current;
-      favoriteDesiredRef.current = null;
-      if (desired === null) return;
-      const finalState = error ? remove : !remove;
-      if (desired !== finalState) {
-        favoriteMutation.mutate(!desired);
-      }
-    }
   });
 
-  const bookmarkMutation = useMutation({
-    mutationFn: async (remove: boolean) => {
-      if (remove) {
-        return apiRequest(`/api/bookmarks/${id}`, { method: 'DELETE' });
-      }
-      return apiRequest(`/api/bookmarks/${id}`, { method: 'POST' });
-    },
-    onSuccess: (_data, remove) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
-      if (remove) {
+  const bookmark = useBookmarkToggle({
+    resourceId: id || '',
+    isActive: isBookmarked,
+    onOptimistic: (next) => flipCachedList('/api/bookmarks', next),
+    onSuccess: (_data, vars, showToast) => {
+      if (vars.remove) {
         // Run17 BUG-013: removal is instant — offer a one-click Undo instead
         // of a confirm dialog.
-        toast({
+        showToast({
           title: "Removed from bookmarks",
           description: "Resource removed from your bookmarks",
           action: (
@@ -217,49 +186,15 @@ export default function ResourceDetail() {
           ),
         });
       } else {
-        toast({
+        showToast({
           title: "Added to bookmarks",
           description: "Resource saved to your bookmarks"
         });
       }
-      // R4-081: mirror the change into other open tabs' bookmark lists.
-      notifyCrossTabSync();
     },
-    onError: (error) => {
-      // R4-056: bookmark failures used to roll back silently with no feedback.
-      // Same pattern as BookmarkButton — 401 prompts re-sign-in, everything
-      // else shows a humanized destructive toast.
-      const status = error instanceof ApiError ? error.status : 0;
-      if (status === 401) {
-        toast({
-          title: "Sign in to bookmark",
-          description: "Your session has expired. Please sign in again to save resources.",
-          action: signInAction,
-        });
-      } else {
-        toast({
-          title: "Couldn't update bookmark",
-          description: humanizeApiError(error, "Failed to update bookmark. Please try again."),
-          variant: "destructive",
-        });
-      }
-      // BUG-038 (run24): expected auth expiry isn't an app error — keep the
-      // console clean on 401s.
-      if (status !== 401) {
-        console.error("Bookmark mutation error:", error);
-      }
+    onErrorRevert: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
     },
-    onSettled: (_data, error, remove) => {
-      // NB-024/NB-059 (run24): converge on the latest desired state with at
-      // most one follow-up request.
-      const desired = bookmarkDesiredRef.current;
-      bookmarkDesiredRef.current = null;
-      if (desired === null) return;
-      const finalState = error ? remove : !remove;
-      if (desired !== finalState) {
-        bookmarkMutation.mutate(!desired);
-      }
-    }
   });
 
   // R2-L09: anonymous users get a clear sign-in prompt instead of a
@@ -279,70 +214,8 @@ export default function ResourceDetail() {
     </ToastAction>
   );
 
-  const handleFavoriteClick = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Sign in to favorite",
-        description: "Create an account or sign in to save your favorite resources.",
-        action: signInAction,
-      });
-      return;
-    }
-    // NB-024/NB-059 (run24): clicks during an in-flight toggle record the
-    // latest desired state (latest-wins) and flip the cached list
-    // optimistically; onSettled converges with at most one follow-up request.
-    // (NB-022 run20 note still applies: never use the native `disabled`
-    // attribute here — a disabled flip while focused drops focus to body.)
-    if (favoriteMutation.isPending) {
-      // Baseline is what the IN-FLIGHT request will make true (its target),
-      // not the query cache — the cache is stale until invalidation, so a
-      // 2nd rapid click computed the same target as the 1st instead of the
-      // inverse (2 clicks ended favorited instead of undone).
-      // variables=remove → in-flight target is !remove.
-      const inFlightTarget = !favoriteMutation.variables;
-      const desired = favoriteDesiredRef.current === null ? !inFlightTarget : !favoriteDesiredRef.current;
-      favoriteDesiredRef.current = desired;
-      if (resource) {
-        queryClient.setQueryData<Resource[]>(['/api/favorites'], (old) => {
-          const list = old ?? [];
-          return desired
-            ? (list.some(f => f.id === numericId) ? list : [...list, resource])
-            : list.filter(f => f.id !== numericId);
-        });
-      }
-      return;
-    }
-    favoriteMutation.mutate(isFavorite);
-  };
-
-  const handleBookmarkClick = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Sign in to bookmark",
-        description: "Create an account or sign in to save resources to your bookmarks.",
-        action: signInAction,
-      });
-      return;
-    }
-    // NB-024/NB-059 (run24): same latest-wins handling as favorite.
-    if (bookmarkMutation.isPending) {
-      // Same as favorite: baseline is the in-flight request's target state
-      // (!remove), never the stale query cache.
-      const inFlightTarget = !bookmarkMutation.variables;
-      const desired = bookmarkDesiredRef.current === null ? !inFlightTarget : !bookmarkDesiredRef.current;
-      bookmarkDesiredRef.current = desired;
-      if (resource) {
-        queryClient.setQueryData<Resource[]>(['/api/bookmarks'], (old) => {
-          const list = old ?? [];
-          return desired
-            ? (list.some(b => b.id === numericId) ? list : [...list, resource])
-            : list.filter(b => b.id !== numericId);
-        });
-      }
-      return;
-    }
-    bookmarkMutation.mutate(isBookmarked);
-  };
+  const handleFavoriteClick = () => favorite.toggle();
+  const handleBookmarkClick = () => bookmark.toggle();
 
   // BUG-028 (run19): Suggest Edit used to open the dialog (which showed its own
   // sign-in wall) while Favorite/Bookmark toast — one auth-gate pattern now:
@@ -553,8 +426,8 @@ export default function ResourceDetail() {
             variant={isFavorite ? "default" : "outline"}
             size="sm"
             onClick={handleFavoriteClick}
-            aria-disabled={favoriteMutation.isPending}
-            aria-busy={favoriteMutation.isPending}
+            aria-disabled={favorite.isPending}
+            aria-busy={favorite.isPending}
             data-testid="button-favorite"
             className="min-h-[44px] px-4"
             aria-pressed={isFavorite}
@@ -569,8 +442,8 @@ export default function ResourceDetail() {
             variant={isBookmarked ? "default" : "outline"}
             size="sm"
             onClick={handleBookmarkClick}
-            aria-disabled={bookmarkMutation.isPending}
-            aria-busy={bookmarkMutation.isPending}
+            aria-disabled={bookmark.isPending}
+            aria-busy={bookmark.isPending}
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
             aria-pressed={isBookmarked}
