@@ -1,6 +1,0 @@
-BUG-023 verdict
-date 2026-07-11
-probe: see comment
-actual: GET /categories -> 200
-classification: ALREADY-FIXED
-reason: 

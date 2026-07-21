@@ -1,6 +1,0 @@
-BUG-018 verdict
-date 2026-07-11
-probe: default-no-probe-defined
-actual: untouched
-classification: BLOCKED
-reason: probe not yet defined for this bug

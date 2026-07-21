@@ -1,4 +1,0 @@
-inserted stale rows: enrichment_jobs.id=42 github_sync_queue.id=40 (startedAt/createdAt = 10min ago)
-PASS owned jobs survive sweep — flipped e=0 g=0; statuses after: enrichment=processing sync=processing
-PASS unowned stale rows still flipped — statuses after: enrichment=failed sync=failed err="Orphaned by server restart"
-probe rows deleted (teardown clean)

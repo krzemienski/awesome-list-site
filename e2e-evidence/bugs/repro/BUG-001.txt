@@ -1,6 +1,0 @@
-BUG-001 verdict
-date 2026-07-11
-probe: see code/probe body
-actual: GET / -> 200
-classification: ALREADY-FIXED
-reason: CSP nonced, no unsafe-inline, no replit-cdn reference in body

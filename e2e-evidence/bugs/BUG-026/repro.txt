@@ -1,6 +1,0 @@
-BUG-026 verdict
-date 2026-07-11
-probe: see comment
-actual: sitemap 5 vs API 5
-classification: ALREADY-FIXED
-reason: 

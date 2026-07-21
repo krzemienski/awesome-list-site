@@ -1,9 +1,0 @@
-{"url":"http://localhost:3001/category/intro-learning","contentMs":1756,"ttfb":275,"dcl":999,"fcp":1020,"reqStarts":{"/api/awesome-list":540,"/api/auth/user":543}}
-{"url":"http://localhost:3001/category/encoding-codecs","contentMs":1102,"ttfb":25,"dcl":338,"fcp":524,"reqStarts":{"/api/awesome-list":116,"/api/auth/user":116}}
-{"url":"http://localhost:3001/subcategory/smart-tv-players","contentMs":989,"ttfb":29,"dcl":386,"fcp":364,"reqStarts":{"/api/awesome-list":175,"/api/auth/user":178}}
-{"url":"http://localhost:3001/category/intro-learning","contentMs":1462,"ttfb":47,"dcl":591,"fcp":1204,"reqStarts":{"/api/awesome-list":237,"/api/auth/user":239}}
-{"url":"http://localhost:3001/category/encoding-codecs","contentMs":1160,"ttfb":15,"dcl":502,"fcp":496,"reqStarts":{"/api/awesome-list":109,"/api/auth/user":113}}
-{"url":"http://localhost:3001/subcategory/smart-tv-players","contentMs":993,"ttfb":17,"dcl":396,"fcp":388,"reqStarts":{"/api/awesome-list":140,"/api/auth/user":141}}
-{"url":"http://localhost:3001/category/intro-learning","contentMs":1509,"ttfb":61,"dcl":892,"fcp":884,"reqStarts":{"/api/awesome-list":384,"/api/auth/user":385}}
-{"url":"http://localhost:3001/category/encoding-codecs","contentMs":1202,"ttfb":25,"dcl":370,"fcp":548,"reqStarts":{"/api/awesome-list":171,"/api/auth/user":173}}
-{"url":"http://localhost:3001/subcategory/smart-tv-players","contentMs":1238,"ttfb":28,"dcl":503,"fcp":508,"reqStarts":{"/api/awesome-list":121,"/api/auth/user":122}}

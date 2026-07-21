@@ -1,2 +1,0 @@
-TS=1783289744
-UEMAIL=__qa_test_1783289744_user@example.invalid

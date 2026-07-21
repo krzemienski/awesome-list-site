@@ -1,6 +1,0 @@
-BUG-046 verdict
-date 2026-07-11
-probe: see code/probe body
-actual: /sitemap.xml -> 200, lastmod sample=['2026-07-11', '2026-07-11', '2026-07-11'], future_count=0
-classification: ALREADY-FIXED
-reason: 

@@ -1,6 +1,0 @@
-BUG-025 verdict
-date 2026-07-11
-probe: see code/probe body
-actual: GET /recommendations -> 200, bytes=9450
-classification: ALREADY-FIXED
-reason: ok

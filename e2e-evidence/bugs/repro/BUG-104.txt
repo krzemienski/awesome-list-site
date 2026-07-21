@@ -1,6 +1,0 @@
-BUG-104 verdict
-date 2026-07-11
-probe: GET /
-actual: top-bar action links=0
-classification: BLOCKED
-reason: Quick Actions duplication requires comparison between top-bar and sidebar component DOM trees

@@ -1,6 +1,0 @@
-{"url":"http://localhost:3001/category/intro-learning","contentMs":1565,"ttfb":179,"dcl":810,"fcp":null,"reqStarts":{"/api/awesome-list":268,"/api/auth/user":1174}}
-{"url":"http://localhost:3001/category/encoding-codecs","contentMs":979,"ttfb":37,"dcl":388,"fcp":null,"reqStarts":{"/api/awesome-list":129,"/api/auth/user":626}}
-{"url":"http://localhost:3001/subcategory/smart-tv-players","contentMs":1208,"ttfb":20,"dcl":426,"fcp":1156,"reqStarts":{"/api/awesome-list":97,"/api/auth/user":732}}
-{"url":"http://localhost:3001/category/intro-learning","contentMs":1361,"ttfb":47,"dcl":698,"fcp":640,"reqStarts":{"/api/awesome-list":264,"/api/auth/user":908}}
-{"url":"http://localhost:3001/category/encoding-codecs","contentMs":1244,"ttfb":24,"dcl":475,"fcp":412,"reqStarts":{"/api/awesome-list":110,"/api/auth/user":664}}
-{"url":"http://localhost:3001/subcategory/smart-tv-players","contentMs":1016,"ttfb":15,"dcl":354,"fcp":328,"reqStarts":{"/api/awesome-list":80,"/api/auth/user":544}}

@@ -1,8 +1,0 @@
-== 6 rapid failed logins against DEV (Run16 BUG-021 re-verify, 2026-07-17T11:16:45Z) ==
-Limiters (server/routes.ts ~545-562): loginBurstLimiter 5/min/IP + authLimiter 20/15min/IP + per-account checkLock cooldown (423).
-
-Attempt results: 401 401 401 401 401 429 429
-
-429 response headers:
-RateLimit-Policy: 5;w=60 / RateLimit-Remaining: 0 / Retry-After: 60
-Body: {"message":"Too many login attempts. Please try again in a minute."}

@@ -1,6 +1,0 @@
-BUG-005 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: /api/auth/login:404 /api/auth/status:404 /api/users/me:404
-actual: /api/auth/login:404 /api/auth/status:404 /api/users/me:404
-classification: REPRODUCES
-reason: 4xx

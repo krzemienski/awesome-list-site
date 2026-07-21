@@ -1,7 +1,0 @@
-BUG-012 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: probe: GET /search?q=zzz
-actual: home bytes=13850, has-hamburger=True, has-search=True
-prior verdict: REPRODUCES
-classification: FIXED
-reason: /search now lives in staticRoutes + renderSearchContent emits real results, so /search?q= no longer soft-404s.

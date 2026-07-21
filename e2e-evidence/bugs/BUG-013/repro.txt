@@ -1,6 +1,0 @@
-BUG-013 verdict
-date 2026-07-11
-probe: see comment
-actual: GET /api/resources -> 200, no-description count=0 of 5
-classification: ALREADY-FIXED
-reason: 

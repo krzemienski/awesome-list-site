@@ -1,9 +1,0 @@
-=== BUG-027: /api/researcher/jobs list excludes agentLog (dev, 2026-07-17T10:04:46Z) ===
-jobs: 12
-keys: ['agentLogCount', 'agentLogLast', 'approvedDiscoveries', 'authTokenLast4', 'baseUrl', 'categoryFocus', 'completedAt', 'createdAt', 'duplicatesSkipped', 'errorMessage', 'estimatedCostUsd', 'id', 'maxBudgetUsd', 'maxTurns', 'model', 'prompt', 'rejectedDiscoveries', 'startedAt', 'startedBy', 'status', 'totalDiscoveries', 'totalInputTokens', 'totalOutputTokens', 'turnsUsed']
-has agentLog: False
-agentLogCount: 13
-agentLogLast type: dict - keys: ['content', 'role', 'timestamp']
-total list payload bytes: 11737
---- detail endpoint still returns full agentLog ---
-detail has agentLog: True - entries: 13

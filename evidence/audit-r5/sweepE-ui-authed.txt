@@ -1,5 +1,0 @@
-PASS ui-login (form submit) landed=/admin
-PASS authed /profile landed=/profile matched=true
-PASS authed /bookmarks landed=/bookmarks matched=true
-PASS authed /admin dashboard renders (no guard panel)
-screenshot saved: evidence/audit-r5/admin-dashboard-authed.png

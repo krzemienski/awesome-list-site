@@ -1,6 +1,0 @@
-BUG-017 verdict
-date 2026-07-11
-probe: see comment
-actual: GET /bookmarks -> 200; /profile -> 200, gated=True/False
-classification: REPRODUCES
-reason: 

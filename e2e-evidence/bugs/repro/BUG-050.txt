@@ -1,6 +1,0 @@
-BUG-050 verdict
-date 2026-07-11
-probe: /journey/6:404b9450 /journey/7:404b9450 /journey/8:404b9450 /journey/9:404b9450 /journey/10:404b9450
-actual: body small/large per page
-classification: ALREADY-FIXED
-reason: ok

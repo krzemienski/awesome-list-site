@@ -1,9 +1,0 @@
-=== BUG-005 re-confirm: REAL auth endpoints (not the guessed names) — 2026-07-11T19:47:57Z ===
--- the auditor's GUESSED paths (expected 404, wrong names) --
-GET  /api/auth/status → 404
-POST /api/auth/login  → 404
--- the REAL endpoints (the actual contract) --
-GET  /api/auth/user (anon)  → 200 :: {"user":null,"isAuthenticated":false}
-GET  /api/auth/user (authed)→ 200 :: {"user":{"id":"c6e7d1c6-9732-4373-acf2-4b5cb626439e","email":"admin@ex
-POST /api/auth/local/login  → 500 (200=works)
-POST /api/auth/logout       → 200

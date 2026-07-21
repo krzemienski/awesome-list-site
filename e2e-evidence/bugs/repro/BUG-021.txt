@@ -1,6 +1,0 @@
-BUG-021 verdict
-date 2026-07-11
-probe: see code/probe body
-actual: /sitemap.xml -> 200, ffmpeg dup count=1
-classification: ALREADY-FIXED
-reason: ok

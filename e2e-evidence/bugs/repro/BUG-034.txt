@@ -1,6 +1,0 @@
-BUG-034 verdict
-date 2026-07-11
-probe: see code/probe body
-actual: GET /journeys -> 200, h1=1 h2=1
-classification: ALREADY-FIXED
-reason: ok

@@ -1,6 +1,0 @@
-BUG-010 verdict
-date 2026-07-11
-probe: see comment
-actual: GET /journeys -> 200
-classification: ALREADY-FIXED
-reason: 

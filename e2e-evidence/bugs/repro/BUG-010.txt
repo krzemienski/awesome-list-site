@@ -1,6 +1,0 @@
-BUG-010 verdict
-date 2026-07-11
-probe: see code/probe body
-actual: GET /journeys -> 200, bytes=12900, main-present=True
-classification: ALREADY-FIXED
-reason: main content present

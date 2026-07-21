@@ -1,1 +1,0 @@
-Baseline: GAESA cookie set by upstream CDN, not app

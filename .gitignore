@@ -103,14 +103,32 @@ playwright/.cache/
 .remember/
 plans/
 
-# Audit evidence (generated, not source)
-audit-evidence/
+# Audit / QA evidence & screenshot artifacts (generated, never source —
+# deep-cleaned July 21, 2026; these patterns keep the clutter from returning).
+# Anchored to repo root so kept dirs like docs/screenshots/ stay committable.
+/audit-evidence/
+/evidence/
+/screenshots/
+/fix-evidence*/
+/e2e-evidence/
+/hunt-workspace/
+/_validation/
+/_planning/
+/artifacts/
+/banks/
 repomix-output.xml
+
+# Agent tooling scratch dirs
+/.audit/
+/.campaign/
+/.debug/
+/.prompts/
+/.serena/
+/.sisyphus/
+/.specs/
+/.cursor/
 
 # Stray dash-named screenshot artifact
 --full-page
 
-# Never commit captured session cookies / auth artifacts
-evidence/cookies-*.txt
-evidence/**/cookies-*.txt
 /.claude-flow

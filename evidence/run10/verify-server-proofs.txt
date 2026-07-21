@@ -1,7 +1,0 @@
-# BUG-008 rate-limit proof (dev, run10)
-## Single request shows standardHeaders policy:
-RateLimit-Policy: 20;w=900 / RateLimit-Limit: 20 / RateLimit-Remaining: 19
-## After 20 hits in window:
-HTTP/1.1 429 Too Many Requests, RateLimit-Remaining: 0, Retry-After: 779
-## check-url (BUG-025) response now (no status field):
-{"exists":true,"resource":{"id":185077,"title":"Awesome Video: A Curated List of Streaming Video Tools and Resources","category":"Standards & Industry","subcategory":null}}

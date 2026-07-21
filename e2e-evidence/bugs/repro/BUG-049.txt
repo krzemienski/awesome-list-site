@@ -1,6 +1,0 @@
-BUG-049 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: /sitemap.xml -> 200, non-canonical locs=0
-actual: /sitemap.xml -> 200, non-canonical locs=0
-classification: ALREADY-FIXED
-reason: ok

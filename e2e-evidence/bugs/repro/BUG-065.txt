@@ -1,6 +1,0 @@
-BUG-065 verdict
-date 2026-07-11
-probe: GET /admin/audit
-actual: code=200 body=11065
-classification: ALREADY-FIXED
-reason: 

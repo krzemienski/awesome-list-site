@@ -1,6 +1,0 @@
-BUG-002 verdict
-date 2026-07-11
-probe: see code/probe body
-actual: GET / -> 200, csp connect-src contains GA=True
-classification: ALREADY-FIXED
-reason: default-src 'self'; script-src 'self' 'nonce-PiJO482DQH4xk6hLlymt2w==' https://www.googletagmanager.com https://replit.com; style-src 'self' 'nonce-PiJO482DQH4x...

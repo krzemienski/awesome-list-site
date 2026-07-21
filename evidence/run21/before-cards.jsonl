@@ -1,9 +1,0 @@
-{"pass":0,"path":"/category/intro-learning","cardsMs":2148,"ttfb":202,"dcl":1056,"jsCount":2,"jsKB":258,"req":{"list":279,"auth":1461}}
-{"pass":0,"path":"/category/encoding-codecs","cardsMs":1851,"ttfb":26,"dcl":1075,"jsCount":2,"jsKB":258,"req":{"list":159,"auth":1174}}
-{"pass":0,"path":"/subcategory/smart-tv-players","cardsMs":1896,"ttfb":25,"dcl":1135,"jsCount":2,"jsKB":258,"req":{"list":183,"auth":1221}}
-{"pass":1,"path":"/category/intro-learning","cardsMs":1638,"ttfb":16,"dcl":1046,"jsCount":2,"jsKB":258,"req":{"list":165,"auth":1137}}
-{"pass":1,"path":"/category/encoding-codecs","cardsMs":1607,"ttfb":18,"dcl":1082,"jsCount":2,"jsKB":258,"req":{"list":187,"auth":1180}}
-{"pass":1,"path":"/subcategory/smart-tv-players","cardsMs":1869,"ttfb":16,"dcl":1119,"jsCount":2,"jsKB":258,"req":{"list":177,"auth":1210}}
-{"pass":2,"path":"/category/intro-learning","cardsMs":1606,"ttfb":11,"dcl":1065,"jsCount":2,"jsKB":258,"req":{"list":170,"auth":1161}}
-{"pass":2,"path":"/category/encoding-codecs","cardsMs":1853,"ttfb":28,"dcl":1057,"jsCount":2,"jsKB":258,"req":{"list":189,"auth":1145}}
-{"pass":2,"path":"/subcategory/smart-tv-players","cardsMs":1492,"ttfb":17,"dcl":1062,"jsCount":2,"jsKB":258,"req":{"list":163,"auth":1156}}

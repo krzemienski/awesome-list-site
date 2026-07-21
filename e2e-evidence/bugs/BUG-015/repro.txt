@@ -1,6 +1,0 @@
-BUG-015 verdict
-date 2026-07-11
-probe: see comment
-actual: /api/resources?q=video ids=[1934, 1933, 1932] | ?q=zzz ids=[1934, 1933, 1932] | (none) ids=[1934, 1933, 1932]
-classification: REPRODUCES
-reason: 

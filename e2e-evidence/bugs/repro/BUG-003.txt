@@ -1,6 +1,0 @@
-BUG-003 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: GET /settings/theme -> 200, toggle-present=False
-actual: GET /settings/theme -> 200, toggle-present=False
-classification: REPRODUCES
-reason: no toggle

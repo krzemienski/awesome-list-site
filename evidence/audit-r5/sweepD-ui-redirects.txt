@@ -1,9 +1,0 @@
-PASS redirect /auth/login -> /login (want /login)
-PASS redirect /auth/register -> /register (want /register)
-PASS redirect /category -> / (want /)
-PASS redirect /subsubcategory/av1-sc2275 -> /sub-subcategory/av1-sc2275 (want /sub-subcategory/av1-sc2275)
-PASS redirect /journey -> /journeys (want /journeys)
-PASS redirect /?q=test -> /search?q=test (want /search?q=test)
-PASS redirect-guard /favorites -> / (accept /bookmarks or /)
-PASS redirect-guard /account -> / (accept /profile or /)
-PASS unknown-route-404-page

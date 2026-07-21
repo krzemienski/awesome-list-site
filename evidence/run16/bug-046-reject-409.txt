@@ -1,8 +1,0 @@
-=== BUG-046: reject non-pending resource -> 409 (dev, 2026-07-17T10:05:09Z) ===
---- resource 185020 status ---
-id: 185020 status: approved
---- POST /api/admin/resources/185020/reject (approved resource) ---
-{"message":"Only pending resources can be rejected here (this resource is 'approved'). Use the resource status controls to change an approved resource."}
-status=409
---- confirm status unchanged ---
-status still: approved

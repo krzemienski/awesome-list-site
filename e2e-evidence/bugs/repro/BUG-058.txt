@@ -1,6 +1,0 @@
-BUG-058 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: GET /news -> 404, top-bar links-news=False
-actual: GET /news -> 404, top-bar links-news=False
-classification: ALREADY-FIXED
-reason: news not linked in nav

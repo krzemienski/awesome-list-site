@@ -1,6 +1,0 @@
-BUG-051 verdict
-date 2026-07-11
-probe: GET /sitemap.xml
-actual: /sub-subcategory/ffmpeg appears 1×
-classification: ALREADY-FIXED
-reason: 

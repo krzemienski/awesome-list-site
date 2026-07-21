@@ -1,7 +1,0 @@
-BUG-035 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: probe: GET / HTML
-actual: home bytes=13850, has-hamburger=True, has-search=True
-prior verdict: REPRODUCES
-classification: FIXED
-reason: homeShellChrome in og-middleware emits the same hamburger aria-label that AppHeader's SidebarTrigger renders post-hydration.

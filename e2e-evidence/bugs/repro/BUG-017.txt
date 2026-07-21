@@ -1,6 +1,0 @@
-BUG-017 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: /bookmarks=200 (gated=True) /profile=200 (gated=False)
-actual: /bookmarks=200 (gated=True) /profile=200 (gated=False)
-classification: REPRODUCES
-reason: routes return full content

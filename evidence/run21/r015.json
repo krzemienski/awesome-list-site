@@ -1,1 +1,0 @@
-{"error":"validation_failed","message":"Validation failed","fieldErrors":{"title":"Title is required"},"errors":[{"code":"custom","path":["title"],"message":"Title is required"}]}

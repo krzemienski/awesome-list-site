@@ -1,9 +1,0 @@
-PASS BUG-082 Add Resource dialog opens then Escape closes it — before=1 after=0
-PASS BUG-013 journey 7 renders 6 grouped step cards (not 18 raw rows) — cards=6
-PASS desktop admin zero page errors — clean
-PASS BUG-011/088 mobile@375 users table contained (no body x-overflow) — body overflow=0px
-PASS BUG-011/088 mobile@375 table lives in an x-scroll container — scroller=true innerOverflow=480px
-PASS BUG-011/088 tablet@768 users table contained (no body x-overflow) — body overflow=0px
-PASS BUG-011/088 tablet@768 table lives in an x-scroll container — scroller=true innerOverflow=407px
-
-7 passed, 0 failed

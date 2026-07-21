@@ -1,6 +1,0 @@
-BUG-015 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: q=video ids[0:5]=(1934, 1933, 1932, 1931, 1930) q=ffmpeg ids[0:5]=(1932, 1924, 1877, 1872, 1863) q=asdfqwerty len=0
-actual: q=video ids[0:5]=(1934, 1933, 1932, 1931, 1930) q=ffmpeg ids[0:5]=(1932, 1924, 1877, 1872, 1863) q=asdfqwerty len=0
-classification: FIXED
-reason: gibberish=0 and queries differ → search filter works

@@ -1,6 +1,0 @@
-BUG-019 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: JSON-LD on 4 pages; missing=/recommendations:200,/submit:200,/login:200,/admin:200
-actual: JSON-LD on 4 pages; missing=/recommendations:200,/submit:200,/login:200,/admin:200
-classification: REPRODUCES
-reason: missing JSON-LD on 4 page(s)

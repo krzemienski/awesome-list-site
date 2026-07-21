@@ -1,1 +1,0 @@
-Baseline: Pagination UI does not advance past page 1 (downstream of BUG-003)

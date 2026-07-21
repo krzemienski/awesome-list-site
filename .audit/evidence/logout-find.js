@@ -1,3 +1,0 @@
-const profile = Array.from(document.querySelectorAll('a, button')).find(el => /profile|account|user/i.test(el.innerText || ''));
-const logout = Array.from(document.querySelectorAll('a, button')).find(el => /log\s*out|sign\s*out|exit/i.test(el.innerText || ''));
-JSON.stringify({profileText: profile ? profile.innerText : null, profileHref: profile ? profile.getAttribute('href') : null, logoutText: logout ? logout.innerText : null, logoutHref: logout ? logout.getAttribute('href') : null}, null, 2);

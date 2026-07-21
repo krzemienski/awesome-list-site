@@ -1,3 +1,0 @@
-server/routes.ts:798:  // GET /api/search?q= - Public JSON search across approved resources. A thin
-server/routes.ts:800:  // share one search path (and /api/search no longer 404s). Results are deduped
-server/routes.ts:803:  app.get('/api/search', async (req, res) => {

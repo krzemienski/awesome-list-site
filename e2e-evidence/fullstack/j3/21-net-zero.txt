@@ -1,1 +1,0 @@
-users=6|total=1994|approved=1838|categories=9|journeys=5|qa_residue=0|orphan_bm=0|orphan_fav=0

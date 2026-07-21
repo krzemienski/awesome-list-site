@@ -1,8 +1,0 @@
-BUG-020/049 card heights: check — [105,77,77,105,49,49,49,21,77,21,21,21]
-BUG-021 desc tails: check — []
-BUG-032 View Details size: not-found — 
-BUG-022 category card badges: check — []
-BUG-022 subcategory card badges: check — []
-BUG-044 footer: no-close — © | 2026 | Awesome | Video | · | Built | with | React | & | shadcn/ui | Home | Categories | Journeys | Submit | About | GitHub
-BUG-046 active styles: check — {"bg":"rgba(0, 0, 0, 0)","color":"rgb(244, 243, 238)","bl":"rgba(244, 243, 238, 0.08)"}
-DONE

@@ -1,6 +1,0 @@
-BUG-029 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: GET / -> 200, login-link-present=False
-actual: GET / -> 200, login-link-present=False
-classification: REPRODUCES
-reason: no login link

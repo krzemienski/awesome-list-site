@@ -1,1 +1,0 @@
-Baseline: /admin returns 200 when logged out

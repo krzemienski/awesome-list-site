@@ -4,6 +4,15 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## July 21, 2026
+
+### Repo deep clean
+- **~700MB of audit/QA leftovers deleted outright**: `hunt-workspace/`, `screenshots/`, `_validation/`, `evidence/`, `fix-evidence*/`, `audit-evidence/`, `e2e-evidence/`, `artifacts/`, `banks/`, `_planning/`, agent scratch dot-dirs (`.audit`, `.campaign`, `.debug`, `.prompts`, `.serena`, `.sisyphus`, `.specs`, `.cursor`), ~30 stale root-level verification reports, stray root test scripts, `seo-geo.zip`, `pnpm-lock.yaml`, `project_index.json`, `.auto-claude-status`.
+- **Evidence paths referenced by older entries below no longer exist in the working tree** — they were removed in this clean. Every file is recoverable from git history at the commit that introduced it.
+- `.gitignore` now blocks all evidence/screenshot/audit artifact directories so the clutter cannot be committed again. Scripts that journal on demand (e.g. `scripts/run25-link-fixes.ts`, `scripts/run26-qa-resource-cleanup.ts`) recreate their output dirs via `mkdirSync(..., { recursive: true })`; their output stays local and is no longer committed.
+
+---
+
 ## July 20, 2026
 
 ### Client UX & State Fixes — Run24C (July 20, 2026)

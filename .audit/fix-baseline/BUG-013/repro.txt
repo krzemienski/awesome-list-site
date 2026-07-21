@@ -1,1 +1,0 @@
-Baseline: All routes return identical SPA shell ETag (architectural)

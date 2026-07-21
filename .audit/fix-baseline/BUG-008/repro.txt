@@ -1,1 +1,0 @@
-Baseline: /api/submit accepts invalid url + category; duplicate URL → 500

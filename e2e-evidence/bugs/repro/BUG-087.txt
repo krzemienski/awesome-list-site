@@ -1,6 +1,0 @@
-BUG-087 verdict
-date 2026-07-11
-probe: GET /admin
-actual: code=200 body=11065
-classification: BLOCKED
-reason: admin auth required

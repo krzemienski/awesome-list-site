@@ -1,1 +1,0 @@
-Baseline: /api/resources?status=pending returns total 1848 (full set, status ignored)

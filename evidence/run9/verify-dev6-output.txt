@@ -1,2 +1,0 @@
-metrics tab aria-selected: true
-PASS BUG-016 local-metrics honest zero-state — {"hint":true,"zeroPctShown":false,"noLocal":true,"dashShown":true}

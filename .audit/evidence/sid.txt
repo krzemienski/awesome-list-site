@@ -1,1 +1,0 @@
-connect.sid=s%3AANfSeDPGIEBLvvwC5l2cYQnMa_BHADA3.0rPtTMZGO%2BLsYLPbWr6wwWe%2F1ygZWtmq9l4m58rKkmc

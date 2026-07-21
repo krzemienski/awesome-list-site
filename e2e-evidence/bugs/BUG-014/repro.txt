@@ -1,6 +1,0 @@
-BUG-014 verdict
-date 2026-07-11
-probe: see comment
-actual: GET / -> 200
-classification: NEEDS-DOM
-reason: top-bar shows resources count text, requires DOM click to confirm no-op

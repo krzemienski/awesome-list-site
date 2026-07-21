@@ -1,6 +1,0 @@
-BUG-056 verdict (RE-PROBE on FRESH build 2026-07-11)
-date 2026-07-11
-probe: GET /news -> 404, bytes=9450
-actual: GET /news -> 404, bytes=9450
-classification: ALREADY-FIXED
-reason: route absent (404)

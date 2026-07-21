@@ -1,1 +1,0 @@
-users=6|total=1994|approved=1838|categories=9|journeys_published=5|qa_residue=0

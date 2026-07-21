@@ -1,6 +1,0 @@
-BUG-001 verdict
-date 2026-07-11
-probe: exception
-actual: ValueError: not enough values to unpack (expected 4, got 3)
-classification: BLOCKED
-reason: probe raised an exception

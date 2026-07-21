@@ -1,7 +1,0 @@
-=== BUG-017 /profile server-guard — 2026-07-11T19:46:03Z ===
-anon /profile   → 302 (expect 302)
-anon /profile/x → 302 (expect 302)
-anon /bookmarks → 302 (expect 302, no regression)
-authed /profile → 200 (expect 200)
-anon /           → 200 (expect 200, public)
-anon /login     → 200 (expect 200, no redirect loop)

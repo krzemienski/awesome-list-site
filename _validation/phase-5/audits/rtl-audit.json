@@ -1,6 +1,0 @@
-{
-  "applicability": "N/A",
-  "dir_rtl_consumers": 0,
-  "locale_strings": "en-only",
-  "decision": "deferred-to-future-i18n-task"
-}

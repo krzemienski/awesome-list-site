@@ -1,7 +1,0 @@
-PASS H02 category card titles are <h2> — h2 in cards: 24
-PASS M33 results count shows range — "Showing 1–24 of 253 resources"
-PASS L15 View Details aria-labels unique + descriptive — View details for 3DLUT Creator | View details for 4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos
-PASS M33 page 2 shows 25–48 — "Showing 25–48 of 253 resources"
-PASS H02 home page has h2 headings — count=1
-
-5/5 PASS

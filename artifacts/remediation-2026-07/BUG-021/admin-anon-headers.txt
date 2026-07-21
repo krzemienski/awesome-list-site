@@ -1,6 +1,0 @@
-HTTP/1.1 302 Found
-X-Content-Type-Options: nosniff
-Referrer-Policy: strict-origin-when-cross-origin
-Permissions-Policy: camera=(), microphone=(), geolocation=()
-Location: /login?next=%2Fadmin
-Vary: Accept, Accept-Encoding

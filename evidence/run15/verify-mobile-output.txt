@@ -1,6 +1,0 @@
-PASS BUG-025a tag chips >=24px — sampled=12 under24=0 sample=[{"w":50,"h":26},{"w":132,"h":26},{"w":47,"h":26}]
-PASS BUG-025b sidebar toggles >=24px — sampled=12 under24=0 sample=[{"t":"toggle-cat-communi","w":24,"h":44},{"t":"expand-sub-communi","w":24,"h":44},{"t":"expand-sub-events-","w":24,"h":44}]
-PASS BUG-044 single search box on mobile /search — visible search inputs=["input-search-page"]
-PASS BUG-007 mobile no-results wraps — docOverflowX=false echoRight=334/375
-
-4/4 PASS (mobile 375)
