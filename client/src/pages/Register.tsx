@@ -116,6 +116,47 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [replitChecking, setReplitChecking] = useState(false);
+
+  // BUG-006: content-validating Replit sign-in preflight (mirrors Login.tsx).
+  // A browser no-cors probe can't distinguish "reachable" from a Cloudflare/WAF
+  // 403 challenge, so ask the server probe (validates OIDC discovery content)
+  // before the external redirect. Fail closed: keep the user on email signup.
+  const handleReplitRegister = async () => {
+    if (replitChecking) return;
+    setReplitChecking(true);
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), 6000);
+    try {
+      const res = await fetch("/api/auth/replit-probe", {
+        cache: "no-store",
+        credentials: "include",
+        signal: abort.signal,
+      });
+      const data = res.ok ? await res.json().catch(() => ({ ok: false })) : { ok: false };
+      if (data?.ok === true) {
+        window.location.href = "/api/login";
+        return;
+      }
+      setReplitChecking(false);
+      toast({
+        title: "Replit sign-in unavailable",
+        description:
+          "replit.com looks unreachable from your network. Please create your account with email above instead.",
+        variant: "destructive",
+      });
+    } catch {
+      setReplitChecking(false);
+      toast({
+        title: "Replit sign-in unavailable",
+        description:
+          "replit.com looks unreachable from your network. Please create your account with email above instead.",
+        variant: "destructive",
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+  };
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   // Distinguishes "arrived already signed in" from "signed up via this form" —
@@ -380,13 +421,13 @@ export default function Register() {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => {
-                window.location.href = "/api/login";
-              }}
+              onClick={handleReplitRegister}
+              disabled={replitChecking}
+              aria-busy={replitChecking}
               data-testid="button-replit-register"
             >
               <SiReplit className="mr-2 h-4 w-4" />
-              Continue with Replit
+              {replitChecking ? "Checking Replit…" : "Continue with Replit"}
             </Button>
             <p className="text-center text-xs text-[color:var(--text-3)]">
               Uses Replit&apos;s secure sign-in

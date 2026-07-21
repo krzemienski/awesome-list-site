@@ -1561,6 +1561,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     .filter(({ query }) => query.isError);
 
   // Fetch main entities with resource counts
+  // R5-037: Categories/Subcategories/Sub-Subcategories managers all run through
+  // this generic list query. Mirror ResearcherTab's jobsData behaviour so a
+  // second tab's create/edit/delete becomes visible on focus (or after a
+  // mutation invalidates [queryKey]) instead of staying stale until a hard
+  // refresh.
   const { data: items, isLoading } = useQuery<T[]>({
     queryKey: [queryKey],
     queryFn: async () => {
@@ -1569,7 +1574,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       });
       if (!response.ok) throw new Error(`Failed to fetch ${entityNamePlural.toLowerCase()}`);
       return response.json();
-    }
+    },
+    staleTime: 30_000,
+    refetchOnWindowFocus: true
   });
 
   // Filter items based on search query

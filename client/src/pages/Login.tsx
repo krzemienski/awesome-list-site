@@ -61,21 +61,29 @@ export default function Login() {
     if (replitChecking) return;
     setReplitChecking(true);
     setReplitUnreachable(false);
-    // no-cors: an opaque response resolves as long as the network path to
-    // replit.com works; DNS-block/offline rejects. 4s abort cap — a HANGING
-    // network (silently dropped packets, captive portal) must fail CLOSED:
-    // redirecting anyway would strand the user on an unreachable page, which
-    // is exactly what this preflight exists to prevent. Only an actual
-    // successful fetch proceeds to the OAuth flow.
+    // BUG-006: a browser `no-cors` fetch to replit.com returns an OPAQUE
+    // response that resolves even for a Cloudflare/WAF 403 challenge, so it
+    // could never tell "reachable" from "blocked by an interstitial". Instead
+    // ask the server-side probe (/api/auth/replit-probe), which validates both
+    // the status AND the OIDC discovery content before we hand the browser to
+    // /api/login. Fail CLOSED: any non-ok result, network error, or timeout
+    // keeps the user in-app on the email-signin fallback rather than stranding
+    // them on an unreachable OAuth page.
     const abort = new AbortController();
-    const timer = setTimeout(() => abort.abort(), 4000);
+    const timer = setTimeout(() => abort.abort(), 6000);
     try {
-      await fetch("https://replit.com/favicon.ico", {
-        mode: "no-cors",
+      const res = await fetch("/api/auth/replit-probe", {
         cache: "no-store",
+        credentials: "include",
         signal: abort.signal,
       });
-      window.location.href = "/api/login";
+      const data = res.ok ? await res.json().catch(() => ({ ok: false })) : { ok: false };
+      if (data?.ok === true) {
+        window.location.href = "/api/login";
+        return;
+      }
+      setReplitChecking(false);
+      setReplitUnreachable(true);
     } catch {
       setReplitChecking(false);
       setReplitUnreachable(true);

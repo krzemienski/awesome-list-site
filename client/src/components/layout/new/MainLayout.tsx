@@ -55,12 +55,15 @@ interface MainLayoutProps {
   // R5-024 (run24): nav tree failed to load — the sidebar resolves its
   // "Loading…" subtitle instead of showing it forever.
   navError?: boolean;
+  // R5-024 (run25): let the sidebar's error state retry the nav fetch, matching
+  // the /categories card's Retry button.
+  onRetryNav?: () => void;
   children: React.ReactNode;
   user?: User;
   onLogout?: () => void;
 }
 
-export default function MainLayout({ nav, isLoading, navError, children, user, onLogout }: MainLayoutProps) {
+export default function MainLayout({ nav, isLoading, navError, onRetryNav, children, user, onLogout }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -81,6 +84,7 @@ export default function MainLayout({ nav, isLoading, navError, children, user, o
           totalResources={nav?.totalResources ?? 0}
           isLoading={isLoading}
           navError={navError}
+          onRetryNav={onRetryNav}
           user={user}
         />
         <SidebarInset>

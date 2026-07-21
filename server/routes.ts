@@ -1193,6 +1193,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // BUG-006: content-validating Replit sign-in preflight.
+  // The client CANNOT validate replit.com reachability itself: a browser
+  // `no-cors` fetch returns an opaque response that resolves even for a
+  // Cloudflare/WAF 403 challenge, so a blocked user would still be redirected
+  // into /api/login and strand on the challenge page. This server-side probe
+  // fetches the OIDC discovery document (a fixed, non-user URL — no SSRF
+  // surface) and only reports reachable when BOTH the status is 200 AND the
+  // body is JSON carrying the stable OIDC markers (`issuer` +
+  // `authorization_endpoint`). A WAF/challenge/login-block/malformed body has
+  // none of those markers, so it fails CLOSED. The client keeps the user in
+  // the app and shows the email-signin fallback when this returns ok:false.
+  let replitProbeCache: { at: number; ok: boolean } | null = null;
+  const REPLIT_PROBE_TTL = 30_000; // cache reachability for 30s to avoid abuse
+  app.get('/api/auth/replit-probe', async (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    if (replitProbeCache && Date.now() - replitProbeCache.at < REPLIT_PROBE_TTL) {
+      return res.json({ ok: replitProbeCache.ok });
+    }
+    const issuer = process.env.ISSUER_URL ?? 'https://replit.com/oidc';
+    const discoveryUrl = `${issuer.replace(/\/$/, '')}/.well-known/openid-configuration`;
+    const finish = (ok: boolean) => {
+      replitProbeCache = { at: Date.now(), ok };
+      res.json({ ok });
+    };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    try {
+      const fetch = (await import('node-fetch')).default;
+      const response = await fetch(discoveryUrl, {
+        signal: controller.signal as any,
+        redirect: 'follow',
+        headers: { Accept: 'application/json' },
+      });
+      // Status must be 200 — a 403 challenge, 5xx, or redirect-to-login all fail.
+      if (response.status !== 200) return finish(false);
+      // A Cloudflare/WAF challenge is served as text/html, never JSON.
+      const contentType = (response.headers.get('content-type') || '').toLowerCase();
+      if (!contentType.includes('application/json')) return finish(false);
+      const raw = await response.text();
+      let doc: any;
+      try {
+        doc = JSON.parse(raw);
+      } catch {
+        return finish(false); // malformed / challenge body masquerading as JSON
+      }
+      // Stable, documented OIDC discovery markers. Their presence proves we
+      // reached the real authorization server, not an interstitial page.
+      const ok =
+        typeof doc?.issuer === 'string' &&
+        typeof doc?.authorization_endpoint === 'string' &&
+        doc.authorization_endpoint.startsWith('http');
+      return finish(ok);
+    } catch {
+      // Timeout / DNS block / network failure → fail closed.
+      return finish(false);
+    } finally {
+      clearTimeout(timer);
+    }
+  });
+
   // Note: /api/login, /api/callback are set up in setupAuth()
 
   // ============= Resource Routes =============
@@ -4011,8 +4071,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const analysis = await claudeService.analyzeURL(url.trim());
       
       if (!analysis) {
-        // Upstream (Claude / target fetch) failure — not a server bug: 502.
-        return res.status(502).json({ message: 'Failed to analyze URL' });
+        // R5-030: an allowlisted-but-unretrievable URL (or an empty/unparseable
+        // model response) is not a server outage — the paid call already ran or
+        // the target could not be fetched. Return a 4xx (never 502) so callers
+        // fall back to manual entry instead of retrying against a "server error".
+        return res.status(422).json({
+          message: "Couldn't analyze that URL — the site may be blocking automated access or returned nothing usable. You can fill in the details manually.",
+        });
       }
       
       res.json(analysis);

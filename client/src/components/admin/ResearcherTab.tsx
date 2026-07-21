@@ -44,6 +44,7 @@ import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 
@@ -632,7 +633,7 @@ export default function ResearcherTab() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0 space-y-1">
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-sm line-clamp-1 break-words" title={d.title}>{d.title}</h4>
+                              <h4 className="font-medium text-sm line-clamp-1 break-words" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</h4>
                               {d.confidence && (
                                 <Badge variant="outline" className="text-xs shrink-0">
                                   {d.confidence}% confident
@@ -641,10 +642,10 @@ export default function ResearcherTab() {
                             </div>
                             <a href={d.url} target="_blank" rel="noopener noreferrer"
                               className="text-xs text-primary hover:underline flex items-center gap-1 truncate">
-                              {d.url} <ExternalLink className="w-3 h-3 shrink-0" />
+                              {sanitizeDisplay(d.url)} <ExternalLink className="w-3 h-3 shrink-0" />
                             </a>
                             {d.description && (
-                              <p className="text-xs text-muted-foreground line-clamp-2">{d.description}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-2">{sanitizeDisplay(d.description)}</p>
                             )}
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               {d.suggestedCategory && <Badge variant="secondary" className="text-xs">{d.suggestedCategory}</Badge>}
@@ -652,7 +653,7 @@ export default function ResearcherTab() {
                               <span>Job #{d.jobId}</span>
                             </div>
                             {d.reasoning && (
-                              <p className="text-xs text-muted-foreground italic mt-1">"{d.reasoning}"</p>
+                              <p className="text-xs text-muted-foreground italic mt-1">"{sanitizeDisplay(d.reasoning)}"</p>
                             )}
                           </div>
                           <div className="flex gap-1 shrink-0">
@@ -952,8 +953,11 @@ export default function ResearcherTab() {
                   log token wraps inside the dialog instead of blowing the row
                   out to >1,600px. */}
               {selectedJob.agentLog && (selectedJob.agentLog as any[]).length > 0 ? (
-                <ScrollArea className="h-[420px] max-w-full border rounded p-2 bg-black/40">
-                  <div className="space-y-1 font-mono text-xs min-w-0 max-w-full">
+                <ScrollArea
+                  className="h-[420px] max-w-full border rounded p-2 bg-black/40"
+                  viewportClassName="[&>div]:!block [&>div]:!w-full [&>div]:!min-w-0"
+                >
+                  <div className="space-y-1 font-mono text-xs min-w-0 max-w-full w-full">
                     {(selectedJob.agentLog as Array<{ role: string; content: string; timestamp: string }>).map((entry, i) => (
                       <div key={i} className="flex gap-2 items-start min-w-0 max-w-full">
                         <span className="text-muted-foreground shrink-0 w-[68px]">
@@ -1022,12 +1026,12 @@ export default function ResearcherTab() {
                       <div key={d.id} className="flex items-center justify-between border rounded p-2 text-sm">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium line-clamp-1 break-words min-w-0" title={d.title}>{d.title}</span>
+                            <span className="font-medium line-clamp-1 break-words min-w-0" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</span>
                             {getDiscoveryStatusBadge(d.status)}
                           </div>
                           <a href={d.url} target="_blank" rel="noopener noreferrer"
                             className="text-xs text-primary hover:underline truncate block">
-                            {d.url}
+                            {sanitizeDisplay(d.url)}
                           </a>
                         </div>
                         {d.status === 'pending_review' && (

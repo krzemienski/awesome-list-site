@@ -384,14 +384,14 @@ function Router() {
   // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <MainLayout nav={nav} isLoading={navLoading} navError={navError} user={user ?? undefined} onLogout={logout}>
+      <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout}>
         <NotFound />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout nav={nav} isLoading={navLoading} navError={navError} user={user ?? undefined} onLogout={logout}>
+    <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout}>
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}

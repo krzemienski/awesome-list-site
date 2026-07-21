@@ -34,7 +34,14 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-[calc(100vw-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 break-words min-w-0 [overflow-wrap:anywhere] max-h-[calc(100dvh-4rem)] overflow-y-auto border bg-background p-6 shadow-lg duration-200 sm:w-full data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        // R4-017/NB-018: the content is `display:grid`, so every direct grid
+        // child defaults to `min-width:auto` and refuses to shrink below its
+        // intrinsic content width. A single unbroken string (e.g. a 1,920-char
+        // URL) in ANY consumer child then forces the grid track — and the whole
+        // dialog scrollWidth — past the viewport, no matter what min-width the
+        // shell carries. `[&>*]:min-w-0` makes every grid child shrinkable so
+        // the inherited `overflow-wrap:anywhere` can actually break the content.
+        "fixed left-[50%] top-[50%] z-50 grid w-[calc(100vw-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 break-words min-w-0 [overflow-wrap:anywhere] [&>*]:min-w-0 max-h-[calc(100dvh-4rem)] overflow-y-auto border bg-background p-6 shadow-lg duration-200 sm:w-full data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
       {...props}

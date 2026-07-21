@@ -47,6 +47,10 @@ interface AppSidebarProps {
   // R5-024 (run24): true when the nav tree fetch failed — the header subtitle
   // resolves to a neutral label instead of showing "Loading…" forever.
   navError?: boolean;
+  // R5-024 (run25): retry the nav fetch from the sidebar's error state, mirroring
+  // the /categories card's Retry button — so a failed fetch never masquerades as
+  // an empty "No categories." list.
+  onRetryNav?: () => void;
   user?: any;
 }
 
@@ -469,6 +473,7 @@ export default function AppSidebar({
   totalResources,
   isLoading,
   navError,
+  onRetryNav,
   user,
 }: AppSidebarProps) {
   const [location, setLocation] = useLocation();
@@ -757,13 +762,42 @@ export default function AppSidebar({
                   />
                 );
               })}
-          {!isLoading && filtered.length === 0 && (
+          {/* R5-024: a failed nav fetch must NOT masquerade as an empty list.
+              When the fetch errored and we have nothing cached to show, render
+              the same error/retry affordance the /categories card uses. The
+              genuine empty-state copy is reserved for a SUCCESSFUL empty
+              response (navError false, not loading, zero categories). */}
+          {navError && filtered.length === 0 ? (
             <div
-              className="px-4 py-6 text-center"
+              className="px-4 py-6 text-center flex flex-col items-center gap-2"
+              role="alert"
               style={{ color: "var(--text-3)", fontSize: 12 }}
+              data-testid="sidebar-nav-error"
             >
-              No categories.
+              <span>Couldn't load categories.</span>
+              {onRetryNav && (
+                <button
+                  type="button"
+                  onClick={() => onRetryNav()}
+                  className="underline underline-offset-2 font-medium min-h-[36px]"
+                  style={{ color: "var(--text-2)" }}
+                  data-testid="sidebar-nav-retry"
+                >
+                  Retry
+                </button>
+              )}
             </div>
+          ) : (
+            !isLoading &&
+            filtered.length === 0 && (
+              <div
+                className="px-4 py-6 text-center"
+                style={{ color: "var(--text-3)", fontSize: 12 }}
+                data-testid="sidebar-nav-empty"
+              >
+                No categories.
+              </div>
+            )
           )}
         </div>
 

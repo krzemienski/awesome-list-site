@@ -564,9 +564,9 @@ export default function PendingResources() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           {resourceToApprove && (
-            <div className="bg-muted p-4 rounded-md">
-              <p className="font-semibold">{resourceToApprove.title}</p>
-              <p className="text-sm text-muted-foreground mt-1">{resourceToApprove.url}</p>
+            <div className="bg-muted p-4 rounded-md min-w-0">
+              <p className="font-semibold min-w-0 break-words [overflow-wrap:anywhere]">{resourceToApprove.title}</p>
+              <p className="text-sm text-muted-foreground mt-1 min-w-0 break-all">{resourceToApprove.url}</p>
             </div>
           )}
           <AlertDialogFooter>
@@ -596,9 +596,9 @@ export default function PendingResources() {
           </AlertDialogHeader>
           {resourceToReject && (
             <div className="space-y-4">
-              <div className="bg-muted p-4 rounded-md">
-                <p className="font-semibold">{resourceToReject.title}</p>
-                <p className="text-sm text-muted-foreground mt-1">{resourceToReject.url}</p>
+              <div className="bg-muted p-4 rounded-md min-w-0">
+                <p className="font-semibold min-w-0 break-words [overflow-wrap:anywhere]">{resourceToReject.title}</p>
+                <p className="text-sm text-muted-foreground mt-1 min-w-0 break-all">{resourceToReject.url}</p>
               </div>
               <div>
                 <Label htmlFor="rejection-reason">Rejection Reason *</Label>

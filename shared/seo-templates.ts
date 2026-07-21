@@ -97,12 +97,39 @@ export function clampSeoTitle(title: string): string {
 // R5-049: same-named child/parent taxonomy nodes must not stutter
 // ("CDN Integration – CDN Integration"). ONE shared builder used by both the
 // server (og-middleware) and the client (SubSubcategory.tsx) keeps the
-// two-pass titles identical while deduping the identical-name case.
+// two-pass titles identical while deduping the redundant-name case.
+//
+// The redundancy is broader than exact equality: "CDN Integration"
+// (sub-subcategory) sits under "CDN Integration & Distribution" (subcategory),
+// so "child – parent" reads as "CDN Integration – CDN Integration &…" once the
+// SERP budget clamps it. We normalize both names (case-fold, drop separators
+// and connective punctuation, collapse whitespace) and compare on WHOLE-WORD
+// containment: when one name fully contains the other's words, the pair is
+// redundant and we emit the single child name (what the visible <h1> shows).
+// Genuinely distinct names (no whole-word overlap) keep the "child – parent"
+// context suffix untouched.
+function normalizeTaxonomyName(value: string): string {
+  return (value || "")
+    .toLowerCase()
+    .replace(/[\u2013\u2014&/,.:;()\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function subSubcategorySeoTitleCore(
   name: string,
   parentName?: string | null,
 ): string {
-  if (!parentName || parentName === name) return name;
+  if (!parentName) return name;
+  const child = normalizeTaxonomyName(name);
+  const parent = normalizeTaxonomyName(parentName);
+  if (!child || !parent) return `${name} – ${parentName}`;
+  if (child === parent) return name;
+  const wrappedChild = ` ${child} `;
+  const wrappedParent = ` ${parent} `;
+  if (wrappedParent.includes(wrappedChild) || wrappedChild.includes(wrappedParent)) {
+    return name;
+  }
   return `${name} – ${parentName}`;
 }
 

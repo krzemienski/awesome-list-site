@@ -104,35 +104,71 @@ const SKILL_INDICATORS: Record<string, string[]> = {
 
 const SKILL_LEVEL_ORDER = ['beginner', 'intermediate', 'advanced'] as const;
 
-// NB-007 (run24): real per-level weighting. The old scorer only counted the
-// USER's own level's indicators, so a beginner and an advanced profile scored
-// most resources identically (no indicator hits → the same flat 0.3) and
-// intermediate got an unconditional +0.05-ish bump via its flat 0.5. Now the
-// resource's own difficulty signals (across ALL levels) are weighted by
-// proximity to the user's level:
-//   distance 0 (resource signals the user's own level)      → 1.0
-//   distance 1 (adjacent level, beginner↔intermediate etc.)  → 0.55
-//   distance 2 (opposite end, beginner↔advanced)             → 0.15
-// Mixed-signal resources get the hit-weighted average; hits are capped at 2
-// per level so keyword repetition can't dominate. No difficulty signals at
-// all → neutral 0.5 for EVERY profile (unknown difficulty must not reorder
-// results between levels).
-export function calculateSkillMatch(resource: Resource, skillLevel: string): number {
+// NB-007 (run25): monotonic skill-level weighting that survives sparse
+// metadata. Prior cycles keyed the skill score entirely off SKILL_INDICATORS
+// keyword hits and returned a flat 0.5 when a resource had none — but MOST of
+// the corpus has no such keyword in its title/description, so beginner and
+// advanced profiles collapsed to byte-identical rankings (only the sparse
+// keyword-bearing tail reordered). The fix estimates a per-resource
+// COMPLEXITY in [0,1] that is (a) primarily driven by the difficulty keyword
+// signal when present and (b) falls back to a deterministic technical-density
+// proxy (technical vocabulary + content length) that VARIES across resources
+// instead of collapsing to a constant. The skill score is then a monotonic
+// affinity curve: score = 1 − |complexity − levelTarget|, where levelTarget is
+// beginner→0.0, intermediate→0.5, advanced→1.0. Because complexity varies
+// across the corpus, a beginner profile ranks low-complexity resources highest
+// while an advanced profile ranks high-complexity resources highest, so the
+// two produce materially different orders (not just a reordered tail). The
+// curve is monotonic in the user's level for any fixed resource complexity, so
+// its effect survives normalization, tie-breaking, filtering, and final
+// sorting. Goals/types scoring is untouched.
+
+// Deterministic technical-density fallback vocabulary. Presence of these
+// tokens (in title/description) signals higher inherent complexity when no
+// explicit beginner/intermediate/advanced keyword is present.
+const COMPLEXITY_TECH_TOKENS = [
+  'api', 'sdk', 'protocol', 'architecture', 'kernel', 'pipeline', 'encoding',
+  'codec', 'latency', 'throughput', 'buffer', 'manifest', 'transcode', 'drm',
+  'hls', 'dash', 'rtmp', 'webrtc', 'ffmpeg', 'gpu', 'container', 'orchestration',
+  'cluster', 'scalable', 'distributed', 'low-level', 'internals', 'specification',
+];
+
+// Estimate a resource's inherent complexity in [0,1]. Deterministic: the same
+// resource always yields the same value, so rankings are stable across calls.
+export function estimateResourceComplexity(resource: Resource): number {
   const text = `${resource.title} ${resource.description || ''}`.toLowerCase();
-  const userIdx = SKILL_LEVEL_ORDER.indexOf(skillLevel as (typeof SKILL_LEVEL_ORDER)[number]);
-  if (userIdx === -1) return 0.5; // unknown profile level → neutral
-  const DISTANCE_WEIGHT = [1.0, 0.55, 0.15];
-  let weighted = 0;
-  let totalHits = 0;
+  // (a) Explicit difficulty keyword signal — anchor each level to a complexity
+  // point (beginner→0.0, intermediate→0.5, advanced→1.0) and take the
+  // hit-weighted average. Hits capped at 2 per level so repetition can't
+  // dominate.
+  let signalSum = 0;
+  let signalWeight = 0;
   for (let i = 0; i < SKILL_LEVEL_ORDER.length; i++) {
+    const anchor = i / (SKILL_LEVEL_ORDER.length - 1); // 0, 0.5, 1
     const indicators = SKILL_INDICATORS[SKILL_LEVEL_ORDER[i]];
     const hits = Math.min(indicators.filter(indicator => text.includes(indicator)).length, 2);
     if (hits === 0) continue;
-    weighted += hits * DISTANCE_WEIGHT[Math.abs(i - userIdx)];
-    totalHits += hits;
+    signalSum += anchor * hits;
+    signalWeight += hits;
   }
-  if (totalHits === 0) return 0.5;
-  return weighted / totalHits;
+  if (signalWeight > 0) return signalSum / signalWeight;
+  // (b) Fallback: technical-density proxy that varies across the corpus.
+  const techHits = COMPLEXITY_TECH_TOKENS.filter(token => text.includes(token)).length;
+  const techScore = Math.min(techHits / 4, 1); // 0..1, saturates at 4 tokens
+  const lenScore = Math.min(text.length / 600, 1); // longer entries skew complex
+  const complexity = 0.3 + 0.5 * techScore + 0.2 * lenScore;
+  return Math.max(0, Math.min(1, complexity));
+}
+
+export function calculateSkillMatch(resource: Resource, skillLevel: string): number {
+  const userIdx = SKILL_LEVEL_ORDER.indexOf(skillLevel as (typeof SKILL_LEVEL_ORDER)[number]);
+  if (userIdx === -1) return 0.5; // unknown profile level → neutral
+  const levelTarget = userIdx / (SKILL_LEVEL_ORDER.length - 1); // 0, 0.5, 1
+  const complexity = estimateResourceComplexity(resource);
+  // Monotonic affinity: max at complexity == levelTarget, falling off linearly
+  // with distance. Beginner favors low-complexity, advanced favors high, so the
+  // two never collapse to identical orders when complexity varies.
+  return 1 - Math.abs(complexity - levelTarget);
 }
 
 export function calculateGoalsMatch(resource: Resource, learningGoals: string[]): number {

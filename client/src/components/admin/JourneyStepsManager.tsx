@@ -685,6 +685,11 @@ export default function JourneyStepsManager() {
       if (!res.ok) throw new Error("Failed to fetch journeys");
       return res.json();
     },
+    // R5-037: mirror ResearcherTab's jobsData — a second tab's journey/step
+    // edit becomes visible on focus (or after a mutation invalidates
+    // ["/api/admin/journeys"]) instead of staying stale until a hard refresh.
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   const [activeJourney, setActiveJourney] = useState<AdminJourney | null>(null);
