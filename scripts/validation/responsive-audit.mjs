@@ -174,6 +174,73 @@ r = await fcPage.evaluate(() => {
 log('forced-colors-home', r.checked > 0 && r.noBorder === 0, JSON.stringify(r));
 await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
 
+// ---- R4-017: seeded pathological-URL admin dialog overflow guard ----
+// Seeds a pending resource with an unbroken ~1,950-char URL through the real
+// submission API, opens the three admin approval dialogs (view details /
+// approve / reject) at 1440/768/375, and asserts the dialog never scrolls
+// horizontally and the document never overflows the viewport. The seed is
+// deleted through the admin API at the end regardless of pass/fail.
+{
+  const longUrl = `https://example.com/__qa_test_r4017_${Date.now()}/` + 'a'.repeat(1900);
+  const catRes = await fetch(`${BASE}/api/resources?limit=1`).then(x => x.json()).catch(() => null);
+  const category = catRes?.resources?.[0]?.category ?? catRes?.[0]?.category ?? 'Learning Resources';
+  let seedId = null;
+  // try/finally: the DELETE must run even if a Playwright wait/click throws
+  // mid-probe, or the __qa_test seed would linger in the pending queue (and in
+  // the publish build container that queue is the PRODUCTION admin queue).
+  try {
+    const create = await ctx.request.post(`${BASE}/api/resources`, {
+      data: { title: '__qa_test_r4017 dialog overflow probe', url: longUrl, description: 'Seeded by responsive-audit to guard against dialog blowout from unbroken URLs; deleted at end of run.', category },
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!create.ok()) {
+      log('r4017-seed-create', false, `POST /api/resources -> ${create.status()}`);
+    } else {
+      seedId = (await create.json()).id;
+      log('r4017-seed-create', true, `seeded pending resource ${seedId} (url ${longUrl.length} chars)`);
+      const dlgPage = await ctx.newPage();
+      try {
+        for (const vw of [1440, 768, 375]) {
+          await dlgPage.setViewportSize({ width: vw, height: 900 });
+          await dlgPage.goto(`${BASE}/admin?tab=approvals`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+          const rowOk = await dlgPage.waitForSelector(`[data-testid="row-pending-resource-${seedId}"]`, { timeout: 20000 }).then(() => true).catch(() => false);
+          if (!rowOk) { log(`r4017-row@${vw}`, false, 'seeded pending row not rendered'); continue; }
+          for (const [name, testid] of [
+            ['details', `button-view-details-${seedId}`],
+            ['approve', `button-approve-${seedId}`],
+            ['reject', `button-reject-${seedId}`],
+          ]) {
+            const btn = dlgPage.locator(`[data-testid="${testid}"]`);
+            if (!(await btn.count())) { log(`r4017-${name}@${vw}`, false, 'trigger not found'); continue; }
+            await btn.scrollIntoViewIfNeeded().catch(() => {});
+            const clicked = await btn.click({ force: true, timeout: 10000 }).then(() => true).catch(() => false);
+            if (!clicked) { log(`r4017-${name}@${vw}`, false, 'trigger not clickable'); continue; }
+            await dlgPage.waitForTimeout(500);
+            const m = await dlgPage.evaluate(() => {
+              const dlg = document.querySelector('[role="dialog"], [role="alertdialog"]');
+              if (!dlg) return null;
+              const doc = document.documentElement;
+              return { sw: dlg.scrollWidth, cw: dlg.clientWidth, docOver: doc.scrollWidth - doc.clientWidth };
+            }).catch(() => null);
+            const pass = !!m && m.sw <= m.cw + 1 && m.docOver <= 0;
+            log(`r4017-${name}@${vw}`, pass, m ? `dialog sw=${m.sw} cw=${m.cw} docOverflow=${m.docOver}` : 'dialog did not open');
+            if (!pass && m) await dlgPage.screenshot({ path: `${OUT}/r4017-${name}-${vw}.png` }).catch(() => {});
+            await dlgPage.keyboard.press('Escape').catch(() => {});
+            await dlgPage.waitForTimeout(300);
+          }
+        }
+      } finally {
+        await dlgPage.close().catch(() => {});
+      }
+    }
+  } finally {
+    if (seedId != null) {
+      const del = await ctx.request.delete(`${BASE}/api/admin/resources/${seedId}`).catch(() => null);
+      log('r4017-seed-delete', !!del && del.ok(), `DELETE /api/admin/resources/${seedId} -> ${del ? del.status() : 'request failed'}`);
+    }
+  }
+}
+
 fs.writeFileSync(`${OUT}/responsive-audit.json`, JSON.stringify(results, null, 2));
 const fails = results.filter(x => !x.pass);
 console.log(`\nTOTAL ${results.length}, FAIL ${fails.length} (evidence: ${OUT})`);

@@ -140,7 +140,10 @@ function calculateDiff(original: Resource, updated: SuggestEditFormData): Record
 
 export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditDialogProps) {
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  // R5-030 (run25): AI URL analysis is admin-only (owner decision) — the
+  // endpoint 403s for everyone else, so only offer the button to admins.
+  const isAdminUser = Boolean(user && (user as any).role === "admin");
   const [claudeSuggestions, setClaudeSuggestions] = useState<ClaudeSuggestions | null>(null);
   const [analyzingWithAI, setAnalyzingWithAI] = useState(false);
 
@@ -568,7 +571,10 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
               />
             )}
 
+            {/* R5-030 (run25): AI analysis is admin-only by owner decision —
+                the endpoint 403s for non-admins, so don't offer the button. */}
             <div className="flex gap-2 pt-2">
+              {isAdminUser && (
               <Button
                 type="button"
                 variant="outline"
@@ -588,6 +594,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
                   </>
                 )}
               </Button>
+              )}
 
               {claudeSuggestions && (
                 <Button

@@ -4011,17 +4011,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // POST /api/claude/analyze - Analyze URL with Claude AI (authenticated)
-  // NB-022 (run23): this endpoint runs a paid Claude call per request. It
-  // stays available to any signed-in user (the suggest-edit dialog calls it),
-  // but is now behind the shared aiLimiter (10 req / 15 min / IP) and caller
-  // errors (missing/garbage URL) are 400s, not 500s.
-  // R5-030 (run24): additionally a PER-USER daily quota — the IP limiter
-  // alone let one registered account mint unlimited paid Claude calls for
-  // arbitrary unique URLs by rotating IPs / pacing requests.
+  // POST /api/claude/analyze - Analyze URL with Claude AI (ADMIN ONLY)
+  // NB-022 (run23): this endpoint runs a paid Claude call per request; behind
+  // the shared aiLimiter (10 req / 15 min / IP), caller errors are 4xx not 5xx.
+  // R5-030 (run25): OWNER DECISION — restricted to admins. A signed-up free
+  // account could previously mint live paid Claude analyses (20/day quota);
+  // the owner chose zero non-admin paid exposure over keeping AI-assisted
+  // suggestions for regular users. Non-admin authenticated callers now get
+  // 403 (the suggest-edit dialog hides the button for them). The per-user
+  // daily quota is kept as defense-in-depth for admin accounts.
   const CLAUDE_ANALYZE_DAILY_LIMIT = 20;
   const claudeAnalyzeQuota = new Map<string, { day: string; count: number }>();
-  app.post('/api/claude/analyze', isAuthenticated, aiLimiter, async (req: any, res) => {
+  app.post('/api/claude/analyze', isAuthenticated, isAdmin, aiLimiter, async (req: any, res) => {
     try {
       const { url } = req.body ?? {};
 

@@ -91,13 +91,52 @@ export function buildCanonicalTagMap(allTags: string[]): {
   pluralMerges: number;
 } {
   // Census: family → (raw spelling → count)
-  const familyCounts = new Map<string, Map<string, number>>();
+  const rawFamilyCounts = new Map<string, Map<string, number>>();
   for (const t of allTags) {
     if (typeof t !== 'string' || !t.trim()) continue;
     const fam = foldTagFamily(t);
-    const spellings = familyCounts.get(fam) ?? new Map<string, number>();
+    const spellings = rawFamilyCounts.get(fam) ?? new Map<string, number>();
     spellings.set(t, (spellings.get(t) ?? 0) + 1);
-    familyCounts.set(fam, spellings);
+    rawFamilyCounts.set(fam, spellings);
+  }
+
+  // Compact merge (R5-063 residual): separator-folded families that differ only
+  // by hyphens/dots are the same family — "livestreaming" joins "live-streaming",
+  // "node.js" joins "nodejs". "+" and "#" are PRESERVED in the compact key so
+  // semantically distinct tags never collapse (c++ vs c#, hdr10 vs hdr10+).
+  // Winner per compact group: a BRAND_CASING family if present, else the family
+  // with the most occurrences.
+  // Compact keys where cross-family merging is UNSAFE: stripping '.' makes
+  // ".net" compact to "net", which would swallow a bare generic "net" tag on a
+  // larger corpus (e.g. prod). Denied keys never group across families.
+  const COMPACT_MERGE_DENY = new Set(['net']);
+  const compactGroups = new Map<string, string[]>();
+  for (const fam of Array.from(rawFamilyCounts.keys())) {
+    const ck = fam.replace(/[-.]/g, '');
+    const key = COMPACT_MERGE_DENY.has(ck) ? `\u0000deny:${fam}` : ck;
+    compactGroups.set(key, [...(compactGroups.get(key) ?? []), fam]);
+  }
+  const compactWinner = new Map<string, string>();
+  for (const fams of Array.from(compactGroups.values())) {
+    if (fams.length === 1) {
+      compactWinner.set(fams[0], fams[0]);
+      continue;
+    }
+    let winner =
+      fams.find((f) => BRAND_CASING[f]) ??
+      fams.reduce((a, b) => {
+        const ca = Array.from(rawFamilyCounts.get(a)!.values()).reduce((x, y) => x + y, 0);
+        const cb = Array.from(rawFamilyCounts.get(b)!.values()).reduce((x, y) => x + y, 0);
+        return cb > ca || (cb === ca && b < a) ? b : a;
+      });
+    for (const f of fams) compactWinner.set(f, winner);
+  }
+  const familyCounts = new Map<string, Map<string, number>>();
+  for (const [fam, spellings] of Array.from(rawFamilyCounts.entries())) {
+    const target = compactWinner.get(fam)!;
+    const acc = familyCounts.get(target) ?? new Map<string, number>();
+    for (const [sp, c] of Array.from(spellings.entries())) acc.set(sp, (acc.get(sp) ?? 0) + c);
+    familyCounts.set(target, acc);
   }
 
   // Plural fold: family → target family (identity unless a merge applies).

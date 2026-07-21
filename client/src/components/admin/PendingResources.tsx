@@ -64,21 +64,29 @@ export default function PendingResources() {
   // BUG-011 (run22): keep the hint in sync with real horizontal overflow.
   // Deps include the loading/count flags because the scroll container only
   // mounts once data has arrived (early returns above it).
+  // R5-058 (run25): the shadcn <Table> renders its own inner `overflow-auto`
+  // wrapper — THAT is the element that actually scrolls horizontally, not the
+  // outer max-h viewport. Track ITS scrollLeft so the gradient cue hides once
+  // the user reaches the rightmost columns (no more content off-screen), and
+  // re-shows when they scroll back.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    // The shadcn <Table> renders its own inner `overflow-auto` wrapper, so
-    // horizontal overflow lives there — compare the table's laid-out width
-    // (min-w 720px) against the visible container width.
+    const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
     const check = () => {
-      const table = el.querySelector('table');
-      const contentWidth = table ? table.getBoundingClientRect().width : el.scrollWidth;
-      setShowSwipeHint(contentWidth > el.clientWidth + 1);
+      const hasOverflow = scroller.scrollWidth > scroller.clientWidth + 1;
+      const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1;
+      setShowSwipeHint(hasOverflow && !atEnd);
     };
     check();
     const ro = new ResizeObserver(check);
     ro.observe(el);
-    return () => ro.disconnect();
+    ro.observe(scroller);
+    scroller.addEventListener('scroll', check, { passive: true });
+    return () => {
+      ro.disconnect();
+      scroller.removeEventListener('scroll', check);
+    };
   }, [isLoading, data?.total]);
 
   const approveMutation = useMutation({
@@ -299,8 +307,12 @@ export default function PendingResources() {
               onKeyDown={(e) => {
                 const el = scrollRef.current;
                 if (!el) return;
-                if (e.key === 'ArrowRight') { el.scrollBy({ left: 80 }); e.preventDefault(); }
-                else if (e.key === 'ArrowLeft') { el.scrollBy({ left: -80 }); e.preventDefault(); }
+                // R5-058: horizontal overflow lives on the shadcn <Table>'s own
+                // inner overflow-auto wrapper — scroll THAT, not the outer
+                // max-h viewport (which only ever overflows vertically).
+                const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
+                if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
+                else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
               }}
             >
             {/* BUG-011 (run22): balanced columns via table-fixed — with auto
@@ -462,16 +474,20 @@ export default function PendingResources() {
                     value is actually a well-formed http(s) URL — malformed
                     submissions render as plain text instead of a dead/unsafe
                     clickable anchor. */}
+                {/* R4-017: the anchor is a flex container, so raw text becomes a
+                    min-width:auto flex item that refuses to wrap — an unbroken
+                    1,900-char URL blew the dialog out to ~15,000px. Wrap the URL
+                    in a min-w-0 span with overflow-wrap:anywhere so it breaks. */}
                 {isSafeHttpUrl(selectedResource.url) ? (
                   <a
                     href={selectedResource.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline flex items-center gap-1 mt-1"
+                    className="text-sm text-primary hover:underline flex items-center gap-1 mt-1 min-w-0"
                     data-testid="link-detail-url"
                   >
-                    {selectedResource.url}
-                    <ExternalLink className="h-3 w-3" />
+                    <span className="min-w-0 [overflow-wrap:anywhere]">{selectedResource.url}</span>
+                    <ExternalLink className="h-3 w-3 shrink-0" />
                   </a>
                 ) : (
                   <p

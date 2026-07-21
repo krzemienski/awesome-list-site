@@ -41,18 +41,28 @@ export default function PendingEdits() {
   // at narrow widths with no affordance that more columns existed.
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
+  // R5-058 (run25): the shadcn <Table> renders its own inner `overflow-auto`
+  // wrapper — THAT is the element that actually scrolls horizontally. Track
+  // ITS scrollLeft so the gradient cue hides at max scroll and re-shows when
+  // the user scrolls back.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+    const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
     const check = () => {
-      const table = el.querySelector('table');
-      const contentWidth = table ? table.getBoundingClientRect().width : el.scrollWidth;
-      setShowSwipeHint(contentWidth > el.clientWidth + 1);
+      const hasOverflow = scroller.scrollWidth > scroller.clientWidth + 1;
+      const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1;
+      setShowSwipeHint(hasOverflow && !atEnd);
     };
     check();
     const ro = new ResizeObserver(check);
     ro.observe(el);
-    return () => ro.disconnect();
+    ro.observe(scroller);
+    scroller.addEventListener('scroll', check, { passive: true });
+    return () => {
+      ro.disconnect();
+      scroller.removeEventListener('scroll', check);
+    };
   }, [isLoading, edits.length]);
 
   const approveMutation = useMutation({
@@ -269,8 +279,11 @@ export default function PendingEdits() {
               onKeyDown={(e) => {
                 const el = scrollRef.current;
                 if (!el) return;
-                if (e.key === 'ArrowRight') { el.scrollBy({ left: 80 }); e.preventDefault(); }
-                else if (e.key === 'ArrowLeft') { el.scrollBy({ left: -80 }); e.preventDefault(); }
+                // R5-058: scroll the shadcn <Table>'s own inner overflow-auto
+                // wrapper — the outer viewport only overflows vertically.
+                const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
+                if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
+                else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
               }}
             >
             <Table className="min-w-[720px]">
