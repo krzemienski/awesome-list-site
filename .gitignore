@@ -96,7 +96,6 @@ playwright/.cache/
 .omc/
 .anneal/
 .a5c/
-.agents/
 .mimirs/
 **/.mimirs/
 .planning/

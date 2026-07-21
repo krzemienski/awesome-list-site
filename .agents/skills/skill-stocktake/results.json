@@ -1,0 +1,1325 @@
+{
+  "evaluated_at": "2026-03-10T15:56:51Z",
+  "mode": "full",
+  "batch_progress": {
+    "total": 219,
+    "evaluated": 219,
+    "status": "completed"
+  },
+  "skills": {
+    "agent-browser": {
+      "path": "~/.claude/skills/agent-browser/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Only skill documenting the agent-browser CLI itself \u2014 525 lines justified by CLI surface area breadth. Related skills (chrome-devtools, playwright-skill, e2e-validate) reference it but cover different toolchains. No overlap with MEMORY.md/CLAUDE.md.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "agent-development": {
+      "path": "~/.claude/skills/agent-development/SKILL.md",
+      "verdict": "Merge into working-with-cc",
+      "reason": "422 lines covering Claude Code agent authoring spec. Substantial overlap with working-with-cc which covers the same plugin/agent development patterns. Integrate the unique agent-specific YAML frontmatter examples and lifecycle hooks into working-with-cc's agent section.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "agent-prompt-evolution": {
+      "path": "~/.claude/skills/agent-prompt-evolution/SKILL.md",
+      "verdict": "Retire",
+      "reason": "404 lines of abstract prompt evolution tracking framework with no actionable code examples or CLI commands. The systematic specialization tracking it describes is not used by any other skill or workflow. continuous-learning-v2 covers iterative improvement patterns with actual implementation. No unique content remains.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ai-artist": {
+      "path": "~/.claude/skills/ai-artist/SKILL.md",
+      "verdict": "Keep",
+      "reason": "129 lines with 129 curated Nano Banana prompts for image generation \u2014 unique capability not covered elsewhere. Compact, actionable, and directly invocable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ai-multimodal": {
+      "path": "~/.claude/skills/ai-multimodal/SKILL.md",
+      "verdict": "Keep",
+      "reason": "118 lines covering Gemini API for vision/audio/video analysis and generation. Unique multimodal capability not duplicated by any other skill. Referenced in CLAUDE.md development-rules as a recommended tool.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "algorithmic-art": {
+      "path": "~/.claude/skills/algorithmic-art/SKILL.md",
+      "verdict": "Keep",
+      "reason": "410 lines with philosophy-first two-phase creative methodology for p5.js generative art. Distinct from canvas-design (static output) and ai-artist (prompt-based). Contains unique conceptual-seed principle and quality-gate patterns.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "api-design": {
+      "path": "~/.claude/skills/api-design/SKILL.md",
+      "verdict": "Keep",
+      "reason": "530 lines of production REST API design reference with comprehensive checklist. Covers versioning, pagination, error handling, rate limiting patterns not found in backend-development or other skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "artifacts-builder": {
+      "path": "~/.claude/skills/artifacts-builder/SKILL.md",
+      "verdict": "Keep",
+      "reason": "80 lines covering specific workflow for bundling multi-component React+shadcn/ui apps into single portable HTML for claude.ai. Clear differentiation from web-artifacts-builder (simpler single-file) and frontend-development (general patterns).",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ask": {
+      "path": "~/.claude/skills/ask/SKILL.md",
+      "verdict": "Retire",
+      "reason": "65 lines defining four named advisor personas that are simply Claude roleplaying different roles \u2014 no distinct tooling, APIs, or unique logic. All capabilities (trade-off analysis, architecture planning, technical investigation) already covered by brainstorm, plan, research skills and the architect agent. Hardcoded file references to project-specific docs are stale.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "backend-development": {
+      "path": "~/.claude/skills/backend-development/SKILL.md",
+      "verdict": "Retire",
+      "reason": "104 lines of thin technology decision matrix with no actionable code examples. All patterns covered more thoroughly by api-design (REST patterns), databases skill (data layer), and framework-specific skills (django-patterns, springboot-patterns). No unique content justifies keeping a separate hub skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "baseline-quality-assessment": {
+      "path": "~/.claude/skills/baseline-quality-assessment/SKILL.md",
+      "verdict": "Merge into methodology-bootstrapping",
+      "reason": "Sub-component of the BAIME methodology-bootstrapping skill family (V_meta scoring, iteration convergence). Covers exactly one aspect \u2014 iteration 0 baseline quality \u2014 already conceptually housed in methodology-bootstrapping (565 lines, the parent framework). Entirely self-referential to BAIME/Bootstrap experiment series with no relevance to general software development. The 465-line skill could be reduced to a short section within methodology-bootstrapping covering 'invest in iteration 0 for faster convergence' with the scoring table.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "beautiful-mermaid": {
+      "path": "~/.claude/skills/beautiful-mermaid/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured, actionable skill for rendering Mermaid diagrams to SVG/PNG via Beautiful Mermaid library with themed output and 4K screenshot capture. Clear differentiation from 3 related Mermaid skills: mermaidjs-v11 (syntax reference only), mermaid-tools (batch extraction), diagram (DDD methodology). Only skill covering the full render pipeline. Technical references current (Mermaid v11, bun/tsx/deno runtimes).",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "better-auth": {
+      "path": "~/.claude/skills/better-auth/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Better Auth is the actual auth framework used by SessionForge (confirmed in MEMORY.md). Provides actionable reference: installation, server/client setup, plugin matrix, implementation checklist. References version 2.0.0 which is current. No other skill covers Better Auth specifically. Well-scoped to a single technology with practical code snippets.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "blog-post-writer": {
+      "path": "~/.claude/skills/blog-post-writer/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique, actionable skill with clear purpose: transforms brain dumps into blog posts in a specific personal voice (Nick Nisi). References bundled resources (voice-tone.md, story-circle.md) for style guidance. Differentiated from copywriting, technical-content-creator, humanize-blog-post by its specific voice/persona focus. No outdated technical references.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "bootstrap": {
+      "path": "~/.claude/skills/bootstrap/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Thin orchestrator chaining plan and cook skills with three greenfield-specific phases (Git init, tech stack research, design). Issues: (1) 4 workflow reference files plus shared-phases.md create deep token cost chain \u2014 consider inlining into SKILL.md. (2) Mode flags (--full/--auto/--fast/--parallel) duplicate flags on plan and cook, creating pass-through layer. (3) No version field. Recommendation: consolidate workflow references into SKILL.md, remove redundant flag pass-through, add version field.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "brainstorm": {
+      "path": "~/.claude/skills/brainstorm/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-scoped ideation/advisory skill with distinct niche: structured trade-off analysis and multi-option evaluation before implementation. Clear 8-phase process with handoff to plan skill. Properly differentiates from ask (consultation), plan (implementation), pdd (design docs). References to AskUserQuestion, planner agent, WebSearch are all current. 84 lines, appropriate size.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "brand-guidelines": {
+      "path": "~/.claude/skills/brand-guidelines/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Compact (80 lines) self-contained reference storing Anthropic's official brand hex codes, typography (Poppins/Lora), and color-application rules. No overlap with MEMORY.md/CLAUDE.md. Provides shared design-token reference consumed by pptx, canvas-design, technical-content-creator, copywriting, pdf skills. Factual content does not go stale.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "build-quality-gates": {
+      "path": "~/.claude/skills/build-quality-gates/SKILL.md",
+      "verdict": "Retire",
+      "reason": "At 1853 lines, second-largest skill in inventory. Most content is generic CI boilerplate bash scripts and procedural walkthrough text any LLM can produce on demand. Tightly coupled to niche BAIME framework with custom metrics (V_instance, V_meta) \u2014 four other BAIME-family skills share same vocabulary. References experiment-config.json suggesting project-specific rather than general use. CI/CD content overlaps with deployment-patterns (434 lines) and production-readiness-audit (759 lines). Go/Make examples irrelevant to current Next.js/bun project.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "building-native-ui": {
+      "path": "~/.claude/skills/building-native-ui/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Highly specialized Expo Router native UI skill with 14 detailed reference files covering cutting-edge APIs (iOS 26 liquid glass, SDK 54+ NativeTabs, Link.Preview/Link.Menu). Distinct from expo-development (build tooling), react-native-expert (React Navigation), react-native-skills (checklist), mobile-development (platform decisions). Very current content (2025+). Dense, actionable guidance expensive to reconstruct.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "canvas-design": {
+      "path": "~/.claude/skills/canvas-design/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique skill for generating static visual art (.png/.pdf) through two-phase process: design philosophy creation then canvas expression. No substantial overlap \u2014 ai-artist uses external APIs, algorithmic-art uses p5.js, frontend-design covers web UI. Fills distinct niche of museum/magazine-quality static visual design. No outdated technical references. 136 lines, well-scoped.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "blog-post": {
+      "path": "~/.claude/skills/blog-post/SKILL.md",
+      "verdict": "Merge into content-research-writer",
+      "reason": "Substantial overlap with content-research-writer on blog structure, SEO, and output format. The cover image generation step is the only unique part and can be folded in.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "blog-writing-guide": {
+      "path": "~/.claude/skills/blog-writing-guide/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Sentry-specific voice, banned language list, and editorial standards are highly opinionated and unique. Valuable as a domain-specific writing style guide.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "chrome-devtools": {
+      "path": "~/.claude/skills/chrome-devtools/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive Puppeteer-based browser automation with persistent sessions, ARIA snapshots, auth methods, and debugging. Unique capability not duplicated elsewhere.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ck-help": {
+      "path": "~/.claude/skills/ck-help/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Meta-skill for discovering and navigating other skills. Lightweight, unique, serves as a routing layer with Python-based intent matching.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "claude-api": {
+      "path": "~/.claude/skills/claude-api/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive, current (Feb 2026 model table), covers Claude API + Agent SDK across 8 languages. Decision tree and pitfalls highly actionable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "code-analyzer": {
+      "path": "~/.claude/skills/code-analyzer/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Useful for Claude Code workflow optimization but depends on shell scripts that may not exist. Should verify scripts are present. GitHub discovery adds unique value.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "code-assist": {
+      "path": "~/.claude/skills/code-assist/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Heavily TDD-oriented (RED-GREEN-REFACTOR) which directly conflicts with project's no-mocks/no-test-files mandate. Duplicates planning/review workflows already in OMC agents.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "code-complete-docs": {
+      "path": "~/.claude/skills/code-complete-docs/SKILL.md",
+      "verdict": "Update",
+      "reason": "References last updated 2025-11-09 covering SDK plugin/skill patterns that may have changed. Core value still relevant but docs need refresh.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "code-refactoring": {
+      "path": "~/.claude/skills/code-refactoring/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Narrowly scoped to Go CLIs with BAIME framework and lambda calculus notation. Not applicable to current Next.js/TypeScript project.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "code-review": {
+      "path": "~/.claude/skills/code-review/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured review pipeline with scout-based edge case detection and verification gates. Adds concrete workflow beyond what OMC code-reviewer agent provides.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "code-task-generator": {
+      "path": "~/.claude/skills/code-task-generator/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Generates structured task files from descriptions. Useful but references Amazon's code task format and PDD plans not standard in this project. Could be simplified.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "codebase-summary": {
+      "path": "~/.claude/skills/codebase-summary/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Generates comprehensive codebase documentation. Supports update mode via git diff. Unique capability for onboarding and AI context generation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "coding-level": {
+      "path": "~/.claude/skills/coding-level/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Lightweight config skill that tailors explanation depth. Minimal overhead, no overlap, integrates via .ck.json config.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "complete-expo-ios-testing-workflow": {
+      "path": "~/.claude/skills/complete-expo-ios-testing-workflow/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Hardcoded to specific app (RepoNexus/vibecode), Xcode version, device UDIDs, and EAS build IDs. Not reusable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "composition-patterns": {
+      "path": "~/.claude/skills/composition-patterns/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Focused React composition patterns with concrete rules and code examples. Directly applicable to SessionForge dashboard (React/Next.js).",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "condition-based-waiting": {
+      "path": "~/.claude/skills/condition-based-waiting/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Test-focused skill about replacing timeouts with condition polling. Conflicts with no-test-files mandate. Core concept too simple for a dedicated skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "conference-talk-builder": {
+      "path": "~/.claude/skills/conference-talk-builder/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique niche \u2014 Story Circle narrative framework mapped to tech talks with iA Presenter slide generation. No overlap.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "configure-ecc": {
+      "path": "~/.claude/skills/configure-ecc/SKILL.md",
+      "verdict": "Retire",
+      "reason": "One-time installer wizard for Everything Claude Code. Clones a specific GitHub repo. If ECC already installed, no further value.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "content-research-writer": {
+      "path": "~/.claude/skills/content-research-writer/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Good template coverage with SEO guidelines. References stale model names. Needs model string updates and could absorb blog-post's cover image workflow.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "context-engineering": {
+      "path": "~/.claude/skills/context-engineering/SKILL.md",
+      "verdict": "Keep",
+      "reason": "High-value skill covering context optimization, degradation debugging, memory systems, multi-agent patterns. Directly applicable to long-running agent sessions.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "cook": {
+      "path": "~/.claude/skills/cook/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Core orchestration skill for end-to-end implementation. Well-structured with smart routing, multiple workflow modes, and mandatory subagent delegation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "copywriting": {
+      "path": "~/.claude/skills/copywriting/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique marketing/copywriting domain knowledge (AIDA, PAS, headline formulas) not found elsewhere. Well-organized with actionable reference files.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "cpp-testing": {
+      "path": "~/.claude/skills/cpp-testing/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Conflicts with mandatory no-mocks/no-test-files policy. C++ irrelevant to SessionForge stack (Next.js/TypeScript).",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "create-meta-prompts": {
+      "path": "~/.claude/skills/create-meta-prompts/SKILL.md",
+      "verdict": "Merge into create-plans",
+      "reason": "Extremely verbose (611 lines) for prompt templating that overlaps heavily with create-plans. Chain execution could be a reference within create-plans.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "create-plans": {
+      "path": "~/.claude/skills/create-plans/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Core planning infrastructure with hierarchical BRIEF->ROADMAP->PLAN->SUMMARY workflow. Well-designed and heavily referenced by other skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "create-validation-plan": {
+      "path": "~/.claude/skills/create-validation-plan/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Adds genuine value with blocking validation gates and evidence compounding, but duplicates much of create-plans' structure. Should be tighter.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "cross-cutting-concerns": {
+      "path": "~/.claude/skills/cross-cutting-concerns/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique methodology for standardizing error handling, logging, config across languages. ROI-based prioritization and automated enforcement are concrete and unique.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "database-migrations": {
+      "path": "~/.claude/skills/database-migrations/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Directly relevant to SessionForge's Drizzle/PostgreSQL stack. Concrete zero-downtime migration patterns.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "databases": {
+      "path": "~/.claude/skills/databases/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Useful reference hub for MongoDB + PostgreSQL but thin at 93 lines. Migration overlap with database-migrations should be cleaned up.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "debug": {
+      "path": "~/.claude/skills/debug/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Core infrastructure skill with 10 technique categories and clear routing table. Reference-loading architecture keeps SKILL.md lean.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "debug-like-expert": {
+      "path": "~/.claude/skills/debug-like-expert/SKILL.md",
+      "verdict": "Merge into debug",
+      "reason": "Significant overlap with debug on root cause analysis, verification, hypothesis testing. Unique additions should be folded into debug as a 'deep mode' reference.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "deep-research": {
+      "path": "~/.claude/skills/deep-research/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Generic research methodology any LLM already knows. Low uniqueness \u2014 4-phase process is standard reasoning patterns.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "defense-in-depth": {
+      "path": "~/.claude/skills/defense-in-depth/SKILL.md",
+      "verdict": "Merge into debug",
+      "reason": "Already embedded as a reference within the debug skill. Standalone 135-line skill adds nothing beyond what debug already references.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "dependency-health": {
+      "path": "~/.claude/skills/dependency-health/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Concrete security-first dependency management with batch remediation strategies. Policy-driven compliance framework provides genuine unique value.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "deployment-patterns": {
+      "path": "~/.claude/skills/deployment-patterns/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Solid reference covering Docker multi-stage builds, CI/CD, health checks, rollback strategies across Node.js/Go/Python.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "design-exploration": {
+      "path": "~/.claude/skills/design-exploration/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Creative concept but heavily depends on external tools (Kimi MCP, Pencil MCP) that may not be available. Should document graceful degradation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "design-md": {
+      "path": "~/.claude/skills/design-md/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Only useful with Google Stitch MCP server. DESIGN.md concept could be 20 lines within a broader design skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "developing-cc-plugins": {
+      "path": "~/.claude/skills/developing-cc-plugins/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique guide for complete Claude Code plugin lifecycle. Clear phase structure and troubleshooting. No other skill covers this domain.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "devlog-pipeline": {
+      "path": "~/.claude/skills/devlog-pipeline/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive content pipeline extending devlog-publisher with companion repos, expansion protocol, and functional validation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "devlog-publisher": {
+      "path": "~/.claude/skills/devlog-publisher/SKILL.md",
+      "verdict": "Merge into devlog-pipeline",
+      "reason": "Largely superseded by devlog-pipeline which adds companion repos, multi-wave expansion, Stitch integration, GitHub push.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "devops": {
+      "path": "~/.claude/skills/devops/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured multi-platform reference (Cloudflare, Docker, GCP, K8s) with platform selection table. Actionable and current.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "diagram": {
+      "path": "~/.claude/skills/diagram/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique DDD (Diagram Driven Development) methodology with Mermaid. 262 lines of detailed workflow. Distinct from excalidraw and beautiful-mermaid.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "dispatching-parallel-agents": {
+      "path": "~/.claude/skills/dispatching-parallel-agents/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Heavy overlap with OMC orchestration protocol in CLAUDE.md. Pattern already codified in orchestration system with more sophisticated routing.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "django-tdd": {
+      "path": "~/.claude/skills/django-tdd/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Django-specific TDD with mocks. Conflicts with no-mocks mandate. SessionForge is Next.js, not Django.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "django-verification": {
+      "path": "~/.claude/skills/django-verification/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Django-specific pre-PR verification. Not relevant to SessionForge. Verification concepts covered by gate-validation-discipline.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "doc-coauthoring": {
+      "path": "~/.claude/skills/doc-coauthoring/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique 3-stage collaborative document creation workflow. No overlap with code docs skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "docker-patterns": {
+      "path": "~/.claude/skills/docker-patterns/SKILL.md",
+      "verdict": "Merge into devops",
+      "reason": "Docker/Compose patterns already covered by devops skill. Merging unique security and networking patterns consolidates without loss.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "docs": {
+      "path": "~/.claude/skills/docs/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Concise 63-line routing skill for doc management. Lightweight dispatcher complementing documentation-management.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "docs-seeker": {
+      "path": "~/.claude/skills/docs-seeker/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique script-first documentation discovery via llms.txt and context7.com. Referenced in development-rules.md.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "documentation-management": {
+      "path": "~/.claude/skills/documentation-management/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Comprehensive 580-line doc methodology. Valuable but overlaps with docs skill's routing. Should clarify relationship with docs skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "docx": {
+      "path": "~/.claude/skills/docx/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Highly specialized Word document creation/editing via docx-js and XML manipulation. 598 lines of unique, actionable content.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "e2e-testing": {
+      "path": "~/.claude/skills/e2e-testing/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Playwright E2E patterns with POM and CI/CD guidance. Should be reframed around functional validation rather than testing \u2014 align with e2e-validate.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "e2e-validate": {
+      "path": "~/.claude/skills/e2e-validate/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive E2E functional validation with Iron Rule. Platform detection, evidence standards. Strongly aligned with user's validation mandate.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "elevenlabs-api": {
+      "path": "~/.claude/skills/elevenlabs-api/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Niche but complete third-party API reference for voice synthesis. Unique domain with no overlap.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "enhance-prompt": {
+      "path": "~/.claude/skills/enhance-prompt/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Extremely niche Google Stitch UI tool. No relevance to SessionForge or general development workflows.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "error-recovery": {
+      "path": "~/.claude/skills/error-recovery/SKILL.md",
+      "verdict": "Improve",
+      "reason": "13-category error taxonomy validated on 1,336 errors is valuable. Should be condensed to actionable lookup tables and integrated with debugging workflow.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "eval": {
+      "path": "~/.claude/skills/eval/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive EvalKit for AI agent evaluation using Strands Evals SDK. Unique domain \u2014 no other skill covers AI evaluation methodology.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "excalidraw": {
+      "path": "~/.claude/skills/excalidraw/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique format-specific skill for generating .excalidraw architecture diagrams from codebase analysis. Fills specific visualization niche.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "executing-plans": {
+      "path": "~/.claude/skills/executing-plans/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Plan execution overlaps heavily with OMC team_pipeline and execution_protocols. OMC provides more complete implementation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "expo-development": {
+      "path": "~/.claude/skills/expo-development/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Very comprehensive 1014-line Expo React Native reference (SDK 52+). Framework-specific but thoroughly actionable for any Expo project.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "expo-ios-complete-testing-workflow": {
+      "path": "~/.claude/skills/expo-ios-complete-testing-workflow/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Hardcoded to specific app, Xcode version, device UDIDs. Not reusable for any other project.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "find-skills": {
+      "path": "~/.claude/skills/find-skills/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Utility meta-skill for discovering ecosystem skills via npx skills. Lightweight, unique purpose.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "finishing-a-development-branch": {
+      "path": "~/.claude/skills/finishing-a-development-branch/SKILL.md",
+      "verdict": "Merge into git",
+      "reason": "4-option branch completion workflow is subset of git operations. Git skill already covers this and references it.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "fix": {
+      "path": "~/.claude/skills/fix/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured multi-mode bug-fixing orchestrator with complexity routing and task orchestration. Unique workflow.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "frontend-design": {
+      "path": "~/.claude/skills/frontend-design/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Distinctive design philosophy focused on avoiding generic AI aesthetics. Broadly applicable to any web UI work.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "frontend-development": {
+      "path": "~/.claude/skills/frontend-development/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Hardcoded to MUI v7 and TanStack Router \u2014 not the stack used here. Would actively mislead if activated.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "frontend-slides": {
+      "path": "~/.claude/skills/frontend-slides/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique niche: zero-dependency HTML presentations with PPT conversion. Well-structured with extensive CSS/JS reference.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "full-functional-audit": {
+      "path": "~/.claude/skills/full-functional-audit/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Strong 5-phase audit protocol with team templates. Overlaps with functional-validation on philosophy but distinct in scope. Could trim iOS team template.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "functional-validation": {
+      "path": "~/.claude/skills/functional-validation/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Core 'Iron Rule' validation philosophy referenced by CLAUDE.md, MEMORY.md, and 5+ other skills. Canonical source of truth.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "gate-validation-discipline": {
+      "path": "~/.claude/skills/gate-validation-discipline/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Evidence-before-completion checklist is critical. ~60% duplicates CLAUDE.md rules. Trim to unique verification loop and anti-pattern table.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "git": {
+      "path": "~/.claude/skills/git/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive git operations with security scanning, commit splitting, and modular references. Well-scoped and actionable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "git-commit-helper": {
+      "path": "~/.claude/skills/git-commit-helper/SKILL.md",
+      "verdict": "Merge into git",
+      "reason": "Conventional commit message generation fully covered by git skill's Step 3-4. This adds examples but no unique workflow.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "gkg": {
+      "path": "~/.claude/skills/gkg/SKILL.md",
+      "verdict": "Retire",
+      "reason": "GitLab Knowledge Graph requires gkg CLI and is beta. LSP tools already provide equivalent functionality.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "golang-testing": {
+      "path": "~/.claude/skills/golang-testing/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Go-only testing patterns. Zero applicability to SessionForge. Conflicts with no-mocking mandate.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "google-adk-python": {
+      "path": "~/.claude/skills/google-adk-python/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Google Agent Development Kit. SessionForge uses Anthropic Claude Agent SDK exclusively.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "humanize-blog-post": {
+      "path": "~/.claude/skills/humanize-blog-post/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique kill-list of AI patterns, structural fixes, and scanner script. Directly relevant to SessionForge's content generation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "internal-comms": {
+      "path": "~/.claude/skills/internal-comms/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Lightweight skill for 3P updates, newsletters, FAQs. Unique domain not covered elsewhere. Low cost to keep.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ios-simulator-control": {
+      "path": "~/.claude/skills/ios-simulator-control/SKILL.md",
+      "verdict": "Retire",
+      "reason": "iOS simulator automation. Zero applicability to SessionForge. Overlaps with expo-ios workflows.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ios-swift-development": {
+      "path": "~/.claude/skills/ios-swift-development/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Basic iOS/Swift MVVM patterns. Zero applicability. Subsumed by ios-swift-expert.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ios-swift-expert": {
+      "path": "~/.claude/skills/ios-swift-expert/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Comprehensive iOS/macOS expertise. Zero applicability to SessionForge (Next.js web app).",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ios-ui-automation": {
+      "path": "~/.claude/skills/ios-ui-automation/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Empty scaffold with TODO placeholders and zero actual instructions. No value in current state.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ios-validation-gate": {
+      "path": "~/.claude/skills/ios-validation-gate/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Strong 3-gate protocol but hardcoded to ILSFullStack project. Needs consistent parameterization throughout.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ios-validation-runner": {
+      "path": "~/.claude/skills/ios-validation-runner/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Excellent 5-phase protocol with real-world gotchas. Slightly project-specific but mostly generalizable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "journal": {
+      "path": "~/.claude/skills/journal/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Only 18 lines, just delegates to journal-writer subagent. No templates, no structure. Too thin for a skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "kanban": {
+      "path": "~/.claude/skills/kanban/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Functional utility skill with specific server-launch instructions and background-task integration. Unique purpose.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "knowledge-transfer": {
+      "path": "~/.claude/skills/knowledge-transfer/SKILL.md",
+      "verdict": "Retire",
+      "reason": "376-line academic onboarding methodology. Too abstract for a coding assistant skill. Better as standalone docs.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "markdown-novel-viewer": {
+      "path": "~/.claude/skills/markdown-novel-viewer/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-documented viewer tool with architecture details, CLI options, Mermaid support. Actively used by preview and kanban skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "mcp-builder": {
+      "path": "~/.claude/skills/mcp-builder/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Solid 4-phase MCP server development guide with current SDK references and evaluation framework. Unique and actionable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "mcp-management": {
+      "path": "~/.claude/skills/mcp-management/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Operational MCP management with Gemini CLI integration. Complements mcp-builder without duplicating it.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "media-processing": {
+      "path": "~/.claude/skills/media-processing/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Concise tool-selection matrix for FFmpeg/ImageMagick/RMBG. Actionable reference, well-scoped.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "mem-search": {
+      "path": "~/.claude/skills/mem-search/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Detailed claude-mem MCP tool usage guide with 3-step workflow and batch optimization. Unique purpose, actionable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "mermaid-tools": {
+      "path": "~/.claude/skills/mermaid-tools/SKILL.md",
+      "verdict": "Merge into mermaidjs-v11",
+      "reason": "Extraction and PNG generation scripts complement the syntax reference in mermaidjs-v11. Merging avoids two separate Mermaid skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "mermaidjs-v11": {
+      "path": "~/.claude/skills/mermaidjs-v11/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Clean, compact Mermaid v11 syntax reference with CLI usage, theming, and integration patterns. Actively referenced by multiple skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "methodology-bootstrapping": {
+      "path": "~/.claude/skills/methodology-bootstrapping/SKILL.md",
+      "verdict": "Retire",
+      "reason": "566 lines of academic BAIME framework. Extremely niche research methodology that bloats context without day-to-day coding value.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "mintlify": {
+      "path": "~/.claude/skills/mintlify/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Current Mintlify documentation builder reference with CLI commands and configuration patterns. Actionable for docs sites.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "mobile-development": {
+      "path": "~/.claude/skills/mobile-development/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Comprehensive but reads like a textbook. Needs trimming to focus on decision-making and reference lookups.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "no-mocking-validation-gates": {
+      "path": "~/.claude/skills/no-mocking-validation-gates/SKILL.md",
+      "verdict": "Retire",
+      "reason": "No-mocking mandate already enforced in CLAUDE.md, testing.md rules, block-test-files.js hook, and functional-validation skill. Redundant.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "notion-knowledge-capture": {
+      "path": "~/.claude/skills/notion-knowledge-capture/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured Notion workflow for capturing knowledge with content type classification. Actionable with Notion MCP tools.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "notion-research-documentation": {
+      "path": "~/.claude/skills/notion-research-documentation/SKILL.md",
+      "verdict": "Merge into notion-knowledge-capture",
+      "reason": "Thin 100-line pattern that is the 'read' complement to knowledge-capture's 'write.' Merging creates one cohesive Notion knowledge skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "notion-spec-to-implementation": {
+      "path": "~/.claude/skills/notion-spec-to-implementation/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Most detailed Notion skill with spec parsing, task breakdown, progress tracking, and change management. Distinct workflow.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "nutrient-document-processing": {
+      "path": "~/.claude/skills/nutrient-document-processing/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Highly actionable with curl examples for every operation (convert, OCR, redact, sign, fill forms). Clear API patterns, MCP server config included. Unique capability \u2014 no other skill covers Nutrient DWS API.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "observability-instrumentation": {
+      "path": "~/.claude/skills/observability-instrumentation/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Go-specific (slog, Prometheus, OpenTelemetry Go bindings) \u2014 SessionForge is TypeScript/Next.js. Generic observability principles covered by CLAUDE.md rules. No Go code exists in the project.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "optimize-prompt": {
+      "path": "~/.claude/skills/optimize-prompt/SKILL.md",
+      "verdict": "Merge into prompt-engineering-expert",
+      "reason": "930 lines of heavily overlapping content with prompt-engineering-expert. Both cover prompt structure, best practices, anti-patterns. Merge the transformation workflow and XML template into prompt-engineering-expert and retire.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "payment-integration": {
+      "path": "~/.claude/skills/payment-integration/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive multi-provider payment reference (Stripe, Paddle, Polar, SePay, Creem.io). SessionForge uses Stripe, making this directly relevant. Unique \u2014 no other skill covers payment integration.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "pdd": {
+      "path": "~/.claude/skills/pdd/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Solid Prompt-Driven Development methodology but references Amazon Q-specific commands (/context add, search_internal_code) that don't exist in Claude Code. Remove Amazon Q references and adapt tool references to Claude Code equivalents.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "pdf": {
+      "path": "~/.claude/skills/pdf/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Highly actionable with Python code examples (pypdf, pdfplumber, reportlab) and CLI tools (qpdf, pdftk). Covers read, merge, split, OCR, watermark, encrypt, forms. Unique capability.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "plan": {
+      "path": "~/.claude/skills/plan/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Core planning skill with multiple workflow modes (fast/hard/parallel/two), red-team and validate subcommands, task hydration, and active plan state management. Central to the planning workflow.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "planning-with-files": {
+      "path": "~/.claude/skills/planning-with-files/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique Manus-style file-based working memory pattern (task_plan.md, findings.md, progress.md) that prevents context loss across long sessions. Complementary to plan skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "plans-kanban": {
+      "path": "~/.claude/skills/plans-kanban/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique visual dashboard for plan directories with progress tracking, timeline visualization. Includes working server.cjs with HTTP routes. No other skill provides visual plan oversight.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "playwright-skill": {
+      "path": "~/.claude/skills/playwright-skill/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive Playwright automation skill with dev server auto-detection, parameterized URLs, /tmp script pattern. Directly useful for SessionForge functional validation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "podcast-blog-post-creator": {
+      "path": "~/.claude/skills/podcast-blog-post-creator/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Highly niche content skill for podcast transcripts to blog posts. Not relevant to SessionForge. Writing guidance overlaps with blog-post-writer and copywriting. References non-existent companion skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "pptx": {
+      "path": "~/.claude/skills/pptx/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Actionable PowerPoint skill with three clear workflows (read via markitdown, edit via unpack/repack, create via pptxgenjs). Unique capability \u2014 no other skill handles PPTX files.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "prd": {
+      "path": "~/.claude/skills/prd/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Clean PRD generator with lettered-option clarifying questions pattern. Unique scope distinct from plan skill (PRD = what to build, plan = how to build). Includes concrete example PRD.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "preflight": {
+      "path": "~/.claude/skills/preflight/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Useful pre-session environment checker but needs update: SessionForge checks should reference current dev setup (bun monorepo, port 3000 not 9090, Neon not local pg). Missing CLAUDECODE env var deletion check.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "preview": {
+      "path": "~/.claude/skills/preview/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Dual-purpose skill: file/directory viewer via markdown-novel-viewer AND visual explanation generator. Referenced in development-rules.md and primary-workflow.md. Central utility skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "problem-solving": {
+      "path": "~/.claude/skills/problem-solving/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique structured problem-solving toolkit with 5 named techniques (Simplification Cascades, Collision-Zone Thinking, Meta-Pattern Recognition, Inversion Exercise, Scale Game). Not replaceable by sequential-thinking.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "production-readiness-audit": {
+      "path": "~/.claude/skills/production-readiness-audit/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive 8-phase methodology with parallel subagent execution, risk-wave approach, and real case study. Unique scope \u2014 no other skill covers systematic production readiness.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "project-guidelines-example": {
+      "path": "~/.claude/skills/project-guidelines-example/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Explicitly labeled as an 'Example' template for a different project (Zenith). Contains hardcoded tech stack (FastAPI, Supabase, GCR) specific to that project. Not actionable for SessionForge.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "project-management": {
+      "path": "~/.claude/skills/project-management/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Core OMC skill for task hydration, session bridging, progress tracking, and documentation coordination. The mandatory sync-back guard and YAML frontmatter patterns are unique and critical.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "prompt-engineering-expert": {
+      "path": "~/.claude/skills/prompt-engineering-expert/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Comprehensive prompt engineering knowledge base but purely conceptual \u2014 zero actionable code examples. Add 2-3 concrete prompt templates, before/after examples. Update tool references (remove Serena MCP).",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "prompt-engineering-patterns": {
+      "path": "~/.claude/skills/prompt-engineering-patterns/SKILL.md",
+      "verdict": "Retire",
+      "reason": "References fictional Python libraries (PromptTemplate, FewShotSelector from prompt_optimizer) that don't exist. Generic prompt theory overlaps with prompt-enhancer and prompt-factory which reference real tools.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "prompt-enhancer": {
+      "path": "~/.claude/skills/prompt-enhancer/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Strong Claude-specific 11-step workflow with XML structuring. References Serena MCP which is not present \u2014 update MCP tool references. Trim redundant coding-rules section that duplicates CLAUDE.md mandates.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "prompt-factory": {
+      "path": "~/.claude/skills/prompt-factory/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Massive 1117-line mega-prompt generator with 69 presets across 15 domains and multi-format output. Unique capability not duplicated by any other skill. Size justified by breadth of coverage.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "python-fastapi-backend-testing": {
+      "path": "~/.claude/skills/python-fastapi-backend-testing/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Hardcoded to specific project path. Contains pytest/mock patterns that directly conflict with user's NEVER-write-mocks mandate enforced by block-test-files.js hook.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "python-ocr-expertise": {
+      "path": "~/.claude/skills/python-ocr-expertise/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Standalone domain skill covering PyTesseract, PaddleOCR, EasyOCR, docTR. Proper applicability guard. Provides genuine specialized knowledge for OCR projects. No overlap.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "python-patterns": {
+      "path": "~/.claude/skills/python-patterns/SKILL.md",
+      "verdict": "Retire",
+      "reason": "757 lines of generic Python idioms and PEP 8 guidelines that any model already knows. No Claude Code-specific actionability. Entirely replaceable by Context7 docs lookup.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "python-testing": {
+      "path": "~/.claude/skills/python-testing/SKILL.md",
+      "verdict": "Retire",
+      "reason": "824 lines of pytest/TDD patterns including mocking guidance. DIRECTLY CONTRADICTS user's mandate: 'NEVER write mocks, stubs, test doubles, unit tests, or test files' \u2014 enforced by block-test-files.js hook.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ralph-tui-create-beads": {
+      "path": "~/.claude/skills/ralph-tui-create-beads/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured PRD-to-beads conversion skill using bd CLI. Clear workflow with concrete examples and anti-patterns. Part of ralph-tui ecosystem.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ralph-tui-create-beads-rust": {
+      "path": "~/.claude/skills/ralph-tui-create-beads-rust/SKILL.md",
+      "verdict": "Merge into ralph-tui-create-beads",
+      "reason": "~95% content overlap with ralph-tui-create-beads. Only difference is br CLI (Rust) vs bd CLI. The br-specific differences could be a 10-line section within the main beads skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ralph-tui-create-json": {
+      "path": "~/.claude/skills/ralph-tui-create-json/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Distinct from beads skills \u2014 converts PRDs to prd.json format. Anti-patterns section identifying common JSON structure mistakes is valuable. Complements ralph-tui-prd.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ralph-tui-prd": {
+      "path": "~/.claude/skills/ralph-tui-prd/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Upstream entry point for ralph-tui ecosystem \u2014 generates PRDs that feed into beads and JSON conversion skills. Essential in the ralph-tui pipeline.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "rapid-convergence": {
+      "path": "~/.claude/skills/rapid-convergence/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique methodology optimization skill with V_meta/V_instance scoring framework for converging on effective approaches in 3-4 iterations. Niche not addressed by any other skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "react-best-practices": {
+      "path": "~/.claude/skills/react-best-practices/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Directly relevant to SessionForge (Next.js/React). 133 lines of Vercel-aligned React/Next.js performance rules. Covers Server Components, memo boundaries, key stability.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "react-components": {
+      "path": "~/.claude/skills/react-components/SKILL.md",
+      "verdict": "Retire",
+      "reason": "53-line skill for converting Google Stitch designs to React. Requires Stitch MCP Server not present in environment. Too narrow and tool-dependent. Standard React covered by react-best-practices.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "react-native-expert": {
+      "path": "~/.claude/skills/react-native-expert/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive 453-line React Native/Expo guide with proper applicability guard. Not relevant to SessionForge but provides genuine specialized knowledge for RN projects.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "react-native-skills": {
+      "path": "~/.claude/skills/react-native-skills/SKILL.md",
+      "verdict": "Merge into react-native-expert",
+      "reason": "127-line rules with significant overlap with react-native-expert (453 lines). Both cover component patterns, navigation. Unique rules could be a section within react-native-expert.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "receiving-code-review": {
+      "path": "~/.claude/skills/receiving-code-review/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique behavioral skill defining how to handle code review feedback with technical rigor. Anti-sycophancy patterns. Complements requesting-code-review. No overlap.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "remotion": {
+      "path": "~/.claude/skills/remotion/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Domain-specific Remotion video creation skill with 55-line index routing to 27 specialized rule files. Proper applicability guard. Valuable for programmatic video generation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "repomix": {
+      "path": "~/.claude/skills/repomix/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Useful utility skill for repository packaging for AI context windows. 257 lines with actionable CLI commands. Solves a real problem. No overlap.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "requesting-code-review": {
+      "path": "~/.claude/skills/requesting-code-review/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Clear 114-line workflow for dispatching code-reviewer subagent with SHA-based diff targeting. Complements receiving-code-review for complete review cycle.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "research": {
+      "path": "~/.claude/skills/research/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured multi-phase research methodology with Gemini CLI integration, parallel search, report templates. Unique repeatable research protocol with source validation.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "retrospective-validation": {
+      "path": "~/.claude/skills/retrospective-validation/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Highly specialized for validating methodologies against historical error datasets (meta-cc, Bootstrap-003). Too niche \u2014 not actionable without specific historical data infrastructure it assumes.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "root-cause-tracing": {
+      "path": "~/.claude/skills/root-cause-tracing/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Actionable debugging methodology with 5-step trace-back, instrumentation examples, bisection script. Unique vs debug skills: focused on backward-tracing technique. Complements debug skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "scout": {
+      "path": "~/.claude/skills/scout/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Fast parallel codebase scouting with divide-and-conquer workflow and task management integration. Unique structured parallel file discovery protocol referenced by other skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "security-scan": {
+      "path": "~/.claude/skills/security-scan/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Actionable AgentShield integration for auditing Claude Code config files. Concrete commands, severity grading, auto-fix support, CI/CD GitHub Action example. Unique.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "sequential-thinking": {
+      "path": "~/.claude/skills/sequential-thinking/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Good structured thinking methodology but overlaps with sequentialthinking MCP tool. Update to position as methodology wrapper around MCP tool. Remove optional scripts references that add complexity.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "shadcn-ui": {
+      "path": "~/.claude/skills/shadcn-ui/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive shadcn/ui integration guide with MCP tools, installation patterns, customization. Current and actionable for React/Next.js projects using shadcn/ui.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "shader": {
+      "path": "~/.claude/skills/shader/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Focused GLSL fragment shader skill with essential functions, quick patterns, progressive reference. Unique domain \u2014 no other skill covers GPU shader programming.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "sharing-skills": {
+      "path": "~/.claude/skills/sharing-skills/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Generic git branch-commit-push-PR workflow for contributing skills upstream. Entirely standard git operations. The sharing criteria could be a paragraph in skill-creator.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "shopify": {
+      "path": "~/.claude/skills/shopify/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive Shopify platform guide covering apps, extensions, themes, CLI, GraphQL/Liquid patterns. Unique domain. Actionable with concrete code examples.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "skill-creator": {
+      "path": "~/.claude/skills/skill-creator/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Highly detailed meta-skill for creating, testing, and iterating on Claude Code skills. Eval framework, grading pipeline, HTML viewer. Canonical skill for skill authorship.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "slack-gif-creator": {
+      "path": "~/.claude/skills/slack-gif-creator/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Focused toolkit for Slack-optimized animated GIFs with PIL/Python. GIFBuilder utility, validators, easing functions, Slack-specific constraints. Unique niche.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "slash-command-factory": {
+      "path": "~/.claude/skills/slash-command-factory/SKILL.md",
+      "verdict": "Improve",
+      "reason": "At 1007 lines, too long. The 10 preset command details should be extracted to references/ file. Core value solid (structured slash command generation with 3 official patterns) but needs aggressive trimming.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "spec-compliance": {
+      "path": "~/.claude/skills/spec-compliance/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Tightly coupled to specific Ralph orchestrator and PROMPT.md framework not part of SessionForge. References ralph run, .agent/, xcrun simctl. Too framework-specific.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "springboot-tdd": {
+      "path": "~/.claude/skills/springboot-tdd/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Directly contradicts global CLAUDE.md mandate: 'NEVER write mocks, stubs, test doubles, unit tests.' Entire skill is JUnit 5 tests with Mockito mocks. Spring Boot not in SessionForge tech stack.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "springboot-verification": {
+      "path": "~/.claude/skills/springboot-verification/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Same conflict as springboot-tdd \u2014 Phase 3 centers on unit/integration tests with mocks. Additionally, Spring Boot is not part of SessionForge tech stack.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "statusline-generator": {
+      "path": "~/.claude/skills/statusline-generator/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Actionable Claude Code statusline customization with installation scripts, ccusage cost tracking, git status indicators. Unique \u2014 no other skill covers statusline configuration.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "stitch-loop": {
+      "path": "~/.claude/skills/stitch-loop/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Depends entirely on Stitch MCP Server not installed in the environment. Also requires DESIGN.md, SITE.md, and baton system not part of any active workflow. Unusable without Stitch infrastructure.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "subagent-driven-development": {
+      "path": "~/.claude/skills/subagent-driven-development/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Good pattern for sequential task execution with fresh subagents. References deprecated TodoWrite (should be TaskCreate/TaskUpdate) and TDD which conflicts with no-mocks mandate. Update tool references.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "subagent-prompt-construction": {
+      "path": "~/.claude/skills/subagent-prompt-construction/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Unique methodology for compact subagent prompts using lambda contracts. However reads more like formal spec than actionable guidance. Add plain-English quick-start section. Symbolic notation should supplement, not replace.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "supabase": {
+      "path": "~/.claude/skills/supabase/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive actionable Supabase reference covering Edge Functions, declarative schema, migrations, DB functions, and RLS policies. Well-scoped. Not replaceable. Valuable for Supabase projects.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "tailwind-v4-shadcn": {
+      "path": "~/.claude/skills/tailwind-v4-shadcn/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Production-tested Tailwind v4 + shadcn/ui setup with specific v4 gotchas (tw-animate-css deprecation, @theme inline pattern). Prevents real documented errors. Current version references.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "tanstack": {
+      "path": "~/.claude/skills/tanstack/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Focused TanStack Start/Form/AI reference with server functions, middleware, route patterns. Clearly scoped with applicability guard. Not duplicated elsewhere.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "tdd-workflow": {
+      "path": "~/.claude/skills/tdd-workflow/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Directly contradicts no-mock validation mandate enforced by block-test-files.js hook. Creates test files, uses jest.mock(). Use functional-validation and e2e-validate instead.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "team": {
+      "path": "~/.claude/skills/team/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Core orchestration skill for Agent Teams with 4 templates (research, cook, review, debug). Detailed execution protocols, CK context blocks, token budgets. Unique multi-agent coordination engine.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "technical-content-creator": {
+      "path": "~/.claude/skills/technical-content-creator/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive technical blog writing with Claude-native visual generation (Mermaid, SVG, HTML cards). Unique combination not replaceable by blog-post-writer or copywriting.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "technical-debt-management": {
+      "path": "~/.claude/skills/technical-debt-management/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Rigorous SQALE methodology with quantified formulas, code smell taxonomy, value-effort matrix. Language-agnostic. Unique systematic debt quantification.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "template-skill": {
+      "path": "~/.claude/skills/template-skill/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Empty placeholder with only 'Insert instructions below'. Zero actionable content. skill-creator already covers skill creation workflow.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "test": {
+      "path": "~/.claude/skills/test/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Test execution and QA reporting skill useful for running existing test suites. Needs explicit applicability guard for no-mock projects \u2014 currently references frameworks that conflict with functional-validation mandate.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "testing-anti-patterns": {
+      "path": "~/.claude/skills/testing-anti-patterns/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Documents mock-based testing anti-patterns \u2014 irrelevant when mandate is NEVER write mocks. Skill's own applicability guard says 'DO NOT USE when project has no-mock mandate.' functional-validation covers the same ground correctly.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "testing-cc-plugins-python-sdk": {
+      "path": "~/.claude/skills/testing-cc-plugins-python-sdk/SKILL.md",
+      "verdict": "Update",
+      "reason": "References ANTHROPIC_API_KEY setup which violates SessionForge SDK auth rules and is blocked by hook. Python SDK API may have changed. Needs update to reflect current SDK and remove API key references.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "testing-skills-with-subagents": {
+      "path": "~/.claude/skills/testing-skills-with-subagents/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique meta-skill for bulletproofing skill documentation using RED-GREEN-REFACTOR applied to process docs. Pressure scenario methodology is original and actionable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "testing-strategy": {
+      "path": "~/.claude/skills/testing-strategy/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Go-specific testing methodology with explicit applicability guard stating 'DO NOT USE when project has no-mock mandate' and 'not Go-based.' SessionForge is TypeScript/Next.js with no-mock mandate.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "theme-factory": {
+      "path": "~/.claude/skills/theme-factory/SKILL.md",
+      "verdict": "Keep",
+      "reason": "10 curated themes with color palettes and font pairings for styling artifacts. Unique pre-built visual identities with PDF showcase. Lightweight and focused.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "threejs": {
+      "path": "~/.claude/skills/threejs/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive Three.js skill with 556 searchable examples, search CLI tool, progressive reference files. Strong applicability guard. Actionable. Unique.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "title-only-detection-iteration": {
+      "path": "~/.claude/skills/title-only-detection-iteration/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Hyper-specific to a single video file (android-12-3-debug.mp4) for YouTube Shorts detection project. References specific frame directories and Python modules. Zero transferability.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "transform-validation-prompt": {
+      "path": "~/.claude/skills/transform-validation-prompt/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Transforms ungated prompts into validation-gated prompts with blocking PASS/FAIL criteria. Unique meta-skill operationalizing the no-mock Iron Rule into prompt engineering.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ui-review-tahoe": {
+      "path": "~/.claude/skills/ui-review-tahoe/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Specialized macOS 26 Tahoe review covering Liquid Glass design system, HIG compliance, SwiftUI/AppKit patterns. Timely for macOS 26. Not duplicated by web-focused UI skills.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ui-styling": {
+      "path": "~/.claude/skills/ui-styling/SKILL.md",
+      "verdict": "Merge into ui-ux-pro-max",
+      "reason": "Significant overlap with ui-ux-pro-max: both cover shadcn/ui, Tailwind CSS, responsive design, dark mode. Core content is a subset. Merge canvas design system reference and utility scripts into ui-ux-pro-max.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "ui-ux-pro-max": {
+      "path": "~/.claude/skills/ui-ux-pro-max/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Most comprehensive UI/UX design intelligence skill with searchable database (50 styles, 97 palettes, 57 font pairings, 99 UX guidelines). Unique search-based recommendation engine.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "usage-based-automation": {
+      "path": "~/.claude/skills/usage-based-automation/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique meta-skill for mining Claude Code session history to generate project-specific commands, agents, and skills. Actionable bash commands for extracting patterns from JSONL session files.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "use-mcp": {
+      "path": "~/.claude/skills/use-mcp/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Depends on Gemini CLI as primary execution path which may not be installed. Improve by making Gemini dependency optional, strengthening fallback path with concrete MCP tool discovery steps.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "using-git-worktrees": {
+      "path": "~/.claude/skills/using-git-worktrees/SKILL.md",
+      "verdict": "Merge into worktree",
+      "reason": "Duplicates worktree skill which has proper Node.js script with monorepo support. Merge .gitignore safety verification and directory priority logic into worktree as pre-creation checklist.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "vercel-deploy-claimable": {
+      "path": "~/.claude/skills/vercel-deploy-claimable/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique deployment capability \u2014 deploys to Vercel without auth via deploy script. Framework auto-detection and troubleshooting for network egress are actionable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "verification-before-completion": {
+      "path": "~/.claude/skills/verification-before-completion/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Strong discipline-enforcement but heavily overlaps with gate-validation-discipline and evidence-gate-reminder.js hook. Trim to focus on unique Iron Law framing and rationalization prevention table, reduce to ~80 lines.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "visual-inspection": {
+      "path": "~/.claude/skills/visual-inspection/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive visual QA protocol with universal checklist, severity classification, and platform-specific routing. Unique \u2014 no other skill covers systematic screenshot review.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "watzup": {
+      "path": "~/.claude/skills/watzup/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Simple focused utility \u2014 reviews current branch changes and summarizes session work without implementing anything. Lightweight, clear trigger, valuable 'do not implement' guard.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "web-artifacts-builder": {
+      "path": "~/.claude/skills/web-artifacts-builder/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Unique skill for self-contained HTML artifacts using React 18 + shadcn/ui + Parcel bundling into single HTML. Anti-AI-slop design guidance.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "web-design-guidelines": {
+      "path": "~/.claude/skills/web-design-guidelines/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Lean skill (44 lines) that fetches Vercel web-interface-guidelines from GitHub. Actionable with concrete source URL and clear review workflow. Complements visual-inspection.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "web-frameworks": {
+      "path": "~/.claude/skills/web-frameworks/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Comprehensive Next.js + Turborepo guide but references local Python scripts that may not exist. Add guard for missing scripts, trim RemixIcon content that inflates the skill.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "web-testing": {
+      "path": "~/.claude/skills/web-testing/SKILL.md",
+      "verdict": "Retire",
+      "reason": "Contradicts core mandate: NEVER write mocks, stubs, test doubles, unit tests, or test files. Entirely about Playwright E2E tests, Vitest unit tests, k6 load tests \u2014 all blocked by hooks.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "webapp-testing": {
+      "path": "~/.claude/skills/webapp-testing/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Python Playwright scripting for local app testing \u2014 aligns with functional validation mandate (real browser interaction, not test files). Does not create test files.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "working-with-cc": {
+      "path": "~/.claude/skills/working-with-cc/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Authoritative reference library for Claude Code internals \u2014 36 reference docs covering plugins, hooks, skills, MCP, settings. Canonical Claude Code documentation source.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "worktree": {
+      "path": "~/.claude/skills/worktree/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Well-structured worktree skill with Node.js script supporting monorepo detection, branch prefix inference, slug generation. Superior to using-git-worktrees.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "writing-plans": {
+      "path": "~/.claude/skills/writing-plans/SKILL.md",
+      "verdict": "Improve",
+      "reason": "Good plan-writing skill but TDD references throughout conflict with no-test-files mandate. Replace TDD step patterns with functional-validation patterns.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "writing-skills": {
+      "path": "~/.claude/skills/writing-skills/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Meta-skill for creating Claude Code skills using TDD-for-documentation methodology. Comprehensive: CSO optimization, frontmatter spec, token efficiency. Canonical skill-authoring reference.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "xc-mcp": {
+      "path": "~/.claude/skills/xc-mcp/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Comprehensive iOS development automation for XC-MCP server. Well-structured with routing table, progressive disclosure, applicability guard. Self-contained for iOS/macOS projects.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "xlsx": {
+      "path": "~/.claude/skills/xlsx/SKILL.md",
+      "verdict": "Keep",
+      "reason": "Deep production-quality spreadsheet skill covering openpyxl + pandas workflows, financial model color coding, formula construction rules. Uniquely valuable.",
+      "mtime": "2026-03-08T00:00:00Z"
+    },
+    "yaml-compliance": {
+      "path": "~/.claude/skills/yaml-compliance/SKILL.md",
+      "verdict": "Merge into working-with-cc",
+      "reason": "YAML frontmatter spec already documented in working-with-cc references. This 164-line skill duplicates that reference. Merge validation checklist and quick-fix patterns into working-with-cc.",
+      "mtime": "2026-03-08T00:00:00Z"
+    }
+  }
+}
