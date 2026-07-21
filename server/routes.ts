@@ -5049,7 +5049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { linkHealthService } = await import('./services/linkHealthService');
-      const job = linkHealthService.getLatestJob();
+      const job = await linkHealthService.getLatestJob();
       res.json({ success: true, job: job || null });
     } catch (error) {
       console.error('Error fetching link health status:', error);
@@ -5076,7 +5076,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/link-health/history', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { linkHealthService } = await import('./services/linkHealthService');
-      const history = linkHealthService.getJobHistory();
+      const history = await linkHealthService.getJobHistory();
       res.json({ success: true, jobs: history });
     } catch (error) {
       console.error('Error fetching link health history:', error);
@@ -5089,7 +5089,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { linkHealthService } = await import('./services/linkHealthService');
       const filter = req.query.status as string;
-      const brokenLinks = linkHealthService.getBrokenLinks(filter);
+      const brokenLinks = await linkHealthService.getBrokenLinks(filter);
       res.json({ success: true, checks: brokenLinks });
     } catch (error) {
       console.error('Error fetching broken links:', error);

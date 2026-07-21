@@ -1255,6 +1255,56 @@ export interface LinkHealthCheck {
   lastCheckedAt: string;
 }
 
+// Persisted link-health scan results (survive server restarts/republishes).
+// LinkHealthJob/LinkHealthCheck above remain the API wire shape; the service
+// maps rows (Date columns) to those interfaces (ISO strings).
+export const linkHealthJobs = pgTable(
+  "link_health_jobs",
+  {
+    id: serial("id").primaryKey(),
+    status: text("status").notNull().default("pending"),
+    totalLinks: integer("total_links").notNull().default(0),
+    checkedLinks: integer("checked_links").notNull().default(0),
+    healthyLinks: integer("healthy_links").notNull().default(0),
+    brokenLinks: integer("broken_links").notNull().default(0),
+    redirectLinks: integer("redirect_links").notNull().default(0),
+    timeoutLinks: integer("timeout_links").notNull().default(0),
+    suspectLinks: integer("suspect_links").notNull().default(0),
+    errorMessage: text("error_message"),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_link_health_jobs_status").on(table.status)]
+);
+
+export type LinkHealthJobRow = typeof linkHealthJobs.$inferSelect;
+
+export const linkHealthChecks = pgTable(
+  "link_health_checks",
+  {
+    id: serial("id").primaryKey(),
+    jobId: integer("job_id").references(() => linkHealthJobs.id, { onDelete: "cascade" }).notNull(),
+    resourceId: integer("resource_id").notNull().default(0),
+    url: text("url").notNull(),
+    status: text("status").notNull(),
+    httpStatus: integer("http_status"),
+    responseTime: integer("response_time"),
+    redirectUrl: text("redirect_url"),
+    finalUrl: text("final_url"),
+    errorMessage: text("error_message"),
+    consecutiveFailures: integer("consecutive_failures").notNull().default(0),
+    flaggedForReview: boolean("flagged_for_review").notNull().default(false),
+    lastCheckedAt: timestamp("last_checked_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_link_health_checks_job_id").on(table.jobId),
+    index("idx_link_health_checks_status").on(table.status),
+  ]
+);
+
+export type LinkHealthCheckRow = typeof linkHealthChecks.$inferSelect;
+
 export const researchJobs = pgTable(
   "research_jobs",
   {
