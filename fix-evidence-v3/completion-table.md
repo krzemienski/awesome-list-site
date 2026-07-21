@@ -120,6 +120,8 @@ Every `https://www.awesome.video/*` URL fails with Cloudflare error 525 (SSL han
 2. **Support www properly**: provision an origin certificate covering `www.awesome.video` (or set Cloudflare SSL mode to match the origin), and add a Cloudflare edge 301 redirect rule `www.awesome.video/* → https://awesome.video/$1` so www never serves content directly.
 History: R4-029/R-14 closed as "by design, owner declined www support" — but that closure predates the observation that the DNS record still exists and now hard-fails. Status: **PLATFORM (owner action)**.
 
+**Owner decision (July 20, 2026):** Presented both options (remove the www DNS record, or provide a Cloudflare API token / do it themselves); owner chose to **leave it as-is for now**. 525 re-verified live the same day (`curl -I https://www.awesome.video/` → HTTP/2 525; apex healthy). Finding is closed as **deferred by owner** — future audits should not re-flag unless the owner revisits.
+
 ### BUG-021 — hostile query params
 Resolved client-side by Run24C (boot-script strip via replaceState, first head script). No WAF exception request pending.
 
