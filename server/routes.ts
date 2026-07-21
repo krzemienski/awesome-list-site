@@ -3569,6 +3569,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const validatedData = validationResult.data;
+
+      // Task #212: resources.url is UNIQUE. A URL change that collides with
+      // another resource used to surface as an unhandled 23505 -> opaque 500
+      // (all 66 QA-residue rows repointed to one URL in the run25 prod run).
+      // Pre-check and answer with an actionable 409 instead.
+      if (validatedData.url !== undefined && validatedData.url !== resource.url) {
+        const conflicting = await resourceRepo.getResourceByUrl(validatedData.url);
+        if (conflicting && conflicting.id !== resourceId) {
+          return res.status(409).json({
+            message: `Another resource already uses this URL (id ${conflicting.id}: "${conflicting.title}"). URLs must be unique.`,
+            conflictingResourceId: conflicting.id,
+          });
+        }
+      }
+
       const updateData: Record<string, any> = {};
       
       if (validatedData.title !== undefined) updateData.title = validatedData.title;
@@ -3606,7 +3621,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       res.json(updatedResource);
-    } catch (error) {
+    } catch (error: any) {
+      // Task #212 safety net: a concurrent writer can still win the race past
+      // the pre-check — map the unique-URL violation to the same 409.
+      if (error?.code === '23505' && String(error?.constraint || '').includes('resources_url')) {
+        return res.status(409).json({
+          message: 'Another resource already uses this URL. URLs must be unique.',
+        });
+      }
       console.error('Error updating resource:', error);
       res.status(500).json({ message: 'Failed to update resource' });
     }
