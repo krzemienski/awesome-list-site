@@ -181,7 +181,11 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
 // horizontally and the document never overflows the viewport. The seed is
 // deleted through the admin API at the end regardless of pass/fail.
 {
-  const longUrl = `https://example.com/__qa_test_r4017_${Date.now()}/` + 'a'.repeat(1900);
+  // Unique per run in BOTH url and title: POST /api/resources 409s on
+  // duplicate url AND duplicate title, and this audit can run concurrently
+  // (workflow + validation step) — a shared title would collide.
+  const runTag = `${Date.now()}_${process.pid}`;
+  const longUrl = `https://example.com/__qa_test_r4017_${runTag}/` + 'a'.repeat(1900);
   const catRes = await fetch(`${BASE}/api/resources?limit=1`).then(x => x.json()).catch(() => null);
   const category = catRes?.resources?.[0]?.category ?? catRes?.[0]?.category ?? 'Learning Resources';
   let seedId = null;
@@ -190,7 +194,7 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
   // the publish build container that queue is the PRODUCTION admin queue).
   try {
     const create = await ctx.request.post(`${BASE}/api/resources`, {
-      data: { title: '__qa_test_r4017 dialog overflow probe', url: longUrl, description: 'Seeded by responsive-audit to guard against dialog blowout from unbroken URLs; deleted at end of run.', category },
+      data: { title: `__qa_test_r4017 dialog overflow probe ${runTag}`, url: longUrl, description: 'Seeded by responsive-audit to guard against dialog blowout from unbroken URLs; deleted at end of run.', category },
       headers: { 'Content-Type': 'application/json' },
     });
     if (!create.ok()) {
