@@ -7,4 +7,4 @@ The `responsive-audit` profile checks measure the first `h1` on /profile. Right 
 
 **Why:** the harness navigates immediately after server boot; profile data fetch is slower on cold start, and the h1 exists but is empty/zero-width until data hydrates.
 
-**How to apply:** if responsive-audit fails only `profile@640`/`profile@700` with `nameW=0` (all else passing) right after a workflow restart, rerun once before debugging — two clean runs bracketing one nameW=0 run means flake, not regression. Durable fix if it recurs: make the harness wait for non-empty h1 text before measuring. Relevant because the pre-publish gate also boots a cold server before running this audit.
+**How to apply:** FIXED July 24, 2026 — the harness now waits (30s) for non-empty h1 text before the sweep and retries once per viewport when nameW=0, so a genuine missing name still fails but the cold-boot skeleton race no longer can. If nameW=0 failures ever reappear, the wait/retry guard in the profile section of `responsive-audit` is the first place to look.

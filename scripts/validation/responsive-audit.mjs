@@ -83,10 +83,14 @@ const ctx = await newAdminContext();
 const page = await ctx.newPage();
 await page.goto(`${BASE}/profile`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
 await page.waitForTimeout(1200);
-for (const w of [640, 700, 768, 812, 860, 900, 1024, 1280, 1440]) {
-  await page.setViewportSize({ width: w, height: 900 });
-  await page.waitForTimeout(350);
-  const r = await page.evaluate(() => {
+// Cold-boot guard: right after a server (re)start the profile page can still be
+// showing its loading skeleton when the first viewports are measured, which reads
+// nameW=0 and false-fails. Wait for the h1 to carry real text before measuring.
+await page.waitForFunction(
+  () => (document.querySelector('h1')?.textContent || '').trim().length > 0,
+  { timeout: 30000 },
+).catch(() => console.log('profile h1 still empty after 30s — measuring anyway (genuine failure will be reported)'));
+const measureProfile = () => page.evaluate(() => {
     const name = document.querySelector('h1');
     const emailEl = [...document.querySelectorAll('span')].find(s => s.textContent.includes('@') && s.querySelector('svg'));
     const settingsBtn = [...document.querySelectorAll('button, a')].find(b => /settings/i.test(b.textContent) && b.closest('.flex.flex-wrap.gap-2'));
@@ -100,6 +104,19 @@ for (const w of [640, 700, 768, 812, 860, 900, 1024, 1280, 1440]) {
     const hOverflow = doc.scrollWidth - doc.clientWidth;
     return { nameVisible, nameW: nr?.w, bad, hOverflow };
   });
+for (const w of [640, 700, 768, 812, 860, 900, 1024, 1280, 1440]) {
+  await page.setViewportSize({ width: w, height: 900 });
+  await page.waitForTimeout(350);
+  let r = await measureProfile();
+  if (!r.nameW) {
+    // one-shot retry: the skeleton may have just swapped in; give it a moment
+    await page.waitForFunction(
+      () => (document.querySelector('h1')?.textContent || '').trim().length > 0,
+      { timeout: 10000 },
+    ).catch(() => {});
+    await page.waitForTimeout(350);
+    r = await measureProfile();
+  }
   log(`profile@${w}`, r.nameVisible && r.bad.length === 0 && r.hOverflow <= 0,
     `nameW=${Math.round(r.nameW || 0)} overlaps=[${r.bad}] hOverflow=${r.hOverflow}`);
   if ([700, 812, 900].includes(w)) await page.screenshot({ path: `${OUT}/profile-${w}.png` });
