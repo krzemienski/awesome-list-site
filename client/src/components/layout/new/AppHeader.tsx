@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Search, Palette, LogIn, LogOut, User, Bookmark, Shield, MoreHorizontal } from "lucide-react";
+import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -239,6 +240,29 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
         data-testid="mobile-drawer-trigger"
         aria-label="Toggle navigation menu"
       />
+      {/* DS shell parity — the full-width header owns the brand (reference
+          layout.jsx Header: logo tile + AWESOME.VIDEO mono wordmark,
+          11px/700/tracking 1.8). Wordmark hides below lg to avoid crowding
+          the breadcrumb + search + action cluster. */}
+      <Link
+        href="/"
+        className="flex items-center gap-2.5 shrink-0 no-underline min-h-[44px]"
+        aria-label="Awesome Video — home"
+        data-testid="header-brand"
+      >
+        <BrandMark className="size-7 shrink-0" />
+        <span
+          className="font-mono hidden lg:inline"
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: 1.8,
+            color: "var(--text)",
+          }}
+        >
+          AWESOME.VIDEO
+        </span>
+      </Link>
       <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />
 
       {/* BUG-017 (run14): breadcrumb must stay on ONE line inside the fixed

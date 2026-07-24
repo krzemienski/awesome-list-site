@@ -68,7 +68,15 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
   const isMobile = useIsMobile();
 
   return (
-    <SidebarProvider defaultOpen={!isMobile}>
+    <SidebarProvider
+      defaultOpen={!isMobile}
+      // DS shell parity: column layout — the full-width 60px header owns the
+      // brand (reference layout.jsx Header), and the sidebar/icon-rail starts
+      // BELOW it (reference .sidebar/.icon-rail: sticky top:60px). The
+      // --header-height var drives the fixed sidebar offset in ui/sidebar.tsx.
+      className="flex-col"
+      style={{ "--header-height": "60px" } as React.CSSProperties}
+    >
       {/* CC-17 — Skip-link is the first focusable element on every page. */}
       <a href="#main" className="skip-link">Skip to main content</a>
       {/* WP-1 — Editorial atmosphere: SVG grain overlay + radial accent
@@ -79,6 +87,13 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
       <div className="grain" aria-hidden="true" />
 
       <div className="page contents">
+        <AppHeader
+          onSearchOpen={() => setSearchOpen(true)}
+          user={user}
+          onLogout={onLogout}
+          categories={nav?.categories || []}
+        />
+        <div className="flex flex-1 w-full min-h-0">
         <AppSidebar
           categories={nav?.categories || []}
           totalResources={nav?.totalResources ?? 0}
@@ -88,12 +103,6 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
           user={user}
         />
         <SidebarInset>
-        <AppHeader
-          onSearchOpen={() => setSearchOpen(true)}
-          user={user}
-          onLogout={onLogout}
-          categories={nav?.categories || []}
-        />
         {/*
           CC-14 (landmark half) — single <main id="main"> wrapping route content.
           CC-16 — 1280 max-width with 48 px desktop gutters.
@@ -163,6 +172,7 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
           </div>
         </footer>
         </SidebarInset>
+        </div>
       </div>
       <SearchDialog
         isOpen={searchOpen}

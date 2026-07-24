@@ -56,3 +56,4 @@
 - [Gitignore cleanup anchoring](gitignore-cleanup-anchoring.md) — root-anchor bulk-cleanup ignore patterns (`/screenshots/`) or they shadow kept dirs at depth (docs/screenshots); verify with check-ignore + ls-files -i -c.
 - [Suspense boundary guards](suspense-boundary-guards.md) — error boundaries render error-free WHILE a chunk fetches; never clear one-shot reload guards on clean render — use timestamp+cooldown.
 - [line-clamp on the clipping ancestor](line-clamp-anchor.md) — -webkit-line-clamp fails silently when an inline-block child wraps the text; clamp the element that directly holds the text node.
+- [Responsive-audit cold-boot flake](audit-cold-boot-flake.md) — profile nameW=0 false-fails right after a server restart (skeleton race); rerun once before debugging.

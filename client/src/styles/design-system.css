@@ -416,6 +416,14 @@ button { font-family: inherit; }
 [data-collapsible="icon"] [data-sidebar="sidebar"] {
   background: var(--bg-2);
 }
+/* Expanded desktop sidebar parity with DS .sidebar: 88% translucent bg so the
+   body atmosphere shows through (reference paints a flat color-mix gradient).
+   Scoped to the expanded desktop wrapper only — the mobile Sheet drawer keeps
+   opaque bg-sidebar (reference .mobile-drawer is opaque --bg-2), and the
+   collapsed rail keeps --bg-2 via the rule above. */
+[data-state="expanded"] [data-sidebar="sidebar"] {
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+}
 [data-collapsible="icon"] .rail-icon-btn {
   width: 36px;
   height: 36px;

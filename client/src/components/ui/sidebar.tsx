@@ -25,7 +25,8 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+// DS parity: reference .sidebar is 280px wide (awesome-list-site-ds/styles.css).
+const SIDEBAR_WIDTH = "17.5rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -292,7 +293,11 @@ const Sidebar = React.forwardRef<
       >
         <div
           className={cn(
-            "duration-200 relative h-svh bg-transparent transition-[width] ease-linear",
+            // DS shell parity: the sidebar starts BELOW the full-width header
+            // (--header-height set by the layout; falls back to 0 for legacy
+            // shells). The spacer height must match the fixed panel or the
+            // page gains phantom scroll equal to the header height.
+            "duration-200 relative h-[calc(100svh-var(--header-height,0px))] bg-transparent transition-[width] ease-linear",
             side === "right" && "rotate-180"
           )}
           style={{
@@ -308,7 +313,10 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] ease-linear md:flex",
+            // DS shell parity: fixed panel is offset below the 60px header
+            // (reference .sidebar/.icon-rail: sticky top:60px, height
+            // calc(100vh - 60px)). Header is z-30, sidebar stays under it.
+            "duration-200 fixed top-[var(--header-height,0px)] bottom-0 z-10 hidden h-[calc(100svh-var(--header-height,0px))] transition-[left,right,width] ease-linear md:flex",
             side === "left" && "left-0 border-r",
             side === "right" && "right-0 border-l",
             (variant === "floating" || variant === "inset") && "p-2",

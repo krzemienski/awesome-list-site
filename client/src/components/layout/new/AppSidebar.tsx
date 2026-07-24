@@ -481,7 +481,7 @@ export default function AppSidebar({
   const activeSearch = useSearch();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const [openSubcategories, setOpenSubcategories] = useState<string[]>([]);
-  const { setOpenMobile } = useSidebar();
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const filtered = useMemo(() => filterCategories(categories), [categories]);
 
@@ -553,17 +553,22 @@ export default function AppSidebar({
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
-      <SidebarHeader className="border-b p-0">
+      {/* DS shell parity — on desktop the brand lives in the full-width
+          header, NEVER in the sidebar/rail (reference layout.jsx). The brand
+          block stays for the MOBILE Sheet drawer only, which mirrors the
+          reference .mobile-drawer (logo + wordmark + close at top). */}
+      {isMobile && (
+        <SidebarHeader className="border-b p-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               onClick={() => navigate("/")}
-              className="cursor-pointer h-14 px-3 group-data-[collapsible=icon]:!size-9 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:my-2 group-data-[collapsible=icon]:justify-center"
+              className="cursor-pointer h-14 px-3"
               tooltip="Awesome Video"
             >
-              <BrandMark className="size-8 shrink-0 group-data-[collapsible=icon]:size-7" />
-              <div className="flex flex-col gap-0.5 leading-none min-w-0 group-data-[collapsible=icon]:hidden">
+              <BrandMark className="size-8 shrink-0" />
+              <div className="flex flex-col gap-0.5 leading-none min-w-0">
                 <span
                   className="font-sans text-sm font-semibold tracking-tight truncate"
                   style={{ color: "var(--text)" }}
@@ -591,7 +596,8 @@ export default function AppSidebar({
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarHeader>
+        </SidebarHeader>
+      )}
 
       <SidebarContent className="gap-0">
         {/* COLLAPSED ICON RAIL — DS .icon-rail parity (56px rail, 36px icon
@@ -704,18 +710,45 @@ export default function AppSidebar({
           )}
         </div>
 
-        {/* CATEGORIES HEADER */}
-        <div
-          className="px-3 pt-4 pb-2 group-data-[collapsible=icon]:hidden"
-        >
+        {/* CATEGORIES HEADER — DS parity: reference sidebar top block is a
+            BROWSE eyebrow + "Categories · N" title (layout.jsx Sidebar). The
+            resource-count line (with its Loading/Catalog-unavailable states,
+            R5-024) relocated here from the old desktop brand header. */}
+        <div className="px-[18px] pt-4 pb-2 group-data-[collapsible=icon]:hidden">
           <div
+            className="font-mono uppercase"
             style={{
-              fontSize: 12,
+              fontSize: 9.5,
+              letterSpacing: 1.8,
+              fontWeight: 700,
               color: "var(--text-3)",
-              fontWeight: 500,
             }}
           >
-            Categories
+            Browse
+          </div>
+          <div
+            style={{ marginTop: 6, fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}
+          >
+            Categories{" "}
+            <span style={{ color: "var(--text-3)", fontWeight: 400 }}>
+              · {isLoading ? "…" : totalCats}
+            </span>
+          </div>
+          <div
+            className="font-mono"
+            style={{
+              marginTop: 2,
+              fontSize: 10,
+              letterSpacing: 0.4,
+              color: "var(--text-3)",
+            }}
+            data-testid="sidebar-resource-count"
+          >
+            {navError && totalResources === 0
+              ? "Catalog unavailable"
+              : isLoading || totalResources === 0
+                ? "Loading…"
+                : `${totalResources.toLocaleString()} resources`}
           </div>
         </div>
 
