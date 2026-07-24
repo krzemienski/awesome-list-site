@@ -11,10 +11,13 @@ A production-ready React application for browsing and discovering over 2,600 cur
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 
+### Full UI experience audit — VERDICT: PASS (July 24, 2026)
+- **Zero-defects run closed**: republished (pre-publish gate green in build container), all 4 fixes re-verified on prod (F-001 admin API 0 residue; F-002 icon-only pill @390 both labels hidden, no clip; F-003 nav API all 9 teasers; F-004 24/24 card external anchors carry sr-only note — sole exception is the visible-text site-chrome GitHub link, out of scope), then **two clean confirmation passes** against prod: 40+ routes × 3 viewports each with 0 console/page errors, 0 HTTP ≥400, 0 overflow, 0 broken images; API contract sweep all 200s (9 cats / 2,282 resources); authed /admin/profile/bookmarks clean; live interactions (search→results, category→resource, journey steps) clean. Verdict + evidence: `audit-evidence/VERDICT.md`, `cycle-02/`, `cycle-03/` (local, gitignored).
+
 ### Full UI experience audit — Cycle 01 (July 24, 2026)
 - **Zero-defect audit of prod completed**: 4 LOW findings total, 0 functional failures. F-001 QA residue deleted live on prod (verified 0 remaining); F-002 header search pill now icon-only below 520px (`AppHeader.tsx`); F-003 nav teaser falls back to subcategory/sub-sub resources so all 9 home cards show "Featured:" (`routes.ts /api/awesome-list/nav`); F-004 sr-only "(opens in new tab)" on external anchors (`ResourceCard.tsx`, `resource-view-modes.tsx`). Artifacts: `audit-evidence/cycle-01/` (findings.json, disposition-table.md, ux-reports/SUMMARY.md).
 - **External 54-claim "Master Fix Prompt" triaged claim-by-claim**: 1 accepted (FIX-040 → F-004), 38 invalid (crawler scanned the unhydrated SPA shell — login/submit forms and aria-labels all exist live; submit E2E: POST /api/resources 201), 8 not-a-defect, 7 declined-by-design. Table: `audit-evidence/cycle-01/disposition-table.md`.
-- Gates green on dev: tsc, migration-drift, print-audit 49/49, responsive-audit 28/28, prod build. Architect review PASS. **Needs republish**, then prod re-verify F-002/F-003/F-004 + two clean confirmation passes → VERDICT.md.
+- Gates green on dev: tsc, migration-drift, print-audit 49/49, responsive-audit 28/28, prod build. Architect review PASS. Republished July 24, 2026; prod re-verification + two clean passes completed (see VERDICT entry above).
 
 
 ### R6 Residual Remediation — Run25 (July 21, 2026)
