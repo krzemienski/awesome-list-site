@@ -405,7 +405,7 @@ export default function BatchEnrichmentPanel() {
                     disabled={hasActiveJob}
                     data-testid="input-enrich-baseurl"
                   />
-                  <p className="text-[11px] text-muted-foreground">Must be https and requires an auth token below. Leave blank to use the platform endpoint.</p>
+                  <p className="text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the platform endpoint.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="enrich-token" className="flex items-center gap-1.5">

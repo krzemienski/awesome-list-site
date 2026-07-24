@@ -585,7 +585,7 @@ export default function ResearcherTab() {
                           className="mt-1 font-mono text-xs"
                           data-testid="input-research-baseurl"
                         />
-                        <p className="mt-1 text-[11px] text-muted-foreground">Must be https and requires an auth token below. Leave blank to use the platform endpoint.</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the platform endpoint.</p>
                       </div>
                       <div>
                         <Label htmlFor="research-token" className="flex items-center gap-1.5">

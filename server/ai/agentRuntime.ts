@@ -43,9 +43,10 @@ function isPrivateIp(ip: string): boolean {
 }
 
 /**
- * Validate a custom Anthropic-compatible base URL: must be https and must not resolve to a
- * private/loopback/link-local address (SSRF guard). Returns a normalized URL (no trailing slash).
- * Throws with a user-facing message on failure.
+ * Validate a custom Anthropic-compatible base URL: must be http or https and must not resolve
+ * to a private/loopback/link-local address (SSRF guard). Returns a normalized URL (no trailing
+ * slash). Throws with a user-facing message on failure. Note: over plain http the auth token
+ * travels unencrypted — the admin UI warns about this.
  */
 export async function validateBaseUrl(raw: string): Promise<string> {
   let u: URL;
@@ -54,7 +55,9 @@ export async function validateBaseUrl(raw: string): Promise<string> {
   } catch {
     throw new Error("Base URL is not a valid URL");
   }
-  if (u.protocol !== "https:") throw new Error("Base URL must use https://");
+  if (u.protocol !== "https:" && u.protocol !== "http:") {
+    throw new Error("Base URL must use http:// or https://");
+  }
   if (!u.hostname) throw new Error("Base URL must include a host");
 
   let addresses: string[] = [];
@@ -136,7 +139,7 @@ export interface ParsedAgentConfig {
 
 /**
  * Parse + validate per-run agent config from an admin request body. A custom base URL is
- * https/SSRF-validated (throws a user-facing message on failure) and a plaintext auth token is
+ * protocol/SSRF-validated (http or https; throws a user-facing message on failure) and a plaintext auth token is
  * encrypted at rest via AES-256-GCM (only the last 4 chars are retained for display). Throws a
  * user-facing Error on any invalid input so the caller can surface it as a 400.
  */
