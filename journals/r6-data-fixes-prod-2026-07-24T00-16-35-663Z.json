@@ -1,0 +1,404 @@
+{
+  "startedAt": "2026-07-24T00:16:35.663Z",
+  "base": "https://awesome.video",
+  "mode": "apply",
+  "actions": [
+    {
+      "step": "fetch",
+      "total": 2482
+    },
+    {
+      "finding": "NB-015",
+      "id": 188130,
+      "before": {
+        "title": "Gstreamer-on-embedded-devices — RPi/Jetson Examples"
+      },
+      "after": {
+        "title": "GStreamer-on-embedded-devices — RPi/Jetson Examples"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 188126,
+      "before": {
+        "title": "gstreamer-media-SDK — HW-Accel GStreamer Plugins"
+      },
+      "after": {
+        "title": "GStreamer-media-SDK — HW-Accel GStreamer Plugins"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 188048,
+      "before": {
+        "description": "Node library validating player CMCD (CTA-5004) in real time across queries/headers/JSON, tested against Video.js/Dash.js/Hls.js/Shaka."
+      },
+      "after": {
+        "description": "Node library validating player CMCD (CTA-5004) in real time across queries/headers/JSON, tested against Video.js/DASH.js/Hls.js/Shaka."
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 187959,
+      "before": {
+        "title": "Dash-Industry-Forum CPIX Spec"
+      },
+      "after": {
+        "title": "DASH Industry Forum CPIX Spec"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186612,
+      "before": {
+        "title": "gstreamer-rs"
+      },
+      "after": {
+        "title": "GStreamer Rust Bindings"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015+R5-032",
+      "id": 186519,
+      "before": {
+        "description": "A.NET Standard wrapper for FFmpeg, enabling developers to compose and execute FFmpeg commands in C# with a fluent interface."
+      },
+      "after": {
+        "description": "A .NET Standard wrapper for FFmpeg, enabling developers to compose and execute FFmpeg commands in C# with a fluent interface."
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186311,
+      "before": {
+        "title": "Dash IF Test Assets Database"
+      },
+      "after": {
+        "title": "DASH IF Test Assets Database"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186248,
+      "before": {
+        "title": "Dash JavaScript Player"
+      },
+      "after": {
+        "title": "DASH JavaScript Player"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186224,
+      "before": {
+        "title": "Opus Dash"
+      },
+      "after": {
+        "title": "Opus DASH"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186222,
+      "before": {
+        "title": "MPEG Ts Inspector"
+      },
+      "after": {
+        "title": "MPEG TS Inspector"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186209,
+      "before": {
+        "description": "encoder with hls output based on gstreamer."
+      },
+      "after": {
+        "description": "encoder with hls output based on GStreamer."
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186183,
+      "before": {
+        "title": "Dash Adaptation Simulator"
+      },
+      "after": {
+        "title": "DASH Adaptation Simulator"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186135,
+      "before": {
+        "description": "A set of command lines to debug video streaming files like mp4 (MPEG-4 Part 14), ts (MPEG-2 Part 1), fmp4 in Dash, HLS, or MSS, with or without DRM."
+      },
+      "after": {
+        "description": "A set of command lines to debug video streaming files like mp4 (MPEG-4 Part 14), ts (MPEG-2 Part 1), fmp4 in DASH, HLS, or MSS, with or without DRM."
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186125,
+      "before": {
+        "title": "Go Dash"
+      },
+      "after": {
+        "title": "Go DASH"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 186116,
+      "before": {
+        "title": "Go Ts Segmenter"
+      },
+      "after": {
+        "title": "Go TS Segmenter"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185944,
+      "before": {
+        "title": "Videojs Contrib Dash"
+      },
+      "after": {
+        "title": "Videojs Contrib DASH"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185930,
+      "before": {
+        "title": "Dash DRM"
+      },
+      "after": {
+        "title": "DASH DRM"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185919,
+      "before": {
+        "title": "Dash Live Source Simulator"
+      },
+      "after": {
+        "title": "DASH Live Source Simulator"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185918,
+      "before": {
+        "title": "Media Tools (Dash-Industry-Forum)"
+      },
+      "after": {
+        "title": "Media Tools (DASH Industry Forum)"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185894,
+      "before": {
+        "title": "HLS Ts Analyzer"
+      },
+      "after": {
+        "title": "HLS TS Analyzer"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185892,
+      "before": {
+        "title": "HLS Ts JS"
+      },
+      "after": {
+        "title": "HLS TS JS"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185883,
+      "before": {
+        "title": "HLS To Dash"
+      },
+      "after": {
+        "title": "HLS To DASH"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185807,
+      "before": {
+        "title": "Dash Proxy"
+      },
+      "after": {
+        "title": "DASH Proxy"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185806,
+      "before": {
+        "title": "Dash JS"
+      },
+      "after": {
+        "title": "DASH JS"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185792,
+      "before": {
+        "title": "Dash Validator JS"
+      },
+      "after": {
+        "title": "DASH Validator JS"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185788,
+      "before": {
+        "title": "Dash Server"
+      },
+      "after": {
+        "title": "DASH Server"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185786,
+      "before": {
+        "title": "VP9 Dash"
+      },
+      "after": {
+        "title": "VP9 DASH"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185776,
+      "before": {
+        "title": "Dash"
+      },
+      "after": {
+        "title": "DASH"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185772,
+      "before": {
+        "title": "Auto Dash HLS"
+      },
+      "after": {
+        "title": "Auto DASH HLS"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185744,
+      "before": {
+        "title": "Dash Proxy (Viblast)"
+      },
+      "after": {
+        "title": "DASH Proxy (Viblast)"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185742,
+      "before": {
+        "title": "Docker Dash Packager"
+      },
+      "after": {
+        "title": "Docker DASH Packager"
+      },
+      "status": 200
+    },
+    {
+      "finding": "NB-015",
+      "id": 185619,
+      "before": {
+        "description": "Highly extensible, modern, JavaScript video player. Handles MPEG-Dash / HLS / MPEG-4 and is built on top of the HTML5 video element."
+      },
+      "after": {
+        "description": "Highly extensible, modern, JavaScript video player. Handles MPEG-DASH / HLS / MPEG-4 and is built on top of the HTML5 video element."
+      },
+      "status": 200
+    },
+    {
+      "step": "sweep-done",
+      "mutatedRows": 32
+    },
+    {
+      "finding": "R5-032",
+      "check": "sentence-initial residual after repair",
+      "count": 0,
+      "ids": []
+    },
+    {
+      "finding": "R4-022",
+      "id": 185390,
+      "before": "https://www.npmjs.com/package/web-monetisation-video-ads",
+      "after": "https://libraries.io/npm/web-monetisation-video-ads",
+      "status": 200
+    },
+    {
+      "finding": "R5-063",
+      "check": "families-before",
+      "count": 0,
+      "families": []
+    },
+    {
+      "finding": "R5-063",
+      "action": "canonicalize-tags",
+      "status": 200,
+      "result": {
+        "variantFamiliesFound": 0,
+        "pluralMerges": 0,
+        "resourcesUpdated": 0
+      }
+    },
+    {
+      "finding": "R5-063",
+      "check": "families-after",
+      "count": 0,
+      "families": []
+    }
+  ],
+  "finishedAt": "2026-07-24T00:16:54.292Z",
+  "mutatedRows": 32
+}

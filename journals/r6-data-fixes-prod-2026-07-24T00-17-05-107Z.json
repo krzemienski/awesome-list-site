@@ -1,0 +1,51 @@
+{
+  "startedAt": "2026-07-24T00:17:05.107Z",
+  "base": "https://awesome.video",
+  "mode": "apply",
+  "actions": [
+    {
+      "step": "fetch",
+      "total": 2482
+    },
+    {
+      "step": "sweep-done",
+      "mutatedRows": 0
+    },
+    {
+      "finding": "R5-032",
+      "check": "sentence-initial residual after repair",
+      "count": 0,
+      "ids": []
+    },
+    {
+      "finding": "R4-022",
+      "id": 185390,
+      "action": "no-op",
+      "url": "https://libraries.io/npm/web-monetisation-video-ads"
+    },
+    {
+      "finding": "R5-063",
+      "check": "families-before",
+      "count": 0,
+      "families": []
+    },
+    {
+      "finding": "R5-063",
+      "action": "canonicalize-tags",
+      "status": 200,
+      "result": {
+        "variantFamiliesFound": 0,
+        "pluralMerges": 0,
+        "resourcesUpdated": 0
+      }
+    },
+    {
+      "finding": "R5-063",
+      "check": "families-after",
+      "count": 0,
+      "families": []
+    }
+  ],
+  "finishedAt": "2026-07-24T00:17:12.460Z",
+  "mutatedRows": 0
+}
