@@ -11,6 +11,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 
+### Full UI experience audit — Cycle 01 (July 24, 2026)
+- **Zero-defect audit of prod completed**: 4 LOW findings total, 0 functional failures. F-001 QA residue deleted live on prod (verified 0 remaining); F-002 header search pill now icon-only below 520px (`AppHeader.tsx`); F-003 nav teaser falls back to subcategory/sub-sub resources so all 9 home cards show "Featured:" (`routes.ts /api/awesome-list/nav`); F-004 sr-only "(opens in new tab)" on external anchors (`ResourceCard.tsx`, `resource-view-modes.tsx`). Artifacts: `audit-evidence/cycle-01/` (findings.json, disposition-table.md, ux-reports/SUMMARY.md).
+- **External 54-claim "Master Fix Prompt" triaged claim-by-claim**: 1 accepted (FIX-040 → F-004), 38 invalid (crawler scanned the unhydrated SPA shell — login/submit forms and aria-labels all exist live; submit E2E: POST /api/resources 201), 8 not-a-defect, 7 declined-by-design. Table: `audit-evidence/cycle-01/disposition-table.md`.
+- Gates green on dev: tsc, migration-drift, print-audit 49/49, responsive-audit 28/28, prod build. Architect review PASS. **Needs republish**, then prod re-verify F-002/F-003/F-004 + two clean confirmation passes → VERDICT.md.
+
+
 ### R6 Residual Remediation — Run25 (July 21, 2026)
 - **All 22 R6 residual work orders closed** with per-finding claims + live dev proof — report: `artifacts/r6/CLAIMS.md` (9-section, evidence in `artifacts/r6/evidence/`). Highlights: R4-017 finally root-caused (flex-anchor `min-width:auto` on the URL text, not just the dialog shell) and locked in by a permanent self-seeding scrollWidth guard inside `responsive-audit` (now 28 checks); NB-018 proven contained with an 8,000-char seeded log line; R5-063 tag families folded to 0 via compact-key merge in `tagCanonicalize.ts`; NB-015/R5-032/R4-022 repaired by journaled, idempotent `scripts/r6-data-fixes.ts` (2nd APPLY run no-op). Dispositions: R5-002 invalid (no taxonomy description column), BUG-024 declined (cold-boot variance; API 36ms), R4-031 declined-by-design, R4-023 platform (archive.org egress-blocked), BUG-038 residual is browser-native console behavior.
 - **Needs republish**, then prod data runs: `scripts/run24-data-fixes-prod.ts` (outstanding from Run24) and `npx tsx scripts/r6-data-fixes.ts --apply`. Done-check for both: second run fully no-op.

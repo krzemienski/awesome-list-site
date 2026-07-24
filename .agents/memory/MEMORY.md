@@ -51,6 +51,7 @@
 - [Vite workspace watch reload](vite-workspace-watch-reload.md) — repo file writes (tee/rm) during live Playwright runs trigger SPA reloads → ERR_ABORTED flakes; stage output in /tmp, cp after.
 - [Flex-anchor min-width:auto](flex-anchor-min-width.md) — raw text in a flex container is an anonymous item with min-width:auto that never wraps; wrap it in a min-w-0 span or long URLs blow dialogs.
 - [Origin-check port normalization](origin-check-port-normalization.md) — Origin/Host CSRF compares must strip :443/:80 + fall back to PUBLIC_SITE_URL (SITE_URL is unset) or prod mutations 403.
+- [Headless E2E gotchas](headless-e2e-gotchas.md) — /submit consent banner eats clicks (dismiss first); toast = li[data-state]; agent-browser daemon dies between calls — prefer one-shot Playwright; verify "blank render" screenshots with a 2nd capture method.
 - [Parallel subagent file clobber](parallel-subagent-file-clobber.md) — subagents silently revert main-agent edits to shared files (README etc.); edit contested files after subagents finish + re-grep before wrap-up.
 - [Gitignore cleanup anchoring](gitignore-cleanup-anchoring.md) — root-anchor bulk-cleanup ignore patterns (`/screenshots/`) or they shadow kept dirs at depth (docs/screenshots); verify with check-ignore + ls-files -i -c.
 - [Suspense boundary guards](suspense-boundary-guards.md) — error boundaries render error-free WHILE a chunk fetches; never clear one-shot reload guards on clean render — use timestamp+cooldown.

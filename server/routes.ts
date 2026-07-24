@@ -5936,12 +5936,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: cat.name,
           slug: cat.slug,
           resourceCount: (cat.resources || []).length,
-          teaser: cat.resources?.[0]
-            ? {
-                title: String(cat.resources[0].title || ''),
-                description: String(cat.resources[0].description || '').slice(0, 200),
-              }
-            : undefined,
+          teaser: (() => {
+            // Run25 C-03: categories with no DIRECT resources (e.g. Community
+            // & Events — everything lives in subcategories) got no teaser, so
+            // their Home card was the only one missing a "Featured:" line.
+            // Fall back to the first subcategory (then sub-subcategory)
+            // resource in tree order.
+            const first =
+              cat.resources?.[0] ??
+              (cat.subcategories || [])
+                .flatMap((sub: any) => [
+                  ...(sub.resources || []),
+                  ...(sub.subSubcategories || []).flatMap((ss: any) => ss.resources || []),
+                ])
+                .find(Boolean);
+            return first
+              ? {
+                  title: String(first.title || ''),
+                  description: String(first.description || '').slice(0, 200),
+                }
+              : undefined;
+          })(),
           subcategories: (cat.subcategories || []).map((sub: any) => ({
             name: sub.name,
             slug: sub.slug,

@@ -38,6 +38,8 @@ function titleAnchor(resource: ViewModeResource, testId: string, clampClass = ""
       data-testid={testId}
     >
       {resource.title}
+      {/* Run25 F-003: external title anchor — announce the new tab. */}
+      <span className="sr-only"> (opens in new tab)</span>
     </a>
   );
 }

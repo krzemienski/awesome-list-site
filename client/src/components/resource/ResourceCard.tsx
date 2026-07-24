@@ -116,6 +116,8 @@ function ResourceCard({
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
+      {/* Run25 F-003: external title anchor — announce the new tab. */}
+      <span className="sr-only"> (opens in new tab)</span>
     </a>
   );
 
@@ -320,6 +322,8 @@ function ResourceCard({
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Open Link
+              {/* Run25 F-003: SRs need to know this leaves the app in a new tab. */}
+              <span className="sr-only"> (opens in new tab)</span>
             </a>
           </Button>
           {isValidDbResource && (

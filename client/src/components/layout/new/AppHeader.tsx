@@ -381,13 +381,17 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           className="w-full max-w-sm flex items-center min-h-[44px] sm:min-h-0 h-11 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
           aria-label="Open search"
         >
-          <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+          <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
           {/* Run16 BUG-047: at 768px the trigger is squeezed to ~78px of
               label space, truncating "Search resources..." to "Search re…".
               Show the full label only from lg up; tablet + mobile get the
               short label that fits. */}
-          <span className="text-muted-foreground truncate hidden lg:inline">Search resources...</span>
-          <span className="text-muted-foreground truncate lg:hidden">Search...</span>
+          {/* Run25 C-02: on narrow phones the mobile breadcrumb squeezes the
+              pill until even "Search..." clips mid-glyph ("S.."). Below 520px
+              the pill is icon-only (button keeps aria-label="Open search");
+              the label margins moved off the icon so it centers cleanly. */}
+          <span className="ml-2 text-muted-foreground truncate hidden lg:inline">Search resources...</span>
+          <span className="ml-2 text-muted-foreground truncate hidden min-[520px]:inline lg:hidden">Search...</span>
           {/* BUG-002 (run22): "/" hint from lg (was md) — saves ~20px at
               768–1023px where header space is tightest. */}
           <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] lg:flex">
