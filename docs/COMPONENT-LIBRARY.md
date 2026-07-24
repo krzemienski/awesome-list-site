@@ -45,7 +45,7 @@ Components live under `client/src/components/`:
 |---|---|
 | `ui/` | shadcn/ui primitives + a few app-specific composite widgets (see below). |
 | `resource/` | Resource-facing widgets: `ResourceCard`, `FavoriteButton`, `BookmarkButton`, `ShareButton`, `resource-view-modes`. |
-| `layout/` | `Footer`, `SEOHead`, and `layout/new/` (`MainLayout`, `AppHeader`, `AppSidebar`, `ModernSidebar`). |
+| `layout/` | `Footer`, `SEOHead`, and `layout/new/` (`MainLayout`, `AppHeader`, `AppSidebar`). |
 | `admin/` | Admin dashboard tabs & managers (`AdminStats`, `ResourceManager`, `CategoryManager`, `UsersTab`, `GitHubSyncPanel`, `ResearcherTab`, `LinkHealthDashboard`, …). |
 | `ai/` | AI feature cards: `LearningPathCard`, `RecommendationCard`, `MobileBottomSheet`. |
 | `auth/` | Route guards: `AuthGuard`, `AdminGuard`. |

@@ -247,7 +247,7 @@ through the facade.
 graph TD
     App["App<br/>(Root)"]
     MainLayout["MainLayout"]
-    AppSidebar["AppSidebar / ModernSidebar<br/>(Navigation)"]
+    AppSidebar["AppSidebar<br/>(Navigation)"]
     AppHeader["AppHeader<br/>(Header + search)"]
     Content["Content<br/>(Wouter Switch)"]
     Pages["Pages"]

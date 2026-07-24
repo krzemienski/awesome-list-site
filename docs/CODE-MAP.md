@@ -44,7 +44,7 @@ Registered in `client/src/App.tsx` (Wouter). Admin and most non-browse pages are
 | File | Purpose |
 |------|---------|
 | `components/layout/new/MainLayout.tsx` | App shell (sidebar + header + content) |
-| `components/layout/new/ModernSidebar.tsx`, `AppSidebar.tsx` | Hierarchical navigation sidebar |
+| `components/layout/new/AppSidebar.tsx` | Hierarchical navigation sidebar |
 | `components/layout/new/AppHeader.tsx` | Top header + search entry point |
 | `components/layout/SEOHead.tsx` | Per-page meta/OG tags (react-helmet) |
 | `components/layout/Footer.tsx` | Site footer |
@@ -223,7 +223,7 @@ helpers from past QA runs. The durable, canonical scripts are:
 ### Categories
 - Schema: `shared/schema.ts`
 - API: `server/routes.ts` — grep `"/api/categories"`
-- Sidebar: `client/src/components/layout/new/ModernSidebar.tsx`
+- Sidebar: `client/src/components/layout/new/AppSidebar.tsx`
 
 ### User Features
 - Bookmarks/favorites/progress: `server/routes.ts` — grep `"/api/bookmarks"`, `"/api/favorites"`, `"/api/user/progress"`
