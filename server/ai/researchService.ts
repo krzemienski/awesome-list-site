@@ -774,6 +774,9 @@ class ResearchService {
       description: 'Web research scout. Runs targeted web searches and reports back concrete candidate resources (URL, title, one-line description) for the orchestrator to dedup and save.',
       model: scoutModel,
       tools: ['WebSearch'],
+      // Belt-and-braces alongside the PreToolUse sync-delegation hook: pin the
+      // scout to foreground execution at the definition level too.
+      background: false,
       prompt:
 `You are a web research SCOUT for an "awesome video" curated list (video streaming, codecs, players, infrastructure, tools).
 
@@ -834,13 +837,14 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
 
 STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveries are saved. When a save_discovery result contains targetReached:true, the server is already shutting the run down — stop searching immediately and do not start new work.` : ''}`;
 
-    // Only the blocking `Task` primitive is allowed for delegation — NOT the
-    // async management set (TaskCreate/TaskList/TaskOutput/etc.). Async
-    // delegation lets the orchestrator end its turn while scouts are still
-    // running; the SDK treats that as run completion and the subsequent
-    // auto-resume kills the in-process MCP bridge (tools go dead for the
-    // remainder of the run). Blocking Task keeps the entire run inside a single
-    // SDK lifecycle event, so the MCP bridge stays alive throughout.
+    // Only the blocking `Task` primitive may be used for delegation — NOT the
+    // async management set (TaskCreate/TaskList/TaskOutput/etc.). NOTE:
+    // `allowedTools` alone does NOT enforce this under bypassPermissions — the
+    // real enforcement lives in runAgentQuery: the async Task* set is in
+    // BASELINE_DISALLOWED_TOOLS, and a PreToolUse hook forces
+    // run_in_background:false on every Task/Agent delegation call (the SDK
+    // defaults to background since ~0.3.2xx, which caused premature run
+    // completion with scouts still in-flight + a dead-MCP auto-resume).
     const allowedTools = [
       'mcp__research__check_duplicate',
       'mcp__research__save_discovery',

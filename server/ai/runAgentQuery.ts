@@ -22,14 +22,23 @@ import { AgentEventEmitter } from "./agentEvents";
 
 // Tools that a server-side research/enrichment agent must never be able to run,
 // even though permissionMode:"bypassPermissions" auto-approves everything.
-// Delegation (Task*), WebSearch, ToolSearch, SendMessage, ReportFindings and
-// mcp__* tools are intentionally NOT in this list.
+// IMPORTANT: under bypassPermissions, `allowedTools` does NOT restrict the
+// toolset — only this disallow list does (verified via the init event's
+// exposed-tools list, July 24, 2026). The async task-management set
+// (TaskCreate/TaskGet/TaskList/TaskOutput/TaskStop/TaskUpdate) is disallowed
+// for BOTH flows: async delegation lets the orchestrator end its turn while
+// subagents still run, which the SDK treats as run completion (premature
+// "success") and its auto-resume kills the in-process MCP bridge. Only the
+// blocking Task/Agent delegation tool, WebSearch, ToolSearch and mcp__* stay
+// available (flows further restrict via extraDisallowedTools).
 const BASELINE_DISALLOWED_TOOLS = [
   "Bash",
   "Edit",
   "Write",
   "NotebookEdit",
   "Read",
+  "Glob",
+  "Grep",
   "WebFetch",
   "CronCreate",
   "CronDelete",
@@ -42,7 +51,20 @@ const BASELINE_DISALLOWED_TOOLS = [
   "ScheduleWakeup",
   "Workflow",
   "Skill",
+  "TaskCreate",
+  "TaskGet",
+  "TaskList",
+  "TaskOutput",
+  "TaskStop",
+  "TaskUpdate",
+  "SendMessage",
+  "ReportFindings",
 ];
+
+// The delegation tool is named "Task" in the SDK today but has surfaced as
+// "Agent" in newer CLI builds — match both so the sync-delegation hook below
+// keeps working across SDK upgrades.
+const DELEGATION_TOOL_NAMES = new Set(["Task", "Agent"]);
 
 // Built-in tool_use blocks we surface as their own tool_call events / graph
 // edges. Everything else built-in (e.g. ToolSearch discovery) is noise.
@@ -61,6 +83,8 @@ export interface AgentDefinitionInput {
   prompt: string;
   tools?: string[];
   model?: string;
+  /** Belt-and-braces: false pins this subagent to foreground execution. */
+  background?: boolean;
 }
 
 export interface RunAgentQueryParams {
@@ -210,6 +234,51 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       allowedTools,
       disallowedTools,
       env: buildAgentEnv(config),
+      // ── Force SYNCHRONOUS delegation. Since SDK ~0.3.2xx the Task/Agent
+      // delegation tool runs subagents IN THE BACKGROUND BY DEFAULT
+      // (run_in_background defaults to true). A background delegation lets the
+      // orchestrator end its turn while scouts are still running; the SDK then
+      // treats that turn end as run completion (premature "success" with
+      // delegations in-flight) and its auto-resume spawns a second session in
+      // which the in-process MCP bridge is dead — every mcp__ call goes
+      // unanswered until the circuit breaker aborts. Rewriting the tool input
+      // here guarantees run_in_background:false no matter what the model
+      // passes, keeping the whole run inside one SDK lifecycle.
+      hooks: {
+        PreToolUse: [
+          {
+            hooks: [
+              async (input: any) => {
+                if (
+                  input?.hook_event_name === "PreToolUse" &&
+                  DELEGATION_TOOL_NAMES.has(input.tool_name) &&
+                  ((input.tool_input as any)?.run_in_background !== false ||
+                    (input.tool_input as any)?.isolation !== undefined)
+                ) {
+                  const updatedInput: Record<string, unknown> = {
+                    ...(typeof input.tool_input === "object" && input.tool_input !== null
+                      ? input.tool_input
+                      : {}),
+                    run_in_background: false,
+                  };
+                  // isolation:"remote" always runs in the background regardless
+                  // of run_in_background — strip it so it can't reintroduce the
+                  // detached-delegation lifecycle.
+                  delete updatedInput.isolation;
+                  return {
+                    continue: true,
+                    hookSpecificOutput: {
+                      hookEventName: "PreToolUse" as const,
+                      updatedInput,
+                    },
+                  };
+                }
+                return { continue: true };
+              },
+            ],
+          },
+        ],
+      },
       stderr: (data) => {
         const redacted = data.replace(
           /((?:token|key|secret|authorization|password|bearer|api.?key|credential)\s*[=:]\s*)\S+/gi,
