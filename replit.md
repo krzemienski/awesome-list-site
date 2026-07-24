@@ -72,6 +72,8 @@ All recharts strokes/fills route through `client/src/lib/charts/palette.ts` (`CH
 
 Preferred communication style: Simple, everyday language.
 
+Design-system verification scope: only verify against the default system we ship (Editorial + Crimson) — no need to sweep all 5 runtime skins (July 24, 2026).
+
 ## System Architecture
 
 The application employs a client-server architecture. The frontend is a React-based single-page application built with Vite, utilizing `shadcn/ui` components, Tailwind CSS, and React Query for data fetching. The backend is an Express.js server providing RESTful API endpoints. Data is stored in a PostgreSQL database using Drizzle ORM, with a defined schema for resources, categories, and subcategories.
