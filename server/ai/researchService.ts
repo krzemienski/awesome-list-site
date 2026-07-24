@@ -277,14 +277,43 @@ class ResearchService {
     const emitResult = (name: string, out: string, ms: number) =>
       ctx.emitter.emit({ actor: name, actorType: 'tool', eventType: 'tool_result', targetActor: 'orchestrator', summary: preview(out), durationMs: ms });
 
+    // ── SCHEMA LENIENCY (July 24, 2026) ──────────────────────────────────
+    // All four research tools deliberately declare LENIENT input schemas
+    // (fields optional, numbers accept strings) and re-validate INSIDE the
+    // handler. Reason: the Agent SDK zod-validates tool input BEFORE the
+    // handler runs; a strict schema means a slightly-off call (observed with
+    // non-Anthropic models via custom base URLs, e.g. grok omitting
+    // `reasoning` or sending confidence as a string) is rejected SDK-side —
+    // the handler never runs, no tool_call/tool_result events are emitted,
+    // nothing is saved, and the runAgentQuery circuit breaker counts the
+    // silence as a dead MCP bridge and aborts the run. With lenient schemas
+    // the handler ALWAYS runs: it emits events, resets the breaker, and
+    // returns an instructive error the model can act on. Required fields are
+    // marked "REQUIRED:" in their descriptions so well-behaved models still
+    // see the contract.
+    const looseNumber = (v: unknown): number => {
+      const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
+      return Number.isFinite(n) ? n : NaN;
+    };
+    const looseString = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
+
     const checkDuplicate = tool(
       'check_duplicate',
       'Check if a URL already exists in the database of known resources. Returns isDuplicate=true if already present. ALWAYS call this before save_discovery.',
-      { url: z.string().describe('The URL to check for duplicates') },
-      async ({ url }) => {
+      { url: z.string().optional().describe('REQUIRED: The URL to check for duplicates') },
+      async (rawInput) => {
         const started = Date.now();
+        const url = looseString(rawInput?.url);
         try {
-          await emitCall('check_duplicate', { url });
+          await emitCall('check_duplicate', { url: url || rawInput?.url });
+          if (!url) {
+            const text = JSON.stringify({
+              error: 'Missing required field: url',
+              guidance: 'Re-call check_duplicate with the candidate URL as the "url" string field. Never stop the run.',
+            });
+            await emitResult('check_duplicate', text, Date.now() - started);
+            return { content: [{ type: 'text' as const, text }] };
+          }
           // Core check is in-memory (existingUrls Set) — it cannot fail on DB issues.
           const normalized = normalizeUrl(url);
           const isDuplicate = ctx.existingUrls.has(normalized);
@@ -326,16 +355,16 @@ class ResearchService {
       'save_discovery',
       "Persist a verified, NON-DUPLICATE resource for admin review. Only call after check_duplicate returns false AND the scout actually surfaced the resource via a real web search (no fabricated URLs).",
       {
-        title: z.string(),
-        url: z.string(),
-        description: z.string(),
-        suggested_category: z.string().describe('Best matching category name from the taxonomy in the system prompt'),
+        title: z.string().optional().describe('REQUIRED: The resource title'),
+        url: z.string().optional().describe('REQUIRED: The exact URL the scout surfaced (never fabricated)'),
+        description: z.string().optional().describe('REQUIRED: 1-2 sentence description of what the resource offers'),
+        suggested_category: z.string().optional().describe('REQUIRED: Best matching category name from the taxonomy in the system prompt'),
         suggested_subcategory: z.string().optional().describe('Best matching subcategory, or omit if none fits'),
         suggested_sub_subcategory: z.string().optional().describe('Best matching sub-subcategory (level-3), or omit if none fits'),
-        confidence: z.number().describe('Confidence score 1-100. Only save if >= 70.'),
-        reasoning: z.string().describe("Why this is valuable AND why it's not redundant with existing resources"),
+        confidence: z.union([z.number(), z.string()]).optional().describe('REQUIRED: Confidence score 1-100 (number). Only save if >= 70.'),
+        reasoning: z.string().optional().describe("REQUIRED: Why this is valuable AND why it's not redundant with existing resources"),
       },
-      async (input) => {
+      async (rawInput) => {
         const started = Date.now();
         const respond = async (payload: Record<string, any>) => {
           const text = JSON.stringify(payload);
@@ -343,7 +372,36 @@ class ResearchService {
           return { content: [{ type: 'text' as const, text }] };
         };
         try {
-          await emitCall('save_discovery', { url: input.url, title: input.title, confidence: input.confidence });
+          await emitCall('save_discovery', { url: rawInput?.url, title: rawInput?.title, confidence: rawInput?.confidence });
+
+          // In-handler validation (see SCHEMA LENIENCY note above): reject
+          // with an actionable error instead of letting the SDK reject the
+          // call before this handler ever runs.
+          const confidence = Math.round(looseNumber(rawInput?.confidence));
+          const input: SaveDiscoveryInput = {
+            title: looseString(rawInput?.title),
+            url: looseString(rawInput?.url),
+            description: looseString(rawInput?.description),
+            suggested_category: looseString(rawInput?.suggested_category),
+            suggested_subcategory: looseString(rawInput?.suggested_subcategory) || undefined,
+            suggested_sub_subcategory: looseString(rawInput?.suggested_sub_subcategory) || undefined,
+            confidence,
+            reasoning: looseString(rawInput?.reasoning),
+          };
+          const missing: string[] = [];
+          if (!input.title) missing.push('title');
+          if (!input.url) missing.push('url');
+          if (!input.description) missing.push('description');
+          if (!input.suggested_category) missing.push('suggested_category');
+          if (!Number.isFinite(confidence)) missing.push('confidence (number 1-100)');
+          if (!input.reasoning) missing.push('reasoning');
+          if (missing.length > 0) {
+            return await respond({
+              saved: false,
+              error: `Missing or invalid required field(s): ${missing.join(', ')}`,
+              guidance: 'Re-call save_discovery for this SAME resource with ALL required fields: title, url, description, suggested_category, confidence (number 1-100), reasoning. Never stop the run.',
+            });
+          }
           const normalized = normalizeUrl(input.url);
           if (ctx.discoveriesSaved >= ctx.discoveryCap) {
             return await respond({ saved: false, reason: `Discovery cap of ${ctx.discoveryCap} reached for this run. Wrap up and stop searching.` });
@@ -432,12 +490,13 @@ class ResearchService {
     const coverageGaps = tool(
       'get_coverage_gaps',
       'Return the most under-represented subcategories (resource_count ASC) with sample existing URLs so you can target real gaps. Call this near the start and again when pivoting.',
-      { limit: z.number().optional().describe('How many gap subcategories to return (default 15, max 30)') },
-      async ({ limit }) => {
+      { limit: z.union([z.number(), z.string()]).optional().describe('How many gap subcategories to return (default 15, max 30)') },
+      async (rawInput) => {
         const started = Date.now();
+        const limit = looseNumber(rawInput?.limit);
         try {
-          await emitCall('get_coverage_gaps', { limit });
-          const gaps = await withTimeout(getCoverageGaps(limit || 15), TOOL_DB_TIMEOUT_MS, 'get_coverage_gaps query');
+          await emitCall('get_coverage_gaps', { limit: rawInput?.limit });
+          const gaps = await withTimeout(getCoverageGaps(Number.isFinite(limit) && limit > 0 ? limit : 15), TOOL_DB_TIMEOUT_MS, 'get_coverage_gaps query');
           const text = JSON.stringify({ gaps });
           await emitResult('get_coverage_gaps', `${gaps.length} gaps`, Date.now() - started);
           return { content: [{ type: 'text', text }] };
@@ -458,14 +517,26 @@ class ResearchService {
       'get_existing_resources',
       'Sample existing resources in a specific category/subcategory so you can avoid proposing duplicates before delegating a search.',
       {
-        category: z.string().describe('Category or subcategory name (case-insensitive substring match)'),
-        limit: z.number().optional().describe('Max resources to return (default 30, max 100)'),
+        category: z.string().optional().describe('REQUIRED: Category or subcategory name (case-insensitive substring match)'),
+        limit: z.union([z.number(), z.string()]).optional().describe('Max resources to return (default 30, max 100)'),
       },
-      async ({ category, limit }) => {
+      async (rawInput) => {
         const started = Date.now();
+        const category = looseString(rawInput?.category);
+        const limit = looseNumber(rawInput?.limit);
         try {
-          await emitCall('get_existing_resources', { category, limit });
-          const existing = await withTimeout(getExistingResourcesByCategory(category, limit || 30), TOOL_DB_TIMEOUT_MS, 'get_existing_resources query');
+          await emitCall('get_existing_resources', { category: category || rawInput?.category, limit: rawInput?.limit });
+          if (!category) {
+            const text = JSON.stringify({
+              count: 0,
+              resources: [],
+              error: 'Missing required field: category',
+              guidance: 'Re-call get_existing_resources with the category (or subcategory) name as the "category" string field.',
+            });
+            await emitResult('get_existing_resources', text, Date.now() - started);
+            return { content: [{ type: 'text' as const, text }] };
+          }
+          const existing = await withTimeout(getExistingResourcesByCategory(category, Number.isFinite(limit) && limit > 0 ? limit : 30), TOOL_DB_TIMEOUT_MS, 'get_existing_resources query');
           const text = JSON.stringify({ count: existing.length, resources: existing });
           await emitResult('get_existing_resources', `${existing.length} resources`, Date.now() - started);
           return { content: [{ type: 'text', text }] };
@@ -878,10 +949,22 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       await this.drainPendingDiscoveries(runCtx);
     }
 
-    const [finalJob] = await db.select({
-      totalDiscoveries: researchJobs.totalDiscoveries,
-      duplicatesSkipped: researchJobs.duplicatesSkipped,
-    }).from(researchJobs).where(eq(researchJobs.id, jobId));
+    // Timeout-guarded with an in-memory fallback: a wedged pool at run end
+    // must not hang the finalization path before the status is persisted.
+    let finalJob: { totalDiscoveries: number | null; duplicatesSkipped: number | null } | undefined;
+    try {
+      [finalJob] = await withTimeout(
+        db.select({
+          totalDiscoveries: researchJobs.totalDiscoveries,
+          duplicatesSkipped: researchJobs.duplicatesSkipped,
+        }).from(researchJobs).where(eq(researchJobs.id, jobId)),
+        TOOL_DB_TIMEOUT_MS,
+        'final job counters select',
+      );
+    } catch (e: any) {
+      console.error(`[research:${jobId}] final counters select failed (${e?.message}) — using in-memory counters`);
+      finalJob = { totalDiscoveries: runCtx.discoveriesSaved, duplicatesSkipped: null };
+    }
 
     // A target-stop aborts the SDK query on purpose — that is a successful
     // completion, not a cancellation.
@@ -900,14 +983,42 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     // manufacturing a "0 turns / $0.0000" contradiction next to real finds.
     const abortedWithNoUsage =
       result.aborted && result.numTurns === 0 && result.totalCostUsd === 0;
+    const finalStatus = result.aborted && !stoppedAtTarget ? 'cancelled' : 'completed';
+    const usageFields = abortedWithNoUsage ? {} : {
+      turnsUsed: result.numTurns,
+      totalInputTokens: result.tokensIn,
+      totalOutputTokens: result.tokensOut,
+      estimatedCostUsd: result.totalCostUsd.toFixed(4),
+    };
+
+    // Persist the terminal status FIRST via a small dedicated retried UPDATE.
+    // Previously status rode along on the single heavyweight agentLog persist
+    // below; if that one write was lost (wedged pool, autoscale instance
+    // freeze at run end — observed on prod job 48) the job stayed
+    // 'processing' forever. Status + usage are a few bytes — land them
+    // before attempting the big log payload.
+    let statusPersisted = false;
+    for (let attempt = 1; attempt <= 3 && !statusPersisted; attempt++) {
+      try {
+        await withTimeout(
+          db.update(researchJobs)
+            .set({ status: finalStatus, completedAt: new Date(), ...usageFields })
+            .where(eq(researchJobs.id, jobId)),
+          TOOL_DB_TIMEOUT_MS,
+          'final status update',
+        );
+        statusPersisted = true;
+      } catch (e: any) {
+        console.error(`[research:${jobId}] final status update attempt ${attempt}/3 failed:`, e?.message || e);
+        if (attempt < 3) await sleep(1000 * attempt);
+      }
+    }
+
+    // Then the heavyweight agentLog snapshot. It re-asserts status/usage as
+    // belt-and-braces in case all three dedicated attempts above failed.
     await persist({
-      status: result.aborted && !stoppedAtTarget ? 'cancelled' : 'completed',
-      ...(abortedWithNoUsage ? {} : {
-        turnsUsed: result.numTurns,
-        totalInputTokens: result.tokensIn,
-        totalOutputTokens: result.tokensOut,
-        estimatedCostUsd: result.totalCostUsd.toFixed(4),
-      }),
+      status: finalStatus,
+      ...usageFields,
       completedAt: new Date(),
     });
   }

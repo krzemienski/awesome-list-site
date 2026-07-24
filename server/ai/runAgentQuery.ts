@@ -202,7 +202,17 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
   // response. The emitter hook decrements when any tool_result is emitted
   // (handlers fire this on every call, success or error). If the count climbs
   // past the threshold the in-process MCP bridge is assumed dead.
+  //
+  // Refinement (July 24, 2026): an SDK-side input rejection (zod validation
+  // fails BEFORE the handler runs → is_error tool_result like "Invalid
+  // arguments…") is NOT a dead bridge — the loop is alive and the model got
+  // feedback. Only genuinely unanswered calls and "no such tool" responses
+  // (the dead-bridge signature after a spurious SDK auto-resume) keep
+  // counting. We track in-flight mcp__ tool_use ids so the incoming user-side
+  // tool_result can be classified.
   let mcpCallsWithoutResult = 0;
+  const pendingMcpCalls = new Map<string, string>(); // tool_use_id → tool name
+  const BRIDGE_DEAD_RE = /no such tool|not connected|not available|mcp server .*(failed|closed|disconnect)/i;
   emitter.setAfterEmitHook((e) => {
     if (e.eventType === "tool_result") {
       mcpCallsWithoutResult = 0;
@@ -251,27 +261,38 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
               async (input: any) => {
                 if (
                   input?.hook_event_name === "PreToolUse" &&
-                  DELEGATION_TOOL_NAMES.has(input.tool_name) &&
-                  ((input.tool_input as any)?.run_in_background !== false ||
-                    (input.tool_input as any)?.isolation !== undefined)
+                  DELEGATION_TOOL_NAMES.has(input.tool_name)
                 ) {
-                  const updatedInput: Record<string, unknown> = {
-                    ...(typeof input.tool_input === "object" && input.tool_input !== null
-                      ? input.tool_input
-                      : {}),
-                    run_in_background: false,
-                  };
-                  // isolation:"remote" always runs in the background regardless
-                  // of run_in_background — strip it so it can't reintroduce the
-                  // detached-delegation lifecycle.
-                  delete updatedInput.isolation;
-                  return {
-                    continue: true,
-                    hookSpecificOutput: {
-                      hookEventName: "PreToolUse" as const,
-                      updatedInput,
-                    },
-                  };
+                  const raw: Record<string, unknown> =
+                    typeof input.tool_input === "object" && input.tool_input !== null
+                      ? (input.tool_input as Record<string, unknown>)
+                      : {};
+                  const needsRewrite =
+                    raw.run_in_background !== false ||
+                    raw.isolation !== undefined ||
+                    raw.model !== undefined;
+                  if (needsRewrite) {
+                    const updatedInput: Record<string, unknown> = {
+                      ...raw,
+                      run_in_background: false,
+                    };
+                    // isolation:"remote" always runs in the background regardless
+                    // of run_in_background — strip it so it can't reintroduce the
+                    // detached-delegation lifecycle.
+                    delete updatedInput.isolation;
+                    // Per-call model overrides break custom endpoints: some
+                    // models pass an Anthropic alias (e.g. "haiku") that a
+                    // custom base URL 404s on. The agent definition already
+                    // pins the subagent model — strip the override.
+                    delete updatedInput.model;
+                    return {
+                      continue: true,
+                      hookSpecificOutput: {
+                        hookEventName: "PreToolUse" as const,
+                        updatedInput,
+                      },
+                    };
+                  }
                 }
                 return { continue: true };
               },
@@ -425,6 +446,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             // answered by a handler-side tool_result. The afterEmitHook resets
             // this counter whenever a tool_result is emitted.
             if (name.startsWith("mcp__")) {
+              if (tb.id) pendingMcpCalls.set(String(tb.id), name);
               mcpCallsWithoutResult++;
               if (mcpCallsWithoutResult >= MCP_CIRCUIT_BREAKER_THRESHOLD) {
                 const cbMsg =
@@ -458,6 +480,55 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
                 "web_search",
                 `${actor} → ${name}(${preview(JSON.stringify(tb.input), 200)})`,
               );
+            }
+          }
+          break;
+        }
+
+        case "user": {
+          // Classify tool_results flowing back for in-flight mcp__ calls.
+          // Handler-emitted results already reset the breaker via the emitter
+          // hook, but SDK-side rejections (zod validation failed before the
+          // handler ran) produce is_error tool_results that were previously
+          // invisible AND miscounted as a dead bridge.
+          const userBlocks: any[] = Array.isArray(msg.message?.content) ? msg.message.content : [];
+          for (const ub of userBlocks) {
+            if (ub?.type !== "tool_result" || !ub.tool_use_id) continue;
+            const toolName = pendingMcpCalls.get(String(ub.tool_use_id));
+            if (!toolName) continue;
+            pendingMcpCalls.delete(String(ub.tool_use_id));
+
+            const text = typeof ub.content === "string"
+              ? ub.content
+              : Array.isArray(ub.content)
+                ? ub.content.filter((c: any) => c?.type === "text").map((c: any) => c.text).join("\n")
+                : "";
+            const shortName = toolName.replace(/^mcp__[^_]+(?:__)?/, "") || toolName;
+
+            if (ub.is_error === true) {
+              if (BRIDGE_DEAD_RE.test(text)) {
+                // Genuine dead-bridge signature — keep the breaker counting,
+                // but surface it so the abort isn't a mystery.
+                await mirror("error", `MCP tool ${shortName} unreachable: ${preview(text, 200)}`);
+              } else {
+                // SDK-level input rejection: the loop is alive (the model got
+                // feedback) — reset the breaker and make the rejection visible
+                // in the event stream, since the handler never ran to emit it.
+                mcpCallsWithoutResult = 0;
+                await emitter.emit({
+                  actor: shortName,
+                  actorType: "tool",
+                  eventType: "tool_result",
+                  targetActor: "orchestrator",
+                  summary: `INPUT REJECTED before handler (SDK schema validation): ${preview(text, 300)}`,
+                  detail: { sdk_rejection: true, tool: toolName, tool_use_id: ub.tool_use_id },
+                });
+                await mirror("error", `${shortName} input rejected by SDK validation (handler never ran): ${preview(text, 300)}`);
+              }
+            } else {
+              // Answered without error — handler ran (and emitted its own
+              // event). Defensive reset in case the emitter hook missed it.
+              mcpCallsWithoutResult = 0;
             }
           }
           break;
