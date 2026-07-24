@@ -302,7 +302,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">We couldn't load the catalog</h1>
+          <h1 className="display-h text-2xl mb-4">We couldn't load the catalog</h1>
           <p className="text-muted-foreground mb-6">
             We couldn't load the catalog. Please try again.
           </p>
@@ -328,7 +328,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
       />
 
       <div className="space-y-3 pt-2 sm:pt-4">
-        <h1 className="font-sans font-bold tracking-tight text-[var(--text)] text-3xl sm:text-4xl">
+        <h1 className="display-h text-[var(--text)] text-3xl sm:text-4xl">
           Awesome Video Resources
         </h1>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-3xl">

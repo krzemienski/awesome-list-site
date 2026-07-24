@@ -139,7 +139,7 @@ export default function Bookmarks() {
         <div className="eyebrow" aria-hidden>// Saved</div>
         <div className="flex items-center gap-3">
           <Bookmark className="h-8 w-8" style={{ color: 'var(--accent)' }} />
-          <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight">
+          <h1 className="display-h text-3xl sm:text-4xl">
             My <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>Bookmarks</em>
           </h1>
         </div>

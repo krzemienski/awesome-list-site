@@ -48,7 +48,7 @@ export default function About() {
       <div className="mb-10 space-y-3">
         <div className="flex items-center gap-3">
           <Sparkles className="h-5 w-5 text-[var(--accent)]" />
-          <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight">
+          <h1 className="display-h text-3xl sm:text-4xl">
             About
           </h1>
         </div>

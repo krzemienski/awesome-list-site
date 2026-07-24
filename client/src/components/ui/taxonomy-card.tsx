@@ -43,7 +43,7 @@ export function TaxonomyCard({
       data-testid={linkTestId}
       className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
     >
-      <Card className="h-full cursor-pointer hover:border-[var(--accent)] transition-colors">
+      <Card className="h-full cursor-pointer hover:border-[var(--accent)] transition-colors" data-ds="card-hover">
         <CardHeader className="p-4 sm:p-5 space-y-1.5">
           <span
             className="flex items-center justify-center shrink-0"

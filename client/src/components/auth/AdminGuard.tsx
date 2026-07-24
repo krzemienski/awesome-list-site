@@ -31,7 +31,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
     const signedInNonAdmin = Boolean(user);
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <h1 className="font-display font-medium tracking-tight text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
+        <h1 className="display-h text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
           <Shield className="h-6 w-6 text-[var(--accent)]" />
           Admin Dashboard
         </h1>

@@ -93,7 +93,7 @@ export default function Advanced() {
           data-testid="advanced-error"
         >
           <AlertCircle className="h-10 w-10 text-[var(--accent)]" />
-          <h1 className="text-xl font-bold">Couldn't load advanced features</h1>
+          <h1 className="display-h text-xl">Couldn't load advanced features</h1>
           <p className="text-sm text-muted-foreground">
             We couldn't reach the catalog data. This is usually a temporary
             network problem.
@@ -115,7 +115,7 @@ export default function Advanced() {
   if (!awesomeList) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Advanced Features</h1>
+        <h1 className="display-h text-2xl mb-4">Advanced Features</h1>
         <p className="text-muted-foreground">Unable to load awesome list data</p>
       </div>
     );
@@ -129,7 +129,7 @@ export default function Advanced() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <Sparkles className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Advanced Features</h1>
+          <h1 className="display-h text-3xl">Advanced Features</h1>
         </div>
         <p className="text-lg text-muted-foreground">
           Discover powerful tools for exploring, analyzing, and sharing awesome list data

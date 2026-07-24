@@ -364,7 +364,7 @@ export default function JourneyDetail() {
               )}
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl mb-2 font-semibold leading-none tracking-tight">{journey.title}</h1>
+          <h1 className="display-h text-2xl sm:text-3xl mb-2">{journey.title}</h1>
           <CardDescription className="text-sm sm:text-base">{journey.description}</CardDescription>
         </CardHeader>
 

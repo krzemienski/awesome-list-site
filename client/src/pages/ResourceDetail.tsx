@@ -523,7 +523,7 @@ export default function ResourceDetail() {
                           }}
                         />
                       )}
-                      <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight tracking-tight" data-testid="text-resource-title">
+                      <h1 className="display-h text-xl sm:text-2xl md:text-3xl" data-testid="text-resource-title">
                         {resource.title}
                       </h1>
                     </div>

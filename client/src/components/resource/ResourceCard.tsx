@@ -127,6 +127,7 @@ function ResourceCard({
         "group relative hover:border-primary/50 transition-all cursor-pointer",
         className
       )}
+      data-ds="card-hover"
       onClick={onClick ? handleCardClick : undefined}
       data-testid={`card-resource-${resource.id}`}
     >

@@ -190,7 +190,7 @@ export default function Search() {
       <div className="space-y-2">
         <div className="flex items-center gap-2 sm:gap-3">
           <SearchIcon className="h-6 w-6 text-[var(--accent)] shrink-0" />
-          <h1 className="font-sans font-bold text-2xl sm:text-3xl tracking-tight">Search</h1>
+          <h1 className="display-h text-2xl sm:text-3xl">Search</h1>
         </div>
       </div>
 

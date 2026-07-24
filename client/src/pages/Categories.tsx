@@ -146,7 +146,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
 
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">All Categories</h1>
+          <h1 className="display-h text-2xl">All Categories</h1>
           <p className="text-muted-foreground">
             Browse every category of curated video development resources.
           </p>

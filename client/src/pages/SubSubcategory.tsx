@@ -329,7 +329,7 @@ export default function SubSubcategory() {
 
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words" data-testid="heading-subsubcategory">
+            <h1 className="display-h text-xl sm:text-2xl md:text-3xl break-words" data-testid="heading-subsubcategory">
               {subSubcategoryName}
             </h1>
           </div>

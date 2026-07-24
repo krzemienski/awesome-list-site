@@ -8,10 +8,11 @@ import {
   Zap,
   Shield,
   ChevronRight,
-  Folder,
+  Info,
   Palette,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
+import { BrandMark } from "@/components/BrandMark";
 import { getCategoryIcon } from "@/config/navigation-icons";
 import {
   Sidebar,
@@ -558,22 +559,11 @@ export default function AppSidebar({
             <SidebarMenuButton
               size="lg"
               onClick={() => navigate("/")}
-              className="cursor-pointer h-14 px-3"
+              className="cursor-pointer h-14 px-3 group-data-[collapsible=icon]:!size-9 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:my-2 group-data-[collapsible=icon]:justify-center"
               tooltip="Awesome Video"
             >
-              <div
-                className="flex aspect-square size-8 items-center justify-center rounded-md"
-                style={{
-                  background:
-                    "color-mix(in srgb, var(--accent) 18%, transparent)",
-                  color: "var(--accent)",
-                  border:
-                    "1px solid color-mix(in srgb, var(--accent) 35%, var(--border))",
-                }}
-              >
-                <Folder className="size-4" />
-              </div>
-              <div className="flex flex-col gap-0.5 leading-none min-w-0">
+              <BrandMark className="size-8 shrink-0 group-data-[collapsible=icon]:size-7" />
+              <div className="flex flex-col gap-0.5 leading-none min-w-0 group-data-[collapsible=icon]:hidden">
                 <span
                   className="font-sans text-sm font-semibold tracking-tight truncate"
                   style={{ color: "var(--text)" }}
@@ -604,6 +594,41 @@ export default function AppSidebar({
       </SidebarHeader>
 
       <SidebarContent className="gap-0">
+        {/* COLLAPSED ICON RAIL — DS .icon-rail parity (56px rail, 36px icon
+            buttons). Desktop-only by construction: the mobile Sheet drawer
+            never carries data-collapsible="icon", so this stays hidden there. */}
+        <div className="hidden group-data-[collapsible=icon]:flex flex-col items-center gap-1.5 py-3">
+          {[
+            ...navItems,
+            ...(user?.role === "admin"
+              ? [{ label: "Admin", icon: Shield, href: "/admin" }]
+              : []),
+            { label: "About", icon: Info, href: "/about" },
+          ].map((item) => {
+            const RailIcon = item.icon;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(item.href);
+                }}
+                title={item.label}
+                aria-label={item.label}
+                data-testid={`rail-${slugify(item.label)}`}
+                data-active={isActive(item.href) || undefined}
+                className={cn(
+                  "rail-icon-btn no-underline touch-manipulation",
+                  isActive(item.href) && "active",
+                )}
+              >
+                <RailIcon className="size-4" />
+              </a>
+            );
+          })}
+        </div>
+
         {/* QUICK NAV */}
         <div className="px-3 pt-4 pb-2 group-data-[collapsible=icon]:hidden">
           <div

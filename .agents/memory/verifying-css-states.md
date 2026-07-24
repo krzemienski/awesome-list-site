@@ -30,3 +30,9 @@ description: How to reliably confirm interactive states render, and why getCompu
 - Semantic `find label/placeholder` was flaky here; `find testid "..."` is reliable.
 - `inert` subtrees: element.tabIndex stays >= 0 under inert, so counting tabIndex is a false
   FAIL. Verify with a REAL `link.focus()` and assert document.activeElement !== link.
+- Fractional `border-width` (e.g. 1.5px): Chrome's `getComputedStyle` returns the
+  device-pixel-FLOORED used value, so 1.5px reads as "1px" — even with Playwright
+  `deviceScaleFactor: 2`, and even for an INLINE `style="border:1.5px solid"` probe.
+  You cannot measure fractional border widths through computed style. Prove the rule
+  applied via a sibling declaration from the SAME rule (border-color, text-transform)
+  plus an inline-probe baseline showing the measurement channel itself floors.

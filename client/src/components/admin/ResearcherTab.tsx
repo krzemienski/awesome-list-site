@@ -194,7 +194,10 @@ export default function ResearcherTab() {
         body: JSON.stringify({
           prompt,
           categoryFocus: categoryFocus && categoryFocus !== 'all' ? categoryFocus : undefined,
-          maxBudgetUsd: maxBudget,
+          // R5-021 made the server require real number types; sending the raw
+          // input string here made every launch 400 with a budget error even
+          // when a valid budget was set.
+          maxBudgetUsd: Number(maxBudget),
           maxTurns: Number(maxTurns),
           model: model.trim() || undefined,
           baseUrl: baseUrl.trim() || undefined,

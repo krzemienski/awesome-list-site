@@ -48,7 +48,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         <CardHeader>
           <div className="flex items-center gap-2">
             <AlertCircle className="h-6 w-6 text-[var(--accent)]" />
-            <h1 className="text-xl font-semibold leading-none tracking-tight">Page Not Found</h1>
+            <h1 className="display-h text-xl">Page Not Found</h1>
           </div>
         </CardHeader>
         <CardContent>

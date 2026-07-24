@@ -114,7 +114,7 @@ export default function ThemeSettings() {
         <div className="flex items-center gap-3">
           {/* P5 — sparkle icon to match ref 08 */}
           <Sparkles className="h-6 w-6 text-[var(--accent)]" />
-          <h1 className="font-sans font-bold text-2xl sm:text-2xl tracking-tight">
+          <h1 className="display-h text-2xl">
             Theme Settings
           </h1>
         </div>

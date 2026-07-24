@@ -123,7 +123,7 @@ export default function AdminDashboard() {
     const signedInNonAdmin = isAuthenticated && !isAdmin;
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <h1 className="font-display font-medium tracking-tight text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
+        <h1 className="display-h text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
           <Shield className="h-6 w-6 text-[var(--accent)]" />
           Admin Dashboard
         </h1>
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
           <span aria-hidden="true" className="text-[var(--text-2)]">·</span>
           <span>Control Surface</span>
         </div>
-        <h1 className="font-display font-medium tracking-tight text-3xl sm:text-4xl text-[var(--text)] flex items-center gap-3">
+        <h1 className="display-h text-3xl sm:text-4xl text-[var(--text)] flex items-center gap-3">
           <Shield className="h-7 w-7 text-[var(--accent)]" />
           <span><em className="not-italic font-display italic text-[var(--accent)]">Admin</em> Dashboard</span>
         </h1>

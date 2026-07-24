@@ -499,7 +499,7 @@ export default function Category() {
         
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
           <div className="min-w-0 lg:flex-1">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight break-words">
+            <h1 className="display-h text-2xl sm:text-3xl md:text-4xl break-words">
               {categoryName}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5 sm:mt-1">

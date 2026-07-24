@@ -13,3 +13,5 @@ Hand-written client TypeScript interfaces describing an API response are NOT ver
 **How to apply:** when you see those symptoms, do NOT trust the local interface. Cross-check it against the server's actual response type (e.g. the engine/route that builds the payload) and fix the client type + accessors to match. Prefer keying by a real DB id from the nested object over a top-level field that may not exist.
 
 **Why:** these bugs are invisible to `tsc` because the lie is in the hand-authored type itself; only runtime/browser evidence exposes them.
+
+**Request-payload variant:** the same drift happens in the other direction — hardening a server route to require strict types (e.g. `typeof x !== 'number'` → 400) silently breaks any client that still sends the raw input string from a text field. `JSON.stringify` bodies are untyped, so tsc can't catch it. When tightening server validation, sweep EVERY caller (admin tabs, scripts) and convert form-state strings with `Number(...)` at the call site; verify by intercepting the real UI request in a browser (route.fulfill a fake 400 so no paid job starts).

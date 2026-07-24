@@ -27,7 +27,7 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
+const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContextProps = {
@@ -301,8 +301,8 @@ const Sidebar = React.forwardRef<
                 ? "0px"
                 : state === "collapsed" && collapsible === "icon"
                   ? variant === "floating" || variant === "inset"
-                    ? "calc(3rem + 1rem)"
-                    : "3rem"
+                    ? "calc(var(--sidebar-width-icon) + 1rem)"
+                    : "var(--sidebar-width-icon)"
                   : "var(--sidebar-width)",
           }}
         />
@@ -321,8 +321,8 @@ const Sidebar = React.forwardRef<
                 ? "0px"
                 : state === "collapsed" && collapsible === "icon"
                   ? variant === "floating" || variant === "inset"
-                    ? "calc(3rem + 1rem + 2px)"
-                    : "3rem"
+                    ? "calc(var(--sidebar-width-icon) + 1rem + 2px)"
+                    : "var(--sidebar-width-icon)"
                   : "var(--sidebar-width)",
             ...(state === "collapsed" && collapsible === "offcanvas"
               ? side === "left"
