@@ -5690,6 +5690,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         turns = n;
       }
+      // Stop-after-N target: omitted/blank => no target. Bounded to the
+      // per-run discovery ceiling (1000) so a typo can't demand a month-long run.
+      const { targetDiscoveries, scoutModel } = req.body ?? {};
+      let target: number | null = null;
+      if (targetDiscoveries !== undefined && targetDiscoveries !== null && String(targetDiscoveries).trim() !== '') {
+        const n = Number(targetDiscoveries);
+        if (typeof targetDiscoveries !== 'number' || !Number.isInteger(n) || n <= 0 || n > 1000) {
+          return res.status(400).json({ success: false, message: 'targetDiscoveries must be a positive integer up to 1000, or omitted for no target' });
+        }
+        target = n;
+      }
+      // Explicit scout model: same single-line contract as categoryFocus.
+      let scout: string | null = null;
+      if (scoutModel !== undefined && scoutModel !== null && scoutModel !== '') {
+        if (typeof scoutModel !== 'string' || scoutModel.trim() === '' || scoutModel.length > 200 || SINGLE_LINE_CONTROL_RE.test(scoutModel)) {
+          return res.status(400).json({ success: false, message: 'scoutModel must be a non-empty string of at most 200 characters' });
+        }
+        scout = scoutModel.trim();
+      }
 
       let agentConfig;
       try {
@@ -5706,6 +5725,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         maxTurns: turns,
         startedBy: userId,
         model: agentConfig.model,
+        scoutModel: scout,
+        targetDiscoveries: target,
         baseUrl: agentConfig.baseUrl,
         authTokenEncrypted: agentConfig.authTokenEncrypted,
         authTokenLast4: agentConfig.authTokenLast4,
@@ -5783,6 +5804,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(discoveries);
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to get discoveries', error: error.message });
+    }
+  });
+
+  // Bulk approve: every pending discovery (optionally scoped to one job).
+  // Registered before the /:id routes are matched by method+path anyway, but
+  // 'approve-all' would also parse as :id — keep it above them for clarity.
+  app.post('/api/researcher/discoveries/approve-all', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { researchService } = await import('./ai/researchService');
+      const rawJobId = req.body?.jobId;
+      let jobId: number | undefined;
+      if (rawJobId !== undefined && rawJobId !== null && rawJobId !== '') {
+        const n = Number(rawJobId);
+        if (!Number.isInteger(n) || n <= 0) {
+          return res.status(400).json({ success: false, message: 'jobId must be a positive integer' });
+        }
+        jobId = n;
+      }
+      const result = await researchService.approveAllPendingDiscoveries(jobId);
+      res.json({ success: true, ...result });
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to bulk-approve discoveries', error: error.message });
     }
   });
 

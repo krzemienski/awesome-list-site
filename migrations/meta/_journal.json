@@ -64,6 +64,13 @@
       "when": 1785000000000,
       "tag": "0036_link_health_persistence",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1785100000000,
+      "tag": "0037_research_scout_model_target",
+      "breakpoints": true
     }
   ]
 }

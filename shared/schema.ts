@@ -1317,6 +1317,13 @@ export const researchJobs = pgTable(
     // Per-run agent config (Claude Agent SDK): model + custom endpoint + encrypted auth token.
     // authTokenEncrypted packs ivHex:tagHex:cipherHex (AES-256-GCM). Null => use platform default (ANTHROPIC_API_KEY).
     model: text("model"),
+    // Explicit scout (subagent) model override. Null => auto: default scout
+    // model on the platform endpoint, or 'inherit' (= orchestrator model)
+    // when a custom model/endpoint is configured.
+    scoutModel: text("scout_model"),
+    // Stop condition: end the run once this many NEW discoveries are saved.
+    // Null => no target (run until budget/turns/model decides to stop).
+    targetDiscoveries: integer("target_discoveries"),
     baseUrl: text("base_url"),
     authTokenEncrypted: text("auth_token_encrypted"),
     authTokenLast4: text("auth_token_last4"),

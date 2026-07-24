@@ -246,6 +246,12 @@ interface ResearchRunContext {
   pendingDiscoveries: PendingDiscovery[];
   /** Epoch ms until which opportunistic (non-forced) flushes are skipped after a failed round. */
   flushBackoffUntil: number;
+  /** Stop condition: end the run once this many NEW discoveries are saved (null = no target). */
+  targetDiscoveries: number | null;
+  /** Set once the target is hit so the aborted run is persisted as 'completed', not 'cancelled'. */
+  targetReached: boolean;
+  /** Aborts the SDK query (slightly delayed so the in-flight tool result can land). */
+  requestStop: () => void;
   addLog: (role: string, content: string, persistNow?: boolean) => Promise<void>;
 }
 
@@ -384,9 +390,23 @@ class ResearchService {
           ctx.discoveriesSaved++;
           ctx.consecutiveDuplicates = 0;
 
+          // Stop-after-N target: this save may be the one that hits it. Flag
+          // first (so the run persists as 'completed', not 'cancelled'), log,
+          // then schedule the abort — requestStop delays slightly so this tool
+          // result still reaches the SDK before the query is torn down.
+          const targetHit = ctx.targetDiscoveries != null && !ctx.targetReached && ctx.discoveriesSaved >= ctx.targetDiscoveries;
+          if (targetHit) {
+            ctx.targetReached = true;
+            await ctx.addLog('system', `Discovery target reached (${ctx.discoveriesSaved}/${ctx.targetDiscoveries}) — ending the run.`, true);
+            ctx.requestStop();
+          }
+          const targetNote = targetHit
+            ? { targetReached: true, note: `Discovery target of ${ctx.targetDiscoveries} reached — the run is ending now. Stop searching.` }
+            : {};
+
           if (discoveryId !== null) {
             await ctx.addLog('discovery', `Saved: ${input.title} — ${input.url} (confidence ${input.confidence})`, true);
-            return await respond({ saved: true, discoveryId });
+            return await respond({ saved: true, discoveryId, ...targetNote });
           }
 
           // Storage briefly unavailable: queue in-memory and keep the run moving.
@@ -396,6 +416,7 @@ class ResearchService {
             saved: true,
             queued: true,
             note: 'Storage was briefly busy, so this discovery is QUEUED server-side and will be persisted automatically. Treat this as saved: do NOT retry this URL, do NOT wait, do NOT stop — continue researching.',
+            ...targetNote,
           });
         } catch (err: any) {
           console.error(`[research:${ctx.jobId}] save_discovery handler error:`, err?.message || err);
@@ -583,6 +604,10 @@ class ResearchService {
     maxTurns?: number | null;
     startedBy?: string;
     model?: string | null;
+    /** Explicit scout (subagent) model. Null => auto (default scout, or 'inherit' with a custom model). */
+    scoutModel?: string | null;
+    /** Stop the run after this many NEW saved discoveries. Null => no target. */
+    targetDiscoveries?: number | null;
     baseUrl?: string | null;
     authTokenEncrypted?: string | null;
     authTokenLast4?: string | null;
@@ -595,6 +620,8 @@ class ResearchService {
       maxTurns: options.maxTurns ?? null,
       startedBy: options.startedBy || null,
       model: options.model || null,
+      scoutModel: options.scoutModel || null,
+      targetDiscoveries: options.targetDiscoveries ?? null,
       baseUrl: options.baseUrl || null,
       authTokenEncrypted: options.authTokenEncrypted || null,
       authTokenLast4: options.authTokenLast4 || null,
@@ -619,6 +646,8 @@ class ResearchService {
       options.maxBudgetUsd != null ? parseFloat(options.maxBudgetUsd) : null,
       config,
       abortController,
+      options.scoutModel ?? null,
+      options.targetDiscoveries ?? null,
     )
       .catch(async (err) => {
         const msg = err?.message || String(err);
@@ -653,15 +682,35 @@ class ResearchService {
     maxBudgetUsd: number | null,
     config: AgentRunConfig,
     abortController: AbortController,
+    scoutModelOverride: string | null = null,
+    targetDiscoveries: number | null = null,
   ): Promise<void> {
     const emitter = new AgentEventEmitter('research', jobId);
     const ctx = await buildResearchContext(categoryFocus);
 
     const orchestratorModel = resolveModel(config, DEFAULT_RESEARCH_MODEL);
-    // When no custom model is set, use a cheaper model for the search scout.
-    // With a custom model/endpoint, use the same model for both so a single
-    // model needs to be served by the custom base URL.
-    const scoutModel = config.model && config.model.trim() ? orchestratorModel : DEFAULT_ENRICHMENT_MODEL;
+    // Scout (subagent) model resolution — verified against the Agent SDK CLI
+    // binary (July 24, 2026): the CLI validates BOTH the per-agent `model`
+    // field AND CLAUDE_CODE_SUBAGENT_MODEL against an internal Anthropic-only
+    // model allowlist. Any unknown id (e.g. "minimax/minimax-m3" pointed at a
+    // custom base URL) is SILENTLY replaced with the CLI's default subagent
+    // model, which the custom endpoint then 404s on ("issue with the selected
+    // model"). The ONE path that bypasses the allowlist is `model: 'inherit'`,
+    // which returns the main-loop model verbatim. Therefore:
+    //  - explicit scout override equal to the orchestrator model -> 'inherit'
+    //    (identical behavior, but allowlist-proof for custom models);
+    //  - explicit override that differs -> passed verbatim (fine for Anthropic
+    //    ids; a non-Anthropic id that differs from the orchestrator cannot
+    //    survive the allowlist and will fall back — the UI documents this);
+    //  - no override + custom model -> 'inherit' (the old buggy path passed
+    //    the custom id verbatim and every scout died on claude-sonnet-5);
+    //  - no override + platform default -> cheaper default scout model.
+    const requestedScout = scoutModelOverride && scoutModelOverride.trim() ? scoutModelOverride.trim() : null;
+    const hasCustomModel = !!(config.model && config.model.trim());
+    const scoutModel = requestedScout
+      ? (requestedScout === orchestratorModel ? 'inherit' : requestedScout)
+      : (hasCustomModel ? 'inherit' : DEFAULT_ENRICHMENT_MODEL);
+    const scoutModelLabel = scoutModel === 'inherit' ? `inherit (${orchestratorModel})` : scoutModel;
 
     const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
     const persist = async (extra: Record<string, any> = {}) => {
@@ -687,10 +736,12 @@ class ResearchService {
     // Discovery ceiling scales with budget (~5 discoveries per $1, bounded
     // 10..1000) when a budget is set. Unlimited budget (null) => unlimited
     // discoveries too — the run is deliberately unbounded per owner request
-    // (July 24, 2026).
-    const discoveryCap = maxBudgetUsd == null
+    // (July 24, 2026). A stop-after-N target raises the cap to at least N so
+    // the budget-derived ceiling can never block reaching the explicit target.
+    const baseCap = maxBudgetUsd == null
       ? Number.POSITIVE_INFINITY
       : Math.max(10, Math.min(1000, Math.round(maxBudgetUsd * 5)));
+    const discoveryCap = targetDiscoveries != null ? Math.max(baseCap, targetDiscoveries) : baseCap;
     const discoveryCapLabel = Number.isFinite(discoveryCap) ? String(discoveryCap) : 'unlimited';
     const runCtx: ResearchRunContext = {
       jobId,
@@ -701,10 +752,18 @@ class ResearchService {
       consecutiveDuplicates: 0,
       pendingDiscoveries: [],
       flushBackoffUntil: 0,
+      targetDiscoveries,
+      targetReached: false,
+      requestStop: () => {
+        // Delay slightly so the in-flight save_discovery tool result reaches
+        // the SDK before the query is torn down; runResearchLoop reinterprets
+        // this abort as a successful target-stop via runCtx.targetReached.
+        setTimeout(() => abortController.abort(), 1500);
+      },
       addLog,
     };
 
-    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModel}, Budget: ${maxBudgetUsd != null ? `$${maxBudgetUsd}` : 'unlimited'}, Discovery cap: ${discoveryCapLabel}, Max turns: ${maxTurns ?? 'unlimited'}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
+    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModelLabel}, Budget: ${maxBudgetUsd != null ? `$${maxBudgetUsd}` : 'unlimited'}, Discovery cap: ${discoveryCapLabel}, Discovery target: ${targetDiscoveries ?? 'none'}, Max turns: ${maxTurns ?? 'unlimited'}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
     if (categoryFocus) await addLog('system', `Focus: ${categoryFocus}`);
     await addLog('user', prompt);
 
@@ -771,7 +830,9 @@ R5. Confidence < 70 → don't save. Quality > quantity.
 R6. Be persistent — the best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, GitHub/Show HN/arXiv) and keep delegating. Wind down only once you've genuinely exhausted varied attempts across multiple gaps.
 R7. TOOLS ARE RESILIENT BUT NOT INDESTRUCTIBLE: check_duplicate / save_discovery / get_coverage_gaps / get_existing_resources are in-process — persistence retries and queueing are handled automatically on the server. If a tool result contains queued:true or degraded:true, that IS success: keep going. If a tool result contains an error field, retry that one call once, then move on to other candidates. NEVER wait for tools to "recover", never hold candidates back, and never end the run early because of a tool response. If tools truly stop responding entirely the server will terminate the run automatically — that is not your concern.
 
-Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCapLabel}.`;
+Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCapLabel}.${targetDiscoveries != null ? `
+
+STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveries are saved. When a save_discovery result contains targetReached:true, the server is already shutting the run down — stop searching immediately and do not start new work.` : ''}`;
 
     // Only the blocking `Task` primitive is allowed for delegation — NOT the
     // async management set (TaskCreate/TaskList/TaskOutput/etc.). Async
@@ -818,9 +879,12 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
       duplicatesSkipped: researchJobs.duplicatesSkipped,
     }).from(researchJobs).where(eq(researchJobs.id, jobId));
 
+    // A target-stop aborts the SDK query on purpose — that is a successful
+    // completion, not a cancellation.
+    const stoppedAtTarget = runCtx.targetReached;
     await addLog(
       'system',
-      `Research ${result.aborted ? 'cancelled' : 'completed'} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
+      `Research ${result.aborted ? (stoppedAtTarget ? 'completed (discovery target reached)' : 'cancelled') : 'completed'} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
       `Web searches: ${result.webSearchCount}, Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
       `Duplicates skipped: ${finalJob?.duplicatesSkipped || 0}, ` +
       `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)}`,
@@ -833,7 +897,7 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
     const abortedWithNoUsage =
       result.aborted && result.numTurns === 0 && result.totalCostUsd === 0;
     await persist({
-      status: result.aborted ? 'cancelled' : 'completed',
+      status: result.aborted && !stoppedAtTarget ? 'cancelled' : 'completed',
       ...(abortedWithNoUsage ? {} : {
         turnsUsed: result.numTurns,
         totalInputTokens: result.tokensIn,
@@ -929,6 +993,65 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
     }
 
     return updated;
+  }
+
+  /**
+   * Bulk-approve every pending discovery (optionally scoped to one job).
+   * Sequential on purpose: approveDiscovery runs ensureSubSubcategoryExists,
+   * which must not race against itself creating the same taxonomy node.
+   * Discoveries whose URL already exists in resources (possible across
+   * jobs — the unique index is per-job) are auto-rejected instead of creating
+   * a duplicate resource row. Duplicate detection uses normalizeUrl so it
+   * matches save-time dedup semantics (www/trailing-slash/case variants),
+   * and the set is updated as the batch approves so intra-batch dupes are
+   * caught too.
+   */
+  async approveAllPendingDiscoveries(jobId?: number): Promise<{
+    approved: number;
+    skippedDuplicates: number;
+    failed: Array<{ id: number; title: string; error: string }>;
+  }> {
+    const where = jobId != null
+      ? and(eq(researchDiscoveries.status, 'pending_review'), eq(researchDiscoveries.jobId, jobId))
+      : eq(researchDiscoveries.status, 'pending_review');
+    const pending = await db
+      .select({ id: researchDiscoveries.id, url: researchDiscoveries.url, title: researchDiscoveries.title })
+      .from(researchDiscoveries)
+      .where(where)
+      .orderBy(researchDiscoveries.id);
+
+    const existingRows = await db
+      .select({ id: resources.id, url: resources.url })
+      .from(resources);
+    const existingByNormUrl = new Map<string, number>();
+    for (const r of existingRows) {
+      const norm = normalizeUrl(r.url);
+      if (!existingByNormUrl.has(norm)) existingByNormUrl.set(norm, r.id);
+    }
+
+    let approved = 0;
+    let skippedDuplicates = 0;
+    const failed: Array<{ id: number; title: string; error: string }> = [];
+    for (const row of pending) {
+      try {
+        const norm = normalizeUrl(row.url);
+        const existingId = existingByNormUrl.get(norm);
+        if (existingId !== undefined) {
+          await this.rejectDiscovery(row.id, `Bulk approve: URL already exists in the database (resource #${existingId})`);
+          skippedDuplicates++;
+          continue;
+        }
+        const created = await this.approveDiscovery(row.id);
+        if (created?.createdResourceId != null) {
+          existingByNormUrl.set(norm, created.createdResourceId);
+        }
+        approved++;
+      } catch (err: any) {
+        console.error(`[research] approve-all failed for discovery ${row.id}:`, err?.message || err);
+        failed.push({ id: row.id, title: row.title, error: String(err?.message || err).slice(0, 300) });
+      }
+    }
+    return { approved, skippedDuplicates, failed };
   }
 
   async rejectDiscovery(discoveryId: number, reason?: string): Promise<ResearchDiscovery> {

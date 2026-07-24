@@ -108,14 +108,21 @@ export default function ResearcherTab() {
   // typing "5.5" or "0" is never silently rewritten — validation feedback is
   // shown instead (see the hint below the field + handleLaunch).
   const [maxTurns, setMaxTurns] = useState("");
+  // Stop condition: end the run automatically after N NEW saved discoveries.
+  // Raw string like maxTurns so typing is never silently rewritten.
+  const [targetDiscoveries, setTargetDiscoveries] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
+  // Explicit scout (subagent) model. Blank = auto: default scout model on the
+  // platform endpoint, or the orchestrator model when a custom model is set.
+  const [scoutModel, setScoutModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [showJobDetails, setShowJobDetails] = useState(false);
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [confirmApproveAll, setConfirmApproveAll] = useState(false);
   // Run23 NB-040: launching a paid research job needs an explicit confirmation
   // step (same AlertDialog pattern as GitHub import/export).
   const [confirmLaunch, setConfirmLaunch] = useState(false);
@@ -201,7 +208,9 @@ export default function ResearcherTab() {
           // when a valid budget was set. Blank = unlimited => omit the field.
           maxBudgetUsd: maxBudget.trim() === "" ? undefined : Number(maxBudget),
           maxTurns: maxTurns.trim() === "" ? undefined : Number(maxTurns),
+          targetDiscoveries: targetDiscoveries.trim() === "" ? undefined : Number(targetDiscoveries),
           model: model.trim() || undefined,
+          scoutModel: scoutModel.trim() || undefined,
           baseUrl: baseUrl.trim() || undefined,
           authToken: authToken.trim() || undefined,
         }),
@@ -266,6 +275,17 @@ export default function ResearcherTab() {
         return;
       }
     }
+    if (targetDiscoveries.trim() !== "") {
+      const target = Number(targetDiscoveries);
+      if (!Number.isInteger(target) || target <= 0 || target > 1000) {
+        toast({
+          title: "Invalid discovery target",
+          description: "Stop-after must be a whole number from 1 to 1000, or leave blank for no target.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
     // Run23 NB-040: don't fire the job from the raw click — open an explicit
     // confirmation dialog first.
     setConfirmLaunch(true);
@@ -278,6 +298,29 @@ export default function ResearcherTab() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       toast({ title: "Job cancelled" });
+    },
+  });
+
+  // Bulk approve every pending discovery (server auto-rejects exact-URL
+  // duplicates instead of double-inserting them as resources).
+  const approveAllMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/researcher/discoveries/approve-all', { method: 'POST', body: JSON.stringify({}) });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
+      const parts = [`${data?.approved ?? 0} approved`];
+      if (data?.skippedDuplicates) parts.push(`${data.skippedDuplicates} skipped as duplicates`);
+      if (data?.failed?.length) parts.push(`${data.failed.length} failed`);
+      toast({
+        title: "Bulk approval finished",
+        description: parts.join(', ') + '.',
+        variant: data?.failed?.length ? "destructive" : undefined,
+      });
+    },
+    onError: (error: any) => {
+      toast({ title: "Bulk approval failed", description: error.message, variant: "destructive" });
     },
   });
 
@@ -448,6 +491,42 @@ export default function ResearcherTab() {
                       );
                     })()}
                   </div>
+                  <div>
+                    <Label htmlFor="target-discoveries">Stop After (discoveries)</Label>
+                    <Input
+                      id="target-discoveries"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      step={1}
+                      placeholder="No target"
+                      value={targetDiscoveries}
+                      onChange={(e) => setTargetDiscoveries(e.target.value)}
+                      className="mt-1"
+                      data-testid="input-target-discoveries"
+                    />
+                    {(() => {
+                      if (targetDiscoveries.trim() === "") {
+                        return (
+                          <p className="text-xs mt-1 text-muted-foreground" data-testid="text-target-hint">
+                            No target — runs until budget/turns end
+                          </p>
+                        );
+                      }
+                      const t = Number(targetDiscoveries);
+                      const invalid = !Number.isInteger(t) || t <= 0 || t > 1000;
+                      return (
+                        <p
+                          className={`text-xs mt-1 ${invalid ? "text-yellow-500" : "text-muted-foreground"}`}
+                          data-testid="text-target-hint"
+                        >
+                          {invalid
+                            ? "Enter a whole number from 1 to 1000, or leave blank for no target."
+                            : `Run stops automatically after ${t} new ${t === 1 ? "discovery" : "discoveries"}.`}
+                        </p>
+                      );
+                    })()}
+                  </div>
                 </div>
 
                 <div className="rounded-md border">
@@ -477,6 +556,22 @@ export default function ResearcherTab() {
                           className="mt-1 font-mono text-xs"
                           data-testid="input-research-model"
                         />
+                      </div>
+                      <div>
+                        <Label htmlFor="research-scout-model" className="flex items-center gap-1.5">
+                          <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Scout Model
+                        </Label>
+                        <Input
+                          id="research-scout-model"
+                          value={scoutModel}
+                          onChange={(e) => setScoutModel(e.target.value)}
+                          placeholder="Auto (recommended)"
+                          className="mt-1 font-mono text-xs"
+                          data-testid="input-research-scout-model"
+                        />
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          Model for the search scout subagents. Blank = auto: a cheaper Claude scout on the platform endpoint, or the same model as above when a custom model is set. With a custom endpoint, a non-Claude scout model only works if it matches the model above.
+                        </p>
                       </div>
                       <div>
                         <Label htmlFor="research-baseurl" className="flex items-center gap-1.5">
@@ -540,7 +635,7 @@ export default function ResearcherTab() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Launch research job?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This starts a Claude research agent with {maxBudget.trim() === "" ? "an UNLIMITED budget" : `a budget of up to $${maxBudget}`} and {maxTurns.trim() === "" ? "unlimited turns" : `${maxTurns} turns`}. The job runs in the background and incurs real API cost{maxBudget.trim() === "" ? " with no spending cap — cancel it manually when you're satisfied" : ""}.
+                        This starts a Claude research agent with {maxBudget.trim() === "" ? "an UNLIMITED budget" : `a budget of up to $${maxBudget}`} and {maxTurns.trim() === "" ? "unlimited turns" : `${maxTurns} turns`}.{targetDiscoveries.trim() !== "" ? ` It will stop automatically after ${targetDiscoveries} new ${Number(targetDiscoveries) === 1 ? "discovery" : "discoveries"}.` : ""} The job runs in the background and incurs real API cost{maxBudget.trim() === "" && targetDiscoveries.trim() === "" ? " with no spending cap — cancel it manually when you're satisfied" : ""}.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -638,14 +733,53 @@ export default function ResearcherTab() {
         <TabsContent value="review">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5 text-primary" />
-                Pending Discoveries
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="w-5 h-5 text-primary" />
+                    Pending Discoveries
+                    {pendingDiscoveries && pendingDiscoveries.length > 0 && (
+                      <Badge variant="destructive" className="ml-2">{pendingDiscoveries.length}</Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription className="mt-1.5">Review and approve or reject AI-discovered resources</CardDescription>
+                </div>
                 {pendingDiscoveries && pendingDiscoveries.length > 0 && (
-                  <Badge variant="destructive" className="ml-2">{pendingDiscoveries.length}</Badge>
+                  <Button
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 shrink-0"
+                    onClick={() => setConfirmApproveAll(true)}
+                    disabled={approveAllMutation.isPending}
+                    data-testid="button-approve-all"
+                  >
+                    {approveAllMutation.isPending ? (
+                      <><RefreshCw className="w-3.5 h-3.5 mr-1.5 animate-spin" />Approving...</>
+                    ) : (
+                      <><ThumbsUp className="w-3.5 h-3.5 mr-1.5" />Approve All ({pendingDiscoveries.length})</>
+                    )}
+                  </Button>
                 )}
-              </CardTitle>
-              <CardDescription>Review and approve or reject AI-discovered resources</CardDescription>
+              </div>
+              {/* Explicit confirmation — bulk approval creates real resources. */}
+              <AlertDialog open={confirmApproveAll} onOpenChange={(open) => { if (!open) setConfirmApproveAll(false); }}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Approve all pending discoveries?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This approves all {pendingDiscoveries?.length ?? 0} pending discoveries and publishes them as live resources. Discoveries whose URL already exists in the database are skipped as duplicates. This cannot be undone in bulk — each resource would need to be removed individually.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel data-testid="button-cancel-approve-all">Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      data-testid="button-confirm-approve-all"
+                      onClick={() => { setConfirmApproveAll(false); approveAllMutation.mutate(); }}
+                    >
+                      Approve All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardHeader>
             <CardContent>
               {!pendingDiscoveries || pendingDiscoveries.length === 0 ? (
@@ -929,6 +1063,14 @@ export default function ResearcherTab() {
                 <div>
                   <Label className="text-xs text-muted-foreground">Model</Label>
                   <p className="text-xs font-mono mt-1">{selectedJob.model || 'claude-sonnet-4-5 (default)'}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Scout Model</Label>
+                  <p className="text-xs font-mono mt-1">{selectedJob.scoutModel || 'Auto'}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Discovery Target</Label>
+                  <p className="text-xs font-mono mt-1">{selectedJob.targetDiscoveries != null ? `Stop after ${selectedJob.targetDiscoveries}` : 'None'}</p>
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Base URL</Label>
