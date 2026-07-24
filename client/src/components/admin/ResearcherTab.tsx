@@ -68,7 +68,7 @@ function getStatusBadge(status: string) {
 // explanation while keeping the raw text for debugging.
 function humanizeJobError(msg: string): string {
   if (/exited with code \d+/i.test(msg) || /process exited/i.test(msg)) {
-    return `The research agent crashed before finishing. This is usually transient — try launching the job again; if it keeps happening, lower the budget/turn limits. (Technical detail: ${msg})`;
+    return `The research agent crashed before finishing. This is usually transient — try launching the job again; if it keeps happening, try setting explicit budget/turn limits. (Technical detail: ${msg})`;
   }
   if (/abort/i.test(msg)) {
     return `The job was stopped before it could finish. (Technical detail: ${msg})`;
@@ -101,11 +101,13 @@ export default function ResearcherTab() {
 
   const [prompt, setPrompt] = useState("Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms.");
   const [categoryFocus, setCategoryFocus] = useState("");
-  const [maxBudget, setMaxBudget] = useState("1.00");
+  // Blank = unlimited (owner request July 24, 2026): budget and turns are
+  // unbounded by default; entering a number opts INTO a cap.
+  const [maxBudget, setMaxBudget] = useState("");
   // R4-052: keep the raw input string (like maxBudget) instead of a number so
-  // typing "5.5" or "0" is never silently rewritten to 5 / 30 — validation
-  // feedback is shown instead (see the hint below the field + handleLaunch).
-  const [maxTurns, setMaxTurns] = useState("30");
+  // typing "5.5" or "0" is never silently rewritten — validation feedback is
+  // shown instead (see the hint below the field + handleLaunch).
+  const [maxTurns, setMaxTurns] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [model, setModel] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
@@ -196,9 +198,9 @@ export default function ResearcherTab() {
           categoryFocus: categoryFocus && categoryFocus !== 'all' ? categoryFocus : undefined,
           // R5-021 made the server require real number types; sending the raw
           // input string here made every launch 400 with a budget error even
-          // when a valid budget was set.
-          maxBudgetUsd: Number(maxBudget),
-          maxTurns: Number(maxTurns),
+          // when a valid budget was set. Blank = unlimited => omit the field.
+          maxBudgetUsd: maxBudget.trim() === "" ? undefined : Number(maxBudget),
+          maxTurns: maxTurns.trim() === "" ? undefined : Number(maxTurns),
           model: model.trim() || undefined,
           baseUrl: baseUrl.trim() || undefined,
           authToken: authToken.trim() || undefined,
@@ -238,25 +240,31 @@ export default function ResearcherTab() {
       });
       return;
     }
-    const budget = Number(maxBudget);
-    if (!Number.isFinite(budget) || budget < 0.25) {
-      toast({
-        title: "Invalid budget",
-        description: "Budget must be at least $0.25.",
-        variant: "destructive",
-      });
-      return;
+    // Blank = unlimited (no cap). A provided value must still be a sane
+    // positive number so garbage can't silently start a run.
+    if (maxBudget.trim() !== "") {
+      const budget = Number(maxBudget);
+      if (!Number.isFinite(budget) || budget <= 0) {
+        toast({
+          title: "Invalid budget",
+          description: "Budget must be a positive number, or leave blank for unlimited.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
-    // R4-052: reject out-of-range / non-integer turns with a message instead of
-    // silently coercing them (5.5 → 5, 0 → 30).
-    const turns = Number(maxTurns);
-    if (maxTurns.trim() === "" || !Number.isInteger(turns) || turns < 5 || turns > 100) {
-      toast({
-        title: "Invalid max turns",
-        description: "Max turns must be a whole number between 5 and 100.",
-        variant: "destructive",
-      });
-      return;
+    // R4-052: reject non-integer turns with a message instead of silently
+    // coercing them (5.5 → 5).
+    if (maxTurns.trim() !== "") {
+      const turns = Number(maxTurns);
+      if (!Number.isInteger(turns) || turns <= 0) {
+        toast({
+          title: "Invalid max turns",
+          description: "Max turns must be a positive whole number, or leave blank for unlimited.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
     // Run23 NB-040: don't fire the job from the raw click — open an explicit
     // confirmation dialog first.
@@ -381,14 +389,22 @@ export default function ResearcherTab() {
                         id="budget"
                         type="number"
                         step="0.25"
-                        min="0.25"
+                        min="0"
+                        placeholder="Unlimited"
                         value={maxBudget}
                         onChange={(e) => setMaxBudget(e.target.value)}
                       />
                     </div>
                     {(() => {
+                      if (maxBudget.trim() === "") {
+                        return (
+                          <p className="text-xs text-muted-foreground mt-1" data-testid="text-discovery-cap">
+                            Unlimited budget — no discovery cap
+                          </p>
+                        );
+                      }
                       const b = Number(maxBudget);
-                      if (!Number.isFinite(b) || b < 0.25) return null;
+                      if (!Number.isFinite(b) || b <= 0) return null;
                       const cap = Math.max(10, Math.min(1000, Math.round(b * 5)));
                       return (
                         <p className="text-xs text-muted-foreground mt-1" data-testid="text-discovery-cap">
@@ -402,26 +418,32 @@ export default function ResearcherTab() {
                     <Input
                       id="turns"
                       type="number"
-                      min={5}
-                      max={100}
+                      min={1}
                       step={1}
+                      placeholder="Unlimited"
                       value={maxTurns}
                       /* R4-052: store the raw text; do NOT silently coerce. */
                       onChange={(e) => setMaxTurns(e.target.value)}
                       className="mt-1"
                     />
                     {(() => {
+                      if (maxTurns.trim() === "") {
+                        return (
+                          <p className="text-xs mt-1 text-muted-foreground" data-testid="text-turns-hint">
+                            Unlimited turns
+                          </p>
+                        );
+                      }
                       const t = Number(maxTurns);
-                      const invalid =
-                        maxTurns.trim() === "" || !Number.isInteger(t) || t < 5 || t > 100;
+                      const invalid = !Number.isInteger(t) || t <= 0;
                       return (
                         <p
                           className={`text-xs mt-1 ${invalid ? "text-yellow-500" : "text-muted-foreground"}`}
                           data-testid="text-turns-hint"
                         >
                           {invalid
-                            ? "Enter a whole number between 5 and 100."
-                            : "Whole number, 5–100."}
+                            ? "Enter a positive whole number, or leave blank for unlimited."
+                            : "Positive whole number (blank = unlimited)."}
                         </p>
                       );
                     })()}
@@ -518,7 +540,7 @@ export default function ResearcherTab() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Launch research job?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This starts a Claude research agent with a budget of up to ${maxBudget} and {maxTurns} turns. The job runs in the background and incurs real API cost.
+                        This starts a Claude research agent with {maxBudget.trim() === "" ? "an UNLIMITED budget" : `a budget of up to $${maxBudget}`} and {maxTurns.trim() === "" ? "unlimited turns" : `${maxTurns} turns`}. The job runs in the background and incurs real API cost{maxBudget.trim() === "" ? " with no spending cap — cancel it manually when you're satisfied" : ""}.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -566,7 +588,7 @@ export default function ResearcherTab() {
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Turns:</span>{' '}
-                                <span className="font-medium">{job.turnsUsed || 0}/{job.maxTurns}</span>
+                                <span className="font-medium">{job.turnsUsed || 0}/{job.maxTurns ?? '∞'}</span>
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Cost:</span>{' '}
@@ -772,6 +794,9 @@ export default function ResearcherTab() {
                           <TableCell>
                             {job.status === 'cancelled' && (job.turnsUsed || 0) === 0 ? (
                               <span className="text-muted-foreground">—</span>
+                            ) : job.maxTurns == null ? (
+                              /* Unlimited-turns job: no cap to annotate against. */
+                              <>{job.turnsUsed || 0}/∞</>
                             ) : (job.turnsUsed || 0) > (job.maxTurns || 0) ? (
                               /* NB-032: visible continuation annotation (was
                                  tooltip-only) — turns accrue across runs while
@@ -931,7 +956,10 @@ export default function ResearcherTab() {
                 <Label className="text-xs text-muted-foreground">
                   {/* NB-032 (run18): annotate turns that exceed the per-run cap. */}
                   Turns:{' '}
-                  {(selectedJob.turnsUsed || 0) > (selectedJob.maxTurns || 0) ? (
+                  {selectedJob.maxTurns == null ? (
+                    /* Unlimited-turns job: no cap to annotate against. */
+                    <>{selectedJob.turnsUsed || 0}/∞</>
+                  ) : (selectedJob.turnsUsed || 0) > (selectedJob.maxTurns || 0) ? (
                     /* NB-032: visible continuation annotation. */
                     <span title={`used across continuation runs (cap ${selectedJob.maxTurns}/run)`}>
                       {selectedJob.turnsUsed}/{selectedJob.maxTurns} (continued runs; cap {selectedJob.maxTurns}/run)

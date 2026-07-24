@@ -5667,27 +5667,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Run16 BUG-008: server-side guardrails mirroring the launch form
-      // (budget min $0.25, turns 5–100). The API used to accept any value
-      // (e.g. maxTurns=301000 / $0 budgets) and silently run with it.
-      // Run24 R5-021: unbounded cost amplification — the ceiling is now the
-      // spec-mandated $100 cap (raise deliberately in the spec if ever needed).
-      let budget = '1.00';
+      // Budget/turns are UNBOUNDED per explicit owner request (July 24, 2026):
+      // omitted/blank => unlimited (stored as NULL, no cap passed to the SDK).
+      // When a value IS provided it still must be a sane positive number so
+      // garbage like NaN/-5/5.5-turns can't silently start a run (type checks
+      // from R5-021 retained; the old $100 / 100-turn ceilings and $0.25 / 5
+      // floors are deliberately removed — this supersedes Run16 BUG-008 and
+      // the R5-021 cost-amplification ceiling).
+      let budget: string | null = null;
       if (maxBudgetUsd !== undefined && maxBudgetUsd !== null && String(maxBudgetUsd).trim() !== '') {
         const n = Number(maxBudgetUsd);
-        if (typeof maxBudgetUsd !== 'number' || !Number.isFinite(n) || n < 0.25) {
-          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be a number of at least 0.25' });
-        }
-        if (n > 100) {
-          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be at most 100' });
+        if (typeof maxBudgetUsd !== 'number' || !Number.isFinite(n) || n <= 0) {
+          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be a positive number, or omitted for unlimited' });
         }
         budget = n.toFixed(2);
       }
-      let turns = 30;
+      let turns: number | null = null;
       if (maxTurns !== undefined && maxTurns !== null && String(maxTurns).trim() !== '') {
         const n = Number(maxTurns);
-        if (typeof maxTurns !== 'number' || !Number.isInteger(n) || n < 5 || n > 100) {
-          return res.status(400).json({ success: false, message: 'maxTurns must be an integer between 5 and 100' });
+        if (typeof maxTurns !== 'number' || !Number.isInteger(n) || n <= 0) {
+          return res.status(400).json({ success: false, message: 'maxTurns must be a positive integer, or omitted for unlimited' });
         }
         turns = n;
       }

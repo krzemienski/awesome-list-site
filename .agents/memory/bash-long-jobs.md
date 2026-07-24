@@ -21,3 +21,6 @@ description: Pattern for multi-minute scripts when nohup/background processes ge
 
 ## /tmp scripts + heredoc-then-run
 Node scripts placed in /tmp cannot resolve workspace node_modules (ERR_MODULE_NOT_FOUND for e.g. playwright) — write the script inside the workspace instead. Also, a `cat > file <<EOF` heredoc chained with `&&`/`;` into a long `timeout node` run is sometimes killed as "waiting on user input"; write the file with the write tool and run node in a separate command.
+
+## tsx helper scripts must live inside the workspace
+A one-off `.ts` helper written to `/tmp` fails under `npx tsx` twice over: relative imports like `./server/db` resolve against `/tmp`, and even absolute imports can't find `node_modules` (drizzle-orm etc.) because Node resolution walks up from the script's own directory. Write throwaway scripts to `.local/` (gitignored) inside the workspace, run, then delete. Also: tsx CJS mode rejects top-level await — wrap in `async function main()`.

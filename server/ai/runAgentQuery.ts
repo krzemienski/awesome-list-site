@@ -81,8 +81,10 @@ export interface RunAgentQueryParams {
   agents?: Record<string, AgentDefinitionInput>;
   /** Allowlist of tools the orchestrator may call (mcp__* + WebSearch + Task…). */
   allowedTools?: string[];
-  maxTurns: number;
-  maxBudgetUsd: number;
+  /** null => unlimited turns (option omitted from the SDK call entirely). */
+  maxTurns: number | null;
+  /** null => unlimited budget (option omitted from the SDK call entirely). */
+  maxBudgetUsd: number | null;
   /** Caller-owned controller; abort() → graceful user cancel. */
   abortController: AbortController;
   /** Extra tools to disallow on top of the baseline. */
@@ -197,8 +199,9 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     options: {
       model,
       systemPrompt,
-      maxTurns,
-      maxBudgetUsd,
+      // Unlimited (null) => omit the cap so the SDK enforces nothing.
+      ...(maxTurns != null ? { maxTurns } : {}),
+      ...(maxBudgetUsd != null ? { maxBudgetUsd } : {}),
       abortController,
       permissionMode: "bypassPermissions",
       settingSources: [],
@@ -230,7 +233,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
               actorType: "system",
               eventType: "lifecycle",
               model,
-              summary: `Run started (model ${model}, maxTurns ${maxTurns}, budget $${maxBudgetUsd})`,
+              summary: `Run started (model ${model}, maxTurns ${maxTurns ?? 'unlimited'}, budget ${maxBudgetUsd != null ? `$${maxBudgetUsd}` : 'unlimited'})`,
               detail: {
                 tools: msg.tools,
                 agents: msg.agents,

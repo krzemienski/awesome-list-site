@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { enrichmentJobs, githubSyncQueue } from "@shared/schema";
+import { enrichmentJobs, githubSyncQueue, researchJobs } from "@shared/schema";
 import { sql, and, inArray, notInArray, lt, or, isNull } from "drizzle-orm";
 
 const ORPHAN_THRESHOLD_MS = 5 * 60 * 1000;
@@ -13,6 +13,7 @@ const STALE_PENDING_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
 export interface OrphanSweepResult {
   enrichmentJobsFailed: number;
   githubSyncQueueFailed: number;
+  researchJobsFailed: number;
   cutoff: Date;
 }
 
@@ -25,6 +26,7 @@ export interface OrphanSweepResult {
 export interface OrphanSweepExclusions {
   enrichmentJobIds?: number[];
   syncQueueIds?: number[];
+  researchJobIds?: number[];
 }
 
 export async function sweepOrphanedJobs(
@@ -88,9 +90,38 @@ export async function sweepOrphanedJobs(
     .where(and(...gConditions))
     .returning({ id: githubSyncQueue.id });
 
+  // Research jobs: now that budget/turns can be unlimited (July 24, 2026),
+  // a server restart mid-run would otherwise strand a job in 'processing'
+  // forever (the SDK subprocess dies with the server, so no cost accrues,
+  // but the row never resolves). Same rules as enrichment: only flip rows
+  // older than the cutoff and never flip ids owned by a live in-process run
+  // (unlimited runs legitimately exceed any age threshold).
+  const rConditions = [
+    inArray(researchJobs.status, ['pending', 'processing']),
+    or(
+      and(isNull(researchJobs.startedAt), lt(researchJobs.createdAt, cutoff)),
+      lt(researchJobs.startedAt, cutoff),
+    ),
+  ];
+  const liveResearchIds = exclude.researchJobIds ?? [];
+  if (liveResearchIds.length > 0) {
+    rConditions.push(notInArray(researchJobs.id, liveResearchIds));
+  }
+
+  const rResult = await db
+    .update(researchJobs)
+    .set({
+      status: 'failed',
+      errorMessage: 'Orphaned by server restart',
+      completedAt: new Date(),
+    })
+    .where(and(...rConditions))
+    .returning({ id: researchJobs.id });
+
   return {
     enrichmentJobsFailed: eResult.length,
     githubSyncQueueFailed: gResult.length,
+    researchJobsFailed: rResult.length,
     cutoff,
   };
 }
@@ -98,9 +129,9 @@ export async function sweepOrphanedJobs(
 export async function runOrphanWatchdogStartup(): Promise<void> {
   try {
     const r = await sweepOrphanedJobs();
-    if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0) {
+    if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
       console.log(
-        `🧹 Orphan watchdog: flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue rows to failed (older than ${r.cutoff.toISOString()})`,
+        `🧹 Orphan watchdog: flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue + ${r.researchJobsFailed} research_jobs rows to failed (older than ${r.cutoff.toISOString()})`,
       );
     } else {
       console.log('✅ Orphan watchdog: no stuck jobs found');
@@ -128,17 +159,19 @@ export function startOrphanWatchdogPeriodic(): void {
   periodicTimer = setInterval(async () => {
     try {
       // Dynamic imports keep the watchdog free of load-order coupling.
-      const [{ enrichmentService }, { syncService }] = await Promise.all([
+      const [{ enrichmentService }, { syncService }, { researchService }] = await Promise.all([
         import('../ai/enrichmentService'),
         import('../github/syncService'),
+        import('../ai/researchService'),
       ]);
       const r = await sweepOrphanedJobs(undefined, {
         enrichmentJobIds: enrichmentService.getActiveJobIds(),
         syncQueueIds: syncService.getActiveQueueIds(),
+        researchJobIds: researchService.getActiveJobIds(),
       });
-      if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0) {
+      if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0 || r.researchJobsFailed > 0) {
         console.log(
-          `🧹 Orphan watchdog (periodic): flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue rows to failed`,
+          `🧹 Orphan watchdog (periodic): flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue + ${r.researchJobsFailed} research_jobs rows to failed`,
         );
       }
     } catch (err: any) {

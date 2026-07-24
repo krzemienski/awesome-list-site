@@ -577,8 +577,10 @@ class ResearchService {
   async startResearchJob(options: {
     prompt: string;
     categoryFocus?: string;
-    maxBudgetUsd?: string;
-    maxTurns?: number;
+    /** null/undefined => unlimited budget (no cap passed to the SDK). */
+    maxBudgetUsd?: string | null;
+    /** null/undefined => unlimited turns (no cap passed to the SDK). */
+    maxTurns?: number | null;
     startedBy?: string;
     model?: string | null;
     baseUrl?: string | null;
@@ -588,8 +590,9 @@ class ResearchService {
     const [job] = await db.insert(researchJobs).values({
       prompt: options.prompt,
       categoryFocus: options.categoryFocus || null,
-      maxBudgetUsd: options.maxBudgetUsd || '1.00',
-      maxTurns: options.maxTurns || 30,
+      // NULL = unlimited (owner request July 24, 2026): no default caps.
+      maxBudgetUsd: options.maxBudgetUsd ?? null,
+      maxTurns: options.maxTurns ?? null,
       startedBy: options.startedBy || null,
       model: options.model || null,
       baseUrl: options.baseUrl || null,
@@ -612,8 +615,8 @@ class ResearchService {
       job.id,
       options.prompt,
       options.categoryFocus,
-      options.maxTurns || 30,
-      parseFloat(options.maxBudgetUsd || '1.00'),
+      options.maxTurns ?? null,
+      options.maxBudgetUsd != null ? parseFloat(options.maxBudgetUsd) : null,
       config,
       abortController,
     )
@@ -646,8 +649,8 @@ class ResearchService {
     jobId: number,
     prompt: string,
     categoryFocus: string | undefined,
-    maxTurns: number,
-    maxBudgetUsd: number,
+    maxTurns: number | null,
+    maxBudgetUsd: number | null,
     config: AgentRunConfig,
     abortController: AbortController,
   ): Promise<void> {
@@ -681,11 +684,14 @@ class ResearchService {
       if (persistNow) await persist();
     };
 
-    // Discovery ceiling scales with budget (~5 discoveries per $1) so larger
-    // budgets can actually yield more resources (budgets are uncapped per user
-    // request). Safety bound of 1000 per run protects the DB/review queue from
-    // a runaway job created with an enormous budget.
-    const discoveryCap = Math.max(10, Math.min(1000, Math.round(maxBudgetUsd * 5)));
+    // Discovery ceiling scales with budget (~5 discoveries per $1, bounded
+    // 10..1000) when a budget is set. Unlimited budget (null) => unlimited
+    // discoveries too — the run is deliberately unbounded per owner request
+    // (July 24, 2026).
+    const discoveryCap = maxBudgetUsd == null
+      ? Number.POSITIVE_INFINITY
+      : Math.max(10, Math.min(1000, Math.round(maxBudgetUsd * 5)));
+    const discoveryCapLabel = Number.isFinite(discoveryCap) ? String(discoveryCap) : 'unlimited';
     const runCtx: ResearchRunContext = {
       jobId,
       emitter,
@@ -698,7 +704,7 @@ class ResearchService {
       addLog,
     };
 
-    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModel}, Budget: $${maxBudgetUsd}, Discovery cap: ${discoveryCap}, Max turns: ${maxTurns}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
+    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModel}, Budget: ${maxBudgetUsd != null ? `$${maxBudgetUsd}` : 'unlimited'}, Discovery cap: ${discoveryCapLabel}, Max turns: ${maxTurns ?? 'unlimited'}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
     if (categoryFocus) await addLog('system', `Focus: ${categoryFocus}`);
     await addLog('user', prompt);
 
@@ -765,7 +771,7 @@ R5. Confidence < 70 → don't save. Quality > quantity.
 R6. Be persistent — the best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, GitHub/Show HN/arXiv) and keep delegating. Wind down only once you've genuinely exhausted varied attempts across multiple gaps.
 R7. TOOLS ARE RESILIENT BUT NOT INDESTRUCTIBLE: check_duplicate / save_discovery / get_coverage_gaps / get_existing_resources are in-process — persistence retries and queueing are handled automatically on the server. If a tool result contains queued:true or degraded:true, that IS success: keep going. If a tool result contains an error field, retry that one call once, then move on to other candidates. NEVER wait for tools to "recover", never hold candidates back, and never end the run early because of a tool response. If tools truly stop responding entirely the server will terminate the run automatically — that is not your concern.
 
-Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCap}.`;
+Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCapLabel}.`;
 
     // Only the blocking `Task` primitive is allowed for delegation — NOT the
     // async management set (TaskCreate/TaskList/TaskOutput/etc.). Async
@@ -814,7 +820,7 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
 
     await addLog(
       'system',
-      `Research ${result.aborted ? 'cancelled' : 'completed'} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns}, ` +
+      `Research ${result.aborted ? 'cancelled' : 'completed'} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns ?? '∞'}, ` +
       `Web searches: ${result.webSearchCount}, Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
       `Duplicates skipped: ${finalJob?.duplicatesSkipped || 0}, ` +
       `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)}`,
@@ -943,6 +949,13 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
 
   isJobActive(jobId: number): boolean {
     return this.activeJobs.has(jobId);
+  }
+
+  // Orphan watchdog exclusion: ids owned by a live in-process run. Research
+  // runs (especially unlimited ones) routinely exceed any age threshold, so
+  // the periodic sweep must never flip a job that is still actively running.
+  getActiveJobIds(): number[] {
+    return [...this.activeJobs.keys()];
   }
 }
 
