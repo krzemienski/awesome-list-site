@@ -60,3 +60,4 @@ Used to run the admin Researcher + Enrichment agents as a real multi-agent syste
 
 ## Non-interactive hygiene
 - Always run non-interactively (server/scripts): set an `abortController` + timeout; a bad endpoint otherwise hangs on ret/backoff with no output.
+- **Terminal job status must be persisted via a small dedicated retried UPDATE before any heavyweight log persist** — a crash mid-persist otherwise leaves jobs stuck "processing".

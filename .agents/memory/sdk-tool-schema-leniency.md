@@ -10,6 +10,5 @@ Custom OpenAI-compatible models (grok etc.) routinely emit tool args with number
 **How to apply:**
 - Tool `inputSchema`s for agent-facing MCP tools stay lenient: fields `.optional()`, numerics `z.union([z.number(), z.string()])`, "REQUIRED:" spelled out in the `describe()` text.
 - Enforce the real contract IN-HANDLER and return instructive JSON errors (`{error, guidance: "Re-call with ..."}`) so the model can self-correct instead of stalling.
-- Any circuit breaker watching for unanswered mcp__ calls must classify tool_results: only genuine bridge-death signatures (no such tool / not connected / mcp server failed|closed) count as strikes; validation rejections and handler errors must reset the counter.
+- Any circuit breaker watching for unanswered mcp__ calls must classify tool_results: only genuine bridge-death signatures (no such tool / not connected / mcp server failed|closed) count as strikes; validation rejections and handler errors must reset the counter. See also [sdk-block-split-messages.md](sdk-block-split-messages.md) — never count assistant messages as unanswered calls.
 - Custom models may also pass `model:` per Task/Agent delegation — strip it in a PreToolUse hook or subagents 404 on the custom endpoint.
-- Terminal job status must be persisted via a small dedicated retried UPDATE before any heavyweight log persist, or a crash mid-persist leaves jobs stuck "processing".

@@ -71,12 +71,35 @@ const DELEGATION_TOOL_NAMES = new Set(["Task", "Agent"]);
 const GRAPHED_BUILTIN_TOOLS = new Set(["WebSearch"]);
 
 /**
- * Circuit breaker: how many consecutive MCP tool_use calls (seen in assistant
- * messages) without a matching handler-emitted tool_result before we abort the
- * run with a clear error. This fires when the in-process MCP bridge is dead
- * (e.g. after a spurious SDK resume) so the model can't retry indefinitely.
+ * Circuit breaker (rewritten July 25, 2026). The old design counted mcp__
+ * tool_use blocks "without a result" — but the SDK emits ONE assistant
+ * message PER CONTENT BLOCK (same message id + usage repeated), so a single
+ * turn batching ≥12 parallel mcp calls tripped the breaker while the bridge
+ * was alive (proven on prod job 49: 16 identical-usage check_duplicate
+ * messages → false abort; results kept flowing right through it).
+ *
+ * The breaker now aborts on two genuine dead-bridge signals only:
+ *  1. MCP_BRIDGE_DEAD_STRIKES consecutive is_error tool_results matching
+ *     BRIDGE_DEAD_RE ("no such tool" etc. — the signature after a spurious
+ *     SDK auto-resume detaches the in-process bridge).
+ *  2. Stall: ≥ MCP_STALL_PENDING_THRESHOLD calls pending AND no mcp
+ *     tool_result of any kind for MCP_STALL_SILENCE_MS. Block-batching can
+ *     never trip this — a turn's block messages arrive within milliseconds,
+ *     and in-process handlers answer in well under the silence window.
  */
-const MCP_CIRCUIT_BREAKER_THRESHOLD = 12;
+const MCP_BRIDGE_DEAD_STRIKES = 6;
+const MCP_STALL_PENDING_THRESHOLD = 12;
+const MCP_STALL_SILENCE_MS = 120_000;
+/**
+ * Regex-drift backstop: if the model receives the SAME is_error text on
+ * mcp__ calls this many times in a row (whatever the text — a future
+ * dead-bridge wording BRIDGE_DEAD_RE misses, or the model stuck re-sending
+ * identical invalid input), the run is looping uselessly. With budget/turns
+ * unlimited by default, nothing else bounds the burn — abort.
+ */
+const MCP_IDENTICAL_ERROR_STRIKES = 10;
+/** How often the timer backstop re-runs the stall check (stream may be idle). */
+const MCP_STALL_TIMER_MS = 30_000;
 
 export interface AgentDefinitionInput {
   description: string;
@@ -198,26 +221,70 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     webSearchCount: 0,
   };
 
-  // ── Circuit breaker: track MCP tool_use calls that never get a handler
-  // response. The emitter hook decrements when any tool_result is emitted
-  // (handlers fire this on every call, success or error). If the count climbs
-  // past the threshold the in-process MCP bridge is assumed dead.
-  //
-  // Refinement (July 24, 2026): an SDK-side input rejection (zod validation
-  // fails BEFORE the handler runs → is_error tool_result like "Invalid
-  // arguments…") is NOT a dead bridge — the loop is alive and the model got
-  // feedback. Only genuinely unanswered calls and "no such tool" responses
-  // (the dead-bridge signature after a spurious SDK auto-resume) keep
-  // counting. We track in-flight mcp__ tool_use ids so the incoming user-side
-  // tool_result can be classified.
-  let mcpCallsWithoutResult = 0;
-  const pendingMcpCalls = new Map<string, string>(); // tool_use_id → tool name
+  // ── Circuit breaker state (see MCP_BRIDGE_DEAD_STRIKES doc above).
+  // pendingMcpCalls tracks in-flight mcp__ tool_use ids so incoming user-side
+  // tool_results can be classified (SDK-side zod rejection ≠ dead bridge —
+  // the loop is alive and the model got feedback). lastMcpResultAt feeds the
+  // stall detector; bridgeDeadStrikes counts consecutive dead-bridge-signature
+  // error results only.
+  const pendingMcpCalls = new Map<string, { name: string; at: number }>();
+  let lastMcpResultAt = Date.now();
+  let bridgeDeadStrikes = 0;
+  let lastMcpErrorText = "";
+  let identicalMcpErrorStreak = 0;
   const BRIDGE_DEAD_RE = /no such tool|not connected|not available|mcp server .*(failed|closed|disconnect)/i;
   emitter.setAfterEmitHook((e) => {
     if (e.eventType === "tool_result") {
-      mcpCallsWithoutResult = 0;
+      // Handler answered (success or handler-level error) — bridge is alive.
+      lastMcpResultAt = Date.now();
+      bridgeDeadStrikes = 0;
     }
   });
+
+  // Shared stall test used by both the in-loop check (fires when a new mcp__
+  // block arrives) and the timer backstop below (fires even when the stream
+  // has gone completely silent, which the in-loop check can never see).
+  const mcpStallDetected = (): { pending: number; silenceMs: number } | null => {
+    const now = Date.now();
+    if (pendingMcpCalls.size < MCP_STALL_PENDING_THRESHOLD) return null;
+    if (now - lastMcpResultAt < MCP_STALL_SILENCE_MS) return null;
+    let oldestAt = now;
+    for (const p of pendingMcpCalls.values()) {
+      if (p.at < oldestAt) oldestAt = p.at;
+    }
+    if (now - oldestAt < MCP_STALL_SILENCE_MS) return null;
+    return { pending: pendingMcpCalls.size, silenceMs: now - lastMcpResultAt };
+  };
+  const abortForStall = async (stall: { pending: number; silenceMs: number }, via: string) => {
+    const cbMsg =
+      `MCP tool bridge appears dead: ${stall.pending} mcp__ tool calls pending ` +
+      `with no handler response for ${Math.round(stall.silenceMs / 1000)}s. ` +
+      `Aborting run to stop burning budget on futile retries.`;
+    await emitter.emit({
+      actor: "orchestrator",
+      actorType: "system",
+      eventType: "error",
+      summary: cbMsg,
+      detail: {
+        circuit_breaker: true,
+        reason: "stall",
+        via,
+        pendingCalls: stall.pending,
+        silenceMs: stall.silenceMs,
+      },
+    });
+    await mirror("error", cbMsg);
+    abortController.abort();
+  };
+  const stallTimer = setInterval(() => {
+    if (abortController.signal.aborted) return;
+    const stall = mcpStallDetected();
+    if (stall) void abortForStall(stall, "timer").catch(() => {});
+  }, MCP_STALL_TIMER_MS);
+
+  // API message ids whose usage has already been attributed to an event —
+  // block-split assistant messages repeat the same usage per block.
+  const seenUsageMessageIds = new Set<string>();
 
   // ── Task attribution: map task_id → actor name so task_updated /
   // task_notification events resolve the real subagent name instead of null.
@@ -404,6 +471,15 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           // Token accounting: include cache read + creation tokens in tokensIn so
           // the event log shows total input consumption, not just non-cached tokens.
           // (Without this, most rows appear as "in 2 / out 2" due to cache hits.)
+          //
+          // Dedupe by API message id: one API turn can produce several SDK
+          // assistant messages sharing a message.id (one per content block),
+          // each repeating the SAME usage — attribute tokens only to the first
+          // block-message or event-log totals inflate by the block count
+          // (job 49: 16× for one batched turn).
+          const apiMessageId: string | null = msg.message?.id ?? null;
+          const usageAlreadyCounted = apiMessageId !== null && seenUsageMessageIds.has(apiMessageId);
+          if (apiMessageId !== null) seenUsageMessageIds.add(apiMessageId);
           const cacheRead = usage?.cache_read_input_tokens ?? 0;
           const cacheCreation = usage?.cache_creation_input_tokens ?? 0;
           const rawIn = usage?.input_tokens ?? null;
@@ -417,14 +493,15 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             summary:
               combinedText ||
               (toolNames.length ? `→ tools: ${toolNames.join(", ")}` : "(no text)"),
-            tokensIn: totalTokensIn,
-            tokensOut: usage?.output_tokens ?? null,
+            tokensIn: usageAlreadyCounted ? null : totalTokensIn,
+            tokensOut: usageAlreadyCounted ? null : (usage?.output_tokens ?? null),
             detail: {
               parent_tool_use_id: msg.parent_tool_use_id ?? null,
               tools: toolNames,
               cache_read: cacheRead,
               cache_creation: cacheCreation,
               input_tokens_raw: rawIn,
+              ...(usageAlreadyCounted ? { usage_deduped: true } : {}),
             },
           });
           if (combinedText) await mirror(actor === "orchestrator" ? "assistant" : `assistant:${actor}`, combinedText);
@@ -442,27 +519,18 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             const name: string = tb.name;
             if (name === "WebSearch") result.webSearchCount++;
 
-            // Circuit breaker: count mcp__ tool_use calls that haven't been
-            // answered by a handler-side tool_result. The afterEmitHook resets
-            // this counter whenever a tool_result is emitted.
+            // Circuit breaker (stall arm): register the in-flight call, then
+            // abort only if a large backlog of calls has gone completely
+            // unanswered for a long time. NOTE: the SDK emits one assistant
+            // message per content block, so a batched turn legitimately
+            // produces many of these before any tool_result — that alone is
+            // NOT a dead bridge (prod job 49 false-abort).
             if (name.startsWith("mcp__")) {
-              if (tb.id) pendingMcpCalls.set(String(tb.id), name);
-              mcpCallsWithoutResult++;
-              if (mcpCallsWithoutResult >= MCP_CIRCUIT_BREAKER_THRESHOLD) {
-                const cbMsg =
-                  `MCP tool bridge appears dead: ${mcpCallsWithoutResult} consecutive ` +
-                  `mcp__ tool calls received no handler response. Aborting run to stop ` +
-                  `burning budget on futile retries.`;
-                await emitter.emit({
-                  actor: "orchestrator",
-                  actorType: "system",
-                  eventType: "error",
-                  summary: cbMsg,
-                  detail: { circuit_breaker: true, mcpCallsWithoutResult, tool: name },
-                });
-                await mirror("error", cbMsg);
-                abortController.abort();
+              if (tb.id && !pendingMcpCalls.has(String(tb.id))) {
+                pendingMcpCalls.set(String(tb.id), { name, at: Date.now() });
               }
+              const stall = mcpStallDetected();
+              if (stall) await abortForStall(stall, "message_loop");
             }
 
             // Custom mcp__ tools emit their own richer tool_call/result from the
@@ -494,9 +562,11 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           const userBlocks: any[] = Array.isArray(msg.message?.content) ? msg.message.content : [];
           for (const ub of userBlocks) {
             if (ub?.type !== "tool_result" || !ub.tool_use_id) continue;
-            const toolName = pendingMcpCalls.get(String(ub.tool_use_id));
-            if (!toolName) continue;
+            const pending = pendingMcpCalls.get(String(ub.tool_use_id));
+            if (!pending) continue;
+            const toolName = pending.name;
             pendingMcpCalls.delete(String(ub.tool_use_id));
+            lastMcpResultAt = Date.now();
 
             const text = typeof ub.content === "string"
               ? ub.content
@@ -506,15 +576,56 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             const shortName = toolName.replace(/^mcp__[^_]+(?:__)?/, "") || toolName;
 
             if (ub.is_error === true) {
+              // Regex-drift backstop: identical error text repeating on mcp__
+              // calls means the run is looping uselessly (dead bridge with
+              // unrecognized wording, or model stuck re-sending the same bad
+              // input). Counted across BOTH classification branches below.
+              if (text && text === lastMcpErrorText) {
+                identicalMcpErrorStreak++;
+              } else {
+                lastMcpErrorText = text;
+                identicalMcpErrorStreak = 1;
+              }
+              if (identicalMcpErrorStreak >= MCP_IDENTICAL_ERROR_STRIKES) {
+                const cbMsg =
+                  `MCP tool loop is stuck: ${identicalMcpErrorStreak} consecutive identical ` +
+                  `error results on mcp__ tool calls ("${preview(text, 120)}"). ` +
+                  `Aborting run to stop burning budget on futile retries.`;
+                await emitter.emit({
+                  actor: "orchestrator",
+                  actorType: "system",
+                  eventType: "error",
+                  summary: cbMsg,
+                  detail: { circuit_breaker: true, reason: "identical_errors", strikes: identicalMcpErrorStreak, tool: toolName },
+                });
+                await mirror("error", cbMsg);
+                abortController.abort();
+              }
               if (BRIDGE_DEAD_RE.test(text)) {
-                // Genuine dead-bridge signature — keep the breaker counting,
-                // but surface it so the abort isn't a mystery.
-                await mirror("error", `MCP tool ${shortName} unreachable: ${preview(text, 200)}`);
+                // Genuine dead-bridge signature — a run of these in a row
+                // means the in-process bridge detached (spurious SDK resume).
+                bridgeDeadStrikes++;
+                await mirror("error", `MCP tool ${shortName} unreachable (strike ${bridgeDeadStrikes}/${MCP_BRIDGE_DEAD_STRIKES}): ${preview(text, 200)}`);
+                if (bridgeDeadStrikes >= MCP_BRIDGE_DEAD_STRIKES) {
+                  const cbMsg =
+                    `MCP tool bridge is dead: ${bridgeDeadStrikes} consecutive mcp__ ` +
+                    `tool calls answered with dead-bridge errors (e.g. "${preview(text, 120)}"). ` +
+                    `Aborting run to stop burning budget on futile retries.`;
+                  await emitter.emit({
+                    actor: "orchestrator",
+                    actorType: "system",
+                    eventType: "error",
+                    summary: cbMsg,
+                    detail: { circuit_breaker: true, reason: "bridge_dead", strikes: bridgeDeadStrikes, tool: toolName },
+                  });
+                  await mirror("error", cbMsg);
+                  abortController.abort();
+                }
               } else {
                 // SDK-level input rejection: the loop is alive (the model got
                 // feedback) — reset the breaker and make the rejection visible
                 // in the event stream, since the handler never ran to emit it.
-                mcpCallsWithoutResult = 0;
+                bridgeDeadStrikes = 0;
                 await emitter.emit({
                   actor: shortName,
                   actorType: "tool",
@@ -528,7 +639,9 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             } else {
               // Answered without error — handler ran (and emitted its own
               // event). Defensive reset in case the emitter hook missed it.
-              mcpCallsWithoutResult = 0;
+              bridgeDeadStrikes = 0;
+              lastMcpErrorText = "";
+              identicalMcpErrorStreak = 0;
             }
           }
           break;
@@ -648,6 +761,8 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       await mirror("error", emsg);
       throw err;
     }
+  } finally {
+    clearInterval(stallTimer);
   }
 
   return result;
