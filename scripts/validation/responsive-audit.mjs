@@ -220,6 +220,21 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
       seedId = (await create.json()).id;
       log('r4017-seed-create', true, `seeded pending resource ${seedId} (url ${longUrl.length} chars)`);
       const dlgPage = await ctx.newPage();
+      // Radix keeps body{pointer-events:none} while a dialog's close animation
+      // runs. The old fixed 300ms/500ms waits were enough in the workspace but
+      // not in the slower publish build container (r4017-reject@375 flaked with
+      // "dialog did not open" and blocked a publish on 2026-07-25): the force
+      // click dispatched into the lingering pointer-events lock, so the next
+      // dialog never opened. Condition-wait on real state instead of sleeping.
+      const OPEN_DLG = '[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"]';
+      // Returns true when no dialog is open and the lock is released; false on
+      // timeout, so callers can FAIL instead of measuring a stale dialog under
+      // the next check's name (false-pass guard).
+      const waitDialogsClosed = async () => {
+        return dlgPage.waitForFunction((sel) => {
+          return !document.querySelector(sel) && getComputedStyle(document.body).pointerEvents !== 'none';
+        }, OPEN_DLG, { timeout: 10000 }).then(() => true).catch(() => false);
+      };
       try {
         for (const vw of [1440, 768, 375]) {
           await dlgPage.setViewportSize({ width: vw, height: 900 });
@@ -234,20 +249,31 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
             const btn = dlgPage.locator(`[data-testid="${testid}"]`);
             if (!(await btn.count())) { log(`r4017-${name}@${vw}`, false, 'trigger not found'); continue; }
             await btn.scrollIntoViewIfNeeded().catch(() => {});
-            const clicked = await btn.click({ force: true, timeout: 10000 }).then(() => true).catch(() => false);
+            // Ensure the previous dialog's close animation fully released the
+            // pointer-events lock before clicking, then wait for the new
+            // dialog to reach data-state="open" — with one retry click for
+            // slow containers where the first click can still race the lock.
+            const cleared = await waitDialogsClosed();
+            if (!cleared) { log(`r4017-${name}@${vw}`, false, 'previous dialog never closed'); continue; }
+            let clicked = false;
+            let opened = false;
+            for (let attempt = 0; attempt < 2 && !opened; attempt++) {
+              clicked = await btn.click({ force: true, timeout: 10000 }).then(() => true).catch(() => false);
+              if (!clicked) break;
+              opened = await dlgPage.waitForSelector(OPEN_DLG, { timeout: 7000 }).then(() => true).catch(() => false);
+            }
             if (!clicked) { log(`r4017-${name}@${vw}`, false, 'trigger not clickable'); continue; }
-            await dlgPage.waitForTimeout(500);
-            const m = await dlgPage.evaluate(() => {
-              const dlg = document.querySelector('[role="dialog"], [role="alertdialog"]');
+            const m = opened ? await dlgPage.evaluate((sel) => {
+              const dlg = document.querySelector(sel);
               if (!dlg) return null;
               const doc = document.documentElement;
               return { sw: dlg.scrollWidth, cw: dlg.clientWidth, docOver: doc.scrollWidth - doc.clientWidth };
-            }).catch(() => null);
+            }, OPEN_DLG).catch(() => null) : null;
             const pass = !!m && m.sw <= m.cw + 1 && m.docOver <= 0;
             log(`r4017-${name}@${vw}`, pass, m ? `dialog sw=${m.sw} cw=${m.cw} docOverflow=${m.docOver}` : 'dialog did not open');
-            if (!pass && m) await dlgPage.screenshot({ path: `${OUT}/r4017-${name}-${vw}.png` }).catch(() => {});
+            if (!pass) await dlgPage.screenshot({ path: `${OUT}/r4017-${name}-${vw}.png` }).catch(() => {});
             await dlgPage.keyboard.press('Escape').catch(() => {});
-            await dlgPage.waitForTimeout(300);
+            await waitDialogsClosed();
           }
         }
       } finally {

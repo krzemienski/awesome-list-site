@@ -11,6 +11,9 @@ A production-ready React application for browsing and discovering over 2,600 cur
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 
+### Publish failure fixed — responsive-audit harness race (July 25, 2026)
+- Build e2fff5ba failed at the pre-publish gate: `r4017-reject@375 :: dialog did not open` (only in the slower build container). Root cause: the harness used fixed sleeps between admin approval dialogs while Radix keeps `body{pointer-events:none}` through the close animation, so the next trigger click hit the lock. Fix (harness-only, `scripts/validation/responsive-audit.mjs`): condition-waits on real dialog state — `waitDialogsClosed()` (no open dialog + pointer-events restored; FAILs the check on timeout instead of risking a stale-dialog false pass) and `waitForSelector` on `[data-state="open"]` with one retry click. Verified 28/28 + print-audit 49/49 (one recommendations print FAIL was the known cold-boot skeleton flake; rerun clean). Architect review PASS. Ready to republish.
+
 ### Full UI experience audit — VERDICT: PASS (July 24, 2026)
 - **Zero-defects run closed**: republished (pre-publish gate green in build container), all 4 fixes re-verified on prod (F-001 admin API 0 residue; F-002 icon-only pill @390 both labels hidden, no clip; F-003 nav API all 9 teasers; F-004 24/24 card external anchors carry sr-only note — sole exception is the visible-text site-chrome GitHub link, out of scope), then **two clean confirmation passes** against prod: 40+ routes × 3 viewports each with 0 console/page errors, 0 HTTP ≥400, 0 overflow, 0 broken images; API contract sweep all 200s (9 cats / 2,282 resources); authed /admin/profile/bookmarks clean; live interactions (search→results, category→resource, journey steps) clean. Verdict + evidence: `audit-evidence/VERDICT.md`, `cycle-02/`, `cycle-03/` (local, gitignored).
 

@@ -56,6 +56,7 @@
 - [Gitignore cleanup anchoring](gitignore-cleanup-anchoring.md) — root-anchor bulk-cleanup ignore patterns (`/screenshots/`) or they shadow kept dirs at depth (docs/screenshots); verify with check-ignore + ls-files -i -c.
 - [Suspense boundary guards](suspense-boundary-guards.md) — error boundaries render error-free WHILE a chunk fetches; never clear one-shot reload guards on clean render — use timestamp+cooldown.
 - [line-clamp on the clipping ancestor](line-clamp-anchor.md) — -webkit-line-clamp fails silently when an inline-block child wraps the text; clamp the element that directly holds the text node.
-- [Responsive-audit cold-boot flake](audit-cold-boot-flake.md) — profile nameW=0 false-fails right after a server restart (skeleton race); rerun once before debugging.
+- [Audit cold-boot flakes](audit-cold-boot-flake.md) — responsive (profile nameW=0) AND print (recommendations blank) false-fail right after a server restart; rerun once before debugging.
+- [Radix dialog close lock](radix-dialog-close-lock.md) — body pointer-events:none persists through close animation; harnesses must condition-wait (not sleep) between dialogs or slow containers flake "dialog did not open".
 - [SDK block-split messages](sdk-block-split-messages.md) — one API turn = many assistant msgs sharing message.id (usage repeated per block); never count msgs as unanswered calls; dedupe tokens by id.
 - [MCP tool schema leniency](sdk-tool-schema-leniency.md) — SDK-side zod rejects loose custom-model tool args BEFORE the handler (no event, no save); keep schemas lenient, validate in-handler; breakers must not count rejections as bridge-death.
