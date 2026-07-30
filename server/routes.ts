@@ -5641,25 +5641,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { researchService } = await import('./ai/researchService');
       const { prompt, categoryFocus, maxBudgetUsd, maxTurns } = req.body ?? {};
 
-      // R5-021 (run24): full input contract — visible prompt (invisible
-      // Unicode runs used to pass .trim()), 4000-char cap (100k-char prompts
-      // went straight into the agent context), no control characters, and
-      // NUMBER types for the numeric knobs (the old String()-coercion path
-      // accepted "5" and friends).
-      if (!prompt || typeof prompt !== 'string' || prompt.trim().length < 10) {
-        return res.status(400).json({ success: false, message: 'Prompt must be at least 10 characters' });
-      }
-      if (prompt.length > 4000) {
-        return res.status(400).json({ success: false, message: 'Prompt must be at most 4000 characters' });
-      }
-      if (MULTILINE_CONTROL_RE.test(prompt)) {
-        return res.status(400).json({ success: false, message: 'Prompt must not contain control characters' });
-      }
-      if (BIDI_CONTROL_RE.test(prompt)) {
-        return res.status(400).json({ success: false, message: `Prompt ${BIDI_CONTROL_MESSAGE}` });
-      }
-      if (visibleLength(prompt) < 10) {
-        return res.status(400).json({ success: false, message: 'Prompt must contain at least 10 visible characters' });
+      // WS1 (July 30, 2026): an EMPTY/omitted prompt means "auto-generate the
+      // brief server-side" (gap-aware, history-aware, rotating campaign angle).
+      // A NON-empty prompt still gets the full R5-021 input contract below —
+      // visible prompt (invisible Unicode runs used to pass .trim()), 4000-char
+      // cap, no control characters, NUMBER types for the numeric knobs.
+      let effectivePrompt: string;
+      const promptIsEmpty = prompt === undefined || prompt === null || (typeof prompt === 'string' && prompt.trim() === '');
+      if (promptIsEmpty) {
+        const generated = await researchService.generateBrief();
+        effectivePrompt = generated.brief;
+      } else {
+        if (typeof prompt !== 'string' || prompt.trim().length < 10) {
+          return res.status(400).json({ success: false, message: 'Prompt must be at least 10 characters (or left empty to auto-generate a brief)' });
+        }
+        if (prompt.length > 4000) {
+          return res.status(400).json({ success: false, message: 'Prompt must be at most 4000 characters' });
+        }
+        if (MULTILINE_CONTROL_RE.test(prompt)) {
+          return res.status(400).json({ success: false, message: 'Prompt must not contain control characters' });
+        }
+        if (BIDI_CONTROL_RE.test(prompt)) {
+          return res.status(400).json({ success: false, message: `Prompt ${BIDI_CONTROL_MESSAGE}` });
+        }
+        if (visibleLength(prompt) < 10) {
+          return res.status(400).json({ success: false, message: 'Prompt must contain at least 10 visible characters' });
+        }
+        effectivePrompt = prompt.trim();
       }
       if (categoryFocus !== undefined && categoryFocus !== null && categoryFocus !== '') {
         if (typeof categoryFocus !== 'string' || categoryFocus.length > 200 || SINGLE_LINE_CONTROL_RE.test(categoryFocus)) {
@@ -5719,7 +5727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const userId = req.user?.claims?.sub;
       const jobId = await researchService.startResearchJob({
-        prompt: prompt.trim(),
+        prompt: effectivePrompt,
         categoryFocus: categoryFocus || undefined,
         maxBudgetUsd: budget,
         maxTurns: turns,
@@ -5736,6 +5744,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('Error starting research job:', error);
       res.status(500).json({ success: false, message: error.message || 'Failed to start research job' });
+    }
+  });
+
+  // WS1 (July 30, 2026): preview the auto-generated research brief so the
+  // admin can inspect/edit it in the textarea before launching.
+  app.get('/api/researcher/brief', isAuthenticated, isAdmin, async (_req, res) => {
+    try {
+      const { researchService } = await import('./ai/researchService');
+      const { brief, angle } = await researchService.generateBrief();
+      res.json({ success: true, brief, angle });
+    } catch (error: any) {
+      console.error('Error generating research brief:', error);
+      res.status(500).json({ success: false, message: error.message || 'Failed to generate research brief' });
     }
   });
 

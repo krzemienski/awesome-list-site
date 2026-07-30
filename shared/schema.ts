@@ -1361,6 +1361,31 @@ export const insertResearchJobSchema = createInsertSchema(researchJobs).pick({
 export type InsertResearchJob = z.infer<typeof insertResearchJobSchema>;
 export type ResearchJob = typeof researchJobs.$inferSelect;
 
+/**
+ * Async post-save verification payload for a research discovery (July 30, 2026).
+ * Written by the fire-and-forget verifier after save_discovery persists —
+ * liveness probe via the shared LinkChecker + GitHub repo metadata for
+ * github.com URLs. Serves ADMIN REVIEW only (badges in the researcher tab);
+ * the model never sees it.
+ */
+export interface DiscoveryVerification {
+  checkedAt: string;
+  /** ok = URL answered healthy; dead = probe failed; skipped = URL failed the public-URL guard; unknown = verifier errored. */
+  liveness: "ok" | "dead" | "skipped" | "unknown";
+  httpStatus?: number;
+  finalUrl?: string;
+  /** LinkChecker 200-but-gone heuristics (domain-takeover / intent-flip-root / parked-content). */
+  suspicion?: string;
+  error?: string;
+  github?: {
+    stars?: number;
+    archived?: boolean;
+    pushedAt?: string;
+    /** GitHub API said no (rate limit / 4xx) — metadata unavailable, not a dead repo. */
+    unavailable?: boolean;
+  };
+}
+
 export const researchDiscoveries = pgTable(
   "research_discoveries",
   {
@@ -1375,6 +1400,7 @@ export const researchDiscoveries = pgTable(
     confidence: integer("confidence").default(0),
     reasoning: text("reasoning"),
     status: text("status").notNull().default("pending_review"),
+    verification: jsonb("verification").$type<DiscoveryVerification>(),
     approvedAt: timestamp("approved_at"),
     rejectedAt: timestamp("rejected_at"),
     rejectionReason: text("rejection_reason"),

@@ -1,7 +1,7 @@
 import { db } from '../db';
-import { resources, researchJobs, researchDiscoveries } from '@shared/schema';
+import { resources, researchJobs, researchDiscoveries, agentEvents } from '@shared/schema';
 import { and, eq, sql, getTableColumns } from 'drizzle-orm';
-import type { ResearchJob, ResearchDiscovery } from '@shared/schema';
+import type { ResearchJob, ResearchDiscovery, DiscoveryVerification } from '@shared/schema';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
@@ -9,21 +9,67 @@ import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
 import { cleanGithubSlugTitle } from '../lib/titleClean';
 import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
-import { DEFAULT_RESEARCH_MODEL, DEFAULT_ENRICHMENT_MODEL, resolveModel, type AgentRunConfig } from './agentRuntime';
+import { DEFAULT_RESEARCH_MODEL, DEFAULT_ENRICHMENT_MODEL, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
+import { LinkChecker } from '../validation/linkChecker';
+import { isPlausiblePublicUrl } from '@shared/validation';
 
 // Cap how much pre-computed context we inline into the orchestrator system prompt.
 const MAX_TAXONOMY_LINES = 200;
 const MAX_TOP_DOMAINS = 50;
 const MAX_FOCUS_URLS = 80;
 
-function normalizeUrl(url: string): string {
+/**
+ * Query params that are pure tracking/share noise — they never distinguish
+ * two different resources, so they are stripped before dedup comparison.
+ * Everything else (e.g. youtube ?v=, ?id=, ?page=) is SIGNIFICANT and kept:
+ * dropping the whole query string (the pre-July-2026 behavior) over-merged
+ * distinct resources like youtube.com/watch?v=A vs ?v=B.
+ */
+const TRACKING_PARAMS = new Set([
+  'ref', 'ref_src', 'ref_url', 'referrer', 'source', 'fbclid', 'gclid',
+  'msclkid', 'dclid', 'twclid', 'igshid', 'mc_cid', 'mc_eid', '_hsenc',
+  '_hsmi', 's_kwcid', 'si', 'feature',
+]);
+function isTrackingParam(key: string): boolean {
+  const k = key.toLowerCase();
+  return k.startsWith('utm_') || TRACKING_PARAMS.has(k);
+}
+
+/**
+ * Canonical dedup key for a URL (July 30, 2026 hardening):
+ *  - protocol-insensitive (http/https variants of the same page merge);
+ *  - hostname lowercased, leading www. stripped;
+ *  - path lowercased, trailing slashes stripped;
+ *  - github.com: strip trailing ".git" and a trailing "/tree/main|master"
+ *    (default-branch root = the repo itself). /blob/* deep links are KEPT
+ *    distinct — a file deep-link is a legitimately different resource;
+ *  - tracking params stripped, remaining params sorted (keys lowercased,
+ *    values case-preserved — youtube IDs are case-sensitive);
+ *  - fragments dropped (#readme anchors etc. never distinguish resources).
+ * Compute-only: nothing stored is normalized, so changing this function
+ * re-keys every comparison on the next run/approval with no data migration.
+ */
+export function normalizeUrl(url: string): string {
   try {
     const parsed = new URL(url);
-    let normalized = parsed.protocol + '//' + parsed.hostname.replace(/^www\./, '') + parsed.pathname;
-    normalized = normalized.replace(/\/+$/, '');
-    return normalized.toLowerCase();
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
+    let path = parsed.pathname.replace(/\/+$/, '').toLowerCase();
+    if (host === 'github.com') {
+      path = path.replace(/\.git$/, '').replace(/\/tree\/(main|master)$/, '');
+    }
+    const params: Array<[string, string]> = [];
+    parsed.searchParams.forEach((value, key) => {
+      if (!isTrackingParam(key)) params.push([key.toLowerCase(), value]);
+    });
+    params.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0));
+    const query = params.length > 0 ? '?' + params.map(([k, v]) => `${k}=${v}`).join('&') : '';
+    return host + path + query;
   } catch {
-    return url.toLowerCase().replace(/\/+$/, '');
+    return url
+      .toLowerCase()
+      .replace(/^https?:\/\//, '')
+      .replace(/^www\./, '')
+      .replace(/\/+$/, '');
   }
 }
 
@@ -55,13 +101,17 @@ interface ResearchContext {
  * plus the in-memory existing-URL Set used by the check_duplicate tool.
  */
 async function buildResearchContext(categoryFocus: string | undefined): Promise<ResearchContext> {
-  const [approvedRes, pendingDisc] = await Promise.all([
-    db.select({ url: resources.url, category: resources.category }).from(resources).where(eq(resources.status, 'approved')),
+  // Known-URL set covers ALL resources regardless of status (a rejected or
+  // archived resource is still "known" — re-discovering it wastes the run)
+  // plus every discovery across all jobs/statuses.
+  const [allRes, allDisc] = await Promise.all([
+    db.select({ url: resources.url, category: resources.category, status: resources.status }).from(resources),
     db.select({ url: researchDiscoveries.url }).from(researchDiscoveries),
   ]);
+  const approvedRes = allRes.filter(r => r.status === 'approved');
   const existingUrls = new Set<string>();
-  for (const r of approvedRes) existingUrls.add(normalizeUrl(r.url));
-  for (const d of pendingDisc) existingUrls.add(normalizeUrl(d.url));
+  for (const r of allRes) existingUrls.add(normalizeUrl(r.url));
+  for (const d of allDisc) existingUrls.add(normalizeUrl(d.url));
 
   const [taxRows, countRows] = await Promise.all([
     db.execute<{ category: string; subcategory: string | null; sub_subcategory: string | null }>(sql`
@@ -125,7 +175,7 @@ async function buildResearchContext(categoryFocus: string | undefined): Promise<
     taxonomyBlock,
     domainsBlock,
     focusUrlsBlock,
-    totalResources: existingUrls.size,
+    totalResources: approvedRes.length,
     totalDomains: domainCounts.size,
   };
 }
@@ -206,6 +256,45 @@ function isNonRetryableDbError(err: any): boolean {
   const code = err?.code ?? err?.cause?.code;
   return typeof code === 'string' && (code.startsWith('22') || code.startsWith('23'));
 }
+
+/**
+ * WS1 dynamic prompt engine (July 30, 2026): rotating campaign angles so
+ * consecutive auto-briefed runs attack the catalog from different directions
+ * instead of re-running the same generic hunt. Rotation is deterministic —
+ * total job count mod angles — so every angle gets its turn.
+ */
+const CAMPAIGN_ANGLES = [
+  {
+    id: 'github-deep-dive',
+    label: 'GitHub deep-dive',
+    directive: 'Bias this run toward GitHub: have the scout run "site:github.com <gap topic>" searches, mine GitHub topic pages, and chase tools named in the READMEs/awesome sections of known projects. Target actively-maintained repos (recent pushes, real documentation) that fill the gaps below.',
+  },
+  {
+    id: 'conference-talks',
+    label: 'Conference talks & videos',
+    directive: 'Bias this run toward conference material: Demuxed, IBC, NAB, Mile High Video, Streaming Media, FOSDEM open-media devroom. Hunt talk pages/recordings AND the specific projects speakers present — both are savable when they fill a gap.',
+  },
+  {
+    id: 'academic',
+    label: 'Academic papers with code',
+    directive: 'Bias this run toward research: arxiv.org, dl.acm.org, IEEE Xplore — papers on the gap topics that ship companion code. Save the paper page or its code repo, whichever is the durable resource.',
+  },
+  {
+    id: 'vendor-engineering',
+    label: 'Vendor & engineering blogs',
+    directive: 'Bias this run toward deep technical blog posts and niche vendor documentation (engineering blogs of streaming platforms, codec vendors, CDN providers) — NOT marketing pages. Search "<gap topic> engineering blog" and "site:<vendor domain> <topic>".',
+  },
+  {
+    id: 'awesome-mining',
+    label: 'Curated-list mining',
+    directive: 'Bias this run toward mining other curated lists: awesome-* repos, roundups, "top N tools" posts. The list itself is rarely savable — extract the INDIVIDUAL tools/projects it names and verify each one\'s official site or repo.',
+  },
+  {
+    id: 'community',
+    label: 'Community finds',
+    directive: 'Bias this run toward community venues: Show HN threads, lobste.rs, r/videoengineering discussions. Chase the concrete tools/projects being discussed (their official sites/repos), not the discussion threads themselves.',
+  },
+];
 
 const STALL_PIVOT_NUDGE =
 `STRATEGY PIVOT REQUIRED. Recent candidates were all duplicates. Do NOT repeat similar searches — change approach now:
@@ -595,6 +684,7 @@ class ResearchService {
       );
       if (!existing) throw new Error('save_discovery insert conflicted but no existing row was found');
       console.log(`[research:${ctx.jobId}] save_discovery conflict — adopting existing row ${existing.id} for ${input.url}`);
+      this.scheduleVerification(existing.id, input.url);
       return existing.id;
     }
     await bestEffort(
@@ -603,7 +693,88 @@ class ResearchService {
         .where(eq(researchJobs.id, ctx.jobId)),
       'totalDiscoveries counter',
     );
+    this.scheduleVerification(id, input.url);
     return id;
+  }
+
+  /**
+   * WS3 quality verification (July 30, 2026): fire-and-forget post-save
+   * verifier. Runs OUTSIDE the agent loop (the model never sees the result,
+   * tool latency is unaffected); failures only log. Sequential saves keep
+   * concurrency naturally bounded.
+   */
+  private scheduleVerification(discoveryId: number, url: string): void {
+    void this.verifyDiscovery(discoveryId, url).catch((e: any) => {
+      console.error(`[research] verification for discovery ${discoveryId} failed:`, e?.message || e);
+    });
+  }
+
+  private async verifyDiscovery(discoveryId: number, url: string): Promise<void> {
+    const verification: DiscoveryVerification = { checkedAt: new Date().toISOString(), liveness: 'unknown' };
+    try {
+      // SSRF guard: catalog-shape check (no bare IPs/localhost/dotless hosts)
+      // + DNS resolution must not land on a private/loopback address.
+      if (!isPlausiblePublicUrl(url)) {
+        verification.liveness = 'skipped';
+        verification.error = 'URL failed the public-URL guard';
+      } else {
+        try {
+          await validateBaseUrl(new URL(url).origin);
+        } catch (ssrfErr: any) {
+          verification.liveness = 'skipped';
+          verification.error = `SSRF guard: ${ssrfErr?.message || ssrfErr}`;
+        }
+      }
+
+      if (verification.liveness !== 'skipped') {
+        const checker = new LinkChecker({ timeout: 10000, retryCount: 1, concurrent: 1 });
+        const report = await checker.checkLinks([{ url }]);
+        const r = report.results[0];
+        if (r) {
+          verification.liveness = r.valid && !r.suspicion ? 'ok' : 'dead';
+          verification.httpStatus = r.status || undefined;
+          if (r.finalUrl && r.finalUrl !== url) verification.finalUrl = r.finalUrl;
+          if (r.suspicion) verification.suspicion = `${r.suspicion}${r.suspicionDetail ? `: ${r.suspicionDetail}` : ''}`;
+          if (r.error) verification.error = r.error;
+        }
+
+        // GitHub repo metadata (unauthenticated — 403/429 rate limits are
+        // recorded as unavailable, never treated as a dead repo).
+        const gh = url.match(/^https?:\/\/(?:www\.)?github\.com\/([^\/?#]+)\/([^\/?#]+)/i);
+        if (gh) {
+          const owner = gh[1];
+          const repo = gh[2].replace(/\.git$/i, '');
+          try {
+            const controller = new AbortController();
+            const t = setTimeout(() => controller.abort(), 10000);
+            const resp = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+              headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'awesome-video-researcher' },
+              signal: controller.signal,
+            });
+            clearTimeout(t);
+            if (resp.ok) {
+              const data: any = await resp.json();
+              verification.github = {
+                stars: typeof data.stargazers_count === 'number' ? data.stargazers_count : undefined,
+                archived: data.archived === true,
+                pushedAt: typeof data.pushed_at === 'string' ? data.pushed_at : undefined,
+              };
+            } else {
+              verification.github = { unavailable: true };
+            }
+          } catch {
+            verification.github = { unavailable: true };
+          }
+        }
+      }
+    } catch (e: any) {
+      verification.liveness = 'unknown';
+      verification.error = String(e?.message || e).slice(0, 300);
+    }
+    await bestEffort(
+      db.update(researchDiscoveries).set({ verification }).where(eq(researchDiscoveries.id, discoveryId)),
+      `verification persist (discovery ${discoveryId})`,
+    );
   }
 
   /**
@@ -664,6 +835,93 @@ class ResearchService {
         await ctx.addLog('error', `Discovery could not be persisted after run-end retries — manual recovery data: ${dump}`, true);
       }
     }
+  }
+
+  /**
+   * WS1 dynamic prompt engine: build a gap-aware, history-aware research brief.
+   * Combines live coverage gaps, a deterministic rotating campaign angle,
+   * queries recent runs already searched (mined from persisted WebSearch
+   * tool-call events — orchestrator AND scout), and domains past discoveries
+   * already plowed. Used by GET /api/researcher/brief (preview/fill the
+   * textarea) and as the server-side prompt when a run starts with an empty
+   * prompt. Every input degrades gracefully to nothing on empty history.
+   */
+  async generateBrief(): Promise<{ brief: string; angle: string }> {
+    const [gaps, jobCountRow, searchEventRows, discRows] = await Promise.all([
+      getCoverageGaps(8),
+      db.select({ count: sql<number>`count(*)::int` }).from(researchJobs),
+      db.select({ summary: agentEvents.summary }).from(agentEvents)
+        .where(and(
+          eq(agentEvents.jobType, 'research'),
+          eq(agentEvents.eventType, 'tool_call'),
+          eq(agentEvents.targetActor, 'WebSearch'),
+        ))
+        .orderBy(sql`${agentEvents.id} DESC`)
+        .limit(200),
+      db.select({ url: researchDiscoveries.url, status: researchDiscoveries.status }).from(researchDiscoveries),
+    ]);
+
+    const angle = CAMPAIGN_ANGLES[(jobCountRow[0]?.count ?? 0) % CAMPAIGN_ANGLES.length];
+
+    // Recent search queries — summaries are preview'd JSON like {"query":"..."}
+    // (possibly truncated), so extract with a tolerant regex instead of JSON.parse.
+    const recentQueries: string[] = [];
+    const seenQueries = new Set<string>();
+    for (const row of searchEventRows) {
+      const m = row.summary?.match(/"query"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (!m) continue;
+      let q = m[1];
+      try { q = JSON.parse(`"${m[1]}"`); } catch { /* keep raw */ }
+      const k = q.trim().toLowerCase();
+      if (!k || seenQueries.has(k)) continue;
+      seenQueries.add(k);
+      recentQueries.push(q.trim());
+      if (recentQueries.length >= 20) break;
+    }
+
+    // Domains past runs already mined (all discoveries) + venues that produced
+    // approved finds (proven hunting grounds).
+    const minedCounts = new Map<string, number>();
+    const approvedCounts = new Map<string, number>();
+    for (const d of discRows) {
+      const dom = domainOf(d.url);
+      if (!dom) continue;
+      minedCounts.set(dom, (minedCounts.get(dom) || 0) + 1);
+      if (d.status === 'approved') approvedCounts.set(dom, (approvedCounts.get(dom) || 0) + 1);
+    }
+    const minedTop = [...minedCounts.entries()].filter(([, n]) => n >= 3).sort((a, b) => b[1] - a[1]).slice(0, 12);
+    const approvedTop = [...approvedCounts.entries()].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+    const sections: string[] = [];
+    sections.push(`AUTO-GENERATED RESEARCH BRIEF (${new Date().toISOString().slice(0, 10)}) — campaign angle: ${angle.label}.`);
+    sections.push(angle.directive);
+    if (gaps.length > 0) {
+      sections.push(
+        `TARGET GAPS THIS RUN (most under-served first — rotate through several):\n` +
+        gaps.map((g: any) => `- ${g.category} › ${g.subcategory} (${g.resource_count} existing)`).join('\n'),
+      );
+    }
+    if (recentQueries.length > 0) {
+      sections.push(
+        `RECENT RUNS ALREADY SEARCHED these queries — do NOT repeat them or near-variants; find NEW ground:\n` +
+        recentQueries.map(q => `- "${q}"`).join('\n'),
+      );
+    }
+    if (minedTop.length > 0) {
+      sections.push(
+        `DOMAINS PAST RUNS ALREADY MINED heavily (skip unless a specific find is exceptional): ` +
+        minedTop.map(([d, n]) => `${d} (${n})`).join(', '),
+      );
+    }
+    if (approvedTop.length > 0) {
+      sections.push(
+        `VENUE TYPES THAT PRODUCED APPROVED FINDS before (proven hunting grounds worth revisiting with NEW queries): ` +
+        approvedTop.map(([d]) => d).join(', '),
+      );
+    }
+    sections.push('Goal: save NEW, high-quality resources (confidence ≥ 70) that fill the target gaps, biased toward the campaign angle.');
+
+    return { brief: sections.join('\n\n'), angle: angle.label };
   }
 
   async startResearchJob(options: {
@@ -1073,9 +1331,22 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     return db.select().from(researchDiscoveries).where(eq(researchDiscoveries.status, 'pending_review')).orderBy(sql`${researchDiscoveries.createdAt} DESC`);
   }
 
-  async approveDiscovery(discoveryId: number): Promise<ResearchDiscovery> {
+  async approveDiscovery(discoveryId: number, opts: { skipDuplicateCheck?: boolean } = {}): Promise<ResearchDiscovery> {
     const [discovery] = await db.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId));
     if (!discovery) throw new Error("Discovery not found");
+
+    // Normalized dedup guard (July 30, 2026): the per-job unique index only
+    // stops exact same-job repeats — a single approve could still create a
+    // duplicate resource (http/https, www, tracking-param variants). Bulk
+    // approve pre-checks with its own shared set, so it opts out here.
+    if (!opts.skipDuplicateCheck) {
+      const norm = normalizeUrl(discovery.url);
+      const existingRows = await db.select({ id: resources.id, url: resources.url }).from(resources);
+      const dup = existingRows.find(r => normalizeUrl(r.url) === norm);
+      if (dup) {
+        throw new Error(`URL already exists in the database (resource #${dup.id}) — reject this discovery instead of approving it`);
+      }
+    }
 
     await ensureSubSubcategoryExists(
       new CategoryRepository(),
@@ -1156,7 +1427,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
           skippedDuplicates++;
           continue;
         }
-        const created = await this.approveDiscovery(row.id);
+        const created = await this.approveDiscovery(row.id, { skipDuplicateCheck: true });
         if (created?.createdResourceId != null) {
           existingByNormUrl.set(norm, created.createdResourceId);
         }

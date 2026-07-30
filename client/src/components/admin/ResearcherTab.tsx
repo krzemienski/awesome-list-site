@@ -39,6 +39,9 @@ import {
   Cpu,
   Server,
   KeyRound,
+  Wand2,
+  Star,
+  Archive,
 } from "lucide-react";
 import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -95,11 +98,55 @@ function getDiscoveryStatusBadge(status: string) {
   }
 }
 
+/**
+ * WS3 (July 30, 2026): verification badges from the async post-save verifier.
+ * Shows liveness (dead link / verified) and GitHub repo signals (stars,
+ * archived). No badge at all = verification still pending or predates WS3.
+ */
+function getVerificationBadges(d: ResearchDiscovery) {
+  const v = d.verification;
+  if (!v) return null;
+  const badges: JSX.Element[] = [];
+  if (v.liveness === "dead") {
+    badges.push(
+      <Badge key="dead" variant="destructive" className="text-xs shrink-0" title={v.suspicion || v.error || undefined} data-testid={`badge-verification-dead-${d.id}`}>
+        <XCircle className="w-3 h-3 mr-1" />{v.suspicion ? "Suspicious link" : "Link check failed"}
+      </Badge>
+    );
+  } else if (v.liveness === "ok") {
+    badges.push(
+      <Badge key="ok" variant="outline" className="text-xs shrink-0 text-green-400 border-green-500/30" data-testid={`badge-verification-ok-${d.id}`}>
+        <CheckCircle2 className="w-3 h-3 mr-1" />Link OK
+      </Badge>
+    );
+  }
+  if (v.github && !v.github.unavailable) {
+    if (typeof v.github.stars === "number") {
+      badges.push(
+        <Badge key="stars" variant="secondary" className="text-xs shrink-0" title={v.github.pushedAt ? `Last push ${new Date(v.github.pushedAt).toLocaleDateString()}` : undefined}>
+          <Star className="w-3 h-3 mr-1" />{v.github.stars.toLocaleString()}
+        </Badge>
+      );
+    }
+    if (v.github.archived) {
+      badges.push(
+        <Badge key="archived" variant="outline" className="text-xs shrink-0 text-yellow-500 border-yellow-500/30">
+          <Archive className="w-3 h-3 mr-1" />Archived repo
+        </Badge>
+      );
+    }
+  }
+  return badges.length > 0 ? badges : null;
+}
+
 export default function ResearcherTab() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [prompt, setPrompt] = useState("Find new, high-quality video streaming and development resources that aren't already in our database. Focus on recently launched tools, libraries, and platforms.");
+  // WS1 (July 30, 2026): empty by default — an empty prompt tells the server
+  // to auto-generate a gap-aware, history-aware brief at launch. The
+  // "Auto-generate brief" button previews the same brief for editing.
+  const [prompt, setPrompt] = useState("");
   const [categoryFocus, setCategoryFocus] = useState("");
   // Blank = unlimited (owner request July 24, 2026): budget and turns are
   // unbounded by default; entering a number opts INTO a cap.
@@ -241,10 +288,12 @@ export default function ResearcherTab() {
     // R4-051: the min-length rule used to only manifest as a disabled button
     // with no explanation — clicking a short prompt now yields explicit feedback
     // (a hint under the field covers the before-submit case).
-    if (prompt.trim().length < 10) {
+    // WS1: an EMPTY prompt is valid — the server auto-generates the brief.
+    const trimmedPrompt = prompt.trim();
+    if (trimmedPrompt.length > 0 && trimmedPrompt.length < 10) {
       toast({
         title: "Prompt too short",
-        description: "The research prompt must be at least 10 characters.",
+        description: "Write at least 10 characters, or clear the field to auto-generate a brief.",
         variant: "destructive",
       });
       return;
@@ -290,6 +339,24 @@ export default function ResearcherTab() {
     // confirmation dialog first.
     setConfirmLaunch(true);
   };
+
+  // WS1: preview the server-generated brief into the textarea for editing.
+  const briefMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/researcher/brief', { credentials: 'include' });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      if (data?.brief) {
+        setPrompt(data.brief);
+        toast({ title: "Brief generated", description: data.angle ? `Campaign angle: ${data.angle}. Edit freely before launching.` : "Edit freely before launching." });
+      }
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to generate brief", description: error.message, variant: "destructive" });
+    },
+  });
 
   const cancelMutation = useMutation({
     mutationFn: async (jobId: number) => {
@@ -388,23 +455,41 @@ export default function ResearcherTab() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="prompt">Research Prompt</Label>
+                  <div className="flex items-center justify-between gap-2">
+                    <Label htmlFor="prompt">Research Prompt</Label>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => briefMutation.mutate()}
+                      disabled={briefMutation.isPending}
+                      data-testid="button-generate-brief"
+                    >
+                      {briefMutation.isPending
+                        ? <><RefreshCw className="w-3 h-3 mr-1 animate-spin" />Generating…</>
+                        : <><Wand2 className="w-3 h-3 mr-1" />Auto-generate brief</>}
+                    </Button>
+                  </div>
                   <Textarea
                     id="prompt"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Describe what types of resources to search for..."
+                    placeholder="Leave empty to auto-generate a gap-aware brief at launch, or describe what to search for..."
                     className="mt-1 min-h-[100px]"
                   />
                   {/* R4-051: surface the ≥10-char rule up front instead of only
-                      as a mysteriously disabled Launch button. */}
+                      as a mysteriously disabled Launch button. WS1: empty is
+                      valid (server auto-generates the brief). */}
                   <p
-                    className={`text-xs mt-1 ${prompt.trim().length < 10 ? "text-yellow-500" : "text-muted-foreground"}`}
+                    className={`text-xs mt-1 ${prompt.trim().length > 0 && prompt.trim().length < 10 ? "text-yellow-500" : "text-muted-foreground"}`}
                     data-testid="text-prompt-hint"
                   >
-                    {prompt.trim().length < 10
-                      ? `At least 10 characters required (${prompt.trim().length}/10).`
-                      : `${prompt.trim().length} characters`}
+                    {prompt.trim().length === 0
+                      ? "Empty = a gap-aware brief is auto-generated at launch."
+                      : prompt.trim().length < 10
+                        ? `At least 10 characters required (${prompt.trim().length}/10) — or clear the field to auto-generate.`
+                        : `${prompt.trim().length} characters`}
                   </p>
                 </div>
 
@@ -798,6 +883,7 @@ export default function ResearcherTab() {
                                   {d.confidence}% confident
                                 </Badge>
                               )}
+                              {getVerificationBadges(d)}
                             </div>
                             <a href={d.url} target="_blank" rel="noopener noreferrer"
                               className="text-xs text-primary hover:underline flex items-center gap-1 truncate">
@@ -1201,6 +1287,7 @@ export default function ResearcherTab() {
                           <div className="flex items-center gap-2">
                             <span className="font-medium line-clamp-1 break-words min-w-0" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</span>
                             {getDiscoveryStatusBadge(d.status)}
+                            {getVerificationBadges(d)}
                           </div>
                           <a href={d.url} target="_blank" rel="noopener noreferrer"
                             className="text-xs text-primary hover:underline truncate block">

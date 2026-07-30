@@ -146,6 +146,8 @@ export interface RunAgentQueryResult {
   aborted: boolean;
   /** SDK result subtype: success | error_max_turns | error_max_budget_usd | error_during_execution | ... */
   subtype?: string;
+  /** SDK ≥0.3.220 fine-grained end reason (e.g. max_turns, budget_exhausted, model_error). Additive — absent on older payloads. */
+  terminalReason?: string;
   resultText: string;
   totalCostUsd: number;
   tokensIn: number;
@@ -649,6 +651,12 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
 
         case "result": {
           result.subtype = msg.subtype;
+          // SDK 0.3.220: results carry an optional fine-grained terminal_reason
+          // alongside subtype. Map it additively (never used for ok/error
+          // decisions — subtype + is_error stay authoritative).
+          if (typeof (msg as any).terminal_reason === "string") {
+            result.terminalReason = (msg as any).terminal_reason;
+          }
           terminalSdkError = msg.is_error === true;
           result.totalCostUsd = typeof msg.total_cost_usd === "number" ? msg.total_cost_usd : 0;
           result.tokensIn = msg.usage?.input_tokens ?? 0;
@@ -694,7 +702,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             eventType: "result",
             model,
             summary: msg.is_error === true
-              ? `Run error: ${preview(result.errorMessage ?? result.subtype ?? "unknown")}`
+              ? `Run error: ${preview(result.errorMessage ?? result.subtype ?? "unknown")}${result.terminalReason ? ` (reason: ${result.terminalReason})` : ""}`
               : `Run ${msg.subtype} — ${result.numTurns} turns, $${result.totalCostUsd.toFixed(4)}`,
             costUsd: result.totalCostUsd.toFixed(4),
             tokensIn: result.tokensIn,

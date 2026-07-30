@@ -7,11 +7,10 @@ description: Hard-won constraints for running @anthropic-ai/claude-agent-sdk in 
 
 Used to run the admin Researcher + Enrichment agents as a real multi-agent system (orchestrator + subagents + custom in-process MCP tools). Replaced direct `@anthropic-ai/sdk` Messages API usage in those two flows.
 
-## Dependency reality (the painful part)
-- Recent agent SDK (0.3.150+, incl. 0.3.201) **hard-peers `zod ^4.0.0` + `@anthropic-ai/sdk >=0.93.0` + `@modelcontextprotocol/sdk ^1.29.0`**. This app is zod v3 everywhere (drizzle-zod ^0.7.0, every schema/form/route).
-- **Decision: keep zod v3** (Path A). Added `legacy-peer-deps=true` to `.npmrc` so installs ignore the zod-v4 peer. Bumped `@anthropic-ai/sdk` 0.37 → 0.110 (its usage in claudeService.ts/recommendations.ts is only `messages.create`/`content[0].text`/`usage.*` — stable, no breakage; build verified).
-- **Why not zod v4:** full v3→v4 migration also forces drizzle-zod/drizzle-orm bumps + createInsertSchema rewrites across the whole app — huge blast radius for zero product gain.
-- **Proven at runtime:** `tool()` custom in-process MCP tools accept **zod v3** schemas fine despite the ^4 peer. Path A is safe.
+## Dependency reality
+- Recent agent SDK (0.3.150+) **hard-peers `zod ^4.0.0` + `@anthropic-ai/sdk >=0.93.0` + `@modelcontextprotocol/sdk ^1.29.0`**.
+- **Current state (July 2026): the app is zod v4** (`zod ^4.4.3`, `drizzle-zod ^0.8.3`) — the earlier "keep zod v3" decision was superseded by a full v4 migration. Keep `.npmrc` `legacy-peer-deps=true` anyway; other transitive peers still conflict on install.
+- SDK upgraded to **0.3.220** (July 2026): additive `terminal_reason` on the result message — map it as supplementary context only; `subtype`/`is_error` remain the authoritative failure signals.
 
 ## Runtime facts (verified by spike in-container)
 - `query()` spawns a **bundled ~251MB linux-x64 native `claude` binary** (`node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude`) as a subprocess per call; a trivial call completes ~13s (ttft ~2.7s). Use `startup()`/WarmQuery to move spawn cost off the critical path if latency matters.

@@ -71,6 +71,13 @@
       "when": 1785100000000,
       "tag": "0037_research_scout_model_target",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1785200000000,
+      "tag": "0038_research_discovery_verification",
+      "breakpoints": true
     }
   ]
 }
