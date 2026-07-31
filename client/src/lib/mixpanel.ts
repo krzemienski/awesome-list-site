@@ -20,6 +20,7 @@
 import type { OverridedMixpanel } from 'mixpanel-browser';
 import { getAnalyticsConsent } from './analytics';
 import { getAcquisition } from './acquisition';
+import { phCapture } from './posthog';
 
 const getToken = (): string | undefined =>
   import.meta.env.VITE_MIXPANEL_TOKEN as string | undefined;
@@ -73,7 +74,13 @@ export const initMixpanel = () => {
   // effect) must not run pre-consent.
   import('mixpanel-browser')
     .then(({ default: mixpanel }) => {
-      if (disabled) return; // consent revoked while the SDK was loading
+      if (disabled) {
+        // Consent revoked while the SDK was loading — abort without latching
+        // initStarted, so a later re-grant re-runs init (ph/mp otherwise stay
+        // null until reload).
+        initStarted = false;
+        return;
+      }
       mixpanel.init(token, {
         // EU/CA compliance: nothing is tracked unless explicitly opted in below.
         opt_out_tracking_by_default: true,
@@ -131,8 +138,13 @@ const referrerOrigin = (): string | undefined => {
   }
 };
 
-// Central dispatcher — every Mixpanel event funnels through here.
+// Central dispatcher — every Mixpanel event funnels through here. Custom
+// events are also mirrored to PostHog here (single choke point: analytics.ts,
+// useResourceToggle, JourneyDetail and suggest-edit all call mpTrack), so the
+// two products see the same event stream. phCapture has its own consent gate
+// and no-ops independently of Mixpanel's state.
 export const mpTrack = (name: string, props: Record<string, unknown> = {}) => {
+  phCapture(name, props);
   if (disabled) return;
   if (!mp) {
     // SDK still loading (or never consented). Buffer only when init is under

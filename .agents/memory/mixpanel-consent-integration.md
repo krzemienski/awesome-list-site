@@ -12,6 +12,7 @@ description: Gotchas for the consent-gated mixpanel-browser setup (pre-consent f
 - Never send `pathname + search` or full `document.referrer` as event props — query strings carry reset-password tokens; send pathname + referrer origin only.
 - Mixpanel `/track` request bodies are **gzipped** form data (`data=` base64/JSON inside); to decode in Playwright use `request.postDataBuffer()` + `gunzipSync`, not `postData()`.
 - Dev-mode SDK batches sends with multi-second delays — E2E asserts need ~6-7s waits or they false-fail with "no events".
+- **PostHog (same consent pattern)**: npm posthog-js does NOT attach `window.posthog` (we expose it in DEV only); `capture()` returns undefined SILENTLY for automation browsers (bot/webdriver filter) — E2E must `set_config({opt_out_useragent_filter:true})` post-consent or ingest looks broken; static asset bundles load from us-assets.i.posthog.com (script-src), ingest+replay POST to us.i.posthog.com (connect-src); `sanitize_properties` is deprecated but still works (use before_send someday); custom events mirror via the mpTrack choke point.
 - **VITE_* env vars**: Vite's root is `client/`, so workspace-root `.env` is INVISIBLE to the client build — put client env vars in `client/.env` (gitignored) or they silently vanish from production bundles while dev (shared env vars) works.
 
 ## Server-side conversions (July 2026)

@@ -4,6 +4,7 @@ import { queryClient, ApiError } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
 import { mpIdentify, mpReset } from '@/lib/mixpanel';
+import { phIdentify, phReset } from '@/lib/posthog';
 
 interface User {
   id: string;
@@ -78,13 +79,15 @@ export function useAuth() {
   const authedUser = data?.user ?? null;
   useEffect(() => {
     if (authedUser?.id) {
-      mpIdentify({
+      const identity = {
         id: authedUser.id,
         name: authedUser.name,
         email: authedUser.email,
         role: authedUser.role,
         createdAt: authedUser.createdAt,
-      });
+      };
+      mpIdentify(identity);
+      phIdentify(identity);
     }
   }, [authedUser?.id]);
 
@@ -109,6 +112,7 @@ export function useAuth() {
       // Task #232: unlink the Mixpanel identity so the next visitor on this
       // device never inherits this account's profile.
       mpReset();
+      phReset();
       // R4-081: tell other open tabs to drop their authed chrome/bookmarks.
       notifyCrossTabSync();
       window.location.href = '/';

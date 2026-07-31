@@ -11,6 +11,9 @@ A production-ready React application for browsing and discovering over 2,600 cur
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 
+### PostHog analytics — consent-gated, full feature set (July 31, 2026)
+- `posthog-js` (npm) integrated with the same zero pre-consent architecture as Mixpanel: dynamic import post-consent only, `opt_out_capturing_by_default:true` + opt-in, Cookie-settings revoke stops capture + session recording. All features on: autocapture, SPA pageviews/pageleave, session replay (all inputs masked), exception capture, web vitals, heatmaps, feature flags (`phIsFeatureEnabled`/`phGetFeatureFlag` in `client/src/lib/posthog.ts`). Custom events mirrored via the `mpTrack` choke point so Mixpanel and PostHog see the same stream. Keys via `VITE_POSTHOG_KEY`/`VITE_POSTHOG_HOST` in gitignored `client/.env` (Vite's root is `client/` — root `.env` is NOT read by client builds). CSP allows `us.i.posthog.com` + `us-assets.i.posthog.com`.
+
 ### Mixpanel analytics — consent-gated, alongside GA4 (July 31, 2026)
 - Task #232. `mixpanel-browser` (npm) integrated with a ZERO pre-consent footprint: SDK is dynamic-imported only after the consent banner "Accept" (same `analytics-consent` localStorage gate as GA4); `opt_out_tracking_by_default:true` + opt-in post-consent; Cookie-settings revoke hard-disables the dispatcher and clears SDK state. Token via `VITE_MIXPANEL_TOKEN` (shared env).
 - Events (snake_case object_action, tracked at server-confirmed points): page_viewed, resource_viewed, resource_link_opened, search_performed, category_viewed, sign_up_completed, logged_in, resource_(un)bookmarked/(un)favorited (choke point: `useResourceToggle`), resource_submitted, resource_edit_submitted, content_shared, journey_step_(un)completed. Tracking plan: `docs/MIXPANEL.md`.

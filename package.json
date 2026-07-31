@@ -98,6 +98,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "8.20.0",
+    "posthog-js": "^1.409.4",
     "puppeteer": "^24.16.1",
     "react": "^18.3.1",
     "react-blurhash": "^0.3.0",

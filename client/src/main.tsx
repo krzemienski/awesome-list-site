@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { initGA } from "./lib/analytics";
 import { initMixpanel } from "./lib/mixpanel";
+import { initPosthog } from "./lib/posthog";
 import { needsCorpusRoute } from "./lib/static-data";
 
 // Initialize GA before React renders so window.gtag exists in time for the very
@@ -18,6 +19,7 @@ initGA();
 // Mixpanel too (same consent gate — both no-op until the visitor accepts the
 // consent banner, which calls these again after "Accept").
 initMixpanel();
+initPosthog();
 
 // Force dark theme immediately
 document.documentElement.classList.add('dark');

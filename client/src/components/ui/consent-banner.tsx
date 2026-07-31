@@ -7,6 +7,7 @@ import {
   initGA,
 } from "@/lib/analytics";
 import { initMixpanel, optOutMixpanel } from "@/lib/mixpanel";
+import { initPosthog, optOutPosthog } from "@/lib/posthog";
 
 // R5-025 (run24): custom event that re-opens the consent banner. Dispatched
 // by the "Cookie settings" links in Footer and /privacy via
@@ -117,11 +118,13 @@ export default function ConsentBanner() {
     if (value === "granted") {
       initGA();
       initMixpanel();
+      initPosthog();
     } else {
       // Task #232: consent revoked (possibly after a prior grant via Cookie
       // settings) — stop Mixpanel tracking and clear its stored state. GA
       // already no-ops via its own consent gate on next load.
       optOutMixpanel();
+      optOutPosthog();
     }
   };
 
