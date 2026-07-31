@@ -44,6 +44,7 @@ import { humanizeApiError, extractFieldErrors } from "@/lib/apiError";
 import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import { redirectToLogin } from "@/lib/authUtils";
 import { trackGenerateLead } from "@/lib/analytics";
+import { serverConversionHeaders } from "@/lib/mixpanel";
 import SEOHead from "@/components/layout/SEOHead";
 import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
 
@@ -433,6 +434,9 @@ export default function SubmitResource() {
 
       return apiRequest('/api/resources', {
         method: 'POST',
+        // serverConversionHeaders: consent + Mixpanel distinct-id so the
+        // server can emit the resource_submitted conversion (Task #233).
+        headers: serverConversionHeaders(),
         body: JSON.stringify({
           title: data.title,
           url: data.url,

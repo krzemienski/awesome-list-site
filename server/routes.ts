@@ -84,6 +84,7 @@ import {
   parseIntInRange,
 } from "@shared/validation";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
+import { trackServerEvent } from "./lib/mixpanelServer";
 import { swaggerSpec } from "./openapi";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
@@ -883,6 +884,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Run16 BUG-042: record account creation in the audit trail.
       auditRepo.logResourceAudit(null, 'auth.register', created.id, { email: created.email }, 'Local account created')
         .catch((e) => console.error('[audit] register log error:', e));
+
+      // Task #233: server-side conversion event — survives ad blockers.
+      // Consent-gated inside trackServerEvent (x-analytics-consent header);
+      // the client no longer emits this Mixpanel event itself. No PII.
+      trackServerEvent(req, 'sign_up_completed', created.id, { sign_up_method: 'password' });
 
       // Never return the password hash.
       return res.status(201).json({
@@ -1783,6 +1789,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...resourceData,
           submittedBy: userId,
           status: 'pending'
+        });
+
+        // Task #233: server-side conversion event — survives ad blockers.
+        // Consent-gated inside trackServerEvent; props mirror the client's
+        // former resource_submitted payload (docs/MIXPANEL.md). No PII.
+        trackServerEvent(req, 'resource_submitted', userId, {
+          content_type: 'resource_submission',
+          category: resourceData.category,
         });
 
         res.status(201).json(resource);

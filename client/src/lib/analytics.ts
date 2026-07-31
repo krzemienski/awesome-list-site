@@ -185,7 +185,9 @@ export const trackLogin = (method: string) => {
 // User created an account. Carries first-touch acquisition.
 export const trackSignUp = (method: string) => {
   sendEvent('sign_up', { method, ...getAcquisition() });
-  mpTrack('sign_up_completed', { sign_up_method: method, ...getAcquisition() });
+  // Mixpanel half (sign_up_completed) is emitted SERVER-side from the
+  // register handler (Task #233) so ad blockers can't undercount it — do not
+  // re-add mpTrack here or the conversion double-counts.
 };
 
 // User selected/opened a piece of content (e.g. viewed a resource detail).
@@ -207,7 +209,9 @@ export const trackSelectContent = (
 // User completed a lead-generating form (e.g. submitted a resource).
 export const trackGenerateLead = (params: Record<string, unknown> = {}) => {
   sendEvent('generate_lead', { ...params, ...getAcquisition() });
-  mpTrack('resource_submitted', { ...params, ...getAcquisition() });
+  // Mixpanel half (resource_submitted) is emitted SERVER-side from the
+  // resource-submit handler (Task #233) — do not re-add mpTrack here or the
+  // conversion double-counts.
 };
 
 // User shared content (GA4 recommended `share`).

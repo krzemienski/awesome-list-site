@@ -222,3 +222,27 @@ export const mpReset = () => {
 // Referrer origin is exposed for trackPageView (analytics.ts) so page_viewed
 // carries attribution without leaking full referrer URLs.
 export const mpReferrerOrigin = referrerOrigin;
+
+// ---------------------------------------------------------------------------
+// Server-side conversion tracking support (Task #233)
+// ---------------------------------------------------------------------------
+// The two critical conversion events (sign_up_completed, resource_submitted)
+// are emitted SERVER-side from the Express handlers that confirm them, so ad
+// blockers can't undercount them. The client's job is only to signal consent
+// (same localStorage gate as the SDKs) and pass its current Mixpanel
+// distinct_id so server events land on the same profile. Attach these headers
+// to the register / resource-submit requests. Empty object = no consent =
+// server tracks nothing.
+export const serverConversionHeaders = (): Record<string, string> => {
+  if (getAnalyticsConsent() !== 'granted') return {};
+  const headers: Record<string, string> = { 'x-analytics-consent': 'granted' };
+  if (mp && !disabled) {
+    try {
+      const id = mp.get_distinct_id();
+      if (id) headers['x-mixpanel-distinct-id'] = String(id);
+    } catch {
+      // fall through — server falls back to the DB user id
+    }
+  }
+  return headers;
+};

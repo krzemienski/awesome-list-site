@@ -1,7 +1,10 @@
 # Mixpanel Tracking Plan
 
 Mixpanel runs **alongside GA4** (see `ANALYTICS.md`) using the `mixpanel-browser`
-npm SDK. Client-side only; server-side tracking is future work.
+npm SDK. Most events are client-side; the two **critical conversion events**
+(`sign_up_completed`, `resource_submitted`) are emitted **server-side** (Task
+#233) so ad blockers can't undercount them — see "Server-side conversions"
+below.
 
 ## Architecture
 
@@ -41,16 +44,40 @@ npm SDK. Client-side only; server-side tracking is future work.
 | `resource_link_opened` | Outbound resource link clicked | `resource_title`, `link_url`, `link_domain`, `category` | `trackResourceClick` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |
 | `category_viewed` | Category navigation | `category` | `trackCategoryView` |
-| `sign_up_completed` | Account created (post-server-confirm) | `sign_up_method`, acquisition | `trackSignUp` |
+| `sign_up_completed` | Account created (server-confirmed) | `sign_up_method`, `tracked_from: 'server'` | **server** — register handler (`server/routes.ts`) |
 | `logged_in` | Login succeeded | `login_method`, acquisition | `trackLogin` |
 | `resource_bookmarked` / `resource_unbookmarked` | Bookmark toggle server-confirmed | `resource_id` | `useResourceToggle` (choke point, all surfaces) |
 | `resource_favorited` / `resource_unfavorited` | Favorite toggle server-confirmed | `resource_id` | `useResourceToggle` |
-| `resource_submitted` | Resource submission accepted | form metadata, acquisition (no PII) | `trackGenerateLead` |
+| `resource_submitted` | Resource submission accepted | `content_type`, `category`, `tracked_from: 'server'` (no PII) | **server** — resource-submit handler (`server/routes.ts`) |
 | `resource_edit_submitted` | Edit suggestion accepted | `resource_id` | `suggest-edit-dialog` |
 | `content_shared` | Share action | `share_method`, `content_type`, `content_id` | `trackShare` |
 | `journey_step_completed` / `journey_step_uncompleted` | Logical journey step toggled (server-confirmed; one event per logical step, not per row) | `journey_id`, `step_row_count` | `JourneyDetail` |
 
 All events also carry auto props `platform: 'web'` and `page_path` from `mpTrack`.
+
+## Server-side conversions (ad-blocker-proof)
+
+Ad blockers block `api-js.mixpanel.com` for a large share of technical
+audiences, undercounting client-only conversions. The fix (Task #233):
+
+- **Module**: `server/lib/mixpanelServer.ts` — `trackServerEvent()` posts to
+  Mixpanel's HTTP ingestion API (`api.mixpanel.com/track`) fire-and-forget.
+- **Events**: `sign_up_completed` (register handler) and `resource_submitted`
+  (resource-submit handler) are emitted **only** server-side. The client
+  helpers (`trackSignUp` / `trackGenerateLead`) still fire the GA4 halves but
+  deliberately no longer call `mpTrack` for these — one producer per event, so
+  there is nothing to dedup. Server events carry `tracked_from: 'server'` and
+  a unique `$insert_id` (Mixpanel's retry-dedup key).
+- **Consent**: the server only tracks when the request carries
+  `x-analytics-consent: granted`, attached by `serverConversionHeaders()`
+  (`client/src/lib/mixpanel.ts`) from the same localStorage gate the browser
+  SDKs use. No consent → no header → no server event.
+- **Identity**: the client also passes its current Mixpanel distinct_id via
+  `x-mixpanel-distinct-id`; the server falls back to the immutable DB user id
+  (the same id `mpIdentify()` uses) when the header is absent.
+- **Token**: server reads `MIXPANEL_TOKEN` (optional server-only override) or
+  the shared `VITE_MIXPANEL_TOKEN` from env — never hardcoded, never shipped
+  in any new client code.
 
 ## Adding a new event
 

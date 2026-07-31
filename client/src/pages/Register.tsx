@@ -16,6 +16,7 @@ import { visibleLength } from "@shared/validation";
 import SEOHead from "@/components/layout/SEOHead";
 import { useAuth } from "@/hooks/useAuth";
 import { trackSignUp } from "@/lib/analytics";
+import { serverConversionHeaders } from "@/lib/mixpanel";
 
 const registerSchema = z.object({
   // BUG-037 (run18): an empty email must read "Email is required", not
@@ -188,7 +189,9 @@ export default function Register() {
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        // serverConversionHeaders: consent + Mixpanel distinct-id so the
+        // server can emit the sign_up_completed conversion (Task #233).
+        headers: { "Content-Type": "application/json", ...serverConversionHeaders() },
         credentials: "include",
         body: JSON.stringify(credentials),
       });
