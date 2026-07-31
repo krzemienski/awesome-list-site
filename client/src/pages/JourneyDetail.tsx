@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
+import { mpTrack } from "@/lib/mixpanel";
 import SEOHead from "@/components/layout/SEOHead";
 
 interface JourneyStep {
@@ -151,7 +152,14 @@ export default function JourneyDetail() {
       }
       return { previous };
     },
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
+      // Task #232: Mixpanel journey engagement (one event per logical-step
+      // toggle, never per row id — the 3 row ids of a logical step are one
+      // user action).
+      mpTrack(vars.completed ? 'journey_step_completed' : 'journey_step_uncompleted', {
+        journey_id: String(id),
+        step_row_count: vars.stepIds.length,
+      });
       toast({
         title: "Progress Updated",
         description: "Your journey progress has been saved.",

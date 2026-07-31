@@ -96,7 +96,9 @@ app.use((_req, res, next) => {
         // <script src="https://replit-cdn.com/feedback-widget/widget.global.js">
         // into the served HTML (it is NOT in our source, so we cannot nonce or
         // remove it) — allowlist the origin so the widget loads cleanly.
-        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://replit.com https://replit-cdn.com`,
+        // Task #232: cdn.mxpnl.com — mixpanel-browser is bundled from npm, but
+        // the SDK can lazy-load auxiliary scripts from its CDN.
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://replit.com https://replit-cdn.com`,
         // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
         // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
         // present in the same directive, so there is no "nonce + fallback"
@@ -116,7 +118,9 @@ app.use((_req, res, next) => {
         // M1 audit fix: allow www.google.com in connect-src (prod console CSP report).
         // BUG-003: replit.com + replit-cdn.com so the platform feedback widget
         // can phone home without spawning new CSP violations once its script loads.
-        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://replit.com https://replit-cdn.com",
+        // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
+        // host; api.mixpanel.com covers config fallbacks.
+        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://replit.com https://replit-cdn.com",
         "frame-ancestors 'none'",
         // BUG-014: add the missing hardening directives.
         "form-action 'self'",

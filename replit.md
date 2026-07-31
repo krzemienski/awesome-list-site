@@ -11,6 +11,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 
+### Mixpanel analytics — consent-gated, alongside GA4 (July 31, 2026)
+- Task #232. `mixpanel-browser` (npm) integrated with a ZERO pre-consent footprint: SDK is dynamic-imported only after the consent banner "Accept" (same `analytics-consent` localStorage gate as GA4); `opt_out_tracking_by_default:true` + opt-in post-consent; Cookie-settings revoke hard-disables the dispatcher and clears SDK state. Token via `VITE_MIXPANEL_TOKEN` (shared env).
+- Events (snake_case object_action, tracked at server-confirmed points): page_viewed, resource_viewed, resource_link_opened, search_performed, category_viewed, sign_up_completed, logged_in, resource_(un)bookmarked/(un)favorited (choke point: `useResourceToggle`), resource_submitted, resource_edit_submitted, content_shared, journey_step_(un)completed. Tracking plan: `docs/MIXPANEL.md`.
+- Identity: identify by DB user id on login/session restore (`useAuth`), people props ($name/$email/role/$created/acquisition), reset on logout. Privacy: `page_path` sent without query strings; referrer reduced to origin. CSP: `api-js.mixpanel.com`/`api.mixpanel.com` (connect-src), `cdn.mxpnl.com` (script-src).
+- Live-verified via headless browser: 0 pre-consent requests, events + $identify + engage decoded from gzipped payloads, no query-token leakage. GA4 unchanged. Architect review findings (static import, URL/referrer leak, revoke hardening) all fixed.
+
 ### Awesome Researcher redesign — 4 workstreams + live E2E (July 30, 2026)
 - **WS1 Dynamic prompt engine**: `GET /api/researcher/brief` generates a research brief from a rotating campaign angle + taxonomy gaps + mined domains from past runs (`researchService.ts`); an empty prompt on `/api/researcher/start` auto-generates the brief server-side. UI: "Auto-generate brief" button in ResearcherTab; empty-prompt launch allowed.
 - **WS2 Dedup hardening**: `normalizeUrl` emits host+path+significant-query dedup keys (protocol/www/trailing-slash/tracking-params/fragment stripped; GitHub `.git`/`/tree/main|master` folded, `/blob/*` kept distinct); known-URL set spans ALL resource statuses; single-approve gets a normalized dedup guard (bulk keeps its own shared set via `skipDuplicateCheck`).

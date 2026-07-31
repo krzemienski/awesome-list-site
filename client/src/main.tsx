@@ -8,12 +8,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { initGA } from "./lib/analytics";
+import { initMixpanel } from "./lib/mixpanel";
 import { needsCorpusRoute } from "./lib/static-data";
 
 // Initialize GA before React renders so window.gtag exists in time for the very
 // first page_view (React runs child effects before parent effects, so App's
 // mount effect fires too late for Router/useAnalytics's initial page_view).
 initGA();
+// Mixpanel too (same consent gate — both no-op until the visitor accepts the
+// consent banner, which calls these again after "Accept").
+initMixpanel();
 
 // Force dark theme immediately
 document.documentElement.classList.add('dark');

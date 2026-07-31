@@ -37,6 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
+import { mpTrack } from "@/lib/mixpanel";
 import type { Resource } from "@shared/schema";
 
 // BUG-024 (run14): the HTTPS rule applies to NEW urls only. Legacy resources
@@ -327,6 +328,9 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       });
     },
     onSuccess: () => {
+      // Task #232: Mixpanel edit-suggestion event (ids only, no content —
+      // proposed text may quote external material).
+      mpTrack('resource_edit_submitted', { resource_id: String(resource.id) });
       toast({
         title: "Edit Suggestion Submitted",
         description: "Your edit will be reviewed by admins",

@@ -12,6 +12,7 @@
 //  - No PII is ever sent (no email/password/token/raw copied text).
 
 import { captureAcquisition, getAcquisition } from './acquisition';
+import { mpTrack, mpReferrerOrigin } from './mixpanel';
 
 // Define the gtag function globally
 declare global {
@@ -142,6 +143,11 @@ export const sendEvent = (name: string, params: Record<string, unknown> = {}) =>
 // Relies on baseContext for page_location (carries UTMs) / page_path / title.
 export const trackPageView = (_url?: string) => {
   sendEvent('page_view', {});
+  mpTrack('page_viewed', {
+    page_title: typeof document !== 'undefined' ? document.title : undefined,
+    // Origin only — full referrer URLs can carry tokens/PII in queries.
+    referrer_origin: mpReferrerOrigin(),
+  });
 };
 
 // Track engagement duration for a page (fired on route change + tab hide).
@@ -173,11 +179,13 @@ export const trackEvent = (
 // User signed in (method e.g. "password"). Carries first-touch acquisition.
 export const trackLogin = (method: string) => {
   sendEvent('login', { method, ...getAcquisition() });
+  mpTrack('logged_in', { login_method: method, ...getAcquisition() });
 };
 
 // User created an account. Carries first-touch acquisition.
 export const trackSignUp = (method: string) => {
   sendEvent('sign_up', { method, ...getAcquisition() });
+  mpTrack('sign_up_completed', { sign_up_method: method, ...getAcquisition() });
 };
 
 // User selected/opened a piece of content (e.g. viewed a resource detail).
@@ -191,11 +199,15 @@ export const trackSelectContent = (
     content_id: String(contentId),
     ...extra,
   });
+  if (contentType === 'resource') {
+    mpTrack('resource_viewed', { resource_id: String(contentId), ...extra });
+  }
 };
 
 // User completed a lead-generating form (e.g. submitted a resource).
 export const trackGenerateLead = (params: Record<string, unknown> = {}) => {
   sendEvent('generate_lead', { ...params, ...getAcquisition() });
+  mpTrack('resource_submitted', { ...params, ...getAcquisition() });
 };
 
 // User shared content (GA4 recommended `share`).
@@ -206,6 +218,11 @@ export const trackShare = (
 ) => {
   sendEvent('share', {
     method,
+    content_type: contentType,
+    content_id: String(contentId),
+  });
+  mpTrack('content_shared', {
+    share_method: method,
     content_type: contentType,
     content_id: String(contentId),
   });
@@ -233,16 +250,24 @@ export const trackResourceClick = (
     link_url: resourceUrl,
     link_domain: domainOf(resourceUrl),
   });
+  mpTrack('resource_link_opened', {
+    resource_title: resourceTitle,
+    link_url: resourceUrl,
+    link_domain: domainOf(resourceUrl),
+    category,
+  });
 };
 
 // Track site search (GA4 recommended `search` with search_term).
 export const trackSearch = (searchTerm: string, resultCount: number) => {
   sendEvent('search', { search_term: searchTerm, result_count: resultCount });
+  mpTrack('search_performed', { search_term: searchTerm, result_count: resultCount });
 };
 
 // Track category navigation.
 export const trackCategoryView = (categoryName: string) => {
   sendEvent('category_view', { content_category: categoryName });
+  mpTrack('category_viewed', { category: categoryName });
 };
 
 // Track theme / appearance changes (themeType e.g. "color" | "font" | "system").

@@ -8,6 +8,7 @@ import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
+import { mpTrack } from "@/lib/mixpanel";
 
 // Shared favorite/bookmark toggle logic (Task: consolidate ResourceDetail's
 // inline copies with FavoriteButton/BookmarkButton so behavior fixes land on
@@ -122,6 +123,17 @@ function useResourceToggle(
       });
       // R4-081: mirror the change into other open tabs.
       notifyCrossTabSync();
+      // Task #232: Mixpanel save/unsave events — tracked HERE (the single
+      // toggle choke point) so every surface (buttons, detail page, lists)
+      // reports without per-surface wiring. GA equivalents stay in the
+      // calling components' onSuccess (legacy naming continuity).
+      const saved = !vars.remove;
+      mpTrack(
+        config.serverField === "isBookmarked"
+          ? saved ? "resource_bookmarked" : "resource_unbookmarked"
+          : saved ? "resource_favorited" : "resource_unfavorited",
+        { resource_id: String(opts.resourceId) },
+      );
       opts.onSuccess?.(data, vars, showToast);
     },
     onError: (error, vars) => {

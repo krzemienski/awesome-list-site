@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient, ApiError } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
+import { mpIdentify, mpReset } from '@/lib/mixpanel';
 
 interface User {
   id: string;
@@ -69,6 +71,23 @@ export function useAuth() {
     retryOnMount: false,
   });
 
+  // Task #232: Mixpanel identity — identify on login AND session restore
+  // (any render where an authed user is present). mpIdentify de-dupes by user
+  // id internally, so this effect firing across many useAuth() consumers is
+  // harmless. Reset lives in the logout mutation below.
+  const authedUser = data?.user ?? null;
+  useEffect(() => {
+    if (authedUser?.id) {
+      mpIdentify({
+        id: authedUser.id,
+        name: authedUser.name,
+        email: authedUser.email,
+        role: authedUser.role,
+        createdAt: authedUser.createdAt,
+      });
+    }
+  }, [authedUser?.id]);
+
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch('/api/auth/logout', {
@@ -87,6 +106,9 @@ export function useAuth() {
       // R5-016: drop the private /submit draft on logout so the next visitor
       // on this device never inherits the previous account's draft text.
       safeRemoveItem('submit-resource-draft');
+      // Task #232: unlink the Mixpanel identity so the next visitor on this
+      // device never inherits this account's profile.
+      mpReset();
       // R4-081: tell other open tabs to drop their authed chrome/bookmarks.
       notifyCrossTabSync();
       window.location.href = '/';

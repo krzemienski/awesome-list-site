@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_GA_MEASUREMENT_ID: string;
+  readonly VITE_MIXPANEL_TOKEN: string;
   readonly VITE_SITE_TITLE: string;
   readonly VITE_SITE_DESCRIPTION: string;
   readonly VITE_SITE_URL: string;
