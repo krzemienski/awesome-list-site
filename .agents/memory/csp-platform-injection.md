@@ -12,3 +12,9 @@ Two ways a strict nonce-based, production-only CSP silently breaks things that w
 **Why:** dev has no CSP (NODE_ENV check), so both failures are invisible until a production build/publish; GA was dead in prod for months this way.
 
 **How to apply:** after any CSP change or republish, load prod in a real browser and check the console for `Refused to`/CSP violations; verify `typeof window.gtag === 'function'` and that a page_view lands in `dataLayer`. A local `NODE_ENV=production node dist/index.js` reproduces the nonce CSP (but NOT the platform widget injection — that only exists on the live deployment).
+
+## worker-src for analytics replay (July 2026)
+Workers fall back to script-src when worker-src is absent — PostHog's session recorder and Amplitude replay spawn blob: compression workers, so a nonce-strict script-src logs "Creating a worker from 'blob:…' violates CSP" on every prod page load (replay still uploads via slower non-worker fallback). Fix: explicit `worker-src 'self' blob:` — never add blob: to script-src.
+
+## Verifying prod analytics headlessly
+PostHog drops captures for automation browsers via navigator.webdriver, not just UA — spoof `navigator.webdriver=false` via addInitScript (a clean Chrome UA alone is NOT enough; assets load but zero /i/v0/e/ POSTs, silently).

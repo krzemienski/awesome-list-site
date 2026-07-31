@@ -110,6 +110,14 @@ app.use((_req, res, next) => {
         // page load and an unstyled widget. Inline STYLE injection is a far
         // weaker vector than script injection; script-src keeps its strict
         // nonce policy.
+        // Task #238 prod verification: PostHog's session recorder and
+        // Amplitude's replay plugin spawn compression Web Workers from blob:
+        // URLs. Without an explicit worker-src, workers fall back to
+        // script-src (which rightly has no blob:) and every page load logs
+        // "Creating a worker from 'blob:…' violates CSP" — replay then runs
+        // on its slower non-worker fallback. blob: workers only execute code
+        // the page itself constructed, so this does not weaken script-src.
+        `worker-src 'self' blob:`,
         `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
         "font-src 'self' https://fonts.gstatic.com",
         // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
