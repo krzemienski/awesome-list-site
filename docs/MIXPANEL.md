@@ -44,11 +44,11 @@ below.
 | `resource_link_opened` | Outbound resource link clicked | `resource_title`, `link_url`, `link_domain`, `category` | `trackResourceClick` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |
 | `category_viewed` | Category navigation | `category` | `trackCategoryView` |
-| `sign_up_completed` | Account created (server-confirmed) | `sign_up_method`, `tracked_from: 'server'` | **server** — register handler (`server/routes.ts`) |
+| `sign_up_completed` | Account created (server-confirmed) | `sign_up_method`, acquisition, `tracked_from: 'server'` | **server** — register handler (`server/routes.ts`) |
 | `logged_in` | Login succeeded | `login_method`, acquisition | `trackLogin` |
 | `resource_bookmarked` / `resource_unbookmarked` | Bookmark toggle server-confirmed | `resource_id` | `useResourceToggle` (choke point, all surfaces) |
 | `resource_favorited` / `resource_unfavorited` | Favorite toggle server-confirmed | `resource_id` | `useResourceToggle` |
-| `resource_submitted` | Resource submission accepted | `content_type`, `category`, `tracked_from: 'server'` (no PII) | **server** — resource-submit handler (`server/routes.ts`) |
+| `resource_submitted` | Resource submission accepted | `content_type`, `category`, acquisition, `tracked_from: 'server'` (no PII) | **server** — resource-submit handler (`server/routes.ts`) |
 | `resource_edit_submitted` | Edit suggestion accepted | `resource_id` | `suggest-edit-dialog` |
 | `content_shared` | Share action | `share_method`, `content_type`, `content_id` | `trackShare` |
 | `journey_step_completed` / `journey_step_uncompleted` | Logical journey step toggled (server-confirmed; one event per logical step, not per row) | `journey_id`, `step_row_count` | `JourneyDetail` |
@@ -72,6 +72,12 @@ audiences, undercounting client-only conversions. The fix (Task #233):
   `x-analytics-consent: granted`, attached by `serverConversionHeaders()`
   (`client/src/lib/mixpanel.ts`) from the same localStorage gate the browser
   SDKs use. No consent → no header → no server event.
+- **Acquisition**: the client also forwards its first-touch acquisition record
+  (`utm_*` + `referrer_domain` from `getAcquisition()`, PII-free) as a compact
+  JSON header `x-mixpanel-acquisition`. The server validates it strictly
+  (allowlisted keys only, values capped at 100 chars, header capped at 1&nbsp;KB)
+  and merges the props onto the two conversion events — so they keep the same
+  acquisition properties the client-side events carried before Task #233.
 - **Identity**: the client also passes its current Mixpanel distinct_id via
   `x-mixpanel-distinct-id`; the server falls back to the immutable DB user id
   (the same id `mpIdentify()` uses) when the header is absent.

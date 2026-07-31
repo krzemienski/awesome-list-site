@@ -244,5 +244,19 @@ export const serverConversionHeaders = (): Record<string, string> => {
       // fall through — server falls back to the DB user id
     }
   }
+  // First-touch acquisition (utm_* + referrer_domain, already PII-free and
+  // value-capped in acquisition.ts). The server merges these onto the two
+  // conversion events so they keep "where did this user come from" context.
+  // Size-capped: skip if serialization is unexpectedly huge (defensive; the
+  // server re-validates independently).
+  try {
+    const acquisition = getAcquisition();
+    if (Object.keys(acquisition).length > 0) {
+      const json = JSON.stringify(acquisition);
+      if (json.length <= 1024) headers['x-mixpanel-acquisition'] = json;
+    }
+  } catch {
+    // acquisition is best-effort — never block the conversion request
+  }
   return headers;
 };

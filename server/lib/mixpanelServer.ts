@@ -52,6 +52,40 @@ const headerDistinctId = (req: Request): string | undefined => {
   return undefined;
 };
 
+// First-touch acquisition props forwarded by the client via the
+// `x-mixpanel-acquisition` JSON header (see serverConversionHeaders() in
+// client/src/lib/mixpanel.ts). Strictly validated: only the documented
+// property names are accepted (docs/MIXPANEL.md — same names getAcquisition()
+// produces), values must be short strings, and the whole header is size-capped
+// so a malicious client can't stuff arbitrary data into the ingest payload.
+const ACQUISITION_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "referrer_domain",
+] as const;
+
+const headerAcquisition = (req: Request): Record<string, string> => {
+  const out: Record<string, string> = {};
+  try {
+    const raw = req.get("x-mixpanel-acquisition");
+    if (typeof raw !== "string" || raw.length === 0 || raw.length > 1024) return out;
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return out;
+    for (const key of ACQUISITION_KEYS) {
+      const value = (parsed as Record<string, unknown>)[key];
+      if (typeof value === "string" && value.length > 0) {
+        out[key] = value.slice(0, 100);
+      }
+    }
+  } catch {
+    // malformed header — ignore, acquisition is best-effort
+  }
+  return out;
+};
+
 /**
  * Fire-and-forget server-side Mixpanel event. Never throws, never blocks the
  * response — analytics must not affect request handling.
@@ -86,6 +120,9 @@ export function trackServerEvent(
       platform: "web",
       // Distinguish pipeline in analysis without renaming the event.
       tracked_from: "server",
+      // First-touch acquisition forwarded from the client (validated above).
+      // Spread before caller props so explicit props always win.
+      ...headerAcquisition(req),
       ...props,
     };
     Object.keys(properties).forEach((k) => {
