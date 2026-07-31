@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly VITE_MIXPANEL_TOKEN: string;
   readonly VITE_POSTHOG_KEY: string;
   readonly VITE_POSTHOG_HOST: string;
+  readonly VITE_AMPLITUDE_API_KEY: string;
   readonly VITE_SITE_TITLE: string;
   readonly VITE_SITE_DESCRIPTION: string;
   readonly VITE_SITE_URL: string;

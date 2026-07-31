@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { initGA } from "./lib/analytics";
 import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
+import { initAmplitude } from "./lib/amplitude";
 import { needsCorpusRoute } from "./lib/static-data";
 
 // Initialize GA before React renders so window.gtag exists in time for the very
@@ -20,6 +21,9 @@ initGA();
 // consent banner, which calls these again after "Accept").
 initMixpanel();
 initPosthog();
+// Amplitude — per explicit user decision this runs immediately (NOT
+// consent-gated like the three above).
+initAmplitude();
 
 // Force dark theme immediately
 document.documentElement.classList.add('dark');

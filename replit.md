@@ -11,6 +11,9 @@ A production-ready React application for browsing and discovering over 2,600 cur
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 
+### Amplitude analytics + session replay (July 31, 2026)
+- `@amplitude/unified` via the Amplitude setup wizard. **Initializes immediately at load — NOT consent-gated** (explicit user decision, unlike GA4/Mixpanel/PostHog). `initAll` with autocapture + session replay (sampleRate 1) in `client/src/lib/amplitude.ts`, called once from `main.tsx`. One verification event: `Viewed Home Page` (fires at load). Key in `VITE_AMPLITUDE_API_KEY` (`client/.env`). CSP: `cdn.amplitude.com` in script-src (lazy engagement bundles), `*.amplitude.com` in connect-src.
+
 ### PostHog analytics — consent-gated, full feature set (July 31, 2026)
 - `posthog-js` (npm) integrated with the same zero pre-consent architecture as Mixpanel: dynamic import post-consent only, `opt_out_capturing_by_default:true` + opt-in, Cookie-settings revoke stops capture + session recording. All features on: autocapture, SPA pageviews/pageleave, session replay (all inputs masked), exception capture, web vitals, heatmaps, feature flags (`phIsFeatureEnabled`/`phGetFeatureFlag` in `client/src/lib/posthog.ts`). Custom events mirrored via the `mpTrack` choke point so Mixpanel and PostHog see the same stream. Keys via `VITE_POSTHOG_KEY`/`VITE_POSTHOG_HOST` in gitignored `client/.env` (Vite's root is `client/` — root `.env` is NOT read by client builds). CSP allows `us.i.posthog.com` + `us-assets.i.posthog.com`.
 

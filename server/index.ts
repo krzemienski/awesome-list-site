@@ -100,7 +100,7 @@ app.use((_req, res, next) => {
         // the SDK can lazy-load auxiliary scripts from its CDN.
         // PostHog: posthog-js is bundled from npm but lazy-loads extra bundles
         // (session recorder, surveys, toolbar) from its assets CDN.
-        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://replit.com https://replit-cdn.com`,
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com`,
         // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
         // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
         // present in the same directive, so there is no "nonce + fallback"
@@ -123,7 +123,7 @@ app.use((_req, res, next) => {
         // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
         // host; api.mixpanel.com covers config fallbacks.
         // PostHog ingest + assets (feature flags, replay, surveys).
-        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://replit.com https://replit-cdn.com",
+        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com",
         "frame-ancestors 'none'",
         // BUG-014: add the missing hardening directives.
         "form-action 'self'",
