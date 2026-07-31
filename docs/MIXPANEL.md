@@ -44,7 +44,7 @@ below.
 | `resource_link_opened` | Outbound resource link clicked | `resource_title`, `link_url`, `link_domain`, `category` | `trackResourceClick` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |
 | `category_viewed` | Category navigation | `category` | `trackCategoryView` |
-| `sign_up_completed` | Account created (server-confirmed) | `sign_up_method`, acquisition, `tracked_from: 'server'` | **server** — register handler (`server/routes.ts`) |
+| `sign_up_completed` | Account created (server-confirmed) | `sign_up_method` (`'password'` \| `'replit'`), acquisition, `tracked_from: 'server'` | **server** — register handler (`server/routes.ts`) + OIDC callback (`server/replitAuth.ts`) |
 | `logged_in` | Login succeeded | `login_method`, acquisition | `trackLogin` |
 | `resource_bookmarked` / `resource_unbookmarked` | Bookmark toggle server-confirmed | `resource_id` | `useResourceToggle` (choke point, all surfaces) |
 | `resource_favorited` / `resource_unfavorited` | Favorite toggle server-confirmed | `resource_id` | `useResourceToggle` |
@@ -84,6 +84,19 @@ audiences, undercounting client-only conversions. The fix (Task #233):
 - **Token**: server reads `MIXPANEL_TOKEN` (optional server-only override) or
   the shared `VITE_MIXPANEL_TOKEN` from env — never hardcoded, never shipped
   in any new client code.
+- **Replit OIDC sign-ups (Task #235)**: first-time Replit-login account
+  creation also fires `sign_up_completed` (`sign_up_method: 'replit'`) from
+  the OIDC verify callback (`server/replitAuth.ts`). The redirect flow can't
+  carry custom headers, so right before navigating to `/api/login` the client
+  POSTs its consent state to `/api/auth/oidc-analytics-consent` via
+  `primeOidcAnalyticsConsent()` (`client/src/lib/mixpanel.ts`), reusing the
+  same consent/distinct-id headers as the register path. The endpoint is
+  CSRF-safe (same-origin check + custom headers) and authoritative: no
+  consent → flags cleared → no event. The verify callback consumes the flags
+  one-shot with a 15-minute TTL and emits only when the upsert **atomically**
+  reports it created the account (`xmax = 0`), so subsequent logins and
+  retried callbacks never fire it. Account creation is confirmed
+  server-side, so the event is emitted regardless of ad blockers.
 
 ## Adding a new event
 

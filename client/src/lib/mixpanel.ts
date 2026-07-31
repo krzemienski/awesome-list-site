@@ -260,3 +260,25 @@ export const serverConversionHeaders = (): Record<string, string> => {
   }
   return headers;
 };
+
+// Replit OIDC sign-in is a full-page redirect (no custom headers possible),
+// so before navigating to /api/login the client POSTs its consent state (and
+// current Mixpanel distinct_id) to a same-origin endpoint using the SAME
+// header channel as the register path (serverConversionHeaders()). The server
+// stashes them in the session and consumes them one-shot in the OIDC callback
+// to consent-gate the server-side sign_up_completed conversion for first-time
+// Replit accounts (Task #235). Called on EVERY Replit-login click — with no
+// consent the header set is empty and the server CLEARS any pending flags, so
+// a revoked consent can never be replayed. Best-effort: analytics must never
+// block sign-in.
+export const primeOidcAnalyticsConsent = async (): Promise<void> => {
+  try {
+    await fetch('/api/auth/oidc-analytics-consent', {
+      method: 'POST',
+      credentials: 'include',
+      headers: serverConversionHeaders(),
+    });
+  } catch {
+    // best-effort — worst case the sign-up conversion goes uncounted
+  }
+};

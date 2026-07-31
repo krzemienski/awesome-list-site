@@ -16,7 +16,7 @@ import { visibleLength } from "@shared/validation";
 import SEOHead from "@/components/layout/SEOHead";
 import { useAuth } from "@/hooks/useAuth";
 import { trackSignUp } from "@/lib/analytics";
-import { serverConversionHeaders } from "@/lib/mixpanel";
+import { serverConversionHeaders, primeOidcAnalyticsConsent } from "@/lib/mixpanel";
 
 const registerSchema = z.object({
   // BUG-037 (run18): an empty email must read "Email is required", not
@@ -136,6 +136,7 @@ export default function Register() {
       });
       const data = res.ok ? await res.json().catch(() => ({ ok: false })) : { ok: false };
       if (data?.ok === true) {
+        await primeOidcAnalyticsConsent();
         window.location.href = "/api/login";
         return;
       }

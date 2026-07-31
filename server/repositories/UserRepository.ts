@@ -29,7 +29,7 @@ import {
   type InsertApiKey,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, asc, desc, sql, or, ilike, type SQL } from "drizzle-orm";
+import { eq, and, asc, desc, sql, or, ilike, getTableColumns, type SQL } from "drizzle-orm";
 import { generateApiKey, hashApiKey } from "../apiKeyUtils";
 
 /**
@@ -77,6 +77,43 @@ export class UserRepository {
       .returning();
 
     return user;
+  }
+
+  /**
+   * Upsert that also reports whether the row was CREATED by this call, read
+   * atomically from the insert itself (`xmax = 0` is true only for a freshly
+   * inserted row, false when ON CONFLICT updated an existing one). Used by the
+   * OIDC sign-in path (Task #235) so the sign_up_completed conversion fires
+   * exactly once even under concurrent/retried callbacks — a separate
+   * read-then-upsert could double-report creation.
+   * @param userData - User data to insert or update
+   * @returns The user plus a `created` flag
+   */
+  async upsertUserDetectingCreation(
+    userData: UpsertUser,
+  ): Promise<{ user: User; created: boolean }> {
+    const userDataWithRole = {
+      ...userData,
+      role: userData.role || 'user',
+    };
+
+    const [row] = await db
+      .insert(users)
+      .values(userDataWithRole)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning({
+        ...getTableColumns(users),
+        created: sql<boolean>`(xmax = 0)`,
+      });
+
+    const { created, ...user } = row;
+    return { user: user as User, created };
   }
 
   /**

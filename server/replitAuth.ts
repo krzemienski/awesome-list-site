@@ -1,5 +1,5 @@
 import * as client from "openid-client";
-import { Strategy, type VerifyFunction } from "openid-client/passport";
+import { Strategy, type VerifyFunctionWithRequest } from "openid-client/passport";
 
 import passport from "passport";
 import session from "express-session";
@@ -7,6 +7,7 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { UserRepository } from "./repositories";
+import { trackConsentedServerEvent } from "./lib/mixpanelServer";
 
 const getOidcConfig = memoize(
   async () => {
@@ -51,17 +52,80 @@ function updateUserSession(
   user.expires_at = user.claims?.exp;
 }
 
+/**
+ * Create-or-update the user row from OIDC claims.
+ * @returns true when this call CREATED the account (first-ever Replit login),
+ *          false for a routine upsert of an existing user. The flag comes
+ *          atomically from the upsert itself (xmax = 0), so concurrent or
+ *          retried callbacks can never both report creation. Task #235 uses
+ *          it to emit the sign_up_completed conversion only on genuine
+ *          account creation, never on subsequent logins.
+ */
+// ---------------------------------------------------------------------------
+// Task #235: analytics consent transport for the OIDC redirect flow.
+//
+// Browser redirects can't carry custom headers, so before navigating to
+// /api/login the client POSTs its consent state (and current Mixpanel
+// distinct_id) to /api/auth/oidc-analytics-consent using the SAME header
+// channel the register path uses (x-analytics-consent /
+// x-mixpanel-distinct-id, built by serverConversionHeaders()). The endpoint
+// stashes them in the session; the OIDC verify callback consumes them
+// one-shot. CSRF safety: the global Origin-check middleware rejects
+// cross-origin POSTs, and a cross-site form/nav can't set custom headers, so
+// consent can never be injected via a top-level GET the way query params
+// could be.
+// ---------------------------------------------------------------------------
+
+// Flags older than this are ignored — an abandoned redirect must not leave a
+// consent grant lying around indefinitely (e.g. across a later revocation).
+export const OIDC_CONSENT_TTL_MS = 15 * 60 * 1000;
+
+/** Store (or clear) the pending analytics consent for an upcoming OIDC login. */
+export function setOidcAnalyticsConsent(session: any, req: { get(name: string): string | undefined }): void {
+  // Always reset first: the latest click's consent state is authoritative.
+  delete session.analyticsConsent;
+  delete session.analyticsConsentAt;
+  delete session.mixpanelDistinctId;
+  if (req.get("x-analytics-consent") === "granted") {
+    session.analyticsConsent = "granted";
+    session.analyticsConsentAt = Date.now();
+    const did = req.get("x-mixpanel-distinct-id");
+    if (typeof did === "string" && did.length > 0 && did.length <= 255) {
+      session.mixpanelDistinctId = did;
+    }
+  }
+}
+
+/**
+ * One-shot read of the pending consent: clears the flags unconditionally
+ * (fresh or stale, granted or not) and reports whether a still-fresh grant
+ * was present, plus the client's Mixpanel distinct_id when it sent one.
+ */
+export function consumeOidcAnalyticsConsent(session: any): { consented: boolean; mixpanelDistinctId?: string } {
+  const granted = session?.analyticsConsent === "granted";
+  const at = session?.analyticsConsentAt;
+  const fresh = typeof at === "number" && Date.now() - at <= OIDC_CONSENT_TTL_MS;
+  const mixpanelDistinctId: string | undefined = session?.mixpanelDistinctId;
+  if (session) {
+    delete session.analyticsConsent;
+    delete session.analyticsConsentAt;
+    delete session.mixpanelDistinctId;
+  }
+  return granted && fresh ? { consented: true, mixpanelDistinctId } : { consented: false };
+}
+
 async function upsertUser(
   claims: any,
-) {
+): Promise<boolean> {
   const userRepo = new UserRepository();
-  await userRepo.upsertUser({
+  const { created } = await userRepo.upsertUserDetectingCreation({
     id: claims["sub"],
     email: claims["email"],
     firstName: claims["first_name"],
     lastName: claims["last_name"],
     profileImageUrl: claims["profile_image_url"],
   });
+  return created;
 }
 
 export async function setupAuth(app: Express) {
@@ -72,13 +136,32 @@ export async function setupAuth(app: Express) {
 
   const config = await getOidcConfig();
 
-  const verify: VerifyFunction = async (
+  const verify: VerifyFunctionWithRequest = async (
+    req,
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
     const user = {};
     updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
+    const claims = tokens.claims();
+    const isNewAccount = await upsertUser(claims);
+
+    // Task #235: count Replit-OIDC sign-ups, not just email registrations.
+    // Consent was stashed pre-redirect via POST /api/auth/oidc-analytics-consent
+    // (see setOidcAnalyticsConsent above). One-shot + TTL'd: read + clear.
+    try {
+      const { consented, mixpanelDistinctId } = consumeOidcAnalyticsConsent(req.session as any);
+      if (isNewAccount && consented && claims?.["sub"]) {
+        trackConsentedServerEvent(
+          "sign_up_completed",
+          mixpanelDistinctId ?? String(claims["sub"]),
+          { sign_up_method: "replit" },
+        );
+      }
+    } catch {
+      // Analytics must never break the login flow.
+    }
+
     verified(null, user);
   };
 
@@ -95,6 +178,7 @@ export async function setupAuth(app: Express) {
           config,
           scope: "openid email profile offline_access",
           callbackURL: `https://${domain}/api/callback`,
+          passReqToCallback: true,
         },
         verify,
       );
@@ -121,6 +205,19 @@ export async function setupAuth(app: Express) {
     } catch (error) {
       cb(error);
     }
+  });
+
+  // Task #235: same-origin, header-based consent hand-off for the OIDC flow.
+  // The client calls this right before navigating to /api/login (see
+  // primeOidcAnalyticsConsent() in client/src/lib/mixpanel.ts). No consent
+  // header → flags cleared → no event. Protected against cross-site abuse by
+  // the global Origin-check middleware (server/index.ts) plus the fact that
+  // cross-site requests can't attach custom headers without a CORS preflight.
+  app.post("/api/auth/oidc-analytics-consent", (req, res) => {
+    setOidcAnalyticsConsent(req.session as any, req);
+    // Persist before the client navigates away — the OIDC redirect races the
+    // session store write otherwise.
+    req.session.save(() => res.status(204).end());
   });
 
   app.get("/api/login", (req, res, next) => {

@@ -15,6 +15,7 @@ import { queryClient } from "@/lib/queryClient";
 import { notifyCrossTabSync } from "@/lib/crossTabSync";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackLogin } from "@/lib/analytics";
+import { primeOidcAnalyticsConsent } from "@/lib/mixpanel";
 import { useAuth } from "@/hooks/useAuth";
 
 const loginSchema = z.object({
@@ -79,6 +80,7 @@ export default function Login() {
       });
       const data = res.ok ? await res.json().catch(() => ({ ok: false })) : { ok: false };
       if (data?.ok === true) {
+        await primeOidcAnalyticsConsent();
         window.location.href = "/api/login";
         return;
       }

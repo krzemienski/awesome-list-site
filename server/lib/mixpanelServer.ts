@@ -102,12 +102,30 @@ export function trackServerEvent(
   fallbackDistinctId: string | null | undefined,
   props: Record<string, unknown> = {},
 ): void {
+  if (!hasAnalyticsConsent(req)) return; // consent gate — hard stop
+  const distinctId = headerDistinctId(req) ?? fallbackDistinctId;
+  // First-touch acquisition forwarded from the client (validated above).
+  // Spread before caller props so explicit props always win.
+  trackConsentedServerEvent(event, distinctId, { ...headerAcquisition(req), ...props });
+}
+
+/**
+ * Same fire-and-forget ingest, but for callers that have ALREADY verified
+ * analytics consent through a non-header channel. The Replit OIDC flow is the
+ * one such caller: browser redirects carry no custom headers, so consent (and
+ * the client's Mixpanel distinct_id) travel via a one-shot session flag set on
+ * /api/login (see server/replitAuth.ts). Never call this without a verified
+ * consent signal — the header gate in trackServerEvent() is bypassed here by
+ * design, not by accident.
+ */
+export function trackConsentedServerEvent(
+  event: string,
+  distinctId: string | null | undefined,
+  props: Record<string, unknown> = {},
+): void {
   try {
-    if (!hasAnalyticsConsent(req)) return; // consent gate — hard stop
     const token = getToken();
     if (!token) return; // Mixpanel not configured in this environment
-
-    const distinctId = headerDistinctId(req) ?? fallbackDistinctId;
     if (!distinctId) return; // nothing sensible to attribute the event to
 
     const properties: Record<string, unknown> = {
@@ -120,9 +138,6 @@ export function trackServerEvent(
       platform: "web",
       // Distinguish pipeline in analysis without renaming the event.
       tracked_from: "server",
-      // First-touch acquisition forwarded from the client (validated above).
-      // Spread before caller props so explicit props always win.
-      ...headerAcquisition(req),
       ...props,
     };
     Object.keys(properties).forEach((k) => {
