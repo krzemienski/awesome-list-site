@@ -1,5 +1,5 @@
+import { TaxonomyCardSkeleton } from "@/components/ui/skeletons";
 import { useMemo, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { TaxonomyCard } from "@/components/ui/taxonomy-card";
 import {
   Select,
@@ -213,7 +213,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
       ) : isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 9 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 w-full bg-[var(--surface-3)]" />
+            <TaxonomyCardSkeleton key={i} />
           ))}
         </div>
       ) : categories.length === 0 ? (

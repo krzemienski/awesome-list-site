@@ -1,8 +1,8 @@
+import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -220,7 +220,7 @@ export default function Search() {
       ) : isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-40 rounded-lg" />
+            <ResourceCardSkeleton key={i} />
           ))}
         </div>
       ) : isError ? (

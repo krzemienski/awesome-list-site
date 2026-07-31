@@ -1,7 +1,7 @@
+import { TaxonomyCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TaxonomyCard } from "@/components/ui/taxonomy-card";
 import { Badge } from "@/components/ui/badge";
@@ -282,11 +282,10 @@ export default function Home({ nav, navLoading }: HomeProps) {
             brand head while the catalog loads. */}
         <SEOHead />
         <div className="space-y-4">
-          <Skeleton className="h-10 w-80" />
-          <Skeleton className="h-6 w-96" />
+          <PageHeaderSkeleton />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 9 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full" />
+              <TaxonomyCardSkeleton key={i} />
             ))}
           </div>
         </div>

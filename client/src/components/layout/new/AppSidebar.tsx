@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useSearch, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -586,11 +587,13 @@ export default function AppSidebar({
                   {/* R5-024 (run24): a failed nav fetch used to leave this
                       stuck on "Loading…" forever (isLoading false, count 0).
                       Resolve to a neutral label when the fetch has errored. */}
-                  {navError && totalResources === 0
-                    ? "Catalog unavailable"
-                    : isLoading || totalResources === 0
-                      ? "Loading…"
-                      : `${totalResources.toLocaleString()} resources`}
+                  {navError && totalResources === 0 ? (
+                    "Catalog unavailable"
+                  ) : isLoading || totalResources === 0 ? (
+                    <Skeleton className="h-3 w-24 rounded" />
+                  ) : (
+                    `${totalResources.toLocaleString()} resources`
+                  )}
                 </span>
               </div>
             </SidebarMenuButton>
@@ -731,7 +734,12 @@ export default function AppSidebar({
           >
             Categories{" "}
             <span style={{ color: "var(--text-3)", fontWeight: 400 }}>
-              · {isLoading ? "…" : totalCats}
+              ·{" "}
+              {isLoading ? (
+                <Skeleton className="inline-block h-3 w-4 rounded align-middle" />
+              ) : (
+                totalCats
+              )}
             </span>
           </div>
           <div
@@ -744,11 +752,13 @@ export default function AppSidebar({
             }}
             data-testid="sidebar-resource-count"
           >
-            {navError && totalResources === 0
-              ? "Catalog unavailable"
-              : isLoading || totalResources === 0
-                ? "Loading…"
-                : `${totalResources.toLocaleString()} resources`}
+            {navError && totalResources === 0 ? (
+              "Catalog unavailable"
+            ) : isLoading || totalResources === 0 ? (
+              <Skeleton className="h-3 w-24 rounded" />
+            ) : (
+              `${totalResources.toLocaleString()} resources`
+            )}
           </div>
         </div>
 
@@ -762,13 +772,10 @@ export default function AppSidebar({
                   style={{ padding: "13px 18px" }}
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className="size-5 rounded animate-pulse"
-                      style={{ background: "var(--surface-2)" }}
-                    />
-                    <div
-                      className="h-3 flex-1 rounded animate-pulse"
-                      style={{ background: "var(--surface-2)" }}
+                    <Skeleton className="size-5 rounded" />
+                    <Skeleton
+                      className="h-3 rounded"
+                      style={{ width: `${55 + ((i * 17) % 30)}%` }}
                     />
                   </div>
                 </div>

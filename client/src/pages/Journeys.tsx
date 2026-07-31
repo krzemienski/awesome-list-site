@@ -1,3 +1,4 @@
+import { JourneyCardSkeleton } from "@/components/ui/skeletons";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
@@ -105,7 +106,7 @@ export default function Journeys() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array(6).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-80" />
+            <JourneyCardSkeleton key={i} />
           ))}
         </div>
       </div>

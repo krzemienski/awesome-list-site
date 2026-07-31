@@ -1,7 +1,7 @@
+import { ResourceCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -248,11 +248,10 @@ export default function SubSubcategory() {
         <SEOHead title="Loading sub-subcategory" description="Loading sub-subcategory resources on Awesome Video." />
         <h1 className="sr-only">Loading sub-subcategory…</h1>
         <div className="space-y-4">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-6 w-48" />
+          <PageHeaderSkeleton />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full" />
+              <ResourceCardSkeleton key={i} />
             ))}
           </div>
         </div>

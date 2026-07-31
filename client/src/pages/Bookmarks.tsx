@@ -1,8 +1,8 @@
+import { ResourceCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bookmark, BookmarkX } from "lucide-react";
 import ResourceCard from "@/components/resource/ResourceCard";
-import { Skeleton } from "@/components/ui/skeleton";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -94,11 +94,10 @@ export default function Bookmarks() {
           noindex
         />
         <div className="space-y-4">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-6 w-96" />
+          <PageHeaderSkeleton />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-48 w-full" />
+              <ResourceCardSkeleton key={i} />
             ))}
           </div>
         </div>
