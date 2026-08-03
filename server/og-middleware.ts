@@ -26,6 +26,8 @@ import {
   renderStaticPageContent,
   renderSearchContent,
   renderCategoriesContent,
+  flattenListingResources,
+  LISTING_PAGE_SIZE,
 } from "./seo-content";
 import { buildRelatedResources } from "./services/relatedResources";
 
@@ -664,6 +666,18 @@ function homeShellChrome(): string {
                 action: "/submit",
                 heading: "Submit a resource",
                 submitLabel: "Submit resource",
+                // BUG-008 (audit 2): no-JS users saw a live-looking form whose
+                // POST the server swallowed with a silent 200. Render it
+                // read-only with the SAME sign-in prompt the logged-out React
+                // UI shows (SubmitResource.tsx alert-login-required copy), so
+                // the no-JS page tells the truth: sign in first. Crafted POSTs
+                // now get a 405 from the method guard in server/index.ts.
+                readOnly: {
+                  notice: "The form below is read-only. Please",
+                  signInHref: "/login?next=%2Fsubmit",
+                  signInLabel: "log in",
+                  signInSuffix: " to submit a resource.",
+                },
                 fields: [
                   {
                     name: "title",
@@ -777,20 +791,39 @@ function homeShellChrome(): string {
       });
     } else if (path === "/search") {
       // BUG-002: render real SSR search results for ?q= (still noindex).
+      // BUG-007 (audit 2): EXACT client parity — the hydrated Search page calls
+      // /api/resources?search=q&page=N&limit=24 and renders the response's
+      // `total` (LOCKSTEP: client/src/pages/Search.tsx PAGE_SIZE = 24). The old
+      // SSR ignored ?page, capped at limit:50, and reported the capped slice
+      // length as the count, so curl and browser disagreed on size, count, AND
+      // first item. Same storage call + same page/limit ⇒ same ordering and
+      // totals in both passes. /search stays noindex, so out-of-range pages
+      // clamp to the last page exactly like the client UI (no 404 needed).
       // audit2 BUG-019: normalize exactly like the API matcher so quote-/
       // whitespace-/control-only queries render the explicit "enter a search
       // term" prompt instead of catalog rows, and the SSR heading always
       // shows the query that was actually matched.
       const q = normalizeSearchQuery(parseQueryParam(url));
       let results: { id: number; title: string; description?: string }[] = [];
+      let total = 0;
+      let sPage = parsePage(url);
+      let sTotalPages = 1;
       if (q) {
         try {
-          const { resources } = await storage.listResources({
-            page: 1,
-            limit: 50,
-            status: "approved",
-            search: q,
-          });
+          const fetchPage = (p: number) =>
+            storage.listResources({
+              page: p,
+              limit: LISTING_PAGE_SIZE,
+              status: "approved",
+              search: q,
+            });
+          let { resources, total: t } = await fetchPage(sPage);
+          sTotalPages = Math.max(1, Math.ceil(t / LISTING_PAGE_SIZE));
+          if ((resources ?? []).length === 0 && t > 0 && sPage > sTotalPages) {
+            sPage = sTotalPages;
+            ({ resources, total: t } = await fetchPage(sPage));
+          }
+          total = t;
           results = (resources ?? []).map((r: any) => ({
             id: r.id,
             title: r.title,
@@ -798,7 +831,13 @@ function homeShellChrome(): string {
           }));
         } catch {}
       }
-      bodyHtml = renderSearchContent({ query: q, results });
+      bodyHtml = renderSearchContent({
+        query: q,
+        results,
+        total,
+        page: sPage,
+        totalPages: sTotalPages,
+      });
     } else if (path === "/categories") {
       // BUG-007: overview page listing every top-level category with its count.
       let cats: { name: string; slug: string; count: number }[] = [];
@@ -867,22 +906,30 @@ function homeShellChrome(): string {
           }),
           breadcrumbSchema(found.crumbs),
         ];
-        // BUG-001: fetch all approved resources for this category, not just the
-        // truncated tree slice (getTreeCached caps a node's resources array).
-        let allCategoryResources: any[] = [];
-        try {
-          const { resources } = await storage.listResources({
-            status: "approved",
-            category: found.name,
-            limit: 100000,
-          });
-          allCategoryResources = resources ?? [];
-        } catch (e) {
-          allCategoryResources = found.node?.resources ?? [];
-        }
-        console.log(
-          `[SSR category] ${found.name}: SSR payload size=${allCategoryResources.length} resources`,
+        // BUG-007 (audit 2): the SSR list must mirror the hydrated client page
+        // EXACTLY — same source (the deduped tree that /api/awesome-list serves
+        // to the client), same flatten order, same 24-per-page slice — so curl
+        // and the browser show the same count and first item with no
+        // post-hydration reflow. (The old BUG-001 listResources() fetch used a
+        // different ordering and 100/page; its "truncated tree slice" rationale
+        // was stale — the tree builder has no per-node caps.)
+        // LOCKSTEP: client/src/pages/Category.tsx treeResources memo.
+        const flat = flattenListingResources(found.node, "category");
+        const totalPages = Math.max(
+          1,
+          Math.ceil(flat.length / LISTING_PAGE_SIZE),
         );
+        // BUG-027 (audit 2): an out-of-range ?page is a real 404 — never a
+        // silent clamp serving page-1 duplicate content on infinite URLs.
+        if (page > totalPages) {
+          return { meta: notFoundMeta(path), found: false };
+        }
+        // BUG-012 (audit 2): page 2+ self-canonicalizes (?page=N) instead of
+        // pointing at page 1, so paginated listings are indexable; the sitemap
+        // lists the same ?page=N URLs (routes.ts) — indexable set == sitemap.
+        if (page > 1) {
+          m.url = abs(`${path}?page=${page}`);
+        }
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
@@ -893,7 +940,7 @@ function homeShellChrome(): string {
             slug: s.slug,
             count: countNodeResources(s),
           })),
-          resources: allCategoryResources.map((r: any) => ({
+          resources: flat.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
@@ -932,22 +979,23 @@ function homeShellChrome(): string {
           }),
           breadcrumbSchema(found.crumbs),
         ];
-        // BUG-001: fetch all approved resources for this subcategory, not just
-        // the truncated tree slice.
-        let allSubResources: any[] = [];
-        try {
-          const { resources } = await storage.listResources({
-            status: "approved",
-            subcategory: found.name,
-            limit: 100000,
-          });
-          allSubResources = resources ?? [];
-        } catch (e) {
-          allSubResources = found.node?.resources ?? [];
-        }
-        console.log(
-          `[SSR subcategory] ${found.name}: SSR payload size=${allSubResources.length} resources`,
+        // BUG-007 (audit 2): mirror the hydrated client page exactly — same
+        // tree source, same flatten order, same 24-per-page slice (the old
+        // BUG-001 listResources fetch ordered differently at 100/page).
+        // LOCKSTEP: client/src/pages/Subcategory.tsx staticResources.
+        const flat = flattenListingResources(found.node, "subcategory");
+        const totalPages = Math.max(
+          1,
+          Math.ceil(flat.length / LISTING_PAGE_SIZE),
         );
+        // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
+        if (page > totalPages) {
+          return { meta: notFoundMeta(path), found: false };
+        }
+        // BUG-012 (audit 2): page 2+ self-canonicalizes (see category branch).
+        if (page > 1) {
+          m.url = abs(`${path}?page=${page}`);
+        }
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
@@ -958,7 +1006,7 @@ function homeShellChrome(): string {
             slug: s.slug,
             count: countNodeResources(s),
           })),
-          resources: allSubResources.map((r: any) => ({
+          resources: flat.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
@@ -1002,36 +1050,29 @@ function homeShellChrome(): string {
           }),
           breadcrumbSchema(found.crumbs),
         ];
-        // BUG-001: fetch all approved resources for this sub-subcategory. The
-        // list API has no sub-subcategory filter, so fetch the full approved set
-        // for the parent category (crumb[1]) and filter by subSubcategory name.
-        let allSubSubResources: any[] = [];
-        try {
-          const parentCategory = found.crumbs[1]?.name;
-          const { resources } = await storage.listResources({
-            status: "approved",
-            category: parentCategory,
-            limit: 100000,
-          });
-          allSubSubResources = (resources ?? []).filter(
-            (r: any) => r.subSubcategory === found.name,
-          );
-          // Fall back to the tree slice if the category-scoped filter found
-          // nothing (e.g. taxonomy name drift) so the page never renders empty.
-          if (allSubSubResources.length === 0) {
-            allSubSubResources = found.node?.resources ?? [];
-          }
-        } catch (e) {
-          allSubSubResources = found.node?.resources ?? [];
-        }
-        console.log(
-          `[SSR sub-subcategory] ${found.name}: SSR payload size=${allSubSubResources.length} resources`,
+        // BUG-007 (audit 2): mirror the hydrated client page exactly — the
+        // node's own tree resources, 24 per page (the old BUG-001 fetch pulled
+        // the parent category's approved set at 100/page in a different order
+        // and filtered by name).
+        // LOCKSTEP: client/src/pages/SubSubcategory.tsx staticResources.
+        const flat = flattenListingResources(found.node, "sub-subcategory");
+        const totalPages = Math.max(
+          1,
+          Math.ceil(flat.length / LISTING_PAGE_SIZE),
         );
+        // BUG-027 (audit 2): out-of-range ?page → real 404, not a clamp.
+        if (page > totalPages) {
+          return { meta: notFoundMeta(path), found: false };
+        }
+        // BUG-012 (audit 2): page 2+ self-canonicalizes (see category branch).
+        if (page > 1) {
+          m.url = abs(`${path}?page=${page}`);
+        }
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
           crumbs: found.crumbs,
-          resources: allSubSubResources.map((r: any) => ({
+          resources: flat.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
@@ -1051,7 +1092,11 @@ function homeShellChrome(): string {
   const resMatch = path.match(/^\/resource\/([^\/]+)$/);
   if (resMatch) {
     const raw = safeDecode(resMatch[1]);
-    const idNum = Number(raw);
+    // BUG-033 (audit 2) defense in depth: only the canonical all-digits form
+    // resolves. Number("+184847") parses fine, so the old check served a 200
+    // duplicate for the "+"-prefixed shape; any non-canonical variant that
+    // slips past the middleware normalizer (which 301s it) soft-404s here.
+    const idNum = /^\d+$/.test(raw) ? parseInt(raw, 10) : NaN;
     if (Number.isInteger(idNum) && idNum > 0) {
       try {
         const resource = await storage.getResource(idNum);
@@ -1172,7 +1217,9 @@ function homeShellChrome(): string {
   const jMatch = path.match(/^\/journey\/([^\/]+)$/);
   if (jMatch) {
     const raw = safeDecode(jMatch[1]);
-    const idNum = Number(raw);
+    // BUG-033 (audit 2): same strict all-digits rule as /resource/:id — a
+    // "+7"-style id must never render a 200 duplicate of /journey/7.
+    const idNum = /^\d+$/.test(raw) ? parseInt(raw, 10) : NaN;
     if (Number.isInteger(idNum) && idNum > 0) {
       try {
         const journey = await storage.getLearningJourney(idNum);
@@ -1525,6 +1572,57 @@ export function ogInjectionMiddleware() {
         // tree lookup failed — fall through to the resolver's fail-open path
       }
     }
+    // BUG-028 (audit 2): the same cross-level tolerance for the OTHER two
+    // taxonomy prefixes. /subcategory/ffmpeg (a shape the site itself linked
+    // historically) is really a sub-subcategory → 301 to the canonical level
+    // instead of hard-404ing; slugs that exist at no level still fall through
+    // to the resolver's 404.
+    const flatSubMatch = urlPath.match(/^\/subcategory\/([^\/]+)$/);
+    if (flatSubMatch) {
+      const maybeSlug = safeDecode(flatSubMatch[1]);
+      try {
+        const tree = await getTreeCached();
+        if (!findSubcategory(tree, maybeSlug)) {
+          if (findSubSubcategory(tree, maybeSlug)) {
+            return res.redirect(
+              301,
+              `/sub-subcategory/${encodeURIComponent(maybeSlug)}`,
+            );
+          }
+          if ((tree?.categories ?? []).some((c: any) => c.slug === maybeSlug)) {
+            return res.redirect(
+              301,
+              `/category/${encodeURIComponent(maybeSlug)}`,
+            );
+          }
+        }
+      } catch {
+        // tree lookup failed — fall through to the resolver's fail-open path
+      }
+    }
+    const flatSubSubMatch = urlPath.match(/^\/sub-subcategory\/([^\/]+)$/);
+    if (flatSubSubMatch) {
+      const maybeSlug = safeDecode(flatSubSubMatch[1]);
+      try {
+        const tree = await getTreeCached();
+        if (!findSubSubcategory(tree, maybeSlug)) {
+          if (findSubcategory(tree, maybeSlug)) {
+            return res.redirect(
+              301,
+              `/subcategory/${encodeURIComponent(maybeSlug)}`,
+            );
+          }
+          if ((tree?.categories ?? []).some((c: any) => c.slug === maybeSlug)) {
+            return res.redirect(
+              301,
+              `/category/${encodeURIComponent(maybeSlug)}`,
+            );
+          }
+        }
+      } catch {
+        // tree lookup failed — fall through to the resolver's fail-open path
+      }
+    }
     // /?q=term was silently rendering the homepage; 301 it to the real search
     // results page so search is a first-class, linkable route (VG-4).
     if (urlPath === "/") {
@@ -1598,18 +1696,24 @@ export function ogInjectionMiddleware() {
     // self-canonicalized the invalid variant (duplicate-content trap). 301
     // any segment that normalizes to a different plain integer; segments
     // that are not numeric at all still fall through to the soft-404 path.
+    // BUG-033 (audit 2): a leading "+" ("/resource/+184847") is the same
+    // class — Number("+184847") parses, so that shape alone served a 200
+    // duplicate while every sibling variant 301'd. The normalizer regex now
+    // admits an optional "+" (parseInt strips it), and /journey/:id gets the
+    // identical treatment (same duplicate-content class of route).
     {
-      const resIdMatch = urlPath.match(/^\/resource\/([^\/]+)$/);
-      if (resIdMatch) {
-        const rawSeg = resIdMatch[1];
+      const idPathMatch = urlPath.match(/^\/(resource|journey)\/([^\/]+)$/);
+      if (idPathMatch) {
+        const prefix = idPathMatch[1];
+        const rawSeg = idPathMatch[2];
         const cleaned = safeDecode(rawSeg).trim();
-        if (/^\d+$/.test(cleaned)) {
+        if (/^\+?\d+$/.test(cleaned)) {
           const normalized = String(parseInt(cleaned, 10));
           if (rawSeg !== normalized) {
             const qs2 = (req.originalUrl || req.url).split("?")[1];
             return res.redirect(
               301,
-              `/resource/${normalized}${qs2 ? `?${qs2}` : ""}`,
+              `/${prefix}/${normalized}${qs2 ? `?${qs2}` : ""}`,
             );
           }
         }
@@ -1646,21 +1750,53 @@ export function ogInjectionMiddleware() {
       }
     }
 
+    // BUG-027 (audit 2): honest ?page= handling on the three taxonomy listing
+    // prefixes. An explicit ?page=1 duplicates the param-less canonical → 301
+    // (other params preserved); a malformed page value (0, -1, abc, 2.5, 1e3,
+    // 007 …) is a real 404, never a silent clamp onto page 1's content.
+    // Out-of-range pages 404 inside the resolver, which knows totalPages.
+    // /search keeps the client's clamp behaviour on purpose (noindex), and
+    // every other route ignores ?page entirely.
+    let forcedNotFound = false;
+    if (/^\/(?:category|subcategory|sub-subcategory)\/[^\/]+$/.test(urlPath)) {
+      const qs = (req.originalUrl || req.url).split("?")[1] || "";
+      const params = new URLSearchParams(qs);
+      const rawPage = params.get("page");
+      if (rawPage !== null) {
+        if (rawPage === "1") {
+          params.delete("page");
+          const rest = params.toString();
+          return res.redirect(301, `${urlPath}${rest ? `?${rest}` : ""}`);
+        }
+        if (!/^[1-9]\d*$/.test(rawPage)) {
+          forcedNotFound = true;
+        }
+      }
+    }
+
     let meta: RouteMeta;
     let notFound = false;
     let bodyHtml: string | undefined;
-    try {
-      // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
-      // render search results; resolveRoute keys its cache on path + page.
-      const resolved = await resolveRoute(req.originalUrl || req.url);
-      meta = resolved.meta;
-      notFound = !resolved.found;
-      bodyHtml = resolved.bodyHtml;
-    } catch (e) {
-      console.warn("[og-middleware] meta lookup failed for", urlPath, e);
-      // Fail open: never demote a real page to 404 on a transient lookup error.
-      meta = defaultMeta(urlPath);
-      notFound = false;
+    if (forcedNotFound) {
+      // Malformed ?page short-circuits the resolver entirely so the junk URL
+      // never lands in META_CACHE (parsePage would collapse it onto the
+      // page-1 cache key) and gets the standard soft-404 + noindex treatment.
+      meta = notFoundMeta(urlPath);
+      notFound = true;
+    } else {
+      try {
+        // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
+        // render search results; resolveRoute keys its cache on path + page.
+        const resolved = await resolveRoute(req.originalUrl || req.url);
+        meta = resolved.meta;
+        notFound = !resolved.found;
+        bodyHtml = resolved.bodyHtml;
+      } catch (e) {
+        console.warn("[og-middleware] meta lookup failed for", urlPath, e);
+        // Fail open: never demote a real page to 404 on a transient lookup error.
+        meta = defaultMeta(urlPath);
+        notFound = false;
+      }
     }
 
     // Wrap res.end / res.write to capture HTML and rewrite it.

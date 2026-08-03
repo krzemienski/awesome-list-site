@@ -108,6 +108,13 @@ import { parseAgentConfigFromRequest, stripJobAuthSecret } from "./ai/agentRunti
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import { SITE_URL, resolveOgImageMeta } from "./og-middleware";
+// BUG-012 (audit 2): the sitemap's paginated-URL counts must use the exact
+// flatten + page size the SSR renderer and client use (indexable == sitemap).
+import {
+  flattenListingResources,
+  LISTING_PAGE_SIZE,
+  type ListingLevel,
+} from "./seo-content";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -226,16 +233,47 @@ async function generateSitemap(_req: any, res: any) {
     const resourceIdsOf = (node: any): number[] =>
       (node?.resources ?? []).map((r: any) => Number(r.id)).filter((n: number) => Number.isFinite(n));
 
+    // BUG-012 (audit 2): paginated listing URLs (?page=2..N) are indexable —
+    // each self-canonicalizes in og-middleware — so the sitemap must list
+    // them too (indexable set == sitemap set). Page counts use THE SAME
+    // flatten + dedupe + page size as the SSR renderer and the client
+    // (seo-content.ts flattenListingResources / LISTING_PAGE_SIZE), so the
+    // sitemap never lists a page the resolver would 404. Slugs can repeat
+    // across parents (R3-05) and the resolver always resolves the FIRST tree
+    // match — `firstSeen` keeps a later same-slug node from contributing
+    // deeper page numbers than the resolved node actually has.
+    const addListingPages = (
+      basePath: string,
+      node: any,
+      level: ListingLevel,
+      changefreq: string,
+    ) => {
+      const totalPages = Math.ceil(
+        flattenListingResources(node, level).length / LISTING_PAGE_SIZE,
+      );
+      for (let p = 2; p <= totalPages; p++) {
+        addUrl(`${basePath}?page=${p}`, changefreq, '0.4');
+      }
+    };
     awesomeListData?.categories?.forEach(category => {
-      addUrl(`/category/${category.slug}`, 'weekly', '0.7');
+      const catBase = `/category/${category.slug}`;
+      const catFirstSeen = !seenLocs.has(catBase);
+      addUrl(catBase, 'weekly', '0.7');
+      if (catFirstSeen) addListingPages(catBase, category, 'category', 'weekly');
       category.subcategories?.forEach(subcategory => {
-        addUrl(`/subcategory/${subcategory.slug}`, 'weekly', '0.6');
+        const subBase = `/subcategory/${subcategory.slug}`;
+        const subFirstSeen = !seenLocs.has(subBase);
+        addUrl(subBase, 'weekly', '0.6');
+        if (subFirstSeen) addListingPages(subBase, subcategory, 'subcategory', 'weekly');
         subcategory.subSubcategories?.forEach(subSubcategory => {
           // BUG-053 (run14): an empty sub-subcategory renders "No resources
           // found" and has no inbound link from its parent page — keep such
           // orphans OUT of the sitemap (sitemap set == reachable content set).
           if (resourceIdsOf(subSubcategory).length === 0) return;
-          addUrl(`/sub-subcategory/${subSubcategory.slug}`, 'weekly', '0.5');
+          const ssBase = `/sub-subcategory/${subSubcategory.slug}`;
+          const ssFirstSeen = !seenLocs.has(ssBase);
+          addUrl(ssBase, 'weekly', '0.5');
+          if (ssFirstSeen) addListingPages(ssBase, subSubcategory, 'sub-subcategory', 'weekly');
         });
       });
     });

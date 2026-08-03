@@ -306,6 +306,24 @@ app.use((req, res, next) => {
   // Centralized error handling middleware
   app.use(errorHandler);
 
+  // BUG-026 (audit 2): non-GET/HEAD requests to page routes (/, /privacy,
+  // /submit …) used to fall through to the SPA catch-all and return 200 with
+  // the HTML shell — silently "accepting" writes (the no-JS submit trap,
+  // BUG-008) and answering OPTIONS 204 as if writes were negotiable. Page
+  // routes serve documents only: anything but GET/HEAD is an explicit 405
+  // with an Allow header. Mounted AFTER registerRoutes, so every real
+  // handler (API, auth callbacks, any method) already had its chance — this
+  // only catches methods nothing claimed; /api is skipped anyway so unknown
+  // API paths keep their JSON 404s instead of turning into 405s.
+  app.use((req, res, next) => {
+    if (req.method === "GET" || req.method === "HEAD") return next();
+    if (req.path.startsWith("/api")) return next();
+    res.setHeader("Allow", "GET, HEAD");
+    return res.status(405).json({
+      message: "Method Not Allowed. This route only serves GET and HEAD requests.",
+    });
+  });
+
   // Per-route Open Graph / Twitter / SEO metadata injection.
   // Must run AFTER registerRoutes (so /api/* and /og-image.png are handled by
   // their real handlers, not intercepted) but BEFORE vite/static so the HTML

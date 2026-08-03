@@ -288,6 +288,9 @@ export default function Subcategory() {
         description={`Browse ${allResources.length} curated ${subcategoryName.toLowerCase()} resources in the ${categoryName} category on Awesome Video.`}
         category={subcategoryName}
         resourceCount={allResources.length}
+        // BUG-012 (audit 2): page 2+ self-canonicalizes (?page=N), mirroring
+        // og-middleware's paginated canonical (two-pass parity).
+        pageParam={currentPage}
       />
 
       {/* BUG-030 (run13): the app header already renders this exact crumb

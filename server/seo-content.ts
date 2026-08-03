@@ -114,30 +114,97 @@ function linkList(items: LinkItem[], external = false): string {
   return `<ul class="ssr-list">${lis}</ul>`;
 }
 
-// Resource links listed per taxonomy page. Large taxonomy nodes are paginated
-// via ?page=N (BUG-001/004/010) so every resource is reachable, not just the
-// first 100. The canonical URL always points at page 1 (set in og-middleware).
-const PAGE_SIZE = 100;
+// Resource links listed per taxonomy page, paginated via ?page=N so every
+// resource is reachable (BUG-001/004/010). BUG-007 (audit 2): the SSR page
+// size MUST equal the client's page size so the crawl pass and the hydrated
+// page render the same slice (same count, same first item, no reflow).
+// LOCKSTEP: client/src/pages/Category.tsx, Subcategory.tsx, SubSubcategory.tsx
+// and Search.tsx all declare PAGE_SIZE = 24. Paginated URLs self-canonicalize
+// (?page=N — set in og-middleware) and the sitemap lists them (routes.ts
+// generateSitemap), keeping the indexable set equal to the sitemap set.
+export const LISTING_PAGE_SIZE = 24;
+const PAGE_SIZE = LISTING_PAGE_SIZE;
 
-// Prev / "Page X of Y" / Next navigation with ?page=N links. Rendered only when
-// a basePath is supplied and there is more than one page.
-function pagination(
-  basePath: string | undefined,
+// BUG-007 (audit 2): ONE flatten order shared by the SSR taxonomy renderer
+// (og-middleware) and the sitemap's per-node page counts (routes.ts), mirroring
+// the client exactly. LOCKSTEP: client/src/pages/Category.tsx (treeResources
+// memo), Subcategory.tsx / SubSubcategory.tsx (staticResources): order is the
+// node's direct resources, then each subcategory's resources followed by that
+// subcategory's sub-subcategories' resources; dedupe key is `id|url`.
+export type ListingLevel = "category" | "subcategory" | "sub-subcategory";
+export function flattenListingResources(node: any, level: ListingLevel): any[] {
+  const flat: any[] =
+    level === "category"
+      ? [
+          ...(node?.resources ?? []),
+          ...((node?.subcategories ?? []) as any[]).flatMap((sub: any) => [
+            ...(sub?.resources ?? []),
+            ...((sub?.subSubcategories ?? []) as any[]).flatMap(
+              (ss: any) => ss?.resources ?? [],
+            ),
+          ]),
+        ]
+      : level === "subcategory"
+        ? [
+            ...(node?.resources ?? []),
+            ...((node?.subSubcategories ?? []) as any[]).flatMap(
+              (ss: any) => ss?.resources ?? [],
+            ),
+          ]
+        : [...(node?.resources ?? [])];
+  const seen = new Set<string>();
+  const out: any[] = [];
+  for (const r of flat) {
+    const key = `${r?.id ?? ""}|${r?.url ?? ""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(r);
+  }
+  return out;
+}
+
+// Prev / numbered page links / Next navigation. Rendered only when there is
+// more than one page. BUG-012 (audit 2): every page is a followable <a href>
+// (current page is a non-link span), so crawlers reach any page in one hop
+// instead of walking a rel=next chain — page 2+ URLs are indexable
+// (self-canonical) and listed in the sitemap.
+function paginationWithHref(
+  href: (p: number) => string,
   page: number,
   totalPages: number,
 ): string {
-  if (!basePath || totalPages <= 1) return "";
-  const href = (p: number) =>
-    internalHref(p <= 1 ? basePath : `${basePath}?page=${p}`);
+  if (totalPages <= 1) return "";
   const parts: string[] = [];
   if (page > 1)
     parts.push(`<a href="${href(page - 1)}" rel="prev">← Previous</a>`);
+  const nums: string[] = [];
+  for (let p = 1; p <= totalPages; p++) {
+    nums.push(
+      p === page
+        ? `<span class="ssr-page" aria-current="page">${p}</span>`
+        : `<a href="${href(p)}">${p}</a>`,
+    );
+  }
+  parts.push(`<span class="ssr-pages">${nums.join(" ")}</span>`);
   parts.push(`<span class="ssr-page">Page ${page} of ${totalPages}</span>`);
   if (page < totalPages)
     parts.push(`<a href="${href(page + 1)}" rel="next">Next →</a>`);
   return `<nav class="ssr-pagination" aria-label="Pagination">${parts.join(
     '<span class="ssr-sep">·</span>',
   )}</nav>`;
+}
+
+function pagination(
+  basePath: string | undefined,
+  page: number,
+  totalPages: number,
+): string {
+  if (!basePath) return "";
+  return paginationWithHref(
+    (p: number) => internalHref(p <= 1 ? basePath : `${basePath}?page=${p}`),
+    page,
+    totalPages,
+  );
 }
 
 export interface TaxoNode {
@@ -222,6 +289,16 @@ export function renderTaxonomyContent(opts: {
 export function renderSearchContent(opts: {
   query: string;
   results: { id: number; title: string; description?: string }[];
+  /**
+   * BUG-007 (audit 2): the REAL total from the same query the client's
+   * /api/resources?search=…&limit=24 call runs — not the length of the
+   * rendered slice (the old code reported the capped slice length as the
+   * result count). page/totalPages drive a query-preserving paginator so
+   * ?page=N is honored exactly like the hydrated client page.
+   */
+  total?: number;
+  page?: number;
+  totalPages?: number;
 }): string {
   const q = String(opts.query ?? "").trim();
   const heading = q ? `Search results for “${escapeHtml(q)}”` : "Search";
@@ -230,12 +307,24 @@ export function renderSearchContent(opts: {
     label: r.title,
     desc: snippet(r.description),
   }));
+  const total = opts.total ?? links.length;
+  const page = opts.page ?? 1;
+  const totalPages = opts.totalPages ?? 1;
+  // ?q= is preserved in every page link (a page link that dropped the query
+  // would land on the empty search page). internalHref escapes for HTML.
+  const searchHref = (p: number) =>
+    internalHref(
+      p <= 1
+        ? `/search?q=${encodeURIComponent(q)}`
+        : `/search?q=${encodeURIComponent(q)}&page=${p}`,
+    );
+  const pager = q ? paginationWithHref(searchHref, page, totalPages) : "";
   const body = !q
     ? `<p class="ssr-lead">Enter a search term to find curated video development resources.</p>`
     : links.length
-      ? `<p class="ssr-lead">${count(links.length)} result${
-          links.length === 1 ? "" : "s"
-        } for “${escapeHtml(q)}”.</p><h2>Results</h2>${linkList(links)}`
+      ? `<p class="ssr-lead">${count(total)} result${
+          total === 1 ? "" : "s"
+        } for “${escapeHtml(q)}”.</p><h2>Results</h2>${linkList(links)}${pager}`
       : `<p class="ssr-lead">No results found for “${escapeHtml(
           q,
         )}”. Try a different term or browse the categories below.</p>`;
@@ -345,6 +434,20 @@ export function renderStaticPageContent(opts: {
     action: string;
     heading?: string;
     submitLabel: string;
+    /**
+     * BUG-008 (audit 2): when set, the form renders read-only — fields inside
+     * a <fieldset disabled>, NO action/method and NO submit control — plus a
+     * sign-in prompt mirroring the logged-out React UI ("The form below is
+     * read-only. Please log in…"). A no-JS visitor is never invited into a
+     * POST that would be silently swallowed; crafted POSTs to page routes now
+     * get an explicit 405 from the method guard in server/index.ts.
+     */
+    readOnly?: {
+      notice: string;
+      signInHref: string;
+      signInLabel: string;
+      signInSuffix?: string;
+    };
     fields: {
       name: string;
       label: string;
@@ -384,10 +487,10 @@ export function renderStaticPageContent(opts: {
   // BUG-015: emit a real <form> so non-JS crawlers see the submission fields
   // (labels, inputs, select) rather than an empty SPA shell. The client
   // hydrates its own interactive form over this markup.
-  const formHtml = opts.form
-    ? `<h2>${escapeHtml(opts.form.heading ?? "Submit a resource")}</h2>` +
-      `<form class="ssr-form" action="${escapeHtml(opts.form.action)}" method="post">` +
-      opts.form.fields
+  const form = opts.form;
+  const formFieldsHtml = !form
+    ? ""
+    : form.fields
         .map((f) => {
           const id = `ssr-${f.name}`;
           const req = f.required ? " required" : "";
@@ -403,10 +506,28 @@ export function renderStaticPageContent(opts: {
           }
           return `<p>${label}<input id="${id}" name="${escapeHtml(f.name)}" type="${escapeHtml(f.type ?? "text")}" placeholder="${escapeHtml(f.placeholder ?? "")}"${req} /></p>`;
         })
-        .join("") +
-      `<p><button type="submit">${escapeHtml(opts.form.submitLabel)}</button></p>` +
-      `</form>`
-    : "";
+        .join("");
+  const formHtml = !form
+    ? ""
+    : form.readOnly
+      ? // BUG-008 (audit 2): read-only rendering — fieldset[disabled], no
+        // action/method, no submit control. The fields stay readable for
+        // crawlers, but a no-JS visitor cannot POST into the void; the notice
+        // + sign-in link mirror the logged-out React UI copy exactly.
+        `<h2>${escapeHtml(form.heading ?? "Submit a resource")}</h2>` +
+        `<p class="ssr-form-notice">${escapeHtml(form.readOnly.notice)} <a href="${internalHref(
+          form.readOnly.signInHref,
+        )}">${escapeHtml(form.readOnly.signInLabel)}</a>${escapeHtml(
+          form.readOnly.signInSuffix ?? ".",
+        )}</p>` +
+        `<form class="ssr-form" aria-disabled="true"><fieldset disabled>` +
+        formFieldsHtml +
+        `</fieldset></form>`
+      : `<h2>${escapeHtml(form.heading ?? "Submit a resource")}</h2>` +
+        `<form class="ssr-form" action="${escapeHtml(form.action)}" method="post">` +
+        formFieldsHtml +
+        `<p><button type="submit">${escapeHtml(form.submitLabel)}</button></p>` +
+        `</form>`;
   return shell(
     `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +

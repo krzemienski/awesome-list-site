@@ -10,6 +10,13 @@ interface SEOHeadProps {
   title?: string;
   description?: string;
   url?: string;
+  /**
+   * BUG-012 (audit 2): 1-based page number for paginated listing routes. When
+   * ≥ 2 (and no explicit `url` override), the canonical + og:url append
+   * ?page=N so page 2+ self-canonicalizes exactly like the server's
+   * og-middleware pass (two-pass parity). Page 1 stays the clean base URL.
+   */
+  pageParam?: number;
   image?: string;
   awesomeList?: AwesomeList;
   category?: string;
@@ -53,6 +60,7 @@ export default function SEOHead({
   title,
   description,
   url,
+  pageParam,
   image,
   awesomeList,
   category,
@@ -81,10 +89,21 @@ export default function SEOHead({
   // NOTE: window.location.pathname never includes the query string, so faceted
   // taxonomy pages (search/sort/tag params pushed via replaceState) always
   // canonicalize back to the clean base route — matching the server's behaviour.
+  // BUG-012 (audit 2): pagination is the ONE deliberate exception — listing
+  // pages pass pageParam so ?page=N (N ≥ 2) self-canonicalizes on both the
+  // crawl pass (og-middleware) and the render pass, instead of folding ~80%
+  // of listing pages onto page 1.
+  const pagedSuffix =
+    !url &&
+    typeof pageParam === "number" &&
+    Number.isInteger(pageParam) &&
+    pageParam > 1
+      ? `?page=${pageParam}`
+      : "";
   const currentUrl =
     url ||
     (typeof window !== 'undefined'
-      ? `${CANONICAL_BASE}${window.location.pathname}`
+      ? `${CANONICAL_BASE}${window.location.pathname}${pagedSuffix}`
       : CANONICAL_BASE);
 
   // siteTitle always resolves to the real brand ("Awesome Video") unless an

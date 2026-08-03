@@ -297,6 +297,9 @@ export default function SubSubcategory() {
         description={`Browse ${allResources.length} curated ${subSubcategoryName.toLowerCase()} resources in the ${subcategoryName} category on Awesome Video.`}
         category={subSubcategoryName}
         resourceCount={allResources.length}
+        // BUG-012 (audit 2): page 2+ self-canonicalizes (?page=N), mirroring
+        // og-middleware's paginated canonical (two-pass parity).
+        pageParam={currentPage}
       />
       
       <div className="space-y-3 sm:space-y-4">
