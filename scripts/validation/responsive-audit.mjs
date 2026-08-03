@@ -288,6 +288,86 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
   }
 }
 
+// ---- Task 253: mobile drawer keyboard trap guard ----
+// Guards the two silent focus-trap breakers fixed in task #245:
+// (1) onOpenAutoFocus targeting a hidden zero-size link (trap never engages,
+//     Tab walks the aria-hidden background), and
+// (2) SidebarMenuButton tooltip mount/unmount on focus/blur tripping Radix
+//     FocusScope's MutationObserver (Tab ping-pongs between the sheet
+//     container and the first control — nav links unreachable).
+// Opens the drawer at 375px, walks >=10 Tabs, and asserts BOTH zero focus
+// escapes AND a growing count of unique focus stops ("0 escapes" alone passes
+// when focus is stuck in a 2-element cycle). Then asserts Escape closes the
+// drawer and returns focus to the hamburger trigger.
+{
+  const kbPage = await ctx.newPage();
+  try {
+    await kbPage.setViewportSize({ width: 375, height: 812 });
+    await kbPage.goto(`${BASE}/`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+    await kbPage.waitForTimeout(800);
+    const trigger = kbPage.locator('button[data-sidebar="trigger"]').first();
+    const trigOk = await trigger.waitFor({ state: 'visible', timeout: 15000 }).then(() => true).catch(() => false);
+    if (!trigOk) {
+      log('drawer-trap-open@375', false, 'hamburger trigger not visible at 375px');
+    } else {
+      await trigger.click();
+      const SHEET = '[data-sidebar="sidebar"][data-mobile="true"][data-state="open"]';
+      const opened = await kbPage.waitForSelector(SHEET, { timeout: 10000 }).then(() => true).catch(() => false);
+      log('drawer-trap-open@375', opened, opened ? 'mobile drawer opened' : 'drawer did not open after trigger click');
+      if (opened) {
+        // Let the open animation + autofocus settle before sampling focus.
+        await kbPage.waitForTimeout(600);
+        const initial = await kbPage.evaluate((sel) => {
+          const sheet = document.querySelector(sel);
+          const ae = document.activeElement;
+          return {
+            inside: !!(sheet && ae && ae !== document.body && sheet.contains(ae)),
+            tag: ae ? `${ae.tagName.toLowerCase()}${ae.getAttribute('data-testid') ? `[${ae.getAttribute('data-testid')}]` : ''}` : 'none',
+          };
+        }, SHEET);
+        log('drawer-trap-autofocus@375', initial.inside, `initial focus=${initial.tag} insideSheet=${initial.inside}`);
+
+        const TABS = 12;
+        const stops = [];
+        let escapes = 0;
+        for (let i = 0; i < TABS; i++) {
+          await kbPage.keyboard.press('Tab');
+          await kbPage.waitForTimeout(120);
+          const s = await kbPage.evaluate((sel) => {
+            const sheet = document.querySelector(sel);
+            const ae = document.activeElement;
+            if (!ae || ae === document.body) return { inside: false, id: 'body' };
+            const id = `${ae.tagName.toLowerCase()}#${ae.id || ''}@${ae.getAttribute('href') || ae.getAttribute('data-testid') || (ae.textContent || '').trim().slice(0, 30)}`;
+            return { inside: !!(sheet && sheet.contains(ae)), id };
+          }, SHEET);
+          if (!s.inside) escapes++;
+          stops.push(s.id);
+        }
+        const unique = new Set(stops).size;
+        // Trap engaged + no 2-element ping-pong: require zero escapes and at
+        // least 4 distinct stops across 12 Tabs (a stuck container<->link
+        // cycle yields exactly 2; a healthy drawer has close btn + many links).
+        const walkPass = escapes === 0 && unique >= 4;
+        log('drawer-trap-walk@375', walkPass, `tabs=${TABS} escapes=${escapes} uniqueStops=${unique} stops=[${[...new Set(stops)].slice(0, 6).join(' | ')}...]`);
+        if (!walkPass) await kbPage.screenshot({ path: `${OUT}/drawer-trap-walk.png` }).catch(() => {});
+
+        // Escape closes the drawer and returns focus to the trigger.
+        await kbPage.keyboard.press('Escape');
+        const closed = await kbPage.waitForFunction((sel) => !document.querySelector(sel), SHEET, { timeout: 8000 }).then(() => true).catch(() => false);
+        await kbPage.waitForTimeout(400); // onCloseAutoFocus re-resolves the live trigger
+        const focusBack = await kbPage.evaluate(() => {
+          const ae = document.activeElement;
+          return { onTrigger: !!(ae && ae.getAttribute && ae.getAttribute('data-sidebar') === 'trigger'), tag: ae ? ae.tagName.toLowerCase() + (ae.getAttribute('data-sidebar') ? `[data-sidebar=${ae.getAttribute('data-sidebar')}]` : '') : 'none' };
+        });
+        log('drawer-trap-escape@375', closed && focusBack.onTrigger, `closed=${closed} focusAfterClose=${focusBack.tag}`);
+        if (!(closed && focusBack.onTrigger)) await kbPage.screenshot({ path: `${OUT}/drawer-trap-escape.png` }).catch(() => {});
+      }
+    }
+  } finally {
+    await kbPage.close().catch(() => {});
+  }
+}
+
 fs.writeFileSync(`${OUT}/responsive-audit.json`, JSON.stringify(results, null, 2));
 const fails = results.filter(x => !x.pass);
 console.log(`\nTOTAL ${results.length}, FAIL ${fails.length} (evidence: ${OUT})`);
