@@ -22,6 +22,11 @@ interface CommunityMetricsProps {
   resources: Resource[];
   categories: Category[];
   className?: string;
+  // audit2 BUG-036: optionally controlled inner sub-tab so /advanced can
+  // deep-link it via ?tab=metrics&sub=…; uncontrolled fallback keeps any
+  // other caller working unchanged.
+  subTab?: string;
+  onSubTabChange?: (value: string) => void;
 }
 
 interface ContributorMetric {
@@ -56,7 +61,7 @@ interface CategoryMetric {
   completeness: number;
 }
 
-export default function CommunityMetrics({ resources, categories, className }: CommunityMetricsProps) {
+export default function CommunityMetrics({ resources, categories, className, subTab, onSubTabChange }: CommunityMetricsProps) {
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
 
   // Load tracking data from localStorage for real engagement metrics
@@ -229,7 +234,12 @@ export default function CommunityMetrics({ resources, categories, className }: C
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="overview" className="space-y-4">
+          <Tabs
+            value={subTab}
+            defaultValue="overview"
+            onValueChange={onSubTabChange}
+            className="space-y-4"
+          >
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="contributors">Contributors</TabsTrigger>

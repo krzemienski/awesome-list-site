@@ -11,6 +11,8 @@ import AdvancedFilter from "@/components/ui/advanced-filter";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
 import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
+import { Paginator } from "@/components/ui/paginator";
+import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { ArrowLeft, Search } from "lucide-react";
 import { deslugify } from "@/lib/utils";
@@ -41,9 +43,33 @@ export default function SubSubcategory() {
   );
   const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
-  const [page, setPage] = useState(() => {
-    const p = parseInt(getSearchParams().get("page") || "1", 10);
-    return Number.isFinite(p) && p > 0 ? p : 1;
+  // audit2 BUG-022/BUG-023/BUG-027: the shared STRICT taxonomy URL rule
+  // (shared/page-param.ts) — the same verdict og-middleware soft-404s on, so
+  // non-canonical spellings ("1e3", "007", "abc") and underflow ("0") fall
+  // back to page 1 WITH a visible notice instead of a silent rewrite (or,
+  // worse, rendering content the crawler pass denies with a 404).
+  const [pageInit] = useState(() => parsePageParamStrict(getSearchParams().get("page")));
+  const [page, setPage] = useState(pageInit.page);
+  const [pageNotice, setPageNotice] = useState<string | null>(() => pageNoticeFor(pageInit));
+  // True while a URL-supplied in-range page still awaits the data-loaded
+  // over-range check; user-driven page changes never re-arm it.
+  const urlPagePendingRef = useRef(pageInit.kind === "valid");
+
+  // Any user-driven filter change resets to page 1 and retires a stale
+  // page-correction notice.
+  const resetPage = () => {
+    setPage(1);
+    setPageNotice(null);
+    urlPagePendingRef.current = false;
+  };
+
+  // audit2 BUG-030: ?filter=general (and the legacy ?view=general alias) has
+  // no bucket to select at this LEAF level — every resource here belongs to
+  // this sub-subcategory. Instead of a silent no-op, keep the param and
+  // explain via a notice; its Remove button drops it.
+  const [generalFilterNotice, setGeneralFilterNotice] = useState<boolean>(() => {
+    const p = getSearchParams();
+    return p.get("filter") === "general" || p.get("view") === "general";
   });
   // Run16 BUG-050: grid/list/compact toggle, shared preference key with
   // Category so the choice follows the user across taxonomy levels.
@@ -168,11 +194,39 @@ export default function SubSubcategory() {
     [filteredResources, currentPage],
   );
 
+  // Guarded on loaded + node found (NOT non-empty results): a zero-match
+  // filter has exactly one empty page, and ?page=2 on it must still correct
+  // visibly instead of lingering in the URL.
   useEffect(() => {
-    if (!isLoading && filteredResources.length > 0 && page > totalPages) {
-      setPage(totalPages);
+    if (!isLoading && currentSubSubcategory) {
+      if (page > totalPages) {
+        // audit2 BUG-023: when the out-of-range page came from the URL, say so
+        // instead of silently rewriting; user-driven shrinks stay silent.
+        if (urlPagePendingRef.current) {
+          setPageNotice(pageNoticeFor({ page, kind: "valid", raw: String(page) }, totalPages));
+        }
+        setPage(totalPages);
+      }
+      urlPagePendingRef.current = false;
     }
-  }, [isLoading, filteredResources.length, page, totalPages]);
+  }, [isLoading, currentSubSubcategory, page, totalPages]);
+
+  // audit2 BUG-032: numbered paginator helpers — real hrefs merge ?page=N into
+  // the current query (filters survive open-in-new-tab); plain SPA clicks go
+  // through goToPage so history semantics stay with the URL-sync effect.
+  const makePageHref = (n: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (n > 1) params.set("page", String(n));
+    else params.delete("page");
+    const qs = params.toString();
+    return `/sub-subcategory/${slug}${qs ? `?${qs}` : ""}`;
+  };
+  const goToPage = (n: number) => {
+    setPage(n);
+    setPageNotice(null);
+    urlPagePendingRef.current = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Run16 BUG-005: tag/sort changes PUSH history entries so Back restores the
   // previous list state; search keystrokes, initial normalization, and the
@@ -193,6 +247,9 @@ export default function SubSubcategory() {
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
     if (page > 1) params.set("page", String(page));
+    // audit2 BUG-030: keep the (ignored) general-filter param while its
+    // notice is up so the URL stays honest; dismissing the notice drops it.
+    if (generalFilterNotice) params.set("filter", "general");
     // Run22 BUG-026: persist an explicitly chosen layout view.
     if (viewParamExplicitRef.current) params.set("view", viewMode);
 
@@ -215,7 +272,7 @@ export default function SubSubcategory() {
     urlSyncInitializedRef.current = true;
     popNavigationRef.current = false;
     pushSnapshotRef.current = pushSnapshot;
-  }, [searchTerm, selectedTags, sortBy, page, slug, location, viewMode]);
+  }, [searchTerm, selectedTags, sortBy, page, slug, location, viewMode, generalFilterNotice]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -225,8 +282,16 @@ export default function SubSubcategory() {
       // BUG-064 (run27): same shared parser as the initializer.
       setSelectedTags(parseTagsParam(params));
       setSortBy(params.get("sortBy") || "default");
-      const p = parseInt(params.get("page") || "1", 10);
-      setPage(Number.isFinite(p) && p > 0 ? p : 1);
+      // audit2 BUG-022/023: same shared page rule as the initializer, with the
+      // same visible feedback when this history entry carries a bad value.
+      const parsed = parsePageParamStrict(params.get("page"));
+      setPage(parsed.page);
+      setPageNotice(pageNoticeFor(parsed));
+      urlPagePendingRef.current = parsed.kind === "valid";
+      // audit2 BUG-030: restore the leaf-level general-filter notice.
+      setGeneralFilterNotice(
+        params.get("filter") === "general" || params.get("view") === "general",
+      );
       // Run22 BUG-026: restore the layout view carried by this history entry.
       const v = params.get("view");
       if (isLayoutViewMode(v)) {
@@ -352,7 +417,7 @@ export default function SubSubcategory() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchTerm}
-          onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+          onChange={(e) => { setSearchTerm(e.target.value); resetPage(); }}
           placeholder="Search resources..."
           className="pl-9 min-h-[44px]"
           data-testid="input-search"
@@ -363,11 +428,53 @@ export default function SubSubcategory() {
         selectedTags={selectedTags}
         sortBy={sortBy}
         availableTags={availableTags}
-        onTagsChange={(tags) => { setSelectedTags(tags); setPage(1); }}
-        onSortChange={(value) => { setSortBy(value); setPage(1); }}
+        onTagsChange={(tags) => { setSelectedTags(tags); resetPage(); }}
+        onSortChange={(value) => { setSortBy(value); resetPage(); }}
         showCountSorts={false}
       />
       
+      {/* audit2 BUG-023: visible feedback whenever a URL-supplied page value
+          was corrected — never a silent rewrite. */}
+      {pageNotice && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-muted-foreground"
+          role="status"
+          data-testid="notice-page-adjusted"
+        >
+          <span>{pageNotice}</span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setPageNotice(null)}
+            data-testid="button-dismiss-page-notice"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* audit2 BUG-030: the general/uncategorized filter can't apply at this
+          leaf level — explain instead of silently ignoring the param. */}
+      {generalFilterNotice && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-muted-foreground"
+          role="status"
+          data-testid="notice-general-leaf"
+        >
+          <span>
+            “Uncategorized” filtering applies to categories and subcategories — {subSubcategoryName} is a single sub-subcategory, so all {filteredResources.length} resources are shown.
+          </span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setGeneralFilterNotice(false)}
+            data-testid="button-clear-general-filter"
+          >
+            Remove it
+          </button>
+        </div>
+      )}
+
       {allResources.length > 0 && (
         <div className="flex items-center justify-between gap-2">
           {/* NB-051 (run18): let the position label wrap at narrow widths instead
@@ -440,7 +547,7 @@ export default function SubSubcategory() {
                 }}
                 onTagClick={(tag) => {
                   setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
-                  setPage(1);
+                  resetPage();
                 }}
               />
             );
@@ -448,31 +555,13 @@ export default function SubSubcategory() {
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-6" data-testid="pagination-controls">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentPage <= 1}
-            onClick={() => setPage(currentPage - 1)}
-            data-testid="button-prev-page"
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-muted-foreground" data-testid="text-page-indicator">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentPage >= totalPages}
-            onClick={() => setPage(currentPage + 1)}
-            data-testid="button-next-page"
-          >
-            Next
-          </Button>
-        </div>
-      )}
+      {/* audit2 BUG-032: numbered pages + jump box — any page in ≤2 interactions. */}
+      <Paginator
+        currentPage={currentPage}
+        totalPages={totalPages}
+        makeHref={makePageHref}
+        onNavigate={goToPage}
+      />
     </div>
   );
 }

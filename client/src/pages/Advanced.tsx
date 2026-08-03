@@ -27,6 +27,9 @@ import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
 const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
+// audit2 BUG-036: inner sub-tabs of the Metrics panel, deep-linkable via
+// ?sub= (only meaningful alongside tab=metrics).
+const VALID_METRICS_SUBTABS = ["overview", "contributors", "popular", "categories"];
 
 export default function Advanced() {
   // BUG-038 (run14): ?tab= deep-links restore the selected tab, and switching
@@ -36,16 +39,37 @@ export default function Advanced() {
     const fromUrl = new URLSearchParams(window.location.search).get("tab");
     return fromUrl && VALID_ADVANCED_TABS.includes(fromUrl) ? fromUrl : "explorer";
   });
+  // audit2 BUG-036: /advanced?tab=metrics&sub=… restores the exact inner
+  // sub-tab after reload (it used to silently reset to Overview).
+  const [metricsSubTab, setMetricsSubTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sub = params.get("sub");
+    return params.get("tab") === "metrics" && sub && VALID_METRICS_SUBTABS.includes(sub)
+      ? sub
+      : "overview";
+  });
   const handleTabChange = (next: string) => {
     setTab(next);
+    // audit2 BUG-036: ?sub= only means anything on the Metrics tab — reset
+    // the inner selection and drop the param when the outer tab changes.
+    setMetricsSubTab("overview");
     // Run22 BUG-016: push (not replace) so Back steps through tab changes.
-    writeFilterParams({ tab: next === "explorer" ? null : next });
+    writeFilterParams({ tab: next === "explorer" ? null : next, sub: null });
+  };
+  const handleMetricsSubChange = (next: string) => {
+    setMetricsSubTab(next);
+    writeFilterParams({ sub: next === "overview" ? null : next });
   };
 
   // Run22 BUG-016: Back/Forward restore the tab from the URL.
   usePopstateParams((params) => {
     const fromUrl = params.get("tab");
     setTab(fromUrl && VALID_ADVANCED_TABS.includes(fromUrl) ? fromUrl : "explorer");
+    // audit2 BUG-036: restore the inner sub-tab carried by this history entry.
+    const sub = params.get("sub");
+    setMetricsSubTab(
+      fromUrl === "metrics" && sub && VALID_METRICS_SUBTABS.includes(sub) ? sub : "overview",
+    );
   });
 
   const [selectedResource, setSelectedResource] = useState<Resource | undefined>();
@@ -247,6 +271,8 @@ export default function Advanced() {
           <CommunityMetrics 
             resources={awesomeList.resources}
             categories={awesomeList.categories}
+            subTab={metricsSubTab}
+            onSubTabChange={handleMetricsSubChange}
           />
         </TabsContent>
 

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
+import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { MAINTAINER } from "@shared/about-content";
 import {
@@ -121,12 +122,15 @@ const META_CACHE = new Map<string, { value: ResolvedRoute; expires: number }>();
 const META_CACHE_TTL_MS = 60_000;
 const META_CACHE_MAX = 500;
 
-// Parse a 1-based ?page= param; anything not an integer > 1 collapses to page 1
-// so the cache key and rendered slice stay canonical.
+// Parse a 1-based ?page= param with the SAME numeric rule as the hydrated
+// client (shared/page-param.ts — "1e3" IS 1000, "1e20" caps at the int32
+// MAX_PAGE, junk is null) so the crawler pass and the client can never read
+// different page numbers out of one URL; anything ≤ 1 or unparseable
+// collapses to page 1 so the cache key and rendered slice stay canonical.
 function parsePage(url: string): number {
   const q = url.split("?")[1] || "";
-  const n = Number(new URLSearchParams(q).get("page"));
-  return Number.isInteger(n) && n > 1 ? n : 1;
+  const n = parsePageNumber(new URLSearchParams(q).get("page"));
+  return n != null && n > 1 ? n : 1;
 }
 
 // Parse and bound the ?q= search term (BUG-002). Capped so an attacker cannot
@@ -1752,11 +1756,14 @@ export function ogInjectionMiddleware() {
 
     // BUG-027 (audit 2): honest ?page= handling on the three taxonomy listing
     // prefixes. An explicit ?page=1 duplicates the param-less canonical → 301
-    // (other params preserved); a malformed page value (0, -1, abc, 2.5, 1e3,
-    // 007 …) is a real 404, never a silent clamp onto page 1's content.
+    // (other params preserved); anything the SHARED strict rule
+    // (shared/page-param.ts parseUrlPageStrict — the exact verdict the
+    // hydrated client renders as its invalid/clamped-to-1 notice) doesn't
+    // accept as a canonical page spelling (0, -1, abc, 2.5, 1e3, 007 …) is a
+    // real 404, never a silent clamp onto page 1's content.
     // Out-of-range pages 404 inside the resolver, which knows totalPages.
-    // /search keeps the client's clamp behaviour on purpose (noindex), and
-    // every other route ignores ?page entirely.
+    // /search keeps the client's clamp behaviour on purpose (noindex, lenient
+    // parsePageNumber on both passes), and every other route ignores ?page.
     let forcedNotFound = false;
     if (/^\/(?:category|subcategory|sub-subcategory)\/[^\/]+$/.test(urlPath)) {
       const qs = (req.originalUrl || req.url).split("?")[1] || "";
@@ -1768,7 +1775,7 @@ export function ogInjectionMiddleware() {
           const rest = params.toString();
           return res.redirect(301, `${urlPath}${rest ? `?${rest}` : ""}`);
         }
-        if (!/^[1-9]\d*$/.test(rawPage)) {
+        if (parseUrlPageStrict(rawPage).kind !== "page") {
           forcedNotFound = true;
         }
       }

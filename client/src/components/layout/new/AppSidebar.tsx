@@ -231,10 +231,14 @@ function CategoryAccordion({
   const directCount = cat.resources
     ? cat.resources.length
     : (cat.resourceCount ?? 0);
-  const generalPath = `${catPath}?view=general`;
+  // audit2 BUG-030: the canonical content-filter key is ?filter=general now
+  // (?view= carries layout only); the legacy ?view=general alias still
+  // counts as active so old links highlight correctly.
+  const generalPath = `${catPath}?filter=general`;
   const generalActive =
     activePath === catPath &&
-    new URLSearchParams(activeSearch).get("view") === "general";
+    (new URLSearchParams(activeSearch).get("filter") === "general" ||
+      new URLSearchParams(activeSearch).get("view") === "general");
 
   // approximate body height for max-height animation
   const expandedHeight = useMemo(() => {

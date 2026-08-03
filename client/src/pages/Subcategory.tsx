@@ -1,6 +1,6 @@
 import { ResourceCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams, Link, useLocation } from "wouter";
+import { useParams, Link, useLocation, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import AdvancedFilter from "@/components/ui/advanced-filter";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
 import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Paginator } from "@/components/ui/paginator";
+import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
@@ -27,9 +30,21 @@ const PAGE_SIZE = 24;
 
 export default function Subcategory() {
   const { slug } = useParams<{ slug: string }>();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const searchString = useSearch();
 
   const getSearchParams = () => new URLSearchParams(window.location.search);
+
+  // audit2 BUG-029/BUG-030: reactive content-filter params (parity with
+  // /category). ?subcategory=<name> drills into one sub-subcategory;
+  // ?filter=general (legacy alias ?view=general — accepted on arrival,
+  // normalized away by the URL-sync effect) shows only rows sitting directly
+  // on this subcategory node. ?view= itself is layout-only.
+  const arrivalParams = new URLSearchParams(searchString);
+  const isGeneralView =
+    arrivalParams.get("filter") === "general" ||
+    arrivalParams.get("view") === "general";
+  const [selectedChild, setSelectedChild] = useState<string>(() => getSearchParams().get("subcategory") || "all");
 
   // BUG-064 (run27): shared parser — canonical ?tags=, the ?tag= alias,
   // repeated params, comma lists, whitespace chunks all parse identically on
@@ -40,10 +55,25 @@ export default function Subcategory() {
   );
   const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
-  const [page, setPage] = useState(() => {
-    const p = parseInt(getSearchParams().get("page") || "1", 10);
-    return Number.isFinite(p) && p > 0 ? p : 1;
-  });
+  // audit2 BUG-022/BUG-023/BUG-027: the shared STRICT taxonomy URL rule
+  // (shared/page-param.ts) — the same verdict og-middleware soft-404s on, so
+  // non-canonical spellings ("1e3", "007", "abc") and underflow ("0") fall
+  // back to page 1 WITH a visible notice instead of a silent rewrite (or,
+  // worse, rendering content the crawler pass denies with a 404).
+  const [pageInit] = useState(() => parsePageParamStrict(getSearchParams().get("page")));
+  const [page, setPage] = useState(pageInit.page);
+  const [pageNotice, setPageNotice] = useState<string | null>(() => pageNoticeFor(pageInit));
+  // True while a URL-supplied in-range page still awaits the data-loaded
+  // over-range check; user-driven page changes never re-arm it.
+  const urlPagePendingRef = useRef(pageInit.kind === "valid");
+
+  // Any user-driven filter change resets to page 1 and retires a stale
+  // page-correction notice.
+  const resetPage = () => {
+    setPage(1);
+    setPageNotice(null);
+    urlPagePendingRef.current = false;
+  };
   // Run16 BUG-050: grid/list/compact toggle, shared preference key with
   // Category so the choice follows the user across taxonomy levels.
   // Run22 BUG-026: an explicit ?view=grid|list|compact wins over the saved
@@ -110,6 +140,52 @@ export default function Subcategory() {
     return normalized;
   }, [staticResources]);
 
+  // audit2 BUG-029: drill-down options over this subcategory's
+  // sub-subcategories — taxonomy TREE nodes with identity-match counts, the
+  // same rule /category uses (option label always equals result-set size).
+  const childOptions = useMemo(() => {
+    const opts: Array<{ value: string; count: number }> = [];
+    if (!currentSubcategory) return opts;
+    const subs = [...((((currentSubcategory as any).subSubcategories as any[]) || []))].sort(
+      (a: any, b: any) => String(a.name).localeCompare(String(b.name)),
+    );
+    for (const ss of subs) {
+      const count = allResources.filter((r) => r.subSubcategory === ss.name).length;
+      if (count > 0) opts.push({ value: ss.name, count });
+    }
+    return opts;
+  }, [currentSubcategory, allResources]);
+
+  const childByValue = useMemo(
+    () => new Map(childOptions.map((o) => [o.value, o])),
+    [childOptions],
+  );
+
+  // audit2 BUG-031 (level parity): the "Uncategorized" bucket is the identity
+  // set of rows sitting DIRECTLY on this subcategory node — the same set the
+  // sidebar's counts use — never `!r.subSubcategory`.
+  const generalIdentitySet = useMemo(() => {
+    const s = new Set<string>();
+    for (const r of (((currentSubcategory as any)?.resources as any[]) || [])) {
+      s.add(`${r.id ?? ""}|${r.url ?? ""}`);
+    }
+    return s;
+  }, [currentSubcategory]);
+
+  // Unknown deep-linked ?subcategory= value → ignored with an explicit notice
+  // (mirrors /category BUG-059) instead of a false empty state.
+  const childUnknown =
+    !isGeneralView &&
+    selectedChild !== "all" &&
+    selectedChild !== "__general__" &&
+    !!currentSubcategory &&
+    !childByValue.has(selectedChild);
+
+  // URL forced ?filter=general but every resource here sits under a
+  // sub-subcategory — ignore the filter and say so (never "0 of 0").
+  const generalFilterEmpty =
+    isGeneralView && !isLoading && !!currentSubcategory && generalIdentitySet.size === 0;
+
   const availableTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
     allResources.forEach((r) => {
@@ -136,6 +212,18 @@ export default function Subcategory() {
       );
     }
 
+    // audit2 BUG-029/030/031: level-consistent content filters (parity with
+    // /category) — drill into one sub-subcategory by node identity, or show
+    // the General bucket (rows directly on this node). An empty General set
+    // is ignored (notice renders instead — never a "0 of 0" dead-end).
+    if (isGeneralView) {
+      if (generalIdentitySet.size > 0) {
+        results = results.filter((r) => generalIdentitySet.has(`${r.id ?? ""}|${r.url ?? ""}`));
+      }
+    } else if (selectedChild !== "all" && !childUnknown && childByValue.has(selectedChild)) {
+      results = results.filter((r) => r.subSubcategory === selectedChild);
+    }
+
     if (selectedTags.length > 0) {
       // NB-011 (run23): case-insensitive tag matching — parity with
       // Home/Category, so ?tags=av1 and ?tags=AV1 return identical results.
@@ -152,7 +240,7 @@ export default function Subcategory() {
     }
 
     return results;
-  }, [allResources, searchTerm, selectedTags, sortBy]);
+  }, [allResources, searchTerm, selectedTags, sortBy, isGeneralView, generalIdentitySet, selectedChild, childUnknown, childByValue]);
 
   // ----- Client-side pagination (Run16 BUG-051, mirrors Category BUG-007) -----
   const totalPages = Math.max(1, Math.ceil(filteredResources.length / PAGE_SIZE));
@@ -162,11 +250,72 @@ export default function Subcategory() {
     [filteredResources, currentPage],
   );
 
+  // Guarded on loaded + node found (NOT non-empty results): a zero-match
+  // filter has exactly one empty page, and ?page=2 on it must still correct
+  // visibly instead of lingering in the URL.
   useEffect(() => {
-    if (!isLoading && filteredResources.length > 0 && page > totalPages) {
-      setPage(totalPages);
+    if (!isLoading && currentSubcategory) {
+      if (page > totalPages) {
+        // audit2 BUG-023: when the out-of-range page came from the URL, say so
+        // instead of silently rewriting; user-driven shrinks stay silent.
+        if (urlPagePendingRef.current) {
+          setPageNotice(pageNoticeFor({ page, kind: "valid", raw: String(page) }, totalPages));
+        }
+        setPage(totalPages);
+      }
+      urlPagePendingRef.current = false;
     }
-  }, [isLoading, filteredResources.length, page, totalPages]);
+  }, [isLoading, currentSubcategory, page, totalPages]);
+
+  // audit2 BUG-032: numbered paginator helpers — real hrefs merge ?page=N into
+  // the current query (filters survive open-in-new-tab); plain SPA clicks go
+  // through goToPage so history semantics stay with the URL-sync effect.
+  const makePageHref = (n: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (n > 1) params.set("page", String(n));
+    else params.delete("page");
+    const qs = params.toString();
+    return `/subcategory/${slug}${qs ? `?${qs}` : ""}`;
+  };
+  const goToPage = (n: number) => {
+    setPage(n);
+    setPageNotice(null);
+    urlPagePendingRef.current = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // audit2 BUG-029: the drill-down Select is also the way OUT of General view
+  // (URL-driven via ?filter=general) — navigating without the flag recomputes
+  // the reactive isGeneralView. "__general__" is the selected sentinel while
+  // in General view, so any other pick is a genuine change.
+  const handleChildChange = (value: string) => {
+    if (value === "__general__") {
+      if (isGeneralView) return; // already in General view
+      setSelectedChild("all");
+      resetPage();
+      const params = new URLSearchParams();
+      if (searchTerm.trim()) params.set("search", searchTerm);
+      if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
+      if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
+      // audit2 BUG-030: content filter key, decoupled from layout ?view=.
+      params.set("filter", "general");
+      if (viewParamExplicitRef.current) params.set("view", viewMode);
+      setLocation(`/subcategory/${slug}?${params.toString()}`);
+      return;
+    }
+    setSelectedChild(value);
+    resetPage();
+    if (isGeneralView) {
+      const params = new URLSearchParams();
+      if (searchTerm.trim()) params.set("search", searchTerm);
+      if (value && value !== "all") params.set("subcategory", value);
+      if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
+      if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
+      if (viewParamExplicitRef.current) params.set("view", viewMode);
+      const qs = params.toString();
+      setLocation(`/subcategory/${slug}${qs ? `?${qs}` : ""}`);
+    }
+  };
 
   // Run16 BUG-005: tag/sort changes PUSH history entries so Back restores the
   // previous list state; search keystrokes, initial normalization, and the
@@ -184,17 +333,22 @@ export default function Subcategory() {
 
     // BUG-060 (run27): drop ?search= when the box holds only whitespace.
     if (searchTerm.trim()) params.set("search", searchTerm);
+    // audit2 BUG-029: persist the sub-subcategory drill-down.
+    if (!isGeneralView && selectedChild && selectedChild !== "all") params.set("subcategory", selectedChild);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
     if (page > 1) params.set("page", String(page));
-    // Run22 BUG-026: persist an explicitly chosen layout view.
+    // audit2 BUG-030: canonical content-filter key (?filter=general); a legacy
+    // ?view=general arrival is normalized here. Independently (Run22 BUG-026)
+    // persist an explicitly chosen layout view — the two params coexist.
+    if (isGeneralView) params.set("filter", "general");
     if (viewParamExplicitRef.current) params.set("view", viewMode);
 
     const newSearch = params.toString();
     const newPath = `/subcategory/${slug}${newSearch ? `?${newSearch}` : ""}`;
     const currentPath = `${window.location.pathname}${window.location.search}`;
 
-    const pushSnapshot = JSON.stringify([page, selectedTags, sortBy, viewMode]);
+    const pushSnapshot = JSON.stringify([page, selectedChild, selectedTags, sortBy, isGeneralView, viewMode]);
     if (currentPath !== newPath) {
       const shouldPush =
         urlSyncInitializedRef.current &&
@@ -209,18 +363,24 @@ export default function Subcategory() {
     urlSyncInitializedRef.current = true;
     popNavigationRef.current = false;
     pushSnapshotRef.current = pushSnapshot;
-  }, [searchTerm, selectedTags, sortBy, page, slug, location, viewMode]);
+  }, [searchTerm, selectedChild, selectedTags, sortBy, page, slug, location, isGeneralView, viewMode]);
 
   useEffect(() => {
     const handlePopState = () => {
       popNavigationRef.current = true;
       const params = getSearchParams();
       setSearchTerm(params.get("search") || "");
+      // audit2 BUG-029: restore the drill-down carried by this history entry.
+      setSelectedChild(params.get("subcategory") || "all");
       // BUG-064 (run27): same shared parser as the initializer.
       setSelectedTags(parseTagsParam(params));
       setSortBy(params.get("sortBy") || "default");
-      const p = parseInt(params.get("page") || "1", 10);
-      setPage(Number.isFinite(p) && p > 0 ? p : 1);
+      // audit2 BUG-022/023: same shared page rule as the initializer, with the
+      // same visible feedback when this history entry carries a bad value.
+      const parsed = parsePageParamStrict(params.get("page"));
+      setPage(parsed.page);
+      setPageNotice(pageNoticeFor(parsed));
+      urlPagePendingRef.current = parsed.kind === "valid";
       // Run22 BUG-026: restore the layout view carried by this history entry.
       const v = params.get("view");
       if (isLayoutViewMode(v)) {
@@ -328,10 +488,36 @@ export default function Subcategory() {
               Category: {categoryName}
             </p>
           </div>
-          {/* Run22 BUG-025: badge tracks the active filter result count. */}
-          <Badge variant="secondary" className="no-print text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
-            {filteredResources.length}
-          </Badge>
+          <div className="flex items-center gap-3 shrink-0">
+            {/* audit2 BUG-029: drill-down filter over this subcategory's
+                sub-subcategories (parity with /category), driven by
+                ?subcategory= so deep links filter too. */}
+            {childOptions.length > 0 && (
+              <Select value={isGeneralView ? "__general__" : selectedChild} onValueChange={handleChildChange}>
+                <SelectTrigger aria-label="Filter by sub-subcategory" className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
+                  <SelectValue placeholder="Filter by sub-subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* Only when the bucket is non-empty (audit2 BUG-031) —
+                      kept listed while a URL forces the filter so the
+                      trigger stays honest. */}
+                  {(generalIdentitySet.size > 0 || isGeneralView) && (
+                    <SelectItem value="__general__">Uncategorized ({generalIdentitySet.size})</SelectItem>
+                  )}
+                  <SelectItem value="all">All Sub-subcategories</SelectItem>
+                  {childOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.value} ({opt.count})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {/* Run22 BUG-025: badge tracks the active filter result count. */}
+            <Badge variant="secondary" className="no-print text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
+              {filteredResources.length}
+            </Badge>
+          </div>
         </div>
       </div>
       
@@ -339,7 +525,7 @@ export default function Subcategory() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchTerm}
-          onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+          onChange={(e) => { setSearchTerm(e.target.value); resetPage(); }}
           placeholder="Search resources..."
           className="pl-9 min-h-[44px]"
           data-testid="input-search"
@@ -350,11 +536,74 @@ export default function Subcategory() {
         selectedTags={selectedTags}
         sortBy={sortBy}
         availableTags={availableTags}
-        onTagsChange={(tags) => { setSelectedTags(tags); setPage(1); }}
-        onSortChange={(value) => { setSortBy(value); setPage(1); }}
+        onTagsChange={(tags) => { setSelectedTags(tags); resetPage(); }}
+        onSortChange={(value) => { setSortBy(value); resetPage(); }}
         showCountSorts={false}
       />
       
+      {/* audit2 BUG-023: visible feedback whenever a URL-supplied page value
+          was corrected — never a silent rewrite. */}
+      {pageNotice && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-muted-foreground"
+          role="status"
+          data-testid="notice-page-adjusted"
+        >
+          <span>{pageNotice}</span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setPageNotice(null)}
+            data-testid="button-dismiss-page-notice"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* audit2 BUG-031: never dead-end the Uncategorized view. */}
+      {generalFilterEmpty && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-muted-foreground"
+          role="status"
+          data-testid="notice-general-empty"
+        >
+          <span>
+            {subcategoryName} has no uncategorized resources, so the filter was ignored and all {filteredResources.length} are shown.
+          </span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => handleChildChange("all")}
+            data-testid="button-clear-general-filter"
+          >
+            Remove filter
+          </button>
+        </div>
+      )}
+
+      {/* audit2 BUG-029: explicit feedback instead of a false empty state
+          when the URL named a sub-subcategory that doesn't exist here. */}
+      {childUnknown && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-muted-foreground"
+          role="status"
+          data-testid="notice-unknown-subcategory"
+        >
+          <span>
+            “{selectedChild}” isn't a sub-subcategory of {subcategoryName}, so that filter was ignored.
+          </span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setSelectedChild("all")}
+            data-testid="button-clear-unknown-subcategory"
+          >
+            Remove it
+          </button>
+        </div>
+      )}
+
       {allResources.length > 0 && (
         <div className="flex items-center justify-between gap-2">
           {/* NB-051 (run18): let the position label wrap at narrow widths instead
@@ -428,7 +677,7 @@ export default function Subcategory() {
                 }}
                 onTagClick={(tag) => {
                   setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
-                  setPage(1);
+                  resetPage();
                 }}
               />
             );
@@ -436,31 +685,13 @@ export default function Subcategory() {
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-6" data-testid="pagination-controls">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentPage <= 1}
-            onClick={() => setPage(currentPage - 1)}
-            data-testid="button-prev-page"
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-muted-foreground" data-testid="text-page-indicator">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={currentPage >= totalPages}
-            onClick={() => setPage(currentPage + 1)}
-            data-testid="button-next-page"
-          >
-            Next
-          </Button>
-        </div>
-      )}
+      {/* audit2 BUG-032: numbered pages + jump box — any page in ≤2 interactions. */}
+      <Paginator
+        currentPage={currentPage}
+        totalPages={totalPages}
+        makeHref={makePageHref}
+        onNavigate={goToPage}
+      />
     </div>
   );
 }

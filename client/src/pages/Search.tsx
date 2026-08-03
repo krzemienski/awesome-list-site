@@ -6,11 +6,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search as SearchIcon, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search as SearchIcon, AlertCircle } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import type { Resource as DbResource } from "@shared/schema";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
+import { Paginator } from "@/components/ui/paginator";
+import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
 
 export default function Search() {
   const searchString = useSearch();
@@ -32,17 +34,24 @@ export default function Search() {
   // card whose Try again replayed the same invalid request forever. Clamped
   // pages fetch a valid (possibly empty) page, then the existing snap-back
   // effect normalizes to the real last page and rewrites the URL.
-  const MAX_PAGE = 2147483647;
-  const parsePage = (search: string) => {
-    const raw = new URLSearchParams(search).get("page");
-    const n = raw ? parseInt(raw, 10) : 1;
-    if (!Number.isFinite(n) || n < 1) return 1;
-    return Math.min(n, MAX_PAGE);
-  };
+  // audit2 BUG-022/BUG-023: shared page rule (lib/page-param.ts) — Number()-
+  // based like the server, so ?page=1e3 means page 1000 on BOTH passes
+  // (parseInt used to stop at the "e" and read 1); invalid values fall back
+  // to page 1 WITH a visible notice; the int32 clamp (R5-043) lives in the
+  // shared parser now.
+  const parsePage = (search: string) => parsePageFromSearch(search).page;
 
   const [input, setInput] = useState(urlQuery);
   // R2-M11: client-side pagination over the fetched result set.
   const [page, setPage] = useState(() => parsePage(searchString));
+  // audit2 BUG-023: visible notice whenever a URL-supplied ?page= was
+  // corrected (invalid → 1, out-of-range → snapped to the last page).
+  const [pageNotice, setPageNotice] = useState<string | null>(() =>
+    pageNoticeFor(parsePageFromSearch(searchString)),
+  );
+  // True while a URL-supplied in-range page still awaits the over-range check
+  // against the fetched total; user-driven page changes never re-arm it.
+  const urlPagePendingRef = useRef(parsePageFromSearch(searchString).kind === "valid");
   const PAGE_SIZE = 24;
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -85,7 +94,15 @@ export default function Search() {
   // Back/forward navigation: adopt the URL's q and page.
   useEffect(() => {
     setInput(urlQuery);
-    setPage(parsePage(searchString));
+    const parsed = parsePageFromSearch(searchString);
+    setPage(parsed.page);
+    // audit2 BUG-023: surface (but never silently clear) URL-page feedback —
+    // this effect also runs after our own normalizing replaceState, which
+    // must not wipe the notice the user is reading. Clearing happens on user
+    // page navigation, a query change, or explicit dismissal.
+    const notice = pageNoticeFor(parsed);
+    if (notice) setPageNotice(notice);
+    urlPagePendingRef.current = parsed.kind === "valid";
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchString]);
 
@@ -130,19 +147,24 @@ export default function Search() {
   const rangeEnd = (safePage - 1) * PAGE_SIZE + results.length;
 
   // A URL-restored ?page= beyond the last page fetches an empty page —
-  // snap back to the real last page once the total is known.
+  // snap back to the real last page once the total is known, and SAY so
+  // (audit2 BUG-023) when the value came from the URL.
   useEffect(() => {
-    if (data && page > totalPages) {
-      setPage(totalPages);
+    if (data) {
+      if (page > totalPages) {
+        if (urlPagePendingRef.current) {
+          setPageNotice(pageNoticeFor({ page, kind: "valid", raw: String(page) }, totalPages));
+        }
+        setPage(totalPages);
+      }
+      urlPagePendingRef.current = false;
     }
   }, [data, page, totalPages]);
 
-  // Run15 BUG-048: direct page-jump input state. Mirrors safePage whenever
-  // the effective page changes; committed on Enter/blur.
-  const [pageJumpValue, setPageJumpValue] = useState(String(safePage));
-  useEffect(() => {
-    setPageJumpValue(String(safePage));
-  }, [safePage]);
+  // audit2 BUG-032: the numbered Paginator owns the jump input now, applying
+  // the shared parse rule with inline validation (BUG-022/BUG-033: "1e3" ≡
+  // "1000", 0/999 clamp into range, junk shows feedback — never a silent
+  // reset).
   // R5-017 (run24): user-initiated page changes PUSH a history entry so Back
   // steps page 3 → 2 → 1 instead of exiting the site. wouter patches
   // pushState, so the adoption effect above picks the change up; the
@@ -154,27 +176,19 @@ export default function Search() {
     const qs = params.toString();
     window.history.pushState(null, "", `/search${qs ? `?${qs}` : ""}`);
     setPage(n);
+    setPageNotice(null);
+    urlPagePendingRef.current = false;
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const commitPageJump = () => {
-    const n = parseInt(pageJumpValue, 10);
-    // BUG-033 (run27): 0/negative used to be silently swallowed (input reset,
-    // no feedback) while an out-of-range URL ?page= clamps. One policy for
-    // both surfaces now: clamp into [1, totalPages] and actually navigate —
-    // typing 0 lands on page 1, 999 lands on the last page, and the input +
-    // URL both reflect the clamped result (same normalization BUG-023's URL
-    // handling applies).
-    if (!Number.isFinite(n)) {
-      setPageJumpValue(String(safePage));
-      return;
-    }
-    const clamped = Math.min(Math.max(n, 1), totalPages);
-    if (clamped !== safePage) {
-      gotoPage(clamped);
-    } else {
-      setPageJumpValue(String(safePage));
-    }
+  // audit2 BUG-032: real hrefs for page links — ?page=N merged into the
+  // current query so open-in-new-tab keeps the search.
+  const makePageHref = (n: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (n > 1) params.set("page", String(n));
+    else params.delete("page");
+    const qs = params.toString();
+    return `/search${qs ? `?${qs}` : ""}`;
   };
 
   // New query → back to page 1. Ref-guarded so the mount run doesn't clobber
@@ -184,6 +198,9 @@ export default function Search() {
     if (prevTrimmed.current !== trimmed) {
       prevTrimmed.current = trimmed;
       setPage(1);
+      // A page notice about the previous query's range is stale now.
+      setPageNotice(null);
+      urlPagePendingRef.current = false;
     }
   }, [trimmed]);
 
@@ -256,6 +273,26 @@ export default function Search() {
           data-testid="input-search-page"
         />
       </div>
+
+      {/* audit2 BUG-023: visible feedback whenever a URL-supplied page value
+          was corrected — never a silent rewrite. */}
+      {pageNotice && trimmed.length >= 2 && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-muted-foreground"
+          role="status"
+          data-testid="notice-page-adjusted"
+        >
+          <span>{pageNotice}</span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setPageNotice(null)}
+            data-testid="button-dismiss-page-notice"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {trimmed.length === 0 ? (
         <Card>
@@ -369,52 +406,22 @@ export default function Search() {
               />
             ))}
           </div>
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3 pt-2" data-testid="search-pagination">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={safePage <= 1}
-                onClick={() => gotoPage(safePage - 1)}
-                data-testid="button-search-prev"
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
-              </Button>
-              {/* Run15 BUG-048: direct page jump for long result sets. */}
-              <span className="flex items-center gap-2 text-sm text-muted-foreground tabular-nums">
-                <label htmlFor="search-page-jump" className="sr-only">
-                  Go to page
-                </label>
-                <Input
-                  id="search-page-jump"
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={pageJumpValue}
-                  onChange={(e) => setPageJumpValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") commitPageJump();
-                  }}
-                  onBlur={commitPageJump}
-                  className="h-8 w-16 text-center"
-                  aria-label={`Page number, 1 to ${totalPages}`}
-                  data-testid="input-search-page-jump"
-                />
-                <span>/ {totalPages}</span>
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={safePage >= totalPages}
-                onClick={() => gotoPage(safePage + 1)}
-                data-testid="button-search-next"
-              >
-                Next
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </div>
-          )}
+          {/* audit2 BUG-032: numbered pages + jump box — any page in ≤2
+              interactions (page 30 used to take 29 Next clicks, tripping the
+              rate limiter). Legacy testids preserved for existing harnesses. */}
+          <Paginator
+            currentPage={safePage}
+            totalPages={totalPages}
+            makeHref={makePageHref}
+            onNavigate={gotoPage}
+            className="pt-2"
+            testIds={{
+              container: "search-pagination",
+              prev: "button-search-prev",
+              next: "button-search-next",
+              jump: "input-search-page-jump",
+            }}
+          />
         </>
       )}
     </div>
