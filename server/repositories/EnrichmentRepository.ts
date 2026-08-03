@@ -28,7 +28,7 @@ import {
   type InsertEnrichmentQueue,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, desc, asc } from "drizzle-orm";
+import { eq, and, desc, asc, inArray, sql } from "drizzle-orm";
 
 /**
  * Repository class for enrichment-related database operations
@@ -45,6 +45,34 @@ export class EnrichmentRepository {
       .values(data)
       .returning();
     return job;
+  }
+
+  /**
+   * BUG-047 (run25): admit at most ONE active enrichment job, atomically.
+   * Concurrent start requests serialize on a transaction-scoped advisory
+   * lock, so the second request sees the first's committed row and gets a
+   * distinctive ENRICHMENT_JOB_ACTIVE error. The active-status query is
+   * unbounded (no recency window) — an old stuck pending/processing row
+   * must still block new admissions until it is cancelled/failed.
+   */
+  async createEnrichmentJobExclusive(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
+    return await db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext('enrichment_job_admission'))`);
+      const [active] = await tx
+        .select({ id: enrichmentJobs.id, status: enrichmentJobs.status })
+        .from(enrichmentJobs)
+        .where(inArray(enrichmentJobs.status, ["pending", "processing"]))
+        .limit(1);
+      if (active) {
+        const err: any = new Error(
+          `Enrichment job #${active.id} is already ${active.status}. Wait for it to finish or cancel it before starting a new one.`
+        );
+        err.code = "ENRICHMENT_JOB_ACTIVE";
+        throw err;
+      }
+      const [job] = await tx.insert(enrichmentJobs).values(data).returning();
+      return job;
+    });
   }
 
   /**
@@ -87,6 +115,28 @@ export class EnrichmentRepository {
       .where(eq(enrichmentJobs.id, id))
       .returning();
     return job;
+  }
+
+  /**
+   * BUG-047 (run25): initialize an admitted job (totals/token fields) and
+   * enqueue its resources in ONE transaction, so a mid-initialization failure
+   * can never leave a half-enqueued job. Queue rows are batch-inserted in
+   * chunks instead of one round trip per resource.
+   */
+  async initializeEnrichmentJob(
+    jobId: number,
+    data: Partial<EnrichmentJob>,
+    queueItems: InsertEnrichmentQueue[]
+  ): Promise<void> {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(enrichmentJobs)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(enrichmentJobs.id, jobId));
+      for (let i = 0; i < queueItems.length; i += 500) {
+        await tx.insert(enrichmentQueue).values(queueItems.slice(i, i + 500));
+      }
+    });
   }
 
   /**

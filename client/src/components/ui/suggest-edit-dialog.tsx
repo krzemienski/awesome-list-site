@@ -39,15 +39,19 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
 import type { Resource } from "@shared/schema";
+import { hasVisibleChars } from "@shared/validation";
 
 // BUG-024 (run14): the HTTPS rule applies to NEW urls only. Legacy resources
 // whose canonical URL is still http:// (their https twin is broken — see the
 // http-recheck journal) pre-fill the form with that value; an unchanged URL
 // must never block an edit to other fields.
 const makeSuggestEditSchema = (originalUrl: string) => z.object({
+  // BUG-012 (run25): zero-width/invisible-only values must fail CLIENT-side
+  // too (the server already 400s them via resourceTitleSchema).
   title: z.string()
     .min(1, "Title is required")
-    .max(200, "Title must be 200 characters or less"),
+    .max(200, "Title must be 200 characters or less")
+    .refine(hasVisibleChars, "Title must contain visible characters"),
   url: z.string()
     .url("Please enter a valid URL")
     .refine((url) => url === originalUrl || url.startsWith("https://"), {
@@ -58,7 +62,8 @@ const makeSuggestEditSchema = (originalUrl: string) => z.object({
     // surface the misleading minimum-length message.
     .min(1, "Description is required")
     .min(10, "Description must be at least 10 characters")
-    .max(1000, "Description must be 1000 characters or less"),
+    .max(1000, "Description must be 1000 characters or less")
+    .refine(hasVisibleChars, "Description must contain visible characters"),
   category: z.string().min(1, "Please select a category"),
   subcategory: z.string().optional(),
   subSubcategory: z.string().optional(),

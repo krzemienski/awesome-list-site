@@ -171,14 +171,23 @@ export class EnrichmentService {
     let resourcesToEnrich = resources;
 
     if (filter === 'unenriched') {
+      // BUG-015 (run25): this predicate must match the coverage banner
+      // (GET /api/admin/enrichment/coverage counts resources with NO tags).
+      // The old "aiEnriched flag + empty description" test found 0 of the
+      // advertised 2,780 untagged resources.
       resourcesToEnrich = resources.filter(resource => {
-        const metadata = resource.metadata || {};
-        return !metadata.aiEnriched &&
-               (!resource.description || resource.description.trim() === '');
+        const metadata = (resource.metadata || {}) as Record<string, any>;
+        const tags = metadata.tags;
+        return !(Array.isArray(tags) && tags.length > 0);
       });
     }
 
-    const job = await this.enrichmentRepo.createEnrichmentJob({
+    // BUG-047 (run25): one enrichment run at a time — a double-click or a
+    // second admin used to silently queue a concurrent job over the same
+    // resource set (duplicate spend, racing writes). Admission is atomic
+    // (advisory-locked transaction in the repository), so simultaneous
+    // requests cannot both pass a read-before-insert check.
+    const job = await this.enrichmentRepo.createEnrichmentJobExclusive({
       filter,
       batchSize,
       startedBy: startedBy || undefined,
@@ -186,19 +195,35 @@ export class EnrichmentService {
       baseUrl: options.baseUrl || undefined,
     });
 
-    await this.enrichmentRepo.updateEnrichmentJob(job.id, {
-      totalResources: resourcesToEnrich.length,
-      status: 'pending',
-      authTokenEncrypted: options.authTokenEncrypted || null,
-      authTokenLast4: options.authTokenLast4 || null,
-    });
-
-    for (const resource of resourcesToEnrich) {
-      await this.enrichmentRepo.createEnrichmentQueueItem({
-        jobId: job.id,
-        resourceId: resource.id,
-        status: 'pending'
-      });
+    // Initialization is one transaction, and any failure marks the admitted
+    // job failed before rethrowing — a job stuck in 'pending' would otherwise
+    // block every future start under the single-active-job guard.
+    try {
+      await this.enrichmentRepo.initializeEnrichmentJob(
+        job.id,
+        {
+          totalResources: resourcesToEnrich.length,
+          status: 'pending',
+          authTokenEncrypted: options.authTokenEncrypted || null,
+          authTokenLast4: options.authTokenLast4 || null,
+        },
+        resourcesToEnrich.map((resource) => ({
+          jobId: job.id,
+          resourceId: resource.id,
+          status: 'pending' as const,
+        }))
+      );
+    } catch (initError: any) {
+      try {
+        await this.enrichmentRepo.updateEnrichmentJob(job.id, {
+          status: 'failed',
+          errorMessage: `Failed to initialize job: ${initError.message}`,
+          completedAt: new Date(),
+        });
+      } catch (cleanupError) {
+        console.error(`Failed to mark job ${job.id} failed after init error:`, cleanupError);
+      }
+      throw initError;
     }
 
     this.startProcessing(job.id).catch(error => {
@@ -263,8 +288,16 @@ export class EnrichmentService {
       console.error(`Error processing job ${jobId}:`, error);
       const cur = await this.enrichmentRepo.getEnrichmentJob(jobId);
       agentLog.push({ role: 'error', content: `Job failed: ${error.message}`, timestamp: new Date().toISOString() });
+      // BUG-013 (run25): status must reflect the work, not just the exception.
+      // A run that already processed its whole target (all successes) and then
+      // hit an error during wrap-up is 'completed' (errorMessage retained);
+      // only runs with unfinished/failed work are 'failed'.
+      const total = cur?.totalResources || 0;
+      const processed = cur?.processedResources || 0;
+      const failedItems = cur?.failedResources || 0;
+      const finishedAllWork = total > 0 && processed >= total && failedItems === 0 && (cur?.successfulResources || 0) > 0;
       await this.enrichmentRepo.updateEnrichmentJob(jobId, {
-        status: 'failed',
+        status: finishedAllWork ? 'completed' : 'failed',
         errorMessage: error.message,
         completedAt: new Date(),
         metadata: this.buildJobMetadata(cur, cur?.model || DEFAULT_ENRICHMENT_MODEL, totals, agentLog),

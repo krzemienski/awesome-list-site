@@ -237,10 +237,13 @@ export default function BatchEnrichmentPanel() {
     }
   };
 
+  // BUG-013 (run25): the rate's denominator must match the DISPLAYED processed
+  // count (clamped below) — mixing raw and clamped figures produced
+  // contradictions like "31/49 ok" beside "32 / 32 processed".
   const calculateSuccessRate = (job: EnrichmentJob) => {
-    const total = job.processedResources || 0;
+    const total = displayProcessed(job);
     if (total === 0) return 0;
-    return Math.round(((job.successfulResources || 0) / total) * 100);
+    return Math.round((Math.min(job.successfulResources || 0, total) / total) * 100);
   };
 
   const calculateProgress = (job: EnrichmentJob) => {
@@ -681,7 +684,7 @@ export default function BatchEnrichmentPanel() {
                             calculateSuccessRate(job) >= 70 ? 'border-yellow-500 text-yellow-500' :
                             'border-red-500 text-red-500'
                           }>
-                            {job.successfulResources || 0}/{job.processedResources || 0} ok ({calculateSuccessRate(job)}%)
+                            {Math.min(job.successfulResources || 0, displayProcessed(job))}/{displayProcessed(job)} ok ({calculateSuccessRate(job)}%)
                           </Badge>
                         )}
                       </TableCell>
@@ -700,6 +703,14 @@ export default function BatchEnrichmentPanel() {
                   ))}
                 </TableBody>
               </Table>
+              {/* BUG-013 (run25): say what the numbers mean so "failed" +
+                  "10/10 ok (100%)" can't read as a contradiction. */}
+              <p className="text-[11px] text-muted-foreground mt-2" data-testid="text-enrichment-legend">
+                Processed = resources attempted out of the job's target. Success
+                rate = successful ÷ processed (not ÷ target). A job marked
+                failed with successes means the run stopped on an error after
+                those resources were enriched — open View Details for the error.
+              </p>
             </div>
           )}
         </CardContent>

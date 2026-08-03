@@ -27,7 +27,11 @@
 import { CategoryRepository } from './CategoryRepository';
 
 function generateSlug(name: string): string {
+  // BUG-055 (run25): transliterate diacritics instead of deleting them so
+  // "Vídeo" slugs to "video", matching the client-side slugify.
   return name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')

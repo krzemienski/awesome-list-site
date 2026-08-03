@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 // Run15 BUG-030: one explicit date format for the whole admin surface —
 // shared formatter keeps every admin table's timestamps identical.
 import { formatAdminDateTime as formatSyncDate } from "@/lib/utils";
+import { normalizeGithubRepoInput } from "@shared/validation";
 
 interface SyncHistory {
   id: number;
@@ -52,6 +53,11 @@ export default function GitHubSyncPanel() {
   // commit — both need an explicit confirmation step before firing.
   const [confirmAction, setConfirmAction] = useState<"import" | "export" | null>(null);
 
+  // BUG-042 (run25): validate the repo reference BEFORE queueing a sync job —
+  // "not a repo!!" used to be accepted and fail minutes later in the queue.
+  const normalizedRepo = normalizeGithubRepoInput(repoUrl);
+  const repoInvalid = repoUrl.trim().length > 0 && !normalizedRepo;
+
   const { data: syncHistory } = useQuery<SyncHistory[]>({
     queryKey: ['/api/github/sync-history'],
   });
@@ -65,7 +71,7 @@ export default function GitHubSyncPanel() {
       return await apiRequest('/api/github/import', {
         method: 'POST',
         body: JSON.stringify({
-          repositoryUrl: repoUrl,
+          repositoryUrl: normalizedRepo ?? repoUrl,
           options: { forceOverwrite: false }
         })
       });
@@ -92,7 +98,7 @@ export default function GitHubSyncPanel() {
       return await apiRequest('/api/github/export', {
         method: 'POST',
         body: JSON.stringify({
-          repositoryUrl: repoUrl,
+          repositoryUrl: normalizedRepo ?? repoUrl,
           options: { createPullRequest: false }
         })
       });
@@ -172,7 +178,9 @@ export default function GitHubSyncPanel() {
                 placeholder="owner/repository"
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
-                className="font-mono text-sm"
+                className={`font-mono text-sm ${repoInvalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                aria-invalid={repoInvalid}
+                aria-describedby={repoInvalid ? "repo-url-error" : undefined}
                 data-testid="input-repo-url"
               />
               <Button
@@ -185,9 +193,15 @@ export default function GitHubSyncPanel() {
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Format: owner/repository (e.g., krzemienski/awesome-video)
-            </p>
+            {repoInvalid ? (
+              <p id="repo-url-error" className="text-xs text-destructive" role="alert" data-testid="text-repo-url-error">
+                Not a valid repository. Use owner/repository (e.g., krzemienski/awesome-video) or a github.com URL.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Format: owner/repository (e.g., krzemienski/awesome-video)
+              </p>
+            )}
           </div>
 
           <Separator />
@@ -203,7 +217,7 @@ export default function GitHubSyncPanel() {
               </p>
               <Button
                 onClick={() => setConfirmAction("import")}
-                disabled={importMutation.isPending || !repoUrl}
+                disabled={importMutation.isPending || !normalizedRepo}
                 className="w-full"
                 data-testid="button-import-github"
               >
@@ -231,7 +245,7 @@ export default function GitHubSyncPanel() {
               </p>
               <Button
                 onClick={() => setConfirmAction("export")}
-                disabled={exportMutation.isPending || !repoUrl}
+                disabled={exportMutation.isPending || !normalizedRepo}
                 className="w-full"
                 data-testid="button-export-github"
               >

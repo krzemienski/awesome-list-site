@@ -160,6 +160,47 @@ export function isPlausiblePublicUrl(raw: string): boolean {
   }
 }
 
+// ---------------------------------------------------------------------------
+// GitHub repository identifiers (BUG-042 run25)
+// ---------------------------------------------------------------------------
+
+/** GitHub login: 1-39 alphanumerics, hyphens allowed but not leading/trailing/doubled. */
+const GITHUB_OWNER_RE = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
+/** GitHub repo name: word chars, dots, hyphens (no spaces, no "!!"). */
+const GITHUB_REPO_RE = /^[A-Za-z0-9._-]{1,100}$/;
+
+/**
+ * Normalize a GitHub repository reference to canonical "owner/repo".
+ * Accepts "owner/repo", "https://github.com/owner/repo(.git)", or
+ * "git@github.com:owner/repo(.git)". Returns null for anything else —
+ * "not a repo!!" must be rejected BEFORE a sync job is queued, not fail
+ * minutes later inside the job.
+ */
+export function normalizeGithubRepoInput(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  let value = raw.trim();
+  if (!value || /\s/.test(value)) return null;
+  const sshMatch = value.match(/^git@github\.com:(.+)$/i);
+  if (sshMatch) {
+    value = sshMatch[1];
+  } else if (/^https?:\/\//i.test(value)) {
+    try {
+      const u = new URL(value);
+      if (!/^(www\.)?github\.com$/i.test(u.hostname)) return null;
+      value = u.pathname.replace(/^\/+/, "");
+    } catch {
+      return null;
+    }
+  }
+  const parts = value.split("/").filter(Boolean);
+  if (parts.length !== 2) return null;
+  const owner = parts[0];
+  const repo = parts[1].replace(/\.git$/i, "");
+  if (!GITHUB_OWNER_RE.test(owner)) return null;
+  if (!GITHUB_REPO_RE.test(repo) || repo === "." || repo === "..") return null;
+  return `${owner}/${repo}`;
+}
+
 /** R4-076: https://user:pass@host smuggles credentials into the catalog. */
 export function urlHasUserinfo(raw: string): boolean {
   try {

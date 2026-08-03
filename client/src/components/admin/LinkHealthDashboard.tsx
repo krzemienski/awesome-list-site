@@ -82,6 +82,15 @@ export default function LinkHealthDashboard() {
     refetchOnWindowFocus: true,
   });
 
+  // BUG-014 (run25): current approved-catalog size, used to state the check's
+  // honest scope (a completed job's totalLinks snapshots the catalog at check
+  // start and goes stale as the catalog grows).
+  const { data: coverageData } = useQuery<{ approvedTotal: number }>({
+    queryKey: ['/api/admin/enrichment/coverage'],
+    staleTime: 60_000,
+  });
+  const approvedTotal = coverageData?.approvedTotal;
+
   const runCheckMutation = useMutation({
     mutationFn: async (): Promise<unknown> => {
       return await apiRequest('/api/admin/link-health/run', {
@@ -291,6 +300,18 @@ export default function LinkHealthDashboard() {
               {isJobInProgress && lastCompletedJob && (
                 <p className="text-xs text-muted-foreground" data-testid="text-summary-last-completed">
                   Showing results from the last completed check ({formatAdminDateTime(lastCompletedJob.createdAt)}) while the current check runs.
+                </p>
+              )}
+              {/* BUG-014 (run25): state the check's ACTUAL scope instead of
+                  implying full-catalog coverage — a check snapshots the
+                  approved catalog at start time, which can be smaller than
+                  the catalog is now. */}
+              {approvedTotal != null && summaryCounts.total > 0 && (
+                <p className="text-xs text-muted-foreground" data-testid="text-linkhealth-scope">
+                  Scope: this check covered {summaryCounts.total.toLocaleString()} approved resource URLs
+                  {summaryCounts.total < approvedTotal
+                    ? ` — the catalog has since grown to ${approvedTotal.toLocaleString()} approved resources, so run a new check for full coverage.`
+                    : " (the full approved catalog at check time)."}
                 </p>
               )}
               <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
@@ -603,8 +624,9 @@ export default function LinkHealthDashboard() {
           <AlertDialogHeader>
             <AlertDialogTitle>Run link health check?</AlertDialogTitle>
             <AlertDialogDescription>
-              This checks every resource URL in the catalog against the live web. The job runs
-              in the background and can take several minutes to complete.
+              This checks the URL of every approved resource in the catalog
+              {approvedTotal != null ? ` (currently ${approvedTotal.toLocaleString()})` : ""} against the
+              live web. The job runs in the background and can take several minutes to complete.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

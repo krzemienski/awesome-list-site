@@ -17,7 +17,7 @@ import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, B
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { humanizeApiError } from "@/lib/apiError";
-import { formatAdminDateTime } from "@/lib/utils";
+import { formatAdminDateTime, slugify } from "@/lib/utils";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -2392,14 +2392,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     setDeleteDialogOpen(true);
   };
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
+  // BUG-055 (run25): delegate to the shared slugify, which transliterates
+  // diacritics (NFKD + combining-mark strip) instead of deleting the letters —
+  // "Vídeo Töols" must become "video-tools", not "vdeo-tols".
+  const generateSlug = (name: string) => slugify(name);
 
   const handleNameChange = (name: string) => {
     setFormData({ ...formData, name, slug: generateSlug(name) });

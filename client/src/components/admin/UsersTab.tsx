@@ -375,21 +375,26 @@ export default function UsersTab() {
               Page {page} of {totalPages}
             </span>
             <div className="flex gap-2">
+              {/* BUG-057 (run25): icon-only pager buttons need accessible names. */}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
+                aria-label="Previous page"
+                data-testid="button-users-prev-page"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
+                aria-label="Next page"
+                data-testid="button-users-next-page"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </div>
@@ -435,9 +440,14 @@ export default function UsersTab() {
             <AlertDialogHeader>
               <AlertDialogTitle>Delete this user?</AlertDialogTitle>
               <AlertDialogDescription>
+                {/* BUG-046 (run25): don't undo the R2-H05 mask here — the
+                    confirmation shows the masked email unless the operator
+                    already revealed that row in the table. */}
                 This permanently deletes{" "}
                 <span className="font-medium text-foreground">
-                  {userToDelete?.email || userToDelete?.id}
+                  {userToDelete?.email
+                    ? (revealedIds.has(userToDelete.id) ? userToDelete.email : maskEmail(userToDelete.email))
+                    : userToDelete?.id}
                 </span>{" "}
                 along with their bookmarks, favorites, progress, and API keys.
                 Any resources they submitted stay in the catalog (attribution is

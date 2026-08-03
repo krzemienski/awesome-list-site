@@ -150,7 +150,9 @@ export default function ResearcherTab() {
   const [categoryFocus, setCategoryFocus] = useState("");
   // Blank = unlimited (owner request July 24, 2026): budget and turns are
   // unbounded by default; entering a number opts INTO a cap.
-  const [maxBudget, setMaxBudget] = useState("");
+  // BUG-045 (run25): default to a sane spending cap instead of UNLIMITED —
+  // the operator can clear the field deliberately if they want no cap.
+  const [maxBudget, setMaxBudget] = useState("25");
   // R4-052: keep the raw input string (like maxBudget) instead of a number so
   // typing "5.5" or "0" is never silently rewritten — validation feedback is
   // shown instead (see the hint below the field + handleLaunch).
@@ -196,6 +198,14 @@ export default function ResearcherTab() {
   });
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
+
+  // BUG-045 (run25): cost guidance is DERIVED from actual job history instead
+  // of a hardcoded range that drifts stale as models/scopes change.
+  const finishedCosts = (jobs || [])
+    .map((j) => Number(j.estimatedCostUsd))
+    .filter((c) => Number.isFinite(c) && c > 0);
+  const costMin = finishedCosts.length > 0 ? Math.min(...finishedCosts) : null;
+  const costMax = finishedCosts.length > 0 ? Math.max(...finishedCosts) : null;
 
   const { data: selectedJob } = useQuery<ResearchJob & { isActive: boolean }>({
     queryKey: ['/api/researcher/jobs', selectedJobId],
@@ -695,7 +705,11 @@ export default function ResearcherTab() {
                 <Alert>
                   <Zap className="w-4 h-4" />
                   <AlertDescription>
-                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens). Recent jobs have cost roughly $2.50-$27 depending on scope and duration (see Job History below). The researcher automatically deduplicates against {categoriesData?.resources?.length ? `the ${categoriesData.resources.length.toLocaleString()} existing resources` : 'the existing catalog'}.
+                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens).{" "}
+                    {costMin !== null && costMax !== null
+                      ? `Your past jobs have cost $${costMin.toFixed(2)}–$${costMax.toFixed(2)} depending on scope and duration (see Job History below).`
+                      : "Cost depends on scope and duration — check Job History after your first run."}{" "}
+                    Jobs without a Max Budget run until you cancel them, so set a cap for a hard stop. The researcher automatically deduplicates against {categoriesData?.resources?.length ? `the ${categoriesData.resources.length.toLocaleString()} existing resources` : 'the existing catalog'}.
                   </AlertDescription>
                 </Alert>
 
@@ -959,7 +973,10 @@ export default function ResearcherTab() {
                       <TableHead>Status</TableHead>
                       <TableHead>Prompt</TableHead>
                       <TableHead>Found</TableHead>
-                      <TableHead>Approved</TableHead>
+                      {/* BUG-017 (run25): "Approved" alone read as one number
+                          and 173 found / "0" looked like lost discoveries —
+                          name both halves and surface the pending remainder. */}
+                      <TableHead>Approved / Rejected</TableHead>
                       <TableHead>Cost</TableHead>
                       <TableHead>Turns</TableHead>
                       <TableHead>Created</TableHead>
@@ -998,6 +1015,19 @@ export default function ResearcherTab() {
                                 <span className="text-green-400">{job.approvedDiscoveries || 0}</span>
                                 {' / '}
                                 <span className="text-red-400">{job.rejectedDiscoveries || 0}</span>
+                                {/* BUG-017 (run25): found = approved + rejected
+                                    + pending must reconcile VISIBLY. */}
+                                {(() => {
+                                  const pending = Math.max(
+                                    0,
+                                    (job.totalDiscoveries || 0) - (job.approvedDiscoveries || 0) - (job.rejectedDiscoveries || 0)
+                                  );
+                                  return pending > 0 ? (
+                                    <span className="block text-[10px] text-muted-foreground whitespace-nowrap">
+                                      {pending} awaiting review
+                                    </span>
+                                  ) : null;
+                                })()}
                               </>
                             )}
                           </TableCell>

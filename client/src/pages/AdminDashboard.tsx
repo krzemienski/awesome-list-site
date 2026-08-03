@@ -23,6 +23,7 @@ import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
 import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import NotFound from "@/pages/not-found";
 // Run3 audit R3-02: the 15 valid tab ids — used to validate /admin/:section
 // deep-links (unknown sections fall back to the default tab).
 const ADMIN_TAB_IDS = [
@@ -63,11 +64,12 @@ export default function AdminDashboard() {
   const isAdmin = Boolean(user && (user as { role?: string }).role === "admin");
 
   // R3-02: /admin/:section deep-links (e.g. /admin/users) select that tab.
+  // BUG-043 (run25): normalizeTab (not raw includes) so aliases like
+  // /admin/link-health resolve, and a truly unknown section renders a 404
+  // page below instead of silently falling back to the default tab.
   const [, sectionParams] = useRoute("/admin/:section");
-  const sectionTab =
-    sectionParams && (ADMIN_TAB_IDS as readonly string[]).includes(sectionParams.section)
-      ? sectionParams.section
-      : null;
+  const sectionTab = normalizeTab(sectionParams?.section);
+  const unknownSection = Boolean(sectionParams?.section) && !sectionTab;
 
   const [activeTab, setActiveTab] = useState(() => {
     if (sectionTab) return sectionTab;
@@ -115,6 +117,13 @@ export default function AdminDashboard() {
       window.history.pushState(null, "", `/admin${window.location.search}#${value}`);
     }
   };
+
+  // BUG-043 (run25): an unknown /admin/<section> is a 404, full stop — it
+  // must never claim "you must be signed in" (misleading when you ARE signed
+  // in) nor silently render the default tab as if the URL were valid.
+  if (unknownSection) {
+    return <NotFound />;
+  }
 
   // BUG-008 (run19): distinguish "no session" from "session without the
   // admin role" — a signed-in non-admin used to be told to "sign in", a

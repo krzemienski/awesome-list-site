@@ -82,6 +82,7 @@ import {
   BIDI_CONTROL_RE,
   BIDI_CONTROL_MESSAGE,
   parseIntInRange,
+  normalizeGithubRepoInput,
 } from "@shared/validation";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
 import { trackServerEvent } from "./lib/mixpanelServer";
@@ -1997,6 +1998,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use sanitized versions in createResourceEdit call
+      // BUG-041 (run25): re-submitting the exact same suggestion must not pile
+      // identical rows into the review queue — compare the proposed change set
+      // against every edit still pending for this resource and 409 on a match.
+      // NOTE: jsonb round-trips reorder object keys ({old,new} comes back as
+      // {new,old}), so the fingerprint must sort keys RECURSIVELY.
+      const stableStringify = (v: any): string => {
+        if (v === null || typeof v !== 'object') return JSON.stringify(v);
+        if (Array.isArray(v)) return `[${v.map(stableStringify).join(',')}]`;
+        return `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${stableStringify(v[k])}`).join(',')}}`;
+      };
+      const existingEdits = await auditRepo.getResourceEditsByResource(resourceId);
+      const changesFingerprint = stableStringify(sanitizedChanges);
+      const duplicatePending = existingEdits.find(
+        (e) => e.status === 'pending' && stableStringify(e.proposedChanges || {}) === changesFingerprint
+      );
+      if (duplicatePending) {
+        return res.status(409).json({
+          message: 'An identical edit suggestion is already pending review for this resource.',
+          existingEditId: duplicatePending.id,
+        });
+      }
+
       const edit = await auditRepo.createResourceEdit({
         resourceId,
         submittedBy: userId,
@@ -4305,6 +4328,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Parent category not found' });
       }
       
+      // BUG-056 (run25): duplicate display names under the same parent were
+      // accepted whenever the caller supplied a different slug — two
+      // identically-named siblings are indistinguishable in every picker.
+      const siblingSubcategories = await categoryRepo.listSubcategories(categoryId);
+      const requestedName = String(validationResult.data.name || '').trim().toLowerCase();
+      const nameDup = siblingSubcategories.find(
+        (s) => s.name.trim().toLowerCase() === requestedName
+      );
+      if (nameDup) {
+        return res.status(409).json({
+          message: `A subcategory named "${nameDup.name}" already exists under ${category.name} (id ${nameDup.id}). Rename it or reuse the existing one.`,
+        });
+      }
+      
       const newSubcategory = await categoryRepo.createSubcategory(validationResult.data);
       
       await auditRepo.logResourceAudit(
@@ -4356,6 +4393,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const category = await categoryRepo.getCategory(validationResult.data.categoryId);
         if (!category) {
           return res.status(404).json({ message: 'Parent category not found' });
+        }
+      }
+      
+      // BUG-056 (run25): neither renames NOR category moves may create
+      // duplicate sibling display names — a move with no rename lands the
+      // EXISTING name among new siblings, so check the destination whenever
+      // either field changes, using the effective (new ?? current) values.
+      if (validationResult.data.name !== undefined || validationResult.data.categoryId != null) {
+        const targetCategoryId = validationResult.data.categoryId ?? existingSubcategory.categoryId;
+        const effectiveName = String(validationResult.data.name ?? existingSubcategory.name ?? '').trim().toLowerCase();
+        const siblings = await categoryRepo.listSubcategories(targetCategoryId ?? undefined);
+        const nameDup = siblings.find(
+          (s) => s.id !== subcategoryId && s.name.trim().toLowerCase() === effectiveName
+        );
+        if (nameDup) {
+          return res.status(409).json({
+            message: `A subcategory named "${nameDup.name}" already exists under this category (id ${nameDup.id}).`,
+          });
         }
       }
       
@@ -4593,7 +4648,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Repository URL is required' });
       }
       
-      const result = await syncService.configureRepository(repositoryUrl, token);
+      // BUG-042 (run25): reject malformed repo references up front.
+      const normalizedConfigRepo = normalizeGithubRepoInput(repositoryUrl);
+      if (!normalizedConfigRepo) {
+        return res.status(400).json({ message: 'Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.' });
+      }
+      
+      const result = await syncService.configureRepository(normalizedConfigRepo, token);
       
       if (!result.success) {
         return res.status(400).json(result);
@@ -4609,10 +4670,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/github/import - Import resources from GitHub awesome list
   app.post('/api/github/import', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const { repositoryUrl, options = {} } = req.body;
+      const { repositoryUrl: rawImportRepo, options = {} } = req.body;
       
-      if (!repositoryUrl) {
+      if (!rawImportRepo) {
         return res.status(400).json({ message: 'Repository URL is required' });
+      }
+      
+      // BUG-042 (run25): "not a repo!!" must 400 here, not fail later in the queue.
+      const repositoryUrl = normalizeGithubRepoInput(rawImportRepo);
+      if (!repositoryUrl) {
+        return res.status(400).json({ message: 'Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.' });
       }
       
       // Add to queue for processing
@@ -4647,10 +4714,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/github/export - Export approved resources to GitHub
   app.post('/api/github/export', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const { repositoryUrl, options = {} } = req.body;
+      const { repositoryUrl: rawExportRepo, options = {} } = req.body;
       
-      if (!repositoryUrl) {
+      if (!rawExportRepo) {
         return res.status(400).json({ message: 'Repository URL is required' });
+      }
+      
+      // BUG-042 (run25): "not a repo!!" must 400 here, not fail later in the queue.
+      const repositoryUrl = normalizeGithubRepoInput(rawExportRepo);
+      if (!repositoryUrl) {
+        return res.status(400).json({ message: 'Invalid repository. Use owner/repository (e.g. krzemienski/awesome-video) or a github.com URL.' });
       }
       
       // Add to queue for processing
@@ -5450,6 +5523,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Batch enrichment job started successfully'
       });
     } catch (error: any) {
+      // BUG-047 (run25): a second concurrent run is a client conflict, not a
+      // server failure — surface it as 409 with the explanatory message.
+      if (error?.code === 'ENRICHMENT_JOB_ACTIVE') {
+        return res.status(409).json({ success: false, message: error.message });
+      }
       console.error('Error starting enrichment job:', error);
       res.status(500).json({
         success: false,

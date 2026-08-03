@@ -19,6 +19,41 @@ interface ResourceEditWithResource extends ResourceEdit {
   resource: Resource;
 }
 
+// BUG-012 (run25): invisible characters must be VISIBLE in review. A
+// zero-width-only value used to render as a blank "+ " line, so a reviewer
+// could approve an edit that visibly changed nothing. Replace each invisible
+// code point with its ‹U+XXXX› escape and flag values that contain them.
+// (Covers Cf/Cs zero-widths, bidi controls, BOM, blank-rendering glyphs.)
+const INVISIBLE_CHAR_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180B-\u180E\u200B-\u200F\u202A-\u202E\u2060-\u206F\u2800\u3164\uFE00-\uFE0F\uFEFF\uFFA0]/g;
+
+function revealInvisible(value: string): { text: string; count: number } {
+  let count = 0;
+  const text = value.replace(INVISIBLE_CHAR_RE, (ch) => {
+    count++;
+    return `‹U+${ch.codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0")}›`;
+  });
+  return { text, count };
+}
+
+function DiffValue({ value }: { value: string | number | null }) {
+  if (value === null || value === undefined || String(value) === "") {
+    return <>(empty)</>;
+  }
+  if (typeof value !== "string") return <>{String(value)}</>;
+  const { text, count } = revealInvisible(value);
+  const visibleRest = text.replace(/‹U\+[0-9A-F]{4,6}›/g, "").trim();
+  return (
+    <>
+      <span className="break-all">{text}</span>
+      {count > 0 && (
+        <span className="ml-1 inline-block align-middle rounded bg-yellow-500/15 px-1 text-[10px] font-medium uppercase tracking-wide text-yellow-600 dark:text-yellow-400">
+          {visibleRest === "" ? "invisible characters only" : `${count} invisible char${count === 1 ? "" : "s"}`}
+        </span>
+      )}
+    </>
+  );
+}
+
 export default function PendingEdits() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -172,11 +207,11 @@ export default function PendingEdits() {
         <div className="mt-1 space-y-1">
           <p className="text-sm text-red-600 dark:text-red-400">
             <span className="font-mono">- </span>
-            {oldValue || '(empty)'}
+            <DiffValue value={oldValue} />
           </p>
           <p className="text-sm text-green-600 dark:text-green-400">
             <span className="font-mono">+ </span>
-            {newValue || '(empty)'}
+            <DiffValue value={newValue} />
           </p>
         </div>
       </div>
