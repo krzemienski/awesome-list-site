@@ -10,11 +10,20 @@ import { Search as SearchIcon, AlertCircle, ChevronLeft, ChevronRight } from "lu
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import type { Resource as DbResource } from "@shared/schema";
+import { normalizeSearchQuery } from "@shared/searchNormalize";
 
 export default function Search() {
   const searchString = useSearch();
   const [, setLocation] = useLocation();
+  // audit2 BUG-010: ONE source of truth for the query — the URL. The input
+  // box, the fetch, the title, and every empty/results state below all
+  // derive from urlQuery/normalizedQuery, so the URL, the input, and the
+  // results can never show three different queries.
   const urlQuery = new URLSearchParams(searchString).get("q") ?? "";
+  // audit2 BUG-011/019/020/021: the SAME normalization the server matcher
+  // applies (collapse whitespace, treat control chars as spaces, strip edge
+  // quotes) decides emptiness, display strings, and the fetch key.
+  const normalizedQuery = normalizeSearchQuery(urlQuery);
 
   // BUG-038 (run14): pagination state serializes to ?page= so reload/share
   // restores the same page instead of silently resetting to page 1.
@@ -32,7 +41,6 @@ export default function Search() {
   };
 
   const [input, setInput] = useState(urlQuery);
-  const [debounced, setDebounced] = useState(urlQuery);
   // R2-M11: client-side pagination over the fetched result set.
   const [page, setPage] = useState(() => parsePage(searchString));
   const PAGE_SIZE = 24;
@@ -55,7 +63,6 @@ export default function Search() {
   // Debounce input → debounced query + URL sync (300ms).
   useEffect(() => {
     const t = setTimeout(() => {
-      setDebounced(input);
       // BUG-038 (run14): if the URL's q already matches the input (e.g. on
       // mount with /search?q=x&page=2), leave the URL alone — rewriting the
       // target here would strip a restored ?page=. Only rewrite when the
@@ -78,12 +85,12 @@ export default function Search() {
   // Back/forward navigation: adopt the URL's q and page.
   useEffect(() => {
     setInput(urlQuery);
-    setDebounced(urlQuery);
     setPage(parsePage(searchString));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchString]);
 
-  const trimmed = debounced.trim();
+  // Canonical query derived straight from the URL (single source of truth).
+  const trimmed = normalizedQuery;
   const {
     data,
     isLoading,
@@ -93,20 +100,23 @@ export default function Search() {
     // Run15: server-side pagination — fetch one 24-row page instead of a
     // 1000-row payload sliced client-side. Page is part of the cache key.
     queryKey: ["/api/resources", "search", trimmed, page],
-    // BUG-011 (run19): with an empty query the page is a paginated browse of
-    // the full approved catalog (the "Browse All Resources" destination), so
-    // omit the search param instead of gating the fetch behind 2+ characters.
+    // audit2 BUG-019: an empty/whitespace/control-only query no longer
+    // browses the full catalog as fake "results" — it renders the explicit
+    // prompt below (same copy as the server-rendered fallback) and fetches
+    // nothing. (BUG-011 run19's "Browse All Resources" entry point links to
+    // /categories now.)
     queryFn: async () =>
       apiRequest(
-        trimmed.length === 0
-          ? `/api/resources?page=${page}&limit=${PAGE_SIZE}`
-          : `/api/resources?search=${encodeURIComponent(trimmed)}&page=${page}&limit=${PAGE_SIZE}`,
+        `/api/resources?search=${encodeURIComponent(trimmed)}&page=${page}&limit=${PAGE_SIZE}`,
         { method: "GET" },
       ),
-    enabled: trimmed.length === 0 || trimmed.length >= 2,
+    enabled: trimmed.length >= 2,
     staleTime: 60 * 1000,
-    // Keep the previous page's rows on screen while the next page loads.
-    placeholderData: (prev) => prev,
+    // Keep the previous page's rows on screen while the next page of the
+    // SAME query loads — but never show query A's rows under query B
+    // (audit2 BUG-010).
+    placeholderData: (prev, prevQ) =>
+      prevQ && (prevQ.queryKey as unknown[])[2] === trimmed ? prev : undefined,
   });
 
   const results = data?.resources ?? [];
@@ -247,7 +257,32 @@ export default function Search() {
         />
       </div>
 
-      {trimmed.length === 1 ? (
+      {trimmed.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+            <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
+              <SearchIcon className="h-8 w-8 text-muted-foreground" />
+            </div>
+            {/* audit2 BUG-019: explicit empty-state prompt (same copy as the
+                server-rendered fallback) instead of dumping the full catalog
+                as "results". */}
+            <h2 className="text-sm font-semibold max-w-md px-4" data-testid="text-search-prompt">
+              Enter a search term to find curated video development resources.
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Try “ffmpeg”, “hls”, or “av1” — or browse instead:
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <Button asChild variant="outline" data-testid="link-search-browse-categories">
+                <Link href="/categories">Browse all categories</Link>
+              </Button>
+              <Button asChild variant="ghost" data-testid="link-search-browse-journeys">
+                <Link href="/journeys">Learning journeys</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : trimmed.length === 1 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
             <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
@@ -311,11 +346,11 @@ export default function Search() {
             {totalPages > 1 ? (
               <>
                 Page {safePage} of {totalPages} · showing {rangeStart}–{rangeEnd} of {total}{" "}
-                {trimmed.length === 0 ? "resources" : <>result{total === 1 ? "" : "s"} for “{trimmed}”</>}
+                result{total === 1 ? "" : "s"} for “{trimmed}”
               </>
             ) : (
               <>
-                {total} {trimmed.length === 0 ? "resources" : <>result{total === 1 ? "" : "s"} for “{trimmed}”</>}
+                {total} result{total === 1 ? "" : "s"} for “{trimmed}”
               </>
             )}
           </p>

@@ -31,15 +31,29 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <script>
-      // BUG-021 (run24): strip query params carrying obvious XSS payloads from
+      // BUG-021 (run24): strip query params carrying real markup payloads from
       // the address bar BEFORE any other boot script runs. The app never
       // renders raw query strings as HTML, but the payload sat in the URL bar
       // (shareable/copyable) and flowed into analytics page_path. Runs
       // pre-React via replaceState so no history entry keeps the payload.
+      //
+      // ONE coherent policy (audit2 BUG-009): scrub ONLY strings that could
+      // parse as actual HTML markup if injected raw — a tag-open sequence.
+      // Per the HTML5 tokenizer, "<" starts markup only when immediately
+      // followed by a letter, "/", "!" or "?", so prose like "a < b > c" or
+      // "javascript: the good parts" is plain text and searches normally.
+      // Bare scheme/attribute text (javascript:, onerror=, data:text/html) is
+      // inert without a markup context: every reflection sink HTML-escapes
+      // (React text nodes + the server-rendered fallback), and query text is
+      // never assigned to href/src — so it is no longer scrubbed.
+      //
+      // audit2 BUG-024: the check runs across RECURSIVE percent-decodings
+      // (URLSearchParams already decoded once; loop up to 5 more passes) so
+      // double-/triple-encoded payloads (%253Cscript…) can't slip through.
       (function () {
         try {
           if (!location.search || location.search.length < 2) return;
-          var XSS = /<\s*\/?\s*[a-z][^>]*>|javascript\s*:|\bon[a-z]+\s*=|data\s*:\s*text\/html/i;
+          var MARKUP = /<[a-z!\/?]/i;
           var params = new URLSearchParams(location.search);
           var dirty = false;
           var names = [];
@@ -47,10 +61,16 @@
           params.forEach(function (v, k) { names.push(k); });
           for (var i = 0; i < names.length; i++) {
             var k = names[i];
-            var raw = k + '=' + (params.get(k) || '');
-            var dec = raw;
-            try { dec = decodeURIComponent(raw); } catch (_) {}
-            if (XSS.test(raw) || XSS.test(dec)) {
+            var probe = k + '=' + (params.get(k) || '');
+            var hit = MARKUP.test(probe);
+            for (var d = 0; d < 5 && !hit; d++) {
+              var next;
+              try { next = decodeURIComponent(probe); } catch (_) { break; }
+              if (next === probe) break;
+              probe = next;
+              hit = MARKUP.test(probe);
+            }
+            if (hit) {
               params.delete(k);
               if (removed.indexOf(k) === -1) removed.push(k);
               dirty = true;

@@ -84,6 +84,7 @@ import {
   parseIntInRange,
   normalizeGithubRepoInput,
 } from "@shared/validation";
+import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { swaggerSpec } from "./openapi";
@@ -1340,12 +1341,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let subcategory = firstQueryValue(req.query.subcategory) as string;
       // BUG-015: accept `q` as an alias for `search` so /api/resources?q=… reaches
       // the real filter layer. `search` wins if both are present (explicit param).
-      // NEW-012: strip NUL + control chars — Postgres rejects NUL bytes in text
-      // params and the raw driver error surfaced as a 500.
+      // NEW-012 + audit2 BUG-019: ONE shared normalization (control chars incl.
+      // NUL — which Postgres rejects in text params — count as whitespace;
+      // whitespace collapses; edge quotes drop). A query that normalizes to
+      // empty ("%00", "%20%20%20") behaves EXACTLY like an absent search param,
+      // instead of NUL → full catalog while spaces → zero rows.
       const rawSearch = firstQueryValue(req.query.search) ?? firstQueryValue(req.query.q);
       const search = typeof rawSearch === 'string'
-        ? rawSearch.replace(/[\x00-\x1f\x7f]/g, '')
-        : rawSearch;
+        ? normalizeSearchQuery(rawSearch) || undefined
+        : undefined;
 
       // Accept category/subcategory as either the display NAME (what the client
       // sends) or a URL slug (e.g. ?category=encoding-codecs — BUG-022). Real
@@ -1462,13 +1466,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET resource surfaces.
   app.get('/api/search', resourceReadLimiter, async (req, res) => {
     try {
-      // NEW-012: strip NUL + control chars before trimming — Postgres rejects
-      // NUL bytes in text params, which previously surfaced as a 500.
+      // NEW-012 + audit2: the same shared normalization as /api/resources and
+      // the /search page (control chars incl. NUL count as whitespace, runs
+      // collapse, edge quotes drop) — so NUL/space/quote junk behaves
+      // identically across every search surface.
       // BUG-v3-M07 (run12): duplicate ?q= params arrive as an array — coerce
       // to the first value instead of crashing on .replace.
-      const q = (firstQueryValue(req.query.q) || firstQueryValue(req.query.search) || '')
-        .replace(/[\x00-\x1f\x7f]/g, '')
-        .trim();
+      const q = normalizeSearchQuery(
+        firstQueryValue(req.query.q) || firstQueryValue(req.query.search) || ''
+      );
       if (q.length < 2) {
         return res.json({ query: q, total: 0, results: [] });
       }

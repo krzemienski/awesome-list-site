@@ -314,11 +314,12 @@ export default function Advanced() {
             These advanced features help you discover, analyze, and share awesome list data more effectively
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            {/* BUG-011 (run19): this button promised an all-resources view but
-                linked to "/" (home = category cards). /search with an empty
-                query now browses the full paginated catalog — link there. */}
+            {/* BUG-011 (run19) linked this to /search because an empty query
+                used to browse the full catalog; audit2 BUG-019 made empty
+                /search an explicit "enter a search term" prompt, so the
+                honest browse-everything destination is the categories hub. */}
             <Link
-              href="/search"
+              href="/categories"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               data-testid="link-browse-all-resources"
             >

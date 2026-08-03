@@ -36,6 +36,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, and, sql, asc, desc, like, ilike, or, inArray } from "drizzle-orm";
+import { tokenizeSearchQuery } from "@shared/searchNormalize";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -95,13 +96,27 @@ export class ResourceRepository {
     // Run16 BUG-044: %, _ and \ are LIKE metacharacters — a search for "___"
     // used to match EVERY 3+-char row (66KB response). Escape them so the
     // user's literal text is what gets matched (PG default escape is \).
-    const escapedSearch = search ? search.replace(/[\\%_]/g, (m) => `\\${m}`) : undefined;
-    if (search && escapedSearch !== undefined) {
+    // Audit2 BUG-011/020/021: the matcher is TOKENIZED — the query is
+    // normalized (control chars stripped, whitespace collapsed, edge quotes
+    // dropped) and split on spaces; every token must appear somewhere in
+    // title/description/url (AND of per-token ORs). "ffmpeg hls" and
+    // "hls ffmpeg" return the same set, doubled spaces and wrapping quotes
+    // no longer zero out matches, and a single-token query builds exactly
+    // the same predicate as before (per-word result counts unchanged).
+    const searchTokens = tokenizeSearchQuery(search);
+    const normalizedSearch = searchTokens.join(" ");
+    const escapeLike = (s: string) => s.replace(/[\\%_]/g, (m) => `\\${m}`);
+    if (searchTokens.length > 0) {
       conditions.push(
-        or(
-          ilike(resources.title, `%${escapedSearch}%`),
-          ilike(resources.description, `%${escapedSearch}%`),
-          ilike(resources.url, `%${escapedSearch}%`)
+        and(
+          ...searchTokens.map((tok) => {
+            const esc = escapeLike(tok);
+            return or(
+              ilike(resources.title, `%${esc}%`),
+              ilike(resources.description, `%${esc}%`),
+              ilike(resources.url, `%${esc}%`)
+            );
+          })
         )
       );
     }
@@ -128,10 +143,14 @@ export class ResourceRepository {
           // relevance — exact title match first, then title prefix, then title
           // substring, then description/url-only matches — instead of raw
           // recency (an exact "FFmpeg" title used to land at position ~158).
-          if (search && escapedSearch !== undefined) {
-            const q = search.toLowerCase();
-            const prefix = `${escapedSearch.toLowerCase()}%`;
-            const substr = `%${escapedSearch.toLowerCase()}%`;
+          if (searchTokens.length > 0) {
+            // Rank on the NORMALIZED phrase — identical to the old behaviour
+            // for single-token queries; multi-token queries rank exact/prefix/
+            // substring against the collapsed "tok1 tok2" form.
+            const q = normalizedSearch.toLowerCase();
+            const escapedPhrase = escapeLike(normalizedSearch);
+            const prefix = `${escapedPhrase.toLowerCase()}%`;
+            const substr = `%${escapedPhrase.toLowerCase()}%`;
             return [
               asc(sql`CASE
                 WHEN lower(${resources.title}) = ${q} THEN 0

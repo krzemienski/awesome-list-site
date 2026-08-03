@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAboutFaqs } from "@shared/faq";
+import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { MAINTAINER } from "@shared/about-content";
 import {
   homeSeoTitle,
@@ -776,7 +777,11 @@ function homeShellChrome(): string {
       });
     } else if (path === "/search") {
       // BUG-002: render real SSR search results for ?q= (still noindex).
-      const q = parseQueryParam(url);
+      // audit2 BUG-019: normalize exactly like the API matcher so quote-/
+      // whitespace-/control-only queries render the explicit "enter a search
+      // term" prompt instead of catalog rows, and the SSR heading always
+      // shows the query that was actually matched.
+      const q = normalizeSearchQuery(parseQueryParam(url));
       let results: { id: number; title: string; description?: string }[] = [];
       if (q) {
         try {

@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
+import { normalizeSearchQuery } from "@shared/searchNormalize";
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -66,7 +67,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const trimmed = debouncedQuery.trim();
+  // audit2: normalize exactly like the /search page + server matcher so the
+  // palette and /search share one cache entry per canonical query, and
+  // quoted/double-spaced queries hit the same results.
+  const trimmed = normalizeSearchQuery(debouncedQuery);
 
   // Same queryKey + fetch as the /search page, so both surfaces share one
   // cached result set and always report the same match count.
@@ -86,7 +90,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     staleTime: 60 * 1000,
   });
 
-  const queryTrimmed = query.trim();
+  // Normalized like `trimmed` above — otherwise a quoted zero-match query
+  // would keep `queryTrimmed !== trimmed` true forever and pin the pending
+  // spinner instead of showing "no results".
+  const queryTrimmed = normalizeSearchQuery(query);
   const allMatches = trimmed.length >= 2 ? data?.resources ?? [] : [];
   // NB-044 (run18): show the TRUE match count from the server (data.total),
   // not the length of the (limit-capped) result page — the palette only renders
