@@ -108,6 +108,13 @@ export const initGA = () => {
   window.gtag('js', new Date());
   const configParams: Record<string, unknown> = { send_page_view: false };
   if (import.meta.env.DEV) configParams.debug_mode = true;
+  // Audit 2 BUG-039: _ga* cookies default to secure:false. gtag exposes
+  // cookie flags as a raw attribute string; SameSite=Lax matches the default
+  // browsers already apply, Secure is added only on https pages (prod +
+  // replit.dev preview) so plain-http localhost dev keeps working cookies.
+  if (window.location.protocol === 'https:') {
+    configParams.cookie_flags = 'SameSite=Lax;Secure';
+  }
   window.gtag('config', measurementId, configParams);
 };
 

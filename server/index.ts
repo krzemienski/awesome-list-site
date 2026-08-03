@@ -50,11 +50,55 @@ app.use((_req, res, next) => {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
   );
+  // Audit 2 BUG-054: cross-origin isolation headers, always-on (both are
+  // no-ops inside the Replit dev preview iframe — COOP only applies to
+  // top-level documents, and same-origin subresource loads satisfy CORP).
+  // COOP uses same-origin-allow-popups rather than the stricter same-origin:
+  // the app itself never relies on window.opener (OIDC login is a full-page
+  // redirect, ResourceCard opens links with noopener), but production HTML
+  // gets the platform-injected Replit feedback widget (see the CSP notes
+  // below) whose popup behavior cannot be regression-tested from the
+  // workspace. allow-popups still blocks the attack that matters here: a
+  // cross-origin page keeping a scriptable handle on awesome.video after
+  // opening it. CORP same-origin stops cross-site hotlinking of our
+  // responses; the OG images are deliberately re-opened to cross-origin
+  // consumers in server/routes.ts. COEP is deliberately NOT set — it would
+  // demand CORP/CORS opt-ins from every external ogImage host ResourceCard
+  // embeds, breaking resource preview images.
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
   // BUG-014: per-request CSP nonce, applied to script-src and style-src. Always
   // generated (even in dev) so downstream middleware can read it unconditionally;
   // the CSP header itself stays production-only per the BUG-019 rationale above.
   const nonce = crypto.randomBytes(16).toString("base64");
   res.locals.cspNonce = nonce;
+  next();
+});
+
+// Audit 2 BUG-016: canonical-host redirect. www.awesome.video currently dies
+// at the Cloudflare edge (HTTP 525: www is orange-cloud proxied toward an
+// origin that has no certificate/route for the www host, while the apex
+// resolves straight to Replit's Google Frontend — DNS/platform config the app
+// cannot change; owner runbook in evidence/run25/PLATFORM-ACTIONS.md). This is
+// the code-side half: the moment www traffic actually terminates at this app
+// (owner adds www as a Replit custom domain, or grey-clouds the record), the
+// app answers with a clean 301 to the apex instead of serving duplicate-host
+// content. GET/HEAD only — other methods fall through to the normal stack.
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  const host = String(req.headers.host || "")
+    .toLowerCase()
+    .replace(/:(443|80)$/, "");
+  let apexHost = "awesome.video";
+  try {
+    apexHost = new URL(process.env.PUBLIC_SITE_URL || "https://awesome.video")
+      .host;
+  } catch {
+    // malformed PUBLIC_SITE_URL — keep the default apex
+  }
+  if (host === `www.${apexHost}`) {
+    return res.redirect(301, `https://${apexHost}${req.originalUrl}`);
+  }
   next();
 });
 

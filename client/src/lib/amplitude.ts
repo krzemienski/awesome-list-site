@@ -16,7 +16,21 @@ export function initAmplitude(): void {
   initialized = true;
   Promise.resolve(
     amplitude.initAll(key, {
-      analytics: { autocapture: true },
+      analytics: {
+        autocapture: true,
+        // Audit 2 BUG-039: AMP_* / AMP_MKTG_* cookies previously shipped with
+        // secure:false on an HTTPS-only site. SameSite is pinned to the Lax
+        // the SDK already defaults to; Secure is set whenever the page is
+        // https (prod + replit.dev preview) — plain-http localhost keeps
+        // unflagged cookies so dev persistence still works. HttpOnly is
+        // impossible by construction: these cookies are written and read by
+        // JavaScript (document.cookie), which is also why the audit's
+        // HttpOnly ask applies only to the platform's GAESA cookie.
+        cookieOptions: {
+          sameSite: 'Lax',
+          secure: window.location.protocol === 'https:',
+        },
+      },
       sessionReplay: { sampleRate: 1 },
     }),
   )

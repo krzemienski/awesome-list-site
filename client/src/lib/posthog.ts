@@ -75,6 +75,12 @@ export const initPosthog = () => {
         // EU/CA compliance: nothing captured unless explicitly opted in below.
         opt_out_capturing_by_default: true,
         persistence: 'localStorage+cookie',
+        // Audit 2 BUG-039: the ph_* cookie half of the persistence defaults
+        // to secure:false. Secure whenever the page is https (prod +
+        // replit.dev preview); plain-http localhost dev keeps an unflagged
+        // cookie so persistence still works there. SameSite already defaults
+        // to Lax in posthog-js.
+        secure_cookie: window.location.protocol === 'https:',
         // Full feature set:
         autocapture: true,
         capture_pageview: 'history_change',

@@ -18,3 +18,5 @@ Workers fall back to script-src when worker-src is absent — PostHog's session 
 
 ## Verifying prod analytics headlessly
 PostHog drops captures for automation browsers via navigator.webdriver, not just UA — spoof `navigator.webdriver=false` via addInitScript (a clean Chrome UA alone is NOT enough; assets load but zero /i/v0/e/ POSTs, silently).
+
+- Run25 additions: expect exactly 1 benign `script-src` violation with blockedURI `eval` per page in prod-mode browser tours — a guarded library feature-probe in the main bundle; console and pageerror streams stay clean, so it is NOT a regression signal. Empirical style-src result: removing 'unsafe-inline' yields 7 violations/page (6 style-src-elem from the SSR shell + runtime createElement("style") in the index/jspdf/html2canvas bundles; 1 style-src-attr — nonces can never authorize style attributes). COOP was shipped as `same-origin-allow-popups` specifically because the platform widget's popup behavior cannot be regression-tested outside prod.

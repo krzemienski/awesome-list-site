@@ -6314,6 +6314,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Audit 2 BUG-056: RFC 9116 security contact. Served from a route (not a
+  // static file) so the Expires field is always ~6 months out — a stale
+  // static Expires would invalidate the whole record. GitHub private
+  // vulnerability reporting is DISABLED on both project repos (verified
+  // 2026-08-03 via the REST API), so Contact points at the public issue
+  // tracker the site already advertises on /about.
+  const serveSecurityTxt = (_req: Request, res: Response) => {
+    const siteUrl = (process.env.PUBLIC_SITE_URL || "https://awesome.video")
+      .replace(/\/$/, "");
+    const expires = new Date(
+      Date.now() + 180 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    res
+      .set("Cache-Control", "public, max-age=86400")
+      .type("text/plain; charset=utf-8")
+      .send(
+        [
+          "Contact: https://github.com/krzemienski/awesome-video/issues",
+          `Expires: ${expires}`,
+          "Preferred-Languages: en",
+          `Canonical: ${siteUrl}/.well-known/security.txt`,
+          "",
+        ].join("\n"),
+      );
+  };
+  app.get("/.well-known/security.txt", serveSecurityTxt);
+  // Legacy fallback location (RFC 9116 §3 recommends serving both).
+  app.get("/security.txt", serveSecurityTxt);
+
+  // Audit 2 BUG-054: OG images exist to be consumed cross-site (link
+  // unfurlers, forums hotlinking the preview) — override the site-wide
+  // CORP: same-origin from server/index.ts for exactly these two assets.
+  app.get(["/og-image.png", "/og-image.svg"], (_req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  });
+
   // SEO routes
   app.get("/sitemap.xml", generateSitemap);
   app.get("/og-image.svg", generateOpenGraphImage);
