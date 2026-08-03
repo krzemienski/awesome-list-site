@@ -24,3 +24,7 @@ Node scripts placed in /tmp cannot resolve workspace node_modules (ERR_MODULE_NO
 
 ## tsx helper scripts must live inside the workspace
 A one-off `.ts` helper written to `/tmp` fails under `npx tsx` twice over: relative imports like `./server/db` resolve against `/tmp`, and even absolute imports can't find `node_modules` (drizzle-orm etc.) because Node resolution walks up from the script's own directory. Write throwaway scripts to `.local/` (gitignored) inside the workspace, run, then delete. Also: tsx CJS mode rejects top-level await — wrap in `async function main()`.
+
+## Poll-loop & workflow-log gotchas (2026-08)
+- `pgrep -f <pattern>` inside a poll loop **matches the loop's own `bash -c` wrapper** (the pattern appears in its command line) -> loop never exits / false "still running". Use `ps aux | grep <pattern> | grep -v grep` or anchor to the real binary.
+- Workflow log files under /tmp/logs are **snapshots at refresh time**, not live tails: a workflow can look wedged at its last drained line while it actually finished minutes ago. Confirm with a process check, then re-drain logs before diagnosing a hang.

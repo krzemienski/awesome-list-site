@@ -264,11 +264,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
       <SidebarTrigger
         className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]"
         data-testid="mobile-drawer-trigger"
-        aria-label="Toggle navigation menu"
+        aria-label="Toggle sidebar"
       />
       {/* DS shell parity — the full-width header owns the brand (reference
           layout.jsx Header: logo tile + AWESOME.VIDEO mono wordmark,
-          11px/700/tracking 1.8). Wordmark hides below lg to avoid crowding
+          12px/700/tracking 1.8). Wordmark hides below lg to avoid crowding
           the breadcrumb + search + action cluster. */}
       {/* BUG-024 (run26): min-w-[32px] — the icon-only brand link measured
           28px wide, under the 32px touch-target floor. */}
@@ -282,7 +282,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
         <span
           className="font-mono hidden lg:inline"
           style={{
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 700,
             letterSpacing: 1.8,
             color: "var(--text)",
@@ -455,7 +455,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           <span className="ml-2 text-muted-foreground truncate hidden min-[520px]:inline lg:hidden">Search...</span>
           {/* BUG-002 (run22): "/" hint from lg (was md) — saves ~20px at
               768–1023px where header space is tightest. */}
-          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] lg:flex">
+          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] lg:flex">
             /
           </kbd>
         </button>

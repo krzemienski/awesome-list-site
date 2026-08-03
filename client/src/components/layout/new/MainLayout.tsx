@@ -8,7 +8,6 @@ import SearchDialog from "@/components/ui/search-dialog";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { openCookieSettings } from "@/components/ui/consent-banner";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
 function BackToTop() {
@@ -30,7 +29,7 @@ function BackToTop() {
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="Back to top"
       data-testid="button-back-to-top"
-      className="fixed bottom-6 right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
+      className="fixed bottom-[calc(1.5rem+var(--consent-banner-h,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
     >
       <ArrowUp className="h-5 w-5" />
     </Button>
@@ -65,11 +64,16 @@ interface MainLayoutProps {
 
 export default function MainLayout({ nav, isLoading, navError, onRetryNav, children, user, onLogout }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
-  const isMobile = useIsMobile();
 
   return (
     <SidebarProvider
-      defaultOpen={!isMobile}
+      // Audit2 BUG-004/005/017/018: default the sidebar CLOSED below 1024px.
+      // At tablet widths (768–1023) the expanded 17.5rem panel squeezed main
+      // content to ~390px — /advanced chips and tabs clipped past the
+      // viewport, the home CTA row overflowed, and /search columns collapsed
+      // to 188px. ui/sidebar.tsx additionally force-collapses when a viewport
+      // ENTERS that range carrying a stale expanded preference.
+      defaultOpen={typeof window !== "undefined" && window.innerWidth >= 1024}
       // DS shell parity: column layout — the full-width 60px header owns the
       // brand (reference layout.jsx Header), and the sidebar/icon-rail starts
       // BELOW it (reference .sidebar/.icon-rail: sticky top:60px). The

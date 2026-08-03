@@ -71,7 +71,9 @@ export default function Settings() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4"
+          // BUG-042 (audit2): the bare text link measured 55×20px — below the
+          // 24px WCAG 2.5.8 floor; give it a 44px-tall hit area.
+          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]"
           data-testid="link-back-home"
         >
           <ArrowLeft className="h-4 w-4" />

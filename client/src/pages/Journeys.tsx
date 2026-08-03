@@ -298,6 +298,16 @@ export default function Journeys() {
                     variant={enrolled ? "outline" : "default"}
                     onClick={() => setLocation(`/journey/${journey.id}`)}
                     data-testid={`button-view-journey-${journey.id}`}
+                    // BUG-037 (audit2): five cards all announced an identical
+                    // "Start Journey" — the accessible name now appends the
+                    // journey title (visible label stays the prefix, WCAG 2.5.3).
+                    aria-label={`${
+                      enrolled && progressPercent === 100
+                        ? "Completed · Review"
+                        : enrolled && (journey.completedStepCount || 0) > 0
+                          ? "Continue Journey"
+                          : "Start Journey"
+                    }: ${journey.title}`}
                   >
                     {/* BUG-037 (run14): shrink-0 icons — at 768px the flex
                         button squeezed the leading icon and clipped it. */}

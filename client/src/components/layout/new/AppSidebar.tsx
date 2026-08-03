@@ -23,7 +23,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -145,7 +144,7 @@ function SubItem({
       data-testid={testId}
       data-active={active || undefined}
       className={cn(
-        "sub-item touch-manipulation min-h-[36px] no-underline w-full",
+        "sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full",
         size === "xs" && "text-[12px]",
         italic && "italic",
       )}
@@ -167,7 +166,7 @@ function SubItem({
       {typeof count === "number" && (
         <span
           className="font-mono shrink-0 tabular-nums"
-          style={{ fontSize: 10, color: "var(--text-3)" }}
+          style={{ fontSize: 12, color: "var(--text-3)" }}
           // BUG-049 (run19): bare numbers were ambiguous next to the labeled
           // "N resources" header — give every count an explicit unit for
           // assistive tech and a hover title for sighted users.
@@ -180,7 +179,7 @@ function SubItem({
       {count === 0 && (
         <span
           className="italic shrink-0"
-          style={{ fontSize: 10, color: "var(--text-3)" }}
+          style={{ fontSize: 12, color: "var(--text-3)" }}
         >
           (empty)
         </span>
@@ -276,11 +275,14 @@ function CategoryAccordion({
         data-state={isOpen ? "open" : "closed"}
         title={cat.name}
       >
+        {/* BUG-043 (audit2): the category label link measured 24px tall in the
+            mobile drawer (the 44px expander alone carried the row height) —
+            give the link itself a 44px floor in the drawer, 36px on md+. */}
         <Link
           href={catPath}
           data-testid={`row-cat-${catSlug}`}
           aria-label={`Open ${cat.name} category page`}
-          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm"
+          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm min-h-[44px] md:min-h-[36px]"
         >
           <span
             className="flex items-center justify-center shrink-0"
@@ -311,7 +313,7 @@ function CategoryAccordion({
         <span className="flex items-center gap-2 shrink-0 pl-2">
           <span
             className="font-mono tabular-nums"
-            style={{ fontSize: 10, color: "var(--text-3)" }}
+            style={{ fontSize: 12, color: "var(--text-3)" }}
             // BUG-049 (run19): unit-label the category badge like the header's
             // "N resources" so the bare number is unambiguous.
             title={`${formatCount(totalCount)} ${totalCount === 1 ? "resource" : "resources"}`}
@@ -599,7 +601,7 @@ export default function AppSidebar({
                 <span
                   className="font-mono"
                   style={{
-                    fontSize: 10,
+                    fontSize: 12,
                     letterSpacing: 0.4,
                     color: "var(--text-3)",
                   }}
@@ -683,7 +685,7 @@ export default function AppSidebar({
                 }}
                 data-testid={`nav-${slugify(item.label)}`}
                 data-active={isActive(item.href) || undefined}
-                className="sub-item touch-manipulation min-h-[36px] no-underline w-full"
+                className="sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full"
                 style={
                   isActive(item.href)
                     ? {
@@ -712,7 +714,7 @@ export default function AppSidebar({
               }}
               data-testid="nav-admin"
               data-active={isActive("/admin") || undefined}
-              className="sub-item touch-manipulation min-h-[36px] no-underline w-full"
+              className="sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full"
               style={
                 isActive("/admin")
                   ? {
@@ -741,7 +743,7 @@ export default function AppSidebar({
           <div
             className="font-mono uppercase"
             style={{
-              fontSize: 9.5,
+              fontSize: 12,
               letterSpacing: 1.8,
               fontWeight: 700,
               color: "var(--text-3)",
@@ -766,7 +768,7 @@ export default function AppSidebar({
             className="font-mono"
             style={{
               marginTop: 2,
-              fontSize: 10,
+              fontSize: 12,
               letterSpacing: 0.4,
               color: "var(--text-3)",
             }}
@@ -864,7 +866,7 @@ export default function AppSidebar({
                 <button
                   type="button"
                   onClick={() => onRetryNav()}
-                  className="underline underline-offset-2 font-medium min-h-[36px]"
+                  className="underline underline-offset-2 font-medium min-h-[44px] md:min-h-[36px]"
                   style={{ color: "var(--text-2)" }}
                   data-testid="sidebar-nav-retry"
                 >
@@ -895,7 +897,7 @@ export default function AppSidebar({
             navigate("/about");
           }}
           data-testid="footer-about"
-          className="sub-item touch-manipulation min-h-[36px] no-underline w-full"
+          className="sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full"
         >
           <span className="flex items-center gap-[10px] min-w-0">
             <BookOpen className="size-[14px] shrink-0" />
@@ -904,7 +906,6 @@ export default function AppSidebar({
         </a>
       </SidebarFooter>
 
-      <SidebarRail />
     </Sidebar>
   );
 }

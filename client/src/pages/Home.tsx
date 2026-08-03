@@ -492,7 +492,10 @@ export default function Home({ nav, navLoading }: HomeProps) {
                 Sign in for AI-powered recommendations tailored to your skill level and interests — or browse quick recommendations below, no account needed
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col sm:flex-row gap-3 sm:items-center">
+            {/* BUG-017 (audit2): at 768px with the sidebar expanded the nowrap
+                row pushed "Browse recommendations" past the viewport edge —
+                let the CTA pair wrap whenever the buttons don't fit. */}
+            <CardContent className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-center">
               {/* BUG-049 (run26): Button asChild renders ONE anchor instead of
                   an <a> wrapping a <button> (invalid nesting, double tab stop). */}
               <Button asChild className="w-full sm:w-auto">

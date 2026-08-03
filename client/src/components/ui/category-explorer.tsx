@@ -468,7 +468,11 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               variant="outline"
                               size="sm"
                               onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
-                              className="min-h-[32px] h-auto px-2 text-xs"
+                              // BUG-004 (audit2): Button's base whitespace-nowrap made
+                              // long chip labels rigid — one wide chip overflowed the
+                              // card and clipped past the tablet viewport edge. Chips
+                              // now cap at the card width and wrap their text.
+                              className="min-h-[32px] h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
                             >
                               {subcategory.name} ({getTotalResourceCount(subcategory)})
                             </Button>
@@ -486,6 +490,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
                     size="sm"
                     onClick={() => navigate(`/category/${category.slug}`)}
                     className="flex-1"
+                    // BUG-037 (audit2): 9 cards all announced an identical
+                    // "Explore Category" — append the category name so each
+                    // accessible name is unique (visible label stays the prefix).
+                    aria-label={`Explore Category: ${category.name}`}
                   >
                     Explore Category
                   </Button>

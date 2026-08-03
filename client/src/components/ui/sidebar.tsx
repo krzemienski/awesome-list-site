@@ -120,6 +120,29 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
+    // Audit2 BUG-004/005/017/018: at tablet widths (768–1023px) an expanded
+    // 17.5rem sidebar squeezes the content column to ~390px — /advanced
+    // subcategory chips and tabs clipped past the viewport, the home CTA row
+    // overflowed, and /search columns collapsed to 188px. Collapse to the
+    // icon rail whenever the viewport IS (or becomes) tablet-sized, which
+    // also overrides a stale expanded preference persisted from a desktop
+    // session. One-way: never auto-expands, and an explicit user expand at
+    // tablet sticks for the session (uses _setOpen so the user's stored
+    // preference isn't clobbered by an environmental adjustment).
+    React.useEffect(() => {
+      if (openProp !== undefined) return // controlled — the owner decides
+      const mql = window.matchMedia("(min-width: 768px) and (max-width: 1023px)")
+      const collapseIfTablet = () => {
+        if (mql.matches) _setOpen(false)
+      }
+      collapseIfTablet()
+      mql.addEventListener("change", collapseIfTablet)
+      return () => mql.removeEventListener("change", collapseIfTablet)
+      // mount-only by design; switching controlled/uncontrolled mid-session
+      // isn't a supported case.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed"
@@ -325,6 +348,11 @@ const Sidebar = React.forwardRef<
             // (reference .sidebar/.icon-rail: sticky top:60px, height
             // calc(100vh - 60px)). Header is z-30, sidebar stays under it.
             "duration-200 fixed top-[var(--header-height,0px)] bottom-0 z-10 hidden h-[calc(100svh-var(--header-height,0px))] transition-[left,right,width] ease-linear md:flex",
+            // Audit2 BUG-006: while the consent banner is visible it overlays
+            // the bottom of this fixed column — reserve the banner's height
+            // (var set by consent-banner.tsx) so the last sidebar links stay
+            // scrollable into view and clickable instead of sitting under it.
+            "pb-[var(--consent-banner-h,0px)]",
             side === "left" && "left-0 border-r",
             side === "right" && "right-0 border-l",
             (variant === "floating" || variant === "inset") && "p-2",
@@ -383,7 +411,7 @@ const SidebarTrigger = React.forwardRef<
       {...props}
     >
       <PanelLeft />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">Toggle sidebar</span>
     </Button>
   )
 })
@@ -399,10 +427,10 @@ const SidebarRail = React.forwardRef<
     <button
       ref={ref}
       data-sidebar="rail"
-      aria-label="Toggle Sidebar"
+      aria-label="Toggle sidebar"
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="Toggle Sidebar"
+      title="Toggle sidebar"
       className={cn(
         "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
         "[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",

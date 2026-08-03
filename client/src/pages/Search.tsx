@@ -293,7 +293,7 @@ export default function Search() {
           </CardContent>
         </Card>
       ) : isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">
           {Array.from({ length: 6 }).map((_, i) => (
             <ResourceCardSkeleton key={i} />
           ))}
@@ -354,7 +354,7 @@ export default function Search() {
               </>
             )}
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">
             {pageResults.map((r) => (
               <ResourceCard
                 key={r.id}

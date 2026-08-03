@@ -280,7 +280,7 @@ button { font-family: inherit; }
   background: var(--surface);
   border: var(--hairline-w) solid var(--border);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px; /* BUG-041 (audit2): 10.5px chip microtext fell below the 12px floor on mobile */
   letter-spacing: 0.6px;
   color: var(--text-2);
   text-transform: uppercase;
@@ -470,7 +470,7 @@ button { font-family: inherit; }
 }
 .kbd {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12px; /* BUG-041 (audit2): 10.5px kbd chips fell below the 12px floor on mobile */
   color: var(--text-3);
   padding: 2px 6px;
   border: var(--hairline-w) solid var(--border);

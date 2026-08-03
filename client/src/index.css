@@ -77,6 +77,15 @@
     font-family: var(--font-body);
   }
 
+  /* BUG-006 (audit2): the fixed consent banner hides whatever a scroll-into-view
+     lands behind it — keyboard Tab focus, anchor navigation, and automation all
+     use the native "scroll into view" algorithm, which honors scroll-margin.
+     Reserve the banner's live height (0px once dismissed) so scrolled-to
+     elements always settle above the banner instead of underneath it. */
+  * {
+    scroll-margin-bottom: var(--consent-banner-h, 0px);
+  }
+
   code, pre, kbd, samp {
     font-family: var(--font-mono);
   }

@@ -145,7 +145,10 @@ export default function Advanced() {
         {/* Run16 BUG-066: at 375px the 4th tab ("AI Recommendations") was
             clipped off-screen with no scroll cue — wrap the tab bar on small
             screens so every tab stays visible. */}
-        <TabsList className="flex w-full flex-wrap justify-start sm:flex-nowrap sm:overflow-x-auto lg:grid lg:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
+        {/* BUG-005 (audit2): sm:flex-nowrap + overflow-x-auto clipped the 4th
+            tab at squeezed widths with no visible scroll affordance — below
+            lg the list now WRAPS so every tab stays visible and tappable. */}
+        <TabsList className="flex w-full flex-wrap justify-start lg:grid lg:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
           <TabsTrigger
             value="explorer"
             className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"

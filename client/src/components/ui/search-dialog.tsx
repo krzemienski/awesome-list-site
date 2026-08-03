@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Search, Clock, X, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -376,9 +375,13 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           </CommandList>
         </Command>
         
-        <DialogFooter className="flex items-center justify-between sm:justify-between gap-2">
+        {/* BUG-035 (audit2): the footer "Cancel" button duplicated the
+            dialog's corner ✕ (and Escape) with no functional difference —
+            one dismiss control remains. The esc hint is keyboard/desktop
+            metadata, so the emptied footer hides below sm entirely. */}
+        <DialogFooter className="hidden sm:flex items-center justify-start gap-2">
           <div
-            className="hidden sm:flex items-center gap-2 text-[10px] uppercase tracking-[0.18em]"
+            className="flex items-center gap-2 text-xs uppercase tracking-[0.18em]"
             style={{ color: 'var(--text-2)', fontFamily: 'var(--font-mono)' }}
           >
             <kbd
@@ -389,9 +392,6 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
             </kbd>
             <span>to close</span>
           </div>
-          <Button variant="secondary" onClick={() => setIsOpen(false)}>
-            Cancel
-          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

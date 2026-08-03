@@ -105,7 +105,9 @@ export default function ThemeSettings() {
       <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4"
+          // BUG-042 (audit2): the bare text link measured 55×20px — below the
+          // 24px WCAG 2.5.8 floor; give it a 44px-tall hit area.
+          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]"
           data-testid="link-back-home"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -164,7 +166,7 @@ export default function ThemeSettings() {
                   <span className="font-semibold text-sm">{sys.name}</span>
                   {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
                 </div>
-                <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase mb-2">
+                <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase mb-2">
                   {sys.tag}
                 </code>
                 <p className="text-xs text-[color:var(--text-2)]">{sys.desc}</p>
@@ -214,7 +216,7 @@ export default function ThemeSettings() {
                   <div aria-hidden style={{ flex: 2, background: a.primary }} />
                   <div aria-hidden style={{ flex: 1, background: a.secondary }} />
                 </div>
-                <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider">
+                <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider">
                   {a.primary}
                 </code>
               </button>
@@ -291,10 +293,22 @@ export default function ThemeSettings() {
           </span>
         </div>
 
-        <Card className="p-6 space-y-6 bg-[var(--surface)] border-[color:var(--border)]" data-testid="preview-card">
+        {/* BUG-034 (audit2): the preview's search input and buttons LOOKED
+            functional but did nothing — a false affordance. The specimen card
+            is now `inert` (no pointer, focus, or AT exposure; lowercase
+            string attr so React 18 forwards it — same pattern as the sidebar
+            accordion bodies) and explicitly captioned as display-only. */}
+        <p className="text-xs text-[color:var(--text-3)] -mt-2 mb-4" data-testid="preview-display-only-note">
+          Display-only specimens — the controls below are intentionally inactive.
+        </p>
+        <Card
+          className="p-6 space-y-6 bg-[var(--surface)] border-[color:var(--border)]"
+          data-testid="preview-card"
+          {...({ inert: "" } as any)}
+        >
           {/* Typography */}
           <div className="space-y-2">
-            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">
               Typography
             </code>
             {/* Run15 BUG-027: type specimen, not a page heading — the page's
@@ -315,7 +329,7 @@ export default function ThemeSettings() {
 
           {/* Buttons */}
           <div className="space-y-2">
-            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">
               Buttons
             </code>
             <div className="flex flex-wrap gap-2">
@@ -335,7 +349,7 @@ export default function ThemeSettings() {
 
           {/* Badges */}
           <div className="space-y-2">
-            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">
               Badges
             </code>
             <div className="flex flex-wrap gap-2">
@@ -351,7 +365,7 @@ export default function ThemeSettings() {
 
           {/* Input + Surface chips */}
           <div className="space-y-2">
-            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">
               Form &amp; Surface
             </code>
             <div className="grid sm:grid-cols-2 gap-3">
@@ -366,7 +380,7 @@ export default function ThemeSettings() {
 
           {/* Token swatches — proves the actual computed values */}
           <div className="space-y-2">
-            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+            <code className="block font-mono text-xs text-[color:var(--text-3)] tracking-wider uppercase">
               Active Tokens
             </code>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
@@ -386,8 +400,8 @@ export default function ThemeSettings() {
                     className="h-8 w-full rounded-[var(--radius-sm)] mb-1.5 border border-[color:var(--border)]"
                     style={{ background: `var(${t.varName})` }}
                   />
-                  <div className="font-mono text-[10.5px] text-[color:var(--text-3)]">{t.label}</div>
-                  <div className="font-mono text-[10.5px] text-[color:var(--text-2)]">{t.varName}</div>
+                  <div className="font-mono text-xs text-[color:var(--text-3)]">{t.label}</div>
+                  <div className="font-mono text-xs text-[color:var(--text-2)]">{t.varName}</div>
                 </div>
               ))}
             </div>
