@@ -482,7 +482,7 @@ export default function AppSidebar({
   const activeSearch = useSearch();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const [openSubcategories, setOpenSubcategories] = useState<string[]>([]);
-  const { setOpenMobile, isMobile } = useSidebar();
+  const { setOpenMobile, isMobile, openMobile } = useSidebar();
 
   const filtered = useMemo(() => filterCategories(categories), [categories]);
 
@@ -523,6 +523,26 @@ export default function AppSidebar({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories, location]);
+
+  /* BUG-011 (run26): deep links must bring the active tree item into the
+     sidebar scrollport — auto-expansion alone can leave it below the fold on
+     long trees. Wait out the accordion max-height transition, then nudge the
+     LAST [data-active] match (tree items render after the nav quick-links, and
+     data-active is only present when active) into view; block:'nearest' is a
+     no-op when it's already visible. Re-runs when the mobile drawer opens,
+     since its content only becomes scrollable/visible at that point. */
+  useEffect(() => {
+    if (categories.length === 0) return;
+    if (isMobile && !openMobile) return;
+    const t = setTimeout(() => {
+      const matches = document.querySelectorAll<HTMLElement>(
+        '[data-sidebar="content"] [data-active]',
+      );
+      const el = matches[matches.length - 1];
+      el?.scrollIntoView({ block: "nearest" });
+    }, 350);
+    return () => clearTimeout(t);
+  }, [categories, location, isMobile, openMobile]);
 
   const navigate = (path: string) => {
     setLocation(path);

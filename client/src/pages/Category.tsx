@@ -196,15 +196,49 @@ export default function Category() {
     }));
   }, [treeResources]);
   
-  const subcategories = useMemo(() => {
-    const uniqueSubcategories = new Set<string>();
-    allResources.forEach(resource => {
-      if (resource.subcategory) {
-        uniqueSubcategories.add(resource.subcategory);
+  // BUG-005/BUG-010 (run26): filter options come from the taxonomy TREE (the
+  // same nodes the sidebar renders), not from unique resource strings, so
+  // every level — including sub-subcategories like Codecs › HEVC — is
+  // selectable. Each option carries the exact node identity (subcategory name
+  // + optional sub-subcategory name); filtering compares those fields with
+  // strict equality, never name substrings. Counts use the same identity
+  // match so the option label always equals the result-set size.
+  const subcategoryOptions = useMemo(() => {
+    const opts: Array<{ value: string; sub: string; subSub?: string; count: number }> = [];
+    if (!currentCategory) return opts;
+    const subs = [...((((currentCategory as any).subcategories as any[]) || []))].sort(
+      (a: any, b: any) => String(a.name).localeCompare(String(b.name)),
+    );
+    for (const sub of subs) {
+      // Identity count: every resource whose subcategory field IS this node
+      // (includes rows nested under its sub-subcategories — they carry the
+      // parent subcategory too), matching the sidebar's recursive badge.
+      const subCount = allResources.filter((r) => r.subcategory === sub.name).length;
+      if (subCount > 0) {
+        opts.push({ value: sub.name, sub: sub.name, count: subCount });
       }
-    });
-    return Array.from(uniqueSubcategories).sort();
-  }, [allResources]);
+      const subSubs = [...(((sub.subSubcategories as any[]) || []))].sort(
+        (a: any, b: any) => String(a.name).localeCompare(String(b.name)),
+      );
+      for (const ss of subSubs) {
+        const ssCount = allResources.filter(
+          (r) => r.subcategory === sub.name && r.subSubcategory === ss.name,
+        ).length;
+        if (ssCount > 0) {
+          opts.push({ value: `${sub.name} › ${ss.name}`, sub: sub.name, subSub: ss.name, count: ssCount });
+        }
+      }
+    }
+    return opts;
+  }, [currentCategory, allResources]);
+
+  // value → exact taxonomy identity, for resolving the Select state (and any
+  // deep-linked ?subcategory= value, including the "Sub › SubSub" form).
+  const optionByValue = useMemo(() => {
+    const m = new Map<string, { sub: string; subSub?: string }>();
+    subcategoryOptions.forEach((o) => m.set(o.value, { sub: o.sub, subSub: o.subSub }));
+    return m;
+  }, [subcategoryOptions]);
 
   const availableTags = useMemo(() => {
     // Canonicalize tag variants (space/underscore/case → hyphenated lowercase)
@@ -246,7 +280,22 @@ export default function Category() {
       // would inflate the badge without appearing here.
       results = results.filter(r => !r.subcategory);
     } else if (selectedSubcategory !== "all") {
-      results = results.filter(r => r.subcategory === selectedSubcategory);
+      // BUG-005 (run26): resolve the selection to its taxonomy node and match
+      // by identity. A "Sub › SubSub" selection matches BOTH fields exactly; a
+      // subcategory selection matches its whole subtree (rows under its
+      // sub-subcategories carry the same subcategory field). Unknown values
+      // (hand-edited URLs) fall back to an exact-field comparison, which
+      // yields the empty set rather than substring guesses.
+      const sel = optionByValue.get(selectedSubcategory);
+      if (sel?.subSub) {
+        results = results.filter(
+          (r) => r.subcategory === sel.sub && r.subSubcategory === sel.subSub,
+        );
+      } else if (sel) {
+        results = results.filter((r) => r.subcategory === sel.sub);
+      } else {
+        results = results.filter((r) => r.subcategory === selectedSubcategory);
+      }
     }
 
     if (selectedTags.length > 0) {
@@ -263,7 +312,7 @@ export default function Category() {
     }
 
     return results;
-  }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy, isGeneralView]);
+  }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy, isGeneralView, optionByValue]);
 
   // ----- Client-side pagination (BUG-007) -----
   const totalPages = Math.max(1, Math.ceil(filteredResources.length / PAGE_SIZE));
@@ -510,7 +559,7 @@ export default function Category() {
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            {subcategories.length > 0 && (
+            {subcategoryOptions.length > 0 && (
               <Select value={isGeneralView ? "__general__" : selectedSubcategory} onValueChange={handleSubcategoryChange}>
                 <SelectTrigger aria-label="Filter by subcategory" className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
                   <SelectValue placeholder="Filter by subcategory" />
@@ -520,8 +569,12 @@ export default function Category() {
                       already in General view. */}
                   <SelectItem value="__general__">Uncategorized</SelectItem>
                   <SelectItem value="all">All Subcategories</SelectItem>
-                  {subcategories.map(sub => (
-                    <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                  {/* BUG-010 (run26): sub-subcategories are listed (indented
+                      under their parent) with identity-derived counts. */}
+                  {subcategoryOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.subSub ? `${opt.sub} › ${opt.subSub}` : opt.sub} ({opt.count})
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

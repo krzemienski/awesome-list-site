@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
+import FavoriteButton from "./FavoriteButton";
+import BookmarkButton from "./BookmarkButton";
 
 // Run16 BUG-050/051: list + compact renderers shared by Subcategory and
 // SubSubcategory so their ViewModeToggle matches Category's behavior without
@@ -52,11 +54,13 @@ export function ResourceListRow({ resource }: { resource: ViewModeResource }) {
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
-          {/* BUG-025 (run27): list rows truncate the title — expose the full
+          {/* BUG-027 (run26): real h2 — List rows sit in the same heading
+              hierarchy as grid ResourceCards (h1 page title → h2 resource).
+              BUG-025 (run27): list rows truncate the title — expose the full
               text via the native title tooltip (grid/compact already do). */}
-          <span className="font-medium truncate" title={resource.title}>
+          <h2 className="font-medium text-base truncate" title={resource.title}>
             {titleAnchor(resource, `link-resource-row-${resource.id || resource.url}`)}
-          </span>
+          </h2>
           {resource.id !== "" && (
             <Badge
               variant="outline"
@@ -71,6 +75,15 @@ export function ResourceListRow({ resource }: { resource: ViewModeResource }) {
         )}
       </div>
       <div className="relative z-10 flex items-center gap-1.5 flex-shrink-0">
+        {/* BUG-027 (run26): favorite/bookmark parity with the grid card —
+            switching to List view must not cost card actions. DB-backed
+            resources only (the toggles need a resource id). */}
+        {resource.id !== "" && (
+          <>
+            <FavoriteButton resourceId={resource.id} size="sm" showCount={false} />
+            <BookmarkButton resourceId={resource.id} size="sm" />
+          </>
+        )}
         <Button
           asChild
           variant="ghost"
@@ -101,9 +114,10 @@ export function ResourceCompactCard({ resource }: { resource: ViewModeResource }
       data-testid={`compact-resource-${resource.id || resource.url}`}
     >
       <div className="flex items-start gap-1.5 min-w-0">
-        <span className="font-medium text-xs sm:text-sm flex-1 min-w-0" title={resource.title}>
+        {/* BUG-027 (run26): real h2 for heading-hierarchy parity with grid. */}
+        <h2 className="font-medium text-xs sm:text-sm flex-1 min-w-0" title={resource.title}>
           {titleAnchor(resource, `link-resource-compact-${resource.id || resource.url}`, "line-clamp-2 break-words")}
-        </span>
+        </h2>
         <Button
           asChild
           variant="ghost"
@@ -123,6 +137,14 @@ export function ResourceCompactCard({ resource }: { resource: ViewModeResource }
           </a>
         </Button>
       </div>
+      {/* BUG-027 (run26): favorite/bookmark parity with the grid card in a
+          footer row (the title row is too tight at 2-up mobile widths). */}
+      {resource.id !== "" && (
+        <div className="relative z-10 flex items-center gap-0.5 mt-1 -mb-1 -ml-1">
+          <FavoriteButton resourceId={resource.id} size="sm" showCount={false} />
+          <BookmarkButton resourceId={resource.id} size="sm" />
+        </div>
+      )}
     </Card>
   );
 }

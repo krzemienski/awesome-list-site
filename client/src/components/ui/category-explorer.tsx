@@ -169,6 +169,26 @@ export default function CategoryExplorer({ categories, resources, className }: C
     return filtered;
   }, [categories, searchTerm, selectedTags, sortBy]);
 
+  // BUG-040 (run26): per-card previews/counts must reflect the active search
+  // and tag filters — a card that matched only via one nested resource used to
+  // preview unrelated resources and show its unfiltered total.
+  const filterActive = searchTerm !== "" || selectedTags.length > 0;
+  const getMatchingResources = (category: Category): Resource[] => {
+    const all = getAllCategoryResources(category);
+    if (!filterActive) return all;
+    const q = searchTerm.toLowerCase();
+    return all.filter((resource) => {
+      const matchesSearch =
+        searchTerm === "" ||
+        resource.title.toLowerCase().includes(q) ||
+        resource.description.toLowerCase().includes(q);
+      const matchesTags =
+        selectedTags.length === 0 ||
+        resource.tags?.some((tag) => selectedTags.includes(tag));
+      return matchesSearch && matchesTags;
+    });
+  };
+
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => 
       prev.includes(tag) 
@@ -316,6 +336,14 @@ export default function CategoryExplorer({ categories, resources, className }: C
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredCategories.map(category => {
           const stats = getCategoryStats(category);
+          // BUG-040 (run26): resources matching the active search/tag filter.
+          // A card can also match by category NAME alone — then no resources
+          // match and the preview stays unfiltered but is labeled as such.
+          const matching = getMatchingResources(category);
+          const nameOnlyMatch = filterActive && matching.length === 0;
+          const previewResources = nameOnlyMatch
+            ? getAllCategoryResources(category)
+            : matching;
           // Run16 BUG-024: expanded by default while the toggle is on.
           const isExpanded = showSubcategories && !collapsedCategories.has(category.name);
 
@@ -355,6 +383,15 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
                         {stats.uniqueTags} tags
                       </span>
+                      {/* BUG-040 (run26): surface how many resources actually
+                          match the active filter, next to the total. */}
+                      {filterActive && (
+                        <span className="text-sm font-medium text-primary whitespace-nowrap">
+                          {nameOnlyMatch
+                            ? "matches category name"
+                            : `${matching.length} match${matching.length === 1 ? "es" : ""} filter`}
+                        </span>
+                      )}
                     </div>
                   </div>
                   
@@ -384,7 +421,15 @@ export default function CategoryExplorer({ categories, resources, className }: C
                     category (direct + nested) so the "+N more" figure agrees
                     with the corrected card total (BUG-001). */}
                 <div className="space-y-2 mb-3">
-                  {getAllCategoryResources(category).slice(0, 3).map(resource => (
+                  {/* BUG-040 (run26): unfiltered fallback previews are labeled
+                      so they can't read as (wrong) filter results. */}
+                  {nameOnlyMatch && (
+                    <p className="text-xs italic text-muted-foreground">
+                      No individual resources match the filter — showing an
+                      unfiltered preview of this category.
+                    </p>
+                  )}
+                  {previewResources.slice(0, 3).map(resource => (
                     <div key={resource.id} className="text-sm">
                       <a
                         href={resource.url}
@@ -399,9 +444,13 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       </p>
                     </div>
                   ))}
-                  {stats.totalResources > 3 && (
+                  {/* BUG-040 (run26): "+N more" counts the same set the
+                      previews come from (matching under a filter, total
+                      otherwise) so the numbers can't contradict. */}
+                  {previewResources.length > 3 && (
                     <p className="text-xs text-muted-foreground">
-                      +{stats.totalResources - 3} more resources
+                      +{previewResources.length - 3} more{" "}
+                      {filterActive && !nameOnlyMatch ? "matching resources" : "resources"}
                     </p>
                   )}
                 </div>
