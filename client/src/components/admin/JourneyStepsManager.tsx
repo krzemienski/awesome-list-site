@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -120,7 +120,7 @@ function ResourcePicker({
       const res = await fetch(`/api/resources?${params.toString()}`, {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to search resources");
+      if (!res.ok) throw new ApiError(res.status, "Failed to search resources");
       return res.json();
     },
     enabled: open,
@@ -330,7 +330,7 @@ function StepsDialog({
       const res = await fetch(`/api/admin/journeys/${journeyId}/steps`, {
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch steps");
+      if (!res.ok) throw new ApiError(res.status, "Failed to fetch steps");
       return res.json();
     },
     enabled: open,
@@ -682,7 +682,7 @@ export default function JourneyStepsManager() {
     queryKey: ["/api/admin/journeys"],
     queryFn: async () => {
       const res = await fetch("/api/admin/journeys", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch journeys");
+      if (!res.ok) throw new ApiError(res.status, "Failed to fetch journeys");
       return res.json();
     },
     // R5-037: mirror ResearcherTab's jobsData — a second tab's journey/step

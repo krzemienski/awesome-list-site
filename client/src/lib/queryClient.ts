@@ -1,4 +1,4 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient, QueryCache, MutationCache, QueryFunction } from "@tanstack/react-query";
 import { trackApiPerformance, trackError } from "./analytics";
 import { humanizeStatusBody } from "./apiError";
 
@@ -90,7 +90,67 @@ export const getQueryFn: <T>(options: {
     }
   };
 
+// BUG-018 (run25): mid-session expiry used to leave protected pages showing a
+// dead-end error over stale cached data (staleTime: Infinity keeps prefetched
+// admin/user data alive forever). When any protected request 401s while the
+// cached auth state still says "signed in", flip that state to signed-out —
+// the route guards (AuthGuard/AdminGuard) then render their re-login paths —
+// and drop all cached protected data so nothing stale keeps rendering.
+// The cache purge is deferred a tick (guards must unmount protected views
+// first, or active observers would refetch-loop) and deduped so an expiry
+// burst across many queries is handled once.
+const PROTECTED_KEY_PREFIXES = [
+  "/api/admin",
+  "/api/user",
+  "/api/bookmarks",
+  "/api/favorites",
+];
+let sessionExpiryHandledAt = 0;
+
+function handleUnauthorized(sourceKey: unknown) {
+  const key = Array.isArray(sourceKey) ? sourceKey[0] : sourceKey;
+  if (key === "/api/auth/user") return; // anonymous visitor, not an expiry
+  const auth = queryClient.getQueryData<{ isAuthenticated?: boolean }>([
+    "/api/auth/user",
+  ]);
+  if (!auth?.isAuthenticated) return; // already signed out — nothing stale
+  const now = Date.now();
+  if (now - sessionExpiryHandledAt < 10_000) return;
+  sessionExpiryHandledAt = now;
+  queryClient.setQueryData(["/api/auth/user"], {
+    user: null,
+    isAuthenticated: false,
+  });
+  setTimeout(() => {
+    queryClient.removeQueries({
+      predicate: (q) => {
+        const k = q.queryKey[0];
+        return (
+          typeof k === "string" &&
+          PROTECTED_KEY_PREFIXES.some(
+            (p) => k === p || k.startsWith(`${p}/`) || k.startsWith(`${p}?`),
+          )
+        );
+      },
+    });
+  }, 0);
+}
+
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      if (error instanceof ApiError && error.status === 401) {
+        handleUnauthorized(query.queryKey);
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      if (error instanceof ApiError && error.status === 401) {
+        handleUnauthorized(undefined);
+      }
+    },
+  }),
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),

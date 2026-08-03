@@ -46,7 +46,7 @@ import {
 import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
@@ -188,7 +188,7 @@ export default function ResearcherTab() {
     queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
     queryFn: async () => {
       const res = await fetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
-      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
       return res.json();
     },
     refetchInterval: isPolling ? 3000 : false,
@@ -215,7 +215,7 @@ export default function ResearcherTab() {
     // to an array (everything undefined → "No log entries" forever).
     queryFn: async () => {
       const res = await fetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error(`Failed to fetch job ${selectedJobId}: ${res.status}`);
+      if (!res.ok) throw new ApiError(res.status, `Failed to fetch job ${selectedJobId}: ${res.status}`);
       return res.json();
     },
     refetchInterval: (query) => {
@@ -237,7 +237,7 @@ export default function ResearcherTab() {
     enabled: !!selectedJobId && showJobDetails,
     queryFn: async () => {
       const res = await fetch(`/api/researcher/discoveries?jobId=${selectedJobId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch');
+      if (!res.ok) throw new ApiError(res.status, 'Failed to fetch');
       return res.json();
     },
   });
@@ -354,7 +354,7 @@ export default function ResearcherTab() {
   const briefMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch('/api/researcher/brief', { credentials: 'include' });
-      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      if (!res.ok) throw new ApiError(res.status, `${res.status}: ${await res.text()}`);
       return res.json();
     },
     onSuccess: (data: any) => {

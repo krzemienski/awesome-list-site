@@ -97,14 +97,19 @@ export class UserFeatureRepository {
    * @param resourceId - Resource ID to bookmark
    * @param notes - Optional notes about the bookmark
    */
-  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<void> {
-    await db
+  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<typeof userBookmarks.$inferSelect> {
+    // BUG-021: return the canonical row so the API can echo the saved state
+    // (POST /api/bookmarks/:id used to return only { message }, leaving
+    // surfaces with hand-held local state stuck on stale notes).
+    const [row] = await db
       .insert(userBookmarks)
       .values({ userId, resourceId, notes })
       .onConflictDoUpdate({
         target: [userBookmarks.userId, userBookmarks.resourceId],
         set: { notes, createdAt: new Date() }
-      });
+      })
+      .returning();
+    return row;
   }
 
   /**

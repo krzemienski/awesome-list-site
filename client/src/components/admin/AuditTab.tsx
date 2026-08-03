@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ApiError } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -69,7 +70,7 @@ export default function AuditTab() {
       const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
       if (appliedFilter) params.set('resourceId', appliedFilter);
       const response = await fetch(`/api/admin/audit-logs?${params}`, { credentials: 'include' });
-      if (!response.ok) throw new Error('Failed to fetch audit logs');
+      if (!response.ok) throw new ApiError(response.status, 'Failed to fetch audit logs');
       return response.json();
     },
     // R5-037: refresh admin data when the operator returns to the tab.

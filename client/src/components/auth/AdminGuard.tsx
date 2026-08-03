@@ -50,9 +50,21 @@ export default function AdminGuard({ children }: AdminGuardProps) {
           ) : (
             <>
               <p className="text-sm text-[var(--text)] mb-3">
-                You must be signed in as an administrator to view this page.
+                You must be signed in as an administrator to view this page. If
+                you were signed in a moment ago, your session has expired —
+                sign in again to continue.
               </p>
-              <WLink href="/login" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
+              {/* BUG-018 (run25): carry ?next= so re-auth after a mid-session
+                  expiry returns the admin to the page they were on. */}
+              <WLink
+                href={`/login?next=${encodeURIComponent(
+                  typeof window !== "undefined"
+                    ? window.location.pathname + window.location.search
+                    : "/admin",
+                )}`}
+                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
+                data-testid="link-admin-login"
+              >
                 Sign in to continue →
               </WLink>
             </>

@@ -745,6 +745,8 @@ export const userBookmarks = pgTable(
   })
 );
 
+export type UserBookmark = typeof userBookmarks.$inferSelect;
+
 /**
  * User Journey Progress table - Learning path tracking
  *

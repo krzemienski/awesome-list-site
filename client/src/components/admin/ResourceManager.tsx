@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -142,7 +142,7 @@ export default function ResourceManager() {
       const response = await fetch(`/api/admin/resources?${params.toString()}`, {
         credentials: 'include'
       });
-      if (!response.ok) throw new Error('Failed to fetch resources');
+      if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resources');
       return response.json();
     },
     refetchInterval: 30000,
@@ -159,7 +159,7 @@ export default function ResourceManager() {
       const response = await fetch('/api/admin/resources?page=1&limit=1', {
         credentials: 'include'
       });
-      if (!response.ok) throw new Error('Failed to fetch resource total');
+      if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resource total');
       return response.json();
     },
     staleTime: 60000

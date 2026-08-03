@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +85,7 @@ export default function UsersTab() {
       params.set('sortBy', sortBy);
       params.set('sortDir', sortDir);
       const response = await fetch(`/api/admin/users?${params}`, { credentials: 'include' });
-      if (!response.ok) throw new Error('Failed to fetch users');
+      if (!response.ok) throw new ApiError(response.status, 'Failed to fetch users');
       return response.json();
     },
     // Keep the previous page rendered while a new search/page loads so the

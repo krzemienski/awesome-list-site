@@ -26,6 +26,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 // Run3 audit R3-02: the 15 valid tab ids — used to validate /admin/:section
 // deep-links (unknown sections fall back to the default tab).
+import { ApiError } from "@/lib/queryClient";
 const ADMIN_TAB_IDS = [
   "approvals", "edits", "enrichment", "researcher", "export", "database",
   "resources", "categories", "subcategories", "subsubcategories", "journeys",
@@ -176,11 +177,31 @@ export default function AdminDashboard() {
   }
 
   if (error) {
+    // BUG-018 (run25): a 401 here means the session expired mid-use. The
+    // global 401 handler flips the cached auth state (AdminGuard then takes
+    // over with its sign-in prompt), but render an explicit re-login path
+    // for the frame where this branch is still mounted — never a dead end.
+    const sessionExpired = error instanceof ApiError && error.status === 401;
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
+        <div className="text-center max-w-md px-4">
           <Shield className="h-12 w-12 text-[var(--accent)] mx-auto mb-4" />
-          <p className="text-[var(--accent)]">Error loading admin dashboard</p>
+          {sessionExpired ? (
+            <>
+              <p className="text-[var(--text)] mb-3" data-testid="text-session-expired">
+                Your session has expired. Sign in again to continue.
+              </p>
+              <WLink
+                href={`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`}
+                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
+                data-testid="link-session-expired-login"
+              >
+                Sign in to continue →
+              </WLink>
+            </>
+          ) : (
+            <p className="text-[var(--accent)]">Error loading admin dashboard</p>
+          )}
         </div>
       </div>
     );

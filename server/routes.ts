@@ -2232,8 +2232,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const resourceId = parseInt(req.params.resourceId);
       const { notes } = req.body;
       
-      await userFeatureRepo.addBookmark(userId, resourceId, notes);
-      res.json({ message: 'Bookmark added successfully' });
+      // BUG-021: echo the canonical saved state so surfaces holding local
+      // bookmark state (e.g. BookmarkButton) can sync notes after an edit.
+      const saved = await userFeatureRepo.addBookmark(userId, resourceId, notes);
+      res.json({ message: 'Bookmark added successfully', isBookmarked: true, notes: saved.notes ?? '' });
     } catch (error) {
       console.error('Error adding bookmark:', error);
       res.status(500).json({ message: 'Failed to add bookmark' });
@@ -2491,6 +2493,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // BUG-063 (run25) / Run17 BUG-003: journey_steps stores up to 3 ROWS per
+  // logical stepNumber, and completedSteps stores row ids. Every surface that
+  // reports journey progress must count LOGICAL steps the same way — a
+  // logical step is complete when every non-optional row of its stepNumber is
+  // completed (falling back to all rows when every row is optional). This is
+  // the single shared implementation for /api/journeys and /api/user/progress
+  // so profile stats can never disagree with the journeys UI again.
+  function countLogicalJourneySteps(
+    steps: Array<{ id: number; stepNumber: number | string; isOptional?: boolean | null }>,
+    completedRowIds: Set<number>,
+  ): { totalSteps: number; completedSteps: number } {
+    const rowsByStepNumber = new Map<number, { id: number; isOptional: boolean }[]>();
+    for (const s of steps) {
+      const n = typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10);
+      if (isNaN(n)) continue;
+      const rows = rowsByStepNumber.get(n) ?? [];
+      rows.push({ id: s.id, isOptional: !!s.isOptional });
+      rowsByStepNumber.set(n, rows);
+    }
+    let completed = 0;
+    rowsByStepNumber.forEach((rows) => {
+      const required = rows.filter(r => !r.isOptional);
+      const consider = required.length > 0 ? required : rows;
+      if (consider.every(r => completedRowIds.has(r.id))) completed++;
+    });
+    return { totalSteps: rowsByStepNumber.size, completedSteps: completed };
+  }
+
   app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -2539,11 +2569,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const journey = journeyMeta.find(j => j?.id === p.journeyId);
         const durationHours = parseDurationHours(journey?.estimatedDuration);
         if (!durationHours) continue;
-        const totalStepRows = (stepsByJourney.get(p.journeyId) ?? []).length;
+        // BUG-063 (run25): the fraction used to divide completed step ROWS by
+        // total rows while the journeys UI counts LOGICAL steps (grouped by
+        // stepNumber) — the two surfaces disagreed whenever a stepNumber has
+        // multiple rows. Use the same shared logical-step accounting.
+        const { totalSteps, completedSteps } = countLogicalJourneySteps(
+          stepsByJourney.get(p.journeyId) ?? [],
+          new Set<number>(p.completedSteps ?? []),
+        );
         const fraction = p.completedAt
           ? 1
-          : totalStepRows > 0
-            ? Math.min(1, (p.completedSteps?.length ?? 0) / totalStepRows)
+          : totalSteps > 0
+            ? Math.min(1, completedSteps / totalSteps)
             : 0;
         estimatedHours += durationHours * fraction;
       }
@@ -2765,23 +2802,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Run17 BUG-003: completedSteps stores step ROW ids while stepCount
           // counts logical steps (distinct stepNumbers). Counting raw rows mixed
           // units and produced >100% progress (e.g. 18 rows / 6 steps = 300%).
-          // A logical step counts as complete when every non-optional row of its
-          // stepNumber is in completedSteps (matches completedAt semantics).
-          const completedRowIds = new Set(progress?.completedSteps ?? []);
-          const rowsByStepNumber = new Map<number, { id: number; isOptional: boolean }[]>();
-          for (const s of steps) {
-            const n = typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10);
-            if (isNaN(n)) continue;
-            const rows = rowsByStepNumber.get(n) ?? [];
-            rows.push({ id: s.id, isOptional: !!s.isOptional });
-            rowsByStepNumber.set(n, rows);
-          }
-          let completedStepCount = 0;
-          rowsByStepNumber.forEach((rows) => {
-            const required = rows.filter(r => !r.isOptional);
-            const consider = required.length > 0 ? required : rows;
-            if (consider.every(r => completedRowIds.has(r.id))) completedStepCount++;
-          });
+          // BUG-063 (run25): delegated to the shared countLogicalJourneySteps
+          // helper so /api/user/progress derives time from the SAME accounting.
+          const completedRowIds = new Set<number>(progress?.completedSteps ?? []);
+          const { completedSteps: completedStepCount } = countLogicalJourneySteps(steps, completedRowIds);
           
           return {
             ...journey,

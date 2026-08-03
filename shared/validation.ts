@@ -391,8 +391,12 @@ export const displayNameSchema = z
   .refine((v) => !SINGLE_LINE_CONTROL_RE.test(v), `Name ${CONTROL_CHARS_MESSAGE}`)
   .refine((v) => !BIDI_CONTROL_RE.test(v), `Name ${BIDI_CONTROL_MESSAGE}`)
   .refine((v) => !NO_HTML_RE.test(v), "Name must not contain HTML tags")
+  // BUG-062 (run25): only the literal empty string means "clear the field".
+  // A whitespace-only value is USER INPUT with no visible characters — it
+  // used to slip through (trim → "" → stored NULL) and silently erase the
+  // name under a success toast. Reject it like any other invisible name.
   .refine(
-    (v) => v.trim() === "" || hasVisibleChars(v),
+    (v) => v === "" || hasVisibleChars(v),
     "Name must contain visible characters",
   )
   .transform((v) => stripInvisible(v));

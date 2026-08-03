@@ -1,20 +1,13 @@
-import { useState, memo } from "react";
+import { useState, useRef, useEffect, memo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkPlus, NotebookPen } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import BookmarkNotesDialog from "./BookmarkNotesDialog";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useBookmarkToggle } from "@/hooks/useResourceToggle";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface BookmarkButtonProps {
@@ -40,8 +33,35 @@ function BookmarkButton({
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [notes, setNotes] = useState(initialNotes);
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
   const [tempNotes, setTempNotes] = useState("");
+  // BUG-021 (run25): remembers whether the in-flight save came from the edit
+  // dialog so the success toast says "Notes saved", not "Bookmark added".
+  const saveModeRef = useRef<"add" | "edit">("add");
   const { toast } = useToast();
+
+  // BUG-021 review fix: not every surface can thread bookmark state through
+  // props (list/compact view modes, search results, category grids receive
+  // bare resources). Derive server truth from the shared /api/bookmarks
+  // query — the same key every bookmark surface uses and the toggle hook
+  // invalidates — so the icon state and note prefill are correct everywhere
+  // and an edit can never start from a stale/empty note and overwrite the
+  // saved one. Props remain the initial seed until the list loads.
+  const { isAuthenticated } = useAuth();
+  const { data: bookmarksList } = useQuery<Array<{ id: number | string; notes?: string | null }>>({
+    queryKey: ["/api/bookmarks"],
+    enabled: isAuthenticated,
+    staleTime: 60_000,
+  });
+  const serverEntry = bookmarksList?.find((b) => String(b.id) === String(resourceId));
+  const serverBookmarked = bookmarksList !== undefined ? !!serverEntry : initialBookmarked;
+  const serverNotes = bookmarksList !== undefined ? (serverEntry?.notes ?? "") : initialNotes;
+  useEffect(() => {
+    setIsBookmarked(serverBookmarked);
+  }, [serverBookmarked]);
+  useEffect(() => {
+    setNotes(serverNotes);
+  }, [serverNotes]);
 
   const bookmark = useBookmarkToggle({
     resourceId,
@@ -55,7 +75,10 @@ function BookmarkButton({
         setIsBookmarked(data.isBookmarked);
       }
       if (data?.notes !== undefined) {
-        setNotes(data.notes);
+        setNotes(data.notes ?? "");
+      } else if (!vars.remove && vars.notes !== undefined) {
+        // Fallback: sync from what we submitted if the server omits notes.
+        setNotes(vars.notes);
       }
 
       if (vars.remove) {
@@ -93,8 +116,12 @@ function BookmarkButton({
           ),
         });
       } else {
-        showToast({ description: "Bookmark added", duration: 2000 });
+        showToast({
+          description: saveModeRef.current === "edit" ? "Notes saved" : "Bookmark added",
+          duration: 2000,
+        });
       }
+      saveModeRef.current = "add";
 
       // Close notes dialog if open
       setNotesDialogOpen(false);
@@ -115,6 +142,7 @@ function BookmarkButton({
     bookmark.toggle({
       interceptActivate: () => {
         if (!showNotesDialog) return false;
+        setDialogMode("add");
         setTempNotes(notes);
         setNotesDialogOpen(true);
         return true;
@@ -122,11 +150,24 @@ function BookmarkButton({
     });
   };
 
+  // BUG-021 (run25): notes used to be write-only — visible as a dead icon,
+  // never editable, and the only "way in" removed the bookmark. The pen is
+  // now its own button that opens the shared dialog in edit mode.
+  const handleEditNotesClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDialogMode("edit");
+    setTempNotes(notes);
+    setNotesDialogOpen(true);
+  };
+
   const handleSaveWithNotes = () => {
+    saveModeRef.current = dialogMode;
     bookmark.mutate({ notes: tempNotes, remove: false });
   };
 
   const handleSaveWithoutNotes = () => {
+    saveModeRef.current = dialogMode;
     bookmark.mutate({ remove: false });
   };
 
@@ -167,67 +208,37 @@ function BookmarkButton({
               )}
             />
           )}
-          {notes && (
-            <NotebookPen className="h-3 w-3 text-muted-foreground" />
-          )}
         </div>
-        
+
         {/* Ripple effect on click */}
         {bookmark.isPending && (
           <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-20" />
         )}
       </Button>
 
-      {/* Notes Dialog */}
-      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <BookmarkPlus className="h-5 w-5 text-primary" />
-              Add Bookmark
-            </DialogTitle>
-            <DialogDescription>
-              Add optional notes to remember why you bookmarked this resource.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="notes">Notes (optional)</Label>
-              <Textarea
-                id="notes"
-                placeholder="Add your thoughts, reminders, or why this resource is useful..."
-                className="min-h-[100px] resize-none"
-                value={tempNotes}
-                onChange={(e) => setTempNotes(e.target.value)}
-                maxLength={500}
-              />
-              <p className="text-xs text-muted-foreground text-right">
-                {tempNotes.length}/500 characters
-              </p>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={handleSaveWithoutNotes}
-              disabled={bookmark.isPending}
-              className="flex-1 sm:flex-initial"
-            >
-              Save without notes
-            </Button>
-            <Button
-              onClick={handleSaveWithNotes}
-              disabled={bookmark.isPending}
-              className="flex-1 sm:flex-initial bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-white border-0"
-            >
-              <NotebookPen className="h-4 w-4 mr-2" />
-              Save with notes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {isBookmarked && showNotesDialog && notes && (
+        <Button
+          variant="ghost"
+          size={size}
+          className={cn("text-muted-foreground hover:text-foreground", className)}
+          onClick={handleEditNotesClick}
+          aria-label="View or edit bookmark notes"
+          data-testid="button-edit-bookmark-notes"
+        >
+          <NotebookPen className={size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4"} />
+        </Button>
+      )}
+
+      <BookmarkNotesDialog
+        open={notesDialogOpen}
+        onOpenChange={setNotesDialogOpen}
+        mode={dialogMode}
+        notes={tempNotes}
+        onNotesChange={setTempNotes}
+        onSaveWithNotes={handleSaveWithNotes}
+        onSaveWithoutNotes={handleSaveWithoutNotes}
+        isPending={bookmark.isPending}
+      />
     </>
   );
 }

@@ -192,9 +192,13 @@ export default function Profile({ user }: ProfileProps) {
     // Run21 R4-049/077: a zero-width-only name would render as an invisible
     // identity — reject inline with an explicit message (the server enforces
     // the same rule via the shared validator).
+    // BUG-062 (run25): compare against the RAW value, not trim() — a
+    // whitespace-only field is non-empty input with no visible characters
+    // and used to silently clear the stored name under a success toast.
+    // Only a genuinely empty field means "clear this name".
     if (
-      (editFirstName.trim() !== "" && !hasVisibleChars(editFirstName)) ||
-      (editLastName.trim() !== "" && !hasVisibleChars(editLastName))
+      (editFirstName !== "" && !hasVisibleChars(editFirstName)) ||
+      (editLastName !== "" && !hasVisibleChars(editLastName))
     ) {
       setNameError("Name must contain visible characters.");
       return;
@@ -562,8 +566,12 @@ export default function Profile({ user }: ProfileProps) {
                   <div>
                     <div className="flex justify-between text-sm mb-2">
                       <span>Journeys Completed</span>
+                      {/* BUG-063 (run25): "1 / 5 started" read as "1 of 5
+                          started" (an enrollment count) when the numerator is
+                          COMPLETED journeys and the denominator is STARTED
+                          ones. Spell both units out. */}
                       <span className="font-medium" data-testid="text-journeys-progress">
-                        {progress?.completedResources || 0} / {userJourneys?.length || 0} started
+                        {progress?.completedResources || 0} completed of {userJourneys?.length || 0} started
                       </span>
                     </div>
                     <div
@@ -596,7 +604,10 @@ export default function Profile({ user }: ProfileProps) {
                   {progress?.totalTimeSpent && progress.totalTimeSpent !== '0h 0m' && (
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span>Estimated learning time: {progress.totalTimeSpent}</span>
+                      {/* BUG-063 (run25): this is a SUM over every started
+                          journey — say so, or it reads as the current path's
+                          duration and contradicts the journey's own label. */}
+                      <span>Estimated learning time across your journeys: {progress.totalTimeSpent}</span>
                     </div>
                   )}
                 </div>

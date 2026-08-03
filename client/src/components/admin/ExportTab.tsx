@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import type { ValidationStatus } from "@/components/admin/types/validation";
@@ -72,7 +72,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
         })
       });
 
-      if (!response.ok) throw new Error('Export failed');
+      if (!response.ok) throw new ApiError(response.status, 'Export failed');
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);

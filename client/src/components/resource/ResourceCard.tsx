@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit, ChevronRight } from "lucide-react";
+import { ExternalLink, Edit, ChevronRight, NotebookPen } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
@@ -173,6 +173,19 @@ function ResourceCard({
         {resource.description && (
           <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
             {resource.description}
+          </p>
+        )}
+        {/* BUG-021 (run25): bookmark notes were stored but never rendered —
+            show the saved note on the card (the /bookmarks page passes it). */}
+        {resource.bookmarkNotes && (
+          <p
+            className="text-xs text-muted-foreground italic mt-2 flex items-start gap-1.5"
+            data-testid={`text-bookmark-notes-${resource.id}`}
+          >
+            <NotebookPen className="h-3.5 w-3.5 shrink-0 mt-0.5" aria-hidden="true" />
+            {/* line-clamp sits on the element that directly holds the text;
+                min-w-0 lets long unbroken notes wrap inside the flex row. */}
+            <span className="min-w-0 line-clamp-2">{resource.bookmarkNotes}</span>
           </p>
         )}
       </CardHeader>

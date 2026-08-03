@@ -41,7 +41,7 @@ import {
   KeyRound
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
@@ -107,7 +107,7 @@ export default function BatchEnrichmentPanel() {
     // config would all render defaults).
     queryFn: async () => {
       const res = await fetch(`/api/enrichment/jobs/${selectedJobId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error(`Failed to fetch enrichment job ${selectedJobId}: ${res.status}`);
+      if (!res.ok) throw new ApiError(res.status, `Failed to fetch enrichment job ${selectedJobId}: ${res.status}`);
       return res.json();
     },
     refetchInterval: isDetailsModalOpen ? 5000 : false

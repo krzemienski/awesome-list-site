@@ -76,6 +76,7 @@ import {
   type InsertEnrichmentQueue,
   type UserInteraction,
   type ApiKey,
+  type UserBookmark,
 } from "@shared/schema";
 
 import {
@@ -240,7 +241,7 @@ export interface IStorage {
   getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>>;
 
   // User Bookmarks
-  addBookmark(userId: string, resourceId: number, notes?: string): Promise<void>;
+  addBookmark(userId: string, resourceId: number, notes?: string): Promise<UserBookmark>;
   removeBookmark(userId: string, resourceId: number): Promise<void>;
   getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string; bookmarkedAt: Date }>>;
 
@@ -637,7 +638,7 @@ export class DatabaseStorage implements IStorage {
     return this.userFeatureRepo.getUserFavorites(userId);
   }
 
-  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<void> {
+  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<UserBookmark> {
     return this.userFeatureRepo.addBookmark(userId, resourceId, notes);
   }
 

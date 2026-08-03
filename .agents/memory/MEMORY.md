@@ -62,3 +62,4 @@
 - [SDK block-split messages](sdk-block-split-messages.md) — one API turn = many assistant msgs sharing message.id; never count msgs as unanswered calls; dedupe tokens by id.
 - [MCP tool schema leniency](sdk-tool-schema-leniency.md) — SDK-side zod rejects loose tool args BEFORE the handler (no event); keep schemas lenient, validate in-handler.
 - [jsonb fingerprint stability](jsonb-fingerprint-stability.md) — jsonb reorders object keys, so JSON.stringify-equality dedupe guards silently never match; use recursive key-sorted stringify + verify with a live double-POST.
+- [Global ApiError handler coverage](apierror-global-handler-coverage.md) — central 401 handling only sees ApiError; queryFns throwing plain Error bypass it and render empty/stale instead of the sign-in prompt.

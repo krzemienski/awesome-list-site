@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState, useMemo, ReactNode, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { humanizeApiError } from "@/lib/apiError";
 import { formatAdminDateTime, slugify } from "@/lib/utils";
+import { apiRequest, ApiError } from "@/lib/queryClient";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -364,7 +364,7 @@ function MultiSelect({ value, onChange, config, id, "data-testid": testId }: Mul
     queryFn: async () => {
       if (!config?.fetchUrl) return [];
       const response = await fetch(config.fetchUrl, { credentials: 'include' });
-      if (!response.ok) throw new Error('Failed to fetch options');
+      if (!response.ok) throw new ApiError(response.status, 'Failed to fetch options');
       return response.json();
     },
     enabled: !!config?.fetchUrl
@@ -1542,7 +1542,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         const response = await fetch(parent.fetchUrl, {
           credentials: 'include'
         });
-        if (!response.ok) throw new Error(`Failed to fetch ${parent.label.toLowerCase()}`);
+        if (!response.ok) throw new ApiError(response.status, `Failed to fetch ${parent.label.toLowerCase()}`);
         return response.json();
       }
     })
@@ -1572,7 +1572,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       const response = await fetch(fetchUrl, {
         credentials: 'include'
       });
-      if (!response.ok) throw new Error(`Failed to fetch ${entityNamePlural.toLowerCase()}`);
+      if (!response.ok) throw new ApiError(response.status, `Failed to fetch ${entityNamePlural.toLowerCase()}`);
       return response.json();
     },
     staleTime: 30_000,
@@ -1711,7 +1711,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         });
         if (!response.ok) {
           const error = await response.json().catch(() => ({ message: 'Request failed' }));
-          throw new Error(error.message || 'Failed to create');
+          throw new ApiError(response.status, error.message || 'Failed to create');
         }
         return response.json();
       }
@@ -1767,7 +1767,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         });
         if (!response.ok) {
           const error = await response.json().catch(() => ({ message: 'Request failed' }));
-          throw new Error(error.message || 'Failed to update');
+          throw new ApiError(response.status, error.message || 'Failed to update');
         }
         return { updatedEntity: await response.json(), previousData };
       }
@@ -1870,8 +1870,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         const results = await Promise.allSettled(
           ids.map(id => apiRequest(deleteUrl(id), { method: 'DELETE' }))
         );
-        const failures = results.filter(r => r.status === 'rejected');
+        const failures = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
         if (failures.length > 0) {
+          // Surface a 401 as ApiError so the global session-expiry handler
+          // fires instead of a generic "failed to delete" toast.
+          const unauthorized = failures.find(f => f.reason instanceof ApiError && f.reason.status === 401);
+          if (unauthorized) throw unauthorized.reason;
           throw new Error(`Failed to delete ${failures.length} of ${ids.length} items`);
         }
         return { deleted: ids.length };

@@ -2,7 +2,7 @@ import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +25,10 @@ import {
   Link2,
   Clock,
   ChevronRight,
-  TrendingUp
+  TrendingUp,
+  NotebookPen
 } from "lucide-react";
+import BookmarkNotesDialog from "@/components/resource/BookmarkNotesDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -63,7 +65,8 @@ export default function ResourceDetail() {
     enabled: isAuthenticated
   });
 
-  const { data: bookmarks } = useQuery<Resource[]>({
+  // BUG-021 (run25): /api/bookmarks items carry the user's saved notes.
+  const { data: bookmarks } = useQuery<(Resource & { notes?: string | null })[]>({
     queryKey: ['/api/bookmarks'],
     enabled: isAuthenticated
   });
@@ -123,7 +126,17 @@ export default function ResourceDetail() {
 
   const numericId = parseInt(id || '0');
   const isFavorite = favorites?.some(f => f.id === numericId) ?? false;
-  const isBookmarked = bookmarks?.some(b => b.id === numericId) ?? false;
+  const bookmarkedEntry = bookmarks?.find(b => b.id === numericId);
+  const isBookmarked = !!bookmarkedEntry;
+  const bookmarkNotes = bookmarkedEntry?.notes ?? "";
+
+  // BUG-061 (run25): the detail page used to instant-toggle bookmarks while
+  // cards opened a notes dialog — both entry points now share
+  // BookmarkNotesDialog (add on bookmark, pen-edit on existing notes).
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [notesDialogMode, setNotesDialogMode] = useState<"add" | "edit">("add");
+  const [tempNotes, setTempNotes] = useState("");
+  const saveModeRef = useRef<"add" | "edit">("add");
 
   // Optimistic state lives in the query cache lists here (not local state):
   // flip the cached list membership so isFavorite/isBookmarked re-derive.
@@ -185,17 +198,41 @@ export default function ResourceDetail() {
             </ToastAction>
           ),
         });
+      } else if (saveModeRef.current === "edit") {
+        showToast({
+          title: "Notes saved",
+          description: "Your bookmark notes were updated"
+        });
       } else {
         showToast({
           title: "Added to bookmarks",
           description: "Resource saved to your bookmarks"
         });
       }
+      saveModeRef.current = "add";
+      setNotesDialogOpen(false);
+      setTempNotes("");
     },
     onErrorRevert: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
     },
   });
+
+  const handleSaveWithNotes = () => {
+    saveModeRef.current = notesDialogMode;
+    bookmark.mutate({ notes: tempNotes, remove: false });
+  };
+
+  const handleSaveWithoutNotes = () => {
+    saveModeRef.current = notesDialogMode;
+    bookmark.mutate({ remove: false });
+  };
+
+  const handleEditNotesClick = () => {
+    setNotesDialogMode("edit");
+    setTempNotes(bookmarkNotes);
+    setNotesDialogOpen(true);
+  };
 
   // R2-L09: anonymous users get a clear sign-in prompt instead of a
   // confusing failed request. BUG-044/026 (run14): the toast now carries a
@@ -215,7 +252,17 @@ export default function ResourceDetail() {
   );
 
   const handleFavoriteClick = () => favorite.toggle();
-  const handleBookmarkClick = () => bookmark.toggle();
+  // BUG-061 (run25): bookmarking here opens the same notes dialog as the
+  // cards (the hook still auth-gates and handles rapid re-clicks first).
+  const handleBookmarkClick = () =>
+    bookmark.toggle({
+      interceptActivate: () => {
+        setNotesDialogMode("add");
+        setTempNotes("");
+        setNotesDialogOpen(true);
+        return true;
+      },
+    });
 
   // BUG-028 (run19): Suggest Edit used to open the dialog (which showed its own
   // sign-in wall) while Favorite/Bookmark toast — one auth-gate pattern now:
@@ -476,6 +523,38 @@ export default function ResourceDetail() {
           </Button>
         </div>
       </div>
+
+      {/* BUG-021 (run25): saved bookmark notes render here too (parity with
+          the /bookmarks cards), with a pen-edit into the shared dialog. */}
+      {isBookmarked && bookmarkNotes && (
+        <div className="flex items-start gap-2 mb-4 text-sm text-muted-foreground">
+          <NotebookPen className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
+          <span className="min-w-0 italic" data-testid="text-bookmark-notes">
+            {bookmarkNotes}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-auto px-2 py-0.5 text-xs shrink-0"
+            onClick={handleEditNotesClick}
+            aria-label="Edit bookmark notes"
+            data-testid="button-edit-bookmark-notes"
+          >
+            Edit
+          </Button>
+        </div>
+      )}
+
+      <BookmarkNotesDialog
+        open={notesDialogOpen}
+        onOpenChange={setNotesDialogOpen}
+        mode={notesDialogMode}
+        notes={tempNotes}
+        onNotesChange={setTempNotes}
+        onSaveWithNotes={handleSaveWithNotes}
+        onSaveWithoutNotes={handleSaveWithoutNotes}
+        isPending={bookmark.isPending}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
