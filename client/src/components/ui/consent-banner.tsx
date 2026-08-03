@@ -43,19 +43,18 @@ export default function ConsentBanner() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // R4-071: keyboard users used to reach the banner's buttons only as the
-  // final tab stops, and Escape did nothing. Move focus to the banner as soon
-  // as it appears (so Tab lands on its controls next) and let Escape dismiss
-  // it. R5-025 (run24): Escape is now dismiss-ONLY — it hides the banner for
-  // this session without persisting any choice (the old behavior silently
-  // wrote a permanent "denied" the user never knowingly made). The banner
-  // returns on the next visit because localStorage stays null.
-  // Run22 BUG-049: the banner is also first in DOM order (App.tsx renders it
-  // before the router), so after its last button Tab flows into the page's
-  // skip-link instead of dead-ending on <body>.
+  // R4-071 / BUG-054 (run26): the banner used to steal focus on mount, which
+  // made its Privacy link the page's FIRST tab stop — ahead of the skip link
+  // (WCAG 2.4.1). It no longer autofocuses on initial appearance (it renders
+  // after the router in App.tsx, so keyboard users reach its controls right
+  // after the page content); focus IS moved here on the explicit
+  // "Cookie settings" re-open below, because that's a user-initiated action.
+  // R5-025 (run24): Escape is dismiss-ONLY — it hides the banner for this
+  // session without persisting any choice (the old behavior silently wrote a
+  // permanent "denied" the user never knowingly made). The banner returns on
+  // the next visit because localStorage stays null.
   useEffect(() => {
     if (choiceMade) return;
-    bannerRef.current?.focus();
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       setChoiceMade(true);
@@ -200,7 +199,7 @@ export default function ConsentBanner() {
           {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
           <Link
             href="/privacy"
-            className="underline hover:text-[color:var(--text)] inline-flex items-center min-h-[24px] align-middle"
+            className="underline hover:text-[color:var(--text)] inline-flex items-center min-h-[32px] align-middle"
             data-testid="consent-privacy-link"
           >
             Privacy Policy

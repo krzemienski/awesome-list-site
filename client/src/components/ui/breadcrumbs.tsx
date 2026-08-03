@@ -28,7 +28,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
           <ChevronRight className="h-4 w-4 mx-1 shrink-0" aria-hidden="true" />
           {/* Run17 BUG-048: ≥24px tap target for breadcrumb links. */}
           {item.href ? (
-            <Link href={item.href} className="hover:text-foreground transition-colors px-1 inline-flex items-center min-h-[24px] min-w-0 break-words">
+            <Link href={item.href} className="hover:text-foreground transition-colors px-1 inline-flex items-center min-h-[32px] min-w-0 break-words">
               {item.label}
             </Link>
           ) : (

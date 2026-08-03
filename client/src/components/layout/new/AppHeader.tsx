@@ -270,9 +270,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           layout.jsx Header: logo tile + AWESOME.VIDEO mono wordmark,
           11px/700/tracking 1.8). Wordmark hides below lg to avoid crowding
           the breadcrumb + search + action cluster. */}
+      {/* BUG-024 (run26): min-w-[32px] — the icon-only brand link measured
+          28px wide, under the 32px touch-target floor. */}
       <Link
         href="/"
-        className="flex items-center gap-2.5 shrink-0 no-underline min-h-[44px]"
+        className="flex items-center justify-center gap-2.5 shrink-0 no-underline min-h-[44px] min-w-[32px]"
         aria-label="Awesome Video — home"
         data-testid="header-brand"
       >
@@ -408,9 +410,14 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           className="flex md:hidden min-w-0 shrink items-center text-sm text-muted-foreground"
           data-testid="breadcrumb-mobile-current"
         >
+          {/* BUG-050 (run26): tighter caps — at 320px the 38vw crumb left the
+              search pill's flex-basis at 0 so its intrinsic ~26px overflowed
+              INTO the Theme/Sign-in cluster (flex children overlap when a
+              zero-width container's content can't shrink). 30vw at 375 and a
+              48px hard cap under 360px keep every header control disjoint. */}
           <span
             aria-current="page"
-            className="truncate max-w-[38vw] text-foreground"
+            className="truncate max-w-[30vw] max-[359px]:max-w-[48px] text-foreground"
             title={crumbs[crumbs.length - 1].label}
           >
             {crumbs[crumbs.length - 1].label}
@@ -425,7 +432,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
       {/* BUG-002 (run22): 200px search floor only from lg; at md 110px fits
           the short "Search..." label and returns the overflow budget to the
           right-side controls. */}
-      <div className="flex-1 min-w-0 md:min-w-[110px] lg:min-w-[200px] mx-1 sm:mx-2">
+      {/* BUG-050 + BUG-024 (run26): a 44px floor below md — min-w-0 let deep
+          breadcrumbs squeeze this container to 0px, so the icon pill inside
+          bled over the action cluster at 320px (and measured 26px wide,
+          under the touch-target floor, at 375px). */}
+      <div className="flex-1 min-w-[44px] md:min-w-[110px] lg:min-w-[200px] mx-1 sm:mx-2">
         <button
           onClick={onSearchOpen}
           className="w-full max-w-sm flex items-center min-h-[44px] sm:min-h-0 h-11 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"

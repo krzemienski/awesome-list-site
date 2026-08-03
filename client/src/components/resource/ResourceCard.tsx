@@ -102,7 +102,7 @@ function ResourceCard({
   ) : isValidDbResource ? (
     <Link
       href={`/resource/${resource.id}`}
-      className="line-clamp-2 break-words py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="line-clamp-2 break-words py-1.5 -my-1.5 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -112,7 +112,7 @@ function ResourceCard({
       href={resource.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="line-clamp-2 break-words py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="line-clamp-2 break-words py-1.5 -my-1.5 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -241,7 +241,7 @@ function ResourceCard({
           {isValidDbResource && (
             <Link
               href={`/resource/${resource.id}`}
-              className="no-print relative z-10"
+              className="no-print relative z-10 inline-flex items-center min-h-[32px]"
               data-testid={`link-view-details-${resource.id}`}
               aria-label={`View details for ${resource.name}`}
             >
@@ -265,7 +265,7 @@ function ResourceCard({
                   <button
                     key={tag}
                     type="button"
-                    className="relative z-10"
+                    className="relative z-10 inline-flex items-center min-h-[32px]"
                     onClick={(e) => {
                       e.stopPropagation();
                       onTagClick(tag);
@@ -281,7 +281,7 @@ function ResourceCard({
                   <Link
                     key={tag}
                     href={`/?tags=${encodeURIComponent(tag)}`}
-                    className="relative z-10"
+                    className="relative z-10 inline-flex items-center min-h-[32px]"
                     data-testid={`tag-pill-${resource.id}-${tag}`}
                     aria-label={`Browse resources tagged ${tag}`}
                   >
@@ -296,7 +296,7 @@ function ResourceCard({
               {resource.tags.length > 3 && (
                 <button
                   type="button"
-                  className="relative z-10 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline cursor-pointer"
+                  className="relative z-10 inline-flex items-center min-h-[32px] text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAllTags((v) => !v);

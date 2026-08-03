@@ -15,7 +15,15 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props}>
+          // BUG-052 (run26): toasts carrying an action must not vanish before
+          // the action can be used (WCAG 2.2.1) — they persist until dismissed
+          // (swipe, Esc/F6 hotkey, close button, or clicking the action).
+          // Plain informational toasts keep the default auto-dismiss.
+          <Toast
+            key={id}
+            {...props}
+            duration={props.duration ?? (action ? Infinity : undefined)}
+          >
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
@@ -23,7 +31,11 @@ export function Toaster() {
               )}
             </div>
             {action}
-            <ToastClose />
+            {/* Persistent (actionable) toasts always show the close button —
+                hover-only affordances don't exist on touch. */}
+            <ToastClose
+              className={action ? "opacity-100 pointer-events-auto" : undefined}
+            />
           </Toast>
         )
       })}

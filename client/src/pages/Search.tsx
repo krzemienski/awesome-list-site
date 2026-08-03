@@ -1,6 +1,6 @@
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useSearch } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent } from "@/components/ui/card";
@@ -283,6 +283,24 @@ export default function Search() {
               No results for “{trimmed}”
             </h2>
             <p className="text-xs text-muted-foreground">Try different keywords</p>
+            {/* BUG-053 (run26): recovery actions — the no-results state was a
+                dead end (the tag empty state offers "Clear filters"; search
+                offered nothing). */}
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setInput("");
+                  inputRef.current?.focus();
+                }}
+                data-testid="button-clear-search"
+              >
+                Clear search
+              </Button>
+              <Button asChild variant="ghost" data-testid="link-browse-categories">
+                <Link href="/categories">Browse all categories</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (

@@ -810,11 +810,13 @@ export default function SubmitResource() {
                 </fieldset>
 
                 {/* Submit Button */}
-                <div className="flex gap-3 pt-4">
+                {/* BUG-051 (run26): stacked below sm — the one-line row pushed
+                    Cancel past the viewport edge at 320px (clipped, untappable). */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <Button
                     type="submit"
                     disabled={submitMutation.isPending || !isAuthenticated}
-                    className="flex-1"
+                    className="sm:flex-1"
                     data-testid="button-submit"
                   >
                     {submitMutation.isPending ? (

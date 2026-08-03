@@ -73,18 +73,27 @@ export default function AdvancedFilter({
           omit the control, which read as an inconsistency across taxonomy
           pages — show it disabled with an explanation instead. */}
       {availableTags.length === 0 && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="min-h-[44px] flex-1 sm:flex-none"
-          disabled
-          title="No tags available for the resources on this page"
-          data-testid="button-filter-by-tag-disabled"
-        >
-          <SlidersHorizontal className="h-4 w-4 mr-2" />
-          Filter by Tag
-          <span className="sr-only">(no tags available for the resources on this page)</span>
-        </Button>
+        <>
+          {/* BUG-028 (run26): the explanation moved OUT of the button into an
+              aria-describedby target — the sr-only span inside the button made
+              the accessible NAME a run-on ("Filter by Tag(no tags available…)").
+              Name stays clean; the reason reads as a description. */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="min-h-[44px] flex-1 sm:flex-none"
+            disabled
+            title="No tags available for the resources on this page"
+            aria-describedby="filter-by-tag-disabled-note"
+            data-testid="button-filter-by-tag-disabled"
+          >
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            Filter by Tag
+          </Button>
+          <span id="filter-by-tag-disabled-note" className="sr-only">
+            No tags available for the resources on this page
+          </span>
+        </>
       )}
       {availableTags.length > 0 && (
         <Popover open={isOpen} onOpenChange={setIsOpen}>

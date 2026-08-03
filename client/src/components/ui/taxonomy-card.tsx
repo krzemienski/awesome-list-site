@@ -4,7 +4,6 @@ import { ChevronRight, type LucideIcon } from "lucide-react";
 import {
   Card,
   CardHeader,
-  CardTitle,
   CardDescription,
 } from "@/components/ui/card";
 
@@ -59,14 +58,16 @@ export function TaxonomyCard({
           </span>
           {/* NB-017 (run18): long names wrap to two reserved lines so cards
               stay aligned in the grid instead of truncating mid-word. */}
-          <CardTitle className="font-sans font-semibold text-base tracking-tight flex items-start justify-between gap-2 pt-1">
+          {/* BUG-058 (run26): taxonomy names are real <h2> headings (they were
+              divs) so AT users can navigate /categories & Home by heading. */}
+          <h2 className="font-sans font-semibold text-base tracking-tight flex items-start justify-between gap-2 pt-1">
             {/* BUG-025 (run27): clamped names expose the full text via the
                 native title tooltip. */}
             <span className="line-clamp-2 min-h-[2.5em] leading-tight" title={name}>
               {name}
             </span>
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-          </CardTitle>
+          </h2>
           {/* BUG-036 (run27): singular form for count === 1 ("1 resource"). */}
           <CardDescription data-testid={countTestId}>
             {count.toLocaleString()} {count === 1 ? "resource" : "resources"}

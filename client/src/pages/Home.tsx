@@ -493,18 +493,20 @@ export default function Home({ nav, navLoading }: HomeProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row gap-3 sm:items-center">
-              <Link href="/login">
-                <Button className="w-full sm:w-auto">
+              {/* BUG-049 (run26): Button asChild renders ONE anchor instead of
+                  an <a> wrapping a <button> (invalid nesting, double tab stop). */}
+              <Button asChild className="w-full sm:w-auto">
+                <Link href="/login">
                   <LogIn className="mr-2 h-4 w-4" />
                   Login to Get Started
-                </Button>
-              </Link>
-              <Link href="/recommendations">
-                <Button variant="outline" className="w-full sm:w-auto" data-testid="button-browse-recommendations">
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full sm:w-auto" data-testid="button-browse-recommendations">
+                <Link href="/recommendations">
                   <Sparkles className="mr-2 h-4 w-4" />
                   Browse recommendations
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         )}

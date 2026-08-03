@@ -239,6 +239,7 @@ const Sidebar = React.forwardRef<
               } as React.CSSProperties
             }
             side={side}
+            aria-modal="true"
             onOpenAutoFocus={(e) => {
               // NB-002 (run18): give the drawer's Radix focus trap a
               // deterministic entry point on the first real nav link so the
@@ -246,10 +247,17 @@ const Sidebar = React.forwardRef<
               // landing on the logo, after which Tab could ping-pong to the
               // content box and skip the nav). Radix still records the
               // hamburger trigger separately for Escape/close focus return.
+              // BUG-019 (run26): the first a[href] can be a HIDDEN icon-mode
+              // duplicate (h=0) — focusing it silently fails, focus never
+              // enters the sheet, and the whole Radix focus trap disengages
+              // (Tab then walks the aria-hidden background). Only accept a
+              // VISIBLE candidate; otherwise let Radix focus the content box.
               const content = e.currentTarget as HTMLElement
-              const first =
-                content.querySelector<HTMLElement>("a[href]") ??
-                content.querySelector<HTMLElement>("button:not([disabled])")
+              const first = Array.from(
+                content.querySelectorAll<HTMLElement>(
+                  "a[href], button:not([disabled])"
+                )
+              ).find((el) => el.offsetWidth > 0 || el.offsetHeight > 0)
               if (first) {
                 e.preventDefault()
                 first.focus()
@@ -671,7 +679,13 @@ const SidebarMenuButton = React.forwardRef<
       />
     )
 
-    if (!tooltip) {
+    // BUG-019 (run26): never wrap in Tooltip inside the mobile drawer.
+    // Tooltips only matter in collapsed icon mode, which mobile never uses —
+    // and the mount/unmount of the (hidden) tooltip node on focus/blur is a
+    // DOM mutation that Radix FocusScope's MutationObserver treats as "focused
+    // element removed", bouncing Tab focus back to the sheet container and
+    // making the drawer's nav unreachable by keyboard.
+    if (!tooltip || isMobile) {
       return button
     }
 

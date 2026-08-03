@@ -60,6 +60,7 @@
 - [line-clamp on the clipping ancestor](line-clamp-anchor.md) — -webkit-line-clamp fails silently when an inline-block child wraps the text; clamp the element that directly holds the text node.
 - [Audit cold-boot flakes](audit-cold-boot-flake.md) — responsive (profile nameW=0) AND print (recommendations blank) false-fail right after a server restart; rerun once before debugging.
 - [Radix dialog close lock](radix-dialog-close-lock.md) — body pointer-events:none persists through close animation; condition-wait (not sleep) between dialogs or slow containers flake.
+- [Radix sheet focus-trap breakers](radix-sheet-focus-trap.md) — hidden autofocus targets silently disengage the trap; tooltip mount/unmount on blur makes FocusScope yank Tab focus back to the container.
 - [SDK block-split messages](sdk-block-split-messages.md) — one API turn = many assistant msgs sharing message.id; never count msgs as unanswered calls; dedupe tokens by id.
 - [MCP tool schema leniency](sdk-tool-schema-leniency.md) — SDK-side zod rejects loose tool args BEFORE the handler (no event); keep schemas lenient, validate in-handler.
 - [jsonb fingerprint stability](jsonb-fingerprint-stability.md) — jsonb reorders object keys, so JSON.stringify-equality dedupe guards silently never match; use recursive key-sorted stringify + verify with a live double-POST.

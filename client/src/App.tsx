@@ -578,12 +578,14 @@ function App() {
     <ThemeProvider>
       {/* BUG-020 (run13): analytics consent banner — gtag loads only after
           an explicit Accept (initGA is consent-gated).
-          Run22 BUG-049: rendered BEFORE the router so it is first in DOM
-          order — after its last control, Tab continues to the skip-link
-          instead of exiting the document through a dead <body> stop (the
-          fixed positioning keeps it visually at the bottom regardless). */}
-      <ConsentBanner />
+          BUG-054 (run26): rendered AFTER the router so the layout's
+          "Skip to main content" link is the document's FIRST tab stop
+          (run22 had it first in DOM, which put 3 banner controls ahead of
+          the skip link on every fresh visit). The banner stays fixed at the
+          bottom visually and remains keyboard-reachable after the page
+          content, with Escape still dismissing it for the session. */}
       <Router />
+      <ConsentBanner />
     </ThemeProvider>
   );
 }

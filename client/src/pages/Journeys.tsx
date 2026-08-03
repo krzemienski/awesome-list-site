@@ -160,7 +160,9 @@ export default function Journeys() {
           <div className="flex flex-col items-center gap-4">
             <BookOpen className="h-12 w-12 text-muted-foreground" />
             <div>
-              <h3 className="text-lg font-semibold mb-2">No journeys found</h3>
+              {/* BUG-037 (run26): h2 — /journeys had no heading level below
+                  the H1, so the empty state and card titles are now h2s. */}
+              <h2 className="text-lg font-semibold mb-2">No journeys found</h2>
               <p className="text-sm text-muted-foreground">
                 {selectedCategory === "all" 
                   ? "No learning journeys are available at the moment." 
@@ -214,7 +216,9 @@ export default function Journeys() {
                       {journey.difficulty}
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg sm:text-xl leading-tight">
+                  {/* BUG-037 (run26): real <h2> heading (CardTitle is a div) so
+                      the journey list has a navigable heading structure. */}
+                  <h2 className="text-lg sm:text-xl font-semibold leading-tight tracking-tight">
                     {/* BUG-010 (run13): journey titles are links, matching the
                         card-title-as-link pattern used on resource cards. */}
                     {/* Run17 BUG-048: ≥24px tap target. */}
@@ -228,7 +232,7 @@ export default function Journeys() {
                     >
                       {journey.title}
                     </Link>
-                  </CardTitle>
+                  </h2>
                   <CardDescription className="line-clamp-3">
                     {journey.description}
                   </CardDescription>
