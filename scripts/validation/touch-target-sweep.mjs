@@ -58,7 +58,7 @@ async function newAdminContext() {
   }
   for (let attempt = 0; attempt < 6; attempt++) {
     const c = await browser.newContext({ viewport: { width: 375, height: 800 } });
-    const res = await c.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json' } });
+    const res = await c.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json', Origin: BASE } });
     if (res.ok()) {
       await c.storageState({ path: SESSION_FILE });
       return c;

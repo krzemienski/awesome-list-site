@@ -1,7 +1,7 @@
 /**
- * ============================================================================
+ * ----------------------------------------------------------------------------
  * ROUTES.TS - Express API Route Definitions
- * ============================================================================
+ * ----------------------------------------------------------------------------
  * 
  * This is the main routing module for the Awesome Video Resource Viewer API.
  * It defines 75+ REST endpoints organized into logical sections:
@@ -26,7 +26,7 @@
  * - runBackgroundInitialization(): Seeds database if empty on startup
  * 
  * See /docs/API.md for complete endpoint documentation.
- * ============================================================================
+ * ----------------------------------------------------------------------------
  */
 
 import type { Express, Request, Response } from "express";
@@ -49,7 +49,7 @@ import {
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
-import { hashPassword, comparePassword, validateEmail, validateNewPassword } from "./passwordUtils";
+import { hashPassword, comparePassword, validateEmail, validateLoginPassword, validateNewPassword } from "./passwordUtils";
 import { checkLock, recordFailure, clearOnSuccess, allowResetRequest } from "./loginLockout";
 import { sendPasswordResetEmail } from "./email";
 import crypto from "crypto";
@@ -116,12 +116,16 @@ import {
   LISTING_PAGE_SIZE,
   type ListingLevel,
 } from "./seo-content";
+import {
+  enforceConcurrentSessionLimit,
+  revokeAllUserSessions,
+} from "./sessionPolicy";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 // REPOSITORY INSTANCES - Direct Usage of Domain Repositories
-// ============================================================================
+// ----------------------------------------------------------------------------
 // Instead of using the storage facade, we instantiate repositories directly
 // for better modularity and clearer dependencies.
 const userRepo = new UserRepository();
@@ -809,14 +813,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Local authentication routes
   app.post("/api/auth/local/login", loginBurstLimiter, authLimiter, (req, res, next) => {
     const loginEmail = typeof req.body?.email === "string" ? req.body.email : "";
+    const loginPassword = req.body?.password;
+    const attackerKey = req.ip || req.socket.remoteAddress || "unknown";
 
-    // Brute-force guard: short-circuit while the account is in a cooldown window.
-    const lock = checkLock(loginEmail);
+    // Request-shape errors are caller errors (400), while a well-formed but
+    // incorrect credential pair remains the generic, non-enumerating 401.
+    if (
+      !validateEmail(loginEmail) ||
+      typeof loginPassword !== "string" ||
+      !loginPassword ||
+      !validateLoginPassword(loginPassword)
+    ) {
+      return res.status(400).json({ message: "Invalid login request" });
+    }
+
+    // Brute-force cooldown is scoped to attacker IP + email, never the account
+    // alone. No exact unlock time is exposed in a body or Retry-After header.
+    const lock = checkLock(loginEmail, attackerKey);
     if (lock.locked) {
-      res.setHeader("Retry-After", String(lock.retryAfterSec));
       return res.status(423).json({
-        message: "Account temporarily locked due to repeated failed login attempts. Try again later.",
-        retryAfter: lock.retryAfterSec,
+        message: "Too many failed login attempts from this client. Try again later.",
       });
     }
 
@@ -828,7 +844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!user) {
         // Count this failure toward the lockout threshold (generic message — no enumeration).
-        recordFailure(loginEmail);
+        recordFailure(loginEmail, attackerKey);
         console.log('[local/login] Authentication failed:', info?.message);
         // Run16 BUG-042: security-relevant auth events now hit the audit trail.
         // performedBy stays null — the attempted email may not map to any user
@@ -860,8 +876,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log('[local/login] Session saved successfully, session ID:', req.sessionID);
 
-          // Successful login clears any accumulated failure/lock state for this email.
-          clearOnSuccess(loginEmail);
+          try {
+            await enforceConcurrentSessionLimit(user.claims.sub, req.sessionID);
+          } catch (policyError) {
+            console.error("[local/login] Session policy enforcement failed:", policyError);
+            return req.session.destroy(() => {
+              res.clearCookie("connect.sid", { path: "/" });
+              res.status(500).json({ message: "Failed to save session" });
+            });
+          }
+
+          // Successful login clears only this attacker's accumulated failures.
+          clearOnSuccess(loginEmail, attackerKey);
 
           // Run16 BUG-042: record successful logins in the audit trail.
           auditRepo.logResourceAudit(null, 'auth.login', user.claims.sub, { email: user.claims.email }, 'Local login success')
@@ -1081,7 +1107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: Database seeding and data initialization moved to runBackgroundInitialization()
   // This ensures the server starts quickly for production deployments
 
-  // ============= Auth Routes (from Replit Auth blueprint) =============
+  // --- Auth Routes (from Replit Auth blueprint) ---
   
   // GET /api/auth/user - Get current user (public endpoint)
   app.get('/api/auth/user', async (req: any, res) => {
@@ -1216,26 +1242,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to logout" });
     }
   });
-  
-  // Run3 audit R3-10: browser-facing GET /logout. Mirrors POST /api/auth/logout
-  // (destroy session + clear cookie) then redirects home, so pasting /logout in
-  // the address bar works instead of 404ing. GET is technically CSRF-able, but
-  // "log the user out" is a nuisance-level primitive and the convenience wins.
-  app.get('/logout', (req: any, res) => {
-    const finish = () => {
-      res.clearCookie("connect.sid", { path: "/" });
-      res.redirect(302, "/");
-    };
+
+  // POST /api/auth/logout-all - Revoke this account's sessions on every device.
+  app.post('/api/auth/logout-all', isAuthenticated, async (req: any, res) => {
+    const logoutUserId: string | undefined = req.user?.claims?.sub;
+    if (!logoutUserId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
     try {
-      req.logout(() => {
-        if (req.session) {
-          req.session.destroy(() => finish());
-        } else {
-          finish();
+      // The store deletion is the authoritative all-device revocation. Do it
+      // before mutating Passport state so a database failure leaves the
+      // current session genuinely intact and the client's failure message is
+      // truthful. Once this succeeds, the current row is already invalid.
+      const revokedSessions = await revokeAllUserSessions(logoutUserId);
+      req.session.destroy((destroyError: any) => {
+        if (destroyError) {
+          // The authoritative DELETE above already removed the current row;
+          // a second idempotent store deletion failure cannot restore it.
+          console.error("Error finalizing current session cleanup:", destroyError);
         }
+        res.clearCookie("connect.sid", { path: "/" });
+        return res.json({ success: true, revokedSessions });
       });
-    } catch {
-      finish();
+    } catch (error) {
+      console.error("Error revoking account sessions:", error);
+      return res.status(500).json({ message: "Failed to logout" });
     }
   });
 
@@ -1318,7 +1350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Note: /api/login, /api/callback are set up in setupAuth()
 
-  // ============= Resource Routes =============
+  // --- Resource Routes ---
 
   // NEW-019 / BUG-027 (run13): public resource serializer. Strips internal
   // fields from any resource returned on a public endpoint: `searchTsv`,
@@ -2129,7 +2161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Category Routes =============
+  // --- Category Routes ---
   
   // GET /api/categories - List all categories (public)
   app.get('/api/categories', async (req, res) => {
@@ -2252,7 +2284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= User Interaction Routes =============
+  // --- User Interaction Routes ---
   
   // POST /api/favorites/:resourceId - Add favorite
   app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
@@ -2337,7 +2369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= User Profile & Progress Routes =============
+  // --- User Profile & Progress Routes ---
 
   // GET /api/user/progress - Get user's learning progress
   // Change the current user's password and invalidate their OTHER sessions.
@@ -2828,7 +2860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Learning Journey Routes =============
+  // --- Learning Journey Routes ---
   
   // GET /api/journeys - List all journeys
   app.get('/api/journeys', async (req: any, res) => {
@@ -3057,7 +3089,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Admin Journey & Step Routes =============
+  // --- Admin Journey & Step Routes ---
 
   // GET /api/admin/journeys - List ALL journeys (including drafts/archived)
   app.get('/api/admin/journeys', isAuthenticated, isAdmin, async (_req, res) => {
@@ -3329,7 +3361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-  // ============= Admin Routes =============
+  // --- Admin Routes ---
   
   // GET /api/admin/stats - Dashboard statistics
   app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
@@ -3533,7 +3565,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Audit Log Routes =============
+  // --- Audit Log Routes ---
 
   // GET /api/admin/audit-logs - List audit log entries
   app.get('/api/admin/audit-logs', isAuthenticated, isAdmin, async (req, res) => {
@@ -3599,7 +3631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Resource Approval Routes =============
+  // --- Resource Approval Routes ---
   
   // GET /api/admin/pending-resources - Get all pending resources for approval
   app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
@@ -4088,7 +4120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ============= Resource Edit Management Routes =============
+  // --- Resource Edit Management Routes ---
   
   // GET /api/admin/resource-edits - Get all pending resource edits (admin only)
   app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, async (req, res) => {
@@ -4258,7 +4290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Category Management Routes =============
+  // --- Category Management Routes ---
   
   // GET /api/admin/categories - List all categories
   app.get('/api/admin/categories', isAuthenticated, isAdmin, async (req, res) => {
@@ -4399,7 +4431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ============= Subcategory Management Routes =============
+  // --- Subcategory Management Routes ---
   
   // GET /api/admin/subcategories - List all subcategories (optionally filtered by category)
   app.get('/api/admin/subcategories', isAuthenticated, isAdmin, async (req, res) => {
@@ -4587,7 +4619,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ============= Sub-subcategory Management Routes =============
+  // --- Sub-subcategory Management Routes ---
   
   // GET /api/admin/sub-subcategories - List all sub-subcategories (optionally filtered by subcategory)
   app.get('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req, res) => {
@@ -4755,7 +4787,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ============= GitHub Sync Routes =============
+  // --- GitHub Sync Routes ---
   
   // POST /api/github/configure - Configure GitHub repository
   app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: any, res) => {
@@ -5041,7 +5073,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Awesome List Export & Validation Routes =============
+  // --- Awesome List Export & Validation Routes ---
 
   // POST /api/admin/export - Generate and download awesome list markdown
   app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
@@ -5338,7 +5370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Link Health Check Routes =============
+  // --- Link Health Check Routes ---
   
   // GET /api/admin/link-health/status - Get current/latest job status
   app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, async (req, res) => {
@@ -5482,7 +5514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Admin Maintenance Routes (Run23) =============
+  // --- Admin Maintenance Routes (Run23) ---
 
   // Run23 NB-046: tag-coverage visibility — the July bulk import left more
   // than half the catalog untagged and the gap was invisible in the admin.
@@ -5600,7 +5632,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Enrichment API Routes =============
+  // --- Enrichment API Routes ---
   
   // POST /api/enrichment/start - Start batch enrichment job
   app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
@@ -5844,7 +5876,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= AI Researcher Routes =============
+  // --- AI Researcher Routes ---
 
   app.post('/api/researcher/start', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
@@ -6081,7 +6113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Database-Driven Routes =============
+  // --- Database-Driven Routes ---
 
   // API routes for awesome list - NOW SERVED FROM DATABASE
   // Run16 BUG-002: the unfiltered awesome-list payload is ~2.7MB and was
@@ -6356,7 +6388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/og-image.svg", generateOpenGraphImage);
   app.get("/og-image.png", generateOpenGraphImagePng);
 
-  // ============= AI Recommendation Routes =============
+  // --- AI Recommendation Routes ---
 
   // GET /api/recommendations/init - Initialize recommendation engine
   app.get("/api/recommendations/init", async (req, res) => {

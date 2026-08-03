@@ -29,6 +29,7 @@ interface AppHeaderProps {
   onSearchOpen: () => void;
   user?: any;
   onLogout?: () => void;
+  logoutError?: string | null;
   categories?: any[];
 }
 
@@ -165,7 +166,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
   return crumbs;
 }
 
-export default function AppHeader({ onSearchOpen, user, onLogout, categories }: AppHeaderProps) {
+export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories }: AppHeaderProps) {
   const [location, setLocation] = useLocation();
   const crumbs = getBreadcrumbs(location, categories || []);
 
@@ -260,6 +261,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
   // compact gaps and smaller floors so the right-side action cluster
   // (shrink-0) always fits.
   return (
+    <>
     <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 lg:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
       <SidebarTrigger
         className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]"
@@ -531,5 +533,15 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
         )}
       </div>
     </header>
+    {logoutError ? (
+      <div
+        className="w-full border-b border-destructive/40 bg-destructive/10 px-4 py-2 text-center text-sm font-medium text-destructive"
+        role="alert"
+        data-testid="banner-logout-error"
+      >
+        Sign out failed. {logoutError}
+      </div>
+    ) : null}
+    </>
   );
 }

@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { UserRepository } from "./repositories";
 import { comparePassword, validateEmail, validateLoginPassword } from "./passwordUtils";
+import { SESSION_TTL_MS } from "./sessionPolicy";
 
 // BUG-030 (run14): pre-computed bcrypt hash (cost 10) used to equalize timing
 // on the unknown-email path. Never matches any real password.
@@ -62,7 +63,7 @@ export function setupLocalAuth() {
             last_name: user.lastName || undefined,
             profile_image_url: user.profileImageUrl || undefined,
           },
-          expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
+          expires_at: Math.floor((Date.now() + SESSION_TTL_MS) / 1000),
         };
 
         return done(null, userSession);

@@ -78,7 +78,7 @@ async function newAdminContext() {
   const ctx = await browser.newContext();
   let loggedIn = false;
   for (let i = 0; i < 8 && !loggedIn; i++) {
-    const res = await ctx.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json' } });
+    const res = await ctx.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json', Origin: BASE } });
     if (res.ok()) { loggedIn = true; break; }
     if (res.status() !== 429) { console.error('FATAL: admin login failed', res.status()); process.exit(1); }
     const retryAfter = Number(res.headers()['retry-after']);

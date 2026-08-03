@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient, ApiError } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
 import { mpIdentify, mpReset } from '@/lib/mixpanel';
 import { phIdentify, phReset } from '@/lib/posthog';
+import { useToast } from '@/hooks/use-toast';
 
 interface User {
   id: string;
@@ -21,6 +22,12 @@ interface User {
 interface AuthResponse {
   user: User | null;
   isAuthenticated: boolean;
+}
+
+const LOGOUT_REQUEST_TIMEOUT_MS = 5_000;
+
+function logoutRequestSignal(): AbortSignal {
+  return AbortSignal.timeout(LOGOUT_REQUEST_TIMEOUT_MS);
 }
 
 /**
@@ -53,6 +60,8 @@ async function fetchAuthUser(): Promise<AuthResponse> {
 }
 
 export function useAuth() {
+  const { toast } = useToast();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
   const { data, isLoading, error, refetch } = useQuery<AuthResponse>({
     queryKey: ['/api/auth/user'],
     queryFn: fetchAuthUser,
@@ -91,32 +100,66 @@ export function useAuth() {
     }
   }, [authedUser?.id]);
 
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/auth/logout', {
+  const requestLogout = async (path: string) => {
+      const response = await fetch(path, {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
+        signal: logoutRequestSignal(),
       });
       if (!response.ok) {
-        throw new Error('Logout failed');
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message || 'Sign out failed');
       }
-      return response.json();
-    },
-    onSuccess: () => {
-      // Clear auth cache and redirect to home
+      const authCheck = await fetch('/api/auth/user', {
+        credentials: 'include',
+        cache: 'no-store',
+        signal: logoutRequestSignal(),
+      });
+      const authState = authCheck.ok ? await authCheck.json() : null;
+      if (!authCheck.ok || authState?.isAuthenticated !== false) {
+        throw new Error('The server could not confirm that your session ended');
+      }
+      return await response.json();
+  };
+
+  const finishLogout = () => {
+      // Clear auth cache only after the server confirms invalidation.
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
-      // R5-016: drop the private /submit draft on logout so the next visitor
-      // on this device never inherits the previous account's draft text.
       safeRemoveItem('submit-resource-draft');
-      // Task #232: unlink the Mixpanel identity so the next visitor on this
-      // device never inherits this account's profile.
       mpReset();
       phReset();
-      // R4-081: tell other open tabs to drop their authed chrome/bookmarks.
       notifyCrossTabSync();
       window.location.href = '/';
-    }
+  };
+
+  const handleLogoutError = (error: Error) => {
+    const message = `${error.message}. You are still signed in; please try again.`;
+    setLogoutError(message);
+    toast({
+      title: 'Sign out failed',
+      description: message,
+      variant: 'destructive',
+      duration: Infinity,
+    });
+  };
+
+  const logoutMutation = useMutation({
+    mutationFn: () => {
+      setLogoutError(null);
+      return requestLogout('/api/auth/logout');
+    },
+    onSuccess: finishLogout,
+    onError: handleLogoutError,
+  });
+
+  const logoutAllMutation = useMutation({
+    mutationFn: () => {
+      setLogoutError(null);
+      return requestLogout('/api/auth/logout-all');
+    },
+    onSuccess: finishLogout,
+    onError: handleLogoutError,
   });
 
   return {
@@ -125,6 +168,9 @@ export function useAuth() {
     isAuthenticated: data?.isAuthenticated ?? false,
     error,
     refetchAuth: refetch,
-    logout: logoutMutation.mutate
+    logout: logoutMutation.mutate,
+    logoutAll: logoutAllMutation.mutate,
+    logoutError,
+    isLoggingOut: logoutMutation.isPending || logoutAllMutation.isPending,
   };
 }

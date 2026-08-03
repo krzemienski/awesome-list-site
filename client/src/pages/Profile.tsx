@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -163,7 +164,7 @@ export default function Profile({ user }: ProfileProps) {
       ? t
       : "overview";
   });
-  const { logout } = useAuth();
+  const { logout, logoutAll, logoutError, isLoggingOut } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -480,11 +481,39 @@ export default function Profile({ user }: ProfileProps) {
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
-          <Button variant="outline" size="sm" onClick={() => logout()}>
+          <Button variant="outline" size="sm" onClick={() => logout()} disabled={isLoggingOut}>
             <LogOut className="h-4 w-4 mr-2" />
-            Logout
+            Sign out
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={isLoggingOut}
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Sign out this account on every device? You will need to sign in again.",
+                )
+              ) {
+                logoutAll();
+              }
+            }}
+            data-testid="button-logout-all"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign out all devices
           </Button>
         </div>
+        {logoutError ? (
+          <Alert
+            variant="destructive"
+            className="sm:basis-full"
+            data-testid="profile-logout-error"
+          >
+            <AlertTitle>Sign out failed</AlertTitle>
+            <AlertDescription>{logoutError}</AlertDescription>
+          </Alert>
+        ) : null}
       </div>
 
       {/* Stats */}

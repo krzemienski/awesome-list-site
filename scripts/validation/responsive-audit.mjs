@@ -64,7 +64,7 @@ async function newAdminContext() {
   const c = await browser.newContext();
   let loggedIn = false;
   for (let i = 0; i < 8 && !loggedIn; i++) {
-    const res = await c.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json' } });
+    const res = await c.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json', Origin: BASE } });
     if (res.ok()) { loggedIn = true; break; }
     if (res.status() !== 429) { console.error('FATAL: admin login failed', res.status()); process.exit(1); }
     const retryAfter = Number(res.headers()['retry-after']);
@@ -212,7 +212,7 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
   try {
     const create = await ctx.request.post(`${BASE}/api/resources`, {
       data: { title: `__qa_test_r4017 dialog overflow probe ${runTag}`, url: longUrl, description: 'Seeded by responsive-audit to guard against dialog blowout from unbroken URLs; deleted at end of run.', category },
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Origin: BASE },
     });
     if (!create.ok()) {
       log('r4017-seed-create', false, `POST /api/resources -> ${create.status()}`);
@@ -282,7 +282,7 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
     }
   } finally {
     if (seedId != null) {
-      const del = await ctx.request.delete(`${BASE}/api/admin/resources/${seedId}`).catch(() => null);
+      const del = await ctx.request.delete(`${BASE}/api/admin/resources/${seedId}`, { headers: { Origin: BASE } }).catch(() => null);
       log('r4017-seed-delete', !!del && del.ok(), `DELETE /api/admin/resources/${seedId} -> ${del ? del.status() : 'request failed'}`);
     }
   }

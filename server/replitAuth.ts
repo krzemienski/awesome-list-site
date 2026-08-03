@@ -8,6 +8,10 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { UserRepository } from "./repositories";
 import { trackConsentedServerEvent } from "./lib/mixpanelServer";
+import {
+  enforceConcurrentSessionLimit,
+  SESSION_TTL_MS,
+} from "./sessionPolicy";
 
 const getOidcConfig = memoize(
   async () => {
@@ -20,12 +24,13 @@ const getOidcConfig = memoize(
 );
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
     createTableIfMissing: false,
-    ttl: sessionTtl,
+    // connect-pg-simple's ttl option is expressed in seconds. Cookie maxAge is
+    // milliseconds, so keep the two representations explicitly aligned.
+    ttl: Math.ceil(SESSION_TTL_MS / 1000),
     tableName: "sessions",
   });
   return session({
@@ -37,7 +42,7 @@ export function getSession() {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: sessionTtl,
+      maxAge: SESSION_TTL_MS,
     },
   });
 }
@@ -222,10 +227,25 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/login", (req, res, next) => {
     ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
-      prompt: "login consent",
-      scope: ["openid", "email", "profile", "offline_access"],
-    })(req, res, next);
+    const nextParam =
+      typeof req.query.next === "string" &&
+      /^\/(?![/\\])/.test(req.query.next)
+        ? req.query.next
+        : null;
+    if (nextParam) {
+      (req.session as any).returnTo = nextParam;
+    } else {
+      delete (req.session as any).returnTo;
+    }
+    // Persist the validated destination before Passport sends the external
+    // redirect; otherwise the callback can race the session-store write.
+    req.session.save((saveError) => {
+      if (saveError) return next(saveError);
+      passport.authenticate(`replitauth:${req.hostname}`, {
+        prompt: "login consent",
+        scope: ["openid", "email", "profile", "offline_access"],
+      })(req, res, next);
+    });
   });
 
   app.get("/api/callback", (req, res, next) => {
@@ -234,22 +254,43 @@ export async function setupAuth(app: Express) {
     // would bounce straight back to the OIDC screen in an endless loop —
     // e.g. when the Replit account's email already belongs to a local
     // email/password account and the upsert hits the unique-email constraint).
-    passport.authenticate(`replitauth:${req.hostname}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/login?error=oauth",
-    })(req, res, next);
+    passport.authenticate(
+      `replitauth:${req.hostname}`,
+      (authError: unknown, user: Express.User | false | null) => {
+        if (authError) return next(authError);
+        if (!user) {
+          return res.redirect("/login?error=oauth");
+        }
+        req.logIn(user, (loginError) => {
+          if (loginError) return next(loginError);
+          const userId = (user as any)?.claims?.sub;
+          if (!userId || !req.sessionID) {
+            return res.redirect("/login?error=oauth");
+          }
+          const returnTo = (req.session as any).returnTo;
+          delete (req.session as any).returnTo;
+          req.session.save(async (saveError) => {
+            if (saveError) return next(saveError);
+            try {
+              await enforceConcurrentSessionLimit(
+                String(userId),
+                req.sessionID,
+              );
+              return res.redirect(
+                typeof returnTo === "string" &&
+                  /^\/(?![/\\])/.test(returnTo)
+                  ? returnTo
+                  : "/",
+              );
+            } catch (error) {
+              return next(error);
+            }
+          });
+        });
+      },
+    )(req, res, next);
   });
 
-  app.get("/api/logout", (req, res) => {
-    req.logout(() => {
-      res.redirect(
-        client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
-        }).href
-      );
-    });
-  });
 }
 
 /**

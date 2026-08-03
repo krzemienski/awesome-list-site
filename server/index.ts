@@ -223,34 +223,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// BUG-015: server-side route guard for auth-gated pages.
-// Without a connect.sid cookie, redirect to /login (302) instead of serving
-// the SPA shell (which only redirects client-side via JS).
-app.use((req, res, next) => {
-  const protectedPatterns = [
-    /^\/admin(\/|$)/,
-    /^\/bookmarks(\/|$)/,
-    // BUG-022 (run19): /settings is a links-only hub (no account data) while
-    // its child /settings/theme was already public — a gated parent with a
-    // public child turned the Theme page's "Settings" breadcrumb into a
-    // one-click login wall. The whole /settings tree is public now; the
-    // account-specific destinations it links to (/profile, /bookmarks) keep
-    // their own gates.
-    // BUG-017: /profile is a per-user page (same trust level as /bookmarks);
-    // gate it server-side so anonymous deep links get 302 → /login instead of
-    // the SPA shell.
-    /^\/profile(\/|$)/,
-  ];
-  const isProtected = protectedPatterns.some(p => p.test(req.path));
-  if (isProtected && !req.headers.cookie?.includes('connect.sid')) {
-    // BUG-008 (run14): carry the originally requested page in ?next= so the
-    // login page can return the user there after sign-in (Login already
-    // validates the param against open-redirect payloads).
-    return res.redirect(302, `/login?next=${encodeURIComponent(req.originalUrl)}`);
-  }
-  next();
-});
-
 // BUG-v3-L02 (run12): unsupported/WebDAV-style HTTP methods (PROPFIND, TRACE,
 // etc.) previously fell through to the SPA catch-all and answered 200 + HTML.
 // Answer 405 with an Allow header instead — no route in the app serves them.
@@ -267,10 +239,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Run17 BUG-054: CSRF hardening for cookie-authed mutations. Browsers always
-// attach an Origin header to cross-origin POST/PUT/PATCH/DELETE, so rejecting
-// mutations whose Origin host differs from the request Host blocks cross-site
-// forgery without breaking curl / server-to-server clients (no Origin header).
+// Run17 BUG-054 + Audit 2 BUG-048: CSRF hardening for cookie-authed mutations.
+// Sensitive auth/admin mutations REQUIRE a valid Origin. Other mutations keep
+// supporting server-to-server clients without an Origin, but reject any
+// explicitly cross-site Origin/Sec-Fetch-Site value.
 // `Origin: null` (sandboxed iframes, cross-origin redirect chains) is also
 // rejected — it is a known CSRF vector and never legitimate for this app.
 // Defense-in-depth alongside SameSite=Lax session cookies.
@@ -278,21 +250,48 @@ app.use((req, res, next) => {
   if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
     return next();
   }
+  const fetchSite = req.get("sec-fetch-site")?.toLowerCase();
+  if (fetchSite === "cross-site") {
+    return res.status(403).json({ message: "Cross-origin request rejected" });
+  }
   const origin = req.headers.origin;
-  if (!origin) return next();
-  // Normalize away default ports: run15 BUG-038 showed the Replit edge can
-  // surface hosts with an explicit `:443`, so `awesome.video` must compare
-  // equal to `awesome.video:443` (and `:80` for http) or every browser
-  // mutation in prod would 403.
-  const stripDefaultPort = (host: string | undefined) =>
-    host?.replace(/:(443|80)$/, "") ?? "";
+  const hasSessionCookie = /(?:^|;\s*)connect\.sid=/.test(
+    req.headers.cookie ?? "",
+  );
+  const requiresOrigin =
+    /^\/api\/(?:auth|admin)(?:\/|$)/.test(req.path) || hasSessionCookie;
+  if (!origin) {
+    return requiresOrigin
+      ? res.status(403).json({ message: "A same-origin request is required" })
+      : next();
+  }
+  // Compare complete origins (scheme + host + effective port), not just hosts:
+  // http://example.com must never be accepted for an https://example.com
+  // request. URL.origin normalizes only the default port for its own scheme,
+  // so https://example.com:443 equals https://example.com while :8443 does not.
+  const normalizeOrigin = (value: string): string => {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new Error("Unsupported origin scheme");
+    }
+    return parsed.origin;
+  };
   try {
-    const originHost = stripDefaultPort(new URL(origin).host);
-    if (originHost === stripDefaultPort(req.headers.host)) return next();
+    const requestProtocol =
+      req.headers["x-forwarded-proto"]
+        ?.toString()
+        .split(",")[0]
+        .trim()
+        .toLowerCase() || req.protocol;
+    const requestHost = req.get("host");
+    if (!requestHost) throw new Error("Missing request host");
+    const suppliedOrigin = normalizeOrigin(origin);
+    const requestOrigin = normalizeOrigin(`${requestProtocol}://${requestHost}`);
+    if (suppliedOrigin === requestOrigin) return next();
     // Fallback allowlist: PUBLIC_SITE_URL is the server's canonical site var
     // (same one og-middleware uses; defaults to https://awesome.video).
     const siteUrl = process.env.PUBLIC_SITE_URL || "https://awesome.video";
-    if (originHost === stripDefaultPort(new URL(siteUrl).host)) return next();
+    if (suppliedOrigin === normalizeOrigin(siteUrl)) return next();
   } catch {
     // fall through to rejection (malformed Origin)
   }
@@ -346,6 +345,29 @@ app.use((req, res, next) => {
   }
 
   const server = await registerRoutes(app);
+
+  // Audit 2 BUG-045: this must run AFTER registerRoutes installs the session
+  // store + Passport, but BEFORE Vite/static serves the SPA shell. Cookie-name
+  // presence is not authentication: empty, expired, and tampered connect.sid
+  // cookies all deserialize to an unauthenticated request and redirect.
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    const protectedPatterns = [
+      /^\/admin(\/|$)/,
+      /^\/bookmarks(\/|$)/,
+      /^\/profile(\/|$)/,
+    ];
+    if (
+      protectedPatterns.some((pattern) => pattern.test(req.path)) &&
+      !req.isAuthenticated?.()
+    ) {
+      return res.redirect(
+        302,
+        `/login?next=${encodeURIComponent(req.originalUrl)}`,
+      );
+    }
+    return next();
+  });
 
   // Centralized error handling middleware
   app.use(errorHandler);

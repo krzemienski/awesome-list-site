@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense, Component, type ReactNode } from "react";
+import { useEffect, useState, lazy, Suspense, Component, type ReactNode } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
@@ -22,6 +22,7 @@ import ResourceDetail from "@/pages/ResourceDetail";
 import Categories from "@/pages/Categories";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
+import { Button } from "@/components/ui/button";
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
@@ -288,27 +289,63 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/settings\/theme\/?$/,
 ];
 
-// Run3 audit R3-10: SPA-side /logout. Direct browser navigation is handled by
-// the server's GET /logout (302 → "/"), but client-side navigation to /logout
-// previously fell through to the 404 page with the session intact. This route
-// posts to /api/auth/logout then hard-redirects home — the full reload wipes
-// all in-memory query cache so no stale authed data survives.
+// SPA-side /logout. Both direct and client-side navigation render this route,
+// which uses the CSRF-protected POST endpoint and confirms invalidation before
+// redirecting. Session mutation is intentionally never performed by a GET.
 function Logout() {
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    fetch("/api/auth/logout", { method: "POST", credentials: "include" })
-      .catch(() => {
-        // Even if the API call fails, fall through to the redirect — the
-        // server GET /logout on the next full load is the backstop.
-      })
-      .finally(() => {
-        window.location.replace("/");
-      });
+    let cancelled = false;
+    const signOut = async () => {
+      try {
+        const response = await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+          signal: AbortSignal.timeout(5_000),
+        });
+        if (!response.ok) throw new Error("The sign-out request failed");
+        const authCheck = await fetch("/api/auth/user", {
+          credentials: "include",
+          cache: "no-store",
+          signal: AbortSignal.timeout(5_000),
+        });
+        const state = authCheck.ok ? await authCheck.json() : null;
+        if (!authCheck.ok || state?.isAuthenticated !== false) {
+          throw new Error("The server could not confirm that your session ended");
+        }
+        if (!cancelled) window.location.replace("/");
+      } catch (reason) {
+        if (!cancelled) {
+          setError(
+            reason instanceof Error ? reason.message : "Sign out failed",
+          );
+        }
+      }
+    };
+    void signOut();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Signing out…</p>
+        {error ? (
+          <>
+            <p className="text-destructive font-medium" role="alert">
+              {error}. You are still signed in.
+            </p>
+            <Button className="mt-4" onClick={() => window.location.reload()}>
+              Try again
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Signing out…</p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -319,7 +356,14 @@ function Router() {
   // R4-081: refresh auth + bookmarks/favorites when another tab logs in/out or
   // toggles a bookmark/favorite (sentinel written via notifyCrossTabSync()).
   useCrossTabSync();
-  const { user, isLoading: authLoading, error: authError, refetchAuth, logout } = useAuth();
+  const {
+    user,
+    isLoading: authLoading,
+    error: authError,
+    refetchAuth,
+    logout,
+    logoutError,
+  } = useAuth();
   const [location] = useLocation();
   const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((re) => re.test(location));
 
@@ -385,14 +429,14 @@ function Router() {
   // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout}>
+      <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError}>
         <NotFound />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout}>
+    <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError}>
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}

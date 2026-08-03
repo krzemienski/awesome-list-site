@@ -60,9 +60,10 @@ interface MainLayoutProps {
   children: React.ReactNode;
   user?: User;
   onLogout?: () => void;
+  logoutError?: string | null;
 }
 
-export default function MainLayout({ nav, isLoading, navError, onRetryNav, children, user, onLogout }: MainLayoutProps) {
+export default function MainLayout({ nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
@@ -95,6 +96,7 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
           onSearchOpen={() => setSearchOpen(true)}
           user={user}
           onLogout={onLogout}
+          logoutError={logoutError}
           categories={nav?.categories || []}
         />
         <div className="flex flex-1 w-full min-h-0">

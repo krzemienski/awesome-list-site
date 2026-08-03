@@ -1,10 +1,10 @@
 ---
-name: Origin/Host CSRF check port normalization
-description: Origin-vs-Host comparisons must strip default ports and use the canonical server site var, or prod mutations 403 behind the Replit edge.
+name: Full-origin CSRF comparison
+description: Origin checks must compare normalized scheme, host, and effective port while tolerating explicit default ports at the edge.
 ---
 
-**Rule:** Any Origin-header-vs-Host CSRF gate must (1) strip default ports (`:443`, `:80`) from BOTH sides before comparing, and (2) use `PUBLIC_SITE_URL` as the fallback allowlist — NOT `SITE_URL`, which is unset in this project (only `VITE_SITE_URL` exists client-side, and it is stale).
+**Rule:** Any Origin-header CSRF gate must compare the complete normalized origin: scheme + host + effective port. Build the request origin from forwarded protocol plus Host, normalize both sides with `URL.origin` (which removes only the correct default port for that scheme), and use `PUBLIC_SITE_URL` as the exact fallback origin — NOT `SITE_URL`.
 
-**Why:** The Replit edge has been observed surfacing hosts with an explicit `:443` (run15 redirect evidence). An exact-string `new URL(origin).host === req.headers.host` compare would then 403 every browser mutation in prod (login, bookmarks, all admin actions) while passing all dev tests. A dead fallback env var makes the failure unrecoverable.
+**Why:** Host-only comparison accepts a scheme downgrade (`http://host` against an HTTPS request), while raw string comparison rejects equivalent edge variants such as explicit `:443`. A dead fallback env var can also make every production mutation fail.
 
-**How to apply:** Whenever touching security middleware that compares Origin/Referer to Host or a canonical URL, normalize default ports and source the canonical host from `PUBLIC_SITE_URL` (og-middleware's `SITE_URL` export wraps it, default `https://awesome.video`). Verify with curl probes: no-Origin, same-origin, canonical-host, canonical-host`:443`, cross-origin, and `Origin: null` — a 403 vs 401/405 distinguishes gate rejection from route-level handling.
+**How to apply:** Whenever touching Origin/Referer middleware, verify same-origin, wrong scheme, wrong port, explicit correct default port, nondefault port, canonical fallback, no-Origin, cross-site Fetch Metadata, and `Origin: null`. A 403 versus route-level 200/400/401 distinguishes gate rejection.

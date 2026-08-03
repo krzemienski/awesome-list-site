@@ -48,6 +48,7 @@ export default function Login() {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   // BUG-006 (run24): Replit sign-in preflight — before handing the browser to
@@ -81,7 +82,12 @@ export default function Login() {
       const data = res.ok ? await res.json().catch(() => ({ ok: false })) : { ok: false };
       if (data?.ok === true) {
         await primeOidcAnalyticsConsent();
-        window.location.href = "/api/login";
+        const nextParam = new URLSearchParams(window.location.search).get("next");
+        const safeNext =
+          nextParam && /^\/(?![/\\])/.test(nextParam) ? nextParam : null;
+        window.location.href = safeNext
+          ? `/api/login?next=${encodeURIComponent(safeNext)}`
+          : "/api/login";
         return;
       }
       setReplitChecking(false);
@@ -138,6 +144,7 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     submitStartedRef.current = true;
     setIsLoading(true);
+    setLoginError(null);
     try {
       const response = await fetch("/api/auth/local/login", {
         method: "POST",
@@ -195,44 +202,15 @@ export default function Login() {
           .json()
           .catch(() => ({ message: "Invalid email or password" }))) as {
           message?: string;
-          retryAfter?: number;
         };
-        // BUG-v3-M19 (run12): the lockout response (423) carries retryAfter
-        // seconds — surface a concrete recovery duration instead of the
-        // generic "try again later".
         if (response.status === 423) {
-          const secs =
-            typeof error.retryAfter === "number" && error.retryAfter > 0
-              ? error.retryAfter
-              : null;
-          const wait =
-            secs === null
-              ? "a few minutes"
-              : secs >= 90
-                ? `about ${Math.ceil(secs / 60)} minutes`
-                : `${secs} seconds`;
-          toast({
-            title: "Too many failed attempts",
-            description: `Sign-in is temporarily locked. Try again in ${wait}.`,
-            variant: "destructive",
-          });
+          setLoginError("Too many failed attempts from this client. Try again later.");
         } else {
-          toast({
-            title: "Login failed",
-            description: error.message ?? "Invalid email or password",
-            variant: "destructive",
-          });
+          setLoginError(error.message ?? "Invalid email or password");
         }
-        // BUG-046 (run13): clear the rejected password so the user retypes it
-        // instead of resubmitting the same wrong value; email stays put.
-        form.resetField("password");
       }
     } catch {
-      toast({
-        title: "Error",
-        description: "An error occurred during login. Please try again.",
-        variant: "destructive",
-      });
+      setLoginError("An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -347,6 +325,15 @@ export default function Login() {
                   Forgot password?
                 </Link>
               </div>
+              {loginError && (
+                <p
+                  role="alert"
+                  className="text-sm text-destructive"
+                  data-testid="text-login-error"
+                >
+                  {loginError}
+                </p>
+              )}
               <Button
                 type="submit"
                 className="w-full"

@@ -1,8 +1,10 @@
 /**
  * In-memory brute-force lockout for local login.
  *
- * Tracks consecutive failed attempts per email and locks the account for a cooldown
- * window once a threshold is crossed. State lives in a process-local Map, so it is
+ * Tracks consecutive failed attempts per attacker+email pair and throttles that
+ * source for a cooldown window once a threshold is crossed. A malicious client
+ * therefore cannot lock the account for a different client that has valid
+ * credentials. State lives in a process-local Map, so it is
  * NON-DURABLE: it resets on restart and is not shared across processes/instances. For a
  * single-process deployment this is sufficient to blunt online password guessing; a
  * durable store would be needed for a multi-instance rollout.
@@ -20,19 +22,23 @@ interface Attempt {
 
 const attempts = new Map<string, Attempt>();
 
-function normalize(email: string): string {
+function normalizeEmail(email: string): string {
   return (email || "").trim().toLowerCase();
 }
 
-/** Returns lock status for an email. retryAfterSec is seconds remaining when locked. */
-export function checkLock(email: string): { locked: boolean; retryAfterSec: number } {
-  const key = normalize(email);
+function loginAttemptKey(email: string, attackerKey: string): string {
+  return `${attackerKey || "unknown"}\u0000${normalizeEmail(email)}`;
+}
+
+/** Returns whether this attacker+email pair is in its cooldown window. */
+export function checkLock(email: string, attackerKey: string): { locked: boolean } {
+  const key = loginAttemptKey(email, attackerKey);
   const rec = attempts.get(key);
-  if (!rec) return { locked: false, retryAfterSec: 0 };
+  if (!rec) return { locked: false };
 
   const now = Date.now();
   if (rec.lockedUntil && rec.lockedUntil > now) {
-    return { locked: true, retryAfterSec: Math.ceil((rec.lockedUntil - now) / 1000) };
+    return { locked: true };
   }
 
   // Lock expired, or stale failure window — clear so the next attempt starts fresh.
@@ -41,12 +47,12 @@ export function checkLock(email: string): { locked: boolean; retryAfterSec: numb
   } else if (now - rec.firstFailureAt > FAILURE_TTL_MS) {
     attempts.delete(key);
   }
-  return { locked: false, retryAfterSec: 0 };
+  return { locked: false };
 }
 
 /** Record a failed login. Engages a lock once MAX_FAILURES is exceeded. */
-export function recordFailure(email: string): void {
-  const key = normalize(email);
+export function recordFailure(email: string, attackerKey: string): void {
+  const key = loginAttemptKey(email, attackerKey);
   const now = Date.now();
   const rec = attempts.get(key);
 
@@ -62,9 +68,19 @@ export function recordFailure(email: string): void {
   attempts.set(key, rec);
 }
 
-/** Clear all failure/lock state for an email after a successful login. */
-export function clearOnSuccess(email: string): void {
-  attempts.delete(normalize(email));
+/** Clear this source's failure/lock state after a successful login. */
+export function clearOnSuccess(email: string, attackerKey?: string): void {
+  if (attackerKey !== undefined) {
+    attempts.delete(loginAttemptKey(email, attackerKey));
+    return;
+  }
+
+  // Password reset is account-authorized and clears every source bucket for
+  // that email so the owner can sign in immediately after rotating credentials.
+  const suffix = `\u0000${normalizeEmail(email)}`;
+  for (const key of attempts.keys()) {
+    if (key.endsWith(suffix)) attempts.delete(key);
+  }
 }
 
 // Test/maintenance helper — not wired to any route.
@@ -113,7 +129,7 @@ function consume(map: Map<string, ResetBucket>, key: string, now: number): void 
  */
 export function allowResetRequest(email: string, ip: string): boolean {
   const now = Date.now();
-  const e = normalize(email);
+  const e = normalizeEmail(email);
   const ipKey = ip || "unknown";
   if (!withinBudget(resetByEmail, e, RESET_MAX_PER_EMAIL, now)) return false;
   if (!withinBudget(resetByIp, ipKey, RESET_MAX_PER_IP, now)) return false;
