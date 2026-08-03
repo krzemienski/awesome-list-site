@@ -20,7 +20,7 @@ import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { useAuth } from "@/hooks/useAuth";
-import { normalizeTag } from "@/lib/tags";
+import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 import {
   FileText,
@@ -138,11 +138,23 @@ export default function Home({ nav, navLoading }: HomeProps) {
   // BUG-017 (run13): tag filters survive refresh + are deep-linkable via
   // ?tags=a,b (same replaceState pattern as ?sort= below). ResourceDetail tag
   // badges link here as /?tags=<tag>.
-  const [selectedTags, setSelectedTagsState] = useState<string[]>(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get("tags");
-    return fromUrl
-      ? fromUrl.split(",").map((t) => t.trim()).filter(Boolean)
-      : [];
+  // BUG-064 (run27): shared parser — repeated ?tags=A&tags=B, the ?tag=
+  // alias, comma lists, and whitespace/empty chunks all resolve identically
+  // on every page that accepts a tag filter (Home previously read only the
+  // first ?tags= occurrence, silently dropping the rest).
+  const [selectedTags, setSelectedTagsState] = useState<string[]>(() =>
+    parseTagsParam(new URLSearchParams(window.location.search)),
+  );
+
+  // BUG-064 (run27): a present-but-empty tag filter (?tags=+++ or ?tags=)
+  // used to be silently ignored — surface a small dismissible note so the
+  // visitor knows their link's filter didn't apply.
+  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return (
+      (params.has("tags") || params.has("tag")) &&
+      parseTagsParam(params).length === 0
+    );
   });
 
   const setSelectedTags = (next: string[]) => {
@@ -168,8 +180,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
   // Run22 BUG-016: Back/Forward re-read the query into state so each history
   // step visibly reverses/restores one tag/sort change.
   usePopstateParams((params) => {
-    const t = params.get("tags");
-    setSelectedTagsState(t ? t.split(",").map((x) => x.trim()).filter(Boolean) : []);
+    // BUG-064 (run27): same shared parser as the initializer.
+    setSelectedTagsState(parseTagsParam(params));
     const s = params.get("sort");
     setSortBy(s && VALID_SORTS.includes(s) ? s : "default");
   });
@@ -339,6 +351,27 @@ export default function Home({ nav, navLoading }: HomeProps) {
             : `Explore ${filteredCategories.length} categories with ${totalResourceCount.toLocaleString()} curated resources.`}
         </p>
       </div>
+
+      {/* BUG-064 (run27): honest feedback when the link carried a tag param
+          that parsed to nothing (?tags=+++ / ?tags=) — previously the page
+          rendered unfiltered with no hint. */}
+      {emptyTagParamNotice && selectedTags.length === 0 && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-[color:var(--text-2)]"
+          role="status"
+          data-testid="notice-empty-tag-param"
+        >
+          <span>The tag filter in the link you followed was empty, so it was ignored.</span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setEmptyTagParamNotice(false)}
+            data-testid="button-dismiss-empty-tag-param"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <AdvancedFilter
         selectedTags={selectedTags}

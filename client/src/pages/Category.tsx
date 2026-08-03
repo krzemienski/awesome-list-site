@@ -15,7 +15,7 @@ import ResourceCard from "@/components/resource/ResourceCard";
 import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
 import { ArrowLeft, Search } from "lucide-react";
 import { deslugify } from "@/lib/utils";
-import { normalizeTag } from "@/lib/tags";
+import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
@@ -104,11 +104,12 @@ export default function Category() {
 
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>(() => getSearchParams().get("subcategory") || "all");
-  const [selectedTags, setSelectedTags] = useState<string[]>(() => {
-    // Canonical ?tags= (comma-separated) OR the ?tag= singular alias (BUG-005).
-    const tags = getSearchParams().get("tags") || getSearchParams().get("tag");
-    return tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
-  });
+  // BUG-064 (run27): shared parser — canonical ?tags=, the ?tag= alias,
+  // repeated params, comma lists, whitespace chunks all parse identically on
+  // every page that accepts a tag filter.
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    parseTagsParam(getSearchParams()),
+  );
   // Canonical ?sortBy= OR the ?sort= alias / bare "name" (BUG-006), normalized.
   const [sortBy, setSortBy] = useState(() => normalizeSort(getSearchParams().get("sortBy") || getSearchParams().get("sort")));
   const [page, setPage] = useState(() => {
@@ -260,11 +261,29 @@ export default function Category() {
       .sort((a, b) => b.count - a.count);
   }, [allResources]);
   
+  // BUG-060 (run27): whitespace-only search input must behave as NO search —
+  // "   " used to be matched literally against titles/descriptions and hid
+  // every resource ("Showing 0 of 0").
+  const effectiveSearch = searchTerm.trim();
+
+  // BUG-059 (run27): a deep-linked ?subcategory= value that names no real
+  // subcategory (e.g. ?subcategory=nonexistent-subcategory) used to filter to
+  // a false "No resources found" empty state. Once options are loaded, an
+  // unknown value is IGNORED (full category shown) and an explicit notice
+  // renders instead. While loading, options are empty — treat as known so
+  // nothing flashes.
+  const subcategoryUnknown =
+    !isGeneralView &&
+    selectedSubcategory !== "all" &&
+    selectedSubcategory !== "__general__" &&
+    subcategoryOptions.length > 0 &&
+    !optionByValue.has(selectedSubcategory);
+
   const filteredResources = useMemo(() => {
     let results = [...allResources];
 
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
+    if (effectiveSearch) {
+      const searchLower = effectiveSearch.toLowerCase();
       results = results.filter(r =>
         r.title.toLowerCase().includes(searchLower) ||
         r.description?.toLowerCase().includes(searchLower)
@@ -279,13 +298,14 @@ export default function Category() {
       // agree exactly; a resource written with an unmapped subcategory string
       // would inflate the badge without appearing here.
       results = results.filter(r => !r.subcategory);
-    } else if (selectedSubcategory !== "all") {
+    } else if (selectedSubcategory !== "all" && !subcategoryUnknown) {
       // BUG-005 (run26): resolve the selection to its taxonomy node and match
       // by identity. A "Sub › SubSub" selection matches BOTH fields exactly; a
       // subcategory selection matches its whole subtree (rows under its
-      // sub-subcategories carry the same subcategory field). Unknown values
-      // (hand-edited URLs) fall back to an exact-field comparison, which
-      // yields the empty set rather than substring guesses.
+      // sub-subcategories carry the same subcategory field).
+      // BUG-059 (run27): unknown deep-linked values no longer fall through to
+      // an exact-field comparison (which produced a false empty state) — they
+      // are skipped here and surfaced via the "unknown subcategory" notice.
       const sel = optionByValue.get(selectedSubcategory);
       if (sel?.subSub) {
         results = results.filter(
@@ -312,7 +332,7 @@ export default function Category() {
     }
 
     return results;
-  }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy, isGeneralView, optionByValue]);
+  }, [allResources, effectiveSearch, selectedSubcategory, subcategoryUnknown, selectedTags, sortBy, isGeneralView, optionByValue]);
 
   // ----- Client-side pagination (BUG-007) -----
   const totalPages = Math.max(1, Math.ceil(filteredResources.length / PAGE_SIZE));
@@ -350,7 +370,7 @@ export default function Category() {
       setSelectedSubcategory("all");
       setPage(1);
       const params = new URLSearchParams();
-      if (searchTerm) params.set("search", searchTerm);
+      if (searchTerm.trim()) params.set("search", searchTerm);
       if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
       if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
       params.set("view", "general");
@@ -361,7 +381,7 @@ export default function Category() {
     setPage(1);
     if (isGeneralView) {
       const params = new URLSearchParams();
-      if (searchTerm) params.set("search", searchTerm);
+      if (searchTerm.trim()) params.set("search", searchTerm);
       if (value && value !== "all") params.set("subcategory", value);
       if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
       if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
@@ -388,7 +408,9 @@ export default function Category() {
     if (window.location.pathname !== `/category/${slug}`) return;
     const params = new URLSearchParams();
 
-    if (searchTerm) params.set("search", searchTerm);
+    // BUG-060 (run27): drop the ?search= param when the box holds only
+    // whitespace so reload/share links don't carry a no-op "+++" query.
+    if (searchTerm.trim()) params.set("search", searchTerm);
     if (!isGeneralView && selectedSubcategory && selectedSubcategory !== "all") params.set("subcategory", selectedSubcategory);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
@@ -428,8 +450,8 @@ export default function Category() {
       const params = getSearchParams();
       setSearchTerm(params.get("search") || "");
       setSelectedSubcategory(params.get("subcategory") || "all");
-      const tags = params.get("tags") || params.get("tag");
-      setSelectedTags(tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : []);
+      // BUG-064 (run27): same shared parser as the initializer.
+      setSelectedTags(parseTagsParam(params));
       setSortBy(normalizeSort(params.get("sortBy") || params.get("sort")));
       const p = parseInt(params.get("page") || "1", 10);
       setPage(Number.isFinite(p) && p > 0 ? p : 1);
@@ -630,15 +652,37 @@ export default function Category() {
         <ViewModeToggle value={viewMode} onChange={handleViewModeChange} />
       </div>
       
+      {/* BUG-059 (run27): explicit feedback instead of a false empty state
+          when the URL named a subcategory that doesn't exist here. */}
+      {subcategoryUnknown && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-muted-foreground"
+          role="status"
+          data-testid="notice-unknown-subcategory"
+        >
+          <span>
+            “{selectedSubcategory}” isn't a subcategory of {categoryName}, so that filter was ignored.
+          </span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setSelectedSubcategory("all")}
+            data-testid="button-clear-unknown-subcategory"
+          >
+            Remove it
+          </button>
+        </div>
+      )}
+
       {filteredResources.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
           <p className="text-muted-foreground mb-4">
-            {searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0
+            {effectiveSearch || (selectedSubcategory !== "all" && !subcategoryUnknown) || selectedTags.length > 0
               ? "Try adjusting your filters to see more results."
               : "There are no resources in this category yet."}
           </p>
-          {(searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0) && (
+          {(effectiveSearch || selectedSubcategory !== "all" || selectedTags.length > 0) && (
             <Button
               variant="outline"
               onClick={() => {

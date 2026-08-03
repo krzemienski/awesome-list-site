@@ -21,6 +21,7 @@ import NotFound from "@/pages/not-found";
 import ResourceDetail from "@/pages/ResourceDetail";
 import Categories from "@/pages/Categories";
 import ConsentBanner from "@/components/ui/consent-banner";
+import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
@@ -395,6 +396,10 @@ function Router() {
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}
+      {/* BUG-032/BUG-064 (run27): if the pre-boot scrubber removed unsafe
+          query params (e.g. an HTML-shaped ?q= or ?tags=), say so explicitly
+          instead of silently rendering the unfiltered page. */}
+      <ScrubbedParamsNotice />
       {authError ? (
         <div
           className="mb-4 flex flex-wrap items-center gap-3 border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm"

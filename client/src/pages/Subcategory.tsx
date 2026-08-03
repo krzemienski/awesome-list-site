@@ -14,7 +14,7 @@ import { ResourceListRow, ResourceCompactCard } from "@/components/resource/reso
 import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { deslugify, getCategorySlug } from "@/lib/utils";
-import { normalizeTag } from "@/lib/tags";
+import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
@@ -31,10 +31,13 @@ export default function Subcategory() {
 
   const getSearchParams = () => new URLSearchParams(window.location.search);
 
-  const [selectedTags, setSelectedTags] = useState<string[]>(() => {
-    const tags = getSearchParams().get("tags");
-    return tags ? tags.split(",") : [];
-  });
+  // BUG-064 (run27): shared parser — canonical ?tags=, the ?tag= alias,
+  // repeated params, comma lists, whitespace chunks all parse identically on
+  // every page that accepts a tag filter (?tags=+++ used to keep a " "
+  // chunk here and filter everything out).
+  const [selectedTags, setSelectedTags] = useState<string[]>(() =>
+    parseTagsParam(getSearchParams()),
+  );
   const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   const [page, setPage] = useState(() => {
@@ -123,8 +126,10 @@ export default function Subcategory() {
   const filteredResources = useMemo(() => {
     let results = [...allResources];
 
-    if (searchTerm) {
-      const q = searchTerm.toLowerCase();
+    // BUG-060 (run27): whitespace-only input is NO search — "   " used to
+    // match literally and hide every resource ("Showing 0 of 0").
+    if (searchTerm.trim()) {
+      const q = searchTerm.trim().toLowerCase();
       results = results.filter(r =>
         r.title.toLowerCase().includes(q) ||
         r.description?.toLowerCase().includes(q)
@@ -177,7 +182,8 @@ export default function Subcategory() {
     if (window.location.pathname !== `/subcategory/${slug}`) return;
     const params = new URLSearchParams();
 
-    if (searchTerm) params.set("search", searchTerm);
+    // BUG-060 (run27): drop ?search= when the box holds only whitespace.
+    if (searchTerm.trim()) params.set("search", searchTerm);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
     if (page > 1) params.set("page", String(page));
@@ -210,8 +216,8 @@ export default function Subcategory() {
       popNavigationRef.current = true;
       const params = getSearchParams();
       setSearchTerm(params.get("search") || "");
-      const tags = params.get("tags");
-      setSelectedTags(tags ? tags.split(",") : []);
+      // BUG-064 (run27): same shared parser as the initializer.
+      setSelectedTags(parseTagsParam(params));
       setSortBy(params.get("sortBy") || "default");
       const p = parseInt(params.get("page") || "1", 10);
       setPage(Number.isFinite(p) && p > 0 ? p : 1);
@@ -375,10 +381,10 @@ export default function Subcategory() {
           {/* BUG-042 (run14): copy matches the control that actually caused
               the empty state (search vs tag filter). */}
           <p className="text-muted-foreground">
-            {searchTerm && selectedTags.length > 0
+            {searchTerm.trim() && selectedTags.length > 0
               ? "Try a different search term or adjust your tag filters."
-              : searchTerm
-                ? `No resources match "${searchTerm}". Try a different search term.`
+              : searchTerm.trim()
+                ? `No resources match "${searchTerm.trim()}". Try a different search term.`
                 : "Try adjusting your tag filters to see more results."}
           </p>
         </div>

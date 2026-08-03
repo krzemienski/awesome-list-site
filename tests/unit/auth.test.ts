@@ -186,11 +186,14 @@ describe('Email Validation - validateEmail', () => {
 
 describe('Password Validation - validatePassword', () => {
   it('should validate passwords with 8 or more characters', () => {
+    // Note: bare dictionary words like "Password"/"P@ssw0rd" and repeated
+    // single chars ("aaaaaaaa") are now rejected by the common-password
+    // denylist (BUG-016 run13 / R5-031), so the valid set uses passwords
+    // that clear both the length rule and the denylist.
     const validPasswords = [
-      'Password',
       'Pass1234',
-      'P@ssw0rd',
-      'a'.repeat(8),
+      'Xk3!mQ9z',
+      'correct-horse-battery',
       'LongPassword123456',
     ];
 
@@ -239,18 +242,32 @@ describe('Password Validation - validatePassword', () => {
   });
 
   it('should accept exactly 8 characters', () => {
-    const result = validatePassword('12345678');
+    // '12345678' is on the common-password denylist — use a non-denylisted
+    // 8-char password to test the length boundary in isolation.
+    const result = validatePassword('Zx9!Qw3p');
 
     expect(result.valid).toBe(true);
     expect(result.error).toBeUndefined();
   });
 
-  it('should accept very long passwords', () => {
-    const longPassword = 'a'.repeat(1000);
-    const result = validatePassword(longPassword);
+  it('should accept passwords up to the 72-byte bcrypt cap', () => {
+    // R5-046: bcrypt silently truncates at 72 bytes, so validateNewPassword
+    // caps there — 72 bytes passes, 73 is rejected (the old 1000-char case
+    // is now intentionally invalid).
+    const atCap = 'x'.repeat(71) + 'Z';
+    expect(validatePassword(atCap).valid).toBe(true);
+    expect(validatePassword(atCap).error).toBeUndefined();
 
-    expect(result.valid).toBe(true);
-    expect(result.error).toBeUndefined();
+    const overCap = 'x'.repeat(72) + 'Z';
+    expect(validatePassword(overCap).valid).toBe(false);
+  });
+
+  it('should reject common breached passwords even at valid lengths', () => {
+    // BUG-016 (run13) + R5-031 confusable folding: denylisted skeletons are
+    // rejected regardless of case or fullwidth/format-char disguises.
+    for (const pwd of ['Password', 'P@ssw0rd', '12345678', 'aaaaaaaa']) {
+      expect(validatePassword(pwd).valid).toBe(false);
+    }
   });
 
   it('should accept passwords with special characters', () => {

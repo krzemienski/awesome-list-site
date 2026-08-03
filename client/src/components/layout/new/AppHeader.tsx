@@ -138,11 +138,25 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
       // BUG-029 (run13): the intermediate crumb must point at the real listing
       // page (/journeys), not the bare /journey redirect stub.
       crumbs.push({ label: "Learning Journeys", href: "/journeys" });
-      crumbs.push({ label: deslugify(segments[1]), href: path });
+      // BUG-038 (run27): journeys are addressed by numeric id — a non-numeric
+      // segment can only be a 404, so never echo the (deslugify-transformed)
+      // raw slug back as a crumb ("/journey/abc" ≠ "Abc").
+      crumbs.push({
+        label: /^\d+$/.test(segments[1]) ? segments[1] : "Not found",
+        href: path,
+      });
     } else if (segments[0] === "resource") {
       // BUG-041 (run13): there is no /resource listing page — the old
       // intermediate "Resource" crumb was a dead link, so it's dropped.
-      crumbs.push({ label: deslugify(segments[1]), href: path });
+      // BUG-038 (run27): resources are addressed by numeric id. A non-numeric
+      // or negative segment ("/resource/abc", "/resource/-1") is always a
+      // 404 — show "Not found" instead of a title-cased echo of user input
+      // ("Abc", "1"). Valid numeric ids keep the raw id until the title query
+      // below swaps it in (or flips it to "Not found" on a 404).
+      crumbs.push({
+        label: /^\d+$/.test(segments[1]) ? segments[1] : "Not found",
+        href: path,
+      });
     } else {
       crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: `/${segments[0]}` });
       crumbs.push({ label: deslugify(segments[1]), href: path });
@@ -167,9 +181,15 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
   });
   if (journeyMatch && Array.isArray(journeyList)) {
     const j = journeyList.find((x) => x.id === Number(journeyMatch[1]));
-    if (j?.title) {
-      const last = crumbs[crumbs.length - 1];
-      if (last && last.href === location) last.label = j.title;
+    const last = crumbs[crumbs.length - 1];
+    if (last && last.href === location) {
+      if (j?.title) {
+        last.label = j.title;
+      } else {
+        // BUG-038 (run27): the journeys list is loaded and this id isn't in
+        // it — a 404, so the crumb must not echo the raw id.
+        last.label = "Not found";
+      }
     }
   }
 
@@ -181,7 +201,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
   // and missing resources fire a single GET /api/resources/:id, not two.
   const resourceMatch = location.match(/^\/resource\/(\d+)$/);
   const resourceId = resourceMatch?.[1];
-  const { data: crumbResource } = useQuery<{
+  const { data: crumbResource, isError: crumbResourceError } = useQuery<{
     id: number;
     title?: string;
     category?: string;
@@ -225,6 +245,12 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
       }
       crumbs.splice(crumbs.length - 1, 0, ...chain);
     }
+  }
+  if (resourceMatch && crumbResourceError) {
+    // BUG-038 (run27): numeric id but the API 404'd — swap the raw-id crumb
+    // for "Not found" so /resource/999999999 doesn't echo the bogus id.
+    const last = crumbs[crumbs.length - 1];
+    if (last && last.href === location) last.label = "Not found";
   }
 
   // BUG-002 (run22): at 768–917px the md floors (breadcrumb 160px + search

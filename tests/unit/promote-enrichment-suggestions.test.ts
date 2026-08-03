@@ -33,6 +33,15 @@ class FakeCategoryRepo {
   async getSubSubcategoryBySlug(slug: string, subcategoryId: number): Promise<FakeSubSubcategory | undefined> {
     return this.subSubcategories.find(ss => ss.slug === slug && ss.subcategoryId === subcategoryId);
   }
+  // Mirrors CategoryRepository.findSubSubcategoryDuplicateGlobal: any row
+  // ANYWHERE whose name matches case-insensitively OR whose slug matches
+  // (BUG-003 run19 recurrence guard called by ensureSubSubcategoryExists).
+  async findSubSubcategoryDuplicateGlobal(name: string, slug: string): Promise<FakeSubSubcategory | undefined> {
+    const lower = name.toLowerCase();
+    return this.subSubcategories.find(
+      ss => ss.name.toLowerCase() === lower || ss.slug === slug,
+    );
+  }
   async createSubSubcategory(input: { name: string; slug: string; subcategoryId: number }): Promise<FakeSubSubcategory> {
     this.createCalls.push(input);
     const row: FakeSubSubcategory = { id: this.subSubcategories.length + 1, ...input };

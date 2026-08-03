@@ -9,6 +9,30 @@ const PLURAL_KEEP = new Set([
   "axios", "redis", "postgres", "jenkins", "devops", "chaos",
 ]);
 
+// BUG-064 (run27): every page that accepts a tag filter in the URL must parse
+// it the same way. Before this, Home read only the FIRST ?tags= value (so
+// ?tags=RTMP&tags=HLS silently applied just RTMP), Subcategory kept empty/
+// whitespace chunks (so ?tags=+++ filtered everything out), and only some
+// pages honored the ?tag= alias. One parser: collects every ?tags=/?tag=
+// occurrence, splits on commas, trims, drops empties, and dedupes on the
+// canonical form (first spelling wins).
+export function parseTagsParam(params: URLSearchParams): string[] {
+  const raw = [...params.getAll("tags"), ...params.getAll("tag")];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const chunk of raw) {
+    for (const piece of chunk.split(",")) {
+      const trimmed = piece.trim();
+      if (!trimmed) continue;
+      const key = normalizeTag(trimmed);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(trimmed);
+    }
+  }
+  return out;
+}
+
 export function normalizeTag(tag: string): string {
   const folded = tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
   if (PLURAL_KEEP.has(folded)) return folded;

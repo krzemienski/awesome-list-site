@@ -43,6 +43,7 @@
           var params = new URLSearchParams(location.search);
           var dirty = false;
           var names = [];
+          var removed = [];
           params.forEach(function (v, k) { names.push(k); });
           for (var i = 0; i < names.length; i++) {
             var k = names[i];
@@ -51,10 +52,17 @@
             try { dec = decodeURIComponent(raw); } catch (_) {}
             if (XSS.test(raw) || XSS.test(dec)) {
               params.delete(k);
+              if (removed.indexOf(k) === -1) removed.push(k);
               dirty = true;
             }
           }
           if (dirty) {
+            // BUG-032/BUG-064 (run27): stripping is the right security call,
+            // but doing it SILENTLY made /search?q=<img…> render the full
+            // catalog and /?tags=<script>… render unfiltered with no hint the
+            // link was altered. Record what was dropped so the app can show
+            // an explicit "part of this link was ignored" notice after boot.
+            window.__scrubbedParams = removed;
             var qs = params.toString();
             history.replaceState(
               history.state,

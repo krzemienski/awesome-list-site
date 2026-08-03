@@ -153,6 +153,15 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [setIsOpen, isOpen]);
 
+  // BUG-034 (run27): pages whose own inputs swallow the "/" shortcut (the
+  // /search page's auto-focused query box) re-dispatch it as this event so
+  // the palette still opens instead of the keystroke corrupting their input.
+  useEffect(() => {
+    const open = () => setIsOpen(true);
+    window.addEventListener('awesome:open-search-palette', open);
+    return () => window.removeEventListener('awesome:open-search-palette', open);
+  }, [setIsOpen]);
+
   // Focus input when dialog opens
   useEffect(() => {
     if (isOpen && inputRef.current) {

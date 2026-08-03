@@ -9,6 +9,7 @@
 - [Dedup cascade safety](resource-dedup-cascade-safety.md) — bulk hard-delete of dup resources silently cascades journey_steps/bookmarks/favorites; journal ROW CONTENTS not just ids & repoint-to-survivor; prod NOW has 89 journey steps (seeded July 2026).
 - [Empty taxonomy cleanup](empty-taxonomy-cleanup.md) — empty nodes hard-delete-safe; pre-check full-chain 0 across ALL statuses + 0 orphans; prod=no direct write, rename-then-delete via admin API (guard is name-global).
 - [Dev server no hot-reload](dev-server-no-watch.md) — tsx runs without --watch; restart the workflow after every server edit before API-testing.
+- [Pre-boot param scrubber honesty](scrubbed-params-honesty.md) — index.html deletes XSS-shaped query params before React boots; "silent full-catalog fallback" on q/tags = the scrubber, surface via window.__scrubbedParams notice.
 - [SPA crawler/SEO prerender](spa-crawler-prerender.md) — crawler visibility = og-middleware injecting content into `<!--app-html-->`, NOT React SSR (no prod server bundle; never set __INITIAL_DATA__ → createRoot replaces).
 - [SEO soft-404 + sitemap](seo-soft-404-architecture.md) — SPA hard-codes 200, so set 404 in og-middleware's buffered res.end; indexable set must equal sitemap; malformed %-URLs crash vite dev via decodeURI — guard before next().
 - [Anthropic mid-loop steering](anthropic-midloop-steering.md) — inject mid-run guidance as a text block on the tool_result user turn (a separate user msg → 400); research agent "don't give up" tuning lives here too.

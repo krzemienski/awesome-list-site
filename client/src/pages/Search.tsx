@@ -38,6 +38,15 @@ export default function Search() {
   const PAGE_SIZE = 24;
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // BUG-034 (run27): this input auto-focuses on mount, so a visitor who lands
+  // on /search?q=hls and presses the site-wide "/" shortcut got a literal
+  // slash typed into the pre-filled query instead of the palette ("hls" +
+  // "/" + "hls" → q=hls/hls). Track whether the visitor has actually
+  // interacted with the input yet — while it's still pristine, "/" behaves
+  // as the advertised shortcut (opens the palette); after any edit/click,
+  // "/" types normally so queries like "24/7" stay possible.
+  const inputPristineRef = useRef(true);
+
   // Auto-focus on mount.
   useEffect(() => {
     inputRef.current?.focus();
@@ -140,8 +149,19 @@ export default function Search() {
 
   const commitPageJump = () => {
     const n = parseInt(pageJumpValue, 10);
-    if (Number.isFinite(n) && n >= 1 && n <= totalPages && n !== safePage) {
-      gotoPage(n);
+    // BUG-033 (run27): 0/negative used to be silently swallowed (input reset,
+    // no feedback) while an out-of-range URL ?page= clamps. One policy for
+    // both surfaces now: clamp into [1, totalPages] and actually navigate —
+    // typing 0 lands on page 1, 999 lands on the last page, and the input +
+    // URL both reflect the clamped result (same normalization BUG-023's URL
+    // handling applies).
+    if (!Number.isFinite(n)) {
+      setPageJumpValue(String(safePage));
+      return;
+    }
+    const clamped = Math.min(Math.max(n, 1), totalPages);
+    if (clamped !== safePage) {
+      gotoPage(clamped);
     } else {
       setPageJumpValue(String(safePage));
     }
@@ -199,7 +219,27 @@ export default function Search() {
         <Input
           ref={inputRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            inputPristineRef.current = false;
+            setInput(e.target.value);
+          }}
+          onMouseDown={() => {
+            inputPristineRef.current = false;
+          }}
+          onKeyDown={(e) => {
+            // BUG-034 (run27): first keystroke into the auto-focused input
+            // being "/" means the visitor wanted the search palette — open it
+            // instead of corrupting the pre-filled query with a slash.
+            if (
+              e.key === "/" &&
+              inputPristineRef.current &&
+              !e.ctrlKey && !e.metaKey && !e.altKey
+            ) {
+              e.preventDefault();
+              window.dispatchEvent(new Event("awesome:open-search-palette"));
+            }
+            inputPristineRef.current = false;
+          }}
           placeholder="Search resources..."
           className="pl-10"
           aria-label="Search resources"
