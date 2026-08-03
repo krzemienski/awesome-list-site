@@ -608,7 +608,7 @@ export default function ResourceDetail() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {resource.category && (
-                        <Link href={`/category/${slugify(resource.category)}`}>
+                        <Link href={`/category/${slugify(resource.category)}`} className="inline-flex items-center min-h-[32px]">
                           <Badge 
                             variant="secondary" 
                             className="cursor-pointer hover:bg-secondary/80"
@@ -621,7 +621,7 @@ export default function ResourceDetail() {
                       )}
                       {resource.subcategory && (
                         taxonomySlugs.subcategory ? (
-                          <Link href={`/subcategory/${taxonomySlugs.subcategory}`}>
+                          <Link href={`/subcategory/${taxonomySlugs.subcategory}`} className="inline-flex items-center min-h-[32px]">
                             <Badge
                               variant="outline"
                               className="cursor-pointer hover:bg-secondary/80"
@@ -638,7 +638,7 @@ export default function ResourceDetail() {
                       )}
                       {resource.subSubcategory && (
                         taxonomySlugs.subSubcategory ? (
-                          <Link href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`}>
+                          <Link href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} className="inline-flex items-center min-h-[32px]">
                             <Badge
                               variant="outline"
                               className="cursor-pointer hover:bg-secondary/80"
@@ -719,7 +719,7 @@ export default function ResourceDetail() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base min-h-[24px]"
+                  className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
                   data-testid="link-url"
                 >
                   {resource.url}

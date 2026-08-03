@@ -2768,7 +2768,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   size="sm"
                   onClick={() => goToPage(1)}
                   disabled={currentPage === 1}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 shrink-0"
                   aria-label="First page"
                   data-testid="button-first-page"
                 >
@@ -2779,7 +2779,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   size="sm"
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 shrink-0"
                   aria-label="Previous page"
                   data-testid="button-prev-page"
                 >
@@ -2790,7 +2790,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   size="sm"
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 shrink-0"
                   aria-label="Next page"
                   data-testid="button-next-page"
                 >
@@ -2801,7 +2801,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   size="sm"
                   onClick={() => goToPage(totalPages)}
                   disabled={currentPage === totalPages}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 shrink-0"
                   aria-label="Last page"
                   data-testid="button-last-page"
                 >

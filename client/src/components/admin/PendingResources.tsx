@@ -342,7 +342,7 @@ export default function PendingResources() {
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-muted-foreground hover:text-primary"
+                          className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] shrink-0 text-muted-foreground hover:text-primary"
                           aria-label={`Open ${resource.title || resource.url} in a new tab`}
                           data-testid={`link-resource-url-${resource.id}`}
                         >

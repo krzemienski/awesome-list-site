@@ -841,7 +841,7 @@ export default function ResourceManager() {
                       checked={isAllSelected}
                       onCheckedChange={toggleSelectAll}
                       aria-label="Select all resources on this page"
-                      className={isSomeSelected ? "data-[state=checked]:bg-primary/50" : ""}
+                      className={`h-8 w-8 ${isSomeSelected ? "data-[state=checked]:bg-primary/50" : ""}`}
                     />
                   </TableHead>
                   <TableHead className="w-12">ID</TableHead>
@@ -876,6 +876,7 @@ export default function ResourceManager() {
                         checked={selectedResourceIds.includes(resource.id)}
                         onCheckedChange={() => toggleResourceSelection(resource.id)}
                         aria-label={`Select ${resource.title || `resource #${resource.id}`}`}
+                        className="h-8 w-8"
                       />
                     </TableCell>
                     <TableCell className="font-mono text-xs text-[var(--text-2)]">
@@ -893,7 +894,7 @@ export default function ResourceManager() {
                             href={resource.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline flex items-center gap-1 truncate max-w-[300px]"
+                            className="text-xs text-primary hover:underline flex items-center gap-1 truncate max-w-[300px] min-h-[32px]"
                           >
                             {resource.url}
                             <ExternalLink className="h-3 w-3 flex-shrink-0" />

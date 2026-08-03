@@ -148,7 +148,7 @@ function ResourcePicker({
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="hover:opacity-80"
+              className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
               aria-label="Clear resource"
               data-testid="step-resource-clear"
             >
@@ -501,7 +501,7 @@ function StepsDialog({
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-6 w-6"
+                      className="h-8 w-8"
                       onClick={() => move(index, -1)}
                       disabled={index === 0 || reorderMutation.isPending}
                       aria-label="Move step up"
@@ -512,7 +512,7 @@ function StepsDialog({
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-6 w-6"
+                      className="h-8 w-8"
                       onClick={() => move(index, 1)}
                       disabled={index === groups.length - 1 || reorderMutation.isPending}
                       aria-label="Move step down"
@@ -546,7 +546,7 @@ function StepsDialog({
                             <button
                               type="button"
                               onClick={() => setRemovingRow(row)}
-                              className="hover:opacity-80"
+                              className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
                               aria-label={`Remove resource #${row.resourceId} from this step`}
                               data-testid={`step-remove-resource-${row.id}`}
                             >

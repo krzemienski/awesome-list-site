@@ -226,7 +226,7 @@ export default function Journeys() {
                         at two lines (line-clamp-2) with word-boundary wrapping. */}
                     <Link
                       href={`/journey/${journey.id}`}
-                      className="hover:underline hover:text-[var(--accent)] transition-colors line-clamp-2 break-words min-h-[24px] text-left"
+                      className="hover:underline hover:text-[var(--accent)] transition-colors line-clamp-2 break-words min-h-[32px] text-left"
                       title={journey.title}
                       data-testid={`link-journey-title-${journey.id}`}
                     >

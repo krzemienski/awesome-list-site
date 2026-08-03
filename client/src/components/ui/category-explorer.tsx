@@ -263,7 +263,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="h-6 w-6"
+                className="h-8 w-8"
                 id="subcategories"
                 aria-label="Show subcategories"
                 checked={showSubcategories}
@@ -365,7 +365,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         size="sm"
                         onClick={() => navigate(`/category/${category.slug}`)}
                         // BUG-048 (run18): min-h keeps the inline title link a ≥24px tap target.
-                        className="p-0 h-auto min-h-[24px] font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
+                        className="p-0 h-auto min-h-[32px] font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
                       >
                         {category.name}
                       </Button>
@@ -435,7 +435,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex min-h-6 items-center text-foreground hover:text-primary transition-colors font-medium"
+                        className="inline-flex min-h-[32px] items-center text-foreground hover:text-primary transition-colors font-medium"
                       >
                         {resource.title}
                       </a>
@@ -468,7 +468,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               variant="outline"
                               size="sm"
                               onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
-                              className="h-6 px-2 text-xs"
+                              className="min-h-[32px] h-auto px-2 text-xs"
                             >
                               {subcategory.name} ({getTotalResourceCount(subcategory)})
                             </Button>

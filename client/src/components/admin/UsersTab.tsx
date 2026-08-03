@@ -209,7 +209,7 @@ export default function UsersTab() {
                   <button
                     type="button"
                     onClick={() => toggleSort(col.key)}
-                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                    className="inline-flex items-center gap-1 min-h-[32px] hover:text-foreground transition-colors"
                     aria-label={`Sort by ${col.label}`}
                     data-testid={`button-sort-${col.key}`}
                   >
@@ -270,7 +270,7 @@ export default function UsersTab() {
                         <button
                           type="button"
                           onClick={() => toggleReveal(user.id)}
-                          className="text-muted-foreground/70 hover:text-foreground transition-colors"
+                          className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:text-foreground transition-colors"
                           aria-label={`${revealedIds.has(user.id) ? "Hide" : "Reveal"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}

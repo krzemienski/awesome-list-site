@@ -48,7 +48,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                 {pendingCount ? (
                   <button
                     type="button"
-                    className="underline decoration-dotted hover:text-[var(--accent)]"
+                    className="inline-flex items-center min-h-[32px] underline decoration-dotted hover:text-[var(--accent)]"
                     data-testid="link-stat-pending"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -62,7 +62,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                 {rejectedCount ? (
                   <button
                     type="button"
-                    className="underline decoration-dotted hover:text-[var(--accent)]"
+                    className="inline-flex items-center min-h-[32px] underline decoration-dotted hover:text-[var(--accent)]"
                     data-testid="link-stat-rejected"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -122,7 +122,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                 {clickable && hasNestedControls ? (
                   <button
                     type="button"
-                    className="underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                    className="inline-flex items-center min-h-[32px] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                     aria-label={`${label} — open the ${tab} tab`}
                     onClick={(e) => {
                       e.stopPropagation();
