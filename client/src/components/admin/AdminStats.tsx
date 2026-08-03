@@ -12,7 +12,8 @@ interface AdminStatsProps {
     pendingApprovals?: number;
     totalPublic?: number;
     totalPending?: number;
-    totalDeleted?: number;
+    /** Rows with status='rejected' (Audit2 BUG-050: was misnamed totalDeleted). */
+    totalRejected?: number;
   };
   isLoading: boolean;
   /** R4-L17: when provided, stat cards become clickable and jump to the matching admin tab. */
@@ -29,7 +30,7 @@ interface AdminStatsProps {
 export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsProps) {
   const publicCount = stats?.totalPublic ?? stats?.resources;
   const pendingCount = stats?.totalPending ?? 0;
-  const rejectedCount = stats?.totalDeleted ?? 0;
+  const rejectedCount = stats?.totalRejected ?? 0;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {[

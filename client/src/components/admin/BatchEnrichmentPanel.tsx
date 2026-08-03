@@ -76,6 +76,12 @@ export default function BatchEnrichmentPanel() {
 
   const [isPolling, setIsPolling] = useState(false);
 
+  // Audit2 BUG-047: single source of truth for the 1–50 rule so the input can
+  // show inline feedback the moment an out-of-range value is typed — the bare
+  // min/max attributes never validated anything (999 sat there silently until
+  // Start was clicked).
+  const batchSizeInvalid = !Number.isInteger(batchSize) || batchSize < 1 || batchSize > 50;
+
   const { data: jobsData, isLoading } = useQuery<JobsResponse>({
     queryKey: ['/api/enrichment/jobs'],
     refetchInterval: isPolling ? 3000 : false,
@@ -357,11 +363,23 @@ export default function BatchEnrichmentPanel() {
                   setBatchSize(Number.isNaN(v) ? 0 : v);
                 }}
                 disabled={hasActiveJob}
+                aria-invalid={batchSizeInvalid}
+                aria-describedby={batchSizeInvalid ? "batch-size-error" : "batch-size-help"}
                 data-testid="input-batch-size"
               />
-              <p className="text-xs text-muted-foreground">
+              <p id="batch-size-help" className="text-xs text-muted-foreground">
                 Resources per batch (1-50)
               </p>
+              {batchSizeInvalid && (
+                <p
+                  id="batch-size-error"
+                  role="alert"
+                  className="text-xs font-medium text-destructive"
+                  data-testid="error-batch-size"
+                >
+                  Batch size must be between 1 and 50.
+                </p>
+              )}
             </div>
           </div>
 
@@ -436,7 +454,7 @@ export default function BatchEnrichmentPanel() {
           <div className="flex items-center justify-between">
             <Button
               onClick={handleStartEnrichment}
-              disabled={hasActiveJob || startMutation.isPending}
+              disabled={hasActiveJob || startMutation.isPending || batchSizeInvalid}
              
               data-testid="button-start-enrichment"
             >

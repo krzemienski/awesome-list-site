@@ -38,7 +38,8 @@ interface DatabaseTabProps {
     // panel can show the live (public) number instead of the raw row count.
     totalPublic?: number;
     totalPending?: number;
-    totalDeleted?: number;
+    /** Rows with status='rejected' (Audit2 BUG-050: was misnamed totalDeleted). */
+    totalRejected?: number;
   };
 }
 
@@ -231,12 +232,12 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                 <div className="text-xl font-mono font-bold text-primary" data-testid="stat-db-live-resources">
                   {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()}
                 </div>
-                {(stats?.totalPending ?? 0) + (stats?.totalDeleted ?? 0) > 0 && (
+                {(stats?.totalPending ?? 0) + (stats?.totalRejected ?? 0) > 0 && (
                   <div className="text-[10px] text-[var(--text-2)]">
                     {/* R2-M22: only mention non-zero buckets (no "+0 pending"). */}
                     {[
                       (stats?.totalPending ?? 0) > 0 ? `+${stats?.totalPending} pending` : null,
-                      (stats?.totalDeleted ?? 0) > 0 ? `${stats?.totalDeleted} rejected` : null,
+                      (stats?.totalRejected ?? 0) > 0 ? `${stats?.totalRejected} rejected` : null,
                     ].filter(Boolean).join(" · ")}
                   </div>
                 )}

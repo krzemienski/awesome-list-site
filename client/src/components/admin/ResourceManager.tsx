@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,6 +59,18 @@ export default function ResourceManager() {
   const [limit, setLimit] = useState(25);
   const [sort, setSort] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
   const [search, setSearch] = useState("");
+  // Audit2 BUG-003: debounce the search text into the query key. Every
+  // keystroke used to swap the queryKey immediately; the fresh key had no
+  // cached data, `isLoading` went true, and the whole component fell into the
+  // skeleton branch — unmounting the search input mid-typing (text truncated
+  // to the first character, focus lost, one request per remount, and rapid
+  // typing could hang the page). Debounce + keepPreviousData keep the form
+  // mounted and send ONE request for the full string.
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   
@@ -130,13 +142,13 @@ export default function ResourceManager() {
   };
 
   const { data, isLoading } = useQuery<ResourcesResponse>({
-    queryKey: ['/api/admin/resources', page, limit, search, categoryFilter, statusFilter, sort],
+    queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.set('page', page.toString());
       params.set('limit', limit.toString());
       if (sort !== 'newest') params.set('sort', sort);
-      if (search) params.set('search', search);
+      if (debouncedSearch) params.set('search', debouncedSearch);
       if (categoryFilter) params.set('category', categoryFilter);
       if (statusFilter) params.set('status', statusFilter);
       const response = await fetch(`/api/admin/resources?${params.toString()}`, {
@@ -145,6 +157,9 @@ export default function ResourceManager() {
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resources');
       return response.json();
     },
+    // Audit2 BUG-003: hold the previous page while a new key fetches so the
+    // table (and the search input above it) never unmounts between requests.
+    placeholderData: keepPreviousData,
     refetchInterval: 30000,
     // R5-037: refresh admin data when the operator returns to the tab.
     staleTime: 30_000,
@@ -519,12 +534,15 @@ export default function ResourceManager() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    // Explicit submit skips the debounce window (Audit2 BUG-003).
+    setDebouncedSearch(search);
     setPage(1);
     setSelectedResourceIds([]);
   };
 
   const clearFilters = () => {
     setSearch("");
+    setDebouncedSearch("");
     setCategoryFilter("");
     setStatusFilter("");
     setPage(1);
@@ -576,7 +594,11 @@ export default function ResourceManager() {
     return data.resources.some(r => selectedResourceIds.includes(r.id)) && !isAllSelected;
   }, [data?.resources, selectedResourceIds, isAllSelected]);
 
-  if (isLoading) {
+  // Audit2 BUG-003: only the true first load may show the skeleton. With
+  // keepPreviousData above, later key changes (typing, paging, filters) keep
+  // `data` populated, so this branch can never unmount the search input
+  // mid-typing again.
+  if (isLoading && !data) {
     return (
       <Card>
         <CardHeader>
@@ -608,7 +630,7 @@ export default function ResourceManager() {
                     binding "Manage all …" to the filtered count. */}
                 {(search || categoryFilter || statusFilter)
                   ? `${(data?.total ?? 0).toLocaleString()} of ${(grandTotalData?.total ?? 0).toLocaleString()} resources match your filters`
-                  : `Manage all ${((grandTotalData?.total ?? data?.total) || 0).toLocaleString()} resources in the database`}
+                  : `Manage all ${((grandTotalData?.total ?? data?.total) || 0).toLocaleString()} resources in the database (live + pending + rejected)`}
               </CardDescription>
             </div>
             <Button 

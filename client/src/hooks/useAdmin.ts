@@ -10,7 +10,8 @@ interface AdminStats {
   pendingEdits?: number;
   totalPublic?: number;
   totalPending?: number;
-  totalDeleted?: number;
+  /** Rows with status='rejected' (Audit2 BUG-050: was misnamed totalDeleted). */
+  totalRejected?: number;
 }
 
 export function useAdmin() {

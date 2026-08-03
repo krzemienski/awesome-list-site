@@ -65,3 +65,4 @@
 - [MCP tool schema leniency](sdk-tool-schema-leniency.md) — SDK-side zod rejects loose tool args BEFORE the handler (no event); keep schemas lenient, validate in-handler.
 - [jsonb fingerprint stability](jsonb-fingerprint-stability.md) — jsonb reorders object keys, so JSON.stringify-equality dedupe guards silently never match; use recursive key-sorted stringify + verify with a live double-POST.
 - [Global ApiError handler coverage](apierror-global-handler-coverage.md) — central 401 handling only sees ApiError; queryFns throwing plain Error bypass it and render empty/stale instead of the sign-in prompt.
+- [Query-loading remount trap](query-loading-remount.md) — raw keystroke state in a queryKey + top-level isLoading skeleton unmounts the input mid-typing; debounce key + keepPreviousData + `isLoading && !data`.

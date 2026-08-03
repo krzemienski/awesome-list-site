@@ -45,7 +45,8 @@ export interface AdminStats {
   pendingEdits: number;
   totalPublic: number;
   totalPending: number;
-  totalDeleted: number;
+  /** Rows with status='rejected'. Audit2 BUG-050: previously misnamed `totalDeleted`. */
+  totalRejected: number;
   totalCategories: number;
   totalJourneys: number;
   activeUsers: number;
@@ -116,7 +117,10 @@ export class AdminRepository {
       .from(resourceEdits)
       .where(eq(resourceEdits.status, 'pending'));
 
-    const [deletedCount] = await db
+    // Audit2 BUG-050: this counts status='rejected' rows and is exposed as
+    // `totalRejected` — it used to ship as `totalDeleted`, making the
+    // dashboard's "N rejected" label look wrong against the API field name.
+    const [rejectedCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(resources)
       .where(eq(resources.status, 'rejected'));
@@ -145,7 +149,7 @@ export class AdminRepository {
       pendingEdits: pendingEditCount.count,
       totalPublic: publicCount.count,
       totalPending: pendingCount.count,
-      totalDeleted: deletedCount.count,
+      totalRejected: rejectedCount.count,
       totalCategories: categoryCount.count,
       totalJourneys: journeyCount.count,
       activeUsers: activeCount.count

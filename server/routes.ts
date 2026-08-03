@@ -1300,11 +1300,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rawOffset = firstQueryValue(req.query.offset) ?? rawCursor;
       const rawLimit = firstQueryValue(req.query.limit);
       const rawPage = firstQueryValue(req.query.page);
-      // Run16 BUG-090: ONE consistent pagination contract — non-numeric values
-      // are 400 (invalid_offset / invalid_limit / invalid_page), every numeric
-      // out-of-range value is CLAMPED into range (page<1→1, limit→[1,100],
-      // offset<0→0). Previously page=-5 errored while page=0 clamped, and
-      // limit=0 silently became the default 20 while limit=-1 became 1.
+      // Run16 BUG-090 + Audit2 BUG-025: ONE consistent pagination contract —
+      // non-numeric values are 400 (invalid_offset / invalid_limit /
+      // invalid_page) and numeric out-of-range values are 400 too (limit
+      // outside [1,100], offset < 0, page < 1). Nothing is silently clamped
+      // anymore: the clamp contradicted the documented "between 1 and 100"
+      // error text (limit=0→1, limit=100000→100, offset=-3→0).
       // Run16 BUG-091: error bodies carry `message` alongside the machine code.
       // NB-019 (run23): strict integer forms + hard bounds. "1e20" passed the
       // old isNaN() check and then parseInt silently read it as 1; all-digit
@@ -1331,11 +1332,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // BUG-050 (run14): cap page size at 100 (was 1000 — full-catalog scrape
       // in 3 requests). Paging via nextOffset/nextCursor still walks the whole
       // catalog; bulk consumers should use /api/awesome-list.
-      const limit = rawLimit !== undefined
-        ? Math.min(Math.max(parseInt(rawLimit as string), 1), 100)
-        : 20;
-      const offset = rawOffset !== undefined
-        ? Math.max(parseInt(rawOffset as string), 0)
+      // Audit2 BUG-025: numeric out-of-range values now REJECT (400) instead
+      // of clamping, matching the error message this endpoint has always sent.
+      const limit = rawLimit !== undefined ? parseInt(String(rawLimit).trim()) : 20;
+      if (limit < 1 || limit > 100) {
+        return res.status(400).json({ error: 'invalid_limit', message: 'limit must be an integer between 1 and 100' });
+      }
+      const parsedOffset = rawOffset !== undefined ? parseInt(String(rawOffset).trim()) : undefined;
+      if (parsedOffset !== undefined && parsedOffset < 0) {
+        return res.status(400).json({ error: 'invalid_offset', message: 'offset must be an integer between 0 and 2147483647' });
+      }
+      const offset = parsedOffset !== undefined
+        ? parsedOffset
         : Math.max((parseInt(rawPage as string) || 1) - 1, 0) * limit;
       let category = firstQueryValue(req.query.category) as string;
       let subcategory = firstQueryValue(req.query.subcategory) as string;
@@ -3281,7 +3289,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pendingEdits: stats.pendingEdits,
         totalPublic: stats.totalPublic,
         totalPending: stats.totalPending,
-        totalDeleted: stats.totalDeleted,
+        // Audit2 BUG-050: this count is rows with status='rejected', but it
+        // shipped under the name `totalDeleted` while the dashboard labeled it
+        // "rejected" — field name now matches what is actually counted.
+        totalRejected: stats.totalRejected,
       });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
@@ -3907,8 +3918,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/resources - Get all resources for admin (with pagination and filters)
   app.get('/api/admin/resources', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 50;
+      // Audit2 BUG-046 + BUG-013: validate pagination like /api/admin/users —
+      // page=-5 previously drove a negative OFFSET into PG → 500, and
+      // limit=100000 dumped the entire table in one response. Invalid values
+      // are 400; limit is clamped to [1,100] (same ceiling as the public
+      // /api/resources contract).
+      let page = 1;
+      if (req.query.page !== undefined && req.query.page !== '') {
+        const parsedPage = parseBoundedInt(req.query.page);
+        if (parsedPage === null) {
+          return res.status(400).json({ message: 'page must be a positive integer' });
+        }
+        page = parsedPage;
+      }
+      let limit = 50;
+      if (req.query.limit !== undefined && req.query.limit !== '') {
+        const parsedLimit = parseBoundedInt(req.query.limit);
+        if (parsedLimit === null) {
+          return res.status(400).json({ message: 'limit must be a positive integer between 1 and 100' });
+        }
+        limit = Math.min(parsedLimit, 100);
+      }
       const search = req.query.search as string;
       const category = req.query.category as string;
       const status = req.query.status as string;
