@@ -32,6 +32,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import rateLimit from "express-rate-limit";
+import { negotiated429Handler, send429 } from "./middleware/rateLimit";
 import {
   UserRepository,
   ResourceRepository,
@@ -718,7 +719,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     limit: perInstanceLimit(20), // 7/instance ⇒ ≤21 effective at 3 instances
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: "Too many attempts. Please try again later." },
+    // BUG-001 (Audit 2): every limiter serves the shared content-negotiated
+    // 429 (styled HTML for browser navigations, JSON for API clients, always
+    // with Retry-After).
+    handler: negotiated429Handler("Too many attempts. Please try again later."),
   });
 
   // BUG-008 (run11): strict per-minute burst limiter on login only —
@@ -730,19 +734,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     limit: perInstanceLimit(5), // 2/instance ⇒ ≤6 effective at 3 instances
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: "Too many login attempts. Please try again in a minute." },
+    handler: negotiated429Handler("Too many login attempts. Please try again in a minute."),
   });
 
   // NEW-051 (run11): public resource-read rate limit — 100 requests per IP
   // per minute across the public GET resource surfaces, 429 + Retry-After.
   // Generous enough for real browsing (a page load issues a handful of calls);
   // caps scraping/abuse.
+  // BUG-001 (Audit 2, Aug 2026): 100/min tripped for shared-NAT clients (the
+  // audit's parallel crawlers from ONE datacenter IP saw intermittent
+  // /api/awesome-list 429s — an office/campus NAT looks identical). 240/min
+  // keeps ~2.5× headroom over that failure mode while still capping
+  // enumeration scrapes; single-user browsing (~5 calls/page) never gets close.
   const resourceReadLimiter = rateLimit({
     windowMs: 60 * 1000,
-    limit: 100,
+    limit: 240,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: "Too many requests. Please slow down and try again shortly." },
+    handler: negotiated429Handler("Too many requests. Please slow down and try again shortly."),
   });
 
   // NB-002 (run23): AI-generation endpoints run paid Claude calls (~15-45s
@@ -754,7 +763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     limit: perInstanceLimit(10), // 4/instance ⇒ ≤12 effective at 3 instances
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: "Too many AI requests. Please try again in a few minutes." },
+    handler: negotiated429Handler("Too many AI requests. Please try again in a few minutes."),
   });
 
   // Task-178: anonymous GET /api/learning-paths/suggested only serves the
@@ -769,7 +778,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     limit: 60,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: "Too many requests. Please slow down and try again shortly." },
+    handler: negotiated429Handler("Too many requests. Please slow down and try again shortly."),
   });
 
   // NB-051 (run23): TRACE/TRACK are already answered 405 + Allow by the
@@ -783,12 +792,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // limiters keep layering on top (both count; the later, stricter limiter's
   // RateLimit-* headers win). 300 req/min/IP is far above real browsing (a
   // page load issues ~5 API calls) but caps unbounded scraping/abuse.
+  // BUG-001 (Audit 2, Aug 2026): raised 300→600/min for the same shared-NAT
+  // headroom as resourceReadLimiter above (one IP can be a whole office). The
+  // backstop only guards /api — HTML documents and /assets/* chunks are NEVER
+  // rate-limited at the app layer, so a burst can't blank the SPA shell or
+  // break code-split imports.
   const apiBackstopLimiter = rateLimit({
     windowMs: 60 * 1000,
-    limit: 300,
+    limit: 600,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: "Too many requests. Please slow down and try again shortly." },
+    handler: negotiated429Handler("Too many requests. Please slow down and try again shortly."),
   });
   app.use('/api', apiBackstopLimiter);
 
@@ -960,8 +974,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.ip ||
         "unknown";
       if (!allowResetRequest(email, ip)) {
+        // BUG-001 (Audit 2): manual throttles share the negotiated 429
+        // contract (styled HTML for browser navigations, JSON otherwise),
+        // keeping this path's 15-minute Retry-After.
         res.setHeader("Retry-After", "900");
-        return res.status(429).json({ message: "Too many reset requests. Please try again in a little while." });
+        return send429(req, res, "Too many reset requests. Please try again in a little while.");
       }
 
       // Respond immediately with the generic message; do the real work after.
@@ -4175,9 +4192,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const quota = claudeAnalyzeQuota.get(quotaUserId);
       const used = quota && quota.day === today ? quota.count : 0;
       if (used >= CLAUDE_ANALYZE_DAILY_LIMIT) {
-        return res.status(429).json({
-          message: `Daily AI analysis limit reached (${CLAUDE_ANALYZE_DAILY_LIMIT}/day). Try again tomorrow.`,
-        });
+        // BUG-001 (Audit 2): every 429 carries Retry-After — here, seconds
+        // until the daily quota resets at UTC midnight — and shares the
+        // negotiated response contract.
+        const nextUtcMidnight = new Date(`${today}T00:00:00.000Z`).getTime() + 24 * 60 * 60 * 1000;
+        res.setHeader("Retry-After", String(Math.max(1, Math.ceil((nextUtcMidnight - Date.now()) / 1000))));
+        return send429(req, res, `Daily AI analysis limit reached (${CLAUDE_ANALYZE_DAILY_LIMIT}/day). Try again tomorrow.`);
       }
 
       if (!url || typeof url !== 'string' || !url.trim()) {

@@ -77,19 +77,116 @@ function generateRateLimitKey(req: Request): string {
 }
 
 /**
- * Custom handler for rate limit exceeded responses
+ * BUG-001 (Audit 2, Aug 2026): honest, content-negotiated 429 responses.
  *
- * Returns a JSON response with rate limit information when the limit is exceeded.
- *
- * @param req - Express request object
- * @param res - Express response object
+ * The audit flagged bare unstyled "Too many requests" text pages with no
+ * Retry-After header. App-level limiters always had Retry-After + RateLimit-*
+ * (express-rate-limit standardHeaders), but a browser NAVIGATING to a
+ * rate-limited /api URL still received raw JSON. This shared handler serves:
+ * - a styled, self-contained HTML page when the client accepts text/html
+ *   (no inline <script> — script-src is nonce-gated; meta refresh retries
+ *   automatically once the window resets), or
+ * - the documented JSON error shape ({ message, error, retryAfter }) for
+ *   API/fetch clients.
+ * Retry-After is guaranteed on both variants.
  */
-function rateLimitExceededHandler(req: Request, res: Response): void {
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function render429Page(message: string, retryAfterSec: number): string {
+  const refreshIn = Math.min(Math.max(retryAfterSec, 5), 300) + 1;
+  const waitCopy =
+    retryAfterSec >= 90
+      ? `about ${Math.ceil(retryAfterSec / 60)} minutes`
+      : `about ${retryAfterSec} seconds`;
+  // Brand tokens mirror client/src/styles/design-system.css editorial defaults
+  // (self-contained on purpose: this page must render even if every other
+  // request from this client is being throttled).
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="${refreshIn}">
+<title>Taking a quick breather — awesome.video</title>
+<style>
+  :root { --bg:#000; --text:#f4f3ee; --text-2:rgba(244,243,238,.66); --accent:#ff3d52; --border:rgba(244,243,238,.16); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',system-ui,-apple-system,sans-serif;
+         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  main { max-width:520px; border:1px solid var(--border); padding:48px 40px; text-align:center; }
+  .code { font-size:13px; letter-spacing:.18em; color:var(--accent); font-weight:600; margin-bottom:16px; }
+  h1 { font-family:Georgia,'Fraunces',serif; font-weight:500; font-size:28px; letter-spacing:-0.02em; line-height:1.1; margin-bottom:14px; }
+  p { color:var(--text-2); font-size:15px; line-height:1.55; }
+  p + p { margin-top:10px; }
+  a { color:var(--text); text-decoration:underline; text-underline-offset:3px; }
+  a:hover { color:var(--accent); }
+  .foot { margin-top:28px; font-size:13px; color:var(--text-2); }
+</style>
+</head>
+<body>
+<main data-testid="rate-limit-page">
+  <div class="code">429 — RATE LIMITED</div>
+  <h1>Taking a quick breather</h1>
+  <p>${escapeHtml(message)}</p>
+  <p>This page retries automatically in ${waitCopy}, or you can head <a href="/">back to the homepage</a>.</p>
+  <div class="foot">awesome.video</div>
+</main>
+</body>
+</html>`;
+}
+
+/**
+ * Send a content-negotiated 429 on an arbitrary response. Preserves an
+ * already-set Retry-After header (falling back to 60s so the header is ALWAYS
+ * present), serves the styled HTML page to text/html clients and the
+ * documented JSON shape to everyone else. Manual throttles (password reset,
+ * daily AI quota) share this exact contract with the express-rate-limit
+ * instances.
+ */
+export function send429(
+  req: Request,
+  res: Response,
+  message = "Too many requests. Please slow down and try again shortly.",
+): void {
+  let retryAfterSec = Number(res.getHeader("Retry-After"));
+  if (!Number.isFinite(retryAfterSec) || retryAfterSec <= 0) {
+    retryAfterSec = 60;
+    res.setHeader("Retry-After", String(retryAfterSec));
+  }
+  const accept = String(req.headers.accept || "");
+  if (accept.includes("text/html")) {
+    res
+      .status(429)
+      .type("html")
+      .send(render429Page(message, retryAfterSec));
+    return;
+  }
   res.status(429).json({
-    message: "Too many requests, please try again later",
+    message,
     error: "Rate limit exceeded",
-    retryAfter: res.getHeader("Retry-After"),
+    retryAfter: retryAfterSec,
   });
+}
+
+/**
+ * Shared 429 handler factory for every express-rate-limit instance in the app.
+ * express-rate-limit sets Retry-After before invoking the handler; send429
+ * keeps a defensive fallback so the header can never go missing.
+ *
+ * @param message - Human-readable copy for this limiter (shown in both variants)
+ * @returns express-rate-limit `handler` implementation
+ */
+export function negotiated429Handler(
+  message = "Too many requests. Please slow down and try again shortly.",
+) {
+  return (req: Request, res: Response): void => send429(req, res, message);
 }
 
 /**
@@ -109,7 +206,7 @@ export function createRateLimiter(tier: RateLimitTier) {
     standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
     legacyHeaders: false, // Disable `X-RateLimit-*` headers
     keyGenerator: generateRateLimitKey,
-    handler: rateLimitExceededHandler,
+    handler: negotiated429Handler("Too many requests, please try again later"),
     // Don't skip any requests - apply to all
     skip: () => false,
     // Store rate limit data in memory (suitable for single-instance deployments)

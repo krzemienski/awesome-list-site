@@ -12,17 +12,27 @@ import { humanizeStatusBody } from "./apiError";
 export class ApiError extends Error {
   status: number;
   body: string;
-  constructor(status: number, body: string) {
+  // BUG-001 (Audit 2): server 429s always carry Retry-After; surfacing it here
+  // lets the query layer schedule an honest automatic retry instead of
+  // hard-failing on the first transient rate-limit response.
+  retryAfterSec?: number;
+  constructor(status: number, body: string, retryAfterSec?: number) {
     super(humanizeStatusBody(status, body));
     this.status = status;
     this.body = body;
+    this.retryAfterSec = retryAfterSec;
   }
 }
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
-    throw new ApiError(res.status, text);
+    const retryAfter = Number(res.headers.get("Retry-After"));
+    throw new ApiError(
+      res.status,
+      text,
+      Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined,
+    );
   }
 }
 
@@ -157,9 +167,25 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      // BUG-001 (Audit 2): a transient 429 used to hard-fail on first sight
+      // (global retry:false), so a rate-limited burst rendered error states —
+      // or with pre-fix silent consumers, EMPTY panels — for data that would
+      // have loaded a second later. Queries (idempotent GETs) now retry a 429
+      // up to twice, honoring the server's Retry-After when it's short.
+      // Long Retry-After values (>10s) fail fast to the visible error/retry
+      // card instead of pinning the UI in a skeleton state.
+      retry: (failureCount, error) =>
+        error instanceof ApiError &&
+        error.status === 429 &&
+        (error.retryAfterSec ?? 2) <= 10 &&
+        failureCount < 2,
+      retryDelay: (failureCount, error) =>
+        error instanceof ApiError && error.status === 429
+          ? Math.min(error.retryAfterSec ?? 2, 10) * 1000
+          : Math.min(1000 * 2 ** failureCount, 30_000),
     },
     mutations: {
+      // Mutations stay non-retried: they are not guaranteed idempotent.
       retry: false,
     },
   },
