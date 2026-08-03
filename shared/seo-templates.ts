@@ -51,12 +51,33 @@ function stripDanglingTail(s: string): string {
   return out;
 }
 
+// BUG-026 (run27): a cut that lands inside a "(...)" group leaves an unclosed
+// parenthetical fragment ("…Codecs (AV1, HEVC…"). Detect an unmatched "(" in
+// the cut and drop the whole group — the pre-parenthetical phrase reads as a
+// complete title instead of a mid-list stub.
+function dropUnclosedParen(cut: string): string {
+  let depth = 0;
+  let openIdx = -1;
+  for (let i = 0; i < cut.length; i++) {
+    const ch = cut[i];
+    if (ch === "(") {
+      if (depth === 0) openIdx = i;
+      depth++;
+    } else if (ch === ")") {
+      depth = Math.max(0, depth - 1);
+      if (depth === 0) openIdx = -1;
+    }
+  }
+  return depth > 0 && openIdx > 0 ? cut.slice(0, openIdx) : cut;
+}
+
 function clampAtWord(s: string, max: number): string {
   const t = (s || "").trim();
   if (t.length <= max) return t;
   let cut = t.slice(0, max - 1);
   const lastSpace = cut.lastIndexOf(" ");
   if (lastSpace > Math.floor(max * 0.5)) cut = cut.slice(0, lastSpace);
+  cut = dropUnclosedParen(cut);
   const cleaned = stripDanglingTail(cut);
   return (cleaned || cut.replace(/[\s—–\-·,;:]+$/u, "")) + "…";
 }
@@ -116,6 +137,18 @@ function normalizeTaxonomyName(value: string): string {
     .trim();
 }
 
+// BUG-026 (run27): "child – parent" context is a nice-to-have; when it can't
+// fit the SERP budget alongside the brand suffix it used to get ellipsized
+// mid-phrase ("Origin Servers – Containerization &…"). Emit the child name
+// alone instead — a complete, un-truncated title. Shared by server and client,
+// so two-pass parity holds.
+function withParentContext(name: string, parentName: string): string {
+  const combined = `${name} – ${parentName}`;
+  return combined.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length
+    ? combined
+    : name;
+}
+
 export function subSubcategorySeoTitleCore(
   name: string,
   parentName?: string | null,
@@ -123,14 +156,14 @@ export function subSubcategorySeoTitleCore(
   if (!parentName) return name;
   const child = normalizeTaxonomyName(name);
   const parent = normalizeTaxonomyName(parentName);
-  if (!child || !parent) return `${name} – ${parentName}`;
+  if (!child || !parent) return withParentContext(name, parentName);
   if (child === parent) return name;
   const wrappedChild = ` ${child} `;
   const wrappedParent = ` ${parent} `;
   if (wrappedParent.includes(wrappedChild) || wrappedChild.includes(wrappedParent)) {
     return name;
   }
-  return `${name} – ${parentName}`;
+  return withParentContext(name, parentName);
 }
 
 export function clampSeoDescription(description: string): string {
@@ -165,14 +198,16 @@ export function homeSeoDescription(
 // the caller on the server and by SEOHead.withBrand on the client). Any slug not
 // listed here falls back to the plain category name, preserving prior behaviour.
 const CATEGORY_TITLE_CORES: Record<string, string> = {
+  // BUG-026 (run27): every core must fit SEO_TITLE_MAX − " — Awesome Video"
+  // (44 chars) so the emitted <title> is never ellipsized mid-list.
   "community-events": "Video Community & Streaming Conferences",
-  "encoding-codecs": "Video Encoding Tools & Codecs (AV1, HEVC, H.264)",
+  "encoding-codecs": "Video Encoding & Codecs: AV1, HEVC, H.264",
   "general-tools": "Video Development Tools & Utilities",
   "infrastructure-delivery": "Video Infrastructure, CDN & Delivery Tools",
   "intro-learning": "Learn Video Development: Courses & Tutorials",
   "media-tools": "Media Processing & Video Editing Tools",
   "players-clients": "Open-Source Video Players & Client SDKs",
-  "protocols-transport": "Streaming Protocols: HLS, DASH, WebRTC & RTMP",
+  "protocols-transport": "Streaming Protocols: HLS, DASH, WebRTC, RTMP",
   "standards-industry": "Video Standards & Industry Specifications",
 };
 

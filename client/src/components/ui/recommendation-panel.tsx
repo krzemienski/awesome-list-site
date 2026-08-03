@@ -331,7 +331,7 @@ export default function RecommendationPanel({
                               </div>
                               <div className="flex items-center gap-1">
                                 <BookOpen className="h-4 w-4" />
-                                {(path.resources || []).length} resources
+                                {(path.resources || []).length} {(path.resources || []).length === 1 ? "resource" : "resources"}
                               </div>
                               <div className="flex items-center gap-1">
                                 <TrendingUp className="h-4 w-4" />

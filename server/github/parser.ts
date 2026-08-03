@@ -1,7 +1,7 @@
 import { Resource } from "@shared/schema";
 import yaml from "js-yaml";
 import { mapCategoryName } from "@shared/categoryMapping";
-import { isJunkResource, humanizeTitle, sanitizeDescription } from "./importHygiene";
+import { isJunkResource, humanizeTitle, sanitizeDescription, decodeHtmlEntities } from "./importHygiene";
 
 /**
  * Parser for awesome list README files
@@ -353,7 +353,11 @@ export function convertToDbResources(parsed: ParsedAwesomeList): Partial<Resourc
  * Normalize category names for consistency
  */
 function normalizeCategory(category: string): string {
-  return category
+  // BUG-007 (run27): decode HTML entities BEFORE stripping special chars.
+  // Markdown headings arrive as "Community &amp; Events"; without decoding,
+  // the entity text persisted verbatim into the denormalized category
+  // columns and rendered as literal "&amp;" site-wide.
+  return decodeHtmlEntities(category)
     .replace(/[^a-zA-Z0-9\s&-]/g, '') // Remove special characters
     .replace(/\s+/g, ' ')              // Normalize whitespace
     .trim();

@@ -345,7 +345,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                     </CardTitle>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
-                        {stats.totalResources} resources
+                        {stats.totalResources} {stats.totalResources === 1 ? "resource" : "resources"}
                       </span>
                       {stats.subcategoryCount > 0 && (
                         <span className="text-sm text-muted-foreground whitespace-nowrap">

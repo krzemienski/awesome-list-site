@@ -102,7 +102,7 @@ function LearningPathCard({
             {/* Resource Count */}
             <Badge variant="secondary" className="text-xs">
               <BookOpen className="h-3 w-3 mr-1" />
-              {learningPath.resourceCount} resources
+              {learningPath.resourceCount} {learningPath.resourceCount === 1 ? "resource" : "resources"}
             </Badge>
 
             {/* Match Percentage */}

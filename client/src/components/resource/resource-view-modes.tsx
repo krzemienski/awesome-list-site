@@ -52,7 +52,9 @@ export function ResourceListRow({ resource }: { resource: ViewModeResource }) {
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="font-medium truncate">
+          {/* BUG-025 (run27): list rows truncate the title — expose the full
+              text via the native title tooltip (grid/compact already do). */}
+          <span className="font-medium truncate" title={resource.title}>
             {titleAnchor(resource, `link-resource-row-${resource.id || resource.url}`)}
           </span>
           {resource.id !== "" && (

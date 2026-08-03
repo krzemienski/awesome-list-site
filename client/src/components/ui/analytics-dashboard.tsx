@@ -329,7 +329,7 @@ export default function AnalyticsDashboard({
                       </Pie>
                       <Tooltip 
                         formatter={(value: number, name: string) => [
-                          `${value} resources`,
+                          `${value} ${value === 1 ? "resource" : "resources"}`,
                           name
                         ]}
                       />

@@ -325,8 +325,12 @@ export default function JourneyDetail() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* BUG-035 (run27): mirror the server's ONE journey title template
+          ("<Name> — Awesome Video") — the old "— Learning Journey" suffix
+          survived the SERP clamp only for short names, so 2 of 5 journeys
+          rendered a different template. */}
       <SEOHead
-        title={`${journey.title} — Learning Journey`}
+        title={journey.title}
         description={journey.description || `Multi-step learning journey on Awesome Video: ${journey.title}.`}
       />
       

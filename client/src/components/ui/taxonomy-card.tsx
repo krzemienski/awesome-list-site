@@ -39,7 +39,7 @@ export function TaxonomyCard({
   return (
     <Link
       href={href}
-      aria-label={ariaLabel ?? `View ${name} with ${count} resources`}
+      aria-label={ariaLabel ?? `View ${name} with ${count} ${count === 1 ? "resource" : "resources"}`}
       data-testid={linkTestId}
       className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
     >
@@ -60,13 +60,16 @@ export function TaxonomyCard({
           {/* NB-017 (run18): long names wrap to two reserved lines so cards
               stay aligned in the grid instead of truncating mid-word. */}
           <CardTitle className="font-sans font-semibold text-base tracking-tight flex items-start justify-between gap-2 pt-1">
-            <span className="line-clamp-2 min-h-[2.5em] leading-tight">
+            {/* BUG-025 (run27): clamped names expose the full text via the
+                native title tooltip. */}
+            <span className="line-clamp-2 min-h-[2.5em] leading-tight" title={name}>
               {name}
             </span>
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
           </CardTitle>
+          {/* BUG-036 (run27): singular form for count === 1 ("1 resource"). */}
           <CardDescription data-testid={countTestId}>
-            {count.toLocaleString()} resources
+            {count.toLocaleString()} {count === 1 ? "resource" : "resources"}
           </CardDescription>
           {extra}
         </CardHeader>

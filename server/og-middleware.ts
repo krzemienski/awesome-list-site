@@ -1176,7 +1176,11 @@ function homeShellChrome(): string {
         // journey resolves to a soft-404 + noindex, no canonical.
         if (journey && journey.status === "published") {
           const m = defaultMeta(path);
-          m.title = `${journey.title} — Learning Journey — ${SITE_NAME}`;
+          // BUG-035 (run27): ONE title template for every journey. The old
+          // "— Learning Journey —" boilerplate survived the SERP clamp only
+          // for short names (2 of 5 journeys), so the emitted template
+          // differed per record. Emit "<Name> — Awesome Video" for all.
+          m.title = `${journey.title} — ${SITE_NAME}`;
           m.description = journey.description
             ? String(journey.description).slice(0, 280)
             : `Multi-step learning journey on ${SITE_NAME}: ${journey.title}.`;

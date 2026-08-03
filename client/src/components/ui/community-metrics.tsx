@@ -499,7 +499,7 @@ export default function CommunityMetrics({ resources, categories, className }: C
                         <div>
                           <h3 className="font-medium">{category.name}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {category.resourceCount} resources
+                            {category.resourceCount} {category.resourceCount === 1 ? "resource" : "resources"}
                           </p>
                         </div>
                         <div className="text-right">
