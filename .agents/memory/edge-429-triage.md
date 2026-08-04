@@ -26,3 +26,10 @@ repro from one shell (24× parallel API/HTML, 16× parallel chunk) got zero 429s
 - A failed catalog fetch surfaces as the APP-LEVEL ErrorPage (App.tsx gates all routes
   on the shared "awesome-list-data" query) — route-level error cards never mount, and
   `main` is empty while the page is NOT blank. E2E asserts must accept either surface.
+
+**Prod verification note (Aug 2026):** app-level 429s DO occur on prod under heavy
+parallel load and always carry `ratelimit-*` + `retry-after` with the negotiated body
+(styled HTML w/ `data-testid="rate-limit-page"` for text/html, JSON otherwise).
+Autoscale runs the in-memory limiter store PER INSTANCE — a modest burst (260 req)
+never trips it and 429 probes only land when they hit an already-throttled instance,
+so verifying needs ~1500 parallel reqs + repeated probes.
