@@ -20,10 +20,6 @@ import {
   Trash2,
   Search,
   ExternalLink,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   Database,
   Filter,
   X,
@@ -31,6 +27,9 @@ import {
   CheckCircle2
 } from "lucide-react";
 import type { Resource, Category, Subcategory, SubSubcategory } from "@shared/schema";
+// Task 275: same fast numbered + jump pagination as the public listings.
+import { Paginator } from "@/components/ui/paginator";
+import { parsePageFromSearch } from "@/lib/page-param";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, resourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
@@ -54,7 +53,9 @@ export default function ResourceManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [page, setPage] = useState(1);
+  // Task 275: honor ?page= on load so the paginator's real hrefs
+  // (copy-link / cmd-click) actually land on the linked page.
+  const [page, setPage] = useState(() => parsePageFromSearch(window.location.search).page);
   // Run16 BUG-035: page size + sort are now user-selectable.
   const [limit, setLimit] = useState(25);
   const [sort, setSort] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
@@ -73,6 +74,18 @@ export default function ResourceManager() {
   }, [search]);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+
+  // Task 275: mirror the effective page into ?page= (replaceState, no history
+  // spam) so the paginator's hrefs stay honest and refresh keeps your place.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const current = url.searchParams.get("page");
+    const want = page > 1 ? String(page) : null;
+    if (current === want) return;
+    if (want) url.searchParams.set("page", want);
+    else url.searchParams.delete("page");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+  }, [page]);
   
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -165,6 +178,13 @@ export default function ResourceManager() {
     staleTime: 30_000,
     refetchOnWindowFocus: true
   });
+
+  // Task 275: clamp an out-of-range page (stale ?page= link, shrunk result
+  // set) back to the last real page instead of showing an empty table.
+  const totalPages = data?.totalPages || 1;
+  useEffect(() => {
+    if (data && page > totalPages) setPage(totalPages);
+  }, [data, page, totalPages]);
 
   // Run17 BUG-028: unfiltered grand total so the header never claims
   // "Manage all 0 resources" while a filter is active.
@@ -996,52 +1016,22 @@ export default function ResourceManager() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(1)}
-                disabled={page <= 1}
-                aria-label="First page"
-                data-testid="button-first-page"
-              >
-                <ChevronsLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                aria-label="Previous page"
-                data-testid="button-prev-page"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm text-[var(--text-2)]">
-                Page {page} of {data?.totalPages || 1}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(p => Math.min(data?.totalPages || 1, p + 1))}
-                disabled={page >= (data?.totalPages || 1)}
-                aria-label="Next page"
-                data-testid="button-next-page"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(data?.totalPages || 1)}
-                disabled={page >= (data?.totalPages || 1)}
-                aria-label="Last page"
-                data-testid="button-last-page"
-              >
-                <ChevronsRight className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
+          {/* Task 275: shared numbered paginator (same component as the
+              public listings) — any of the 100+ pages is reachable in ≤2
+              interactions via the number links or the jump input. */}
+          <Paginator
+            currentPage={page}
+            totalPages={totalPages}
+            makeHref={(p) => {
+              const url = new URL(window.location.href);
+              if (p > 1) url.searchParams.set("page", String(p));
+              else url.searchParams.delete("page");
+              return url.pathname + url.search + url.hash;
+            }}
+            onNavigate={(p) => setPage(p)}
+            className="pt-4"
+          />
         </CardContent>
       </Card>
 

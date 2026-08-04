@@ -12,12 +12,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
+import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { humanizeApiError } from "@/lib/apiError";
 import { formatAdminDateTime, slugify } from "@/lib/utils";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+// Task 275: same fast numbered + jump pagination as the public listings.
+import { Paginator } from "@/components/ui/paginator";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -1596,8 +1598,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const totalItems = filteredItems?.length || 0;
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  // Reset to page 1 when search query changes or when current page exceeds total pages
+  // Task 275: search resets paging to page 1 (same as the public listings)
+  // instead of only clamping when the page ran past the end.
+  const prevSearchRef = useRef(searchQuery);
   useEffect(() => {
+    if (prevSearchRef.current !== searchQuery) {
+      prevSearchRef.current = searchQuery;
+      setCurrentPage(1);
+      return;
+    }
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(1);
     }
@@ -2737,9 +2746,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </TableBody>
           </Table>
 
-          {/* Pagination Controls */}
+          {/* Pagination Controls — Task 275: shared numbered paginator (same
+              component as the public listings) so any page is reachable in ≤2
+              interactions; rows-per-page selector kept alongside it. */}
           {paginationEnabled && totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4 pt-4 border-t" data-testid={`pagination-${testIdEntityPlural}`}>
+            <div className="mt-4 pt-4 border-t" data-testid={`pagination-${testIdEntityPlural}`}>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rows per page:</span>
                 <Select
@@ -2758,56 +2769,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="flex items-center gap-1">
-                <span className="text-sm text-muted-foreground mr-2" data-testid="text-page-info">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(1)}
-                  disabled={currentPage === 1}
-                  className="h-8 w-8 p-0 shrink-0"
-                  aria-label="First page"
-                  data-testid="button-first-page"
-                >
-                  <ChevronsLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="h-8 w-8 p-0 shrink-0"
-                  aria-label="Previous page"
-                  data-testid="button-prev-page"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="h-8 w-8 p-0 shrink-0"
-                  aria-label="Next page"
-                  data-testid="button-next-page"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(totalPages)}
-                  disabled={currentPage === totalPages}
-                  className="h-8 w-8 p-0 shrink-0"
-                  aria-label="Last page"
-                  data-testid="button-last-page"
-                >
-                  <ChevronsRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <Paginator
+                currentPage={currentPage}
+                totalPages={totalPages}
+                makeHref={(p) => {
+                  const url = new URL(window.location.href);
+                  if (p > 1) url.searchParams.set("page", String(p));
+                  else url.searchParams.delete("page");
+                  return url.pathname + url.search + url.hash;
+                }}
+                onNavigate={goToPage}
+                className="pt-3"
+                testIds={{ container: `paginator-${testIdEntityPlural}` }}
+              />
             </div>
           )}
           </>
