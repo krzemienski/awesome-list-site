@@ -245,7 +245,31 @@ export class ResourceRepository {
    * @returns The created resource
    */
   async createResource(resource: InsertResource): Promise<Resource> {
-    const [newResource] = await db.insert(resources).values(resource).returning();
+    let newResource: Resource;
+    try {
+      [newResource] = await db.insert(resources).values(resource).returning();
+    } catch (error: any) {
+      // Task #215: if the resources id sequence has drifted behind max(id)
+      // (rows were ever inserted with explicit ids by imports/seeds), the
+      // insert fails with 23505 on the PRIMARY KEY and used to surface as an
+      // intermittent opaque 500. Self-heal: resync the sequence to max(id)
+      // and retry once. (URL-unique 23505s are NOT retried — they rethrow so
+      // routes can map them to a 409.)
+      const cause = error?.cause ?? error;
+      const code = error?.code ?? cause?.code;
+      const constraint = String(error?.constraint ?? cause?.constraint ?? '');
+      if (code === '23505' && constraint === 'resources_pkey') {
+        console.warn(
+          'resources_id_seq drift detected (23505 on resources_pkey); resyncing sequence and retrying insert',
+        );
+        await db.execute(
+          sql`SELECT setval('resources_id_seq', (SELECT COALESCE(max(id), 1) FROM resources))`,
+        );
+        [newResource] = await db.insert(resources).values(resource).returning();
+      } else {
+        throw error;
+      }
+    }
 
     // Log the creation
     await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
