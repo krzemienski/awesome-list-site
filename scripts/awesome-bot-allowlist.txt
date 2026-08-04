@@ -1,0 +1,36 @@
+# awesome_bot allowlist (whitelist) for the exported Awesome-list Markdown.
+#
+# Entries here are passed to awesome_bot --white-list and are SKIPPED from
+# link checking. Only list URLs/domains that are known false positives:
+#   - sites that bot-block datacenter-IP requests (403/429/connect-timeout
+#     under a non-browser UA) but load fine for humans
+#   - intentionally non-HTTP or auth-walled targets
+#
+# Do NOT add a URL here just because a scan flagged it once. Per the project's
+# strict dead-link policy (docs + .agents/memory/link-scan-false-positives.md),
+# only DNS failures, connection-refused, browser-UA-confirmed 404/410, and SSL
+# certificate failures count as dead. Timeouts and 4xx bot-blocks are already
+# tolerated via awesome_bot flags (--allow-timeout, --allow <codes>), so most
+# bot-blocked sites need no entry at all.
+#
+# One entry per line; substring match (a bare domain covers all its URLs).
+# Lines starting with # are comments.
+
+# Anchors inside the generated document (Contents section)
+https://awesome.video
+
+# The list's own repo badge / awesome badge targets are checked constantly by
+# every awesome_bot run across GitHub and are occasionally rate-limited.
+awesome.re
+
+# Adobe help center holds non-browser connections open until read-timeout
+# (bot-block); awesome_bot reports Net::ReadTimeout as an error, not a
+# timeout, so --allow-timeout does not cover it.
+helpx.adobe.com
+
+# LinkedIn hard-blocks all non-browser clients (999/redirect-to-authwall).
+linkedin.com
+
+# Twitter/X requires JS + auth for nearly everything now.
+twitter.com
+x.com

@@ -1,0 +1,59 @@
+name: awesome_bot link check (exported list)
+
+# Scope: validates links in the Awesome-list Markdown that this project
+# EXPORTS to the repository-list repo (krzemienski/awesome-video). This is
+# the repository/export validation path — it is deliberately separate from
+# the production Link Health dashboard, which scans approved resources in
+# the live database and records results in the admin panel. Do not treat
+# these CI results as dashboard data.
+
+on:
+  workflow_dispatch:
+    inputs:
+      list_repo:
+        description: 'Repository containing the exported list README'
+        required: false
+        default: 'krzemienski/awesome-video'
+  schedule:
+    # Weekly sweep, Mondays 06:00 UTC
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  awesome-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo (for allowlist + runner script)
+        uses: actions/checkout@v4
+
+      - name: Checkout exported list repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.list_repo || 'krzemienski/awesome-video' }}
+          path: exported-list
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install awesome_bot
+        run: gem install awesome_bot --no-document
+
+      - name: Run awesome_bot with project exclusions
+        # scripts/check-awesome-bot.sh applies the documented allowlist
+        # (scripts/awesome-bot-allowlist.txt) and the strict false-positive
+        # policy: timeouts, redirects, and bot-block status codes are allowed;
+        # only DNS failures, connection-refused, confirmed 404/410, and SSL
+        # failures fail the check.
+        run: bash scripts/check-awesome-bot.sh exported-list/README.md
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: awesome-bot-results
+          path: /tmp/validation/awesome-bot/ab-results*.json
+          if-no-files-found: ignore

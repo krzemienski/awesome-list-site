@@ -53,6 +53,8 @@ interface SyncOptions {
   forceOverwrite?: boolean;
   createPullRequest?: boolean;
   branchName?: string;
+  /** Skip the pre-push broken-link gate (export link check). Default: run it. */
+  skipLinkCheck?: boolean;
 }
 
 interface ImportResult {
@@ -704,6 +706,38 @@ export class GitHubSyncService {
       }
       
       console.log(`✓ awesome-lint validation passed (${validationResult.warnings.length} warnings)`);
+
+      // Export link gate: check the EXACT README we are about to push for
+      // confirmed-broken links, BEFORE any GitHub write. Repository/export
+      // scope only — findings are logged here, never written to the Link
+      // Health dashboard. Strict dead-link policy: bot-blocks/timeouts pass;
+      // only DNS/refused/browser-confirmed 404-410/SSL failures block.
+      // Opt out via options.skipLinkCheck or EXPORT_LINK_CHECK=off.
+      if (!options.skipLinkCheck && process.env.EXPORT_LINK_CHECK !== 'off') {
+        const { runExportLinkGate } = await import('../validation/exportLinkGate');
+        console.log('[export-link-check] scanning generated README for confirmed-broken links...');
+        const gate = await runExportLinkGate(readmeContent, {
+          onProgress: (checked, total) => {
+            if (checked % 200 === 0 || checked === total) {
+              console.log(`[export-link-check] first pass ${checked}/${total}`);
+            }
+          },
+        });
+        if (!gate.passed) {
+          const details = gate.confirmedBroken
+            .map((b) => `  - ${b.url} (${b.verdict})`)
+            .join('\n');
+          throw new Error(
+            `GitHub export blocked: export link check found ${gate.confirmedBroken.length} confirmed-broken link(s) in the generated README ` +
+            `(checked ${gate.checked}, allowlisted ${gate.skipped}; bot-blocks/timeouts do not count):\n${details}\n` +
+            `Fix or remove these resources (or add documented false positives to scripts/awesome-bot-allowlist.txt) and re-export. ` +
+            `This check is separate from the Link Health dashboard.`
+          );
+        }
+        console.log(`[export-link-check] ✓ passed — ${gate.checked} links checked, ${gate.skipped} allowlisted, 0 confirmed broken`);
+      } else {
+        console.log('[export-link-check] skipped (disabled by option or EXPORT_LINK_CHECK=off)');
+      }
 
       if (options.dryRun) {
         console.log('Dry run - would update:');
