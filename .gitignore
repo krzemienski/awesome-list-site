@@ -131,3 +131,6 @@ repomix-output.xml
 --full-page
 
 /.claude-flow
+
+# Local awesome_bot gem installs (script installs into ~/.cache, but guard the repo too)
+/.gem/
