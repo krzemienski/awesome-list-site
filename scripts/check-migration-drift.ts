@@ -12,6 +12,11 @@
  *     then run `drizzle-kit push` against the scratch DB and require that it
  *     reports no changes. Any reported change = drift between migrations and
  *     shared/schema.ts.
+ *  3. Sequence drift (Task #282): for EVERY serial-id table in the real dev
+ *     database, compare the owned sequence's next value against max(id).
+ *     Imports/seeds that insert explicit ids leave the sequence behind, which
+ *     later surfaces as intermittent 23505 "duplicate key" 500s on normal
+ *     saves (the Task #215 resources bug — now checked for all tables).
  *
  * Usage: npx tsx scripts/check-migration-drift.ts
  * Exit code 0 = clean, 1 = drift or error.
@@ -33,7 +38,7 @@ function fail(message: string): never {
 }
 
 function checkJournal(): void {
-  console.log('Step 1/2: journal integrity check...');
+  console.log('Step 1/3: journal integrity check...');
 
   if (!fs.existsSync(JOURNAL_PATH)) {
     fail(`Missing ${JOURNAL_PATH}. The migrations folder is corrupt — the boot-time migrator will not run anything without it.`);
@@ -84,7 +89,7 @@ async function withAdminPool<T>(baseUrl: string, fn: (pool: Pool) => Promise<T>)
 }
 
 async function checkSchemaReproduction(baseUrl: string): Promise<void> {
-  console.log('Step 2/2: schema reproduction check on scratch database...');
+  console.log('Step 2/3: schema reproduction check on scratch database...');
 
   await withAdminPool(baseUrl, async (admin) => {
     await admin.query(`DROP DATABASE IF EXISTS ${SCRATCH_DB} WITH (FORCE)`);
@@ -139,6 +144,84 @@ async function checkSchemaReproduction(baseUrl: string): Promise<void> {
   }
 }
 
+interface DriftedSequence {
+  table: string;
+  column: string;
+  sequence: string;
+  nextValue: number;
+  maxId: number;
+  repair: string;
+}
+
+async function checkSequenceDrift(baseUrl: string): Promise<void> {
+  console.log('Step 3/3: id-sequence drift check (every serial-id table)...');
+
+  await withAdminPool(baseUrl, async (pool) => {
+    // Find every sequence OWNED BY a table column (covers serial/bigserial
+    // and identity-backed columns) in the public schema.
+    const { rows: seqs } = await pool.query(`
+      SELECT seq.relname  AS sequence,
+             tab.relname  AS table,
+             attr.attname AS column
+      FROM pg_class seq
+      JOIN pg_depend d    ON d.objid = seq.oid AND d.deptype IN ('a', 'i')
+      JOIN pg_class tab   ON tab.oid = d.refobjid
+      JOIN pg_attribute attr ON attr.attrelid = tab.oid AND attr.attnum = d.refobjsubid
+      WHERE seq.relkind = 'S'
+        AND seq.relnamespace = 'public'::regnamespace
+        AND tab.relkind = 'r'
+      ORDER BY tab.relname
+    `);
+
+    if (seqs.length === 0) {
+      fail('Found no table-owned sequences in the public schema — that is unexpected for this app.');
+    }
+
+    const drifted: DriftedSequence[] = [];
+
+    for (const s of seqs) {
+      const seqIdent = `"public"."${s.sequence}"`;
+      const [{ rows: seqRows }, { rows: maxRows }] = await Promise.all([
+        pool.query(`SELECT last_value, is_called FROM ${seqIdent}`),
+        pool.query(`SELECT COALESCE(max("${s.column}"), 0) AS max_id FROM "public"."${s.table}"`),
+      ]);
+      const lastValue = Number(seqRows[0].last_value);
+      const isCalled = Boolean(seqRows[0].is_called);
+      const nextValue = isCalled ? lastValue + 1 : lastValue;
+      const maxId = Number(maxRows[0].max_id);
+
+      if (maxId > 0 && nextValue <= maxId) {
+        drifted.push({
+          table: s.table,
+          column: s.column,
+          sequence: s.sequence,
+          nextValue,
+          maxId,
+          repair: `SELECT setval('${s.sequence}', (SELECT COALESCE(max("${s.column}"), 1) FROM "${s.table}"));`,
+        });
+      }
+    }
+
+    if (drifted.length > 0) {
+      fail(
+        `${drifted.length} id sequence(s) are BEHIND their table's max(id). The next insert on these tables ` +
+          `will fail with 23505 duplicate-key (the intermittent-500 pattern from Task #215):\n\n` +
+          drifted
+            .map(
+              (d) =>
+                `  - ${d.table}.${d.column}: sequence ${d.sequence} would issue ${d.nextValue}, but max(${d.column}) = ${d.maxId}`,
+            )
+            .join('\n') +
+          `\n\nRepair by running:\n` +
+          drifted.map((d) => `  ${d.repair}`).join('\n') +
+          `\n\nRoot cause is usually an import/seed that inserted explicit ids without resyncing the sequence afterward.`,
+      );
+    }
+
+    console.log(`  ✓ ${seqs.length} serial-id sequence(s) checked — none behind max(id).`);
+  });
+}
+
 async function main() {
   const baseUrl = process.env.DATABASE_URL;
   if (!baseUrl) {
@@ -147,8 +230,9 @@ async function main() {
 
   checkJournal();
   await checkSchemaReproduction(baseUrl);
+  await checkSequenceDrift(baseUrl);
 
-  console.log('\n✅ No migration drift: migrations/ fully reproduces shared/schema.ts.');
+  console.log('\n✅ No migration drift: migrations/ fully reproduces shared/schema.ts, and no id-sequence drift.');
 }
 
 main().catch((err) => {
