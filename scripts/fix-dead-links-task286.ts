@@ -4,7 +4,7 @@ import { resources } from "../shared/schema";
 import { eq } from "drizzle-orm";
 
 const updates: Array<{ id: number; url: string; note: string }> = [
-  { id: 185479, url: "https://www.theoplayer.com/docs/theoplayer/how-to-guides/drm/introduction/", note: "THEOplayer docs moved off GitHub" },
+  { id: 185479, url: "https://optiview.dolby.com/docs/theoplayer/how-to-guides/drm/introduction/", note: "THEOplayer docs moved off GitHub; theoplayer.com redirects to Dolby OptiView, so use the final host" },
   { id: 185182, url: "https://en.wikipedia.org/wiki/Real-Time_Messaging_Protocol", note: "adobe.com/devnet/rtmp.html retired; veriskope mirror fails DNS" },
   { id: 185555, url: "https://sourceforge.net/projects/cinepaint/", note: "cinepaint.org DNS dead; SourceForge project page" },
   { id: 187906, url: "https://github.com/ThibaultBee/StreamPack", note: "example.com/x placeholder -> real StreamPack repo" },

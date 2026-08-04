@@ -52,7 +52,7 @@
 - [RHF formState Proxy](rhf-formstate-proxy.md) — formState.isDirty etc. must be READ during render to subscribe; first read inside an event handler returns stale false forever.
 - [Vite workspace watch reload](vite-workspace-watch-reload.md) — repo file writes (tee/rm) during live Playwright runs trigger SPA reloads → ERR_ABORTED flakes; stage output in /tmp, cp after.
 - [Flex-anchor min-width:auto](flex-anchor-min-width.md) — raw text in a flex container is an anonymous item with min-width:auto that never wraps; wrap it in a min-w-0 span or long URLs blow dialogs.
-- [Full-origin CSRF comparison](origin-check-port-normalization.md) — compare normalized scheme+host+effective port; tolerate true default ports and use PUBLIC_SITE_URL as the exact fallback.
+- [Full-origin CSRF comparison](origin-check-port-normalization.md) — compare normalized scheme+host+effective port; scripts hitting prod admin API MUST send Origin header or 403.
 - [Headless E2E gotchas](headless-e2e-gotchas.md) — /submit consent banner eats clicks (dismiss first); toast = li[data-state]; agent-browser daemon dies between calls — prefer one-shot Playwright; verify "blank render" screenshots with a 2nd capture method.
 - [Parallel subagent file clobber](parallel-subagent-file-clobber.md) — subagents silently revert main-agent edits to shared files (README etc.); edit contested files after subagents finish + re-grep before wrap-up.
 - [Gitignore cleanup anchoring](gitignore-cleanup-anchoring.md) — root-anchor bulk-cleanup ignore patterns (`/screenshots/`) or they shadow kept dirs at depth (docs/screenshots); verify with check-ignore + ls-files -i -c.
@@ -71,3 +71,4 @@
 - [Export URL normalization](export-url-normalization.md) — export strips trailing slashes (a live slashed URL can 404 slashless); allowlist bare domains, %-encoded entries never match.
 - [awesome_bot export check](awesome-bot-export-check.md) — gem via nix-shell ruby; chunk big lists past the 5-min shell budget; ReadTimeout/418/202 are bot-blocks, not dead.
 - [www/apex split-brain DNS](www-domain-split-brain.md) — www is Cloudflare-proxied (525: origin lacks a www cert) while apex hits Replit's edge directly; only a CF redirect rule or Replit custom domain fixes it — never app code.
+- [Link Health scan lifecycle](link-health-scan-lifecycle.md) — dashboard flags = latest COMPLETED job only; URL fixes need a fresh ~90-min scan; "suspect" = off-domain redirect, repoint to final host.
