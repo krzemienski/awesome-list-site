@@ -7,6 +7,7 @@
 // Writes JSON + markdown summary under _validation/full-audit/.
 import fs from 'fs';
 import path from 'path';
+import { fetchWith429Retry } from './lib/fetch429.mjs';
 
 const BASE = process.env.AUDIT_BASE_URL || 'http://localhost:5000';
 const OUT_DIR = path.resolve('_validation/full-audit');
@@ -42,9 +43,19 @@ for (const cat of al.categories) {
   rows.push({ level: 1, category: cat.name, subcategory: null, subSubcategory: null, resourceCount: directCount });
 }
 
-// Field-completeness contract against /api/resources (paginated, request full set)
-const resources = await fetch(`${BASE}/api/resources?limit=10000`).then(r => r.json());
-const list = Array.isArray(resources) ? resources : (resources.resources || []);
+// Field-completeness contract against /api/resources. The API caps limit at
+// 100 and 400s on out-of-range values (Audit2 BUG-025), so walk the full set
+// via the documented offset/nextOffset pagination contract.
+const list = [];
+let offset = 0;
+for (;;) {
+  const r = await fetchWith429Retry(`${BASE}/api/resources?limit=100&offset=${offset}`);
+  if (!r.ok) throw new Error(`/api/resources limit=100 offset=${offset} -> ${r.status}`);
+  const page = await r.json();
+  list.push(...(page.resources || []));
+  if (page.nextOffset == null) break;
+  offset = page.nextOffset;
+}
 const contractFailures = [];
 for (const r of list) {
   const missing = [];

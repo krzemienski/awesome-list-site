@@ -1,5 +1,6 @@
 import { checkResourceLinks, type LinkCheckResult } from "../server/validation/linkChecker";
 import fs from "fs";
+import { fetchWith429Retry } from "./lib/fetch429.mjs";
 
 const OUT_DIR = ".local/prod-link-scan";
 fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -46,9 +47,17 @@ async function main() {
     resources = JSON.parse(fs.readFileSync(resFile, "utf8"));
   } else {
     log("Fetching production resources...");
-    const resp = await fetch("https://awesome.video/api/resources?limit=3000");
-    const data = (await resp.json()) as { resources: typeof resources };
-    resources = data.resources;
+    // Audit2 BUG-025: limit>100 now 400s — page via offset/nextOffset instead.
+    resources = [];
+    let offset = 0;
+    for (;;) {
+      const resp = await fetchWith429Retry(`https://awesome.video/api/resources?limit=100&offset=${offset}`);
+      if (!resp.ok) throw new Error(`/api/resources limit=100 offset=${offset} -> ${resp.status}`);
+      const data = (await resp.json()) as { resources: typeof resources; nextOffset: number | null };
+      resources.push(...(data.resources || []));
+      if (data.nextOffset == null) break;
+      offset = data.nextOffset;
+    }
     fs.writeFileSync(resFile, JSON.stringify(resources));
     log(`Fetched ${resources.length} approved resources from production.`);
   }

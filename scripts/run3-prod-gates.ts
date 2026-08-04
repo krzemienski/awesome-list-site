@@ -14,6 +14,7 @@ import {
   domainOf,
   MIN_DESCRIPTION_LENGTH,
 } from "../server/github/importHygiene";
+import { fetchWith429Retry } from "./lib/fetch429.mjs";
 
 const BASE = process.env.PROD_BASE || "https://awesome.video";
 const ENTITY_RE = /&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z]+);/;
@@ -23,8 +24,9 @@ type Row = { id: number; title: string; url: string; description: string | null 
 async function fetchAllApproved(): Promise<Row[]> {
   const out: Row[] = [];
   let offset = 0;
-  for (let page = 0; page < 25; page++) {
-    const r = await fetch(`${BASE}/api/resources?limit=200&offset=${offset}`);
+  // Audit2 BUG-025: limit>100 now 400s — page with limit=100 via nextOffset.
+  for (let page = 0; page < 100; page++) {
+    const r = await fetchWith429Retry(`${BASE}/api/resources?limit=100&offset=${offset}`);
     if (!r.ok) throw new Error(`fetch failed ${r.status}`);
     const j: any = await r.json();
     const items: Row[] = j.resources || j.items || [];

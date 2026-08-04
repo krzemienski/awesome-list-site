@@ -26,6 +26,7 @@
  */
 import fs from "fs";
 import path from "path";
+import { fetchWith429Retry } from "./lib/fetch429.mjs";
 import {
   isJunkResource,
   isSlugTitle,
@@ -90,7 +91,8 @@ function bail(msg: string): never {
 async function login(): Promise<string> {
   const r = await fetch(`${BASE}/api/auth/local/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    // Run17 BUG-054: auth/admin mutations require a same-origin Origin header.
+    headers: { "Content-Type": "application/json", Origin: BASE },
     body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
   });
   const body = await r.text();
@@ -104,18 +106,23 @@ async function login(): Promise<string> {
   return cookie;
 }
 
-async function fetchAll(): Promise<Row[]> {
+async function fetchAll(cookie: string): Promise<Row[]> {
   const out: Row[] = [];
+  // NEW-006: pending/rejected listings are admin-only — send the session
+  // cookie (dry runs log in too, since detection needs the full dataset).
+  const headers = cookie ? { Cookie: cookie } : undefined;
   for (const status of ["approved", "pending", "rejected"]) {
+    // Audit2 BUG-025: limit>100 now 400s — page with limit=100 via nextOffset.
+    // Rapid sequential pages can trip the platform edge 429; back off + retry.
     let offset = 0;
     for (;;) {
-      const r = await fetch(`${BASE}/api/resources?status=${status}&limit=200&offset=${offset}`);
+      const r = await fetchWith429Retry(`${BASE}/api/resources?status=${status}&limit=100&offset=${offset}`, { headers });
       if (!r.ok) throw new Error(`fetch ${status}@${offset} -> ${r.status}`);
       const j = await r.json();
       const rows: Row[] = j.resources || [];
       out.push(...rows);
-      offset += rows.length;
-      if (rows.length === 0 || offset >= (j.total || 0)) break;
+      if (rows.length === 0 || j.nextOffset == null) break;
+      offset = j.nextOffset;
     }
   }
   return out;
@@ -126,7 +133,7 @@ async function apiDelete(id: number, cookie: string): Promise<boolean> {
   if (state[key]) return true;
   if (!APPLY) return false;
   if (overBudget()) bail(`before delete #${id}`);
-  const r = await fetch(`${BASE}/api/admin/resources/${id}`, { method: "DELETE", headers: { Cookie: cookie } });
+  const r = await fetch(`${BASE}/api/admin/resources/${id}`, { method: "DELETE", headers: { Cookie: cookie, Origin: BASE } });
   if (r.status === 200 || r.status === 404) {
     state[key] = r.status;
     saveState();
@@ -141,7 +148,7 @@ async function apiReject(id: number, cookie: string): Promise<boolean> {
   if (state[key]) return true;
   if (!APPLY) return false;
   if (overBudget()) bail(`before reject #${id}`);
-  const r = await fetch(`${BASE}/api/resources/${id}/reject`, { method: "PUT", headers: { Cookie: cookie } });
+  const r = await fetch(`${BASE}/api/resources/${id}/reject`, { method: "PUT", headers: { Cookie: cookie, Origin: BASE } });
   if (r.ok || r.status === 404) {
     state[key] = r.status;
     saveState();
@@ -176,7 +183,7 @@ async function apiRepointStep(step: StepRef, newResourceId: number, cookie: stri
   if (overBudget()) bail(`before step repoint #${step.stepId}`);
   const r = await fetch(`${BASE}/api/admin/journeys/${step.journeyId}/steps/${step.stepId}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json", Cookie: cookie },
+    headers: { "Content-Type": "application/json", Cookie: cookie, Origin: BASE },
     body: JSON.stringify({ resourceId: newResourceId }),
   });
   if (r.ok) {
@@ -195,7 +202,7 @@ async function apiUpdate(id: number, patch: Record<string, unknown>, cookie: str
   if (overBudget()) bail(`before update #${id}`);
   const r = await fetch(`${BASE}/api/admin/resources/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json", Cookie: cookie },
+    headers: { "Content-Type": "application/json", Cookie: cookie, Origin: BASE },
     body: JSON.stringify(patch),
   });
   if (r.ok) {
@@ -209,10 +216,12 @@ async function apiUpdate(id: number, patch: Record<string, unknown>, cookie: str
 
 async function main() {
   console.log(`=== run3 cleanup (PROD ${BASE}) — ${APPLY ? "APPLY" : "DRY RUN"} ===\n`);
-  const cookie = APPLY ? await login() : "";
-  if (APPLY) console.log("logged in — session acquired");
+  // NEW-006: fetchAll needs an admin session even for dry runs, because
+  // pending/rejected listings are now admin-only.
+  const cookie = await login();
+  console.log("logged in — session acquired");
 
-  const all = await fetchAll();
+  const all = await fetchAll(cookie);
   console.log(`fetched ${all.length} rows (all statuses)`);
 
   // ---------- Phase A: QA artifacts (R3-03) ----------
@@ -393,7 +402,7 @@ async function main() {
   }
 
   // ---------- Phase G: verification (refetch) ----------
-  const finalRows = APPLY ? await fetchAll() : all;
+  const finalRows = APPLY ? await fetchAll(cookie) : all;
   const finalApproved = finalRows.filter((r) => r.status === "approved");
   const gates = {
     junkUrls: finalRows.filter((r) => isJunkResource(r.title, r.url)).length,

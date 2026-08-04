@@ -8,3 +8,5 @@ description: Origin checks must compare normalized scheme, host, and effective p
 **Why:** Host-only comparison accepts a scheme downgrade (`http://host` against an HTTPS request), while raw string comparison rejects equivalent edge variants such as explicit `:443`. A dead fallback env var can also make every production mutation fail.
 
 **How to apply:** Whenever touching Origin/Referer middleware, verify same-origin, wrong scheme, wrong port, explicit correct default port, nondefault port, canonical fallback, no-Origin, cross-site Fetch Metadata, and `Origin: null`. A 403 versus route-level 200/400/401 distinguishes gate rejection.
+
+**Scripts:** server-to-server clients (Node fetch) send no Origin header, so cookie-authed mutations 403 under the CSRF check — non-browser scripts must set an Origin matching the target base.

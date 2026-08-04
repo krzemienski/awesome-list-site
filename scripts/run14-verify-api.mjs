@@ -12,12 +12,16 @@ const j = async (path, opts) => {
   return { r, body };
 };
 
-// BUG-050: page size capped at 100
+// BUG-050 (as amended by Audit2 BUG-025): oversized limits now REJECT with
+// 400 invalid_limit instead of silently clamping to 100.
 {
-  const { body } = await j("/api/resources?limit=1000");
-  const items = body?.resources ?? body?.items ?? body?.data ?? [];
-  ok("BUG-050 page cap", Array.isArray(items) && items.length <= 100 && items.length > 0,
-    `limit=1000 returned ${Array.isArray(items) ? items.length : "?"} rows`);
+  const { r, body } = await j("/api/resources?limit=1000");
+  ok("BUG-050 page cap", r.status === 400 && body?.error === "invalid_limit",
+    `limit=1000 -> ${r.status} ${JSON.stringify(body)?.slice(0, 120)}`);
+  const { body: pageBody } = await j("/api/resources?limit=100");
+  const items = pageBody?.resources ?? [];
+  ok("BUG-050 max page size", Array.isArray(items) && items.length > 0 && items.length <= 100,
+    `limit=100 returned ${Array.isArray(items) ? items.length : "?"} rows`);
 }
 
 // BUG-051: canonical 401 envelope { message: "Unauthorized" } everywhere
