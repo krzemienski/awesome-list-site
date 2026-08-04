@@ -5,10 +5,8 @@
  * `client/index.html` boot script for pre-paint application (the boot script
  * cannot import TS modules because it runs before bundle resolution).
  *
- * `scripts/verify-fixes.mjs` has a runtime test (V11) that iterates EVERY
- * id in FONT_OPTIONS, persists it to localStorage, hard-reloads, and asserts
- * the resulting `--font-sans` matches `stack`. This catches drift between
- * the two definitions without a build step.
+ * When editing FONT_OPTIONS, keep the inline map in `client/index.html` in
+ * sync by hand — there is no build step to catch drift between the two.
  */
 export type FontOption = { id: string; name: string; stack: string };
 

@@ -1,7 +1,7 @@
 /**
  * Run22 link-rot fixes (BUG-004, BUG-005) — applied via the live admin HTTP
  * API (prod DB is not directly writable from the agent environment; mirrors
- * scripts/run21-link-fixes-prod.ts). Base-configurable so the exact same code
+ * the earlier run21 link-fix harness, since pruned). Base-configurable so the exact same code
  * path is validated against dev first (PROD_BASE=http://localhost:5000).
  *
  * Rules are matched by URL (NOT by id) so they apply identically to both

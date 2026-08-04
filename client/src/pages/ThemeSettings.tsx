@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 
 // I1 — Font override picker. Source-of-truth list + applier live in
 // `client/src/lib/font-options.ts`. The boot script in `client/index.html`
-// duplicates the same map inline for pre-paint application; verify-fixes.mjs
-// V11 asserts the two stay in sync.
+// duplicates the same map inline for pre-paint application;
+// Keep the two in sync by hand.
 import { FONT_OPTIONS, FONT_LS_KEY, applyFontOverride } from "@/lib/font-options";
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
