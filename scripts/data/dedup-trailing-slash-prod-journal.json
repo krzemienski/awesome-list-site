@@ -1,0 +1,3513 @@
+{
+  "auditLog": [
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:17:14.374594",
+      "id": 16122,
+      "notes": null,
+      "original_resource_id": 187240,
+      "performed_by": null,
+      "resource_id": 187240
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:18:11.224932",
+      "id": 16164,
+      "notes": null,
+      "original_resource_id": 187273,
+      "performed_by": null,
+      "resource_id": 187273
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:19:48.722354",
+      "id": 16210,
+      "notes": null,
+      "original_resource_id": 187305,
+      "performed_by": null,
+      "resource_id": 187305
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "category": "Protocols & Transport",
+        "description": "Bento4 offers MPEG-DASH sample content for developers to test and validate their DASH implementations.",
+        "githubSynced": true,
+        "id": 186313,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-02-12T01:04:38.347Z",
+          "lastUpdatedAt": "2026-02-12T01:05:47.870Z",
+          "lastUpdatedFrom": "krzemienski/awesome-video",
+          "sourceList": "Video [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)",
+          "subcategoryId": 2239
+        },
+        "status": "approved",
+        "subcategory": "DASH Tools",
+        "title": "MPEG DASH Sample Content Bento4",
+        "url": "http://www.bento4.com/developers/dash/dash-sample-content/"
+      },
+      "created_at": "2026-02-12T01:05:47.903761",
+      "id": 11285,
+      "notes": null,
+      "original_resource_id": 186313,
+      "performed_by": null,
+      "resource_id": 186313
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-02-12T01:05:47.925283",
+      "id": 11286,
+      "notes": "Updated from GitHub: Updated content",
+      "original_resource_id": 186313,
+      "performed_by": null,
+      "resource_id": 186313
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:20:56.805675",
+      "id": 16238,
+      "notes": null,
+      "original_resource_id": 187320,
+      "performed_by": null,
+      "resource_id": 187320
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:21:00.304394",
+      "id": 16242,
+      "notes": null,
+      "original_resource_id": 187323,
+      "performed_by": null,
+      "resource_id": 187323
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:21:42.227482",
+      "id": 16274,
+      "notes": null,
+      "original_resource_id": 187353,
+      "performed_by": null,
+      "resource_id": 187353
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "githubSynced": true,
+        "lastSyncedAt": "2026-06-03T05:17:05.985Z"
+      },
+      "created_at": "2026-06-03T05:17:24.867173",
+      "id": 12476,
+      "notes": null,
+      "original_resource_id": 186313,
+      "performed_by": null,
+      "resource_id": 186313
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:28:15.224544",
+      "id": 16510,
+      "notes": null,
+      "original_resource_id": 187529,
+      "performed_by": null,
+      "resource_id": 187529
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "githubSynced": true,
+        "lastSyncedAt": "2026-06-25T21:58:49.048Z"
+      },
+      "created_at": "2026-06-25T21:59:08.500307",
+      "id": 14055,
+      "notes": null,
+      "original_resource_id": 186313,
+      "performed_by": null,
+      "resource_id": 186313
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:00:53.529542",
+      "id": 15286,
+      "notes": null,
+      "original_resource_id": 186879,
+      "performed_by": null,
+      "resource_id": 186879
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:32:19.447398",
+      "id": 16680,
+      "notes": null,
+      "original_resource_id": 187630,
+      "performed_by": null,
+      "resource_id": 187630
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:04:30.132549",
+      "id": 15826,
+      "notes": null,
+      "original_resource_id": 187073,
+      "performed_by": null,
+      "resource_id": 187073
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:04:30.160912",
+      "id": 15827,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187073,
+      "performed_by": null,
+      "resource_id": 187073
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:00:53.558064",
+      "id": 15287,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 186879,
+      "performed_by": null,
+      "resource_id": 186879
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:00:53.721277",
+      "id": 15288,
+      "notes": null,
+      "original_resource_id": 186880,
+      "performed_by": null,
+      "resource_id": 186880
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:00:53.749802",
+      "id": 15289,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 186880,
+      "performed_by": null,
+      "resource_id": 186880
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:04:35.435375",
+      "id": 15834,
+      "notes": null,
+      "original_resource_id": 187080,
+      "performed_by": null,
+      "resource_id": 187080
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:04:35.465014",
+      "id": 15835,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187080,
+      "performed_by": null,
+      "resource_id": 187080
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:08:07.519453",
+      "id": 15914,
+      "notes": null,
+      "original_resource_id": 187117,
+      "performed_by": null,
+      "resource_id": 187117
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:08:07.548239",
+      "id": 15915,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187117,
+      "performed_by": null,
+      "resource_id": 187117
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:13:57.82662",
+      "id": 16022,
+      "notes": null,
+      "original_resource_id": 187199,
+      "performed_by": null,
+      "resource_id": 187199
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:01:30.30348",
+      "id": 15398,
+      "notes": null,
+      "original_resource_id": 186908,
+      "performed_by": null,
+      "resource_id": 186908
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:01:30.332486",
+      "id": 15399,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 186908,
+      "performed_by": null,
+      "resource_id": 186908
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:02:02.747872",
+      "id": 15490,
+      "notes": null,
+      "original_resource_id": 186943,
+      "performed_by": null,
+      "resource_id": 186943
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:02:02.776898",
+      "id": 15491,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 186943,
+      "performed_by": null,
+      "resource_id": 186943
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:01:46.215756",
+      "id": 15440,
+      "notes": null,
+      "original_resource_id": 186924,
+      "performed_by": null,
+      "resource_id": 186924
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:01:46.243985",
+      "id": 15441,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 186924,
+      "performed_by": null,
+      "resource_id": 186924
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:03:50.673919",
+      "id": 15762,
+      "notes": null,
+      "original_resource_id": 187020,
+      "performed_by": null,
+      "resource_id": 187020
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:03:50.703949",
+      "id": 15763,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187020,
+      "performed_by": null,
+      "resource_id": 187020
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:13:58.026793",
+      "id": 16023,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187199,
+      "performed_by": null,
+      "resource_id": 187199
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:17:14.403279",
+      "id": 16123,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187240,
+      "performed_by": null,
+      "resource_id": 187240
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:35:17.325345",
+      "id": 16714,
+      "notes": null,
+      "original_resource_id": 187660,
+      "performed_by": null,
+      "resource_id": 187660
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:04:01.589115",
+      "id": 15774,
+      "notes": null,
+      "original_resource_id": 187034,
+      "performed_by": null,
+      "resource_id": 187034
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:04:01.625491",
+      "id": 15775,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187034,
+      "performed_by": null,
+      "resource_id": 187034
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:17:42.637791",
+      "id": 16148,
+      "notes": null,
+      "original_resource_id": 187260,
+      "performed_by": null,
+      "resource_id": 187260
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:17:42.666607",
+      "id": 16149,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187260,
+      "performed_by": null,
+      "resource_id": 187260
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:18:01.767295",
+      "id": 16162,
+      "notes": null,
+      "original_resource_id": 187268,
+      "performed_by": null,
+      "resource_id": 187268
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:18:01.797677",
+      "id": 16163,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187268,
+      "performed_by": null,
+      "resource_id": 187268
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:18:11.424447",
+      "id": 16165,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187273,
+      "performed_by": null,
+      "resource_id": 187273
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:19:48.752705",
+      "id": 16211,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187305,
+      "performed_by": null,
+      "resource_id": 187305
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:20:56.834027",
+      "id": 16239,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187320,
+      "performed_by": null,
+      "resource_id": 187320
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:21:00.33432",
+      "id": 16243,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187323,
+      "performed_by": null,
+      "resource_id": 187323
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:21:02.299467",
+      "id": 16250,
+      "notes": null,
+      "original_resource_id": 187327,
+      "performed_by": null,
+      "resource_id": 187327
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:21:02.328263",
+      "id": 16251,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187327,
+      "performed_by": null,
+      "resource_id": 187327
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:21:02.481219",
+      "id": 16252,
+      "notes": null,
+      "original_resource_id": 187328,
+      "performed_by": null,
+      "resource_id": 187328
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:21:02.509206",
+      "id": 16253,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187328,
+      "performed_by": null,
+      "resource_id": 187328
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:21:42.326381",
+      "id": 16275,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187353,
+      "performed_by": null,
+      "resource_id": 187353
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:23:31.030711",
+      "id": 16332,
+      "notes": null,
+      "original_resource_id": 187382,
+      "performed_by": null,
+      "resource_id": 187382
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:23:31.059398",
+      "id": 16333,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187382,
+      "performed_by": null,
+      "resource_id": 187382
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:26:15.524596",
+      "id": 16382,
+      "notes": null,
+      "original_resource_id": 187454,
+      "performed_by": null,
+      "resource_id": 187454
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:26:15.724766",
+      "id": 16383,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187454,
+      "performed_by": null,
+      "resource_id": 187454
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:26:24.343859",
+      "id": 16386,
+      "notes": null,
+      "original_resource_id": 187457,
+      "performed_by": null,
+      "resource_id": 187457
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:26:24.372545",
+      "id": 16387,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187457,
+      "performed_by": null,
+      "resource_id": 187457
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "description": ""
+      },
+      "created_at": "2026-07-17T22:12:46.327639",
+      "id": 19960,
+      "notes": null,
+      "original_resource_id": 187564,
+      "performed_by": null,
+      "resource_id": 187564
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "description": ""
+      },
+      "created_at": "2026-07-17T22:12:46.358647",
+      "id": 19961,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187564,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187564
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:26:45.027925",
+      "id": 16432,
+      "notes": null,
+      "original_resource_id": 187483,
+      "performed_by": null,
+      "resource_id": 187483
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:26:45.056131",
+      "id": 16433,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187483,
+      "performed_by": null,
+      "resource_id": 187483
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:26:52.466753",
+      "id": 16442,
+      "notes": null,
+      "original_resource_id": 187492,
+      "performed_by": null,
+      "resource_id": 187492
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:26:52.496688",
+      "id": 16443,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187492,
+      "performed_by": null,
+      "resource_id": 187492
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:28:15.424166",
+      "id": 16511,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187529,
+      "performed_by": null,
+      "resource_id": 187529
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:28:54.629033",
+      "id": 16538,
+      "notes": null,
+      "original_resource_id": 187553,
+      "performed_by": null,
+      "resource_id": 187553
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:28:54.65722",
+      "id": 16539,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187553,
+      "performed_by": null,
+      "resource_id": 187553
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:29:07.225106",
+      "id": 16560,
+      "notes": null,
+      "original_resource_id": 187564,
+      "performed_by": null,
+      "resource_id": 187564
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:29:07.424594",
+      "id": 16561,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187564,
+      "performed_by": null,
+      "resource_id": 187564
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:32:19.477533",
+      "id": 16681,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187630,
+      "performed_by": null,
+      "resource_id": 187630
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:35:18.624557",
+      "id": 16715,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187660,
+      "performed_by": null,
+      "resource_id": 187660
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:37:56.125",
+      "id": 16736,
+      "notes": null,
+      "original_resource_id": 187687,
+      "performed_by": null,
+      "resource_id": 187687
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:37:56.225175",
+      "id": 16737,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187687,
+      "performed_by": null,
+      "resource_id": 187687
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:40:29.323956",
+      "id": 16766,
+      "notes": null,
+      "original_resource_id": 187705,
+      "performed_by": null,
+      "resource_id": 187705
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:40:29.523694",
+      "id": 16767,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187705,
+      "performed_by": null,
+      "resource_id": 187705
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:49:11.02435",
+      "id": 16780,
+      "notes": null,
+      "original_resource_id": 187765,
+      "performed_by": null,
+      "resource_id": 187765
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:49:11.124739",
+      "id": 16781,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187765,
+      "performed_by": null,
+      "resource_id": 187765
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:57:46.527041",
+      "id": 16834,
+      "notes": null,
+      "original_resource_id": 187833,
+      "performed_by": null,
+      "resource_id": 187833
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:57:46.726591",
+      "id": 16835,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187833,
+      "performed_by": null,
+      "resource_id": 187833
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:57:57.424616",
+      "id": 16836,
+      "notes": null,
+      "original_resource_id": 187835,
+      "performed_by": null,
+      "resource_id": 187835
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:52:25.724889",
+      "id": 16796,
+      "notes": null,
+      "original_resource_id": 187793,
+      "performed_by": null,
+      "resource_id": 187793
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:52:25.824612",
+      "id": 16797,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187793,
+      "performed_by": null,
+      "resource_id": 187793
+    },
+    {
+      "action": "created",
+      "changes": null,
+      "created_at": "2026-06-25T22:53:44.724955",
+      "id": 16804,
+      "notes": null,
+      "original_resource_id": 187803,
+      "performed_by": null,
+      "resource_id": 187803
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:53:45.425276",
+      "id": 16805,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187803,
+      "performed_by": null,
+      "resource_id": 187803
+    },
+    {
+      "action": "imported",
+      "changes": {
+        "source": "krzemienski/awesome-video"
+      },
+      "created_at": "2026-06-25T22:57:57.524334",
+      "id": 16837,
+      "notes": "Imported from GitHub: krzemienski/awesome-video",
+      "original_resource_id": 187835,
+      "performed_by": null,
+      "resource_id": 187835
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.917169",
+      "id": 16906,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187630,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187630
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.022107",
+      "id": 16911,
+      "notes": null,
+      "original_resource_id": 187564,
+      "performed_by": null,
+      "resource_id": 187564
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.0562",
+      "id": 16912,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187564,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187564
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.382628",
+      "id": 16914,
+      "notes": null,
+      "original_resource_id": 187327,
+      "performed_by": null,
+      "resource_id": 187327
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.374338",
+      "id": 16913,
+      "notes": null,
+      "original_resource_id": 187483,
+      "performed_by": null,
+      "resource_id": 187483
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.406896",
+      "id": 16915,
+      "notes": null,
+      "original_resource_id": 187454,
+      "performed_by": null,
+      "resource_id": 187454
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.439342",
+      "id": 16918,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187327,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187327
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.001129",
+      "id": 16909,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187529,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187529
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.433834",
+      "id": 16917,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187483,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187483
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.373525",
+      "id": 16893,
+      "notes": null,
+      "original_resource_id": 187835,
+      "performed_by": null,
+      "resource_id": 187835
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.401841",
+      "id": 16894,
+      "notes": null,
+      "original_resource_id": 187833,
+      "performed_by": null,
+      "resource_id": 187833
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.417751",
+      "id": 16896,
+      "notes": null,
+      "original_resource_id": 187803,
+      "performed_by": null,
+      "resource_id": 187803
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.43761",
+      "id": 16897,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187835,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187835
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.451187",
+      "id": 16898,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187833,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187833
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.473386",
+      "id": 16900,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187803,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187803
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.516946",
+      "id": 16901,
+      "notes": null,
+      "original_resource_id": 187705,
+      "performed_by": null,
+      "resource_id": 187705
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.550112",
+      "id": 16902,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187705,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187705
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.84557",
+      "id": 16903,
+      "notes": null,
+      "original_resource_id": 187553,
+      "performed_by": null,
+      "resource_id": 187553
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.873389",
+      "id": 16904,
+      "notes": null,
+      "original_resource_id": 187630,
+      "performed_by": null,
+      "resource_id": 187630
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.905262",
+      "id": 16905,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187553,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187553
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:24.9691",
+      "id": 16907,
+      "notes": null,
+      "original_resource_id": 187529,
+      "performed_by": null,
+      "resource_id": 187529
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.450067",
+      "id": 16919,
+      "notes": null,
+      "original_resource_id": 187273,
+      "performed_by": null,
+      "resource_id": 187273
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.484168",
+      "id": 16922,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187273,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187273
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.806217",
+      "id": 16923,
+      "notes": null,
+      "original_resource_id": 187268,
+      "performed_by": null,
+      "resource_id": 187268
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.873117",
+      "id": 16928,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187080,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187080
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.906837",
+      "id": 16930,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187260,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187260
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:26.349044",
+      "id": 16936,
+      "notes": null,
+      "original_resource_id": 186908,
+      "performed_by": null,
+      "resource_id": 186908
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:26.417363",
+      "id": 16942,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 186879,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 186879
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:29.774443",
+      "id": 17004,
+      "notes": null,
+      "original_resource_id": 186313,
+      "performed_by": null,
+      "resource_id": 186313
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.46546",
+      "id": 16920,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187454,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187454
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.824099",
+      "id": 16924,
+      "notes": null,
+      "original_resource_id": 187080,
+      "performed_by": null,
+      "resource_id": 187080
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.855995",
+      "id": 16926,
+      "notes": null,
+      "original_resource_id": 187260,
+      "performed_by": null,
+      "resource_id": 187260
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.888105",
+      "id": 16929,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187240,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187240
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:26.366905",
+      "id": 16937,
+      "notes": null,
+      "original_resource_id": 186879,
+      "performed_by": null,
+      "resource_id": 186879
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:26.398554",
+      "id": 16940,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187020,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187020
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.252973",
+      "id": 17108,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187793,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187793
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.606673",
+      "id": 17111,
+      "notes": null,
+      "original_resource_id": 187660,
+      "performed_by": null,
+      "resource_id": 187660
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.83188",
+      "id": 16925,
+      "notes": null,
+      "original_resource_id": 187240,
+      "performed_by": null,
+      "resource_id": 187240
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.864685",
+      "id": 16927,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187268,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187268
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.962524",
+      "id": 16931,
+      "notes": null,
+      "original_resource_id": 187117,
+      "performed_by": null,
+      "resource_id": 187117
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:25.995817",
+      "id": 16932,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187117,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187117
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:26.340507",
+      "id": 16935,
+      "notes": null,
+      "original_resource_id": 187020,
+      "performed_by": null,
+      "resource_id": 187020
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:26.405966",
+      "id": 16941,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 186908,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 186908
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:29.822289",
+      "id": 17009,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 186313,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 186313
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.191379",
+      "id": 17103,
+      "notes": null,
+      "original_resource_id": 187793,
+      "performed_by": null,
+      "resource_id": 187793
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.645093",
+      "id": 17113,
+      "notes": null,
+      "original_resource_id": 187328,
+      "performed_by": null,
+      "resource_id": 187328
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.74298",
+      "id": 17118,
+      "notes": null,
+      "original_resource_id": 187765,
+      "performed_by": null,
+      "resource_id": 187765
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.775684",
+      "id": 17120,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187765,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187765
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.654939",
+      "id": 17114,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187660,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187660
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.725182",
+      "id": 17117,
+      "notes": null,
+      "original_resource_id": 187382,
+      "performed_by": null,
+      "resource_id": 187382
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.759215",
+      "id": 17119,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187382,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187382
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:35.096616",
+      "id": 17121,
+      "notes": null,
+      "original_resource_id": 186943,
+      "performed_by": null,
+      "resource_id": 186943
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:35.130978",
+      "id": 17124,
+      "notes": null,
+      "original_resource_id": 187305,
+      "performed_by": null,
+      "resource_id": 187305
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:35.200335",
+      "id": 17130,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187073,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187073
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.594645",
+      "id": 17157,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187687,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187687
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.629326",
+      "id": 17160,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187492,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187492
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.951805",
+      "id": 17161,
+      "notes": null,
+      "original_resource_id": 186924,
+      "performed_by": null,
+      "resource_id": 186924
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.986218",
+      "id": 17164,
+      "notes": null,
+      "original_resource_id": 187034,
+      "performed_by": null,
+      "resource_id": 187034
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.020146",
+      "id": 17167,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187199,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187199
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.054072",
+      "id": 17170,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187323,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187323
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:38.213242",
+      "id": 17191,
+      "notes": null,
+      "original_resource_id": 186880,
+      "performed_by": null,
+      "resource_id": 186880
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:38.246773",
+      "id": 17192,
+      "notes": null,
+      "original_resource_id": 187320,
+      "performed_by": null,
+      "resource_id": 187320
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:34.700992",
+      "id": 17116,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187328,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187328
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:35.148203",
+      "id": 17125,
+      "notes": null,
+      "original_resource_id": 187073,
+      "performed_by": null,
+      "resource_id": 187073
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.54191",
+      "id": 17152,
+      "notes": null,
+      "original_resource_id": 187687,
+      "performed_by": null,
+      "resource_id": 187687
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.968861",
+      "id": 17162,
+      "notes": null,
+      "original_resource_id": 187199,
+      "performed_by": null,
+      "resource_id": 187199
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.010029",
+      "id": 17166,
+      "notes": null,
+      "original_resource_id": 187323,
+      "performed_by": null,
+      "resource_id": 187323
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.042546",
+      "id": 17168,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187353,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187353
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.878294",
+      "id": 17188,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187457,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187457
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:35.153752",
+      "id": 17126,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 186943,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 186943
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:35.186683",
+      "id": 17129,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187305,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187305
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.583438",
+      "id": 17156,
+      "notes": null,
+      "original_resource_id": 187492,
+      "performed_by": null,
+      "resource_id": 187492
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:36.977167",
+      "id": 17163,
+      "notes": null,
+      "original_resource_id": 187353,
+      "performed_by": null,
+      "resource_id": 187353
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.009669",
+      "id": 17165,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 186924,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 186924
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.042926",
+      "id": 17169,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187034,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187034
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:37.819909",
+      "id": 17183,
+      "notes": null,
+      "original_resource_id": 187457,
+      "performed_by": null,
+      "resource_id": 187457
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:38.268376",
+      "id": 17194,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 186880,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 186880
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "status": "rejected"
+      },
+      "created_at": "2026-07-02T05:40:38.30195",
+      "id": 17195,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187320,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187320
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "description": "A hybrid video editor and VJ tool for Linux. LiVES allows both timeline editing of video and real-time performance (mixing clips and applying effects live), making it unique for video artists. Note: the official site is served over plain HTTP — the host does not support HTTPS."
+      },
+      "created_at": "2026-07-20T06:20:01.887759",
+      "id": 22713,
+      "notes": null,
+      "original_resource_id": 187492,
+      "performed_by": null,
+      "resource_id": 187492
+    },
+    {
+      "action": "updated",
+      "changes": {
+        "description": "A hybrid video editor and VJ tool for Linux. LiVES allows both timeline editing of video and real-time performance (mixing clips and applying effects live), making it unique for video artists. Note: the official site is served over plain HTTP — the host does not support HTTPS."
+      },
+      "created_at": "2026-07-20T06:20:01.918082",
+      "id": 22714,
+      "notes": "Resource updated by admin",
+      "original_resource_id": 187492,
+      "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "resource_id": 187492
+    }
+  ],
+  "capturedAt": "2026-08-04",
+  "enrichmentQueue": [
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:38.503979",
+      "error_message": null,
+      "id": 4543,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187835,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:38.503979"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:38.534467",
+      "error_message": null,
+      "id": 4544,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187833,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:38.534467"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:38.96763",
+      "error_message": null,
+      "id": 4558,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187803,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:38.96763"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:39.06085",
+      "error_message": null,
+      "id": 4561,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187793,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:39.06085"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:39.184257",
+      "error_message": null,
+      "id": 4565,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187765,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:39.184257"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:39.277753",
+      "error_message": null,
+      "id": 4568,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187705,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:39.277753"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:39.555613",
+      "error_message": null,
+      "id": 4577,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187687,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:39.555613"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:39.864053",
+      "error_message": null,
+      "id": 4587,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187660,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:39.864053"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:40.241457",
+      "error_message": null,
+      "id": 4599,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187630,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:40.241457"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:40.739679",
+      "error_message": null,
+      "id": 4615,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187564,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:40.739679"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:40.959622",
+      "error_message": null,
+      "id": 4622,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187553,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:40.959622"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:41.177631",
+      "error_message": null,
+      "id": 4629,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187529,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:41.177631"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:41.763972",
+      "error_message": null,
+      "id": 4648,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187492,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:41.763972"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:41.919984",
+      "error_message": null,
+      "id": 4653,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187483,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:41.919984"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:42.383017",
+      "error_message": null,
+      "id": 4668,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187457,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:42.383017"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:42.412998",
+      "error_message": null,
+      "id": 4669,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187454,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:42.412998"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:42.68754",
+      "error_message": null,
+      "id": 4678,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187382,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:42.68754"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:42.933254",
+      "error_message": null,
+      "id": 4686,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187353,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:42.933254"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:43.210427",
+      "error_message": null,
+      "id": 4695,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187328,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:43.210427"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:43.240975",
+      "error_message": null,
+      "id": 4696,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187327,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:43.240975"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:43.364883",
+      "error_message": null,
+      "id": 4700,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187323,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:43.364883"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:43.427908",
+      "error_message": null,
+      "id": 4702,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187320,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:43.427908"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:43.766853",
+      "error_message": null,
+      "id": 4713,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187305,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:43.766853"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:44.357626",
+      "error_message": null,
+      "id": 4732,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187273,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:44.357626"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:44.387815",
+      "error_message": null,
+      "id": 4733,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187268,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:44.387815"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:44.541645",
+      "error_message": null,
+      "id": 4738,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187260,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:44.541645"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:44.954618",
+      "error_message": null,
+      "id": 4751,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187240,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:44.954618"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:45.267939",
+      "error_message": null,
+      "id": 4761,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187199,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:45.267939"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:46.005005",
+      "error_message": null,
+      "id": 4785,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187117,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:46.005005"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:46.502961",
+      "error_message": null,
+      "id": 4801,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187080,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:46.502961"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:46.599022",
+      "error_message": null,
+      "id": 4804,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187073,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:46.599022"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:47.24803",
+      "error_message": null,
+      "id": 4825,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187034,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:47.24803"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:47.403489",
+      "error_message": null,
+      "id": 4830,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 187020,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:47.403489"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:48.671682",
+      "error_message": null,
+      "id": 4871,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 186943,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:48.671682"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:49.070775",
+      "error_message": null,
+      "id": 4884,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 186924,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:49.070775"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:49.289259",
+      "error_message": null,
+      "id": 4891,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 186908,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:49.289259"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:49.875638",
+      "error_message": null,
+      "id": 4910,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 186880,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:49.875638"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:20:49.906272",
+      "error_message": null,
+      "id": 4911,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 186879,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:20:49.906272"
+    },
+    {
+      "ai_metadata": null,
+      "created_at": "2026-06-26T12:21:02.471241",
+      "error_message": null,
+      "id": 5317,
+      "job_id": 24,
+      "max_retries": 3,
+      "processed_at": null,
+      "resource_id": 186313,
+      "retry_count": 0,
+      "status": "pending",
+      "updated_at": "2026-06-26T12:21:02.471241"
+    }
+  ],
+  "plan": [
+    {
+      "loser": 187835,
+      "survivor": 185379
+    },
+    {
+      "loser": 187803,
+      "survivor": 184773
+    },
+    {
+      "loser": 187564,
+      "survivor": 185842
+    },
+    {
+      "loser": 187793,
+      "survivor": 186096
+    },
+    {
+      "loser": 187660,
+      "survivor": 186657
+    },
+    {
+      "loser": 187765,
+      "survivor": 185823
+    },
+    {
+      "loser": 187353,
+      "survivor": 185523
+    },
+    {
+      "loser": 187034,
+      "survivor": 185382
+    },
+    {
+      "loser": 186879,
+      "survivor": 186493
+    },
+    {
+      "loser": 186908,
+      "survivor": 186385
+    },
+    {
+      "loser": 187327,
+      "survivor": 185464
+    },
+    {
+      "loser": 187273,
+      "survivor": 185117
+    },
+    {
+      "loser": 187268,
+      "survivor": 184962
+    },
+    {
+      "loser": 187529,
+      "survivor": 184861
+    },
+    {
+      "loser": 187117,
+      "survivor": 186461
+    },
+    {
+      "loser": 186924,
+      "survivor": 186551
+    },
+    {
+      "loser": 187492,
+      "note": "survivor differs from dev",
+      "survivor": 185277
+    },
+    {
+      "loser": 187630,
+      "survivor": 185098
+    },
+    {
+      "loser": 187305,
+      "survivor": 185109
+    },
+    {
+      "loser": 187457,
+      "survivor": 185322
+    },
+    {
+      "loser": 187320,
+      "survivor": 184766
+    },
+    {
+      "loser": 187382,
+      "survivor": 186433
+    },
+    {
+      "loser": 187328,
+      "survivor": 186502
+    },
+    {
+      "loser": 187705,
+      "survivor": 186446
+    },
+    {
+      "loser": 187833,
+      "survivor": 185395
+    },
+    {
+      "loser": 187687,
+      "survivor": 185342
+    },
+    {
+      "loser": 186880,
+      "survivor": 186376
+    },
+    {
+      "loser": 187080,
+      "survivor": 185072
+    },
+    {
+      "loser": 186943,
+      "survivor": 186454
+    },
+    {
+      "loser": 187240,
+      "survivor": 185503
+    },
+    {
+      "loser": 186313,
+      "survivor": 186227
+    },
+    {
+      "loser": 187260,
+      "survivor": 185409
+    },
+    {
+      "loser": 187454,
+      "survivor": 185245
+    },
+    {
+      "loser": 187020,
+      "survivor": 186438
+    },
+    {
+      "loser": 187553,
+      "survivor": 185524
+    },
+    {
+      "loser": 187483,
+      "survivor": 184867
+    },
+    {
+      "loser": 187323,
+      "survivor": 185539
+    },
+    {
+      "loser": 187073,
+      "survivor": 185295
+    },
+    {
+      "loser": 187199,
+      "survivor": 185082
+    }
+  ],
+  "resources": [
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Encoding & Codecs",
+      "created_at": "2026-06-25T22:00:53.691307",
+      "description": "An open source H.265/HEVC encoder designed for speed and efficiency in video compression, focusing on fast encoding of high-quality video content.",
+      "github_synced": true,
+      "id": 186880,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1085,
+        "importedAt": "2026-06-25T22:00:53.675Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'codec':2 'compress':18 'content':28 'design':11 'effici':15 'encod':5,10,22 'fast':21 'focus':19 'h.265':4 'h.265/hevc':9 'high':25 'high-qual':24 'open':3,7 'qualiti':26 'sourc':8 'speed':13 'ture':1 'turingcodec.org':29 'video':17,27",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Turing Codec (Open H.265 Encoder)",
+      "updated_at": "2026-07-02T05:40:38.124",
+      "url": "https://turingcodec.org"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Infrastructure & Delivery",
+      "created_at": "2026-06-25T22:08:07.4906",
+      "description": "A discussion on using Kubernetes for batch processing like transcoding. It covers how to define Kubernetes Jobs or CronJobs to run FFmpeg transcoding tasks, highlighting the benefits of containerization and orchestration in building scalable video processing infrastructure.",
+      "github_synced": true,
+      "id": 187117,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1089,
+        "importedAt": "2026-06-25T22:08:07.474Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subSubcategoryId": 3646,
+        "subcategoryId": 2199
+      },
+      "search_tsv": "'/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art':45 'batch':4,12 'benefit':32 'build':38 'container':34 'cover':17 'cronjob':24 'defin':20 'discuss':7 'ffmpeg':3,27 'highlight':30 'infrastructur':42 'job':5,22 'kubernet':1,10,21 'kubernetes.io':44 'kubernetes.io/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art':43 'like':14 'orchestr':36 'process':13,41 'run':26 'scalabl':39 'task':29 'transcod':15,28 'use':9 'video':40",
+      "status": "rejected",
+      "sub_subcategory": "Cloud Platforms",
+      "subcategory": "Cloud & CDN",
+      "submitted_by": null,
+      "title": "Kubernetes and FFmpeg (Batch Jobs)",
+      "updated_at": "2026-07-02T05:40:25.912",
+      "url": "https://kubernetes.io/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Encoding & Codecs",
+      "created_at": "2026-06-25T22:01:46.186384",
+      "description": "A fork of the FFmpeg project that started in 2011 to develop a cleaner codebase. Libav provides similar functionality to FFmpeg (libraries for decoding/encoding and avconv tool) though it's now largely inactive.",
+      "github_synced": true,
+      "id": 186924,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1085,
+        "importedAt": "2026-06-25T22:01:46.170Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subcategoryId": 2190
+      },
+      "search_tsv": "'2011':11 'avconv':27 'cleaner':15 'codebas':16 'decoding/encoding':25 'develop':13 'ffmpeg':6,22 'fork':3 'function':20 'inact':34 'larg':33 'libav':1,17 'libav.org':35 'librari':23 'project':7 'provid':18 'similar':19 'start':9 'though':29 'tool':28",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": "Encoding Tools",
+      "submitted_by": null,
+      "title": "Libav",
+      "updated_at": "2026-07-02T05:40:36.861",
+      "url": "https://libav.org"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Protocols & Transport",
+      "created_at": "2026-06-25T22:49:10.624444",
+      "description": "Peer5 documentation.",
+      "github_synced": true,
+      "id": 187765,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1084,
+        "importedAt": "2026-06-25T22:49:10.409Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subSubcategoryId": 3705,
+        "subcategoryId": 2241
+      },
+      "search_tsv": "'/guides/production-ready-hls-vod':17 'bitrat':6 'creat':1 'doc':12 'docs.peer5.com':16 'docs.peer5.com/guides/production-ready-hls-vod':15 'document':14 'hls':7 'multi':5 'p2p':11 'peer5':10,13 'product':3 'readi':4 'stream':9 'vod':8",
+      "status": "rejected",
+      "sub_subcategory": "HLS",
+      "subcategory": "HLS Tools",
+      "submitted_by": null,
+      "title": "Creating A Production Ready Multi Bitrate HLS VOD stream - Peer5 P2P Docs",
+      "updated_at": "2026-07-02T05:40:34.691",
+      "url": "https://docs.peer5.com/guides/production-ready-hls-vod"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:19:48.688764",
+      "description": "A movie-focused HTML5 player that is fully customizable and easy to use. It offers built-in support for captions, plugins, and custom events, enhancing the viewing experience.",
+      "github_synced": true,
+      "id": 187305,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:19:48.673Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'built':19 'built-in':18 'caption':23 'custom':26 'customiz':11 'easi':13 'enhanc':28 'event':27 'experi':31 'focus':5 'fulli':10 'html5':6 'moovie.js':1 'mooviejs.com':32 'movi':4 'movie-focus':3 'offer':17 'player':7 'plugin':24 'support':21 'use':15 'view':30",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Moovie.js",
+      "updated_at": "2026-07-02T05:40:35.037",
+      "url": "https://mooviejs.com"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Protocols & Transport",
+      "created_at": "2026-06-25T22:32:19.416934",
+      "description": "This article from Medialooks offers a comprehensive comparison of various video transport technologies, including RTMP, HLS, DASH, SRT, and WebRTC. It explains the pros and cons of each protocol, highlights popular products that use them, and provides guidance on selecting the best technology based on specific use cases.",
+      "github_synced": true,
+      "id": 187630,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1084,
+        "importedAt": "2026-06-25T22:32:19.399Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs':62 'articl':13 'base':55 'best':8,53 'case':59 'compar':1 'comparison':19 'comprehens':18 'con':37 'dash':28 'explain':33 'guidanc':49 'highlight':41 'hls':27 'includ':25 'medialook':15 'medialooks.com':61 'medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs':60 'need':11 'offer':16 'one':6 'popular':42 'product':43 'pros':35 'protocol':40 'provid':48 'rtmp':26 'select':51 'specif':57 'srt':29 'technolog':4,24,54 'transport':3,23 'use':45,58 'various':21 'video':2,22 'webrtc':31",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Comparing Video Transport Technologies: Which One is Best for Your Needs?",
+      "updated_at": "2026-07-02T05:40:24.765",
+      "url": "https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:18:01.728703",
+      "description": "A project that demonstrates the capability of the ESP32 microcontroller to play both video and sound. It involves creating an AVI file that can be decoded on the fly by the ESP32, showcasing the potential of this microcontroller for video playback applications. The project utilizes a standard ESP32 device with an I2C bus, and the video stream is managed efficiently to accommodate the hardware's limitations. This project serves as an inspiration for developing small, cost-effective video players using microcontrollers.",
+      "github_synced": true,
+      "id": 187268,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:18:01.711Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/2025/03/15/esp32-tv-plays-video-and-sound':88 'accommod':65 'applic':45 'avi':24 'bus':56 'capabl':9 'cost':80 'cost-effect':79 'creat':22 'decod':29 'demonstr':7 'develop':77 'devic':52 'effect':81 'effici':63 'esp32':2,12,35,51 'esp32-tv':1 'file':25 'fli':32 'hackaday.com':87 'hackaday.com/2025/03/15/esp32-tv-plays-video-and-sound':86 'hardwar':67 'i2c':55 'inspir':75 'involv':21 'limit':69 'manag':62 'microcontrol':13,41,85 'play':15 'playback':44 'player':83 'potenti':38 'project':5,47,71 'serv':72 'showcas':36 'small':78 'sound':19 'standard':50 'stream':60 'tv':3 'use':84 'util':48 'video':17,43,59,82",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "ESP32-TV",
+      "updated_at": "2026-07-02T05:40:25.716",
+      "url": "https://hackaday.com/2025/03/15/esp32-tv-plays-video-and-sound"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:21:00.275231",
+      "description": "An open-source, flexible, and low-cost Visible Light Communication (VLC) system platform. It enables fast prototyping of new system protocols to build a LiFi network using standard visible light LEDs. OpenVLC is valuable for developers interested in exploring and developing VLC systems and applications.",
+      "github_synced": true,
+      "id": 187323,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:21:00.259Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'applic':48 'build':26 'communic':13 'cost':10 'develop':39,44 'enabl':18 'explor':42 'fast':19 'flexibl':6 'interest':40 'led':34 'lifi':28 'light':12,33 'low':9 'low-cost':8 'network':29 'new':22 'open':4 'open-sourc':3 'openvlc':1,35 'platform':16 'protocol':24 'prototyp':20 'sourc':5 'standard':31 'system':15,23,46 'use':30 'valuabl':37 'visibl':11,32 'vlc':14,45 'www.openvlc.org':49",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "OpenVLC",
+      "updated_at": "2026-07-02T05:40:36.897",
+      "url": "https://www.openvlc.org"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Infrastructure & Delivery",
+      "created_at": "2026-06-25T22:04:01.559875",
+      "description": "Edgio provides a highly functional content delivery network tailored for video streaming, ensuring exceptional user experiences across devices. It supports live events and on-demand video content with high-speed delivery and robust security measures. Edgio's platform is designed for scalability, making it suitable for developers aiming to reach a global audience with their video applications.",
+      "github_synced": true,
+      "id": 187034,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1089,
+        "importedAt": "2026-06-25T22:04:01.544Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'across':19 'aim':52 'applic':61 'audienc':57 'cdn':2 'content':8,30 'deliveri':9,35 'demand':28 'design':44 'develop':51 'devic':20 'edg.io':62 'edgio':1,3,40 'ensur':15 'event':24 'except':16 'experi':18 'function':7 'global':56 'high':6,33 'high-spe':32 'live':23 'make':47 'measur':39 'network':10 'on-demand':26 'platform':42 'provid':4 'reach':54 'robust':37 'scalabl':46 'secur':38 'speed':34 'stream':14 'suitabl':49 'support':22 'tailor':11 'user':17 'video':13,29,60",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Edgio CDN",
+      "updated_at": "2026-07-02T05:40:36.893",
+      "url": "https://edg.io"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:18:11.124688",
+      "description": "FPGAmp is a media player project that utilizes the Arty A7 development board, based on the Xilinx Artix-7 FPGA. It is capable of playing back MJPEG video at 800 x 600 resolution and 25 fps, as well as MP3 audio. The project serves as an educational resource for those interested in FPGA development and media processing, demonstrating the integration of RISC V processor cores and hardware JPEG decoders.",
+      "github_synced": true,
+      "id": 187273,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:18:11.009Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'-7':22 '/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3':75 '25':38 '600':35 '800':33 'a7':14 'arti':13 'artix':21 'audio':44 'back':29 'base':17 'board':16 'capabl':26 'core':68 'decod':72 'demonstr':61 'develop':15,57 'educ':50 'fpga':23,56 'fpgamp':1,4 'fps':39 'hackaday.com':74 'hackaday.com/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3':73 'hardwar':70 'integr':63 'interest':54 'jpeg':71 'media':2,7,59 'mjpeg':30 'mp3':43 'play':28 'player':3,8 'process':60 'processor':67 'project':9,46 'resolut':36 'resourc':51 'risc':65 'serv':47 'util':11 'v':66 'video':31 'well':41 'x':34 'xilinx':20",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "FPGAmp Media Player",
+      "updated_at": "2026-07-02T05:40:25.357",
+      "url": "https://hackaday.com/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:17:14.346372",
+      "description": "Agora provides a real-time communication SDK that enables developers to embed video chat into native apps, web, and mobile platforms. It offers features like real-time voice, video, messaging, and live streaming products.",
+      "github_synced": true,
+      "id": 187240,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:17:14.331Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/en/products/video-call-sdk':42 'agora':1,4 'app':21 'chat':18 'communic':10 'develop':14 'emb':16 'enabl':13 'featur':28 'like':29 'live':37 'messag':35 'mobil':24 'nativ':20 'offer':27 'platform':25 'product':39 'provid':5 'real':8,31 'real-tim':7,30 'sdk':3,11 'stream':38 'time':9,32 'video':2,17,34 'voic':33 'web':22 'www.agora.io':41 'www.agora.io/en/products/video-call-sdk':40",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Agora Video SDK",
+      "updated_at": "2026-07-02T05:40:25.744",
+      "url": "https://www.agora.io/en/products/video-call-sdk"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Protocols & Transport",
+      "created_at": "2026-06-25T22:37:56.024261",
+      "description": "A suite of tools for analysis, manipulation, streaming, and monitoring of Transport Streams and OTT workflows. It includes applications like SMASH for MPEG-DASH stream analysis, multicast stream tools, and HLS checker tools, providing comprehensive solutions for transport stream management.",
+      "github_synced": true,
+      "id": 187687,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1084,
+        "importedAt": "2026-06-25T22:37:55.809Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'analysi':10,31 'applic':23 'checker':37 'comprehens':40 'dash':29 'hls':36 'includ':22 'like':24 'manag':45 'manipul':11 'monitor':14 'mpeg':28 'mpeg-dash':27 'multicast':32 'ott':19 'provid':39 'smash':25 'solut':41 'stream':3,12,17,30,33,44 'suit':6 'tool':4,8,34,38 'transport':2,16,43 'tslemur':1 'tslemurs.com':46 'workflow':20",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "TSLemurs Transport Stream Tools",
+      "updated_at": "2026-07-02T05:40:36.439",
+      "url": "https://tslemurs.com"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Protocols & Transport",
+      "created_at": "2026-06-25T22:52:25.525238",
+      "description": "Design of scheduling and rate-adaptation algorithms for adaptive HTTP streaming - Stephan Hesse.",
+      "github_synced": true,
+      "id": 187793,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1084,
+        "importedAt": "2026-06-25T22:52:24.909Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subcategoryId": 2236
+      },
+      "search_tsv": "'/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming':31 'adapt':7,10,21,24 'algorithm':8,22 'blog':14 'design':1,15 'dispar.at':13,30 'dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming':29 'hess':28 'http':11,25 'rate':6,20 'rate-adapt':5,19 'schedul':3,17 'stephan':27 'stream':12,26",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": "Adaptive Bitrate Algorithms & Tools",
+      "submitted_by": null,
+      "title": "Design of scheduling and rate-adaptation algorithms for adaptive HTTP streaming · dispar.at Blog",
+      "updated_at": "2026-07-02T05:40:34.106",
+      "url": "https://dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Infrastructure & Delivery",
+      "created_at": "2026-06-25T22:04:30.102946",
+      "description": "A platform that allows teams to securely save, manage, and search all their video content, facilitating faster collaboration and improved workflows. It automatically transcribes videos, making content readable and searchable. Rewatch is designed to enhance team communication by providing a centralized hub for video content with advanced search capabilities.",
+      "github_synced": true,
+      "id": 187073,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1089,
+        "importedAt": "2026-06-25T22:04:30.088Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'advanc':48 'allow':5 'automat':24 'capabl':50 'central':42 'collabor':19 'communic':38 'content':16,28,46 'design':34 'enhanc':36 'facilit':17 'faster':18 'hub':43 'improv':21 'make':27 'manag':10 'platform':3 'provid':40 'readabl':29 'rewatch':1,32 'save':9 'search':12,49 'searchabl':31 'secur':8 'team':6,37 'transcrib':25 'video':15,26,45 'workflow':22 'www.rewatch.com':51",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Rewatch",
+      "updated_at": "2026-07-02T05:40:35.044",
+      "url": "https://www.rewatch.com"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Infrastructure & Delivery",
+      "created_at": "2026-06-25T22:04:35.406414",
+      "description": "UStudio provides a SaaS-based video platform designed to support flexible deployment models. It offers configurable storage options, RESTful developer APIs, and a suite of video integrations for existing business applications. Features include live streaming, VOD delivery via choice of CDN, flexible access control settings, and WAN optimization solutions, making it valuable for developers seeking customizable video infrastructure solutions.",
+      "github_synced": true,
+      "id": 187080,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1089,
+        "importedAt": "2026-06-25T22:04:35.390Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/platform/video-platform/integrations/cloud-video-integrations':67 'access':48 'api':26 'applic':36 'base':10 'busi':35 'cdn':46 'choic':44 'cloud':2 'configur':21 'control':49 'customiz':61 'deliveri':42 'deploy':17 'design':13 'develop':25,59 'exist':34 'featur':37 'flexibl':16,47 'includ':38 'infrastructur':63 'integr':4,32 'live':39 'make':55 'model':18 'offer':20 'optim':53 'option':23 'platform':12 'provid':6 'rest':24 'saa':9 'saas-bas':8 'seek':60 'set':50 'solut':54,64 'storag':22 'stream':40 'suit':29 'support':15 'ustudio':1,5 'ustudio.com':66 'ustudio.com/platform/video-platform/integrations/cloud-video-integrations':65 'valuabl':57 'via':43 'video':3,11,31,62 'vod':41 'wan':52",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "uStudio Cloud Video Integrations",
+      "updated_at": "2026-07-02T05:40:25.72",
+      "url": "https://ustudio.com/platform/video-platform/integrations/cloud-video-integrations"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Intro & Learning",
+      "created_at": "2026-06-25T22:53:44.125069",
+      "description": "A comprehensive collection of technical blog posts and tutorials covering protocols like WebRTC, RTMP, HLS, and CMAF. These resources guide users in building their own live streaming platforms and integrating various streaming technologies.",
+      "github_synced": true,
+      "id": 187803,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1083,
+        "importedAt": "2026-06-25T22:53:44.009Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/tutorial':41 'ant':1 'antmedia.io':40 'antmedia.io/tutorial':39 'blog':11 'build':28 'cmaf':22 'collect':8 'comprehens':7 'cover':15 'guid':25 'hls':20 'integr':35 'like':17 'live':31 'media':2 'platform':33 'post':12 'protocol':16 'resourc':24 'rtmp':19 'stream':4,32,37 'technic':10 'technolog':38 'tutori':5,14 'user':26 'various':36 'video':3 'webrtc':18",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Ant Media Video Streaming Tutorials",
+      "updated_at": "2026-07-02T05:40:24.323",
+      "url": "https://antmedia.io/tutorial"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "General Tools",
+      "created_at": "2026-06-25T22:13:57.626457",
+      "description": "A multi-DRM solution supporting Google Widevine, Apple FairPlay, Microsoft PlayReady, Huawei WisePlay, and AES-128 with streaming protocols such as HLS/DASH/HSS. It offers features like offline playback, anti-capture protection, and hardware-level DRM support across various platforms.",
+      "github_synced": true,
+      "id": 187199,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1090,
+        "importedAt": "2026-06-25T22:13:57.608Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'-128':18 '/multi-digital-right-management':46 'across':41 'ae':17 'anti':32 'anti-captur':31 'appl':10 'captur':33 'drm':5,39 'fairplay':11 'featur':27 'googl':8 'hardwar':37 'hardware-level':36 'hls/dash/hss':24 'huawei':14 'level':38 'like':28 'microsoft':12 'multi':4 'multi-drm':3 'offer':26 'offlin':29 'platform':43 'playback':30 'playreadi':13 'protect':34 'protocol':21 'solut':6 'stream':20 'support':7,40 'various':42 'widevin':9 'wiseplay':15 'www.xmediatv.com':45 'www.xmediatv.com/multi-digital-right-management':44 'xmediadrm':1",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "XMediaDRM",
+      "updated_at": "2026-07-02T05:40:36.864",
+      "url": "https://www.xmediatv.com/multi-digital-right-management"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:17:42.608057",
+      "description": "Brightcove provides native player SDKs for iOS, tvOS, and Android platforms, enabling developers to create high-performance video applications. These SDKs offer integrations for digital rights management (DRM) and advertising, facilitating advanced video features with minimal code.",
+      "github_synced": true,
+      "id": 187260,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:17:42.592Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps':45 'advanc':37 'advertis':35 'android':14 'applic':24 'brightcov':1,5 'code':42 'creat':19 'develop':17 'digit':30 'drm':33 'enabl':16 'facilit':36 'featur':39 'high':21 'high-perform':20 'integr':28 'io':11 'manag':32 'minim':41 'nativ':2,7 'offer':27 'perform':22 'platform':15 'player':3,8 'provid':6 'right':31 'sdks':4,9,26 'tvos':12 'video':23,38 'www.brightcove.com':44 'www.brightcove.com/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps':43",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Brightcove Native Player SDKs",
+      "updated_at": "2026-07-02T05:40:25.753",
+      "url": "https://www.brightcove.com/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:21:02.2702",
+      "description": "A portable video player project that emulates the aesthetic of vintage devices. It features a modern LCD behind a large lens to mimic the appearance of old CRT screens. This project is ideal for enthusiasts interested in retro-style hardware combined with modern video playback capabilities.",
+      "github_synced": true,
+      "id": 187327,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:21:02.254Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid':54 'aesthet':13 'appear':29 'behind':22 'capabl':51 'combin':46 'crt':32 'devic':16 'emul':11 'enthusiast':39 'featur':18 'hackaday.com':53 'hackaday.com/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid':52 'hardwar':45 'ideal':37 'interest':40 'larg':24 'lcd':21 'len':25 'mimic':27 'modern':20,48 'old':31 'playback':50 'player':8 'port':2 'port-a-vid':1 'portabl':6 'project':9,35 'retro':43 'retro-styl':42 'screen':33 'style':44 'vid':4 'video':7,49 'vintag':15",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Port-A-Vid",
+      "updated_at": "2026-07-02T05:40:25.293",
+      "url": "https://hackaday.com/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:21:02.452943",
+      "description": "A free multimedia player for Windows with extensive format support, advanced features (such as 3D and 360° playback), and custom skins.",
+      "github_synced": true,
+      "id": 187328,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:21:02.437Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'360':18 '3d':16 'advanc':12 'custom':21 'extens':9 'featur':13 'format':10 'free':3 'multimedia':4 'playback':19 'player':5 'potplay':1 'potplayer.daum.net':23 'skin':22 'support':11 'window':7",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "PotPlayer",
+      "updated_at": "2026-07-02T05:40:34.559",
+      "url": "https://potplayer.daum.net"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:21:42.126528",
+      "description": "VXG's Player SDK is part of their Mobile SDK suite, responsible for playback of various media streams. It supports multiple streaming formats, hardware acceleration, and offers features like low latency playback and dynamic latency control.",
+      "github_synced": true,
+      "id": 187353,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:21:42.009Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/site/android.playersdk':42 'acceler':28 'control':39 'docs.vxg.io':41 'docs.vxg.io/site/android.playersdk':40 'dynam':37 'featur':31 'format':26 'hardwar':27 'latenc':34,38 'like':32 'low':33 'media':20 'mobil':12 'multipl':24 'offer':30 'part':9 'playback':17,35 'player':2,6 'respons':15 'sdk':3,7,13 'stream':21,25 'suit':14 'support':23 'various':19 'vxg':1,4",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "VXG Player SDK",
+      "updated_at": "2026-07-02T05:40:36.888",
+      "url": "https://docs.vxg.io/site/Android.PlayerSDK"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:23:31.002147",
+      "description": "A lightweight open source video and audio player for the web. OpenPlayerJS supports modern streaming formats (HLS via hls.js, DASH via dash.js) and provides a clean UI that is easily customizable, aiming to be an easy-to-integrate solution.",
+      "github_synced": true,
+      "id": 187382,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:23:30.987Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subSubcategoryId": 3635,
+        "subcategoryId": 2193
+      },
+      "search_tsv": "'aim':33 'audio':8 'clean':27 'customiz':32 'dash':21 'dash.js':23 'easi':38 'easili':31 'easy-to-integr':37 'format':17 'hls':18 'hls.js':20 'integr':40 'lightweight':3 'modern':15 'open':4 'openplayerj':1,13 'openplayerjs.io':42 'player':9 'provid':25 'solut':41 'sourc':5 'stream':16 'support':14 'ui':28 'via':19,22 'video':6 'web':12",
+      "status": "rejected",
+      "sub_subcategory": "Web Players",
+      "subcategory": "Mobile & Web Players",
+      "submitted_by": null,
+      "title": "OpenPlayerJS",
+      "updated_at": "2026-07-02T05:40:34.652",
+      "url": "https://openplayerjs.io"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Intro & Learning",
+      "created_at": "2026-06-25T22:57:57.224711",
+      "description": "A guide providing five simple steps to start live streaming, including choosing the right platform, setting up equipment, and engaging with your audience.",
+      "github_synced": true,
+      "id": 187835,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1083,
+        "importedAt": "2026-06-25T22:57:57.009Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/how-to-live-stream':35 'academy.wedio.com':34 'academy.wedio.com/how-to-live-stream':33 'audienc':32 'beginn':5 'choos':21 'engag':29 'equip':27 'five':13 'get':8 'guid':6,11 'includ':20 'live':3,18 'platform':24 'provid':12 'right':23 'set':25 'simpl':14 'start':9,17 'step':15 'stream':4,19",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "How to Live Stream: Beginners Guide to Get Started",
+      "updated_at": "2026-07-02T05:40:24.282",
+      "url": "https://academy.wedio.com/how-to-live-stream"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Protocols & Transport",
+      "created_at": "2026-06-25T22:40:28.923485",
+      "description": "A sample page demonstrating MPEG-DASH playback with ClearKey DRM using the DASH-IF reference player (dash.js). It provides a working example of encrypted content playback which can be a template for developers testing DRM with DASH.",
+      "github_synced": true,
+      "id": 187705,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1084,
+        "importedAt": "2026-06-25T22:40:28.809Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subSubcategoryId": 3621,
+        "subcategoryId": 2188
+      },
+      "search_tsv": "'/dash.js/v/latest/samples/drm/clearkey':50 'clearkey':4,18 'content':35 'dash':2,7,15,23,47 'dash-if':6,22 'dash.js':27 'demonstr':12 'develop':43 'drm':3,19,45 'encrypt':34 'exampl':32 'live':1 'mpeg':14 'mpeg-dash':13 'page':11 'playback':16,36 'player':26 'provid':29 'refer':25 'reference.dashif.org':49 'reference.dashif.org/dash.js/v/latest/samples/drm/clearkey':48 'sampl':5,10 'templat':41 'test':44 'use':20 'work':31",
+      "status": "rejected",
+      "sub_subcategory": "DASH",
+      "subcategory": "Adaptive Streaming",
+      "submitted_by": null,
+      "title": "Live DASH DRM ClearKey Sample (DASH-IF)",
+      "updated_at": "2026-07-02T05:40:24.456",
+      "url": "https://reference.dashif.org/dash.js/v/latest/samples/drm/clearkey"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Encoding & Codecs",
+      "created_at": "2026-06-25T22:00:53.499911",
+      "description": "A Facebook Engineering blog post about the challenges and solutions for processing 360° VR video. It discusses cube map projection, encoding optimizations, and how Facebook re-architected parts of the pipeline to handle the massive data of 360 videos while preserving quality.",
+      "github_synced": true,
+      "id": 186879,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1085,
+        "importedAt": "2026-06-25T22:00:53.484Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/2017/03/14/video-engineering/transcoding-360-video-at-facebook':51 '360':2,18,44 'architect':33 'blog':9 'challeng':13 'cube':23 'data':42 'discuss':22 'encod':26 'engin':8 'engineering.fb.com':50 'engineering.fb.com/2017/03/14/video-engineering/transcoding-360-video-at-facebook':49 'facebook':5,7,30 'handl':39 'map':24 'massiv':41 'optim':27 'part':34 'pipelin':37 'post':10 'preserv':47 'process':17 'project':25 'qualiti':48 're':32 're-architect':31 'solut':15 'transcod':1 'video':3,20,45 'vr':19",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Transcoding 360 Video at Facebook",
+      "updated_at": "2026-07-02T05:40:26.262",
+      "url": "https://engineering.fb.com/2017/03/14/video-engineering/transcoding-360-video-at-facebook"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Infrastructure & Delivery",
+      "created_at": "2026-06-25T22:03:50.643672",
+      "description": "Cedexis (now part of Citrix) provided Openmix, a load balancing platform for directing traffic across multiple CDNs based on real-time performance data. Their resources and whitepapers describe strategies for multi-CDN failover and optimization for video streaming.",
+      "github_synced": true,
+      "id": 187020,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1089,
+        "importedAt": "2026-06-25T22:03:50.626Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/openmix-application-load-balancer':46 'across':18 'balanc':13 'base':21 'cdn':37 'cdns':20 'cedexi':1,4 'citrix':8 'data':27 'describ':32 'direct':16 'failov':38 'load':12 'multi':36 'multi-cdn':35 'multipl':19 'openmix':2,10 'optim':40 'part':6 'perform':26 'platform':14 'provid':9 'real':24 'real-tim':23 'resourc':29 'strategi':33 'stream':43 'time':25 'traffic':17 'video':42 'whitepap':3,31 'www.cedexis.com':45 'www.cedexis.com/openmix-application-load-balancer':44",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Cedexis Openmix (Whitepaper)",
+      "updated_at": "2026-07-02T05:40:26.253",
+      "url": "https://www.cedexis.com/openmix-application-load-balancer"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Media Tools",
+      "created_at": "2026-06-25T22:26:15.324163",
+      "description": "Brightcove offers an extensive library of APIs and SDKs that allow developers to customize, extend, and integrate with the Brightcove platform. These tools enable access to streaming content, metadata, analytics, and support integration with third-party technologies like CMS services and DAM systems. They also facilitate the creation of custom video player templates and the extension of video player functionality with plugins.",
+      "github_synced": true,
+      "id": 187454,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1087,
+        "importedAt": "2026-06-25T22:26:15.009Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/platform-and-apis':70 'access':29 'allow':15 'also':50 'analyt':34 'api':2,11 'brightcov':1,5,24 'cms':44 'content':32 'creation':53 'custom':18,55 'dam':47 'develop':16 'enabl':28 'extend':19 'extens':8,61 'facilit':51 'function':65 'integr':21,37 'librari':9 'like':43 'metadata':33 'offer':6 'parti':41 'platform':25 'player':57,64 'plugin':67 'sdks':4,13 'servic':45 'stream':31 'support':36 'system':48 'technolog':42 'templat':58 'third':40 'third-parti':39 'tool':27 'video':56,63 'www.brightcove.com':69 'www.brightcove.com/platform-and-apis':68",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Brightcove APIs and SDKs",
+      "updated_at": "2026-07-02T05:40:25.318",
+      "url": "https://www.brightcove.com/platform-and-apis"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Encoding & Codecs",
+      "created_at": "2026-06-25T22:01:30.274032",
+      "description": "AMD's SDK for GPU-based video encoding and decoding. The AMF SDK allows developers to utilize AMD hardware (VCE/VCN) for accelerating video encode/decode tasks.",
+      "github_synced": true,
+      "id": 186908,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1085,
+        "importedAt": "2026-06-25T22:01:30.259Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subcategoryId": 2190
+      },
+      "search_tsv": "'/video-encode-decode':35 'acceler':29 'advanc':2 'allow':21 'amd':1,7,25 'amf':5,19 'base':13 'decod':17 'develop':22 'encod':15 'encode/decode':31 'framework':4 'gpu':12 'gpu-bas':11 'gpuopen.com':34 'gpuopen.com/video-encode-decode':33 'hardwar':26 'media':3 'sdk':6,9,20 'task':32 'util':24 'vce/vcn':27 'video':14,30",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": "Encoding Tools",
+      "submitted_by": null,
+      "title": "AMD Advanced Media Framework (AMF SDK)",
+      "updated_at": "2026-07-02T05:40:26.256",
+      "url": "https://gpuopen.com/video-encode-decode"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Protocols & Transport",
+      "created_at": "2026-01-20T20:31:00.288291",
+      "description": "Bento4 offers MPEG-DASH sample content for developers to test and validate their DASH implementations.",
+      "github_synced": true,
+      "id": 186313,
+      "last_synced_at": "2026-06-25T21:58:49.048",
+      "metadata": {
+        "categoryId": 1084,
+        "importedAt": "2026-02-12T01:04:38.347Z",
+        "lastUpdatedAt": "2026-02-12T01:05:47.870Z",
+        "lastUpdatedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)",
+        "subcategoryId": 2239
+      },
+      "search_tsv": "'/developers/dash/dash-sample-content/':24 'bento4':5,6 'content':4,12 'dash':2,10,20 'develop':14 'implement':21 'mpeg':1,9 'mpeg-dash':8 'offer':7 'sampl':3,11 'test':16 'valid':18 'www.bento4.com':23 'www.bento4.com/developers/dash/dash-sample-content/':22",
+      "status": "rejected",
+      "sub_subcategory": "DASH",
+      "subcategory": "DASH Tools",
+      "submitted_by": null,
+      "title": "MPEG DASH Sample Content Bento4",
+      "updated_at": "2026-07-02T05:40:29.674",
+      "url": "http://www.bento4.com/developers/dash/dash-sample-content/"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Encoding & Codecs",
+      "created_at": "2026-06-25T22:02:02.718522",
+      "description": "A repository and package manager of VapourSynth filters and scripts. It automates the installation and management of community-contributed VapourSynth plugins, which is useful for automating video processing tasks in scripts.",
+      "github_synced": true,
+      "id": 186943,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1085,
+        "importedAt": "2026-06-25T22:02:02.702Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subcategoryId": 2190
+      },
+      "search_tsv": "'autom':15,30 'communiti':22 'community-contribut':21 'contribut':23 'filter':11 'instal':17 'manag':8,19 'packag':7 'plugin':25 'process':32 'repositori':3,5 'script':2,13,35 'task':33 'use':28 'vapoursynth':1,10,24 'video':31 'vsrepo.vapoursynth.com':36",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": "Encoding Tools",
+      "submitted_by": null,
+      "title": "VapourSynth Script Repository",
+      "updated_at": "2026-07-02T05:40:35.005",
+      "url": "https://vsrepo.vapoursynth.com"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Intro & Learning",
+      "created_at": "2026-06-25T22:57:46.126966",
+      "description": "This guide by Repur Tech offers a comprehensive overview of building a video streaming platform. It discusses the basics of video streaming apps, essential features to include, technology stacks, design considerations, and monetization strategies. This resource is beneficial for developers aiming to create their own video streaming platforms.",
+      "github_synced": true,
+      "id": 187833,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1083,
+        "importedAt": "2026-06-25T22:57:45.909Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform':69 'aim':59 'app':7,41 'basic':37 'benefici':56 'build':15,29 'comprehens':26 'consider':49 'creat':3,61 'design':48 'develop':58 'discuss':35 'essenti':42 'featur':43 'guid':13,20 'includ':45 'monet':51 'offer':24 'overview':27 'platform':18,33,66 'repur':22 'repurtech.com':68 'repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform':67 'resourc':54 'stack':47 'step':10,12 'step-by-step':9 'strategi':52 'stream':6,32,40,65 'tech':23 'technolog':46 'video':5,31,39,64",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "How to Create a Video Streaming App: A Step-by-Step Guide to Building Your Own Platform",
+      "updated_at": "2026-07-02T05:40:24.295",
+      "url": "https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Media Tools",
+      "created_at": "2026-06-25T22:26:44.999324",
+      "description": "JW Player offers a comprehensive advertising solution that supports various ad formats, including VAST, VPAID, and Google IMA. It provides tools for ad scheduling, targeting, and analytics, enabling publishers to monetize their video content effectively.",
+      "github_synced": true,
+      "id": 187483,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1087,
+        "importedAt": "2026-06-25T22:26:44.983Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/advertising':41 'ad':14,26 'advertis':3,9 'analyt':30 'comprehens':8 'content':37 'effect':38 'enabl':31 'format':15 'googl':20 'ima':21 'includ':16 'jw':1,4 'monet':34 'offer':6 'player':2,5 'provid':23 'publish':32 'schedul':27 'solut':10 'support':12 'target':28 'tool':24 'various':13 'vast':17 'video':36 'vpaid':18 'www.jwplayer.com':40 'www.jwplayer.com/advertising':39",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "JW Player Advertising",
+      "updated_at": "2026-07-02T05:40:25.288",
+      "url": "https://www.jwplayer.com/advertising"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Media Tools",
+      "created_at": "2026-06-25T22:28:15.024654",
+      "description": "An open-source subtitle editing tool for the GNU/Linux desktop. It allows users to create, edit, and synchronize subtitles, supporting multiple subtitle formats and offering features like video previewing and waveform generation, making it beneficial for developers in video streaming and encoding.",
+      "github_synced": true,
+      "id": 187529,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1087,
+        "importedAt": "2026-06-25T22:28:15.009Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/subtitleeditor':48 'allow':15 'benefici':38 'creat':18 'desktop':13 'develop':40 'edit':8,19 'editor':2 'encod':45 'featur':29 'format':26 'generat':35 'gnu/linux':12 'kitone.github.io':47 'kitone.github.io/subtitleeditor':46 'like':30 'make':36 'multipl':24 'offer':28 'open':5 'open-sourc':4 'preview':32 'sourc':6 'stream':43 'subtitl':1,7,22,25 'support':23 'synchron':21 'tool':9 'user':16 'video':31,42 'waveform':34",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Subtitle Editor",
+      "updated_at": "2026-07-02T05:40:24.893",
+      "url": "https://kitone.github.io/subtitleeditor"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Protocols & Transport",
+      "created_at": "2026-06-25T22:35:16.724964",
+      "description": "Peer5's peer-to-peer content delivery solution for HLS streams. It uses WebRTC to distribute video segments among viewers to offload bandwidth from the CDN.",
+      "github_synced": true,
+      "id": 187660,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1084,
+        "importedAt": "2026-06-25T22:35:16.509Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'among':23 'bandwidth':27 'cdn':30 'content':10 'deliveri':11 'distribut':20 'docs.peer5.com':31 'hls':2,14 'offload':26 'p2p':3 'peer':7,9 'peer-to-p':6 'peer5':1,4 'segment':22 'solut':12 'stream':15 'use':17 'video':21 'viewer':24 'webrtc':18",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "Peer5 HLS P2P",
+      "updated_at": "2026-07-02T05:40:34.502",
+      "url": "https://docs.peer5.com"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Media Tools",
+      "created_at": "2026-06-25T22:28:54.600483",
+      "description": "The Video Player Ad-Serving Interface Definition (VPAID) is a standard that establishes a common interface between video players and ad units, enabling rich interactive in-stream ad experiences. It allows for the creation of interactive video ads that can respond to user interactions and provide enhanced engagement.",
+      "github_synced": true,
+      "id": 187553,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1087,
+        "importedAt": "2026-06-25T22:28:54.585Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0':55 'ad':7,24,32,42 'ad-serv':6 'allow':35 'common':18 'creation':38 'definit':10 'enabl':26 'engag':52 'enhanc':51 'establish':16 'experi':33 'in-stream':29 'interact':28,40,48 'interfac':9,19 'player':5,22 'provid':50 'respond':45 'rich':27 'serv':8 'specif':2 'standard':14 'stream':31 'unit':25 'user':47 'video':4,21,41 'vpaid':1,11 'www.iab.com':54 'www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0':53",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "VPAID Specification",
+      "updated_at": "2026-07-02T05:40:24.762",
+      "url": "https://www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Players & Clients",
+      "created_at": "2026-06-25T22:20:56.777402",
+      "description": "A small and fast-booting Linux-based distribution that turns a computer into a Kodi media center. OpenELEC is designed to be lightweight and easy to install, providing a complete media center experience with minimal setup.",
+      "github_synced": true,
+      "id": 187320,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1086,
+        "importedAt": "2026-06-25T22:20:56.761Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'base':10 'boot':7 'center':20,35 'complet':33 'comput':15 'design':23 'distribut':11 'easi':28 'experi':36 'fast':6 'fast-boot':5 'instal':30 'kodi':18 'lightweight':26 'linux':9 'linux-bas':8 'media':19,34 'minim':38 'openelec':1,21 'openelec.tv':40 'provid':31 'setup':39 'small':3 'turn':13",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "OpenELEC",
+      "updated_at": "2026-07-02T05:40:38.155",
+      "url": "https://openelec.tv"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Media Tools",
+      "created_at": "2026-06-25T22:29:07.124847",
+      "description": "",
+      "github_synced": true,
+      "id": 187564,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1087,
+        "importedAt": "2026-06-25T22:29:07.009Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+        "subSubcategoryId": 3639,
+        "subcategoryId": 2195
+      },
+      "search_tsv": "'/docs/plugin-hls':9 'artillery.io':5,8 'artillery.io/docs/plugin-hls':7 'doc':6 'hls':4 'http':1 'live':2 'stream':3",
+      "status": "rejected",
+      "sub_subcategory": "Quality & Testing",
+      "subcategory": "Ads & QoE",
+      "submitted_by": null,
+      "title": "HTTP Live Streaming (HLS) - Artillery.io Docs",
+      "updated_at": "2026-07-17T22:12:46.253",
+      "url": "https://artillery.io/docs/plugin-hls"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Media Tools",
+      "created_at": "2026-06-25T22:26:24.313547",
+      "description": "CADET is a free, browser-based tool developed by the National Center for Accessible Media at WGBH. It allows users to create high-quality caption files compatible with various media players and can also be used to generate audio-description scripts. CADET operates locally in the browser, ensuring privacy and security.",
+      "github_synced": true,
+      "id": 187457,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1087,
+        "importedAt": "2026-06-25T22:26:24.296Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'/cadet':63 'access':21 'allow':26 'also':42 'audio':48 'audio-descript':47 'base':13 'browser':12,56 'browser-bas':11 'cadet':1,7,51 'caption':2,33 'center':19 'compat':35 'creat':29 'descript':4,49 'develop':15 'edit':5 'ensur':57 'file':34 'free':10 'generat':46 'high':31 'high-qual':30 'local':53 'media':22,38 'nation':18 'ncamftp.wgbh.org':62 'ncamftp.wgbh.org/cadet':61 'oper':52 'player':39 'privaci':58 'qualiti':32 'script':50 'secur':60 'tool':6,14 'use':44 'user':27 'various':37 'wgbh':24",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "CADET (Caption and Description Editing Tool)",
+      "updated_at": "2026-07-02T05:40:37.734",
+      "url": "https://ncamftp.wgbh.org/cadet"
+    },
+    {
+      "approved_at": null,
+      "approved_by": null,
+      "category": "Media Tools",
+      "created_at": "2026-06-25T22:26:52.43669",
+      "description": "A hybrid video editor and VJ tool for Linux. LiVES allows both timeline editing of video and real-time performance (mixing clips and applying effects live), making it unique for video artists. Note: the official site is served over plain HTTP — the host does not support HTTPS.",
+      "github_synced": true,
+      "id": 187492,
+      "last_synced_at": null,
+      "metadata": {
+        "categoryId": 1087,
+        "importedAt": "2026-06-25T22:26:52.409Z",
+        "importedFrom": "krzemienski/awesome-video",
+        "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)"
+      },
+      "search_tsv": "'allow':12 'appli':26 'artist':34 'clip':24 'edit':15 'editor':5 'effect':27 'host':45 'http':43 'https':49 'hybrid':3 'linux':10 'live':1,11,28 'lives-video.com':50 'make':29 'mix':23 'note':35 'offici':37 'perform':22 'plain':42 'real':20 'real-tim':19 'serv':40 'site':38 'support':48 'time':21 'timelin':14 'tool':8 'uniqu':31 'video':4,17,33 'vj':7",
+      "status": "rejected",
+      "sub_subcategory": null,
+      "subcategory": null,
+      "submitted_by": null,
+      "title": "LiVES",
+      "updated_at": "2026-07-20T06:20:01.821",
+      "url": "https://lives-video.com"
+    }
+  ],
+  "source": "production read replica"
+}

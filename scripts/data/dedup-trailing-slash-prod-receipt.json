@@ -1,0 +1,412 @@
+{
+  "startedAt": "2026-08-04T22:09:22.058Z",
+  "base": "https://awesome.video",
+  "pairs": [
+    {
+      "survivor": 185379,
+      "loser": 187835,
+      "loserUrl": "https://academy.wedio.com/how-to-live-stream",
+      "survivorVerified": {
+        "id": 185379,
+        "status": "approved"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 184773,
+      "loser": 187803,
+      "loserUrl": "https://antmedia.io/tutorial",
+      "survivorVerified": {
+        "id": 184773,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185842,
+      "loser": 187564,
+      "loserUrl": "https://artillery.io/docs/plugin-hls",
+      "survivorVerified": {
+        "id": 185842,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186096,
+      "loser": 187793,
+      "loserUrl": "https://dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming",
+      "survivorVerified": {
+        "id": 186096,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186657,
+      "loser": 187660,
+      "loserUrl": "https://docs.peer5.com",
+      "survivorVerified": {
+        "id": 186657,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185823,
+      "loser": 187765,
+      "loserUrl": "https://docs.peer5.com/guides/production-ready-hls-vod",
+      "survivorVerified": {
+        "id": 185823,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185523,
+      "loser": 187353,
+      "loserUrl": "https://docs.vxg.io/site/Android.PlayerSDK",
+      "survivorVerified": {
+        "id": 185523,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185382,
+      "loser": 187034,
+      "loserUrl": "https://edg.io",
+      "survivorVerified": {
+        "id": 185382,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186493,
+      "loser": 186879,
+      "loserUrl": "https://engineering.fb.com/2017/03/14/video-engineering/transcoding-360-video-at-facebook",
+      "survivorVerified": {
+        "id": 186493,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186385,
+      "loser": 186908,
+      "loserUrl": "https://gpuopen.com/video-encode-decode",
+      "survivorVerified": {
+        "id": 186385,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185464,
+      "loser": 187327,
+      "loserUrl": "https://hackaday.com/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid",
+      "survivorVerified": {
+        "id": 185464,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185117,
+      "loser": 187273,
+      "loserUrl": "https://hackaday.com/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3",
+      "survivorVerified": {
+        "id": 185117,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 184962,
+      "loser": 187268,
+      "loserUrl": "https://hackaday.com/2025/03/15/esp32-tv-plays-video-and-sound",
+      "survivorVerified": {
+        "id": 184962,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 184861,
+      "loser": 187529,
+      "loserUrl": "https://kitone.github.io/subtitleeditor",
+      "survivorVerified": {
+        "id": 184861,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186461,
+      "loser": 187117,
+      "loserUrl": "https://kubernetes.io/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art",
+      "survivorVerified": {
+        "id": 186461,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186551,
+      "loser": 186924,
+      "loserUrl": "https://libav.org",
+      "survivorVerified": {
+        "id": 186551,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185277,
+      "loser": 187492,
+      "loserUrl": "https://lives-video.com",
+      "survivorVerified": {
+        "id": 185277,
+        "status": "approved"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185098,
+      "loser": 187630,
+      "loserUrl": "https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs",
+      "survivorVerified": {
+        "id": 185098,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185109,
+      "loser": 187305,
+      "loserUrl": "https://mooviejs.com",
+      "survivorVerified": {
+        "id": 185109,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185322,
+      "loser": 187457,
+      "loserUrl": "https://ncamftp.wgbh.org/cadet",
+      "survivorVerified": {
+        "id": 185322,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 184766,
+      "loser": 187320,
+      "loserUrl": "https://openelec.tv",
+      "survivorVerified": {
+        "id": 184766,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186433,
+      "loser": 187382,
+      "loserUrl": "https://openplayerjs.io",
+      "survivorVerified": {
+        "id": 186433,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186502,
+      "loser": 187328,
+      "loserUrl": "https://potplayer.daum.net",
+      "survivorVerified": {
+        "id": 186502,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186446,
+      "loser": 187705,
+      "loserUrl": "https://reference.dashif.org/dash.js/v/latest/samples/drm/clearkey",
+      "survivorVerified": {
+        "id": 186446,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185395,
+      "loser": 187833,
+      "loserUrl": "https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform",
+      "survivorVerified": {
+        "id": 185395,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185342,
+      "loser": 187687,
+      "loserUrl": "https://tslemurs.com",
+      "survivorVerified": {
+        "id": 185342,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186376,
+      "loser": 186880,
+      "loserUrl": "https://turingcodec.org",
+      "survivorVerified": {
+        "id": 186376,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185072,
+      "loser": 187080,
+      "loserUrl": "https://ustudio.com/platform/video-platform/integrations/cloud-video-integrations",
+      "survivorVerified": {
+        "id": 185072,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186454,
+      "loser": 186943,
+      "loserUrl": "https://vsrepo.vapoursynth.com",
+      "survivorVerified": {
+        "id": 186454,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185503,
+      "loser": 187240,
+      "loserUrl": "https://www.agora.io/en/products/video-call-sdk",
+      "survivorVerified": {
+        "id": 185503,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186227,
+      "loser": 186313,
+      "loserUrl": "http://www.bento4.com/developers/dash/dash-sample-content/",
+      "survivorVerified": {
+        "id": 186227,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185409,
+      "loser": 187260,
+      "loserUrl": "https://www.brightcove.com/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps",
+      "survivorVerified": {
+        "id": 185409,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185245,
+      "loser": 187454,
+      "loserUrl": "https://www.brightcove.com/platform-and-apis",
+      "survivorVerified": {
+        "id": 185245,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 186438,
+      "loser": 187020,
+      "loserUrl": "https://www.cedexis.com/openmix-application-load-balancer",
+      "survivorVerified": {
+        "id": 186438,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185524,
+      "loser": 187553,
+      "loserUrl": "https://www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0",
+      "survivorVerified": {
+        "id": 185524,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 184867,
+      "loser": 187483,
+      "loserUrl": "https://www.jwplayer.com/advertising",
+      "survivorVerified": {
+        "id": 184867,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185539,
+      "loser": 187323,
+      "loserUrl": "https://www.openvlc.org",
+      "survivorVerified": {
+        "id": 185539,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185295,
+      "loser": 187073,
+      "loserUrl": "https://www.rewatch.com",
+      "survivorVerified": {
+        "id": 185295,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    },
+    {
+      "survivor": 185082,
+      "loser": 187199,
+      "loserUrl": "https://www.xmediatv.com/multi-digital-right-management",
+      "survivorVerified": {
+        "id": 185082,
+        "status": "rejected"
+      },
+      "outcome": "already-absent (survivor verified present)"
+    }
+  ],
+  "finishedAt": "2026-08-04T22:09:45.388Z",
+  "summary": {
+    "pairs": 39,
+    "deletedThisRun": 0,
+    "alreadyAbsent": 39
+  },
+  "finalSqlVerification": {
+    "duplicateUrlGroupsRemaining": 0,
+    "expectedSurvivors": 39,
+    "loserEnrichmentQueueRowsRemaining": 0,
+    "losersRemaining": 0,
+    "orphanedJourneySteps": 0,
+    "ranAt": "2026-08-04",
+    "source": "production read replica (read-only SQL)",
+    "survivorsPresent": 39
+  }
+}
