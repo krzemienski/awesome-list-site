@@ -18,7 +18,18 @@
  *     later surfaces as intermittent 23505 "duplicate key" 500s on normal
  *     saves (the Task #215 resources bug — now checked for all tables).
  *
- * Usage: npx tsx scripts/check-migration-drift.ts
+ * Usage:
+ *   npx tsx scripts/check-migration-drift.ts
+ *     Full check (journal + scratch-DB schema reproduction + sequence drift)
+ *     against DATABASE_URL (development).
+ *
+ *   npx tsx scripts/check-migration-drift.ts --sequences-only [--database-url <url>]
+ *     Run ONLY the read-only sequence-drift check (Step 3). Safe to point at
+ *     the PRODUCTION database: it never creates/drops databases and only runs
+ *     SELECTs. It reports drifted sequences with setval repair statements but
+ *     NEVER applies them. The target URL comes from --database-url, else the
+ *     SEQUENCE_CHECK_DATABASE_URL env var, else DATABASE_URL.
+ *
  * Exit code 0 = clean, 1 = drift or error.
  */
 import fs from 'fs';
@@ -222,7 +233,50 @@ async function checkSequenceDrift(baseUrl: string): Promise<void> {
   });
 }
 
+function parseArgs(argv: string[]): { sequencesOnly: boolean; databaseUrl?: string } {
+  let sequencesOnly = false;
+  let databaseUrl: string | undefined;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--sequences-only') {
+      sequencesOnly = true;
+    } else if (arg === '--database-url') {
+      databaseUrl = argv[++i];
+      if (!databaseUrl) fail('--database-url requires a value.');
+    } else if (arg.startsWith('--database-url=')) {
+      databaseUrl = arg.slice('--database-url='.length);
+    } else {
+      fail(`Unknown argument: ${arg}\nSupported: --sequences-only, --database-url <url>`);
+    }
+  }
+  if (databaseUrl && !sequencesOnly) {
+    fail(
+      '--database-url is only allowed with --sequences-only.\n' +
+        'The full check creates and drops a scratch database, which must NEVER run against production.'
+    );
+  }
+  return { sequencesOnly, databaseUrl };
+}
+
 async function main() {
+  const { sequencesOnly, databaseUrl } = parseArgs(process.argv.slice(2));
+
+  if (sequencesOnly) {
+    const url = databaseUrl ?? process.env.SEQUENCE_CHECK_DATABASE_URL ?? process.env.DATABASE_URL;
+    if (!url) {
+      fail('No database URL: pass --database-url, or set SEQUENCE_CHECK_DATABASE_URL or DATABASE_URL.');
+    }
+    const source = databaseUrl
+      ? '--database-url'
+      : process.env.SEQUENCE_CHECK_DATABASE_URL
+        ? 'SEQUENCE_CHECK_DATABASE_URL'
+        : 'DATABASE_URL';
+    console.log(`Sequences-only mode (read-only) against ${source}. No schema/scratch-DB steps will run.`);
+    await checkSequenceDrift(url);
+    console.log('\n✅ No id-sequence drift.');
+    return;
+  }
+
   const baseUrl = process.env.DATABASE_URL;
   if (!baseUrl) {
     fail('DATABASE_URL is not set.');
