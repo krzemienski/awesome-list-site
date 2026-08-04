@@ -1,0 +1,1368 @@
+{
+  "plan": [
+    {
+      "survivor": 184766,
+      "loser": 187320
+    },
+    {
+      "survivor": 184773,
+      "loser": 187803
+    },
+    {
+      "survivor": 184861,
+      "loser": 187529
+    },
+    {
+      "survivor": 184867,
+      "loser": 187483
+    },
+    {
+      "survivor": 184962,
+      "loser": 187268
+    },
+    {
+      "survivor": 185072,
+      "loser": 187080
+    },
+    {
+      "survivor": 185082,
+      "loser": 187199
+    },
+    {
+      "survivor": 185098,
+      "loser": 187630
+    },
+    {
+      "survivor": 185109,
+      "loser": 187305
+    },
+    {
+      "survivor": 185117,
+      "loser": 187273
+    },
+    {
+      "survivor": 185129,
+      "loser": 187324
+    },
+    {
+      "survivor": 185245,
+      "loser": 187454
+    },
+    {
+      "survivor": 185295,
+      "loser": 187073
+    },
+    {
+      "survivor": 185322,
+      "loser": 187457
+    },
+    {
+      "survivor": 185342,
+      "loser": 187687
+    },
+    {
+      "survivor": 185379,
+      "loser": 187835
+    },
+    {
+      "survivor": 185382,
+      "loser": 187034
+    },
+    {
+      "survivor": 185395,
+      "loser": 187833
+    },
+    {
+      "survivor": 185409,
+      "loser": 187260
+    },
+    {
+      "survivor": 185464,
+      "loser": 187327
+    },
+    {
+      "survivor": 185469,
+      "loser": 187636
+    },
+    {
+      "survivor": 185503,
+      "loser": 187240
+    },
+    {
+      "survivor": 185523,
+      "loser": 187353
+    },
+    {
+      "survivor": 185524,
+      "loser": 187553
+    },
+    {
+      "survivor": 185539,
+      "loser": 187323
+    },
+    {
+      "survivor": 185823,
+      "loser": 187765
+    },
+    {
+      "survivor": 185842,
+      "loser": 187564
+    },
+    {
+      "survivor": 186096,
+      "loser": 187793
+    },
+    {
+      "survivor": 186227,
+      "loser": 186313
+    },
+    {
+      "survivor": 186376,
+      "loser": 186880
+    },
+    {
+      "survivor": 186385,
+      "loser": 186908
+    },
+    {
+      "survivor": 186433,
+      "loser": 187382
+    },
+    {
+      "survivor": 186438,
+      "loser": 187020
+    },
+    {
+      "survivor": 186446,
+      "loser": 187705
+    },
+    {
+      "survivor": 186454,
+      "loser": 186943
+    },
+    {
+      "survivor": 186461,
+      "loser": 187117
+    },
+    {
+      "survivor": 186493,
+      "loser": 186879
+    },
+    {
+      "survivor": 186502,
+      "loser": 187328
+    },
+    {
+      "survivor": 186551,
+      "loser": 186924
+    },
+    {
+      "survivor": 186568,
+      "loser": 187492
+    },
+    {
+      "survivor": 186657,
+      "loser": 187660
+    }
+  ],
+  "resources": [
+    {
+      "j": {
+        "id": 186313,
+        "title": "MPEG DASH Sample Content Bento4",
+        "url": "http://www.bento4.com/developers/dash/dash-sample-content/",
+        "description": "Bento4 offers MPEG-DASH sample content for developers to test and validate their DASH implementations.",
+        "category": "Protocols & Transport",
+        "subcategory": "DASH Tools",
+        "sub_subcategory": "DASH",
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": "2026-06-25T21:58:49.048",
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-02-12T01:04:38.347Z",
+          "sourceList": "Video [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)",
+          "lastUpdatedAt": "2026-02-12T01:05:47.870Z",
+          "subcategoryId": 2239,
+          "lastUpdatedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-01-20T20:31:00.288291",
+        "updated_at": "2026-07-02T05:40:29.674",
+        "search_tsv": "'/developers/dash/dash-sample-content/':24 'bento4':5,6 'content':4,12 'dash':2,10,20 'develop':14 'implement':21 'mpeg':1,9 'mpeg-dash':8 'offer':7 'sampl':3,11 'test':16 'valid':18 'www.bento4.com':23 'www.bento4.com/developers/dash/dash-sample-content/':22"
+      }
+    },
+    {
+      "j": {
+        "id": 186879,
+        "title": "Transcoding 360 Video at Facebook",
+        "url": "https://engineering.fb.com/2017/03/14/video-engineering/transcoding-360-video-at-facebook",
+        "description": "A Facebook Engineering blog post about the challenges and solutions for processing 360° VR video. It discusses cube map projection, encoding optimizations, and how Facebook re-architected parts of the pipeline to handle the massive data of 360 videos while preserving quality.",
+        "category": "Encoding & Codecs",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1085,
+          "importedAt": "2026-06-25T22:00:53.484Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:00:53.499911",
+        "updated_at": "2026-07-02T05:40:26.262",
+        "search_tsv": "'/2017/03/14/video-engineering/transcoding-360-video-at-facebook':51 '360':2,18,44 'architect':33 'blog':9 'challeng':13 'cube':23 'data':42 'discuss':22 'encod':26 'engin':8 'engineering.fb.com':50 'engineering.fb.com/2017/03/14/video-engineering/transcoding-360-video-at-facebook':49 'facebook':5,7,30 'handl':39 'map':24 'massiv':41 'optim':27 'part':34 'pipelin':37 'post':10 'preserv':47 'process':17 'project':25 'qualiti':48 're':32 're-architect':31 'solut':15 'transcod':1 'video':3,20,45 'vr':19"
+      }
+    },
+    {
+      "j": {
+        "id": 186880,
+        "title": "Turing Codec (Open H.265 Encoder)",
+        "url": "https://turingcodec.org",
+        "description": "An open source H.265/HEVC encoder designed for speed and efficiency in video compression, focusing on fast encoding of high-quality video content.",
+        "category": "Encoding & Codecs",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1085,
+          "importedAt": "2026-06-25T22:00:53.675Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:00:53.691307",
+        "updated_at": "2026-07-02T05:40:38.124",
+        "search_tsv": "'codec':2 'compress':18 'content':28 'design':11 'effici':15 'encod':5,10,22 'fast':21 'focus':19 'h.265':4 'h.265/hevc':9 'high':25 'high-qual':24 'open':3,7 'qualiti':26 'sourc':8 'speed':13 'ture':1 'turingcodec.org':29 'video':17,27"
+      }
+    },
+    {
+      "j": {
+        "id": 186908,
+        "title": "AMD Advanced Media Framework (AMF SDK)",
+        "url": "https://gpuopen.com/video-encode-decode",
+        "description": "AMD's SDK for GPU-based video encoding and decoding. The AMF SDK allows developers to utilize AMD hardware (VCE/VCN) for accelerating video encode/decode tasks.",
+        "category": "Encoding & Codecs",
+        "subcategory": "Encoding Tools",
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1085,
+          "importedAt": "2026-06-25T22:01:30.259Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2190
+        },
+        "created_at": "2026-06-25T22:01:30.274032",
+        "updated_at": "2026-07-02T05:40:26.256",
+        "search_tsv": "'/video-encode-decode':35 'acceler':29 'advanc':2 'allow':21 'amd':1,7,25 'amf':5,19 'base':13 'decod':17 'develop':22 'encod':15 'encode/decode':31 'framework':4 'gpu':12 'gpu-bas':11 'gpuopen.com':34 'gpuopen.com/video-encode-decode':33 'hardwar':26 'media':3 'sdk':6,9,20 'task':32 'util':24 'vce/vcn':27 'video':14,30"
+      }
+    },
+    {
+      "j": {
+        "id": 186924,
+        "title": "Libav",
+        "url": "https://libav.org",
+        "description": "A fork of the FFmpeg project that started in 2011 to develop a cleaner codebase. Libav provides similar functionality to FFmpeg (libraries for decoding/encoding and avconv tool) though it's now largely inactive.",
+        "category": "Encoding & Codecs",
+        "subcategory": "Encoding Tools",
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1085,
+          "importedAt": "2026-06-25T22:01:46.170Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2190
+        },
+        "created_at": "2026-06-25T22:01:46.186384",
+        "updated_at": "2026-07-02T05:40:36.861",
+        "search_tsv": "'2011':11 'avconv':27 'cleaner':15 'codebas':16 'decoding/encoding':25 'develop':13 'ffmpeg':6,22 'fork':3 'function':20 'inact':34 'larg':33 'libav':1,17 'libav.org':35 'librari':23 'project':7 'provid':18 'similar':19 'start':9 'though':29 'tool':28"
+      }
+    },
+    {
+      "j": {
+        "id": 186943,
+        "title": "VapourSynth Script Repository",
+        "url": "https://vsrepo.vapoursynth.com",
+        "description": "A repository and package manager of VapourSynth filters and scripts. It automates the installation and management of community-contributed VapourSynth plugins, which is useful for automating video processing tasks in scripts.",
+        "category": "Encoding & Codecs",
+        "subcategory": "Encoding Tools",
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1085,
+          "importedAt": "2026-06-25T22:02:02.702Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2190
+        },
+        "created_at": "2026-06-25T22:02:02.718522",
+        "updated_at": "2026-07-02T05:40:35.005",
+        "search_tsv": "'autom':15,30 'communiti':22 'community-contribut':21 'contribut':23 'filter':11 'instal':17 'manag':8,19 'packag':7 'plugin':25 'process':32 'repositori':3,5 'script':2,13,35 'task':33 'use':28 'vapoursynth':1,10,24 'video':31 'vsrepo.vapoursynth.com':36"
+      }
+    },
+    {
+      "j": {
+        "id": 187020,
+        "title": "Cedexis Openmix (Whitepaper)",
+        "url": "https://www.cedexis.com/openmix-application-load-balancer",
+        "description": "Cedexis (now part of Citrix) provided Openmix, a load balancing platform for directing traffic across multiple CDNs based on real-time performance data. Their resources and whitepapers describe strategies for multi-CDN failover and optimization for video streaming.",
+        "category": "Infrastructure & Delivery",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1089,
+          "importedAt": "2026-06-25T22:03:50.626Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:03:50.643672",
+        "updated_at": "2026-07-02T05:40:26.253",
+        "search_tsv": "'/openmix-application-load-balancer':46 'across':18 'balanc':13 'base':21 'cdn':37 'cdns':20 'cedexi':1,4 'citrix':8 'data':27 'describ':32 'direct':16 'failov':38 'load':12 'multi':36 'multi-cdn':35 'multipl':19 'openmix':2,10 'optim':40 'part':6 'perform':26 'platform':14 'provid':9 'real':24 'real-tim':23 'resourc':29 'strategi':33 'stream':43 'time':25 'traffic':17 'video':42 'whitepap':3,31 'www.cedexis.com':45 'www.cedexis.com/openmix-application-load-balancer':44"
+      }
+    },
+    {
+      "j": {
+        "id": 187034,
+        "title": "Edgio CDN",
+        "url": "https://edg.io",
+        "description": "Edgio provides a highly functional content delivery network tailored for video streaming, ensuring exceptional user experiences across devices. It supports live events and on-demand video content with high-speed delivery and robust security measures. Edgio's platform is designed for scalability, making it suitable for developers aiming to reach a global audience with their video applications.",
+        "category": "Infrastructure & Delivery",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1089,
+          "importedAt": "2026-06-25T22:04:01.544Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:04:01.559875",
+        "updated_at": "2026-07-02T05:40:36.893",
+        "search_tsv": "'across':19 'aim':52 'applic':61 'audienc':57 'cdn':2 'content':8,30 'deliveri':9,35 'demand':28 'design':44 'develop':51 'devic':20 'edg.io':62 'edgio':1,3,40 'ensur':15 'event':24 'except':16 'experi':18 'function':7 'global':56 'high':6,33 'high-spe':32 'live':23 'make':47 'measur':39 'network':10 'on-demand':26 'platform':42 'provid':4 'reach':54 'robust':37 'scalabl':46 'secur':38 'speed':34 'stream':14 'suitabl':49 'support':22 'tailor':11 'user':17 'video':13,29,60"
+      }
+    },
+    {
+      "j": {
+        "id": 187073,
+        "title": "Rewatch",
+        "url": "https://www.rewatch.com",
+        "description": "A platform that allows teams to securely save, manage, and search all their video content, facilitating faster collaboration and improved workflows. It automatically transcribes videos, making content readable and searchable. Rewatch is designed to enhance team communication by providing a centralized hub for video content with advanced search capabilities.",
+        "category": "Infrastructure & Delivery",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1089,
+          "importedAt": "2026-06-25T22:04:30.088Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:04:30.102946",
+        "updated_at": "2026-07-02T05:40:35.044",
+        "search_tsv": "'advanc':48 'allow':5 'automat':24 'capabl':50 'central':42 'collabor':19 'communic':38 'content':16,28,46 'design':34 'enhanc':36 'facilit':17 'faster':18 'hub':43 'improv':21 'make':27 'manag':10 'platform':3 'provid':40 'readabl':29 'rewatch':1,32 'save':9 'search':12,49 'searchabl':31 'secur':8 'team':6,37 'transcrib':25 'video':15,26,45 'workflow':22 'www.rewatch.com':51"
+      }
+    },
+    {
+      "j": {
+        "id": 187080,
+        "title": "uStudio Cloud Video Integrations",
+        "url": "https://ustudio.com/platform/video-platform/integrations/cloud-video-integrations",
+        "description": "UStudio provides a SaaS-based video platform designed to support flexible deployment models. It offers configurable storage options, RESTful developer APIs, and a suite of video integrations for existing business applications. Features include live streaming, VOD delivery via choice of CDN, flexible access control settings, and WAN optimization solutions, making it valuable for developers seeking customizable video infrastructure solutions.",
+        "category": "Infrastructure & Delivery",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1089,
+          "importedAt": "2026-06-25T22:04:35.390Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:04:35.406414",
+        "updated_at": "2026-07-02T05:40:25.72",
+        "search_tsv": "'/platform/video-platform/integrations/cloud-video-integrations':67 'access':48 'api':26 'applic':36 'base':10 'busi':35 'cdn':46 'choic':44 'cloud':2 'configur':21 'control':49 'customiz':61 'deliveri':42 'deploy':17 'design':13 'develop':25,59 'exist':34 'featur':37 'flexibl':16,47 'includ':38 'infrastructur':63 'integr':4,32 'live':39 'make':55 'model':18 'offer':20 'optim':53 'option':23 'platform':12 'provid':6 'rest':24 'saa':9 'saas-bas':8 'seek':60 'set':50 'solut':54,64 'storag':22 'stream':40 'suit':29 'support':15 'ustudio':1,5 'ustudio.com':66 'ustudio.com/platform/video-platform/integrations/cloud-video-integrations':65 'valuabl':57 'via':43 'video':3,11,31,62 'vod':41 'wan':52"
+      }
+    },
+    {
+      "j": {
+        "id": 187117,
+        "title": "Kubernetes and FFmpeg (Batch Jobs)",
+        "url": "https://kubernetes.io/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art",
+        "description": "A discussion on using Kubernetes for batch processing like transcoding. It covers how to define Kubernetes Jobs or CronJobs to run FFmpeg transcoding tasks, highlighting the benefits of containerization and orchestration in building scalable video processing infrastructure.",
+        "category": "Infrastructure & Delivery",
+        "subcategory": "Cloud & CDN",
+        "sub_subcategory": "Cloud Platforms",
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1089,
+          "importedAt": "2026-06-25T22:08:07.474Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2199,
+          "subSubcategoryId": 3646
+        },
+        "created_at": "2026-06-25T22:08:07.4906",
+        "updated_at": "2026-07-02T05:40:25.912",
+        "search_tsv": "'/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art':45 'batch':4,12 'benefit':32 'build':38 'container':34 'cover':17 'cronjob':24 'defin':20 'discuss':7 'ffmpeg':3,27 'highlight':30 'infrastructur':42 'job':5,22 'kubernet':1,10,21 'kubernetes.io':44 'kubernetes.io/blog/2018/07/24/kubernetes-batch-processing-state-of-the-art':43 'like':14 'orchestr':36 'process':13,41 'run':26 'scalabl':39 'task':29 'transcod':15,28 'use':9 'video':40"
+      }
+    },
+    {
+      "j": {
+        "id": 187199,
+        "title": "XMediaDRM",
+        "url": "https://www.xmediatv.com/multi-digital-right-management",
+        "description": "A multi-DRM solution supporting Google Widevine, Apple FairPlay, Microsoft PlayReady, Huawei WisePlay, and AES-128 with streaming protocols such as HLS/DASH/HSS. It offers features like offline playback, anti-capture protection, and hardware-level DRM support across various platforms.",
+        "category": "General Tools",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1090,
+          "importedAt": "2026-06-25T22:13:57.608Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:13:57.626457",
+        "updated_at": "2026-07-02T05:40:36.864",
+        "search_tsv": "'-128':18 '/multi-digital-right-management':46 'across':41 'ae':17 'anti':32 'anti-captur':31 'appl':10 'captur':33 'drm':5,39 'fairplay':11 'featur':27 'googl':8 'hardwar':37 'hardware-level':36 'hls/dash/hss':24 'huawei':14 'level':38 'like':28 'microsoft':12 'multi':4 'multi-drm':3 'offer':26 'offlin':29 'platform':43 'playback':30 'playreadi':13 'protect':34 'protocol':21 'solut':6 'stream':20 'support':7,40 'various':42 'widevin':9 'wiseplay':15 'www.xmediatv.com':45 'www.xmediatv.com/multi-digital-right-management':44 'xmediadrm':1"
+      }
+    },
+    {
+      "j": {
+        "id": 187240,
+        "title": "Agora Video SDK",
+        "url": "https://www.agora.io/en/products/video-call-sdk",
+        "description": "Agora provides a real-time communication SDK that enables developers to embed video chat into native apps, web, and mobile platforms. It offers features like real-time voice, video, messaging, and live streaming products.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:17:14.331Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:17:14.346372",
+        "updated_at": "2026-07-02T05:40:25.744",
+        "search_tsv": "'/en/products/video-call-sdk':42 'agora':1,4 'app':21 'chat':18 'communic':10 'develop':14 'emb':16 'enabl':13 'featur':28 'like':29 'live':37 'messag':35 'mobil':24 'nativ':20 'offer':27 'platform':25 'product':39 'provid':5 'real':8,31 'real-tim':7,30 'sdk':3,11 'stream':38 'time':9,32 'video':2,17,34 'voic':33 'web':22 'www.agora.io':41 'www.agora.io/en/products/video-call-sdk':40"
+      }
+    },
+    {
+      "j": {
+        "id": 187260,
+        "title": "Brightcove Native Player SDKs",
+        "url": "https://www.brightcove.com/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps",
+        "description": "Brightcove provides native player SDKs for iOS, tvOS, and Android platforms, enabling developers to create high-performance video applications. These SDKs offer integrations for digital rights management (DRM) and advertising, facilitating advanced video features with minimal code.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:17:42.592Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:17:42.608057",
+        "updated_at": "2026-07-02T05:40:25.753",
+        "search_tsv": "'/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps':45 'advanc':37 'advertis':35 'android':14 'applic':24 'brightcov':1,5 'code':42 'creat':19 'develop':17 'digit':30 'drm':33 'enabl':16 'facilit':36 'featur':39 'high':21 'high-perform':20 'integr':28 'io':11 'manag':32 'minim':41 'nativ':2,7 'offer':27 'perform':22 'platform':15 'player':3,8 'provid':6 'right':31 'sdks':4,9,26 'tvos':12 'video':23,38 'www.brightcove.com':44 'www.brightcove.com/en/resources/blog/mobile-sdks-serving-videos-natively-custom-apps':43"
+      }
+    },
+    {
+      "j": {
+        "id": 187268,
+        "title": "ESP32-TV",
+        "url": "https://hackaday.com/2025/03/15/esp32-tv-plays-video-and-sound",
+        "description": "A project that demonstrates the capability of the ESP32 microcontroller to play both video and sound. It involves creating an AVI file that can be decoded on the fly by the ESP32, showcasing the potential of this microcontroller for video playback applications. The project utilizes a standard ESP32 device with an I2C bus, and the video stream is managed efficiently to accommodate the hardware's limitations. This project serves as an inspiration for developing small, cost-effective video players using microcontrollers.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:18:01.711Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:18:01.728703",
+        "updated_at": "2026-07-02T05:40:25.716",
+        "search_tsv": "'/2025/03/15/esp32-tv-plays-video-and-sound':88 'accommod':65 'applic':45 'avi':24 'bus':56 'capabl':9 'cost':80 'cost-effect':79 'creat':22 'decod':29 'demonstr':7 'develop':77 'devic':52 'effect':81 'effici':63 'esp32':2,12,35,51 'esp32-tv':1 'file':25 'fli':32 'hackaday.com':87 'hackaday.com/2025/03/15/esp32-tv-plays-video-and-sound':86 'hardwar':67 'i2c':55 'inspir':75 'involv':21 'limit':69 'manag':62 'microcontrol':13,41,85 'play':15 'playback':44 'player':83 'potenti':38 'project':5,47,71 'serv':72 'showcas':36 'small':78 'sound':19 'standard':50 'stream':60 'tv':3 'use':84 'util':48 'video':17,43,59,82"
+      }
+    },
+    {
+      "j": {
+        "id": 187273,
+        "title": "FPGAmp Media Player",
+        "url": "https://hackaday.com/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3",
+        "description": "FPGAmp is a media player project that utilizes the Arty A7 development board, based on the Xilinx Artix-7 FPGA. It is capable of playing back MJPEG video at 800 x 600 resolution and 25 fps, as well as MP3 audio. The project serves as an educational resource for those interested in FPGA development and media processing, demonstrating the integration of RISC V processor cores and hardware JPEG decoders.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:18:11.009Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:18:11.124688",
+        "updated_at": "2026-07-02T05:40:25.357",
+        "search_tsv": "'-7':22 '/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3':75 '25':38 '600':35 '800':33 'a7':14 'arti':13 'artix':21 'audio':44 'back':29 'base':17 'board':16 'capabl':26 'core':68 'decod':72 'demonstr':61 'develop':15,57 'educ':50 'fpga':23,56 'fpgamp':1,4 'fps':39 'hackaday.com':74 'hackaday.com/2021/09/28/fpga-media-player-plays-mjpeg-and-mp3':73 'hardwar':70 'integr':63 'interest':54 'jpeg':71 'media':2,7,59 'mjpeg':30 'mp3':43 'play':28 'player':3,8 'process':60 'processor':67 'project':9,46 'resolut':36 'resourc':51 'risc':65 'serv':47 'util':11 'v':66 'video':31 'well':41 'x':34 'xilinx':20"
+      }
+    },
+    {
+      "j": {
+        "id": 187305,
+        "title": "Moovie.js",
+        "url": "https://mooviejs.com",
+        "description": "A movie-focused HTML5 player that is fully customizable and easy to use. It offers built-in support for captions, plugins, and custom events, enhancing the viewing experience.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:19:48.673Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:19:48.688764",
+        "updated_at": "2026-07-02T05:40:35.037",
+        "search_tsv": "'built':19 'built-in':18 'caption':23 'custom':26 'customiz':11 'easi':13 'enhanc':28 'event':27 'experi':31 'focus':5 'fulli':10 'html5':6 'moovie.js':1 'mooviejs.com':32 'movi':4 'movie-focus':3 'offer':17 'player':7 'plugin':24 'support':21 'use':15 'view':30"
+      }
+    },
+    {
+      "j": {
+        "id": 187320,
+        "title": "OpenELEC",
+        "url": "https://openelec.tv",
+        "description": "A small and fast-booting Linux-based distribution that turns a computer into a Kodi media center. OpenELEC is designed to be lightweight and easy to install, providing a complete media center experience with minimal setup.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:20:56.761Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:20:56.777402",
+        "updated_at": "2026-07-02T05:40:38.155",
+        "search_tsv": "'base':10 'boot':7 'center':20,35 'complet':33 'comput':15 'design':23 'distribut':11 'easi':28 'experi':36 'fast':6 'fast-boot':5 'instal':30 'kodi':18 'lightweight':26 'linux':9 'linux-bas':8 'media':19,34 'minim':38 'openelec':1,21 'openelec.tv':40 'provid':31 'setup':39 'small':3 'turn':13"
+      }
+    },
+    {
+      "j": {
+        "id": 187323,
+        "title": "OpenVLC",
+        "url": "https://www.openvlc.org",
+        "description": "An open-source, flexible, and low-cost Visible Light Communication (VLC) system platform. It enables fast prototyping of new system protocols to build a LiFi network using standard visible light LEDs. OpenVLC is valuable for developers interested in exploring and developing VLC systems and applications.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:21:00.259Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:21:00.275231",
+        "updated_at": "2026-07-02T05:40:36.897",
+        "search_tsv": "'applic':48 'build':26 'communic':13 'cost':10 'develop':39,44 'enabl':18 'explor':42 'fast':19 'flexibl':6 'interest':40 'led':34 'lifi':28 'light':12,33 'low':9 'low-cost':8 'network':29 'new':22 'open':4 'open-sourc':3 'openvlc':1,35 'platform':16 'protocol':24 'prototyp':20 'sourc':5 'standard':31 'system':15,23,46 'use':30 'valuabl':37 'visibl':11,32 'vlc':14,45 'www.openvlc.org':49"
+      }
+    },
+    {
+      "j": {
+        "id": 187324,
+        "title": "Panopto Certified Video Capture Appliances",
+        "url": "https://www.panopto.com/features/video-recording/video-capture-hardware",
+        "description": "Panopto offers certified video capture appliances that seamlessly integrate with their video platform, providing a comprehensive solution for recording and streaming. These appliances are designed for high-quality video capture and are suitable for various applications, including education and corporate communications. Panopto's hardware solutions ensure reliability and ease of use for content creators.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:21:00.448Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:21:00.464864",
+        "updated_at": "2026-07-02T05:40:25.325",
+        "search_tsv": "'/features/video-recording/video-capture-hardware':63 'applianc':5,11,28 'applic':42 'captur':4,10,36 'certifi':2,8 'communic':47 'comprehens':21 'content':59 'corpor':46 'creator':60 'design':30 'eas':55 'educ':44 'ensur':52 'hardwar':50 'high':33 'high-qual':32 'includ':43 'integr':14 'offer':7 'panopto':1,6,48 'platform':18 'provid':19 'qualiti':34 'record':24 'reliabl':53 'seamless':13 'solut':22,51 'stream':26 'suitabl':39 'use':57 'various':41 'video':3,9,17,35 'www.panopto.com':62 'www.panopto.com/features/video-recording/video-capture-hardware':61"
+      }
+    },
+    {
+      "j": {
+        "id": 187327,
+        "title": "Port-A-Vid",
+        "url": "https://hackaday.com/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid",
+        "description": "A portable video player project that emulates the aesthetic of vintage devices. It features a modern LCD behind a large lens to mimic the appearance of old CRT screens. This project is ideal for enthusiasts interested in retro-style hardware combined with modern video playback capabilities.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:21:02.254Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:21:02.2702",
+        "updated_at": "2026-07-02T05:40:25.293",
+        "search_tsv": "'/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid':54 'aesthet':13 'appear':29 'behind':22 'capabl':51 'combin':46 'crt':32 'devic':16 'emul':11 'enthusiast':39 'featur':18 'hackaday.com':53 'hackaday.com/2021/04/06/escape-to-an-alternate-reality-anywhere-with-port-a-vid':52 'hardwar':45 'ideal':37 'interest':40 'larg':24 'lcd':21 'len':25 'mimic':27 'modern':20,48 'old':31 'playback':50 'player':8 'port':2 'port-a-vid':1 'portabl':6 'project':9,35 'retro':43 'retro-styl':42 'screen':33 'style':44 'vid':4 'video':7,49 'vintag':15"
+      }
+    },
+    {
+      "j": {
+        "id": 187328,
+        "title": "PotPlayer",
+        "url": "https://potplayer.daum.net",
+        "description": "A free multimedia player for Windows with extensive format support, advanced features (such as 3D and 360° playback), and custom skins.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:21:02.437Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:21:02.452943",
+        "updated_at": "2026-07-02T05:40:34.559",
+        "search_tsv": "'360':18 '3d':16 'advanc':12 'custom':21 'extens':9 'featur':13 'format':10 'free':3 'multimedia':4 'playback':19 'player':5 'potplay':1 'potplayer.daum.net':23 'skin':22 'support':11 'window':7"
+      }
+    },
+    {
+      "j": {
+        "id": 187353,
+        "title": "VXG Player SDK",
+        "url": "https://docs.vxg.io/site/Android.PlayerSDK",
+        "description": "VXG's Player SDK is part of their Mobile SDK suite, responsible for playback of various media streams. It supports multiple streaming formats, hardware acceleration, and offers features like low latency playback and dynamic latency control.",
+        "category": "Players & Clients",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:21:42.009Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:21:42.126528",
+        "updated_at": "2026-07-02T05:40:36.888",
+        "search_tsv": "'/site/android.playersdk':42 'acceler':28 'control':39 'docs.vxg.io':41 'docs.vxg.io/site/android.playersdk':40 'dynam':37 'featur':31 'format':26 'hardwar':27 'latenc':34,38 'like':32 'low':33 'media':20 'mobil':12 'multipl':24 'offer':30 'part':9 'playback':17,35 'player':2,6 'respons':15 'sdk':3,7,13 'stream':21,25 'suit':14 'support':23 'various':19 'vxg':1,4"
+      }
+    },
+    {
+      "j": {
+        "id": 187382,
+        "title": "OpenPlayerJS",
+        "url": "https://openplayerjs.io",
+        "description": "A lightweight open source video and audio player for the web. OpenPlayerJS supports modern streaming formats (HLS via hls.js, DASH via dash.js) and provides a clean UI that is easily customizable, aiming to be an easy-to-integrate solution.",
+        "category": "Players & Clients",
+        "subcategory": "Mobile & Web Players",
+        "sub_subcategory": "Web Players",
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1086,
+          "importedAt": "2026-06-25T22:23:30.987Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2193,
+          "subSubcategoryId": 3635
+        },
+        "created_at": "2026-06-25T22:23:31.002147",
+        "updated_at": "2026-07-02T05:40:34.652",
+        "search_tsv": "'aim':33 'audio':8 'clean':27 'customiz':32 'dash':21 'dash.js':23 'easi':38 'easili':31 'easy-to-integr':37 'format':17 'hls':18 'hls.js':20 'integr':40 'lightweight':3 'modern':15 'open':4 'openplayerj':1,13 'openplayerjs.io':42 'player':9 'provid':25 'solut':41 'sourc':5 'stream':16 'support':14 'ui':28 'via':19,22 'video':6 'web':12"
+      }
+    },
+    {
+      "j": {
+        "id": 187454,
+        "title": "Brightcove APIs and SDKs",
+        "url": "https://www.brightcove.com/platform-and-apis",
+        "description": "Brightcove offers an extensive library of APIs and SDKs that allow developers to customize, extend, and integrate with the Brightcove platform. These tools enable access to streaming content, metadata, analytics, and support integration with third-party technologies like CMS services and DAM systems. They also facilitate the creation of custom video player templates and the extension of video player functionality with plugins.",
+        "category": "Media Tools",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1087,
+          "importedAt": "2026-06-25T22:26:15.009Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:26:15.324163",
+        "updated_at": "2026-07-02T05:40:25.318",
+        "search_tsv": "'/platform-and-apis':70 'access':29 'allow':15 'also':50 'analyt':34 'api':2,11 'brightcov':1,5,24 'cms':44 'content':32 'creation':53 'custom':18,55 'dam':47 'develop':16 'enabl':28 'extend':19 'extens':8,61 'facilit':51 'function':65 'integr':21,37 'librari':9 'like':43 'metadata':33 'offer':6 'parti':41 'platform':25 'player':57,64 'plugin':67 'sdks':4,13 'servic':45 'stream':31 'support':36 'system':48 'technolog':42 'templat':58 'third':40 'third-parti':39 'tool':27 'video':56,63 'www.brightcove.com':69 'www.brightcove.com/platform-and-apis':68"
+      }
+    },
+    {
+      "j": {
+        "id": 187457,
+        "title": "CADET (Caption and Description Editing Tool)",
+        "url": "https://ncamftp.wgbh.org/cadet",
+        "description": "CADET is a free, browser-based tool developed by the National Center for Accessible Media at WGBH. It allows users to create high-quality caption files compatible with various media players and can also be used to generate audio-description scripts. CADET operates locally in the browser, ensuring privacy and security.",
+        "category": "Media Tools",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1087,
+          "importedAt": "2026-06-25T22:26:24.296Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:26:24.313547",
+        "updated_at": "2026-07-02T05:40:37.734",
+        "search_tsv": "'/cadet':63 'access':21 'allow':26 'also':42 'audio':48 'audio-descript':47 'base':13 'browser':12,56 'browser-bas':11 'cadet':1,7,51 'caption':2,33 'center':19 'compat':35 'creat':29 'descript':4,49 'develop':15 'edit':5 'ensur':57 'file':34 'free':10 'generat':46 'high':31 'high-qual':30 'local':53 'media':22,38 'nation':18 'ncamftp.wgbh.org':62 'ncamftp.wgbh.org/cadet':61 'oper':52 'player':39 'privaci':58 'qualiti':32 'script':50 'secur':60 'tool':6,14 'use':44 'user':27 'various':37 'wgbh':24"
+      }
+    },
+    {
+      "j": {
+        "id": 187483,
+        "title": "JW Player Advertising",
+        "url": "https://www.jwplayer.com/advertising",
+        "description": "JW Player offers a comprehensive advertising solution that supports various ad formats, including VAST, VPAID, and Google IMA. It provides tools for ad scheduling, targeting, and analytics, enabling publishers to monetize their video content effectively.",
+        "category": "Media Tools",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1087,
+          "importedAt": "2026-06-25T22:26:44.983Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:26:44.999324",
+        "updated_at": "2026-07-02T05:40:25.288",
+        "search_tsv": "'/advertising':41 'ad':14,26 'advertis':3,9 'analyt':30 'comprehens':8 'content':37 'effect':38 'enabl':31 'format':15 'googl':20 'ima':21 'includ':16 'jw':1,4 'monet':34 'offer':6 'player':2,5 'provid':23 'publish':32 'schedul':27 'solut':10 'support':12 'target':28 'tool':24 'various':13 'vast':17 'video':36 'vpaid':18 'www.jwplayer.com':40 'www.jwplayer.com/advertising':39"
+      }
+    },
+    {
+      "j": {
+        "id": 187492,
+        "title": "LiVES",
+        "url": "https://lives-video.com",
+        "description": "A hybrid video editor and VJ tool for Linux. LiVES allows both timeline editing of video and real-time performance (mixing clips and applying effects live), making it unique for video artists. Note: the official site is served over plain HTTP — the host does not support HTTPS.",
+        "category": "Media Tools",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1087,
+          "importedAt": "2026-06-25T22:26:52.409Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:26:52.43669",
+        "updated_at": "2026-07-20T01:27:01.662",
+        "search_tsv": "'allow':12 'appli':26 'artist':34 'clip':24 'edit':15 'editor':5 'effect':27 'host':45 'http':43 'https':49 'hybrid':3 'linux':10 'live':1,11,28 'lives-video.com':50 'make':29 'mix':23 'note':35 'offici':37 'perform':22 'plain':42 'real':20 'real-tim':19 'serv':40 'site':38 'support':48 'time':21 'timelin':14 'tool':8 'uniqu':31 'video':4,17,33 'vj':7"
+      }
+    },
+    {
+      "j": {
+        "id": 187529,
+        "title": "Subtitle Editor",
+        "url": "https://kitone.github.io/subtitleeditor",
+        "description": "An open-source subtitle editing tool for the GNU/Linux desktop. It allows users to create, edit, and synchronize subtitles, supporting multiple subtitle formats and offering features like video previewing and waveform generation, making it beneficial for developers in video streaming and encoding.",
+        "category": "Media Tools",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1087,
+          "importedAt": "2026-06-25T22:28:15.009Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:28:15.024654",
+        "updated_at": "2026-07-02T05:40:24.893",
+        "search_tsv": "'/subtitleeditor':48 'allow':15 'benefici':38 'creat':18 'desktop':13 'develop':40 'edit':8,19 'editor':2 'encod':45 'featur':29 'format':26 'generat':35 'gnu/linux':12 'kitone.github.io':47 'kitone.github.io/subtitleeditor':46 'like':30 'make':36 'multipl':24 'offer':28 'open':5 'open-sourc':4 'preview':32 'sourc':6 'stream':43 'subtitl':1,7,22,25 'support':23 'synchron':21 'tool':9 'user':16 'video':31,42 'waveform':34"
+      }
+    },
+    {
+      "j": {
+        "id": 187553,
+        "title": "VPAID Specification",
+        "url": "https://www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0",
+        "description": "The Video Player Ad-Serving Interface Definition (VPAID) is a standard that establishes a common interface between video players and ad units, enabling rich interactive in-stream ad experiences. It allows for the creation of interactive video ads that can respond to user interactions and provide enhanced engagement.",
+        "category": "Media Tools",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1087,
+          "importedAt": "2026-06-25T22:28:54.585Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:28:54.600483",
+        "updated_at": "2026-07-02T05:40:24.762",
+        "search_tsv": "'/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0':55 'ad':7,24,32,42 'ad-serv':6 'allow':35 'common':18 'creation':38 'definit':10 'enabl':26 'engag':52 'enhanc':51 'establish':16 'experi':33 'in-stream':29 'interact':28,40,48 'interfac':9,19 'player':5,22 'provid':50 'respond':45 'rich':27 'serv':8 'specif':2 'standard':14 'stream':31 'unit':25 'user':47 'video':4,21,41 'vpaid':1,11 'www.iab.com':54 'www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0':53"
+      }
+    },
+    {
+      "j": {
+        "id": 187564,
+        "title": "HTTP Live Streaming (HLS) - Artillery.io Docs",
+        "url": "https://artillery.io/docs/plugin-hls",
+        "description": "Testing tool documentation for the HTTP Live Streaming protocol, used for load testing and quality assessment of HLS streams.",
+        "category": "Media Tools",
+        "subcategory": "Ads & QoE",
+        "sub_subcategory": "Quality & Testing",
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1087,
+          "importedAt": "2026-06-25T22:29:07.009Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2195,
+          "subSubcategoryId": 3639
+        },
+        "created_at": "2026-06-25T22:29:07.124847",
+        "updated_at": "2026-07-16T19:32:51.979867",
+        "search_tsv": "'/docs/plugin-hls':28 'artillery.io':5,27 'artillery.io/docs/plugin-hls':26 'assess':22 'doc':6 'document':9 'hls':4,24 'http':1,12 'live':2,13 'load':18 'protocol':15 'qualiti':21 'stream':3,14,25 'test':7,19 'tool':8 'use':16"
+      }
+    },
+    {
+      "j": {
+        "id": 187630,
+        "title": "Comparing Video Transport Technologies: Which One is Best for Your Needs?",
+        "url": "https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs",
+        "description": "This article from Medialooks offers a comprehensive comparison of various video transport technologies, including RTMP, HLS, DASH, SRT, and WebRTC. It explains the pros and cons of each protocol, highlights popular products that use them, and provides guidance on selecting the best technology based on specific use cases.",
+        "category": "Protocols & Transport",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-06-25T22:32:19.399Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:32:19.416934",
+        "updated_at": "2026-07-02T05:40:24.765",
+        "search_tsv": "'/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs':62 'articl':13 'base':55 'best':8,53 'case':59 'compar':1 'comparison':19 'comprehens':18 'con':37 'dash':28 'explain':33 'guidanc':49 'highlight':41 'hls':27 'includ':25 'medialook':15 'medialooks.com':61 'medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs':60 'need':11 'offer':16 'one':6 'popular':42 'product':43 'pros':35 'protocol':40 'provid':48 'rtmp':26 'select':51 'specif':57 'srt':29 'technolog':4,24,54 'transport':3,23 'use':45,58 'various':21 'video':2,22 'webrtc':31"
+      }
+    },
+    {
+      "j": {
+        "id": 187636,
+        "title": "Haivision SRT Protocol Technical Overview",
+        "url": "https://www.haivision.com/resources/white-paper/srt-protocol-technical-overview",
+        "description": "This comprehensive technical overview provides in-depth information about the SRT protocol, including its architecture, features, and implementation details. It serves as a valuable resource for developers looking to understand and implement SRT in their video streaming applications.",
+        "category": "Protocols & Transport",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-06-25T22:32:27.909Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:32:27.924171",
+        "updated_at": "2026-07-02T05:40:24.313",
+        "search_tsv": "'/resources/white-paper/srt-protocol-technical-overview':47 'applic':44 'architectur':21 'comprehens':7 'depth':13 'detail':25 'develop':33 'featur':22 'haivis':1 'implement':24,38 'in-depth':11 'includ':19 'inform':14 'look':34 'overview':5,9 'protocol':3,18 'provid':10 'resourc':31 'serv':27 'srt':2,17,39 'stream':43 'technic':4,8 'understand':36 'valuabl':30 'video':42 'www.haivision.com':46 'www.haivision.com/resources/white-paper/srt-protocol-technical-overview':45"
+      }
+    },
+    {
+      "j": {
+        "id": 187660,
+        "title": "Peer5 HLS P2P",
+        "url": "https://docs.peer5.com",
+        "description": "Peer5's peer-to-peer content delivery solution for HLS streams. It uses WebRTC to distribute video segments among viewers to offload bandwidth from the CDN.",
+        "category": "Protocols & Transport",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-06-25T22:35:16.509Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:35:16.724964",
+        "updated_at": "2026-07-02T05:40:34.502",
+        "search_tsv": "'among':23 'bandwidth':27 'cdn':30 'content':10 'deliveri':11 'distribut':20 'docs.peer5.com':31 'hls':2,14 'offload':26 'p2p':3 'peer':7,9 'peer-to-p':6 'peer5':1,4 'segment':22 'solut':12 'stream':15 'use':17 'video':21 'viewer':24 'webrtc':18"
+      }
+    },
+    {
+      "j": {
+        "id": 187687,
+        "title": "TSLemurs Transport Stream Tools",
+        "url": "https://tslemurs.com",
+        "description": "A suite of tools for analysis, manipulation, streaming, and monitoring of Transport Streams and OTT workflows. It includes applications like SMASH for MPEG-DASH stream analysis, multicast stream tools, and HLS checker tools, providing comprehensive solutions for transport stream management.",
+        "category": "Protocols & Transport",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-06-25T22:37:55.809Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:37:56.024261",
+        "updated_at": "2026-07-02T05:40:36.439",
+        "search_tsv": "'analysi':10,31 'applic':23 'checker':37 'comprehens':40 'dash':29 'hls':36 'includ':22 'like':24 'manag':45 'manipul':11 'monitor':14 'mpeg':28 'mpeg-dash':27 'multicast':32 'ott':19 'provid':39 'smash':25 'solut':41 'stream':3,12,17,30,33,44 'suit':6 'tool':4,8,34,38 'transport':2,16,43 'tslemur':1 'tslemurs.com':46 'workflow':20"
+      }
+    },
+    {
+      "j": {
+        "id": 187705,
+        "title": "Live DASH DRM ClearKey Sample (DASH-IF)",
+        "url": "https://reference.dashif.org/dash.js/v/latest/samples/drm/clearkey",
+        "description": "A sample page demonstrating MPEG-DASH playback with ClearKey DRM using the DASH-IF reference player (dash.js). It provides a working example of encrypted content playback which can be a template for developers testing DRM with DASH.",
+        "category": "Protocols & Transport",
+        "subcategory": "Adaptive Streaming",
+        "sub_subcategory": "DASH",
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-06-25T22:40:28.809Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2188,
+          "subSubcategoryId": 3621
+        },
+        "created_at": "2026-06-25T22:40:28.923485",
+        "updated_at": "2026-07-02T05:40:24.456",
+        "search_tsv": "'/dash.js/v/latest/samples/drm/clearkey':50 'clearkey':4,18 'content':35 'dash':2,7,15,23,47 'dash-if':6,22 'dash.js':27 'demonstr':12 'develop':43 'drm':3,19,45 'encrypt':34 'exampl':32 'live':1 'mpeg':14 'mpeg-dash':13 'page':11 'playback':16,36 'player':26 'provid':29 'refer':25 'reference.dashif.org':49 'reference.dashif.org/dash.js/v/latest/samples/drm/clearkey':48 'sampl':5,10 'templat':41 'test':44 'use':20 'work':31"
+      }
+    },
+    {
+      "j": {
+        "id": 187765,
+        "title": "Creating A Production Ready Multi Bitrate HLS VOD stream - Peer5 P2P Docs",
+        "url": "https://docs.peer5.com/guides/production-ready-hls-vod",
+        "description": "Peer5 documentation.",
+        "category": "Protocols & Transport",
+        "subcategory": "HLS Tools",
+        "sub_subcategory": "HLS",
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-06-25T22:49:10.409Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2241,
+          "subSubcategoryId": 3705
+        },
+        "created_at": "2026-06-25T22:49:10.624444",
+        "updated_at": "2026-07-02T05:40:34.691",
+        "search_tsv": "'/guides/production-ready-hls-vod':17 'bitrat':6 'creat':1 'doc':12 'docs.peer5.com':16 'docs.peer5.com/guides/production-ready-hls-vod':15 'document':14 'hls':7 'multi':5 'p2p':11 'peer5':10,13 'product':3 'readi':4 'stream':9 'vod':8"
+      }
+    },
+    {
+      "j": {
+        "id": 187793,
+        "title": "Design of scheduling and rate-adaptation algorithms for adaptive HTTP streaming · dispar.at Blog",
+        "url": "https://dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming",
+        "description": "Design of scheduling and rate-adaptation algorithms for adaptive HTTP streaming - Stephan Hesse.",
+        "category": "Protocols & Transport",
+        "subcategory": "Adaptive Bitrate Algorithms & Tools",
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1084,
+          "importedAt": "2026-06-25T22:52:24.909Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video",
+          "subcategoryId": 2236
+        },
+        "created_at": "2026-06-25T22:52:25.525238",
+        "updated_at": "2026-07-02T05:40:34.106",
+        "search_tsv": "'/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming':31 'adapt':7,10,21,24 'algorithm':8,22 'blog':14 'design':1,15 'dispar.at':13,30 'dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming':29 'hess':28 'http':11,25 'rate':6,20 'rate-adapt':5,19 'schedul':3,17 'stephan':27 'stream':12,26"
+      }
+    },
+    {
+      "j": {
+        "id": 187803,
+        "title": "Ant Media Video Streaming Tutorials",
+        "url": "https://antmedia.io/tutorial",
+        "description": "A comprehensive collection of technical blog posts and tutorials covering protocols like WebRTC, RTMP, HLS, and CMAF. These resources guide users in building their own live streaming platforms and integrating various streaming technologies.",
+        "category": "Intro & Learning",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1083,
+          "importedAt": "2026-06-25T22:53:44.009Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:53:44.125069",
+        "updated_at": "2026-07-02T05:40:24.323",
+        "search_tsv": "'/tutorial':41 'ant':1 'antmedia.io':40 'antmedia.io/tutorial':39 'blog':11 'build':28 'cmaf':22 'collect':8 'comprehens':7 'cover':15 'guid':25 'hls':20 'integr':35 'like':17 'live':31 'media':2 'platform':33 'post':12 'protocol':16 'resourc':24 'rtmp':19 'stream':4,32,37 'technic':10 'technolog':38 'tutori':5,14 'user':26 'various':36 'video':3 'webrtc':18"
+      }
+    },
+    {
+      "j": {
+        "id": 187833,
+        "title": "How to Create a Video Streaming App: A Step-by-Step Guide to Building Your Own Platform",
+        "url": "https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform",
+        "description": "This guide by Repur Tech offers a comprehensive overview of building a video streaming platform. It discusses the basics of video streaming apps, essential features to include, technology stacks, design considerations, and monetization strategies. This resource is beneficial for developers aiming to create their own video streaming platforms.",
+        "category": "Intro & Learning",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1083,
+          "importedAt": "2026-06-25T22:57:45.909Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:57:46.126966",
+        "updated_at": "2026-07-02T05:40:24.295",
+        "search_tsv": "'/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform':69 'aim':59 'app':7,41 'basic':37 'benefici':56 'build':15,29 'comprehens':26 'consider':49 'creat':3,61 'design':48 'develop':58 'discuss':35 'essenti':42 'featur':43 'guid':13,20 'includ':45 'monet':51 'offer':24 'overview':27 'platform':18,33,66 'repur':22 'repurtech.com':68 'repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform':67 'resourc':54 'stack':47 'step':10,12 'step-by-step':9 'strategi':52 'stream':6,32,40,65 'tech':23 'technolog':46 'video':5,31,39,64"
+      }
+    },
+    {
+      "j": {
+        "id": 187835,
+        "title": "How to Live Stream: Beginners Guide to Get Started",
+        "url": "https://academy.wedio.com/how-to-live-stream",
+        "description": "A guide providing five simple steps to start live streaming, including choosing the right platform, setting up equipment, and engaging with your audience.",
+        "category": "Intro & Learning",
+        "subcategory": null,
+        "sub_subcategory": null,
+        "status": "rejected",
+        "submitted_by": null,
+        "approved_by": null,
+        "approved_at": null,
+        "github_synced": true,
+        "last_synced_at": null,
+        "metadata": {
+          "categoryId": 1083,
+          "importedAt": "2026-06-25T22:57:57.009Z",
+          "sourceList": "Video [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)",
+          "importedFrom": "krzemienski/awesome-video"
+        },
+        "created_at": "2026-06-25T22:57:57.224711",
+        "updated_at": "2026-07-02T05:40:24.282",
+        "search_tsv": "'/how-to-live-stream':35 'academy.wedio.com':34 'academy.wedio.com/how-to-live-stream':33 'audienc':32 'beginn':5 'choos':21 'engag':29 'equip':27 'five':13 'get':8 'guid':6,11 'includ':20 'live':3,18 'platform':24 'provid':12 'right':23 'set':25 'simpl':14 'start':9,17 'step':15 'stream':4,19"
+      }
+    }
+  ],
+  "auditLog": [
+    {
+      "j": {
+        "id": 11285,
+        "resource_id": 186313,
+        "action": "updated",
+        "performed_by": null,
+        "changes": {
+          "id": 186313,
+          "url": "http://www.bento4.com/developers/dash/dash-sample-content/",
+          "title": "MPEG DASH Sample Content Bento4",
+          "status": "approved",
+          "category": "Protocols & Transport",
+          "metadata": {
+            "categoryId": 1084,
+            "importedAt": "2026-02-12T01:04:38.347Z",
+            "sourceList": "Video [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)",
+            "lastUpdatedAt": "2026-02-12T01:05:47.870Z",
+            "subcategoryId": 2239,
+            "lastUpdatedFrom": "krzemienski/awesome-video"
+          },
+          "description": "Bento4 offers MPEG-DASH sample content for developers to test and validate their DASH implementations.",
+          "subcategory": "DASH Tools",
+          "githubSynced": true
+        },
+        "notes": null,
+        "created_at": "2026-02-12T01:05:47.903761",
+        "original_resource_id": 186313
+      }
+    },
+    {
+      "j": {
+        "id": 11286,
+        "resource_id": 186313,
+        "action": "updated",
+        "performed_by": null,
+        "changes": {
+          "source": "krzemienski/awesome-video"
+        },
+        "notes": "Updated from GitHub: Updated content",
+        "created_at": "2026-02-12T01:05:47.925283",
+        "original_resource_id": 186313
+      }
+    },
+    {
+      "j": {
+        "id": 12716,
+        "resource_id": 186313,
+        "action": "updated",
+        "performed_by": null,
+        "changes": {
+          "id": 186313,
+          "url": "http://www.bento4.com/developers/dash/dash-sample-content/",
+          "title": "MPEG DASH Sample Content Bento4",
+          "status": "approved",
+          "category": "Protocols & Transport",
+          "metadata": {
+            "categoryId": 1084,
+            "importedAt": "2026-05-20T08:19:29.380Z",
+            "sourceList": "Video [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)",
+            "lastUpdatedAt": "2026-05-20T08:19:36.297Z",
+            "subcategoryId": 2239,
+            "lastUpdatedFrom": "https://github.com/krzemienski/awesome-video"
+          },
+          "description": "Bento4 offers MPEG-DASH sample content for developers to test and validate their DASH implementations.",
+          "subcategory": "DASH Tools",
+          "githubSynced": true
+        },
+        "notes": null,
+        "created_at": "2026-05-20T08:19:36.300536",
+        "original_resource_id": 186313
+      }
+    },
+    {
+      "j": {
+        "id": 12717,
+        "resource_id": 186313,
+        "action": "updated",
+        "performed_by": null,
+        "changes": {
+          "source": "https://github.com/krzemienski/awesome-video"
+        },
+        "notes": "Updated from GitHub: Updated content",
+        "created_at": "2026-05-20T08:19:36.302528",
+        "original_resource_id": 186313
+      }
+    },
+    {
+      "j": {
+        "id": 16255,
+        "resource_id": 187492,
+        "action": "updated",
+        "performed_by": null,
+        "changes": {
+          "description": "A hybrid video editor and VJ tool for Linux. LiVES allows both timeline editing of video and real-time performance (mixing clips and applying effects live), making it unique for video artists. Note: the official site is served over plain HTTP — the host does not support HTTPS."
+        },
+        "notes": null,
+        "created_at": "2026-07-20T01:27:01.685866",
+        "original_resource_id": 187492
+      }
+    },
+    {
+      "j": {
+        "id": 16256,
+        "resource_id": 187492,
+        "action": "updated",
+        "performed_by": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+        "changes": {
+          "description": "A hybrid video editor and VJ tool for Linux. LiVES allows both timeline editing of video and real-time performance (mixing clips and applying effects live), making it unique for video artists. Note: the official site is served over plain HTTP — the host does not support HTTPS."
+        },
+        "notes": "Resource updated by admin",
+        "created_at": "2026-07-20T01:27:01.698759",
+        "original_resource_id": 187492
+      }
+    }
+  ]
+}
