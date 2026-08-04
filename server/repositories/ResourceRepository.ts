@@ -144,22 +144,38 @@ export class ResourceRepository {
           // substring, then description/url-only matches — instead of raw
           // recency (an exact "FFmpeg" title used to land at position ~158).
           if (searchTokens.length > 0) {
-            // Rank on the NORMALIZED phrase — identical to the old behaviour
-            // for single-token queries; multi-token queries rank exact/prefix/
-            // substring against the collapsed "tok1 tok2" form.
+            // Task 265: rank TOKEN coverage first so "ffmpeg hls" and
+            // "hls ffmpeg" produce the SAME order. Tier by how many tokens
+            // appear in the title (all > some > none). Multi-token queries
+            // must use only order-invariant tie-breakers (a phrase-based
+            // tie-breaker would still promote different titles per word
+            // order), so within a tier they fall through to title + id.
+            // Single-token queries keep the original exact > prefix >
+            // substring > none phrase ranking — same ordering as before.
             const q = normalizedSearch.toLowerCase();
             const escapedPhrase = escapeLike(normalizedSearch);
             const prefix = `${escapedPhrase.toLowerCase()}%`;
             const substr = `%${escapedPhrase.toLowerCase()}%`;
-            return [
-              asc(sql`CASE
-                WHEN lower(${resources.title}) = ${q} THEN 0
-                WHEN lower(${resources.title}) LIKE ${prefix} THEN 1
-                WHEN lower(${resources.title}) LIKE ${substr} THEN 2
-                ELSE 3 END`),
-              asc(sql`lower(${resources.title})`),
-              asc(resources.id),
-            ];
+            const titleTokenHits = sql.join(
+              searchTokens.map(
+                (tok) =>
+                  sql`(CASE WHEN ${resources.title} ILIKE ${`%${escapeLike(tok)}%`} THEN 1 ELSE 0 END)`
+              ),
+              sql` + `
+            );
+            // Rank by the actual hit count descending (not a collapsed
+            // all/some/none tier) so, e.g., a 2-of-3 title match outranks a
+            // 1-of-3 match. For single-token queries this is the same
+            // in-title (1) vs not (0) split as before.
+            const coverageTier = desc(sql`(${titleTokenHits})`);
+            const phraseTier = asc(sql`CASE
+              WHEN lower(${resources.title}) = ${q} THEN 0
+              WHEN lower(${resources.title}) LIKE ${prefix} THEN 1
+              WHEN lower(${resources.title}) LIKE ${substr} THEN 2
+              ELSE 3 END`);
+            return searchTokens.length === 1
+              ? [coverageTier, phraseTier, asc(sql`lower(${resources.title})`), asc(resources.id)]
+              : [coverageTier, asc(sql`lower(${resources.title})`), asc(resources.id)];
           }
           return [desc(resources.createdAt), desc(resources.id)];
       }
