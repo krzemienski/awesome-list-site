@@ -31,6 +31,7 @@
 
 import type { CategoryRepository } from '../repositories/CategoryRepository';
 import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
+import { decodeHtmlEntities } from '../github/importHygiene';
 
 export interface PromotableResource {
   category: string | null | undefined;
@@ -75,9 +76,13 @@ export async function promoteEnrichmentSuggestions(
   const existingSubcategory = nonEmpty(resource.subcategory);
   const existingSubSubcategory = nonEmpty(resource.subSubcategory);
 
-  const suggestedCategory = nonEmpty(suggestions.category);
-  const suggestedSubcategory = nonEmpty(suggestions.subcategory);
-  const suggestedSubSubcategory = nonEmpty(suggestions.subSubcategory);
+  // Task #248: LLM suggestions (and legacy metadata stashes promoted by the
+  // admin backfill route) can arrive entity-escaped ("A &amp; B") — decode at
+  // this promotion boundary so "&amp;" never lands on hierarchy columns.
+  const decode = (v: string | null) => (v === null ? null : decodeHtmlEntities(v));
+  const suggestedCategory = decode(nonEmpty(suggestions.category));
+  const suggestedSubcategory = decode(nonEmpty(suggestions.subcategory));
+  const suggestedSubSubcategory = decode(nonEmpty(suggestions.subSubcategory));
 
   const finalCategory = existingCategory ?? suggestedCategory;
   if (!existingCategory && suggestedCategory) {

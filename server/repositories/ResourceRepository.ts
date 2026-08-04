@@ -37,6 +37,7 @@ import {
 import { db } from "../db";
 import { eq, and, sql, asc, desc, like, ilike, or, inArray } from "drizzle-orm";
 import { tokenizeSearchQuery } from "@shared/searchNormalize";
+import { decodeResourceTextFields } from "../github/importHygiene";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -245,6 +246,10 @@ export class ResourceRepository {
    * @returns The created resource
    */
   async createResource(resource: InsertResource): Promise<Resource> {
+    // Task #248: universal write boundary — decode HTML entities in
+    // title/description/hierarchy fields (never the URL) so "&amp;" text can
+    // never be persisted, whatever the caller (routes, GitHub sync, AI).
+    resource = decodeResourceTextFields({ ...resource });
     let newResource: Resource;
     try {
       [newResource] = await db.insert(resources).values(resource).returning();
@@ -285,6 +290,8 @@ export class ResourceRepository {
    * @returns The updated resource
    */
   async updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource> {
+    // Task #248: same universal decode boundary as createResource.
+    resource = decodeResourceTextFields({ ...resource });
     const [updatedResource] = await db
       .update(resources)
       .set({ ...resource, updatedAt: new Date() })

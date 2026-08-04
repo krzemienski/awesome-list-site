@@ -8,6 +8,7 @@ import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
 import { cleanGithubSlugTitle } from '../lib/titleClean';
+import { decodeHtmlEntities } from '../github/importHygiene';
 import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
 import { DEFAULT_RESEARCH_MODEL, DEFAULT_ENRICHMENT_MODEL, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { LinkChecker } from '../validation/linkChecker';
@@ -654,12 +655,14 @@ class ResearchService {
         // Run24 R5-041: scouts report GitHub results as "owner/repo — desc";
         // store the cleaned title (repo name, not full_name) at the choke
         // point every save path (direct, retry queue flush) funnels through.
-        title: cleanGithubSlugTitle(input.title),
+        // Task #248: LLM output can arrive entity-escaped ("A &amp; B") —
+        // decode at this choke point so "&amp;" never reaches storage.
+        title: decodeHtmlEntities(cleanGithubSlugTitle(input.title)),
         url: input.url,
-        description: input.description || '',
-        suggestedCategory: input.suggested_category || '',
-        suggestedSubcategory: input.suggested_subcategory || '',
-        suggestedSubSubcategory: input.suggested_sub_subcategory || '',
+        description: decodeHtmlEntities(input.description || ''),
+        suggestedCategory: decodeHtmlEntities(input.suggested_category || ''),
+        suggestedSubcategory: decodeHtmlEntities(input.suggested_subcategory || ''),
+        suggestedSubSubcategory: decodeHtmlEntities(input.suggested_sub_subcategory || ''),
         // Clamp to the 1–100 contract so out-of-range model values can never
         // trigger a permanent DB rejection (e.g. int4 overflow).
         confidence: Math.min(100, Math.max(1, Math.round(input.confidence || 1))),
@@ -1356,12 +1359,14 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
     );
 
     const [newResource] = await db.insert(resources).values({
-      title: discovery.title,
+      // Task #248: decode again at approval so discoveries saved BEFORE the
+      // save-time decode (pre-existing pending rows) still land clean.
+      title: decodeHtmlEntities(discovery.title),
       url: discovery.url,
-      description: discovery.description || '',
-      category: discovery.suggestedCategory || 'Uncategorized',
-      subcategory: discovery.suggestedSubcategory || null,
-      subSubcategory: discovery.suggestedSubSubcategory || null,
+      description: decodeHtmlEntities(discovery.description || ''),
+      category: decodeHtmlEntities(discovery.suggestedCategory || '') || 'Uncategorized',
+      subcategory: decodeHtmlEntities(discovery.suggestedSubcategory || '') || null,
+      subSubcategory: decodeHtmlEntities(discovery.suggestedSubSubcategory || '') || null,
       status: 'approved',
       metadata: { source: 'ai_researcher', discoveryId: discovery.id, confidence: discovery.confidence },
     }).returning();

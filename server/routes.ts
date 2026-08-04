@@ -92,7 +92,7 @@ import { swaggerSpec } from "./openapi";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
-import { ensureMinDescription } from "./github/importHygiene";
+import { ensureMinDescription, decodeResourceTextFields } from "./github/importHygiene";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
 import { buildRelatedResources } from "./services/relatedResources";
 import { stripInternalResourceFields } from "./lib/publicResource";
@@ -1867,13 +1867,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use the NORMALIZED values (trimmed/zero-width-stripped) from the
       // shared validators — never the raw body — so " title " and ZWSP
       // padding can't reach the DB (R4-015/069).
-      const resourceData = {
+      // Task #248: decode HTML entities ("&amp;" pasted from web pages /
+      // LLM output) at EVERY resource write path so literal entity text
+      // never reaches the DB (shared with admin create/edit + AI imports).
+      const resourceData = decodeResourceTextFields({
         ...insertResourceSchema.parse(req.body),
         title: submitValidation.data.title,
         url: submitValidation.data.url,
         description: submitValidation.data.description,
         metadata: submitValidation.data.metadata,
-      };
+      });
 
       // Run21 R4-037: if the label can't be contained under the resource's
       // own category > subcategory chain, store null instead of an orphan.
@@ -2088,6 +2091,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         sanitizedProposedData.tags = normalizedTags;
       }
+
+      // Task #248: approved edits land verbatim on the live resource, so
+      // decode HTML entities here (shared step with every other write path)
+      // or "&amp;" pasted into a suggestion resurfaces site-wide on approval.
+      decodeResourceTextFields(sanitizedProposedData);
       
       let aiMetadata = claudeMetadata;
       if (triggerClaudeAnalysis && resource.url) {
@@ -3795,7 +3803,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const validatedData = validationResult.data;
+      // Task #248: entity-escaped text must never be stored (shared decode
+      // step with submit/admin-create/AI imports).
+      const validatedData = decodeResourceTextFields(validationResult.data);
 
       // Task #212: resources.url is UNIQUE. A URL change that collides with
       // another resource used to surface as an unhandled 23505 -> opaque 500
@@ -4078,7 +4088,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const validatedData = validationResult.data;
+      // Task #248: entity-escaped text must never be stored (shared decode
+      // step with submit/admin-edit/AI imports).
+      const validatedData = decodeResourceTextFields(validationResult.data);
 
       const resolvedCategory = validatedData.category || 'General Tools';
       const resolvedSubcategory = validatedData.subcategory || null;

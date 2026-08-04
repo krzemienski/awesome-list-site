@@ -35,6 +35,7 @@ import {
   type InsertResourceEdit,
 } from "@shared/schema";
 import { db } from "../db";
+import { decodeHtmlEntities } from "../github/importHygiene";
 import { eq, desc, asc, or, sql } from "drizzle-orm";
 
 /**
@@ -273,7 +274,13 @@ export class AuditRepository {
             };
           }
         } else {
-          updates[field] = proposedData[field];
+          // Task #248: decode HTML entities at the merge too — the submit
+          // route decodes new suggestions, but pending edits saved BEFORE
+          // that fix (or written by scripts) could still carry "&amp;" text.
+          updates[field] =
+            typeof proposedData[field] === 'string' && field !== 'url'
+              ? decodeHtmlEntities(proposedData[field])
+              : proposedData[field];
         }
       }
     }

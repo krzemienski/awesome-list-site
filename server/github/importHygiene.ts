@@ -70,6 +70,30 @@ export function decodeHtmlEntities(text: string): string {
   return out;
 }
 
+/**
+ * Task #248: ONE shared sanitation step for every resource write path
+ * (admin create/edit, public submit, edit-suggestion, AI research/import).
+ * Entity-escaped text ("Community &amp; Events" pasted from a web page or
+ * produced by an LLM) must be stored decoded, or literal "&amp;" renders
+ * site-wide again (the Task 242 regression class).
+ */
+export const RESOURCE_TEXT_FIELDS = [
+  "title",
+  "description",
+  "category",
+  "subcategory",
+  "subSubcategory",
+] as const;
+
+export function decodeResourceTextFields<T extends Record<string, any>>(obj: T): T {
+  for (const field of RESOURCE_TEXT_FIELDS) {
+    if (typeof obj[field] === "string") {
+      (obj as Record<string, any>)[field] = decodeHtmlEntities(obj[field]);
+    }
+  }
+  return obj;
+}
+
 const EMAIL_REGEX = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 
 /** R3-27: remove email addresses (and dangling separators around them). */

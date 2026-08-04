@@ -7,7 +7,7 @@ import { AuditRepository } from '../repositories/AuditRepository';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
 import { promoteEnrichmentSuggestions } from './promoteEnrichmentSuggestions';
-import { humanizeTitle, sanitizeDescription } from '../github/importHygiene';
+import { humanizeTitle, sanitizeDescription, decodeHtmlEntities } from '../github/importHygiene';
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
@@ -633,6 +633,12 @@ ${taxonomyHint}`;
     // Tool contract is a 1-100 scale, so always normalize by 100 (a model
     // sending 1 = lowest, not 100%). Clamp to guard out-of-range values.
     const confidence01 = Math.max(0, Math.min(1, (ai.confidence || 0) / 100));
+
+    // Task #248: decode entity-escaped LLM output ("A &amp; B") before the
+    // suggestions are stashed in metadata or promoted onto hierarchy columns.
+    if (ai.category) ai.category = decodeHtmlEntities(ai.category);
+    if (ai.subcategory) ai.subcategory = decodeHtmlEntities(ai.subcategory);
+    if (ai.subSubcategory) ai.subSubcategory = decodeHtmlEntities(ai.subSubcategory);
 
     const scrapedFields = buildScrapedFields(item.urlMetadata, item.metadata);
 
