@@ -1473,6 +1473,29 @@ export const agentEvents = pgTable(
   ]
 );
 
+/**
+ * Rate limit hit counters (Task #279) — shared fixed-window store for every
+ * express-rate-limit instance in the app. The default in-memory store is
+ * per-process, so under Autoscale fan-out the advertised per-IP limits were
+ * effectively multiplied by the instance count. Counters here are keyed by
+ * (limiter name, client key) so all instances share ONE budget and the
+ * RateLimit-* headers stay accurate regardless of which instance answers.
+ * Mirrors migrations/0039_rate_limit_hits.sql.
+ */
+export const rateLimitHits = pgTable(
+  "rate_limit_hits",
+  {
+    limiter: varchar("limiter", { length: 64 }).notNull(),
+    key: varchar("key", { length: 256 }).notNull(),
+    hits: integer("hits").notNull().default(0),
+    resetAt: timestamp("reset_at", { withTimezone: true }).notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ name: "rate_limit_hits_pk", columns: [table.limiter, table.key] }),
+    resetAtIdx: index("idx_rate_limit_hits_reset_at").on(table.resetAt),
+  })
+);
+
 export const insertAgentEventSchema = createInsertSchema(agentEvents).omit({
   id: true,
   ts: true,

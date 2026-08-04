@@ -67,4 +67,5 @@
 - [Global ApiError handler coverage](apierror-global-handler-coverage.md) — central 401 handling only sees ApiError; queryFns throwing plain Error bypass it and render empty/stale instead of the sign-in prompt.
 - [Query-loading remount trap](query-loading-remount.md) — raw keystroke state in a queryKey + top-level isLoading skeleton unmounts the input mid-typing; debounce key + keepPreviousData + `isLoading && !data`.
 - [Platform-edge 429 triage](edge-429-triage.md) — bare-text 429 w/o RateLimit-* headers = Replit edge, not app (app limiters are /api-only + negotiated handler); app's job is tolerance, and catalog failures surface as the app-level ErrorPage, not route cards.
+- [Shared PG rate-limit store](pg-shared-rate-limit-store.md) — limits are global via rate_limit_hits; localKeys=false stores need distinct `prefix` or layered limiters trip ERR_ERL_DOUBLE_COUNT; fails open to memory on DB trouble.
 - [www/apex split-brain DNS](www-domain-split-brain.md) — www is Cloudflare-proxied (525: origin lacks a www cert) while apex hits Replit's edge directly; only a CF redirect rule or Replit custom domain fixes it — never app code.

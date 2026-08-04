@@ -78,6 +78,13 @@
       "when": 1785200000000,
       "tag": "0038_research_discovery_verification",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1785300000000,
+      "tag": "0039_rate_limit_hits",
+      "breakpoints": true
     }
   ]
 }

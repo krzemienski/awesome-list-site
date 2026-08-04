@@ -1,5 +1,6 @@
 import rateLimit from "express-rate-limit";
 import type { Request, Response } from "express";
+import { PgRateLimitStore } from "./pgRateLimitStore";
 
 /**
  * Rate Limiting Middleware
@@ -209,8 +210,10 @@ export function createRateLimiter(tier: RateLimitTier) {
     handler: negotiated429Handler("Too many requests, please try again later"),
     // Don't skip any requests - apply to all
     skip: () => false,
-    // Store rate limit data in memory (suitable for single-instance deployments)
-    // For multi-instance deployments, consider using a shared store like Redis
+    // Task #279: shared Postgres-backed store — counters live in the
+    // rate_limit_hits table, so the documented limit holds across every
+    // Autoscale instance (fail-open to per-instance memory on DB trouble).
+    store: new PgRateLimitStore(`tier:${tier.name}`),
   });
 }
 

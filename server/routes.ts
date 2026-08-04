@@ -33,6 +33,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import rateLimit from "express-rate-limit";
 import { negotiated429Handler, send429 } from "./middleware/rateLimit";
+import { PgRateLimitStore } from "./middleware/pgRateLimitStore";
 import {
   UserRepository,
   ResourceRepository,
@@ -698,20 +699,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   setupLocalAuth();
 
-  // R4-031 (run24): express-rate-limit stores are per-process, and production
-  // autoscale runs up to MAX_LIMITER_INSTANCES concurrent instances — a
-  // client whose requests spread across instances sees an effective limit of
-  // (per-instance limit × instance count). The R4 probe (490-request burst →
-  // zero 429s) proved the old numbers could never fire under fan-out. For the
-  // expensive clusters (auth brute-force, paid AI) the per-instance limit is
-  // now ceil(intended_global / MAX_LIMITER_INSTANCES), so the worst-case
-  // effective limit stays within the intended global budget. Cheap read
-  // surfaces (resource reads, the 300/min backstop) intentionally keep their
-  // generous per-instance numbers — over-throttling real browsing is worse
-  // than the residual scrape risk there.
-  const MAX_LIMITER_INSTANCES = 3;
-  const perInstanceLimit = (intendedGlobal: number) =>
-    Math.max(1, Math.ceil(intendedGlobal / MAX_LIMITER_INSTANCES));
+  // Task #279 (supersedes R4-031/run24): every limiter now uses the shared
+  // Postgres-backed store (rate_limit_hits table), so counters are global
+  // across all Autoscale instances and the documented limit is the REAL
+  // limit — no more ceil(global / MAX_LIMITER_INSTANCES) arithmetic, and the
+  // RateLimit-* headers reflect the true cluster-wide budget. On DB trouble
+  // the store fails open to a per-instance MemoryStore for 30s (the old
+  // semantics) rather than blocking traffic; see
+  // server/middleware/pgRateLimitStore.ts for the full design.
 
   // BUG-008 (run10): IP-based rate limiting across the auth cluster.
   // Complements the existing per-account cooldown (checkLock) which only
@@ -720,9 +715,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Intended global budget: 20 attempts / 15 min / IP.
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: perInstanceLimit(20), // 7/instance ⇒ ≤21 effective at 3 instances
+    limit: 20, // global across instances (shared PG store)
     standardHeaders: true,
     legacyHeaders: false,
+    store: new PgRateLimitStore("auth-cluster"),
     // BUG-001 (Audit 2): every limiter serves the shared content-negotiated
     // 429 (styled HTML for browser navigations, JSON for API clients, always
     // with Retry-After).
@@ -735,9 +731,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Intended global budget: 5 attempts / min / IP.
   const loginBurstLimiter = rateLimit({
     windowMs: 60 * 1000,
-    limit: perInstanceLimit(5), // 2/instance ⇒ ≤6 effective at 3 instances
+    limit: 5, // global across instances (shared PG store)
     standardHeaders: true,
     legacyHeaders: false,
+    store: new PgRateLimitStore("login-burst"),
     handler: negotiated429Handler("Too many login attempts. Please try again in a minute."),
   });
 
@@ -752,9 +749,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // enumeration scrapes; single-user browsing (~5 calls/page) never gets close.
   const resourceReadLimiter = rateLimit({
     windowMs: 60 * 1000,
-    limit: 240,
+    limit: 240, // Task #279: now a true global 240/min (shared PG store)
     standardHeaders: true,
     legacyHeaders: false,
+    store: new PgRateLimitStore("resource-read"),
     handler: negotiated429Handler("Too many requests. Please slow down and try again shortly."),
   });
 
@@ -764,9 +762,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // R4-031: intended global budget 10 req / 15 min / IP (see arithmetic above).
   const aiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: perInstanceLimit(10), // 4/instance ⇒ ≤12 effective at 3 instances
+    limit: 10, // global across instances (shared PG store)
     standardHeaders: true,
     legacyHeaders: false,
+    store: new PgRateLimitStore("ai-generation"),
     handler: negotiated429Handler("Too many AI requests. Please try again in a few minutes."),
   });
 
@@ -779,9 +778,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // mint new cache keys and trigger paid generation.
   const suggestedReadLimiter = rateLimit({
     windowMs: 60 * 1000,
-    limit: 60,
+    limit: 60, // global across instances (shared PG store)
     standardHeaders: true,
     legacyHeaders: false,
+    store: new PgRateLimitStore("suggested-read"),
     handler: negotiated429Handler("Too many requests. Please slow down and try again shortly."),
   });
 
@@ -803,9 +803,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // break code-split imports.
   const apiBackstopLimiter = rateLimit({
     windowMs: 60 * 1000,
-    limit: 600,
+    limit: 600, // Task #279: now a true global 600/min (shared PG store)
     standardHeaders: true,
     legacyHeaders: false,
+    store: new PgRateLimitStore("api-backstop"),
     handler: negotiated429Handler("Too many requests. Please slow down and try again shortly."),
   });
   app.use('/api', apiBackstopLimiter);
