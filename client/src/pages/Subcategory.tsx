@@ -53,6 +53,16 @@ export default function Subcategory() {
   const [selectedTags, setSelectedTags] = useState<string[]>(() =>
     parseTagsParam(getSearchParams()),
   );
+  // BUG-064 (run27, parity with Home): a present-but-empty tag filter
+  // (?tags=+++ or ?tags=) is ignored — surface a small dismissible note so
+  // the visitor knows their link's filter didn't apply.
+  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(() => {
+    const params = getSearchParams();
+    return (
+      (params.has("tags") || params.has("tag")) &&
+      parseTagsParam(params).length === 0
+    );
+  });
   const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   // audit2 BUG-022/BUG-023/BUG-027: the shared STRICT taxonomy URL rule
@@ -541,6 +551,26 @@ export default function Subcategory() {
         showCountSorts={false}
       />
       
+      {/* BUG-064 (run27, parity with Home): honest feedback when the link
+          carried a tag param that parsed to nothing (?tags=+++ / ?tags=). */}
+      {emptyTagParamNotice && selectedTags.length === 0 && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-[color:var(--text-2)]"
+          role="status"
+          data-testid="notice-empty-tag-param"
+        >
+          <span>The tag filter in the link you followed was empty, so it was ignored.</span>
+          <button
+            type="button"
+            className="underline underline-offset-2 min-h-8"
+            onClick={() => setEmptyTagParamNotice(false)}
+            data-testid="button-dismiss-empty-tag-param"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* audit2 BUG-023: visible feedback whenever a URL-supplied page value
           was corrected — never a silent rewrite. */}
       {pageNotice && (
