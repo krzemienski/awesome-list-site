@@ -51,6 +51,10 @@ args = "artifacts/mockup-sandbox: Component Preview Server"
 task = "workflow.run"
 args = "tablet-audit"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "url-params-audit"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -126,6 +130,14 @@ args = "node scripts/validation/tablet-audit.mjs"
 [workflows.workflow.metadata]
 outputType = "console"
 isValidation = true
+
+[[workflows.workflow]]
+name = "url-params-audit"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/url-params-audit.mjs"
 
 [agent]
 integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0", "javascript_anthropic_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0", "github:1.0.0"]
