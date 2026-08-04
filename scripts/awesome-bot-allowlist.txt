@@ -23,6 +23,22 @@ https://awesome.video
 # every awesome_bot run across GitHub and are occasionally rate-limited.
 awesome.re
 
+# The URL path legitimately contains percent-encoded spaces; awesome_bot's
+# URI parser decodes then rejects it as malformed ("bad URI") even though the
+# page is live (browser-UA 200, verified 2026-08-04). Bare domain so the match
+# survives awesome_bot's URL decoding.
+beendless.com
+
+# Serves an incomplete certificate chain (missing intermediate); browsers
+# fetch it via AIA and load the site fine (verified alive 2026-08-04), but
+# non-browser TLS stacks report "unable to get local issuer certificate".
+jvet.hhi.fraunhofer.de
+
+# TLS-fingerprint bot-block: resets the SSL handshake for non-browser clients
+# ("Connection reset by peer - SSL_connect") but loads fine with a browser UA
+# (200, verified 2026-08-04).
+www.coursera.org
+
 # Adobe help center holds non-browser connections open until read-timeout
 # (bot-block); awesome_bot reports Net::ReadTimeout as an error, not a
 # timeout, so --allow-timeout does not cover it.
