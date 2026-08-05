@@ -4,6 +4,12 @@
  */
 
 import fetch from 'node-fetch';
+import * as tls from 'node:tls';
+import * as https from 'node:https';
+import * as http from 'node:http';
+import * as net from 'node:net';
+import { lookup as dnsLookup } from 'node:dns/promises';
+import { X509Certificate } from 'node:crypto';
 
 export interface LinkCheckResult {
   url: string;
@@ -594,7 +600,12 @@ export function classifyBrowserVerification(status: number | string): Pick<Brows
   if (typeof status === 'string') {
     if (status.includes('ENOTFOUND')) return { confirmedDead: true, confirmedAlive: false, verdict: 'dead: DNS not found (browser-UA verified)' };
     if (status.includes('ECONNREFUSED')) return { confirmedDead: true, confirmedAlive: false, verdict: 'dead: connection refused (browser-UA verified)' };
-    if (/CERT|LEAF_SIGNATURE|UNABLE_TO_VERIFY|SELF_SIGNED|DEPTH_ZERO/i.test(status)) {
+    // Note: missing-intermediate chains (UNABLE_TO_VERIFY_LEAF_SIGNATURE /
+    // UNABLE_TO_GET_ISSUER_CERT*) are given an AIA chain-completion retry in
+    // browserVerifyLink BEFORE reaching this classifier — browsers recover
+    // from those via Authority Information Access, so only chains that still
+    // fail after completion land here (and are then genuinely dead).
+    if (/CERT|LEAF_SIGNATURE|UNABLE_TO_VERIFY|SELF_SIGNED|DEPTH_ZERO|ALTNAME/i.test(status)) {
       return { confirmedDead: true, confirmedAlive: false, verdict: `dead: SSL failure (${status})` };
     }
     // Connect timeouts / resets from a datacenter IP are the classic
@@ -606,6 +617,264 @@ export function classifyBrowserVerification(status: number | string): Pick<Brows
   // 401/403/429/999, 5xx and anything else: bot-block, auth wall, or
   // transient server trouble — alive per the strict policy.
   return { confirmedDead: false, confirmedAlive: false, verdict: `likely bot-block/auth wall (${status} under browser UA)` };
+}
+
+/**
+ * TLS errors that mean "the server forgot to send its intermediate cert" —
+ * every mainstream browser recovers from these via the AIA (Authority
+ * Information Access) CA-Issuers URL in the leaf certificate, so they must
+ * not be treated as hard-dead until an AIA chain-completion retry also fails.
+ */
+const MISSING_INTERMEDIATE_CODES = /UNABLE_TO_VERIFY_LEAF_SIGNATURE|UNABLE_TO_GET_ISSUER_CERT/i;
+
+/** System trust anchors parsed once, grouped by subject for issuer lookup. */
+let systemRootsBySubject: Map<string, X509Certificate[]> | null = null;
+function getSystemRoots(): Map<string, X509Certificate[]> {
+  if (!systemRootsBySubject) {
+    systemRootsBySubject = new Map();
+    for (const pem of tls.rootCertificates) {
+      try {
+        const cert = new X509Certificate(pem);
+        const list = systemRootsBySubject.get(cert.subject) ?? [];
+        list.push(cert);
+        systemRootsBySubject.set(cert.subject, list);
+      } catch { /* skip unparseable roots */ }
+    }
+  }
+  return systemRootsBySubject;
+}
+
+/**
+ * Validate an AIA-downloaded chain WITHOUT ever promoting downloaded certs to
+ * trust anchors: every signature is verified link-by-link, every cert must be
+ * a currently-valid CA cert (except the leaf), the leaf must match the target
+ * hostname, and the terminal issuer must be an EXISTING platform system root.
+ * A hostile endpoint publishing AIA links to its own intermediate/self-signed
+ * root fails here — the downloaded chain never reaches a system trust anchor.
+ * Exported for regression coverage (scripts/validation/tls-recovery-check.ts).
+ */
+export function validateAiaChain(
+  leaf: X509Certificate,
+  intermediates: X509Certificate[],
+  hostname: string,
+  now: Date = new Date(),
+): boolean {
+  const within = (c: X509Certificate) => now >= new Date(c.validFrom) && now <= new Date(c.validTo);
+  try {
+    if (intermediates.length === 0) return false;
+    if (!within(leaf)) return false;
+    if (!leaf.checkHost(hostname)) return false;
+    let current = leaf;
+    for (const inter of intermediates) {
+      if (!inter.ca) return false; // downloaded cert is not a CA cert
+      if (inter.subject === inter.issuer) return false; // never accept a downloaded root
+      if (!within(inter)) return false;
+      if (!current.checkIssued(inter)) return false;
+      if (!current.verify(inter.publicKey)) return false; // signature check
+      current = inter;
+    }
+    // The last downloaded intermediate must be signed by a platform root.
+    const candidates = getSystemRoots().get(current.issuer) ?? [];
+    return candidates.some(root => {
+      try {
+        return within(root) && current.checkIssued(root) && current.verify(root.publicKey);
+      } catch {
+        return false;
+      }
+    });
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * SSRF guard for AIA "CA Issuers" URLs: those URLs come from an UNVERIFIED
+ * peer certificate, i.e. fully attacker-controlled input, so the downloader
+ * must never be usable to reach internal services or cloud metadata.
+ * Exported for regression coverage (scripts/validation/tls-recovery-check.ts).
+ */
+export function isPrivateAddress(ip: string): boolean {
+  const family = net.isIP(ip);
+  if (family === 4) {
+    const parts = ip.split('.').map(Number);
+    if (parts.length !== 4 || parts.some(p => Number.isNaN(p))) return true;
+    const [a, b] = parts;
+    return (
+      a === 0 || a === 10 || a === 127 ||
+      (a === 100 && b >= 64 && b <= 127) ||       // CGNAT 100.64/10
+      (a === 169 && b === 254) ||                  // link-local / cloud metadata
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 192 && b === 0) ||                    // 192.0.0/24 + 192.0.2/24 doc
+      (a === 198 && (b === 18 || b === 19)) ||     // benchmarking
+      (a === 198 && b === 51) || (a === 203 && b === 113) || // doc ranges
+      a >= 224                                     // multicast + reserved + broadcast
+    );
+  }
+  if (family === 6) {
+    const lower = ip.toLowerCase();
+    // IPv4-mapped/compatible: validate the embedded IPv4.
+    const v4 = lower.match(/(\d+\.\d+\.\d+\.\d+)$/);
+    if (v4) return isPrivateAddress(v4[1]);
+    return (
+      lower === '::' || lower === '::1' ||
+      lower.startsWith('fe8') || lower.startsWith('fe9') ||
+      lower.startsWith('fea') || lower.startsWith('feb') || // fe80::/10 link-local
+      lower.startsWith('fc') || lower.startsWith('fd') ||   // fc00::/7 ULA
+      lower.startsWith('ff') ||                             // multicast
+      lower.startsWith('64:ff9b')                           // NAT64 (embeds v4)
+    );
+  }
+  return true; // not a parseable IP → treat as unsafe
+}
+
+/**
+ * Download an AIA CA-Issuers URL with SSRF controls:
+ *  - http(s) only, no credentials in the URL
+ *  - hostname resolved once; ALL resolved addresses must be public
+ *  - the connection is pinned to the validated address (custom lookup), so a
+ *    DNS-rebinding second resolution can never redirect the socket
+ *  - redirects are refused entirely (CA issuer URLs are direct downloads)
+ * Returns the response body, or null when anything is off. Exported for
+ * regression coverage.
+ */
+export async function fetchAiaUrlSafely(rawUrl: string, timeoutMs: number): Promise<Buffer | null> {
+  let u: URL;
+  try { u = new URL(rawUrl); } catch { return null; }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+  if (u.username || u.password) return null;
+
+  const host = u.hostname.replace(/^\[|\]$/g, '');
+  let pinnedAddress: string;
+  if (net.isIP(host)) {
+    pinnedAddress = host;
+  } else {
+    let resolved: Array<{ address: string; family: number }>;
+    try {
+      resolved = await dnsLookup(host, { all: true });
+    } catch {
+      return null;
+    }
+    if (resolved.length === 0 || resolved.some(a => isPrivateAddress(a.address))) return null;
+    pinnedAddress = resolved[0].address;
+  }
+  if (isPrivateAddress(pinnedAddress)) return null;
+
+  const pinnedFamily = net.isIP(pinnedAddress);
+  // Pin every connection this agent makes to the pre-validated address.
+  const pinnedLookup = (_hostname: string, options: any, cb: any) => {
+    if (options && options.all) cb(null, [{ address: pinnedAddress, family: pinnedFamily }]);
+    else cb(null, pinnedAddress, pinnedFamily);
+  };
+  const agent = u.protocol === 'https:'
+    ? new https.Agent({ lookup: pinnedLookup as any })
+    : new http.Agent({ lookup: pinnedLookup as any });
+
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(u.toString(), {
+      method: 'GET',
+      redirect: 'manual', // never follow: a redirect could point anywhere
+      signal: ctrl.signal,
+      agent,
+      size: 262144, // an intermediate cert is a few KB; hard-cap the body
+    } as any);
+    if (res.status < 200 || res.status >= 300) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(t);
+    agent.destroy();
+  }
+}
+
+/**
+ * Fetch the peer's leaf certificate without verification, then walk the AIA
+ * "CA Issuers" URLs to download the missing intermediate(s). The downloads
+ * are UNTRUSTED input — callers must pass them through validateAiaChain.
+ */
+async function fetchAiaLeafAndIntermediates(url: string, timeoutMs: number): Promise<{ leaf: X509Certificate; intermediates: X509Certificate[] } | null> {
+  const parsed = new URL(url);
+  if (parsed.protocol !== 'https:') return null;
+  const leaf = await new Promise<X509Certificate | null>((resolve) => {
+    const sock = tls.connect(
+      {
+        host: parsed.hostname,
+        port: Number(parsed.port) || 443,
+        servername: parsed.hostname,
+        rejectUnauthorized: false,
+        timeout: timeoutMs,
+      },
+      () => {
+        const cert = sock.getPeerX509Certificate() ?? null;
+        sock.destroy();
+        resolve(cert);
+      },
+    );
+    sock.on('error', () => resolve(null));
+    sock.on('timeout', () => { sock.destroy(); resolve(null); });
+  });
+
+  if (!leaf) return null;
+
+  const intermediates: X509Certificate[] = [];
+  let current: X509Certificate = leaf;
+  for (let depth = 0; depth < 3; depth++) {
+    const aia = current.infoAccess?.match(/CA Issuers - URI:(\S+)/);
+    if (!aia) break;
+    try {
+      const body = await fetchAiaUrlSafely(aia[1], timeoutMs);
+      if (!body) break;
+      const issuer = new X509Certificate(body);
+      if (issuer.subject === issuer.issuer) break; // self-signed root: never collect
+      intermediates.push(issuer);
+      current = issuer;
+    } catch {
+      break;
+    }
+  }
+  return { leaf, intermediates };
+}
+
+/**
+ * Retry the browser-UA GET with the AIA-downloaded intermediates appended to
+ * the trust bundle — exactly the recovery a real browser performs. Returns
+ * null when no recovery was possible (no AIA, download failed, or the chain
+ * still doesn't verify — e.g. untrusted root, expired intermediate).
+ */
+async function retryWithCompletedChain(url: string, timeoutMs: number): Promise<{ status: number; finalUrl?: string } | null> {
+  const fetched = await fetchAiaLeafAndIntermediates(url, timeoutMs);
+  if (!fetched || fetched.intermediates.length === 0) return null;
+  // Trust boundary: the downloaded chain must first verify link-by-link up to
+  // an EXISTING system root (signatures, CA flag, validity, hostname). Only
+  // then are the proven intermediates supplied for the retry — a private or
+  // attacker-published chain is rejected here and stays dead.
+  if (!validateAiaChain(fetched.leaf, fetched.intermediates, new URL(url).hostname)) return null;
+  const agent = new https.Agent({ ca: [...tls.rootCertificates, ...fetched.intermediates.map(c => c.toString())] });
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const r = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+      signal: ctrl.signal,
+      agent: (parsedUrl: URL) => (parsedUrl.protocol === 'https:' ? agent : undefined),
+      headers: {
+        'User-Agent': BROWSER_UA,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+    } as any);
+    try { (r.body as any)?.destroy?.(); } catch { /* ignore */ }
+    return { status: r.status, finalUrl: r.url };
+  } catch {
+    return null; // chain STILL invalid (or network flake) — caller keeps the dead verdict
+  } finally {
+    clearTimeout(t);
+    agent.destroy();
+  }
 }
 
 export async function browserVerifyLink(url: string, timeoutMs = 15000): Promise<BrowserVerification> {
@@ -626,7 +895,23 @@ export async function browserVerifyLink(url: string, timeoutMs = 15000): Promise
     try { await (r.body as any)?.cancel?.(); } catch { /* ignore */ }
     return { status: r.status, finalUrl: r.url, ...classifyBrowserVerification(r.status) };
   } catch (e: any) {
-    const code = 'ERR:' + (e?.cause?.code || e?.code || e?.name || 'unknown');
+    const rawCode = String(e?.cause?.code || e?.code || e?.name || 'unknown');
+    const code = 'ERR:' + rawCode;
+    // Missing-intermediate chains are browser-recoverable via AIA — retry
+    // with the completed chain before declaring the link dead.
+    if (MISSING_INTERMEDIATE_CODES.test(rawCode)) {
+      const recovered = await retryWithCompletedChain(url, timeoutMs);
+      if (recovered && recovered.status >= 200 && recovered.status < 400) {
+        return {
+          status: recovered.status,
+          finalUrl: recovered.finalUrl,
+          confirmedDead: false,
+          confirmedAlive: true,
+          verdict: `alive: ${recovered.status} after AIA chain completion (server omits intermediate cert; browsers recover — not dead)`,
+        };
+      }
+      // No recovery: fall through to the strict SSL-failure classification.
+    }
     return { status: code, ...classifyBrowserVerification(code) };
   } finally {
     clearTimeout(t);
