@@ -1,0 +1,318 @@
+{
+  "version": "1.3",
+  "schemaVersion": "1.0",
+  "generatedBy": "ecc-tools",
+  "generatedAt": "2026-03-22T20:17:05.111Z",
+  "repo": "https://github.com/krzemienski/awesome-list-site",
+  "profiles": {
+    "requested": "full",
+    "recommended": "full",
+    "effective": "research",
+    "requestedAlias": "full",
+    "recommendedAlias": "full",
+    "effectiveAlias": "research"
+  },
+  "requestedProfile": "full",
+  "profile": "research",
+  "recommendedProfile": "full",
+  "effectiveProfile": "research",
+  "tier": "pro",
+  "requestedComponents": [
+    "repo-baseline",
+    "workflow-automation",
+    "security-audits",
+    "research-tooling",
+    "team-rollout",
+    "governance-controls"
+  ],
+  "selectedComponents": [
+    "repo-baseline",
+    "workflow-automation",
+    "security-audits",
+    "research-tooling",
+    "team-rollout"
+  ],
+  "requestedAddComponents": [],
+  "requestedRemoveComponents": [],
+  "blockedRemovalComponents": [],
+  "tierFilteredComponents": [
+    "governance-controls"
+  ],
+  "requestedRootPackages": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
+  ],
+  "selectedRootPackages": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync"
+  ],
+  "requestedPackages": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
+  ],
+  "requestedAddPackages": [],
+  "requestedRemovePackages": [],
+  "selectedPackages": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync"
+  ],
+  "packages": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync"
+  ],
+  "blockedRemovalPackages": [],
+  "tierFilteredRootPackages": [
+    "enterprise-controls"
+  ],
+  "tierFilteredPackages": [
+    "enterprise-controls"
+  ],
+  "conflictingPackages": [],
+  "dependencyGraph": {
+    "runtime-core": [],
+    "workflow-pack": [
+      "runtime-core"
+    ],
+    "agentshield-pack": [
+      "workflow-pack"
+    ],
+    "research-pack": [
+      "workflow-pack"
+    ],
+    "team-config-sync": [
+      "runtime-core"
+    ]
+  },
+  "resolutionOrder": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync"
+  ],
+  "requestedModules": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
+  ],
+  "selectedModules": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync"
+  ],
+  "modules": [
+    "runtime-core",
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync"
+  ],
+  "managedFiles": [
+    ".claude/skills/awesome-list-site/SKILL.md",
+    ".agents/skills/awesome-list-site/SKILL.md",
+    ".agents/skills/awesome-list-site/agents/openai.yaml",
+    ".claude/identity.json",
+    ".codex/config.toml",
+    ".codex/AGENTS.md",
+    ".codex/agents/explorer.toml",
+    ".codex/agents/reviewer.toml",
+    ".codex/agents/docs-researcher.toml",
+    ".claude/homunculus/instincts/inherited/awesome-list-site-instincts.yaml",
+    ".claude/rules/awesome-list-site-guardrails.md",
+    ".claude/research/awesome-list-site-research-playbook.md",
+    ".claude/team/awesome-list-site-team-config.json",
+    ".claude/commands/feature-development.md",
+    ".claude/commands/refactoring.md",
+    ".claude/commands/add-ai-powered-feature.md"
+  ],
+  "packageFiles": {
+    "runtime-core": [
+      ".claude/skills/awesome-list-site/SKILL.md",
+      ".agents/skills/awesome-list-site/SKILL.md",
+      ".agents/skills/awesome-list-site/agents/openai.yaml",
+      ".claude/identity.json",
+      ".codex/config.toml",
+      ".codex/AGENTS.md",
+      ".codex/agents/explorer.toml",
+      ".codex/agents/reviewer.toml",
+      ".codex/agents/docs-researcher.toml",
+      ".claude/homunculus/instincts/inherited/awesome-list-site-instincts.yaml"
+    ],
+    "agentshield-pack": [
+      ".claude/rules/awesome-list-site-guardrails.md"
+    ],
+    "research-pack": [
+      ".claude/research/awesome-list-site-research-playbook.md"
+    ],
+    "team-config-sync": [
+      ".claude/team/awesome-list-site-team-config.json"
+    ],
+    "workflow-pack": [
+      ".claude/commands/feature-development.md",
+      ".claude/commands/refactoring.md",
+      ".claude/commands/add-ai-powered-feature.md"
+    ]
+  },
+  "moduleFiles": {
+    "runtime-core": [
+      ".claude/skills/awesome-list-site/SKILL.md",
+      ".agents/skills/awesome-list-site/SKILL.md",
+      ".agents/skills/awesome-list-site/agents/openai.yaml",
+      ".claude/identity.json",
+      ".codex/config.toml",
+      ".codex/AGENTS.md",
+      ".codex/agents/explorer.toml",
+      ".codex/agents/reviewer.toml",
+      ".codex/agents/docs-researcher.toml",
+      ".claude/homunculus/instincts/inherited/awesome-list-site-instincts.yaml"
+    ],
+    "agentshield-pack": [
+      ".claude/rules/awesome-list-site-guardrails.md"
+    ],
+    "research-pack": [
+      ".claude/research/awesome-list-site-research-playbook.md"
+    ],
+    "team-config-sync": [
+      ".claude/team/awesome-list-site-team-config.json"
+    ],
+    "workflow-pack": [
+      ".claude/commands/feature-development.md",
+      ".claude/commands/refactoring.md",
+      ".claude/commands/add-ai-powered-feature.md"
+    ]
+  },
+  "files": [
+    {
+      "moduleId": "runtime-core",
+      "path": ".claude/skills/awesome-list-site/SKILL.md",
+      "description": "Repository-specific Claude Code skill generated from git history."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".agents/skills/awesome-list-site/SKILL.md",
+      "description": "Codex-facing copy of the generated repository skill."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".agents/skills/awesome-list-site/agents/openai.yaml",
+      "description": "Codex skill metadata so the repo skill appears cleanly in the skill interface."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".claude/identity.json",
+      "description": "Suggested identity.json baseline derived from repository conventions."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".codex/config.toml",
+      "description": "Repo-local Codex MCP and multi-agent baseline aligned with ECC defaults."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".codex/AGENTS.md",
+      "description": "Codex usage guide that points at the generated repo skill and workflow bundle."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".codex/agents/explorer.toml",
+      "description": "Read-only explorer role config for Codex multi-agent work."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".codex/agents/reviewer.toml",
+      "description": "Read-only reviewer role config focused on correctness and security."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".codex/agents/docs-researcher.toml",
+      "description": "Read-only docs researcher role config for API verification."
+    },
+    {
+      "moduleId": "runtime-core",
+      "path": ".claude/homunculus/instincts/inherited/awesome-list-site-instincts.yaml",
+      "description": "Continuous-learning instincts derived from repository patterns."
+    },
+    {
+      "moduleId": "agentshield-pack",
+      "path": ".claude/rules/awesome-list-site-guardrails.md",
+      "description": "Repository guardrails distilled from analysis for security and workflow review."
+    },
+    {
+      "moduleId": "research-pack",
+      "path": ".claude/research/awesome-list-site-research-playbook.md",
+      "description": "Research workflow playbook for source attribution and long-context tasks."
+    },
+    {
+      "moduleId": "team-config-sync",
+      "path": ".claude/team/awesome-list-site-team-config.json",
+      "description": "Team config scaffold that points collaborators at the shared ECC bundle."
+    },
+    {
+      "moduleId": "workflow-pack",
+      "path": ".claude/commands/feature-development.md",
+      "description": "Workflow command scaffold for feature-development."
+    },
+    {
+      "moduleId": "workflow-pack",
+      "path": ".claude/commands/refactoring.md",
+      "description": "Workflow command scaffold for refactoring."
+    },
+    {
+      "moduleId": "workflow-pack",
+      "path": ".claude/commands/add-ai-powered-feature.md",
+      "description": "Workflow command scaffold for add-ai-powered-feature."
+    }
+  ],
+  "workflows": [
+    {
+      "command": "feature-development",
+      "path": ".claude/commands/feature-development.md"
+    },
+    {
+      "command": "refactoring",
+      "path": ".claude/commands/refactoring.md"
+    },
+    {
+      "command": "add-ai-powered-feature",
+      "path": ".claude/commands/add-ai-powered-feature.md"
+    }
+  ],
+  "adapters": {
+    "claudeCode": {
+      "skillPath": ".claude/skills/awesome-list-site/SKILL.md",
+      "identityPath": ".claude/identity.json",
+      "commandPaths": [
+        ".claude/commands/feature-development.md",
+        ".claude/commands/refactoring.md",
+        ".claude/commands/add-ai-powered-feature.md"
+      ]
+    },
+    "codex": {
+      "configPath": ".codex/config.toml",
+      "agentsGuidePath": ".codex/AGENTS.md",
+      "skillPath": ".agents/skills/awesome-list-site/SKILL.md"
+    }
+  }
+}
