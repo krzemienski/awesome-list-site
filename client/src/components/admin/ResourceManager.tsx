@@ -33,6 +33,17 @@ import { parsePageFromSearch } from "@/lib/page-param";
 // BUG-049: client-side validation mirrors the server's shared schemas so the
 // dialog flags bad input inline instead of only failing server-side.
 import { resourceTitleSchema, resourceDescriptionSchema, webUrlSchema, httpsUrlSchema } from "@shared/validation";
+import {
+  RESOURCE_FORMAT_LABELS,
+  RESOURCE_FORMAT_VALUES,
+  RESOURCE_PROVIDER_LABELS,
+  RESOURCE_PROVIDER_VALUES,
+  RESOURCE_SKILL_LEVEL_LABELS,
+  RESOURCE_SKILL_LEVEL_VALUES,
+  type ResourceFormat,
+  type ResourceProvider,
+  type ResourceSkillLevel,
+} from "@shared/resourceFacets";
 
 interface ResourcesResponse {
   resources: Resource[];
@@ -111,6 +122,9 @@ export default function ResourceManager() {
     category: "",
     subcategory: "",
     subSubcategory: "",
+    resourceFormat: "unknown" as ResourceFormat,
+    provider: "unknown" as ResourceProvider,
+    skillLevel: "unknown" as ResourceSkillLevel,
     status: "approved"
   });
 
@@ -380,6 +394,9 @@ export default function ResourceManager() {
       category: "",
       subcategory: "",
       subSubcategory: "",
+      resourceFormat: "unknown",
+      provider: "unknown",
+      skillLevel: "unknown",
       status: "approved"
     });
   };
@@ -396,6 +413,9 @@ export default function ResourceManager() {
       category: resource.category || "",
       subcategory: resource.subcategory || "",
       subSubcategory: resource.subSubcategory || "",
+      resourceFormat: resource.resourceFormat || "unknown",
+      provider: resource.provider || "unknown",
+      skillLevel: resource.skillLevel || "unknown",
       status: resource.status || "approved"
     });
     setEditDialogOpen(true);
@@ -1182,6 +1202,56 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-resource-format">Format</Label>
+                <Select
+                  value={editForm.resourceFormat}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, resourceFormat: v as ResourceFormat }))}
+                >
+                  <SelectTrigger id="edit-resource-format" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-resource-format">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RESOURCE_FORMAT_VALUES.map((value) => (
+                      <SelectItem key={value} value={value}>{RESOURCE_FORMAT_LABELS[value]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-provider">Provider</Label>
+                <Select
+                  value={editForm.provider}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, provider: v as ResourceProvider }))}
+                >
+                  <SelectTrigger id="edit-provider" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-provider">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RESOURCE_PROVIDER_VALUES.map((value) => (
+                      <SelectItem key={value} value={value}>{RESOURCE_PROVIDER_LABELS[value]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-skill-level">Skill level</Label>
+                <Select
+                  value={editForm.skillLevel}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, skillLevel: v as ResourceSkillLevel }))}
+                >
+                  <SelectTrigger id="edit-skill-level" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-skill-level">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RESOURCE_SKILL_LEVEL_VALUES.map((value) => (
+                      <SelectItem key={value} value={value}>{RESOURCE_SKILL_LEVEL_LABELS[value]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
@@ -1350,6 +1420,56 @@ export default function ResourceManager() {
                   <SelectContent>
                     {filteredSubSubcategories.map((subSub: SubSubcategory) => (
                       <SelectItem key={subSub.id} value={subSub.name}>{subSub.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-2">
+                <Label htmlFor="create-resource-format">Format</Label>
+                <Select
+                  value={editForm.resourceFormat}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, resourceFormat: v as ResourceFormat }))}
+                >
+                  <SelectTrigger id="create-resource-format" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-resource-format">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RESOURCE_FORMAT_VALUES.map((value) => (
+                      <SelectItem key={value} value={value}>{RESOURCE_FORMAT_LABELS[value]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-provider">Provider</Label>
+                <Select
+                  value={editForm.provider}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, provider: v as ResourceProvider }))}
+                >
+                  <SelectTrigger id="create-provider" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-provider">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RESOURCE_PROVIDER_VALUES.map((value) => (
+                      <SelectItem key={value} value={value}>{RESOURCE_PROVIDER_LABELS[value]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-skill-level">Skill level</Label>
+                <Select
+                  value={editForm.skillLevel}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, skillLevel: v as ResourceSkillLevel }))}
+                >
+                  <SelectTrigger id="create-skill-level" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-skill-level">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RESOURCE_SKILL_LEVEL_VALUES.map((value) => (
+                      <SelectItem key={value} value={value}>{RESOURCE_SKILL_LEVEL_LABELS[value]}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

@@ -27,6 +27,8 @@
 
 import {
   resources,
+  resourceTags,
+  tags as tagTable,
   resourceAuditLog,
   resourceEdits,
   researchDiscoveries,
@@ -38,6 +40,16 @@ import { db } from "../db";
 import { eq, and, sql, asc, desc, like, ilike, or, inArray } from "drizzle-orm";
 import { tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
+import {
+  resourceFormatSchema,
+  resourceProviderSchema,
+  resourceSkillLevelSchema,
+  type ResourceFormat,
+  type ResourceProvider,
+  type ResourceSearchFacets,
+  type ResourceSkillLevel,
+} from "@shared/resourceFacets";
+import { normalizeTagFilter, TAG_PLURAL_KEEP } from "@shared/tagNormalize";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -52,8 +64,13 @@ export interface ListResourceOptions {
   subSubcategory?: string;
   userId?: string;
   search?: string;
+  tags?: string[];
+  provider?: ResourceProvider;
+  resourceFormat?: ResourceFormat;
+  skillLevel?: ResourceSkillLevel;
+  includeFacets?: boolean;
   /** R3-H08: whitelisted sort order; unknown/absent falls back to newest-first. */
-  sort?: "name-asc" | "name-desc" | "newest" | "oldest";
+  sort?: "relevance" | "name-asc" | "name-desc" | "newest" | "oldest";
 }
 
 /**
@@ -65,34 +82,31 @@ export class ResourceRepository {
    * @param options - Filter and pagination options
    * @returns Object containing resources array and total count
    */
-  async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search, sort } = options;
+  async listResources(options: ListResourceOptions): Promise<{
+    resources: Resource[];
+    total: number;
+    facets?: ResourceSearchFacets;
+  }> {
+    const {
+      page = 1,
+      limit = 20,
+      status,
+      category,
+      subcategory,
+      subSubcategory,
+      userId,
+      search,
+      tags = [],
+      provider,
+      resourceFormat,
+      skillLevel,
+      sort,
+      includeFacets = false,
+    } = options;
     const offset = options.offset ?? ((page - 1) * limit);
 
     let query = db.select().from(resources).$dynamic();
     let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources).$dynamic();
-
-    const conditions = [];
-
-    if (status) {
-      conditions.push(eq(resources.status, status));
-    }
-
-    if (category) {
-      conditions.push(eq(resources.category, category));
-    }
-
-    if (subcategory) {
-      conditions.push(eq(resources.subcategory, subcategory));
-    }
-
-    if (subSubcategory) {
-      conditions.push(eq(resources.subSubcategory, subSubcategory));
-    }
-
-    if (userId) {
-      conditions.push(eq(resources.submittedBy, userId));
-    }
 
     // Run16 BUG-044: %, _ and \ are LIKE metacharacters — a search for "___"
     // used to match EVERY 3+-char row (66KB response). Escape them so the
@@ -107,20 +121,74 @@ export class ResourceRepository {
     const searchTokens = tokenizeSearchQuery(search);
     const normalizedSearch = searchTokens.join(" ");
     const escapeLike = (s: string) => s.replace(/[\\%_]/g, (m) => `\\${m}`);
-    if (searchTokens.length > 0) {
-      conditions.push(
-        and(
-          ...searchTokens.map((tok) => {
-            const esc = escapeLike(tok);
-            return or(
-              ilike(resources.title, `%${esc}%`),
-              ilike(resources.description, `%${esc}%`),
-              ilike(resources.url, `%${esc}%`)
-            );
-          })
-        )
-      );
-    }
+    const safeMetadataTags = sql`CASE
+      WHEN jsonb_typeof(${resources.metadata}->'tags') = 'array'
+      THEN ${resources.metadata}->'tags'
+      ELSE '[]'::jsonb
+    END`;
+    // Both stores are supported write paths in the existing application:
+    // submissions/admin resource edits persist metadata.tags, while TagRepository
+    // persists resource_tags. Search must not make either path invisible.
+    const resourceTagSource = sql`
+      SELECT ${tagTable.name} AS value
+      FROM ${resourceTags}
+      INNER JOIN ${tagTable} ON ${tagTable.id} = ${resourceTags.tagId}
+      WHERE ${resourceTags.resourceId} = ${resources.id}
+      UNION
+      SELECT metadata_tag.value
+      FROM jsonb_array_elements_text(${safeMetadataTags}) AS metadata_tag(value)
+    `;
+    const tagExists = (predicate: ReturnType<typeof sql>) => sql`EXISTS (
+      SELECT 1
+      FROM (${resourceTagSource}) AS resource_tag(value)
+      WHERE ${predicate}
+    )`;
+    const foldTagSql = sql`lower(regexp_replace(trim(resource_tag.value), '[ _]+', '-', 'g'))`;
+    const canonicalTagSql = sql`CASE
+      WHEN ${foldTagSql} IN (${sql.join(Array.from(TAG_PLURAL_KEEP).map((v) => sql`${v}`), sql`, `)})
+        THEN ${foldTagSql}
+      WHEN length(${foldTagSql}) > 4 AND right(${foldTagSql}, 3) = 'ies'
+        THEN left(${foldTagSql}, length(${foldTagSql}) - 3) || 'y'
+      WHEN length(${foldTagSql}) > 3 AND right(${foldTagSql}, 1) = 's'
+        AND right(${foldTagSql}, 2) <> 'ss'
+        THEN left(${foldTagSql}, length(${foldTagSql}) - 1)
+      ELSE ${foldTagSql}
+    END`;
+
+    const buildConditions = (
+      omit?: "category" | "subcategory" | "subSubcategory" | "tags" | "provider" | "resourceFormat" | "skillLevel",
+    ) => {
+      const conditions = [];
+      if (status) conditions.push(eq(resources.status, status));
+      if (category && omit !== "category") conditions.push(eq(resources.category, category));
+      if (subcategory && omit !== "subcategory") conditions.push(eq(resources.subcategory, subcategory));
+      if (subSubcategory && omit !== "subSubcategory") conditions.push(eq(resources.subSubcategory, subSubcategory));
+      if (userId) conditions.push(eq(resources.submittedBy, userId));
+      if (provider && omit !== "provider") conditions.push(eq(resources.provider, provider));
+      if (resourceFormat && omit !== "resourceFormat") conditions.push(eq(resources.resourceFormat, resourceFormat));
+      if (skillLevel && omit !== "skillLevel") conditions.push(eq(resources.skillLevel, skillLevel));
+      if (tags.length > 0 && omit !== "tags") {
+        const canonicalTags = Array.from(new Set(tags.map(normalizeTagFilter)));
+        conditions.push(tagExists(sql`${canonicalTagSql} IN (${sql.join(canonicalTags.map((v) => sql`${v}`), sql`, `)})`));
+      }
+      if (searchTokens.length > 0) {
+        conditions.push(
+          and(
+            ...searchTokens.map((tok) => {
+              const esc = escapeLike(tok);
+              return or(
+                ilike(resources.title, `%${esc}%`),
+                ilike(resources.description, `%${esc}%`),
+                ilike(resources.url, `%${esc}%`)
+              );
+            })
+          )
+        );
+      }
+      return conditions;
+    };
+
+    const conditions = buildConditions();
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
@@ -139,6 +207,7 @@ export class ResourceRepository {
           return [asc(resources.createdAt), asc(resources.id)];
         case "newest":
           return [desc(resources.createdAt), desc(resources.id)];
+        case "relevance":
         default:
           // NB-013 (run18): when searching without an explicit sort, rank by
           // relevance — exact title match first, then title prefix, then title
@@ -182,13 +251,90 @@ export class ResourceRepository {
       }
     })();
 
-    const [totalResult] = await countQuery;
-    const resourceList = await query
-      .orderBy(...orderBy)
-      .limit(limit)
-      .offset(offset);
+    const whereSql = (omit?: Parameters<typeof buildConditions>[0]) => {
+      const facetConditions = buildConditions(omit);
+      return facetConditions.length > 0 ? and(...facetConditions)! : sql`true`;
+    };
 
-    return { resources: resourceList, total: totalResult.count };
+    const facetPromise: Promise<ResourceSearchFacets | undefined> = includeFacets
+      ? db.execute(sql`
+          SELECT facet, value, count
+          FROM (
+            SELECT 'category'::text AS facet, ${resources.category} AS value, count(*)::int AS count
+            FROM ${resources}
+            WHERE ${whereSql("category")}
+            GROUP BY ${resources.category}
+            UNION ALL
+            SELECT 'subcategory', coalesce(${resources.subcategory}, ''), count(*)::int
+            FROM ${resources}
+            WHERE ${whereSql("subcategory")} AND ${resources.subcategory} IS NOT NULL
+            GROUP BY ${resources.subcategory}
+            UNION ALL
+            SELECT 'subSubcategory', coalesce(${resources.subSubcategory}, ''), count(*)::int
+            FROM ${resources}
+            WHERE ${whereSql("subSubcategory")} AND ${resources.subSubcategory} IS NOT NULL
+            GROUP BY ${resources.subSubcategory}
+            UNION ALL
+            SELECT 'provider', ${resources.provider}, count(*)::int
+            FROM ${resources}
+            WHERE ${whereSql("provider")}
+            GROUP BY ${resources.provider}
+            UNION ALL
+            SELECT 'resourceFormat', ${resources.resourceFormat}, count(*)::int
+            FROM ${resources}
+            WHERE ${whereSql("resourceFormat")}
+            GROUP BY ${resources.resourceFormat}
+            UNION ALL
+            SELECT 'skillLevel', ${resources.skillLevel}, count(*)::int
+            FROM ${resources}
+            WHERE ${whereSql("skillLevel")}
+            GROUP BY ${resources.skillLevel}
+            UNION ALL
+            SELECT 'tag', ${canonicalTagSql}, count(DISTINCT ${resources.id})::int
+            FROM ${resources}
+            CROSS JOIN LATERAL (${resourceTagSource}) AS resource_tag(value)
+            WHERE ${whereSql("tags")} AND trim(resource_tag.value) <> ''
+            -- Group by the selected value instead of repeating canonicalTagSql.
+            -- Drizzle assigns fresh parameter positions to repeated SQL
+            -- fragments, so PostgreSQL does not consider the two rendered CASE
+            -- expressions structurally identical (42803).
+            GROUP BY 2
+          ) facet_counts
+          WHERE value <> ''
+          ORDER BY facet, count DESC, lower(value), value
+        `).then((result) => {
+          const facets: ResourceSearchFacets = {
+            categories: [],
+            subcategories: [],
+            subSubcategories: [],
+            tags: [],
+            providers: [],
+            formats: [],
+            skillLevels: [],
+          };
+          for (const row of result.rows as Array<{ facet: string; value: string; count: number | string }>) {
+            const item = { value: String(row.value), count: Number(row.count) };
+            switch (row.facet) {
+              case "category": facets.categories.push(item); break;
+              case "subcategory": facets.subcategories.push(item); break;
+              case "subSubcategory": facets.subSubcategories.push(item); break;
+              case "provider": facets.providers.push(item); break;
+              case "resourceFormat": facets.formats.push(item); break;
+              case "skillLevel": facets.skillLevels.push(item); break;
+              case "tag": facets.tags.push(item); break;
+            }
+          }
+          return facets;
+        })
+      : Promise.resolve(undefined);
+
+    const [[totalResult], resourceList, facets] = await Promise.all([
+      countQuery,
+      query.orderBy(...orderBy).limit(limit).offset(offset),
+      facetPromise,
+    ]);
+
+    return { resources: resourceList, total: totalResult.count, ...(facets ? { facets } : {}) };
   }
 
   /**
@@ -249,7 +395,7 @@ export class ResourceRepository {
     // Task #248: universal write boundary — decode HTML entities in
     // title/description/hierarchy fields (never the URL) so "&amp;" text can
     // never be persisted, whatever the caller (routes, GitHub sync, AI).
-    resource = decodeResourceTextFields({ ...resource });
+    resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), true);
     let newResource: Resource;
     try {
       [newResource] = await db.insert(resources).values(resource).returning();
@@ -291,7 +437,7 @@ export class ResourceRepository {
    */
   async updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource> {
     // Task #248: same universal decode boundary as createResource.
-    resource = decodeResourceTextFields({ ...resource });
+    resource = this.normalizeResourceFacets(decodeResourceTextFields({ ...resource }), false);
     const [updatedResource] = await db
       .update(resources)
       .set({ ...resource, updatedAt: new Date() })
@@ -302,6 +448,31 @@ export class ResourceRepository {
     await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
 
     return updatedResource;
+  }
+
+  /**
+   * Universal write boundary for resource facets. Route validators provide
+   * friendly errors, while this layer protects direct import/enrichment writes.
+   * Missing create values intentionally become `unknown`; unsupported explicit
+   * values throw rather than being silently guessed or downgraded.
+   */
+  private normalizeResourceFacets<T extends Partial<InsertResource>>(resource: T, fillDefaults: boolean): T {
+    if (resource.resourceFormat !== undefined) {
+      resource.resourceFormat = resourceFormatSchema.parse(resource.resourceFormat) as T["resourceFormat"];
+    } else if (fillDefaults) {
+      resource.resourceFormat = "unknown" as T["resourceFormat"];
+    }
+    if (resource.provider !== undefined) {
+      resource.provider = resourceProviderSchema.parse(resource.provider) as T["provider"];
+    } else if (fillDefaults) {
+      resource.provider = "unknown" as T["provider"];
+    }
+    if (resource.skillLevel !== undefined) {
+      resource.skillLevel = resourceSkillLevelSchema.parse(resource.skillLevel) as T["skillLevel"];
+    } else if (fillDefaults) {
+      resource.skillLevel = "unknown" as T["skillLevel"];
+    }
+    return resource;
   }
 
   /**

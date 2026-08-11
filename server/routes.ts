@@ -87,6 +87,16 @@ import {
   normalizeGithubRepoInput,
 } from "@shared/validation";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
+import {
+  RESOURCE_FORMAT_VALUES,
+  RESOURCE_PROVIDER_VALUES,
+  RESOURCE_SEARCH_SORT_VALUES,
+  RESOURCE_SKILL_LEVEL_VALUES,
+  resourceFormatSchema,
+  resourceProviderSchema,
+  resourceSkillLevelSchema,
+} from "@shared/resourceFacets";
+import { parseTagFilterValues } from "@shared/tagNormalize";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { swaggerSpec } from "./openapi";
@@ -1447,6 +1457,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? normalizeSearchQuery(rawSearch) || undefined
         : undefined;
 
+      // Task #294: controlled public facet contract. Unknown is a valid,
+      // explicit selection; unsupported controlled values are caller errors,
+      // not silent empty-result filters. Tags keep the established comma-
+      // separated or repeated URL forms (including legacy `tag`) and are
+      // canonicalized for singular/plural parity.
+      const parseControlledFacet = <T extends string>(
+        param: string,
+        schema: z.ZodType<T>,
+        allowed: readonly T[],
+      ): T | undefined | false => {
+        const raw = firstQueryValue(req.query[param]);
+        if (raw === undefined || raw.trim() === '') return undefined;
+        const parsed = schema.safeParse(raw.trim().toLowerCase());
+        if (!parsed.success) {
+          res.status(400).json({
+            error: `invalid_${param}`,
+            message: `${param} must be one of: ${allowed.join(', ')}`,
+            allowed,
+          });
+          return false;
+        }
+        return parsed.data;
+      };
+      const provider = parseControlledFacet('provider', resourceProviderSchema, RESOURCE_PROVIDER_VALUES);
+      if (provider === false) return;
+      const resourceFormat = parseControlledFacet('format', resourceFormatSchema, RESOURCE_FORMAT_VALUES);
+      if (resourceFormat === false) return;
+      const skillLevel = parseControlledFacet('skillLevel', resourceSkillLevelSchema, RESOURCE_SKILL_LEVEL_VALUES);
+      if (skillLevel === false) return;
+
+      const rawTagValues = [
+        ...(Array.isArray(req.query.tags) ? req.query.tags : [req.query.tags]),
+        ...(Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag]),
+      ];
+      const hasTagParam = req.query.tags !== undefined || req.query.tag !== undefined;
+      const tags = parseTagFilterValues(rawTagValues);
+      if (hasTagParam && (tags.length === 0 || tags.length > 10 || tags.some((tag) => tag.length > TAG_MAX_LENGTH))) {
+        return res.status(400).json({
+          error: 'invalid_tags',
+          message: `tags/tag must contain 1 to 10 repeated or comma-separated values of at most ${TAG_MAX_LENGTH} characters each`,
+        });
+      }
+
+      const rawFacets = firstQueryValue(req.query.facets);
+      if (rawFacets !== undefined && rawFacets !== 'true' && rawFacets !== 'false') {
+        return res.status(400).json({
+          error: 'invalid_facets',
+          message: 'facets must be true or false',
+          allowed: ['true', 'false'],
+        });
+      }
+      const includeFacets = rawFacets === 'true';
+
       // Accept category/subcategory as either the display NAME (what the client
       // sends) or a URL slug (e.g. ?category=encoding-codecs — BUG-022). Real
       // names contain spaces/capitals/'&', so a value matching the slug shape is
@@ -1479,7 +1542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // R3-H08: server-side sort with allow-list; unknown values 400 (mirrors
       // the invalid_status pattern) so callers learn the valid options.
-      const ALLOWED_SORTS = ['name-asc', 'name-desc', 'newest', 'oldest'] as const;
+      const ALLOWED_SORTS = RESOURCE_SEARCH_SORT_VALUES;
       const requestedSort = firstQueryValue(req.query.sort);
       if (requestedSort !== undefined && !ALLOWED_SORTS.includes(requestedSort as any)) {
         return res.status(400).json({ error: 'invalid_sort', message: `sort must be one of: ${ALLOWED_SORTS.join(', ')}`, allowed: ALLOWED_SORTS });
@@ -1516,7 +1579,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subcategory,
         subSubcategory,
         search,
-        sort
+        tags,
+        provider: provider || undefined,
+        resourceFormat: resourceFormat || undefined,
+        skillLevel: skillLevel || undefined,
+        includeFacets,
+        sort,
       });
 
       // R3-06: explicit paging metadata. nextOffset is null on the last page.
@@ -2053,6 +2121,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: parsedDesc.error.issues[0]?.message || 'Invalid description' });
         }
         sanitizedProposedData.description = parsedDesc.data;
+      }
+
+      const controlledEditFacets = [
+        ['resourceFormat', resourceFormatSchema],
+        ['provider', resourceProviderSchema],
+        ['skillLevel', resourceSkillLevelSchema],
+      ] as const;
+      for (const [field, schema] of controlledEditFacets) {
+        if (sanitizedProposedData[field] !== undefined) {
+          const parsedFacet = schema.safeParse(sanitizedProposedData[field]);
+          if (!parsedFacet.success) {
+            return res.status(400).json({
+              message: `${field} contains an unsupported value`,
+              field,
+            });
+          }
+          sanitizedProposedData[field] = parsedFacet.data;
+        }
       }
 
       // Run16 BUG-001 / BUG-018 / Run21 R4-048/076: a proposed URL *change* must
@@ -3830,6 +3916,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (validatedData.category !== undefined) updateData.category = validatedData.category;
       if (validatedData.subcategory !== undefined) updateData.subcategory = validatedData.subcategory;
       if (validatedData.subSubcategory !== undefined) updateData.subSubcategory = validatedData.subSubcategory;
+      if (validatedData.resourceFormat !== undefined) updateData.resourceFormat = validatedData.resourceFormat;
+      if (validatedData.provider !== undefined) updateData.provider = validatedData.provider;
+      if (validatedData.skillLevel !== undefined) updateData.skillLevel = validatedData.skillLevel;
       if (validatedData.status !== undefined) updateData.status = validatedData.status;
 
       // Auto-create the implied sub_subcategories row so the resource never
@@ -4114,6 +4203,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         category: resolvedCategory,
         subcategory: resolvedSubcategory,
         subSubcategory: resolvedSubSubcategory,
+        resourceFormat: validatedData.resourceFormat,
+        provider: validatedData.provider,
+        skillLevel: validatedData.skillLevel,
         status: validatedData.status || 'approved',
         submittedBy: userId
       });

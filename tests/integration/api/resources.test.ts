@@ -23,9 +23,12 @@ import {
   createTestResource,
   createTestCategory,
   createTestSubcategory,
+  createTestTag,
+  getTestDb,
   closeTestDb,
 } from '../../helpers/db-helper';
 import { hashPassword } from '../../../server/passwordUtils';
+import { resourceTags } from '../../../shared/schema';
 
 describe('Resources API Integration Tests', () => {
   let app: Express;
@@ -241,6 +244,64 @@ describe('Resources API Integration Tests', () => {
 
       expect(response.body.resources.length).toBe(1);
       expect(response.body.resources[0].title).toContain('React');
+    });
+
+    it('returns identical results for repeated, comma-separated, and legacy tag params', async () => {
+      const both = await createTestResource({
+        title: 'Both Tags',
+        url: 'https://example.com/both-tags',
+        status: 'approved',
+        resourceFormat: 'tool',
+        provider: 'self-hosted',
+        skillLevel: 'advanced',
+      });
+      const rtmpOnly = await createTestResource({
+        title: 'RTMP Only',
+        url: 'https://example.com/rtmp-only',
+        status: 'approved',
+      });
+      const metadataOnly = await createTestResource({
+        title: 'Metadata HLS',
+        url: 'https://example.com/metadata-hls',
+        status: 'approved',
+        metadata: { tags: ['HLS'] },
+      });
+      const rtmp = await createTestTag({ name: 'RTMP', slug: 'rtmp' });
+      const hls = await createTestTag({ name: 'HLS', slug: 'hls' });
+      await getTestDb().insert(resourceTags).values([
+        { resourceId: both.id, tagId: rtmp.id },
+        { resourceId: both.id, tagId: hls.id },
+        { resourceId: rtmpOnly.id, tagId: rtmp.id },
+      ]);
+
+      const [repeated, comma, mixedAlias] = await Promise.all([
+        request(app).get('/api/resources?tags=RTMP&tags=HLS&limit=100&facets=true&sort=name-asc').expect(200),
+        request(app).get('/api/resources?tags=RTMP,HLS&limit=100&facets=true&sort=name-asc').expect(200),
+        request(app).get('/api/resources?tags=RTMP&tag=HLS&limit=100&facets=true&sort=name-asc').expect(200),
+      ]);
+      const ids = (response: request.Response) =>
+        response.body.resources.map((resource: { id: number }) => resource.id);
+
+      expect(ids(repeated)).toEqual(ids(comma));
+      expect(ids(mixedAlias)).toEqual(ids(comma));
+      expect(repeated.body.total).toBe(comma.body.total);
+      expect(mixedAlias.body.total).toBe(comma.body.total);
+      expect(ids(repeated)).toEqual(expect.arrayContaining([both.id, rtmpOnly.id, metadataOnly.id]));
+      expect(repeated.body.facets.tags).toEqual(expect.arrayContaining([
+        { value: 'rtmp', count: 2 },
+        { value: 'hls', count: 2 },
+      ]));
+
+      const controlled = await request(app)
+        .get('/api/resources?format=tool&provider=self-hosted&skillLevel=advanced')
+        .expect(200);
+      expect(ids(controlled)).toContain(both.id);
+      expect(controlled.body.resources.find((resource: { id: number }) => resource.id === both.id))
+        .toMatchObject({
+          resourceFormat: 'tool',
+          provider: 'self-hosted',
+          skillLevel: 'advanced',
+        });
     });
 
     it('should return empty array when no resources exist', async () => {

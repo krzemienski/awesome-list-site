@@ -85,6 +85,13 @@
       "when": 1785300000000,
       "tag": "0039_rate_limit_hits",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786406400000,
+      "tag": "0040_resource_search_facets",
+      "breakpoints": true
     }
   ]
 }

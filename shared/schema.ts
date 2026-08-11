@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uniqueIndex, uuid, primaryKey, unique, real, customType } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uniqueIndex, uuid, primaryKey, unique, real, customType, check } from "drizzle-orm/pg-core";
 
 /**
  * Postgres tsvector column type for full-text search (BUG-018).
@@ -15,6 +15,14 @@ const tsvector = customType<{ data: string }>({
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { taxonomyNameSchema, slugSchema, journeyTitleSchema, journeyDescriptionSchema } from "./validation";
+import {
+  resourceFormatSchema,
+  resourceProviderSchema,
+  resourceSkillLevelSchema,
+  type ResourceFormat,
+  type ResourceProvider,
+  type ResourceSkillLevel,
+} from "./resourceFacets";
 
 /**
  * Session storage table for Replit Auth
@@ -227,6 +235,11 @@ export const resources = pgTable(
     category: text("category").notNull(),
     subcategory: text("subcategory"),
     subSubcategory: text("sub_subcategory"),
+    // Task #294: explicit, curated discovery facets. `unknown` is intentional:
+    // it represents missing curation and must never be inferred at request time.
+    resourceFormat: text("resource_format").$type<ResourceFormat>().notNull().default("unknown"),
+    provider: text("provider").$type<ResourceProvider>().notNull().default("unknown"),
+    skillLevel: text("skill_level").$type<ResourceSkillLevel>().notNull().default("unknown"),
     status: text("status").default("approved"), // pending, approved, rejected, archived
     submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "cascade" }),
     approvedBy: varchar("approved_by").references(() => users.id),
@@ -247,6 +260,16 @@ export const resources = pgTable(
     index("idx_resources_status_category").on(table.status, table.category),
     index("idx_resources_category").on(table.category),
     index("idx_resources_search_tsv").using("gin", table.searchTsv),
+    // Public search always gates on approved status. Partial indexes keep the
+    // facet indexes small and match that hot query predicate.
+    index("idx_resources_approved_format").on(table.resourceFormat).where(sql`${table.status} = 'approved'`),
+    index("idx_resources_approved_provider").on(table.provider).where(sql`${table.status} = 'approved'`),
+    index("idx_resources_approved_skill_level").on(table.skillLevel).where(sql`${table.status} = 'approved'`),
+    // Schema DDL cannot contain bind parameters. Keep these literals in
+    // lockstep with shared/resourceFacets.ts and migration 0040.
+    check("resources_resource_format_check", sql`${table.resourceFormat} IN ('unknown','tool','library','player','sdk','api-service','platform','course','article','video','book','specification','dataset','community','other')`),
+    check("resources_provider_check", sql`${table.provider} IN ('unknown','self-hosted','github','youtube','vimeo','aws','google-cloud','azure','cloudflare','mux','akamai','wowza','brightcove','bitmovin','other')`),
+    check("resources_skill_level_check", sql`${table.skillLevel} IN ('unknown','beginner','intermediate','advanced','all-levels')`),
   ]
 );
 
@@ -257,9 +280,16 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
   category: true,
   subcategory: true,
   subSubcategory: true,
+  resourceFormat: true,
+  provider: true,
+  skillLevel: true,
   status: true,
   submittedBy: true,
   metadata: true,
+}).extend({
+  resourceFormat: resourceFormatSchema.optional(),
+  provider: resourceProviderSchema.optional(),
+  skillLevel: resourceSkillLevelSchema.optional(),
 });
 
 export type InsertResource = z.infer<typeof insertResourceSchema>;
@@ -1514,5 +1544,8 @@ export const EDITABLE_RESOURCE_FIELDS = [
   'category',
   'subcategory',
   'subSubcategory',
+  'resourceFormat',
+  'provider',
+  'skillLevel',
 ] as const;
 export type EditableResourceField = typeof EDITABLE_RESOURCE_FIELDS[number];

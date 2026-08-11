@@ -7,7 +7,15 @@
 //   5. /resource/abc (non-numeric id) breadcrumb reads "Not found"
 //   6. ?subcategory=bogus is ignored with a visible notice
 //   7. whitespace-only search: /search prompt; /category ?search=+++ shows all resources
-//   8. ?tags=RTMP&tags=HLS parses identically to ?tags=RTMP,HLS
+//   8. API and UI parse repeated/legacy tags identically to comma lists
+//   9. smart-search facets reject unsupported values and never leak unapproved rows
+//  10. facet-only URLs restore all controlled state and expose explicit Unknown chips
+//  11. singular/plural tag spellings return the same resources
+//  12. combined facets return disjunctive counts for the selected category + tag
+//  13. stable sorting produces repeatable, non-overlapping pages
+//  14. exact-title and word-order-independent relevance remain intact
+//  15. Back/Forward restores URL, chips, selected facets, and result rows
+//  16. legacy ?search= links hydrate correctly and canonicalize to ?q=
 // Anonymous-only (no login needed). Requires the dev server on :5000. Exits 1 on any failure.
 import fs from 'fs';
 import path from 'path';
@@ -204,6 +212,249 @@ const visible = (page, sel) => page.locator(sel).first().isVisible().catch(() =>
   const b = await tagState(`${catRoute}?tags=RTMP,HLS`);
   log('tags:repeated-equals-comma', a.count === b.count && a.pressed === b.pressed,
     `repeated {count:"${a.count}", chips:"${a.pressed}"} vs comma {count:"${b.count}", chips:"${b.pressed}"}`);
+}
+
+{
+  const get = async (query) => {
+    const response = await fetch(`${BASE}/api/resources?${query}&limit=100&sort=name-asc`);
+    const body = await response.json();
+    return {
+      status: response.status,
+      total: body.total,
+      ids: (body.resources || []).map((resource) => resource.id),
+    };
+  };
+  const [repeated, comma, mixedAlias] = await Promise.all([
+    get('tags=RTMP&tags=HLS'),
+    get('tags=RTMP,HLS'),
+    get('tags=RTMP&tag=HLS'),
+  ]);
+  log('tags:api-repeated-comma-alias-parity',
+    repeated.status === 200 &&
+      comma.status === 200 &&
+      mixedAlias.status === 200 &&
+      repeated.total === comma.total &&
+      mixedAlias.total === comma.total &&
+      JSON.stringify(repeated.ids) === JSON.stringify(comma.ids) &&
+      JSON.stringify(mixedAlias.ids) === JSON.stringify(comma.ids),
+    `repeated=${JSON.stringify(repeated)} comma=${JSON.stringify(comma)} mixedAlias=${JSON.stringify(mixedAlias)}`);
+}
+
+// ---- 9. Controlled facet values + approved-only public contract.
+let initialFacets = null;
+{
+  const invalidCases = [
+    ['provider', 'definitely-not-a-provider'],
+    ['format', 'definitely-not-a-format'],
+    ['skillLevel', 'definitely-not-a-level'],
+    ['sort', 'definitely-not-a-sort'],
+  ];
+  const invalidResults = await Promise.all(invalidCases.map(async ([key, value]) => {
+    const response = await fetch(`${BASE}/api/resources?${key}=${value}`);
+    const body = await response.json().catch(() => ({}));
+    return { key, status: response.status, message: body.message || '' };
+  }));
+  log('facets:invalid-controlled-values-400',
+    invalidResults.every(result => result.status === 400 && result.message.toLowerCase().includes(result.key.toLowerCase())),
+    invalidResults.map(result => `${result.key}=${result.status}`).join(', '));
+
+  const unknown = await fetch(`${BASE}/api/resources?format=unknown&facets=true&limit=100`);
+  const unknownBody = await unknown.json().catch(() => ({}));
+  const rows = Array.isArray(unknownBody.resources) ? unknownBody.resources : [];
+  initialFacets = unknownBody.facets ?? null;
+  const approvedOnly = rows.length > 0 && rows.every(r => r.status === 'approved');
+  const formatOnly = rows.length > 0 && rows.every(r => r.resourceFormat === 'unknown');
+  log('facets:approved-only', unknown.ok && approvedOnly,
+    `status=${unknown.status}; rows=${rows.length}; statuses=${[...new Set(rows.map(r => r.status))].join(',')}`);
+  log('facets:unknown-filter', unknown.ok && formatOnly,
+    `rows=${rows.length}; formats=${[...new Set(rows.map(r => r.resourceFormat))].join(',')}`);
+  log('facets:counts-returned', !!initialFacets && Array.isArray(initialFacets.formats) && Array.isArray(initialFacets.tags),
+    `facet groups=${initialFacets ? Object.keys(initialFacets).join(',') : 'none'}`);
+}
+
+// ---- 10. Facet-only URL restoration: all state survives the shareable URL.
+{
+  const route = '/search?format=unknown&provider=unknown&skillLevel=unknown&sort=name-asc';
+  const page = await openPage(route, '[data-testid="active-filter-chips"]');
+  const search = await page.evaluate(() => window.location.search);
+  const params = new URLSearchParams(search);
+  const chips = await text(page, '[data-testid="active-filter-chips"]');
+  const cards = await page.locator('[data-testid^="link-resource-title-"]').count();
+  const restored =
+    params.get('format') === 'unknown' &&
+    params.get('provider') === 'unknown' &&
+    params.get('skillLevel') === 'unknown' &&
+    params.get('sort') === 'name-asc';
+  log('facets:url-state-restored', restored,
+    `location.search="${search}"`);
+  log('facets:unknown-chips-visible', /Format: Unknown/i.test(chips || '') &&
+    /Provider: Unknown/i.test(chips || '') && /Skill level: Unknown/i.test(chips || ''),
+    `chips="${(chips || '').replace(/\s+/g, ' ').slice(0, 180)}"`);
+  log('facets:filter-only-results', cards > 0, `${cards} cards rendered without q`);
+  await page.screenshot({ path: `${OUT}/smart-facets.png`, fullPage: true }).catch(() => {});
+  await page.close();
+}
+
+// ---- 11. Singular/plural tag normalization keeps the same result set.
+{
+  const tags = (initialFacets?.tags ?? []).map(item => item.value).filter(Boolean);
+  const keepPlural = new Set([
+    'hls', 'obs', 'oss', 'os', 'css', 'mss', 'cbcs', 'cbs', 'dts', 'ts',
+    'graphics', 'analytics', 'analysis', 'ios', 'tvos', 'macos', 'nas',
+    'kubernetes', 'less', 'sass', 'aws', 'cors', 'https', 'dns', 'tls',
+    'sas', 'saas', 'paas', 'iaas', 'ffmpeg-libs', 'canvas', 'atmos',
+    'axios', 'redis', 'postgres', 'jenkins', 'devops', 'chaos',
+  ]);
+  const singularTag = tags.find(tag =>
+    /^[a-z0-9-]{4,}$/i.test(tag) &&
+    !tag.endsWith('s') &&
+    !tag.endsWith('y') &&
+    !keepPlural.has(tag));
+  if (!singularTag) {
+    log('facets:singular-plural-tags', false, 'no suitable canonical singular tag was present in live facet counts');
+  } else {
+    const pluralTag = `${singularTag}s`;
+    async function resourceIds(tag) {
+      const response = await fetch(`${BASE}/api/resources?tags=${encodeURIComponent(tag)}&limit=100`);
+      const body = await response.json().catch(() => ({}));
+      return {
+        status: response.status,
+        ids: (body.resources ?? []).map(r => r.id).sort((a, b) => a - b),
+        total: body.total,
+      };
+    }
+    const plural = await resourceIds(pluralTag);
+    const singular = await resourceIds(singularTag);
+    log('facets:singular-plural-tags',
+      plural.status === 200 && singular.status === 200 &&
+        plural.total > 0 && plural.total === singular.total &&
+        JSON.stringify(plural.ids) === JSON.stringify(singular.ids),
+      `"${pluralTag}" total=${plural.total} vs "${singularTag}" total=${singular.total}`);
+  }
+}
+
+// ---- 12. Combination-aware facet counts omit only their own selection.
+{
+  const categoryResponse = await fetch(
+    `${BASE}/api/resources?category=${encodeURIComponent(cat.name)}&facets=true&limit=1`,
+  );
+  const categoryBody = await categoryResponse.json().catch(() => ({}));
+  const tag = (categoryBody.facets?.tags ?? []).find(item => item.value && item.count > 0)?.value;
+  if (!categoryResponse.ok || !tag) {
+    log('facets:disjunctive-counts', false,
+      `could not find a nonzero tag for category "${cat.name}" (status=${categoryResponse.status})`);
+  } else {
+    const [combinedResponse, tagOnlyResponse] = await Promise.all([
+      fetch(`${BASE}/api/resources?category=${encodeURIComponent(cat.name)}&tags=${encodeURIComponent(tag)}&facets=true&limit=1`),
+      fetch(`${BASE}/api/resources?tags=${encodeURIComponent(tag)}&facets=true&limit=1`),
+    ]);
+    const [combined, tagOnly] = await Promise.all([
+      combinedResponse.json().catch(() => ({})),
+      tagOnlyResponse.json().catch(() => ({})),
+    ]);
+    const categoryCount = combined.facets?.categories?.find(item => item.value === cat.name)?.count;
+    const tagCount = combined.facets?.tags?.find(item => item.value === tag)?.count;
+    const sameCategoryCounts =
+      JSON.stringify(combined.facets?.categories ?? []) ===
+      JSON.stringify(tagOnly.facets?.categories ?? []);
+    const sameTagCounts =
+      JSON.stringify(combined.facets?.tags ?? []) ===
+      JSON.stringify(categoryBody.facets?.tags ?? []);
+    log('facets:disjunctive-counts',
+      combinedResponse.ok && tagOnlyResponse.ok && combined.total > 0 &&
+        categoryCount === combined.total && tagCount === combined.total &&
+        sameCategoryCounts && sameTagCounts,
+      `category="${cat.name}", tag="${tag}", combined=${combined.total}, selectedCounts=${categoryCount}/${tagCount}, categoryFacetMatchesTagOnly=${sameCategoryCounts}, tagFacetMatchesCategoryOnly=${sameTagCounts}`);
+  }
+}
+
+// ---- 13. Stable sorting gives repeatable page 1 and no page overlap.
+{
+  const loadPage = async page => {
+    const response = await fetch(`${BASE}/api/resources?sort=name-asc&page=${page}&limit=24`);
+    const body = await response.json().catch(() => ({}));
+    return { status: response.status, ids: (body.resources ?? []).map(resource => resource.id) };
+  };
+  const [first, firstAgain, second] = await Promise.all([loadPage(1), loadPage(1), loadPage(2)]);
+  const overlap = first.ids.filter(id => second.ids.includes(id));
+  log('facets:stable-pagination',
+    first.status === 200 && firstAgain.status === 200 && second.status === 200 &&
+      first.ids.length === 24 && second.ids.length > 0 &&
+      JSON.stringify(first.ids) === JSON.stringify(firstAgain.ids) && overlap.length === 0,
+    `page1=${first.ids.length}, repeated=${JSON.stringify(first.ids) === JSON.stringify(firstAgain.ids)}, page2=${second.ids.length}, overlap=${overlap.length}`);
+}
+
+// ---- 14. Relevance: exact title first; multi-word ranking ignores word order.
+{
+  const search = async query => {
+    const response = await fetch(`${BASE}/api/resources?search=${encodeURIComponent(query)}&sort=relevance&limit=20`);
+    const body = await response.json().catch(() => ({}));
+    return { status: response.status, rows: body.resources ?? [] };
+  };
+  const [exact, forward, reversed] = await Promise.all([
+    search('ffmpeg'),
+    search('video processing'),
+    search('processing video'),
+  ]);
+  const forwardIds = forward.rows.map(resource => resource.id);
+  const reversedIds = reversed.rows.map(resource => resource.id);
+  log('facets:relevance-parity',
+    exact.status === 200 && exact.rows[0]?.title?.toLowerCase() === 'ffmpeg' &&
+      forward.status === 200 && reversed.status === 200 &&
+      forwardIds.length > 0 && JSON.stringify(forwardIds) === JSON.stringify(reversedIds),
+    `exactFirst="${exact.rows[0]?.title ?? ''}", multiWordRows=${forwardIds.length}, reversedSame=${JSON.stringify(forwardIds) === JSON.stringify(reversedIds)}`);
+}
+
+// ---- 15. Real history traversal restores filters, chips, and result rows.
+{
+  const page = await openPage('/search?format=unknown&sort=name-asc', '[data-testid="text-result-count"]');
+  const categoryButton = page.getByTestId(/^facet-category-/).first();
+  if (!(await categoryButton.isVisible().catch(() => false))) {
+    log('facets:back-forward-restores', false, 'no visible category facet button');
+  } else {
+    await categoryButton.click();
+    await page.waitForFunction(() => new URLSearchParams(location.search).has('category'));
+    const categoryValue = await page.evaluate(() => new URLSearchParams(location.search).get('category'));
+    const categoryFirstHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
+    const providerButton = page.getByTestId('facet-provider-unknown').first();
+    await providerButton.click();
+    await page.waitForFunction(() => new URLSearchParams(location.search).get('provider') === 'unknown');
+    const forwardHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
+    await page.goBack();
+    await page.waitForFunction(expected =>
+      new URLSearchParams(location.search).get('category') === expected &&
+      !new URLSearchParams(location.search).has('provider'), categoryValue);
+    const backChips = await text(page, '[data-testid="active-filter-chips"]');
+    const backHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
+    await page.goForward();
+    await page.waitForFunction(() => new URLSearchParams(location.search).get('provider') === 'unknown');
+    const restoredChips = await text(page, '[data-testid="active-filter-chips"]');
+    const restoredHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
+    log('facets:back-forward-restores',
+      !!categoryValue && /Category:/i.test(backChips || '') && !/Provider:/i.test(backChips || '') &&
+        /Provider: Unknown/i.test(restoredChips || '') &&
+        backHref === categoryFirstHref && restoredHref === forwardHref,
+      `category="${categoryValue}", backRowsMatch=${backHref === categoryFirstHref}, forwardRowsMatch=${restoredHref === forwardHref}`);
+  }
+  await page.screenshot({ path: `${OUT}/back-forward.png`, fullPage: true }).catch(() => {});
+  await page.close();
+}
+
+// ---- 16. Legacy/external ?search= links hydrate and replace to canonical ?q=.
+{
+  const page = await openPage('/search?search=ffmpeg', '[data-testid="text-result-count"]');
+  const value = await page.getByTestId('input-search-page').inputValue().catch(() => '');
+  const params = new URLSearchParams(await page.evaluate(() => window.location.search));
+  const firstTitle = await text(page, '[data-testid^="link-resource-title-"]');
+  log('search-alias:input-hydrated', value === 'ffmpeg', `input="${value}"`);
+  log('search-alias:url-canonicalized',
+    params.get('q') === 'ffmpeg' && !params.has('search'),
+    `location.search="?${params.toString()}"`);
+  log('search-alias:matching-results',
+    /^ffmpeg$/i.test(firstTitle || ''),
+    `first result="${firstTitle || ''}"`);
+  await page.screenshot({ path: `${OUT}/search-alias.png`, fullPage: true }).catch(() => {});
+  await page.close();
 }
 
 fs.writeFileSync(`${OUT}/url-params-audit.json`, JSON.stringify(results, null, 2));

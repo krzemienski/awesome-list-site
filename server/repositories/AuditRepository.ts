@@ -36,6 +36,11 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { decodeHtmlEntities } from "../github/importHygiene";
+import {
+  resourceFormatSchema,
+  resourceProviderSchema,
+  resourceSkillLevelSchema,
+} from "@shared/resourceFacets";
 import { eq, desc, asc, or, sql } from "drizzle-orm";
 
 /**
@@ -273,6 +278,12 @@ export class AuditRepository {
               tags: normalizedTags,
             };
           }
+        } else if (field === 'resourceFormat') {
+          updates[field] = resourceFormatSchema.parse(proposedData[field]);
+        } else if (field === 'provider') {
+          updates[field] = resourceProviderSchema.parse(proposedData[field]);
+        } else if (field === 'skillLevel') {
+          updates[field] = resourceSkillLevelSchema.parse(proposedData[field]);
         } else {
           // Task #248: decode HTML entities at the merge too — the submit
           // route decodes new suggestions, but pending edits saved BEFORE
