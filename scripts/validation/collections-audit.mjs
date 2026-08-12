@@ -46,22 +46,75 @@ async function purgeQaUsers() {
 }
 
 async function requestJson(request, method, route, body) {
-  const response = await request.fetch(`${BASE}${route}`, {
-    method,
-    headers: { Origin: BASE, "Content-Type": "application/json" },
-    data: body,
-  });
-  const text = await response.text();
-  let data = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = text;
+  const deadline = Date.now() + 90_000;
+  let last = "no response";
+  while (Date.now() < deadline) {
+    const response = await request.fetch(`${BASE}${route}`, {
+      method,
+      headers: { Origin: BASE, "Content-Type": "application/json" },
+      data: body,
+    });
+    const text = await response.text();
+    if (response.status() === 429 || response.status() === 503) {
+      last = `${response.status()}: ${text.slice(0, 200)}`;
+      const retryAfter = Number(response.headers()["retry-after"] || 1);
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.max(1000, Math.min(retryAfter * 1000, 5000))),
+      );
+      continue;
+    }
+    let data = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = text;
+    }
+    if (!response.ok()) {
+      throw new Error(`${method} ${route} -> ${response.status()}: ${text.slice(0, 200)}`);
+    }
+    return { status: response.status(), data };
   }
-  if (!response.ok()) {
-    throw new Error(`${method} ${route} -> ${response.status()}: ${text.slice(0, 200)}`);
+  throw new Error(`${method} ${route} remained unavailable (${last})`);
+}
+
+async function fetchWithRetry(route, options = {}) {
+  const deadline = Date.now() + 90_000;
+  let last = "no response";
+  while (Date.now() < deadline) {
+    const response = await fetch(`${BASE}${route}`, options);
+    if (response.status !== 429 && response.status !== 503) return response;
+    last = `status ${response.status}`;
+    const retryAfter = Number(response.headers.get("retry-after") || 1);
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.max(1000, Math.min(retryAfter * 1000, 5000))),
+    );
   }
-  return { status: response.status(), data };
+  throw new Error(`GET ${route} remained unavailable (${last})`);
+}
+
+async function gotoPage(page, route) {
+  const deadline = Date.now() + 90_000;
+  let last = "no response";
+  while (Date.now() < deadline) {
+    try {
+      const response = await page.goto(`${BASE}${route}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 45_000,
+      });
+      const status = response?.status() ?? 0;
+      if (status > 0 && status !== 429 && status !== 503) {
+        await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
+        return;
+      }
+      last = `status ${status}`;
+      const retryAfter = Number(response?.headers()["retry-after"] || 1);
+      await page.waitForTimeout(Math.max(1000, Math.min(retryAfter * 1000, 5000)));
+    } catch (error) {
+      last = error instanceof Error ? error.message : String(error);
+      await page.waitForTimeout(1500);
+    }
+  }
+  throw new Error(`Unable to load ${route} for collections audit (${last})`);
 }
 
 // Wait for the application before creating any data.
@@ -125,11 +178,24 @@ try {
   });
 
   const page = await ownerContext.newPage();
-  await page.goto(`${BASE}/bookmarks?collection=${collectionId}`, {
-    waitUntil: "networkidle",
-    timeout: 45_000,
-  });
-  await page.waitForSelector(`[data-testid="bookmark-card-${resource.id}"]`, { timeout: 20_000 });
+  await gotoPage(page, `/bookmarks?collection=${collectionId}`);
+  const bookmarkSelector = `[data-testid="bookmark-card-${resource.id}"]`;
+  let bookmarkVisible = await page
+    .waitForSelector(bookmarkSelector, { timeout: 20_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (!bookmarkVisible) {
+    // The document itself is static and can return 200 just before the
+    // resilience harness exhausts the pool; reload after that bounded pressure
+    // so a transient failed client query is never measured as an empty library.
+    await fetchWithRetry("/api/health/ready");
+    await gotoPage(page, `/bookmarks?collection=${collectionId}`);
+    bookmarkVisible = await page
+      .waitForSelector(bookmarkSelector, { timeout: 20_000 })
+      .then(() => true)
+      .catch(() => false);
+  }
+  if (!bookmarkVisible) throw new Error(`Bookmark card ${resource.id} did not render after ready reload`);
   const libraryText = await page.locator("#main").innerText();
   log(
     "library:state-rendered",
@@ -150,7 +216,7 @@ try {
   const shareId = published.data.shareId;
   const route = `/collection/${shareId}`;
 
-  const crawlerResponse = await fetch(`${BASE}${route}`, {
+  const crawlerResponse = await fetchWithRetry(route, {
     headers: { "User-Agent": "Twitterbot/1.0" },
   });
   const crawlerHtml = await crawlerResponse.text();
@@ -164,7 +230,7 @@ try {
 
   anonymousContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const publicPage = await anonymousContext.newPage();
-  await publicPage.goto(`${BASE}${route}`, { waitUntil: "networkidle", timeout: 45_000 });
+  await gotoPage(publicPage, route);
   await publicPage.waitForSelector(`[data-testid="card-resource-${resource.id}"]`, { timeout: 20_000 });
   const publicControls = {
     detail: await publicPage.locator(`[data-testid="link-view-details-${resource.id}"]`).count(),
@@ -193,7 +259,7 @@ try {
   await publicPage.screenshot({ path: `${OUT}/public-collection.png`, fullPage: true });
 
   await requestJson(request, "DELETE", `/api/collections/${collectionId}/publish`);
-  const revoked = await fetch(`${BASE}${route}`, { headers: { "User-Agent": "Twitterbot/1.0" } });
+  const revoked = await fetchWithRetry(route, { headers: { "User-Agent": "Twitterbot/1.0" } });
   log("share:unpublish-revokes", revoked.status === 404, `status=${revoked.status}`);
   const republished = await requestJson(
     request,
@@ -203,15 +269,12 @@ try {
   log("share:stable-id", republished.data.shareId === shareId, `reused=${republished.data.shareId === shareId}`);
 
   await requestJson(request, "PATCH", `/api/collections/${collectionId}`, { archived: true });
-  const archived = await fetch(`${BASE}${route}`, { headers: { "User-Agent": "Twitterbot/1.0" } });
+  const archived = await fetchWithRetry(route, { headers: { "User-Agent": "Twitterbot/1.0" } });
   log("share:archive-revokes", archived.status === 404, `status=${archived.status}`);
   await requestJson(request, "PATCH", `/api/collections/${collectionId}`, { archived: false });
 
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto(`${BASE}/resource/${mobileResource.id}`, {
-    waitUntil: "networkidle",
-    timeout: 45_000,
-  });
+  await gotoPage(page, `/resource/${mobileResource.id}`);
   await page.getByRole("button", { name: "Add bookmark" }).click();
   await page.getByText("Add to collections (optional)").waitFor({ timeout: 20_000 });
   const chooser = page.getByLabel(`Add bookmark to ${collectionName}`);

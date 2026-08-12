@@ -142,7 +142,7 @@ import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChec
 import { seedDatabase, syncAdminPasswordFromEnv } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { parseAgentConfigFromRequest, stripJobAuthSecret } from "./ai/agentRuntime";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { sql } from "drizzle-orm";
 import { SITE_URL, resolveOgImageMeta } from "./og-middleware";
 // BUG-012 (audit 2): the sitemap's paginated-URL counts must use the exact
@@ -157,8 +157,38 @@ import {
   revokeAllUserSessions,
 } from "./sessionPolicy";
 import { registerNotificationRoutes } from "./api/notifications";
+import {
+  getPublicCacheSnapshot,
+  getPublicCacheValue,
+} from "./cache/publicCache";
+import { isDatabaseUnavailableError } from "./db/errors";
+import { ServiceUnavailableError } from "./middleware/errors";
+import { checkReadiness, getReadinessSnapshot } from "./health";
+import {
+  getHeavyWorkSnapshot,
+  runHeavyWork,
+  startHeavyWork,
+} from "./ops/heavyWork";
+import { getOperationalTelemetrySnapshot } from "./ops/operationalTelemetry";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
+
+function sendOperationalFailure(
+  res: Response,
+  error: unknown,
+  fallbackMessage: string,
+) {
+  if (
+    error instanceof ServiceUnavailableError ||
+    isDatabaseUnavailableError(error)
+  ) {
+    return res
+      .status(503)
+      .set("Retry-After", "1")
+      .json({ message: "Service is temporarily unavailable" });
+  }
+  return res.status(500).json({ message: fallbackMessage });
+}
 
 // ----------------------------------------------------------------------------
 // REPOSITORY INSTANCES - Direct Usage of Domain Repositories
@@ -193,7 +223,7 @@ const isAdmin = async (req: any, res: Response, next: any) => {
     
     next();
   } catch (error) {
-    res.status(500).json({ message: "Error checking admin status" });
+    sendOperationalFailure(res, error, "Error checking admin status");
   }
 };
 
@@ -588,10 +618,8 @@ async function resolveOgParams(req: any): Promise<OgParams> {
     }
   }
   let count = '2000+';
-  try {
-    const data = await legacyRepo.getAwesomeListFromDatabase();
-    count = `${data?.resources?.length ?? 2000}+`;
-  } catch {}
+  const data = await legacyRepo.getAwesomeListFromDatabase();
+  count = `${data?.resources?.length ?? 2000}+`;
   return { ok: true, pageTitle, category, kicker, count };
 }
 
@@ -605,7 +633,7 @@ async function generateOpenGraphImage(req: any, res: any) {
     res.send(svg);
   } catch (error) {
     console.error('Error generating OG image (SVG):', error);
-    res.status(500).send('Error generating image');
+    sendOperationalFailure(res, error, 'Error generating image');
   }
 }
 
@@ -627,7 +655,7 @@ async function generateOpenGraphImagePng(req: any, res: any) {
     res.send(png);
   } catch (error) {
     console.error('Error generating OG image (PNG):', error);
-    res.status(500).send('Error generating image');
+    sendOperationalFailure(res, error, 'Error generating image');
   }
 }
 
@@ -1644,7 +1672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error fetching resources:', error);
-      res.status(500).json({ message: 'Failed to fetch resources' });
+      sendOperationalFailure(res, error, 'Failed to fetch resources');
     }
   });
 
@@ -1707,7 +1735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ query: q, total, limit, offset, nextOffset, results: results.map(toPublicResource) });
     } catch (error) {
       console.error('Error searching resources:', error);
-      res.status(500).json({ message: 'Failed to search resources' });
+      sendOperationalFailure(res, error, 'Failed to search resources');
     }
   });
 
@@ -1777,7 +1805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ exists: !!existingResource });
     } catch (error) {
       console.error('Error checking URL:', error);
-      res.status(500).json({ message: 'Failed to check URL' });
+      sendOperationalFailure(res, error, 'Failed to check URL');
     }
   });
 
@@ -1817,7 +1845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(toPublicResource(resource));
     } catch (error) {
       console.error('Error fetching resource:', error);
-      res.status(500).json({ message: 'Failed to fetch resource' });
+      sendOperationalFailure(res, error, 'Failed to fetch resource');
     }
   };
   app.get('/api/resources/:id(\\d+)', resourceReadLimiter, getResourceByIdHandler);
@@ -1867,7 +1895,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error fetching related resources:', error);
-      res.json(empty);
+      sendOperationalFailure(res, error, 'Failed to fetch related resources');
     }
   });
 
@@ -2013,7 +2041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource data', errors: error.issues });
       }
       console.error('Error creating resource:', error);
-      res.status(500).json({ message: 'Failed to create resource' });
+      sendOperationalFailure(res, error, 'Failed to create resource');
     }
   };
   app.post('/api/resources', isAuthenticated, createResourceHandler);
@@ -2295,19 +2323,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/categories - List all categories (public)
   app.get('/api/categories', async (req, res) => {
     try {
-      const categories = await categoryRepo.listCategories();
-      // Attach the authoritative approved-resource count per category (single
-      // GROUP BY query) so the nav and landing page show DB-accurate counts
-      // instead of client-side static-tree sums.
-      const counts = await categoryRepo.getResourceCountsByCategory();
-      const enriched = categories.map((cat) => ({
-        ...cat,
-        resourceCount: counts[cat.name] ?? 0,
-      }));
+      const enriched = await getPublicCacheValue({
+        namespace: 'catalog-taxonomy',
+        key: 'categories',
+        ttlMs: 60_000,
+        load: async () => {
+          const categories = await categoryRepo.listCategories();
+          // Attach the authoritative approved-resource count per category.
+          const counts = await categoryRepo.getResourceCountsByCategory();
+          return categories.map((cat) => ({
+            ...cat,
+            resourceCount: counts[cat.name] ?? 0,
+          }));
+        },
+      });
+      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
       res.json(enriched);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      res.status(500).json({ message: 'Failed to fetch categories' });
+      sendOperationalFailure(res, error, 'Failed to fetch categories');
     }
   });
 
@@ -2320,25 +2354,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // spaces/underscores to hyphens so "open source", "Open Source" and
       // "open-source" merge into one "open-source" bucket instead of showing
       // as three near-duplicate filter chips.
-      const result = await db.execute(sql`
-        SELECT lower(regexp_replace(btrim(tag), '[[:space:]_]+', '-', 'g')) AS tag,
-               count(*)::int AS count
-        FROM resources r,
-             jsonb_array_elements_text(r.metadata->'tags') AS tag
-        WHERE r.status = 'approved'
-          AND jsonb_typeof(r.metadata->'tags') = 'array'
-          AND btrim(tag) <> ''
-        GROUP BY 1
-        ORDER BY count DESC, tag ASC
-      `);
-      res.set('Cache-Control', 'public, max-age=300');
-      res.json({
-        total: result.rows.length,
-        tags: result.rows.map((r: any) => ({ tag: r.tag, count: r.count })),
+      const payload = await getPublicCacheValue({
+        namespace: 'catalog-taxonomy',
+        key: 'tags',
+        ttlMs: 60_000,
+        load: async () => {
+          const result = await db.execute(sql`
+            SELECT lower(regexp_replace(btrim(tag), '[[:space:]_]+', '-', 'g')) AS tag,
+                   count(*)::int AS count
+            FROM resources r,
+                 jsonb_array_elements_text(r.metadata->'tags') AS tag
+            WHERE r.status = 'approved'
+              AND jsonb_typeof(r.metadata->'tags') = 'array'
+              AND btrim(tag) <> ''
+            GROUP BY 1
+            ORDER BY count DESC, tag ASC
+          `);
+          return {
+            total: result.rows.length,
+            tags: result.rows.map((r: any) => ({ tag: r.tag, count: r.count })),
+          };
+        },
       });
+      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      res.json(payload);
     } catch (error) {
       console.error('Error aggregating tags:', error);
-      res.status(500).json({ message: 'Failed to fetch tags' });
+      sendOperationalFailure(res, error, 'Failed to fetch tags');
     }
   });
 
@@ -2370,11 +2412,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         categoryId = parsed;
       }
       
-      const subcategories = await categoryRepo.listSubcategories(categoryId);
+      const subcategories = await getPublicCacheValue({
+        namespace: 'catalog-taxonomy',
+        key: `subcategories:${categoryId ?? 'all'}`,
+        ttlMs: 60_000,
+        load: () => categoryRepo.listSubcategories(categoryId),
+      });
+      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
       res.json(subcategories);
     } catch (error) {
       console.error('Error fetching subcategories:', error);
-      res.status(500).json({ message: 'Failed to fetch subcategories' });
+      sendOperationalFailure(res, error, 'Failed to fetch subcategories');
     }
   });
 
@@ -2405,11 +2453,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subcategoryId = parsed;
       }
       
-      const subSubcategories = await categoryRepo.listSubSubcategories(subcategoryId);
+      const subSubcategories = await getPublicCacheValue({
+        namespace: 'catalog-taxonomy',
+        key: `sub-subcategories:${subcategoryId ?? 'all'}`,
+        ttlMs: 60_000,
+        load: () => categoryRepo.listSubSubcategories(subcategoryId),
+      });
+      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
       res.json(subSubcategories);
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);
-      res.status(500).json({ message: 'Failed to fetch sub-subcategories' });
+      sendOperationalFailure(res, error, 'Failed to fetch sub-subcategories');
     }
   });
 
@@ -4870,17 +4924,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'No valid resource IDs provided' });
       }
 
-      const results = await Promise.allSettled(
-        numericIds.map((id) => resourceRepo.approveResource(id, userId))
-      );
-
-      const succeeded = results.filter((r) => r.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
+      let succeeded = 0;
+      let failed = 0;
+      // Sequential on purpose: a bulk moderation request must not monopolize
+      // all three database connections and starve sessions/catalog reads.
+      for (const id of numericIds) {
+        try {
+          await resourceRepo.approveResource(id, userId);
+          succeeded++;
+        } catch (error) {
+          if (isDatabaseUnavailableError(error)) throw error;
+          failed++;
+        }
+      }
 
       res.json({ message: `Approved ${succeeded} resource(s)`, succeeded, failed });
     } catch (error) {
       console.error('Error in bulk approve:', error);
-      res.status(500).json({ message: 'Failed to bulk approve resources' });
+      sendOperationalFailure(res, error, 'Failed to bulk approve resources');
     }
   });
 
@@ -4906,17 +4967,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'No valid resource IDs provided' });
       }
 
-      const results = await Promise.allSettled(
-        numericIds.map((id) => resourceRepo.rejectResource(id, userId, reason))
-      );
-
-      const succeeded = results.filter((r) => r.status === 'fulfilled').length;
-      const failed = results.length - succeeded;
+      let succeeded = 0;
+      let failed = 0;
+      for (const id of numericIds) {
+        try {
+          await resourceRepo.rejectResource(id, userId, reason);
+          succeeded++;
+        } catch (error) {
+          if (isDatabaseUnavailableError(error)) throw error;
+          failed++;
+        }
+      }
 
       res.json({ message: `Rejected ${succeeded} resource(s)`, succeeded, failed });
     } catch (error) {
       console.error('Error in bulk reject:', error);
-      res.status(500).json({ message: 'Failed to bulk reject resources' });
+      sendOperationalFailure(res, error, 'Failed to bulk reject resources');
     }
   });
 
@@ -4954,6 +5020,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           succeeded++;
         } catch (err) {
           console.error(`Error deleting resource ${id} in bulk:`, err);
+          if (isDatabaseUnavailableError(err)) throw err;
           failed++;
         }
       }
@@ -4961,7 +5028,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: `Deleted ${succeeded} resource(s)`, succeeded, failed });
     } catch (error) {
       console.error('Error in bulk delete:', error);
-      res.status(500).json({ message: 'Failed to bulk delete resources' });
+      sendOperationalFailure(res, error, 'Failed to bulk delete resources');
     }
   });
 
@@ -5795,6 +5862,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // POST /api/github/import - Import resources from GitHub awesome list
   app.post('/api/github/import', isAuthenticated, isAdmin, async (req: any, res) => {
+    let queueItemId: number | undefined;
     try {
       const { repositoryUrl: rawImportRepo, options = {} } = req.body;
       
@@ -5816,15 +5884,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resourceIds: [],
         metadata: options
       });
+      queueItemId = queueItem.id;
       
-      // Process immediately in background
-      syncService.importFromGitHub(repositoryUrl, options)
-        .then(result => {
+      // Acquire bounded capacity before acknowledging background processing.
+      await startHeavyWork('github-sync', async () => {
+        await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
+        try {
+          const result = await syncService.importFromGitHub(repositoryUrl, options);
           console.log('GitHub import completed:', result);
-        })
-        .catch(error => {
+          const completed = result.errors.length === 0 || result.imported > 0 || result.updated > 0;
+          await githubSyncRepo.updateGithubSyncStatus(
+            queueItem.id,
+            completed ? 'completed' : 'failed',
+            completed ? undefined : result.errors.slice(0, 3).join('; '),
+            {
+              imported: result.imported,
+              updated: result.updated,
+              skipped: result.skipped,
+              errors: result.errors.length,
+            },
+          );
+        } catch (error) {
           console.error('GitHub import failed:', error);
-        });
+          await githubSyncRepo.updateGithubSyncStatus(
+            queueItem.id,
+            'failed',
+            error instanceof Error ? error.message : String(error),
+          ).catch(() => undefined);
+          throw error;
+        }
+      });
       
       res.json({
         message: 'Import started',
@@ -5833,12 +5922,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error starting GitHub import:', error);
-      res.status(500).json({ message: 'Failed to start GitHub import' });
+      if (queueItemId !== undefined) {
+        await githubSyncRepo.updateGithubSyncStatus(
+          queueItemId,
+          'failed',
+          'Heavy operation capacity was unavailable',
+        ).catch(() => undefined);
+      }
+      sendOperationalFailure(res, error, 'Failed to start GitHub import');
     }
   });
   
   // POST /api/github/export - Export approved resources to GitHub
   app.post('/api/github/export', isAuthenticated, isAdmin, async (req: any, res) => {
+    let queueItemId: number | undefined;
     try {
       const { repositoryUrl: rawExportRepo, options = {} } = req.body;
       
@@ -5860,6 +5957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resourceIds: [],
         metadata: options
       });
+      queueItemId = queueItem.id;
 
       // R5-029 (run24) sweep: every bulk-export-shaped admin action leaves an
       // audit-trail entry (who, what, when) like users/export.
@@ -5871,9 +5969,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `Admin started GitHub export to ${repositoryUrl}`
       );
       
-      // Process immediately in background
-      syncService.exportToGitHub(repositoryUrl, options)
-        .then(async result => {
+      // Process immediately in the bounded background gate.
+      await startHeavyWork('github-sync', async () => {
+        await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'processing');
+        try {
+          const result = await syncService.exportToGitHub(repositoryUrl, options);
           if (result.errors.length > 0) {
             console.error('GitHub export failed:', result.errors);
             await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '));
@@ -5885,15 +5985,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             commitSha: result.commitSha,
             commitUrl: result.commitUrl
           });
-        })
-        .catch(async error => {
+        } catch (error) {
           console.error('GitHub export failed:', error);
           await githubSyncRepo.updateGithubSyncStatus(
             queueItem.id,
             'failed',
             error instanceof Error ? error.message : String(error)
-          ).catch(() => {});
-        });
+          ).catch(() => undefined);
+          throw error;
+        }
+      });
       
       res.json({
         message: 'Export started',
@@ -5902,7 +6003,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error starting GitHub export:', error);
-      res.status(500).json({ message: 'Failed to start GitHub export' });
+      if (queueItemId !== undefined) {
+        await githubSyncRepo.updateGithubSyncStatus(
+          queueItemId,
+          'failed',
+          'Heavy operation capacity was unavailable',
+        ).catch(() => undefined);
+      }
+      sendOperationalFailure(res, error, 'Failed to start GitHub export');
     }
   });
   
@@ -6030,14 +6138,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/github/process-queue - Manually trigger queue processing
   app.post('/api/github/process-queue', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      // Process queue in background
-      syncService.processQueue()
-        .then(() => {
-          console.log('GitHub sync queue processing completed');
-        })
-        .catch(error => {
-          console.error('GitHub sync queue processing failed:', error);
-        });
+      // Acquire bounded heavy-work capacity before acknowledging the job.
+      await startHeavyWork('github-sync', async () => {
+        await syncService.processQueue();
+        console.log('GitHub sync queue processing completed');
+      });
       
       res.json({
         message: 'Queue processing started',
@@ -6045,7 +6150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error starting queue processing:', error);
-      res.status(500).json({ message: 'Failed to start queue processing' });
+      sendOperationalFailure(res, error, 'Failed to start queue processing');
     }
   });
 
@@ -6054,34 +6159,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/export - Generate and download awesome list markdown
   app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      // Export the public catalog (deduped, orphan-excluded) — see R3-17 note
-      // on getPublicCatalogResources().
-      const resources = await getPublicCatalogResources();
-      
-      // Get export options from request body
-      // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
-      // NOTE: includeLicense defaults to false because awesome-lint forbids inline license sections
-      const {
-        title = 'Awesome Video',
-        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-        includeContributing = false, // References CONTRIBUTING.md which may not exist
-        includeLicense = false, // awesome-lint forbids inline license sections
-        websiteUrl = undefined, // Don't include dev URLs in exports
-        repoUrl = process.env.GITHUB_REPO_URL
-      } = req.body;
-
-      // Create formatter with options
-      const formatter = new AwesomeListFormatter(resources, {
-        title,
-        description,
-        includeContributing,
-        includeLicense,
-        websiteUrl,
-        repoUrl
+      const { resources, markdown } = await runHeavyWork('catalog-export', async () => {
+        // Export the public catalog (deduped, orphan-excluded).
+        const resources = await getPublicCatalogResources();
+        const {
+          title = 'Awesome Video',
+          description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+          includeContributing = false,
+          includeLicense = false,
+          websiteUrl = undefined,
+          repoUrl = process.env.GITHUB_REPO_URL
+        } = req.body;
+        const formatter = new AwesomeListFormatter(resources, {
+          title,
+          description,
+          includeContributing,
+          includeLicense,
+          websiteUrl,
+          repoUrl
+        });
+        return { resources, markdown: formatter.generate() };
       });
-
-      // Generate the markdown
-      const markdown = formatter.generate();
 
       // R5-029 (run24) sweep: bulk-export actions are audit-logged.
       await auditRepo.logResourceAudit(
@@ -6099,33 +6197,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(markdown);
     } catch (error) {
       console.error('Error generating awesome list export:', error);
-      res.status(500).json({ message: 'Failed to generate awesome list export' });
+      sendOperationalFailure(res, error, 'Failed to generate awesome list export');
     }
   });
 
   // GET /api/admin/export-json - Export full database as JSON for backup
   app.get('/api/admin/export-json', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      // Get ALL data from database (not just approved resources)
-      const [
-        allResources,
-        categories,
-        subcategories,
-        subSubcategories,
-        tags,
-        learningJourneys,
-        syncQueue,
-        users
-      ] = await Promise.all([
-        resourceRepo.listResources({ limit: 100000 }), // Get all resources regardless of status
-        categoryRepo.listCategories(),
-        categoryRepo.listSubcategories(),
-        categoryRepo.listSubSubcategories(),
-        tagRepo.listTags(),
-        learningJourneyRepo.listLearningJourneys(),
-        githubSyncRepo.getGithubSyncQueue(),
-        userRepo.listUsers(1, 10000)
-      ]);
+      const exportData = await runHeavyWork('database-export', async () => {
+        // Sequential reads intentionally use at most one pool connection at a
+        // time. This private backup never enters a public cache entry.
+        const allResources = await resourceRepo.listResources({ limit: 100000 });
+        const categories = await categoryRepo.listCategories();
+        const subcategories = await categoryRepo.listSubcategories();
+        const subSubcategories = await categoryRepo.listSubSubcategories();
+        const tags = await tagRepo.listTags();
+        const learningJourneys = await learningJourneyRepo.listLearningJourneys();
+        const syncQueue = await githubSyncRepo.getGithubSyncQueue();
+        const users = await userRepo.listUsers(1, 10000);
       
       const resources = allResources.resources;
       const usersList = users.users;
@@ -6178,7 +6267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `Admin exported full database JSON backup (${resources.length} resources, ${usersList.length} users)`
       );
 
-      const exportData = {
+      return {
         exportedAt: new Date().toISOString(),
         version: '1.0.0',
         schema: {
@@ -6209,6 +6298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           users: sanitizedUsers
         }
       };
+      });
 
       // Set headers for JSON download
       res.setHeader('Content-Type', 'application/json');
@@ -6217,43 +6307,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(exportData);
     } catch (error) {
       console.error('Error generating JSON export:', error);
-      res.status(500).json({ message: 'Failed to generate JSON export' });
+      sendOperationalFailure(res, error, 'Failed to generate JSON export');
     }
   });
 
   // POST /api/admin/validate - Run awesome-lint validation on current data
   app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      // Validate the public catalog (deduped, orphan-excluded) — see R3-17
-      // note on getPublicCatalogResources(). Counts here must equal the public
-      // sidebar/categories totals.
-      const resources = await getPublicCatalogResources();
-      
-      // Get export options from request body
-      // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint
-      const {
-        title = 'Awesome Video',
-        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-        includeContributing = false,
-        includeLicense = false,
-        websiteUrl = undefined,
-        repoUrl = process.env.GITHUB_REPO_URL
-      } = req.body;
-
-      // Create formatter and generate markdown
-      const formatter = new AwesomeListFormatter(resources, {
-        title,
-        description,
-        includeContributing,
-        includeLicense,
-        websiteUrl,
-        repoUrl
+      const { markdown, validationResult } = await runHeavyWork('catalog-validation', async () => {
+        const resources = await getPublicCatalogResources();
+        const {
+          title = 'Awesome Video',
+          description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+          includeContributing = false,
+          includeLicense = false,
+          websiteUrl = undefined,
+          repoUrl = process.env.GITHUB_REPO_URL
+        } = req.body;
+        const formatter = new AwesomeListFormatter(resources, {
+          title,
+          description,
+          includeContributing,
+          includeLicense,
+          websiteUrl,
+          repoUrl
+        });
+        const markdown = formatter.generate();
+        return { markdown, validationResult: validateAwesomeList(markdown) };
       });
-
-      const markdown = formatter.generate();
-      
-      // Validate the generated markdown
-      const validationResult = validateAwesomeList(markdown);
       
       // Store validation result for later retrieval
       await adminRepo.storeValidationResult({
@@ -6273,35 +6354,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error validating awesome list:', error);
-      res.status(500).json({ message: 'Failed to validate awesome list' });
+      sendOperationalFailure(res, error, 'Failed to validate awesome list');
     }
   });
 
   // POST /api/admin/check-links - Run link checker on all resources
   app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      // Get all approved resources
-      const resources = await resourceRepo.getAllApprovedResources();
-      
-      // Get check options from request body
-      const {
-        timeout = 10000,
-        concurrent = 5,
-        retryCount = 1
-      } = req.body;
-
-      // Prepare resources for link checking
-      const resourcesToCheck = resources.map(r => ({
-        id: r.id,
-        title: r.title,
-        url: r.url
-      }));
-
-      // Check links
-      const linkCheckReport = await checkResourceLinks(resourcesToCheck, {
-        timeout,
-        concurrent,
-        retryCount
+      const linkCheckReport = await runHeavyWork('link-health', async () => {
+        const resources = await resourceRepo.getAllApprovedResources();
+        const {
+          timeout = 10000,
+          concurrent = 5,
+          retryCount = 1
+        } = req.body;
+        const resourcesToCheck = resources.map(r => ({
+          id: r.id,
+          title: r.title,
+          url: r.url
+        }));
+        return checkResourceLinks(resourcesToCheck, {
+          timeout,
+          concurrent,
+          retryCount
+        });
       });
       
       // Store link check result for later retrieval
@@ -6324,7 +6400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error checking links:', error);
-      res.status(500).json({ message: 'Failed to check links' });
+      sendOperationalFailure(res, error, 'Failed to check links');
     }
   });
 
@@ -6342,7 +6418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error fetching validation status:', error);
-      res.json({ awesomeLint: null, linkCheck: null, lastUpdated: null });
+      sendOperationalFailure(res, error, 'Failed to fetch validation status');
     }
   });
 
@@ -6356,7 +6432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, job: job || null });
     } catch (error) {
       console.error('Error fetching link health status:', error);
-      res.status(500).json({ success: false, message: 'Failed to fetch link health status' });
+      sendOperationalFailure(res, error, 'Failed to fetch link health status');
     }
   });
 
@@ -6371,7 +6447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error.message?.includes('already running')) {
         return res.status(409).json({ success: false, message: error.message });
       }
-      res.status(500).json({ success: false, message: 'Failed to start link health check' });
+      sendOperationalFailure(res, error, 'Failed to start link health check');
     }
   });
 
@@ -6383,7 +6459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, jobs: history });
     } catch (error) {
       console.error('Error fetching link health history:', error);
-      res.status(500).json({ success: false, message: 'Failed to fetch link health history' });
+      sendOperationalFailure(res, error, 'Failed to fetch link health history');
     }
   });
 
@@ -6396,7 +6472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, checks: brokenLinks });
     } catch (error) {
       console.error('Error fetching broken links:', error);
-      res.status(500).json({ success: false, message: 'Failed to fetch broken links' });
+      sendOperationalFailure(res, error, 'Failed to fetch broken links');
     }
   });
 
@@ -6413,7 +6489,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { clearExisting = false } = req.body;
       
       // Run seeding
-      const result = await seedDatabase({ clearExisting });
+      const result = await runHeavyWork(
+        'manual-seed',
+        () => seedDatabase({ clearExisting }),
+      );
       
       // Return results
       res.json({
@@ -6430,11 +6509,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('Error seeding database:', error);
-      res.status(500).json({ 
-        success: false,
-        message: 'Failed to seed database',
-        error: error.message 
-      });
+      if (
+        error instanceof ServiceUnavailableError ||
+        isDatabaseUnavailableError(error)
+      ) {
+        return res
+          .status(503)
+          .set('Retry-After', '1')
+          .json({ success: false, message: 'Service is temporarily unavailable' });
+      }
+      res.status(500).json({ success: false, message: 'Failed to seed database' });
     }
   });
 
@@ -6450,7 +6534,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Starting GitHub import from: ${repoUrl}`);
       
       // Use the sync service to import
-      const result = await syncService.importFromGitHub(repoUrl, { dryRun, strictMode });
+      const result = await runHeavyWork(
+        'github-sync',
+        () => syncService.importFromGitHub(repoUrl, { dryRun, strictMode }),
+      );
       
       console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
       
@@ -6482,6 +6569,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('Error importing from GitHub:', error);
+      if (
+        error instanceof ServiceUnavailableError ||
+        isDatabaseUnavailableError(error)
+      ) {
+        return sendOperationalFailure(res, error, 'Failed to import from GitHub');
+      }
       res.status(500).json({ 
         success: false,
         message: 'Failed to import from GitHub',
@@ -7091,15 +7184,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // --- Database-Driven Routes ---
 
-  // API routes for awesome list - NOW SERVED FROM DATABASE
-  // Run16 BUG-002: the unfiltered awesome-list payload is ~2.7MB and was
-  // rebuilt from the DB on every request. Cache the serialized tree for 60s
-  // and answer conditional requests with 304 via a strong content-hash ETag
-  // (compression middleware already gzips the 200 path). Filtered requests
-  // (rare, admin/deep-link only) bypass the cache. Staleness ceiling after an
-  // admin edit is the 60s TTL — acceptable for a read-mostly catalog.
-  let awesomeListCache: { body: string; etag: string; builtAt: number } | null = null;
-  const AWESOME_LIST_TTL_MS = 60_000;
+  // The complete tree, serialized body, nav projection, taxonomy endpoints,
+  // and SEO metadata all share one generation-aware public cache. Successful
+  // repository mutations invalidate the generation immediately.
 
   // R4-031: the heaviest public read now shares the resource-read rate limit
   // (100 req/min/IP, 429 + Retry-After) — the server cache + ETag/304 make
@@ -7110,34 +7197,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { category, subcategory, subSubcategory } = req.query;
       const isUnfiltered = !category && !subcategory && !subSubcategory;
 
-      if (isUnfiltered && awesomeListCache && Date.now() - awesomeListCache.builtAt < AWESOME_LIST_TTL_MS) {
-        res.set('ETag', awesomeListCache.etag);
+      if (isUnfiltered) {
+        const payload = await getPublicCacheValue({
+          namespace: 'catalog-body',
+          key: 'complete',
+          ttlMs: 60_000,
+          load: async () => {
+            // The source tree must be obtained inside this generation-checked
+            // loader. Capturing it before getPublicCacheValue would let a
+            // mutation invalidate between the two awaits and publish the old
+            // tree as a fresh derived entry in the new generation.
+            const data = await legacyRepo.getAwesomeListFromDatabase();
+            if (!data?.resources?.length) {
+              throw new Error('No awesome list data available');
+            }
+            const body = JSON.stringify(data);
+            return {
+              body,
+              etag: '"' + crypto.createHash('sha1').update(body).digest('hex') + '"',
+            };
+          },
+        });
+        res.set('ETag', payload.etag);
         res.set('Cache-Control', 'public, max-age=0, must-revalidate');
-        if (req.headers['if-none-match'] === awesomeListCache.etag) {
+        if (req.headers['if-none-match'] === payload.etag) {
           return res.status(304).end();
         }
-        return res.type('application/json').send(awesomeListCache.body);
+        return res.type('application/json').send(payload.body);
       }
 
-      // Use database-driven hierarchy (replaces static JSON)
+      // Filtered responses are request-specific and deliberately not cached.
       const data = await legacyRepo.getAwesomeListFromDatabase();
-      
-      if (!data || !data.resources || data.resources.length === 0) {
+      if (!data?.resources?.length) {
         console.warn('⚠️ No resources in database - database may need seeding');
         return res.status(500).json({ message: 'No awesome list data available' });
-      }
-
-      if (isUnfiltered) {
-        const body = JSON.stringify(data);
-        const etag = '"' + crypto.createHash('sha1').update(body).digest('hex') + '"';
-        awesomeListCache = { body, etag, builtAt: Date.now() };
-        res.set('ETag', etag);
-        res.set('Cache-Control', 'public, max-age=0, must-revalidate');
-        if (req.headers['if-none-match'] === etag) {
-          return res.status(304).end();
-        }
-        console.log(`📊 /api/awesome-list: ${data.resources.length} resources, ${data.categories.length} categories (cache rebuild)`);
-        return res.type('application/json').send(body);
       }
 
       let filteredResources = data.resources;
@@ -7180,7 +7273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(filteredData);
     } catch (error) {
       console.error('Error processing awesome list:', error);
-      res.status(500).json({ message: 'Failed to process awesome list' });
+      sendOperationalFailure(res, error, 'Failed to process awesome list');
     }
   });
 
@@ -7190,30 +7283,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ~2.7MB corpus for them. This serves a ~few-KB tree with the same 60s
   // TTL + ETag/304 discipline as the corpus route, so pages that don't
   // render resource listings never download the corpus at all.
-  let awesomeListNavCache: { body: string; etag: string; builtAt: number } | null = null;
   app.get("/api/awesome-list/nav", resourceReadLimiter, async (req, res) => {
     try {
-      if (awesomeListNavCache && Date.now() - awesomeListNavCache.builtAt < AWESOME_LIST_TTL_MS) {
-        res.set('ETag', awesomeListNavCache.etag);
-        res.set('Cache-Control', 'public, max-age=0, must-revalidate');
-        if (req.headers['if-none-match'] === awesomeListNavCache.etag) {
-          return res.status(304).end();
-        }
-        return res.type('application/json').send(awesomeListNavCache.body);
-      }
-
-      const data = await legacyRepo.getAwesomeListFromDatabase();
-      if (!data || !data.categories || data.categories.length === 0) {
-        return res.status(500).json({ message: 'No awesome list data available' });
-      }
-
       // Run23 R-06: each category carries a tiny teaser (first direct
       // resource's title/description) so the Home grid renders card blurbs
       // from the nav tree alone — without downloading the full corpus.
-      const nav = {
-        title: data.title,
-        totalResources: (data.resources || []).length,
-        categories: (data.categories || []).map((cat: any) => ({
+      const payload = await getPublicCacheValue({
+        namespace: 'catalog-nav',
+        key: 'complete',
+        ttlMs: 60_000,
+        load: async () => {
+          // Keep the source read inside the derived cache loader so generation
+          // invalidation covers both the tree read and this projection.
+          const data = await legacyRepo.getAwesomeListFromDatabase();
+          if (!data?.categories?.length) {
+            throw new Error('No awesome list data available');
+          }
+          const nav = {
+            title: data.title,
+            totalResources: (data.resources || []).length,
+            categories: (data.categories || []).map((cat: any) => ({
           name: cat.name,
           slug: cat.slug,
           resourceCount: (cat.resources || []).length,
@@ -7248,21 +7337,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
               resourceCount: (ss.resources || []).length,
             })),
           })),
-        })),
-      };
-
-      const body = JSON.stringify(nav);
-      const etag = '"' + crypto.createHash('sha1').update(body).digest('hex') + '"';
-      awesomeListNavCache = { body, etag, builtAt: Date.now() };
-      res.set('ETag', etag);
+            })),
+          };
+          const body = JSON.stringify(nav);
+          return {
+            body,
+            etag: '"' + crypto.createHash('sha1').update(body).digest('hex') + '"',
+          };
+        },
+      });
+      res.set('ETag', payload.etag);
       res.set('Cache-Control', 'public, max-age=0, must-revalidate');
-      if (req.headers['if-none-match'] === etag) {
+      if (req.headers['if-none-match'] === payload.etag) {
         return res.status(304).end();
       }
-      return res.type('application/json').send(body);
+      return res.type('application/json').send(payload.body);
     } catch (error) {
       console.error('Error building awesome-list nav:', error);
-      res.status(500).json({ message: 'Failed to build navigation tree' });
+      sendOperationalFailure(res, error, 'Failed to build navigation tree');
     }
   });
 
@@ -7921,10 +8013,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Health check
-  app.get("/api/health", (req, res) => {
+  // Compatibility liveness plus explicit process-only liveness. Neither route
+  // touches the database, so an orchestrator can distinguish a live process
+  // from a process that is ready to serve database-dependent traffic.
+  app.get("/api/health", (_req, res) => {
+    res.set("Cache-Control", "no-store");
     res.json({ status: "ok" });
   });
+  app.get("/api/health/live", (_req, res) => {
+    res.set("Cache-Control", "no-store");
+    res.json({ status: "ok" });
+  });
+  app.get("/api/health/ready", async (_req, res) => {
+    const readiness = await checkReadiness();
+    res.set("Cache-Control", "no-store");
+    if (!readiness.ready) res.set("Retry-After", "1");
+    res.status(readiness.ready ? 200 : 503).json({
+      status: readiness.ready ? "ready" : "not_ready",
+    });
+  });
+
+  app.get(
+    "/api/admin/operations/health",
+    isAuthenticated,
+    isAdmin,
+    async (_req, res) => {
+      const readiness = await checkReadiness();
+      res.set("Cache-Control", "no-store");
+      res.json({
+        status: readiness.ready ? "ready" : "degraded",
+        readiness: getReadinessSnapshot(),
+        databasePool: {
+          max: 3,
+          total: pool.totalCount,
+          idle: pool.idleCount,
+          active: Math.max(0, pool.totalCount - pool.idleCount),
+          waiting: pool.waitingCount,
+        },
+        publicCache: getPublicCacheSnapshot(),
+        heavyWork: getHeavyWorkSnapshot(),
+        telemetry: getOperationalTelemetrySnapshot(),
+      });
+    },
+  );
 
   // AI service health check (documented in docs/AI-SERVICES.md).
   // NB-005/NB-057 (run23): anonymous callers get availability status ONLY.
@@ -8188,7 +8319,12 @@ export async function runBackgroundInitialization(): Promise<void> {
     if (needsReseeding) {
       console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${actualResourceCount})...`);
       console.log(`⚙️  Running database seeding in ${isProduction ? 'production' : 'development'} mode...`);
-      const seedResult = await seedDatabase({ clearExisting: actualResourceCount > 0 ? true : false });
+      const seedResult = await runHeavyWork(
+        'automatic-seed',
+        () => seedDatabase({
+          clearExisting: actualResourceCount > 0 ? true : false,
+        }),
+      );
 
       console.log('✅ Auto-seeding completed successfully:');
       console.log(`   - Categories: ${seedResult.categoriesInserted}`);

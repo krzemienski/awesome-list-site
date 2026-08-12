@@ -4,6 +4,7 @@ import { db } from "../db";
 import { desc, eq, ne, and, inArray, lt } from "drizzle-orm";
 import { storage } from "../storage";
 import { checkResourceLinks, browserVerifyLink, type LinkCheckResult } from "../validation/linkChecker";
+import { runHeavyWork } from "../ops/heavyWork";
 
 function mapResultToStatus(result: LinkCheckResult): LinkHealthCheck['status'] {
   // 200-at-face-value but takeover/intent-flip/parked heuristics fired:
@@ -140,6 +141,7 @@ export const linkHealthService = {
 
   async runCheckInBackground(jobId: number): Promise<void> {
     try {
+      await runHeavyWork('link-health', async () => {
       const resources = await storage.getAllApprovedResources();
       const resourcesToCheck = resources.map(r => ({
         id: r.id,
@@ -286,6 +288,7 @@ export const linkHealthService = {
       await db.delete(linkHealthChecks).where(lt(linkHealthChecks.jobId, jobId));
 
       console.log(`[LinkHealth] Check completed for job ${jobId}: ${healthyCount} healthy, ${suspectCount} suspect, ${brokenCount} broken, ${redirectCount} redirects, ${timeoutCount} timeouts out of ${report.totalLinks} total (verification pass cleared ${toVerify.length - (brokenCount + timeoutCount)} bot-block false positives)`);
+      });
     } catch (err: any) {
       await db
         .update(linkHealthJobs)

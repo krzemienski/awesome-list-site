@@ -4,6 +4,11 @@ import pkg from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  markMigrationsFailed,
+  markMigrationsReady,
+  markMigrationsRunning,
+} from './ops/bootState';
 
 const { Pool } = pkg;
 const __filename = fileURLToPath(import.meta.url);
@@ -23,8 +28,10 @@ const __dirname = path.dirname(__filename);
  * schema.
  */
 export async function runMigrations(databaseUrl: string = process.env.DATABASE_URL ?? '') {
+  markMigrationsRunning();
   if (!databaseUrl) {
     console.error('Error: DATABASE_URL environment variable is not set');
+    markMigrationsFailed();
     throw new Error('DATABASE_URL is required');
   }
 
@@ -73,12 +80,14 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
 
       if (result.rows[0]?.exists) {
         console.log('✓ Database schema already exists (configured via db:push)');
+        markMigrationsReady();
         return;
       } else {
         throw new Error('Migrations folder not found and database schema is missing. Please run db:push or ensure migrations are included in build.');
       }
     } catch (error: any) {
-      await pool.end();
+      await pool.end().catch(() => undefined);
+      markMigrationsFailed();
       throw error;
     }
   }
@@ -96,8 +105,10 @@ export async function runMigrations(databaseUrl: string = process.env.DATABASE_U
     // starting with a possibly partial schema.
     await verifyMigrationJournal(pool, migrationsFolder);
     await pool.end();
+    markMigrationsReady();
   } catch (error: any) {
     await pool.end();
+    markMigrationsFailed();
     if (error?.code === '42P07' || (error?.message?.includes('already exists') && error?.message?.includes('relation'))) {
       console.error(
         'Migration failed with "already exists" (42P07). This means a migration is NOT idempotent — ' +

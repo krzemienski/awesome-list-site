@@ -35,6 +35,7 @@ import {
 import { db } from "../db";
 import { eq, asc } from "drizzle-orm";
 import { stripInternalResourceFields } from "../lib/publicResource";
+import { getPublicCacheValue } from "../cache/publicCache";
 
 // Hierarchical category structure types
 export interface HierarchicalSubSubcategory {
@@ -86,6 +87,15 @@ export class LegacyRepository {
    * without resources are still included in the hierarchy.
    */
   async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
+    return getPublicCacheValue({
+      namespace: "catalog-tree",
+      key: "complete-tree",
+      ttlMs: 60_000,
+      load: () => this.buildAwesomeListFromDatabase(),
+    });
+  }
+
+  private async buildAwesomeListFromDatabase(): Promise<AwesomeListData> {
     // Fetch all approved resources
     const allResourcesRaw = await db
       .select()

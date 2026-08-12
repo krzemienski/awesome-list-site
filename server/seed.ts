@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { hashPassword, comparePassword } from "./passwordUtils";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
+import { invalidatePublicCache } from "./cache/publicCache";
 
 /**
  * Helper function to generate slugs from category names
@@ -307,6 +308,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
       await db.delete(subSubcategories);
       await db.delete(subcategories);
       await db.delete(categories);
+      invalidatePublicCache('seed-mutation');
       console.log("✅ Existing data cleared");
     }
 
@@ -365,6 +367,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           }).returning();
           dbId = inserted.id;
           result.categoriesInserted++;
+          invalidatePublicCache('seed-mutation');
           console.log(`  ✅ Inserted category: ${cat.title} (ID: ${dbId})`);
         }
 
@@ -405,6 +408,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           }).returning();
           dbId = inserted.id;
           result.subcategoriesInserted++;
+          invalidatePublicCache('seed-mutation');
           console.log(`  ✅ Inserted subcategory: ${cat.title} (ID: ${dbId})`);
         }
 
@@ -445,6 +449,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           }).returning();
           dbId = inserted.id;
           result.subSubcategoriesInserted++;
+          invalidatePublicCache('seed-mutation');
           console.log(`  ✅ Inserted sub-subcategory: ${cat.title} (ID: ${dbId})`);
         }
 
@@ -533,6 +538,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
 
         resourceCount++;
         result.resourcesInserted++;
+        invalidatePublicCache('seed-mutation');
 
         if (resourceCount % 100 === 0) {
           console.log(`  📊 Inserted ${resourceCount} resources...`);
@@ -550,6 +556,9 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     // of returning an empty list. Idempotent via onConflictDoNothing.
     try {
       const tagsSeeded = await seedTagsFromResourceMetadata();
+      if (tagsSeeded.tagRows > 0 || tagsSeeded.linkRows > 0) {
+        invalidatePublicCache('seed-mutation');
+      }
       console.log(`🏷️  Tags: ${tagsSeeded.tagRows} new tag rows, ${tagsSeeded.linkRows} new resource links inserted (existing rows untouched)`);
     } catch (tagErr: unknown) {
       const msg = tagErr instanceof Error ? tagErr.message : 'Unknown error';

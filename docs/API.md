@@ -147,10 +147,29 @@ Replit OAuth is enabled when `REPL_ID`/`ISSUER_URL` are configured.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/health` | Liveness — returns `{ "status": "ok" }` |
+| GET | `/api/health` | Compatibility liveness — process health only |
+| GET | `/api/health/live` | Liveness — process health only, never touches the database |
+| GET | `/api/health/ready` | Readiness — migrations complete plus a bounded catalog-database probe |
 | GET | `/api/health/ai` | AI service status (deep checks are admin-only) |
 
 > Note: there is **no** `/health` route — use `/api/health`.
+
+### Catalog/database resilience policy
+
+- Public catalog representations use one process-local cache with schema
+  version `public-v1`, explicit public-only namespaces, 30–60 second TTLs, a
+  512-entry/24 MiB committed-value bound, a 64-rebuild in-flight bound, and one
+  coalesced rebuild per key/generation.
+- Every successful resource, taxonomy, or tag mutation advances the generation.
+  An older in-flight rebuild is discarded and retried, so a completed mutation
+  is immediately visible. Failed rebuilds are never cached and stale data is
+  never returned as a fresh success.
+- The PostgreSQL pool remains capped at three connections. Pool acquisition,
+  statements, locks, and idle transactions have bounded deadlines; transient
+  failures return a redacted `503` with `Retry-After: 1`.
+- Admins can inspect bounded aggregate pool/query/endpoint/cache/heavy-work
+  telemetry at `GET /api/admin/operations/health`. SQL text, parameters,
+  request bodies, row values, IDs, and connection details are not retained.
 
 ---
 

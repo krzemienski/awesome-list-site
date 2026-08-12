@@ -43,6 +43,7 @@ import {
   resourceSkillLevelSchema,
 } from "@shared/resourceFacets";
 import { and, eq, desc, asc, or, sql } from "drizzle-orm";
+import { invalidatePublicCache } from "../cache/publicCache";
 
 export type ContributorLifecycleStatus =
   | "pending"
@@ -695,6 +696,7 @@ export class AuditRepository {
     if (outcome.kind === 'not_pending') {
       throw new Error('Edit not found or already processed');
     }
+    invalidatePublicCache('resource-mutation');
   }
 
   /**

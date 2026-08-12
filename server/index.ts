@@ -12,11 +12,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import {
+  endpointGroup,
+  recordEndpointLatency,
+} from "./ops/operationalTelemetry";
+import { markMigrationsNotRequired } from "./ops/bootState";
+import { operationalRequestContext } from "./ops/requestContext";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Must run before sessions, rate limits, and routes so any caught transient DB
+// error can still be translated to the same bounded, redacted 503 response.
+app.use(operationalRequestContext);
 
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
@@ -305,27 +315,23 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
 
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
+      const group = endpointGroup(path);
+      recordEndpointLatency(req.method, group, res.statusCode, duration);
+      // Bounded labels only: never emit raw paths, query strings, response
+      // bodies, user ids, cookies, or database details.
+      log(
+        JSON.stringify({
+          event: "ops.http_request",
+          method: req.method,
+          group,
+          status: res.statusCode,
+          durationMs: duration,
+        }),
+      );
     }
   });
 
@@ -343,6 +349,8 @@ app.use((req, res, next) => {
       console.error('❌ Failed to run migrations, cannot start server');
       process.exit(1);
     }
+  } else {
+    markMigrationsNotRequired();
   }
 
   const server = await registerRoutes(app);

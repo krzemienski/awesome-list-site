@@ -67,7 +67,34 @@ const newPage = async (w, h) => {
   const page = await ctx.newPage();
   return { ctx, page };
 };
-const goto = (page, route) => page.goto(`${BASE}${route}`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+// Completion validations run in parallel. A resilience gate may deliberately
+// hold the catalog table and return a bounded 503 while this audit is starting.
+// Do not silently inspect that JSON error page as if it were the requested UI;
+// honor Retry-After and retry until the real document is available.
+const goto = async (page, route) => {
+  const deadline = Date.now() + 90000;
+  let last = 'no response';
+  while (Date.now() < deadline) {
+    try {
+      const response = await page.goto(`${BASE}${route}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 45000,
+      });
+      const status = response?.status() ?? 0;
+      if (status > 0 && status < 429) {
+        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+        return;
+      }
+      last = `status ${status}`;
+      const retryAfter = Number(response?.headers()['retry-after'] || 1);
+      await page.waitForTimeout(Math.max(1000, Math.min(retryAfter * 1000, 5000)));
+    } catch (error) {
+      last = error instanceof Error ? error.message : String(error);
+      await page.waitForTimeout(1500);
+    }
+  }
+  throw new Error(`Unable to load ${route} for tablet audit (${last})`);
+};
 
 // Shared in-page helpers (serialized into evaluate calls).
 const IN_BOUNDS = `(els, vw) => {

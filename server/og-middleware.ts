@@ -33,6 +33,9 @@ import {
 import { buildRelatedResources } from "./services/relatedResources";
 import { CollectionRepository } from "./repositories/CollectionRepository";
 import { collectionShareIdSchema } from "@shared/bookmarkCollections";
+import { getPublicCacheValue } from "./cache/publicCache";
+import { isDatabaseUnavailableError } from "./db/errors";
+import { ServiceUnavailableError } from "./middleware/errors";
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
@@ -79,6 +82,17 @@ export interface RouteMeta {
   structuredData?: unknown;
 }
 
+function isBoundedDependencyFailure(error: unknown): boolean {
+  return (
+    error instanceof ServiceUnavailableError ||
+    isDatabaseUnavailableError(error)
+  );
+}
+
+function rethrowBoundedDependencyFailure(error: unknown): void {
+  if (isBoundedDependencyFailure(error)) throw error;
+}
+
 /** A resolved route: its metadata plus whether the route actually exists. */
 interface ResolvedRoute {
   meta: RouteMeta;
@@ -120,13 +134,6 @@ function defaultMeta(url: string): RouteMeta {
   };
 }
 
-// Small TTL cache so we don't hit the DB on every crawler/browser HTML request.
-// Per-route metadata changes rarely (category renames, journey edits) — a 60s
-// window is fine and still keeps crawler previews fresh after a deploy.
-const META_CACHE = new Map<string, { value: ResolvedRoute; expires: number }>();
-const META_CACHE_TTL_MS = 60_000;
-const META_CACHE_MAX = 500;
-
 // Parse a 1-based ?page= param with the SAME numeric rule as the hydrated
 // client (shared/page-param.ts — "1e3" IS 1000, "1e20" caps at the int32
 // MAX_PAGE, junk is null) so the crawler pass and the client can never read
@@ -165,21 +172,12 @@ async function resolveRoute(url: string): Promise<ResolvedRoute> {
   // is not served page 1's cached body (BUG-001). All other params are ignored.
   const page = parsePage(url);
   const key = page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
-  const now = Date.now();
-  const cached = META_CACHE.get(key);
-  if (cached && cached.expires > now) return cached.value;
-  const value = await resolveRouteUncached(url);
-  if (META_CACHE.size >= META_CACHE_MAX) {
-    // Simple eviction: drop the oldest ~10% entries
-    const drop = Math.ceil(META_CACHE_MAX / 10);
-    let i = 0;
-    for (const k of META_CACHE.keys()) {
-      if (i++ >= drop) break;
-      META_CACHE.delete(k);
-    }
-  }
-  META_CACHE.set(key, { value, expires: now + META_CACHE_TTL_MS });
-  return value;
+  return getPublicCacheValue({
+    namespace: "route-meta",
+    key,
+    ttlMs: 60_000,
+    load: () => resolveRouteUncached(url),
+  });
 }
 
 // Soft-404 metadata: a known-shape page rendered for an unknown URL. Marked
@@ -330,17 +328,10 @@ function countNodeResources(node: any): number {
   return n;
 }
 
-// Module-level tree cache: taxonomy + resource breadcrumb resolution all need
-// the hierarchical tree. A 60s TTL (matching META_CACHE) keeps a full crawl of
-// hundreds of distinct taxonomy/resource URLs to one tree build per minute.
-let TREE_CACHE: { value: any; expires: number } | null = null;
-const TREE_CACHE_TTL_MS = 60_000;
+// The shared public cache inside LegacyRepository coalesces and invalidates
+// this tree together with the JSON catalog/nav and route metadata.
 async function getTreeCached(): Promise<any> {
-  const now = Date.now();
-  if (TREE_CACHE && TREE_CACHE.expires > now) return TREE_CACHE.value;
-  const value = await storage.getAwesomeListFromDatabase();
-  TREE_CACHE = { value, expires: now + TREE_CACHE_TTL_MS };
-  return value;
+  return storage.getAwesomeListFromDatabase();
 }
 
 type TaxoMatch = {
@@ -458,7 +449,9 @@ function homeShellChrome(): string {
        slug: c.slug,
        count: countNodeResources(c),
      }));
-   } catch {}
+    } catch (error) {
+      rethrowBoundedDependencyFailure(error);
+    }
    m.structuredData = webSiteSchema(m.description);
    const bodyHtml =
      homeShellChrome() +
@@ -670,7 +663,9 @@ function homeShellChrome(): string {
             description: j.description,
           })),
         });
-      } catch {}
+      } catch (error) {
+        rethrowBoundedDependencyFailure(error);
+      }
     } else if (path === "/about" || path === "/advanced" || path === "/submit") {
       let categories: { name: string; slug: string; count: number }[] = [];
       // Run22 BUG-018: FAQ count claim comes from the live catalog total so
@@ -684,7 +679,9 @@ function homeShellChrome(): string {
           slug: c.slug,
           count: countNodeResources(c),
         }));
-      } catch {}
+      } catch (error) {
+        rethrowBoundedDependencyFailure(error);
+      }
       const aboutFaqs = getAboutFaqs(aboutResourceCount);
       if (path === "/about") {
         // GEO: FAQPage schema (+ breadcrumb) markedly improves citation rates
@@ -885,7 +882,9 @@ function homeShellChrome(): string {
             title: r.title,
             description: r.description,
           }));
-        } catch {}
+        } catch (error) {
+          rethrowBoundedDependencyFailure(error);
+        }
       }
       bodyHtml = renderSearchContent({
         query: q,
@@ -904,7 +903,9 @@ function homeShellChrome(): string {
           slug: c.slug,
           count: countNodeResources(c),
         }));
-      } catch {}
+      } catch (error) {
+        rethrowBoundedDependencyFailure(error);
+      }
       m.structuredData = [
         collectionPageSchema({
           name: "All Categories",
@@ -1006,9 +1007,8 @@ function homeShellChrome(): string {
         });
         return { meta: m, found: true, bodyHtml };
       }
-    } catch {
-      // DB error → fail open (treat as found) so a transient blip never marks a
-      // real page as a 404 for crawlers.
+    } catch (error) {
+      rethrowBoundedDependencyFailure(error);
       return { meta: defaultMeta(path), found: true };
     }
     return { meta: notFoundMeta(path), found: false };
@@ -1072,7 +1072,8 @@ function homeShellChrome(): string {
         });
         return { meta: m, found: true, bodyHtml };
       }
-    } catch {
+    } catch (error) {
+      rethrowBoundedDependencyFailure(error);
       return { meta: defaultMeta(path), found: true };
     }
     return { meta: notFoundMeta(path), found: false };
@@ -1138,7 +1139,8 @@ function homeShellChrome(): string {
         });
         return { meta: m, found: true, bodyHtml };
       }
-    } catch {
+    } catch (error) {
+      rethrowBoundedDependencyFailure(error);
       return { meta: defaultMeta(path), found: true };
     }
     return { meta: notFoundMeta(path), found: false };
@@ -1201,7 +1203,9 @@ function homeShellChrome(): string {
                 }
               }
             }
-          } catch {}
+          } catch (error) {
+            rethrowBoundedDependencyFailure(error);
+          }
           crumbs.push({ name: resource.title });
           m.structuredData = [
             webPageSchema({
@@ -1252,7 +1256,9 @@ function homeShellChrome(): string {
                 }
               }
             }
-          } catch {}
+          } catch (error) {
+            rethrowBoundedDependencyFailure(error);
+          }
           const bodyHtml = renderResourceContent({
             heading: resource.title,
             description: m.description,
@@ -1262,7 +1268,8 @@ function homeShellChrome(): string {
           });
           return { meta: m, found: true, bodyHtml };
         }
-      } catch {
+      } catch (error) {
+        rethrowBoundedDependencyFailure(error);
         return { meta: defaultMeta(path), found: true };
       }
     }
@@ -1325,7 +1332,8 @@ function homeShellChrome(): string {
           });
           return { meta: m, found: true, bodyHtml };
         }
-      } catch {
+      } catch (error) {
+        rethrowBoundedDependencyFailure(error);
         return { meta: defaultMeta(path), found: true };
       }
     }
@@ -1482,34 +1490,30 @@ function rewriteHead(html: string, meta: RouteMeta): string {
 export async function resolveOgImageMeta(
   path: string,
 ): Promise<{ pageTitle: string; category?: string; kicker?: string } | null> {
-  try {
-    if (!path || path === "/") return { pageTitle: SITE_NAME };
-    const r = await resolveRoute(path);
-    if (!r.found || r.meta.noindex) return null;
-    const pageTitle = r.meta.title.split(" — ")[0].trim() || SITE_NAME;
-    let category: string | undefined;
-    let kicker: string | undefined;
-    if (path.startsWith("/category/")) category = kicker = "Category";
-    else if (path.startsWith("/sub-subcategory/")) category = kicker = "Topic";
-    else if (path.startsWith("/subcategory/")) category = kicker = "Subcategory";
-    else if (path.startsWith("/resource/")) {
-      category = "Resource";
-      kicker = "Resource";
-      // Run22 BUG-027: the kicker reflects the resource's REAL category
-      // (server-resolved from the stored row — never caller-supplied text)
-      // instead of the generic page-type label.
-      const idNum = Number(path.split("/")[2]);
-      if (Number.isInteger(idNum) && idNum > 0) {
-        try {
-          const resource = await storage.getResource(idNum);
-          if (resource?.category) kicker = resource.category;
-        } catch {}
-      }
-    } else if (path.startsWith("/journey")) category = kicker = "Learning Journeys";
-    return { pageTitle, category, kicker };
-  } catch {
-    return null;
+  if (!path || path === "/") return { pageTitle: SITE_NAME };
+  const r = await resolveRoute(path);
+  if (!r.found || r.meta.noindex) return null;
+  const pageTitle = r.meta.title.split(" — ")[0].trim() || SITE_NAME;
+  let category: string | undefined;
+  let kicker: string | undefined;
+  if (path.startsWith("/category/")) category = kicker = "Category";
+  else if (path.startsWith("/sub-subcategory/")) category = kicker = "Topic";
+  else if (path.startsWith("/subcategory/")) category = kicker = "Subcategory";
+  else if (path.startsWith("/resource/")) {
+    category = "Resource";
+    kicker = "Resource";
+    // Run22 BUG-027: the kicker reflects the resource's REAL category
+    // (server-resolved from the stored row — never caller-supplied text)
+    // instead of the generic page-type label.
+    const idNum = Number(path.split("/")[2]);
+    if (Number.isInteger(idNum) && idNum > 0) {
+      const resource = await storage.getResource(idNum);
+      if (resource?.category) kicker = resource.category;
+    }
+  } else if (path.startsWith("/journey")) {
+    category = kicker = "Learning Journeys";
   }
+  return { pageTitle, category, kicker };
 }
 
 // Express middleware that intercepts HTML responses and rewrites <head> with
@@ -1838,7 +1842,7 @@ export function ogInjectionMiddleware() {
     let bodyHtml: string | undefined;
     if (forcedNotFound) {
       // Malformed ?page short-circuits the resolver entirely so the junk URL
-      // never lands in META_CACHE (parsePage would collapse it onto the
+      // never lands in the public route-meta cache (parsePage would collapse it onto the
       // page-1 cache key) and gets the standard soft-404 + noindex treatment.
       meta = notFoundMeta(urlPath);
       notFound = true;
@@ -1851,6 +1855,16 @@ export function ogInjectionMiddleware() {
         notFound = !resolved.found;
         bodyHtml = resolved.bodyHtml;
       } catch (e) {
+        if (isBoundedDependencyFailure(e)) {
+          console.warn(
+            "[og-middleware] bounded dependency failure for",
+            urlPath,
+          );
+          return res
+            .status(503)
+            .set("Retry-After", "1")
+            .json({ message: "Service is temporarily unavailable" });
+        }
         console.warn("[og-middleware] meta lookup failed for", urlPath, e);
         // Fail open: never demote a real page to 404 on a transient lookup error.
         meta = defaultMeta(urlPath);

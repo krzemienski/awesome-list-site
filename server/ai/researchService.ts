@@ -13,6 +13,7 @@ import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
 import { DEFAULT_RESEARCH_MODEL, DEFAULT_ENRICHMENT_MODEL, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { LinkChecker } from '../validation/linkChecker';
 import { isPlausiblePublicUrl } from '@shared/validation';
+import { invalidatePublicCache } from '../cache/publicCache';
 
 // Cap how much pre-computed context we inline into the orchestrator system prompt.
 const MAX_TAXONOMY_LINES = 200;
@@ -1370,6 +1371,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       status: 'approved',
       metadata: { source: 'ai_researcher', discoveryId: discovery.id, confidence: discovery.confidence },
     }).returning();
+    invalidatePublicCache('resource-mutation');
 
     const [updated] = await db.update(researchDiscoveries).set({
       status: 'approved',

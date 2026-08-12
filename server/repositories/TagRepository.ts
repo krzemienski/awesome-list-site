@@ -30,6 +30,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, and, asc } from "drizzle-orm";
+import { invalidatePublicCache } from "../cache/publicCache";
 
 /**
  * Repository class for tag-related database operations
@@ -60,6 +61,7 @@ export class TagRepository {
    */
   async createTag(tag: InsertTag): Promise<Tag> {
     const [newTag] = await db.insert(tags).values(tag).returning();
+    invalidatePublicCache('tag-mutation');
     return newTag;
   }
 
@@ -69,6 +71,7 @@ export class TagRepository {
    */
   async deleteTag(id: number): Promise<void> {
     await db.delete(tags).where(eq(tags.id, id));
+    invalidatePublicCache('tag-mutation');
   }
 
   /**
@@ -82,6 +85,7 @@ export class TagRepository {
       .insert(resourceTags)
       .values({ resourceId, tagId })
       .onConflictDoNothing();
+    invalidatePublicCache('tag-mutation');
   }
 
   /**
@@ -99,6 +103,7 @@ export class TagRepository {
           eq(resourceTags.tagId, tagId)
         )
       );
+    invalidatePublicCache('tag-mutation');
   }
 
   /**

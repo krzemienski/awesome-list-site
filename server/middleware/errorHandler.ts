@@ -31,6 +31,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppError, ValidationError } from "./errors";
 import { ZodError } from "zod";
+import { isDatabaseUnavailableError } from "../db/errors";
 
 /**
  * Centralized error handling middleware for Express
@@ -88,6 +89,17 @@ export function errorHandler(
   if ((err as any)?.code === "22021") {
     res.status(400).json({ message: "Request contains invalid characters" });
     console.log("Client error (400): invalid byte sequence for PG (22021)");
+    return;
+  }
+
+  if (isDatabaseUnavailableError(err)) {
+    res
+      .status(503)
+      .set("Retry-After", "1")
+      .json({ message: "Database is temporarily unavailable" });
+    console.error("Operational database error:", {
+      code: (err as any)?.code ?? (err as any)?.cause?.code ?? "timeout",
+    });
     return;
   }
 

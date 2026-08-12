@@ -40,6 +40,7 @@ import { db } from "../db";
 import { eq, and, sql, asc, desc, like, ilike, or, inArray } from "drizzle-orm";
 import { tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
+import { invalidatePublicCache } from "../cache/publicCache";
 import {
   resourceFormatSchema,
   resourceProviderSchema,
@@ -422,6 +423,8 @@ export class ResourceRepository {
       }
     }
 
+    invalidatePublicCache('resource-mutation');
+
     // Log the creation
     await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
 
@@ -443,6 +446,8 @@ export class ResourceRepository {
       .set({ ...resource, updatedAt: new Date() })
       .where(eq(resources.id, id))
       .returning();
+
+    if (updatedResource) invalidatePublicCache('resource-mutation');
 
     // Log the update
     await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
@@ -561,6 +566,7 @@ export class ResourceRepository {
             : 'Resource not found',
       );
     }
+    invalidatePublicCache('resource-mutation');
     return updatedResource;
   }
 
@@ -605,6 +611,7 @@ export class ResourceRepository {
       .where(eq(researchDiscoveries.createdResourceId, id));
 
     await db.delete(resources).where(eq(resources.id, id));
+    invalidatePublicCache('resource-mutation');
   }
 
   /**
@@ -682,6 +689,7 @@ export class ResourceRepository {
     });
 
     if (!approved) throw new Error('Resource is not pending approval');
+    invalidatePublicCache('resource-mutation');
     return approved;
   }
 
@@ -728,6 +736,7 @@ export class ResourceRepository {
       return updated;
     });
     if (!rejected) throw new Error('Resource is not pending approval');
+    invalidatePublicCache('resource-mutation');
   }
 
   /**
@@ -739,7 +748,7 @@ export class ResourceRepository {
    * The audit record is in the same transaction as the state change.
    */
   async withdrawPendingSubmission(id: number, userId: string): Promise<Resource | undefined> {
-    return db.transaction(async (tx) => {
+    const withdrawn = await db.transaction(async (tx) => {
       const [withdrawn] = await tx
         .update(resources)
         .set({
@@ -769,6 +778,8 @@ export class ResourceRepository {
 
       return withdrawn;
     });
+    if (withdrawn) invalidatePublicCache('resource-mutation');
+    return withdrawn;
   }
 
   /**

@@ -35,6 +35,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, and, or, sql, asc } from "drizzle-orm";
+import { invalidatePublicCache } from "../cache/publicCache";
 
 /**
  * Repository class for category hierarchy database operations
@@ -100,6 +101,7 @@ export class CategoryRepository {
     }
 
     const [newCategory] = await db.insert(categories).values(category).returning();
+    invalidatePublicCache('category-mutation');
     return newCategory;
   }
 
@@ -115,6 +117,7 @@ export class CategoryRepository {
       .set(category)
       .where(eq(categories.id, id))
       .returning();
+    if (updatedCategory) invalidatePublicCache('category-mutation');
     return updatedCategory;
   }
 
@@ -142,6 +145,7 @@ export class CategoryRepository {
     }
 
     await db.delete(categories).where(eq(categories.id, id));
+    invalidatePublicCache('category-mutation');
   }
 
   /**
@@ -279,6 +283,7 @@ export class CategoryRepository {
     }
 
     const [newSubcategory] = await db.insert(subcategories).values(subcategory).returning();
+    invalidatePublicCache('category-mutation');
     return newSubcategory;
   }
 
@@ -294,6 +299,7 @@ export class CategoryRepository {
       .set(subcategory)
       .where(eq(subcategories.id, id))
       .returning();
+    if (updatedSubcategory) invalidatePublicCache('category-mutation');
     return updatedSubcategory;
   }
 
@@ -321,6 +327,7 @@ export class CategoryRepository {
     }
 
     await db.delete(subcategories).where(eq(subcategories.id, id));
+    invalidatePublicCache('category-mutation');
   }
 
   /**
@@ -439,6 +446,7 @@ export class CategoryRepository {
     }
 
     const [newSubSubcategory] = await db.insert(subSubcategories).values(subSubcategory).returning();
+    invalidatePublicCache('category-mutation');
     return newSubSubcategory;
   }
 
@@ -454,6 +462,7 @@ export class CategoryRepository {
       .set(subSubcategory)
       .where(eq(subSubcategories.id, id))
       .returning();
+    if (updatedSubSubcategory) invalidatePublicCache('category-mutation');
     return updatedSubSubcategory;
   }
 
@@ -475,6 +484,7 @@ export class CategoryRepository {
     }
 
     await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
+    invalidatePublicCache('category-mutation');
   }
 
   /**

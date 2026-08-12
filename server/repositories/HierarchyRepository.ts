@@ -36,6 +36,7 @@ import { db as dbInstance } from "../db";
 import { eq, and, sql, asc } from "drizzle-orm";
 import type { PgTable, PgColumn } from "drizzle-orm/pg-core";
 import { resources } from "@shared/schema";
+import { invalidatePublicCache } from "../cache/publicCache";
 
 /**
  * Configuration for HierarchyRepository
@@ -233,6 +234,7 @@ export class HierarchyRepository<
       .values(data)
       .returning();
 
+    invalidatePublicCache("category-mutation");
     return newEntity as TEntity;
   }
 
@@ -254,6 +256,7 @@ export class HierarchyRepository<
       .where(eq(this.config.idColumn, id))
       .returning();
 
+    if (updatedEntity) invalidatePublicCache("category-mutation");
     return updatedEntity as TEntity;
   }
 
@@ -305,6 +308,7 @@ export class HierarchyRepository<
     }
 
     await this.db.delete(this.table).where(eq(this.config.idColumn, id));
+    invalidatePublicCache("category-mutation");
   }
 
   /**

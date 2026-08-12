@@ -36,10 +36,47 @@ if (!process.env.ADMIN_PASSWORD) { console.error('FATAL: ADMIN_PASSWORD env var 
   if (!up) { console.error(`FATAL: app not reachable at ${BASE} after 120s (${lastErr}) — start the "Start application" workflow`); process.exit(1); }
 }
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const retryableStatus = (status) => status === 429 || status === 503;
+
+async function fetchJsonWithRetry(route) {
+  const deadline = Date.now() + 90_000;
+  let last = 'no response';
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`${BASE}${route}`);
+      if (!retryableStatus(response.status)) return await response.json();
+      last = `status ${response.status}`;
+      const retryAfter = Number(response.headers.get('retry-after') || 1);
+      await sleep(Math.max(1000, Math.min(retryAfter * 1000, 5000)));
+    } catch (error) {
+      last = error instanceof Error ? error.message : String(error);
+      await sleep(1500);
+    }
+  }
+  throw new Error(`Unable to fetch ${route} (${last})`);
+}
+
+async function waitForReadiness() {
+  const deadline = Date.now() + 90_000;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`${BASE}/api/health/ready`);
+      if (response.ok) return;
+      const retryAfter = Number(response.headers.get('retry-after') || 1);
+      await sleep(Math.max(1000, Math.min(retryAfter * 1000, 5000)));
+    } catch {
+      await sleep(1500);
+    }
+  }
+  throw new Error('Application did not regain readiness for responsive audit');
+}
+
 async function firstResourceId() {
-  const r = await fetch(`${BASE}/api/resources?limit=1`).then(x => x.json()).catch(() => null);
+  const r = await fetchJsonWithRetry('/api/resources?limit=1');
   const id = r?.resources?.[0]?.id ?? r?.[0]?.id;
-  return id ?? 187906;
+  if (!id) throw new Error('Catalog returned no resource for responsive audit');
+  return id;
 }
 
 const results = [];
@@ -79,17 +116,72 @@ async function newAdminContext() {
 }
 const ctx = await newAdminContext();
 
+async function gotoPage(page, route) {
+  const deadline = Date.now() + 90_000;
+  let last = 'no response';
+  while (Date.now() < deadline) {
+    try {
+      await waitForReadiness();
+      const response = await page.goto(`${BASE}${route}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 45000,
+      });
+      const status = response?.status() ?? 0;
+      if (status > 0 && !retryableStatus(status)) {
+        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+        return;
+      }
+      last = `status ${status}`;
+      const retryAfter = Number(response?.headers()['retry-after'] || 1);
+      await page.waitForTimeout(Math.max(1000, Math.min(retryAfter * 1000, 5000)));
+    } catch (error) {
+      last = error instanceof Error ? error.message : String(error);
+      await page.waitForTimeout(1500);
+    }
+  }
+  throw new Error(`Unable to load ${route} for responsive audit (${last})`);
+}
+
+async function requestWithRetry(request, method, route, data) {
+  const deadline = Date.now() + 90_000;
+  let last = 'no response';
+  while (Date.now() < deadline) {
+    const response = await request.fetch(`${BASE}${route}`, {
+      method,
+      data,
+      headers: { 'Content-Type': 'application/json', Origin: BASE },
+    });
+    if (!retryableStatus(response.status())) return response;
+    last = `status ${response.status()}`;
+    const retryAfter = Number(response.headers()['retry-after'] || 1);
+    await sleep(Math.max(1000, Math.min(retryAfter * 1000, 5000)));
+  }
+  throw new Error(`${method} ${route} remained unavailable (${last})`);
+}
+
 // ---- R5-026: profile header overlap 640..1440 ----
 const page = await ctx.newPage();
-await page.goto(`${BASE}/profile`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+await gotoPage(page, '/profile');
 await page.waitForTimeout(1200);
 // Cold-boot guard: right after a server (re)start the profile page can still be
 // showing its loading skeleton when the first viewports are measured, which reads
 // nameW=0 and false-fails. Wait for the h1 to carry real text before measuring.
-await page.waitForFunction(
+let profileReady = await page.waitForFunction(
   () => (document.querySelector('h1')?.textContent || '').trim().length > 0,
   { timeout: 30000 },
-).catch(() => console.log('profile h1 still empty after 30s — measuring anyway (genuine failure will be reported)'));
+).then(() => true).catch(() => false);
+if (!profileReady) {
+  console.log('profile h1 empty after dependency pressure — waiting for readiness and reloading');
+  await waitForReadiness();
+  await gotoPage(page, '/profile');
+  profileReady = await page.waitForFunction(
+    () => (document.querySelector('h1')?.textContent || '').trim().length > 0,
+    { timeout: 30000 },
+  ).then(() => true).catch(() => false);
+  if (!profileReady) {
+    console.log('profile h1 still empty after a ready reload — measuring as genuine failure');
+  }
+}
 const measureProfile = () => page.evaluate(() => {
     const name = document.querySelector('h1');
     const emailEl = [...document.querySelectorAll('span')].find(s => s.textContent.includes('@') && s.querySelector('svg'));
@@ -125,7 +217,7 @@ for (const w of [640, 700, 768, 812, 860, 900, 1024, 1280, 1440]) {
 // ---- R5-054: tabs radius when wrapped ----
 for (const [w, route, name] of [[375, '/profile', 'tabs-profile-375'], [500, '/profile', 'tabs-profile-500'], [768, '/admin', 'tabs-admin-768'], [1440, '/profile', 'tabs-profile-1440']]) {
   await page.setViewportSize({ width: w, height: 900 });
-  await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+  await gotoPage(page, route);
   await page.waitForSelector('[role="tablist"]', { timeout: 15000 }).catch(() => {});
   await page.waitForTimeout(800);
   const r = await page.evaluate(() => {
@@ -146,7 +238,7 @@ for (const [w, route, name] of [[375, '/profile', 'tabs-profile-375'], [500, '/p
 const resourceRoute = `/resource/${await firstResourceId()}`;
 const resPage = await ctx.newPage();
 await resPage.setViewportSize({ width: 375, height: 812 });
-await resPage.goto(`${BASE}${resourceRoute}`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+await gotoPage(resPage, resourceRoute);
 await resPage.waitForTimeout(1000);
 let r = await resPage.evaluate(() => {
   const m = document.querySelector('[data-testid="breadcrumb-mobile-current"]');
@@ -181,7 +273,7 @@ log('breadcrumb-titles@1440', r.crumbCount > 0 && r.withTitle === r.crumbCount &
 const fcPage = await ctx.newPage();
 await fcPage.emulateMedia({ forcedColors: 'active' });
 await fcPage.setViewportSize({ width: 1440, height: 900 });
-await fcPage.goto(`${BASE}/`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+await gotoPage(fcPage, '/');
 await fcPage.waitForTimeout(1200);
 r = await fcPage.evaluate(() => {
   const btns = [...document.querySelectorAll('button')].filter(b => { const r = b.getBoundingClientRect(); return r.width > 10 && r.height > 10; }).slice(0, 30);
@@ -203,16 +295,18 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
   // (workflow + validation step) — a shared title would collide.
   const runTag = `${Date.now()}_${process.pid}`;
   const longUrl = `https://example.com/__qa_test_r4017_${runTag}/` + 'a'.repeat(1900);
-  const catRes = await fetch(`${BASE}/api/resources?limit=1`).then(x => x.json()).catch(() => null);
+  const catRes = await fetchJsonWithRetry('/api/resources?limit=1');
   const category = catRes?.resources?.[0]?.category ?? catRes?.[0]?.category ?? 'Learning Resources';
   let seedId = null;
   // try/finally: the DELETE must run even if a Playwright wait/click throws
   // mid-probe, or the __qa_test seed would linger in the pending queue (and in
   // the publish build container that queue is the PRODUCTION admin queue).
   try {
-    const create = await ctx.request.post(`${BASE}/api/resources`, {
-      data: { title: `__qa_test_r4017 dialog overflow probe ${runTag}`, url: longUrl, description: 'Seeded by responsive-audit to guard against dialog blowout from unbroken URLs; deleted at end of run.', category },
-      headers: { 'Content-Type': 'application/json', Origin: BASE },
+    const create = await requestWithRetry(ctx.request, 'POST', '/api/resources', {
+      title: `__qa_test_r4017 dialog overflow probe ${runTag}`,
+      url: longUrl,
+      description: 'Seeded by responsive-audit to guard against dialog blowout from unbroken URLs; deleted at end of run.',
+      category,
     });
     if (!create.ok()) {
       log('r4017-seed-create', false, `POST /api/resources -> ${create.status()}`);
@@ -238,7 +332,7 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
       try {
         for (const vw of [1440, 768, 375]) {
           await dlgPage.setViewportSize({ width: vw, height: 900 });
-          await dlgPage.goto(`${BASE}/admin?tab=approvals`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+          await gotoPage(dlgPage, '/admin?tab=approvals');
           const rowOk = await dlgPage.waitForSelector(`[data-testid="row-pending-resource-${seedId}"]`, { timeout: 20000 }).then(() => true).catch(() => false);
           if (!rowOk) { log(`r4017-row@${vw}`, false, 'seeded pending row not rendered'); continue; }
           for (const [name, testid] of [
@@ -282,7 +376,7 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
     }
   } finally {
     if (seedId != null) {
-      const del = await ctx.request.delete(`${BASE}/api/admin/resources/${seedId}`, { headers: { Origin: BASE } }).catch(() => null);
+      const del = await requestWithRetry(ctx.request, 'DELETE', `/api/admin/resources/${seedId}`).catch(() => null);
       log('r4017-seed-delete', !!del && del.ok(), `DELETE /api/admin/resources/${seedId} -> ${del ? del.status() : 'request failed'}`);
     }
   }
@@ -303,7 +397,7 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
   const kbPage = await ctx.newPage();
   try {
     await kbPage.setViewportSize({ width: 375, height: 812 });
-    await kbPage.goto(`${BASE}/`, { waitUntil: 'networkidle', timeout: 45000 }).catch(() => {});
+    await gotoPage(kbPage, '/');
     await kbPage.waitForTimeout(800);
     const trigger = kbPage.locator('button[data-sidebar="trigger"]').first();
     const trigOk = await trigger.waitFor({ state: 'visible', timeout: 15000 }).then(() => true).catch(() => false);

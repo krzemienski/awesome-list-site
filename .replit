@@ -59,6 +59,22 @@ args = "url-params-audit"
 task = "workflow.run"
 args = "collections-audit"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "task302-typecheck"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "task302-build"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "task302-boot-safety"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "task302-resilience"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -150,6 +166,50 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/collections-audit.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "task302-typecheck"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run check"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "task302-build"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "task302-boot-safety"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx scripts/verify-boot-migration-safety.ts"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "task302-resilience"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "BASE_URL=http://127.0.0.1:5000 npm run validate:resilience"
 
 [workflows.workflow.metadata]
 isValidation = true
