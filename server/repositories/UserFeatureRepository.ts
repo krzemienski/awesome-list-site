@@ -35,6 +35,18 @@ import {
   type UserPreferences,
   type UserInteraction,
 } from "@shared/schema";
+import type {
+  LearningFormat,
+  LearningGoal,
+  LearningSkillLevel,
+  LearningTimeCommitment,
+  OnboardingStatus,
+} from "@shared/onboarding";
+import {
+  DEFAULT_LEARNING_PREFERENCES,
+  normalizeLearningFormats,
+  normalizeLearningGoals,
+} from "@shared/onboarding";
 import { db } from "../db";
 import { eq, and, desc, sql } from "drizzle-orm";
 
@@ -311,7 +323,168 @@ export class UserFeatureRepository {
       .select()
       .from(userPreferences)
       .where(eq(userPreferences.userId, userId));
-    return prefs;
+    if (!prefs) return undefined;
+    const learningGoals = normalizeLearningGoals(prefs.learningGoals);
+    const preferredResourceTypes = normalizeLearningFormats(
+      prefs.preferredResourceTypes,
+    );
+    const complete =
+      prefs.preferredCategories.length > 0 &&
+      learningGoals.length > 0 &&
+      preferredResourceTypes.length > 0;
+    const downgradeCompleted = prefs.onboardingStatus === "completed" && !complete;
+    return {
+      ...prefs,
+      learningGoals,
+      preferredResourceTypes,
+      onboardingStatus: downgradeCompleted ? "in_progress" : prefs.onboardingStatus,
+      onboardingStep: downgradeCompleted
+        ? prefs.preferredCategories.length === 0
+          ? 2
+          : learningGoals.length === 0
+            ? 3
+            : 4
+        : prefs.onboardingStep,
+      onboardingCompletedAt: downgradeCompleted ? null : prefs.onboardingCompletedAt,
+    };
+  }
+
+  /**
+   * Create or update the user's single canonical preference row.
+   *
+   * The unique user_id constraint prevents duplicates. First-party callers also
+   * supply the version they observed so overlapping tabs fail with a conflict
+   * instead of silently replacing one another.
+   */
+  async upsertUserPreferences(
+    userId: string,
+    values: {
+      preferredCategories: string[];
+      skillLevel: LearningSkillLevel;
+      learningGoals: LearningGoal[];
+      preferredResourceTypes: LearningFormat[];
+      timeCommitment: LearningTimeCommitment;
+      onboardingStatus: OnboardingStatus;
+      onboardingStep: number;
+      onboardingCompletedAt: Date | null;
+      onboardingDismissedAt: Date | null;
+    },
+    expectedRevision?: number | null,
+  ): Promise<UserPreferences | undefined> {
+    const updateValues = {
+      ...values,
+      updatedAt: new Date(),
+      revision: sql`${userPreferences.revision} + 1`,
+    };
+
+    // A first-party client that observed an existing row must update that exact
+    // version. This is atomic and cannot recreate a row deleted by another tab.
+    if (typeof expectedRevision === "number") {
+      const [preferences] = await db
+        .update(userPreferences)
+        .set(updateValues)
+        .where(
+          and(
+            eq(userPreferences.userId, userId),
+            eq(userPreferences.revision, expectedRevision),
+          ),
+        )
+        .returning();
+      return preferences;
+    }
+
+    // Null means the client observed no row. Insert once, but never overwrite a
+    // row another tab created in the meantime.
+    if (expectedRevision === null) {
+      return db.transaction(async (tx) => {
+        await tx.execute(
+          sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`,
+        );
+        const [preferences] = await tx
+          .insert(userPreferences)
+          .values({ userId, ...values })
+          .onConflictDoNothing({ target: userPreferences.userId })
+          .returning();
+        return preferences;
+      });
+    }
+
+    // Backward-compatible callers without a version retain idempotent upsert
+    // semantics. The first-party onboarding and Settings clients never use it.
+    const [preferences] = await db
+      .insert(userPreferences)
+      .values({ userId, ...values })
+      .onConflictDoUpdate({
+        target: userPreferences.userId,
+        set: updateValues,
+      })
+      .returning();
+    return preferences;
+  }
+
+  /**
+   * Clear learning preferences without touching the account or activity data.
+   */
+  async resetUserPreferences(
+    userId: string,
+    expectedRevision?: number | null,
+  ): Promise<UserPreferences | undefined> {
+    const resetValues = {
+      ...DEFAULT_LEARNING_PREFERENCES,
+      onboardingStatus: "not_started" as const,
+      onboardingStep: 1,
+      onboardingCompletedAt: null,
+      onboardingDismissedAt: null,
+      updatedAt: new Date(),
+    };
+    const resetUpdateValues = {
+      ...resetValues,
+      revision: sql`${userPreferences.revision} + 1`,
+    };
+
+    if (expectedRevision === null) {
+      // A cleared row is an API-hidden tombstone. It preserves a version after
+      // reset so a concurrent first save cannot recreate stale preferences.
+      // The same advisory lock is used by the expected-null insert path above.
+      return db.transaction(async (tx) => {
+        await tx.execute(
+          sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`,
+        );
+        const [preferences] = await tx
+          .insert(userPreferences)
+          .values({ userId, ...resetValues })
+          .onConflictDoUpdate({
+            target: userPreferences.userId,
+            set: resetUpdateValues,
+          })
+          .returning();
+        return preferences;
+      });
+    }
+
+    if (typeof expectedRevision === "number") {
+      const [preferences] = await db
+        .update(userPreferences)
+        .set(resetUpdateValues)
+        .where(
+          and(
+            eq(userPreferences.userId, userId),
+            eq(userPreferences.revision, expectedRevision),
+          ),
+        )
+        .returning();
+      return preferences;
+    }
+
+    const [preferences] = await db
+      .insert(userPreferences)
+      .values({ userId, ...resetValues })
+      .onConflictDoUpdate({
+        target: userPreferences.userId,
+        set: resetUpdateValues,
+      })
+      .returning();
+    return preferences;
   }
 
   /**

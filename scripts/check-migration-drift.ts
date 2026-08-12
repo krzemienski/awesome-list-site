@@ -109,13 +109,132 @@ async function checkSchemaReproduction(baseUrl: string): Promise<void> {
   console.log(`  ✓ Created scratch database "${SCRATCH_DB}".`);
 
   const scratch = scratchUrl(baseUrl);
+  const preLegacyRepairDir = fs.mkdtempSync('/tmp/migrations-pre-legacy-repair-');
 
   try {
+    // First reproduce an upgrade from the version immediately before
+    // personalized onboarding. This catches data migrations that a fresh,
+    // empty-schema reproduction cannot exercise.
+    fs.mkdirSync(path.join(preLegacyRepairDir, 'meta'), { recursive: true });
+    const journal = JSON.parse(fs.readFileSync(JOURNAL_PATH, 'utf8'));
+    fs.writeFileSync(
+      path.join(preLegacyRepairDir, 'meta', '_journal.json'),
+      JSON.stringify({
+        ...journal,
+        entries: journal.entries.filter(
+          (entry: { tag: string }) => entry.tag !== '0042_normalize_learning_preferences',
+        ),
+      }),
+    );
+    for (const file of fs.readdirSync(MIGRATIONS_DIR).filter(
+      (file) => file.endsWith('.sql') && file !== '0042_normalize_learning_preferences.sql',
+    )) {
+      fs.copyFileSync(
+        path.join(MIGRATIONS_DIR, file),
+        path.join(preLegacyRepairDir, file),
+      );
+    }
+
     // Run the migrator exactly like server/index.ts does at boot.
     const pool = new Pool({ connectionString: scratch, max: 1, connectionTimeoutMillis: 15000 });
     try {
       const db = drizzle(pool);
+      await migrate(db, { migrationsFolder: preLegacyRepairDir });
+      await pool.query(`
+        INSERT INTO users (id, email) VALUES
+          ('migration-legacy-complete', 'migration-legacy-complete@example.test'),
+          ('migration-legacy-incomplete', 'migration-legacy-incomplete@example.test'),
+          ('migration-legacy-dismissed', 'migration-legacy-dismissed@example.test');
+        INSERT INTO user_preferences (
+          user_id, preferred_categories, skill_level, learning_goals,
+          preferred_resource_types, time_commitment
+        ) VALUES
+          (
+            'migration-legacy-complete',
+            '["Intro & Learning"]'::jsonb,
+            'beginner',
+            '["Learn video encoding fundamentals","Master video streaming protocols","Master video analytics","Learn video encoding fundamentals","Totally custom goal"]'::jsonb,
+            '["Documentation","Tutorials","Framework","Articles","Documentation","Unknown format"]'::jsonb,
+            'weekly'
+          ),
+          (
+            'migration-legacy-incomplete',
+            '["Intro & Learning"]'::jsonb,
+            'intermediate',
+            '["A totally custom goal with no known intent"]'::jsonb,
+            '["Documentation"]'::jsonb,
+            'flexible'
+          ),
+          (
+            'migration-legacy-dismissed',
+            '["Intro & Learning"]'::jsonb,
+            'intermediate',
+            '["Master video streaming protocols"]'::jsonb,
+            '["Documentation"]'::jsonb,
+            'weekly'
+          );
+        UPDATE user_preferences
+        SET onboarding_status = 'dismissed',
+            onboarding_step = 4,
+            onboarding_completed_at = NULL,
+            onboarding_dismissed_at = '2026-08-01 12:00:00'
+        WHERE user_id = 'migration-legacy-dismissed';
+      `);
       await migrate(db, { migrationsFolder: MIGRATIONS_DIR });
+
+      const { rows: upgraded } = await pool.query(`
+        SELECT user_id, learning_goals, preferred_resource_types,
+               onboarding_status, onboarding_step, onboarding_completed_at,
+               onboarding_dismissed_at
+        FROM user_preferences
+        WHERE user_id LIKE 'migration-legacy-%'
+        ORDER BY user_id
+      `);
+      const complete = upgraded.find((row) => row.user_id === 'migration-legacy-complete');
+      const incomplete = upgraded.find((row) => row.user_id === 'migration-legacy-incomplete');
+      const dismissed = upgraded.find((row) => row.user_id === 'migration-legacy-dismissed');
+      const same = (actual: unknown, expected: unknown) =>
+        JSON.stringify(actual) === JSON.stringify(expected);
+      if (
+        !complete ||
+        !same(complete.learning_goals, [
+          'learn-fundamentals',
+          'improve-streaming',
+          'operate-infrastructure',
+        ]) ||
+        !same(complete.preferred_resource_types, [
+          'specification',
+          'course',
+          'library',
+          'article',
+        ]) ||
+        complete.onboarding_status !== 'completed' ||
+        complete.onboarding_step !== 5
+      ) {
+        fail(`Legacy completed preference upgrade produced invalid data:\n${JSON.stringify(complete, null, 2)}`);
+      }
+      if (
+        !incomplete ||
+        !same(incomplete.learning_goals, []) ||
+        !same(incomplete.preferred_resource_types, ['specification']) ||
+        incomplete.onboarding_status !== 'in_progress' ||
+        incomplete.onboarding_step !== 3
+      ) {
+        fail(`Unmappable legacy preference was not left reviewable/incomplete:\n${JSON.stringify(incomplete, null, 2)}`);
+      }
+      if (
+        !dismissed ||
+        !same(dismissed.learning_goals, ['improve-streaming']) ||
+        !same(dismissed.preferred_resource_types, ['specification']) ||
+        dismissed.onboarding_status !== 'dismissed' ||
+        dismissed.onboarding_step !== 4 ||
+        dismissed.onboarding_completed_at !== null ||
+        !(dismissed.onboarding_dismissed_at instanceof Date) ||
+        dismissed.onboarding_dismissed_at.toISOString() !== '2026-08-01T12:00:00.000Z'
+      ) {
+        fail(`Dismissed legacy preference did not preserve dismissal semantics:\n${JSON.stringify(dismissed, null, 2)}`);
+      }
+      console.log('  ✓ Legacy goals/types normalize; incomplete and dismissed lifecycle states remain honest.');
     } finally {
       await pool.end();
     }
@@ -148,6 +267,7 @@ async function checkSchemaReproduction(baseUrl: string): Promise<void> {
 
     console.log('  ✓ drizzle-kit push reports no changes — migrations reproduce shared/schema.ts exactly.');
   } finally {
+    fs.rmSync(preLegacyRepairDir, { recursive: true, force: true });
     await withAdminPool(baseUrl, async (admin) => {
       await admin.query(`DROP DATABASE IF EXISTS ${SCRATCH_DB} WITH (FORCE)`);
     });

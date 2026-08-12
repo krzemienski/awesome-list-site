@@ -1,5 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Resource } from '../../shared/schema';
+import {
+  LEARNING_FORMAT_OPTIONS,
+  LEARNING_GOAL_OPTIONS,
+  type LearningGoal,
+  type LearningTimeCommitment,
+} from '../../shared/onboarding';
 
 // <important_do_not_delete>
 const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
@@ -91,7 +97,7 @@ export interface AIRecommendationResult {
 // NB-007 / NB-042 (run18): shared scoring + reason helpers.
 // Every non-AI recommendation path (cold-start popularity blend, rule-based
 // scorer, Claude-unavailable fallback) must derive scores from the SAME
-// advertised inputs (skill level, learning goals, resource types) and phrase
+// advertised inputs (skill, goals, resource types, and schedule) and phrase
 // its reason through ONE deterministic builder, so the same resource + the
 // same profile always reads identically on /profile and /advanced.
 // ---------------------------------------------------------------------------
@@ -174,18 +180,66 @@ export function calculateSkillMatch(resource: Resource, skillLevel: string): num
 export function calculateGoalsMatch(resource: Resource, learningGoals: string[]): number {
   if (!learningGoals || learningGoals.length === 0) return 0.5;
   const resourceText = `${resource.title} ${resource.description || ''} ${resource.category || ''}`.toLowerCase();
-  let totalAlignment = 0;
-  for (const goal of learningGoals) {
-    const goalWords = goal.toLowerCase().split(/\s+/).filter(word => word.length > 2);
-    if (goalWords.length === 0) continue;
-    const matchingWords = goalWords.filter(word => resourceText.includes(word));
-    if (matchingWords.length > 0) totalAlignment += matchingWords.length / goalWords.length;
-  }
-  return Math.min(totalAlignment / learningGoals.length, 1.0);
+  const matches = getMatchingLearningGoals(resource, learningGoals);
+  const scores = learningGoals.map(goal => {
+    const keywords = goalKeywords(goal);
+    const hits = keywords.filter(keyword => resourceText.includes(keyword)).length;
+    // One strong intent term is meaningful; additional terms increase
+    // confidence without allowing keyword repetition to dominate.
+    return hits === 0 ? 0 : Math.min(1, 0.6 + (hits - 1) * 0.2);
+  });
+  if (matches.length === 0) return 0;
+  return Math.min(scores.reduce((sum, score) => sum + score, 0) / learningGoals.length, 1);
 }
 
-// Keyword hints per resource type as offered by the preference UIs
-// ("Documentation", "Tutorials", "Tools", "Case Studies", "Video", …).
+const GOAL_KEYWORDS: Record<LearningGoal, readonly string[]> = {
+  'learn-fundamentals': [
+    'fundamental', 'beginner', 'introduction', 'intro', 'getting started',
+    'tutorial', 'basics', 'overview', 'concept',
+  ],
+  'build-video-apps': [
+    'application', ' app ', 'sdk', 'api', 'player', 'integration', 'framework',
+    'library', 'web', 'mobile',
+  ],
+  'improve-streaming': [
+    'streaming', 'live stream', 'hls', 'dash', 'webrtc', 'latency', 'playback',
+    'adaptive bitrate', 'buffer', 'cdn',
+  ],
+  'optimize-encoding': [
+    'encoding', 'encoder', 'codec', 'transcod', 'compression', 'bitrate',
+    'quality', 'av1', 'h.264', 'h264', 'h.265', 'hevc', 'vp9', 'ffmpeg',
+  ],
+  'operate-infrastructure': [
+    'infrastructure', 'server', 'cloud', 'cdn', 'delivery', 'pipeline',
+    'monitoring', 'scalab', 'deploy', 'orchestration', 'kubernetes', 'operations',
+  ],
+  'keep-current': [
+    'standard', 'specification', 'news', 'newsletter', 'community', 'conference',
+    'research', 'update', 'latest', 'emerging', 'release',
+  ],
+};
+
+function goalKeywords(goal: string): readonly string[] {
+  if (goal in GOAL_KEYWORDS) return GOAL_KEYWORDS[goal as LearningGoal];
+  // Keep anonymous/legacy callers useful while treating hyphens as separators.
+  return goal.toLowerCase().split(/[\s-]+/).filter(word => word.length > 2);
+}
+
+export function getMatchingLearningGoals(resource: Resource, learningGoals: string[]): string[] {
+  const resourceText = ` ${resource.title} ${resource.description || ''} ${resource.category || ''} `.toLowerCase();
+  return learningGoals.filter(goal =>
+    goalKeywords(goal).some(keyword => resourceText.includes(keyword)),
+  );
+}
+
+export function learningGoalLabel(goal: string): string {
+  return LEARNING_GOAL_OPTIONS.find(option => option.value === goal)?.label
+    ?? goal.replace(/-/g, ' ');
+}
+
+// Keyword hints are only a fallback for legacy resources whose canonical
+// resourceFormat is unknown. Onboarding values otherwise compare directly to
+// resources.resource_format.
 const TYPE_KEYWORDS: Record<string, string[]> = {
   documentation: ['documentation', 'docs', 'reference', 'specification', 'spec', 'api'],
   tutorial: ['tutorial', 'guide', 'how to', 'walkthrough', 'getting started', 'learn'],
@@ -210,14 +264,69 @@ function normalizeTypeKey(rawType: string): string {
 
 export function calculateTypeMatch(resource: Resource, preferredResourceTypes: string[]): number {
   if (!preferredResourceTypes || preferredResourceTypes.length === 0) return 0.5; // neutral
+  return getMatchingResourceTypes(resource, preferredResourceTypes).length /
+    preferredResourceTypes.length;
+}
+
+const FORMAT_ALIASES: Record<string, readonly string[]> = {
+  library: ['library', 'sdk'],
+  community: ['community'],
+};
+
+export function getMatchingResourceTypes(resource: Resource, preferredResourceTypes: string[]): string[] {
+  const canonicalFormat = normalizeTypeKey(resource.resourceFormat || 'unknown');
+  const hasCanonicalFormat = canonicalFormat !== 'unknown';
   const text = `${resource.title} ${resource.description || ''}`.toLowerCase();
-  let matched = 0;
-  for (const rawType of preferredResourceTypes) {
+
+  return preferredResourceTypes.filter(rawType => {
     const key = normalizeTypeKey(rawType);
+    const acceptedFormats = FORMAT_ALIASES[key] || [key];
+    if (hasCanonicalFormat) return acceptedFormats.includes(canonicalFormat);
     const keywords = TYPE_KEYWORDS[key] || [key];
-    if (keywords.some(k => text.includes(k))) matched++;
+    return keywords.some(keyword => text.includes(keyword));
+  });
+}
+
+export function learningFormatLabel(format: string): string {
+  return LEARNING_FORMAT_OPTIONS.find(option => option.value === format)?.label
+    ?? format.replace(/-/g, ' ');
+}
+
+// The catalog does not carry durations, so time fit uses the curated resource
+// format as an explicit, stable proxy. Short-session formats are easy to sample
+// in small daily blocks; focused-session formats generally reward a longer,
+// uninterrupted block. Unknown/other formats and "flexible" profiles remain
+// neutral rather than making unsupported duration claims.
+const SHORT_SESSION_FORMATS = new Set([
+  'article', 'video', 'tool', 'player', 'community',
+]);
+const FOCUSED_SESSION_FORMATS = new Set([
+  'course', 'book', 'specification', 'library', 'sdk', 'api-service',
+  'platform', 'dataset',
+]);
+
+function resourceFormatForTimeFit(resource: Resource): string {
+  const canonical = normalizeTypeKey(resource.resourceFormat || 'unknown');
+  if (canonical !== 'unknown') return canonical;
+  for (const option of LEARNING_FORMAT_OPTIONS) {
+    if (getMatchingResourceTypes(resource, [option.value]).length > 0) {
+      return normalizeTypeKey(option.value);
+    }
   }
-  return matched / preferredResourceTypes.length;
+  return 'unknown';
+}
+
+export function calculateTimeCommitmentMatch(
+  resource: Resource,
+  timeCommitment: LearningTimeCommitment,
+): number {
+  if (timeCommitment === 'flexible') return 0.5;
+  const format = resourceFormatForTimeFit(resource);
+  if (format === 'unknown' || format === 'other') return 0.5;
+  const matches = timeCommitment === 'daily'
+    ? SHORT_SESSION_FORMATS.has(format)
+    : FOCUSED_SESSION_FORMATS.has(format);
+  return matches ? 1 : 0;
 }
 
 export function skillPhrase(skillLevel: string): string {
@@ -232,6 +341,7 @@ export interface ReasonComponents {
   skillScore: number;
   goalsScore: number;
   typeScore: number;
+  timeScore: number;
   popular?: boolean;
 }
 
@@ -242,18 +352,32 @@ export interface ReasonComponents {
  */
 export function buildRecommendationReason(
   resource: Resource,
-  profile: Pick<UserProfile, 'skillLevel' | 'preferredCategories' | 'learningGoals' | 'preferredResourceTypes'>,
+  profile: Pick<UserProfile, 'skillLevel' | 'preferredCategories' | 'learningGoals' | 'preferredResourceTypes' | 'timeCommitment'>,
   comps: ReasonComponents
 ): string {
   const parts: string[] = [];
-  if (resource.category && (profile.preferredCategories || []).includes(resource.category)) {
+  const matchingGoals = getMatchingLearningGoals(resource, profile.learningGoals || []);
+  const matchingTypes = getMatchingResourceTypes(resource, profile.preferredResourceTypes || []);
+  if (matchingGoals.length > 0) {
+    parts.push(`supports your goal: ${learningGoalLabel(matchingGoals[0])}`);
+  }
+  if (matchingTypes.length > 0) {
+    parts.push(`matches your preferred format: ${learningFormatLabel(matchingTypes[0])}`);
+  }
+  if (comps.timeScore === 1 && profile.timeCommitment === 'daily') {
+    parts.push('fits shorter daily learning sessions');
+  }
+  if (comps.timeScore === 1 && profile.timeCommitment === 'weekly') {
+    parts.push('fits a focused weekly learning session');
+  }
+  // Goal/format/time evidence is more specific than broad taxonomy context.
+  // Keep category as a fallback rather than crowding out controlled choices.
+  if (
+    parts.length < 2 &&
+    resource.category &&
+    (profile.preferredCategories || []).includes(resource.category)
+  ) {
     parts.push(`matches your interest in ${resource.category}`);
-  }
-  if (comps.goalsScore > 0.5 && (profile.learningGoals || []).length > 0) {
-    parts.push('aligns with your learning goals');
-  }
-  if (comps.typeScore > 0.5 && (profile.preferredResourceTypes || []).length > 0) {
-    parts.push('one of your preferred resource types');
   }
   if (comps.skillScore >= 0.7) {
     parts.push(`a good fit ${skillPhrase(profile.skillLevel)}`);
@@ -265,7 +389,7 @@ export function buildRecommendationReason(
         : 'based on your preferences'
     );
   }
-  const sentence = parts.slice(0, 2).join(' and ');
+  const sentence = parts.slice(0, 3).join(' and ');
   return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 }
 
@@ -312,6 +436,13 @@ export async function generateAIRecommendations(
         }
         return true;
       })
+      .sort((a, b) => {
+        const score = (resource: Resource) =>
+          calculateGoalsMatch(resource, userProfile.learningGoals) * 0.4 +
+          calculateTypeMatch(resource, userProfile.preferredResourceTypes) * 0.35 +
+          calculateTimeCommitmentMatch(resource, userProfile.timeCommitment) * 0.25;
+        return score(b) - score(a);
+      })
       .slice(0, 100); // Limit for API efficiency
 
     const prompt = `You are an AI recommendation system for video development resources. Analyze this user profile and recommend the most relevant resources.
@@ -319,7 +450,7 @@ export async function generateAIRecommendations(
 USER PROFILE:
 - Skill Level: ${userProfile.skillLevel}
 - Preferred Categories: ${userProfile.preferredCategories.join(', ')}
-- Learning Goals: ${userProfile.learningGoals.join(', ')}
+- Learning Goals: ${userProfile.learningGoals.map(learningGoalLabel).join(', ')}
 - Time Commitment: ${userProfile.timeCommitment}
 - Resources Types Preference: ${userProfile.preferredResourceTypes.join(', ')}
 - Recently Rated Highly: ${Object.entries(userProfile.ratings).filter(([_, rating]) => rating >= 4).map(([url, _]) => url).slice(0, 5).join(', ')}
@@ -329,7 +460,8 @@ ${JSON.stringify(relevantResources.slice(0, 15).map(r => ({
   url: r.url,
   title: r.title,
   description: r.description?.substring(0, 100) || '', // Truncate descriptions to save tokens
-  category: r.category
+  category: r.category,
+  resourceFormat: r.resourceFormat
 })), null, 2)}
 
 Please provide ${Math.min(limit, 8)} personalized recommendations. For each recommendation, provide:
@@ -369,11 +501,33 @@ Respond in JSON format:
 
     const recommendations: AIRecommendationResult[] = result.recommendations?.map((rec: AIRecommendationResponse) => {
       const resource = availableResources.find(r => r.url === rec.resourceId);
+      if (!resource) {
+        return {
+          resourceId: rec.resourceId,
+          score: 0,
+          reason: 'Resource is no longer available',
+          category: 'Unknown',
+          confidenceLevel: 0,
+          aiGenerated: true,
+        };
+      }
+      const skillScore = calculateSkillMatch(resource, userProfile.skillLevel);
+      const goalsScore = calculateGoalsMatch(resource, userProfile.learningGoals);
+      const typeScore = calculateTypeMatch(resource, userProfile.preferredResourceTypes);
+      const timeScore = calculateTimeCommitmentMatch(resource, userProfile.timeCommitment);
+      const preferenceScore =
+        skillScore * 0.25 + goalsScore * 0.3 + typeScore * 0.25 + timeScore * 0.2;
+      const score = Math.max(0, Math.min(1, (rec.score || 0.5) * 0.55 + preferenceScore * 0.45));
       return {
         resourceId: rec.resourceId,
-        score: Math.max(0, Math.min(1, rec.score || 0.5)),
-        reason: rec.reason || 'AI-generated recommendation',
-        category: resource?.category || 'Unknown',
+        score,
+        reason: buildRecommendationReason(resource, userProfile, {
+          skillScore,
+          goalsScore,
+          typeScore,
+          timeScore,
+        }),
+        category: resource.category || 'Unknown',
         confidenceLevel: Math.max(0, Math.min(1, rec.confidenceLevel || 0.7)),
         aiGenerated: true
       };
@@ -509,18 +663,25 @@ function generateFallbackRecommendations(
     const skillScore = calculateSkillMatch(resource, userProfile.skillLevel);
     const goalsScore = calculateGoalsMatch(resource, userProfile.learningGoals);
     const typeScore = calculateTypeMatch(resource, userProfile.preferredResourceTypes);
+    const timeScore = calculateTimeCommitmentMatch(resource, userProfile.timeCommitment);
     let score = 0;
     if (userProfile.preferredCategories.includes(resource.category || '')) {
-      score += 0.35;
+      score += 0.3;
     }
-    score += skillScore * 0.25 + goalsScore * 0.25 + typeScore * 0.15;
+    score +=
+      skillScore * 0.2 + goalsScore * 0.2 + typeScore * 0.15 + timeScore * 0.15;
 
     if (score > 0.2) {
       recommendations.push({
         resourceId: resource.url,
         score,
         // NB-042 (run18): one deterministic reason per (resource, profile).
-        reason: buildRecommendationReason(resource, userProfile, { skillScore, goalsScore, typeScore }),
+        reason: buildRecommendationReason(resource, userProfile, {
+          skillScore,
+          goalsScore,
+          typeScore,
+          timeScore,
+        }),
         category: resource.category || 'Unknown',
         // Confidence tracks the actual match strength instead of a flat 0.6.
         confidenceLevel: Math.min(0.9, Math.max(0.4, 0.35 + score * 0.55)),

@@ -41,6 +41,8 @@ import {
 // Run23 R-06: Home renders from the ~few-KB nav tree (+ /api/tags for the
 // filter panel). The 3.1MB corpus is fetched lazily ONLY when a tag filter is
 // active (per-category match counts need per-resource tags).
+import { useLearningPreferences } from "@/hooks/use-learning-preferences";
+import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding";
 interface HomeProps {
   nav?: AwesomeListNav;
   navLoading: boolean;
@@ -111,8 +113,20 @@ function getAllResources(category: Category): Resource[] {
 }
 
 export default function Home({ nav, navLoading }: HomeProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const {
+    preferences,
+    isLoading: preferencesLoading,
+    savePreferences: saveLearningPreferences,
+    isSaving: dismissingPreferences,
+  } = useLearningPreferences();
+  const showOnboardingInvitation =
+    isAuthenticated &&
+    !preferencesLoading &&
+    (!preferences ||
+      preferences.onboardingStatus === "not_started" ||
+      preferences.onboardingStatus === "in_progress");
 
   // BUG-047 (run13): the register flow lands here with ?welcome=1 after its
   // full-page nav (which drops any in-flight toast). Greet once, then strip
@@ -375,6 +389,70 @@ export default function Home({ nav, navLoading }: HomeProps) {
           </button>
         </div>
       )}
+
+      {showOnboardingInvitation ? (
+        <Card
+          className="border-[var(--accent)] bg-[var(--surface-2)]"
+          data-testid="card-onboarding-invitation"
+        >
+          <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="min-w-0">
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+                Optional · about two minutes
+              </p>
+              <h2 className="mt-1 font-sans text-lg font-semibold">
+                Make personalized recommendations more relevant
+              </h2>
+              <p className="mt-1 text-sm text-[color:var(--text-2)]">
+                Tell us what you want to learn. Browsing and public search stay
+                available—and unchanged—whether you finish this or not.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+              <Button asChild size="sm">
+                <Link
+                  href={`/onboarding?step=${preferences?.onboardingStep ?? 1}`}
+                  data-testid="link-continue-onboarding"
+                >
+                  {preferences?.onboardingStatus === "in_progress"
+                    ? "Continue setup"
+                    : "Choose preferences"}
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={dismissingPreferences}
+                onClick={() =>
+                  saveLearningPreferences({
+                    preferredCategories:
+                      preferences?.preferredCategories ??
+                      DEFAULT_LEARNING_PREFERENCES.preferredCategories,
+                    skillLevel:
+                      preferences?.skillLevel ??
+                      DEFAULT_LEARNING_PREFERENCES.skillLevel,
+                    learningGoals:
+                      preferences?.learningGoals ??
+                      DEFAULT_LEARNING_PREFERENCES.learningGoals,
+                    preferredResourceTypes:
+                      preferences?.preferredResourceTypes ??
+                      DEFAULT_LEARNING_PREFERENCES.preferredResourceTypes,
+                    timeCommitment:
+                      preferences?.timeCommitment ??
+                      DEFAULT_LEARNING_PREFERENCES.timeCommitment,
+                    onboardingStatus: "dismissed",
+                    onboardingStep: preferences?.onboardingStep ?? 1,
+                  })
+                }
+                data-testid="button-dismiss-onboarding-invitation"
+              >
+                Not now
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <AdvancedFilter
         selectedTags={selectedTags}

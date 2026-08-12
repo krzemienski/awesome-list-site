@@ -6,6 +6,7 @@ import {
   calculateSkillMatch,
   calculateGoalsMatch,
   calculateTypeMatch,
+  calculateTimeCommitmentMatch,
   buildRecommendationReason,
   skillPhrase,
 } from './recommendations';
@@ -52,6 +53,27 @@ export interface LearningPathRecommendation {
   category?: string;
   description?: string;
   resources?: Resource[];
+}
+
+export function calculateColdStartBlend(
+  resource: Resource,
+  profile: Pick<
+    UserProfile,
+    'skillLevel' | 'learningGoals' | 'preferredResourceTypes' | 'timeCommitment'
+  >,
+  popularity: number,
+) {
+  const skillScore = calculateSkillMatch(resource, profile.skillLevel);
+  const goalsScore = calculateGoalsMatch(resource, profile.learningGoals);
+  const typeScore = calculateTypeMatch(resource, profile.preferredResourceTypes);
+  const timeScore = calculateTimeCommitmentMatch(resource, profile.timeCommitment);
+  const score =
+    0.32 * popularity +
+    0.2 * skillScore +
+    0.17 * goalsScore +
+    0.16 * typeScore +
+    0.15 * timeScore;
+  return { skillScore, goalsScore, typeScore, timeScore, score };
 }
 
 export class RecommendationEngine {
@@ -229,6 +251,7 @@ export class RecommendationEngine {
             submittedBy: null,
             approvedBy: null,
             approvedAt: null,
+            resourceFormat: r.resourceFormat || 'unknown',
             githubSynced: false,
             lastSyncedAt: null,
           } as Resource));
@@ -340,18 +363,14 @@ export class RecommendationEngine {
         // rendered as 0.85→0.60) that ignored Skill/Goals/Types entirely, so
         // changing those inputs never changed the results. Now a 3×-wide
         // popularity pool is re-ranked by a deterministic blend of popularity
-        // + skill + goals + resource-type match, so every advertised input
+        // + skill + goals + resource-type + schedule fit, so every advertised input
         // shifts both membership and scores (deterministic per config — the
         // cache key already fingerprints these inputs).
         const blend = (resource: Resource, index: number, poolSize: number) => {
           const popularity = poolSize > 1 ? 1 - index / (poolSize - 1) : 1;
-          const skillScore = calculateSkillMatch(resource, enrichedProfile.skillLevel);
-          const goalsScore = calculateGoalsMatch(resource, enrichedProfile.learningGoals);
-          const typeScore = calculateTypeMatch(resource, enrichedProfile.preferredResourceTypes);
-          const score = 0.4 * popularity + 0.25 * skillScore + 0.2 * goalsScore + 0.15 * typeScore;
-          return { skillScore, goalsScore, typeScore, score };
+          return calculateColdStartBlend(resource, enrichedProfile, popularity);
         };
-        const popularCandidates = await this.getPopularResources(preferredPool, limit * 3);
+        const popularCandidates = await this.getPopularResources(preferredPool, Math.max(limit * 10, 100));
         const rankedPreferred = popularCandidates
           .map((resource, index) => ({ resource, comps: blend(resource, index, popularCandidates.length) }))
           .sort((a, b) => b.comps.score - a.comps.score)
@@ -603,9 +622,19 @@ export class RecommendationEngine {
       // Learning goals alignment (15% weight)
       const goalsScore = this.calculateGoalsAlignment(resource, userProfile.learningGoals);
       score += goalsScore * 15;
-      if (goalsScore > 0.5 && userProfile.learningGoals.length > 0) {
-        reasons.push(`aligns with your learning goals`);
-      }
+
+      // Canonical resource-format match (15% weight). The helper compares the
+      // stored resources.resource_format value and only falls back to keywords
+      // for legacy rows explicitly marked unknown.
+      const typeScore = calculateTypeMatch(resource, userProfile.preferredResourceTypes);
+      score += typeScore * 15;
+
+      // Time-commitment fit (12% weight). Duration is not cataloged, so the
+      // shared helper uses curated format as the honest proxy: article/video/
+      // tool/community for shorter daily blocks; course/book/specification/
+      // library-style resources for a focused weekly session.
+      const timeScore = calculateTimeCommitmentMatch(resource, userProfile.timeCommitment);
+      score += timeScore * 12;
 
       // Recency bonus (5% weight)
       if (resource.createdAt) {
@@ -617,10 +646,26 @@ export class RecommendationEngine {
       }
 
       if (score > 20) { // Minimum threshold
+        // Preference evidence is always first and uses controlled human labels.
+        // Keep at most one behavioral context after it so history can explain
+        // the boost without hiding the goal/format that shaped this result.
+        const preferenceReason = buildRecommendationReason(resource, userProfile, {
+          skillScore,
+          goalsScore,
+          typeScore,
+          timeScore,
+        });
+        const behavioralReason = reasons.find(reason =>
+          reason.startsWith('similar to') ||
+          reason.startsWith('related to') ||
+          reason.startsWith('recently added'),
+        );
         recommendations.push({
           resource,
           confidence: Math.min(Math.round(score), 100),
-          reason: reasons.length > 0 ? reasons.slice(0, 2).join(' and ') : 'Based on your preferences',
+          reason: behavioralReason
+            ? `${preferenceReason}; ${behavioralReason.charAt(0).toUpperCase()}${behavioralReason.slice(1)}`
+            : preferenceReason,
           type: 'rule_based',
           score: score / 100
         });

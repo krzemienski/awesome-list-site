@@ -234,9 +234,9 @@ export default function Register() {
           title: "Account created",
           description: `Welcome, ${result.user.email}!`,
         });
-        // BUG-047 (run13): land on home with ?welcome=1 so the destination
-        // page greets the new account (the full-page nav drops this toast).
-        window.location.href = "/?welcome=1";
+        // Personalized onboarding is optional and never a gate: new accounts
+        // are invited into it, with a prominent "Save and browse later" path.
+        window.location.href = "/onboarding?welcome=1";
       } else {
         // Account exists but auto-login failed — send them to the login page.
         toast({

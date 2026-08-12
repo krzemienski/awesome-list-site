@@ -24,6 +24,13 @@ import {
   type ResourceSkillLevel,
 } from "./resourceFacets";
 import type { BookmarkQueueStatus } from "./bookmarkCollections";
+import {
+  type LearningFormat,
+  type LearningGoal,
+  type LearningSkillLevel,
+  type LearningTimeCommitment,
+  type OnboardingStatus,
+} from "./onboarding";
 
 /**
  * Session storage table for Replit Auth
@@ -1044,17 +1051,29 @@ export const userPreferences = pgTable(
   {
     id: serial("id").primaryKey(),
     userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-    preferredCategories: jsonb("preferred_categories").$type<string[]>().default([]),
-    skillLevel: text("skill_level").notNull().default("beginner"), // beginner, intermediate, advanced
-    learningGoals: jsonb("learning_goals").$type<string[]>().default([]),
-    preferredResourceTypes: jsonb("preferred_resource_types").$type<string[]>().default([]),
-    timeCommitment: text("time_commitment").default("flexible"), // daily, weekly, flexible
+    preferredCategories: jsonb("preferred_categories").$type<string[]>().default([]).notNull(),
+    skillLevel: text("skill_level").$type<LearningSkillLevel>().notNull().default("beginner"),
+    learningGoals: jsonb("learning_goals").$type<LearningGoal[]>().default([]).notNull(),
+    preferredResourceTypes: jsonb("preferred_resource_types").$type<LearningFormat[]>().default([]).notNull(),
+    timeCommitment: text("time_commitment").$type<LearningTimeCommitment>().default("flexible").notNull(),
+    onboardingStatus: text("onboarding_status").$type<OnboardingStatus>().default("not_started").notNull(),
+    onboardingStep: integer("onboarding_step").default(1).notNull(),
+    onboardingCompletedAt: timestamp("onboarding_completed_at"),
+    onboardingDismissedAt: timestamp("onboarding_dismissed_at"),
+    revision: integer("revision").default(1).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
   (table) => [
     index("idx_user_preferences_user_id").on(table.userId),
     unique("user_preferences_user_id_unique").on(table.userId),
+    check("user_preferences_skill_level_check", sql`${table.skillLevel} IN ('beginner','intermediate','advanced')`),
+    check("user_preferences_time_commitment_check", sql`${table.timeCommitment} IN ('daily','weekly','flexible')`),
+    check("user_preferences_onboarding_status_check", sql`${table.onboardingStatus} IN ('not_started','in_progress','completed','dismissed')`),
+    check("user_preferences_onboarding_step_check", sql`${table.onboardingStep} BETWEEN 1 AND 5`),
+    check("user_preferences_revision_check", sql`${table.revision} >= 1`),
+    check("user_preferences_learning_goals_values_check", sql`${table.learningGoals} <@ '["learn-fundamentals","build-video-apps","improve-streaming","optimize-encoding","operate-infrastructure","keep-current"]'::jsonb`),
+    check("user_preferences_resource_types_values_check", sql`${table.preferredResourceTypes} <@ '["video","course","article","book","specification","tool","library","community"]'::jsonb`),
   ]
 );
 
@@ -1065,6 +1084,10 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).p
   learningGoals: true,
   preferredResourceTypes: true,
   timeCommitment: true,
+  onboardingStatus: true,
+  onboardingStep: true,
+  onboardingCompletedAt: true,
+  onboardingDismissedAt: true,
 });
 
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;

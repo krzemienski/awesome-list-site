@@ -1,34 +1,23 @@
-import { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useEffect, useMemo, useRef } from "react";
+import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAIRecommendations, type RecommendationResult } from "@/hooks/useAIRecommendations";
+import { useAIRecommendations } from "@/hooks/useAIRecommendations";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { useLearningPreferences } from "@/hooks/use-learning-preferences";
+import { useAuth } from "@/hooks/useAuth";
 import { Resource } from "@/types/awesome-list";
 import RecommendationFeedback from "@/components/ui/recommendation-feedback";
 import { queryClient } from "@/lib/queryClient";
+import {
+  DEFAULT_LEARNING_PREFERENCES,
+  LEARNING_FORMAT_OPTIONS,
+  LEARNING_GOAL_OPTIONS,
+  hasMeaningfulLearningPreferences,
+} from "@shared/onboarding";
 import {
   Sparkles,
   ExternalLink,
@@ -54,54 +43,14 @@ interface AIRecommendationsPanelProps {
   showHeader?: boolean;
 }
 
-const formSchema = z.object({
-  skillLevel: z.enum(['beginner', 'intermediate', 'advanced']),
-  preferredCategories: z.array(z.string()),
-  learningGoals: z.array(z.string()),
-  preferredResourceTypes: z.array(z.string()),
-  timeCommitment: z.enum(['daily', 'weekly', 'flexible']),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-// BUG-025 (run19): names must match resources.category in the DB verbatim —
-// profile preferences are string-matched against resource categories.
-const AVAILABLE_CATEGORIES = [
-  "Encoding & Codecs",
-  "Intro & Learning",
-  "Protocols & Transport",
-  "Players & Clients",
-  "Media Tools",
-  "Standards & Industry",
-  "Infrastructure & Delivery",
-  "General Tools",
-  "Community & Events",
-];
-
-const LEARNING_GOALS = [
-  "Master video streaming protocols",
-  "Learn encoding optimization",
-  "Build streaming applications",
-  "Understand video codecs",
-  "Implement adaptive bitrate",
-  "Deploy CDN solutions",
-  "Develop video players",
-  "Optimize video quality",
-];
-
-const RESOURCE_TYPES = [
-  "Documentation",
-  "Tutorials",
-  "Tools",
-  "Libraries",
-  "Frameworks",
-  "Services",
-  "Case Studies",
-  "Community Resources",
-];
-
 export default function AIRecommendationsPanel({ resources = [], showHeader = true }: AIRecommendationsPanelProps) {
-  const { userProfile, updateProfile, isLoaded } = useUserProfile();
+  const { user, isAuthenticated } = useAuth();
+  const { userProfile: localProfile, isLoaded: localProfileLoaded } =
+    useUserProfile();
+  const {
+    preferences,
+    isLoading: preferencesLoading,
+  } = useLearningPreferences();
   const {
     generateRecommendations,
     recommendations,
@@ -110,66 +59,83 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
     error,
     isSuccess,
   } = useAIRecommendations(undefined, { limit: 10 });
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      skillLevel: userProfile.skillLevel || 'beginner',
-      preferredCategories: userProfile.preferredCategories.length > 0 
-        ? userProfile.preferredCategories 
-        : [],
-      learningGoals: userProfile.learningGoals.length > 0 
-        ? userProfile.learningGoals 
-        : [],
-      preferredResourceTypes: userProfile.preferredResourceTypes.length > 0 
-        ? userProfile.preferredResourceTypes 
-        : [],
-      timeCommitment: userProfile.timeCommitment || 'flexible',
-    },
+  const hasPersonalization =
+    isAuthenticated && hasMeaningfulLearningPreferences(preferences);
+  const effectiveProfile = useMemo(
+    () => ({
+      userId: user?.id ?? localProfile.userId,
+      preferredCategories:
+        preferences?.preferredCategories ??
+        DEFAULT_LEARNING_PREFERENCES.preferredCategories,
+      skillLevel:
+        preferences?.skillLevel ?? DEFAULT_LEARNING_PREFERENCES.skillLevel,
+      learningGoals:
+        preferences?.learningGoals ??
+        DEFAULT_LEARNING_PREFERENCES.learningGoals,
+      preferredResourceTypes:
+        preferences?.preferredResourceTypes ??
+        DEFAULT_LEARNING_PREFERENCES.preferredResourceTypes,
+      timeCommitment:
+        preferences?.timeCommitment ??
+        DEFAULT_LEARNING_PREFERENCES.timeCommitment,
+      viewHistory: localProfile.viewHistory,
+      bookmarks: localProfile.bookmarks,
+      completedResources: localProfile.completedResources,
+      ratings: localProfile.ratings,
+    }),
+    [
+      user?.id,
+      preferences,
+      localProfile.userId,
+      localProfile.viewHistory,
+      localProfile.bookmarks,
+      localProfile.completedResources,
+      localProfile.ratings,
+    ],
+  );
+  const generationKey = JSON.stringify({
+    userId: effectiveProfile.userId,
+    categories: effectiveProfile.preferredCategories,
+    skill: effectiveProfile.skillLevel,
+    goals: effectiveProfile.learningGoals,
+    formats: effectiveProfile.preferredResourceTypes,
+    time: effectiveProfile.timeCommitment,
+    personalized: hasPersonalization,
   });
+  const generatedKeyRef = useRef<string | null>(null);
 
-  // Run15 BUG-018: the saved profile loads from localStorage asynchronously
-  // (after mount), but useForm captured its defaults on first render — so a
-  // reload always showed factory defaults even though the profile was saved.
-  // Rehydrate the form ONCE when the stored profile arrives.
-  const rehydratedRef = useRef(false);
+  // Saved account preferences immediately drive this clearly labeled surface.
+  // Anonymous/default visitors use the public GET endpoint and are described as
+  // receiving general picks, never personalized results.
   useEffect(() => {
-    if (!isLoaded || rehydratedRef.current) return;
-    rehydratedRef.current = true;
-    form.reset({
-      skillLevel: userProfile.skillLevel || 'beginner',
-      preferredCategories: userProfile.preferredCategories || [],
-      learningGoals: userProfile.learningGoals || [],
-      preferredResourceTypes: userProfile.preferredResourceTypes || [],
-      timeCommitment: userProfile.timeCommitment || 'flexible',
-    });
-  }, [isLoaded, userProfile, form]);
+    if (
+      !localProfileLoaded ||
+      (isAuthenticated && preferencesLoading) ||
+      !effectiveProfile.userId ||
+      generatedKeyRef.current === generationKey
+    ) {
+      return;
+    }
+    generatedKeyRef.current = generationKey;
+    generateRecommendations(
+      hasPersonalization ? effectiveProfile : undefined,
+    );
+  }, [
+    localProfileLoaded,
+    isAuthenticated,
+    preferencesLoading,
+    generationKey,
+    hasPersonalization,
+    effectiveProfile,
+    generateRecommendations,
+  ]);
 
-  const onSubmit = (values: FormValues) => {
-    // Run15 BUG-018: persist the chosen preferences so they survive reloads.
-    updateProfile({
-      skillLevel: values.skillLevel,
-      preferredCategories: values.preferredCategories,
-      learningGoals: values.learningGoals,
-      preferredResourceTypes: values.preferredResourceTypes,
-      timeCommitment: values.timeCommitment,
-    });
-
-    const payload = {
-      userId: userProfile.userId,
-      preferredCategories: values.preferredCategories,
-      skillLevel: values.skillLevel,
-      learningGoals: values.learningGoals,
-      preferredResourceTypes: values.preferredResourceTypes,
-      timeCommitment: values.timeCommitment,
-      viewHistory: userProfile.viewHistory,
-      bookmarks: userProfile.bookmarks,
-      completedResources: userProfile.completedResources,
-      ratings: userProfile.ratings,
-    };
-
-    generateRecommendations(payload);
-  };
+  const goalLabels = new Map(
+    LEARNING_GOAL_OPTIONS.map((option) => [option.value, option.label]),
+  );
+  const formatLabels = new Map(
+    LEARNING_FORMAT_OPTIONS.map((option) => [option.value, option.label]),
+  );
 
   const getResourceDetails = (resourceUrl: string): Resource | undefined => {
     // Try exact URL match first
@@ -222,256 +188,67 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
         </Card>
       )}
 
-      {/* Preference Form */}
-      {/* R5-027 (run24): no-print — with checkboxes/selects hidden in print
-          this form printed as a meaningless list of dangling labels; hide the
-          whole preference-configuration card as one unit. */}
+      {/* The canonical editor lives in Settings and is shared with onboarding.
+          This personalized surface only summarizes what it is using. */}
       <Card className="no-print">
         <CardHeader>
-          <CardTitle className="text-lg">Configure Your Preferences</CardTitle>
+          <CardTitle className="text-lg">
+            {hasPersonalization
+              ? "Using your saved learning profile"
+              : "General recommendations"}
+          </CardTitle>
           <CardDescription>
-            Tell us about your skill level and interests to get tailored recommendations
+            {hasPersonalization
+              ? "These results use your saved topics, goals, formats, skill level, and available time."
+              : "No completed learning profile is being used, so these are popular picks from across the catalog."}
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Skill Level */}
-              <FormField
-                control={form.control}
-                name="skillLevel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Skill Level</FormLabel>
-                    {/* Run15 BUG-018: controlled `value` (not defaultValue) so
-                        the rehydrating form.reset updates the visible trigger. */}
-                    <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value}
-                      data-testid="select-skill-level"
-                    >
-                      <FormControl>
-                        <SelectTrigger data-testid="trigger-skill-level">
-                          <SelectValue placeholder="Select your skill level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner" data-testid="option-skill-beginner">
-                          Beginner - Just getting started with video technology
-                        </SelectItem>
-                        <SelectItem value="intermediate" data-testid="option-skill-intermediate">
-                          Intermediate - Have basic understanding, want to go deeper
-                        </SelectItem>
-                        <SelectItem value="advanced" data-testid="option-skill-advanced">
-                          Advanced - Experienced professional seeking advanced topics
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Your current experience level with video streaming and development
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Preferred Categories */}
-              <FormField
-                control={form.control}
-                name="preferredCategories"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Preferred Categories</FormLabel>
-                    <FormDescription>
-                      Select the categories you're most interested in learning about
-                    </FormDescription>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                      {AVAILABLE_CATEGORIES.map((category) => (
-                        <FormField
-                          key={category}
-                          control={form.control}
-                          name="preferredCategories"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                {/* BUG-048 (run18) + Run22 BUG-017: a real 24px
-                                    box — audits measure bounding rects, so a
-                                    pseudo-element hit-area doesn't count. */}
-                                <Checkbox
-                                  className="h-6 w-6"
-                                  data-testid={`checkbox-category-${category.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                                  checked={field.value?.includes(category)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, category])
-                                      : field.onChange(
-                                          field.value?.filter((value) => value !== category)
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal text-sm">
-                                {category}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Learning Goals */}
-              <FormField
-                control={form.control}
-                name="learningGoals"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Learning Goals</FormLabel>
-                    <FormDescription>
-                      What do you want to achieve? Select all that apply
-                    </FormDescription>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                      {LEARNING_GOALS.map((goal) => (
-                        <FormField
-                          key={goal}
-                          control={form.control}
-                          name="learningGoals"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  className="h-6 w-6"
-                                  data-testid={`checkbox-goal-${goal.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                                  checked={field.value?.includes(goal)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, goal])
-                                      : field.onChange(
-                                          field.value?.filter((value) => value !== goal)
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal text-sm">
-                                {goal}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Preferred Resource Types */}
-              <FormField
-                control={form.control}
-                name="preferredResourceTypes"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Preferred Resource Types</FormLabel>
-                    <FormDescription>
-                      What types of resources do you prefer to learn from?
-                    </FormDescription>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                      {RESOURCE_TYPES.map((type) => (
-                        <FormField
-                          key={type}
-                          control={form.control}
-                          name="preferredResourceTypes"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  className="h-6 w-6"
-                                  data-testid={`checkbox-type-${type.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                                  checked={field.value?.includes(type)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, type])
-                                      : field.onChange(
-                                          field.value?.filter((value) => value !== type)
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal text-sm">
-                                {type}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Time Commitment */}
-              <FormField
-                control={form.control}
-                name="timeCommitment"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Time Commitment</FormLabel>
-                    {/* Run15 BUG-018: controlled `value` — see skillLevel above. */}
-                    <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value}
-                      data-testid="select-time-commitment"
-                    >
-                      <FormControl>
-                        <SelectTrigger data-testid="trigger-time-commitment">
-                          <SelectValue placeholder="Select your time commitment" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="daily" data-testid="option-time-daily">
-                          Daily - I can dedicate time every day
-                        </SelectItem>
-                        <SelectItem value="weekly" data-testid="option-time-weekly">
-                          Weekly - I prefer weekly learning sessions
-                        </SelectItem>
-                        <SelectItem value="flexible" data-testid="option-time-flexible">
-                          Flexible - I'll learn at my own pace
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      How much time can you dedicate to learning?
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Submit Button */}
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
-                data-testid="button-generate-recommendations"
-              >
-                {isLoading ? (
-                  <>
-                    <Zap className="mr-2 h-4 w-4 animate-pulse" />
-                    Generating AI Recommendations...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Recommendations
-                  </>
-                )}
+        <CardContent className="space-y-4">
+          {hasPersonalization ? (
+            <div className="flex flex-wrap gap-2" data-testid="active-preference-summary">
+              <Badge variant="secondary">{effectiveProfile.skillLevel}</Badge>
+              {effectiveProfile.preferredCategories.map((category) => (
+                <Badge key={category} variant="outline">
+                  {category}
+                </Badge>
+              ))}
+              {effectiveProfile.learningGoals.map((goal) => (
+                <Badge key={goal} variant="outline">
+                  {goalLabels.get(goal as any) ?? goal}
+                </Badge>
+              ))}
+              {effectiveProfile.preferredResourceTypes.map((format) => (
+                <Badge key={format} variant="outline">
+                  {formatLabels.get(format as any) ?? format}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {isAuthenticated ? (
+              <Button asChild variant="outline">
+                <Link href="/settings#learning-preferences">
+                  {hasPersonalization
+                    ? "Edit learning preferences"
+                    : "Choose learning preferences"}
+                </Link>
               </Button>
-            </form>
-          </Form>
+            ) : null}
+            <Button
+              type="button"
+              variant={isAuthenticated ? "ghost" : "outline"}
+              onClick={() =>
+                generateRecommendations(
+                  hasPersonalization ? effectiveProfile : undefined,
+                )
+              }
+              disabled={isLoading}
+              data-testid="button-generate-recommendations"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              {isLoading ? "Refreshing…" : "Refresh recommendations"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -542,9 +319,7 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                {userProfile.preferredCategories.length > 0 ||
-                userProfile.learningGoals.length > 0 ||
-                userProfile.preferredResourceTypes.length > 0
+                {hasPersonalization
                   ? "Your Personalized Recommendations"
                   : "Recommended Resources"}
               </CardTitle>
@@ -552,11 +327,9 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
                   actually set preferences — otherwise be honest that these
                   are general picks. */}
               <CardDescription>
-                {userProfile.preferredCategories.length > 0 ||
-                userProfile.learningGoals.length > 0 ||
-                userProfile.preferredResourceTypes.length > 0
+                {hasPersonalization
                   ? `${recommendations.length} resources selected specifically for your learning journey`
-                  : `${recommendations.length} recommended resources — popular picks from across the catalog. Set preferences above for personalized results.`}
+                  : `${recommendations.length} recommended resources — popular picks from across the catalog. Set learning preferences in Settings for personalized results.`}
                 {recommendations.some(r => r.type === 'ai_powered') && (
                   <Badge variant="outline" className="ml-2">
                     <Sparkles className="h-3 w-3 mr-1" />
@@ -688,7 +461,7 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
                         <span className="text-xs text-muted-foreground">Was this helpful?</span>
                         <RecommendationFeedback
                           resourceId={parseInt(String(resource.id), 10)}
-                          userId={userProfile.userId}
+                          userId={effectiveProfile.userId}
                           size="sm"
                           onFeedbackChange={handleFeedbackChange}
                           data-testid={`feedback-${index}`}
@@ -723,7 +496,7 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
               Ready to Get Started
             </CardTitle>
             <CardDescription>
-              Configure your preferences above and click "Generate Recommendations" to receive personalized suggestions
+               Recommendations will load automatically. You can refresh them or update your learning preferences in Settings.
             </CardDescription>
           </CardHeader>
         </Card>

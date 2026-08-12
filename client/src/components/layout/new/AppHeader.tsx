@@ -91,6 +91,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     "continue-learning": "Continue Learning",
     login: "Sign in",
     settings: "Settings",
+    onboarding: "Learning preferences",
   };
   // Taxonomy routes get a real parent chain resolved from the tree.
   if (
@@ -131,6 +132,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     "privacy",
     "favorites",
     "account",
+    "onboarding",
   ]);
   if (!knownFirstSegments.has(segments[0])) {
     return [...crumbs, { label: "Not found", href: path }];

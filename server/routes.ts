@@ -63,6 +63,13 @@ import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema, insertLearningJourneySchema, passwordResetTokens, type Resource } from "@shared/schema";
 import {
+  DEFAULT_LEARNING_PREFERENCES,
+  completedLearningPreferencesSchema,
+  learningPreferencesUpdateSchema,
+  type LearningPreferencesValues,
+  type OnboardingStatus,
+} from "@shared/onboarding";
+import {
   HTTPS_URL_RE,
   WEB_URL_RE,
   isPlausiblePublicUrl,
@@ -3161,6 +3168,199 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // --- Learning preferences / optional onboarding ---
+
+  // GET does not create a row. A missing row is meaningful: the user has not
+  // started onboarding and can be invited without being blocked from browsing.
+  app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const preferences = await userFeatureRepo.getUserPreferences(userId);
+      const isCleared =
+        preferences?.onboardingStatus === 'not_started' &&
+        preferences.preferredCategories.length === 0 &&
+        preferences.learningGoals.length === 0 &&
+        preferences.preferredResourceTypes.length === 0;
+      res.set('Cache-Control', 'private, no-store');
+      res.json({
+        preferences: isCleared ? null : preferences ?? null,
+        // A cleared row remains hidden from the form model but its version
+        // prevents a stale tab from resurrecting pre-reset values.
+        revision: preferences?.revision ?? null,
+      });
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
+      res.status(500).json({ message: 'Failed to fetch learning preferences' });
+    }
+  });
+
+  // PUT is an idempotent upsert into the user_id-unique preference row. Draft
+  // saves may be partial; a completed profile must satisfy the full contract.
+  app.put('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const parsed = learningPreferencesUpdateSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          message: 'Please check your learning preferences',
+          errors: parsed.error.issues.map((issue) => ({
+            field: issue.path.join('.'),
+            message: issue.message,
+          })),
+        });
+      }
+
+      const current = await userFeatureRepo.getUserPreferences(userId);
+      const expectedRevision =
+        parsed.data.expectedRevision === undefined
+          ? undefined
+          : parsed.data.expectedRevision === null
+            ? null
+            : parsed.data.expectedRevision;
+      if (
+        expectedRevision !== undefined &&
+        ((current === undefined && expectedRevision !== null) ||
+          (current !== undefined &&
+            (expectedRevision === null ||
+              current.revision !== expectedRevision)))
+      ) {
+        return res.status(409).json({
+          message:
+            'Your learning preferences changed in another tab. Reload before saving again.',
+        });
+      }
+      const dedupe = <T,>(items: T[]): T[] => [...new Set(items)];
+      const values: LearningPreferencesValues = {
+        preferredCategories: dedupe(
+          parsed.data.preferredCategories ??
+            current?.preferredCategories ??
+            DEFAULT_LEARNING_PREFERENCES.preferredCategories,
+        ),
+        skillLevel:
+          parsed.data.skillLevel ??
+          current?.skillLevel ??
+          DEFAULT_LEARNING_PREFERENCES.skillLevel,
+        learningGoals: dedupe(
+          parsed.data.learningGoals ??
+            current?.learningGoals ??
+            DEFAULT_LEARNING_PREFERENCES.learningGoals,
+        ),
+        preferredResourceTypes: dedupe(
+          parsed.data.preferredResourceTypes ??
+            current?.preferredResourceTypes ??
+            DEFAULT_LEARNING_PREFERENCES.preferredResourceTypes,
+        ),
+        timeCommitment:
+          parsed.data.timeCommitment ??
+          current?.timeCommitment ??
+          DEFAULT_LEARNING_PREFERENCES.timeCommitment,
+      };
+
+      // Taxonomy values are intentionally resolved at write time. A stale tab
+      // cannot persist a deleted/renamed category, and no hard-coded client list
+      // can drift from the catalog.
+      if (parsed.data.preferredCategories !== undefined) {
+        const knownCategories = new Set(
+          (await categoryRepo.listCategories()).map((category) => category.name),
+        );
+        const unknown = values.preferredCategories.filter(
+          (category) => !knownCategories.has(category),
+        );
+        if (unknown.length > 0) {
+          return res.status(400).json({
+            message: 'One or more selected topics are no longer available. Refresh and choose again.',
+          });
+        }
+      }
+
+      const onboardingStatus: OnboardingStatus =
+        parsed.data.onboardingStatus ??
+        current?.onboardingStatus ??
+        'not_started';
+      const onboardingStep =
+        parsed.data.onboardingStep ?? current?.onboardingStep ?? 1;
+
+      if (onboardingStatus === 'completed') {
+        const completed = completedLearningPreferencesSchema.safeParse(values);
+        if (!completed.success) {
+          return res.status(400).json({
+            message: 'Complete each preference section before saving',
+            errors: completed.error.issues.map((issue) => ({
+              field: issue.path.join('.'),
+              message: issue.message,
+            })),
+          });
+        }
+      }
+
+      const now = new Date();
+      const preferences = await userFeatureRepo.upsertUserPreferences(
+        userId,
+        {
+          ...values,
+          onboardingStatus,
+          onboardingStep: onboardingStatus === 'completed' ? 5 : onboardingStep,
+          onboardingCompletedAt:
+            onboardingStatus === 'completed'
+              ? current?.onboardingCompletedAt ?? now
+              : null,
+          onboardingDismissedAt:
+            onboardingStatus === 'dismissed'
+              ? current?.onboardingDismissedAt ?? now
+              : null,
+        },
+        expectedRevision,
+      );
+      if (!preferences) {
+        return res.status(409).json({
+          message:
+            'Your learning preferences changed in another tab. Reload before saving again.',
+        });
+      }
+
+      res.set('Cache-Control', 'private, no-store');
+      res.json({
+        preferences,
+        revision: preferences.revision,
+      });
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
+      res.status(500).json({ message: 'Failed to save learning preferences' });
+    }
+  });
+
+  app.delete('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const rawExpected = req.body?.expectedRevision;
+      if (
+        rawExpected !== undefined &&
+        rawExpected !== null &&
+        (!Number.isInteger(rawExpected) || rawExpected < 1)
+      ) {
+        return res.status(400).json({ message: 'expectedRevision must be a positive integer or null' });
+      }
+      const reset = await userFeatureRepo.resetUserPreferences(
+        userId,
+        rawExpected,
+      );
+      if (!reset) {
+        return res.status(409).json({
+          message:
+            'Your learning preferences changed in another tab. Reload before resetting.',
+        });
+      }
+      res.set('Cache-Control', 'private, no-store');
+      res.json({
+        preferences: null,
+        revision: reset.revision,
+      });
+    } catch (error) {
+      console.error('Error resetting user preferences:', error);
+      res.status(500).json({ message: 'Failed to reset learning preferences' });
+    }
+  });
+
   const contributionQuerySchema = z.object({
     type: z.enum(['all', 'resource', 'edit']).default('all'),
     status: z
@@ -3516,10 +3716,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
       const preferredCategories = (preferences?.preferredCategories ?? [])
-        .filter((value): value is string => typeof value === 'string' && !!value.trim())
+        .filter((value) => typeof value === 'string' && !!value.trim())
         .slice(0, 6);
       const learningGoals = (preferences?.learningGoals ?? [])
-        .filter((value): value is string => typeof value === 'string' && !!value.trim())
+        .filter((value) => !!value.trim())
         .slice(0, 6);
       const preferredCategorySet = new Set(
         preferredCategories.map((value) => value.trim().toLowerCase()),
@@ -7246,15 +7446,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/recommendations - Get personalized recommendations for authenticated users
-  app.post("/api/recommendations", async (req, res) => {
+  app.post("/api/recommendations", isAuthenticated, aiLimiter, async (req: any, res) => {
     try {
-      const userProfile: AIUserProfile = req.body;
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      if (req.body?.userId !== undefined && req.body.userId !== userId) {
+        return res.status(403).json({
+          message: 'userId does not match the authenticated session',
+        });
+      }
       // NB-007 (run23): same limit validation as the GET.
       const limit = parseRecommendationLimit(req.query.limit, 10);
       if (limit === null) {
         return res.status(400).json({ message: 'limit must be a positive integer (max 50)' });
       }
       const forceRefresh = req.query.refresh === 'true';
+      const saved = await userFeatureRepo.getUserPreferences(userId);
+      const userProfile: AIUserProfile = {
+        userId,
+        preferredCategories:
+          saved?.preferredCategories ??
+          DEFAULT_LEARNING_PREFERENCES.preferredCategories,
+        skillLevel:
+          saved?.skillLevel ?? DEFAULT_LEARNING_PREFERENCES.skillLevel,
+        learningGoals:
+          saved?.learningGoals ?? DEFAULT_LEARNING_PREFERENCES.learningGoals,
+        preferredResourceTypes:
+          saved?.preferredResourceTypes ??
+          DEFAULT_LEARNING_PREFERENCES.preferredResourceTypes,
+        timeCommitment:
+          saved?.timeCommitment ??
+          DEFAULT_LEARNING_PREFERENCES.timeCommitment,
+        // Activity is loaded by RecommendationEngine using the session-derived
+        // identity. Client-supplied history is deliberately ignored.
+        viewHistory: [],
+        bookmarks: [],
+        completedResources: [],
+        completedJourneys: [],
+        journeyProgress: [],
+        ratings: {},
+      };
 
       const result = await recommendationEngine.generateRecommendations(
         userProfile,

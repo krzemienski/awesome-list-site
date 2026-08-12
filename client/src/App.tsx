@@ -55,6 +55,7 @@ const ThemeSettings = lazy(() => import("@/pages/ThemeSettings"));
 const Recommendations = lazy(() => import("@/pages/Recommendations"));
 const Search = lazy(() => import("@/pages/Search"));
 const Settings = lazy(() => import("@/pages/Settings"));
+const Onboarding = lazy(() => import("@/pages/Onboarding"));
 const Terms = lazy(() => import("@/pages/Terms"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
 
@@ -283,7 +284,7 @@ import {
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|resource|terms|privacy)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|onboarding|resource|terms|privacy)\/?$/,
   /^\/auth\/(login|register)\/?$/,
   /^\/category\/[^/]+(\/[^/]+)?$/,
   /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
@@ -561,6 +562,11 @@ function Router() {
         )} />
         <Route path="/settings/theme" component={ThemeSettings} />
         <Route path="/settings" component={Settings} />
+        <Route path="/onboarding" component={() => (
+          <AuthGuard>
+            <Onboarding />
+          </AuthGuard>
+        )} />
         <Route>
           <NotFound />
         </Route>
