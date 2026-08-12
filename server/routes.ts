@@ -2051,8 +2051,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
       res.json(resource);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error approving resource:', error);
+      if (error?.message?.includes('not pending approval')) {
+        return res.status(409).json({ message: error.message });
+      }
       res.status(500).json({ message: 'Failed to approve resource' });
     }
   });
@@ -2076,8 +2079,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const resource = await resourceRepo.updateResourceStatus(id, 'rejected', userId);
       res.json(resource);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error rejecting resource:', error);
+      if (error?.message?.includes('not pending approval')) {
+        return res.status(409).json({ message: error.message });
+      }
       res.status(500).json({ message: 'Failed to reject resource' });
     }
   });
@@ -3155,67 +3161,245 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/user/submissions - Get user's submitted resources and edits
-  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
+  const contributionQuerySchema = z.object({
+    type: z.enum(['all', 'resource', 'edit']).default('all'),
+    status: z
+      .enum(['all', 'pending', 'approved', 'rejected', 'withdrawn', 'superseded'])
+      .default('all'),
+    sort: z.enum(['newest', 'oldest']).default('newest'),
+    q: z.string().trim().max(100, 'Search must be 100 characters or fewer').default(''),
+    page: z.coerce.number().int().min(1).max(PG_INT_MAX).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(12),
+  });
 
-      // Get user's submitted resources
-      const submittedResources = await resourceRepo.listResources({
-        userId,
-        page: 1,
-        limit: 100
+  // GET /api/user/contributions - One ownership-scoped, safely serialized
+  // timeline for resource submissions and edit suggestions.
+  app.get('/api/user/contributions', isAuthenticated, async (req: any, res) => {
+    try {
+      const parsed = contributionQuerySchema.safeParse(req.query);
+      if (!parsed.success) {
+        return res.status(400).json({
+          message: parsed.error.issues[0]?.message || 'Invalid contribution filters',
+        });
+      }
+
+      const userId = req.user.claims.sub;
+      const { type, status, sort, q, page, limit } = parsed.data;
+      const dashboard = await auditRepo.getContributorDashboardData(userId);
+      const statusCounts = {
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+        withdrawn: 0,
+        superseded: 0,
+      };
+      for (const item of dashboard.items) statusCounts[item.status]++;
+
+      const normalizedQuery = q.toLocaleLowerCase();
+      const filtered = dashboard.items.filter((item) => {
+        if (type !== 'all' && item.kind !== type) return false;
+        if (status !== 'all' && item.status !== status) return false;
+        if (!normalizedQuery) return true;
+        const searchable = [
+          item.title,
+          item.submission?.url,
+          item.submission?.description,
+          item.submission?.category,
+          ...(item.changes ?? []).flatMap((change) => [
+            change.field,
+            String(change.new ?? ''),
+          ]),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLocaleLowerCase();
+        return searchable.includes(normalizedQuery);
       });
 
-      // Get user's suggested edits
-      const resourceEdits = await auditRepo.getResourceEditsByUser(userId);
+      filtered.sort((a, b) => {
+        const byTime = a.changedAt.getTime() - b.changedAt.getTime();
+        if (byTime !== 0) return sort === 'oldest' ? byTime : -byTime;
+        if (a.kind !== b.kind) return a.kind.localeCompare(b.kind);
+        return b.id - a.id;
+      });
 
-      res.json({
-        resources: submittedResources.resources,
-        edits: resourceEdits,
-        totalResources: submittedResources.total,
-        totalEdits: resourceEdits.length
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / limit));
+      const effectivePage = Math.min(page, totalPages);
+      const offset = (effectivePage - 1) * limit;
+
+      res.set('Cache-Control', 'private, no-store');
+      return res.json({
+        items: filtered.slice(offset, offset + limit),
+        pagination: {
+          page: effectivePage,
+          requestedPage: page,
+          limit,
+          total,
+          totalPages,
+        },
+        summary: {
+          total: dashboard.items.length,
+          ...statusCounts,
+          ...dashboard.impact,
+        },
+        definitions: {
+          acceptedContributions:
+            'Resource submissions and edit suggestions that moderators approved.',
+          publicResources:
+            'Currently public resources you submitted or improved with an approved edit. Each resource is counted once.',
+          recordedViews:
+            'Distinct signed-in accounts with a recorded resource detail view across those currently public resources. Each account is counted once.',
+        },
       });
     } catch (error) {
-      console.error('Error fetching user submissions:', error);
-      res.status(500).json({ message: 'Failed to fetch user submissions' });
+      console.error('Error fetching contributor dashboard:', error);
+      return res.status(500).json({ message: 'Failed to fetch contributions' });
     }
   });
 
-  // DELETE /api/user/submissions/:id - Withdraw own pending resource submission
-  // (NB-039). Only the submitter may withdraw, and only while still pending —
-  // approved/rejected items are part of the moderated catalog/audit history.
-  app.delete('/api/user/submissions/:id', isAuthenticated, async (req: any, res) => {
+  // Compatibility endpoint for older profile clients. It is still
+  // ownership-scoped, but new clients use the paginated safe serializer above.
+  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.id);
+      const dashboard = await auditRepo.getContributorDashboardData(userId);
+      const resourceItems = dashboard.items.filter((item) => item.kind === 'resource');
+      const editItems = dashboard.items.filter((item) => item.kind === 'edit');
 
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-
-      const resource = await resourceRepo.getResource(resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: 'Submission not found' });
-      }
-      if (resource.submittedBy !== userId) {
-        return res.status(403).json({ message: 'You can only withdraw your own submissions' });
-      }
-      if (resource.status !== 'pending') {
-        return res.status(409).json({ message: 'Only pending submissions can be withdrawn' });
-      }
-
-      // deleteResource writes the 'deleted' audit row itself (before the row is
-      // removed, so the audit FK stays valid) and cleans up the non-cascading
-      // child FKs (resource_edits, research_discoveries.created_resource_id).
-      // Do NOT log the deletion again here.
-      await resourceRepo.deleteResource(resourceId, userId);
-
-      res.json({ message: 'Submission withdrawn' });
+      res.set('Cache-Control', 'private, no-store');
+      return res.json({
+        resources: resourceItems.map((item) => ({
+          id: item.id,
+          title: item.title,
+          url: item.submission?.url,
+          description: item.submission?.description,
+          category: item.submission?.category,
+          status: item.status,
+          createdAt: item.submittedAt,
+          changedAt: item.changedAt,
+          rejectionReason: item.rejectionReason,
+          publicResource: item.publicResource,
+        })),
+        edits: editItems.map((item) => ({
+          id: item.id,
+          title: item.title,
+          status: item.status,
+          proposedChanges: Object.fromEntries(
+            (item.changes ?? []).map((change) => [
+              change.field,
+              { old: change.old, new: change.new },
+            ]),
+          ),
+          createdAt: item.submittedAt,
+          changedAt: item.changedAt,
+          rejectionReason: item.rejectionReason,
+          publicResource: item.publicResource,
+        })),
+        totalResources: resourceItems.length,
+        totalEdits: editItems.length,
+      });
     } catch (error) {
-      console.error('Error withdrawing submission:', error);
-      res.status(500).json({ message: 'Failed to withdraw submission' });
+      console.error('Error fetching user submissions:', error);
+      return res.status(500).json({ message: 'Failed to fetch user submissions' });
     }
+  });
+
+  const withdrawContribution = async (
+    req: any,
+    res: Response,
+    forcedKind?: 'resource' | 'edit',
+  ) => {
+    try {
+      const userId = req.user.claims.sub;
+      const contributionId = parseInt(req.params.id);
+      const kind = forcedKind ?? req.params.kind;
+
+      if (!['resource', 'edit'].includes(kind) || isNaN(contributionId)) {
+        return res.status(400).json({ message: 'Invalid contribution' });
+      }
+
+      if (kind === 'resource') {
+        const withdrawn = await resourceRepo.withdrawPendingSubmission(
+          contributionId,
+          userId,
+        );
+        if (withdrawn) {
+          return res.json({
+            message: 'Resource submission withdrawn',
+            current: {
+              id: withdrawn.id,
+              kind,
+              status: 'withdrawn',
+              changedAt: withdrawn.statusChangedAt,
+            },
+          });
+        }
+
+        const current = await resourceRepo.getResource(contributionId);
+        // A missing row and another user's row are intentionally identical:
+        // ownership is never disclosed.
+        if (!current || current.submittedBy !== userId) {
+          return res.status(404).json({ message: 'Contribution not found' });
+        }
+        const currentStatus = [
+          'pending',
+          'approved',
+          'rejected',
+          'withdrawn',
+        ].includes(current.status ?? '')
+          ? current.status
+          : 'superseded';
+        return res.status(409).json({
+          message: `This contribution is already ${currentStatus}. The timeline has been refreshed.`,
+          current: { id: current.id, kind, status: currentStatus },
+        });
+      }
+
+      const withdrawn = await auditRepo.withdrawPendingResourceEdit(
+        contributionId,
+        userId,
+      );
+      if (withdrawn) {
+        return res.json({
+          message: 'Edit suggestion withdrawn',
+          current: {
+            id: withdrawn.id,
+            kind,
+            status: 'withdrawn',
+            changedAt: withdrawn.withdrawnAt,
+          },
+        });
+      }
+
+      const current = await auditRepo.getResourceEdit(contributionId);
+      if (!current || current.submittedBy !== userId) {
+        return res.status(404).json({ message: 'Contribution not found' });
+      }
+      const dashboard = await auditRepo.getContributorDashboardData(userId);
+      const currentItem = dashboard.items.find(
+        (item) => item.kind === 'edit' && item.id === contributionId,
+      );
+      const currentStatus = currentItem?.status ?? current.status;
+      return res.status(409).json({
+        message: `This contribution is already ${currentStatus}. The timeline has been refreshed.`,
+        current: { id: current.id, kind, status: currentStatus },
+      });
+    } catch (error) {
+      console.error('Error withdrawing contribution:', error);
+      return res.status(500).json({ message: 'Failed to withdraw contribution' });
+    }
+  };
+
+  // POST is the canonical action. The old DELETE path remains as a
+  // compatibility alias, but now performs the same durable soft withdrawal.
+  app.post(
+    '/api/user/contributions/:kind(resource|edit)/:id/withdraw',
+    isAuthenticated,
+    (req, res) => withdrawContribution(req, res),
+  );
+  app.delete('/api/user/submissions/:id', isAuthenticated, (req, res) => {
+    return withdrawContribution(req, res, 'resource');
   });
 
   // GET /api/user/journeys - Get user's learning journeys with details
@@ -4238,8 +4422,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedResource = await resourceRepo.approveResource(resourceId, userId);
       
       res.json(updatedResource);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error approving resource:', error);
+      if (error?.message?.includes('not pending approval')) {
+        return res.status(409).json({ message: error.message });
+      }
       res.status(500).json({ message: 'Failed to approve resource' });
     }
   });
@@ -4278,8 +4465,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedResource = await resourceRepo.getResource(resourceId);
       
       res.json(updatedResource);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error rejecting resource:', error);
+      if (error?.message?.includes('not pending approval')) {
+        return res.status(409).json({ message: error.message });
+      }
       res.status(500).json({ message: 'Failed to reject resource' });
     }
   });
@@ -4308,8 +4498,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const updatedResource = await resourceRepo.updateResourceStatus(resourceId, 'pending', userId);
       res.json(updatedResource);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error unapproving resource:', error);
+      if (error?.message?.includes('not approved')) {
+        return res.status(409).json({ message: error.message });
+      }
       res.status(500).json({ message: 'Failed to unapprove resource' });
     }
   });
@@ -4729,7 +4922,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('Error approving edit:', error);
       
-      if (error.message && error.message.includes('Conflict detected')) {
+      if (
+        error.message &&
+        (error.message.includes('Conflict detected') ||
+          error.message.includes('Merge conflict detected') ||
+          error.message.includes('already processed'))
+      ) {
         return res.status(409).json({ 
           message: error.message,
           conflict: true
@@ -4760,6 +4958,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Edit rejected successfully' });
     } catch (error: any) {
       console.error('Error rejecting edit:', error);
+      if (error?.message?.includes('not pending')) {
+        return res.status(409).json({ message: error.message });
+      }
       res.status(500).json({ message: error.message || 'Failed to reject edit' });
     }
   });

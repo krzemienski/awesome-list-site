@@ -43,6 +43,7 @@ const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const About = lazy(() => import("@/pages/About"));
 const Advanced = lazy(() => import("@/pages/Advanced"));
 const Profile = lazy(() => import("@/pages/Profile"));
+const Contributions = lazy(() => import("@/pages/Contributions"));
 const Bookmarks = lazy(() => import("@/pages/Bookmarks"));
 const PublicCollection = lazy(() => import("@/pages/PublicCollection"));
 const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
@@ -282,7 +283,7 @@ import {
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|bookmarks|favorites|account|admin|settings|resource|terms|privacy)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|resource|terms|privacy)\/?$/,
   /^\/auth\/(login|register)\/?$/,
   /^\/category\/[^/]+(\/[^/]+)?$/,
   /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
@@ -532,6 +533,7 @@ function Router() {
           {(params) => <PublicCollection shareId={params.shareId} />}
         </Route>
         <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
+        <Route path="/contributions" component={() => (<AuthGuard><Contributions /></AuthGuard>)} />
         <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
         {/* Run17 BUG-055: favorites and bookmarks are different collections —
             this used to land on /bookmarks. */}

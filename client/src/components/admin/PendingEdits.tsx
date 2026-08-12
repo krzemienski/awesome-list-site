@@ -562,7 +562,8 @@ export default function PendingEdits() {
           <DialogHeader>
             <DialogTitle>Reject Edit Suggestion</DialogTitle>
             <DialogDescription>
-              Provide a reason for rejecting this edit suggestion (minimum 10 characters)
+              Provide a reason for rejecting this edit suggestion (minimum 10 characters).
+              This message is shown to the contributor, so keep internal moderation notes out of it.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -577,7 +578,7 @@ export default function PendingEdits() {
                 data-testid="input-rejection-reason"
               />
               <p className="text-sm text-muted-foreground">
-                {rejectionReason.trim().length} / 10 characters minimum
+                {rejectionReason.trim().length} / 10 characters minimum · visible to the contributor
               </p>
             </div>
           </div>

@@ -99,6 +99,13 @@
       "when": 1786492800000,
       "tag": "0041_bookmark_collections",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1786536000000,
+      "tag": "0042_contributor_impact",
+      "breakpoints": true
     }
   ]
 }

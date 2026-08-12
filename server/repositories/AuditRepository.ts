@@ -29,6 +29,7 @@ import {
   resourceAuditLog,
   resourceEdits,
   resources,
+  userInteractions,
   users,
   EDITABLE_RESOURCE_FIELDS,
   type ResourceEdit,
@@ -41,7 +42,54 @@ import {
   resourceProviderSchema,
   resourceSkillLevelSchema,
 } from "@shared/resourceFacets";
-import { eq, desc, asc, or, sql } from "drizzle-orm";
+import { and, eq, desc, asc, or, sql } from "drizzle-orm";
+
+export type ContributorLifecycleStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "withdrawn"
+  | "superseded";
+
+type ContributorChangeValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Array<string | number | boolean | null>;
+
+export interface ContributorChange {
+  field: string;
+  old: ContributorChangeValue;
+  new: ContributorChangeValue;
+}
+
+export interface ContributorItem {
+  id: number;
+  kind: "resource" | "edit";
+  status: ContributorLifecycleStatus;
+  title: string;
+  submittedAt: Date;
+  changedAt: Date;
+  canWithdraw: boolean;
+  rejectionReason: string | null;
+  publicResource: { id: number; title: string; path: string } | null;
+  submission?: {
+    url: string;
+    description: string;
+    category: string;
+    subcategory: string | null;
+    subSubcategory: string | null;
+    tags: string[];
+  };
+  changes?: ContributorChange[];
+}
+
+export interface ContributorImpact {
+  acceptedContributions: number;
+  publicResources: number;
+  recordedViews: number;
+}
 
 /**
  * Repository class for audit log and resource edit operations
@@ -208,6 +256,313 @@ export class AuditRepository {
   }
 
   /**
+   * Build the contributor dashboard from ownership-scoped selects only.
+   *
+   * This is deliberately a safe serializer rather than `select *`: moderator
+   * identity, audit notes, Claude metadata, proposedData, and contributor
+   * identity never enter the response shape.
+   */
+  async getContributorDashboardData(userId: string): Promise<{
+    items: ContributorItem[];
+    impact: ContributorImpact;
+  }> {
+    const [resourceRows, editRows, impactResult] = await Promise.all([
+      db
+        .select({
+          id: resources.id,
+          title: resources.title,
+          url: resources.url,
+          description: resources.description,
+          category: resources.category,
+          subcategory: resources.subcategory,
+          subSubcategory: resources.subSubcategory,
+          metadata: resources.metadata,
+          status: resources.status,
+          contributorRejectionReason: resources.contributorRejectionReason,
+          createdAt: resources.createdAt,
+          updatedAt: resources.updatedAt,
+          approvedAt: resources.approvedAt,
+          statusChangedAt: resources.statusChangedAt,
+        })
+        .from(resources)
+        .where(eq(resources.submittedBy, userId)),
+      db
+        .select({
+          id: resourceEdits.id,
+          resourceId: resourceEdits.resourceId,
+          status: resourceEdits.status,
+          proposedChanges: resourceEdits.proposedChanges,
+          rejectionReason: resourceEdits.rejectionReason,
+          originalResourceUpdatedAt: resourceEdits.originalResourceUpdatedAt,
+          createdAt: resourceEdits.createdAt,
+          updatedAt: resourceEdits.updatedAt,
+          handledAt: resourceEdits.handledAt,
+          withdrawnAt: resourceEdits.withdrawnAt,
+          resourceTitle: resources.title,
+          currentResourceStatus: resources.status,
+          currentResourceUpdatedAt: resources.updatedAt,
+        })
+        .from(resourceEdits)
+        .innerJoin(resources, eq(resourceEdits.resourceId, resources.id))
+        .where(eq(resourceEdits.submittedBy, userId)),
+      db.execute(sql`
+        WITH impacted_resources AS (
+          SELECT ${resources.id} AS id
+          FROM ${resources}
+          WHERE ${resources.submittedBy} = ${userId}
+            AND ${resources.status} = 'approved'
+          UNION
+          SELECT current_resource.id
+          FROM ${resourceEdits} contribution_edit
+          INNER JOIN ${resources} current_resource
+            ON current_resource.id = contribution_edit.resource_id
+          WHERE contribution_edit.submitted_by = ${userId}
+            AND contribution_edit.status = 'approved'
+            AND current_resource.status = 'approved'
+        )
+        SELECT
+          (
+            (SELECT count(*) FROM ${resources}
+             WHERE ${resources.submittedBy} = ${userId}
+               AND ${resources.status} = 'approved')
+            +
+            (SELECT count(*) FROM ${resourceEdits}
+             WHERE ${resourceEdits.submittedBy} = ${userId}
+               AND ${resourceEdits.status} = 'approved')
+          )::int AS accepted_contributions,
+          (SELECT count(*) FROM impacted_resources)::int AS public_resources,
+          (
+             SELECT count(DISTINCT interaction.user_id)
+            FROM ${userInteractions} interaction
+            INNER JOIN impacted_resources impacted
+              ON impacted.id = interaction.resource_id
+            WHERE interaction.interaction_type = 'view'
+          )::int AS recorded_views
+      `),
+    ]);
+
+    const contributorStatuses = new Set<ContributorLifecycleStatus>([
+      "pending",
+      "approved",
+      "rejected",
+      "withdrawn",
+      "superseded",
+    ]);
+    const asLifecycleStatus = (
+      status: string | null,
+    ): ContributorLifecycleStatus =>
+      contributorStatuses.has(status as ContributorLifecycleStatus)
+        ? (status as ContributorLifecycleStatus)
+        : "superseded";
+    const asDate = (value: Date | null | undefined, fallback: Date): Date =>
+      value instanceof Date ? value : fallback;
+    const safeReason = (value: string | null | undefined): string | null => {
+      const trimmed = value?.trim();
+      return trimmed ? trimmed.slice(0, 1000) : null;
+    };
+    const safeValue = (value: unknown): ContributorChangeValue => {
+      if (
+        value === null ||
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+      ) {
+        return typeof value === "string" ? value.slice(0, 2048) : value;
+      }
+      if (Array.isArray(value)) {
+        return value
+          .filter(
+            (entry): entry is string | number | boolean | null =>
+              entry === null ||
+              typeof entry === "string" ||
+              typeof entry === "number" ||
+              typeof entry === "boolean",
+          )
+          .slice(0, 20)
+          .map((entry) =>
+            typeof entry === "string" ? entry.slice(0, 2048) : entry,
+          );
+      }
+      return String(value ?? "").slice(0, 2048);
+    };
+
+    const resourceItems: ContributorItem[] = resourceRows.map((resource) => {
+      const status = asLifecycleStatus(resource.status);
+      const submittedAt = asDate(resource.createdAt, new Date(0));
+      const changedAt =
+        status === "approved"
+          ? asDate(resource.approvedAt, asDate(resource.updatedAt, submittedAt))
+          : status === "pending"
+            ? submittedAt
+            : asDate(
+                resource.statusChangedAt,
+                asDate(resource.updatedAt, submittedAt),
+              );
+      const metadata = resource.metadata as Record<string, unknown> | null;
+      const tags = Array.isArray(metadata?.tags)
+        ? metadata.tags
+            .filter((tag): tag is string => typeof tag === "string")
+            .slice(0, 20)
+        : [];
+
+      return {
+        id: resource.id,
+        kind: "resource",
+        status,
+        title: resource.title,
+        submittedAt,
+        changedAt,
+        canWithdraw: status === "pending",
+        rejectionReason:
+          status === "rejected"
+            ? safeReason(resource.contributorRejectionReason)
+            : null,
+        publicResource:
+          status === "approved"
+            ? {
+                id: resource.id,
+                title: resource.title,
+                path: `/resource/${resource.id}`,
+              }
+            : null,
+        submission: {
+          url: resource.url,
+          description: resource.description,
+          category: resource.category,
+          subcategory: resource.subcategory,
+          subSubcategory: resource.subSubcategory,
+          tags,
+        },
+      };
+    });
+
+    const editItems: ContributorItem[] = editRows.map((edit) => {
+      const submittedAt = edit.createdAt;
+      const resourceChangedAfterSubmission =
+        !!edit.currentResourceUpdatedAt &&
+        edit.currentResourceUpdatedAt.getTime() >
+          edit.originalResourceUpdatedAt.getTime();
+      const storedStatus = asLifecycleStatus(edit.status);
+      const status: ContributorLifecycleStatus =
+        storedStatus === "pending" && resourceChangedAfterSubmission
+          ? "superseded"
+          : storedStatus;
+      const changedAt =
+        status === "pending"
+          ? submittedAt
+          : status === "withdrawn"
+            ? asDate(edit.withdrawnAt, edit.updatedAt)
+            : status === "superseded"
+              ? asDate(edit.currentResourceUpdatedAt, edit.updatedAt)
+              : asDate(edit.handledAt, edit.updatedAt);
+      const changes: ContributorChange[] = [];
+      const proposedChanges = edit.proposedChanges as Record<
+        string,
+        { old?: unknown; new?: unknown }
+      >;
+      for (const field of EDITABLE_RESOURCE_FIELDS) {
+        const change = proposedChanges?.[field];
+        if (!change || typeof change !== "object") continue;
+        if (!("old" in change) && !("new" in change)) continue;
+        changes.push({
+          field,
+          old: safeValue(change.old),
+          new: safeValue(change.new),
+        });
+      }
+
+      return {
+        id: edit.id,
+        kind: "edit",
+        status,
+        title: edit.resourceTitle,
+        submittedAt,
+        changedAt,
+        canWithdraw: status === "pending",
+        rejectionReason:
+          status === "rejected" ? safeReason(edit.rejectionReason) : null,
+        publicResource:
+          status === "approved" && edit.currentResourceStatus === "approved"
+            ? {
+                id: edit.resourceId,
+                title: edit.resourceTitle,
+                path: `/resource/${edit.resourceId}`,
+              }
+            : null,
+        changes,
+      };
+    });
+
+    const impactRow = impactResult.rows[0] as
+      | {
+          accepted_contributions: number | string;
+          public_resources: number | string;
+          recorded_views: number | string;
+        }
+      | undefined;
+
+    return {
+      items: [...resourceItems, ...editItems],
+      impact: {
+        acceptedContributions: Number(
+          impactRow?.accepted_contributions ?? 0,
+        ),
+        publicResources: Number(impactRow?.public_resources ?? 0),
+        recordedViews: Number(impactRow?.recorded_views ?? 0),
+      },
+    };
+  }
+
+  /**
+   * Atomically withdraw a contributor's own still-pending edit suggestion.
+   */
+  async withdrawPendingResourceEdit(
+    editId: number,
+    userId: string,
+  ): Promise<ResourceEdit | undefined> {
+    return db.transaction(async (tx) => {
+      const [withdrawn] = await tx
+        .update(resourceEdits)
+        .set({
+          status: "withdrawn",
+          withdrawnAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(resourceEdits.id, editId),
+            eq(resourceEdits.submittedBy, userId),
+            eq(resourceEdits.status, "pending"),
+            sql`EXISTS (
+              SELECT 1
+              FROM ${resources} current_resource
+              WHERE current_resource.id = ${resourceEdits.resourceId}
+                AND current_resource.updated_at <= ${resourceEdits.originalResourceUpdatedAt}
+            )`,
+          ),
+        )
+        .returning();
+
+      if (!withdrawn) return undefined;
+
+      await tx.insert(resourceAuditLog).values({
+        resourceId: withdrawn.resourceId,
+        originalResourceId: withdrawn.resourceId,
+        action: "edit_withdrawn",
+        performedBy: userId,
+        changes: {
+          editId,
+          previousStatus: "pending",
+          newStatus: "withdrawn",
+        },
+        notes: "Contributor withdrew pending edit suggestion",
+      });
+
+      return withdrawn;
+    });
+  }
+
+  /**
    * Get all pending resource edit suggestions
    * @returns Array of pending resource edits, ordered by oldest first
    */
@@ -226,51 +581,66 @@ export class AuditRepository {
    * @throws Error if edit not found, already processed, resource not found, or merge conflict detected
    */
   async approveResourceEdit(editId: number, adminId: string): Promise<void> {
-    const edit = await this.getResourceEdit(editId);
-    if (!edit || edit.status !== 'pending') {
-      throw new Error('Edit not found or already processed');
-    }
+    const outcome = await db.transaction(async (tx) => {
+      // Lock the contribution before inspecting it. A contributor withdrawal
+      // racing this moderation action will either commit first (and be seen
+      // here) or wait until this transaction commits and then lose its
+      // status='pending' predicate. Neither path can overwrite the other.
+      const [edit] = await tx
+        .select()
+        .from(resourceEdits)
+        .where(eq(resourceEdits.id, editId))
+        .for('update');
+      if (!edit || edit.status !== 'pending') {
+        return { kind: 'not_pending' as const };
+      }
 
-    // SECURITY FIX: Re-fetch CURRENT resource state (not cached) (ISSUE 2)
-    const [currentResource] = await db
-      .select()
-      .from(resources)
-      .where(eq(resources.id, edit.resourceId));
+      // Lock the resource too, so no content write can land between the
+      // version check and applying this proposal.
+      const [currentResource] = await tx
+        .select()
+        .from(resources)
+        .where(eq(resources.id, edit.resourceId))
+        .for('update');
+      if (!currentResource) {
+        return { kind: 'missing_resource' as const };
+      }
 
-    if (!currentResource) {
-      throw new Error('Resource not found');
-    }
+      const editTimestamp = edit.originalResourceUpdatedAt.getTime();
+      const currentTimestamp = (currentResource.updatedAt ?? new Date()).getTime();
+      const now = new Date();
+      if (editTimestamp < currentTimestamp) {
+        await tx
+          .update(resourceEdits)
+          .set({
+            status: 'superseded',
+            handledBy: adminId,
+            handledAt: now,
+            updatedAt: now,
+          })
+          .where(and(eq(resourceEdits.id, editId), eq(resourceEdits.status, 'pending')));
+        await tx.insert(resourceAuditLog).values({
+          resourceId: edit.resourceId,
+          originalResourceId: edit.resourceId,
+          action: 'edit_superseded',
+          performedBy: adminId,
+          changes: { editId },
+          notes: `Edit #${editId} superseded by a newer resource version`,
+        });
+        return { kind: 'superseded' as const };
+      }
 
-    // CONFLICT CHECK: Compare timestamps
-    const editTimestamp = new Date(edit.originalResourceUpdatedAt).getTime();
-    const currentTimestamp = new Date(currentResource.updatedAt ? currentResource.updatedAt : new Date()).getTime();
-
-    if (editTimestamp < currentTimestamp) {
-      // Resource was modified after edit was created - REJECT merge
-      throw new Error('Merge conflict detected: Resource was modified after this edit was submitted. Please review and resubmit.');
-    }
-
-    // SAFE MERGE: Only update whitelisted fields from proposedData
-    // Shared whitelist with POST /api/resources/:id/edit — see @shared/schema EDITABLE_RESOURCE_FIELDS
-    const updates: Record<string, any> = {};
-
-    const proposedData = edit.proposedData as any;
-    for (const field of EDITABLE_RESOURCE_FIELDS) {
-      if (proposedData && field in proposedData) {
+      // SAFE MERGE: Only update whitelisted fields from proposedData.
+      const updates: Record<string, any> = {};
+      const proposedData = edit.proposedData as any;
+      for (const field of EDITABLE_RESOURCE_FIELDS) {
+        if (!proposedData || !(field in proposedData)) continue;
         if (field === 'tags') {
-          // `tags` is not a column on `resources` — it is stored in metadata.tags.
-          // Writing a bare `tags` key here is silently dropped by Drizzle, so the
-          // tag edit never persists. Merge into existing metadata so sibling keys
-          // (ogImage, favicon, blurhash, ...) survive. Normalize to a clean
-          // string[] (trimmed, non-empty, capped at 20 to match the submit route).
-          // If the stored payload is malformed (not an array), skip the tags write
-          // entirely so we preserve the resource's existing tags rather than
-          // clearing them.
           if (Array.isArray(proposedData.tags)) {
             const normalizedTags = proposedData.tags
-              .filter((t: unknown): t is string => typeof t === 'string')
-              .map((t: string) => t.trim())
-              .filter((t: string) => t.length > 0)
+              .filter((tag: unknown): tag is string => typeof tag === 'string')
+              .map((tag: string) => tag.trim())
+              .filter((tag: string) => tag.length > 0)
               .slice(0, 20);
             updates.metadata = {
               ...((currentResource.metadata as Record<string, any> | null) ?? {}),
@@ -285,40 +655,46 @@ export class AuditRepository {
         } else if (field === 'skillLevel') {
           updates[field] = resourceSkillLevelSchema.parse(proposedData[field]);
         } else {
-          // Task #248: decode HTML entities at the merge too — the submit
-          // route decodes new suggestions, but pending edits saved BEFORE
-          // that fix (or written by scripts) could still carry "&amp;" text.
           updates[field] =
             typeof proposedData[field] === 'string' && field !== 'url'
               ? decodeHtmlEntities(proposedData[field])
               : proposedData[field];
         }
       }
+
+      await tx
+        .update(resources)
+        .set({ ...updates, updatedAt: now })
+        .where(eq(resources.id, edit.resourceId));
+      await tx
+        .update(resourceEdits)
+        .set({
+          status: 'approved',
+          handledBy: adminId,
+          handledAt: now,
+          updatedAt: now,
+        })
+        .where(and(eq(resourceEdits.id, editId), eq(resourceEdits.status, 'pending')));
+      await tx.insert(resourceAuditLog).values({
+        resourceId: edit.resourceId,
+        originalResourceId: edit.resourceId,
+        action: 'edit_approved',
+        performedBy: adminId,
+        changes: { changes: edit.proposedChanges },
+        notes: `Edit #${editId} approved and merged`,
+      });
+      return { kind: 'approved' as const };
+    });
+
+    if (outcome.kind === 'superseded') {
+      throw new Error('Merge conflict detected: Resource was modified after this edit was submitted. Please review and resubmit.');
     }
-
-    // Apply vetted updates only
-    await db
-      .update(resources)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(resources.id, edit.resourceId));
-
-    await db
-      .update(resourceEdits)
-      .set({
-        status: 'approved',
-        handledBy: adminId,
-        handledAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(resourceEdits.id, editId));
-
-    await this.logResourceAudit(
-      edit.resourceId,
-      'edit_approved',
-      adminId,
-      { changes: edit.proposedChanges },
-      `Edit #${editId} approved and merged`
-    );
+    if (outcome.kind === 'missing_resource') {
+      throw new Error('Resource not found');
+    }
+    if (outcome.kind === 'not_pending') {
+      throw new Error('Edit not found or already processed');
+    }
   }
 
   /**
@@ -329,36 +705,41 @@ export class AuditRepository {
    * @throws Error if edit not found, not pending, or reason too short
    */
   async rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void> {
-    const edit = await this.getResourceEdit(editId);
-    if (!edit) {
-      throw new Error('Edit not found');
-    }
-
-    if (edit.status !== 'pending') {
-      throw new Error('Edit is not pending');
-    }
-
     if (!reason || reason.trim().length < 10) {
       throw new Error('Rejection reason must be at least 10 characters');
     }
 
-    await db
-      .update(resourceEdits)
-      .set({
-        status: 'rejected',
-        handledBy: adminId,
-        handledAt: new Date(),
-        rejectionReason: reason,
-        updatedAt: new Date(),
-      })
-      .where(eq(resourceEdits.id, editId));
+    const rejected = await db.transaction(async (tx) => {
+      const now = new Date();
+      const contributorReason = reason.trim();
+      const [updated] = await tx
+        .update(resourceEdits)
+        .set({
+          status: 'rejected',
+          handledBy: adminId,
+          handledAt: now,
+          rejectionReason: contributorReason,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(resourceEdits.id, editId),
+            eq(resourceEdits.status, 'pending'),
+          ),
+        )
+        .returning();
+      if (!updated) return undefined;
 
-    await this.logResourceAudit(
-      edit.resourceId,
-      'edit_rejected',
-      adminId,
-      { reason },
-      `Edit #${editId} rejected: ${reason}`
-    );
+      await tx.insert(resourceAuditLog).values({
+        resourceId: updated.resourceId,
+        originalResourceId: updated.resourceId,
+        action: 'edit_rejected',
+        performedBy: adminId,
+        changes: { reason: contributorReason },
+        notes: `Edit #${editId} rejected: ${contributorReason}`,
+      });
+      return updated;
+    });
+    if (!rejected) throw new Error('Edit is not pending');
   }
 }

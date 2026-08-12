@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+import { useLocation } from "wouter";
 import { Loader2, Sparkles, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -146,6 +148,7 @@ function calculateDiff(original: Resource, updated: SuggestEditFormData): Record
 
 export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditDialogProps) {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const { isAuthenticated, user } = useAuth();
   // R5-030 (run25): AI URL analysis is admin-only (owner decision) — the
   // endpoint 403s for everyone else, so only offer the button to admins.
@@ -338,12 +341,21 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       mpTrack('resource_edit_submitted', { resource_id: String(resource.id) });
       toast({
         title: "Edit Suggestion Submitted",
-        description: "Your edit will be reviewed by admins",
+        description: "Your edit is pending review and now appears in your contribution timeline.",
+        action: (
+          <ToastAction
+            altText="View your contributions"
+            onClick={() => setLocation("/contributions")}
+          >
+            View status
+          </ToastAction>
+        ),
       });
       onOpenChange(false);
       form.reset();
       setClaudeSuggestions(null);
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });
     },
     onError: (error: Error) => {
       // BUG-007 (run14): map raw "STATUS: body" API errors to friendly copy.

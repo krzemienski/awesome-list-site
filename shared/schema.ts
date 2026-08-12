@@ -197,7 +197,7 @@ export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
  * @property {string} category - Top-level category (required, e.g., "Frameworks", "Languages")
  * @property {string} subcategory - Second-level category (optional)
  * @property {string} subSubcategory - Third-level category (optional)
- * @property {string} status - Approval status: 'pending', 'approved', 'rejected', or 'archived' (default: 'approved')
+ * @property {string} status - Contributor lifecycle status plus internal archive state
  * @property {string} submittedBy - User ID who submitted the resource (cascades on user delete)
  * @property {string} approvedBy - User ID who approved the resource
  * @property {timestamp} approvedAt - When the resource was approved
@@ -241,10 +241,16 @@ export const resources = pgTable(
     resourceFormat: text("resource_format").$type<ResourceFormat>().notNull().default("unknown"),
     provider: text("provider").$type<ResourceProvider>().notNull().default("unknown"),
     skillLevel: text("skill_level").$type<ResourceSkillLevel>().notNull().default("unknown"),
-    status: text("status").default("approved"), // pending, approved, rejected, archived
+    status: text("status").default("approved"), // pending, approved, rejected, withdrawn, archived
     submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "cascade" }),
     approvedBy: varchar("approved_by").references(() => users.id),
     approvedAt: timestamp("approved_at"),
+    // Explicitly contributor-facing copy. Internal moderator notes remain in
+    // resource_audit_log and are never serialized by the contributor API.
+    contributorRejectionReason: text("contributor_rejection_reason"),
+    // Durable lifecycle timestamp for contributor-facing status changes. This
+    // is separate from updatedAt, which also changes for ordinary catalog edits.
+    statusChangedAt: timestamp("status_changed_at"),
     githubSynced: boolean("github_synced").default(false),
     lastSyncedAt: timestamp("last_synced_at"),
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
@@ -260,6 +266,11 @@ export const resources = pgTable(
     index("idx_resources_status").on(table.status),
     index("idx_resources_status_category").on(table.status, table.category),
     index("idx_resources_category").on(table.category),
+    index("idx_resources_submitted_by_status_created_at").on(
+      table.submittedBy,
+      table.status,
+      table.createdAt,
+    ),
     index("idx_resources_search_tsv").using("gin", table.searchTsv),
     // Public search always gates on approved status. Partial indexes keep the
     // facet indexes small and match that hot query predicate.
@@ -305,7 +316,7 @@ export type Resource = typeof resources.$inferSelect;
  * @property {number} id - Auto-incrementing primary key
  * @property {number} resourceId - Reference to the resource being edited (required)
  * @property {string} submittedBy - User who submitted the edit suggestion (required)
- * @property {string} status - Edit status: 'pending', 'approved', or 'rejected' (default: 'pending')
+ * @property {string} status - Edit status: pending, approved, rejected, withdrawn, or superseded
  * @property {timestamp} originalResourceUpdatedAt - Timestamp of resource when edit was created (for conflict detection)
  * @property {object} proposedChanges - Field-by-field changes showing old vs new values
  * @property {object} proposedData - Complete proposed resource data after changes applied
@@ -332,7 +343,10 @@ export const resourceEdits = pgTable(
     id: serial("id").primaryKey(),
     resourceId: integer("resource_id").references(() => resources.id).notNull(),
     submittedBy: varchar("submitted_by").references(() => users.id).notNull(),
-    status: text("status").$type<"pending" | "approved" | "rejected">().default("pending").notNull(),
+    status: text("status")
+      .$type<"pending" | "approved" | "rejected" | "withdrawn" | "superseded">()
+      .default("pending")
+      .notNull(),
 
     originalResourceUpdatedAt: timestamp("original_resource_updated_at").notNull(),
 
@@ -353,6 +367,7 @@ export const resourceEdits = pgTable(
 
     handledBy: varchar("handled_by").references(() => users.id),
     handledAt: timestamp("handled_at"),
+    withdrawnAt: timestamp("withdrawn_at"),
     rejectionReason: text("rejection_reason"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -362,6 +377,11 @@ export const resourceEdits = pgTable(
     index("idx_resource_edits_resource_id").on(table.resourceId),
     index("idx_resource_edits_status").on(table.status),
     index("idx_resource_edits_submitted_by").on(table.submittedBy),
+    index("idx_resource_edits_submitted_by_status_created_at").on(
+      table.submittedBy,
+      table.status,
+      table.createdAt,
+    ),
   ]
 );
 

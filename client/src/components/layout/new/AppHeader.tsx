@@ -80,6 +80,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     resource: "Resource",
     admin: "Admin",
     profile: "Profile",
+    contributions: "Contributions",
     bookmarks: "Bookmarks",
     about: "About",
     advanced: "Advanced",

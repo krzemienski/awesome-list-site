@@ -466,6 +466,7 @@ export default function SubmitResource() {
       
       // Invalidate resources cache
       void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/user/contributions'] });
       
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -542,6 +543,19 @@ export default function SubmitResource() {
                 </div>
               </div>
             </CardHeader>
+            <CardContent className="flex flex-col gap-3 border-t border-green-500/20 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                Track review status and outcomes in your private contribution timeline.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setLocation("/contributions")}
+                data-testid="link-submission-contributions"
+              >
+                View your contributions
+              </Button>
+            </CardContent>
           </Card>
         )}
 

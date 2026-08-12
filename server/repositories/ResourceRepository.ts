@@ -508,22 +508,59 @@ export class ResourceRepository {
    * @returns The updated resource
    */
   async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
-    const updateData: Partial<typeof resources.$inferInsert> = { status, updatedAt: new Date() };
+    const now = new Date();
+    const expectedCurrentStatus =
+      status === 'approved' || status === 'rejected'
+        ? 'pending'
+        : status === 'pending'
+          ? 'approved'
+          : undefined;
+    const updateData: Partial<typeof resources.$inferInsert> = {
+      status,
+      statusChangedAt: now,
+      updatedAt: now,
+    };
 
     if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
-      updateData.approvedAt = new Date();
+      updateData.approvedAt = now;
+      updateData.contributorRejectionReason = null;
     }
 
-    const [updatedResource] = await db
-      .update(resources)
-      .set(updateData)
-      .where(eq(resources.id, id))
-      .returning();
+    const updatedResource = await db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(resources)
+        .set(updateData)
+        .where(
+          expectedCurrentStatus
+            ? and(
+                eq(resources.id, id),
+                eq(resources.status, expectedCurrentStatus),
+              )
+            : eq(resources.id, id),
+        )
+        .returning();
+      if (!updated) return undefined;
 
-    // Log the status change
-    await this.logResourceAudit(id, status, approvedBy, { status });
+      await tx.insert(resourceAuditLog).values({
+        resourceId: id,
+        originalResourceId: id,
+        action: status,
+        performedBy: approvedBy,
+        changes: { status },
+      });
+      return updated;
+    });
 
+    if (!updatedResource) {
+      throw new Error(
+        expectedCurrentStatus === 'pending'
+          ? 'Resource is not pending approval'
+          : expectedCurrentStatus === 'approved'
+            ? 'Resource is not approved'
+            : 'Resource not found',
+      );
+    }
     return updatedResource;
   }
 
@@ -617,36 +654,35 @@ export class ResourceRepository {
    * @throws Error if resource not found or not pending
    */
   async approveResource(id: number, approvedBy: string): Promise<Resource> {
-    const resource = await this.getResource(id);
-    if (!resource) {
-      throw new Error('Resource not found');
-    }
+    const approved = await db.transaction(async (tx) => {
+      const now = new Date();
+      const [updated] = await tx
+        .update(resources)
+        .set({
+          status: 'approved',
+          approvedBy,
+          approvedAt: now,
+          contributorRejectionReason: null,
+          statusChangedAt: now,
+          updatedAt: now,
+        })
+        .where(and(eq(resources.id, id), eq(resources.status, 'pending')))
+        .returning();
+      if (!updated) return undefined;
 
-    if (resource.status !== 'pending') {
-      throw new Error('Resource is not pending approval');
-    }
+      await tx.insert(resourceAuditLog).values({
+        resourceId: id,
+        originalResourceId: id,
+        action: 'approved',
+        performedBy: approvedBy,
+        changes: { previousStatus: 'pending', newStatus: 'approved' },
+        notes: 'Resource approved by admin',
+      });
+      return updated;
+    });
 
-    const [updated] = await db
-      .update(resources)
-      .set({
-        status: 'approved',
-        approvedBy: approvedBy,
-        approvedAt: new Date(),
-        updatedAt: new Date()
-      })
-      .where(eq(resources.id, id))
-      .returning();
-
-    // Log the approval action
-    await this.logResourceAudit(
-      id,
-      'approved',
-      approvedBy,
-      { previousStatus: resource.status, newStatus: 'approved' },
-      'Resource approved by admin'
-    );
-
-    return updated;
+    if (!approved) throw new Error('Resource is not pending approval');
+    return approved;
   }
 
   /**
@@ -658,35 +694,81 @@ export class ResourceRepository {
    * @throws Error if resource not found, not pending, or reason too short
    */
   async rejectResource(id: number, adminId: string, reason: string): Promise<void> {
-    const resource = await this.getResource(id);
-    if (!resource) {
-      throw new Error('Resource not found');
-    }
-
-    if (resource.status !== 'pending') {
-      throw new Error('Resource is not pending approval');
-    }
-
     if (!reason || reason.trim().length < 10) {
       throw new Error('Rejection reason must be at least 10 characters');
     }
 
-    await db
-      .update(resources)
-      .set({
-        status: 'rejected',
-        updatedAt: new Date()
-      })
-      .where(eq(resources.id, id));
+    const rejected = await db.transaction(async (tx) => {
+      const now = new Date();
+      const contributorReason = reason.trim();
+      const [updated] = await tx
+        .update(resources)
+        .set({
+          status: 'rejected',
+          contributorRejectionReason: contributorReason,
+          statusChangedAt: now,
+          updatedAt: now,
+        })
+        .where(and(eq(resources.id, id), eq(resources.status, 'pending')))
+        .returning();
+      if (!updated) return undefined;
 
-    // Log the rejection action
-    await this.logResourceAudit(
-      id,
-      'rejected',
-      adminId,
-      { previousStatus: resource.status, newStatus: 'rejected', reason },
-      `Resource rejected: ${reason}`
-    );
+      await tx.insert(resourceAuditLog).values({
+        resourceId: id,
+        originalResourceId: id,
+        action: 'rejected',
+        performedBy: adminId,
+        changes: {
+          previousStatus: 'pending',
+          newStatus: 'rejected',
+          reason: contributorReason,
+        },
+        notes: `Resource rejected: ${contributorReason}`,
+      });
+      return updated;
+    });
+    if (!rejected) throw new Error('Resource is not pending approval');
+  }
+
+  /**
+   * Soft-withdraw one pending submission owned by a contributor.
+   *
+   * The ownership and status predicates live in the UPDATE itself so an admin
+   * decision racing this request wins cleanly: PostgreSQL re-checks the
+   * predicate after acquiring the row lock and returns no row on conflict.
+   * The audit record is in the same transaction as the state change.
+   */
+  async withdrawPendingSubmission(id: number, userId: string): Promise<Resource | undefined> {
+    return db.transaction(async (tx) => {
+      const [withdrawn] = await tx
+        .update(resources)
+        .set({
+          status: 'withdrawn',
+          statusChangedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(resources.id, id),
+            eq(resources.submittedBy, userId),
+            eq(resources.status, 'pending'),
+          ),
+        )
+        .returning();
+
+      if (!withdrawn) return undefined;
+
+      await tx.insert(resourceAuditLog).values({
+        resourceId: id,
+        originalResourceId: id,
+        action: 'withdrawn',
+        performedBy: userId,
+        changes: { previousStatus: 'pending', newStatus: 'withdrawn' },
+        notes: 'Contributor withdrew pending resource submission',
+      });
+
+      return withdrawn;
+    });
   }
 
   /**

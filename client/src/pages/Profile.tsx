@@ -46,14 +46,10 @@ import {
   ExternalLink,
   Star,
   FileText,
-  Edit,
   Pencil,
   BookOpen,
   CheckCircle,
-  XCircle,
-  AlertCircle,
   Sparkles,
-  Trash2
 } from "lucide-react";
 import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
@@ -95,31 +91,15 @@ interface LearningProgress {
   skillLevel: string;
 }
 
-interface SubmittedResource {
-  id: number;
-  title: string;
-  url: string;
-  description: string;
-  category: string;
-  status: string;
-  createdAt: string;
+interface ContributorSummaryResponse {
+  summary: {
+    total: number;
+    pending: number;
+    acceptedContributions: number;
+    publicResources: number;
+    recordedViews: number;
+  };
 }
-
-interface ResourceEdit {
-  id: number;
-  resourceId: number;
-  status: string;
-  proposedChanges: Record<string, { old: any; new: any }>;
-  createdAt: string;
-}
-
-interface UserSubmissions {
-  resources: SubmittedResource[];
-  edits: ResourceEdit[];
-  totalResources: number;
-  totalEdits: number;
-}
-
 interface UserJourney {
   id: number;
   journeyId: number;
@@ -233,31 +213,6 @@ export default function Profile({ user }: ProfileProps) {
     },
   });
 
-  // NB-039: withdraw one of the user's own still-pending submissions.
-  const [withdrawTarget, setWithdrawTarget] = useState<SubmittedResource | null>(null);
-
-  const withdrawMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest(`/api/user/submissions/${id}`, { method: "DELETE" });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/submissions"] });
-      setWithdrawTarget(null);
-      toast({
-        title: "Submission withdrawn",
-        description: "Your pending submission has been removed.",
-      });
-    },
-    onError: (err: any) => {
-      setWithdrawTarget(null);
-      toast({
-        title: "Couldn't withdraw submission",
-        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
   // Run22 BUG-020: private account/data-deletion request channel — no public
   // GitHub issue (and no personal data exposure) required.
   const [deletionDialogOpen, setDeletionDialogOpen] = useState(false);
@@ -323,9 +278,15 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
-  // Fetch user submissions
-  const { data: submissions, isLoading: submissionsLoading } = useQuery<UserSubmissions>({
-    queryKey: ['/api/user/submissions'],
+  // Compact contribution summary. The full filtered timeline lives at
+  // /contributions so profile no longer maintains two divergent lists.
+  const {
+    data: contributions,
+    isLoading: contributionsLoading,
+    isError: contributionsError,
+    refetch: refetchContributions,
+  } = useQuery<ContributorSummaryResponse>({
+    queryKey: ['/api/user/contributions?limit=1'],
     enabled: !!user
   });
 
@@ -869,246 +830,62 @@ export default function Profile({ user }: ProfileProps) {
           </Card>
         </TabsContent>
 
-        {/* Submissions Tab */}
+        {/* Contributions Tab */}
         <TabsContent value="submissions" data-testid="tab-submissions">
-          <div className="space-y-4">
-            {/* Submitted Resources */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  Submitted Resources
-                </CardTitle>
-                <CardDescription>
-                  Resources you've submitted for review
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[300px] pr-4">
-                  {submissionsLoading ? (
-                    <div className="space-y-3" aria-busy={true} aria-live="polite">
-                      {Array(2).fill(0).map((_, i) => (
-                        <Skeleton key={i} className="h-24 w-full" />
-                      ))}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                Contribution impact
+              </CardTitle>
+              <CardDescription>
+                Resource submissions and edit suggestions now share one private timeline.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {contributionsLoading ? (
+                <div className="grid gap-3 sm:grid-cols-3" aria-busy="true" aria-label="Loading contribution summary">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Skeleton key={index} className="h-24 w-full" />
+                  ))}
+                </div>
+              ) : contributionsError ? (
+                <Alert variant="destructive">
+                  <AlertTitle>Couldn't load your contribution summary</AlertTitle>
+                  <AlertDescription className="mt-2">
+                    <Button variant="outline" size="sm" onClick={() => refetchContributions()}>
+                      Try again
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["Accepted", contributions?.summary.acceptedContributions ?? 0, "Approved submissions and edits"],
+                    ["Awaiting review", contributions?.summary.pending ?? 0, "Still pending moderation"],
+                    ["Live resources", contributions?.summary.publicResources ?? 0, "Public resources you improved"],
+                  ].map(([label, value, hint]) => (
+                    <div key={label} className="border border-border p-4">
+                      <p className="font-mono text-2xl font-semibold tabular-nums">{value}</p>
+                      <p className="mt-1 text-sm font-medium">{label}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
                     </div>
-                  ) : submissions && submissions.resources.length > 0 ? (
-                    <div className="space-y-3">
-                      {submissions.resources.map((resource) => (
-                        <div
-                          key={resource.id}
-                          className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                          data-testid={`submitted-resource-${resource.id}`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-medium line-clamp-1 break-words min-w-0" title={resource.title}>{resource.title}</h4>
-                                {resource.status === 'pending' && (
-                                  <Badge variant="outline" className="text-yellow-500 border-yellow-500">
-                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                    Pending
-                                  </Badge>
-                                )}
-                                {resource.status === 'approved' && (
-                                  <Badge variant="outline" className="text-green-500 border-green-500">
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Approved
-                                  </Badge>
-                                )}
-                                {resource.status === 'rejected' && (
-                                  <Badge variant="outline" className="text-red-500 border-red-500">
-                                    <XCircle className="h-3 w-3 mr-1" />
-                                    Rejected
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {resource.description}
-                              </p>
-                              {/* NB-039 (run18): surface the submitted URL
-                                  (truncated) and a details expander so users can
-                                  review exactly what they submitted. Pending
-                                  submissions can be withdrawn via
-                                  DELETE /api/user/submissions/:id. */}
-                              {resource.url && (
-                                <a
-                                  href={resource.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="mt-1 flex items-center min-h-[32px] max-w-full text-xs text-muted-foreground hover:text-primary"
-                                  title={resource.url}
-                                  data-testid={`text-submission-url-${resource.id}`}
-                                >
-                                  <span className="truncate">{resource.url}</span>
-                                </a>
-                              )}
-                              <details className="mt-2" data-testid={`details-submission-${resource.id}`}>
-                                <summary className="cursor-pointer text-xs text-primary">
-                                  View submission details
-                                </summary>
-                                <div className="mt-2 space-y-1">
-                                  <p className="text-xs text-muted-foreground whitespace-pre-wrap break-words">
-                                    {resource.description || "No description provided."}
-                                  </p>
-                                  {resource.url && (
-                                    <p className="text-xs break-all">
-                                      <span className="text-muted-foreground">URL: </span>
-                                      <a
-                                        href={resource.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex min-h-[32px] items-center break-all hover:text-primary underline"
-                                      >
-                                        {resource.url}
-                                      </a>
-                                    </p>
-                                  )}
-                                </div>
-                              </details>
-                              <div className="flex items-center gap-2 mt-2">
-                                <Badge variant="secondary" className="text-xs">
-                                  {resource.category}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  Submitted {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                asChild
-                                data-testid={`button-view-resource-${resource.id}`}
-                              >
-                                <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              </Button>
-                              {resource.status === 'pending' && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive"
-                                  onClick={() => setWithdrawTarget(resource)}
-                                  disabled={withdrawMutation.isPending}
-                                  aria-label={`Withdraw submission ${resource.title}`}
-                                  data-testid={`button-withdraw-submission-${resource.id}`}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No submitted resources</p>
-                      <p className="text-sm mt-2">Submit a resource to get started!</p>
-                    </div>
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-
-            {/* Suggested Edits */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Edit className="h-5 w-5 text-muted-foreground" />
-                  Suggested Edits
-                </CardTitle>
-                <CardDescription>
-                  Your edit suggestions for existing resources
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[300px] pr-4">
-                  {submissionsLoading ? (
-                    <div className="space-y-3" aria-busy={true} aria-live="polite">
-                      {Array(2).fill(0).map((_, i) => (
-                        <Skeleton key={i} className="h-24 w-full" />
-                      ))}
-                    </div>
-                  ) : submissions && submissions.edits.length > 0 ? (
-                    <div className="space-y-3">
-                      {submissions.edits.map((edit) => (
-                        <div
-                          key={edit.id}
-                          className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                          data-testid={`suggested-edit-${edit.id}`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium">Edit #{edit.id}</span>
-                                {edit.status === 'pending' && (
-                                  <Badge variant="outline" className="text-yellow-500 border-yellow-500">
-                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                    Pending
-                                  </Badge>
-                                )}
-                                {edit.status === 'approved' && (
-                                  <Badge variant="outline" className="text-green-500 border-green-500">
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Approved
-                                  </Badge>
-                                )}
-                                {edit.status === 'rejected' && (
-                                  <Badge variant="outline" className="text-red-500 border-red-500">
-                                    <XCircle className="h-3 w-3 mr-1" />
-                                    Rejected
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="text-sm space-y-1">
-                                {edit.proposedChanges && (
-                                  <div className="mt-2 space-y-1">
-                                    <p className="text-xs text-muted-foreground font-medium">Changes:</p>
-                                    {Object.entries(edit.proposedChanges as Record<string, any>).map(([field, changeData]) => {
-                                      // Handle both formats: direct values or {old, new} objects
-                                      const isObjectFormat = changeData && typeof changeData === 'object' && ('old' in changeData || 'new' in changeData);
-                                      
-                                      if (!isObjectFormat) return null;
-                                      
-                                      const change = changeData as { old?: any; new?: any };
-                                      const oldValue = Array.isArray(change.old) ? change.old.join(', ') : String(change.old ?? '');
-                                      const newValue = Array.isArray(change.new) ? change.new.join(', ') : String(change.new ?? '');
-                                      
-                                      return (
-                                        <div key={field} className="text-xs pl-2">
-                                          <span className="text-primary">{field}:</span>{' '}
-                                          <span className="line-through opacity-60">{oldValue}</span>
-                                          {' → '}
-                                          <span className="text-primary">{newValue}</span>
-                                        </div>
-                                      );
-                                    }).filter(Boolean)}
-                                  </div>
-                                )}
-                                <p className="text-xs text-muted-foreground">
-                                  Submitted {formatDistanceToNow(new Date(edit.createdAt), { addSuffix: true })}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Edit className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No suggested edits</p>
-                      <p className="text-sm mt-2">Help improve resources by suggesting edits!</p>
-                    </div>
-                  )}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Review statuses, outcomes, submitted details, and recorded impact.
+                </p>
+                <Button asChild data-testid="link-open-contributions">
+                  <Link href="/contributions">
+                    Open contribution dashboard
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Security Tab */}
@@ -1263,41 +1040,6 @@ export default function Profile({ user }: ProfileProps) {
         </DialogContent>
       </Dialog>
 
-      {/* NB-039: confirm before withdrawing a pending submission — the delete
-          is permanent (the row plus any of its suggested edits are removed). */}
-      <AlertDialog
-        open={!!withdrawTarget}
-        onOpenChange={(open) => {
-          if (!open) setWithdrawTarget(null);
-        }}
-      >
-        <AlertDialogContent data-testid="dialog-withdraw-submission">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Withdraw this submission?</AlertDialogTitle>
-            <AlertDialogDescription>
-              "{withdrawTarget?.title}" will be permanently removed from the
-              review queue. This can't be undone — you can submit it again
-              later if you change your mind.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={withdrawMutation.isPending}>
-              Keep it
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={withdrawMutation.isPending}
-              onClick={(e) => {
-                e.preventDefault();
-                if (withdrawTarget) withdrawMutation.mutate(withdrawTarget.id);
-              }}
-              data-testid="button-confirm-withdraw"
-            >
-              {withdrawMutation.isPending ? "Withdrawing..." : "Withdraw"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

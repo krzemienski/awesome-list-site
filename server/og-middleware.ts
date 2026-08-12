@@ -576,6 +576,13 @@ function homeShellChrome(): string {
       // Personalized, auth-gated progress summary — noindex like /profile.
       noindex: true,
     },
+    "/contributions": {
+      title: `Your Contributions — ${SITE_NAME}`,
+      description: `Track your resource submissions, edit suggestions, and public impact on ${SITE_NAME}.`,
+      // Personalized, auth-gated contributor history — found, but never
+      // indexable and never canonicalized.
+      noindex: true,
+    },
     "/bookmarks": {
       title: `Bookmarks — ${SITE_NAME}`,
       description: `Your saved video development resources on ${SITE_NAME}.`,

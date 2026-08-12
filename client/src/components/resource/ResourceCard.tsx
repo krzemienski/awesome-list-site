@@ -83,6 +83,8 @@ function ResourceCard({
     submittedBy: null,
     approvedBy: null,
     approvedAt: null,
+    contributorRejectionReason: null,
+    statusChangedAt: null,
     githubSynced: false,
     lastSyncedAt: null,
     metadata: {},

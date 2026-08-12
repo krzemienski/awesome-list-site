@@ -608,6 +608,7 @@ export default function PendingResources() {
             <AlertDialogTitle>Reject Resource?</AlertDialogTitle>
             <AlertDialogDescription>
               Please provide a reason for rejecting this resource (minimum 10 characters).
+              This message is shown to the contributor, so keep it factual and do not include internal notes.
             </AlertDialogDescription>
           </AlertDialogHeader>
           {resourceToReject && (
@@ -627,7 +628,7 @@ export default function PendingResources() {
                   data-testid="textarea-rejection-reason"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  {rejectionReason.trim().length}/10 characters minimum
+                  {rejectionReason.trim().length}/10 characters minimum · visible to the contributor
                 </p>
               </div>
             </div>
