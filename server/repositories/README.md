@@ -186,6 +186,12 @@ const steps = await journeyRepo.listJourneySteps(journeyId);
 **Special Behaviors**:
 - Favorites use `onConflictDoNothing` to prevent duplicates
 - Bookmarks support optional notes field
+- **Bookmark persistence is canonical here and in `CollectionRepository`**: core
+  bookmark rows (add/remove/list with notes) live in `UserFeatureRepository`,
+  while queue status, archiving, personal tags, collections membership, and bulk
+  operations live in `CollectionRepository`. A legacy standalone
+  `BookmarkRepository` was removed because the app never called it — do not
+  reintroduce a separate bookmark repository; extend these two instead.
 - Journey progress tracks completion percentage and completed steps array
 - Automatically calculates `isCompleted` when all steps are done
 
