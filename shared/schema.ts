@@ -24,6 +24,13 @@ import {
   type ResourceSkillLevel,
 } from "./resourceFacets";
 import type { BookmarkQueueStatus } from "./bookmarkCollections";
+import type {
+  DigestAttemptOutcome,
+  DigestCadence,
+  DigestChannel,
+  DigestJobStatus,
+  NotificationKind,
+} from "./notifications";
 import {
   type LearningFormat,
   type LearningGoal,
@@ -1092,6 +1099,225 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).p
 
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
 export type UserPreferences = typeof userPreferences.$inferSelect;
+
+/**
+ * Explicit reminder consent and delivery policy. Email and in-app consent are
+ * independent and default off. The raw email-unsubscribe token is never stored.
+ */
+export const notificationPreferences = pgTable(
+  "notification_preferences",
+  {
+    userId: varchar("user_id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    emailDigestEnabled: boolean("email_digest_enabled").notNull().default(false),
+    inAppEnabled: boolean("in_app_enabled").notNull().default(false),
+    includeNewResources: boolean("include_new_resources").notNull().default(true),
+    includeWatchNext: boolean("include_watch_next").notNull().default(true),
+    includeJourneyStep: boolean("include_journey_step").notNull().default(true),
+    cadence: text("cadence").$type<DigestCadence>().notNull().default("weekly"),
+    timezone: varchar("timezone", { length: 64 }).notNull().default("UTC"),
+    policyVersion: integer("policy_version").notNull().default(1),
+    pausedUntil: timestamp("paused_until", { withTimezone: true }),
+    emailOptedInAt: timestamp("email_opted_in_at", { withTimezone: true }),
+    emailUnsubscribedAt: timestamp("email_unsubscribed_at", { withTimezone: true }),
+    inAppOptedInAt: timestamp("in_app_opted_in_at", { withTimezone: true }),
+    lastEmailDigestAt: timestamp("last_email_digest_at", { withTimezone: true }),
+    lastInAppDigestAt: timestamp("last_in_app_digest_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_notification_preferences_email_due")
+      .on(table.emailDigestEnabled, table.pausedUntil, table.lastEmailDigestAt),
+    index("idx_notification_preferences_in_app_due")
+      .on(table.inAppEnabled, table.pausedUntil, table.lastInAppDigestAt),
+    check(
+      "notification_preferences_cadence_check",
+      sql`${table.cadence} IN ('weekly','biweekly','monthly')`,
+    ),
+    check(
+      "notification_preferences_policy_version_check",
+      sql`${table.policyVersion} >= 1`,
+    ),
+  ],
+);
+
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
+
+/**
+ * Long-lived, single-use unsubscribe links. Each digest receives its own random
+ * token, while only the SHA-256 hash is retained at rest.
+ */
+export const digestUnsubscribeTokens = pgTable(
+  "digest_unsubscribe_tokens",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_digest_unsubscribe_tokens_user").on(table.userId),
+    index("idx_digest_unsubscribe_tokens_expires").on(table.expiresAt),
+  ],
+);
+
+export type DigestUnsubscribeToken =
+  typeof digestUnsubscribeTokens.$inferSelect;
+
+/**
+ * Minimal in-app reminder payloads. Hrefs are app-owned paths only; private
+ * notes, external resource URLs, and behavioral history never enter this table.
+ */
+export const inAppNotifications = pgTable(
+  "in_app_notifications",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    kind: text("kind").$type<NotificationKind>().notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    href: text("href").notNull(),
+    resourceId: integer("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    collectionId: integer("collection_id").references(
+      () => bookmarkCollections.id,
+      { onDelete: "set null" },
+    ),
+    journeyId: integer("journey_id").references(() => learningJourneys.id, {
+      onDelete: "set null",
+    }),
+    stepNumber: integer("step_number"),
+    idempotencyKey: text("idempotency_key").notNull().unique(),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_in_app_notifications_user_created").on(
+      table.userId,
+      table.createdAt,
+    ),
+    index("idx_in_app_notifications_user_read").on(
+      table.userId,
+      table.readAt,
+      table.createdAt,
+    ),
+    index("idx_in_app_notifications_expires_at").on(table.expiresAt),
+    check(
+      "in_app_notifications_kind_check",
+      sql`${table.kind} IN ('new_resource','watch_next','journey_step')`,
+    ),
+    check(
+      "in_app_notifications_href_check",
+      sql`${table.href} ~ '^/(resource|bookmarks|journey)/'`,
+    ),
+  ],
+);
+
+export type InAppNotification = typeof inAppNotifications.$inferSelect;
+
+/**
+ * Durable, idempotent digest outbox. No message content or unsubscribe token is
+ * stored in a job; content is selected from the owning user's current data.
+ */
+export const digestJobs = pgTable(
+  "digest_jobs",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    channel: text("channel").$type<DigestChannel>().notNull(),
+    periodKey: varchar("period_key", { length: 96 }).notNull(),
+    policyVersion: integer("policy_version").notNull().default(1),
+    idempotencyKey: text("idempotency_key").notNull().unique(),
+    status: text("status").$type<DigestJobStatus>().notNull().default("queued"),
+    scheduledFor: timestamp("scheduled_for", { withTimezone: true }).notNull(),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull(),
+    attemptCount: integer("attempt_count").notNull().default(0),
+    maxAttempts: integer("max_attempts").notNull().default(3),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
+    workerId: varchar("worker_id", { length: 96 }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    lastErrorCode: varchar("last_error_code", { length: 96 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_digest_jobs_claim").on(
+      table.status,
+      table.nextAttemptAt,
+      table.scheduledFor,
+      table.id,
+    ),
+    index("idx_digest_jobs_user_created").on(table.userId, table.createdAt),
+    index("idx_digest_jobs_lease").on(table.status, table.leaseExpiresAt),
+    uniqueIndex("digest_jobs_pending_user_channel_unique")
+      .on(table.userId, table.channel)
+      .where(sql`${table.status} IN ('queued','processing')`),
+    check(
+      "digest_jobs_channel_check",
+      sql`${table.channel} IN ('email','in_app')`,
+    ),
+    check(
+      "digest_jobs_status_check",
+      sql`${table.status} IN ('queued','processing','sent','failed','skipped')`,
+    ),
+    check("digest_jobs_attempt_count_check", sql`${table.attemptCount} >= 0`),
+    check("digest_jobs_max_attempts_check", sql`${table.maxAttempts} BETWEEN 1 AND 10`),
+    check("digest_jobs_policy_version_check", sql`${table.policyVersion} >= 1`),
+  ],
+);
+
+export type DigestJob = typeof digestJobs.$inferSelect;
+
+/** Sanitized attempt history for queue operations and aggregate health. */
+export const digestAttempts = pgTable(
+  "digest_attempts",
+  {
+    id: serial("id").primaryKey(),
+    jobId: integer("job_id")
+      .references(() => digestJobs.id, { onDelete: "cascade" })
+      .notNull(),
+    attemptNumber: integer("attempt_number").notNull(),
+    outcome: text("outcome")
+      .$type<DigestAttemptOutcome>()
+      .notNull()
+      .default("started"),
+    errorCode: varchar("error_code", { length: 96 }),
+    providerMessageId: varchar("provider_message_id", { length: 255 }),
+    startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    unique("digest_attempts_job_attempt_unique").on(
+      table.jobId,
+      table.attemptNumber,
+    ),
+    index("idx_digest_attempts_job").on(table.jobId),
+    index("idx_digest_attempts_outcome_started").on(
+      table.outcome,
+      table.startedAt,
+    ),
+    check(
+      "digest_attempts_outcome_check",
+      sql`${table.outcome} IN ('started','sent','failed','skipped','delivery_unknown')`,
+    ),
+  ],
+);
+
+export type DigestAttempt = typeof digestAttempts.$inferSelect;
 
 /**
  * User Interactions table - Behavioral analytics

@@ -117,17 +117,30 @@ async function checkSchemaReproduction(baseUrl: string): Promise<void> {
     // empty-schema reproduction cannot exercise.
     fs.mkdirSync(path.join(preLegacyRepairDir, 'meta'), { recursive: true });
     const journal = JSON.parse(fs.readFileSync(JOURNAL_PATH, 'utf8'));
+    const normalizationIndex = journal.entries.findIndex(
+      (entry: { tag: string }) => entry.tag === '0042_normalize_learning_preferences',
+    );
+    if (normalizationIndex < 0) {
+      fail('Migration 0042_normalize_learning_preferences is missing from the journal.');
+    }
+    // Reproduce the schema immediately BEFORE 0042. Filtering just 0042 is
+    // insufficient once later migrations exist: Drizzle records the later
+    // timestamp and then correctly refuses to run the older migration.
+    const preNormalizationEntries = journal.entries.slice(0, normalizationIndex);
+    const preNormalizationTags = new Set(
+      preNormalizationEntries.map((entry: { tag: string }) => entry.tag),
+    );
     fs.writeFileSync(
       path.join(preLegacyRepairDir, 'meta', '_journal.json'),
       JSON.stringify({
         ...journal,
-        entries: journal.entries.filter(
-          (entry: { tag: string }) => entry.tag !== '0042_normalize_learning_preferences',
-        ),
+        entries: preNormalizationEntries,
       }),
     );
     for (const file of fs.readdirSync(MIGRATIONS_DIR).filter(
-      (file) => file.endsWith('.sql') && file !== '0042_normalize_learning_preferences.sql',
+      (file) =>
+        file.endsWith('.sql') &&
+        preNormalizationTags.has(file.replace(/\.sql$/, '')),
     )) {
       fs.copyFileSync(
         path.join(MIGRATIONS_DIR, file),
@@ -241,11 +254,15 @@ async function checkSchemaReproduction(baseUrl: string): Promise<void> {
     console.log('  ✓ Drizzle migrator ran cleanly against the scratch database.');
 
     // Now ask drizzle-kit to diff shared/schema.ts against the migrated scratch DB.
-    const result = spawnSync('npx', ['drizzle-kit', 'push', '--force'], {
+    const result = spawnSync(
+      'npx',
+      ['drizzle-kit', 'push', '--force', '--verbose'],
+      {
       env: { ...process.env, DATABASE_URL: scratch },
       encoding: 'utf8',
       timeout: 120000,
-    });
+      },
+    );
 
     const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Link, Sparkles, Brain, ListOrdered } from "lucide-react";
+import { Shield, Link, Sparkles, Brain, ListOrdered, MailCheck } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink, useRoute } from "wouter";
@@ -22,15 +22,16 @@ import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
 import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
+import DigestQueueHealth from "@/components/admin/DigestQueueHealth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
-// Run3 audit R3-02: the 15 valid tab ids — used to validate /admin/:section
+// Run3 audit R3-02: valid tab ids — used to validate /admin/:section
 // deep-links (unknown sections fall back to the default tab).
 import { ApiError } from "@/lib/queryClient";
 const ADMIN_TAB_IDS = [
   "approvals", "edits", "enrichment", "researcher", "export", "database",
   "resources", "categories", "subcategories", "subsubcategories", "journeys",
-  "users", "github", "linkhealth", "audit",
+  "users", "github", "linkhealth", "digests", "audit",
 ] as const;
 
 // Run16 BUG-085: human-guessable slug aliases → canonical tab ids.
@@ -272,6 +273,10 @@ export default function AdminDashboard() {
               <Link className="h-4 w-4 mr-1" />
               Link Health
             </TabsTrigger>
+            <TabsTrigger value="digests" className="whitespace-nowrap" data-testid="tab-digests">
+              <MailCheck className="h-4 w-4 mr-1" />
+              Digests
+            </TabsTrigger>
             <TabsTrigger value="audit" className="whitespace-nowrap" data-testid="tab-audit">Audit</TabsTrigger>
           </TabsList>
         </div>
@@ -332,6 +337,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="linkhealth">
           <ErrorBoundary label="Link Health tab"><LinkHealthDashboard /></ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent value="digests" data-testid="content-digests">
+          <ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="audit">

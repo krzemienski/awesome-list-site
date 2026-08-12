@@ -7,6 +7,7 @@ import { handleSSR } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { runMigrations } from "./migrate";
 import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
+import { initializeDigestScheduler } from "./jobs/digestScheduler";
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -474,6 +475,7 @@ app.use((req, res, next) => {
 
     // Initialize link health monitoring cron job
     initializeLinkHealthScheduler();
+    initializeDigestScheduler();
   }).on('error', (err) => {
     console.error(`❌ Server failed to start on port ${port}:`, err);
     process.exit(1);

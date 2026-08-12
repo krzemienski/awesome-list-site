@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Palette, LogIn, LogOut, User, Bookmark, Shield, MoreHorizontal } from "lucide-react";
+import { Search, Palette, LogIn, LogOut, User, Bookmark, Bell, Settings, Shield, MoreHorizontal } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -91,6 +91,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     "continue-learning": "Continue Learning",
     login: "Sign in",
     settings: "Settings",
+    notifications: "Notifications",
     onboarding: "Learning preferences",
   };
   // Taxonomy routes get a real parent chain resolved from the tree.
@@ -178,6 +179,13 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
 export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories }: AppHeaderProps) {
   const [location, setLocation] = useLocation();
   const crumbs = getBreadcrumbs(location, categories || []);
+  const { data: notificationState } = useQuery<{ unreadCount: number }>({
+    queryKey: ["/api/notifications?limit=50"],
+    enabled: Boolean(user),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
+  const unreadCount = notificationState?.unreadCount ?? 0;
 
   // BUG-020 (run9): on /journey/:id the generic crumb chain ends in the raw
   // numeric id ("Home > Journey > 6"). Resolve the journey title from the
@@ -476,13 +484,44 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 min-h-[44px] min-w-[44px] relative touch-manipulation"
+          className="hidden h-9 w-9 min-h-[44px] min-w-[44px] relative touch-manipulation min-[360px]:inline-flex"
           onClick={() => setLocation("/settings/theme")}
           title="Theme Settings"
           aria-label="Theme Settings"
         >
           <Palette className="h-4 w-4" />
         </Button>
+
+        {user ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative h-9 w-9 min-h-[44px] min-w-[44px] touch-manipulation"
+            onClick={() => setLocation("/notifications")}
+            title={
+              unreadCount > 0
+                ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
+                : "Notifications"
+            }
+            aria-label={
+              unreadCount > 0
+                ? `Notifications, ${unreadCount} unread`
+                : "Notifications"
+            }
+            data-testid="button-notifications"
+          >
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 ? (
+              <span
+                className="absolute right-0.5 top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold leading-none text-white"
+                aria-hidden="true"
+                data-testid="badge-notification-count"
+              >
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            ) : null}
+          </Button>
+        ) : null}
 
         {user ? (
           <DropdownMenu modal={false}>
@@ -514,6 +553,17 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setLocation("/bookmarks")} className="min-h-[44px]">
                 <Bookmark className="mr-2 h-4 w-4" /> Bookmarks
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLocation("/notifications")} className="min-h-[44px]">
+                <Bell className="mr-2 h-4 w-4" /> Notifications
+                {unreadCount > 0 ? (
+                  <span className="ml-auto text-xs font-semibold text-[var(--accent)]">
+                    {unreadCount}
+                  </span>
+                ) : null}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setLocation("/settings")} className="min-h-[44px]">
+                <Settings className="mr-2 h-4 w-4" /> Settings
               </DropdownMenuItem>
               {user.role === "admin" && (
                 <DropdownMenuItem onSelect={() => setLocation("/admin")} className="min-h-[44px]">

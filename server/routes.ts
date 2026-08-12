@@ -152,6 +152,7 @@ import {
   enforceConcurrentSessionLimit,
   revokeAllUserSessions,
 } from "./sessionPolicy";
+import { registerNotificationRoutes } from "./api/notifications";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -730,6 +731,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("Running in local mode - Replit OAuth disabled, use local auth at /api/auth/local/login");
   }
   setupLocalAuth();
+  registerNotificationRoutes(app, isAuthenticated, isAdmin);
 
   // Task #279 (supersedes R4-031/run24): every limiter now uses the shared
   // Postgres-backed store (rate_limit_hits table), so counters are global

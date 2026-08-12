@@ -220,6 +220,15 @@ export default function Bookmarks() {
     });
   }, [archiveFilter, bookmarks, collectionFilter, sortBy, statusFilter]);
 
+  useEffect(() => {
+    const match = window.location.hash.match(/^#bookmark-(\d+)$/);
+    if (!match || filteredBookmarks.length === 0) return;
+    const target = document.getElementById(`bookmark-${match[1]}`);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    target.focus({ preventScroll: true });
+  }, [filteredBookmarks]);
+
   const selectedCollection =
     collectionFilter === "all"
       ? null
@@ -772,7 +781,13 @@ export default function Bookmarks() {
           {filteredBookmarks.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               {filteredBookmarks.map((resource) => (
-                <article key={resource.id} className="border bg-card" data-testid={`bookmark-card-${resource.id}`}>
+                <article
+                  key={resource.id}
+                  id={`bookmark-${resource.id}`}
+                  tabIndex={-1}
+                  className="scroll-mt-24 border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  data-testid={`bookmark-card-${resource.id}`}
+                >
                   <div className="flex flex-wrap items-center gap-2 border-b p-3">
                     <label className="flex min-h-11 cursor-pointer items-center gap-2 px-1">
                       <Checkbox

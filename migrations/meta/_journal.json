@@ -120,6 +120,13 @@
       "when": 1786708800000,
       "tag": "0042_normalize_learning_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1786795200000,
+      "tag": "0043_opt_in_digests",
+      "breakpoints": true
     }
   ]
 }

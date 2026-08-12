@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import NotificationPreferencesCard from "@/components/notifications/NotificationPreferencesCard";
 
 interface CategoryOption {
   name: string;
@@ -363,6 +364,12 @@ export default function Settings() {
               )}
             </CardContent>
           </Card>
+        </section>
+      ) : null}
+
+      {isAuthenticated ? (
+        <section aria-labelledby="notification-settings-title">
+          <NotificationPreferencesCard />
         </section>
       ) : null}
 

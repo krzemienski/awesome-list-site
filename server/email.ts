@@ -1,22 +1,30 @@
 /**
- * Transactional email transport for password-reset links.
+ * Shared transactional email transport.
  *
- * Real transport: Gmail via the Replit Gmail connection ("google-mail") using
- * the @replit/connectors-sdk proxy → POST /gmail/v1/users/me/messages/send.
- * The connection handles OAuth token refresh automatically; we never store
- * credentials. The SDK/package is only present after the integration is added,
- * so it is imported LAZILY inside the send path — the server must boot fine
- * before the integration is connected.
- *
- * Fallback (transport unavailable — e.g. local dev before the integration is
- * bound, or a send error): we never leak account existence to the caller. In
- * development we log the reset link to the server console so the flow is
- * testable end-to-end; in production we log a loud warning (never the token) so
- * a missing integration is visible. The calling endpoint always returns a
- * generic 200 regardless of delivery outcome.
+ * Gmail is reached through the Replit connector, which owns OAuth credentials
+ * and refresh. Callers receive an explicit delivered/unavailable/failed result:
+ * there is no success-shaped fallback. Password reset keeps its historical
+ * development-only console link, while digests never do.
  */
+import { ReplitConnectors } from "@replit/connectors-sdk";
 
 const FROM_NAME = "Awesome Video";
+
+export interface TransactionalEmail {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  messageId?: string;
+  unsubscribeUrl?: string;
+}
+
+export interface EmailDeliveryResult {
+  delivered: boolean;
+  status: "delivered" | "unavailable" | "failed" | "delivery_unknown";
+  providerMessageId?: string;
+  errorCode?: string;
+}
 
 function base64url(input: string): string {
   return Buffer.from(input, "utf-8")
@@ -26,27 +34,159 @@ function base64url(input: string): string {
     .replace(/=+$/, "");
 }
 
-function buildMimeMessage(to: string, subject: string, html: string, text: string): string {
-  const boundary = "bnd_" + Math.random().toString(36).slice(2);
-  return [
-    `To: ${to}`,
-    `Subject: ${subject}`,
+function singleLine(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
+function buildMimeMessage(message: TransactionalEmail): string {
+  const boundary = `bnd_${crypto.randomUUID().replace(/-/g, "")}`;
+  const headers = [
+    `To: ${singleLine(message.to)}`,
+    `Subject: ${singleLine(message.subject)}`,
+    ...(message.messageId
+      ? [`Message-ID: <${singleLine(message.messageId)}@awesome.video>`]
+      : []),
+    ...(message.unsubscribeUrl
+      ? [
+          `List-Unsubscribe: <${singleLine(message.unsubscribeUrl)}>`,
+          "List-Unsubscribe-Post: List-Unsubscribe=One-Click",
+        ]
+      : []),
     "MIME-Version: 1.0",
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
+  ];
+  return [
+    ...headers,
     "",
     `--${boundary}`,
     "Content-Type: text/plain; charset=UTF-8",
+    "Content-Transfer-Encoding: 8bit",
     "",
-    text,
+    message.text,
     "",
     `--${boundary}`,
     "Content-Type: text/html; charset=UTF-8",
+    "Content-Transfer-Encoding: 8bit",
     "",
-    html,
+    message.html,
     "",
     `--${boundary}--`,
     "",
   ].join("\r\n");
+}
+
+function classifyTransportError(error: unknown): EmailDeliveryResult {
+  const message = error instanceof Error ? error.message : String(error);
+  if (
+    /Cannot find package|module not found|not connected|unauthori[sz]ed|401|403|identity|connector/i.test(
+      message,
+    )
+  ) {
+    return {
+      delivered: false,
+      status: "unavailable",
+      errorCode: "transport_unavailable",
+    };
+  }
+  // Once the proxy request starts, a thrown network/timeout error cannot prove
+  // Gmail rejected the message. Never retry an ambiguous outcome.
+  return {
+    delivered: false,
+    status: "delivery_unknown",
+    errorCode: "transport_delivery_unknown",
+  };
+}
+
+function classifyProviderResponse(status: number): EmailDeliveryResult {
+  if (status === 401 || status === 403) {
+    return {
+      delivered: false,
+      status: "unavailable",
+      errorCode: "transport_unavailable",
+    };
+  }
+  if (status === 429) {
+    return {
+      delivered: false,
+      status: "failed",
+      errorCode: "transport_rate_limited",
+    };
+  }
+  return {
+    delivered: false,
+    status: "failed",
+    errorCode: "transport_send_failed",
+  };
+}
+
+export async function sendTransactionalEmail(
+  message: TransactionalEmail,
+): Promise<EmailDeliveryResult> {
+  try {
+    const connectors = new ReplitConnectors();
+    const raw = base64url(buildMimeMessage(message));
+    const response = await connectors.proxy(
+      "google-mail",
+      "/gmail/v1/users/me/messages/send",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ raw }),
+      },
+    );
+    if (!response.ok) {
+      return classifyProviderResponse(response.status);
+    }
+    const payload = (await response.json().catch(() => null)) as {
+      id?: string;
+    } | null;
+    if (!payload?.id) {
+      return {
+        delivered: false,
+        status: "delivery_unknown",
+        errorCode: "transport_missing_provider_receipt",
+      };
+    }
+    return {
+      delivered: true,
+      status: "delivered",
+      providerMessageId: payload.id,
+    };
+  } catch (error) {
+    return classifyTransportError(error);
+  }
+}
+
+export async function probeEmailTransport(): Promise<{
+  available: boolean;
+  errorCode?: string;
+}> {
+  try {
+    const connectors = new ReplitConnectors();
+    // gmail.send is sufficient for delivery but does not grant users.getProfile;
+    // probing that endpoint therefore reports a healthy send-only connection as
+    // unavailable. Connector health is the non-sending readiness check.
+    const connections = await connectors.listConnections({
+      connector_names: "google-mail",
+      refresh_policy: "auto",
+    });
+    const healthy = connections.some(
+      (connection) =>
+        connection.connector_name === "google-mail" &&
+        (!connection.status ||
+          connection.status === "healthy" ||
+          connection.status === "active"),
+    );
+    if (!healthy) {
+      throw new Error("Gmail connector is not connected or healthy");
+    }
+    return { available: true };
+  } catch (error) {
+    return {
+      available: false,
+      errorCode: "transport_unavailable",
+    };
+  }
 }
 
 export async function sendPasswordResetEmail(
@@ -67,41 +207,15 @@ export async function sendPasswordResetEmail(
     `<p style="color:#888;font-size:12px;margin-top:24px">If you didn't request this, you can safely ignore this email — your password won't change.</p>` +
     `</body></html>`;
 
-  try {
-    // Lazy import via an indirect specifier: the @replit/connectors-sdk package
-    // only exists once the Gmail integration is added, so a literal import would
-    // break typecheck/boot beforehand. Node resolves this at runtime; if the
-    // package (or binding) is missing it throws and we fall through to the
-    // dev/console fallback below.
-    const pkg = "@replit/connectors-sdk";
-    const { ReplitConnectors } = (await import(/* @vite-ignore */ pkg)) as any;
-    const connectors = new ReplitConnectors();
-    const raw = base64url(buildMimeMessage(to, subject, html, text));
-    const resp: any = await connectors.proxy(
-      "google-mail",
-      "/gmail/v1/users/me/messages/send",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ raw }),
-      },
-    );
-    if (!resp?.ok) {
-      const body = typeof resp?.text === "function" ? await resp.text().catch(() => "") : "";
-      throw new Error(`Gmail send failed: ${resp?.status} ${String(body).slice(0, 200)}`);
-    }
-    return { delivered: true };
-  } catch (err) {
-    // Transport not configured or send failed — degrade without leaking to the
-    // caller. Surface enough for operators; only surface the token in dev.
+  const result = await sendTransactionalEmail({ to, subject, html, text });
+  if (!result.delivered) {
     if (process.env.NODE_ENV !== "production") {
       console.log(`[email:dev] Password reset link for ${to}: ${resetUrl}`);
     } else {
       console.warn(
-        `[email] Password reset email NOT sent to ${to} — transport unavailable:`,
-        (err as Error)?.message,
+        `[email] Password reset email NOT sent (${result.errorCode ?? "unknown"})`,
       );
     }
-    return { delivered: false };
   }
+  return { delivered: result.delivered };
 }
