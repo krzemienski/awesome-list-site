@@ -193,7 +193,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'users.exported',
-        req.user?.claims?.sub,
+        req.dbUser?.id,
         { rowCount: allUsers.length },
         `Admin exported ${allUsers.length} user rows (unmasked emails, CSV)`
       );
@@ -281,7 +281,7 @@ export function registerAdminContentRoutes(
       // Run16 BUG-014: block self role changes server-side — a one-click
       // self-demotion would lock the last admin out (mirrors the existing
       // self-delete guard below).
-      if (req.user?.claims?.sub === userId) {
+      if (req.dbUser?.id === userId) {
         return res.status(400).json({ message: 'You cannot change your own role' });
       }
       
@@ -303,7 +303,7 @@ export function registerAdminContentRoutes(
   app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const targetId = req.params.id;
-      if (req.user?.claims?.sub === targetId) {
+      if (req.dbUser?.id === targetId) {
         return res.status(400).json({ message: 'You cannot delete your own account' });
       }
       const target = await userRepo.getUser(targetId);
@@ -404,7 +404,7 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resources/:id(\\d+)/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -446,7 +446,7 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resources/:id(\\d+)/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const { reason } = req.body;
       
       if (isNaN(resourceId)) {
@@ -489,7 +489,7 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resources/:id(\\d+)/unapprove', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
 
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -521,7 +521,7 @@ export function registerAdminContentRoutes(
   app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -632,7 +632,7 @@ export function registerAdminContentRoutes(
   app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -659,7 +659,7 @@ export function registerAdminContentRoutes(
   // POST /api/admin/resources/bulk/approve - Bulk approve resources
   app.post('/api/admin/resources/bulk/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const { ids } = req.body as { ids?: unknown };
 
       if (!Array.isArray(ids) || ids.length === 0) {
@@ -698,7 +698,7 @@ export function registerAdminContentRoutes(
   // POST /api/admin/resources/bulk/reject - Bulk reject resources
   app.post('/api/admin/resources/bulk/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const { ids, reason } = req.body as { ids?: unknown; reason?: string };
 
       if (!Array.isArray(ids) || ids.length === 0) {
@@ -739,7 +739,7 @@ export function registerAdminContentRoutes(
   // POST /api/admin/resources/bulk/delete - Bulk delete resources
   app.post('/api/admin/resources/bulk/delete', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const { ids } = req.body as { ids?: unknown };
 
       if (!Array.isArray(ids) || ids.length === 0) {
@@ -838,7 +838,7 @@ export function registerAdminContentRoutes(
   // POST /api/admin/resources - Create a new resource (admin only)
   app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       
       // Run16 BUG-001/BUG-031 + Run21 R4-016: admin-created resources go live
       // immediately — full shared validation (https-only bounded URL, visible
@@ -933,7 +933,7 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       
       if (isNaN(editId)) {
         return res.status(400).json({ message: 'Invalid edit ID' });
@@ -965,7 +965,7 @@ export function registerAdminContentRoutes(
   app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const { reason } = req.body;
       
       if (isNaN(editId)) {
@@ -1003,7 +1003,7 @@ export function registerAdminContentRoutes(
     try {
       const { url } = req.body ?? {};
 
-      const quotaUserId = req.user?.claims?.sub;
+      const quotaUserId = req.dbUser?.id;
       if (!quotaUserId) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
@@ -1127,7 +1127,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'category_created',
-        req.user.claims.sub,
+        req.dbUser.id,
         { category: newCategory },
         `Created category: ${newCategory.name}`
       );
@@ -1174,7 +1174,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'category_updated',
-        req.user.claims.sub,
+        req.dbUser.id,
         { before: existingCategory, after: updatedCategory },
         `Updated category: ${existingCategory.name}`
       );
@@ -1212,7 +1212,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'category_deleted',
-        req.user.claims.sub,
+        req.dbUser.id,
         { category },
         `Deleted category: ${category.name}`
       );
@@ -1290,7 +1290,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'subcategory_created',
-        req.user.claims.sub,
+        req.dbUser.id,
         { subcategory: newSubcategory },
         `Created subcategory: ${newSubcategory.name} under ${category.name}`
       );
@@ -1362,7 +1362,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'subcategory_updated',
-        req.user.claims.sub,
+        req.dbUser.id,
         { before: existingSubcategory, after: updatedSubcategory },
         `Updated subcategory: ${existingSubcategory.name}`
       );
@@ -1400,7 +1400,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'subcategory_deleted',
-        req.user.claims.sub,
+        req.dbUser.id,
         { subcategory },
         `Deleted subcategory: ${subcategory.name}`
       );
@@ -1476,7 +1476,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'sub_subcategory_created',
-        req.user.claims.sub,
+        req.dbUser.id,
         { subSubcategory: newSubSubcategory },
         `Created sub-subcategory: ${newSubSubcategory.name} under ${subcategory.name}`
       );
@@ -1530,7 +1530,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'sub_subcategory_updated',
-        req.user.claims.sub,
+        req.dbUser.id,
         { before: existingSubSubcategory, after: updatedSubSubcategory },
         `Updated sub-subcategory: ${existingSubSubcategory.name}`
       );
@@ -1568,7 +1568,7 @@ export function registerAdminContentRoutes(
       await auditRepo.logResourceAudit(
         null,
         'sub_subcategory_deleted',
-        req.user.claims.sub,
+        req.dbUser.id,
         { subSubcategory },
         `Deleted sub-subcategory: ${subSubcategory.name}`
       );

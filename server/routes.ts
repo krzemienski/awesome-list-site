@@ -10,7 +10,6 @@
  */
 import type { Express, Response } from "express";
 import { createServer, type Server } from "http";
-import passport from "passport";
 import rateLimit from "express-rate-limit";
 import type { Resource } from "@shared/schema";
 
@@ -28,8 +27,7 @@ import {
   UserFeatureRepository,
   UserRepository,
 } from "./repositories";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { setupLocalAuth } from "./localAuth";
+import { requireAuth as isAuthenticated } from "./clerkAuth";
 import { negotiated429Handler } from "./middleware/rateLimit";
 import { PgRateLimitStore } from "./middleware/pgRateLimitStore";
 import { isDatabaseUnavailableError } from "./db/errors";
@@ -98,12 +96,13 @@ function sendOperationalFailure(
 
 const isAdmin = async (req: any, res: Response, next: any) => {
   try {
-    const userId = req.user?.claims?.sub;
-    if (!userId) {
+    // req.dbUser is resolved fresh per request by clerkUserContext, so role
+    // changes apply immediately (same semantics as the old per-request fetch).
+    const user = req.dbUser;
+    if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const user = await userRepo.getUser(userId);
-    if (!user || user.role !== "admin") {
+    if (user.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Forbidden: Admin access required" });
@@ -214,45 +213,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // covers the OIDC callback/probe routes that setupAuth registers.
   installApiContractRegistration(app);
 
-  // Authentication/session middleware must be first.
-  if (process.env.REPL_ID) {
-    await setupAuth(app);
-  } else {
-    const { getSession } = await import("./replitAuth");
-    app.set("trust proxy", 1);
-    app.use(getSession());
-    app.use(passport.initialize());
-    app.use(passport.session());
-    passport.serializeUser((user: any, done) => done(null, user));
-    passport.deserializeUser((user: any, done) => done(null, user));
-    console.log(
-      "Running in local mode - Replit OAuth disabled, use local auth at /api/auth/local/login",
-    );
-  }
-  setupLocalAuth();
+  // Authentication (Task #307): Clerk middleware + user context are mounted
+  // globally in server/index.ts (clerkMiddleware + clerkUserContext). The
+  // requireAuth gate imported above is passed to domain registrars below.
 
   // Historical compatibility: notification API routes and the two unsubscribe
   // HTML routes are mounted before the /api backstop limiter.
   registerNotificationRoutes(app, isAuthenticated, isAdmin);
 
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 20,
-    standardHeaders: true,
-    legacyHeaders: false,
-    store: new PgRateLimitStore("auth-cluster"),
-    handler: negotiated429Handler("Too many attempts. Please try again later."),
-  });
-  const loginBurstLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    limit: 5,
-    standardHeaders: true,
-    legacyHeaders: false,
-    store: new PgRateLimitStore("login-burst"),
-    handler: negotiated429Handler(
-      "Too many login attempts. Please try again in a minute.",
-    ),
-  });
   const resourceReadLimiter = rateLimit({
     windowMs: 60 * 1000,
     limit: 240,
@@ -297,11 +265,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Domain declaration order mirrors the former monolith exactly.
   registerAuthUserRoutes(app, {
-    loginBurstLimiter,
-    authLimiter,
     isAuthenticated,
     userRepo,
-    auditRepo,
   });
   registerCatalogContributionsRoutes(app, {
     resourceReadLimiter,

@@ -607,7 +607,7 @@ export default function SubmitResource() {
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
                   <AlertDescription>
                     The form below is read-only. Please{" "}
-                    <a href="/login?next=%2Fsubmit" className="inline-flex items-center min-h-[24px] align-middle underline" data-testid="link-login">log in</a>{" "}
+                    <a href="/sign-in?redirect_url=%2Fsubmit" className="inline-flex items-center min-h-[24px] align-middle underline" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>

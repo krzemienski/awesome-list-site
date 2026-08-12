@@ -14,10 +14,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   
   useEffect(() => {
     // If not loading and not authenticated, redirect and show message.
-    // BUG-008 (run14): send the user to /login carrying the originally
-    // requested page in ?next= so a successful sign-in returns them here
-    // (Login already honors a validated ?next= param). wouter's useLocation()
-    // is path-only, so read pathname+search off window.location directly.
+    // BUG-008 (run14): send the user to /sign-in carrying the originally
+    // requested page in ?redirect_url= so a successful sign-in returns them
+    // here (Clerk honors redirect_url). wouter's useLocation() is path-only,
+    // so read pathname+search off window.location directly.
     if (!isLoading && !isAuthenticated) {
       toast({
         title: "Authentication Required",
@@ -25,7 +25,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         variant: "destructive"
       });
       const next = window.location.pathname + window.location.search;
-      setLocation(`/login?next=${encodeURIComponent(next)}`);
+      setLocation(`/sign-in?redirect_url=${encodeURIComponent(next)}`);
     }
   }, [isLoading, isAuthenticated, setLocation, toast]);
   

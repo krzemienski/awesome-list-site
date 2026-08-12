@@ -10,7 +10,94 @@ servers:
     description: Awesome Video
 components:
   schemas:
-    post_3a__2f_api_2f_auth_2f_oidc-analytics-consent.Query:
+    get_3a__2f_api_2f_notification-preferences.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 512
+          - type: string
+            maxLength: 0
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    JsonResponse:
+      anyOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: string
+          nullable: true
+          enum:
+            - null
+        - type: array
+          items:
+            $ref: '#/components/schemas/JsonResponse'
+        - type: object
+          additionalProperties:
+            $ref: '#/components/schemas/JsonResponse'
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        fieldErrors:
+          type: object
+          additionalProperties: {}
+        errors:
+          type: array
+          items: {}
+      required:
+        - error
+        - message
+        - fieldErrors
+        - errors
+      additionalProperties: {}
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+      additionalProperties: {}
+    put_3a__2f_api_2f_notification-preferences.Query:
       type: object
       properties:
         page:
@@ -58,228 +145,6 @@ components:
     JsonObjectBody:
       type: object
       additionalProperties: {}
-    JsonResponse:
-      anyOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: string
-          nullable: true
-          enum:
-            - null
-        - type: array
-          items:
-            $ref: '#/components/schemas/JsonResponse'
-        - type: object
-          additionalProperties:
-            $ref: '#/components/schemas/JsonResponse'
-    ValidationError:
-      type: object
-      properties:
-        error:
-          type: string
-        message:
-          type: string
-        fieldErrors:
-          type: object
-          additionalProperties: {}
-        errors:
-          type: array
-          items: {}
-      required:
-        - error
-        - message
-        - fieldErrors
-        - errors
-      additionalProperties: {}
-    ErrorResponse:
-      type: object
-      properties:
-        message:
-          type: string
-      required:
-        - message
-      additionalProperties: {}
-    get_3a__2f_api_2f_login.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    get_3a__2f_api_2f_callback.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    get_3a__2f_api_2f_notification-preferences.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    put_3a__2f_api_2f_notification-preferences.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
     get_3a__2f_api_2f_digests_2f_preview.Query:
       type: object
       properties:
@@ -514,186 +379,6 @@ components:
             items:
               type: string
               maxLength: 512
-    post_3a__2f_api_2f_auth_2f_local_2f_login.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    post_3a__2f_api_2f_auth_2f_register.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    post_3a__2f_api_2f_auth_2f_forgot-password.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    post_3a__2f_api_2f_auth_2f_reset-password.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
     get_3a__2f_api_2f_auth_2f_user.Query:
       type: object
       properties:
@@ -784,51 +469,6 @@ components:
             items:
               type: string
               maxLength: 512
-    post_3a__2f_api_2f_auth_2f_logout.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
     post_3a__2f_api_2f_auth_2f_logout-all.Query:
       type: object
       properties:
@@ -875,51 +515,6 @@ components:
               type: string
               maxLength: 512
     get_3a__2f_api_2f_auth_2f_status.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    get_3a__2f_api_2f_auth_2f_replit-probe.Query:
       type: object
       properties:
         page:
@@ -2670,51 +2265,6 @@ components:
         - shareId
       additionalProperties: {}
     get_3a__2f_api_2f_public_2f_collections_2f__7b_shareId_7d_.Query:
-      type: object
-      properties:
-        page:
-          type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
-    post_3a__2f_api_2f_user_2f_change-password.Query:
       type: object
       properties:
         page:
@@ -8866,429 +8416,6 @@ components:
       in: cookie
       name: connect.sid
 paths:
-  /api/auth/oidc-analytics-consent:
-    post:
-      operationId: post:/api/auth/oidc-analytics-consent
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '204':
-          description: Successful response with no body
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - auth
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JsonObjectBody'
-      x-domain: auth
-      x-middleware: []
-      x-contract-schemas:
-        query: post_3a__2f_api_2f_auth_2f_oidc-analytics-consent.Query
-        body: JsonObjectBody
-  /api/login:
-    get:
-      operationId: get:/api/login
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - login
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      x-domain: login
-      x-middleware: []
-      x-contract-schemas:
-        query: get_3a__2f_api_2f_login.Query
-  /api/callback:
-    get:
-      operationId: get:/api/callback
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - callback
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      x-domain: callback
-      x-middleware: []
-      x-contract-schemas:
-        query: get_3a__2f_api_2f_callback.Query
   /api/notification-preferences:
     get:
       operationId: get:/api/notification-preferences
@@ -9428,7 +8555,7 @@ paths:
       x-domain: notification-preferences
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_notification-preferences.Query
     put:
@@ -9575,7 +8702,7 @@ paths:
       x-domain: notification-preferences
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: put_3a__2f_api_2f_notification-preferences.Query
         body: JsonObjectBody
@@ -9718,7 +8845,7 @@ paths:
       x-domain: digests
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_digests_2f_preview.Query
   /api/notifications:
@@ -9860,7 +8987,7 @@ paths:
       x-domain: notifications
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_notifications.Query
   /api/notifications/{id}/read:
@@ -10014,7 +9141,7 @@ paths:
       x-domain: notifications
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: patch_3a__2f_api_2f_notifications_2f__7b_id_7d__2f_read.Params
         query: patch_3a__2f_api_2f_notifications_2f__7b_id_7d__2f_read.Query
@@ -10164,7 +9291,7 @@ paths:
       x-domain: notifications
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_notifications_2f_read-all.Query
         body: JsonObjectBody
@@ -10308,596 +9435,10 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_digests_2f_health.Query
-  /api/auth/local/login:
-    post:
-      operationId: post:/api/auth/local/login
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - auth
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JsonObjectBody'
-      x-domain: auth
-      x-middleware: []
-      x-contract-schemas:
-        query: post_3a__2f_api_2f_auth_2f_local_2f_login.Query
-        body: JsonObjectBody
-  /api/auth/register:
-    post:
-      operationId: post:/api/auth/register
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '201':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - auth
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JsonObjectBody'
-      x-domain: auth
-      x-middleware: []
-      x-contract-schemas:
-        query: post_3a__2f_api_2f_auth_2f_register.Query
-        body: JsonObjectBody
-  /api/auth/forgot-password:
-    post:
-      operationId: post:/api/auth/forgot-password
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - auth
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JsonObjectBody'
-      x-domain: auth
-      x-middleware: []
-      x-contract-schemas:
-        query: post_3a__2f_api_2f_auth_2f_forgot-password.Query
-        body: JsonObjectBody
-  /api/auth/reset-password:
-    post:
-      operationId: post:/api/auth/reset-password
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - auth
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JsonObjectBody'
-      x-domain: auth
-      x-middleware: []
-      x-contract-schemas:
-        query: post_3a__2f_api_2f_auth_2f_reset-password.Query
-        body: JsonObjectBody
   /api/auth/user:
     get:
       operationId: get:/api/auth/user
@@ -11174,151 +9715,6 @@ paths:
       x-middleware: []
       x-contract-schemas:
         query: get_3a__2f_api_2f_auth_2f_me.Query
-  /api/auth/logout:
-    post:
-      operationId: post:/api/auth/logout
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - auth
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JsonObjectBody'
-      x-domain: auth
-      x-middleware: []
-      x-contract-schemas:
-        query: post_3a__2f_api_2f_auth_2f_logout.Query
-        body: JsonObjectBody
   /api/auth/logout-all:
     post:
       operationId: post:/api/auth/logout-all
@@ -11464,7 +9860,7 @@ paths:
       x-domain: auth
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_auth_2f_logout-all.Query
         body: JsonObjectBody
@@ -11606,144 +10002,6 @@ paths:
       x-middleware: []
       x-contract-schemas:
         query: get_3a__2f_api_2f_auth_2f_status.Query
-  /api/auth/replit-probe:
-    get:
-      operationId: get:/api/auth/replit-probe
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - auth
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      x-domain: auth
-      x-middleware: []
-      x-contract-schemas:
-        query: get_3a__2f_api_2f_auth_2f_replit-probe.Query
   /api/resources:
     get:
       operationId: get:/api/resources
@@ -12032,7 +10290,7 @@ paths:
       x-domain: resources
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - createResourceHandler
       x-contract-schemas:
         query: post_3a__2f_api_2f_resources.Query
@@ -13048,7 +11306,7 @@ paths:
       x-domain: submit
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - createResourceHandler
       x-contract-schemas:
         query: post_3a__2f_api_2f_submit.Query
@@ -13193,7 +11451,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_resources_2f_pending.Query
@@ -13349,7 +11607,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: put_3a__2f_api_2f_resources_2f__7b_id_7d__2f_approve.Params
@@ -13507,7 +11765,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: put_3a__2f_api_2f_resources_2f__7b_id_7d__2f_reject.Params
@@ -13670,7 +11928,7 @@ paths:
       x-domain: resources
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_resources_2f__7b_id_7d__2f_edits.Params
         query: post_3a__2f_api_2f_resources_2f__7b_id_7d__2f_edits.Query
@@ -14378,7 +12636,7 @@ paths:
       x-domain: favorites
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_favorites_2f__7b_resourceId_7d_.Params
         query: post_3a__2f_api_2f_favorites_2f__7b_resourceId_7d_.Query
@@ -14533,7 +12791,7 @@ paths:
       x-domain: favorites
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: delete_3a__2f_api_2f_favorites_2f__7b_resourceId_7d_.Params
         query: delete_3a__2f_api_2f_favorites_2f__7b_resourceId_7d_.Query
@@ -14677,7 +12935,7 @@ paths:
       x-domain: favorites
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_favorites.Query
   /api/bookmarks/{resourceId}:
@@ -14835,7 +13093,7 @@ paths:
       x-domain: bookmarks
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_bookmarks_2f__7b_resourceId_7d_.Params
         query: post_3a__2f_api_2f_bookmarks_2f__7b_resourceId_7d_.Query
@@ -14990,7 +13248,7 @@ paths:
       x-domain: bookmarks
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: delete_3a__2f_api_2f_bookmarks_2f__7b_resourceId_7d_.Params
         query: delete_3a__2f_api_2f_bookmarks_2f__7b_resourceId_7d_.Query
@@ -15134,7 +13392,7 @@ paths:
       x-domain: bookmarks
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_bookmarks.Query
   /api/collections:
@@ -15276,7 +13534,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_collections.Query
     post:
@@ -15429,7 +13687,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_collections.Query
         body: JsonObjectBody
@@ -15578,7 +13836,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: put_3a__2f_api_2f_collections_2f_reorder.Query
         body: JsonObjectBody
@@ -15733,7 +13991,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: patch_3a__2f_api_2f_collections_2f__7b_collectionId_7d_.Params
         query: patch_3a__2f_api_2f_collections_2f__7b_collectionId_7d_.Query
@@ -15888,7 +14146,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: delete_3a__2f_api_2f_collections_2f__7b_collectionId_7d_.Params
         query: delete_3a__2f_api_2f_collections_2f__7b_collectionId_7d_.Query
@@ -16050,7 +14308,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_items_2f__7b_resourceId_7d_.Params
         query: post_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_items_2f__7b_resourceId_7d_.Query
@@ -16211,7 +14469,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: delete_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_items_2f__7b_resourceId_7d_.Params
         query: delete_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_items_2f__7b_resourceId_7d_.Query
@@ -16367,7 +14625,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_publish.Params
         query: post_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_publish.Query
@@ -16522,7 +14780,7 @@ paths:
       x-domain: collections
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: delete_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_publish.Params
         query: delete_3a__2f_api_2f_collections_2f__7b_collectionId_7d__2f_publish.Query
@@ -16678,7 +14936,7 @@ paths:
       x-domain: bookmarks
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: patch_3a__2f_api_2f_bookmarks_2f__7b_resourceId_7d__2f_state.Params
         query: patch_3a__2f_api_2f_bookmarks_2f__7b_resourceId_7d__2f_state.Query
@@ -16828,7 +15086,7 @@ paths:
       x-domain: bookmarks
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_bookmarks_2f_bulk.Query
         body: JsonObjectBody
@@ -16978,155 +15236,6 @@ paths:
       x-contract-schemas:
         params: get_3a__2f_api_2f_public_2f_collections_2f__7b_shareId_7d_.Params
         query: get_3a__2f_api_2f_public_2f_collections_2f__7b_shareId_7d_.Query
-  /api/user/change-password:
-    post:
-      operationId: post:/api/user/change-password
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JsonResponse'
-        '400':
-          description: Request validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '401':
-          description: Authentication required
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Insufficient permission
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Resource not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Request conflicts with current state
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '413':
-          description: Request body too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-        '422':
-          description: Request could not be processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '429':
-          description: Rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '503':
-          description: Service temporarily unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      tags:
-        - user
-      parameters:
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
-          in: query
-          required: false
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JsonObjectBody'
-      security:
-        - SessionCookie: []
-      x-domain: user
-      x-requires-auth: true
-      x-middleware:
-        - isAuthenticated
-      x-contract-schemas:
-        query: post_3a__2f_api_2f_user_2f_change-password.Query
-        body: JsonObjectBody
   /api/user/api-keys:
     post:
       operationId: post:/api/user/api-keys
@@ -17278,7 +15387,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_user_2f_api-keys.Query
         body: JsonObjectBody
@@ -17420,7 +15529,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_user_2f_api-keys.Query
   /api/user/api-keys/{id}:
@@ -17574,7 +15683,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: delete_3a__2f_api_2f_user_2f_api-keys_2f__7b_id_7d_.Params
         query: delete_3a__2f_api_2f_user_2f_api-keys_2f__7b_id_7d_.Query
@@ -17724,7 +15833,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: patch_3a__2f_api_2f_user_2f_profile.Query
         body: JsonObjectBody
@@ -17873,7 +15982,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_user_2f_deletion-request.Query
         body: JsonObjectBody
@@ -18021,7 +16130,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: delete_3a__2f_api_2f_user_2f_deletion-request.Query
         body: JsonObjectBody
@@ -18164,7 +16273,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_user_2f_progress.Query
   /api/user/preferences:
@@ -18306,7 +16415,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_user_2f_preferences.Query
     put:
@@ -18453,7 +16562,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: put_3a__2f_api_2f_user_2f_preferences.Query
         body: JsonObjectBody
@@ -18601,7 +16710,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: delete_3a__2f_api_2f_user_2f_preferences.Query
         body: JsonObjectBody
@@ -18744,7 +16853,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_user_2f_contributions.Query
   /api/user/submissions:
@@ -18886,7 +16995,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_user_2f_submissions.Query
   /api/user/contributions/{kind}/{id}/withdraw:
@@ -19047,7 +17156,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_user_2f_contributions_2f__7b_kind_7d__2f__7b_id_7d__2f_withdraw.Params
         query: post_3a__2f_api_2f_user_2f_contributions_2f__7b_kind_7d__2f__7b_id_7d__2f_withdraw.Query
@@ -19203,7 +17312,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: delete_3a__2f_api_2f_user_2f_submissions_2f__7b_id_7d_.Params
         query: delete_3a__2f_api_2f_user_2f_submissions_2f__7b_id_7d_.Query
@@ -19347,7 +17456,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_user_2f_journeys.Query
   /api/user/continue-learning:
@@ -19489,7 +17598,7 @@ paths:
       x-domain: user
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_user_2f_continue-learning.Query
   /api/journeys:
@@ -19926,7 +18035,7 @@ paths:
       x-domain: journeys
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_journeys_2f__7b_id_7d__2f_start.Params
         query: post_3a__2f_api_2f_journeys_2f__7b_id_7d__2f_start.Query
@@ -20082,7 +18191,7 @@ paths:
       x-domain: journeys
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: put_3a__2f_api_2f_journeys_2f__7b_id_7d__2f_progress.Params
         query: put_3a__2f_api_2f_journeys_2f__7b_id_7d__2f_progress.Query
@@ -20231,7 +18340,7 @@ paths:
       x-domain: journeys
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: get_3a__2f_api_2f_journeys_2f__7b_id_7d__2f_progress.Params
         query: get_3a__2f_api_2f_journeys_2f__7b_id_7d__2f_progress.Query
@@ -20375,7 +18484,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_journeys.Query
@@ -20531,7 +18640,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: put_3a__2f_api_2f_admin_2f_journeys_2f__7b_id_7d_.Params
@@ -20683,7 +18792,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: get_3a__2f_api_2f_admin_2f_journeys_2f__7b_id_7d__2f_steps.Params
@@ -20845,7 +18954,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_admin_2f_journeys_2f__7b_id_7d__2f_steps.Params
@@ -21009,7 +19118,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: patch_3a__2f_api_2f_admin_2f_journeys_2f__7b_journeyId_7d__2f_steps_2f__7b_stepId_7d_.Params
@@ -21172,7 +19281,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_journeys_2f__7b_journeyId_7d__2f_steps_2f__7b_stepId_7d_.Params
@@ -21330,7 +19439,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_admin_2f_journeys_2f__7b_id_7d__2f_steps_2f_reorder.Params
@@ -21476,7 +19585,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_stats.Query
@@ -21620,7 +19729,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_users.Query
@@ -21764,7 +19873,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_users_2f_export.Query
@@ -21920,7 +20029,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: patch_3a__2f_api_2f_admin_2f_users_2f__7b_id_7d__2f_name.Params
@@ -22078,7 +20187,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: put_3a__2f_api_2f_admin_2f_users_2f__7b_id_7d__2f_role.Params
@@ -22236,7 +20345,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_users_2f__7b_id_7d_.Params
@@ -22382,7 +20491,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_audit-logs.Query
@@ -22526,7 +20635,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_pending-resources.Query
@@ -22682,7 +20791,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_approve.Params
@@ -22840,7 +20949,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_reject.Params
@@ -22998,7 +21107,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_unapprove.Params
@@ -23156,7 +21265,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: put_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d_.Params
@@ -23313,7 +21422,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d_.Params
@@ -23465,7 +21574,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_resources_2f_bulk_2f_approve.Query
@@ -23616,7 +21725,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_resources_2f_bulk_2f_reject.Query
@@ -23767,7 +21876,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_resources_2f_bulk_2f_delete.Query
@@ -23912,7 +22021,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_resources.Query
@@ -24067,7 +22176,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_resources.Query
@@ -24212,7 +22321,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_resource-edits.Query
@@ -24368,7 +22477,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_admin_2f_resource-edits_2f__7b_id_7d__2f_approve.Params
@@ -24526,7 +22635,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_admin_2f_resource-edits_2f__7b_id_7d__2f_reject.Params
@@ -24678,7 +22787,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_claude_2f_analyze.Query
@@ -24823,7 +22932,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_categories.Query
@@ -24978,7 +23087,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_categories.Query
@@ -25135,7 +23244,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: patch_3a__2f_api_2f_admin_2f_categories_2f__7b_id_7d_.Params
@@ -25292,7 +23401,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_categories_2f__7b_id_7d_.Params
@@ -25438,7 +23547,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_subcategories.Query
@@ -25593,7 +23702,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_subcategories.Query
@@ -25750,7 +23859,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: patch_3a__2f_api_2f_admin_2f_subcategories_2f__7b_id_7d_.Params
@@ -25907,7 +24016,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_subcategories_2f__7b_id_7d_.Params
@@ -26053,7 +24162,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_sub-subcategories.Query
@@ -26208,7 +24317,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_sub-subcategories.Query
@@ -26365,7 +24474,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: patch_3a__2f_api_2f_admin_2f_sub-subcategories_2f__7b_id_7d_.Params
@@ -26522,7 +24631,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_admin_2f_sub-subcategories_2f__7b_id_7d_.Params
@@ -26674,7 +24783,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_github_2f_configure.Query
@@ -26825,7 +24934,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_github_2f_import.Query
@@ -26976,7 +25085,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_github_2f_export.Query
@@ -27121,7 +25230,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_github_2f_sync-status.Query
@@ -27271,7 +25380,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: get_3a__2f_api_2f_github_2f_sync-status_2f__7b_id_7d_.Params
@@ -27416,7 +25525,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_github_2f_sync-history.Query
@@ -27566,7 +25675,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_github_2f_process-queue.Query
@@ -27717,7 +25826,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_export.Query
@@ -27862,7 +25971,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_export-json.Query
@@ -28012,7 +26121,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_validate.Query
@@ -28163,7 +26272,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_check-links.Query
@@ -28308,7 +26417,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_validation-status.Query
@@ -28452,7 +26561,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_link-health_2f_status.Query
@@ -28602,7 +26711,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_link-health_2f_run.Query
@@ -28747,7 +26856,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_link-health_2f_history.Query
@@ -28891,7 +27000,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_link-health_2f_broken-links.Query
@@ -29041,7 +27150,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_seed-database.Query
@@ -29192,7 +27301,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_import-github.Query
@@ -29337,7 +27446,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_enrichment_2f_coverage.Query
@@ -29487,7 +27596,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_maintenance_2f_backfill-approved-at.Query
@@ -29638,7 +27747,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_maintenance_2f_canonicalize-tags.Query
@@ -29789,7 +27898,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_enrichment_2f_start.Query
@@ -29934,7 +28043,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_enrichment_2f_jobs.Query
@@ -30084,7 +28193,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: get_3a__2f_api_2f_enrichment_2f_jobs_2f__7b_id_7d_.Params
@@ -30240,7 +28349,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_enrichment_2f_jobs_2f__7b_id_7d_.Params
@@ -30392,7 +28501,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: get_3a__2f_api_2f_enrichment_2f_jobs_2f__7b_id_7d__2f_events.Params
@@ -30543,7 +28652,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_admin_2f_enrichment_2f_backfill-suggestions.Query
@@ -30694,7 +28803,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_researcher_2f_start.Query
@@ -30839,7 +28948,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_researcher_2f_brief.Query
@@ -30983,7 +29092,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_researcher_2f_jobs.Query
@@ -31133,7 +29242,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: get_3a__2f_api_2f_researcher_2f_jobs_2f__7b_id_7d_.Params
@@ -31289,7 +29398,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: delete_3a__2f_api_2f_researcher_2f_jobs_2f__7b_id_7d_.Params
@@ -31441,7 +29550,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: get_3a__2f_api_2f_researcher_2f_jobs_2f__7b_id_7d__2f_events.Params
@@ -31586,7 +29695,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_researcher_2f_discoveries.Query
@@ -31736,7 +29845,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: post_3a__2f_api_2f_researcher_2f_discoveries_2f_approve-all.Query
@@ -31893,7 +30002,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_researcher_2f_discoveries_2f__7b_id_7d__2f_approve.Params
@@ -32051,7 +30160,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         params: post_3a__2f_api_2f_researcher_2f_discoveries_2f__7b_id_7d__2f_reject.Params
@@ -32760,7 +30869,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_github_2f_search.Query
@@ -33184,7 +31293,7 @@ paths:
       x-domain: recommendations
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_recommendations.Query
         body: JsonObjectBody
@@ -33333,7 +31442,7 @@ paths:
       x-domain: recommendations
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_recommendations_2f_feedback.Query
         body: JsonObjectBody
@@ -33475,7 +31584,7 @@ paths:
       x-domain: recommendations
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: get_3a__2f_api_2f_recommendations_2f_feedback.Query
   /api/recommendations/{resourceId}/feedback:
@@ -33629,7 +31738,7 @@ paths:
       x-domain: recommendations
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: put_3a__2f_api_2f_recommendations_2f__7b_resourceId_7d__2f_feedback.Params
         query: put_3a__2f_api_2f_recommendations_2f__7b_resourceId_7d__2f_feedback.Query
@@ -33784,7 +31893,7 @@ paths:
       x-domain: recommendations
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         params: post_3a__2f_api_2f_recommendations_2f__7b_resourceId_7d__2f_feedback.Params
         query: post_3a__2f_api_2f_recommendations_2f__7b_resourceId_7d__2f_feedback.Query
@@ -34072,7 +32181,7 @@ paths:
       x-domain: learning-paths
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_learning-paths_2f_generate.Query
         body: JsonObjectBody
@@ -34221,7 +32330,7 @@ paths:
       x-domain: learning-paths
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_learning-paths.Query
         body: JsonObjectBody
@@ -34376,7 +32485,7 @@ paths:
       x-domain: interactions
       x-requires-auth: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
       x-contract-schemas:
         query: post_3a__2f_api_2f_interactions.Query
         body: JsonObjectBody
@@ -34934,7 +33043,7 @@ paths:
       x-requires-auth: true
       x-requires-admin: true
       x-middleware:
-        - isAuthenticated
+        - requireAuth
         - isAdmin
       x-contract-schemas:
         query: get_3a__2f_api_2f_admin_2f_operations_2f_health.Query
@@ -36050,13 +34159,11 @@ paths:
       x-contract-schemas:
         query: get_3a__2f_api_2f_docs.Query
 tags:
-  - name: auth
-  - name: login
-  - name: callback
   - name: notification-preferences
   - name: digests
   - name: notifications
   - name: admin
+  - name: auth
   - name: resources
   - name: search
   - name: telemetry

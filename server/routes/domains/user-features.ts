@@ -33,7 +33,6 @@ import {
   CollectionNotFoundError,
 } from "../../repositories";
 import { storage } from "../../storage";
-import { comparePassword, hashPassword, validateNewPassword } from "../../passwordUtils";
 import { db } from "../../db";
 import {
   DEFAULT_LEARNING_PREFERENCES,
@@ -101,7 +100,7 @@ export function registerUserFeatureRoutes(
   // POST /api/favorites/:resourceId - Add favorite
   app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
       
       await userFeatureRepo.addFavorite(userId, resourceId);
@@ -115,7 +114,7 @@ export function registerUserFeatureRoutes(
   // DELETE /api/favorites/:resourceId - Remove favorite
   app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
       
       await userFeatureRepo.removeFavorite(userId, resourceId);
@@ -129,7 +128,7 @@ export function registerUserFeatureRoutes(
   // GET /api/favorites - Get user's favorites
   app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const favorites = await userFeatureRepo.getUserFavorites(userId);
       res.json(favorites);
     } catch (error) {
@@ -144,7 +143,7 @@ export function registerUserFeatureRoutes(
     // additive bulk handler registered below instead of parsing it as an ID.
     if (req.params.resourceId === "bulk") return next("route");
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
       const { notes } = req.body;
       
@@ -161,7 +160,7 @@ export function registerUserFeatureRoutes(
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
   app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.resourceId);
       
       await userFeatureRepo.removeBookmark(userId, resourceId);
@@ -175,7 +174,7 @@ export function registerUserFeatureRoutes(
   // GET /api/bookmarks - Get user's bookmarks
   app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
       res.json(bookmarks);
     } catch (error) {
@@ -268,7 +267,7 @@ export function registerUserFeatureRoutes(
         return res.status(400).json({ message: "includeArchived must be true or false" });
       }
       const collections = await collectionRepo.listCollections(
-        req.user.claims.sub,
+        req.dbUser.id,
         req.query.includeArchived === "true",
       );
       res.json(collections.map(collectionResponse));
@@ -283,7 +282,7 @@ export function registerUserFeatureRoutes(
     if (!parsed.success) return validationError(res, parsed);
     try {
       const collection = await collectionRepo.createCollection(
-        req.user.claims.sub,
+        req.dbUser.id,
         parsed.data.name,
       );
       res.status(201).json(collectionResponse({ ...collection, itemCount: 0 }));
@@ -298,7 +297,7 @@ export function registerUserFeatureRoutes(
     if (!parsed.success) return validationError(res, parsed);
     try {
       const reordered = await collectionRepo.reorderCollections(
-        req.user.claims.sub,
+        req.dbUser.id,
         parsed.data.orderedIds,
       );
       if (!reordered) return res.status(404).json({ message: 'Collection not found' });
@@ -316,7 +315,7 @@ export function registerUserFeatureRoutes(
     if (!parsed.success) return validationError(res, parsed);
     try {
       const collection = await collectionRepo.updateCollection(
-        req.user.claims.sub,
+        req.dbUser.id,
         collectionId,
         parsed.data,
       );
@@ -332,7 +331,7 @@ export function registerUserFeatureRoutes(
     const collectionId = parseCollectionId(req.params.collectionId);
     if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
     try {
-      const deleted = await collectionRepo.deleteCollection(req.user.claims.sub, collectionId);
+      const deleted = await collectionRepo.deleteCollection(req.dbUser.id, collectionId);
       if (!deleted) return res.status(404).json({ message: 'Collection not found' });
       res.json({ message: 'Collection deleted; bookmarks were preserved' });
     } catch (error) {
@@ -352,7 +351,7 @@ export function registerUserFeatureRoutes(
       }
       try {
         const result = await collectionRepo.addMembership(
-          req.user.claims.sub,
+          req.dbUser.id,
           collectionId,
           resourceId,
         );
@@ -381,7 +380,7 @@ export function registerUserFeatureRoutes(
       }
       try {
         const result = await collectionRepo.removeMembership(
-          req.user.claims.sub,
+          req.dbUser.id,
           collectionId,
           resourceId,
         );
@@ -400,7 +399,7 @@ export function registerUserFeatureRoutes(
     const collectionId = parseCollectionId(req.params.collectionId);
     if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
     try {
-      const collection = await collectionRepo.publishCollection(req.user.claims.sub, collectionId);
+      const collection = await collectionRepo.publishCollection(req.dbUser.id, collectionId);
       if (!collection) return res.status(404).json({ message: 'Collection not found' });
       res.json(collectionResponse(collection));
     } catch (error) {
@@ -413,7 +412,7 @@ export function registerUserFeatureRoutes(
     const collectionId = parseCollectionId(req.params.collectionId);
     if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
     try {
-      const collection = await collectionRepo.unpublishCollection(req.user.claims.sub, collectionId);
+      const collection = await collectionRepo.unpublishCollection(req.dbUser.id, collectionId);
       if (!collection) return res.status(404).json({ message: 'Collection not found' });
       res.json(collectionResponse(collection));
     } catch (error) {
@@ -429,7 +428,7 @@ export function registerUserFeatureRoutes(
     if (!parsed.success) return validationError(res, parsed);
     try {
       const bookmark = await collectionRepo.updateBookmarkState(
-        req.user.claims.sub,
+        req.dbUser.id,
         resourceId,
         parsed.data,
       );
@@ -446,7 +445,7 @@ export function registerUserFeatureRoutes(
     if (!parsed.success) return validationError(res, parsed);
     try {
       const result = await collectionRepo.bulkUpdate(
-        req.user.claims.sub,
+        req.dbUser.id,
         parsed.data.resourceIds,
         parsed.data.action,
       );
@@ -477,65 +476,14 @@ export function registerUserFeatureRoutes(
   // --- User Profile & Progress Routes ---
 
   // GET /api/user/progress - Get user's learning progress
-  // Change the current user's password and invalidate their OTHER sessions.
-  // Additive: requires an authenticated session; verifies the current password before changing.
-  app.post('/api/user/change-password', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { currentPassword, newPassword } = req.body ?? {};
-
-      if (typeof currentPassword !== 'string' || typeof newPassword !== 'string') {
-        return res.status(400).json({ message: 'Current and new password are required' });
-      }
-
-      const user = await userRepo.getUser(userId);
-      if (!user || !user.password) {
-        return res.status(400).json({ message: 'Password change is not available for this account' });
-      }
-
-      const currentValid = await comparePassword(currentPassword, user.password as string);
-      if (!currentValid) {
-        return res.status(401).json({ message: 'Current password is incorrect' });
-      }
-
-      // Run15 BUG-029: "changing" to the identical password is always a user
-      // error — reject it explicitly instead of silently succeeding.
-      if (newPassword === currentPassword) {
-        return res.status(400).json({ message: 'New password must be different from your current password' });
-      }
-
-      const pwCheck = validateNewPassword(newPassword);
-      if (!pwCheck.valid) {
-        return res.status(400).json({ message: pwCheck.error || 'Invalid new password' });
-      }
-
-      const hashed = await hashPassword(newPassword);
-      await userRepo.upsertUser({ id: user.id, email: user.email, password: hashed, role: user.role });
-
-      // Invalidate every OTHER session for this user; keep the current one so the caller stays signed in.
-      // Session userId lives at sess->'passport'->'user'->'claims'->>'sub'.
-      const currentSid = req.sessionID;
-      const deleted = await db.execute(sql`
-        DELETE FROM sessions
-        WHERE sess->'passport'->'user'->'claims'->>'sub' = ${userId}
-          AND sid <> ${currentSid}
-      `);
-
-      return res.status(200).json({
-        message: 'Password changed successfully',
-        otherSessionsInvalidated: (deleted as any).rowCount ?? null,
-      });
-    } catch (error) {
-      console.error('[/api/user/change-password] Error:', error);
-      return res.status(500).json({ message: 'Failed to change password' });
-    }
-  });
+  // (Task #307: the legacy /api/user/change-password endpoint is gone —
+  // passwords and session revocation are managed by Clerk.)
 
   // ---- API key management (session-authed) -------------------------------
   // POST /api/user/api-keys — create a key; the plaintext is returned ONCE.
   app.post('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const { name, scopes, expiresInDays } = req.body ?? {};
 
       if (typeof name !== 'string' || name.trim().length === 0) {
@@ -580,7 +528,7 @@ export function registerUserFeatureRoutes(
   // GET /api/user/api-keys — list the caller's keys (never returns the secret).
   app.get('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const keys = await storage.listApiKeys(userId);
       return res.json({ apiKeys: keys });
     } catch (error) {
@@ -592,7 +540,7 @@ export function registerUserFeatureRoutes(
   // DELETE /api/user/api-keys/:id — revoke one of the caller's keys.
   app.delete('/api/user/api-keys/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const revoked = await storage.revokeApiKey(req.params.id, userId);
       if (!revoked) {
         return res.status(404).json({ message: 'API key not found' });
@@ -608,7 +556,7 @@ export function registerUserFeatureRoutes(
   // Only firstName/lastName; email/password/role have their own guarded flows.
   app.patch('/api/user/profile', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       // Run17 BUG-012: cap at 50; Run21 R4-049: shared displayNameSchema also
       // strips zero-width chars and rejects names with NO visible characters
       // (a ZWSP-only name used to render as an invisible identity).
@@ -658,7 +606,7 @@ export function registerUserFeatureRoutes(
   // users table and action it via the existing guarded delete-user flow.
   app.post('/api/user/deletion-request', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const existing = await userRepo.getUser(userId);
       if (!existing) {
         return res.status(404).json({ message: 'User not found' });
@@ -683,7 +631,7 @@ export function registerUserFeatureRoutes(
   // DELETE /api/user/deletion-request — withdraw a pending deletion request.
   app.delete('/api/user/deletion-request', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const existing = await userRepo.getUser(userId);
       if (!existing) {
         return res.status(404).json({ message: 'User not found' });
@@ -715,7 +663,7 @@ export function registerUserFeatureRoutes(
 
   app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
 
       // Get total resources in catalog
       const totalResourcesResult = await resourceRepo.listResources({ status: 'approved', limit: 1 });
@@ -863,7 +811,7 @@ export function registerUserFeatureRoutes(
   // started onboarding and can be invited without being blocked from browsing.
   app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       const preferences = await userFeatureRepo.getUserPreferences(userId);
       const isCleared =
         preferences?.onboardingStatus === 'not_started' &&
@@ -887,7 +835,7 @@ export function registerUserFeatureRoutes(
   // saves may be partial; a completed profile must satisfy the full contract.
   app.put('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       const parsed = learningPreferencesUpdateSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({
@@ -1020,7 +968,7 @@ export function registerUserFeatureRoutes(
 
   app.delete('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       const rawExpected = req.body?.expectedRevision;
       if (
         rawExpected !== undefined &&
@@ -1072,7 +1020,7 @@ export function registerUserFeatureRoutes(
         });
       }
 
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const { type, status, sort, q, page, limit } = parsed.data;
       const dashboard = await auditRepo.getContributorDashboardData(userId);
       const statusCounts = {
@@ -1151,7 +1099,7 @@ export function registerUserFeatureRoutes(
   // ownership-scoped, but new clients use the paginated safe serializer above.
   app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const dashboard = await auditRepo.getContributorDashboardData(userId);
       const resourceItems = dashboard.items.filter((item) => item.kind === 'resource');
       const editItems = dashboard.items.filter((item) => item.kind === 'edit');
@@ -1200,7 +1148,7 @@ export function registerUserFeatureRoutes(
     forcedKind?: 'resource' | 'edit',
   ) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const contributionId = parseInt(req.params.id);
       const kind = forcedKind ?? req.params.kind;
 
@@ -1294,7 +1242,7 @@ export function registerUserFeatureRoutes(
   // GET /api/user/journeys - Get user's learning journeys with details
   app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       // NB-018 (run23): per-user progress must never come from the browser's
       // HTTP cache — Express's default ETag + no Cache-Control let the browser
       // intermittently serve a stale 200 from disk cache, so progress made in
@@ -1325,7 +1273,7 @@ export function registerUserFeatureRoutes(
   // GET /api/user/continue-learning - One bounded, user-scoped resume summary.
   app.get('/api/user/continue-learning', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       res.set('Cache-Control', 'no-store');
 
       const [progressRows, recentViews, preferences, candidates] = await Promise.all([

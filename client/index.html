@@ -168,14 +168,9 @@
             p.catch(function () {});
           }
         } catch (e) {}
-        // Task 169: same trick for the auth check — /api/auth/user used to
-        // wait for bundle-parse + React mount before firing, and header
-        // state waited on it. useAuth() consumes this promise (one shot).
-        try {
-          var a = fetch('/api/auth/user', { credentials: 'include' });
-          window.__authUserEarlyFetch = a;
-          a.catch(function () {});
-        } catch (e) {}
+        // Task #307: the Task-169 auth early-fetch was removed — the Clerk
+        // SDK must initialize before auth state is meaningful, so a pre-boot
+        // /api/auth/user snapshot could only go stale.
       })();
     </script>
 

@@ -23,16 +23,21 @@ import {
   contracts,
 } from "../../server/contracts";
 
+// Task #307 (Clerk migration): the legacy auth surface (local login, register,
+// forgot/reset password, logout, replit-probe, oidc-analytics-consent,
+// change-password, /api/login, /api/callback) was removed and
+// /api/auth/logout-all was reintroduced Clerk-backed. Route registration no
+// longer branches on REPL_ID, so both environments share one baseline.
 const BASELINES = {
   replit: {
-    apiCount: 183,
-    apiHash: "83275383dbc4af8a188d365b3f9354fc806eadd4eeafbca75cfe48156a68cf59",
+    apiCount: 173,
+    apiHash: "6706ef9e7c1ae891049de051a014ff8ebd8ab63d08ad9c910f99a6be6cdfa766",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
   portable: {
-    apiCount: 180,
-    apiHash: "f1854969be4bf5007f5588fe8f32bdbfa3f81b16b41c13cb17f388007615a78a",
+    apiCount: 173,
+    apiHash: "6706ef9e7c1ae891049de051a014ff8ebd8ab63d08ad9c910f99a6be6cdfa766",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },

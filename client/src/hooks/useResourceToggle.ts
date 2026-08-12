@@ -99,7 +99,7 @@ function useResourceToggle(
 
   const goSignIn = () =>
     setLocation(
-      `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+      `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname + window.location.search)}`,
     );
 
   const mutation = useMutation({

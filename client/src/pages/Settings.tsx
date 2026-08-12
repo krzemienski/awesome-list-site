@@ -384,7 +384,7 @@ export default function Settings() {
                 are available once you sign in.
               </p>
               <Button asChild size="sm" data-testid="button-settings-signin">
-                <Link href="/login?next=%2Fsettings">Sign in</Link>
+                <Link href="/sign-in?redirect_url=%2Fsettings">Sign in</Link>
               </Button>
             </div>
           </div>

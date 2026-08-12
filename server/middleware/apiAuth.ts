@@ -89,7 +89,7 @@ export const requireApiKey: RequestHandler = async (req, res, next) => {
     }
 
     // Attach user and API key metadata to request
-    req.user = user as any;
+    req.dbUser = user;
     (req as any).apiKey = {
       id: apiKey.id,
       name: apiKey.name,

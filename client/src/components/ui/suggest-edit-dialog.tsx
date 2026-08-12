@@ -421,7 +421,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
                     const next = encodeURIComponent(
                       window.location.pathname + window.location.search,
                     );
-                    window.location.href = `/login?next=${next}`;
+                    window.location.href = `/sign-in?redirect_url=${next}`;
                   }}
                   data-testid="button-login-redirect"
                 >

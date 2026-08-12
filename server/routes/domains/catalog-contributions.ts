@@ -339,8 +339,8 @@ export function registerCatalogContributionsRoutes(
         // (The admin UI uses /api/resources/pending, which already requires
         // admin; this path only ever served anonymous probes.)
         if (requestedStatus !== 'approved') {
-          const requesterId = (req as any).user?.claims?.sub;
-          const requester = requesterId ? await userRepo.getUser(requesterId) : undefined;
+          // Clerk migration: req.dbUser IS the resolved user row.
+          const requester = req.dbUser;
           if (!requester || requester.role !== 'admin') {
             return res.status(403).json({ error: 'forbidden', message: 'Non-approved listings require admin access' });
           }
@@ -555,7 +555,7 @@ export function registerCatalogContributionsRoutes(
       // leaked. This mirrors og-middleware, which already soft-404s
       // non-approved /resource/:id routes for crawlers.
       if (resource.status !== 'approved') {
-        const userId = req.user?.claims?.sub;
+        const userId = req.dbUser?.id;
         const user = userId ? await userRepo.getUser(userId) : undefined;
         if (!user || user.role !== 'admin') {
           return res.status(404).json({ message: 'Resource not found' });
@@ -589,8 +589,8 @@ export function registerCatalogContributionsRoutes(
       // to non-admins — a populated `similar` list would confirm the hidden
       // id exists and leak its category.
       if (resource.status !== 'approved') {
-        const requesterId = (req as any).user?.claims?.sub;
-        const requester = requesterId ? await userRepo.getUser(requesterId) : undefined;
+        // Clerk migration: req.dbUser IS the resolved user row.
+        const requester = req.dbUser;
         if (!requester || requester.role !== 'admin') {
           return res.json(empty);
         }
@@ -625,7 +625,7 @@ export function registerCatalogContributionsRoutes(
   // shared handler so both inherit the identical auth + validation chain.
   const createResourceHandler = async (req: any, res: any) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
 
       // BUG-008: explicit server-side validation before DB insert
       // BUG-009 (run10): reject raw HTML/script markup in text fields. React
@@ -791,7 +791,7 @@ export function registerCatalogContributionsRoutes(
   app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       
       // BUG-010: NaN guard → 400
       if (isNaN(id)) {
@@ -826,7 +826,7 @@ export function registerCatalogContributionsRoutes(
   app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       
       // BUG-010: NaN guard → 400
       if (isNaN(id)) {
@@ -853,7 +853,7 @@ export function registerCatalogContributionsRoutes(
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
   app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const resourceId = parseInt(req.params.id);
       const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
       

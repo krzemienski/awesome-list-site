@@ -54,10 +54,10 @@ export default function AdminGuard({ children }: AdminGuardProps) {
                 you were signed in a moment ago, your session has expired —
                 sign in again to continue.
               </p>
-              {/* BUG-018 (run25): carry ?next= so re-auth after a mid-session
-                  expiry returns the admin to the page they were on. */}
+              {/* BUG-018 (run25): carry redirect_url so re-auth after a
+                  mid-session expiry returns the admin to the page they were on. */}
               <WLink
-                href={`/login?next=${encodeURIComponent(
+                href={`/sign-in?redirect_url=${encodeURIComponent(
                   typeof window !== "undefined"
                     ? window.location.pathname + window.location.search
                     : "/admin",

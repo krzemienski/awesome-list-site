@@ -155,7 +155,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-[var(--text)] mb-3">
                 You must be signed in as an administrator to view this page.
               </p>
-              <WLink href="/login" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
+              <WLink href="/sign-in" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
                 Sign in to continue →
               </WLink>
             </>
@@ -193,7 +193,7 @@ export default function AdminDashboard() {
                 Your session has expired. Sign in again to continue.
               </p>
               <WLink
-                href={`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`}
+                href={`/sign-in?redirect_url=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                 className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
                 data-testid="link-session-expired-login"
               >

@@ -1,3 +1,5 @@
+- [Clerk auth migration](clerk-auth-migration.md) — users.id = Clerk externalId bridge; JIT provisioning FAILS CLOSED on email collision (auto-bind = account takeover); FAPI proxy is prod-only (dev 404 expected).
+- [Identity sweep by claim token](identity-sweep-claim-token.md) — sweep auth refactors by claim pattern (claims.sub), not receiver name; `request.`/`(req as any).` aliases silently survive `req.user` seds and tsc can't catch them.
 - [Resource count source-of-truth](count-source-of-truth.md) — sidebar counts must come from ONE complete tree; orphan resources fold into nearest valid node or counts desync.
 - [Public resource/journey status gate](resource-status-public-gate.md) — public resources are status "approved" (NOT "published"); journeys are "published". Counting resources by "published" returns 0.
 - [Server-authoritative JSON-LD](jsonld-server-authority.md) — og-middleware emits route JSON-LD; client SEOHead ships none, so the two pipelines never produce conflicting graphs.

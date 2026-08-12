@@ -277,7 +277,7 @@ export function registerExportLinkHealthRoutes(
       await auditRepo.logResourceAudit(
         null,
         'catalog.exported_github',
-        req.user?.claims?.sub,
+        req.dbUser?.id,
         { repositoryUrl, queueId: queueItem.id },
         `Admin started GitHub export to ${repositoryUrl}`
       );
@@ -498,7 +498,7 @@ export function registerExportLinkHealthRoutes(
       await auditRepo.logResourceAudit(
         null,
         'catalog.exported',
-        req.user?.claims?.sub,
+        req.dbUser?.id,
         { rowCount: resources.length, format: 'markdown' },
         `Admin exported ${resources.length} catalog rows as awesome-list markdown`
       );
@@ -575,7 +575,7 @@ export function registerExportLinkHealthRoutes(
       await auditRepo.logResourceAudit(
         null,
         'database.exported',
-        (req as any).user?.claims?.sub,
+        req.dbUser?.id,
         { resources: resources.length, users: usersList.length, format: 'json' },
         `Admin exported full database JSON backup (${resources.length} resources, ${usersList.length} users)`
       );
@@ -949,7 +949,7 @@ export function registerExportLinkHealthRoutes(
       await auditRepo.logResourceAudit(
         null,
         'maintenance_backfill_approved_at',
-        req.user.claims.sub,
+        req.dbUser.id,
         { backfilled },
         `Backfilled approved_at from created_at on ${backfilled} approved resources`
       );
@@ -1003,7 +1003,7 @@ export function registerExportLinkHealthRoutes(
       await auditRepo.logResourceAudit(
         null,
         'maintenance_canonicalize_tags',
-        req.user.claims.sub,
+        req.dbUser.id,
         { variantFamilies, pluralMerges, resourcesUpdated },
         `Canonicalized tags: ${variantFamilies} variant families, ${pluralMerges} plural merges, ${resourcesUpdated} resources rewritten`
       );

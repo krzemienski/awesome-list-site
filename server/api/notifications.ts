@@ -12,12 +12,11 @@ import {
   updateNotificationPreferences,
 } from "../services/digestService";
 
-type AuthedRequest = Parameters<RequestHandler>[0] & {
-  user?: { claims?: { sub?: string } };
-};
+type AuthedRequest = Parameters<RequestHandler>[0];
 
 function userIdOf(request: AuthedRequest): string {
-  return String(request.user?.claims?.sub ?? "");
+  // Clerk migration: identity lives on req.dbUser (resolved by clerkUserContext).
+  return String(request.dbUser?.id ?? "");
 }
 
 function unsubscribePage(success: boolean): string {

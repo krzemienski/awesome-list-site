@@ -67,7 +67,7 @@ export function registerAiJobsRoutes(
   app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const { filter = 'unenriched', batchSize = 10 } = req.body;
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
 
       // Run15 BUG-019 companion: the client guard alone is bypassable —
       // reject out-of-range batch sizes at the API too.
@@ -405,7 +405,7 @@ export function registerAiJobsRoutes(
         return res.status(400).json({ success: false, message: cfgErr.message || 'Invalid agent configuration' });
       }
 
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       const jobId = await researchService.startResearchJob({
         prompt: effectivePrompt,
         categoryFocus: categoryFocus || undefined,

@@ -77,7 +77,7 @@ export default function Recommendations() {
             <CardContent>
               {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
               <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
-                <Link href="/login">
+                <Link href="/sign-in">
                   <LogIn className="mr-2 h-4 w-4" />
                   Login to Get Started
                 </Link>

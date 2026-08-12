@@ -25,9 +25,8 @@ export function redirectToLogin(returnTo?: string) {
   const currentPath = returnTo || window.location.pathname + window.location.search;
   // Store the return path in session storage
   sessionStorage.setItem('authReturnTo', currentPath);
-  // Redirect to the local login page (the /api/login OAuth endpoint only
-  // exists when running on Replit with REPL_ID set).
-  window.location.href = '/login';
+  // Task #307: sign-in is served by the Clerk-backed /sign-in page.
+  window.location.href = `/sign-in?redirect_url=${encodeURIComponent(currentPath)}`;
 }
 
 export function getReturnPath(): string {

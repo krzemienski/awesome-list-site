@@ -1,6 +1,9 @@
-import { useEffect, useState, lazy, Suspense, Component, type ReactNode } from "react";
+import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
+import { publishableKeyFromHost } from "@clerk/react/internal";
+import { dark } from "@clerk/themes";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
@@ -33,10 +36,6 @@ const Subcategory = lazy(() => import("@/pages/Subcategory"));
 const SubSubcategory = lazy(() => import("@/pages/SubSubcategory"));
 const ResourceDetail = lazy(() => import("@/pages/ResourceDetail"));
 const Categories = lazy(() => import("@/pages/Categories"));
-const Login = lazy(() => import("@/pages/Login"));
-const Register = lazy(() => import("@/pages/Register"));
-const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
-const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const About = lazy(() => import("@/pages/About"));
 const Advanced = lazy(() => import("@/pages/Advanced"));
 const Profile = lazy(() => import("@/pages/Profile"));
@@ -304,6 +303,8 @@ import {
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
   /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy)\/?$/,
+  // Task #307: Clerk-hosted auth pages, including OAuth/verification sub-paths.
+  /^\/(sign-in|sign-up)(\/.*)?$/,
   /^\/auth\/(login|register)\/?$/,
   /^\/category\/[^/]+(\/[^/]+)?$/,
   /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
@@ -314,22 +315,133 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/settings\/theme\/?$/,
 ];
 
+// Task #307 — Clerk auth wiring. REQUIRED canonical constants (copy-verbatim
+// per the platform auth integration): resolve the publishable key from the
+// window hostname so the same build serves multiple domains, and pass the
+// proxy URL unconditionally (empty in dev is intentional — no PROD gates).
+const clerkPubKey = publishableKeyFromHost(
+  window.location.hostname,
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+);
+const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Clerk passes full paths to routerPush/routerReplace, but wouter's
+// setLocation prepends the base — strip it to avoid doubling.
+function stripBase(path: string): string {
+  return basePath && path.startsWith(basePath)
+    ? path.slice(basePath.length) || "/"
+    : path;
+}
+
+if (!clerkPubKey) {
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env file");
+}
+
+// Branded appearance: the app is dark-only with a red accent (--accent:
+// #E50914 in the design system) and square corners throughout.
+const clerkAppearance = {
+  theme: dark,
+  options: {
+    logoPlacement: "inside" as const,
+    logoLinkUrl: basePath || "/",
+    logoImageUrl: `${window.location.origin}${basePath}/favicon.svg`,
+  },
+  variables: {
+    colorPrimary: "#E50914",
+    colorBackground: "#0a0a0a",
+    borderRadius: "0px",
+  },
+} as const;
+
+const clerkLocalization = {
+  signIn: {
+    start: {
+      title: "Welcome back",
+      subtitle: "Sign in to continue to Awesome Video",
+    },
+  },
+  signUp: {
+    start: {
+      title: "Create your account",
+      subtitle: "Track journeys, bookmarks, and recommendations",
+    },
+  },
+};
+
+/** Legacy auth URL redirect: maps the old validated ?next= param onto Clerk's
+ * ?redirect_url= so pre-migration links keep returning users to their page. */
+function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
+  const next = new URLSearchParams(window.location.search).get("next");
+  const safeNext = next && /^\/(?![/\\])/.test(next) ? next : null;
+  const suffix = safeNext ? `?redirect_url=${encodeURIComponent(safeNext)}` : "";
+  return <Redirect to={`${to}${suffix}`} replace />;
+}
+
+function SignInPage() {
+  return (
+    <div className="flex justify-center py-10" data-testid="page-sign-in">
+      {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
+      <SEOHead title="Sign In" noindex />
+      <SignIn
+        routing="path"
+        path={`${basePath}/sign-in`}
+        signUpUrl={`${basePath}/sign-up`}
+      />
+    </div>
+  );
+}
+
+function SignUpPage() {
+  return (
+    <div className="flex justify-center py-10" data-testid="page-sign-up">
+      {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
+      <SEOHead title="Create an Account" noindex />
+      <SignUp
+        routing="path"
+        path={`${basePath}/sign-up`}
+        signInUrl={`${basePath}/sign-in`}
+      />
+    </div>
+  );
+}
+
+// Keeps the webview truthful when the signed-in user changes: any Clerk user
+// switch (sign-in, sign-out, account change) clears the query cache so no
+// user-scoped data leaks across identities.
+function ClerkQueryClientCacheInvalidator() {
+  const { addListener } = useClerk();
+  const qc = useQueryClient();
+  const prevUserIdRef = useRef<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    const unsubscribe = addListener(({ user }) => {
+      const userId = user?.id ?? null;
+      if (
+        prevUserIdRef.current !== undefined &&
+        prevUserIdRef.current !== userId
+      ) {
+        qc.clear();
+      }
+      prevUserIdRef.current = userId;
+    });
+    return unsubscribe;
+  }, [addListener, qc]);
+
+  return null;
+}
+
 // SPA-side /logout. Both direct and client-side navigation render this route,
-// which uses the CSRF-protected POST endpoint and confirms invalidation before
-// redirecting. Session mutation is intentionally never performed by a GET.
+// which signs out via Clerk and confirms invalidation before redirecting.
 function Logout() {
+  const { signOut } = useClerk();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    const signOut = async () => {
+    const doSignOut = async () => {
       try {
-        const response = await fetch("/api/auth/logout", {
-          method: "POST",
-          credentials: "include",
-          signal: AbortSignal.timeout(5_000),
-        });
-        if (!response.ok) throw new Error("The sign-out request failed");
+        await signOut();
         const authCheck = await fetch("/api/auth/user", {
           credentials: "include",
           cache: "no-store",
@@ -348,11 +460,11 @@ function Logout() {
         }
       }
     };
-    void signOut();
+    void doSignOut();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [signOut]);
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
@@ -509,20 +621,19 @@ function Router() {
           if (q && q.trim()) return <Redirect to={`/search?q=${encodeURIComponent(q.trim())}`} replace />;
           return <Home nav={nav} navLoading={navLoading} />;
         }} />
-        <Route path="/login" component={Login} />
+        {/* REQUIRED — the /*? optional wildcard is the only wouter syntax that
+            matches both the bare URL and Clerk's OAuth/verification sub-paths. */}
+        <Route path="/sign-in/*?" component={SignInPage} />
+        <Route path="/sign-up/*?" component={SignUpPage} />
         <Route path="/logout" component={Logout} />
-        <Route path="/register" component={Register} />
-        <Route path="/forgot-password" component={ForgotPassword} />
-        <Route path="/reset-password" component={ResetPassword} />
-        <Route path="/auth/login">
-          <Redirect to="/login" replace />
-        </Route>
-        <Route path="/auth/register">
-          <Redirect to="/register" replace />
-        </Route>
-        <Route path="/signup">
-          <Redirect to="/register" replace />
-        </Route>
+        {/* Legacy auth URLs (pre-Clerk) — preserve validated ?next= returns. */}
+        <Route path="/login" component={() => <LegacyAuthRedirect to="/sign-in" />} />
+        <Route path="/register" component={() => <LegacyAuthRedirect to="/sign-up" />} />
+        <Route path="/forgot-password" component={() => <LegacyAuthRedirect to="/sign-in" />} />
+        <Route path="/reset-password" component={() => <LegacyAuthRedirect to="/sign-in" />} />
+        <Route path="/auth/login" component={() => <LegacyAuthRedirect to="/sign-in" />} />
+        <Route path="/auth/register" component={() => <LegacyAuthRedirect to="/sign-up" />} />
+        <Route path="/signup" component={() => <LegacyAuthRedirect to="/sign-up" />} />
         <Route path="/explore">
           <Redirect to="/search" replace />
         </Route>
@@ -617,6 +728,8 @@ function Router() {
 }
 
 function App() {
+  const [, setLocation] = useLocation();
+
   useEffect(() => {
     if (!import.meta.env.VITE_GA_MEASUREMENT_ID) {
       console.warn("Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID");
@@ -674,18 +787,30 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      {/* BUG-020 (run13): analytics consent banner — gtag loads only after
-          an explicit Accept (initGA is consent-gated).
-          BUG-054 (run26): rendered AFTER the router so the layout's
-          "Skip to main content" link is the document's FIRST tab stop
-          (run22 had it first in DOM, which put 3 banner controls ahead of
-          the skip link on every fresh visit). The banner stays fixed at the
-          bottom visually and remains keyboard-reachable after the page
-          content, with Escape still dismissing it for the session. */}
-      <Router />
-      <ConsentBanner />
-    </ThemeProvider>
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      proxyUrl={clerkProxyUrl}
+      appearance={clerkAppearance}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
+      localization={clerkLocalization}
+      routerPush={(to) => setLocation(stripBase(to))}
+      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+    >
+      <ClerkQueryClientCacheInvalidator />
+      <ThemeProvider>
+        {/* BUG-020 (run13): analytics consent banner — gtag loads only after
+            an explicit Accept (initGA is consent-gated).
+            BUG-054 (run26): rendered AFTER the router so the layout's
+            "Skip to main content" link is the document's FIRST tab stop
+            (run22 had it first in DOM, which put 3 banner controls ahead of
+            the skip link on every fresh visit). The banner stays fixed at the
+            bottom visually and remains keyboard-reachable after the page
+            content, with Escape still dismissing it for the session. */}
+        <Router />
+        <ConsentBanner />
+      </ThemeProvider>
+    </ClerkProvider>
   );
 }
 

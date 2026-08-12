@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useClerk } from '@clerk/react';
 import { queryClient, ApiError } from '@/lib/queryClient';
 import { notifyCrossTabSync } from '@/lib/crossTabSync';
 import { safeRemoveItem } from '@/lib/safeStorage';
@@ -31,27 +32,14 @@ function logoutRequestSignal(): AbortSignal {
 }
 
 /**
- * Task 169 (cold-load perf): index.html kicks off the /api/auth/user fetch
- * before the JS bundle is parsed (window.__authUserEarlyFetch). Consume it
- * once here; any failure falls through to a normal fetch with the same
- * error semantics as the default query fetcher (ApiError carrying status).
+ * Task #307 (Clerk migration): sessions are Clerk cookies now, but the app's
+ * identity endpoint stays /api/auth/user — it overlays app-specific columns
+ * (role, deletionRequestedAt, joined display name) that Clerk doesn't own.
+ * The hook's return surface is unchanged; only the sign-out path switched
+ * from POST /api/auth/logout to Clerk's signOut().
  */
 async function fetchAuthUser(): Promise<AuthResponse> {
-  let res: Response | undefined;
-  if (typeof window !== 'undefined') {
-    const early: Promise<Response> | undefined = (window as any).__authUserEarlyFetch;
-    if (early) {
-      (window as any).__authUserEarlyFetch = undefined;
-      try {
-        res = await early;
-      } catch {
-        res = undefined; // network failure on the early attempt — refetch below
-      }
-    }
-  }
-  if (!res) {
-    res = await fetch('/api/auth/user', { credentials: 'include' });
-  }
+  const res = await fetch('/api/auth/user', { credentials: 'include' });
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new ApiError(res.status, text);
@@ -61,6 +49,7 @@ async function fetchAuthUser(): Promise<AuthResponse> {
 
 export function useAuth() {
   const { toast } = useToast();
+  const { signOut } = useClerk();
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const { data, isLoading, error, refetch } = useQuery<AuthResponse>({
     queryKey: ['/api/auth/user'],
@@ -71,13 +60,9 @@ export function useAuth() {
       if (error && typeof error === 'object' && 'status' in error && (error as { status: number }).status === 401) return false;
       return failureCount < 2;
     },
-    // NB-028 (run18): an errored auth query used to restart its full retry
-    // cycle every time an observer remounted. Router's skeleton gate flips
-    // page components in/out of the tree on auth pending<->error transitions,
-    // so retryOnMount:true produced an unbounded remount/refetch storm
-    // (~26 req/45s) with a permanent skeleton. Failed auth checks now stay
-    // failed until the user explicitly retries (refetchAuth) or navigates
-    // with a full reload.
+    // NB-028 (run18): failed auth checks stay failed until the user explicitly
+    // retries (refetchAuth) or navigates with a full reload — retryOnMount
+    // used to produce a remount/refetch storm behind a permanent skeleton.
     retryOnMount: false,
   });
 
@@ -100,26 +85,18 @@ export function useAuth() {
     }
   }, [authedUser?.id]);
 
-  const requestLogout = async (path: string) => {
-      const response = await fetch(path, {
-        method: 'POST',
-        credentials: 'include',
-        signal: logoutRequestSignal(),
-      });
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.message || 'Sign out failed');
-      }
-      const authCheck = await fetch('/api/auth/user', {
-        credentials: 'include',
-        cache: 'no-store',
-        signal: logoutRequestSignal(),
-      });
-      const authState = authCheck.ok ? await authCheck.json() : null;
-      if (!authCheck.ok || authState?.isAuthenticated !== false) {
-        throw new Error('The server could not confirm that your session ended');
-      }
-      return await response.json();
+  /** Sign out via Clerk, then confirm the server no longer sees a session. */
+  const clerkSignOutAndVerify = async () => {
+    await signOut();
+    const authCheck = await fetch('/api/auth/user', {
+      credentials: 'include',
+      cache: 'no-store',
+      signal: logoutRequestSignal(),
+    });
+    const authState = authCheck.ok ? await authCheck.json() : null;
+    if (!authCheck.ok || authState?.isAuthenticated !== false) {
+      throw new Error('The server could not confirm that your session ended');
+    }
   };
 
   const finishLogout = () => {
@@ -145,18 +122,30 @@ export function useAuth() {
   };
 
   const logoutMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       setLogoutError(null);
-      return requestLogout('/api/auth/logout');
+      await clerkSignOutAndVerify();
     },
     onSuccess: finishLogout,
     onError: handleLogoutError,
   });
 
+  // "Sign out all devices": revoke every Clerk session server-side, then end
+  // the local one. The server call must come first — after revocation the
+  // local session is already dead, signOut() just clears the client state.
   const logoutAllMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       setLogoutError(null);
-      return requestLogout('/api/auth/logout-all');
+      const response = await fetch('/api/auth/logout-all', {
+        method: 'POST',
+        credentials: 'include',
+        signal: logoutRequestSignal(),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message || 'Sign out failed');
+      }
+      await clerkSignOutAndVerify();
     },
     onSuccess: finishLogout,
     onError: handleLogoutError,

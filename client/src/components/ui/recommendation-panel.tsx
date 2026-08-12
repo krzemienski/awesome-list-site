@@ -289,7 +289,7 @@ export default function RecommendationPanel({
                     available to signed-in members.
                   </p>
                   <Button asChild size="sm">
-                    <a href="/login">Sign in</a>
+                    <a href="/sign-in">Sign in</a>
                   </Button>
                 </div>
               ) : loadingPaths ? (

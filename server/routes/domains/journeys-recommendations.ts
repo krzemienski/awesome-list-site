@@ -97,8 +97,8 @@ export function registerJourneyRoutes(
       const stepsMap = await learningJourneyRepo.listJourneyStepsBatch(journeyIds);
       
       // If user is authenticated, batch fetch all progress
-      if (req.user?.claims?.sub) {
-        const userId = req.user.claims.sub;
+      if (req.dbUser?.id) {
+        const userId = req.dbUser.id;
         const allProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
         
         // Create progress map for O(1) lookup
@@ -192,8 +192,8 @@ export function registerJourneyRoutes(
       
       // If user is authenticated, get their progress
       let progress = null;
-      if (req.user?.claims?.sub) {
-        progress = await learningJourneyRepo.getUserJourneyProgress(req.user.claims.sub, id);
+      if (req.dbUser?.id) {
+        progress = await learningJourneyRepo.getUserJourneyProgress(req.dbUser.id, id);
       }
       
       res.json({
@@ -215,7 +215,7 @@ export function registerJourneyRoutes(
   // POST /api/journeys/:id/start - Start journey
   app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const journeyId = parseInt(req.params.id);
       if (isNaN(journeyId)) {
         return res.status(404).json({ message: 'Journey not found' });
@@ -232,7 +232,7 @@ export function registerJourneyRoutes(
   // PUT /api/journeys/:id/progress - Update progress
   app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const journeyId = parseInt(req.params.id);
       if (isNaN(journeyId)) {
         return res.status(404).json({ message: 'Journey not found' });
@@ -289,7 +289,7 @@ export function registerJourneyRoutes(
   // GET /api/journeys/:id/progress - Get user's progress
   app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.dbUser.id;
       const journeyId = parseInt(req.params.id);
       if (isNaN(journeyId)) {
         return res.status(404).json({ message: 'Journey not found' });
@@ -705,7 +705,7 @@ export function registerRecommendationRoutes(
   // POST /api/recommendations - Get personalized recommendations for authenticated users
   app.post("/api/recommendations", isAuthenticated, aiLimiter, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       if (!userId) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
@@ -767,7 +767,7 @@ export function registerRecommendationRoutes(
   // Require a session and derive the identity from it; body userId is ignored.
   app.post("/api/recommendations/feedback", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       if (!userId) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
@@ -829,7 +829,7 @@ export function registerRecommendationRoutes(
   // recommendation surface. Identity always comes from the session.
   app.get("/api/recommendations/feedback", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       if (!userId) return res.status(401).json({ message: 'Unauthorized' });
       const rows = await userFeatureRepo.getRecommendationFeedback(userId);
       const states = await Promise.all(rows.map(async (row) => {
@@ -852,7 +852,7 @@ export function registerRecommendationRoutes(
 
   app.put("/api/recommendations/:resourceId/feedback", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       if (!userId) return res.status(401).json({ message: 'Unauthorized' });
       const resourceId = parseIntInRange(req.params.resourceId, { min: 1 });
       if (resourceId === null) {
@@ -890,7 +890,7 @@ export function registerRecommendationRoutes(
   // POST /api/recommendations/:resourceId/feedback - Record thumbs up/down feedback on a recommendation
   app.post("/api/recommendations/:resourceId/feedback", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       if (!userId) {
         // BUG-051 (run14): canonical 401 envelope.
         return res.status(401).json({ message: 'Unauthorized' });
@@ -937,14 +937,14 @@ export function registerRecommendationRoutes(
   // requests (which can trigger paid generation) stay behind the strict
   // aiLimiter.
   app.get("/api/learning-paths/suggested", (req: any, res, next) => {
-    const isAuthed = typeof req.isAuthenticated === "function" && req.isAuthenticated();
+    const isAuthed = Boolean(req.dbUser);
     return (isAuthed ? aiLimiter : suggestedReadLimiter)(req, res, next);
   }, async (req: any, res) => {
     try {
       const rawLimit = parseInt(req.query.limit as string);
       const requestedLimit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
 
-      const isAuthed = typeof req.isAuthenticated === "function" && req.isAuthenticated();
+      const isAuthed = Boolean(req.dbUser);
 
       if (!isAuthed) {
         // Must mirror warmDefaultSuggestedPaths() exactly so this always hits
@@ -995,7 +995,7 @@ export function registerRecommendationRoutes(
 
       // Identity comes from the session, never from the query string.
       const userProfile: AIUserProfile = {
-        userId: req.user?.claims?.sub || 'anonymous',
+        userId: req.dbUser?.id || 'anonymous',
         preferredCategories,
         skillLevel,
         learningGoals,
@@ -1062,7 +1062,7 @@ export function registerRecommendationRoutes(
         return res.status(400).json({ message: 'User profile is required' });
       }
 
-      const sessionUserId = req.user?.claims?.sub;
+      const sessionUserId = req.dbUser?.id;
       const safeProfile = sanitizeBodyProfile(userProfile, sessionUserId);
       const safeCategory = typeof category === 'string' ? category.trim().slice(0, 100) : undefined;
       const safeGoals = Array.isArray(customGoals)
@@ -1089,7 +1089,7 @@ export function registerRecommendationRoutes(
   // straight into the generator with no auth and no limiter).
   app.post("/api/learning-paths", isAuthenticated, aiLimiter, async (req: any, res) => {
     try {
-      const sessionUserId = req.user?.claims?.sub;
+      const sessionUserId = req.dbUser?.id;
       const userProfile = sanitizeBodyProfile(req.body, sessionUserId);
       const rawLimit = parseInt(req.query.limit as string);
       const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
@@ -1112,7 +1112,7 @@ export function registerRecommendationRoutes(
   // the session — the spoofable body `userId` is ignored.
   app.post("/api/interactions", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.dbUser?.id;
       const { resourceId, interactionType } = req.body ?? {};
       const parsedResourceId =
         typeof resourceId === 'number'

@@ -18,15 +18,31 @@ import {
 } from "./ops/operationalTelemetry";
 import { markMigrationsNotRequired } from "./ops/bootState";
 import { operationalRequestContext } from "./ops/requestContext";
+import { clerkMiddleware } from "@clerk/express";
+import { publishableKeyFromHost } from "@clerk/shared/keys";
+import {
+  CLERK_PROXY_PATH,
+  clerkProxyMiddleware,
+  getClerkProxyHost,
+} from "./middlewares/clerkProxyMiddleware";
+import { clerkUserContext } from "./clerkAuth";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Replit terminates TLS at the edge; trust the first proxy hop so req.protocol
+// and secure-cookie handling are correct (previously set inside setupAuth).
+app.set("trust proxy", 1);
+
 // Must run before sessions, rate limits, and routes so any caught transient DB
 // error can still be translated to the same bounded, redacted 503 response.
 app.use(operationalRequestContext);
+
+// Clerk Frontend API proxy (Task #307). Must be mounted before compression and
+// body parsers — it streams raw bytes to Clerk's FAPI in production.
+app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
@@ -266,7 +282,9 @@ app.use((req, res, next) => {
     return res.status(403).json({ message: "Cross-origin request rejected" });
   }
   const origin = req.headers.origin;
-  const hasSessionCookie = /(?:^|;\s*)connect\.sid=/.test(
+  // Clerk's session cookie is `__session` (with optional per-instance
+  // suffixes like `__session_abc123`), replacing the old connect.sid.
+  const hasSessionCookie = /(?:^|;\s*)__session[^=;]*=/.test(
     req.headers.cookie ?? "",
   );
   const requiresOrigin =
@@ -316,6 +334,22 @@ export const REQUEST_BODY_LIMIT = "256kb";
 app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
 app.use(express.urlencoded({ extended: false, limit: REQUEST_BODY_LIMIT }));
 
+// Clerk session verification (Task #307). Resolve the publishable key from the
+// incoming request host so the same server can serve multiple Clerk custom
+// domains; getClerkProxyHost is shared with clerkProxyMiddleware so both
+// halves of the auth setup agree on which hostname is canonical.
+app.use(
+  clerkMiddleware((req) => ({
+    publishableKey: publishableKeyFromHost(
+      getClerkProxyHost(req) ?? "",
+      process.env.CLERK_PUBLISHABLE_KEY,
+    ),
+  })),
+);
+// Attach req.dbUser for signed-in visitors (JIT-provisions first-time Clerk
+// users) — the Clerk-era replacement for Passport's deserializeUser.
+app.use(clerkUserContext);
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -359,10 +393,10 @@ app.use((req, res, next) => {
 
   const server = await registerRoutes(app);
 
-  // Audit 2 BUG-045: this must run AFTER registerRoutes installs the session
-  // store + Passport, but BEFORE Vite/static serves the SPA shell. Cookie-name
-  // presence is not authentication: empty, expired, and tampered connect.sid
-  // cookies all deserialize to an unauthenticated request and redirect.
+  // Audit 2 BUG-045: server-side guard for protected pages, BEFORE Vite/static
+  // serves the SPA shell. Cookie-name presence is not authentication: Clerk's
+  // middleware has already verified the session cryptographically, so empty,
+  // expired, and tampered __session cookies all resolve to no dbUser here.
   app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
     const protectedPatterns = [
@@ -372,11 +406,11 @@ app.use((req, res, next) => {
     ];
     if (
       protectedPatterns.some((pattern) => pattern.test(req.path)) &&
-      !req.isAuthenticated?.()
+      !req.dbUser
     ) {
       return res.redirect(
         302,
-        `/login?next=${encodeURIComponent(req.originalUrl)}`,
+        `/sign-in?redirect_url=${encodeURIComponent(req.originalUrl)}`,
       );
     }
     return next();

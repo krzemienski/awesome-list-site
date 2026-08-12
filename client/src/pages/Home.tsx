@@ -626,7 +626,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
               {/* BUG-049 (run26): Button asChild renders ONE anchor instead of
                   an <a> wrapping a <button> (invalid nesting, double tab stop). */}
               <Button asChild className="w-full sm:w-auto">
-                <Link href="/login">
+                <Link href="/sign-in">
                   <LogIn className="mr-2 h-4 w-4" />
                   Login to Get Started
                 </Link>

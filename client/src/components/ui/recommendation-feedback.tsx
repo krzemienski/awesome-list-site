@@ -123,7 +123,7 @@ function RecommendationFeedback({
             altText="Sign in"
             onClick={() =>
               setLocation(
-                `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+                `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname + window.location.search)}`,
               )
             }
           >

@@ -111,7 +111,7 @@ export function registerOperationsRoutes(
       const stats = claudeService.getStats();
       const deep = req.query.deep === '1' || req.query.deep === 'true';
 
-      const sessionUserId = req.user?.claims?.sub;
+      const sessionUserId = req.dbUser?.id;
       const sessionUser = sessionUserId ? await userRepo.getUser(sessionUserId) : undefined;
       const isAdminUser = !!sessionUser && sessionUser.role === 'admin';
 

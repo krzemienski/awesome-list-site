@@ -58,7 +58,7 @@ export interface RouteMeta {
    * og:url. Two cases use this:
    *   1. Soft-404s (unknown/non-existent route served as the SPA shell) — these
    *      ALSO get HTTP 404 from the middleware because `found` is false.
-   *   2. Valid utility pages with no search value (e.g. /login, /register) —
+   *   2. Valid utility pages with no search value (e.g. /sign-in, /sign-up) —
    *      these stay HTTP 200 because `found` is true; only the index signal is
    *      suppressed. These may still opt in to prerendered body injection
    *      (noindex governs indexing, not readability); soft-404s never receive
@@ -155,13 +155,9 @@ function parseQueryParam(url: string): string {
 async function resolveRoute(url: string): Promise<ResolvedRoute> {
   const cleanPath = url.split("?")[0].replace(/\/+$/, "") || "/";
   // /search is query-driven with an unbounded key space — never cache it
-  // (cache poisoning / unbounded memory). /reset-password and /forgot-password
-  // carry a secret token in the query; never let a token-bearing URL become a
-  // cache key. All are cheap to resolve fresh. Always bypass the cache.
+  // (cache poisoning / unbounded memory). Always bypass the cache.
   if (
     cleanPath === "/search" ||
-    cleanPath === "/reset-password" ||
-    cleanPath === "/forgot-password" ||
     // Shared collections are revocable. Never let the metadata cache keep a
     // just-unpublished or deleted collection reachable for another 60 seconds.
     cleanPath.startsWith("/collection/")
@@ -528,7 +524,10 @@ function homeShellChrome(): string {
       title: submitSeoTitle,
       description: submitSeoDescription,
     },
-    "/login": {
+    // Task #307: /login, /register, /forgot-password, /reset-password now 301
+    // to the Clerk-backed /sign-in and /sign-up pages (see the redirect block
+    // below) — only the new paths carry route metadata.
+    "/sign-in": {
       title: `Sign In — ${SITE_NAME}`,
       description: `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`,
       // Utility auth page: thin, duplicate content with no search value. Mark
@@ -536,23 +535,10 @@ function homeShellChrome(): string {
       // the canonical/og:url); the route still returns HTTP 200 (found: true).
       noindex: true,
     },
-    "/register": {
+    "/sign-up": {
       title: `Create an Account — ${SITE_NAME}`,
       description: `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`,
-      // Utility auth page — noindex for the same reason as /login.
-      noindex: true,
-    },
-    "/forgot-password": {
-      title: `Reset Your Password — ${SITE_NAME}`,
-      description: `Request a password reset link for your ${SITE_NAME} account.`,
-      // Utility auth page — noindex like /login; route still returns HTTP 200.
-      noindex: true,
-    },
-    "/reset-password": {
-      title: `Set a New Password — ${SITE_NAME}`,
-      description: `Choose a new password for your ${SITE_NAME} account.`,
-      // Token-bearing auth page — noindex; the token stays out of the cache key
-      // (resolveRoute bypasses the cache for this path).
+      // Utility auth page — noindex for the same reason as /sign-in.
       noindex: true,
     },
     "/profile": {
@@ -713,7 +699,7 @@ function homeShellChrome(): string {
                 "Share a valuable video development tool, library, article, or course with the community. All submissions are reviewed before being published.",
                 "You can preview the submission form without an account, but you must log in to actually submit a resource.",
               ],
-              links: [{ path: "/login", label: "Sign in to submit a resource" }],
+              links: [{ path: "/sign-in", label: "Sign in to submit a resource" }],
               // BUG-015: real form markup for non-JS crawlers.
               form: {
                 action: "/submit",
@@ -727,7 +713,7 @@ function homeShellChrome(): string {
                 // now get a 405 from the method guard in server/index.ts.
                 readOnly: {
                   notice: "The form below is read-only. Please",
-                  signInHref: "/login?next=%2Fsubmit",
+                  signInHref: "/sign-in?redirect_url=%2Fsubmit",
                   signInLabel: "log in",
                   signInSuffix: " to submit a resource.",
                 },
@@ -777,70 +763,35 @@ function homeShellChrome(): string {
           : {}),
         categories,
       });
-    } else if (path === "/login" || path === "/register" || path === "/reset-password" || path === "/forgot-password") {
+    } else if (path === "/sign-in" || path === "/sign-up") {
       // Noindex utility pages still get a minimal readable body so non-JS
       // crawlers (GPTBot, ClaudeBot, PerplexityBot, Applebot-Extended) see real
       // content instead of an empty SPA shell. noindex governs indexing only —
-      // the pages remain crawlable and readable.
-      // BUG-042 / BUG-044: /reset-password and /forgot-password render zero
-      // inputs at the SPA shell — emit real <form> markup so HTML-grounded
-      // tooling (search bots, accessibility readers, password-manager form
-      // autofill) see the fields. The client hydrates its own interactive
-      // form over this markup.
-      const isLogin = path === "/login";
-      const isRegister = path === "/register";
-      const isForgot = path === "/forgot-password";
-      const isReset = path === "/reset-password";
-      const staticForm = isForgot || isReset ? {
-        action: isReset ? "/api/auth/reset-password" : "/api/auth/forgot-password",
-        heading: isReset ? "Set a new password" : "Request a password reset link",
-        submitLabel: isReset ? "Update password" : "Send reset link",
-        fields: isReset
-          ? [
-              { name: "newPassword", label: "New password", placeholder: "At least 8 characters", required: true },
-              { name: "confirmPassword", label: "Confirm new password", required: true },
-            ]
-          : [
-              { name: "email", label: "Your account email", placeholder: "you@example.com", required: true },
-            ],
-      } : undefined;
+      // the pages remain crawlable and readable. (Task #307: the interactive
+      // form itself is rendered client-side by the auth provider, so no static
+      // <form> markup is emitted — password reset lives inside the sign-in
+      // flow now, not on a separate token-bearing page.)
+      const isSignIn = path === "/sign-in";
       bodyHtml = renderStaticPageContent({
-        heading: isLogin
+        heading: isSignIn
           ? "Sign in to Awesome Video"
-          : isRegister
-            ? "Create an Awesome Video account"
-            : isReset
-              ? "Set a New Password"
-              : "Reset your Awesome Video password",
+          : "Create an Awesome Video account",
         description: m.description,
         paragraphs: [
-          isLogin
-            ? "Welcome back. Sign in to access your bookmarks, submitted resources, and personalized learning journeys."
-            : isRegister
-              ? "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys."
-              : isReset
-                ? "Choose a new password for your Awesome Video account. The reset link from your email should already have the secret token appended; submit both the new password and a confirmation."
-                : "Enter the email tied to your account and we'll send you a one-time password reset link. The link expires in one hour.",
+          isSignIn
+            ? "Welcome back. Sign in to access your bookmarks, submitted resources, and personalized learning journeys. Forgot your password? Use the reset option on the sign-in form."
+            : "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.",
+          "The interactive sign-in form requires JavaScript.",
         ],
-        links: isLogin
+        links: isSignIn
           ? [
-              { path: "/register", label: "Create an account" },
+              { path: "/sign-up", label: "Create an account" },
               { path: "/submit", label: "Submit a resource" },
             ]
-          : isRegister
-            ? [
-                { path: "/login", label: "Sign in" },
-                { path: "/submit", label: "Submit a resource" },
-              ]
-            : isReset
-              ? [
-                  { path: "/login", label: "Back to login" },
-                  { path: "/forgot-password", label: "Request a new reset link" },
-                ]
-              : [
-                  { path: "/login", label: "Back to login" },
-                ],
-        ...(staticForm ? { form: staticForm } : {}),
+          : [
+              { path: "/sign-in", label: "Sign in" },
+              { path: "/submit", label: "Submit a resource" },
+            ],
       });
     } else if (path === "/search") {
       // BUG-002: render real SSR search results for ?q= (still noindex).
@@ -1710,7 +1661,7 @@ export function ogInjectionMiddleware() {
     }
     // R5-042: submissions moved into the profile — keep the legacy URL alive.
     // The auth gate in server/index.ts then 302s anonymous visitors to
-    // /login?next=… exactly like a direct /profile visit.
+    // /sign-in?redirect_url=… exactly like a direct /profile visit.
     if (urlPath === "/submissions") {
       return res.redirect(301, "/profile?tab=submissions");
     }
@@ -1724,17 +1675,31 @@ export function ogInjectionMiddleware() {
       // /account was never a route; canonical is the profile page (BUG-016).
       return res.redirect(301, "/profile");
     }
+    // Task #307: the legacy auth pages 301 to the Clerk-backed routes. A
+    // validated relative ?next= return path is carried over as Clerk's
+    // ?redirect_url= so old links keep returning users to their page.
+    const legacyAuthTarget = (to: "/sign-in" | "/sign-up") => {
+      const next = new URL(req.originalUrl, "http://x").searchParams.get("next");
+      const safeNext = next && /^\/(?![/\\])/.test(next) ? next : null;
+      return safeNext ? `${to}?redirect_url=${encodeURIComponent(safeNext)}` : to;
+    };
+    if (urlPath === "/login" || urlPath === "/forgot-password" || urlPath === "/reset-password") {
+      return res.redirect(301, legacyAuthTarget("/sign-in"));
+    }
+    if (urlPath === "/register") {
+      return res.redirect(301, legacyAuthTarget("/sign-up"));
+    }
     // BUG-009: /auth/* aliases were never routes — 301 to the canonical pages.
     if (urlPath === "/auth/register") {
-      return res.redirect(301, "/register");
+      return res.redirect(301, "/sign-up");
     }
     if (urlPath === "/auth/login") {
-      return res.redirect(301, "/login");
+      return res.redirect(301, "/sign-in");
     }
     // Run3 audit R3-08/R3-09: more circulating URL shapes that were never
     // routes — 301 them to their canonical pages instead of soft-404ing.
     if (urlPath === "/signup") {
-      return res.redirect(301, "/register");
+      return res.redirect(301, "/sign-up");
     }
     if (urlPath === "/explore") {
       return res.redirect(301, "/search");
@@ -1916,7 +1881,7 @@ export function ogInjectionMiddleware() {
           // Task #80: inject prerendered semantic content into the SPA shell for
           // found routes so non-JS crawlers (GPTBot, ClaudeBot, Googlebot's
           // pre-render) see real headings, summaries, and internal links.
-          // Noindex utility routes (/login, /register) are included on purpose:
+          // Noindex utility routes (/sign-in, /sign-up) are included on purpose:
           // noindex governs indexing, not readability, and bodyHtml is only ever
           // assigned to routes that deliberately opt in. main.tsx calls
           // createRoot().render() on boot, which REPLACES this content — we
