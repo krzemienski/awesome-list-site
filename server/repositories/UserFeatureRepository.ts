@@ -366,6 +366,57 @@ export class UserFeatureRepository {
   }
 
   /**
+   * Return one recent-view row per resource. MAX(timestamp) deduplicates page
+   * reloads and repeated opens at the database boundary, while the stable
+   * resource-id tiebreaker keeps cards from reordering unpredictably.
+   */
+  async getRecentResourceViews(
+    userId: string,
+    limit = 8,
+  ): Promise<Array<{
+    resourceId: number;
+    viewedAt: Date;
+    resource: {
+      id: number;
+      title: string;
+      category: string;
+      status: string | null;
+    } | null;
+  }>> {
+    const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 20);
+    const viewedAt = sql<Date>`max(${userInteractions.timestamp})`.as("viewed_at");
+    const rows = await db
+      .select({
+        resourceId: userInteractions.resourceId,
+        viewedAt,
+        resource: {
+          id: resources.id,
+          title: resources.title,
+          category: resources.category,
+          status: resources.status,
+        },
+      })
+      .from(userInteractions)
+      .leftJoin(resources, eq(userInteractions.resourceId, resources.id))
+      .where(
+        and(
+          eq(userInteractions.userId, userId),
+          eq(userInteractions.interactionType, "view"),
+        ),
+      )
+      .groupBy(userInteractions.resourceId, resources.id)
+      .orderBy(desc(viewedAt), desc(userInteractions.resourceId))
+      .limit(safeLimit);
+
+    return rows.map((row) => ({
+      ...row,
+      viewedAt: new Date(row.viewedAt),
+      resource:
+        row.resource && row.resource.id != null ? row.resource : null,
+    }));
+  }
+
+  /**
    * Record a user interaction with a resource
    * @param userId - User ID
    * @param resourceId - Resource ID

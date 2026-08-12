@@ -48,6 +48,8 @@ const PublicCollection = lazy(() => import("@/pages/PublicCollection"));
 const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
 const Journeys = lazy(() => import("@/pages/Journeys"));
 const JourneyDetail = lazy(() => import("@/pages/JourneyDetail"));
+
+const ContinueLearning = lazy(() => import("@/pages/ContinueLearning"));
 const ThemeSettings = lazy(() => import("@/pages/ThemeSettings"));
 const Recommendations = lazy(() => import("@/pages/Recommendations"));
 const Search = lazy(() => import("@/pages/Search"));
@@ -280,7 +282,7 @@ import {
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|profile|bookmarks|favorites|account|admin|settings|resource|terms|privacy)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|bookmarks|favorites|account|admin|settings|resource|terms|privacy)\/?$/,
   /^\/auth\/(login|register)\/?$/,
   /^\/category\/[^/]+(\/[^/]+)?$/,
   /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
@@ -522,6 +524,7 @@ function Router() {
         <Route path="/submit" component={SubmitResource} />
         <Route path="/journeys" component={Journeys} />
         <Route path="/journey/:id" component={JourneyDetail} />
+        <Route path="/continue-learning" component={ContinueLearning} />
         <Route path="/journey">
           <Redirect to="/journeys" replace />
         </Route>

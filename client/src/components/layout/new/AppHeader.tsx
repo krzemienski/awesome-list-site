@@ -87,6 +87,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     journeys: "Learning Journeys",
     journey: "Journey",
     collection: "Shared collection",
+    "continue-learning": "Continue Learning",
     login: "Sign in",
     settings: "Settings",
   };

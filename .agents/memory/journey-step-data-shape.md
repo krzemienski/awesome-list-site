@@ -20,10 +20,13 @@ and triplicated step titles.
 
 **Rule 2 — completion:** the backend
 (`LearningJourneyRepository.updateUserJourneyProgress`) sets `completedAt` only
-when **every non-optional row id** is in `completedSteps`. Therefore completing
-a logical step in the UI must mark **all** of that step's underlying row ids,
-not just one — otherwise an authenticated journey can reach "100%" in the UI but
-never finalize server-side.
+when each logical group is complete. A mixed group is complete when every
+non-optional row id is in `completedSteps`; an all-optional group falls back to
+requiring every row so it cannot become vacuously complete. Therefore completing
+a logical step in the UI must mark **all** of that step's underlying row ids, not
+just one — otherwise an authenticated journey can reach "100%" in the UI but
+never finalize server-side. Keep this rule shared across write-time
+`completedAt`, summary percentages/Resume, and Journey Detail card state.
 
 **Rule 3 — hydration:** the journey detail UI reads `step.resource` (id/title/
 url/description) to render real clickable resource links. The API only carries

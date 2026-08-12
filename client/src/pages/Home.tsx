@@ -18,6 +18,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
+import ContinueLearningPreview from "@/components/learning/ContinueLearningPreview";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
@@ -351,6 +352,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
             : `Explore ${filteredCategories.length} categories with ${totalResourceCount.toLocaleString()} curated resources.`}
         </p>
       </div>
+
+      {isAuthenticated ? <ContinueLearningPreview /> : null}
 
       {/* BUG-064 (run27): honest feedback when the link carried a tag param
           that parsed to nothing (?tags=+++ / ?tags=) — previously the page

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
 import SEOHead from "@/components/layout/SEOHead";
+import { isLogicalJourneyStepComplete } from "@shared/journeyProgress";
 
 interface JourneyStep {
   id: number;
@@ -84,6 +85,21 @@ export default function JourneyDetail() {
     },
   });
 
+  // Resume links target a logical stepNumber (not an underlying row id). The
+  // element mounts after the journey query resolves, so perform the hash scroll
+  // and keyboard focus here rather than relying on the browser's initial-load
+  // anchor pass.
+  useEffect(() => {
+    if (!journey || !window.location.hash.startsWith("#step-")) return;
+    const target = document.getElementById(window.location.hash.slice(1));
+    if (!target) return;
+    const frame = requestAnimationFrame(() => {
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+      target.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [journey?.id, journey?.steps?.length]);
+
   // Start journey mutation
   const startJourneyMutation = useMutation({
     mutationFn: async () => {
@@ -97,6 +113,7 @@ export default function JourneyDetail() {
       // NB-018 (run23): Profile's "My Journeys" card reads /api/user/journeys —
       // invalidate it too or it shows stale enrollment/progress until reload.
       queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
       toast({
         title: "Journey Started!",
         description: "You've successfully enrolled in this learning journey.",
@@ -197,6 +214,7 @@ export default function JourneyDetail() {
       queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
       // NB-018 (run23): keep Profile's journeys card in sync with progress.
       queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
     },
   });
 
@@ -304,22 +322,28 @@ export default function JourneyDetail() {
       description: string;
       isOptional: boolean;
       rowIds: number[];
+      rows: Array<{ id: number; stepNumber: number; isOptional: boolean }>;
       resources: NonNullable<JourneyStep["resource"]>[];
     }>();
     for (const s of journey?.steps || []) {
       let g = map.get(s.stepNumber);
       if (!g) {
-        g = { stepNumber: s.stepNumber, title: s.title, description: s.description, isOptional: s.isOptional, rowIds: [], resources: [] };
+        g = { stepNumber: s.stepNumber, title: s.title, description: s.description, isOptional: true, rowIds: [], rows: [], resources: [] };
         map.set(s.stepNumber, g);
       }
       g.rowIds.push(s.id);
+      g.rows.push({ id: s.id, stepNumber: s.stepNumber, isOptional: s.isOptional });
+      g.isOptional = g.isOptional && s.isOptional;
       if (s.resource) g.resources.push(s.resource);
     }
     return Array.from(map.values()).sort((a, b) => a.stepNumber - b.stepNumber);
   })();
 
   const totalSteps = logicalSteps.length;
-  const completedCount = logicalSteps.filter((g) => g.rowIds.some((rid) => completedSteps.includes(rid))).length;
+  const completedRowIds = new Set(completedSteps);
+  const completedCount = logicalSteps.filter((g) =>
+    isLogicalJourneyStepComplete(g.rows, completedRowIds),
+  ).length;
   const progressPercent = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
   const isCompleted = !!journey?.progress?.completedAt;
 
@@ -461,14 +485,19 @@ export default function JourneyDetail() {
         
         {logicalSteps.length > 0 ? (
           logicalSteps.map((step, index: number) => {
-              const isStepCompleted = step.rowIds.some((rid) => completedSteps.includes(rid));
+              const isStepCompleted = isLogicalJourneyStepComplete(
+                step.rows,
+                completedRowIds,
+              );
               const isCurrentStep = step.rowIds.includes(journey?.progress?.currentStepId ?? -1);
 
               return (
                 <Card 
                   key={step.stepNumber}
+                  id={`step-${step.stepNumber}`}
+                  tabIndex={-1}
                   className={cn(
-                    "transition-all",
+                    "scroll-mt-24 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
                     isStepCompleted && "border-green-500/30 bg-green-500/5",
                     isCurrentStep && !isStepCompleted && "border-primary/50 shadow-lg"
                   )}

@@ -31,6 +31,7 @@ import {
   type InsertJourneyStep,
   type UserJourneyProgress,
 } from "@shared/schema";
+import { areAllLogicalJourneyStepsComplete } from "@shared/journeyProgress";
 import { db } from "../db";
 import { eq, and, asc, desc, inArray } from "drizzle-orm";
 
@@ -38,6 +39,51 @@ import { eq, and, asc, desc, inArray } from "drizzle-orm";
  * Repository class for learning journey-related database operations
  */
 export class LearningJourneyRepository {
+  /**
+   * Bounded source rows for the Continue Learning dashboard. The LEFT JOIN is
+   * intentional: if legacy/stale progress survives a content change, callers
+   * can render an unavailable-content fallback instead of throwing.
+   */
+  async listContinueLearningProgress(
+    userId: string,
+    limit = 24,
+  ): Promise<Array<{ progress: UserJourneyProgress; journey: LearningJourney | null }>> {
+    const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 50);
+    return db
+      .select({
+        progress: userJourneyProgress,
+        journey: learningJourneys,
+      })
+      .from(userJourneyProgress)
+      .leftJoin(
+        learningJourneys,
+        eq(userJourneyProgress.journeyId, learningJourneys.id),
+      )
+      .where(eq(userJourneyProgress.userId, userId))
+      .orderBy(
+        desc(userJourneyProgress.lastAccessedAt),
+        desc(userJourneyProgress.id),
+      )
+      .limit(safeLimit);
+  }
+
+  /**
+   * Bounded published candidates. Personal scoring happens after this query so
+   * preference values never become dynamic SQL.
+   */
+  async listContinueLearningCandidates(limit = 24): Promise<LearningJourney[]> {
+    const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 50);
+    return db
+      .select()
+      .from(learningJourneys)
+      .where(eq(learningJourneys.status, "published"))
+      .orderBy(
+        asc(learningJourneys.orderIndex),
+        asc(learningJourneys.id),
+      )
+      .limit(safeLimit);
+  }
+
   /**
    * List all published learning journeys
    * @param category - Optional category filter
@@ -407,9 +453,12 @@ export class LearningJourneyRepository {
     }
     const completedSteps = Array.from(completedSet);
 
-    // Check if all steps are completed
-    const allCompleted = allSteps.every(step =>
-      step.isOptional || completedSet.has(step.id)
+    // The same logical-step rule powers writes, summary reads, and the detail
+    // UI: required rows when present, otherwise every row in an all-optional
+    // group. This prevents completedAt from disagreeing with Resume.
+    const allCompleted = areAllLogicalJourneyStepsComplete(
+      allSteps,
+      completedSet,
     );
 
     const [updated] = await db

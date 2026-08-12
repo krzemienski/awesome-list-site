@@ -338,15 +338,16 @@ export default function ResourceDetail() {
       interactionValue?: number;
       metadata?: any;
     }) => {
-      const response = await fetch("/api/interactions", {
+      return apiRequest("/api/interactions", {
         method: "POST",
         body: JSON.stringify({
           userId: user?.id,
           ...interaction
         }),
-        headers: { "Content-Type": "application/json" }
       });
-      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/continue-learning"] });
     },
   });
 

@@ -570,6 +570,12 @@ function homeShellChrome(): string {
       // still returns HTTP 200 (found: true).
       noindex: true,
     },
+    "/continue-learning": {
+      title: `Continue Learning — ${SITE_NAME}`,
+      description: `Resume journeys, revisit resources, and see learning milestones on ${SITE_NAME}.`,
+      // Personalized, auth-gated progress summary — noindex like /profile.
+      noindex: true,
+    },
     "/bookmarks": {
       title: `Bookmarks — ${SITE_NAME}`,
       description: `Your saved video development resources on ${SITE_NAME}.`,

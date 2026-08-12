@@ -107,6 +107,11 @@ import {
   personalTagsSchema,
 } from "@shared/bookmarkCollections";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
+import type {
+  ContinueLearningJourney,
+  ContinueLearningSummary,
+} from "@shared/continueLearning";
+import { summarizeLogicalJourneySteps } from "@shared/journeyProgress";
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { swaggerSpec } from "./openapi";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
@@ -2992,32 +2997,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // BUG-063 (run25) / Run17 BUG-003: journey_steps stores up to 3 ROWS per
-  // logical stepNumber, and completedSteps stores row ids. Every surface that
-  // reports journey progress must count LOGICAL steps the same way — a
-  // logical step is complete when every non-optional row of its stepNumber is
-  // completed (falling back to all rows when every row is optional). This is
-  // the single shared implementation for /api/journeys and /api/user/progress
-  // so profile stats can never disagree with the journeys UI again.
+  // journey_steps stores multiple rows per logical stepNumber. The imported
+  // helper is shared with write-time completion and Journey Detail so grouped
+  // progress cannot drift across surfaces.
   function countLogicalJourneySteps(
     steps: Array<{ id: number; stepNumber: number | string; isOptional?: boolean | null }>,
     completedRowIds: Set<number>,
   ): { totalSteps: number; completedSteps: number } {
-    const rowsByStepNumber = new Map<number, { id: number; isOptional: boolean }[]>();
-    for (const s of steps) {
-      const n = typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10);
-      if (isNaN(n)) continue;
-      const rows = rowsByStepNumber.get(n) ?? [];
-      rows.push({ id: s.id, isOptional: !!s.isOptional });
-      rowsByStepNumber.set(n, rows);
-    }
-    let completed = 0;
-    rowsByStepNumber.forEach((rows) => {
-      const required = rows.filter(r => !r.isOptional);
-      const consider = required.length > 0 ? required : rows;
-      if (consider.every(r => completedRowIds.has(r.id))) completed++;
-    });
-    return { totalSteps: rowsByStepNumber.size, completedSteps: completed };
+    const { totalSteps, completedSteps } = summarizeLogicalJourneySteps(
+      steps,
+      completedRowIds,
+    );
+    return { totalSteps, completedSteps };
   }
 
   app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
@@ -3255,6 +3246,176 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching user journeys:', error);
       res.status(500).json({ message: 'Failed to fetch user journeys' });
+    }
+  });
+
+  // GET /api/user/continue-learning - One bounded, user-scoped resume summary.
+  app.get('/api/user/continue-learning', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      res.set('Cache-Control', 'no-store');
+
+      const [progressRows, recentViews, preferences, candidates] = await Promise.all([
+        learningJourneyRepo.listContinueLearningProgress(userId, 24),
+        userFeatureRepo.getRecentResourceViews(userId, 8),
+        userFeatureRepo.getUserPreferences(userId),
+        learningJourneyRepo.listContinueLearningCandidates(24),
+      ]);
+
+      const stepsByJourney = await learningJourneyRepo.listJourneyStepsBatch(
+        progressRows.map(({ progress }) => progress.journeyId),
+      );
+
+      const summarized: ContinueLearningJourney[] = progressRows.map(
+        ({ progress, journey }) => {
+          const completedRowIds = new Set(
+            (progress.completedSteps ?? []).map(Number),
+          );
+          const logical = summarizeLogicalJourneySteps(
+            stepsByJourney.get(progress.journeyId) ?? [],
+            completedRowIds,
+          );
+          const isAvailable = journey?.status === 'published';
+          const progressPercent = progress.completedAt
+            ? 100
+            : logical.totalSteps > 0
+              ? Math.min(
+                  100,
+                  Math.round(
+                    (logical.completedSteps / logical.totalSteps) * 100,
+                  ),
+                )
+              : 0;
+          const nextHref =
+            isAvailable && logical.nextStep
+              ? `/journey/${progress.journeyId}#step-${logical.nextStep.stepNumber}`
+              : isAvailable
+                ? `/journey/${progress.journeyId}`
+                : '/journeys';
+
+          return {
+            progressId: progress.id,
+            journeyId: progress.journeyId,
+            title: journey?.title || 'Unavailable learning journey',
+            description:
+              journey?.description ||
+              'This journey is no longer available. Browse current journeys to keep learning.',
+            category: journey?.category || 'Learning',
+            difficulty: journey?.difficulty || 'unknown',
+            estimatedDuration: journey?.estimatedDuration ?? null,
+            isAvailable,
+            totalSteps: logical.totalSteps,
+            completedSteps: logical.completedSteps,
+            progressPercent,
+            startedAt: (progress.startedAt ?? new Date(0)).toISOString(),
+            lastAccessedAt: (progress.lastAccessedAt ?? progress.startedAt ?? new Date(0)).toISOString(),
+            completedAt: progress.completedAt?.toISOString() ?? null,
+            href: isAvailable ? `/journey/${progress.journeyId}` : '/journeys',
+            nextStep:
+              isAvailable && logical.nextStep
+                ? {
+                    ...logical.nextStep,
+                    href: nextHref,
+                  }
+                : null,
+          };
+        },
+      );
+
+      const activeJourneys = summarized.filter((item) => !item.completedAt);
+      const completedMilestones = summarized
+        .filter((item) => !!item.completedAt)
+        .sort((a, b) => {
+          const byCompleted =
+            new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime();
+          return byCompleted || b.progressId - a.progressId;
+        });
+
+      const preferredCategories = (preferences?.preferredCategories ?? [])
+        .filter((value): value is string => typeof value === 'string' && !!value.trim())
+        .slice(0, 6);
+      const learningGoals = (preferences?.learningGoals ?? [])
+        .filter((value): value is string => typeof value === 'string' && !!value.trim())
+        .slice(0, 6);
+      const preferredCategorySet = new Set(
+        preferredCategories.map((value) => value.trim().toLowerCase()),
+      );
+      const goalTerms = learningGoals.map((value) => value.trim().toLowerCase());
+      const startedJourneyIds = new Set(
+        progressRows.map(({ progress }) => progress.journeyId),
+      );
+
+      const suggestedJourneys = candidates
+        .filter((journey) => !startedJourneyIds.has(journey.id))
+        .map((journey) => {
+          const categoryMatch = preferredCategorySet.has(
+            journey.category.trim().toLowerCase(),
+          );
+          const skillMatch =
+            !!preferences?.skillLevel &&
+            journey.difficulty === preferences.skillLevel;
+          const searchable =
+            `${journey.title} ${journey.description} ${journey.category}`.toLowerCase();
+          const goalMatchCount = goalTerms.filter((term) => searchable.includes(term)).length;
+          const score =
+            (categoryMatch ? 4 : 0) +
+            (skillMatch ? 2 : 0) +
+            Math.min(goalMatchCount, 2);
+          const reason = categoryMatch
+            ? `Matches your ${journey.category} interest`
+            : goalMatchCount > 0
+              ? 'Matches one of your learning goals'
+              : skillMatch
+                ? `Fits your ${preferences!.skillLevel} level`
+                : 'A useful next learning journey';
+          return { journey, score, reason };
+        })
+        .sort((a, b) => {
+          return (
+            b.score - a.score ||
+            (a.journey.orderIndex ?? Number.MAX_SAFE_INTEGER) -
+              (b.journey.orderIndex ?? Number.MAX_SAFE_INTEGER) ||
+            a.journey.id - b.journey.id
+          );
+        })
+        .slice(0, 3)
+        .map(({ journey, reason }) => ({
+          journeyId: journey.id,
+          title: journey.title,
+          description: journey.description,
+          category: journey.category,
+          difficulty: journey.difficulty || 'beginner',
+          estimatedDuration: journey.estimatedDuration ?? null,
+          reason,
+          href: `/journey/${journey.id}`,
+        }));
+
+      const summary: ContinueLearningSummary = {
+        activeJourneys,
+        recentResources: recentViews.map((view) => {
+          const isAvailable = view.resource?.status === 'approved';
+          return {
+            resourceId: view.resourceId,
+            title: view.resource?.title || 'Unavailable resource',
+            category: view.resource?.category || 'Resource',
+            viewedAt: view.viewedAt.toISOString(),
+            isAvailable,
+            href: isAvailable ? `/resource/${view.resourceId}` : '/search',
+          };
+        }),
+        completedMilestones,
+        suggestedJourneys,
+        emptyState: {
+          skillLevel: preferences?.skillLevel ?? null,
+          preferredCategories,
+          learningGoals,
+        },
+      };
+
+      return res.json(summary);
+    } catch (error) {
+      console.error('Error fetching Continue Learning summary:', error);
+      return res.status(500).json({ message: 'Failed to load your learning summary' });
     }
   });
 
@@ -7185,15 +7346,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.claims?.sub;
       const { resourceId, interactionType } = req.body ?? {};
-      if (typeof interactionType !== "string" || !interactionType.trim()) {
-        return res.status(400).json({ error: "interactionType is required" });
+      const parsedResourceId =
+        typeof resourceId === 'number'
+          ? resourceId
+          : typeof resourceId === 'string' && /^\d+$/.test(resourceId)
+            ? Number(resourceId)
+            : NaN;
+      if (
+        !Number.isInteger(parsedResourceId) ||
+        parsedResourceId < 1 ||
+        parsedResourceId > PG_INT_MAX
+      ) {
+        return res.status(400).json({ error: "A valid resourceId is required" });
+      }
+      const allowedTypes = new Set([
+        'view',
+        'click',
+        'bookmark',
+        'rate',
+        'complete',
+        'dismiss',
+        'start_path',
+      ]);
+      if (
+        typeof interactionType !== "string" ||
+        !allowedTypes.has(interactionType)
+      ) {
+        return res.status(400).json({ error: "Unsupported interactionType" });
+      }
+      const resource = await resourceRepo.getResource(parsedResourceId);
+      if (!resource || resource.status !== 'approved') {
+        return res.status(404).json({ error: "Resource not found" });
       }
 
-      // Store interaction data (in a real app, this would go to database)
-      // For now, we'll just acknowledge the interaction
-      console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
+      const interaction = await userFeatureRepo.trackUserInteraction(
+        userId,
+        parsedResourceId,
+        interactionType,
+        typeof req.body?.interactionValue === 'number'
+          ? req.body.interactionValue
+          : null,
+        req.body?.metadata &&
+          typeof req.body.metadata === 'object' &&
+          !Array.isArray(req.body.metadata)
+          ? req.body.metadata
+          : {},
+      );
 
-      res.json({ status: "recorded" });
+      res.status(201).json({
+        status: "recorded",
+        id: interaction.id,
+        timestamp: interaction.timestamp,
+      });
     } catch (error) {
       console.error('Error recording interaction:', error);
       res.status(500).json({ message: 'Failed to record interaction' });

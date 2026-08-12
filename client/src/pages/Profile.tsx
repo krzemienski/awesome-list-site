@@ -59,6 +59,7 @@ import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
 import RecommendationCard from "@/components/ai/RecommendationCard";
 import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
+import ContinueLearningPreview from "@/components/learning/ContinueLearningPreview";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { useLocation, Link } from "wouter";
@@ -644,82 +645,9 @@ export default function Profile({ user }: ProfileProps) {
             </CardContent>
           </Card>
 
-          {/* Learning Journeys */}
-          <Card data-testid="card-learning-journeys">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Learning Journeys
-              </CardTitle>
-              <CardDescription>
-                Your enrolled learning paths and progress
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {journeysLoading ? (
-                <div className="space-y-3" aria-busy={true} aria-live="polite">
-                  <Skeleton className="h-20 w-full" />
-                  <Skeleton className="h-20 w-full" />
-                </div>
-              ) : userJourneys && userJourneys.length > 0 ? (
-                <div className="space-y-3">
-                  {userJourneys.map((userJourney) => (
-                    <div
-                      key={userJourney.id}
-                      className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                      data-testid={`journey-${userJourney.journeyId}`}
-                    >
-                      {/* Run22 BUG-036: stack the badge under the title on
-                          narrow screens — side-by-side it squeezed titles to
-                          ~95px / 3 lines at 320px. Titles stay left-aligned and
-                          clamp at two lines (full text in the title tooltip). */}
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h4
-                            className="font-medium line-clamp-2 break-words"
-                            title={userJourney.journey?.title || 'Learning Journey'}
-                          >
-                            {userJourney.journey?.title || 'Learning Journey'}
-                          </h4>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {userJourney.journey?.description}
-                          </p>
-                        </div>
-                        {userJourney.completedAt && (
-                          <Badge variant="default" className="bg-green-500 self-start flex-shrink-0">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Completed
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground mt-3">
-                        {userJourney.journey?.difficulty && (
-                          <Badge variant="secondary" className="capitalize">
-                            {userJourney.journey.difficulty}
-                          </Badge>
-                        )}
-                        {userJourney.journey?.estimatedDuration && (
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {userJourney.journey.estimatedDuration}
-                          </span>
-                        )}
-                        <span className="ml-auto">
-                          Last accessed {formatDistanceToNow(new Date(userJourney.lastAccessedAt), { addSuffix: true })}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No learning journeys started yet</p>
-                  <p className="text-sm mt-2">Start a learning path to track your progress!</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Compact resume module backed by the same server summary as the
+              dedicated dashboard. It only mounts on this authenticated page. */}
+          <ContinueLearningPreview />
 
           {/* Personalized Recommendations */}
           <Card data-testid="card-recommendations">
