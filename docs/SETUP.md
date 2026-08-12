@@ -104,8 +104,10 @@ npm run db:studio        # open Drizzle Studio (GUI)
 │   └── App.tsx          # Router + providers
 ├── server/              # Express backend
 │   ├── index.ts         # App entry (boot migrations in prod, middleware, listen)
-│   ├── routes.ts        # Route registration (~145 routes)
-│   ├── openapi.ts       # OpenAPI spec → served at /api/docs & /api/openapi.json
+│   ├── routes.ts        # Route composition root (registrar order + dependencies)
+│   ├── routes/          # Domain API registrars + non-API crawler routes
+│   ├── contracts/       # Runtime validation, OpenAPI generation, drift gate
+│   ├── openapi.ts       # Generated spec → /api/docs & /api/openapi.json
 │   ├── storage.ts       # IStorage data-access interface
 │   ├── repositories/    # DB repositories
 │   ├── api/public.ts    # Public API (/api/public/*)

@@ -84,7 +84,11 @@ Registered in `client/src/App.tsx` (Wouter). Admin and most non-browse pages are
 | File | Purpose |
 |------|---------|
 | `index.ts` | Server entry point; runs boot migrations, mounts middleware/routes |
-| `routes.ts` | All API route definitions (~6,600 lines, ~145 routes) |
+| `routes.ts` | Small route composition root; shared repositories, middleware placement, and registrar order |
+| `routes/domains/` | Owned API domain registrars (catalog, auth/user, contributions, journeys, admin, exports/link health, AI/jobs, operations) |
+| `routes/non-api.ts` | Crawler-facing security.txt, sitemap, and OG routes (deliberately outside API routers) |
+| `contracts/` | Named request/response registry, automatic guards, OpenAPI generation, and runtime drift comparison |
+| `openapi.ts` | Builds the live OpenAPI document from registered contracts |
 | `storage.ts` | `IStorage` facade delegating to domain repositories |
 | `repositories/` | Domain data-access layer (see ARCHITECTURE.md) |
 | `config.ts` | Site config derived from env |
@@ -128,6 +132,28 @@ Registered in `client/src/App.tsx` (Wouter). Admin and most non-browse pages are
 | `linkChecker.ts` | URL link checking |
 | `inputs.ts` | Request input validation helpers |
 
+### API Domain Ownership
+
+`server/routes.ts` is the composition root. Registrar order is a compatibility
+contract: notifications precede the API backstop limiter, non-API crawler
+routes stay outside API routers, and operations fallbacks remain last.
+
+| File | Owned surface |
+|------|---------------|
+| `routes/domains/auth-user.ts` | Local/session auth, account identity, password reset |
+| `routes/domains/catalog-contributions.ts` | Public catalog/search, resources, submissions, edit suggestions |
+| `routes/domains/user-features.ts` | Favorites, bookmarks, collections, preferences, account contributions |
+| `routes/domains/journeys-recommendations.ts` | Journeys, progress, recommendations, learning paths, interactions |
+| `routes/domains/admin-content.ts` | Admin users, resources, taxonomy, content moderation |
+| `routes/domains/export-link-health.ts` | GitHub sync, exports, link health, awesome-list discovery |
+| `routes/domains/ai-jobs.ts` | Enrichment and researcher jobs |
+| `routes/domains/operations.ts` | Health, public developer API, docs, 405/404 fallbacks |
+| `routes/non-api.ts` | Sitemap, security.txt, OG image routes |
+
+Every concrete `/api` registration is intercepted by
+`contracts/install.ts`, assigned a stable method/path name, guarded before its
+final handler, observed against named responses, and included in OpenAPI.
+
 ### Parsers
 | File | Purpose |
 |------|---------|
@@ -168,6 +194,7 @@ helpers from past QA runs. The durable, canonical scripts are:
 | `audit-sidebar.sh` | Sidebar audit (`npm run audit:sidebar`) |
 | `test-awesome-lint.ts` | Lint validation testing |
 | `export-openapi-yaml.ts` | Export the OpenAPI spec |
+| `validation/openapi-drift.ts` | Block method/path, contract, OpenAPI, auth, and baseline drift |
 
 ## Configuration Files
 
@@ -182,8 +209,9 @@ helpers from past QA runs. The durable, canonical scripts are:
 
 ## Feature Location Quick Reference
 
-> `server/routes.ts` is large; find endpoints by grepping their path rather than by line
-> number (e.g. search `"/api/resources"`).
+> Find endpoint implementations in `server/routes/domains/` by path. Keep
+> `server/routes.ts` limited to dependency construction and explicit registrar
+> order.
 
 ### Authentication
 - OAuth: `server/replitAuth.ts`
@@ -192,12 +220,12 @@ helpers from past QA runs. The durable, canonical scripts are:
 - Login page: `client/src/pages/Login.tsx`
 
 ### Resource CRUD
-- API: `server/routes.ts` — grep `"/api/resources"`
+- API: `server/routes/domains/catalog-contributions.ts` and `admin-content.ts`
 - Data access: `server/repositories/ResourceRepository.ts` (via `server/storage.ts`)
 - Frontend: `client/src/pages/Category.tsx`, `ResourceDetail.tsx`
 
 ### Admin Panel
-- API: `server/routes.ts` — grep `"/api/admin"`
+- API: `server/routes/domains/admin-content.ts`
 - Frontend: `client/src/pages/AdminDashboard.tsx`
 
 ### Search
@@ -206,27 +234,27 @@ helpers from past QA runs. The durable, canonical scripts are:
 
 ### GitHub Sync
 - Service: `server/github/syncService.ts`
-- API: `server/routes.ts` — grep `"/api/admin"` (import/export/sync)
+- API: `server/routes/domains/export-link-health.ts`
 - Formatter: `server/github/formatter.ts`
 
 ### AI Features
 - Claude: `server/ai/claudeService.ts`
 - Enrichment: `server/ai/enrichmentService.ts`
 - Research agents: `server/ai/researchService.ts`, `agentRuntime.ts`
-- API: `server/routes.ts` — grep `"/api/admin/enrichment"`, `"/api/researcher"`
+- API: `server/routes/domains/ai-jobs.ts`
 
 ### Validation
 - awesome-lint: `server/validation/awesomeLint.ts`
 - Link checker: `server/validation/linkChecker.ts`
-- API: `server/routes.ts` — grep `"/api/admin/validation"`, `"/api/admin/link-health"`
+- API: `server/routes/domains/export-link-health.ts`
 
 ### Categories
 - Schema: `shared/schema.ts`
-- API: `server/routes.ts` — grep `"/api/categories"`
+- API: `server/routes/domains/catalog-contributions.ts`, `admin-content.ts`
 - Sidebar: `client/src/components/layout/new/AppSidebar.tsx`
 
 ### User Features
-- Bookmarks/favorites/progress: `server/routes.ts` — grep `"/api/bookmarks"`, `"/api/favorites"`, `"/api/user/progress"`
+- Bookmarks/favorites/progress: `server/routes/domains/user-features.ts`
 - Data access: `server/repositories/UserFeatureRepository.ts`
 
 ### Learning Journeys

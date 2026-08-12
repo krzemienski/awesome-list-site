@@ -13,27 +13,25 @@
  */
 import type { Request, Response, NextFunction } from "express";
 import type { ZodTypeAny } from "zod";
+import { buildValidationEnvelope } from "../contracts/envelope";
 
 export function validateBody(schema: ZodTypeAny) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  const middleware = (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body ?? {});
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        let key = String(issue.path[0] ?? "form");
-        if (key === "metadata" && issue.path[1] === "tags") key = "tags";
-        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
-      }
-      return res.status(400).json({
-        error: "validation_failed",
-        message: "Validation failed",
-        fieldErrors,
-        errors: result.error.issues,
-      });
+      return res.status(400).json(buildValidationEnvelope(result.error));
     }
     req.body = result.data;
     next();
   };
+  // The contract installer reads this non-executable metadata while routes are
+  // registered, so OpenAPI documents the same schema this middleware enforces.
+  Object.defineProperty(middleware, "validationSchema", {
+    value: schema,
+    enumerable: false,
+    writable: false,
+  });
+  return middleware;
 }
 
 /** The only user fields any API response may carry. NEVER password. */

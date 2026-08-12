@@ -32,6 +32,10 @@ import type { Request, Response, NextFunction } from "express";
 import { AppError, ValidationError } from "./errors";
 import { ZodError } from "zod";
 import { isDatabaseUnavailableError } from "../db/errors";
+import {
+  buildValidationEnvelope,
+  normalizeValidationBody,
+} from "../contracts/envelope";
 
 /**
  * Centralized error handling middleware for Express
@@ -67,7 +71,9 @@ export function errorHandler(
     (err as any).status === 400 &&
     "body" in err
   ) {
-    res.status(400).json({ message: "Invalid JSON payload" });
+    res.status(400).json(
+      normalizeValidationBody({ message: "Invalid JSON payload" }),
+    );
     console.log("Client error (400): malformed JSON body");
     return;
   }
@@ -76,7 +82,9 @@ export function errorHandler(
   // `PayloadTooLargeError` (type "entity.too.large", status 413). It is a
   // client error — answer 413 explicitly instead of a stack-logged 500.
   if ((err as any)?.type === "entity.too.large" || (err as any)?.status === 413) {
-    res.status(413).json({ message: "Request body too large" });
+    res.status(413).json(
+      normalizeValidationBody({ message: "Request body too large" }),
+    );
     console.log("Client error (413): request body too large");
     return;
   }
@@ -87,7 +95,11 @@ export function errorHandler(
   // exact SQLSTATE; every other PG error still surfaces as a 500 so real
   // server bugs stay loud.
   if ((err as any)?.code === "22021") {
-    res.status(400).json({ message: "Request contains invalid characters" });
+    res.status(400).json(
+      normalizeValidationBody({
+        message: "Request contains invalid characters",
+      }),
+    );
     console.log("Client error (400): invalid byte sequence for PG (22021)");
     return;
   }
@@ -105,19 +117,18 @@ export function errorHandler(
 
   // Handle Zod validation errors
   if (err instanceof ZodError) {
-    const validationError = new ValidationError(
-      "Validation failed",
-      err.issues
-    );
-
-    res.status(validationError.statusCode).json({
-      message: validationError.message,
-      errors: validationError.errors,
-    });
+    const validationError = new ValidationError("Validation failed", err.issues);
+    res
+      .status(validationError.statusCode)
+      .json(buildValidationEnvelope(err, validationError.message));
 
     console.error("Validation error:", {
       message: validationError.message,
-      errors: validationError.errors,
+      errors: err.issues.map((issue) => ({
+        path: issue.path,
+        message: issue.message,
+        code: issue.code,
+      })),
     });
 
     return;
@@ -125,10 +136,21 @@ export function errorHandler(
 
   // Handle AppError instances (operational errors)
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({
+    const body = {
       message: err.message,
-      ...(err instanceof ValidationError && err.errors ? { errors: err.errors } : {}),
-    });
+      ...(err instanceof ValidationError && err.errors
+        ? { errors: err.errors }
+        : {}),
+    };
+    res
+      .status(err.statusCode)
+      .json(
+        err.statusCode === 400 ||
+          err.statusCode === 413 ||
+          err instanceof ValidationError
+          ? normalizeValidationBody(body)
+          : body,
+      );
 
     // Only log non-client errors (5xx) as errors
     if (err.statusCode >= 500) {
@@ -152,10 +174,5 @@ export function errorHandler(
   });
 
   // Don't leak error details in production for unknown errors
-  const message =
-    process.env.NODE_ENV === "production"
-      ? "Internal Server Error"
-      : err.message || "Internal Server Error";
-
-  res.status(500).json({ message });
+  res.status(500).json({ message: "Internal Server Error" });
 }

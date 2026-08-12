@@ -75,6 +75,10 @@ args = "task302-boot-safety"
 task = "workflow.run"
 args = "task302-resilience"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "openapi-drift"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -207,9 +211,20 @@ isValidation = true
 name = "task302-resilience"
 author = "agent"
 
+[workflows.workflow.metadata]
+isValidation = true
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "BASE_URL=http://127.0.0.1:5000 npm run validate:resilience"
+args = "sleep 90 && BASE_URL=http://127.0.0.1:5000 npm run validate:resilience"
+
+[[workflows.workflow]]
+name = "openapi-drift"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:openapi"
 
 [workflows.workflow.metadata]
 isValidation = true

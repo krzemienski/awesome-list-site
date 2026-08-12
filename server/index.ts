@@ -309,8 +309,12 @@ app.use((req, res, next) => {
   return res.status(403).json({ message: "Cross-origin request rejected" });
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// One explicit transport ceiling applies before every API contract guard.
+// Structural/depth/string limits are enforced by the contract layer after
+// parsing; body-parser rejects raw oversized JSON/form payloads at 413.
+export const REQUEST_BODY_LIMIT = "256kb";
+app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
+app.use(express.urlencoded({ extended: false, limit: REQUEST_BODY_LIMIT }));
 
 app.use((req, res, next) => {
   const start = Date.now();

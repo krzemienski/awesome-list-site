@@ -5,11 +5,12 @@ REST API for the Awesome Video Resource Viewer.
 - **Base URL**: `http://localhost:5000/api` (dev) / `https://<your-domain>/api` (prod)
 - **Live, always-current spec**: the app serves interactive docs at **`/api/docs`**
   and the machine-readable OpenAPI 3.0 document at **`/api/openapi.json`**.
-  Both are generated from `server/openapi.ts` and are the source of truth for the
-  **public** API. This page is a curated human overview; when in doubt, trust the
+  Both are generated from the named runtime contracts in `server/contracts/`
+  after the domain registrars mount. They are the source of truth for the full
+  API. This page is a curated human overview; when in doubt, trust the
   live spec.
 
-The server registers ~145 routes. This document covers the **public API** in
+The server registers 183 concrete API method/path pairs. This document covers the **public API** in
 full plus a verified map of the authenticated and admin surface — it does not
 enumerate every internal route. Use `/api/docs` for the exact request/response
 schemas.
@@ -277,9 +278,19 @@ See [RESEARCH_FEATURE.md](../RESEARCH_FEATURE.md) and
 
 Errors are JSON with a `message` field (and optional `errors` for validation):
 
+Validation failures use one field-level envelope:
+
 ```json
-{ "message": "Error description", "errors": [] }
+{
+  "error": "validation_failed",
+  "message": "Validation failed",
+  "fieldErrors": { "url": "Must be a valid public URL" },
+  "errors": []
+}
 ```
+
+Authentication, authorization, not-found, conflict, rate-limit, and server
+errors retain their documented status-specific JSON bodies.
 
 | Status | Meaning |
 |--------|---------|

@@ -9,12 +9,21 @@
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { dump } from 'js-yaml';
-import { swaggerSpec } from '../server/openapi';
+import express from 'express';
+import { registerRoutes } from '../server/routes';
+import { getSwaggerSpec } from '../server/openapi';
 
 async function exportOpenApiYaml() {
   console.log('🚀 Starting OpenAPI YAML export...');
 
   try {
+    // Route registration is the source of contract declarations. Build the
+    // Express table without listening on a port, then generate from the exact
+    // same registry used by runtime validation and /api/openapi.json.
+    const app = express();
+    await registerRoutes(app);
+    const swaggerSpec = getSwaggerSpec();
+
     // Create docs/api directory if it doesn't exist
     const apiDocsDir = join(process.cwd(), 'docs', 'api');
     if (!existsSync(apiDocsDir)) {
