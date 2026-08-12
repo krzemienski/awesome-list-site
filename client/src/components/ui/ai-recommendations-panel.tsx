@@ -1,98 +1,102 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertCircle,
+  EyeOff,
+  RefreshCw,
+  Sparkles,
+  Target,
+  Zap,
+} from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import RecommendationCard from "@/components/ai/RecommendationCard";
 import { useAIRecommendations } from "@/hooks/useAIRecommendations";
-import { useUserProfile } from "@/hooks/use-user-profile";
+import {
+  useRecommendationFeedback,
+  useRecommendationFeedbackStates,
+} from "@/hooks/useRecommendationFeedback";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { useAuth } from "@/hooks/useAuth";
-import { Resource } from "@/types/awesome-list";
-import RecommendationFeedback from "@/components/ui/recommendation-feedback";
-import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import type { Resource } from "@/types/awesome-list";
 import {
   DEFAULT_LEARNING_PREFERENCES,
   LEARNING_FORMAT_OPTIONS,
   LEARNING_GOAL_OPTIONS,
   hasMeaningfulLearningPreferences,
 } from "@shared/onboarding";
-import {
-  Sparkles,
-  ExternalLink,
-  TrendingUp,
-  AlertCircle,
-  Lightbulb,
-  Target,
-  Zap,
-} from "lucide-react";
+import type { RecommendationFeedbackValue } from "@shared/recommendations";
 
 interface AIRecommendationsPanelProps {
-  /**
-   * Run23 R-06: optional — each /api/recommendations item already embeds a
-   * full Resource (rec.resource), so the corpus prop is only an enrichment
-   * for callers that happen to have it loaded (e.g. /recommendations).
-   */
   resources?: Resource[];
-  /**
-   * Run16 BUG-048: pages that already render their own "Personalized
-   * Recommendations" heading (Home, /recommendations) pass false so the
-   * panel doesn't repeat it back-to-back.
-   */
   showHeader?: boolean;
 }
 
-export default function AIRecommendationsPanel({ resources = [], showHeader = true }: AIRecommendationsPanelProps) {
+export default function AIRecommendationsPanel({
+  showHeader = true,
+}: AIRecommendationsPanelProps) {
   const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const { userProfile: localProfile, isLoaded: localProfileLoaded } =
     useUserProfile();
+  const { preferences, isLoading: preferencesLoading } =
+    useLearningPreferences();
   const {
-    preferences,
-    isLoading: preferencesLoading,
-  } = useLearningPreferences();
-  const {
-    generateRecommendations,
-    recommendations,
-    isLoading,
-    isError,
-    error,
-    isSuccess,
-  } = useAIRecommendations(undefined, { limit: 10 });
-  const hasPersonalization =
+    data: feedbackStates = [],
+    isError: feedbackStatesError,
+    isLoading: feedbackStatesLoading,
+    refetch: refetchFeedbackStates,
+  } = useRecommendationFeedbackStates(user?.id, isAuthenticated);
+  const { recordFeedbackAsync, isLoading: isRestoring } =
+    useRecommendationFeedback();
+  const [locallyHidden, setLocallyHidden] = useState<Set<number>>(new Set());
+
+  const hasSavedPreferences =
     isAuthenticated && hasMeaningfulLearningPreferences(preferences);
   const effectiveProfile = useMemo(
     () => ({
       userId: user?.id ?? localProfile.userId,
       preferredCategories:
-        preferences?.preferredCategories ??
-        DEFAULT_LEARNING_PREFERENCES.preferredCategories,
+        preferences?.preferredCategories
+        ?? DEFAULT_LEARNING_PREFERENCES.preferredCategories,
       skillLevel:
         preferences?.skillLevel ?? DEFAULT_LEARNING_PREFERENCES.skillLevel,
       learningGoals:
-        preferences?.learningGoals ??
-        DEFAULT_LEARNING_PREFERENCES.learningGoals,
+        preferences?.learningGoals ?? DEFAULT_LEARNING_PREFERENCES.learningGoals,
       preferredResourceTypes:
-        preferences?.preferredResourceTypes ??
-        DEFAULT_LEARNING_PREFERENCES.preferredResourceTypes,
+        preferences?.preferredResourceTypes
+        ?? DEFAULT_LEARNING_PREFERENCES.preferredResourceTypes,
       timeCommitment:
-        preferences?.timeCommitment ??
-        DEFAULT_LEARNING_PREFERENCES.timeCommitment,
+        preferences?.timeCommitment ?? DEFAULT_LEARNING_PREFERENCES.timeCommitment,
       viewHistory: localProfile.viewHistory,
       bookmarks: localProfile.bookmarks,
       completedResources: localProfile.completedResources,
       ratings: localProfile.ratings,
     }),
-    [
-      user?.id,
-      preferences,
-      localProfile.userId,
-      localProfile.viewHistory,
-      localProfile.bookmarks,
-      localProfile.completedResources,
-      localProfile.ratings,
-    ],
+    [user?.id, localProfile, preferences],
   );
+
+  const {
+    generateRecommendations,
+    refreshRecommendations,
+    recommendations,
+    isLoading,
+    isError,
+    error,
+    hasUsefulResults,
+    isStale,
+    isFromCache,
+    lastUpdatedAt,
+  } = useAIRecommendations(undefined, {
+    limit: 10,
+    cacheUserId: user?.id,
+  });
+
   const generationKey = JSON.stringify({
     userId: effectiveProfile.userId,
     categories: effectiveProfile.preferredCategories,
@@ -100,81 +104,101 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
     goals: effectiveProfile.learningGoals,
     formats: effectiveProfile.preferredResourceTypes,
     time: effectiveProfile.timeCommitment,
-    personalized: hasPersonalization,
   });
   const generatedKeyRef = useRef<string | null>(null);
 
-  // Saved account preferences immediately drive this clearly labeled surface.
-  // Anonymous/default visitors use the public GET endpoint and are described as
-  // receiving general picks, never personalized results.
   useEffect(() => {
     if (
-      !localProfileLoaded ||
-      (isAuthenticated && preferencesLoading) ||
-      !effectiveProfile.userId ||
-      generatedKeyRef.current === generationKey
+      !isAuthenticated
+      || !localProfileLoaded
+      || preferencesLoading
+      || !effectiveProfile.userId
+      || generatedKeyRef.current === generationKey
     ) {
       return;
     }
     generatedKeyRef.current = generationKey;
-    generateRecommendations(
-      hasPersonalization ? effectiveProfile : undefined,
-    );
+    generateRecommendations(effectiveProfile);
   }, [
-    localProfileLoaded,
     isAuthenticated,
+    localProfileLoaded,
     preferencesLoading,
-    generationKey,
-    hasPersonalization,
     effectiveProfile,
+    generationKey,
     generateRecommendations,
   ]);
 
-  const goalLabels = new Map(
-    LEARNING_GOAL_OPTIONS.map((option) => [option.value, option.label]),
+  const goalLabels = useMemo(
+    () => new Map(LEARNING_GOAL_OPTIONS.map((option) => [option.value, option.label])),
+    [],
   );
-  const formatLabels = new Map(
-    LEARNING_FORMAT_OPTIONS.map((option) => [option.value, option.label]),
+  const formatLabels = useMemo(
+    () => new Map(LEARNING_FORMAT_OPTIONS.map((option) => [option.value, option.label])),
+    [],
   );
 
-  const getResourceDetails = (resourceUrl: string): Resource | undefined => {
-    // Try exact URL match first
-    let resource = resources.find(r => r.url === resourceUrl);
+  const authoritativeExcludedIds = new Set(
+    feedbackStates
+      .filter((state) =>
+        state.feedback === "hidden"
+        || (isFromCache && (
+          state.feedback === "not_for_me"
+          || state.feedback === "already_known"
+        )),
+      )
+      .map((state) => state.resourceId),
+  );
+  const canRenderRecommendations =
+    !isFromCache || (!feedbackStatesLoading && !feedbackStatesError);
+  const visibleRecommendations = canRenderRecommendations
+    ? recommendations.filter(
+        (recommendation) =>
+          !locallyHidden.has(recommendation.resource.id)
+          && !authoritativeExcludedIds.has(recommendation.resource.id),
+      )
+    : [];
+  const hiddenStates = feedbackStates.filter(
+    (state) => state.feedback === "hidden" && state.resource,
+  );
 
-    // If not found, try matching by ID or title as fallback
-    if (!resource) {
-      resource = resources.find(r => r.id?.toString() === resourceUrl);
+  const handleFeedbackChange = (
+    resourceId: number,
+    feedback: RecommendationFeedbackValue | null,
+  ) => {
+    setLocallyHidden((current) => {
+      const next = new Set(current);
+      if (feedback === "hidden") next.add(resourceId);
+      else next.delete(resourceId);
+      return next;
+    });
+  };
+
+  const restoreHidden = async (resourceId: number) => {
+    try {
+      await recordFeedbackAsync({ resourceId, feedback: null });
+      setLocallyHidden((current) => {
+        const next = new Set(current);
+        next.delete(resourceId);
+        return next;
+      });
+      toast({
+        title: "Recommendation restored",
+        description: "It can appear the next time recommendations are refreshed.",
+      });
+    } catch {
+      toast({
+        title: "Couldn’t restore recommendation",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
-
-    // Additional fallback: try partial URL match
-    if (!resource) {
-      resource = resources.find(r => r.url?.includes(resourceUrl) || resourceUrl.includes(r.url || ''));
-    }
-
-    return resource;
   };
 
-  // Run16 BUG-019: the badge previously hardcoded text-green-500 on top of the
-  // default (red) badge background — 4.20:1 at 12px, failing WCAG AA, and a
-  // red/green pairing hostile to color-vision deficiency. (confidence is a
-  // 0–100 percent here, so the old >= 0.8 check was also always true.) The
-  // badge now relies on each variant's own AA-compliant foreground color and
-  // tiers by variant only.
-  const getConfidenceBadgeVariant = (confidence: number): "default" | "secondary" | "outline" => {
-    if (confidence >= 80) return "default";
-    if (confidence >= 60) return "secondary";
-    return "outline";
-  };
-
-  const handleFeedbackChange = (feedback: 'helpful' | 'not_helpful' | null) => {
-    // Invalidate recommendations cache to refresh with updated user preferences
-    queryClient.invalidateQueries({ queryKey: ['/api/recommendations'] });
-  };
+  const retry = () => refreshRecommendations(effectiveProfile);
 
   return (
     <div className="space-y-6">
-      {/* Header (suppressed where the page renders its own — Run16 BUG-048) */}
-      {showHeader && (
+      {showHeader ? (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -182,325 +206,242 @@ export default function AIRecommendationsPanel({ resources = [], showHeader = tr
               Personalized Recommendations
             </CardTitle>
             <CardDescription>
-              Get personalized resource recommendations based on your learning profile and goals
+              Account preferences, learning activity, and your feedback shape these picks.
             </CardDescription>
           </CardHeader>
         </Card>
-      )}
+      ) : null}
 
-      {/* The canonical editor lives in Settings and is shared with onboarding.
-          This personalized surface only summarizes what it is using. */}
       <Card className="no-print">
         <CardHeader>
           <CardTitle className="text-lg">
-            {hasPersonalization
+            {hasSavedPreferences
               ? "Using your saved learning profile"
-              : "General recommendations"}
+              : "Using your account activity"}
           </CardTitle>
           <CardDescription>
-            {hasPersonalization
+            {hasSavedPreferences
               ? "These results use your saved topics, goals, formats, skill level, and available time."
-              : "No completed learning profile is being used, so these are popular picks from across the catalog."}
+              : "Add learning preferences for more precise matches. Existing activity and feedback still shape your results."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {hasPersonalization ? (
+          {hasSavedPreferences ? (
             <div className="flex flex-wrap gap-2" data-testid="active-preference-summary">
               <Badge variant="secondary">{effectiveProfile.skillLevel}</Badge>
               {effectiveProfile.preferredCategories.map((category) => (
-                <Badge key={category} variant="outline">
-                  {category}
-                </Badge>
+                <Badge key={category} variant="outline">{category}</Badge>
               ))}
               {effectiveProfile.learningGoals.map((goal) => (
                 <Badge key={goal} variant="outline">
-                  {goalLabels.get(goal as any) ?? goal}
+                  {goalLabels.get(goal) ?? goal}
                 </Badge>
               ))}
               {effectiveProfile.preferredResourceTypes.map((format) => (
                 <Badge key={format} variant="outline">
-                  {formatLabels.get(format as any) ?? format}
+                  {formatLabels.get(format) ?? format}
                 </Badge>
               ))}
             </div>
           ) : null}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            {isAuthenticated ? (
-              <Button asChild variant="outline">
-                <Link href="/settings#learning-preferences">
-                  {hasPersonalization
-                    ? "Edit learning preferences"
-                    : "Choose learning preferences"}
-                </Link>
-              </Button>
-            ) : null}
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button asChild variant="outline">
+              <Link href="/settings#learning-preferences">
+                {hasSavedPreferences
+                  ? "Edit learning preferences"
+                  : "Choose learning preferences"}
+              </Link>
+            </Button>
             <Button
               type="button"
-              variant={isAuthenticated ? "ghost" : "outline"}
-              onClick={() =>
-                generateRecommendations(
-                  hasPersonalization ? effectiveProfile : undefined,
-                )
-              }
+              variant="ghost"
+              onClick={retry}
               disabled={isLoading}
               data-testid="button-generate-recommendations"
             >
-              <Sparkles className="mr-2 h-4 w-4" />
+              <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
               {isLoading ? "Refreshing…" : "Refresh recommendations"}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Loading State */}
-      {isLoading && (
+      {hiddenStates.length > 0 ? (
+        <details className="no-print rounded-lg border bg-card p-4">
+          <summary className="cursor-pointer font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="inline-flex items-center gap-2">
+              <EyeOff className="h-4 w-4" />
+              Hidden recommendations ({hiddenStates.length})
+            </span>
+          </summary>
+          <ul className="mt-3 space-y-2">
+            {hiddenStates.map((state) => (
+              <li
+                key={state.resourceId}
+                className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <span className="min-w-0 break-words text-sm font-medium">
+                  {state.resource?.title}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isRestoring}
+                  onClick={() => void restoreHidden(state.resourceId)}
+                  data-testid={`restore-hidden-${state.resourceId}`}
+                >
+                  Restore
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+
+      {feedbackStatesError ? (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Saved feedback is temporarily unavailable</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>
+              Saved cards are paused until hidden choices can be checked, so no
+              dismissed resource is shown by mistake.
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => void refetchFeedbackStates()}
+            >
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {isFromCache && feedbackStatesLoading ? (
+        <Card aria-busy="true" data-testid="feedback-sync-state">
+          <CardContent className="flex items-center gap-3 p-4 text-sm text-muted-foreground">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            Syncing saved recommendation choices…
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {(isStale || (isError && hasUsefulResults)) ? (
+        <Alert data-testid="stale-recommendations-state">
+          <RefreshCw className="h-4 w-4" />
+          <AlertTitle>Showing your last useful recommendations</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>
+              {isError
+                ? "The latest refresh failed, so these saved results were kept."
+                : "These saved results may be out of date."}
+              {lastUpdatedAt
+                ? ` Last updated ${new Date(lastUpdatedAt).toLocaleString()}.`
+                : ""}
+            </p>
+            <Button type="button" size="sm" variant="outline" onClick={retry}>
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {isLoading && !hasUsefulResults ? (
         <Card data-testid="loading-state">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary animate-pulse" />
-              Analyzing Your Profile...
+              <Zap className="h-5 w-5 animate-pulse text-primary" />
+              Building your recommendations…
             </CardTitle>
             <CardDescription>
-              Generating personalized recommendations based on your preferences
+              Matching saved preferences and feedback with catalog resources.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {Array(3).fill(0).map((_, i) => (
-              <div key={i} className="space-y-2">
-                <Skeleton className="h-6 w-3/4" />
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            {[0, 1, 2, 3].map((index) => (
+              <div key={index} className="space-y-3 rounded-lg border p-4">
+                <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-20 w-full" />
               </div>
             ))}
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
-      {/* Error State */}
-      {isError && (
+      {isError && !hasUsefulResults ? (
         <Alert variant="destructive" data-testid="error-state">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error Generating Recommendations</AlertTitle>
-          <AlertDescription>
-            <div className="space-y-2">
-              <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
-              
-              {/* Specific error handling for different failure modes */}
-              {error?.message?.includes('401') || error?.message?.includes('Unauthorized') ? (
-                <div className="mt-2 p-2 bg-background/50 rounded border">
-                  <p className="font-semibold">🔑 API Key Issue</p>
-                  <p className="text-sm">The Anthropic API key is missing or invalid. Please configure it in the integration settings.</p>
-                </div>
-              ) : error?.message?.includes('fetch') || error?.message?.includes('network') || error?.message?.includes('Failed to fetch') ? (
-                <div className="mt-2 p-2 bg-background/50 rounded border">
-                  <p className="font-semibold">🌐 Network Error</p>
-                  <p className="text-sm">Unable to connect to the AI service. Please check your internet connection and try again.</p>
-                </div>
-              ) : error?.message?.includes('timeout') ? (
-                <div className="mt-2 p-2 bg-background/50 rounded border">
-                  <p className="font-semibold">⏱️ Request Timeout</p>
-                  <p className="text-sm">The AI service took too long to respond. Please try again.</p>
-                </div>
-              ) : (
-                <div className="mt-2 p-2 bg-background/50 rounded border">
-                  <p className="font-semibold">ℹ️ Error Details</p>
-                  <p className="text-sm">If this persists, try adjusting your preferences or contact support.</p>
-                </div>
-              )}
-            </div>
+          <AlertTitle>Recommendations couldn’t be refreshed</AlertTitle>
+          <AlertDescription className="space-y-3">
+            <p>{error instanceof Error ? error.message : "An unexpected error occurred."}</p>
+            <Button type="button" size="sm" variant="outline" onClick={retry}>
+              Try again
+            </Button>
           </AlertDescription>
         </Alert>
-      )}
+      ) : null}
 
-      {/* Success State - Recommendations */}
-      {isSuccess && recommendations && recommendations.length > 0 && (
-        <div className="space-y-4" data-testid="recommendations-list">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                {hasPersonalization
-                  ? "Your Personalized Recommendations"
-                  : "Recommended Resources"}
-              </CardTitle>
-              {/* Run17 BUG-043: only claim personalization when the user has
-                  actually set preferences — otherwise be honest that these
-                  are general picks. */}
-              <CardDescription>
-                {hasPersonalization
-                  ? `${recommendations.length} resources selected specifically for your learning journey`
-                  : `${recommendations.length} recommended resources — popular picks from across the catalog. Set learning preferences in Settings for personalized results.`}
-                {recommendations.some(r => r.type === 'ai_powered') && (
-                  <Badge variant="outline" className="ml-2">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    AI-Powered
-                  </Badge>
-                )}
-              </CardDescription>
-            </CardHeader>
-          </Card>
+      {visibleRecommendations.length > 0 ? (
+        <section className="space-y-4" data-testid="recommendations-list">
+          <div>
+            <h2 className="flex items-center gap-2 text-xl font-semibold">
+              <Target className="h-5 w-5 text-primary" />
+              Your personalized recommendations
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {visibleRecommendations.length} resources selected from real profile and catalog signals.
+            </p>
+          </div>
+          <div className="grid items-stretch gap-4 md:grid-cols-2">
+            {visibleRecommendations.map((recommendation) => (
+              <RecommendationCard
+                key={recommendation.resource.id}
+                className="min-w-0"
+                resource={{
+                  id: String(recommendation.resource.id),
+                  name: recommendation.resource.title,
+                  url: recommendation.resource.url,
+                  description: recommendation.resource.description,
+                  category: recommendation.resource.category ?? "Catalog",
+                  tags: [
+                    recommendation.resource.subcategory,
+                    recommendation.resource.subSubcategory,
+                  ].filter((value): value is string => Boolean(value)),
+                  confidence: recommendation.confidence,
+                  isAIBased: recommendation.type === "ai_powered",
+                  personalized: recommendation.personalized !== false,
+                  explanation: recommendation.explanation ?? {
+                    summary: recommendation.reason,
+                    signals: [],
+                  },
+                  feedback: recommendation.feedback,
+                }}
+                onFeedbackChange={(feedback) =>
+                  handleFeedbackChange(recommendation.resource.id, feedback)
+                }
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-          {recommendations.map((rec, index) => {
-            // Run23 R-06: prefer the corpus lookup when a corpus was passed,
-            // but fall back to the full Resource embedded in the response —
-            // Home no longer passes the 3.1MB corpus just for this panel.
-            const resource =
-              getResourceDetails(rec.resource.url) ??
-              (rec.resource?.id ? rec.resource : undefined);
-            
-            // Fallback display info when resource lookup fails
-            const displayTitle = resource?.title || rec.resource.title || rec.resource.url.split('/').pop()?.replace(/-/g, ' ') || rec.resource.url;
-            const hasResourceDetails = !!resource;
-            
-            return (
-              <Card 
-                key={rec.resource.url} 
-                className="hover:border-primary transition-colors"
-                data-testid={`recommendation-${index}`}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CardTitle className="text-lg">
-                          {displayTitle}
-                        </CardTitle>
-                        {rec.type === 'ai_powered' && (
-                          <Badge variant="outline" className="text-xs" data-testid={`badge-ai-${index}`}>
-                            <Sparkles className="h-3 w-3 mr-1" />
-                            AI
-                          </Badge>
-                        )}
-                        {!hasResourceDetails && (
-                          <Badge variant="outline" className="text-xs bg-yellow-500/10">
-                            External
-                          </Badge>
-                        )}
-                      </div>
-                      <CardDescription className="flex flex-wrap items-center gap-2">
-                        {rec.resource.category && (
-                          <Badge variant="secondary" data-testid={`badge-category-${index}`}>
-                            {rec.resource.category}
-                          </Badge>
-                        )}
-                        <Badge 
-                          variant={getConfidenceBadgeVariant(rec.confidence)}
-                          data-testid={`badge-confidence-${index}`}
-                        >
-                          <TrendingUp className="h-3 w-3 mr-1" />
-                          {Math.round(rec.confidence)}% match
-                        </Badge>
-                        {rec.score !== undefined && (
-                          <Badge 
-                            variant="outline"
-                            data-testid={`badge-score-${index}`}
-                          >
-                            Score: {rec.score.toFixed(2)}
-                          </Badge>
-                        )}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* AI Reasoning */}
-                  <div className="flex gap-2" data-testid={`reason-${index}`}>
-                    <Lightbulb className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-semibold text-foreground">Why this matches: </span>
-                      {rec.reason}
-                    </p>
-                  </div>
-
-                  {/* Resource Description - show if available */}
-                  {(resource?.description || rec.resource.description) && (
-                    <p className="text-sm" data-testid={`description-${index}`}>
-                      {resource?.description || rec.resource.description}
-                    </p>
-                  )}
-                  
-                  {/* Fallback info when resource details unavailable */}
-                  {!hasResourceDetails && (
-                    <div className="p-3 bg-muted/50 rounded-md border border-dashed">
-                      <p className="text-xs text-muted-foreground">
-                        <span className="font-semibold">URL:</span> {rec.resource.url}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Additional resource metadata if available */}
-                  {(resource?.subcategory || rec.resource.subcategory) && (
-                    <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold">Subcategory:</span> {resource?.subcategory || rec.resource.subcategory}
-                    </p>
-                  )}
-
-                  {/* Action Button and Feedback */}
-                  <div className="space-y-3">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      asChild
-                      data-testid={`button-view-${index}`}
-                    >
-                      <a
-                        href={rec.resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        View Resource
-                      </a>
-                    </Button>
-
-                    {/* Feedback Buttons */}
-                    {/* R5-027 (run24): no-print hides the vote block as one unit in print. */}
-                    {resource?.id && (
-                      <div className="no-print flex items-center justify-center gap-2 pt-2 border-t">
-                        <span className="text-xs text-muted-foreground">Was this helpful?</span>
-                        <RecommendationFeedback
-                          resourceId={parseInt(String(resource.id), 10)}
-                          userId={effectiveProfile.userId}
-                          size="sm"
-                          onFeedbackChange={handleFeedbackChange}
-                          data-testid={`feedback-${index}`}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-
-      {/* No Recommendations State */}
-      {isSuccess && recommendations && recommendations.length === 0 && (
+      {!isLoading && !isError && recommendations.length === 0 ? (
         <Alert data-testid="no-recommendations">
-          <Lightbulb className="h-4 w-4" />
-          <AlertTitle>No Recommendations Found</AlertTitle>
-          <AlertDescription>
-            Try adjusting your preferences or selecting different categories to get personalized recommendations.
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No unseen recommendations right now</AlertTitle>
+          <AlertDescription className="space-y-3">
+            <p>
+              Restore hidden items, update your preferences, or try again to look for new catalog matches.
+            </p>
+            <Button type="button" size="sm" variant="outline" onClick={retry}>
+              Try again
+            </Button>
           </AlertDescription>
         </Alert>
-      )}
-
-      {/* API Unavailable Fallback */}
-      {!isLoading && !isSuccess && !isError && (
-        <Card data-testid="initial-state">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Ready to Get Started
-            </CardTitle>
-            <CardDescription>
-               Recommendations will load automatically. You can refresh them or update your learning preferences in Settings.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      )}
+      ) : null}
     </div>
   );
 }

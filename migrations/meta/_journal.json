@@ -127,6 +127,13 @@
       "when": 1786795200000,
       "tag": "0043_opt_in_digests",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1786881600000,
+      "tag": "0043_recommendation_feedback",
+      "breakpoints": true
     }
   ]
 }

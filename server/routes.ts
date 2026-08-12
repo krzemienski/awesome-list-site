@@ -107,6 +107,10 @@ import {
 } from "@shared/resourceFacets";
 import { parseTagFilterValues } from "@shared/tagNormalize";
 import {
+  RECOMMENDATION_FEEDBACK_VALUES,
+  type RecommendationFeedbackValue,
+} from "@shared/recommendations";
+import {
   bookmarkQueueStatusSchema,
   collectionNameSchema,
   collectionShareIdSchema,
@@ -7531,8 +7535,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (rid === null) {
         return res.status(400).json({ message: 'resourceId must be a positive integer' });
       }
-      if (feedback !== 'clicked' && feedback !== 'dismissed' && feedback !== 'completed') {
-        return res.status(400).json({ message: "feedback must be one of 'clicked', 'dismissed', 'completed'" });
+      if (
+        feedback !== 'clicked'
+        && feedback !== 'dismissed'
+        && feedback !== 'completed'
+        && !RECOMMENDATION_FEEDBACK_VALUES.includes(feedback)
+      ) {
+        return res.status(400).json({
+          message: "feedback must be a supported recommendation feedback value",
+        });
       }
       if (rating !== undefined && rating !== null) {
         if (typeof rating !== 'number' || !Number.isInteger(rating) || rating < 1 || rating > 5) {
@@ -7545,17 +7556,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Record the feedback
-      await recommendationEngine.recordFeedback(
-        userId,
-        rid,
-        feedback,
-        rating ?? undefined
-      );
+      if (RECOMMENDATION_FEEDBACK_VALUES.includes(feedback)) {
+        await recommendationEngine.setFeedbackState(userId, rid, feedback);
+      } else {
+        await recommendationEngine.recordFeedback(
+          userId,
+          rid,
+          feedback,
+          rating ?? undefined,
+        );
+      }
 
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {
       console.error('Error recording recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to record feedback' });
+    }
+  });
+
+  // One current-state read and mutation contract is shared by every signed-in
+  // recommendation surface. Identity always comes from the session.
+  app.get("/api/recommendations/feedback", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+      const rows = await userFeatureRepo.getRecommendationFeedback(userId);
+      const states = await Promise.all(rows.map(async (row) => {
+        const resource = await resourceRepo.getResource(row.resourceId);
+        return {
+          resourceId: row.resourceId,
+          feedback: row.feedback,
+          updatedAt: row.updatedAt.toISOString(),
+          resource: resource && resource.status === 'approved'
+            ? stripInternalResourceFields(resource)
+            : undefined,
+        };
+      }));
+      res.json(states);
+    } catch (error) {
+      console.error('Error listing recommendation feedback:', error);
+      res.status(500).json({ message: 'Failed to load recommendation feedback' });
+    }
+  });
+
+  app.put("/api/recommendations/:resourceId/feedback", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+      const resourceId = parseIntInRange(req.params.resourceId, { min: 1 });
+      if (resourceId === null) {
+        return res.status(400).json({ message: 'Invalid resource id' });
+      }
+      const feedback = req.body?.feedback;
+      if (
+        feedback !== null
+        && !RECOMMENDATION_FEEDBACK_VALUES.includes(feedback)
+      ) {
+        return res.status(400).json({
+          message: `feedback must be null or one of ${RECOMMENDATION_FEEDBACK_VALUES.join(', ')}`,
+        });
+      }
+      const target = await resourceRepo.getResource(resourceId);
+      if (!target || target.status !== 'approved') {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      await recommendationEngine.setFeedbackState(
+        userId,
+        resourceId,
+        feedback as RecommendationFeedbackValue | null,
+      );
+      res.json({
+        resourceId,
+        feedback,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Error updating recommendation feedback:', error);
+      res.status(500).json({ message: 'Failed to update recommendation feedback' });
     }
   });
 
@@ -7585,7 +7662,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
 
-      await recommendationEngine.recordDetailedFeedback(userId, resourceId, feedback);
+      await recommendationEngine.recordDetailedFeedback(
+        userId,
+        resourceId,
+        feedback === 'not_helpful' ? 'irrelevant' : feedback,
+      );
 
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {

@@ -8,12 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import CategoryExplorer from "@/components/ui/category-explorer";
 import CommunityMetrics from "@/components/ui/community-metrics";
 import ExportTools from "@/components/ui/export-tools";
-import ResourceRecommendations from "@/components/ui/resource-recommendations";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { 
-  Zap, 
   Compass, 
   BarChart3, 
   Download, 
@@ -22,7 +20,7 @@ import {
   AlertCircle,
   RefreshCw
 } from "lucide-react";
-import { AwesomeList, Resource } from "@/types/awesome-list";
+import { AwesomeList } from "@/types/awesome-list";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
@@ -72,8 +70,6 @@ export default function Advanced() {
     );
   });
 
-  const [selectedResource, setSelectedResource] = useState<Resource | undefined>();
-  const [userInterests] = useState<string[]>(["web", "api", "testing", "database"]);
   // BUG-026 (run13): selected export format, driven by the showcase cards.
   const [exportFormat, setExportFormat] = useState<"markdown" | "json" | "csv" | "pdf" | "html" | "yaml" | undefined>();
 
@@ -86,11 +82,10 @@ export default function Advanced() {
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
   });
+  const resources = awesomeList?.resources ?? [];
+  const categories = awesomeList?.categories ?? [];
 
-  // Select a featured resource for demonstration
-  const featuredResource = awesomeList?.resources?.[0];
-
-  if (isLoading) {
+  if (isLoading && tab !== "recommendations") {
     return (
       <div className="container mx-auto px-4 py-8">
         <Skeleton className="h-12 w-3/4 mb-4" />
@@ -107,7 +102,7 @@ export default function Advanced() {
   // Run21 R4-032: a failed catalog fetch (429/500/network) gets an explicit
   // error state with a manual retry — the same treatment /search already has —
   // instead of the ambiguous "Unable to load" dead-end that offered no recovery.
-  if (isError) {
+  if (isError && tab !== "recommendations") {
     return (
       <div className="container mx-auto px-4 py-8">
         <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
@@ -117,9 +112,9 @@ export default function Advanced() {
           data-testid="advanced-error"
         >
           <AlertCircle className="h-10 w-10 text-[var(--accent)]" />
-          <h1 className="display-h text-xl">Couldn't load advanced features</h1>
+          <h1 className="display-h text-xl">Couldn&apos;t load advanced features</h1>
           <p className="text-sm text-muted-foreground">
-            We couldn't reach the catalog data. This is usually a temporary
+            We couldn&apos;t reach the catalog data. This is usually a temporary
             network problem.
           </p>
           <Button
@@ -136,7 +131,7 @@ export default function Advanced() {
     );
   }
 
-  if (!awesomeList) {
+  if (!awesomeList && tab !== "recommendations") {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="display-h text-2xl mb-4">Advanced Features</h1>
@@ -220,7 +215,7 @@ export default function Advanced() {
                 <Card className="lg:col-span-1">
                   <CardContent className="p-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{awesomeList.categories.length}</div>
+                      <div className="text-2xl font-bold text-primary">{categories.length}</div>
                       <div className="text-sm text-muted-foreground">Categories</div>
                     </div>
                   </CardContent>
@@ -228,7 +223,7 @@ export default function Advanced() {
                 <Card className="lg:col-span-1">
                   <CardContent className="p-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">{awesomeList.resources.length}</div>
+                      <div className="text-2xl font-bold text-blue-600">{resources.length}</div>
                       <div className="text-sm text-muted-foreground">Resources</div>
                     </div>
                   </CardContent>
@@ -237,7 +232,7 @@ export default function Advanced() {
                   <CardContent className="p-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {new Set(awesomeList.resources.flatMap((r) => ((r as any).metadata?.tags as string[] | undefined) ?? r.tags ?? [])).size}
+                        {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? [])).size}
                       </div>
                       <div className="text-sm text-muted-foreground">Unique Tags</div>
                     </div>
@@ -247,7 +242,7 @@ export default function Advanced() {
                   <CardContent className="p-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-purple-600">
-                        {awesomeList.categories.reduce((sum, cat) => sum + (cat.subcategories?.length || 0), 0)}
+                        {categories.reduce((sum, cat) => sum + (cat.subcategories?.length || 0), 0)}
                       </div>
                       <div className="text-sm text-muted-foreground">Subcategories</div>
                     </div>
@@ -258,8 +253,8 @@ export default function Advanced() {
           </Card>
 
           <CategoryExplorer 
-            categories={awesomeList.categories}
-            resources={awesomeList.resources}
+            categories={categories}
+            resources={resources}
           />
         </TabsContent>
 
@@ -269,8 +264,8 @@ export default function Advanced() {
               removed. CommunityMetrics below computes real counts from the
               live catalog. */}
           <CommunityMetrics 
-            resources={awesomeList.resources}
-            categories={awesomeList.categories}
+            resources={resources}
+            categories={categories}
             subTab={metricsSubTab}
             onSubTabChange={handleMetricsSubChange}
           />
@@ -327,11 +322,13 @@ export default function Advanced() {
             </CardContent>
           </Card>
 
-          <ExportTools awesomeList={awesomeList} formatOverride={exportFormat} />
+          {awesomeList ? (
+            <ExportTools awesomeList={awesomeList} formatOverride={exportFormat} />
+          ) : null}
         </TabsContent>
 
         <TabsContent value="recommendations" className="space-y-6">
-          <AIRecommendationsPanel resources={awesomeList.resources} />
+          <AIRecommendationsPanel />
         </TabsContent>
       </Tabs>
 
@@ -355,7 +352,7 @@ export default function Advanced() {
               Browse All Resources
             </Link>
             <Link
-              href={awesomeList.categories?.[0]?.slug ? `/category/${awesomeList.categories[0].slug}` : "/"}
+              href={categories[0]?.slug ? `/category/${categories[0].slug}` : "/"}
               className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors"
             >
               Explore Categories

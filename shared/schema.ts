@@ -31,6 +31,7 @@ import type {
   DigestJobStatus,
   NotificationKind,
 } from "./notifications";
+import type { RecommendationFeedbackValue } from "./recommendations";
 import {
   type LearningFormat,
   type LearningGoal,
@@ -1375,6 +1376,33 @@ export type InsertUserInteraction = z.infer<typeof insertUserInteractionSchema>;
 export type UserInteraction = typeof userInteractions.$inferSelect;
 
 /**
+ * Current recommendation feedback state. Unlike append-only interaction
+ * analytics, this row is intentionally replaceable and removable so feedback
+ * can be changed or undone without stale historical votes affecting ranking.
+ */
+export const userRecommendationFeedback = pgTable(
+  "user_recommendation_feedback",
+  {
+    userId: varchar("user_id")
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    resourceId: integer("resource_id")
+      .references(() => resources.id, { onDelete: "cascade" })
+      .notNull(),
+    feedback: text("feedback").$type<RecommendationFeedbackValue>().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.resourceId] }),
+    index("idx_user_recommendation_feedback_resource").on(table.resourceId),
+    check(
+      "user_recommendation_feedback_value_check",
+      sql`${table.feedback} IN ('helpful','not_for_me','already_known','hidden')`,
+    ),
+  ],
+);
+/**
  * GitHub Sync History table - Sync operation tracking
  *
  * Records every GitHub sync operation with detailed statistics and snapshots.
@@ -1891,3 +1919,6 @@ export const EDITABLE_RESOURCE_FIELDS = [
   'skillLevel',
 ] as const;
 export type EditableResourceField = typeof EDITABLE_RESOURCE_FIELDS[number];
+
+export type UserRecommendationFeedback =
+  typeof userRecommendationFeedback.$inferSelect;

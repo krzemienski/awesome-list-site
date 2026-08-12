@@ -9,21 +9,10 @@ import SEOHead from "@/components/layout/SEOHead";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { useAuth } from "@/hooks/useAuth";
-import { processAwesomeListData } from "@/lib/parser";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
 import type { RecommendationResult } from "@/hooks/useAIRecommendations";
 
 export default function Recommendations() {
   const { isAuthenticated } = useAuth();
-
-  // Shared cached tree (same key as App/Home) — no extra network round-trip.
-  const { data: rawData, isLoading: treeLoading } = useQuery({
-    queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60,
-    enabled: isAuthenticated,
-  });
-  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
 
   // Anonymous browse: rule-based recommendations from the public GET endpoint.
   const {
@@ -35,7 +24,15 @@ export default function Recommendations() {
     // GET /api/recommendations (anonymous fallback) returns a plain array of
     // RecommendationResult (the authed POST endpoint returns the same shape).
     queryKey: ["/api/recommendations", "anonymous"],
-    queryFn: async () => apiRequest("/api/recommendations?limit=12", { method: "GET" }),
+    queryFn: async () => {
+      const response: unknown = await apiRequest(
+        "/api/recommendations?limit=12",
+        { method: "GET" },
+      );
+      return Array.isArray(response)
+        ? response as RecommendationResult[]
+        : [];
+    },
     enabled: !isAuthenticated,
     staleTime: 5 * 60 * 1000,
     retry: false,
@@ -64,15 +61,7 @@ export default function Recommendations() {
       </div>
 
       {isAuthenticated ? (
-        treeLoading || !awesomeList ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-40 rounded-lg" />
-            ))}
-          </div>
-        ) : (
-          <AIRecommendationsPanel resources={awesomeList.resources} showHeader={false} />
-        )
+        <AIRecommendationsPanel showHeader={false} />
       ) : (
         <>
           <Card>
@@ -112,9 +101,9 @@ export default function Recommendations() {
                 <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
                   <AlertCircle className="h-8 w-8 text-[var(--accent)]" />
                   <p className="text-sm text-muted-foreground">
-                    We couldn't load recommendations right now.
+                    We couldn&apos;t load recommendations right now.
                   </p>
-                  <Button variant="outline" onClick={() => refetch()} data-testid="button-retry-recommendations">
+                  <Button variant="outline" onClick={() => void refetch()} data-testid="button-retry-recommendations">
                     Try again
                   </Button>
                 </CardContent>

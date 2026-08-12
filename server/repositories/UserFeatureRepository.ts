@@ -29,12 +29,15 @@ import {
   userJourneyProgress,
   userPreferences,
   userInteractions,
+  userRecommendationFeedback,
   type Resource,
   type UserJourneyProgress,
   type InsertUserJourneyProgress,
   type UserPreferences,
   type UserInteraction,
+  type UserRecommendationFeedback,
 } from "@shared/schema";
+import type { RecommendationFeedbackValue } from "@shared/recommendations";
 import type {
   LearningFormat,
   LearningGoal,
@@ -536,6 +539,51 @@ export class UserFeatureRepository {
       .from(userInteractions)
       .where(eq(userInteractions.userId, userId))
       .orderBy(desc(userInteractions.timestamp));
+  }
+
+  async getRecommendationFeedback(
+    userId: string,
+  ): Promise<UserRecommendationFeedback[]> {
+    return db
+      .select()
+      .from(userRecommendationFeedback)
+      .where(eq(userRecommendationFeedback.userId, userId))
+      .orderBy(desc(userRecommendationFeedback.updatedAt));
+  }
+
+  async setRecommendationFeedback(
+    userId: string,
+    resourceId: number,
+    feedback: RecommendationFeedbackValue | null,
+  ): Promise<UserRecommendationFeedback | undefined> {
+    if (feedback === null) {
+      const [removed] = await db
+        .delete(userRecommendationFeedback)
+        .where(
+          and(
+            eq(userRecommendationFeedback.userId, userId),
+            eq(userRecommendationFeedback.resourceId, resourceId),
+          ),
+        )
+        .returning();
+      return removed;
+    }
+
+    const [saved] = await db
+      .insert(userRecommendationFeedback)
+      .values({ userId, resourceId, feedback })
+      .onConflictDoUpdate({
+        target: [
+          userRecommendationFeedback.userId,
+          userRecommendationFeedback.resourceId,
+        ],
+        set: {
+          feedback,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return saved;
   }
 
   /**

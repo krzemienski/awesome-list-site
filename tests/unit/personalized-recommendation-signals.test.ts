@@ -1,13 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { Resource } from '../../shared/schema';
 import {
   buildRecommendationReason,
+  buildRecommendationExplanation,
   calculateGoalsMatch,
   calculateTimeCommitmentMatch,
   calculateTypeMatch,
 } from '../../server/ai/recommendations';
 import {
   calculateColdStartBlend,
+  buildRecommendationFeedbackInfluence,
+  calculateRecommendationFeedbackAdjustment,
   recommendationEngine,
   type RecommendationResult,
   type UserProfile,
@@ -16,6 +19,11 @@ import {
   normalizeLearningFormats,
   normalizeLearningGoals,
 } from '../../shared/onboarding';
+import { storage } from '../../server/storage';
+import {
+  recommendationFeedbackQueryKey,
+  updateSerializedRecommendationCache,
+} from '../../client/src/lib/recommendation-cache';
 
 function resource(
   id: number,
@@ -67,6 +75,60 @@ function profile(
 }
 
 describe('personalized onboarding recommendation signals', () => {
+  it('propagates operational generation failures instead of returning a successful blank result', async () => {
+    const failure = new Error('catalog unavailable');
+    const listSpy = vi.spyOn(storage, 'listResources').mockRejectedValueOnce(failure);
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    await expect(
+      recommendationEngine.generateRecommendations(
+        profile([], []),
+        5,
+        true,
+        false,
+      ),
+    ).rejects.toBe(failure);
+
+    listSpy.mockRestore();
+    consoleSpy.mockRestore();
+  });
+
+  it('prunes excluded feedback from saved results and keeps Helpful visible', () => {
+    const serialized = JSON.stringify({
+      data: {
+        recommendations: [
+          { resource: { id: 1 }, feedback: null },
+          { resource: { id: 2 }, feedback: null },
+        ],
+        learningPaths: [],
+      },
+      timestamp: 1,
+    });
+
+    const helpful = updateSerializedRecommendationCache(serialized, 1, 'helpful');
+    expect(JSON.parse(helpful ?? '{}').data.recommendations).toEqual([
+      { resource: { id: 1 }, feedback: 'helpful' },
+      { resource: { id: 2 }, feedback: null },
+    ]);
+
+    for (const feedback of ['hidden', 'not_for_me', 'already_known'] as const) {
+      const updated = updateSerializedRecommendationCache(serialized, 1, feedback);
+      expect(JSON.parse(updated ?? '{}').data.recommendations).toEqual([
+        { resource: { id: 2 }, feedback: null },
+      ]);
+    }
+  });
+
+  it('keeps feedback query caches isolated when the browser switches accounts', () => {
+    expect(recommendationFeedbackQueryKey('account-a')).not.toEqual(
+      recommendationFeedbackQueryKey('account-b'),
+    );
+    expect(recommendationFeedbackQueryKey()).toEqual([
+      '/api/recommendations/feedback',
+      'signed-out',
+    ]);
+  });
+
   it('normalizes and deduplicates the previous preference vocabulary', () => {
     expect(normalizeLearningGoals([
       'Learn video encoding fundamentals',
@@ -141,6 +203,41 @@ describe('personalized onboarding recommendation signals', () => {
     expect(reason).toContain('Optimize encoding and quality');
     expect(reason).toContain('Articles');
     expect(reason).not.toContain('Intro & Learning');
+  });
+
+  it('returns structured evidence from the same verified profile signals', () => {
+    const match = resource(
+      40,
+      'Introduction to H.264 encoding',
+      'A fundamentals article about codecs and bitrate',
+      'article',
+    );
+    const explanation = buildRecommendationExplanation(
+      match,
+      profile(['optimize-encoding'], ['article']),
+      {
+        skillScore: 0.8,
+        goalsScore: 1,
+        typeScore: 1,
+        timeScore: 0,
+      },
+    );
+
+    expect(explanation.summary).toContain('Optimize encoding and quality');
+    expect(explanation.signals).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: 'goal_match',
+        evidence: 'Optimize encoding and quality',
+      }),
+      expect.objectContaining({
+        code: 'format_match',
+        evidence: 'Articles',
+      }),
+      expect.objectContaining({
+        code: 'skill_match',
+        evidence: 'intermediate',
+      }),
+    ]));
   });
 
   it('uses curated formats as a deterministic time-commitment proxy', () => {
@@ -242,5 +339,28 @@ describe('personalized onboarding recommendation signals', () => {
     expect(recommendation.reason).toContain(
       'Related to your active learning journey in Intro & Learning',
     );
+  });
+
+  it('applies bounded, measurable category affinity from durable feedback', () => {
+    const candidate = resource(50, 'Candidate', 'Candidate description', 'article');
+    const positiveAnchor = resource(51, 'Helpful anchor', 'Anchor', 'article');
+    const negativeAnchor = resource(52, 'Off-topic anchor', 'Anchor', 'article');
+
+    const positive = buildRecommendationFeedbackInfluence(
+      [candidate, positiveAnchor],
+      [{ resourceId: positiveAnchor.id, feedback: 'helpful' }],
+    );
+    const negative = buildRecommendationFeedbackInfluence(
+      [candidate, negativeAnchor],
+      [{ resourceId: negativeAnchor.id, feedback: 'not_for_me' }],
+    );
+    const alreadyKnown = buildRecommendationFeedbackInfluence(
+      [candidate, negativeAnchor],
+      [{ resourceId: negativeAnchor.id, feedback: 'already_known' }],
+    );
+
+    expect(calculateRecommendationFeedbackAdjustment(candidate, positive)).toBe(0.08);
+    expect(calculateRecommendationFeedbackAdjustment(candidate, negative)).toBe(-0.18);
+    expect(calculateRecommendationFeedbackAdjustment(candidate, alreadyKnown)).toBe(-0.05);
   });
 });

@@ -1,32 +1,22 @@
-import { memo, useState } from "react";
-import { useLocation } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
+import { memo } from "react";
+import {
+  Brain,
+  ExternalLink,
+  Lightbulb,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Brain, TrendingUp, Sparkles, ThumbsUp, ThumbsDown } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
-import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent } from "@/components/ui/card";
+import RecommendationFeedback from "@/components/ui/recommendation-feedback";
 import { cn } from "@/lib/utils";
+import type {
+  RecommendationExplanation,
+  RecommendationFeedbackValue,
+} from "@shared/recommendations";
 
-/**
- * RecommendationCard - AI-based resource recommendation display component
- *
- * IMPORTANT: This component is wrapped with React.memo using custom comparison.
- * When using this component, avoid creating new object references for the
- * `resource` prop on every render. Use useMemo or pass stable references.
- *
- * @example
- * // ❌ BAD - Creates new object every render
- * <RecommendationCard resource={{ ...data, extra: true }} />
- *
- * // ✅ GOOD - Stable reference from query/state
- * <RecommendationCard resource={recommendation} />
- */
-
-interface Resource {
+export interface RecommendationCardResource {
   id: string;
   name: string;
   url: string;
@@ -34,263 +24,111 @@ interface Resource {
   category: string;
   tags?: string[];
   confidence?: number;
-  matchReason?: string;
   isAIBased?: boolean;
-  userFeedback?: 'helpful' | 'not_helpful' | null;
+  personalized?: boolean;
+  explanation: RecommendationExplanation;
+  feedback?: RecommendationFeedbackValue | null;
 }
 
 interface RecommendationCardProps {
-  resource: Resource;
-  userId?: string;
-  onClick?: () => void;
+  resource: RecommendationCardResource;
   className?: string;
+  onFeedbackChange?: (feedback: RecommendationFeedbackValue | null) => void;
 }
 
 function RecommendationCard({
   resource,
-  userId,
-  onClick,
-  className
+  className,
+  onFeedbackChange,
 }: RecommendationCardProps) {
-  const [feedback, setFeedback] = useState<'helpful' | 'not_helpful' | null>(
-    resource.userFeedback || null
-  );
-  const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
-  const [, setLocation] = useLocation();
-  const confidence = resource.confidence || 0;
-
-  // NB-038 (run18): logged-out feedback must be honest — do NOT pretend the
-  // vote was saved. Prompt the user to sign in (with a working Sign in action)
-  // and skip the mutation entirely instead of firing a fake "thanks" toast.
-  const handleFeedback = (
-    feedbackType: 'helpful' | 'not_helpful',
-    e: React.MouseEvent
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isAuthenticated) {
-      toast({
-        title: "Sign in to save feedback",
-        description: "Create an account or sign in so your recommendation feedback is saved.",
-        action: (
-          <ToastAction
-            altText="Sign in"
-            onClick={() =>
-              setLocation(
-                `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
-              )
-            }
-          >
-            Sign in
-          </ToastAction>
-        ),
-      });
-      return;
-    }
-    feedbackMutation.mutate(feedbackType);
-  };
-
-  // Determine confidence level
-  const getConfidenceLevel = (conf: number) => {
-    if (conf >= 80) return { label: "High", color: "text-green-500", bgColor: "bg-green-500/10" };
-    if (conf >= 50) return { label: "Medium", color: "text-yellow-500", bgColor: "bg-yellow-500/10" };
-    return { label: "Low", color: "text-orange-500", bgColor: "bg-orange-500/10" };
-  };
-
-  const confidenceLevel = getConfidenceLevel(confidence);
-
-  const feedbackMutation = useMutation({
-    mutationFn: async (feedbackType: 'helpful' | 'not_helpful') => {
-      if (!userId) {
-        throw new Error("User must be logged in to provide feedback");
-      }
-      return await apiRequest(`/api/recommendations/feedback`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          userId,
-          resourceId: Number(resource.id),
-          feedback: feedbackType === 'helpful' ? 'clicked' : 'dismissed',
-          rating: feedbackType === 'helpful' ? 5 : 1,
-        })
-      });
-    },
-    onMutate: async (feedbackType) => {
-      // Optimistic update
-      setFeedback(feedbackType);
-    },
-    onSuccess: (data, feedbackType) => {
-      // Invalidate recommendations queries
-      queryClient.invalidateQueries({ queryKey: ['/api/recommendations'] });
-
-      toast({
-        description: feedbackType === 'helpful'
-          ? "Thanks for your feedback! This helps improve recommendations."
-          : "Feedback recorded. We'll improve our recommendations.",
-        duration: 2000
-      });
-    },
-    onError: (error, feedbackType) => {
-      // Revert optimistic update
-      setFeedback(resource.userFeedback || null);
-
-      toast({
-        title: "Error",
-        description: "Failed to submit feedback. Please try again.",
-        variant: "destructive"
-      });
-    }
-  });
+  const confidence = Math.max(0, Math.min(100, resource.confidence ?? 0));
+  const confidenceLabel =
+    confidence >= 80 ? "High" : confidence >= 60 ? "Medium" : "Exploratory";
 
   return (
-    <Card 
-      className={cn(
-        "overflow-hidden transition-all hover:border-primary/50 cursor-pointer",
-        className
-      )}
-      onClick={onClick}
-    >
-      <CardContent className="p-4">
-        <div className="flex flex-col gap-3">
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1 min-w-0">
-              {/* BUG-029 (run10): full title via native tooltip on the truncated heading.
-                  BUG-030 (run22): line-clamp-1 cuts between words instead of mid-word. */}
-              <h3 className="font-semibold text-base line-clamp-1 break-words" title={resource.name}>{resource.name}</h3>
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {resource.description || "No description available"}
-              </p>
-            </div>
-          </div>
+    <Card className={cn("h-full overflow-hidden transition-colors hover:border-primary/50", className)}>
+      <CardContent className="flex h-full flex-col gap-4 p-4">
+        <div className="min-w-0">
+          <h3 className="line-clamp-2 break-words text-base font-semibold" title={resource.name}>
+            {resource.name}
+          </h3>
+          <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">
+            {resource.description ?? "No description available"}
+          </p>
+        </div>
 
-          {/* Match Reason */}
-          {resource.matchReason && (
-            <div className="text-sm text-muted-foreground italic">
-              "{resource.matchReason}"
-            </div>
-          )}
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="max-w-full truncate text-xs">
+            {resource.category}
+          </Badge>
+          <Badge variant="outline" className="text-xs">
+            <TrendingUp className="mr-1 h-3 w-3" />
+            {Math.round(confidence)}% · {confidenceLabel}
+          </Badge>
+          <Badge variant="outline" className="text-xs">
+            {resource.isAIBased ? (
+              <Brain className="mr-1 h-3 w-3" />
+            ) : (
+              <Sparkles className="mr-1 h-3 w-3" />
+            )}
+            {resource.isAIBased ? "AI ranked" : "Rule ranked"}
+          </Badge>
+        </div>
 
-          {/* Badges Row */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Category Badge */}
-            <Badge variant="secondary" className="text-xs">
-              {resource.category}
-            </Badge>
-
-            {/* Confidence Score */}
-            <Badge 
-              variant="outline" 
-              className={cn("text-xs", confidenceLevel.bgColor, confidenceLevel.color)}
-            >
-              <TrendingUp className="h-3 w-3 mr-1" />
-              {confidence}% - {confidenceLevel.label}
-            </Badge>
-
-            {/* AI/Rule Based Indicator */}
-            <Badge 
-              variant="outline"
-              className={cn(
-                "text-xs",
-                resource.isAIBased 
-                  ? "bg-gradient-to-r from-primary/10 to-primary/5 text-primary border-primary/30" 
-                  : "bg-muted text-muted-foreground"
-              )}
-            >
-              {resource.isAIBased ? (
-                <>
-                  <Brain className="h-3 w-3 mr-1" />
-                  AI-Based
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Rule-Based
-                </>
-              )}
-            </Badge>
-          </div>
-
-          {/* Tags */}
-          {resource.tags && resource.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {resource.tags.slice(0, 3).map((tag) => (
-                <span 
-                  key={tag} 
-                  className="text-xs px-2 py-1 bg-muted rounded-md"
-                >
-                  #{tag}
-                </span>
+        <details
+          className="rounded-md border bg-muted/25 px-3 py-2 text-sm"
+          data-testid={`recommendation-explanation-${resource.id}`}
+        >
+          <summary className="cursor-pointer list-none font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="inline-flex items-center gap-2">
+              <Lightbulb className="h-4 w-4 text-primary" />
+              Why this?
+            </span>
+          </summary>
+          <p className="mt-2 text-muted-foreground">
+            {resource.explanation.summary}
+          </p>
+          {resource.explanation.signals.length > 0 ? (
+            <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+              {resource.explanation.signals.map((signal) => (
+                <li key={`${signal.code}:${signal.evidence ?? signal.label}`}>
+                  <span className="font-medium text-foreground">{signal.label}</span>
+                  {signal.evidence ? `: ${signal.evidence}` : ""}
+                </li>
               ))}
-              {resource.tags.length > 3 && (
-                <span className="text-xs px-2 py-1 text-muted-foreground">
-                  +{resource.tags.length - 3} more
-                </span>
-              )}
-            </div>
-          )}
+            </ul>
+          ) : null}
+        </details>
 
-          {/* Feedback Buttons */}
-          {/* R5-027 (run24): no-print hides the whole voting block as one unit
-              (label + buttons) instead of leaving an orphan question. */}
-          <div className="no-print flex items-center gap-2 pt-2 border-t border-border flex-wrap">
-            <span className="text-xs text-muted-foreground mr-1">Was this helpful?</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-8 px-3",
-                feedback === 'helpful' && "text-green-500 hover:text-green-600 bg-green-500/10"
-              )}
-              onClick={(e) => handleFeedback('helpful', e)}
-              disabled={feedbackMutation.isPending}
-              aria-label="Mark as helpful"
-            >
-              <ThumbsUp
-                className={cn(
-                  "h-4 w-4 mr-1.5",
-                  feedback === 'helpful' && "fill-current"
-                )}
-              />
-              <span className="text-xs">Helpful</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-8 px-3",
-                feedback === 'not_helpful' && "text-red-500 hover:text-red-600 bg-red-500/10"
-              )}
-              onClick={(e) => handleFeedback('not_helpful', e)}
-              disabled={feedbackMutation.isPending}
-              aria-label="Mark as not helpful"
-            >
-              <ThumbsDown
-                className={cn(
-                  "h-4 w-4 mr-1.5",
-                  feedback === 'not_helpful' && "fill-current"
-                )}
-              />
-              <span className="text-xs">Not Helpful</span>
-            </Button>
+        {resource.tags && resource.tags.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            {resource.tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="rounded-md bg-muted px-2 py-1 text-xs">
+                #{tag}
+              </span>
+            ))}
           </div>
+        ) : null}
 
-          {/* Action Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full border-primary/50 hover:bg-primary/10 hover:border-primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick && onClick();
-            }}
-          >
-            <ExternalLink className="h-4 w-4 mr-2" />
-            View Resource
+        <div className="mt-auto space-y-3">
+          {resource.personalized ? (
+            <div className="no-print border-t pt-3">
+              <p className="mb-2 text-xs text-muted-foreground">
+                Shape future recommendations
+              </p>
+              <RecommendationFeedback
+                resourceId={Number(resource.id)}
+                initialFeedback={resource.feedback}
+                onFeedbackChange={onFeedbackChange}
+              />
+            </div>
+          ) : null}
+
+          <Button asChild variant="outline" size="sm" className="w-full">
+            <a href={resource.url} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              View resource
+            </a>
           </Button>
         </div>
       </CardContent>
@@ -298,23 +136,18 @@ function RecommendationCard({
   );
 }
 
-export default memo(RecommendationCard, (prevProps, nextProps) => {
-  const prevRes = prevProps.resource;
-  const nextRes = nextProps.resource;
-
-  return (
-    prevRes.id === nextRes.id &&
-    prevRes.name === nextRes.name &&
-    prevRes.url === nextRes.url &&
-    prevRes.description === nextRes.description &&
-    prevRes.category === nextRes.category &&
-    prevRes.confidence === nextRes.confidence &&
-    prevRes.matchReason === nextRes.matchReason &&
-    prevRes.isAIBased === nextRes.isAIBased &&
-    prevRes.userFeedback === nextRes.userFeedback &&
-    JSON.stringify(prevRes.tags || []) === JSON.stringify(nextRes.tags || []) &&
-    prevProps.userId === nextProps.userId &&
-    prevProps.onClick === nextProps.onClick &&
-    prevProps.className === nextProps.className
-  );
-});
+export default memo(RecommendationCard, (previous, next) =>
+  previous.resource.id === next.resource.id
+  && previous.resource.name === next.resource.name
+  && previous.resource.url === next.resource.url
+  && previous.resource.description === next.resource.description
+  && previous.resource.category === next.resource.category
+  && previous.resource.confidence === next.resource.confidence
+  && previous.resource.isAIBased === next.resource.isAIBased
+  && previous.resource.personalized === next.resource.personalized
+  && previous.resource.feedback === next.resource.feedback
+  && JSON.stringify(previous.resource.explanation) === JSON.stringify(next.resource.explanation)
+  && JSON.stringify(previous.resource.tags ?? []) === JSON.stringify(next.resource.tags ?? [])
+  && previous.className === next.className
+  && previous.onFeedbackChange === next.onFeedbackChange
+);

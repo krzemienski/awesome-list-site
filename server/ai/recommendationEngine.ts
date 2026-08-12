@@ -1,5 +1,9 @@
 import { storage } from '../storage';
-import { Resource, User } from '@shared/schema';
+import { Resource, type UserRecommendationFeedback } from '@shared/schema';
+import type {
+  RecommendationExplanation,
+  RecommendationFeedbackValue,
+} from '@shared/recommendations';
 import {
   generateAIRecommendations as generateClaudeRecommendations,
   generateAILearningPaths,
@@ -7,7 +11,7 @@ import {
   calculateGoalsMatch,
   calculateTypeMatch,
   calculateTimeCommitmentMatch,
-  buildRecommendationReason,
+  buildRecommendationExplanation,
   skillPhrase,
 } from './recommendations';
 import { claudeService } from './claudeService';
@@ -41,6 +45,67 @@ export interface RecommendationResult {
   type: 'ai_powered' | 'rule_based' | 'hybrid';
   score?: number; // Internal score for ranking
   aiGenerated?: boolean; // Flag to indicate if AI generated
+  explanation: RecommendationExplanation;
+  feedback: RecommendationFeedbackValue | null;
+  personalized: boolean;
+}
+
+export interface RecommendationFeedbackInfluence {
+  byCategory: Map<string, {
+    helpful: number;
+    notForMe: number;
+    alreadyKnown: number;
+  }>;
+}
+
+export function buildRecommendationFeedbackInfluence(
+  resources: Resource[],
+  feedbackRows: Array<Pick<UserRecommendationFeedback, 'resourceId' | 'feedback'>>,
+): RecommendationFeedbackInfluence {
+  const resourcesById = new Map(resources.map((resource) => [resource.id, resource]));
+  const byCategory = new Map<string, {
+    helpful: number;
+    notForMe: number;
+    alreadyKnown: number;
+  }>();
+  for (const row of feedbackRows) {
+    const category = resourcesById.get(row.resourceId)?.category;
+    if (!category) continue;
+    const counts = byCategory.get(category) ?? {
+      helpful: 0,
+      notForMe: 0,
+      alreadyKnown: 0,
+    };
+    if (row.feedback === 'helpful') counts.helpful += 1;
+    if (row.feedback === 'not_for_me') counts.notForMe += 1;
+    if (row.feedback === 'already_known') counts.alreadyKnown += 1;
+    byCategory.set(category, counts);
+  }
+  return { byCategory };
+}
+
+/**
+ * Bounded category-level influence. Off-topic feedback is deliberately
+ * stronger than a helpful boost; "already known" only applies a small novelty
+ * penalty because it does not imply dislike of the topic.
+ */
+export function calculateRecommendationFeedbackAdjustment(
+  resource: Resource,
+  influence: RecommendationFeedbackInfluence,
+): number {
+  const counts = resource.category
+    ? influence.byCategory.get(resource.category)
+    : undefined;
+  if (!counts) return 0;
+  return Math.max(
+    -0.36,
+    Math.min(
+      0.16,
+      Math.min(counts.helpful * 0.08, 0.16)
+        - Math.min(counts.notForMe * 0.18, 0.36)
+        - Math.min(counts.alreadyKnown * 0.05, 0.1),
+    ),
+  );
 }
 
 export interface LearningPathRecommendation {
@@ -118,15 +183,20 @@ export class RecommendationEngine {
       completedJourneys: userProfile.completedJourneys || [],
       journeyProgress: userProfile.journeyProgress || []
     };
+    let recommendationFeedback: UserRecommendationFeedback[] = [];
 
     // Get user preferences and interactions from database and enrich the profile
     try {
-      const [dbPreferences, viewHistory, interactions, journeyProgressList] = await Promise.all([
+      const [dbPreferences, viewHistory, interactions, journeyProgressList, feedbackRows] = await Promise.all([
         storage.getUserPreferences(userProfile.userId),
         typeof (storage as any).getUserViewHistory === 'function' ? (storage as any).getUserViewHistory(userProfile.userId) : Promise.resolve([]),
         typeof (storage as any).getUserInteractions === 'function' ? (storage as any).getUserInteractions(userProfile.userId) : Promise.resolve([]),
-        storage.listUserJourneyProgress(userProfile.userId)
+        storage.listUserJourneyProgress(userProfile.userId),
+        userProfile.userId === 'anonymous'
+          ? Promise.resolve([])
+          : storage.getRecommendationFeedback(userProfile.userId),
       ]);
+      recommendationFeedback = feedbackRows;
 
       // Merge DB preferences with provided profile (provided profile takes precedence)
       if (dbPreferences) {
@@ -208,8 +278,12 @@ export class RecommendationEngine {
       [...(enrichedProfile.learningGoals || [])].sort().join(','),
       [...(enrichedProfile.preferredResourceTypes || [])].sort().join(','),
       enrichedProfile.timeCommitment || '',
+      [...recommendationFeedback]
+        .sort((a, b) => a.resourceId - b.resourceId)
+        .map((row) => `${row.resourceId}:${row.feedback}`)
+        .join(','),
     ].join('|');
-    const cacheKey = `${enrichedProfile.userId}_${limit}_${profileFingerprint}`;
+    const cacheKey = `${enrichedProfile.userId}::${limit}::${profileFingerprint}`;
     
     // Check cache if not forcing refresh
     if (!forceRefresh) {
@@ -275,10 +349,28 @@ export class RecommendationEngine {
         ...completedJourneyUrls.filter((url: string) => !enrichedProfile.completedResources.includes(url))
       ];
 
+      const feedbackByResourceId = new Map(
+        recommendationFeedback.map((row) => [row.resourceId, row.feedback]),
+      );
+      const feedbackInfluence = buildRecommendationFeedbackInfluence(
+        resources,
+        recommendationFeedback,
+      );
+      const excludedByFeedback = new Set(
+        recommendationFeedback
+          .filter((row) =>
+            row.feedback === 'hidden'
+            || row.feedback === 'already_known'
+            || row.feedback === 'not_for_me',
+          )
+          .map((row) => row.resourceId),
+      );
+
       // Filter out already viewed/completed resources (including journey resources)
       const eligibleResources = resources.filter(resource =>
         !enrichedProfile.viewHistory.includes(resource.url) &&
-        !enrichedProfile.completedResources.includes(resource.url)
+        !enrichedProfile.completedResources.includes(resource.url) &&
+        !excludedByFeedback.has(resource.id)
       );
 
       let recommendations: RecommendationResult[] = [];
@@ -368,7 +460,16 @@ export class RecommendationEngine {
         // cache key already fingerprints these inputs).
         const blend = (resource: Resource, index: number, poolSize: number) => {
           const popularity = poolSize > 1 ? 1 - index / (poolSize - 1) : 1;
-          return calculateColdStartBlend(resource, enrichedProfile, popularity);
+          const components = calculateColdStartBlend(resource, enrichedProfile, popularity);
+          const feedbackAdjustment = calculateRecommendationFeedbackAdjustment(
+            resource,
+            feedbackInfluence,
+          );
+          return {
+            ...components,
+            score: Math.max(0, Math.min(1, components.score + feedbackAdjustment)),
+            feedbackAdjustment,
+          };
         };
         const popularCandidates = await this.getPopularResources(preferredPool, Math.max(limit * 10, 100));
         const rankedPreferred = popularCandidates
@@ -390,20 +491,44 @@ export class RecommendationEngine {
           .slice(0, limit - rankedPreferred.length);
         // NB-042: reasons come from the ONE shared deterministic builder, so
         // the same resource + profile reads identically on every page.
-        recommendations = rankedPreferred.map(({ resource, comps }) => ({
-          resource,
-          confidence: Math.min(95, Math.max(55, Math.round(40 + comps.score * 55))),
-          reason: buildRecommendationReason(resource, enrichedProfile, { ...comps, popular: true }),
-          type: 'rule_based' as const,
-          score: comps.score
+        recommendations = rankedPreferred.map(({ resource, comps }) => {
+          const explanation = buildRecommendationExplanation(resource, enrichedProfile, {
+            ...comps,
+            popular: true,
+            positiveFeedback: comps.feedbackAdjustment > 0 ? resource.category : undefined,
+          });
+          return {
+            resource,
+            confidence: Math.min(95, Math.max(55, Math.round(40 + comps.score * 55))),
+            reason: explanation.summary,
+            explanation,
+            type: 'rule_based' as const,
+            score: comps.score,
+            feedback: feedbackByResourceId.get(resource.id) ?? null,
+            personalized: enrichedProfile.userId !== 'anonymous',
+          };
+        });
+        recommendations.push(...rankedPad.map(({ resource, comps }) => {
+          const baseExplanation = buildRecommendationExplanation(resource, enrichedProfile, {
+            ...comps,
+            popular: true,
+            positiveFeedback: comps.feedbackAdjustment > 0 ? resource.category : undefined,
+          });
+          const explanation = {
+            ...baseExplanation,
+            summary: `${baseExplanation.summary} — added because your selected categories had few unseen resources`,
+          };
+          return {
+            resource,
+            confidence: Math.min(90, Math.max(50, Math.round(35 + comps.score * 55))),
+            reason: explanation.summary,
+            explanation,
+            type: 'rule_based' as const,
+            score: comps.score,
+            feedback: feedbackByResourceId.get(resource.id) ?? null,
+            personalized: enrichedProfile.userId !== 'anonymous',
+          };
         }));
-        recommendations.push(...rankedPad.map(({ resource, comps }) => ({
-          resource,
-          confidence: Math.min(90, Math.max(50, Math.round(35 + comps.score * 55))),
-          reason: `${buildRecommendationReason(resource, enrichedProfile, { ...comps, popular: true })} — added because your selected categories had few unseen resources`,
-          type: 'rule_based' as const,
-          score: comps.score
-        })));
 
         // Cache and return early for cold-start users
         this.recommendationCache.set(cacheKey, {
@@ -432,15 +557,38 @@ export class RecommendationEngine {
             const resource = eligibleResources.find(r => r.url === rec.resourceId);
             if (!resource) return null;
 
+            const feedbackAdjustment = calculateRecommendationFeedbackAdjustment(
+              resource,
+              feedbackInfluence,
+            );
+            const skillScore = calculateSkillMatch(resource, enrichedProfile.skillLevel);
+            const goalsScore = calculateGoalsMatch(resource, enrichedProfile.learningGoals);
+            const typeScore = calculateTypeMatch(resource, enrichedProfile.preferredResourceTypes);
+            const timeScore = calculateTimeCommitmentMatch(resource, enrichedProfile.timeCommitment);
+            const explanation = buildRecommendationExplanation(resource, enrichedProfile, {
+              skillScore,
+              goalsScore,
+              typeScore,
+              timeScore,
+              positiveFeedback: feedbackAdjustment > 0 ? resource.category : undefined,
+            });
             return {
               resource,
-              confidence: Math.round(rec.confidenceLevel * 100),
-              reason: rec.reason,
+              confidence: Math.max(
+                0,
+                Math.min(100, Math.round(rec.confidenceLevel * 100 + feedbackAdjustment * 100)),
+              ),
+              reason: explanation.summary,
+              explanation,
               type: 'ai_powered' as const,
-              score: rec.score,
-              aiGenerated: true // Preserve AI flag
+              score: Math.max(0, Math.min(1, rec.score + feedbackAdjustment)),
+              aiGenerated: true, // Preserve AI flag
+              feedback: feedbackByResourceId.get(resource.id) ?? null,
+              personalized: true,
             };
-          }).filter(Boolean) as RecommendationResult[];
+          })
+            .filter(Boolean)
+            .sort((a, b) => (b?.score ?? 0) - (a?.score ?? 0)) as RecommendationResult[];
         } catch (error) {
           console.warn('AI recommendations failed, falling back to rule-based:', error);
         }
@@ -455,7 +603,9 @@ export class RecommendationEngine {
           favorites,
           bookmarks,
           completedJourneyResources,
-          remainingSlots
+          remainingSlots,
+          feedbackInfluence,
+          feedbackByResourceId,
         );
 
         // Merge and deduplicate
@@ -500,12 +650,10 @@ export class RecommendationEngine {
 
     } catch (error) {
       console.error('Error generating recommendations:', error);
-      
-      // Return empty results on error
-      return {
-        recommendations: [],
-        learningPaths: []
-      };
+      // Keep operational failures distinct from a valid "no eligible matches"
+      // result. The API layer turns this into a non-2xx response, allowing the
+      // client to preserve its last useful recommendations and offer a retry.
+      throw error;
     }
   }
 
@@ -518,7 +666,9 @@ export class RecommendationEngine {
     favorites: Resource[],
     bookmarks: Resource[],
     journeyResources: Resource[],
-    limit: number
+    limit: number,
+    feedbackInfluence: RecommendationFeedbackInfluence = { byCategory: new Map() },
+    feedbackByResourceId: Map<number, RecommendationFeedbackValue> = new Map(),
   ): RecommendationResult[] {
     const recommendations: RecommendationResult[] = [];
 
@@ -636,6 +786,12 @@ export class RecommendationEngine {
       const timeScore = calculateTimeCommitmentMatch(resource, userProfile.timeCommitment);
       score += timeScore * 12;
 
+      const feedbackAdjustment = calculateRecommendationFeedbackAdjustment(
+        resource,
+        feedbackInfluence,
+      );
+      score += feedbackAdjustment * 100;
+
       // Recency bonus (5% weight)
       if (resource.createdAt) {
         const daysSinceCreation = (Date.now() - new Date(resource.createdAt).getTime()) / (1000 * 60 * 60 * 24);
@@ -649,25 +805,26 @@ export class RecommendationEngine {
         // Preference evidence is always first and uses controlled human labels.
         // Keep at most one behavioral context after it so history can explain
         // the boost without hiding the goal/format that shaped this result.
-        const preferenceReason = buildRecommendationReason(resource, userProfile, {
+        const journeyContext = resource.category && journeyCategoryFrequency.has(resource.category)
+          ? resource.category
+          : undefined;
+        const explanation = buildRecommendationExplanation(resource, userProfile, {
           skillScore,
           goalsScore,
           typeScore,
           timeScore,
+          journeyContext,
+          positiveFeedback: feedbackAdjustment > 0 ? resource.category : undefined,
         });
-        const behavioralReason = reasons.find(reason =>
-          reason.startsWith('similar to') ||
-          reason.startsWith('related to') ||
-          reason.startsWith('recently added'),
-        );
         recommendations.push({
           resource,
           confidence: Math.min(Math.round(score), 100),
-          reason: behavioralReason
-            ? `${preferenceReason}; ${behavioralReason.charAt(0).toUpperCase()}${behavioralReason.slice(1)}`
-            : preferenceReason,
+          reason: explanation.summary,
+          explanation,
           type: 'rule_based',
-          score: score / 100
+          score: Math.max(0, Math.min(1, score / 100)),
+          feedback: feedbackByResourceId.get(resource.id) ?? null,
+          personalized: userProfile.userId !== 'anonymous',
         });
       }
     });
@@ -826,64 +983,13 @@ export class RecommendationEngine {
     feedback: 'clicked' | 'dismissed' | 'completed',
     rating?: number
   ): Promise<void> {
-    try {
-      // Log feedback for future improvements
-      await storage.logResourceAudit(
-        resourceId,
-        `recommendation_${feedback}`,
-        userId,
-        { rating },
-        `User ${feedback} recommendation`
-      );
-
-      // Store rating as user interaction so it influences future recommendations
-      if (rating !== undefined && rating !== null) {
-        await storage.trackUserInteraction(
-          userId,
-          resourceId,
-          'rate',
-          rating,
-          { source: 'recommendation_feedback', feedback }
-        );
-        console.log('[FEEDBACK DEBUG] Stored rating interaction:', {
-          userId,
-          resourceId,
-          feedback,
-          rating,
-          impact: rating >= 4 ? 'positive - will boost similar resources' : 'negative - will reduce similar resources'
-        });
-      }
-
-      // Also track clicked/dismissed interactions for better personalization
-      if (feedback === 'clicked') {
-        await storage.trackUserInteraction(
-          userId,
-          resourceId,
-          'click',
-          null,
-          { source: 'recommendation_feedback' }
-        );
-      } else if (feedback === 'dismissed') {
-        await storage.trackUserInteraction(
-          userId,
-          resourceId,
-          'dismiss',
-          null,
-          { source: 'recommendation_feedback' }
-        );
-      }
-
-      // Clear cache to refresh recommendations
-      for (const [key] of Array.from(this.recommendationCache.entries())) {
-        if (key.startsWith(userId)) {
-          this.recommendationCache.delete(key);
-        }
-      }
-
-      console.log('[FEEDBACK DEBUG] Cache invalidated for user:', userId);
-    } catch (error) {
-      console.error('Error recording recommendation feedback:', error);
-    }
+    const state: RecommendationFeedbackValue =
+      feedback === 'clicked'
+        ? 'helpful'
+        : feedback === 'completed'
+          ? 'already_known'
+          : 'not_for_me';
+    await this.setFeedbackState(userId, resourceId, state, { legacyRating: rating });
   }
 
   /**
@@ -901,65 +1007,40 @@ export class RecommendationEngine {
       sessionId?: string;
     }
   ): Promise<void> {
-    try {
-      // Log detailed feedback with analytics context
-      await storage.logResourceAudit(
-        resourceId,
-        `recommendation_feedback_${feedback_type}`,
-        userId,
-        {
-          feedback_type,
-          recommendation_type: context?.recommendationType,
-          confidence_score: context?.confidence,
-          recommendation_reason: context?.reason,
-          position_in_list: context?.position,
-          session_id: context?.sessionId,
-          timestamp: new Date().toISOString()
-        },
-        `User marked recommendation as ${feedback_type}`
-      );
+    const state: RecommendationFeedbackValue =
+      feedback_type === 'helpful'
+        ? 'helpful'
+        : feedback_type === 'already_known'
+          ? 'already_known'
+          : 'not_for_me';
+    await this.setFeedbackState(userId, resourceId, state, context);
+  }
 
-      // Map the qualitative feedback to a numeric rating and persist it as a
-      // 'rate' interaction so it actually moves future recommendation scoring.
-      // The rule-based engine treats ratings >= 4 as a positive category signal
-      // and ratings <= 2 as a negative one (see getRuleBasedRecommendations).
-      // 'already_known' is intentionally left as a neutral signal (no rating)
-      // because it says nothing about whether the user likes that category.
-      const ratingByFeedback: Record<typeof feedback_type, number | null> = {
-        helpful: 5,
-        not_helpful: 1,
-        irrelevant: 1,
-        already_known: null,
-      };
-      const rating = ratingByFeedback[feedback_type];
-      if (rating !== null) {
-        await storage.trackUserInteraction(
-          userId,
-          resourceId,
-          'rate',
-          rating,
-          { source: 'recommendation_detailed_feedback', feedback_type }
-        );
-        console.log('[FEEDBACK DEBUG] Stored detailed feedback rating interaction:', {
-          userId,
-          resourceId,
-          feedback_type,
-          rating,
-          impact: rating >= 4
-            ? 'positive - will boost similar resources'
-            : 'negative - will reduce similar resources',
-        });
-      }
+  public async setFeedbackState(
+    userId: string,
+    resourceId: number,
+    feedback: RecommendationFeedbackValue | null,
+    context?: Record<string, unknown>,
+  ): Promise<void> {
+    await storage.setRecommendationFeedback(userId, resourceId, feedback);
+    await storage.logResourceAudit(
+      resourceId,
+      feedback
+        ? `recommendation_feedback_${feedback}`
+        : 'recommendation_feedback_restored',
+      userId,
+      { feedback, ...context },
+      feedback
+        ? `User marked recommendation as ${feedback}`
+        : 'User restored recommendation feedback',
+    );
+    this.clearUserCache(userId);
+  }
 
-      // Clear cache to trigger fresh recommendations based on feedback
-      for (const [key] of Array.from(this.recommendationCache.entries())) {
-        if (key.startsWith(userId)) {
-          this.recommendationCache.delete(key);
-        }
-      }
-    } catch (error) {
-      console.error('Error recording detailed recommendation feedback:', error);
-      throw error;
+  private clearUserCache(userId: string): void {
+    const prefix = `${userId}::`;
+    for (const key of this.recommendationCache.keys()) {
+      if (key.startsWith(prefix)) this.recommendationCache.delete(key);
     }
   }
 }

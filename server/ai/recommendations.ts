@@ -6,6 +6,7 @@ import {
   type LearningGoal,
   type LearningTimeCommitment,
 } from '../../shared/onboarding';
+import type { RecommendationExplanation } from '../../shared/recommendations';
 
 // <important_do_not_delete>
 const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
@@ -91,6 +92,7 @@ export interface AIRecommendationResult {
   category: string;
   confidenceLevel: number;
   aiGenerated: boolean;
+  explanation: RecommendationExplanation;
 }
 
 // ---------------------------------------------------------------------------
@@ -343,32 +345,41 @@ export interface ReasonComponents {
   typeScore: number;
   timeScore: number;
   popular?: boolean;
+  journeyContext?: string;
+  positiveFeedback?: string;
 }
 
 /**
- * ONE deterministic reason per (resource, profile) pair. The skill phrase
- * always reflects the user's OWN configured level — a Beginner is never told
- * a pick is "for intermediate learners" (NB-042).
+ * Build the public explanation from named catalog/profile signals. Model prose
+ * is never passed through to clients, which keeps explanations reproducible
+ * and prevents unsupported claims.
  */
-export function buildRecommendationReason(
+export function buildRecommendationExplanation(
   resource: Resource,
   profile: Pick<UserProfile, 'skillLevel' | 'preferredCategories' | 'learningGoals' | 'preferredResourceTypes' | 'timeCommitment'>,
   comps: ReasonComponents
-): string {
+): RecommendationExplanation {
   const parts: string[] = [];
+  const signals: RecommendationExplanation['signals'] = [];
   const matchingGoals = getMatchingLearningGoals(resource, profile.learningGoals || []);
   const matchingTypes = getMatchingResourceTypes(resource, profile.preferredResourceTypes || []);
   if (matchingGoals.length > 0) {
-    parts.push(`supports your goal: ${learningGoalLabel(matchingGoals[0])}`);
+    const evidence = learningGoalLabel(matchingGoals[0]);
+    parts.push(`supports your goal: ${evidence}`);
+    signals.push({ code: 'goal_match', label: 'Learning goal match', evidence });
   }
   if (matchingTypes.length > 0) {
-    parts.push(`matches your preferred format: ${learningFormatLabel(matchingTypes[0])}`);
+    const evidence = learningFormatLabel(matchingTypes[0]);
+    parts.push(`matches your preferred format: ${evidence}`);
+    signals.push({ code: 'format_match', label: 'Preferred format match', evidence });
   }
   if (comps.timeScore === 1 && profile.timeCommitment === 'daily') {
     parts.push('fits shorter daily learning sessions');
+    signals.push({ code: 'time_fit', label: 'Fits your schedule', evidence: 'Short daily sessions' });
   }
   if (comps.timeScore === 1 && profile.timeCommitment === 'weekly') {
     parts.push('fits a focused weekly learning session');
+    signals.push({ code: 'time_fit', label: 'Fits your schedule', evidence: 'Focused weekly session' });
   }
   // Goal/format/time evidence is more specific than broad taxonomy context.
   // Keep category as a fallback rather than crowding out controlled choices.
@@ -378,19 +389,58 @@ export function buildRecommendationReason(
     (profile.preferredCategories || []).includes(resource.category)
   ) {
     parts.push(`matches your interest in ${resource.category}`);
+    signals.push({ code: 'topic_match', label: 'Topic match', evidence: resource.category });
   }
   if (comps.skillScore >= 0.7) {
     parts.push(`a good fit ${skillPhrase(profile.skillLevel)}`);
+    signals.push({
+      code: 'skill_match',
+      label: 'Skill-level fit',
+      evidence: profile.skillLevel,
+    });
+  }
+  if (comps.journeyContext) {
+    parts.push(`Related to your active learning journey in ${comps.journeyContext}`);
+    signals.push({
+      code: 'journey_context',
+      label: 'Active journey context',
+      evidence: comps.journeyContext,
+    });
+  }
+  if (comps.positiveFeedback) {
+    parts.push('similar to recommendations you marked helpful');
+    signals.push({
+      code: 'positive_feedback',
+      label: 'Prior helpful feedback',
+      evidence: comps.positiveFeedback,
+    });
   }
   if (parts.length === 0) {
-    parts.push(
-      comps.popular
-        ? (resource.category ? `popular in ${resource.category}` : 'popular across the catalog')
-        : 'based on your preferences'
-    );
+    const evidence = resource.category || 'Across the catalog';
+    parts.push(comps.popular ? `popular in ${evidence}` : `relevant to ${evidence}`);
+    signals.push({
+      code: comps.popular ? 'popular' : 'topic_match',
+      label: comps.popular ? 'Popular pick' : 'Catalog topic',
+      evidence,
+    });
   }
   const sentence = parts.slice(0, 3).join(' and ');
-  return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+  return {
+    summary: sentence.charAt(0).toUpperCase() + sentence.slice(1),
+    signals: signals.slice(0, 4),
+  };
+}
+
+/**
+ * Backward-compatible summary for older clients. New clients render the
+ * structured explanation returned alongside it.
+ */
+export function buildRecommendationReason(
+  resource: Resource,
+  profile: Pick<UserProfile, 'skillLevel' | 'preferredCategories' | 'learningGoals' | 'preferredResourceTypes' | 'timeCommitment'>,
+  comps: ReasonComponents,
+): string {
+  return buildRecommendationExplanation(resource, profile, comps).summary;
 }
 
 export interface AILearningPath {
@@ -492,7 +542,7 @@ Respond in JSON format:
         }
       ],
       max_tokens: 2000
-    });
+    }, { timeout: 15_000 });
 
     // Extract JSON from response using robust extraction
     const firstContent = response.content[0];
@@ -502,6 +552,10 @@ Respond in JSON format:
     const recommendations: AIRecommendationResult[] = result.recommendations?.map((rec: AIRecommendationResponse) => {
       const resource = availableResources.find(r => r.url === rec.resourceId);
       if (!resource) {
+        const explanation: RecommendationExplanation = {
+          summary: 'Resource is no longer available',
+          signals: [],
+        };
         return {
           resourceId: rec.resourceId,
           score: 0,
@@ -509,6 +563,7 @@ Respond in JSON format:
           category: 'Unknown',
           confidenceLevel: 0,
           aiGenerated: true,
+          explanation,
         };
       }
       const skillScore = calculateSkillMatch(resource, userProfile.skillLevel);
@@ -518,18 +573,20 @@ Respond in JSON format:
       const preferenceScore =
         skillScore * 0.25 + goalsScore * 0.3 + typeScore * 0.25 + timeScore * 0.2;
       const score = Math.max(0, Math.min(1, (rec.score || 0.5) * 0.55 + preferenceScore * 0.45));
+      const explanation = buildRecommendationExplanation(resource, userProfile, {
+        skillScore,
+        goalsScore,
+        typeScore,
+        timeScore,
+      });
       return {
         resourceId: rec.resourceId,
         score,
-        reason: buildRecommendationReason(resource, userProfile, {
-          skillScore,
-          goalsScore,
-          typeScore,
-          timeScore,
-        }),
+        reason: explanation.summary,
         category: resource.category || 'Unknown',
         confidenceLevel: Math.max(0, Math.min(1, rec.confidenceLevel || 0.7)),
-        aiGenerated: true
+        aiGenerated: true,
+        explanation,
       };
     }) || [];
 
@@ -672,20 +729,22 @@ function generateFallbackRecommendations(
       skillScore * 0.2 + goalsScore * 0.2 + typeScore * 0.15 + timeScore * 0.15;
 
     if (score > 0.2) {
+      const explanation = buildRecommendationExplanation(resource, userProfile, {
+        skillScore,
+        goalsScore,
+        typeScore,
+        timeScore,
+      });
       recommendations.push({
         resourceId: resource.url,
         score,
         // NB-042 (run18): one deterministic reason per (resource, profile).
-        reason: buildRecommendationReason(resource, userProfile, {
-          skillScore,
-          goalsScore,
-          typeScore,
-          timeScore,
-        }),
+        reason: explanation.summary,
         category: resource.category || 'Unknown',
         // Confidence tracks the actual match strength instead of a flat 0.6.
         confidenceLevel: Math.min(0.9, Math.max(0.4, 0.35 + score * 0.55)),
-        aiGenerated: false
+        aiGenerated: false,
+        explanation,
       });
     }
   });

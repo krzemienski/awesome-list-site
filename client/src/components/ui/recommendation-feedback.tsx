@@ -1,214 +1,186 @@
-import { useState, memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import {
+  BookCheck,
+  EyeOff,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useRecommendationFeedback } from "@/hooks/useRecommendationFeedback";
 import { cn } from "@/lib/utils";
+import type { RecommendationFeedbackValue } from "@shared/recommendations";
 
 interface RecommendationFeedbackProps {
   resourceId: number;
-  userId?: string;
+  initialFeedback?: RecommendationFeedbackValue | null;
   className?: string;
-  size?: "sm" | "default" | "lg";
-  showCount?: boolean;
-  onFeedbackChange?: (feedback: 'helpful' | 'not_helpful' | null) => void;
+  onFeedbackChange?: (feedback: RecommendationFeedbackValue | null) => void;
 }
+
+const FEEDBACK_OPTIONS: {
+  value: RecommendationFeedbackValue;
+  label: string;
+  activeClass: string;
+  icon: typeof ThumbsUp;
+}[] = [
+  {
+    value: "helpful",
+    label: "Helpful",
+    activeClass: "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    icon: ThumbsUp,
+  },
+  {
+    value: "not_for_me",
+    label: "Not for me",
+    activeClass: "border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200",
+    icon: ThumbsDown,
+  },
+  {
+    value: "already_known",
+    label: "Already know this",
+    activeClass: "border-sky-500/50 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    icon: BookCheck,
+  },
+  {
+    value: "hidden",
+    label: "Hide",
+    activeClass: "border-muted-foreground/50 bg-muted text-foreground",
+    icon: EyeOff,
+  },
+];
 
 function RecommendationFeedback({
   resourceId,
-  userId,
+  initialFeedback = null,
   className,
-  size = "sm",
-  showCount = false,
-  onFeedbackChange
+  onFeedbackChange,
 }: RecommendationFeedbackProps) {
-  const [feedback, setFeedback] = useState<'helpful' | 'not_helpful' | null>(null);
-  const { toast } = useToast();
+  const [feedback, setFeedback] =
+    useState<RecommendationFeedbackValue | null>(initialFeedback);
+  const { recordFeedbackAsync, isLoading } = useRecommendationFeedback();
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  // NB-038 (run18): logged-out feedback used to fake-accept ("Thanks! We'll
-  // recommend more like this") while storing nothing. Give honest UX instead —
-  // prompt the user to sign in with a working action and skip the mutation.
-  const promptSignIn = () => {
-    toast({
-      title: "Sign in to save feedback",
-      description: "Create an account or sign in so your recommendation feedback is saved.",
-      action: (
-        <ToastAction
-          altText="Sign in"
-          onClick={() =>
-            setLocation(
-              `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
-            )
-          }
-        >
-          Sign in
-        </ToastAction>
-      ),
-    });
-  };
+  useEffect(() => {
+    setFeedback(initialFeedback);
+  }, [initialFeedback]);
 
-  const feedbackMutation = useMutation({
-    mutationFn: async (newFeedback: 'helpful' | 'not_helpful') => {
-      if (!userId) {
-        throw new Error("User must be logged in to provide feedback");
+  const save = async (
+    next: RecommendationFeedbackValue | null,
+    previous: RecommendationFeedbackValue | null,
+  ) => {
+    setFeedback(next);
+    onFeedbackChange?.(next);
+    try {
+      await recordFeedbackAsync({ resourceId, feedback: next });
+      if (next === "hidden") {
+        toast({
+          title: "Recommendation hidden",
+          description: "It will stay out of future recommendations until restored.",
+          action: (
+            <ToastAction
+              altText="Undo hiding this recommendation"
+              onClick={() => {
+                void save(null, "hidden");
+              }}
+            >
+              Undo
+            </ToastAction>
+          ),
+        });
+      } else {
+        toast({
+          description: next
+            ? "Feedback saved. It will shape future recommendations."
+            : "Feedback removed.",
+          duration: 2500,
+        });
       }
-
-      return await apiRequest('/api/recommendations/feedback', {
-        method: 'POST',
-        body: JSON.stringify({
-          userId,
-          resourceId,
-          feedback: newFeedback === 'helpful' ? 'clicked' : 'dismissed',
-          rating: newFeedback === 'helpful' ? 5 : 1
-        }),
-        credentials: 'include'
-      });
-    },
-    onMutate: async (newFeedback) => {
-      // Optimistic update
-      const previousFeedback = feedback;
-      setFeedback(newFeedback);
-      return { previousFeedback };
-    },
-    onSuccess: (data, newFeedback) => {
-      // Invalidate recommendations cache to improve future recommendations
-      queryClient.invalidateQueries({ queryKey: ['/api/recommendations'] });
-
-      // Notify parent component
-      onFeedbackChange?.(newFeedback);
-
+    } catch {
+      setFeedback(previous);
+      onFeedbackChange?.(previous);
       toast({
-        description: newFeedback === 'helpful'
-          ? "Thanks! We'll recommend more like this."
-          : "Thanks for the feedback. We'll improve your recommendations.",
-        duration: 2000
-      });
-    },
-    onError: (error, newFeedback, context) => {
-      // Revert optimistic update
-      setFeedback(context?.previousFeedback || null);
-
-      toast({
-        title: "Error",
-        description: "Failed to record feedback. Please try again.",
-        variant: "destructive"
+        title: "Feedback wasn’t saved",
+        description: "Your previous choice was restored. Please try again.",
+        variant: "destructive",
       });
     }
-  });
-
-  const handleThumbsUp = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // NB-038 (run18): honest logged-out UX — prompt sign-in, store nothing.
-    if (!isAuthenticated) {
-      promptSignIn();
-      return;
-    }
-
-    // Toggle feedback if clicking the same button
-    const newFeedback = feedback === 'helpful' ? null : 'helpful';
-
-    if (newFeedback === null) {
-      setFeedback(null);
-      onFeedbackChange?.(null);
-      return;
-    }
-
-    feedbackMutation.mutate('helpful');
   };
 
-  const handleThumbsDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // NB-038 (run18): honest logged-out UX — prompt sign-in, store nothing.
+  const choose = (next: RecommendationFeedbackValue) => {
     if (!isAuthenticated) {
-      promptSignIn();
+      toast({
+        title: "Sign in to save feedback",
+        description: "Recommendation controls are available for signed-in members.",
+        action: (
+          <ToastAction
+            altText="Sign in"
+            onClick={() =>
+              setLocation(
+                `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+              )
+            }
+          >
+            Sign in
+          </ToastAction>
+        ),
+      });
       return;
     }
-
-    // Toggle feedback if clicking the same button
-    const newFeedback = feedback === 'not_helpful' ? null : 'not_helpful';
-
-    if (newFeedback === null) {
-      setFeedback(null);
-      onFeedbackChange?.(null);
-      return;
-    }
-
-    feedbackMutation.mutate('not_helpful');
+    const selected = feedback === next ? null : next;
+    void save(selected, feedback);
   };
 
-  const iconSize = size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";
+  const selectedLabel = FEEDBACK_OPTIONS.find(
+    (option) => option.value === feedback,
+  )?.label;
 
   return (
-    <div className={cn("flex items-center gap-1", className)}>
-      {/* Thumbs Up Button */}
-      <Button
-        variant="ghost"
-        size={size}
-        className={cn(
-          "group relative",
-          feedback === 'helpful' && "text-green-500 hover:text-green-600"
-        )}
-        onClick={handleThumbsUp}
-        disabled={feedbackMutation.isPending}
-        aria-label={feedback === 'helpful' ? "Remove helpful feedback" : "Mark as helpful"}
-        data-testid="button-thumbs-up"
+    <div className={cn("space-y-2", className)}>
+      <div
+        className="flex flex-wrap gap-2"
+        role="group"
+        aria-label="Recommendation feedback"
       >
-        <div className="flex items-center gap-1.5">
-          <ThumbsUp
-            className={cn(
-              iconSize,
-              "transition-all duration-200",
-              feedback === 'helpful' ? "fill-current" : "",
-              "group-hover:scale-110"
-            )}
-          />
-        </div>
-
-        {/* Ripple effect on click */}
-        {feedbackMutation.isPending && feedback === 'helpful' && (
-          <span className="absolute inset-0 animate-ping rounded-full bg-green-500 opacity-20" />
-        )}
-      </Button>
-
-      {/* Thumbs Down Button */}
-      <Button
-        variant="ghost"
-        size={size}
-        className={cn(
-          "group relative",
-          feedback === 'not_helpful' && "text-red-500 hover:text-red-600"
-        )}
-        onClick={handleThumbsDown}
-        disabled={feedbackMutation.isPending}
-        aria-label={feedback === 'not_helpful' ? "Remove not helpful feedback" : "Mark as not helpful"}
-        data-testid="button-thumbs-down"
-      >
-        <div className="flex items-center gap-1.5">
-          <ThumbsDown
-            className={cn(
-              iconSize,
-              "transition-all duration-200",
-              feedback === 'not_helpful' ? "fill-current" : "",
-              "group-hover:scale-110"
-            )}
-          />
-        </div>
-
-        {/* Ripple effect on click */}
-        {feedbackMutation.isPending && feedback === 'not_helpful' && (
-          <span className="absolute inset-0 animate-ping rounded-full bg-red-500 opacity-20" />
-        )}
-      </Button>
+        {FEEDBACK_OPTIONS.map((option) => {
+          const Icon = option.icon;
+          const selected = feedback === option.value;
+          return (
+            <Button
+              key={option.value}
+              type="button"
+              variant="outline"
+              size="sm"
+              className={cn(
+                "h-9 min-h-9 whitespace-nowrap",
+                selected && option.activeClass,
+              )}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                choose(option.value);
+              }}
+              disabled={isLoading}
+              aria-pressed={selected}
+              data-testid={`recommendation-feedback-${option.value}-${resourceId}`}
+            >
+              <Icon className={cn("mr-1.5 h-4 w-4", selected && "fill-current")} />
+              {option.label}
+            </Button>
+          );
+        })}
+      </div>
+      {selectedLabel ? (
+        <Badge variant="secondary" aria-live="polite">
+          Saved: {selectedLabel}
+        </Badge>
+      ) : null}
     </div>
   );
 }

@@ -53,7 +53,7 @@ import {
 } from "lucide-react";
 import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
-import RecommendationCard from "@/components/ai/RecommendationCard";
+import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 import ContinueLearningPreview from "@/components/learning/ContinueLearningPreview";
 import { useAuth } from "@/hooks/useAuth";
@@ -114,26 +114,6 @@ interface UserJourney {
     difficulty: string;
     estimatedDuration?: string;
   };
-}
-
-interface RecommendationResource {
-  id: number;
-  title: string;
-  url: string;
-  description?: string;
-  category: string;
-  subcategory?: string;
-  subSubcategory?: string;
-  status?: string;
-}
-
-interface Recommendation {
-  resource: RecommendationResource;
-  confidence?: number;
-  reason?: string;
-  type?: string;
-  aiGenerated?: boolean;
-  score?: number;
 }
 
 export default function Profile({ user }: ProfileProps) {
@@ -293,17 +273,6 @@ export default function Profile({ user }: ProfileProps) {
   // Fetch user's learning journeys
   const { data: userJourneys, isLoading: journeysLoading } = useQuery<UserJourney[]>({
     queryKey: ['/api/user/journeys'],
-    enabled: !!user
-  });
-
-  // Fetch personalized recommendations
-  const { data: recommendations, isLoading: recommendationsLoading } = useQuery<Recommendation[]>({
-    queryKey: ['/api/recommendations'],
-    queryFn: async () => {
-      const response = await fetch('/api/recommendations?limit=6', { credentials: 'include' });
-      if (!response.ok) throw new Error('Failed to fetch recommendations');
-      return response.json();
-    },
     enabled: !!user
   });
 
@@ -610,57 +579,11 @@ export default function Profile({ user }: ProfileProps) {
               dedicated dashboard. It only mounts on this authenticated page. */}
           <ContinueLearningPreview />
 
-          {/* Personalized Recommendations */}
-          <Card data-testid="card-recommendations">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Recommended for You
-              </CardTitle>
-              <CardDescription>
-                AI-powered resource suggestions based on your interests and learning journey
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {recommendationsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4" aria-busy={true} aria-live="polite">
-                  {Array(4).fill(0).map((_, i) => (
-                    <Skeleton key={i} className="h-48 w-full" />
-                  ))}
-                </div>
-              ) : recommendations && recommendations.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {recommendations.map((recommendation) => (
-                    <RecommendationCard
-                      key={recommendation.resource.id}
-                      userId={user?.id}
-                      resource={{
-                        id: String(recommendation.resource.id),
-                        name: recommendation.resource.title,
-                        url: recommendation.resource.url,
-                        description: recommendation.resource.description,
-                        category: recommendation.resource.category,
-                        confidence: recommendation.confidence,
-                        matchReason: recommendation.reason,
-                        isAIBased: recommendation.aiGenerated ?? recommendation.type !== 'rule_based',
-                      }}
-                      onClick={() => {
-                        setLocation(`/resource/${recommendation.resource.id}`);
-                      }}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No recommendations yet</p>
-                  <p className="text-sm mt-2">
-                    Start exploring resources to get personalized recommendations!
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Same server-authoritative response and feedback mutation path used
+              on Home, Recommendations, and Advanced. */}
+          <div data-testid="card-recommendations">
+            <AIRecommendationsPanel />
+          </div>
         </TabsContent>
 
         {/* Favorites Tab */}

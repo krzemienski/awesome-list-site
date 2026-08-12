@@ -24,8 +24,35 @@ interface LearningPreferencesResponse {
   revision: number | null;
 }
 
+function parseLearningPreferencesResponse(
+  value: unknown,
+): LearningPreferencesResponse {
+  if (!value || typeof value !== "object") {
+    throw new Error("Invalid learning preferences response");
+  }
+  const response = value as Partial<LearningPreferencesResponse>;
+  if (
+    response.revision !== null
+    && response.revision !== undefined
+    && typeof response.revision !== "number"
+  ) {
+    throw new Error("Invalid learning preferences response");
+  }
+  if (
+    response.preferences !== null
+    && response.preferences !== undefined
+    && typeof response.preferences !== "object"
+  ) {
+    throw new Error("Invalid learning preferences response");
+  }
+  return {
+    preferences: response.preferences ?? null,
+    revision: response.revision ?? null,
+  };
+}
+
 export function useLearningPreferences() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const query = useQuery<LearningPreferencesResponse>({
     queryKey: ["/api/user/preferences"],
     enabled: !authLoading && isAuthenticated,
@@ -38,7 +65,7 @@ export function useLearningPreferences() {
       const current = queryClient.getQueryData<LearningPreferencesResponse>([
         "/api/user/preferences",
       ]);
-      return apiRequest("/api/user/preferences", {
+      const response: unknown = await apiRequest("/api/user/preferences", {
         method: "PUT",
         body: JSON.stringify({
           ...update,
@@ -46,6 +73,7 @@ export function useLearningPreferences() {
             current?.revision ?? current?.preferences?.revision ?? null,
         }),
       });
+      return parseLearningPreferencesResponse(response);
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/user/preferences"], data);
@@ -54,11 +82,14 @@ export function useLearningPreferences() {
       // newly saved profile.
       try {
         window.localStorage.removeItem("ai_recommendations_cache");
+        if (user?.id) {
+          window.localStorage.removeItem(`ai_recommendations_cache:${user.id}`);
+        }
       } catch {
         // Storage may be unavailable in private browsing; the server save still
         // succeeded and the mounted recommendations panel will re-run.
       }
-      queryClient.invalidateQueries({ queryKey: ["/api/recommendations"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/recommendations"] });
     },
   });
 
@@ -67,22 +98,26 @@ export function useLearningPreferences() {
       const current = queryClient.getQueryData<LearningPreferencesResponse>([
         "/api/user/preferences",
       ]);
-      return apiRequest("/api/user/preferences", {
+      const response: unknown = await apiRequest("/api/user/preferences", {
         method: "DELETE",
         body: JSON.stringify({
           expectedRevision:
             current?.revision ?? current?.preferences?.revision ?? null,
         }),
       });
+      return parseLearningPreferencesResponse(response);
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/user/preferences"], data);
       try {
         window.localStorage.removeItem("ai_recommendations_cache");
+        if (user?.id) {
+          window.localStorage.removeItem(`ai_recommendations_cache:${user.id}`);
+        }
       } catch {
         // See save mutation above.
       }
-      queryClient.invalidateQueries({ queryKey: ["/api/recommendations"] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/recommendations"] });
     },
   });
 

@@ -77,7 +77,9 @@ import {
   type UserInteraction,
   type ApiKey,
   type UserBookmark,
+  type UserRecommendationFeedback,
 } from "@shared/schema";
+import type { RecommendationFeedbackValue } from "@shared/recommendations";
 
 import {
   UserRepository,
@@ -269,6 +271,8 @@ export interface IStorage {
   getResourceInteractions(resourceId: number): Promise<UserInteraction[]>;
   getResourcePopularityScores(): Promise<Array<{ resourceId: number; score: number }>>;
   getUserInteractions(userId: string): Promise<UserInteraction[]>;
+  getRecommendationFeedback(userId: string): Promise<UserRecommendationFeedback[]>;
+  setRecommendationFeedback(userId: string, resourceId: number, feedback: RecommendationFeedbackValue | null): Promise<UserRecommendationFeedback | undefined>;
   trackUserInteraction(userId: string, resourceId: number, interactionType: string, interactionValue?: number | null, metadata?: Record<string, any>): Promise<UserInteraction>;
   getApiKey(key: string): Promise<ApiKey | undefined>;
   updateApiKeyLastUsed(id: string): Promise<void>;
@@ -685,6 +689,18 @@ export class DatabaseStorage implements IStorage {
 
   async getUserInteractions(userId: string): Promise<UserInteraction[]> {
     return this.userFeatureRepo.getUserInteractions(userId);
+  }
+
+  async getRecommendationFeedback(userId: string): Promise<UserRecommendationFeedback[]> {
+    return this.userFeatureRepo.getRecommendationFeedback(userId);
+  }
+
+  async setRecommendationFeedback(
+    userId: string,
+    resourceId: number,
+    feedback: RecommendationFeedbackValue | null,
+  ): Promise<UserRecommendationFeedback | undefined> {
+    return this.userFeatureRepo.setRecommendationFeedback(userId, resourceId, feedback);
   }
 
   async trackUserInteraction(userId: string, resourceId: number, interactionType: string, interactionValue?: number | null, metadata?: Record<string, any>): Promise<UserInteraction> {
