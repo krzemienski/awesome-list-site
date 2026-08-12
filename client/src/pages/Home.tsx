@@ -1,5 +1,5 @@
 import { TaxonomyCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -17,9 +17,6 @@ import {
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
-import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
-import ContinueLearningPreview from "@/components/learning/ContinueLearningPreview";
-import AdvancedFilter from "@/components/ui/advanced-filter";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
@@ -42,7 +39,44 @@ import {
 // filter panel). The 3.1MB corpus is fetched lazily ONLY when a tag filter is
 // active (per-category match counts need per-resource tags).
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
-import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding";
+import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding-values";
+
+// Account-only home features are separate from the anonymous landing path.
+// Their imports start only after auth resolves true; the route-level error
+// boundary in App still provides the established one-shot chunk recovery UI.
+const AIRecommendationsPanel = lazy(
+  () => import("@/components/ui/ai-recommendations-panel"),
+);
+const ContinueLearningPreview = lazy(
+  () => import("@/components/learning/ContinueLearningPreview"),
+);
+const AdvancedFilter = lazy(() => import("@/components/ui/advanced-filter"));
+
+function AccountFeatureFallback({ label }: { label: string }) {
+  return (
+    <div
+      className="h-28 animate-pulse border border-[var(--border)] bg-[var(--surface)]"
+      aria-busy="true"
+      aria-label={label}
+      data-testid="home-account-feature-skeleton"
+    />
+  );
+}
+
+function FilterControlsFallback() {
+  return (
+    <div
+      className="flex w-full flex-wrap gap-2"
+      aria-busy="true"
+      aria-label="Loading filter controls"
+      data-testid="filter-controls-skeleton"
+    >
+      <div className="h-11 w-36 animate-pulse bg-muted" />
+      <div className="h-11 w-full animate-pulse bg-muted sm:w-[180px]" />
+    </div>
+  );
+}
+
 interface HomeProps {
   nav?: AwesomeListNav;
   navLoading: boolean;
@@ -367,7 +401,13 @@ export default function Home({ nav, navLoading }: HomeProps) {
         </p>
       </div>
 
-      {isAuthenticated ? <ContinueLearningPreview /> : null}
+      {isAuthenticated ? (
+        <Suspense
+          fallback={<AccountFeatureFallback label="Loading your learning progress" />}
+        >
+          <ContinueLearningPreview />
+        </Suspense>
+      ) : null}
 
       {/* BUG-064 (run27): honest feedback when the link carried a tag param
           that parsed to nothing (?tags=+++ / ?tags=) — previously the page
@@ -454,13 +494,15 @@ export default function Home({ nav, navLoading }: HomeProps) {
         </Card>
       ) : null}
 
-      <AdvancedFilter
-        selectedTags={selectedTags}
-        sortBy={sortBy}
-        availableTags={availableTags}
-        onTagsChange={setSelectedTags}
-        onSortChange={handleSortChange}
-      />
+      <Suspense fallback={<FilterControlsFallback />}>
+        <AdvancedFilter
+          selectedTags={selectedTags}
+          sortBy={sortBy}
+          availableTags={availableTags}
+          onTagsChange={setSelectedTags}
+          onSortChange={handleSortChange}
+        />
+      </Suspense>
 
       {filteredCategories.length === 0 ? (
         <div
@@ -559,7 +601,11 @@ export default function Home({ nav, navLoading }: HomeProps) {
           // full Resource object already embedded in the /api/recommendations
           // response (rec.resource), so Home never needs the 3.1MB corpus
           // for recommendations.
-          <AIRecommendationsPanel showHeader={false} />
+          <Suspense
+            fallback={<AccountFeatureFallback label="Loading personalized recommendations" />}
+          >
+            <AIRecommendationsPanel showHeader={false} />
+          </Suspense>
         ) : (
           <Card>
             <CardHeader>

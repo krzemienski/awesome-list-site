@@ -18,6 +18,10 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
+    "bundle:report": "node scripts/validation/bundle-budget.mjs",
+    "bundle:budget": "node scripts/validation/bundle-budget.mjs --check",
+    "perf:serve": "node scripts/validation/serve-performance-build.mjs",
+    "perf:mobile": "node scripts/validation/mobile-performance-audit.mjs",
     "digest:dispatch": "tsx scripts/run-digest-dispatch.ts",
     "audit:sidebar": "bash scripts/audit-sidebar.sh",
     "check:awesome-bot": "bash scripts/check-awesome-bot.sh"

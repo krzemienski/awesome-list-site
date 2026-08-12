@@ -12,14 +12,9 @@ import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
 import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
-import Category from "@/pages/Category";
-import Subcategory from "@/pages/Subcategory";
-import SubSubcategory from "@/pages/SubSubcategory";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
-import ResourceDetail from "@/pages/ResourceDetail";
-import Categories from "@/pages/Categories";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
@@ -29,13 +24,15 @@ import { Button } from "@/components/ui/button";
 // chunk that regular visitors never download.
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 
-// Task 169 (cold-load perf): only the hot browse surfaces (home, the three
-// category-tree levels, resource detail, 404) stay in the entry chunk.
-// Everything else — auth forms, profile/bookmarks, submit (react-hook-form +
-// zod), journeys, settings, static/legal pages — is code-split so the first
-// parse/eval of the main bundle is smaller on cold loads of heavy category
-// pages. Each lazy route renders inside the Suspense boundary around the
-// Switch below (lightweight skeleton fallback, chrome stays mounted).
+// Task 301: Home is the only route kept in the entry chunk. Every other page
+// loads behind the shared Suspense + RouteErrorBoundary below, so anonymous
+// visitors do not parse category/detail form dependencies or role-gated code
+// before they can use the landing page. The shell stays eager and interactive.
+const Category = lazy(() => import("@/pages/Category"));
+const Subcategory = lazy(() => import("@/pages/Subcategory"));
+const SubSubcategory = lazy(() => import("@/pages/SubSubcategory"));
+const ResourceDetail = lazy(() => import("@/pages/ResourceDetail"));
+const Categories = lazy(() => import("@/pages/Categories"));
 const Login = lazy(() => import("@/pages/Login"));
 const Register = lazy(() => import("@/pages/Register"));
 const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
@@ -59,6 +56,7 @@ const Notifications = lazy(() => import("@/pages/Notifications"));
 const Onboarding = lazy(() => import("@/pages/Onboarding"));
 const Terms = lazy(() => import("@/pages/Terms"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
+const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
 
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
  * route paints a familiar loading state instead of a blank main region. */
@@ -77,6 +75,26 @@ function RouteFallback() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="h-36 rounded-none bg-muted animate-pulse" />
         ))}
+      </div>
+    </div>
+  );
+}
+
+/** Search-palette Suspense fallback. It occupies the same modal layer as the
+ * eventual palette, so opening search on a cold cache has a truthful visible
+ * loading state instead of an inert click or a blank page. */
+function SearchDialogFallback() {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 px-4 pt-[15vh]"
+      role="status"
+      aria-busy="true"
+      aria-label="Loading search"
+      data-testid="search-dialog-skeleton"
+    >
+      <div className="w-full max-w-lg border border-border bg-background p-5 shadow-2xl">
+        <div className="mb-4 h-5 w-32 animate-pulse bg-muted" />
+        <div className="h-11 w-full animate-pulse bg-muted" />
       </div>
     </div>
   );
@@ -373,6 +391,21 @@ function Router() {
   } = useAuth();
   const [location] = useLocation();
   const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((re) => re.test(location));
+  const renderSearchDialog = ({
+    isOpen,
+    setIsOpen,
+  }: {
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+  }) => (
+    <RouteErrorBoundary location={location}>
+      {isOpen ? (
+        <Suspense fallback={<SearchDialogFallback />}>
+          <SearchDialog isOpen setIsOpen={setIsOpen} />
+        </Suspense>
+      ) : null}
+    </RouteErrorBoundary>
+  );
 
   // BUG-013 (run14): count wouter navigations so back buttons can tell a
   // deep-linked first page (no in-app history) from real in-app browsing.
@@ -436,14 +469,14 @@ function Router() {
   // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError}>
+      <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
         <NotFound />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError}>
+    <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}
@@ -552,7 +585,7 @@ function Router() {
         </Route>
         <Route path="/admin" component={() => (
           <AdminGuard>
-            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
+            <Suspense fallback={<RouteFallback />}>
               <AdminDashboard />
             </Suspense>
           </AdminGuard>
@@ -561,7 +594,7 @@ function Router() {
             open the matching tab — AdminDashboard reads :section via useRoute. */}
         <Route path="/admin/:section" component={() => (
           <AdminGuard>
-            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
+            <Suspense fallback={<RouteFallback />}>
               <AdminDashboard />
             </Suspense>
           </AdminGuard>

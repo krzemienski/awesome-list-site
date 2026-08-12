@@ -1,10 +1,51 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+
+const workspaceRoot = path.resolve(import.meta.dirname);
+
+/**
+ * Vite's manifest describes the chunk graph but not which source modules were
+ * rolled into an entry. Emit a small deterministic companion file so the
+ * bundle gate can prove that admin/AI/export/chart modules are absent from the
+ * anonymous entry without shipping source maps.
+ */
+function bundleModuleManifest(): Plugin {
+  return {
+    name: "bundle-module-manifest",
+    generateBundle(_options, bundle) {
+      const chunks: Record<
+        string,
+        { isEntry: boolean; isDynamicEntry: boolean; modules: string[] }
+      > = {};
+      for (const [fileName, output] of Object.entries(bundle)) {
+        if (output.type !== "chunk") continue;
+        chunks[fileName] = {
+          isEntry: output.isEntry,
+          isDynamicEntry: output.isDynamicEntry,
+          modules: Object.keys(output.modules)
+            .map((moduleId) => {
+              const relative = path.relative(workspaceRoot, moduleId);
+              return relative.startsWith("..")
+                ? moduleId.replaceAll("\\", "/")
+                : relative.replaceAll("\\", "/");
+            })
+            .sort(),
+        };
+      }
+      this.emitFile({
+        type: "asset",
+        fileName: "bundle-modules.json",
+        source: `${JSON.stringify({ schemaVersion: 1, chunks }, null, 2)}\n`,
+      });
+    },
+  };
+}
 
 export default defineConfig({
   plugins: [
     react(),
+    bundleModuleManifest(),
     ...(process.env.REPL_ID !== undefined
       ? [
           await import("@replit/vite-plugin-runtime-error-modal").then((m) =>
@@ -32,6 +73,8 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Logical source keys make bundle budgets stable across hashed filenames.
+    manifest: true,
   },
   server: {
     watch: {

@@ -124,50 +124,6 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     }
   }, [isOpen]);
 
-  // Global keyboard shortcut listener (Cmd+K, Ctrl+K, and `/`)
-  // MR-DS-03 — `/` branch added (dead listener in App.tsx deleted) so the
-  // header's advertised `/` kbd hint actually opens this dialog.
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as Element | null;
-      const inField =
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        (target instanceof HTMLElement && target.isContentEditable);
-
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsOpen(true);
-        return;
-      }
-      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        // NB-028 (run23): while the palette is already open, '/' is a spent
-        // shortcut, not input — swallow it so it never types a literal slash
-        // into the query field.
-        if (isOpen) {
-          if (inField) e.preventDefault();
-          return;
-        }
-        if (!inField) {
-          e.preventDefault();
-          setIsOpen(true);
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [setIsOpen, isOpen]);
-
-  // BUG-034 (run27): pages whose own inputs swallow the "/" shortcut (the
-  // /search page's auto-focused query box) re-dispatch it as this event so
-  // the palette still opens instead of the keystroke corrupting their input.
-  useEffect(() => {
-    const open = () => setIsOpen(true);
-    window.addEventListener('awesome:open-search-palette', open);
-    return () => window.removeEventListener('awesome:open-search-palette', open);
-  }, [setIsOpen]);
-
   // Focus input when dialog opens
   useEffect(() => {
     if (isOpen && inputRef.current) {

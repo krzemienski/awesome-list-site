@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Palette, User, ShieldCheck, Bookmark, Sparkles, ChevronRight, LogIn, RotateCcw, SlidersHorizontal } from "lucide-react";
 import {
   DEFAULT_LEARNING_PREFERENCES,
-  completedLearningPreferencesSchema,
   type LearningPreferencesValues,
-} from "@shared/onboarding";
+} from "@shared/onboarding-values";
+import { completedLearningPreferencesSchema } from "@shared/onboarding";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";

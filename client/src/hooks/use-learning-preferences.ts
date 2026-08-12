@@ -3,7 +3,7 @@ import type {
   LearningPreferencesUpdate,
   LearningPreferencesValues,
   OnboardingStatus,
-} from "@shared/onboarding";
+} from "@shared/onboarding-values";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 

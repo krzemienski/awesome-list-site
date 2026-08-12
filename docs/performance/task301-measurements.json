@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-08-12",
+  "bundle": {
+    "command": "npm run build && npm run bundle:report",
+    "baselineCommit": "62e36d7880bf617539a4b2b7926b395c77ff07a4",
+    "baselineInitial": {
+      "rawBytes": 1257018,
+      "gzipBytes": 372294,
+      "brotliBytes": 302232
+    },
+    "currentInitial": {
+      "rawBytes": 839837,
+      "gzipBytes": 253230,
+      "brotliBytes": 209906
+    },
+    "reductionPercent": {
+      "raw": 33.2,
+      "gzip": 32.0,
+      "brotli": 30.5
+    },
+    "incrementalRoutes": {
+      "admin": {
+        "rawBytes": 809834,
+        "gzipBytes": 218335,
+        "brotliBytes": 181339
+      },
+      "category": {
+        "rawBytes": 222847,
+        "gzipBytes": 75910,
+        "brotliBytes": 67793
+      },
+      "resource": {
+        "rawBytes": 189607,
+        "gzipBytes": 63688,
+        "brotliBytes": 56766
+      },
+      "search": {
+        "rawBytes": 203076,
+        "gzipBytes": 68930,
+        "brotliBytes": 61406
+      },
+      "journeys": {
+        "rawBytes": 34187,
+        "gzipBytes": 12777,
+        "brotliBytes": 11343
+      },
+      "login": {
+        "rawBytes": 117128,
+        "gzipBytes": 37030,
+        "brotliBytes": 33233
+      },
+      "recommendations": {
+        "rawBytes": 209070,
+        "gzipBytes": 70785,
+        "brotliBytes": 63048
+      }
+    },
+    "budgetFailures": [],
+    "initialIsolationViolations": []
+  },
+  "mobile": {
+    "command": "PERF_STATIC_DIR=<build>/public PERF_STATIC_PORT=<port> PERF_API_BASE_URL=http://127.0.0.1:5000 npm run perf:serve; PERF_BASE_URL=http://127.0.0.1:<port> PERF_RUNS=3 npm run perf:mobile -- --json <output.json>",
+    "profile": {
+      "viewport": "390x844@2x",
+      "latencyMs": 150,
+      "downloadMbps": 1.6,
+      "uploadKbps": 750,
+      "cpuSlowdown": 4,
+      "cacheDisabled": true,
+      "runs": 3
+    },
+    "baseline": {
+      "artifactCommit": "62e36d7880bf617539a4b2b7926b395c77ff07a4",
+      "note": "Baseline public build served with gzip on port 5101 and /api proxied to the same local server used by the current run.",
+      "runs": [
+        {
+          "run": 1,
+          "domContentLoadedMs": 2691,
+          "homeReadyMs": 3460,
+          "scriptEvaluationMs": 664,
+          "taskDurationMs": 1167,
+          "scriptTransferBytes": 372557,
+          "decodedScriptBytes": 1257018,
+          "categoryReadyMs": 7504,
+          "categoryTransitionMs": 4044,
+          "categoryScriptEvaluationMs": 1566,
+          "categoryTaskDurationMs": 3733,
+          "categoryScriptTransferBytes": 794985,
+          "categoryDecodedScriptBytes": 1448523
+        },
+        {
+          "run": 2,
+          "domContentLoadedMs": 2674,
+          "homeReadyMs": 3403,
+          "scriptEvaluationMs": 656,
+          "taskDurationMs": 1127,
+          "scriptTransferBytes": 372557,
+          "decodedScriptBytes": 1257018,
+          "categoryReadyMs": 7842,
+          "categoryTransitionMs": 4439,
+          "categoryScriptEvaluationMs": 1880,
+          "categoryTaskDurationMs": 5136,
+          "categoryScriptTransferBytes": 795012,
+          "categoryDecodedScriptBytes": 1448523
+        },
+        {
+          "run": 3,
+          "domContentLoadedMs": 2793,
+          "homeReadyMs": 3566,
+          "scriptEvaluationMs": 804,
+          "taskDurationMs": 1345,
+          "scriptTransferBytes": 372557,
+          "decodedScriptBytes": 1257018,
+          "categoryReadyMs": 7176,
+          "categoryTransitionMs": 3610,
+          "categoryScriptEvaluationMs": 1541,
+          "categoryTaskDurationMs": 3781,
+          "categoryScriptTransferBytes": 737027,
+          "categoryDecodedScriptBytes": 1265665
+        }
+      ],
+      "median": {
+        "domContentLoadedMs": 2691,
+        "homeReadyMs": 3460,
+        "scriptEvaluationMs": 664,
+        "taskDurationMs": 1167,
+        "scriptTransferBytes": 372557,
+        "decodedScriptBytes": 1257018,
+        "categoryReadyMs": 7504,
+        "categoryTransitionMs": 4044,
+        "categoryScriptEvaluationMs": 1566,
+        "categoryTaskDurationMs": 3781,
+        "categoryScriptTransferBytes": 794985,
+        "categoryDecodedScriptBytes": 1448523
+      }
+    },
+    "current": {
+      "runs": [
+        {
+          "run": 1,
+          "domContentLoadedMs": 1975,
+          "homeReadyMs": 2692,
+          "scriptEvaluationMs": 530,
+          "taskDurationMs": 1024,
+          "scriptTransferBytes": 260698,
+          "decodedScriptBytes": 855672,
+          "categoryReadyMs": 6353,
+          "categoryTransitionMs": 3661,
+          "categoryScriptEvaluationMs": 993,
+          "categoryTaskDurationMs": 2804,
+          "categoryScriptTransferBytes": 557228,
+          "categoryDecodedScriptBytes": 1160013
+        },
+        {
+          "run": 2,
+          "domContentLoadedMs": 1987,
+          "homeReadyMs": 2689,
+          "scriptEvaluationMs": 506,
+          "taskDurationMs": 994,
+          "scriptTransferBytes": 261037,
+          "decodedScriptBytes": 855736,
+          "categoryReadyMs": 6579,
+          "categoryTransitionMs": 3890,
+          "categoryScriptEvaluationMs": 965,
+          "categoryTaskDurationMs": 2992,
+          "categoryScriptTransferBytes": 557248,
+          "categoryDecodedScriptBytes": 1160013
+        },
+        {
+          "run": 3,
+          "domContentLoadedMs": 1967,
+          "homeReadyMs": 2653,
+          "scriptEvaluationMs": 520,
+          "taskDurationMs": 977,
+          "scriptTransferBytes": 260698,
+          "decodedScriptBytes": 855672,
+          "categoryReadyMs": 6537,
+          "categoryTransitionMs": 3884,
+          "categoryScriptEvaluationMs": 959,
+          "categoryTaskDurationMs": 2955,
+          "categoryScriptTransferBytes": 557264,
+          "categoryDecodedScriptBytes": 1160013
+        }
+      ],
+      "median": {
+        "domContentLoadedMs": 1975,
+        "homeReadyMs": 2689,
+        "scriptEvaluationMs": 520,
+        "taskDurationMs": 994,
+        "scriptTransferBytes": 260698,
+        "decodedScriptBytes": 855672,
+        "categoryReadyMs": 6537,
+        "categoryTransitionMs": 3884,
+        "categoryScriptEvaluationMs": 965,
+        "categoryTaskDurationMs": 2955,
+        "categoryScriptTransferBytes": 557248,
+        "categoryDecodedScriptBytes": 1160013
+      }
+    },
+    "improvementPercent": {
+      "domContentLoaded": 26.6,
+      "homeReady": 22.3,
+      "scriptEvaluation": 21.7,
+      "taskDuration": 14.8,
+      "scriptTransfer": 30.0,
+      "decodedScript": 31.9,
+      "categoryReady": 12.9,
+      "categoryTransition": 4.0,
+      "categoryScriptEvaluation": 38.4,
+      "categoryTaskDuration": 21.8,
+      "categoryScriptTransfer": 29.9,
+      "categoryDecodedScript": 19.9
+    }
+  }
+}

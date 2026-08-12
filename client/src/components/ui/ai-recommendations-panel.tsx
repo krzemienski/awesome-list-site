@@ -29,7 +29,7 @@ import {
   LEARNING_FORMAT_OPTIONS,
   LEARNING_GOAL_OPTIONS,
   hasMeaningfulLearningPreferences,
-} from "@shared/onboarding";
+} from "@shared/onboarding-values";
 import type { RecommendationFeedbackValue } from "@shared/recommendations";
 
 interface AIRecommendationsPanelProps {

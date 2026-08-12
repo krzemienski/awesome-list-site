@@ -9,7 +9,7 @@ import {
   type LearningPreferencesValues,
   type LearningSkillLevel,
   type LearningTimeCommitment,
-} from "@shared/onboarding";
+} from "@shared/onboarding-values";
 
 export const LEARNING_PREFERENCE_STEPS = [
   { number: 1, short: "Level", title: "Where are you starting?" },

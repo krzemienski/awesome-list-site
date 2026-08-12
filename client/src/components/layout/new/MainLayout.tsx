@@ -4,7 +4,6 @@ import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
-import SearchDialog from "@/components/ui/search-dialog";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { openCookieSettings } from "@/components/ui/consent-banner";
@@ -61,10 +60,56 @@ interface MainLayoutProps {
   user?: User;
   onLogout?: () => void;
   logoutError?: string | null;
+  renderSearchDialog?: (controls: {
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+  }) => React.ReactNode;
 }
 
-export default function MainLayout({ nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError }: MainLayoutProps) {
+export default function MainLayout({ nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, renderSearchDialog }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Keep the lightweight global trigger in the eager shell. The palette code
+  // itself is loaded only after one of these controls opens it.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as Element | null;
+      const inField =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === "k"
+      ) {
+        event.preventDefault();
+        setSearchOpen(true);
+        return;
+      }
+      if (
+        event.key === "/" &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey
+      ) {
+        if (searchOpen) {
+          if (inField) event.preventDefault();
+          return;
+        }
+        if (!inField) {
+          event.preventDefault();
+          setSearchOpen(true);
+        }
+      }
+    };
+    const openSearch = () => setSearchOpen(true);
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("awesome:open-search-palette", openSearch);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("awesome:open-search-palette", openSearch);
+    };
+  }, [searchOpen]);
 
   return (
     <SidebarProvider
@@ -180,10 +225,10 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
         </SidebarInset>
         </div>
       </div>
-      <SearchDialog
-        isOpen={searchOpen}
-        setIsOpen={setSearchOpen}
-      />
+      {renderSearchDialog?.({
+        isOpen: searchOpen,
+        setIsOpen: setSearchOpen,
+      })}
       <BackToTop />
     </SidebarProvider>
   );

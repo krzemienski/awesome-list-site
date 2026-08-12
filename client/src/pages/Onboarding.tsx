@@ -6,7 +6,7 @@ import {
   DEFAULT_LEARNING_PREFERENCES,
   ONBOARDING_STEP_COUNT,
   type LearningPreferencesValues,
-} from "@shared/onboarding";
+} from "@shared/onboarding-values";
 import LearningPreferencesForm, {
   LEARNING_PREFERENCE_STEPS,
 } from "@/components/onboarding/learning-preferences-form";

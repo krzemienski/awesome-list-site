@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "commit": "62e36d7880bf617539a4b2b7926b395c77ff07a4",
+    "initial": {
+      "rawBytes": 1257018,
+      "gzipBytes": 372294,
+      "brotliBytes": 302232
+    }
+  },
+  "initial": {
+    "maxRawBytes": 860000,
+    "maxGzipBytes": 260000,
+    "maxBrotliBytes": 211500
+  },
+  "maxAsyncChunk": {
+    "maxGzipBytes": 180000,
+    "maxBrotliBytes": 155000
+  },
+  "routes": {
+    "admin": {
+      "manifestKey": "src/pages/AdminDashboard.tsx",
+      "maxRawBytes": 850000,
+      "maxGzipBytes": 232000,
+      "maxBrotliBytes": 194000
+    },
+    "category": {
+      "manifestKey": "src/pages/Category.tsx",
+      "maxRawBytes": 237000,
+      "maxGzipBytes": 81500,
+      "maxBrotliBytes": 73000
+    },
+    "resource": {
+      "manifestKey": "src/pages/ResourceDetail.tsx",
+      "maxRawBytes": 202000,
+      "maxGzipBytes": 68500,
+      "maxBrotliBytes": 61000
+    },
+    "search": {
+      "manifestKey": "src/pages/Search.tsx",
+      "maxRawBytes": 216000,
+      "maxGzipBytes": 74000,
+      "maxBrotliBytes": 66000
+    },
+    "journeys": {
+      "manifestKey": "src/pages/Journeys.tsx",
+      "maxRawBytes": 37000,
+      "maxGzipBytes": 14000,
+      "maxBrotliBytes": 12500
+    },
+    "login": {
+      "manifestKey": "src/pages/Login.tsx",
+      "maxRawBytes": 125000,
+      "maxGzipBytes": 40000,
+      "maxBrotliBytes": 35500
+    },
+    "recommendations": {
+      "manifestKey": "src/pages/Recommendations.tsx",
+      "maxRawBytes": 223000,
+      "maxGzipBytes": 76000,
+      "maxBrotliBytes": 68000
+    }
+  },
+  "initialForbiddenModulePatterns": [
+    "(^|/)client/src/pages/AdminDashboard\\.tsx$",
+    "(^|/)client/src/components/admin/",
+    "(^|/)client/src/components/ui/ai-recommendations-panel\\.tsx$",
+    "(^|/)jspdf/",
+    "(^|/)html2canvas/",
+    "(^|/)recharts/"
+  ]
+}

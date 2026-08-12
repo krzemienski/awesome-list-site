@@ -7,6 +7,7 @@
 #   3. print-audit      — scripts/validation/print-audit.mjs      (headless Chromium)
 #   4. responsive-audit — scripts/validation/responsive-audit.mjs (headless Chromium)
 #   5. npm run build    — the actual production build
+#   6. bundle-budget    — deterministic entry/major-route size + isolation gate
 #
 # The two browser audits need the app serving on :5000 and ADMIN_PASSWORD set.
 # In the dev workspace the "Start application" workflow is usually already up;
@@ -108,6 +109,10 @@ STARTED_SERVER_PID=""
 
 # 5. Production build
 run_step build npm run build
+
+# 6. The report consumes Vite's logical manifest and module inventory emitted
+# by the production build above. It must run after (never before) that build.
+run_step bundle-budget npm run bundle:budget
 
 echo ""
 echo "[pre-publish] ALL CHECKS PASSED — build artifacts are ready in dist/"
