@@ -56,6 +56,14 @@ export { CategoryRepository } from './CategoryRepository';
 export { TagRepository } from './TagRepository';
 export { LearningJourneyRepository } from './LearningJourneyRepository';
 export { UserFeatureRepository } from './UserFeatureRepository';
+export {
+  CollectionRepository,
+  CollectionNotFoundError,
+  type BookmarkBulkAction,
+  type BookmarkBulkResult,
+  type CollectionWithCount,
+  type PublicCollection,
+} from './CollectionRepository';
 export { AuditRepository } from './AuditRepository';
 export { GithubSyncRepository } from './GithubSyncRepository';
 export { EnrichmentRepository } from './EnrichmentRepository';

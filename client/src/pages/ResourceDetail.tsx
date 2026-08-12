@@ -40,6 +40,7 @@ import { slugify, formatAdminDate } from "@/lib/utils";
 import { fetchAwesomeListNav } from "@/lib/static-data";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
+import type { BookmarkCollection } from "@/types/bookmarks";
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -66,7 +67,9 @@ export default function ResourceDetail() {
   });
 
   // BUG-021 (run25): /api/bookmarks items carry the user's saved notes.
-  const { data: bookmarks } = useQuery<(Resource & { notes?: string | null })[]>({
+  const { data: bookmarks } = useQuery<
+    (Resource & { notes?: string | null; collectionIds?: number[] })[]
+  >({
     queryKey: ['/api/bookmarks'],
     enabled: isAuthenticated
   });
@@ -136,7 +139,16 @@ export default function ResourceDetail() {
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [notesDialogMode, setNotesDialogMode] = useState<"add" | "edit">("add");
   const [tempNotes, setTempNotes] = useState("");
+  const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
+  const originalCollectionIdsRef = useRef<number[]>([]);
+  const desiredCollectionIdsRef = useRef<number[]>([]);
   const saveModeRef = useRef<"add" | "edit">("add");
+  const { data: collections = [], isLoading: collectionsLoading } =
+    useQuery<BookmarkCollection[]>({
+      queryKey: ["/api/collections?includeArchived=true"],
+      enabled: isAuthenticated && notesDialogOpen,
+      staleTime: 60_000,
+    });
 
   // Optimistic state lives in the query cache lists here (not local state):
   // flip the cached list membership so isFavorite/isBookmarked re-derive.
@@ -209,6 +221,39 @@ export default function ResourceDetail() {
           description: "Resource saved to your bookmarks"
         });
       }
+      if (!vars.remove) {
+        const original = new Set(originalCollectionIdsRef.current);
+        const desired = new Set(desiredCollectionIdsRef.current);
+        const additions = Array.from(desired).filter((collectionId) => !original.has(collectionId));
+        const removals = Array.from(original).filter((collectionId) => !desired.has(collectionId));
+        if (additions.length || removals.length) {
+          void Promise.allSettled([
+            ...additions.map((collectionId) =>
+              apiRequest(`/api/collections/${collectionId}/items/${id}`, {
+                method: "POST",
+              }),
+            ),
+            ...removals.map((collectionId) =>
+              apiRequest(`/api/collections/${collectionId}/items/${id}`, {
+                method: "DELETE",
+              }),
+            ),
+          ]).then((results) => {
+            queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+            queryClient.invalidateQueries({
+              queryKey: ["/api/collections?includeArchived=true"],
+            });
+            if (results.some((result) => result.status === "rejected")) {
+              toast({
+                title: "Bookmark saved",
+                description:
+                  "Some collection choices couldn't be updated. Open the bookmark again to retry.",
+                variant: "destructive",
+              });
+            }
+          });
+        }
+      }
       saveModeRef.current = "add";
       setNotesDialogOpen(false);
       setTempNotes("");
@@ -220,17 +265,22 @@ export default function ResourceDetail() {
 
   const handleSaveWithNotes = () => {
     saveModeRef.current = notesDialogMode;
+    desiredCollectionIdsRef.current = selectedCollectionIds;
     bookmark.mutate({ notes: tempNotes, remove: false });
   };
 
   const handleSaveWithoutNotes = () => {
     saveModeRef.current = notesDialogMode;
+    desiredCollectionIdsRef.current = selectedCollectionIds;
     bookmark.mutate({ remove: false });
   };
 
   const handleEditNotesClick = () => {
     setNotesDialogMode("edit");
     setTempNotes(bookmarkNotes);
+    const current = bookmarkedEntry?.collectionIds ?? [];
+    originalCollectionIdsRef.current = current;
+    setSelectedCollectionIds(current);
     setNotesDialogOpen(true);
   };
 
@@ -259,6 +309,8 @@ export default function ResourceDetail() {
       interceptActivate: () => {
         setNotesDialogMode("add");
         setTempNotes("");
+        originalCollectionIdsRef.current = [];
+        setSelectedCollectionIds([]);
         setNotesDialogOpen(true);
         return true;
       },
@@ -554,6 +606,18 @@ export default function ResourceDetail() {
         onSaveWithNotes={handleSaveWithNotes}
         onSaveWithoutNotes={handleSaveWithoutNotes}
         isPending={bookmark.isPending}
+        collections={collections}
+        selectedCollectionIds={selectedCollectionIds}
+        onCollectionToggle={(collectionId, selected) =>
+          setSelectedCollectionIds((current) =>
+            selected
+              ? current.includes(collectionId)
+                ? current
+                : [...current, collectionId]
+              : current.filter((existingId) => existingId !== collectionId),
+          )
+        }
+        collectionsLoading={collectionsLoading}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

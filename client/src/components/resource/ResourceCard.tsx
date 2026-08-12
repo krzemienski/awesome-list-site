@@ -31,6 +31,9 @@ interface ResourceCardProps {
    * tag as a filter on the hosting page; otherwise they link to the
    * tag-filtered home view. */
   onTagClick?: (tag: string) => void;
+  /** Public read-only collections hide account/edit actions while preserving
+   * the card's real detail and external links. */
+  showPersonalActions?: boolean;
 }
 
 function ResourceCard({
@@ -38,7 +41,8 @@ function ResourceCard({
   fullResource,
   className,
   onClick,
-  onTagClick
+  onTagClick,
+  showPersonalActions = true,
 }: ResourceCardProps) {
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
@@ -151,21 +155,23 @@ function ResourceCard({
           </h2>
           {/* R2-L09: shown to anonymous users too — the buttons themselves
               prompt sign-in on click instead of hiding the affordance. */}
-          <div className="no-print relative z-10 flex items-center gap-1 ml-2">
-            <FavoriteButton
-              resourceId={resource.id}
-              isFavorited={resource.isFavorited}
-              favoriteCount={resource.favoriteCount}
-              size="sm"
-              showCount={false}
-            />
-            <BookmarkButton
-              resourceId={resource.id}
-              isBookmarked={resource.isBookmarked}
-              notes={resource.bookmarkNotes}
-              size="sm"
-            />
-          </div>
+          {showPersonalActions && (
+            <div className="no-print relative z-10 flex items-center gap-1 ml-2">
+              <FavoriteButton
+                resourceId={resource.id}
+                isFavorited={resource.isFavorited}
+                favoriteCount={resource.favoriteCount}
+                size="sm"
+                showCount={false}
+              />
+              <BookmarkButton
+                resourceId={resource.id}
+                isBookmarked={resource.isBookmarked}
+                notes={resource.bookmarkNotes}
+                size="sm"
+              />
+            </div>
+          )}
         </div>
         {/* R5-053 (run24): printed card grids previously showed dead buttons
             and never a URL. Print the destination under the title so a paper
@@ -343,7 +349,7 @@ function ResourceCard({
               <span className="sr-only"> (opens in new tab)</span>
             </a>
           </Button>
-          {isValidDbResource && (
+          {isValidDbResource && showPersonalActions && (
             <Button
               variant="ghost"
               size="sm"
@@ -359,7 +365,7 @@ function ResourceCard({
         </div>
       </CardContent>
 
-      {suggestEditOpen && (
+      {suggestEditOpen && showPersonalActions && (
         <SuggestEditDialog 
           resource={resourceForDialog}
           open={suggestEditOpen}
@@ -391,6 +397,7 @@ export default memo(ResourceCard, (prevProps, nextProps) => {
     prevProps.className === nextProps.className &&
     prevProps.onClick === nextProps.onClick &&
     prevProps.onTagClick === nextProps.onTagClick &&
+    prevProps.showPersonalActions === nextProps.showPersonalActions &&
     prevProps.fullResource === nextProps.fullResource
   );
 });

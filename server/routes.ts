@@ -41,6 +41,8 @@ import {
   TagRepository,
   LearningJourneyRepository,
   UserFeatureRepository,
+  CollectionRepository,
+  CollectionNotFoundError,
   AuditRepository,
   GithubSyncRepository,
   EnrichmentRepository,
@@ -97,6 +99,13 @@ import {
   resourceSkillLevelSchema,
 } from "@shared/resourceFacets";
 import { parseTagFilterValues } from "@shared/tagNormalize";
+import {
+  bookmarkQueueStatusSchema,
+  collectionNameSchema,
+  collectionShareIdSchema,
+  personalTagSchema,
+  personalTagsSchema,
+} from "@shared/bookmarkCollections";
 import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "./validation/inputs";
 import { trackServerEvent } from "./lib/mixpanelServer";
 import { swaggerSpec } from "./openapi";
@@ -145,6 +154,7 @@ const categoryRepo = new CategoryRepository();
 const tagRepo = new TagRepository();
 const learningJourneyRepo = new LearningJourneyRepository();
 const userFeatureRepo = new UserFeatureRepository();
+const collectionRepo = new CollectionRepository();
 const auditRepo = new AuditRepository();
 const githubSyncRepo = new GithubSyncRepository();
 const enrichmentRepo = new EnrichmentRepository();
@@ -2422,7 +2432,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/bookmarks/:resourceId - Add bookmark
-  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res, next) => {
+    // Express matches in declaration order. Let the reserved segment reach the
+    // additive bulk handler registered below instead of parsing it as an ID.
+    if (req.params.resourceId === "bulk") return next("route");
     try {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
@@ -2461,6 +2474,296 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching bookmarks:', error);
       res.status(500).json({ message: 'Failed to fetch bookmarks' });
+    }
+  });
+
+  // --- Bookmark Collections & Learning Queue (Task #295) ---
+  // Additive to the existing bookmark routes above: user_bookmarks remains the
+  // one save/note record; collections only organize those rows.
+  const collectionIdSchema = z.number().int().min(1).max(PG_INT_MAX);
+  const collectionCreateSchema = z.object({
+    name: collectionNameSchema,
+  }).strict();
+  const collectionPatchSchema = z.object({
+    name: collectionNameSchema.optional(),
+    archived: z.boolean().optional(),
+  }).strict().refine(
+    (value) => value.name !== undefined || value.archived !== undefined,
+    "At least one collection field is required",
+  );
+  const collectionReorderSchema = z.object({
+    orderedIds: z.array(collectionIdSchema).max(500).refine(
+      (ids) => new Set(ids).size === ids.length,
+      "Collection IDs must be unique",
+    ),
+  }).strict();
+  const bookmarkStateSchema = z.object({
+    queueStatus: bookmarkQueueStatusSchema.optional(),
+    archived: z.boolean().optional(),
+    personalTags: personalTagsSchema.optional(),
+  }).strict().refine(
+    (value) =>
+      value.queueStatus !== undefined ||
+      value.archived !== undefined ||
+      value.personalTags !== undefined,
+    "At least one bookmark field is required",
+  );
+  const bookmarkBulkSchema = z.object({
+    resourceIds: z
+      .array(z.number().int().min(1).max(PG_INT_MAX))
+      .min(1)
+      .max(100)
+      .refine((ids) => new Set(ids).size === ids.length, "Resource IDs must be unique"),
+    action: z.discriminatedUnion("type", [
+      z.object({
+        type: z.literal("status"),
+        status: bookmarkQueueStatusSchema,
+      }).strict(),
+      z.object({
+        type: z.literal("archive"),
+        archived: z.boolean(),
+      }).strict(),
+      z.object({
+        type: z.literal("tag"),
+        tag: personalTagSchema,
+        mode: z.enum(["add", "remove"]),
+      }).strict(),
+      z.object({
+        type: z.literal("move"),
+        destinationCollectionId: collectionIdSchema,
+        sourceCollectionId: collectionIdSchema.nullish(),
+      }).strict(),
+    ]),
+  }).strict();
+
+  const parseCollectionId = (value: unknown) =>
+    parseIntInRange(value, { min: 1, max: PG_INT_MAX });
+  const collectionResponse = (collection: any) => ({
+    ...collection,
+    publicUrl:
+      collection.publishedAt && collection.shareId
+        ? `${SITE_URL.replace(/\/+$/, "")}/collection/${collection.shareId}`
+        : null,
+  });
+  const validationError = (res: Response, parsed: { error: z.ZodError }) =>
+    res.status(400).json({
+      message: parsed.error.issues[0]?.message || "Invalid request",
+      errors: parsed.error.issues,
+    });
+
+  app.get('/api/collections', isAuthenticated, async (req: any, res) => {
+    try {
+      if (
+        req.query.includeArchived !== undefined &&
+        req.query.includeArchived !== "true" &&
+        req.query.includeArchived !== "false"
+      ) {
+        return res.status(400).json({ message: "includeArchived must be true or false" });
+      }
+      const collections = await collectionRepo.listCollections(
+        req.user.claims.sub,
+        req.query.includeArchived === "true",
+      );
+      res.json(collections.map(collectionResponse));
+    } catch (error) {
+      console.error('Error fetching bookmark collections:', error);
+      res.status(500).json({ message: 'Failed to fetch collections' });
+    }
+  });
+
+  app.post('/api/collections', isAuthenticated, async (req: any, res) => {
+    const parsed = collectionCreateSchema.safeParse(req.body ?? {});
+    if (!parsed.success) return validationError(res, parsed);
+    try {
+      const collection = await collectionRepo.createCollection(
+        req.user.claims.sub,
+        parsed.data.name,
+      );
+      res.status(201).json(collectionResponse({ ...collection, itemCount: 0 }));
+    } catch (error) {
+      console.error('Error creating bookmark collection:', error);
+      res.status(500).json({ message: 'Failed to create collection' });
+    }
+  });
+
+  app.put('/api/collections/reorder', isAuthenticated, async (req: any, res) => {
+    const parsed = collectionReorderSchema.safeParse(req.body ?? {});
+    if (!parsed.success) return validationError(res, parsed);
+    try {
+      const reordered = await collectionRepo.reorderCollections(
+        req.user.claims.sub,
+        parsed.data.orderedIds,
+      );
+      if (!reordered) return res.status(404).json({ message: 'Collection not found' });
+      res.json({ orderedIds: parsed.data.orderedIds });
+    } catch (error) {
+      console.error('Error reordering bookmark collections:', error);
+      res.status(500).json({ message: 'Failed to reorder collections' });
+    }
+  });
+
+  app.patch('/api/collections/:collectionId', isAuthenticated, async (req: any, res) => {
+    const collectionId = parseCollectionId(req.params.collectionId);
+    if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
+    const parsed = collectionPatchSchema.safeParse(req.body ?? {});
+    if (!parsed.success) return validationError(res, parsed);
+    try {
+      const collection = await collectionRepo.updateCollection(
+        req.user.claims.sub,
+        collectionId,
+        parsed.data,
+      );
+      if (!collection) return res.status(404).json({ message: 'Collection not found' });
+      res.json(collectionResponse(collection));
+    } catch (error) {
+      console.error('Error updating bookmark collection:', error);
+      res.status(500).json({ message: 'Failed to update collection' });
+    }
+  });
+
+  app.delete('/api/collections/:collectionId', isAuthenticated, async (req: any, res) => {
+    const collectionId = parseCollectionId(req.params.collectionId);
+    if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
+    try {
+      const deleted = await collectionRepo.deleteCollection(req.user.claims.sub, collectionId);
+      if (!deleted) return res.status(404).json({ message: 'Collection not found' });
+      res.json({ message: 'Collection deleted; bookmarks were preserved' });
+    } catch (error) {
+      console.error('Error deleting bookmark collection:', error);
+      res.status(500).json({ message: 'Failed to delete collection' });
+    }
+  });
+
+  app.post(
+    '/api/collections/:collectionId/items/:resourceId',
+    isAuthenticated,
+    async (req: any, res) => {
+      const collectionId = parseCollectionId(req.params.collectionId);
+      const resourceId = parseIntInRange(req.params.resourceId, { min: 1, max: PG_INT_MAX });
+      if (!collectionId || !resourceId) {
+        return res.status(400).json({ message: 'Invalid collection or resource ID' });
+      }
+      try {
+        const result = await collectionRepo.addMembership(
+          req.user.claims.sub,
+          collectionId,
+          resourceId,
+        );
+        if (result === "collection-not-found") {
+          return res.status(404).json({ message: 'Collection not found' });
+        }
+        if (result === "not-bookmarked") {
+          return res.status(409).json({ message: 'Bookmark the resource before adding it to a collection' });
+        }
+        res.status(result === "added" ? 201 : 200).json({ collectionId, resourceId, result });
+      } catch (error) {
+        console.error('Error adding bookmark to collection:', error);
+        res.status(500).json({ message: 'Failed to add bookmark to collection' });
+      }
+    },
+  );
+
+  app.delete(
+    '/api/collections/:collectionId/items/:resourceId',
+    isAuthenticated,
+    async (req: any, res) => {
+      const collectionId = parseCollectionId(req.params.collectionId);
+      const resourceId = parseIntInRange(req.params.resourceId, { min: 1, max: PG_INT_MAX });
+      if (!collectionId || !resourceId) {
+        return res.status(400).json({ message: 'Invalid collection or resource ID' });
+      }
+      try {
+        const result = await collectionRepo.removeMembership(
+          req.user.claims.sub,
+          collectionId,
+          resourceId,
+        );
+        if (result === "collection-not-found") {
+          return res.status(404).json({ message: 'Collection not found' });
+        }
+        res.json({ collectionId, resourceId, result });
+      } catch (error) {
+        console.error('Error removing bookmark from collection:', error);
+        res.status(500).json({ message: 'Failed to remove bookmark from collection' });
+      }
+    },
+  );
+
+  app.post('/api/collections/:collectionId/publish', isAuthenticated, async (req: any, res) => {
+    const collectionId = parseCollectionId(req.params.collectionId);
+    if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
+    try {
+      const collection = await collectionRepo.publishCollection(req.user.claims.sub, collectionId);
+      if (!collection) return res.status(404).json({ message: 'Collection not found' });
+      res.json(collectionResponse(collection));
+    } catch (error) {
+      console.error('Error publishing bookmark collection:', error);
+      res.status(500).json({ message: 'Failed to publish collection' });
+    }
+  });
+
+  app.delete('/api/collections/:collectionId/publish', isAuthenticated, async (req: any, res) => {
+    const collectionId = parseCollectionId(req.params.collectionId);
+    if (!collectionId) return res.status(400).json({ message: 'Invalid collection ID' });
+    try {
+      const collection = await collectionRepo.unpublishCollection(req.user.claims.sub, collectionId);
+      if (!collection) return res.status(404).json({ message: 'Collection not found' });
+      res.json(collectionResponse(collection));
+    } catch (error) {
+      console.error('Error unpublishing bookmark collection:', error);
+      res.status(500).json({ message: 'Failed to unpublish collection' });
+    }
+  });
+
+  app.patch('/api/bookmarks/:resourceId/state', isAuthenticated, async (req: any, res) => {
+    const resourceId = parseIntInRange(req.params.resourceId, { min: 1, max: PG_INT_MAX });
+    if (!resourceId) return res.status(400).json({ message: 'Invalid resource ID' });
+    const parsed = bookmarkStateSchema.safeParse(req.body ?? {});
+    if (!parsed.success) return validationError(res, parsed);
+    try {
+      const bookmark = await collectionRepo.updateBookmarkState(
+        req.user.claims.sub,
+        resourceId,
+        parsed.data,
+      );
+      if (!bookmark) return res.status(404).json({ message: 'Bookmark not found' });
+      res.json(bookmark);
+    } catch (error) {
+      console.error('Error updating bookmark state:', error);
+      res.status(500).json({ message: 'Failed to update bookmark state' });
+    }
+  });
+
+  app.post('/api/bookmarks/bulk', isAuthenticated, async (req: any, res) => {
+    const parsed = bookmarkBulkSchema.safeParse(req.body ?? {});
+    if (!parsed.success) return validationError(res, parsed);
+    try {
+      const result = await collectionRepo.bulkUpdate(
+        req.user.claims.sub,
+        parsed.data.resourceIds,
+        parsed.data.action,
+      );
+      const status = result.succeeded.length === 0 ? 400 : result.failed.length > 0 ? 207 : 200;
+      res.status(status).json(result);
+    } catch (error) {
+      if (error instanceof CollectionNotFoundError) {
+        return res.status(404).json({ message: 'Collection not found' });
+      }
+      console.error('Error applying bulk bookmark action:', error);
+      res.status(500).json({ message: 'Failed to update bookmarks' });
+    }
+  });
+
+  app.get('/api/public/collections/:shareId', async (req, res) => {
+    const parsed = collectionShareIdSchema.safeParse(req.params.shareId);
+    if (!parsed.success) return res.status(404).json({ message: 'Collection not found' });
+    try {
+      const collection = await collectionRepo.getPublicCollection(parsed.data);
+      if (!collection) return res.status(404).json({ message: 'Collection not found' });
+      res.json(collection);
+    } catch (error) {
+      console.error('Error fetching public bookmark collection:', error);
+      res.status(500).json({ message: 'Failed to fetch collection' });
     }
   });
 

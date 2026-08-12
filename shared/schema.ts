@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uniqueIndex, uuid, primaryKey, unique, real, customType, check } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uniqueIndex, uuid, primaryKey, unique, real, customType, check, foreignKey } from "drizzle-orm/pg-core";
 
 /**
  * Postgres tsvector column type for full-text search (BUG-018).
@@ -23,6 +23,7 @@ import {
   type ResourceProvider,
   type ResourceSkillLevel,
 } from "./resourceFacets";
+import type { BookmarkQueueStatus } from "./bookmarkCollections";
 
 /**
  * Session storage table for Replit Auth
@@ -768,14 +769,86 @@ export const userBookmarks = pgTable(
     userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
     resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     notes: text("notes"),
+    queueStatus: text("queue_status").$type<BookmarkQueueStatus>().notNull().default("saved"),
+    archivedAt: timestamp("archived_at"),
+    personalTags: jsonb("personal_tags").$type<string[]>().notNull().default([]),
     createdAt: timestamp("created_at").defaultNow(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.resourceId] }),
-  })
+  (table) => [
+    primaryKey({ columns: [table.userId, table.resourceId] }),
+    check(
+      "user_bookmarks_queue_status_check",
+      sql`${table.queueStatus} IN ('saved','watch-next','in-progress','done')`,
+    ),
+    check(
+      "user_bookmarks_personal_tags_array_check",
+      sql`jsonb_typeof(${table.personalTags}) = 'array'`,
+    ),
+    index("idx_user_bookmarks_queue").on(table.userId, table.queueStatus, table.archivedAt),
+  ]
 );
 
 export type UserBookmark = typeof userBookmarks.$inferSelect;
+
+/**
+ * User-owned bookmark collections. Collections organize user_bookmarks without
+ * replacing them; deleting a collection only cascades its membership rows.
+ */
+export const bookmarkCollections = pgTable(
+  "bookmark_collections",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    name: text("name").notNull(),
+    position: integer("position").notNull().default(0),
+    archivedAt: timestamp("archived_at"),
+    shareId: text("share_id"),
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    unique("bookmark_collections_id_user_unique").on(table.id, table.userId),
+    uniqueIndex("bookmark_collections_share_id_unique").on(table.shareId),
+    index("idx_bookmark_collections_owner_order").on(table.userId, table.archivedAt, table.position, table.id),
+  ],
+);
+
+export type BookmarkCollection = typeof bookmarkCollections.$inferSelect;
+export type InsertBookmarkCollection = typeof bookmarkCollections.$inferInsert;
+
+/**
+ * Collection memberships are anchored to the owner's existing bookmark row.
+ * Composite foreign keys enforce same-owner collection/bookmark membership.
+ */
+export const bookmarkCollectionItems = pgTable(
+  "bookmark_collection_items",
+  {
+    collectionId: integer("collection_id").notNull(),
+    userId: varchar("user_id").notNull(),
+    resourceId: integer("resource_id").notNull(),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.collectionId, table.resourceId] }),
+    foreignKey({
+      name: "bookmark_collection_items_collection_owner_fk",
+      columns: [table.collectionId, table.userId],
+      foreignColumns: [bookmarkCollections.id, bookmarkCollections.userId],
+    }).onDelete("cascade"),
+    foreignKey({
+      name: "bookmark_collection_items_bookmark_owner_fk",
+      columns: [table.userId, table.resourceId],
+      foreignColumns: [userBookmarks.userId, userBookmarks.resourceId],
+    }).onDelete("cascade"),
+    index("idx_bookmark_collection_items_owner_resource").on(table.userId, table.resourceId),
+    index("idx_bookmark_collection_items_order").on(table.collectionId, table.position, table.resourceId),
+  ],
+);
+
+export type BookmarkCollectionItem = typeof bookmarkCollectionItems.$inferSelect;
+export type InsertBookmarkCollectionItem = typeof bookmarkCollectionItems.$inferInsert;
 
 /**
  * User Journey Progress table - Learning path tracking

@@ -25,6 +25,7 @@ import {
   resources,
   userFavorites,
   userBookmarks,
+  bookmarkCollectionItems,
   userJourneyProgress,
   userPreferences,
   userInteractions,
@@ -74,7 +75,9 @@ export class UserFeatureRepository {
    * @param userId - User ID
    * @returns Array of resources with favorited timestamp
    */
-  async getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>> {
+  async getUserFavorites(
+    userId: string,
+  ): Promise<Array<Resource & { resourceId: number; favoritedAt: Date }>> {
     const result = await db
       .select({
         resource: resources,
@@ -87,6 +90,9 @@ export class UserFeatureRepository {
 
     return result.map(r => ({
       ...r.resource,
+      // Keep the legacy alias consumed by older clients and integration
+      // surfaces while `id` remains the canonical flattened resource id.
+      resourceId: r.resource.id,
       favoritedAt: r.favoritedAt!
     }));
   }
@@ -138,17 +144,39 @@ export class UserFeatureRepository {
       .select({
         resource: resources,
         notes: userBookmarks.notes,
-        bookmarkedAt: userBookmarks.createdAt
+        bookmarkedAt: userBookmarks.createdAt,
+        queueStatus: userBookmarks.queueStatus,
+        archivedAt: userBookmarks.archivedAt,
+        personalTags: userBookmarks.personalTags,
       })
       .from(userBookmarks)
       .innerJoin(resources, eq(userBookmarks.resourceId, resources.id))
       .where(eq(userBookmarks.userId, userId))
       .orderBy(desc(userBookmarks.createdAt));
 
+    const memberships = await db
+      .select({
+        resourceId: bookmarkCollectionItems.resourceId,
+        collectionId: bookmarkCollectionItems.collectionId,
+      })
+      .from(bookmarkCollectionItems)
+      .where(eq(bookmarkCollectionItems.userId, userId));
+    const collectionIdsByResource = new Map<number, number[]>();
+    for (const membership of memberships) {
+      const ids = collectionIdsByResource.get(membership.resourceId) ?? [];
+      ids.push(membership.collectionId);
+      collectionIdsByResource.set(membership.resourceId, ids);
+    }
+
     return result.map(r => ({
       ...r.resource,
+      resourceId: r.resource.id,
       notes: r.notes || undefined,
-      bookmarkedAt: r.bookmarkedAt!
+      bookmarkedAt: r.bookmarkedAt!,
+      queueStatus: r.queueStatus,
+      archivedAt: r.archivedAt,
+      personalTags: r.personalTags,
+      collectionIds: collectionIdsByResource.get(r.resource.id) ?? [],
     }));
   }
 

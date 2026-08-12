@@ -31,12 +31,15 @@ import {
   LISTING_PAGE_SIZE,
 } from "./seo-content";
 import { buildRelatedResources } from "./services/relatedResources";
+import { CollectionRepository } from "./repositories/CollectionRepository";
+import { collectionShareIdSchema } from "@shared/bookmarkCollections";
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
 export const SITE_NAME = "Awesome Video";
 export const SITE_TAGLINE =
   "The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
+const collectionRepo = new CollectionRepository();
 
 export interface RouteMeta {
   title: string;
@@ -59,6 +62,8 @@ export interface RouteMeta {
    *      an injected body because `found` is false (`!notFound` guard).
    */
   noindex?: boolean;
+  /** Opt a valid noindex page into link crawling; soft-404s stay nofollow. */
+  follow?: boolean;
   /**
    * R5-050: explicit og:url override that is emitted EVEN on noindex pages.
    * Used by the 404 head so social shares of dead links carry a share target
@@ -149,7 +154,10 @@ async function resolveRoute(url: string): Promise<ResolvedRoute> {
   if (
     cleanPath === "/search" ||
     cleanPath === "/reset-password" ||
-    cleanPath === "/forgot-password"
+    cleanPath === "/forgot-password" ||
+    // Shared collections are revocable. Never let the metadata cache keep a
+    // just-unpublished or deleted collection reachable for another 60 seconds.
+    cleanPath.startsWith("/collection/")
   ) {
     return resolveRouteUncached(url);
   }
@@ -461,6 +469,37 @@ function homeShellChrome(): string {
      });
    return { meta: m, found: true, bodyHtml };
  }
+
+  // Public-to-anyone-with-the-link collection. Valid published links return
+  // 200 with share-preview metadata but remain noindex; malformed, unknown,
+  // archived, deleted, and unpublished identifiers all use the honest 404.
+  if (path.startsWith("/collection/")) {
+    const segments = path.split("/").filter(Boolean);
+    const parsedShareId =
+      segments.length === 2 && segments[0] === "collection"
+        ? collectionShareIdSchema.safeParse(safeDecode(segments[1]))
+        : null;
+    if (!parsedShareId?.success) {
+      return { meta: notFoundMeta(path), found: false };
+    }
+    const collection = await collectionRepo.getPublicCollection(parsedShareId.data);
+    if (!collection) {
+      return { meta: notFoundMeta(path), found: false };
+    }
+    const m = defaultMeta(path);
+    const count = collection.resources.length;
+    m.title = clampSeoTitle(`${collection.name} — Shared collection — ${SITE_NAME}`);
+    m.description = clampSeoDescription(
+      `A read-only collection of ${count} curated video development ${
+        count === 1 ? "resource" : "resources"
+      } shared on ${SITE_NAME}.`,
+    );
+    m.noindex = true;
+    m.follow = true;
+    m.ogUrl = abs(path);
+    m.image = ogImage(path);
+    return { meta: m, found: true };
+  }
 
   // Static page routes (every fixed client route in App.tsx). These always
 
@@ -1351,7 +1390,7 @@ export function buildMetaTags(m: RouteMeta): string {
   // explicitly excluded from indexing. Real pages carry an EXPLICIT indexable
   // robots tag (R4-058) whose value mirrors the client SEOHead string exactly.
   const robotsTag = m.noindex
-    ? `\n    <meta name="robots" content="noindex, nofollow" data-react-helmet="true" />`
+    ? `\n    <meta name="robots" content="noindex, ${m.follow ? "follow" : "nofollow"}" data-react-helmet="true" />`
     : `\n    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" data-react-helmet="true" />`;
   const canonicalTag = m.noindex
     ? ""

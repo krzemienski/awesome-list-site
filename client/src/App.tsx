@@ -44,6 +44,7 @@ const About = lazy(() => import("@/pages/About"));
 const Advanced = lazy(() => import("@/pages/Advanced"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Bookmarks = lazy(() => import("@/pages/Bookmarks"));
+const PublicCollection = lazy(() => import("@/pages/PublicCollection"));
 const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
 const Journeys = lazy(() => import("@/pages/Journeys"));
 const JourneyDetail = lazy(() => import("@/pages/JourneyDetail"));
@@ -285,6 +286,7 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
   /^\/resource\/[^/]+$/,
   /^\/journey\/[^/]+$/,
+  /^\/collection\/[^/]+$/,
   /^\/admin\/[^/]+$/,
   /^\/settings\/theme\/?$/,
 ];
@@ -522,6 +524,9 @@ function Router() {
         <Route path="/journey/:id" component={JourneyDetail} />
         <Route path="/journey">
           <Redirect to="/journeys" replace />
+        </Route>
+        <Route path="/collection/:shareId">
+          {(params) => <PublicCollection shareId={params.shareId} />}
         </Route>
         <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
         <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />

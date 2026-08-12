@@ -9,6 +9,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import type { BookmarkCollection } from "@/types/bookmarks";
 
 interface BookmarkButtonProps {
   resourceId: string;
@@ -35,6 +36,9 @@ function BookmarkButton({
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
   const [tempNotes, setTempNotes] = useState("");
+  const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
+  const originalCollectionIdsRef = useRef<number[]>([]);
+  const desiredCollectionIdsRef = useRef<number[]>([]);
   // BUG-021 (run25): remembers whether the in-flight save came from the edit
   // dialog so the success toast says "Notes saved", not "Bookmark added".
   const saveModeRef = useRef<"add" | "edit">("add");
@@ -48,7 +52,11 @@ function BookmarkButton({
   // and an edit can never start from a stale/empty note and overwrite the
   // saved one. Props remain the initial seed until the list loads.
   const { isAuthenticated } = useAuth();
-  const { data: bookmarksList } = useQuery<Array<{ id: number | string; notes?: string | null }>>({
+  const { data: bookmarksList } = useQuery<Array<{
+    id: number | string;
+    notes?: string | null;
+    collectionIds?: number[];
+  }>>({
     queryKey: ["/api/bookmarks"],
     enabled: isAuthenticated,
     staleTime: 60_000,
@@ -62,6 +70,11 @@ function BookmarkButton({
   useEffect(() => {
     setNotes(serverNotes);
   }, [serverNotes]);
+  const { data: collections = [], isLoading: collectionsLoading } = useQuery<BookmarkCollection[]>({
+    queryKey: ["/api/collections?includeArchived=true"],
+    enabled: isAuthenticated && notesDialogOpen,
+    staleTime: 60_000,
+  });
 
   const bookmark = useBookmarkToggle({
     resourceId,
@@ -121,6 +134,39 @@ function BookmarkButton({
           duration: 2000,
         });
       }
+      if (!vars.remove && showNotesDialog) {
+        const original = new Set(originalCollectionIdsRef.current);
+        const desired = new Set(desiredCollectionIdsRef.current);
+        const additions = Array.from(desired).filter((id) => !original.has(id));
+        const removals = Array.from(original).filter((id) => !desired.has(id));
+        if (additions.length || removals.length) {
+          void Promise.allSettled([
+            ...additions.map((collectionId) =>
+              apiRequest(`/api/collections/${collectionId}/items/${resourceId}`, {
+                method: "POST",
+              }),
+            ),
+            ...removals.map((collectionId) =>
+              apiRequest(`/api/collections/${collectionId}/items/${resourceId}`, {
+                method: "DELETE",
+              }),
+            ),
+          ]).then((results) => {
+            queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+            queryClient.invalidateQueries({
+              queryKey: ["/api/collections?includeArchived=true"],
+            });
+            if (results.some((result) => result.status === "rejected")) {
+              toast({
+                title: "Bookmark saved",
+                description:
+                  "Some collection choices couldn't be updated. Open the bookmark again to retry.",
+                variant: "destructive",
+              });
+            }
+          });
+        }
+      }
       saveModeRef.current = "add";
 
       // Close notes dialog if open
@@ -144,6 +190,9 @@ function BookmarkButton({
         if (!showNotesDialog) return false;
         setDialogMode("add");
         setTempNotes(notes);
+        const current = serverEntry?.collectionIds ?? [];
+        originalCollectionIdsRef.current = current;
+        setSelectedCollectionIds(current);
         setNotesDialogOpen(true);
         return true;
       },
@@ -158,16 +207,21 @@ function BookmarkButton({
     e.stopPropagation();
     setDialogMode("edit");
     setTempNotes(notes);
+    const current = serverEntry?.collectionIds ?? [];
+    originalCollectionIdsRef.current = current;
+    setSelectedCollectionIds(current);
     setNotesDialogOpen(true);
   };
 
   const handleSaveWithNotes = () => {
     saveModeRef.current = dialogMode;
+    desiredCollectionIdsRef.current = selectedCollectionIds;
     bookmark.mutate({ notes: tempNotes, remove: false });
   };
 
   const handleSaveWithoutNotes = () => {
     saveModeRef.current = dialogMode;
+    desiredCollectionIdsRef.current = selectedCollectionIds;
     bookmark.mutate({ remove: false });
   };
 
@@ -238,6 +292,18 @@ function BookmarkButton({
         onSaveWithNotes={handleSaveWithNotes}
         onSaveWithoutNotes={handleSaveWithoutNotes}
         isPending={bookmark.isPending}
+        collections={collections}
+        selectedCollectionIds={selectedCollectionIds}
+        onCollectionToggle={(collectionId, selected) =>
+          setSelectedCollectionIds((current) =>
+            selected
+              ? current.includes(collectionId)
+                ? current
+                : [...current, collectionId]
+              : current.filter((id) => id !== collectionId),
+          )
+        }
+        collectionsLoading={collectionsLoading}
       />
     </>
   );

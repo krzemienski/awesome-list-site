@@ -69,6 +69,8 @@ export async function cleanupDatabase() {
     // Delete in order that respects foreign key constraints
     // Start with junction tables and dependent tables
     await db.delete(schema.resourceTags);
+    await db.delete(schema.bookmarkCollectionItems);
+    await db.delete(schema.bookmarkCollections);
     await db.delete(schema.userFavorites);
     await db.delete(schema.userBookmarks);
     await db.delete(schema.userInteractions);
@@ -88,6 +90,7 @@ export async function cleanupDatabase() {
     await db.delete(schema.categories);
     await db.delete(schema.tags);
     await db.delete(schema.awesomeLists);
+    await db.delete(schema.rateLimitHits);
     await db.delete(schema.sessions);
     await db.delete(schema.users);
   } catch (error) {

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BookmarkPlus, NotebookPen } from "lucide-react";
+import { BookmarkPlus, Folder, NotebookPen } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { BookmarkCollection } from "@/types/bookmarks";
 
 interface BookmarkNotesDialogProps {
   open: boolean;
@@ -22,6 +24,10 @@ interface BookmarkNotesDialogProps {
   onSaveWithNotes: () => void;
   onSaveWithoutNotes: () => void;
   isPending?: boolean;
+  collections?: BookmarkCollection[];
+  selectedCollectionIds?: number[];
+  onCollectionToggle?: (collectionId: number, selected: boolean) => void;
+  collectionsLoading?: boolean;
 }
 
 /**
@@ -39,6 +45,10 @@ export default function BookmarkNotesDialog({
   onSaveWithNotes,
   onSaveWithoutNotes,
   isPending = false,
+  collections = [],
+  selectedCollectionIds = [],
+  onCollectionToggle,
+  collectionsLoading = false,
 }: BookmarkNotesDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,6 +90,42 @@ export default function BookmarkNotesDialog({
               {notes.length}/500 characters
             </p>
           </div>
+          {onCollectionToggle && (
+            <fieldset className="grid gap-2 border-t pt-4">
+              <legend className="mb-1 flex items-center gap-2 text-sm font-medium">
+                <Folder className="h-4 w-4 text-primary" aria-hidden="true" />
+                Add to collections (optional)
+              </legend>
+              {collectionsLoading ? (
+                <p className="text-sm text-muted-foreground">Loading collections…</p>
+              ) : collections.filter((collection) => !collection.archivedAt).length > 0 ? (
+                <div className="max-h-40 overflow-y-auto border">
+                  {collections
+                    .filter((collection) => !collection.archivedAt)
+                    .map((collection) => (
+                      <label
+                        key={collection.id}
+                        className="flex min-h-11 cursor-pointer items-center gap-3 border-b px-3 text-sm last:border-b-0 hover:bg-muted"
+                      >
+                        <Checkbox
+                          checked={selectedCollectionIds.includes(collection.id)}
+                          onCheckedChange={(checked) =>
+                            onCollectionToggle(collection.id, checked === true)
+                          }
+                          aria-label={`Add bookmark to ${collection.name}`}
+                          className="h-5 w-5"
+                        />
+                        <span className="min-w-0 flex-1 truncate">{collection.name}</span>
+                      </label>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Create collections from My Library when you’re ready to organize.
+                </p>
+              )}
+            </fieldset>
+          )}
         </div>
 
         <DialogFooter className="flex gap-2 sm:gap-0">

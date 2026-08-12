@@ -29,6 +29,8 @@ interface SEOHeadProps {
    * branches so client hydration never re-asserts indexability on a dead URL.
    */
   noindex?: boolean;
+  /** Keep links crawlable on an intentionally unindexed public page. */
+  follow?: boolean;
   /**
    * R5-050: explicit og:url emitted EVEN when noindex is set. Used by the 404
    * head so dead-link shares still carry a share target (the site card) while
@@ -67,6 +69,7 @@ export default function SEOHead({
   resourceCount,
   type = "website",
   noindex = false,
+  follow = false,
   ogUrl
 }: SEOHeadProps) {
   // R5-022: identify transient loading fallbacks — the "Loading …" titles the
@@ -155,7 +158,7 @@ export default function SEOHead({
       <meta name="description" content={pageDescription} />
       <meta name="keywords" content={generateKeywords(awesomeList, category)} />
       <meta name="author" content={repoInfo ? `${repoInfo.owner} contributors` : `${SITE_NAME} contributors`} />
-      <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
+      <meta name="robots" content={noindex ? `noindex, ${follow ? "follow" : "nofollow"}` : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
       {!noindex && <link rel="canonical" href={currentUrl} />}
 
       {/* Open Graph Meta Tags */}

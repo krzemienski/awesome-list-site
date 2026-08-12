@@ -113,6 +113,7 @@ const PROTECTED_KEY_PREFIXES = [
   "/api/admin",
   "/api/user",
   "/api/bookmarks",
+  "/api/collections",
   "/api/favorites",
 ];
 let sessionExpiryHandledAt = 0;
