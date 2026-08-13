@@ -185,7 +185,6 @@ helpers from past QA runs. The durable, canonical scripts are:
 | File | Purpose |
 |------|---------|
 | `build-static.ts` | Static build generation |
-| `reset-admin-password.ts` | Admin password reset |
 | `migrate.ts` | Standalone Drizzle migration runner |
 | `migrate-audit-log-original-resource-id.ts` | One-off audit-log backfill |
 | `check-migration-drift.ts` | Verify migrations reproduce `shared/schema.ts` |

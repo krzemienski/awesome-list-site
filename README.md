@@ -157,9 +157,10 @@ This project requires several environment variables to run. See [ENVIRONMENT.md]
 
 ## Admin Access
 
-Create an admin user:
-```bash
-npx tsx scripts/reset-admin-password.ts
+Authentication is handled by Clerk (there is no local password login). Sign in
+through the site, then grant your account the admin role in the database:
+```sql
+UPDATE users SET role = 'admin' WHERE email = '<your-email>';
 ```
 
 Access admin panel at `/admin` after login.

@@ -25,7 +25,6 @@ cat > .env <<'EOF'
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/awesome_list"
 SESSION_SECRET="change-me-use-a-long-random-string"
 NODE_ENV="development"
-ADMIN_PASSWORD="a-strong-admin-password"
 EOF
 
 # 3. Create the schema in your database
@@ -55,18 +54,11 @@ npm run db:studio        # open Drizzle Studio (GUI)
 ## Seeding & admin account
 
 - **Auto-seed on first boot**: when the database is empty the server seeds
-  categories, sample resources, and an admin user (`admin@example.com`) using the
-  `ADMIN_PASSWORD` secret. If `ADMIN_PASSWORD` is unset or shorter than 8
-  characters, admin seeding is skipped.
-- **Password sync**: on every boot `syncAdminPasswordFromEnv()` updates the admin
-  password to match the current `ADMIN_PASSWORD`.
-- **Reset the admin password manually**:
-
-  ```bash
-  ADMIN_PASSWORD="a-strong-admin-password" tsx scripts/reset-admin-password.ts
-  ```
-
-  This resets `admin@example.com` (requires the DB to already contain the user).
+  categories and sample resources.
+- **Admin access**: authentication is handled by Clerk — there is no local
+  password login. Sign in through the site's normal Clerk flow, then grant the
+  account the `admin` role in the `users` table (e.g. via SQL:
+  `UPDATE users SET role = 'admin' WHERE email = '<your-email>'`).
 - **Manual re-seed** (admin session required):
 
   ```bash
@@ -140,8 +132,8 @@ Integration and e2e tests expect a reachable PostgreSQL database. Point
 - **Schema errors / missing tables** — run `npm run db:push`.
 - **Port 5000 in use** — set `PORT` in `.env` (note: on Replit the platform sets
   the port for you).
-- **Can't log in as admin** — ensure `ADMIN_PASSWORD` is ≥ 8 chars, then run
-  `tsx scripts/reset-admin-password.ts` or restart to trigger the password sync.
+- **Can't access the admin panel** — sign in via Clerk, then confirm your user
+  row has `role = 'admin'` in the database (password login was removed).
 - **AI/GitHub features missing** — those require optional keys; see
   [ENVIRONMENT.md](./ENVIRONMENT.md).
 

@@ -107,17 +107,15 @@ data = r.json()
 
 ## Authentication endpoints
 
-Session-based auth (cookies). Local email/password auth is always available;
-Replit OAuth is enabled when `REPL_ID`/`ISSUER_URL` are configured.
+Authentication is handled by Clerk (session tokens). The old local
+email/password login endpoint was removed.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/auth/local/login` | Email/password login (rate-limited) |
 | GET | `/api/auth/user` | Current user (returns `null` when anonymous) |
-| GET | `/api/login`, `/api/callback` | Replit OAuth flow (when configured) |
 
-> Logout is handled through the OAuth/session flow; check `/api/docs` and
-> `server/routes.ts` for the exact logout route for your auth mode.
+> Sign-in, sign-out, and session management go through Clerk's hosted flow;
+> check `/api/docs` and `server/routes.ts` for the current auth routes.
 
 ---
 

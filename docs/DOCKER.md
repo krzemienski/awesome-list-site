@@ -74,13 +74,12 @@ environment variable.
    ```
 
 2. **Set the required secrets.** `docker-compose.yml` ships with sane defaults for
-   `DATABASE_URL`, `NODE_ENV`, and `PORT`, and reads `SESSION_SECRET` /
-   `ADMIN_PASSWORD` from your shell or a `.env` file (see
+   `DATABASE_URL`, `NODE_ENV`, and `PORT`, and reads `SESSION_SECRET`
+   from your shell or a `.env` file (see
    [Environment Variables](#environment-variables)). Create a `.env` next to
    `docker-compose.yml`:
    ```env
    SESSION_SECRET=replace-with-openssl-rand-base64-32
-   ADMIN_PASSWORD=choose-a-strong-admin-password
    ```
 
 3. **Start the application**:
@@ -107,7 +106,6 @@ your environment / `.env` file:
 | `NODE_ENV` | Yes | Set to `production` — this is what enables the boot migrator. |
 | `PORT` | No | Listen port (default `5000`). |
 | `SESSION_SECRET` | **Yes** | `express-session` refuses to start without it. Generate with `openssl rand -base64 32`. |
-| `ADMIN_PASSWORD` | Recommended | Seeds/rotates the local admin account (`admin@example.com`) on boot. Must be ≥ 8 characters. Omit to skip admin creation. |
 
 Optional feature flags (only needed if you use those features):
 
@@ -130,38 +128,33 @@ The complete, grep-verified list of environment variables lives in
 
 ## Runnable local recipe
 
-A complete, from-scratch local run with database, migrations, seeding, and admin
-login:
+A complete, from-scratch local run with database, migrations, and seeding:
 
 ```bash
-# 1. Provide the two secrets (or put them in a .env file)
+# 1. Provide the session secret (or put it in a .env file)
 export SESSION_SECRET="$(openssl rand -base64 32)"
-export ADMIN_PASSWORD="choose-a-strong-admin-password"
 
 # 2. Build and start Postgres + the app
 docker compose up -d --build
 
 # 3. Watch the app boot. In production mode the server runs migrations and,
-#    if the database is empty, seeds categories/resources and the admin user.
+#    if the database is empty, seeds categories/resources.
 docker compose logs -f app
 #   Look for: "Running database migrations..." / "Migrations completed successfully"
-#             "🔐 ADMIN USER CREATED" (only on first, empty-DB boot)
 
 # 4. Confirm it is serving
 curl http://localhost:5000/api/health          # -> {"status":"ok"}
 open http://localhost:5000                      # homepage
 
-# 5. Log in as admin at /login with:
-#      email:    admin@example.com
-#      password: the ADMIN_PASSWORD you set above
+# 5. Sign in via Clerk, then grant your account the admin role in the DB:
+#      UPDATE users SET role = 'admin' WHERE email = '<your-email>';
 ```
 
 Notes:
 - **Seeding is automatic** on first boot (both dev and production) *only when the
   database is empty* (no categories and no resources). It never overwrites
   existing data, so restarts preserve your changes.
-- If you set `ADMIN_PASSWORD` *after* the DB was already seeded, the app rotates
-  the existing admin's password on the next boot — you do not need to reseed.
+- Authentication is Clerk-based; there is no local admin password.
 - To re-run seeding manually against a running container, use the admin API
   (`POST /api/admin/seed-database`) or `docker compose exec app npm run db:push`
   for schema-only sync.
@@ -419,8 +412,8 @@ works on any container platform (Cloud Run, ECS, Container Apps). See
 1. **Use an external, managed PostgreSQL** rather than the bundled Compose
    database. Set `DATABASE_URL` accordingly (append `?sslmode=require` for most
    managed providers).
-2. **Provide secrets at runtime** — `SESSION_SECRET` (required) and
-   `ADMIN_PASSWORD` (to manage the admin account). Prefer your platform's secret
+2. **Provide secrets at runtime** — `SESSION_SECRET` (required) and your Clerk
+   keys for authentication. Prefer your platform's secret
    store or Docker secrets over baking them into the image.
 3. **Set resource limits** in `docker-compose.yml`:
    ```yaml

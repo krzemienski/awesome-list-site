@@ -229,11 +229,10 @@ npm run test:e2e -- tests/e2e/admin-users-audit.spec.ts
 npm run test:e2e -- --grep "Audit tab"
 ```
 
-The `admin-users-audit.spec.ts` spec relies on the seeded
-`admin@example.com` / `admin123` admin and the `test-user-123` fixture
-user. If those are missing, run `tsx scripts/reset-admin-password.ts`
-and reseed the database first (see `tests/README.md` for full fixture
-requirements).
+The `admin-users-audit.spec.ts` spec relies on an admin account and the
+`test-user-123` fixture user. Auth is now Clerk-based (the old password
+login and reset script were removed); see `tests/README.md` for fixture
+requirements and the auth-check migration status.
 
 Test artifacts (`playwright-report/`, `test-results/`) are git-ignored —
 do not commit them.

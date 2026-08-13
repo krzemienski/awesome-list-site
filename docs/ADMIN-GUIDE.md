@@ -5,16 +5,15 @@ Comprehensive guide for administrators of the Awesome Video Resource Viewer plat
 ## Accessing the Admin Panel
 
 ### Login
-1. Navigate to `/login`
-2. Use local admin credentials or Replit OAuth (if configured as admin)
-3. After login, click "Admin" in the navigation or go to `/admin`
+1. Sign in through the site's Clerk authentication flow (password login was removed)
+2. After login, click "Admin" in the navigation or go to `/admin`
 
 ### Initial Admin Setup
-If no admin exists:
-```bash
-npx tsx scripts/reset-admin-password.ts
+If no admin exists, sign in once via Clerk, then grant the account the admin
+role directly in the database:
+```sql
+UPDATE users SET role = 'admin' WHERE email = '<your-email>';
 ```
-This creates/resets the admin account with credentials displayed in console.
 
 ## Dashboard Overview
 

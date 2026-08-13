@@ -306,20 +306,19 @@ sequenceDiagram
 sequenceDiagram
     participant U as User
     participant C as Client
+    participant K as Clerk
     participant E as Express
-    participant P as Passport.js
-    participant S as Session Store
     participant DB as Database
 
     U->>C: Click Login
-    C->>E: POST /api/auth/local/login
-    E->>P: authenticate('local')
-    P->>DB: Verify credentials
-    DB-->>P: User record
-    P->>S: Create session
-    S-->>P: Session ID
-    P-->>E: Set connect.sid cookie
-    E-->>C: 200 OK + Set-Cookie
+    C->>K: Clerk hosted sign-in flow
+    K-->>C: Session token (cookie)
+    C->>E: Request with Clerk session cookie
+    E->>K: Verify session token
+    K-->>E: Verified claims
+    E->>DB: Look up / provision local user (externalId bridge)
+    DB-->>E: User record
+    E-->>C: Authenticated response
     C->>C: Store auth state
 
     Note over C,E: Subsequent Requests (Protected)

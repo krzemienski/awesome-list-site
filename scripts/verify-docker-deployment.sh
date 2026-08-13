@@ -170,13 +170,13 @@ else
     print_error "Frontend returned status $FRONTEND_STATUS"
 fi
 
-# Step 9: Check if local auth endpoint exists
-print_step "Step 9: Checking local authentication endpoints..."
-LOCAL_AUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/auth/local/login 2>/dev/null || echo "000")
-if [ "$LOCAL_AUTH_STATUS" = "405" ] || [ "$LOCAL_AUTH_STATUS" = "200" ]; then
-    print_success "Local auth endpoint exists (status: $LOCAL_AUTH_STATUS)"
+# Step 9: Confirm the removed local auth endpoint stays gone (auth is Clerk-based now)
+print_step "Step 9: Checking local authentication endpoint is removed..."
+LOCAL_AUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:5000/api/auth/local/login 2>/dev/null || echo "000")
+if [ "$LOCAL_AUTH_STATUS" = "404" ]; then
+    print_success "Local auth endpoint correctly absent (404) — auth is handled by Clerk"
 else
-    print_warning "Local auth endpoint status: $LOCAL_AUTH_STATUS (may require POST request)"
+    print_error "Local auth endpoint returned $LOCAL_AUTH_STATUS (expected 404; password login was removed)"
 fi
 
 # Step 10: Show running containers
@@ -219,4 +219,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     print_success "Containers stopped"
 fi
 
-exit 0
+# Exit nonzero if any verification step failed so CI/operators see it
+if [ "$VERIFICATION_PASSED" = true ]; then
+    exit 0
+else
+    exit 1
+fi

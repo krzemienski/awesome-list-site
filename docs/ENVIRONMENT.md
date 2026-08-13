@@ -24,7 +24,6 @@ these in the **Secrets** pane instead of a file.
 | `SESSION_SECRET` | ✅ | – | `server/replitAuth.ts` |
 | `NODE_ENV` | ⚠️ recommended | `development` | `server/index.ts`, `server/replitAuth.ts` |
 | `PORT` | ❌ | `5000` | `server/index.ts` |
-| `ADMIN_PASSWORD` | ⚠️ (to seed admin) | – | `server/seed.ts`, `server/repositories/UserRepository.ts`, `scripts/reset-admin-password.ts` |
 | `REPL_ID` | ❌ (Replit OAuth) | – | `server/replitAuth.ts`, `server/routes.ts` |
 | `ISSUER_URL` | ❌ | `https://replit.com/oidc` | `server/replitAuth.ts` |
 | `AWESOME_RAW_URL` | ❌ | avelino/awesome-go README | `server/config.ts`, `server/routes.ts` |
@@ -92,12 +91,9 @@ automatically — do not override it on Replit/Railway/Vercel.
 
 ## Admin bootstrap
 
-### `ADMIN_PASSWORD`
-Password for the seeded admin account (`admin@example.com`). On first boot (empty
-DB) the server seeds the admin user; on every boot `syncAdminPasswordFromEnv()`
-rotates the stored password to match this value if it changed. Must be at least 8
-characters or seeding/reset is skipped. Also read by
-`scripts/reset-admin-password.ts`.
+Authentication is handled by Clerk; there is no local password login and no
+`ADMIN_PASSWORD` variable. To make an account an admin, sign in once via Clerk,
+then set `role = 'admin'` on the corresponding row in the `users` table.
 
 ---
 
@@ -225,9 +221,6 @@ SESSION_SECRET="change-me-use-a-long-random-string"
 NODE_ENV="development"
 PORT="5000"
 
-# Seed / manage the admin account (admin@example.com)
-ADMIN_PASSWORD="a-strong-admin-password"
-
 # Optional: AI features
 # AI_INTEGRATIONS_ANTHROPIC_API_KEY="sk-ant-..."
 # AI_INTEGRATIONS_OPENAI_API_KEY="sk-..."
@@ -250,7 +243,6 @@ ADMIN_PASSWORD="a-strong-admin-password"
 DATABASE_URL="postgresql://user:pass@host:5432/db"
 SESSION_SECRET="a-long-random-secret"
 NODE_ENV="production"
-ADMIN_PASSWORD="a-strong-admin-password"
 
 # Public URLs (match your domain)
 PUBLIC_SITE_URL="https://your-domain.com"
@@ -264,7 +256,7 @@ VITE_SITE_TITLE="Your Site Title"
 ```
 
 On Replit, `DATABASE_URL`, `REPL_ID`, and `PORT` are provided automatically; set
-`SESSION_SECRET`, `ADMIN_PASSWORD`, and any optional keys in the Secrets pane.
+`SESSION_SECRET` and any optional keys in the Secrets pane.
 
 ---
 
@@ -278,9 +270,8 @@ On Replit, `DATABASE_URL`, `REPL_ID`, and `PORT` are provided automatically; set
   `AI_INTEGRATIONS_OPENAI_API_KEY` for embeddings).
 - **GitHub sync failing** — set a token with repo scope and verify it hasn't
   expired.
-- **Can't log in as admin** — set `ADMIN_PASSWORD` (≥ 8 chars) and re-run
-  `tsx scripts/reset-admin-password.ts`, or restart to let
-  `syncAdminPasswordFromEnv()` rotate it.
+- **Can't access the admin panel** — sign in via Clerk, then confirm your user
+  row has `role = 'admin'` in the database (password login was removed).
 
 ## See also
 

@@ -68,9 +68,10 @@ Steps:
 
 1. Open the project on Replit.
 2. Set **Secrets** (Tools → Secrets): `DATABASE_URL`, `SESSION_SECRET`,
-   `ADMIN_PASSWORD`, and any optional feature keys (see
+   Clerk keys, and any optional feature keys (see
    [ENVIRONMENT.md](./ENVIRONMENT.md)). `NODE_ENV=production` is set by the run
-   command. The pre-publish gate's browser audits require `ADMIN_PASSWORD`.
+   command. The pre-publish gate's browser audits need an admin session (their
+   sign-in is being migrated to Clerk under a separate task).
 3. Click **Deploy**. The build gate runs; on success the app is published.
 
 Replit does not provide managed PostgreSQL — use Neon or another external
@@ -87,7 +88,6 @@ recipe, the required env vars, and verification steps. Quick start:
 
 ```bash
 export SESSION_SECRET="$(openssl rand -base64 32)"
-export ADMIN_PASSWORD="choose-a-strong-admin-password"
 docker compose up -d --build
 curl http://localhost:5000/api/health   # -> {"status":"ok"}
 ```
@@ -114,7 +114,7 @@ Steps:
 1. Create a project from your GitHub repo at [railway.app](https://railway.app).
 2. Add a **PostgreSQL** plugin (Railway sets `DATABASE_URL` automatically) or point
    `DATABASE_URL` at an external database.
-3. Set variables: `NODE_ENV=production`, `SESSION_SECRET`, `ADMIN_PASSWORD`.
+3. Set variables: `NODE_ENV=production`, `SESSION_SECRET`, and your Clerk keys.
 4. Deploy — Railway builds the Dockerfile and health-checks `/api/health`.
 
 ## Vercel
@@ -155,8 +155,8 @@ Run, AWS ECS/Fargate, Azure Container Apps, Fly.io, etc.). The general recipe:
    ```
 2. Deploy it with:
    - **Port** `5000` (or set `PORT`).
-   - **Env** `NODE_ENV=production`, `DATABASE_URL`, `SESSION_SECRET`,
-     `ADMIN_PASSWORD`.
+   - **Env** `NODE_ENV=production`, `DATABASE_URL`, `SESSION_SECRET`, and your
+     Clerk keys.
    - **Health check** path `/api/health`.
 3. Provision a managed PostgreSQL and set `DATABASE_URL` (use connection pooling
    for serverless container runtimes).
@@ -189,12 +189,6 @@ Required for any deployment:
 DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
 NODE_ENV=production
 SESSION_SECRET=<openssl rand -base64 32>   # express-session will not start without it
-```
-
-Recommended:
-
-```bash
-ADMIN_PASSWORD=<>=8 chars>   # seeds/rotates the admin@example.com account on boot
 ```
 
 Optional feature keys (AI enrichment, GitHub import/export, analytics, etc.) are
