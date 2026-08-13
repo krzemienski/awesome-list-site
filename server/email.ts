@@ -3,8 +3,7 @@
  *
  * Gmail is reached through the Replit connector, which owns OAuth credentials
  * and refresh. Callers receive an explicit delivered/unavailable/failed result:
- * there is no success-shaped fallback. Password reset keeps its historical
- * development-only console link, while digests never do.
+ * there is no success-shaped fallback.
  */
 import { ReplitConnectors } from "@replit/connectors-sdk";
 
@@ -187,35 +186,4 @@ export async function probeEmailTransport(): Promise<{
       errorCode: "transport_unavailable",
     };
   }
-}
-
-export async function sendPasswordResetEmail(
-  to: string,
-  resetUrl: string,
-): Promise<{ delivered: boolean }> {
-  const subject = `Reset your ${FROM_NAME} password`;
-  const text =
-    `We received a request to reset your ${FROM_NAME} password.\n\n` +
-    `Reset it using the link below (it expires in 1 hour):\n${resetUrl}\n\n` +
-    `If you didn't request this, you can safely ignore this email — your password won't change.`;
-  const html =
-    `<!doctype html><html><body style="font-family:system-ui,-apple-system,sans-serif;line-height:1.5;color:#111;max-width:520px;margin:0 auto;padding:24px">` +
-    `<h2 style="margin:0 0 12px">Reset your ${FROM_NAME} password</h2>` +
-    `<p>We received a request to reset your password. This link expires in <strong>1 hour</strong>.</p>` +
-    `<p style="margin:24px 0"><a href="${resetUrl}" style="display:inline-block;padding:12px 20px;background:#111;color:#fff;text-decoration:none;font-weight:600">Reset password</a></p>` +
-    `<p style="color:#555;font-size:13px;word-break:break-all">Or paste this URL into your browser:<br>${resetUrl}</p>` +
-    `<p style="color:#888;font-size:12px;margin-top:24px">If you didn't request this, you can safely ignore this email — your password won't change.</p>` +
-    `</body></html>`;
-
-  const result = await sendTransactionalEmail({ to, subject, html, text });
-  if (!result.delivered) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`[email:dev] Password reset link for ${to}: ${resetUrl}`);
-    } else {
-      console.warn(
-        `[email] Password reset email NOT sent (${result.errorCode ?? "unknown"})`,
-      );
-    }
-  }
-  return { delivered: result.delivered };
 }

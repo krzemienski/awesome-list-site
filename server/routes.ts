@@ -39,7 +39,7 @@ import { SITE_URL } from "./og-middleware";
 import { stripInternalResourceFields } from "./lib/publicResource";
 import { parseBoundedInt } from "./validation/inputs";
 import { runHeavyWork } from "./ops/heavyWork";
-import { seedDatabase, syncAdminPasswordFromEnv } from "./seed";
+import { seedDatabase } from "./seed";
 import {
   installApiContractRegistration,
   observeRoutes,
@@ -397,12 +397,6 @@ export async function runBackgroundInitialization(): Promise<void> {
     startOrphanWatchdogPeriodic();
   } catch (error) {
     console.error("Failed to import/run orphan watchdog (non-fatal):", error);
-  }
-
-  try {
-    await syncAdminPasswordFromEnv();
-  } catch (error) {
-    console.error("Admin password sync failed (non-fatal):", error);
   }
 
   try {

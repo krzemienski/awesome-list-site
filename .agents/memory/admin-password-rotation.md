@@ -1,14 +1,13 @@
 ---
-name: Admin password rotation path
-description: How the local admin password is rotated on a populated deployment (boot sync from ADMIN_PASSWORD secret); PROD_ADMIN_PASSWORD secret is stale.
+name: Admin password rotation path (RETIRED)
+description: Local admin password stack removed Aug 2026 (Clerk owns auth); ADMIN_PASSWORD boot sync no longer exists.
 ---
 
-**Rule:** The ONLY way to rotate `admin@example.com`'s password on a populated deployment is the boot-time sync: `syncAdminPasswordFromEnv()` (server/seed.ts, called from `runBackgroundInitialization`) bcrypt-compares the `ADMIN_PASSWORD` secret against the stored hash on every boot and rotates on mismatch. Changing the secret + restart (dev) or republish (prod) is the whole procedure.
+**Rule:** As of Task 310 (Aug 12, 2026) the local admin password stack is retired: `syncAdminPasswordFromEnv()` and `sendPasswordResetEmail()` were deleted, and there is no local-login endpoint (`/api/auth/local/login` returns 404). Admin auth is Clerk-only; role comes from `users.role` on the Clerk-bridged user row.
 
-**Why:** `seedAdminUser` only runs when the DB is completely empty; prod DB is a read-only replica for the agent (no direct UPDATE); the reset-email flow can't reach the placeholder admin inbox and prod never logs reset tokens. The old `PROD_ADMIN_PASSWORD` secret went stale (prod rejected it for both admin accounts) with no recovery path — hence this boot sync.
+**Why:** After the Clerk migration nothing authenticated against `users.password`; the boot sync only re-hashed a secret into a dead column. Scripts that log in with `ADMIN_PASSWORD` against `/api/auth/local/login` are broken and are being converted under the "automated site checks sign-in" task.
 
 **How to apply:**
-- To change the admin password: update the `ADMIN_PASSWORD` secret; dev picks it up on workflow restart, prod on next publish. Never edit hashes by hand.
-- `PROD_ADMIN_PASSWORD` secret is obsolete — do not trust it for prod logins; `ADMIN_PASSWORD` is the source of truth for both envs. All committed scripts now read `ADMIN_PASSWORD` (July 16, 2026); the stale secret awaits manual user deletion — agents cannot delete secrets (only env vars), `deleteEnvVars` on a secret name silently no-ops.
-- Rotation does NOT invalidate existing sessions (accepted risk; architect-noted).
-- Scripts hitting the prod admin API must capture ONLY the `connect.sid` cookie from the login response and never update it afterward — prod infra injects a GAESA affinity Set-Cookie on arbitrary responses that clobbers naive cookie jars. Right after a republish, retry login (boot sync runs async post-listen).
+- Do NOT reintroduce ADMIN_PASSWORD-based flows; scripts needing admin API access must authenticate via Clerk (see the auth-check fix task).
+- `users.password`, `sessions`, and `password_reset_tokens` tables are intentionally KEPT (historical data, non-destructive schema); nothing reads them.
+- `PROD_ADMIN_PASSWORD` and `ADMIN_PASSWORD` secrets are both obsolete for login purposes.

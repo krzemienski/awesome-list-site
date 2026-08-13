@@ -7,10 +7,6 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, SALT_ROUNDS);
 }
 
-export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
-}
-
 export function validateEmail(email: string): boolean {
   // BUG-035 (run14): cap length at the RFC 5321 practical maximum (254) —
   // unbounded emails otherwise reach bcrypt-adjacent paths and the DB verbatim.
