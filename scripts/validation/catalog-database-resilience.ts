@@ -64,20 +64,23 @@ async function main() {
   let createdCategoryId: number | undefined;
 
   try {
-    const login = await fetch(`${BASE_URL}/api/auth/local/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Origin: BASE_URL,
-      },
-      body: JSON.stringify({
-        email: "admin@example.com",
-        password: process.env.ADMIN_PASSWORD,
-      }),
-    });
-    assert(login.status === 200, `admin login failed (${login.status})`);
-    const adminCookie = (login.headers.get("set-cookie") ?? "").split(";")[0];
-    assert(adminCookie, "admin login returned no session cookie");
+    // The Clerk migration removed /api/auth/local/login and sessions; admin
+    // requests now ride the X-Admin-Audit-Key header, which the server only
+    // honors when ADMIN_PASSWORD is set in its environment and >= 8 chars
+    // (fail-closed). Verify it authenticates before relying on it.
+    const adminKey = process.env.ADMIN_PASSWORD;
+    assert(
+      adminKey && adminKey.length >= 8,
+      "ADMIN_PASSWORD must be >= 8 chars — the server ignores shorter audit keys (fail-closed guard)",
+    );
+    const adminHeaders = { "X-Admin-Audit-Key": adminKey };
+    const whoami = await fetch(`${BASE_URL}/api/auth/user`, { headers: adminHeaders });
+    assert(whoami.status === 200, `admin identity check failed (${whoami.status})`);
+    const whoamiBody = (await whoami.json()) as { user?: { role?: string } };
+    assert(
+      whoamiBody.user?.role === "admin",
+      "audit-key header did not authenticate as admin — is the admin user seeded and ADMIN_PASSWORD set in the server env?",
+    );
 
     invalidatePublicCache("manual");
     const before = getPublicCacheSnapshot();
@@ -254,7 +257,7 @@ async function main() {
         (async () => {
           const startedAt = Date.now();
           const response = await fetch(`${BASE_URL}/api/resources/pending`, {
-            headers: { Cookie: adminCookie },
+            headers: adminHeaders,
           });
           return { response, durationMs: Date.now() - startedAt };
         })(),
@@ -340,9 +343,15 @@ async function main() {
       const saturatedPages = await Promise.all(
         Array.from({ length: 80 }, async (_, index) => {
           const startedAt = Date.now();
+          // Deliberately anonymous and WITHOUT `Accept: text/html`: an
+          // explicit HTML Accept makes Clerk's dev middleware 307 the request
+          // to its off-site dev-browser handshake (fetch follows it and gets
+          // Clerk's 429s), while an authenticated probe (audit key) would
+          // bypass the anonymous cache-admission path under test. With no
+          // Accept header the SSR handler still serves HTML and the request
+          // stays anonymous.
           const response = await fetch(
             `${BASE_URL}/resource/${900_000_000 + index}?probe=${token}`,
-            { headers: { Accept: "text/html" } },
           );
           return { response, durationMs: Date.now() - startedAt };
         }),

@@ -52,6 +52,7 @@
 - [Safe ?next= redirect validation](next-redirect-validation.md) — startsWith("/") && !startsWith("//") is bypassable via /\evil.com (backslash→slash normalization); require /^\/(?![/\\])/.
 - [Toast dropped by full-page nav](toast-fullpage-nav.md) — window.location.href tears down the toast store pre-paint; use a one-shot ?param and let the destination greet + strip it.
 - [Admin password rotation path](admin-password-rotation.md) — rotate via ADMIN_PASSWORD secret + boot sync (restart/republish); PROD_ADMIN_PASSWORD is stale; prod scripts must pin connect.sid from login only.
+- [Audit-key header auth](audit-key-header-auth.md) — post-Clerk, audit scripts auth via X-Admin-Audit-Key: ADMIN_PASSWORD header (no login POST/cookie); server bypass fails closed (<8 chars = ignored).
 - [RHF formState Proxy](rhf-formstate-proxy.md) — formState.isDirty etc. must be READ during render to subscribe; first read inside an event handler returns stale false forever.
 - [Vite workspace watch reload](vite-workspace-watch-reload.md) — repo file writes (tee/rm) during live Playwright runs trigger SPA reloads → ERR_ABORTED flakes; stage output in /tmp, cp after.
 - [Flex-anchor min-width:auto](flex-anchor-min-width.md) — raw text in a flex container is an anonymous item with min-width:auto that never wraps; wrap it in a min-w-0 span or long URLs blow dialogs.

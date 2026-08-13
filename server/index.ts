@@ -25,7 +25,7 @@ import {
   clerkProxyMiddleware,
   getClerkProxyHost,
 } from "./middlewares/clerkProxyMiddleware";
-import { clerkUserContext } from "./clerkAuth";
+import { clerkUserContext, hasValidAuditKey } from "./clerkAuth";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -338,14 +338,22 @@ app.use(express.urlencoded({ extended: false, limit: REQUEST_BODY_LIMIT }));
 // incoming request host so the same server can serve multiple Clerk custom
 // domains; getClerkProxyHost is shared with clerkProxyMiddleware so both
 // halves of the auth setup agree on which hostname is canonical.
-app.use(
-  clerkMiddleware((req) => ({
-    publishableKey: publishableKeyFromHost(
-      getClerkProxyHost(req) ?? "",
-      process.env.CLERK_PUBLISHABLE_KEY,
-    ),
-  })),
-);
+const clerkSessionMiddleware = clerkMiddleware((req) => ({
+  publishableKey: publishableKeyFromHost(
+    getClerkProxyHost(req) ?? "",
+    process.env.CLERK_PUBLISHABLE_KEY,
+  ),
+}));
+app.use((req, res, next) => {
+  // Requests carrying a valid X-Admin-Audit-Key (pre-publish audit scripts)
+  // skip Clerk verification entirely — clerkUserContext resolves the admin
+  // row for them instead. Without this, clerkMiddleware 307-redirects
+  // non-browser HTML requests to Clerk's dev-browser handshake, which breaks
+  // fetch-based validation probes. Fail-closed: hasValidAuditKey is false
+  // unless ADMIN_PASSWORD is set (>= 8 chars) and matches in constant time.
+  if (hasValidAuditKey(req)) return next();
+  return clerkSessionMiddleware(req, res, next);
+});
 // Attach req.dbUser for signed-in visitors (JIT-provisions first-time Clerk
 // users) — the Clerk-era replacement for Passport's deserializeUser.
 app.use(clerkUserContext);

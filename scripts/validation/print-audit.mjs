@@ -60,39 +60,66 @@ const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.lo
 
 const browser = await chromium.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 
-// Login is rate-limited (429, 5/min burst + 20/15min window). Repeated validation
-// runs exhaust the 15-minute window, so cache the admin session cookie across runs
-// (shared by print-audit + responsive-audit) and only log in when the cached
-// session is missing/expired. On 429, honor Retry-After and back off with jitter.
-const SESSION_FILE = '/tmp/validation/admin-session.json';
+// Auth: the Clerk migration removed /api/auth/local/login and express-session,
+// so there is no password+cookie login anymore. Authenticated checks instead
+// send `X-Admin-Audit-Key: <ADMIN_PASSWORD>` on every request; the server
+// (server/clerkAuth.ts) honors the header only when ADMIN_PASSWORD is set in
+// ITS environment and is >= 8 chars (mirrors the seedAdminUser length guard).
+// If ADMIN_PASSWORD is too short the server ignores the header, so warn and
+// SKIP authenticated checks instead of silently degrading to anonymous runs.
 async function newAdminContext() {
-  const fsm = await import('node:fs');
-  if (fsm.existsSync(SESSION_FILE)) {
-    try {
-      const ctx = await browser.newContext({ storageState: SESSION_FILE });
-      const me = await ctx.request.get(`${BASE}/api/auth/user`).then(r => r.json()).catch(() => null);
-      if (me?.user?.role === 'admin') { console.log('admin session reused from cache'); return ctx; }
-      await ctx.close();
-    } catch { /* stale/corrupt state — fall through to fresh login */ }
+  if (process.env.ADMIN_PASSWORD.length < 8) {
+    console.warn('WARN: ADMIN_PASSWORD is shorter than 8 characters — the server ignores the audit-key header (fail-closed guard); SKIPPING authenticated page checks.');
+    return null;
   }
+  const KEY = process.env.ADMIN_PASSWORD;
+  const APP_ORIGIN = new URL(BASE).origin;
   const ctx = await browser.newContext();
-  let loggedIn = false;
-  for (let i = 0; i < 8 && !loggedIn; i++) {
-    const res = await ctx.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json', Origin: BASE } });
-    if (res.ok()) { loggedIn = true; break; }
-    if (res.status() !== 429) { console.error('FATAL: admin login failed', res.status()); process.exit(1); }
-    const retryAfter = Number(res.headers()['retry-after']);
-    const wait = (Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 15000 * (i + 1)) + Math.floor(Math.random() * 5000);
-    console.log(`login 429, retrying in ${Math.round(wait / 1000)}s...`);
-    await new Promise(r => setTimeout(r, wait));
+  // Inject the audit key ONLY into same-origin requests. A context-wide
+  // extraHTTPHeaders would attach the admin credential to EVERY request the
+  // SPA makes — Clerk-hosted scripts, external images, any third-party origin
+  // — leaking an admin bearer credential off-site. Route interception scopes
+  // the header to the app origin and nothing else.
+  await ctx.route('**/*', (route) => {
+    let sameOrigin = false;
+    try { sameOrigin = new URL(route.request().url()).origin === APP_ORIGIN; } catch { /* opaque scheme (data:, about:) — never inject */ }
+    if (sameOrigin) route.continue({ headers: { ...route.request().headers(), 'x-admin-audit-key': KEY } });
+    else route.continue();
+  });
+  // Regression probe: prove a cross-origin request does NOT carry the audit
+  // key. Fulfilled locally (no real network); registered AFTER the injector so
+  // it matches first (Playwright checks newest routes first).
+  let probeHeaders = null;
+  await ctx.route('https://audit-key-leak-probe.invalid/**', (route) => {
+    probeHeaders = route.request().headers();
+    route.fulfill({ status: 200, contentType: 'text/plain', body: 'probe' });
+  });
+  const probePage = await ctx.newPage();
+  await probePage.goto('https://audit-key-leak-probe.invalid/probe').catch(() => {});
+  await probePage.close();
+  await ctx.unroute('https://audit-key-leak-probe.invalid/**');
+  if (!probeHeaders) { console.error('FATAL: cross-origin leak probe never ran — cannot prove the audit key stays same-origin'); process.exit(1); }
+  if (Object.keys(probeHeaders).some(h => h.toLowerCase() === 'x-admin-audit-key')) {
+    console.error('FATAL: audit key LEAKED to a cross-origin request — refusing to run');
+    process.exit(1);
   }
-  if (!loggedIn) { console.error('FATAL: admin login still rate-limited after retries'); process.exit(1); }
-  fsm.mkdirSync('/tmp/validation', { recursive: true });
-  await ctx.storageState({ path: SESSION_FILE });
+  console.log('leak probe OK: audit key absent from cross-origin request');
+  // API-context calls bypass route interception, so pass the header explicitly.
+  const me = await ctx.request.get(`${BASE}/api/auth/user`, { headers: { 'x-admin-audit-key': KEY } }).then(r => r.json()).catch(() => null);
+  if (me?.user?.role !== 'admin') {
+    console.error('FATAL: audit-key auth failed — /api/auth/user did not return the admin. Is ADMIN_PASSWORD set (>=8 chars) in the SERVER environment and the admin user seeded?');
+    process.exit(1);
+  }
+  console.log('admin auth OK via X-Admin-Audit-Key header');
   return ctx;
 }
 const authCtx = await newAdminContext();
 const anonCtx = await browser.newContext();
+// Wrapper for auth-only routes: SKIP (not FAIL) when the audit key is unusable.
+async function authedPrintCheck(route, name, checks, pdfOpts = {}) {
+  if (!authCtx) { console.log(`SKIP ${name} :: authenticated check skipped (ADMIN_PASSWORD < 8 chars)`); return; }
+  await printCheck(authCtx, route, name, checks, pdfOpts);
+}
 
 // Positive blank-page guard, run on EVERY audited route: a print render must keep
 // a meaningful amount of visible text. A route where the print stylesheet hides
@@ -187,7 +214,7 @@ await printCheck(anonCtx, await firstJourneyRoute(), 'journey-anon', [
 ]);
 
 // Recommendations (auth) — R5-027: "helpful" feedback row hidden.
-await printCheck(authCtx, '/recommendations', 'recommendations', [
+await authedPrintCheck('/recommendations', 'recommendations', [
   { id: 'helpful-hidden', fn: new Function(`
       const nodes = [...document.querySelectorAll('.no-print')].filter(e => /helpful/i.test(e.textContent));
       const vis = nodes.filter(e => getComputedStyle(e).display !== 'none');
@@ -195,7 +222,7 @@ await printCheck(authCtx, '/recommendations', 'recommendations', [
 ]);
 
 // Theme settings (auth) — R5-027: pickers/swatches hidden.
-await printCheck(authCtx, '/settings/theme', 'theme-settings', [
+await authedPrintCheck('/settings/theme', 'theme-settings', [
   { id: 'pickers-hidden', fn: new Function(`
       const cards = [...document.querySelectorAll('.no-print')];
       const vis = cards.filter(e => getComputedStyle(e).display !== 'none');
@@ -211,10 +238,10 @@ const chromeChecks = [
 await printCheck(anonCtx, `/resource/${await firstResourceId()}`, 'resource', chromeChecks);
 await printCheck(anonCtx, '/', 'home', chromeChecks);
 await printCheck(anonCtx, '/advanced', 'advanced', chromeChecks);
-await printCheck(authCtx, '/profile', 'profile', chromeChecks);
+await authedPrintCheck('/profile', 'profile', chromeChecks);
 
 // Admin — R4-070: prints without blank overflow pages.
-await printCheck(authCtx, '/admin', 'admin', chromeChecks.slice(0, 2));
+await authedPrintCheck('/admin', 'admin', chromeChecks.slice(0, 2));
 
 fs.writeFileSync(`${OUT}/print-audit.json`, JSON.stringify(results, null, 2));
 const fails = results.filter(r => !r.pass);

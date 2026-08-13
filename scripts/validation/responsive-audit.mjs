@@ -83,38 +83,64 @@ const results = [];
 const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} ${k} :: ${detail}`); };
 
 const browser = await chromium.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] });
-// Login is rate-limited (429, 5/min burst + 20/15min window). Repeated validation
-// runs exhaust the 15-minute window, so cache the admin session cookie across runs
-// (shared by print-audit + responsive-audit) and only log in when the cached
-// session is missing/expired. On 429, honor Retry-After and back off with jitter.
-const SESSION_FILE = '/tmp/validation/admin-session.json';
+// Auth: the Clerk migration removed /api/auth/local/login and express-session,
+// so there is no password+cookie login anymore. Authenticated checks instead
+// send `X-Admin-Audit-Key: <ADMIN_PASSWORD>` on every request; the server
+// (server/clerkAuth.ts) honors the header only when ADMIN_PASSWORD is set in
+// ITS environment and is >= 8 chars (mirrors the seedAdminUser length guard).
+// If ADMIN_PASSWORD is too short the server ignores the header, so warn and
+// SKIP authenticated checks instead of silently degrading to anonymous runs.
 async function newAdminContext() {
-  const fsm = await import('node:fs');
-  if (fsm.existsSync(SESSION_FILE)) {
-    try {
-      const c = await browser.newContext({ storageState: SESSION_FILE });
-      const me = await c.request.get(`${BASE}/api/auth/user`).then(r => r.json()).catch(() => null);
-      if (me?.user?.role === 'admin') { console.log('admin session reused from cache'); return c; }
-      await c.close();
-    } catch { /* stale/corrupt state — fall through to fresh login */ }
+  if (process.env.ADMIN_PASSWORD.length < 8) {
+    console.warn('WARN: ADMIN_PASSWORD is shorter than 8 characters — the server ignores the audit-key header (fail-closed guard); SKIPPING authenticated page checks.');
+    return null;
   }
+  const KEY = process.env.ADMIN_PASSWORD;
+  const APP_ORIGIN = new URL(BASE).origin;
   const c = await browser.newContext();
-  let loggedIn = false;
-  for (let i = 0; i < 8 && !loggedIn; i++) {
-    const res = await c.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json', Origin: BASE } });
-    if (res.ok()) { loggedIn = true; break; }
-    if (res.status() !== 429) { console.error('FATAL: admin login failed', res.status()); process.exit(1); }
-    const retryAfter = Number(res.headers()['retry-after']);
-    const wait = (Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 15000 * (i + 1)) + Math.floor(Math.random() * 5000);
-    console.log(`login 429, retrying in ${Math.round(wait / 1000)}s...`);
-    await new Promise(r => setTimeout(r, wait));
+  // Inject the audit key ONLY into same-origin requests. A context-wide
+  // extraHTTPHeaders would attach the admin credential to EVERY request the
+  // SPA makes — Clerk-hosted scripts, external images, any third-party origin
+  // — leaking an admin bearer credential off-site. Route interception scopes
+  // the header to the app origin and nothing else.
+  await c.route('**/*', (route) => {
+    let sameOrigin = false;
+    try { sameOrigin = new URL(route.request().url()).origin === APP_ORIGIN; } catch { /* opaque scheme (data:, about:) — never inject */ }
+    if (sameOrigin) route.continue({ headers: { ...route.request().headers(), 'x-admin-audit-key': KEY } });
+    else route.continue();
+  });
+  // Regression probe: prove a cross-origin request does NOT carry the audit
+  // key. Fulfilled locally (no real network); registered AFTER the injector so
+  // it matches first (Playwright checks newest routes first).
+  let probeHeaders = null;
+  await c.route('https://audit-key-leak-probe.invalid/**', (route) => {
+    probeHeaders = route.request().headers();
+    route.fulfill({ status: 200, contentType: 'text/plain', body: 'probe' });
+  });
+  const probePage = await c.newPage();
+  await probePage.goto('https://audit-key-leak-probe.invalid/probe').catch(() => {});
+  await probePage.close();
+  await c.unroute('https://audit-key-leak-probe.invalid/**');
+  if (!probeHeaders) { console.error('FATAL: cross-origin leak probe never ran — cannot prove the audit key stays same-origin'); process.exit(1); }
+  if (Object.keys(probeHeaders).some(h => h.toLowerCase() === 'x-admin-audit-key')) {
+    console.error('FATAL: audit key LEAKED to a cross-origin request — refusing to run');
+    process.exit(1);
   }
-  if (!loggedIn) { console.error('FATAL: admin login still rate-limited after retries'); process.exit(1); }
-  fsm.mkdirSync('/tmp/validation', { recursive: true });
-  await c.storageState({ path: SESSION_FILE });
+  console.log('leak probe OK: audit key absent from cross-origin request');
+  // API-context calls bypass route interception, so pass the header explicitly.
+  const me = await c.request.get(`${BASE}/api/auth/user`, { headers: { 'x-admin-audit-key': KEY } }).then(r => r.json()).catch(() => null);
+  if (me?.user?.role !== 'admin') {
+    console.error('FATAL: audit-key auth failed — /api/auth/user did not return the admin. Is ADMIN_PASSWORD set (>=8 chars) in the SERVER environment and the admin user seeded?');
+    process.exit(1);
+  }
+  console.log('admin auth OK via X-Admin-Audit-Key header');
   return c;
 }
-const ctx = await newAdminContext();
+const authCtx = await newAdminContext();
+const AUTHED = authCtx !== null;
+// Anonymous-capable checks (breadcrumb, forced-colors, drawer trap) still run
+// when auth is unavailable; auth-only sections below check AUTHED and SKIP.
+const ctx = authCtx ?? await browser.newContext();
 
 async function gotoPage(page, route) {
   const deadline = Date.now() + 90_000;
@@ -149,7 +175,13 @@ async function requestWithRetry(request, method, route, data) {
     const response = await request.fetch(`${BASE}${route}`, {
       method,
       data,
-      headers: { 'Content-Type': 'application/json', Origin: BASE },
+      // API-context calls bypass route interception, so the audit key must be
+      // attached explicitly here (same-origin only: every URL is `${BASE}...`).
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: BASE,
+        ...(AUTHED ? { 'x-admin-audit-key': process.env.ADMIN_PASSWORD } : {}),
+      },
     });
     if (!retryableStatus(response.status())) return response;
     last = `status ${response.status()}`;
@@ -160,6 +192,12 @@ async function requestWithRetry(request, method, route, data) {
 }
 
 // ---- R5-026: profile header overlap 640..1440 ----
+// ---- R5-054: tabs radius when wrapped ----
+// Both sections need the signed-in admin (profile page + /admin tabs), so they
+// SKIP as a unit when the audit key is unusable.
+if (!AUTHED) {
+  console.log('SKIP profile@* + tabs-* :: authenticated checks skipped (ADMIN_PASSWORD < 8 chars)');
+} else {
 const page = await ctx.newPage();
 await gotoPage(page, '/profile');
 await page.waitForTimeout(1200);
@@ -233,6 +271,7 @@ for (const [w, route, name] of [[375, '/profile', 'tabs-profile-375'], [500, '/p
   log(name, pass, `radius=${r.radius} wrapped=${r.wrapped} h=${Math.round(r.h)}`);
   await page.locator('[role="tablist"]').first().screenshot({ path: `${OUT}/${name}.png` }).catch(() => {});
 }
+}
 
 // ---- R5-057: breadcrumb at <=375 ----
 const resourceRoute = `/resource/${await firstResourceId()}`;
@@ -289,7 +328,10 @@ await fcPage.screenshot({ path: `${OUT}/forced-colors-home.png` });
 // approve / reject) at 1440/768/375, and asserts the dialog never scrolls
 // horizontally and the document never overflows the viewport. The seed is
 // deleted through the admin API at the end regardless of pass/fail.
-{
+// Needs the signed-in admin (/admin page + DELETE /api/admin/resources).
+if (!AUTHED) {
+  console.log('SKIP r4017-* :: authenticated checks skipped (ADMIN_PASSWORD < 8 chars)');
+} else {
   // Unique per run in BOTH url and title: POST /api/resources 409s on
   // duplicate url AND duplicate title, and this audit can run concurrently
   // (workflow + validation step) — a shared title would collide.

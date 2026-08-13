@@ -19,6 +19,7 @@
  *    misreported as "signed out").
  */
 import type { Request, RequestHandler } from "express";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { getAuth } from "@clerk/express";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
@@ -141,6 +142,47 @@ function skipUserContext(req: Request): boolean {
   return false;
 }
 
+/** Constant-time string comparison (hash first so lengths never leak). */
+function secretsMatch(candidate: string, expected: string): boolean {
+  const a = createHash("sha256").update(candidate).digest();
+  const b = createHash("sha256").update(expected).digest();
+  return timingSafeEqual(a, b);
+}
+
+/**
+ * Header bypass for the pre-publish browser audits (print-audit /
+ * responsive-audit). The Clerk migration removed /api/auth/local/login and
+ * express-session, so the audit scripts can no longer log in with a
+ * password + cookie; instead they send `X-Admin-Audit-Key: <ADMIN_PASSWORD>`
+ * on every request and this resolves the local admin row directly.
+ *
+ * Fails closed:
+ *  - ADMIN_PASSWORD unset or shorter than 8 chars (mirrors the seedAdminUser
+ *    guard in server/seed.ts) → header is ignored entirely.
+ *  - Header value must match ADMIN_PASSWORD in constant time.
+ *  - No admin@example.com row in the DB → no bypass.
+ * Anonymous visitors (and production without the secret) can never exercise
+ * this path.
+ */
+export function hasValidAuditKey(req: Request): boolean {
+  const headerValue = req.get("x-admin-audit-key");
+  if (!headerValue) return false;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword || adminPassword.length < 8) return false;
+  return secretsMatch(headerValue, adminPassword);
+}
+
+async function resolveAuditKeyAdmin(req: Request): Promise<User | undefined> {
+  if (!hasValidAuditKey(req)) return undefined;
+  const [admin] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, "admin@example.com"))
+    .limit(1);
+  if (!admin) return undefined;
+  return admin;
+}
+
 /**
  * Global middleware: attaches `req.dbUser` for signed-in visitors.
  * On DB failure it records the error in res.locals so `requireAuth` can
@@ -148,6 +190,31 @@ function skipUserContext(req: Request): boolean {
  */
 export const clerkUserContext: RequestHandler = async (req, res, next) => {
   if (skipUserContext(req)) return next();
+  // Audit-key bypass (pre-publish browser audits) — checked before the Clerk
+  // path so the scripts need no Clerk session at all. Requests with a VALID
+  // key skipped clerkMiddleware entirely (see server/index.ts), so this branch
+  // must never fall through to getSessionIdentity for them.
+  if (hasValidAuditKey(req)) {
+    try {
+      const auditAdmin = await resolveAuditKeyAdmin(req);
+      if (auditAdmin) {
+        req.dbUser = auditAdmin;
+        req.clerkIdentity = undefined; // no Clerk session backs this request
+        console.log(`[clerkAuth] audit-key bypass: ${req.method} ${req.path}`);
+      } else {
+        // Valid key but no seeded admin row: treat as anonymous.
+        console.warn(
+          "[clerkAuth] audit-key valid but admin@example.com row missing — request stays anonymous",
+        );
+      }
+    } catch (error) {
+      console.error("[clerkAuth] audit-key bypass lookup failed:", error);
+      res.locals.clerkUserLookupError = error;
+    }
+    return next();
+  }
+  // Invalid/disabled header values fall through to the normal Clerk path
+  // (the request is treated as whatever its Clerk session says).
   const identity = getSessionIdentity(req);
   if (!identity) return next();
   req.clerkIdentity = identity;
