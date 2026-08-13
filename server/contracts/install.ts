@@ -59,7 +59,28 @@ import { buildValidationEnvelope, normalizeValidationBody } from "./envelope";
 const BODY_METHODS = new Set<HttpMethod>(["post", "put", "patch", "delete"]);
 
 /** Named, reusable wire contracts shared by every inferred endpoint. */
-const jsonResponseSchema = z.json();
+/**
+ * "JSON response" must describe the WIRE format, not the in-memory object.
+ * `z.json()` rejects Date instances (and other toJSON-able values) that
+ * Express's res.json serializes perfectly well, which made every DB-backed
+ * payload with a timestamp log a false "[contract] response mismatch".
+ * So we validate serializability the same way res.json does: the body must
+ * survive JSON.stringify to a defined value without throwing (circular
+ * structures, BigInt, bare undefined/functions/symbols still fail).
+ */
+const jsonResponseSchema = z.custom<unknown>(
+  (value) => {
+    if (value === undefined || typeof value === "function" || typeof value === "symbol") {
+      return false;
+    }
+    try {
+      return JSON.stringify(value) !== undefined;
+    } catch {
+      return false;
+    }
+  },
+  { message: "Response body is not JSON-serializable" },
+);
 const jsonObjectResponseSchema = z
   .object({ message: z.string() })
   .passthrough();

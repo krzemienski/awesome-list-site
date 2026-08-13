@@ -75,4 +75,5 @@
 - [Export URL normalization](export-url-normalization.md) — export strips trailing slashes (a live slashed URL can 404 slashless); allowlist bare domains, %-encoded entries never match.
 - [awesome_bot export check](awesome-bot-export-check.md) — gem via nix-shell ruby; chunk big lists past the 5-min shell budget; ReadTimeout/418/202 are bot-blocks, not dead.
 - [www/apex split-brain DNS](www-domain-split-brain.md) — www is Cloudflare-proxied (525: origin lacks a www cert) while apex hits Replit's edge directly; only a CF redirect rule or Replit custom domain fixes it — never app code.
+- [z.json() wire vs memory](zod-json-wire-vs-memory.md) — res.json-wrapper validation sees pre-serialization bodies; z.json() rejects Dates → false mismatch spam; validate JSON.stringify-ability instead.
 - [Link Health scan lifecycle](link-health-scan-lifecycle.md) — dashboard flags = latest COMPLETED job only; URL fixes need a fresh ~90-min scan; "suspect" = off-domain redirect, repoint to final host.

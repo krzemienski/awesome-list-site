@@ -55,21 +55,7 @@ components:
             items:
               type: string
               maxLength: 512
-    JsonResponse:
-      anyOf:
-        - type: string
-        - type: number
-        - type: boolean
-        - type: string
-          nullable: true
-          enum:
-            - null
-        - type: array
-          items:
-            $ref: '#/components/schemas/JsonResponse'
-        - type: object
-          additionalProperties:
-            $ref: '#/components/schemas/JsonResponse'
+    JsonResponse: {}
     ValidationError:
       type: object
       properties:
