@@ -370,21 +370,31 @@ async function checkSequenceDrift(baseUrl: string): Promise<void> {
   });
 }
 
-function parseArgs(argv: string[]): { sequencesOnly: boolean; databaseUrl?: string } {
+function parseArgs(argv: string[]): {
+  sequencesOnly: boolean;
+  journalOnly: boolean;
+  databaseUrl?: string;
+} {
   let sequencesOnly = false;
+  let journalOnly = false;
   let databaseUrl: string | undefined;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--sequences-only') {
       sequencesOnly = true;
+    } else if (arg === '--journal-only') {
+      journalOnly = true;
     } else if (arg === '--database-url') {
       databaseUrl = argv[++i];
       if (!databaseUrl) fail('--database-url requires a value.');
     } else if (arg.startsWith('--database-url=')) {
       databaseUrl = arg.slice('--database-url='.length);
     } else {
-      fail(`Unknown argument: ${arg}\nSupported: --sequences-only, --database-url <url>`);
+      fail(`Unknown argument: ${arg}\nSupported: --journal-only, --sequences-only, --database-url <url>`);
     }
+  }
+  if (journalOnly && sequencesOnly) {
+    fail('--journal-only and --sequences-only are mutually exclusive.');
   }
   if (databaseUrl && !sequencesOnly) {
     fail(
@@ -392,11 +402,23 @@ function parseArgs(argv: string[]): { sequencesOnly: boolean; databaseUrl?: stri
         'The full check creates and drops a scratch database, which must NEVER run against production.'
     );
   }
-  return { sequencesOnly, databaseUrl };
+  return { sequencesOnly, journalOnly, databaseUrl };
 }
 
 async function main() {
-  const { sequencesOnly, databaseUrl } = parseArgs(process.argv.slice(2));
+  const { sequencesOnly, journalOnly, databaseUrl } = parseArgs(process.argv.slice(2));
+
+  if (journalOnly) {
+    // File-only validation: every migrations/*.sql is journaled and vice versa.
+    // Opens NO database connection, so it is the only mode safe to run in the
+    // publish build container (whose DATABASE_URL is production). The full
+    // scratch-DB reproduction + sequence checks run in the dev workspace
+    // (migration-drift workflow / manual gate runs) instead.
+    console.log('Journal-only mode (no database connection).');
+    checkJournal();
+    console.log('\n✅ Journal is consistent with migrations/.');
+    return;
+  }
 
   if (sequencesOnly) {
     const url = databaseUrl ?? process.env.SEQUENCE_CHECK_DATABASE_URL ?? process.env.DATABASE_URL;

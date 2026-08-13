@@ -43,6 +43,7 @@
 - [Hand-dropped migration drift repair](hand-dropped-migration-drift.md) — unjournaled .sql in migrations/ silently never runs; fix journal + mirror in schema.ts + psql-apply to dev (dev never runs boot migrator); generate re-emits snapshotless DDL.
 - [Real-outage DB resilience testing](db-resilience-testing.md) — LOCK TABLE ACCESS EXCLUSIVE = real no-mock outage; timed-out queries still commit later (need unique idx + ON CONFLICT); pg 22xxx/23xxx = never retry.
 - [Publish diff vs boot migrator](publish-diff-vs-boot-migrator.md) — Publish pre-applies the dev schema diff to prod, then the boot migrator re-runs the same DDL; every migration MUST be idempotent or publish 42P07-loops.
+- [Publish build gate isolation](publish-build-gate-isolation.md) — deploy-build gates run with PROD env before the schema diff applies; never boot the app or open a DB there (chicken-and-egg block + scratch-DB DDL hit prod).
 - [CSP vs platform/inline scripts](csp-platform-injection.md) — Replit injects replit-cdn.com widget into prod HTML (must allowlist); runtime-created inline scripts get no nonce → bootstrap gtag as module code.
 - [PII masking must cover every DOM path](pii-mask-full-dom.md) — masks leak via fallback columns and aria-label/title attributes; leak checks must scan outerHTML, not textContent.
 - [Public serializer choke point](public-serializer-choke-point.md) — per-route field stripping misses sibling surfaces (related/tree/public API); strip via ONE shared util + probe ALL send sites.

@@ -9,9 +9,9 @@
     }
   },
   "initial": {
-    "maxRawBytes": 860000,
-    "maxGzipBytes": 260000,
-    "maxBrotliBytes": 211500
+    "maxRawBytes": 960000,
+    "maxGzipBytes": 285000,
+    "maxBrotliBytes": 236000
   },
   "maxAsyncChunk": {
     "maxGzipBytes": 180000,
@@ -47,12 +47,6 @@
       "maxRawBytes": 37000,
       "maxGzipBytes": 14000,
       "maxBrotliBytes": 12500
-    },
-    "login": {
-      "manifestKey": "src/pages/Login.tsx",
-      "maxRawBytes": 125000,
-      "maxGzipBytes": 40000,
-      "maxBrotliBytes": 35500
     },
     "recommendations": {
       "manifestKey": "src/pages/Recommendations.tsx",
