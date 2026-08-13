@@ -344,7 +344,34 @@ const clerkSessionMiddleware = clerkMiddleware((req) => ({
     process.env.CLERK_PUBLISHABLE_KEY,
   ),
 }));
+// Server-side auth is only ever read on /api routes (req.dbUser via
+// clerkUserContext + requireAuth). Document/SPA navigations must NOT pass
+// through clerkMiddleware: on dev instances it 307-redirects anonymous HTML
+// requests to Clerk's cross-origin dev-browser handshake
+// (__clerk_hs_reason=dev-browser-missing) BEFORE index.html — and its
+// pre-boot param scrubber — can run. Headless audit browsers then get stuck
+// on clerk.accounts.dev (Cloudflare 403s the handshake), which broke the
+// url-params-audit scrub checks (Task #313). The Clerk client SDK obtains
+// its own dev-browser JWT, so the server-side handshake is unnecessary for
+// this SPA. `/api/__clerk` (FAPI proxy) is already mounted earlier and never
+// reaches this middleware stack's Clerk verification.
+//
+// Exception: the protected PAGE routes below (server-side guard further down
+// redirects them to /sign-in when req.dbUser is absent) still need Clerk to
+// run on their document requests, or signed-in users hard-loading /profile
+// would always bounce to /sign-in. Anonymous dev loads of THESE paths still
+// take Clerk's handshake redirect — acceptable: they'd be redirected to
+// /sign-in anyway, and audit scripts reach them with the audit-key bypass.
+export const PROTECTED_PAGE_PATTERNS = [
+  /^\/admin(\/|$)/,
+  /^\/bookmarks(\/|$)/,
+  /^\/profile(\/|$)/,
+];
+const needsClerkAuth = (req: express.Request) =>
+  req.path.startsWith("/api") ||
+  PROTECTED_PAGE_PATTERNS.some((pattern) => pattern.test(req.path));
 app.use((req, res, next) => {
+  if (!needsClerkAuth(req)) return next();
   // Requests carrying a valid X-Admin-Audit-Key (pre-publish audit scripts)
   // skip Clerk verification entirely — clerkUserContext resolves the admin
   // row for them instead. Without this, clerkMiddleware 307-redirects
@@ -355,8 +382,13 @@ app.use((req, res, next) => {
   return clerkSessionMiddleware(req, res, next);
 });
 // Attach req.dbUser for signed-in visitors (JIT-provisions first-time Clerk
-// users) — the Clerk-era replacement for Passport's deserializeUser.
-app.use(clerkUserContext);
+// users) — the Clerk-era replacement for Passport's deserializeUser. Gated to
+// /api like clerkMiddleware above: getAuth() throws on requests the Clerk
+// middleware never saw.
+app.use((req, res, next) => {
+  if (!needsClerkAuth(req)) return next();
+  return clerkUserContext(req, res, next);
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -407,13 +439,10 @@ app.use((req, res, next) => {
   // expired, and tampered __session cookies all resolve to no dbUser here.
   app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
-    const protectedPatterns = [
-      /^\/admin(\/|$)/,
-      /^\/bookmarks(\/|$)/,
-      /^\/profile(\/|$)/,
-    ];
+    // Patterns hoisted to PROTECTED_PAGE_PATTERNS (above): needsClerkAuth
+    // must keep Clerk running on these documents or req.dbUser is never set.
     if (
-      protectedPatterns.some((pattern) => pattern.test(req.path)) &&
+      PROTECTED_PAGE_PATTERNS.some((pattern) => pattern.test(req.path)) &&
       !req.dbUser
     ) {
       return res.redirect(
