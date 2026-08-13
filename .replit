@@ -79,6 +79,10 @@ args = "task302-resilience"
 task = "workflow.run"
 args = "openapi-drift"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "prefs-revision-races"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -225,6 +229,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run validate:openapi"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "prefs-revision-races"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx scripts/validation/preferences-revision-races.ts"
 
 [workflows.workflow.metadata]
 isValidation = true

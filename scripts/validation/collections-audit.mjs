@@ -30,6 +30,67 @@ function chromePath() {
   return path.join(cache, dir, "chrome-linux64/chrome");
 }
 
+const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
+if (!CLERK_SECRET_KEY) {
+  console.error("FATAL: CLERK_SECRET_KEY is required to create the disposable audit account");
+  process.exit(1);
+}
+
+async function clerkApi(method, route, body) {
+  const response = await fetch(`https://api.clerk.com/v1${route}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${CLERK_SECRET_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(`Clerk ${method} ${route} -> ${response.status}: ${JSON.stringify(data).slice(0, 300)}`);
+  }
+  return data;
+}
+
+// Remove this run's user AND any residue from previously aborted runs.
+async function purgeClerkQaUsers() {
+  const matches = await clerkApi("GET", `/users?query=${encodeURIComponent(PREFIX)}&limit=100`);
+  for (const user of Array.isArray(matches) ? matches : []) {
+    await clerkApi("DELETE", `/users/${user.id}`).catch(() => {});
+  }
+}
+
+// Drive the real Clerk sign-in UI (post-Clerk there is no local login API).
+// Headless/new-device sessions land on the client-trust OTP step; +clerk_test
+// emails accept the fixed code 424242.
+async function signInWithClerk(page, signInEmail, signInPassword) {
+  await gotoPage(page, "/sign-in");
+  const identifier = page.locator('input[name="identifier"]');
+  await identifier.waitFor({ timeout: 30_000 });
+  await identifier.fill(signInEmail);
+  await page.keyboard.press("Enter");
+  const passwordField = page.locator('input[name="password"]');
+  await passwordField.waitFor({ timeout: 30_000 });
+  await passwordField.fill(signInPassword);
+  await page.keyboard.press("Enter");
+  const otp = page.locator('input[aria-label="Enter verification code"]');
+  const otpNeeded = await otp.waitFor({ timeout: 20_000 }).then(() => true).catch(() => false);
+  if (otpNeeded) {
+    await otp.click();
+    await page.keyboard.type("424242", { delay: 120 });
+  }
+  const deadline = Date.now() + 60_000;
+  while (Date.now() < deadline) {
+    const auth = await page.evaluate(async () => {
+      const response = await fetch("/api/auth/user", { credentials: "include" });
+      return response.json().catch(() => null);
+    });
+    if (auth?.isAuthenticated === true) return;
+    await page.waitForTimeout(1500);
+  }
+  throw new Error("Clerk UI sign-in did not produce an authenticated session");
+}
+
 const pool = new Pool({ connectionString: DATABASE_URL });
 const results = [];
 const log = (name, pass, detail) => {
@@ -136,7 +197,8 @@ async function gotoPage(page, route) {
 
 await purgeQaUsers();
 const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-const email = `${PREFIX}${suffix}@example.com`;
+// +clerk_test emails accept the fixed OTP 424242 on the dev instance.
+const email = `${PREFIX}${suffix}+clerk_test@example.com`;
 const password = `CollectionAudit-${suffix}!`;
 const collectionName = `Collection audit ${suffix}`;
 let browser;
@@ -152,10 +214,18 @@ try {
   ownerContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const request = ownerContext.request;
 
-  await requestJson(request, "POST", "/api/auth/register", { email, password });
-  await requestJson(request, "POST", "/api/auth/local/login", { email, password });
+  await purgeClerkQaUsers();
+  const clerkUser = await clerkApi("POST", "/users", {
+    email_address: [email],
+    password,
+    skip_password_checks: true,
+  });
+  const signInPage = await ownerContext.newPage();
+  await signInWithClerk(signInPage, email, password);
+  await signInPage.close();
   const auth = await requestJson(request, "GET", "/api/auth/user");
-  log("auth:local-session", auth.data?.isAuthenticated === true, `authenticated=${auth.data?.isAuthenticated}`);
+  log("auth:clerk-session", auth.data?.isAuthenticated === true, `authenticated=${auth.data?.isAuthenticated}`);
+  void clerkUser;
 
   const catalog = await requestJson(request, "GET", "/api/resources?limit=2");
   const resources = catalog.data?.resources ?? catalog.data ?? [];
@@ -306,6 +376,9 @@ try {
   await ownerContext?.close().catch(() => {});
   await browser?.close().catch(() => {});
   try {
+    await purgeClerkQaUsers().catch((error) => {
+      log("teardown:clerk-users", false, error instanceof Error ? error.message : String(error));
+    });
     await purgeQaUsers();
     const residue = await pool.query("SELECT count(*)::int AS count FROM users WHERE email LIKE $1", [
       `${PREFIX}%`,
