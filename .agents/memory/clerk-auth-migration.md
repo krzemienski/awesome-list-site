@@ -26,3 +26,10 @@ The app migrated from Replit OIDC + local email/password (Passport) to Replit-ma
 
 ## Prod deploy requirement
 Production needs the same env vars (CLERK_SECRET_KEY, CLERK_PUBLISHABLE_KEY, VITE_CLERK_PUBLISHABLE_KEY, VITE_CLERK_PROXY_URL for the proxy) and the prod-only proxy path verified after the next publish.
+
+## Dev vs prod Clerk instances (verified Aug 2026 post-publish)
+- Replit-managed Clerk has **two isolated instances**: workspace `CLERK_SECRET_KEY` = dev instance ONLY; prod live keys are swapped in at publish and are NOT visible from dev — no backend-API access to the prod user store from the workspace.
+- A user created via the workspace key does NOT exist on the published site (`form_identifier_not_found`). Never conclude "prod auth broken" from that.
+- **Probe prod accounts without secrets** via the same-origin proxy: `POST https://<domain>/api/__clerk/v1/client/sign_ins` with `identifier=<email>` → `needs_first_factor` = account exists; `supported_first_factors` reveals whether the password factor transferred.
+- The platform migration (`migrateReplitAuthToClerk`) populated BOTH instances, incl. the password hash. Only 1/14 migrated users ever had a password — the rest were OIDC-era (email_code/oauth factors only); email_code-only on those accounts is correct, not data loss.
+- A full authed-session prod test needs a real inbox for the email code (sign-ups require verification; the Gmail connector is send-scope-only, cannot read codes) — final round-trip confirmation belongs to the account owner.
