@@ -23,3 +23,8 @@ PostHog drops captures for automation browsers via navigator.webdriver, not just
 - One `script-src` violation with blockedURI `eval` per page is a guarded library feature-probe in the main bundle, NOT a regression signal — console/pageerror streams stay clean alongside it.
 - `style-src` cannot drop `'unsafe-inline'`: the SSR shell plus runtime `createElement("style")` in bundled libs (pdf/canvas exporters) emit inline styles, and style ATTRIBUTES can never be nonce-authorized.
 - COOP must stay `same-origin-allow-popups`: the platform widget's popup behavior only exists on prod, so a stricter value can't be regression-tested before shipping.
+
+## Clerk Turnstile captcha vs strict CSP (Aug 2026 prod sign-in outage)
+Clerk loads Cloudflare Turnstile (`challenges.cloudflare.com/turnstile/v0/api.js`) for bot protection on **sign-ups and OAuth-transfer sign-ins**. A strict CSP that doesn't allowlist it makes Clerk FAPI reject those flows with "Error loading CAPTCHA" (or silent hang / Turnstile error 300030) — password sign-in may still work, so the breakage looks account-specific.
+**Fix:** add `https://challenges.cloudflare.com` to `script-src` AND `connect-src`, plus an explicit `frame-src 'self' https://challenges.cloudflare.com` (without frame-src, frames fall back to default-src 'self' and the widget iframe is blocked silently). This is the Clerk skill's canonical directive list (web-migration.md § CSP blocks Clerk or Cloudflare Turnstile).
+**How found:** headless prod sign-up run captured both the CSP console violation and the FAPI 400 — curl alone never sees captcha failures; only a real browser flow does.

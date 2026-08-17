@@ -171,7 +171,13 @@ app.use((_req, res, next) => {
         // the SDK can lazy-load auxiliary scripts from its CDN.
         // PostHog: posthog-js is bundled from npm but lazy-loads extra bundles
         // (session recorder, surveys, toolbar) from its assets CDN.
-        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com`,
+        // Aug 2026 prod sign-in outage: Clerk uses Cloudflare Turnstile for bot
+        // protection on sign-up and OAuth-transfer sign-in flows. Its loader
+        // (challenges.cloudflare.com/turnstile/v0/api.js) was blocked by this
+        // CSP, so Clerk's FAPI rejected those flows with "Error loading
+        // CAPTCHA" — allowlist it in script-src, connect-src, and frame-src
+        // (per the Clerk skill's canonical directive list).
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com`,
         // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
         // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
         // present in the same directive, so there is no "nonce + fallback"
@@ -202,7 +208,11 @@ app.use((_req, res, next) => {
         // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
         // host; api.mixpanel.com covers config fallbacks.
         // PostHog ingest + assets (feature flags, replay, surveys).
-        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com",
+        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com",
+        // Turnstile renders inside an iframe from challenges.cloudflare.com;
+        // without an explicit frame-src it falls back to default-src 'self'
+        // and the widget is blocked silently (Turnstile error 300030).
+        "frame-src 'self' https://challenges.cloudflare.com",
         "frame-ancestors 'none'",
         // BUG-014: add the missing hardening directives.
         "form-action 'self'",
