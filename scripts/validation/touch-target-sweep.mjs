@@ -46,30 +46,37 @@ async function firstJourneyId() {
 
 const browser = await chromium.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 
-const SESSION_FILE = '/tmp/validation/admin-session.json';
+// Auth: the Clerk migration removed /api/auth/local/login and express-session,
+// so there is no password+cookie login anymore. Authenticated checks instead
+// send `X-Admin-Audit-Key: <ADMIN_PASSWORD>` on every same-origin request;
+// the server (server/clerkAuth.ts) honors the header only when ADMIN_PASSWORD
+// is set in ITS environment and is >= 8 chars (fail-closed guard).
 async function newAdminContext() {
-  if (fs.existsSync(SESSION_FILE)) {
-    try {
-      const c = await browser.newContext({ storageState: SESSION_FILE, viewport: { width: 375, height: 800 } });
-      const me = await c.request.get(`${BASE}/api/auth/user`).then(r => r.json()).catch(() => null);
-      if (me?.user?.role === 'admin' || me?.role === 'admin') { console.log('admin session reused from cache'); return c; }
-      await c.close();
-    } catch { /* fall through */ }
+  const KEY = process.env.ADMIN_PASSWORD;
+  if (KEY.length < 8) {
+    console.error('FATAL: ADMIN_PASSWORD is shorter than 8 characters — the server ignores the audit-key header (fail-closed guard)');
+    process.exit(1);
   }
-  for (let attempt = 0; attempt < 6; attempt++) {
-    const c = await browser.newContext({ viewport: { width: 375, height: 800 } });
-    const res = await c.request.post(`${BASE}/api/auth/local/login`, { data: { email: 'admin@example.com', password: process.env.ADMIN_PASSWORD }, headers: { 'Content-Type': 'application/json', Origin: BASE } });
-    if (res.ok()) {
-      await c.storageState({ path: SESSION_FILE });
-      return c;
-    }
-    await c.close();
-    if (res.status() !== 429) { console.error('FATAL: admin login failed', res.status()); process.exit(1); }
-    const wait = (Number(res.headers()['retry-after']) || 20) * 1000 + Math.random() * 2000;
-    console.log(`login 429, retrying in ${Math.round(wait / 1000)}s...`);
-    await new Promise(r => setTimeout(r, wait));
+  const APP_ORIGIN = new URL(BASE).origin;
+  const c = await browser.newContext({ viewport: { width: 375, height: 800 } });
+  // Inject the audit key ONLY into same-origin requests. A context-wide
+  // extraHTTPHeaders would attach the admin credential to EVERY request the
+  // SPA makes (Clerk scripts, external images, third-party origins), leaking
+  // an admin bearer credential off-site.
+  await c.route('**/*', (route) => {
+    let sameOrigin = false;
+    try { sameOrigin = new URL(route.request().url()).origin === APP_ORIGIN; } catch { /* opaque scheme — never inject */ }
+    if (sameOrigin) route.continue({ headers: { ...route.request().headers(), 'x-admin-audit-key': KEY } });
+    else route.continue();
+  });
+  // API-context calls bypass route interception, so pass the header explicitly.
+  const me = await c.request.get(`${BASE}/api/auth/user`, { headers: { 'x-admin-audit-key': KEY } }).then(r => r.json()).catch(() => null);
+  if (me?.user?.role !== 'admin' && me?.role !== 'admin') {
+    console.error('FATAL: audit-key auth failed — /api/auth/user did not return the admin. Is ADMIN_PASSWORD set (>=8 chars) in the SERVER environment and the admin user seeded?');
+    process.exit(1);
   }
-  console.error('FATAL: admin login still rate-limited'); process.exit(1);
+  console.log('admin context ready via audit-key header');
+  return c;
 }
 
 // Same probe as run26 BUG-024: every visible a/button/input(+select/textarea),
