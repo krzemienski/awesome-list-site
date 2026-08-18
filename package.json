@@ -16,6 +16,7 @@
     "type-check": "tsc --noEmit",
     "validate:resilience": "tsx scripts/validation/catalog-database-resilience.ts",
     "validate:openapi": "tsx scripts/validation/openapi-drift.ts",
+    "validate:response-contracts": "tsx scripts/validation/response-contract-drift.ts",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
