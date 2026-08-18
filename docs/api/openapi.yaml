@@ -511,6 +511,42 @@ components:
             items:
               type: string
               maxLength: 512
+    AuthMeResponse:
+      type: object
+      properties:
+        id:
+          anyOf:
+            - type: string
+            - type: number
+        email:
+          nullable: true
+          type: string
+        name:
+          type: string
+        avatar:
+          nullable: true
+          type: string
+        role:
+          type: string
+        createdAt:
+          anyOf:
+            - {}
+            - type: string
+        deletionRequestedAt:
+          anyOf:
+            - {}
+            - type: string
+            - type: string
+              nullable: true
+              enum:
+                - null
+      required:
+        - id
+        - name
+        - role
+        - createdAt
+        - deletionRequestedAt
+      additionalProperties: {}
     post_3a__2f_api_2f_auth_2f_logout-all.Query:
       type: object
       properties:
@@ -906,6 +942,29 @@ components:
             items:
               type: string
               maxLength: 512
+    SingleResourceResponse:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+        category:
+          nullable: true
+          type: string
+        subcategory:
+          nullable: true
+          type: string
+      required:
+        - id
+        - title
+        - url
+        - status
+      additionalProperties: {}
     get_3a__2f_api_2f_resource_2f__7b_id_7d_.Params:
       type: object
       properties:
@@ -3219,6 +3278,31 @@ components:
             items:
               type: string
               maxLength: 512
+    JourneysListResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: number
+          title:
+            type: string
+          status:
+            type: string
+          stepCount:
+            type: number
+          completedStepCount:
+            type: number
+          isEnrolled:
+            type: boolean
+        required:
+          - id
+          - title
+          - status
+          - stepCount
+          - completedStepCount
+          - isEnrolled
+        additionalProperties: {}
     get_3a__2f_api_2f_journeys_2f__7b_id_7d_.Params:
       type: object
       properties:
@@ -3857,6 +3941,35 @@ components:
             items:
               type: string
               maxLength: 512
+    AdminStatsResponse:
+      type: object
+      properties:
+        users:
+          type: number
+        resources:
+          type: number
+        journeys:
+          type: number
+        pendingApprovals:
+          type: number
+        pendingEdits:
+          type: number
+        totalPublic:
+          type: number
+        totalPending:
+          type: number
+        totalRejected:
+          type: number
+      required:
+        - users
+        - resources
+        - journeys
+        - pendingApprovals
+        - pendingEdits
+        - totalPublic
+        - totalPending
+        - totalRejected
+      additionalProperties: {}
     get_3a__2f_api_2f_admin_2f_users.Query:
       type: object
       properties:
@@ -9748,11 +9861,11 @@ paths:
       operationId: get:/api/auth/me
       responses:
         '200':
-          description: Successful response
+          description: 'Deprecated /me alias: returns the authenticated user object directly'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/AuthMeResponse'
         '400':
           description: Request validation failed
           content:
@@ -10889,11 +11002,11 @@ paths:
       operationId: get:/api/resources/{id}
       responses:
         '200':
-          description: Successful response
+          description: Single public resource by ID after field stripping
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/SingleResourceResponse'
         '400':
           description: Request validation failed
           content:
@@ -17772,11 +17885,11 @@ paths:
       operationId: get:/api/journeys
       responses:
         '200':
-          description: Successful response
+          description: Full journey list with per-journey step and enrolment counts
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/JourneysListResponse'
         '400':
           description: Request validation failed
           content:
@@ -19616,11 +19729,11 @@ paths:
       operationId: get:/api/admin/stats
       responses:
         '200':
-          description: Successful response
+          description: Admin dashboard aggregate counts
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/AdminStatsResponse'
         '400':
           description: Request validation failed
           content:

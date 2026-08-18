@@ -16,6 +16,10 @@
  *   - GET /api/resources
  *   - GET /api/recommendations
  *   - GET /api/admin/pending-resources  (via X-Admin-Audit-Key header)
+ *   - GET /api/resources/:id            (first resource from the list)
+ *   - GET /api/auth/me                  (audit-key admin; anonymous → 401)
+ *   - GET /api/admin/stats              (via X-Admin-Audit-Key header)
+ *   - GET /api/journeys                 (anonymous)
  *
  * Harness self-verification: a throwaway probe route deliberately returns a
  * 401 body violating the shared ErrorResponse schema. The run FAILS unless
@@ -154,6 +158,53 @@ async function main() {
     200,
     auditHeaders,
   );
+
+  // --- Task #320: four additional endpoints ---
+
+  // GET /api/resources/:id — resolve a real resource ID from the list first
+  // so the check exercises the real handler rather than a guaranteed 404.
+  let firstResourceId: number | null = null;
+  try {
+    const listRes = await fetch(`${base}/api/resources`);
+    const listBody = (await listRes.json()) as { resources?: { id: number }[] };
+    firstResourceId = listBody.resources?.[0]?.id ?? null;
+  } catch {
+    // leave null; the check below will record a status-mismatch failure
+  }
+  if (firstResourceId !== null) {
+    await check(
+      `GET /api/resources/:id (id=${firstResourceId})`,
+      `/api/resources/${firstResourceId}`,
+      200,
+    );
+  } else {
+    checks.push({
+      label: "GET /api/resources/:id",
+      status: 0,
+      ok: false,
+      detail: "could not resolve a resource ID from /api/resources list",
+    });
+  }
+
+  // GET /api/auth/me — authenticated only; anonymous returns 401 (not in schema)
+  await check(
+    "GET /api/auth/me (audit-key admin)",
+    "/api/auth/me",
+    200,
+    auditHeaders,
+  );
+
+  // GET /api/admin/stats — admin-only
+  await check(
+    "GET /api/admin/stats (audit-key)",
+    "/api/admin/stats",
+    200,
+    auditHeaders,
+  );
+
+  // GET /api/journeys — works for anonymous visitors
+  await check("GET /api/journeys (anonymous)", "/api/journeys", 200);
+
   await check(`GET ${PROBE_PATH} (observer liveness)`, PROBE_PATH, 401);
 
   // Give any post-response observer logging a beat to flush.

@@ -7,6 +7,10 @@
  * endpoints so the response-contract observer catches genuine shape drift
  * (renamed fields, missing keys) — not just "is the body JSON-serializable".
  *
+ * Task #320: extends coverage to four more client-critical endpoints:
+ * GET /api/resources/:id, GET /api/auth/me, GET /api/admin/stats,
+ * GET /api/journeys.
+ *
  * Call `registerCoreEndpointSchemas()` once, before
  * `installApiContractRegistration` processes any routes (i.e. before
  * `registerRoutes(app)` in the server and before the equivalent setup in
@@ -30,8 +34,17 @@ import { setRouteResponseSchema } from "./install";
  * undefined) to res.json() and Express serializes it to an ISO string.  The
  * schema sees the pre-serialization value, so we accept both shapes to avoid
  * false positives when the column is fetched as a Date from Drizzle/pg.
+ *
+ * `timestampField`         — nullable+optional; use for fields that may be
+ *                            absent from the payload (e.g. internal-only cols
+ *                            that passthrough surfaces on some rows).
+ * `requiredTimestampField` — present-but-nullable; dropping the key from the
+ *                            response will fail the contract check.
+ * `requiredTimestampNonNull` — always present AND non-null (e.g. createdAt).
  */
 const timestampField = z.union([z.date(), z.string(), z.null(), z.undefined()]);
+const requiredTimestampField = z.union([z.date(), z.string(), z.null()]);
+const requiredTimestampNonNull = z.union([z.date(), z.string()]);
 
 /**
  * A public resource row after `stripInternalResourceFields`. We only assert
@@ -134,11 +147,96 @@ const adminPendingResourcesResponseSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// GET /api/resources/:id
+// ---------------------------------------------------------------------------
+
+/**
+ * Single public resource after `toPublicResource` / `stripInternalResourceFields`.
+ * We assert the stable client-critical keys; all other columns pass through.
+ */
+const singleResourceResponseSchema = z
+  .object({
+    id: z.number(),
+    title: z.string(),
+    url: z.string(),
+    status: z.string(),
+    category: z.string().nullable().optional(),
+    subcategory: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+// ---------------------------------------------------------------------------
+// GET /api/auth/me  (deprecated alias of /api/auth/user — authenticated only)
+// ---------------------------------------------------------------------------
+
+/**
+ * /api/auth/me returns the user object directly (no isAuthenticated wrapper)
+ * for authenticated requests, and 401 for anonymous visitors.  The contract
+ * gate exercises it with an audit-key so only the 200 success shape matters
+ * here.
+ */
+const authMeResponseSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]),
+    email: z.string().nullable().optional(),
+    name: z.string(),
+    avatar: z.string().nullable().optional(),
+    role: z.string(),
+    // Required fields — dropping either key must fail the contract check.
+    createdAt: requiredTimestampNonNull,
+    deletionRequestedAt: requiredTimestampField,
+  })
+  .passthrough();
+
+// ---------------------------------------------------------------------------
+// GET /api/admin/stats
+// ---------------------------------------------------------------------------
+
+/**
+ * Admin dashboard statistics.  All counts are numbers; extra future fields
+ * pass through.
+ */
+const adminStatsResponseSchema = z
+  .object({
+    users: z.number(),
+    resources: z.number(),
+    journeys: z.number(),
+    pendingApprovals: z.number(),
+    pendingEdits: z.number(),
+    totalPublic: z.number(),
+    totalPending: z.number(),
+    totalRejected: z.number(),
+  })
+  .passthrough();
+
+// ---------------------------------------------------------------------------
+// GET /api/journeys
+// ---------------------------------------------------------------------------
+
+/**
+ * Each journey item spreads the raw DB row and appends stepCount,
+ * completedStepCount, and isEnrolled.  We assert those three derived fields
+ * plus the core identity fields; everything else passes through.
+ */
+const journeyItemSchema = z
+  .object({
+    id: z.number(),
+    title: z.string(),
+    status: z.string(),
+    stepCount: z.number(),
+    completedStepCount: z.number(),
+    isEnrolled: z.boolean(),
+  })
+  .passthrough();
+
+const journeysListResponseSchema = z.array(journeyItemSchema);
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
 /**
- * Register structural 200 schemas for the four key endpoints. Must be called
+ * Register structural 200 schemas for all key endpoints. Must be called
  * before `installApiContractRegistration` so that when the auto-installer
  * calls `inferredResponsesFor` for each route it picks up the override
  * instead of the generic `JsonResponse` (JSON-serializable-only) schema.
@@ -147,6 +245,8 @@ const adminPendingResourcesResponseSchema = z.object({
  * override map is simply overwritten with the same values).
  */
 export function registerCoreEndpointSchemas(): void {
+  // --- Task #319 endpoints ---
+
   setRouteResponseSchema("get", "/api/auth/user", {
     name: "AuthUserResponse",
     description: "Canonical identity response: always 200 with user=null for anonymous visitors",
@@ -169,5 +269,31 @@ export function registerCoreEndpointSchemas(): void {
     name: "AdminPendingResourcesResponse",
     description: "Pending-approval resource queue for admin review",
     schema: adminPendingResourcesResponseSchema,
+  });
+
+  // --- Task #320 endpoints ---
+
+  setRouteResponseSchema("get", "/api/resources/:id(\\d+)", {
+    name: "SingleResourceResponse",
+    description: "Single public resource by ID after field stripping",
+    schema: singleResourceResponseSchema,
+  });
+
+  setRouteResponseSchema("get", "/api/auth/me", {
+    name: "AuthMeResponse",
+    description: "Deprecated /me alias: returns the authenticated user object directly",
+    schema: authMeResponseSchema,
+  });
+
+  setRouteResponseSchema("get", "/api/admin/stats", {
+    name: "AdminStatsResponse",
+    description: "Admin dashboard aggregate counts",
+    schema: adminStatsResponseSchema,
+  });
+
+  setRouteResponseSchema("get", "/api/journeys", {
+    name: "JourneysListResponse",
+    description: "Full journey list with per-journey step and enrolment counts",
+    schema: journeysListResponseSchema,
   });
 }
