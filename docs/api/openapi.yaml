@@ -410,6 +410,62 @@ components:
             items:
               type: string
               maxLength: 512
+    AuthUserResponse:
+      type: object
+      properties:
+        isAuthenticated:
+          type: boolean
+        user:
+          anyOf:
+            - type: object
+              properties:
+                id:
+                  anyOf:
+                    - type: string
+                    - type: number
+                email:
+                  nullable: true
+                  type: string
+                name:
+                  type: string
+                avatar:
+                  nullable: true
+                  type: string
+                role:
+                  type: string
+                createdAt:
+                  anyOf:
+                    - {}
+                    - type: string
+                    - type: string
+                      nullable: true
+                      enum:
+                        - null
+                    - {}
+                deletionRequestedAt:
+                  anyOf:
+                    - {}
+                    - type: string
+                    - type: string
+                      nullable: true
+                      enum:
+                        - null
+                    - {}
+              required:
+                - id
+                - name
+                - role
+                - createdAt
+                - deletionRequestedAt
+              additionalProperties: {}
+            - type: string
+              nullable: true
+              enum:
+                - null
+      required:
+        - isAuthenticated
+        - user
+      additionalProperties: false
     get_3a__2f_api_2f_auth_2f_me.Query:
       type: object
       properties:
@@ -590,6 +646,77 @@ components:
             items:
               type: string
               maxLength: 512
+    ResourcesListResponse:
+      type: object
+      properties:
+        resources:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              status:
+                type: string
+            required:
+              - id
+              - title
+              - url
+              - status
+            additionalProperties: {}
+        total:
+          type: number
+        limit:
+          type: number
+        offset:
+          type: number
+        nextOffset:
+          anyOf:
+            - type: number
+            - type: string
+              nullable: true
+              enum:
+                - null
+        nextCursor:
+          anyOf:
+            - type: number
+            - type: string
+              nullable: true
+              enum:
+                - null
+        pagination:
+          type: object
+          properties:
+            page:
+              type: number
+            limit:
+              type: number
+            total:
+              type: number
+            totalPages:
+              type: number
+            hasMore:
+              type: boolean
+          required:
+            - page
+            - limit
+            - total
+            - totalPages
+            - hasMore
+          additionalProperties: false
+      required:
+        - resources
+        - total
+        - limit
+        - offset
+        - nextOffset
+        - nextCursor
+        - pagination
+      additionalProperties: false
     get_3a__2f_api_2f_search.Query:
       type: object
       properties:
@@ -4072,6 +4199,34 @@ components:
             items:
               type: string
               maxLength: 512
+    AdminPendingResourcesResponse:
+      type: object
+      properties:
+        resources:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              status:
+                type: string
+            required:
+              - id
+              - title
+              - url
+              - status
+            additionalProperties: {}
+        total:
+          type: number
+      required:
+        - resources
+        - total
+      additionalProperties: false
     post_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_approve.Params:
       type: object
       properties:
@@ -7420,6 +7575,31 @@ components:
             items:
               type: string
               maxLength: 512
+    RecommendationsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          resource:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              status:
+                type: string
+            required:
+              - id
+              - title
+              - url
+              - status
+            additionalProperties: {}
+        required:
+          - resource
+        additionalProperties: {}
     post_3a__2f_api_2f_recommendations.Query:
       type: object
       properties:
@@ -9430,11 +9610,11 @@ paths:
       operationId: get:/api/auth/user
       responses:
         '200':
-          description: Successful response
+          description: 'Canonical identity response: always 200 with user=null for anonymous visitors'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/AuthUserResponse'
         '400':
           description: Request validation failed
           content:
@@ -9993,11 +10173,11 @@ paths:
       operationId: get:/api/resources
       responses:
         '200':
-          description: Successful response
+          description: Paginated list of approved public resources with pagination metadata
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/ResourcesListResponse'
         '400':
           description: Request validation failed
           content:
@@ -20486,11 +20666,11 @@ paths:
       operationId: get:/api/admin/pending-resources
       responses:
         '200':
-          description: Successful response
+          description: Pending-approval resource queue for admin review
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/AdminPendingResourcesResponse'
         '400':
           description: Request validation failed
           content:
@@ -31002,11 +31182,11 @@ paths:
       operationId: get:/api/recommendations
       responses:
         '200':
-          description: Successful response
+          description: Array of recommendation items, each wrapping a public resource
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/RecommendationsResponse'
         '400':
           description: Request validation failed
           content:

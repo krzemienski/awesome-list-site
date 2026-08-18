@@ -58,6 +58,42 @@ import { buildValidationEnvelope, normalizeValidationBody } from "./envelope";
 /** Methods whose registrations carry a request body worth guarding. */
 const BODY_METHODS = new Set<HttpMethod>(["post", "put", "patch", "delete"]);
 
+// ---------------------------------------------------------------------------
+// Per-route 200 response schema overrides
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-route override map for the 200 success schema. Keys are
+ * `"METHOD /api/path"` (e.g. `"get /api/auth/user"`). When present,
+ * `inferredResponsesFor` uses the registered schema instead of the generic
+ * `jsonResponseSchema`, making the observer catch real field-level drift.
+ *
+ * Call `setRouteResponseSchema` before `installApiContractRegistration` is
+ * invoked (or before the first route is registered via `app.get/post/...`).
+ * Because `getOrRegister` is idempotent, a pre-registered override will be
+ * returned as-is when the auto-installer later tries to declare the same
+ * endpoint; when called after registration, the override map is still checked
+ * on every future call to `inferredResponsesFor` for any new registration.
+ */
+const routeResponseOverrideMap = new Map<string, import("./registry").NamedResponseSchema>();
+
+/**
+ * Register a structural 200 response schema for a specific endpoint. Must be
+ * called before `installApiContractRegistration` (i.e. before any route with
+ * this path+method is registered on the app).
+ *
+ * @param method  Lowercase HTTP method ("get", "post", …)
+ * @param path    Express-style path, e.g. "/api/auth/user"
+ * @param schema  Named response schema entry (name + description + zod schema)
+ */
+export function setRouteResponseSchema(
+  method: string,
+  path: string,
+  schema: import("./registry").NamedResponseSchema,
+): void {
+  routeResponseOverrideMap.set(`${method.toLowerCase()} ${path}`, schema);
+}
+
 /** Named, reusable wire contracts shared by every inferred endpoint. */
 /**
  * "JSON response" must describe the WIRE format, not the in-memory object.
@@ -114,10 +150,13 @@ function inferredResponsesFor(
   path: string,
   explicitStatuses: number[],
 ): import("./registry").ResponseSchemaMap {
+  const override = routeResponseOverrideMap.get(`${method} ${path}`);
   const success: import("./registry").ResponseSchemaMap =
     path === "/api/docs"
       ? { "200": { name: "HtmlResponse", description: "HTML API documentation" } }
-      : { "200": { name: "JsonResponse", description: "Successful response", schema: jsonResponseSchema } };
+      : override
+        ? { "200": override }
+        : { "200": { name: "JsonResponse", description: "Successful response", schema: jsonResponseSchema } };
   for (const status of explicitStatuses) {
     if (status < 200 || status >= 400 || status === 200) continue;
     success[String(status)] =

@@ -65,8 +65,12 @@ export {
   isSettingsGetterCall,
   isInterceptablePath,
   toOpenApiPath,
+  setRouteResponseSchema,
 } from "./install";
 export type { InstallOptions, InstalledContractApp } from "./install";
+
+// --- Per-endpoint structural response schemas (task #319) ---
+export { registerCoreEndpointSchemas } from "./endpointSchemas";
 
 // --- Inference helpers (pure, unit-testable) ---
 export {

@@ -43,6 +43,7 @@ import { seedDatabase } from "./seed";
 import {
   installApiContractRegistration,
   observeRoutes,
+  registerCoreEndpointSchemas,
 } from "./contracts";
 
 import { registerAuthUserRoutes } from "./routes/domains/auth-user";
@@ -211,6 +212,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // signature while gaining one named request/response contract and validation
   // immediately before its final handler. Installing before auth setup also
   // covers the OIDC callback/probe routes that setupAuth registers.
+  //
+  // Register per-endpoint structural schemas BEFORE the installer so that
+  // inferredResponsesFor picks up the overrides when each route is first
+  // declared (task #319: catch field-level payload drift, not just broken JSON).
+  registerCoreEndpointSchemas();
   installApiContractRegistration(app);
 
   // Authentication (Task #307): Clerk middleware + user context are mounted

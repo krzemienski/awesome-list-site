@@ -27,6 +27,7 @@ import type { AddressInfo } from "node:net";
 import { clerkMiddleware } from "@clerk/express";
 import { registerRoutes } from "../../server/routes";
 import { installApiContractRegistration } from "../../server/contracts/install";
+import { registerCoreEndpointSchemas } from "../../server/contracts/endpointSchemas";
 import { clerkUserContext, hasValidAuditKey } from "../../server/clerkAuth";
 
 const PROBE_PATH = "/api/__contract-drift-probe";
@@ -89,6 +90,12 @@ async function main() {
   // through the same patched app.get, and register it BEFORE registerRoutes
   // so the /api 404 backstop can't shadow it. The 401 body deliberately lacks
   // the required { message } field, so exactly one mismatch MUST be reported.
+  //
+  // Register per-endpoint structural schemas BEFORE installApiContractRegistration
+  // so that inferredResponsesFor picks up the overrides when each route is
+  // first declared. If called after the first registration it has no effect on
+  // already-declared routes (getOrRegister is idempotent).
+  registerCoreEndpointSchemas();
   installApiContractRegistration(app);
   app.get(PROBE_PATH, (_req, res) => {
     res.status(401).json({ probe: true });
