@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useBookmarkToggle } from "@/hooks/useResourceToggle";
 import { useAuth } from "@/hooks/useAuth";
+import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { cn } from "@/lib/utils";
 import type { BookmarkCollection } from "@/types/bookmarks";
 
@@ -64,12 +65,21 @@ function BookmarkButton({
   const serverEntry = bookmarksList?.find((b) => String(b.id) === String(resourceId));
   const serverBookmarked = bookmarksList !== undefined ? !!serverEntry : initialBookmarked;
   const serverNotes = bookmarksList !== undefined ? (serverEntry?.notes ?? "") : initialNotes;
+  // Task #329: signed-out surfaces derive saved state from the on-device
+  // guest store (the authed list query above is disabled for guests), so
+  // guest saves light up every card/list/detail surface and stay in sync
+  // across tabs. Guests have plain saves — no notes.
+  const guestIds = useGuestBookmarkIds();
+  const effectiveBookmarked = isAuthenticated
+    ? serverBookmarked
+    : guestIds.has(Number(resourceId));
+  const effectiveNotes = isAuthenticated ? serverNotes : "";
   useEffect(() => {
-    setIsBookmarked(serverBookmarked);
-  }, [serverBookmarked]);
+    setIsBookmarked(effectiveBookmarked);
+  }, [effectiveBookmarked]);
   useEffect(() => {
-    setNotes(serverNotes);
-  }, [serverNotes]);
+    setNotes(effectiveNotes);
+  }, [effectiveNotes]);
   const { data: collections = [], isLoading: collectionsLoading } = useQuery<BookmarkCollection[]>({
     queryKey: ["/api/collections?includeArchived=true"],
     enabled: isAuthenticated && notesDialogOpen,

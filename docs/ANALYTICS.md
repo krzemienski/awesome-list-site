@@ -102,6 +102,9 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
 | `error` | Failed API request — `queryClient.ts` | `error_type`, `error_message` |
 | `copy_action` | *(helper available, not currently wired)* | `content_type`, `content_length` — **never the copied text** |
+| `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out save toggle (on-device store, Task #329) — `useResourceToggle` guest branch | `resource_id`, `guest_saved_count` |
+| `auth_prompt_shown` | Save-intent sign-in prompt shown to a guest — toggle hook / `GuestBookmarks.tsx` | `prompt_context: "guest_save_toast" \| "guest_save_cap" \| "bookmarks_page"`, `guest_saved_count` |
+| `bookmarks_merged` | Guest saves merged into the account after sign-in — `GuestBookmarkMerge.tsx` | `merged_count`, `duplicate_count`, `failed_count` |
 
 > Note: `scroll` and `user_engagement` events that appear in GA are produced by
 > GA4 **Enhanced Measurement** automatically, not by app code.

@@ -98,25 +98,87 @@ app.use((_req, res, next) => {
   // BUG-014: per-request CSP nonce, applied to script-src and style-src. Always
   // generated (even in dev) so downstream middleware can read it unconditionally;
   // the CSP header itself stays production-only per the BUG-019 rationale above.
-  const nonce = crypto.randomBytes(16).toString("base64");
-  res.locals.cspNonce = nonce;
+  const nonce = String(res.locals.cspNonce || "");
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("X-Frame-Options", "DENY");
+    // Run16 BUG-094 set an app-level HSTS header, but Replit's edge already
+    // sends its own Strict-Transport-Security — the two copies arrived as
+    // duplicate headers with conflicting directives (Run17 BUG-051). The edge
+    // owns TLS termination, so it owns HSTS; the app copy is dropped.
+    res.setHeader(
+      "Content-Security-Policy",
+      [
+        "default-src 'self'",
+        // BUG-014: nonce-based scripts — no 'unsafe-inline'.
+        // July 2026 audit BUG-003: Replit's deployment platform injects
+        // <script src="https://replit-cdn.com/feedback-widget/widget.global.js">
+        // into the served HTML (it is NOT in our source, so we cannot nonce or
+        // remove it) — allowlist the origin so the widget loads cleanly.
+        // Task #232: cdn.mxpnl.com — mixpanel-browser is bundled from npm, but
+        // the SDK can lazy-load auxiliary scripts from its CDN.
+        // PostHog: posthog-js is bundled from npm but lazy-loads extra bundles
+        // (session recorder, surveys, toolbar) from its assets CDN.
+        // Aug 2026 prod sign-in outage: Clerk uses Cloudflare Turnstile for bot
+        // protection on sign-up and OAuth-transfer sign-in flows. Its loader
+        // (challenges.cloudflare.com/turnstile/v0/api.js) was blocked by this
+        // CSP, so Clerk's FAPI rejected those flows with "Error loading
+        // CAPTCHA" — allowlist it in script-src, connect-src, and frame-src
+        // (per the Clerk skill's canonical directive list).
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com`,
+        // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
+        // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
+        // present in the same directive, so there is no "nonce + fallback"
+        // option — and the platform-injected Replit feedback widget (plus other
+        // third-party snippets we don't render) sets inline style="" attributes
+        // that can never carry our nonce, producing a CSP violation on every
+        // page load and an unstyled widget. Inline STYLE injection is a far
+        // weaker vector than script injection; script-src keeps its strict
+        // nonce policy.
+        // Task #238 prod verification: PostHog's session recorder and
+        // Amplitude's replay plugin spawn compression Web Workers from blob:
+        // URLs. Without an explicit worker-src, workers fall back to
+        // script-src (which rightly has no blob:) and every page load logs
+        // "Creating a worker from 'blob:…' violates CSP" — replay then runs
+        // on its slower non-worker fallback. blob: workers only execute code
+        // the page itself constructed, so this does not weaken script-src.
+        `worker-src 'self' blob:`,
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+        "font-src 'self' https://fonts.gstatic.com",
+        // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
+        // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,
+        // so a fixed allowlist would break resource preview images in production.
+        // Keeping the blanket https: for img-src (it covers the allowlist hosts too).
+        "img-src 'self' data: https:",
+        // M1 audit fix: allow www.google.com in connect-src (prod console CSP report).
+        // BUG-003: replit.com + replit-cdn.com so the platform feedback widget
+        // can phone home without spawning new CSP violations once its script loads.
+        // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
+        // host; api.mixpanel.com covers config fallbacks.
+        // PostHog ingest + assets (feature flags, replay, surveys).
+        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com",
+        // Turnstile renders inside an iframe from challenges.cloudflare.com;
+        // without an explicit frame-src it falls back to default-src 'self'
+        // and the widget is blocked silently (Turnstile error 300030).
+        "frame-src 'self' https://challenges.cloudflare.com",
+        "frame-ancestors 'none'",
+        // BUG-014: add the missing hardening directives.
+        "form-action 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
+      ].join("; "),
+    );
+  }
   next();
 });
 
-// Audit 2 BUG-016: canonical-host redirect. www.awesome.video currently dies
-// at the Cloudflare edge (HTTP 525: www is orange-cloud proxied toward an
-// origin that has no certificate/route for the www host, while the apex
-// resolves straight to Replit's Google Frontend — DNS/platform config the app
-// cannot change; owner runbook in evidence/run25/PLATFORM-ACTIONS.md). This is
-// the code-side half: the moment www traffic actually terminates at this app
-// (owner adds www as a Replit custom domain, or grey-clouds the record), the
-// app answers with a clean 301 to the apex instead of serving duplicate-host
-// content. GET/HEAD only — other methods fall through to the normal stack.
+// R4-061: URLs with an explicit default port ("https://awesome.video:443/...")
+// serve the same document as the canonical host, creating a duplicate-host
+// variant whose on-page canonical disagrees with the address bar. 301 GET/HEAD
+// requests to the portless host. Only the DEFAULT port for the scheme is
+// stripped — a genuinely nonstandard port (e.g. dev :5000) never matches.
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
-  const host = String(req.headers.host || "")
-    .toLowerCase()
-    .replace(/:(443|80)$/, "");
+  const host = req.headers.host || "";
   let apexHost = "awesome.video";
   try {
     apexHost = new URL(process.env.PUBLIC_SITE_URL || "https://awesome.video")
@@ -375,7 +437,6 @@ const clerkSessionMiddleware = clerkMiddleware((req) => ({
 // /sign-in anyway, and audit scripts reach them with the audit-key bypass.
 export const PROTECTED_PAGE_PATTERNS = [
   /^\/admin(\/|$)/,
-  /^\/bookmarks(\/|$)/,
   /^\/profile(\/|$)/,
 ];
 const needsClerkAuth = (req: express.Request) =>

@@ -9,6 +9,17 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
 import { mpTrack } from "@/lib/mixpanel";
+import {
+  addGuestBookmark,
+  isGuestBookmarked,
+  isGuestStorePersistent,
+  removeGuestBookmark,
+} from "@/lib/guestBookmarks";
+import {
+  trackAuthPromptShown,
+  trackGuestBookmarkAdded,
+  trackGuestBookmarkRemoved,
+} from "@/lib/analytics";
 
 // Shared favorite/bookmark toggle logic (Task: consolidate ResourceDetail's
 // inline copies with FavoriteButton/BookmarkButton so behavior fixes land on
@@ -68,6 +79,10 @@ interface ToggleConfig {
   errorTitle: string;
   errorFallback: string;
   logLabel: string;
+  /** Task #329: signed-out clicks save to the on-device guest store instead
+   * of dead-ending in a sign-in toast (bookmarks only — favorites stay
+   * account-gated). */
+  supportsGuestSave?: boolean;
 }
 
 function useResourceToggle(
@@ -101,6 +116,72 @@ function useResourceToggle(
     setLocation(
       `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname + window.location.search)}`,
     );
+
+  // Task #329: guest bookmark toggle — same one-click save/undo UX, stored on
+  // this device. Guests get plain saves (the notes dialog via
+  // interceptActivate stays authed-only); the save toast is the contextual
+  // auth prompt, naming exactly what will be kept after sign-in.
+  const guestToggle = () => {
+    if (isGuestBookmarked(opts.resourceId)) {
+      const { count } = removeGuestBookmark(opts.resourceId);
+      opts.onOptimistic(false);
+      trackGuestBookmarkRemoved(opts.resourceId, count);
+      showToast({
+        description: "Removed from this device's saves",
+        duration: 6000,
+        action: createElement(
+          ToastAction,
+          {
+            altText: "Undo removal",
+            onClick: () => {
+              const restored = addGuestBookmark(opts.resourceId);
+              if (restored.ok) {
+                opts.onOptimistic(true);
+                trackGuestBookmarkAdded(opts.resourceId, restored.count);
+                showToast({ description: "Bookmark restored", duration: 2000 });
+              }
+            },
+          },
+          "Undo",
+        ),
+      });
+      return;
+    }
+
+    const result = addGuestBookmark(opts.resourceId);
+    if (!result.ok) {
+      if (result.reason === "cap") {
+        trackAuthPromptShown("guest_save_cap", result.count);
+        showToast({
+          title: "This device's saves are full",
+          description: `You've saved ${result.count} resources on this device. Sign in and they'll all move to your account, which has no limit.`,
+          action: signInAction(goSignIn),
+        });
+      } else {
+        showToast({
+          title: config.errorTitle,
+          description: config.errorFallback,
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    opts.onOptimistic(true);
+    trackGuestBookmarkAdded(opts.resourceId, result.count);
+    trackAuthPromptShown("guest_save_toast", result.count);
+    showToast({
+      title: "Saved on this device",
+      description:
+        (result.count === 1
+          ? "Your saved resource will move to your account when you sign in."
+          : `Your ${result.count} saved resources will move to your account when you sign in.`) +
+        (isGuestStorePersistent()
+          ? ""
+          : " Heads up: browser storage is unavailable, so this save lasts only for this visit."),
+      action: signInAction(goSignIn),
+    });
+  };
 
   const mutation = useMutation({
     // `vars.remove` is captured at click time so the POST/DELETE decision
@@ -201,8 +282,13 @@ function useResourceToggle(
     }
 
     // R2-L09: anonymous users get a clear sign-in prompt instead of a
-    // confusing failed request.
+    // confusing failed request — except bookmark saves, which now work for
+    // guests via the on-device store (Task #329).
     if (!isAuthenticated) {
+      if (config.supportsGuestSave) {
+        guestToggle();
+        return;
+      }
       toast({
         title: config.signInTitle,
         description: config.signInDescription,
@@ -271,5 +357,6 @@ export function useBookmarkToggle(opts: ResourceToggleOptions) {
     errorTitle: "Couldn't update bookmark",
     errorFallback: "Failed to update bookmark. Please try again.",
     logLabel: "Bookmark",
+    supportsGuestSave: true,
   });
 }

@@ -17,6 +17,7 @@ import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
+import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
 import NotFound from "@/pages/not-found";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
@@ -40,7 +41,9 @@ const About = lazy(() => import("@/pages/About"));
 const Advanced = lazy(() => import("@/pages/Advanced"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Contributions = lazy(() => import("@/pages/Contributions"));
-const Bookmarks = lazy(() => import("@/pages/Bookmarks"));
+
+const BookmarksGate = lazy(() => import("@/pages/BookmarksGate"));
+const BookmarksGate = lazy(() => import("@/pages/BookmarksGate"));
 const PublicCollection = lazy(() => import("@/pages/PublicCollection"));
 const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
 const Journeys = lazy(() => import("@/pages/Journeys"));
@@ -696,7 +699,7 @@ function Router() {
         </Route>
         <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
         <Route path="/contributions" component={() => (<AuthGuard><Contributions /></AuthGuard>)} />
-        <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
+        <Route path="/bookmarks" component={BookmarksGate} />
         <Route path="/notifications" component={() => (
           <AuthGuard>
             <Notifications />
@@ -814,6 +817,10 @@ function App() {
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
       <ClerkQueryClientCacheInvalidator />
+      {/* Task #329: pushes on-device guest saves into the account after
+          sign-in (SPA transition or full-reload) — see the component for the
+          dedupe/cleanup rules. */}
+      <GuestBookmarkMerge />
       <ThemeProvider>
         {/* BUG-020 (run13): analytics consent banner — gtag loads only after
             an explicit Accept (initGA is consent-gated).

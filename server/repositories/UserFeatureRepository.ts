@@ -127,7 +127,18 @@ export class UserFeatureRepository {
       .values({ userId, resourceId, notes })
       .onConflictDoUpdate({
         target: [userBookmarks.userId, userBookmarks.resourceId],
-        set: { notes, createdAt: new Date() }
+        // A bare POST means “save this resource”, not “erase any existing
+        // annotation”. Keeping the row's values when notes is omitted makes
+        // duplicate saves idempotent and closes the guest-merge race where
+        // another tab creates a noted bookmark after the merge's pre-dedupe
+        // read but before its POST reaches PostgreSQL. An explicit empty
+        // string still intentionally clears notes via the editor.
+        set: notes === undefined
+          ? {
+              notes: sql`${userBookmarks.notes}`,
+              createdAt: sql`${userBookmarks.createdAt}`,
+            }
+          : { notes, createdAt: new Date() }
       })
       .returning();
     return row;

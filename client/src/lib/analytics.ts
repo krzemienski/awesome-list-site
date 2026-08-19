@@ -221,7 +221,10 @@ export const trackGenerateLead = (params: Record<string, unknown> = {}) => {
   // conversion double-counts.
 };
 
-// User shared content (GA4 recommended `share`).
+export type AuthPromptContext =
+  | 'guest_save_toast' // shown right after a guest saves a resource
+  | 'guest_save_cap' // guest hit the on-device save cap
+  | 'bookmarks_page'; // guest viewing their device library
 export const trackShare = (
   method: string,
   contentType: string,
@@ -477,4 +480,51 @@ export const trackSessionQuality = (metrics: {
     time_spent_sec: Math.round(metrics.timeSpent / 1000),
     categories_explored: metrics.categoriesExplored,
   });
+};
+
+export const trackAuthPromptShown = (
+  context: AuthPromptContext,
+  guestSavedCount: number
+) => {
+  const params = { prompt_context: context, guest_saved_count: guestSavedCount };
+  sendEvent('auth_prompt_shown', params);
+  mpTrack('auth_prompt_shown', params);
+};
+
+export const trackBookmarksMerged = (outcome: {
+  merged: number;
+  duplicates: number;
+  failed: number;
+}) => {
+  const params = {
+    merged_count: outcome.merged,
+    duplicate_count: outcome.duplicates,
+    failed_count: outcome.failed,
+  };
+  sendEvent('bookmarks_merged', params);
+  mpTrack('bookmarks_merged', params);
+};
+
+export const trackGuestBookmarkRemoved = (
+  resourceId: string | number,
+  guestSavedCount: number
+) => {
+  const params = {
+    resource_id: String(resourceId),
+    guest_saved_count: guestSavedCount,
+  };
+  sendEvent('guest_bookmark_removed', params);
+  mpTrack('guest_bookmark_removed', params);
+};
+
+export const trackGuestBookmarkAdded = (
+  resourceId: string | number,
+  guestSavedCount: number
+) => {
+  const params = {
+    resource_id: String(resourceId),
+    guest_saved_count: guestSavedCount,
+  };
+  sendEvent('guest_bookmark_added', params);
+  mpTrack('guest_bookmark_added', params);
 };

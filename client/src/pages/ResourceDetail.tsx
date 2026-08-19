@@ -42,6 +42,7 @@ import { fetchAwesomeListNav } from "@/lib/static-data";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 import type { BookmarkCollection } from "@/types/bookmarks";
+import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -128,10 +129,15 @@ export default function ResourceDetail() {
     enabled: !!id
   });
 
+  // Task #329: signed-out visitors derive saved state from the on-device
+  // guest store (the authed /api/bookmarks query above is disabled for them).
+  const guestBookmarkIds = useGuestBookmarkIds();
   const numericId = parseInt(id || '0');
   const isFavorite = favorites?.some(f => f.id === numericId) ?? false;
   const bookmarkedEntry = bookmarks?.find(b => b.id === numericId);
-  const isBookmarked = !!bookmarkedEntry;
+  const isBookmarked = isAuthenticated
+    ? !!bookmarkedEntry
+    : guestBookmarkIds.has(numericId);
   const bookmarkNotes = bookmarkedEntry?.notes ?? "";
 
   // BUG-061 (run25): the detail page used to instant-toggle bookmarks while
@@ -190,7 +196,11 @@ export default function ResourceDetail() {
   const bookmark = useBookmarkToggle({
     resourceId: id || '',
     isActive: isBookmarked,
-    onOptimistic: (next) => flipCachedList('/api/bookmarks', next),
+    onOptimistic: (next) => {
+      // Guests: saved state re-derives from the guest store — don't seed the
+      // disabled authed list cache with guest flips.
+      if (isAuthenticated) flipCachedList('/api/bookmarks', next);
+    },
     onSuccess: (_data, vars, showToast) => {
       if (vars.remove) {
         // Run17 BUG-013: removal is instant — offer a one-click Undo instead

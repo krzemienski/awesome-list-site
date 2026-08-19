@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Search, Palette, LogIn, LogOut, User, Bookmark, Bell, Settings, Shield, MoreHorizontal } from "lucide-react";
+import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -177,6 +178,9 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
 }
 
 export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories }: AppHeaderProps) {
+  // Task #329: signed-out visitors with on-device saves get a header entry
+  // point to /bookmarks (their guest library).
+  const guestSavedCount = useGuestBookmarkIds().size;
   const [location, setLocation] = useLocation();
   const crumbs = getBreadcrumbs(location, categories || []);
   const { data: notificationState } = useQuery<{ unreadCount: number }>({
@@ -577,18 +581,42 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          // BUG-025 (run9): "Sign in" everywhere — matches the sign-in page
-          // and sign-up flow instead of mixing "Login" and "Sign in".
-          <Button variant="ghost" size="sm" onClick={() => {
-            // BUG-023 (run13): carry the current page as redirect_url so
-            // signing in returns the user here (Clerk honors redirect_url).
-            const here = window.location.pathname + window.location.search;
-            const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
-            setLocation(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
-          }} aria-label="Sign in" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
-            <LogIn className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign in</span>
-          </Button>
+          <>
+            {/* Task #329: guests with on-device saves get a visible entry
+                point to their library (badge mirrors the notification one). */}
+            {guestSavedCount > 0 ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative h-9 w-9 min-h-[44px] min-w-[44px] touch-manipulation"
+                onClick={() => setLocation("/bookmarks")}
+                title={`${guestSavedCount} saved on this device`}
+                aria-label={`Saved resources, ${guestSavedCount} on this device`}
+                data-testid="button-guest-saved"
+              >
+                <Bookmark className="h-4 w-4" />
+                <span
+                  className="absolute right-0.5 top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold leading-none text-white"
+                  aria-hidden="true"
+                  data-testid="badge-guest-saved-count"
+                >
+                  {guestSavedCount > 99 ? "99+" : guestSavedCount}
+                </span>
+              </Button>
+            ) : null}
+            {/* BUG-025 (run9): "Sign in" everywhere — matches the sign-in page
+                and sign-up flow instead of mixing "Login" and "Sign in". */}
+            <Button variant="ghost" size="sm" onClick={() => {
+              // BUG-023 (run13): carry the current page as redirect_url so
+              // signing in returns the user here (Clerk honors redirect_url).
+              const here = window.location.pathname + window.location.search;
+              const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
+              setLocation(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
+            }} aria-label="Sign in" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
+              <LogIn className="h-4 w-4" />
+              <span className="hidden sm:inline">Sign in</span>
+            </Button>
+          </>
         )}
       </div>
     </header>
