@@ -1,14 +1,13 @@
--- Typo recovery runs only after indexed FTS returns no rows. pg_trgm provides
--- `%` candidate selection and similarity ordering without a full catalog scan.
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
-CREATE INDEX IF NOT EXISTS idx_resources_title_trgm
-  ON resources USING GIN (title gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS idx_resources_description_trgm
-  ON resources USING GIN (description gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS idx_resources_url_trgm
-  ON resources USING GIN (url gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS idx_resources_title_compact_trgm
-  ON resources USING GIST (
-    lower(regexp_replace(title, '[^a-zA-Z0-9]+', '', 'g')) gist_trgm_ops
-  );
+-- Intentionally neutralized before its first production application.
+--
+-- The original version created pg_trgm and four extension-owned indexes.
+-- Replit Publish derives production DDL from the development/prod schema
+-- difference and does not provision optional extensions, so those indexes
+-- made Publish generate invalid SQL. Typo recovery now uses bounded,
+-- deterministic application scoring after a scoped FTS miss; built-in FTS
+-- remains indexed by idx_resources_search_tsv.
+--
+-- Keep this journaled migration as a no-op: development already recorded its
+-- historical version, while fresh databases must reproduce the extension-free
+-- schema source exactly.
+-- No SQL statement is intentionally present below this comment.

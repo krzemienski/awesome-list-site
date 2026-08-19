@@ -81,6 +81,8 @@ export type ResourceSearchMetadata = {
   suggestion?: string;
 };
 
+const MAX_FUZZY_CANDIDATES = 10_000;
+
 function damerauLevenshtein(left: string, right: string): number {
   const rows = left.length + 1;
   const cols = right.length + 1;
@@ -106,6 +108,214 @@ function damerauLevenshtein(left: string, right: string): number {
     }
   }
   return matrix[left.length][right.length];
+}
+
+type FuzzyCandidate = Pick<Resource, "id" | "title" | "description" | "url" | "createdAt">;
+
+type FuzzyMatch = {
+  id: number;
+  title: string;
+  createdAt: Date | null;
+  fieldPriority: number;
+  distance: number;
+  normalizedDistance: number;
+  lengthDelta: number;
+  titleLengthDelta: number;
+  editDirectionPriority: number;
+};
+
+function compactSearchText(value: string): string {
+  return value.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+}
+
+type FuzzyScoreContext = {
+  needle: string;
+  maxDistance: number;
+  titleSpanWords: number;
+  needleBigrams: Set<string>;
+};
+
+function bigrams(value: string): Set<string> {
+  const result = new Set<string>();
+  for (let index = 0; index < value.length - 1; index++) {
+    result.add(value.slice(index, index + 2));
+  }
+  return result;
+}
+
+function sharesBigram(leftBigrams: Set<string>, right: string): boolean {
+  if (right.length < 2) return true;
+  for (let index = 0; index < right.length - 1; index++) {
+    if (leftBigrams.has(right.slice(index, index + 2))) return true;
+  }
+  return false;
+}
+
+function isSubsequence(needle: string, haystack: string): boolean {
+  let needleIndex = 0;
+  for (const character of haystack) {
+    if (character === needle[needleIndex]) needleIndex++;
+    if (needleIndex === needle.length) return true;
+  }
+  return needle.length === 0;
+}
+
+function boundedDamerauLevenshtein(left: string, right: string, maxDistance: number): number {
+  if (Math.abs(left.length - right.length) > maxDistance) return maxDistance + 1;
+
+  let previousPrevious = Array.from({ length: right.length + 1 }, (_, index) => index);
+  let previous = [...previousPrevious];
+  let current = Array<number>(right.length + 1).fill(0);
+
+  for (let row = 1; row <= left.length; row++) {
+    current[0] = row;
+    for (let col = 1; col <= right.length; col++) {
+      const cost = left[row - 1] === right[col - 1] ? 0 : 1;
+      current[col] = Math.min(
+        previous[col] + 1,
+        current[col - 1] + 1,
+        previous[col - 1] + cost,
+      );
+      if (
+        row > 1 &&
+        col > 1 &&
+        left[row - 1] === right[col - 2] &&
+        left[row - 2] === right[col - 1]
+      ) {
+        current[col] = Math.min(current[col], previousPrevious[col - 2] + 1);
+      }
+    }
+    [previousPrevious, previous, current] = [previous, current, previousPrevious];
+  }
+
+  return previous[right.length] <= maxDistance
+    ? previous[right.length]
+    : maxDistance + 1;
+}
+
+function fuzzyMatchForCandidate(
+  context: FuzzyScoreContext,
+  candidate: FuzzyCandidate,
+): FuzzyMatch | undefined {
+  const { needle, maxDistance, needleBigrams, titleSpanWords } = context;
+  const fields = [
+    { text: candidate.title, priority: 0, spanWords: titleSpanWords },
+    { text: candidate.description.slice(0, 320), priority: 1, spanWords: 1 },
+    { text: candidate.url, priority: 2, spanWords: 2 },
+  ];
+  let best: FuzzyMatch | undefined;
+
+  for (const field of fields) {
+    const words = field.text.match(/[\p{L}\p{N}]+/gu) ?? [];
+    for (let start = 0; start < words.length; start++) {
+      let span = "";
+      for (let size = 1; size <= field.spanWords && start + size <= words.length; size++) {
+        span += words[start + size - 1].toLowerCase();
+        const variants = [span];
+        // Camel-cased product families often append a suffix to the searchable
+        // brand (for example OvenMediaEngine). Compare bounded title prefixes
+        // without granting the same broad prefix behavior to descriptions.
+        if (field.priority === 0 && size === 1 && span.length > needle.length + maxDistance) {
+          for (
+            let prefixLength = Math.max(2, needle.length - maxDistance);
+            prefixLength <= needle.length + maxDistance;
+            prefixLength++
+          ) {
+            variants.push(span.slice(0, prefixLength));
+          }
+        }
+        for (const variant of variants) {
+          const lengthDelta = Math.abs(needle.length - variant.length);
+          if (lengthDelta > maxDistance || !sharesBigram(needleBigrams, variant)) continue;
+          const distance = boundedDamerauLevenshtein(needle, variant, maxDistance);
+          const normalizedDistance = distance / Math.max(needle.length, variant.length);
+          if (distance > maxDistance || normalizedDistance > 0.4) continue;
+          const match: FuzzyMatch = {
+            id: candidate.id,
+            title: candidate.title,
+            createdAt: candidate.createdAt,
+            fieldPriority: field.priority,
+            distance,
+            normalizedDistance,
+            lengthDelta,
+            titleLengthDelta: Math.abs(needle.length - compactSearchText(candidate.title).length),
+            editDirectionPriority: isSubsequence(variant, needle)
+              ? 0
+              : isSubsequence(needle, variant)
+                ? 1
+                : 2,
+          };
+          if (
+            !best ||
+            match.distance < best.distance ||
+            (match.distance === best.distance &&
+              match.editDirectionPriority < best.editDirectionPriority) ||
+            (match.distance === best.distance &&
+              match.editDirectionPriority === best.editDirectionPriority &&
+              match.normalizedDistance < best.normalizedDistance) ||
+            (match.distance === best.distance &&
+              match.editDirectionPriority === best.editDirectionPriority &&
+              match.normalizedDistance === best.normalizedDistance &&
+              match.lengthDelta < best.lengthDelta)
+          ) {
+            best = match;
+          }
+        }
+      }
+    }
+    // A title match always outranks a description or URL match, so avoid
+    // scanning lower-priority fields once one is found.
+    if (best) break;
+  }
+  return best;
+}
+
+function scoreFuzzyCandidates(
+  query: string,
+  candidates: FuzzyCandidate[],
+  sort: ListResourceOptions["sort"],
+): FuzzyMatch[] {
+  const needle = compactSearchText(query);
+  if (!needle) return [];
+  const context: FuzzyScoreContext = {
+    needle,
+    maxDistance: needle.length <= 4
+      ? 1
+      : needle.length <= 6
+        ? 2
+        : Math.max(2, Math.floor(needle.length * 0.34)),
+    titleSpanWords: Math.min(4, Math.max(1, tokenizeSearchQuery(query).length + 2)),
+    needleBigrams: bigrams(needle),
+  };
+  const matches = candidates
+    .map((candidate) => fuzzyMatchForCandidate(context, candidate))
+    .filter((match): match is FuzzyMatch => Boolean(match));
+
+  return matches.sort((left, right) => {
+    const titleOrder = left.title.localeCompare(right.title, undefined, { sensitivity: "base" });
+    switch (sort) {
+      case "name-asc":
+        return titleOrder || left.id - right.id;
+      case "name-desc":
+        return -titleOrder || right.id - left.id;
+      case "oldest":
+        return (left.createdAt?.getTime() ?? 0) - (right.createdAt?.getTime() ?? 0) || left.id - right.id;
+      case "newest":
+        return (right.createdAt?.getTime() ?? 0) - (left.createdAt?.getTime() ?? 0) || right.id - left.id;
+      case "relevance":
+      default:
+        return (
+          left.fieldPriority - right.fieldPriority ||
+          left.distance - right.distance ||
+          left.editDirectionPriority - right.editDirectionPriority ||
+          left.normalizedDistance - right.normalizedDistance ||
+          left.lengthDelta - right.lengthDelta ||
+          left.titleLengthDelta - right.titleLengthDelta ||
+          titleOrder ||
+          left.id - right.id
+        );
+    }
+  });
 }
 
 function bestSearchSuggestion(query: string, titles: string[]): string | undefined {
@@ -238,64 +448,7 @@ export class ResourceRepository {
       return conditions;
     };
 
-    const strictConditions = buildConditions(undefined, strictSearchCondition);
-    const strictProbe = strictSearchCondition
-      ? db.select({ id: resources.id }).from(resources).where(and(...strictConditions)).limit(1)
-      : undefined;
-    let activeSearchCondition = strictSearchCondition;
-    let extendedFuzzyCondition: ReturnType<typeof sql> | undefined;
-
-    // The fallback decision is part of the SQL predicate instead of a serial
-    // preflight round trip. Strict rows always win; fuzzy rows become eligible
-    // only when the same scoped strict query has no match.
-    if (strictSearchCondition && strictProbe) {
-      const fuzzyNeedle = normalizedSearch.toLowerCase();
-      const fuzzyCompactNeedle = fuzzyNeedle.replace(/[^\p{L}\p{N}]+/gu, "");
-      // pg_trgm operators are overloaded. Bound parameters otherwise arrive as
-      // `unknown`, so a true no-match fallback can fail operator resolution
-      // (`text % unknown`) instead of returning an empty result set.
-      const fuzzyNeedleSql = sql`${fuzzyNeedle}::text`;
-      const fuzzyCompactNeedleSql = sql`${fuzzyCompactNeedle}::text`;
-      const compactTitle = sql`lower(regexp_replace(${resources.title}, '[^a-zA-Z0-9]+', '', 'g'))`;
-      const transpositionTsQuery = Array.from(new Set(ftsTerms.flatMap((term) => {
-        const chars = Array.from(term);
-        return chars.slice(0, -1).map((_, index) => {
-          const variant = [...chars];
-          [variant[index], variant[index + 1]] = [variant[index + 1], variant[index]];
-          return `${variant.join("")}:*`;
-        });
-      }))).slice(0, 64).join(" | ");
-      const fuzzyCandidateScope = buildConditions(undefined, sql`TRUE`);
-      const nearestTitleCandidates = db
-        .select({ id: resources.id })
-        .from(resources)
-        .where(and(...fuzzyCandidateScope))
-        .orderBy(sql`${compactTitle} <-> ${fuzzyCompactNeedleSql}`)
-        .limit(50);
-      const indexedFuzzyCondition = sql`(
-        ${resources.title} % ${fuzzyNeedleSql}
-        OR ${fuzzyNeedleSql} <% ${resources.title}
-        OR ${fuzzyNeedleSql} <<% ${resources.title}
-        OR ${compactTitle} % ${fuzzyCompactNeedleSql}
-        OR ${resources.searchTsv} @@ to_tsquery('english', ${transpositionTsQuery})
-        OR ${resources.description} % ${fuzzyNeedleSql}
-        OR ${fuzzyNeedleSql} <% ${resources.description}
-        OR ${resources.url} % ${fuzzyNeedleSql}
-        OR ${fuzzyNeedleSql} <% ${resources.url}
-      )`;
-      extendedFuzzyCondition = sql`(
-        ${indexedFuzzyCondition}
-        OR (
-          similarity(${compactTitle}, ${fuzzyCompactNeedleSql}) >= 0.2
-          AND ${resources.id} IN (${nearestTitleCandidates})
-        )
-      )`;
-      activeSearchCondition = sql`(
-        ${strictSearchCondition}
-        OR (NOT EXISTS (${strictProbe}) AND ${indexedFuzzyCondition})
-      )`;
-    }
-    const conditions = buildConditions(undefined, activeSearchCondition);
+    const conditions = buildConditions(undefined, strictSearchCondition);
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
@@ -317,17 +470,14 @@ export class ResourceRepository {
         case "relevance":
         default:
           // NB-013 (run18): when searching without an explicit sort, rank by
-          // relevance — exact title match first, then the existing full-text
-          // and trigram signals. This prevents a prefix match (for example,
+          // relevance — exact title match first, then built-in full-text rank.
+          // This prevents a prefix match (for example,
           // "ffmpeg-wasm") from outranking a direct "FFmpeg" lookup.
           if (strictSearchCondition) {
             const q = normalizedSearch.toLowerCase();
             return [
-              asc(sql`CASE WHEN ${strictSearchCondition} THEN 0 ELSE 1 END`),
               asc(sql`CASE WHEN lower(${resources.title}) = ${q} THEN 0 ELSE 1 END`),
               desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`),
-              desc(sql`word_similarity(${q}, lower(${resources.title}))`),
-              desc(sql`similarity(lower(${resources.title}), ${q})`),
               asc(sql`length(${resources.title})`),
               asc(sql`lower(${resources.title})`),
               asc(resources.id),
@@ -415,12 +565,12 @@ export class ResourceRepository {
           return facets;
         });
     };
-    const facetPromise = getFacetPromise(activeSearchCondition);
+    const facetPromise = getFacetPromise(strictSearchCondition);
 
     if (strictSearchCondition) {
-      // Search pages get rows + total + mode from one SQL statement. The
+      // Search pages get rows + total from one indexed FTS statement. The
       // window count avoids a second network round trip to the remote Postgres
-      // service, which dominates latency far more than ranking 2k local rows.
+      // service.
       const searchQuery = db
         .select({
           ...getTableColumns(resources),
@@ -432,7 +582,7 @@ export class ResourceRepository {
         .orderBy(...orderBy)
         .limit(limit)
         .offset(offset);
-      let [searchRows, facets] = await Promise.all([searchQuery, facetPromise]);
+      const [searchRows, facets] = await Promise.all([searchQuery, facetPromise]);
       let total = searchRows[0]?.searchTotal ?? 0;
       // Preserve honest pagination for a now-out-of-range offset. This rare
       // recovery query is intentionally not paid on normal page-one searches.
@@ -440,42 +590,92 @@ export class ResourceRepository {
         const [totalResult] = await countQuery;
         total = totalResult.count;
       }
-      let searchMetadata: ResourceSearchMetadata = {
-        mode: searchRows[0]?.strictMatch ? "fts" : "fuzzy",
-      };
-      // The indexed operators intentionally use conservative thresholds. If
-      // they find fewer than two rows, broaden only this rare miss via the
-      // compact-title GiST nearest-neighbour index (e.g. obsstuido, vidoe).
-      if (searchMetadata.mode === "fuzzy" && total === 0 && extendedFuzzyCondition) {
-        const recoveryConditions = buildConditions(undefined, extendedFuzzyCondition);
-        const recoveryCountQuery = db
-          .select({ count: sql<number>`count(*)::int` })
-          .from(resources)
-          .where(and(...recoveryConditions));
-        const recoveryQuery = db
-          .select({
-            ...getTableColumns(resources),
-            searchTotal: sql<number>`count(*) over()::int`,
-            strictMatch: sql<boolean>`false`,
-          })
-          .from(resources)
-          .where(and(...recoveryConditions))
-          .orderBy(...orderBy)
-          .limit(limit)
-          .offset(offset);
-        [searchRows, facets] = await Promise.all([
-          recoveryQuery,
-          getFacetPromise(extendedFuzzyCondition),
-        ]);
-        total = searchRows[0]?.searchTotal ?? 0;
-        if (searchRows.length === 0 && offset > 0) {
-          const [totalResult] = await recoveryCountQuery;
-          total = totalResult.count;
-        }
-        searchMetadata = { mode: "fuzzy" };
+      if (total > 0) {
+        const resourceList = searchRows.map(({ searchTotal: _total, strictMatch: _strict, ...resource }) => resource);
+        return {
+          resources: resourceList,
+          total,
+          ...(facets ? { facets } : {}),
+          search: { mode: "fts" },
+        };
       }
-      const resourceList = searchRows.map(({ searchTotal: _total, strictMatch: _strict, ...resource }) => resource);
-      if (searchMetadata.mode === "fuzzy" && resourceList[0]?.title) {
+
+      // Only a scoped strict miss reaches application scoring. The scoring
+      // pool intentionally omits selectable facet filters so disjunctive facet
+      // counts can still broaden one facet at a time; the result-id query below
+      // reapplies every requested filter before pagination.
+      const invariantFuzzyConditions = [];
+      if (status) invariantFuzzyConditions.push(eq(resources.status, status));
+      if (userId) invariantFuzzyConditions.push(eq(resources.submittedBy, userId));
+      if (generalScope === "category") invariantFuzzyConditions.push(isNull(resources.subcategory));
+      if (generalScope === "subcategory") invariantFuzzyConditions.push(isNull(resources.subSubcategory));
+      const hasSelectableFuzzyFilters = Boolean(
+        category ||
+        subcategory ||
+        subSubcategory ||
+        provider ||
+        resourceFormat ||
+        skillLevel ||
+        tags.length > 0,
+      );
+      // Pass an explicit tautology instead of undefined: undefined would
+      // activate buildConditions' default strict FTS predicate, but this path
+      // is reached only after that strict predicate has produced zero rows.
+      const activeFuzzyConditions = buildConditions(undefined, sql`TRUE`);
+      const fuzzyCandidateOrder = hasSelectableFuzzyFilters
+        ? [
+            asc(sql`CASE WHEN ${and(...activeFuzzyConditions)} THEN 0 ELSE 1 END`),
+            asc(resources.id),
+          ]
+        : [asc(resources.id)];
+      const fuzzyCandidates = await db
+        .select({
+          id: resources.id,
+          title: resources.title,
+          description: resources.description,
+          url: resources.url,
+          createdAt: resources.createdAt,
+        })
+        .from(resources)
+        .where(invariantFuzzyConditions.length > 0 ? and(...invariantFuzzyConditions) : undefined)
+        // Preserve the disjunctive facet pool while ensuring a scoped search
+        // cannot be displaced by unrelated low IDs at the bounded pool edge.
+        .orderBy(...fuzzyCandidateOrder)
+        .limit(MAX_FUZZY_CANDIDATES);
+      const fuzzyMatches = scoreFuzzyCandidates(normalizedSearch, fuzzyCandidates, sort);
+      const fuzzyTextIds = fuzzyMatches.map((match) => match.id);
+      // Drizzle expands a JavaScript array interpolation into a SQL record.
+      // Serialize trusted numeric database IDs as one PostgreSQL array-literal
+      // parameter so every reused facet predicate still costs one bind.
+      const fuzzyTextIdArray = `{${fuzzyTextIds.join(",")}}`;
+      const fuzzyTextCondition = fuzzyTextIds.length > 0
+        // Bind the full match set once as a PostgreSQL array. The predicate is
+        // reused in seven facet branches; expanding one placeholder per ID per
+        // branch can otherwise exceed PostgreSQL's 65,535-parameter limit.
+        ? sql`${resources.id} = ANY(${fuzzyTextIdArray}::int[])`
+        : sql`FALSE`;
+      const filteredIdRows = fuzzyTextIds.length > 0
+        ? await db
+            .select({ id: resources.id })
+            .from(resources)
+            .where(and(...buildConditions(undefined, fuzzyTextCondition)))
+        : [];
+      const filteredIdSet = new Set(filteredIdRows.map((row) => row.id));
+      const filteredMatches = fuzzyMatches.filter((match) => filteredIdSet.has(match.id));
+      total = filteredMatches.length;
+      const pageIds = filteredMatches.slice(offset, offset + limit).map((match) => match.id);
+      const [fuzzyRows, fuzzyFacets] = await Promise.all([
+        pageIds.length > 0
+          ? db.select().from(resources).where(inArray(resources.id, pageIds))
+          : Promise.resolve([] as Resource[]),
+        getFacetPromise(fuzzyTextCondition),
+      ]);
+      const rowsById = new Map(fuzzyRows.map((row) => [row.id, row]));
+      const resourceList = pageIds
+        .map((id) => rowsById.get(id))
+        .filter((resource): resource is Resource => Boolean(resource));
+      const searchMetadata: ResourceSearchMetadata = { mode: "fuzzy" };
+      if (resourceList[0]?.title) {
         searchMetadata.suggestion = bestSearchSuggestion(
           normalizedSearch,
           resourceList.map((resource) => resource.title),
@@ -484,7 +684,7 @@ export class ResourceRepository {
       return {
         resources: resourceList,
         total,
-        ...(facets ? { facets } : {}),
+        ...(fuzzyFacets ? { facets: fuzzyFacets } : {}),
         search: searchMetadata,
       };
     }
