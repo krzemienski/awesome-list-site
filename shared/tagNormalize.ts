@@ -24,6 +24,12 @@ const TAG_DISPLAY_ACRONYMS = new Set([
 export function normalizeTagFilter(tag: string): string {
   const folded = tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
   if (TAG_PLURAL_KEEP.has(folded)) return folded;
+  // Audit cycle-01 F008: compound tags must respect the keep-list on their
+  // FINAL word too — "video analysis" folds to "video-analysis", whose last
+  // word "analysis" is kept, so it must not singularize to "video-analysi"
+  // (broken slug + mis-titled h1 on the public tag page).
+  const lastToken = folded.slice(folded.lastIndexOf("-") + 1);
+  if (TAG_PLURAL_KEEP.has(lastToken)) return folded;
   if (folded.length > 4 && folded.endsWith("ies")) {
     return folded.slice(0, -3) + "y";
   }

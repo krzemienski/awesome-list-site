@@ -414,8 +414,17 @@ export class ResourceRepository {
       WHERE ${predicate}
     )`;
     const foldTagSql = sql`lower(regexp_replace(trim(resource_tag.value), '[ _]+', '-', 'g'))`;
+    // This CASE is the SQL replica of shared/tagNormalize.ts#normalizeTagFilter
+    // and MUST stay in lockstep with it (both sides changed together for audit
+    // cycle-01 F008: the keep-list also applies to the FINAL word of compound
+    // tags, so stored "Video Analysis" canonicalizes to "video-analysis", not
+    // "video-analysi"). regexp_replace('.*-') strips through the last hyphen;
+    // hyphen-less values pass through unchanged, matching the TS lastToken.
+    const keepListSql = sql.join(Array.from(TAG_PLURAL_KEEP).map((v) => sql`${v}`), sql`, `);
     const canonicalTagSql = sql`CASE
-      WHEN ${foldTagSql} IN (${sql.join(Array.from(TAG_PLURAL_KEEP).map((v) => sql`${v}`), sql`, `)})
+      WHEN ${foldTagSql} IN (${keepListSql})
+        THEN ${foldTagSql}
+      WHEN regexp_replace(${foldTagSql}, '.*-', '') IN (${keepListSql})
         THEN ${foldTagSql}
       WHEN length(${foldTagSql}) > 4 AND right(${foldTagSql}, 3) = 'ies'
         THEN left(${foldTagSql}, length(${foldTagSql}) - 3) || 'y'
