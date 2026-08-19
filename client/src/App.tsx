@@ -350,7 +350,24 @@ const clerkAppearance = {
   variables: {
     colorPrimary: "#E50914",
     colorBackground: "#0a0a0a",
+    colorForeground: "#f5f5f5",
+    colorMutedForeground: "#a3a3a3",
     borderRadius: "0px",
+  },
+  elements: {
+    // OAuth provider marks default to dark ink. Keep the dark card treatment,
+    // but invert those marks so Apple, GitHub, and other monochrome providers
+    // remain visible against their near-black buttons.
+    socialButtonsBlockButton: {
+      color: "#f5f5f5",
+      borderColor: "#2a2a2a",
+    },
+    socialButtonsBlockButtonText: {
+      color: "#f5f5f5",
+    },
+    socialButtonsProviderIcon: {
+      filter: "brightness(0) invert(1)",
+    },
   },
 } as const;
 
