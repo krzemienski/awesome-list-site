@@ -1,4 +1,5 @@
 // Server-side prerendered content for indexable public routes (Task #80).
+import { resourceFactsSummary } from "@shared/seo-content-templates";
 //
 // Why this exists: the app is a Vite SPA whose initial HTML is an empty
 // `<div id="root"><!--app-html--></div>` shell. Non-JavaScript crawlers (GPTBot,
@@ -145,6 +146,7 @@ const STYLE = [
   // the DOM never contains two H1s once React renders the page's real <h1>.
   "#ssr-seo-content h1,#ssr-seo-content .ssr-h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:#fff}",
   "#ssr-seo-content h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .75rem;color:#fff}",
+  "#ssr-seo-content h3{font-size:.98rem;font-weight:700;margin:1.25rem 0 .35rem;color:#fff}",
   "#ssr-seo-content p.ssr-lead{font-size:1.05rem;color:#b6b6c0;margin:0 0 1rem;max-width:72ch}",
   "#ssr-seo-content a{color:#ff5c7a;text-decoration:none}",
   "#ssr-seo-content a:hover{text-decoration:underline}",
@@ -155,6 +157,9 @@ const STYLE = [
   "#ssr-seo-content nav.ssr-crumbs{font-size:.85rem;color:#76768a;margin:0 0 1rem}",
   "#ssr-seo-content nav.ssr-crumbs a{color:#9a9aae}",
   "#ssr-seo-content .ssr-sep{color:#44444f;padding:0 .35rem}",
+  "#ssr-seo-content dl{display:grid;grid-template-columns:9rem 1fr;gap:.45rem 1rem;margin:0}",
+  "#ssr-seo-content dt{color:#9a9aae;font-weight:600}",
+  "#ssr-seo-content dd{margin:0}",
 ].join("");
 
 // BUG-014: the shell <style> carries the per-request CSP nonce so it executes
@@ -316,6 +321,7 @@ export function renderHomeContent(opts: {
 export function renderTaxonomyContent(opts: {
   heading: string;
   description: string;
+  intro: string;
   crumbs: Crumb[];
   childKind?: "subcategory" | "sub-subcategory";
   children?: { name: string; slug: string; count: number }[];
@@ -359,6 +365,7 @@ export function renderTaxonomyContent(opts: {
     crumbsHtml(opts.crumbs) +
       `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      `<section data-seo-section="taxonomy-intro"><h2>About this collection</h2><p>${escapeHtml(opts.intro)}</p></section>` +
       (childLinks.length ? `<h2>${childHeading}</h2>${linkList(childLinks)}` : "") +
       (resLinks.length ? `<h2>${resHeading}</h2>${linkList(resLinks)}${pager}` : ""),
   );
@@ -445,15 +452,44 @@ export function renderResourceContent(opts: {
   description: string;
   crumbs: Crumb[];
   url?: string;
+  provider: string;
+  format: string;
+  skillLevel: string;
+  tags?: string[];
   // BUG-007: related resource links injected into the SSR payload so
   // crawlers and link-graph extractors see internal links.
   related?: { id: number; title: string; description?: string }[];
 }): string {
-
   const ext = externalHref(opts.url);
   const outbound = ext
-    ? `<h2>Link</h2>${linkList([{ href: ext, label: "Visit resource" }], true)}`
+    ? `<h2>URL</h2>${linkList([{ href: ext, label: "Visit resource" }], true)}`
     : "";
+  const taxonomy = opts.crumbs.slice(1, -1).map((crumb) =>
+    crumb.path
+      ? `<a href="${internalHref(crumb.path)}">${escapeHtml(crumb.name)}</a>`
+      : escapeHtml(crumb.name),
+  ).join('<span class="ssr-sep">›</span>');
+  const facts = [
+    taxonomy ? `<dt>Category path</dt><dd>${taxonomy}</dd>` : "",
+    `<dt>Provider</dt><dd>${escapeHtml(opts.provider)}</dd>`,
+    `<dt>Format</dt><dd>${escapeHtml(opts.format)}</dd>`,
+    `<dt>Skill level</dt><dd>${escapeHtml(opts.skillLevel)}</dd>`,
+  ].join("");
+  const tagItems = (opts.tags ?? []).map((tag) => ({
+    href: internalHref(`/?tags=${encodeURIComponent(tag)}`),
+    label: tag,
+  }));
+  const tags = tagItems.length
+    ? `<section data-seo-section="resource-tags"><h2>Tags</h2>${linkList(tagItems)}</section>`
+    : "";
+  const factsSummary = resourceFactsSummary({
+    title: opts.heading,
+    taxonomy: opts.crumbs.slice(1, -1).map((crumb) => crumb.name),
+    provider: opts.provider,
+    format: opts.format,
+    skillLevel: opts.skillLevel,
+    tags: opts.tags,
+  });
   // BUG-007: related resource links so non-JS crawlers see internal links out to
   // similar/prerequisite/next-step resources instead of a dead-end page.
   const relatedItems: LinkItem[] = (opts.related ?? []).map((r) => ({
@@ -468,8 +504,10 @@ export function renderResourceContent(opts: {
   return shell(
     crumbsHtml(opts.crumbs) +
       `<h1>${escapeHtml(opts.heading)}</h1>` +
-      `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      `<h2>Description</h2><p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      `<section data-seo-section="resource-details"><h2>Resource details</h2><dl>${facts}</dl><p>${escapeHtml(factsSummary)}</p></section>` +
       outbound +
+      tags +
       related,
   );
 }
@@ -495,11 +533,31 @@ export function renderJourneyContent(opts: {
   heading: string;
   description: string;
   crumbs: Crumb[];
+  steps?: {
+    stepNumber: number;
+    title: string;
+    description?: string;
+    isOptional?: boolean;
+    resources: { id: number; title: string; description?: string | null }[];
+  }[];
 }): string {
+  const syllabus = (opts.steps ?? []).map((step) => {
+    const resources = step.resources.map((resource) => ({
+      href: internalHref(`/resource/${resource.id}`),
+      label: resource.title,
+      desc: snippet(resource.description),
+    }));
+    return `<section><h3>${escapeHtml(step.title)}${
+      step.isOptional ? ' <span class="ssr-meta">(optional)</span>' : ""
+    }</h3>${
+      step.description ? `<p data-seo-step-description>${escapeHtml(step.description)}</p>` : ""
+    }${resources.length ? linkList(resources) : ""}</section>`;
+  }).join("");
   return shell(
     crumbsHtml(opts.crumbs) +
       `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      (syllabus ? `<div data-seo-section="journey-syllabus"><h2>Learning Path</h2>${syllabus}</div>` : "") +
       `<h2>More</h2>${linkList([{ href: internalHref("/journeys"), label: "All learning journeys" }])}`,
   );
 }

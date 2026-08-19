@@ -26,7 +26,12 @@ import {
   pagedSeoTitleCore,
   pagedSeoDescription,
 } from "@shared/seo-templates";
-import { RESOURCE_PROVIDER_LABELS } from "@shared/resourceFacets";
+import {
+  RESOURCE_FORMAT_LABELS,
+  RESOURCE_PROVIDER_LABELS,
+  RESOURCE_SKILL_LEVEL_LABELS,
+} from "@shared/resourceFacets";
+import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import {
   renderHomeContent,
   renderTaxonomyContent,
@@ -906,6 +911,15 @@ function homeShellChrome(): string {
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
+          intro: taxonomyScopeIntro({
+            name: found.name,
+            level: "category",
+            totalResources: flat.length,
+            childNames: (found.node?.subcategories ?? [])
+              .filter((child: any) => countNodeResources(child) > 0)
+              .map((child: any) => child.name),
+            formats: flat.map((resource: any) => resource.resourceFormat),
+          }),
           crumbs: found.crumbs,
           childKind: "subcategory",
           children: (found.node?.subcategories ?? []).map((s: any) => ({
@@ -987,6 +1001,16 @@ function homeShellChrome(): string {
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
+          intro: taxonomyScopeIntro({
+            name: found.name,
+            level: "subcategory",
+            totalResources: flat.length,
+            parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
+            childNames: (found.node?.subSubcategories ?? [])
+              .filter((child: any) => countNodeResources(child) > 0)
+              .map((child: any) => child.name),
+            formats: flat.map((resource: any) => resource.resourceFormat),
+          }),
           crumbs: found.crumbs,
           childKind: "sub-subcategory",
           children: (found.node?.subSubcategories ?? []).map((s: any) => ({
@@ -1078,6 +1102,13 @@ function homeShellChrome(): string {
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
+          intro: taxonomyScopeIntro({
+            name: found.name,
+            level: "sub-subcategory",
+            totalResources: flat.length,
+            parentNames: found.crumbs.slice(1, -1).map((crumb) => crumb.name),
+            formats: flat.map((resource: any) => resource.resourceFormat),
+          }),
           crumbs: found.crumbs,
           resources: flat.map((r: any) => ({
             id: r.id,
@@ -1155,7 +1186,18 @@ function homeShellChrome(): string {
             rethrowBoundedDependencyFailure(error);
           }
           crumbs.push({ name: resource.title });
-          const tags = await storage.getResourceTags(resource.id);
+          const metadataTags = Array.isArray((resource as any).metadata?.tags)
+            ? (resource as any).metadata.tags
+            : [];
+          const tagMap = new Map<string, { name: string }>(
+              metadataTags
+                  .filter((tag: unknown): tag is string => typeof tag === "string" && tag.trim().length > 0)
+                  .map((tag: string) => [
+                    tag.trim().toLowerCase(),
+                    { name: tag.trim() },
+                  ] as const),
+            );
+          const tags = [...tagMap.values()];
           const format = (resource as any).resourceFormat ?? "unknown";
           const entityTypeByFormat: Record<string, string> = {
             video: "VideoObject",
@@ -1259,9 +1301,22 @@ function homeShellChrome(): string {
           }
           const bodyHtml = renderResourceContent({
             heading: resource.title,
-            description: m.description,
+            description: resource.description || m.description,
             crumbs,
             url: resource.url,
+            provider:
+              RESOURCE_PROVIDER_LABELS[
+                (resource as any).provider as keyof typeof RESOURCE_PROVIDER_LABELS
+              ] ?? "Not yet classified",
+            format:
+              RESOURCE_FORMAT_LABELS[
+                format as keyof typeof RESOURCE_FORMAT_LABELS
+              ] ?? "Not yet classified",
+            skillLevel:
+              RESOURCE_SKILL_LEVEL_LABELS[
+                (resource as any).skillLevel as keyof typeof RESOURCE_SKILL_LEVEL_LABELS
+              ] ?? "Not yet classified",
+            tags: tags.map((tag) => tag.name),
             related: relatedLinks,
           });
           return { meta: m, found: true, bodyHtml };
@@ -1298,11 +1353,31 @@ function homeShellChrome(): string {
           m.image = ogImage(path);
           m.type = "website"; // R5-052: listing/detail pages are not articles
           const steps = await storage.listJourneySteps(journey.id);
-          const logicalSteps = [...new Map(
-            [...steps]
-              .sort((a: any, b: any) => a.stepNumber - b.stepNumber || a.id - b.id)
-              .map((step: any) => [step.stepNumber, step]),
-          ).values()];
+          const logicalStepMap = new Map<number, {
+            stepNumber: number;
+            title: string;
+            description?: string;
+            isOptional: boolean;
+            resources: { id: number; title: string; description?: string | null }[];
+          }>();
+          for (const step of [...steps].sort(
+            (a: any, b: any) => a.stepNumber - b.stepNumber || a.id - b.id,
+          ) as any[]) {
+            let group = logicalStepMap.get(step.stepNumber);
+            if (!group) {
+              group = {
+                stepNumber: step.stepNumber,
+                title: step.title,
+                description: step.description || undefined,
+                isOptional: true,
+                resources: [],
+              };
+              logicalStepMap.set(step.stepNumber, group);
+            }
+            group.isOptional = group.isOptional && Boolean(step.isOptional);
+            if (step.resource) group.resources.push(step.resource);
+          }
+          const logicalSteps = [...logicalStepMap.values()];
           const duration = String((journey as any).estimatedDuration ?? "").match(/^(\d+)\s*hours?$/i);
           m.structuredData = [
             webPageSchema({
@@ -1343,12 +1418,13 @@ function homeShellChrome(): string {
           ];
           const bodyHtml = renderJourneyContent({
             heading: journey.title,
-            description: m.description,
+            description: journey.description || m.description,
             crumbs: [
               { name: "Home", path: "/" },
               { name: "Learning Journeys", path: "/journeys" },
               { name: journey.title },
             ],
+            steps: logicalSteps,
           });
           return { meta: m, found: true, bodyHtml };
         }

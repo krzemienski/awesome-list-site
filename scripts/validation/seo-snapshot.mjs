@@ -110,6 +110,79 @@ function extractHead(html) {
   return { title, description, robots, canonical, ogTitle, ogDescription, ld, ldErrors };
 }
 
+function extractCrawlerContent(html) {
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)?.[1] ?? "";
+  const cleaned = main
+    .replace(/<(script|style|noscript|template|svg)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ");
+  const headings = [...cleaned.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi)]
+    .map((match) => ({
+      level: Number(match[1]),
+      text: decodeEntities(match[2].replace(/<[^>]+>/g, " "))
+        .replace(/\s+/g, " ")
+        .trim(),
+    }));
+  const links = [...cleaned.matchAll(/<a\b[^>]*href="([^"]*)"[^>]*>/gi)]
+    .map((match) => decodeEntities(match[1]))
+    .filter((href) => href.startsWith("/") && !href.startsWith("//"));
+  const visibleProse = decodeEntities(cleaned.replace(/<[^>]+>/g, " "))
+    .replace(/&#(\d+);/g, (_, value) => String.fromCodePoint(Number(value)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, value) => String.fromCodePoint(parseInt(value, 16)))
+    .replace(/\s+/g, " ")
+    .trim();
+  const normalizeSectionText = (value) =>
+    decodeEntities(value.replace(/<[^>]+>/g, " "))
+      .replace(/&#(\d+);/g, (_, number) => String.fromCodePoint(Number(number)))
+      .replace(/&#x([0-9a-f]+);/gi, (_, number) => String.fromCodePoint(parseInt(number, 16)))
+      .replace(/\s*›\s*/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  const markedSection = (name) => {
+    const safeName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const match = cleaned.match(
+      new RegExp(`<([a-z][\\w-]*)\\b[^>]*data-seo-section="${safeName}"[^>]*>([\\s\\S]*?)<\\/\\1>`, "i"),
+    );
+    if (!match) return null;
+    const body = match[2];
+    const sectionLinks = [...body.matchAll(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi)]
+      .map((link) => ({
+        href: decodeEntities(link[1]),
+        text: normalizeSectionText(link[2]).replace(/^#/, ""),
+      }));
+    return {
+      text: normalizeSectionText(body),
+      links: sectionLinks,
+      paragraphs: [...body.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)].map((paragraph) =>
+        normalizeSectionText(paragraph[1]),
+      ),
+      definitionTerms: [...body.matchAll(/<dt\b[^>]*>([\s\S]*?)<\/dt>/gi)].map((term) =>
+        normalizeSectionText(term[1]),
+      ),
+      definitionValues: [...body.matchAll(/<dd\b[^>]*>([\s\S]*?)<\/dd>/gi)].map((value) =>
+        normalizeSectionText(value[1]),
+      ),
+      stepTitles: [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)].map((heading) =>
+        normalizeSectionText(heading[1].replace(/<span\b[^>]*>[\s\S]*?<\/span>/gi, "")),
+      ),
+      stepDescriptions: [
+        ...body.matchAll(/<p\b[^>]*data-seo-step-description[^>]*>([\s\S]*?)<\/p>/gi),
+      ].map((paragraph) => normalizeSectionText(paragraph[1])),
+    };
+  };
+  return {
+    visibleProse,
+    visibleProseBytes: Buffer.byteLength(visibleProse),
+    headings,
+    mainLinks: [...new Set(links)],
+    seoSections: {
+      taxonomyIntro: markedSection("taxonomy-intro"),
+      resourceDetails: markedSection("resource-details"),
+      resourceTags: markedSection("resource-tags"),
+      journeySyllabus: markedSection("journey-syllabus"),
+    },
+  };
+}
+
 function routeType(p) {
   if (p === "/" || p === "") return "home";
   if (p === "/categories") return "categories-hub";
@@ -183,16 +256,22 @@ async function loadCorpus() {
     process.exit(1);
   }
   const xml = await res.text();
-  const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => decodeEntities(m[1].trim()));
-  if (!locs.length) {
+  const sitemapEntries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => {
+    const block = match[1];
+    const loc = firstMatch(block, [/<loc>([^<]+)<\/loc>/i]);
+    const lastmod = firstMatch(block, [/<lastmod>([^<]+)<\/lastmod>/i]);
+    return { loc, lastmod };
+  }).filter((entry) => entry.loc);
+  if (!sitemapEntries.length) {
     console.error("FATAL: sitemap.xml contained no <loc> entries");
     process.exit(1);
   }
-  const siteOrigin = new URL(locs[0]).origin;
-  let entries = locs.map((loc) => {
+  const siteOrigin = new URL(sitemapEntries[0].loc).origin;
+  let entries = sitemapEntries.map(({ loc, lastmod }) => {
     const u = new URL(loc);
     return {
       loc,
+      lastmod,
       pathq: u.pathname + u.search,
       path: u.pathname === "" ? "/" : u.pathname,
       page: parseInt(new URLSearchParams(u.search).get("page") || "1", 10) || 1,
@@ -229,7 +308,13 @@ async function fetchOne(entry) {
         signal: AbortSignal.timeout(20_000),
       });
       const html = await res.text();
-      return { ...entry, status: res.status, ...extractHead(html), htmlBytes: html.length };
+      return {
+        ...entry,
+        status: res.status,
+        ...extractHead(html),
+        ...extractCrawlerContent(html),
+        htmlBytes: html.length,
+      };
     } catch (e) {
       if (attempt === 2) return { ...entry, status: 0, fetchError: String(e.message).slice(0, 160) };
       await new Promise((r) => setTimeout(r, 1000));
@@ -424,6 +509,94 @@ function dupStats(pages, key) {
   };
 }
 
+function percentile(values, fraction) {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * fraction))];
+}
+
+function proseStats(pages) {
+  const byType = {};
+  for (const page of pages) {
+    const values = byType[page.type] ??= [];
+    values.push(page.visibleProseBytes ?? 0);
+  }
+  return Object.fromEntries(Object.entries(byType).map(([type, values]) => {
+    const unique = new Set(
+      pages
+        .filter((page) => page.type === type)
+        .map((page) => page.visibleProse?.toLowerCase()),
+    ).size;
+    return [type, {
+      urls: values.length,
+      averageBytes: Math.round(values.reduce((sum, value) => sum + value, 0) / values.length),
+      medianBytes: percentile(values, 0.5),
+      minimumBytes: Math.min(...values),
+      uniquePageRate: +(unique / values.length).toFixed(4),
+    }];
+  }));
+}
+
+function shingles(text, size = 5) {
+  const words = String(text ?? "").toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  const out = new Set();
+  for (let index = 0; index <= words.length - size; index++) {
+    out.add(words.slice(index, index + size).join(" "));
+  }
+  return out;
+}
+
+function jaccard(left, right) {
+  if (!left.size && !right.size) return 1;
+  let intersection = 0;
+  for (const value of left) if (right.has(value)) intersection++;
+  return intersection / (left.size + right.size - intersection);
+}
+
+function parentChildSimilarity(pages) {
+  const threshold = 0.85;
+  const pageByPath = new Map(
+    pages
+      .filter((page) => page.page === 1)
+      .map((page) => [page.path, page]),
+  );
+  const childPrefix = {
+    category: "/subcategory/",
+    subcategory: "/sub-subcategory/",
+  };
+  const pairs = [];
+  for (const parent of pages) {
+    const prefix = childPrefix[parent.type];
+    if (!prefix || parent.page !== 1) continue;
+    for (const href of parent.mainLinks ?? []) {
+      const childPath = href.split("?")[0];
+      if (!childPath.startsWith(prefix)) continue;
+      const child = pageByPath.get(childPath);
+      if (!child) continue;
+      const similarity = jaccard(
+        shingles(parent.visibleProse),
+        shingles(child.visibleProse),
+      );
+      pairs.push({
+        parent: parent.path,
+        child: child.path,
+        similarity: +similarity.toFixed(4),
+      });
+    }
+  }
+  const nearDuplicates = pairs.filter((pair) => pair.similarity >= threshold);
+  return {
+    threshold,
+    pairs: pairs.length,
+    nearDuplicates: nearDuplicates.length,
+    rate: pairs.length ? +(nearDuplicates.length / pairs.length).toFixed(4) : 0,
+    averageSimilarity: pairs.length
+      ? +(pairs.reduce((sum, pair) => sum + pair.similarity, 0) / pairs.length).toFixed(4)
+      : 0,
+    samples: nearDuplicates.sort((a, b) => b.similarity - a.similarity).slice(0, 10),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // hydration parity (client SEOHead vs server og-middleware) — sample-based
 // ---------------------------------------------------------------------------
@@ -481,6 +654,51 @@ async function runParity(pages) {
         robots: document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? null,
         canonical: document.querySelector('link[rel="canonical"]')?.getAttribute("href") ?? null,
         jsonLdCount: document.querySelectorAll('script[type="application/ld+json"]').length,
+        headings: [...document.querySelectorAll("main h1, main h2, main h3")].map((heading) => ({
+          level: Number(heading.tagName.slice(1)),
+          text: heading.textContent?.replace(/\s+/g, " ").trim() ?? "",
+        })),
+        seoSections: (() => {
+          const normalize = (value) =>
+            (value ?? "").replace(/\s*›\s*/g, " ").replace(/\s+/g, " ").trim();
+          const snapshot = (name) => {
+            const section = document.querySelector(`[data-seo-section="${name}"]`);
+            if (!section) return null;
+            return {
+              text: normalize(section.textContent),
+              links: [...section.querySelectorAll("a")].map((link) => ({
+                href: link.getAttribute("href") ?? "",
+                text: normalize(link.textContent).replace(/^#/, ""),
+              })),
+              paragraphs: [...section.querySelectorAll("p")].map((paragraph) =>
+                normalize(paragraph.textContent),
+              ),
+              definitionTerms: [...section.querySelectorAll("dt")].map((term) =>
+                normalize(term.textContent),
+              ),
+              definitionValues: [...section.querySelectorAll("dd")].map((value) =>
+                normalize(value.textContent),
+              ),
+              stepTitles: [...section.querySelectorAll("h3")].map((heading) =>
+                normalize(
+                  [...heading.childNodes]
+                    .filter((node) => node.nodeType === Node.TEXT_NODE)
+                    .map((node) => node.textContent)
+                    .join(" "),
+                ),
+              ),
+              stepDescriptions: [...section.querySelectorAll("[data-seo-step-description]")].map(
+                (paragraph) => normalize(paragraph.textContent),
+              ),
+            };
+          };
+          return {
+            taxonomyIntro: snapshot("taxonomy-intro"),
+            resourceDetails: snapshot("resource-details"),
+            resourceTags: snapshot("resource-tags"),
+            journeySyllabus: snapshot("journey-syllabus"),
+          };
+        })(),
       }));
       const canonPathq = (u) => {
         try {
@@ -500,6 +718,65 @@ async function runParity(pages) {
         mismatches.push(`canonical: server="${s.canonical}" client="${dom.canonical}"`);
       if (dom.jsonLdCount !== s.ld.length)
         mismatches.push(`JSON-LD blocks: server=${s.ld.length} client=${dom.jsonLdCount}`);
+      const requiredHeading = ["resource", "category", "subcategory", "sub-subcategory"].includes(s.type)
+        ? s.type === "resource" ? "Resource details" : "About this collection"
+        : s.type === "journey" ? "Learning Path" : null;
+      if (requiredHeading) {
+        const serverHeading = (s.headings ?? []).find((heading) => heading.text === requiredHeading);
+        const clientHeading = dom.headings.find((heading) => heading.text === requiredHeading);
+        if (!serverHeading || !clientHeading || serverHeading.level !== clientHeading.level) {
+          mismatches.push(
+            `heading "${requiredHeading}": server=h${serverHeading?.level ?? "missing"} client=h${clientHeading?.level ?? "missing"}`,
+          );
+        }
+      }
+      const exact = (label, serverValue, clientValue) => {
+        if (JSON.stringify(serverValue) !== JSON.stringify(clientValue)) {
+          mismatches.push(`${label} differs between crawler and client`);
+        }
+      };
+      if (["category", "subcategory", "sub-subcategory"].includes(s.type)) {
+        exact(
+          "taxonomy intro",
+          s.seoSections?.taxonomyIntro?.paragraphs ?? null,
+          dom.seoSections.taxonomyIntro?.paragraphs ?? null,
+        );
+      }
+      if (s.type === "resource") {
+        for (const key of ["definitionTerms", "definitionValues", "paragraphs"]) {
+          exact(
+            `resource facts ${key}`,
+            s.seoSections?.resourceDetails?.[key] ?? null,
+            dom.seoSections.resourceDetails?.[key] ?? null,
+          );
+        }
+        exact(
+          "resource tags",
+          s.seoSections?.resourceTags?.links ?? [],
+          dom.seoSections.resourceTags?.links ?? [],
+        );
+      }
+      if (s.type === "journey") {
+        exact(
+          "journey step titles",
+          s.seoSections?.journeySyllabus?.stepTitles ?? [],
+          dom.seoSections.journeySyllabus?.stepTitles ?? [],
+        );
+        exact(
+          "journey step descriptions",
+          s.seoSections?.journeySyllabus?.stepDescriptions ?? [],
+          dom.seoSections.journeySyllabus?.stepDescriptions ?? [],
+        );
+        exact(
+          "journey resource links",
+          (s.seoSections?.journeySyllabus?.links ?? []).filter((link) =>
+            link.href.startsWith("/resource/"),
+          ),
+          (dom.seoSections.journeySyllabus?.links ?? []).filter((link) =>
+            link.href.startsWith("/resource/"),
+          ),
+        );
+      }
       results.push({ pathq: s.pathq, type: s.type, page: s.page, ok: mismatches.length === 0, mismatches });
       console.log(`  ${mismatches.length === 0 ? "PASS" : "FAIL"} parity ${s.pathq}${mismatches.length ? " :: " + mismatches[0] : ""}`);
     } catch (e) {
@@ -526,8 +803,11 @@ const failures = [];
 const warnings = [];
 let syllabusJourneys = 0;
 let journeyPages = 0;
+let crawlerSyllabusJourneys = 0;
 const entityTypeCounts = {};
 const enrichment = { providerCount: 0, keywordsCount: 0, aboutCount: 0, isPartOfCount: 0, itemListElementPages: 0 };
+const datedTypes = new Set(["category", "subcategory", "sub-subcategory", "resource", "journey"]);
+const sitemapLastmod = { eligible: 0, dated: 0, invalid: 0 };
 
 for (const r of pages) {
   const { issues, warns } = validatePage(r, siteOrigin, GATE);
@@ -535,12 +815,52 @@ for (const r of pages) {
   for (const w of warns) warnings.push({ url: r.pathq, type: r.type, ...w });
   r.issues = issues.map((i) => i.code);
   if (r.kind === "sitemap" && r.status === 200) {
+    if (datedTypes.has(r.type)) {
+      sitemapLastmod.eligible++;
+      if (r.lastmod) {
+        const parsed = new Date(`${r.lastmod}T00:00:00.000Z`);
+        const valid =
+          /^\d{4}-\d{2}-\d{2}$/.test(r.lastmod) &&
+          Number.isFinite(parsed.getTime()) &&
+          parsed.toISOString().slice(0, 10) === r.lastmod;
+        if (valid) sitemapLastmod.dated++;
+        else {
+          sitemapLastmod.invalid++;
+          failures.push({
+            url: r.pathq,
+            type: r.type,
+            code: "sitemap-lastmod-invalid",
+            detail: `lastmod=${r.lastmod}`,
+          });
+        }
+      }
+    }
+    const headingTexts = new Set((r.headings ?? []).map((heading) => heading.text));
     if (r.type === "journey") {
       journeyPages++;
       const course = findTop(r.ld ?? [], "WebPage")?.mainEntity;
       if (Array.isArray(course?.syllabusSections) && course.syllabusSections.length) syllabusJourneys++;
+      const stepHeadings = r.seoSections?.journeySyllabus?.stepTitles ?? [];
+      if (stepHeadings.length) crawlerSyllabusJourneys++;
+      if (GATE && Array.isArray(course?.syllabusSections) &&
+          stepHeadings.length !== course.syllabusSections.length) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-journey-step-count",
+          detail: `crawler=${stepHeadings.length}, schema=${course.syllabusSections.length}`,
+        });
+      }
     }
     if (r.type === "resource") {
+      if (GATE && (!headingTexts.has("Description") || !headingTexts.has("Resource details"))) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-resource-headings",
+          detail: `headings=${[...headingTexts].join(" | ")}`,
+        });
+      }
       const entity = findTop(r.ld ?? [], "WebPage")?.mainEntity;
       if (entity) {
         entityTypeCounts[entity["@type"]] = (entityTypeCounts[entity["@type"]] || 0) + 1;
@@ -549,6 +869,15 @@ for (const r of pages) {
         if (entity.about) enrichment.aboutCount++;
         if (entity.isPartOf) enrichment.isPartOfCount++;
       }
+    }
+    if (["category", "subcategory", "sub-subcategory"].includes(r.type) &&
+        GATE && !headingTexts.has("About this collection")) {
+      failures.push({
+        url: r.pathq,
+        type: r.type,
+        code: "crawler-taxonomy-intro",
+        detail: "missing About this collection heading",
+      });
     }
     if (COLLECTION_TYPES.has(r.type)) {
       const list = findTop(r.ld ?? [], "CollectionPage")?.mainEntity;
@@ -560,6 +889,8 @@ for (const r of pages) {
 const indexable = pages.filter((p) => p.kind === "sitemap" && p.status === 200);
 const dupTitles = dupStats(indexable, "title");
 const dupDescs = dupStats(indexable, "description");
+const proseByType = proseStats(indexable);
+const taxonomyNearDuplicates = parentChildSimilarity(indexable);
 const perType = {};
 for (const p of indexable) {
   perType[p.type] ??= { urls: 0, withIssues: 0 };
@@ -576,6 +907,23 @@ if (PARITY) parityResults = await runParity(pages);
 // journeys have steps; a corpus-wide zero means the enrichment regressed).
 if (GATE && journeyPages > 0 && syllabusJourneys === 0) {
   failures.push({ url: "(aggregate)", type: "journey", code: "journey-syllabus-zero", detail: "no journey page emits syllabusSections" });
+}
+if (GATE && sitemapLastmod.invalid > 0) {
+  failures.push({
+    url: "(sitemap)",
+    type: "sitemap",
+    code: "sitemap-lastmod-invalid-total",
+    detail: `${sitemapLastmod.invalid} malformed lastmod values`,
+  });
+}
+if (GATE && sitemapLastmod.eligible > 0 &&
+    sitemapLastmod.dated !== sitemapLastmod.eligible) {
+  failures.push({
+    url: "(sitemap)",
+    type: "sitemap",
+    code: "sitemap-lastmod-coverage",
+    detail: `${sitemapLastmod.dated}/${sitemapLastmod.eligible} resource, journey, and taxonomy URLs dated`,
+  });
 }
 
 const metrics = {
@@ -599,6 +947,17 @@ const metrics = {
     journeysWithSyllabus: `${syllabusJourneys}/${journeyPages}`,
     collectionsWithItemListElement: enrichment.itemListElementPages,
     resourceEnrichment: enrichment,
+    crawlerJourneysWithSteps: `${crawlerSyllabusJourneys}/${journeyPages}`,
+  },
+  crawlerContent: {
+    proseBytesByType: proseByType,
+    taxonomyParentChildNearDuplicates: taxonomyNearDuplicates,
+  },
+  sitemapLastmod: {
+    ...sitemapLastmod,
+    coverage: sitemapLastmod.eligible
+      ? +(sitemapLastmod.dated / sitemapLastmod.eligible).toFixed(4)
+      : 0,
   },
   duplicates: {
     titleRate: +dupTitles.rate.toFixed(4),
@@ -638,10 +997,29 @@ md.push(`| duplicate-title rate | **${(dupTitles.rate * 100).toFixed(2)}%** (${d
 md.push(`| duplicate-description rate | **${(dupDescs.rate * 100).toFixed(2)}%** (${dupDescs.dupUrlCount} URLs) |`);
 md.push(`| collections emitting itemListElement | ${enrichment.itemListElementPages} |`);
 md.push(`| journeys with Course syllabus | ${syllabusJourneys}/${journeyPages} |`);
+md.push(`| journeys with crawler-visible steps | ${crawlerSyllabusJourneys}/${journeyPages} |`);
+md.push(`| valid lastmod coverage (resource/journey/taxonomy) | ${sitemapLastmod.dated}/${sitemapLastmod.eligible} (${(metrics.sitemapLastmod.coverage * 100).toFixed(2)}%) |`);
+md.push(`| parent/child taxonomy near-duplicate rate (≥${taxonomyNearDuplicates.threshold}) | **${(taxonomyNearDuplicates.rate * 100).toFixed(2)}%** (${taxonomyNearDuplicates.nearDuplicates}/${taxonomyNearDuplicates.pairs}) |`);
 md.push(`| resource mainEntity types | ${Object.entries(entityTypeCounts).map(([k, v]) => `${k}=${v}`).join(", ") || "—"} |`);
 md.push(`| resource enrichment (provider/keywords/about/isPartOf) | ${enrichment.providerCount}/${enrichment.keywordsCount}/${enrichment.aboutCount}/${enrichment.isPartOfCount} |`);
 if (parityResults)
   md.push(`| hydration parity | ${parityResults.filter((p) => p.ok).length}/${parityResults.length} PASS |`);
+md.push(``);
+md.push(`## Crawler-visible prose`);
+md.push(`| page type | URLs | average bytes | median bytes | minimum bytes | unique-page rate |`);
+md.push(`|---|---:|---:|---:|---:|---:|`);
+for (const [type, stats] of Object.entries(proseByType)) {
+  md.push(`| ${type} | ${stats.urls} | ${stats.averageBytes} | ${stats.medianBytes} | ${stats.minimumBytes} | ${(stats.uniquePageRate * 100).toFixed(2)}% |`);
+}
+md.push(``);
+md.push(`Parent/child taxonomy average prose similarity: **${(taxonomyNearDuplicates.averageSimilarity * 100).toFixed(2)}%**.`);
+if (taxonomyNearDuplicates.samples.length) {
+  md.push(``);
+  md.push(`Highest near-duplicate parent/child pairs:`);
+  for (const pair of taxonomyNearDuplicates.samples) {
+    md.push(`- ${(pair.similarity * 100).toFixed(2)}% — ${pair.parent} → ${pair.child}`);
+  }
+}
 md.push(``);
 md.push(`## Failures by code (${failures.length})`);
 if (!failures.length) md.push(`None. ✅`);

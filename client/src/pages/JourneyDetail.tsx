@@ -553,7 +553,7 @@ export default function JourneyDetail() {
       </Card>
 
       {/* Journey Steps */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-seo-section="journey-syllabus">
         <h2 className="text-xl sm:text-2xl font-bold mb-4">Learning Path</h2>
         
         {logicalSteps.length > 0 ? (
@@ -605,7 +605,7 @@ export default function JourneyDetail() {
                               )}
                             </h3>
                             {step.description && (
-                              <p className="text-sm text-muted-foreground mb-3">
+                              <p className="text-sm text-muted-foreground mb-3" data-seo-step-description>
                                 {step.description}
                               </p>
                             )}

@@ -23,7 +23,7 @@
  * ============================================================================
  */
 import { z } from "zod";
-import { setRouteResponseSchema } from "./install";
+import { setRouteQuerySchema, setRouteResponseSchema } from "./install";
 
 // ---------------------------------------------------------------------------
 // Shared primitives
@@ -247,6 +247,7 @@ const awesomeListListingResponseSchema = z.object({
   totalPages: z.number().int().positive(),
   totalAll: z.number().int().nonnegative(),
   generalCount: z.number().int().nonnegative(),
+  scopeIntro: z.string(),
   scope: z.object({
     ignoredSubcategory: z.boolean(),
     ignoredSubSubcategory: z.boolean(),
@@ -256,6 +257,15 @@ const awesomeListListingResponseSchema = z.object({
   tags: z.array(z.object({ tag: z.string(), count: z.number() })),
   resources: z.array(publicResourceSchema),
 }).passthrough();
+
+const awesomeListListingQuerySchema = z.object({
+  level: z.enum(["category", "subcategory", "sub-subcategory"]),
+  slug: z.string().min(1).max(512),
+  page: z.string().regex(/^\d+$/).optional(),
+  subcategory: z.string().min(1).max(512).optional(),
+  subSubcategory: z.string().min(1).max(512).optional(),
+  general: z.literal("1").optional(),
+});
 /**
  * Register structural 200 schemas for all key endpoints. Must be called
  * before `installApiContractRegistration` so that when the auto-installer
@@ -322,5 +332,9 @@ export function registerCoreEndpointSchemas(): void {
     name: "AwesomeListListingResponse",
     description: "One deterministic, tree-ordered taxonomy page with metadata for browse controls",
     schema: awesomeListListingResponseSchema,
+  });
+  setRouteQuerySchema("get", "/api/awesome-list/listing", {
+    name: "AwesomeListListingQuery",
+    schema: awesomeListListingQuerySchema,
   });
 }

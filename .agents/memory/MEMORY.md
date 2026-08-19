@@ -9,7 +9,7 @@
 - [Drizzle double .where() override](drizzle-where-override.md) — a 2nd .where() silently replaces the 1st (drops the predicate); always combine with a single .where(and(...)).
 - [wouter useLocation() no query](wouter-location-no-query.md) — useLocation() is path-only; URL-sync guards must compare window.location.pathname+search or query-clears never apply.
 - [Resource delete FK cleanup](resource-delete-fk-cleanup.md) — deleting a resource needs audit-log-before-delete + manual cleanup of child FKs lacking ON DELETE (resource_edits, research_discoveries.created_resource_id) or it throws a false 500.
-- [Dedup cascade safety](resource-dedup-cascade-safety.md) — bulk hard-delete of dup resources silently cascades journey_steps/bookmarks/favorites; journal ROW CONTENTS not just ids & repoint-to-survivor; prod NOW has 89 journey steps (seeded July 2026).
+- [Dedup cascade safety](resource-dedup-cascade-safety.md) — bulk hard-delete of duplicate resources silently cascades dependent rows; journal row contents and repoint them before deleting.
 - [Empty taxonomy cleanup](empty-taxonomy-cleanup.md) — empty nodes hard-delete-safe; pre-check full-chain 0 across ALL statuses + 0 orphans; prod=no direct write, rename-then-delete via admin API (guard is name-global).
 - [Dev server no hot-reload](dev-server-no-watch.md) — tsx runs without --watch; restart the workflow after every server edit before API-testing.
 - [Pre-boot param scrubber honesty](scrubbed-params-honesty.md) — index.html deletes XSS-shaped query params before React boots; "silent full-catalog fallback" on q/tags = the scrubber, surface via window.__scrubbedParams notice.

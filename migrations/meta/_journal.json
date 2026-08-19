@@ -141,6 +141,13 @@
       "when": 1787112000000,
       "tag": "0044_trigram_search_recovery",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1787140800000,
+      "tag": "0044_taxonomy_updated_at",
+      "breakpoints": true
     }
   ]
 }

@@ -33,8 +33,10 @@ import {
 import { isDatabaseUnavailableError } from "../db/errors";
 import { ServiceUnavailableError } from "../middleware/errors";
 import type {
+  CategoryRepository,
   LegacyRepository,
   LearningJourneyRepository,
+  ResourceRepository,
 } from "../repositories";
 
 /**
@@ -45,6 +47,8 @@ import type {
 export interface NonApiRouteContext {
   legacyRepo: LegacyRepository;
   learningJourneyRepo: LearningJourneyRepository;
+  resourceRepo: ResourceRepository;
+  categoryRepo: CategoryRepository;
 }
 
 /**
@@ -55,7 +59,7 @@ export function registerNonApiRoutes(
   app: Express,
   context: NonApiRouteContext,
 ): void {
-  const { legacyRepo, learningJourneyRepo } = context;
+  const { legacyRepo, learningJourneyRepo, resourceRepo, categoryRepo } = context;
 
   // --------------------------------------------------------------------------
   // Helper functions copied verbatim from the top of server/routes.ts. They
@@ -99,24 +103,37 @@ export function registerNonApiRoutes(
     // visit the same public URL many times. Every <loc> must appear exactly once.
     const seenLocs = new Set<string>();
 
-    // R-12 (run23, supersedes Run16 BUG-095 + Run22 BUG-045/046): <lastmod> is
-    // now OMITTED for EVERY sitemap URL. History: Run16 replaced the hardcoded
-    // "today" stamp with per-resource updated_at; Run22 filtered per-second
-    // bulk-write bursts. The residual audit still found the surviving dates
-    // batch-clustered (419 dated URLs sharing only 8 distinct dates — 234 on a
-    // single day from mass enrichment passes), i.e. updated_at is a bookkeeping
-    // artifact for most of the corpus, not a content-change signal. The audit
-    // acceptance offers "real per-URL dates or omit for ALL"; since genuinely
-    // real per-URL dates do not exist for this corpus, the honest, uniform
-    // policy is omission everywhere — a lastmod-free sitemap is fully valid and
-    // crawlers distrust inconsistent lastmod anyway. Do NOT reintroduce dates
-    // unless a true content-change signal (not bulk-script stamping) exists.
-    const addUrl = (path: string, changefreq: string, priority: string) => {
+    const sitemapDate = (value: unknown): string | undefined => {
+      if (!value) return undefined;
+      const date = value instanceof Date ? value : new Date(String(value));
+      return Number.isFinite(date.getTime())
+        ? date.toISOString().slice(0, 10)
+        : undefined;
+    };
+    const latestDate = (records: any[]): string | undefined => {
+      let latest = -Infinity;
+      for (const record of records) {
+        const time = record?.updatedAt
+          ? new Date(record.updatedAt).getTime()
+          : NaN;
+        if (Number.isFinite(time)) latest = Math.max(latest, time);
+      }
+      return Number.isFinite(latest)
+        ? sitemapDate(new Date(latest))
+        : undefined;
+    };
+    const addUrl = (
+      path: string,
+      changefreq: string,
+      priority: string,
+      lastmod?: unknown,
+    ) => {
       if (seenLocs.has(path)) return;
       seenLocs.add(path);
+      const date = sitemapDate(lastmod);
       urls.push(`  <url>
     <loc>${xmlEscape(baseUrl + path)}</loc>
-    <changefreq>${changefreq}</changefreq>
+${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`);
     };
@@ -136,7 +153,28 @@ export function registerNonApiRoutes(
 
     // Category taxonomy + every approved resource detail page.
     try {
-      const awesomeListData = await legacyRepo.getAwesomeListFromDatabase();
+      const [
+        awesomeListData,
+        approvedResourceResult,
+        categoryRecords,
+        subcategoryRecords,
+        subSubcategoryRecords,
+      ] = await Promise.all([
+        legacyRepo.getAwesomeListFromDatabase(),
+        resourceRepo.listResources({
+          status: "approved",
+          limit: 10_000,
+          sort: "newest",
+        }),
+        categoryRepo.listCategories(),
+        categoryRepo.listSubcategories(),
+        categoryRepo.listSubSubcategories(),
+      ]);
+      const resourceById = new Map(
+        approvedResourceResult.resources.map((resource) => [resource.id, resource]),
+      );
+      const datedResources = (records: any[]): any[] =>
+        records.map((record) => resourceById.get(Number(record.id)) ?? record);
 
       const resourceIdsOf = (node: any): number[] =>
         (node?.resources ?? []).map((r: any) => Number(r.id)).filter((n: number) => Number.isFinite(n));
@@ -155,39 +193,132 @@ export function registerNonApiRoutes(
         node: any,
         level: ListingLevel,
         changefreq: string,
+        scopeLastmod: string | undefined,
       ) => {
-        const totalPages = Math.ceil(
-          flattenListingResources(node, level).length / LISTING_PAGE_SIZE,
-        );
+        const resources = flattenListingResources(node, level);
+        const totalPages = Math.ceil(resources.length / LISTING_PAGE_SIZE);
         for (let p = 2; p <= totalPages; p++) {
-          addUrl(`${basePath}?page=${p}`, changefreq, '0.4');
+          addUrl(
+            `${basePath}?page=${p}`,
+            changefreq,
+            '0.4',
+            scopeLastmod,
+          );
         }
       };
       awesomeListData?.categories?.forEach(category => {
+        const categoryRecord = categoryRecords.find(
+          (record) => record.slug === category.slug,
+        );
+        const categorySubcategoryRecords = categoryRecord
+          ? subcategoryRecords.filter((record) => record.categoryId === categoryRecord.id)
+          : [];
+        const categorySubcategoryIds = new Set(
+          categorySubcategoryRecords.map((record) => record.id),
+        );
+        const categorySubSubcategoryRecords = subSubcategoryRecords.filter(
+          (record) =>
+            record.subcategoryId != null &&
+            categorySubcategoryIds.has(record.subcategoryId),
+        );
+        const categoryLastmod = latestDate([
+          categoryRecord,
+          ...categorySubcategoryRecords,
+          ...categorySubSubcategoryRecords,
+          ...datedResources(flattenListingResources(category, 'category')),
+        ]);
         const catBase = `/category/${category.slug}`;
         const catFirstSeen = !seenLocs.has(catBase);
-        addUrl(catBase, 'weekly', '0.7');
-        if (catFirstSeen) addListingPages(catBase, category, 'category', 'weekly');
+        addUrl(
+          catBase,
+          'weekly',
+          '0.7',
+          categoryLastmod,
+        );
+        if (catFirstSeen) {
+          addListingPages(catBase, category, 'category', 'weekly', categoryLastmod);
+        }
         category.subcategories?.forEach(subcategory => {
+          const subcategoryRecord = categoryRecord
+            ? subcategoryRecords.find(
+                (record) =>
+                  record.categoryId === categoryRecord.id &&
+                  record.slug === subcategory.slug,
+              )
+            : undefined;
+          const subcategorySubSubcategoryRecords = subcategoryRecord
+            ? subSubcategoryRecords.filter(
+                (record) => record.subcategoryId === subcategoryRecord.id,
+              )
+            : [];
+          const subcategoryLastmod = latestDate([
+            subcategoryRecord,
+            ...subcategorySubSubcategoryRecords,
+            ...datedResources(flattenListingResources(subcategory, 'subcategory')),
+          ]);
           const subBase = `/subcategory/${subcategory.slug}`;
           const subFirstSeen = !seenLocs.has(subBase);
-          addUrl(subBase, 'weekly', '0.6');
-          if (subFirstSeen) addListingPages(subBase, subcategory, 'subcategory', 'weekly');
+          addUrl(
+            subBase,
+            'weekly',
+            '0.6',
+            subcategoryLastmod,
+          );
+          if (subFirstSeen) {
+            addListingPages(
+              subBase,
+              subcategory,
+              'subcategory',
+              'weekly',
+              subcategoryLastmod,
+            );
+          }
           subcategory.subSubcategories?.forEach(subSubcategory => {
             // BUG-053 (run14): an empty sub-subcategory renders "No resources
             // found" and has no inbound link from its parent page — keep such
             // orphans OUT of the sitemap (sitemap set == reachable content set).
             if (resourceIdsOf(subSubcategory).length === 0) return;
+            const subSubcategoryRecord = subcategoryRecord
+              ? subSubcategoryRecords.find(
+                  (record) =>
+                    record.subcategoryId === subcategoryRecord.id &&
+                    record.slug === subSubcategory.slug,
+                )
+              : undefined;
+            const subSubcategoryLastmod = latestDate([
+              subSubcategoryRecord,
+              ...datedResources(
+                flattenListingResources(subSubcategory, 'sub-subcategory'),
+              ),
+            ]);
             const ssBase = `/sub-subcategory/${subSubcategory.slug}`;
             const ssFirstSeen = !seenLocs.has(ssBase);
-            addUrl(ssBase, 'weekly', '0.5');
-            if (ssFirstSeen) addListingPages(ssBase, subSubcategory, 'sub-subcategory', 'weekly');
+            addUrl(
+              ssBase,
+              'weekly',
+              '0.5',
+              subSubcategoryLastmod,
+            );
+            if (ssFirstSeen) {
+              addListingPages(
+                ssBase,
+                subSubcategory,
+                'sub-subcategory',
+                'weekly',
+                subSubcategoryLastmod,
+              );
+            }
           });
         });
       });
 
       awesomeListData?.resources?.forEach(resource => {
-        addUrl(`/resource/${resource.id}`, 'monthly', '0.5');
+        addUrl(
+          `/resource/${resource.id}`,
+          'monthly',
+          '0.5',
+          resourceById.get(Number(resource.id))?.updatedAt,
+        );
       });
     } catch (error) {
       console.error('Error adding category/resource URLs to sitemap:', error);
@@ -197,9 +328,7 @@ export function registerNonApiRoutes(
     try {
       const journeys = await learningJourneyRepo.listLearningJourneys();
       journeys?.forEach(journey => {
-        // R-12 (run23): lastmod omitted here too — ONE uniform no-lastmod
-        // policy for the entire sitemap (see the R-12 comment above).
-        addUrl(`/journey/${journey.id}`, 'weekly', '0.6');
+        addUrl(`/journey/${journey.id}`, 'weekly', '0.6', journey.updatedAt);
       });
     } catch (error) {
       console.error('Error adding journey URLs to sitemap:', error);

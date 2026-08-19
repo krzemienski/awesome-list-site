@@ -76,6 +76,10 @@ const BODY_METHODS = new Set<HttpMethod>(["post", "put", "patch", "delete"]);
  * on every future call to `inferredResponsesFor` for any new registration.
  */
 const routeResponseOverrideMap = new Map<string, import("./registry").NamedResponseSchema>();
+const routeQueryOverrideMap = new Map<
+  string,
+  { name: string; schema: ZodTypeAny }
+>();
 
 /**
  * Register a structural 200 response schema for a specific endpoint. Must be
@@ -92,6 +96,17 @@ export function setRouteResponseSchema(
   schema: import("./registry").NamedResponseSchema,
 ): void {
   routeResponseOverrideMap.set(`${method.toLowerCase()} ${path}`, schema);
+}
+
+/** Register an exact query-string schema for a route that cannot use the
+ * broad inferred query contract. This drives both runtime validation and
+ * generated OpenAPI parameters. */
+export function setRouteQuerySchema(
+  method: string,
+  path: string,
+  query: { name: string; schema: ZodTypeAny },
+): void {
+  routeQueryOverrideMap.set(`${method.toLowerCase()} ${path}`, query);
 }
 
 /** Named, reusable wire contracts shared by every inferred endpoint. */
@@ -456,7 +471,9 @@ export function installApiContractRegistration(
       const priorMiddleware = handlers.slice(0, -1);
 
       const paramsSchema = inferParamsSchema(path, method);
-      const querySchema = genericQuerySchema;
+      const querySchema =
+        routeQueryOverrideMap.get(`${method} ${path}`)?.schema ??
+        genericQuerySchema;
       // Always run the structural guard here. A route-specific validateBody
       // middleware has already run in the preserved prior chain and its exact
       // schema is recorded in the contract/OpenAPI declaration above.
@@ -512,6 +529,7 @@ export function declareContract(
 ): ApiContract {
   const meta = inferMetaFromMiddleware(path, middlewareNames);
   const paramsSchema = inferParamsSchema(path, method);
+  const queryOverride = routeQueryOverrideMap.get(`${method} ${path}`);
   const schemaBase = deriveContractName(method, path).replace(
     /[^A-Za-z0-9.-]/g,
     (char) => `_${char.charCodeAt(0).toString(16)}_`,
@@ -524,8 +542,8 @@ export function declareContract(
     tags: meta.domain ? [meta.domain] : undefined,
     params: paramsSchema,
     paramsName: paramsSchema ? `${schemaBase}.Params` : undefined,
-    query: genericQuerySchema,
-    queryName: `${schemaBase}.Query`,
+    query: queryOverride?.schema ?? genericQuerySchema,
+    queryName: queryOverride?.name ?? `${schemaBase}.Query`,
     body: BODY_METHODS.has(method)
       ? routeBodySchema ?? objectBodyGuardSchema
       : undefined,

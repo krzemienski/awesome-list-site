@@ -40,6 +40,17 @@ import { processAwesomeListData } from "@/lib/parser";
 const PAGE_SIZE = 24;
 type Props = { level: ListingLevel };
 
+const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc"]);
+
+function normalizeSort(value: string | null): string {
+  if (!value) return "default";
+  const normalized = value.toLowerCase();
+  if (CANONICAL_SORTS.has(normalized)) return normalized;
+  if (normalized === "name" || normalized === "asc") return "name-asc";
+  if (normalized === "desc") return "name-desc";
+  return "default";
+}
+
 function routeFor(level: ListingLevel, slug: string) {
   return `/${level === "category" ? "category" : level === "subcategory" ? "subcategory" : "sub-subcategory"}/${slug}`;
 }
@@ -80,7 +91,9 @@ export default function TaxonomyListing({ level }: Props) {
   const [page, setPage] = useState(initialPage.page);
   const [searchTerm, setSearchTerm] = useState(params.get("search") ?? "");
   const [tags, setTags] = useState(() => parseTagsParam(params));
-  const [sort, setSort] = useState(params.get("sortBy") ?? "default");
+  const [sort, setSort] = useState(() =>
+    normalizeSort(params.get("sortBy") || params.get("sort")),
+  );
   const [view, setView] = useState<ViewMode>(() => {
     const fromUrl = params.get("view");
     if (isLayoutViewMode(fromUrl)) return fromUrl;
@@ -125,6 +138,41 @@ export default function TaxonomyListing({ level }: Props) {
     [corpus.data, level, slug],
   );
   const listingData = listing.data;
+  const resolvedSelection = useMemo(() => {
+    if (
+      selection === "all" ||
+      selection === "__general__" ||
+      !listingData
+    ) {
+      return {};
+    }
+    if (level === "category") {
+      const [subcategory, subSubcategory] = selection.split(" › ");
+      const child = listingData.children.find(
+        (candidate) => candidate.name === subcategory,
+      );
+      if (!child) return {};
+      const validSubSubcategory = child.subSubcategories?.some(
+        (candidate) => candidate.name === subSubcategory,
+      );
+      return {
+        subcategory,
+        subSubcategory:
+          subSubcategory && validSubSubcategory
+            ? subSubcategory
+            : undefined,
+      };
+    }
+    if (level === "subcategory") {
+      const validSubSubcategory = listingData.children.some(
+        (candidate) => candidate.name === selection,
+      );
+      return {
+        subSubcategory: validSubSubcategory ? selection : undefined,
+      };
+    }
+    return {};
+  }, [level, listingData, selection]);
   const taxonomySearchUrl = useMemo(() => {
     if (!serverSearchActive || !listingData) return "";
     const query = new URLSearchParams({
@@ -135,16 +183,19 @@ export default function TaxonomyListing({ level }: Props) {
     if (level === "category") {
       query.set("category", slug);
       if (general) query.set("generalScope", "category");
-      else if (selection !== "all") {
-        const [subcategory, subSubcategory] = selection.split(" › ");
-        query.set("subcategory", subcategory);
-        if (subSubcategory) query.set("subSubcategory", subSubcategory);
+      else if (resolvedSelection.subcategory) {
+        query.set("subcategory", resolvedSelection.subcategory);
+        if (resolvedSelection.subSubcategory) {
+          query.set("subSubcategory", resolvedSelection.subSubcategory);
+        }
       }
     } else if (level === "subcategory") {
       if (listingData.parents.category?.slug) query.set("category", listingData.parents.category.slug);
       query.set("subcategory", slug);
       if (general) query.set("generalScope", "subcategory");
-      else if (selection !== "all") query.set("subSubcategory", selection);
+      else if (resolvedSelection.subSubcategory) {
+        query.set("subSubcategory", resolvedSelection.subSubcategory);
+      }
     } else {
       if (listingData.parents.category?.name) query.set("category", listingData.parents.category.name);
       if (listingData.parents.subcategory?.name) query.set("subcategory", listingData.parents.subcategory.name);
@@ -153,7 +204,7 @@ export default function TaxonomyListing({ level }: Props) {
     if (tags.length) query.set("tags", tags.join(","));
     if (sort !== "default") query.set("sort", sort);
     return `/api/resources?${query.toString()}`;
-  }, [debouncedSearch, general, level, listingData, page, selection, serverSearchActive, slug, sort, tags]);
+  }, [debouncedSearch, general, level, listingData, page, resolvedSelection, serverSearchActive, slug, sort, tags]);
   const taxonomySearch = useQuery<{
     resources: any[];
     total: number;
@@ -170,11 +221,18 @@ export default function TaxonomyListing({ level }: Props) {
     let result = [...corpusNode.resources];
     const direct = new Set((corpusNode.node.resources ?? []).map((r: any) => `${r.id}|${r.url}`));
     if (general && direct.size) result = result.filter((r: any) => direct.has(`${r.id}|${r.url}`));
-    else if (selection !== "all" && selection !== "__general__") {
-      const [sub, subSub] = selection.split(" › ");
-      result = level === "subcategory"
-        ? result.filter((r: any) => r.subSubcategory === sub)
-        : result.filter((r: any) => r.subcategory === sub && (!subSub || r.subSubcategory === subSub));
+    else if (level === "subcategory" && resolvedSelection.subSubcategory) {
+      result = result.filter(
+        (r: any) =>
+          r.subSubcategory === resolvedSelection.subSubcategory,
+      );
+    } else if (level === "category" && resolvedSelection.subcategory) {
+      result = result.filter(
+        (r: any) =>
+          r.subcategory === resolvedSelection.subcategory &&
+          (!resolvedSelection.subSubcategory ||
+            r.subSubcategory === resolvedSelection.subSubcategory),
+      );
     }
     if (tags.length) {
       const wanted = tags.map(normalizeTag);
@@ -183,7 +241,7 @@ export default function TaxonomyListing({ level }: Props) {
     if (sort === "name-asc") result.sort((a: any, b: any) => a.title.localeCompare(b.title));
     if (sort === "name-desc") result.sort((a: any, b: any) => b.title.localeCompare(a.title));
     return result;
-  }, [corpusNode, general, selection, sort, tags]);
+  }, [corpusNode, general, level, resolvedSelection, sort, tags]);
   const total = serverSearchActive ? taxonomySearch.data?.total ?? 0 : corpusMode ? fullResources.length : listingData?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -243,7 +301,7 @@ export default function TaxonomyListing({ level }: Props) {
       setSearchTerm(next.get("search") ?? "");
       setSelection(next.get("subcategory") ?? "all");
       setTags(parseTagsParam(next));
-      setSort(next.get("sortBy") ?? "default");
+      setSort(normalizeSort(next.get("sortBy") || next.get("sort")));
       const parsed = parsePageParamStrict(next.get("page"));
       setPage(parsed.page);
       setNotice(pageNoticeFor(parsed));
@@ -288,6 +346,10 @@ export default function TaxonomyListing({ level }: Props) {
     <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} />
     <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]"><Link href={back}><ArrowLeft className="h-4 w-4" />Back to {level === "category" ? "Home" : parentCategory?.name ?? "Category"}</Link></Button>
     <div className="flex items-start justify-between gap-3"><div><h1 className="display-h text-2xl sm:text-3xl">{name}</h1><p className="text-sm text-muted-foreground">{total === listingData.totalAll ? `${total} resources available` : `${total} of ${listingData.totalAll} resources shown`}</p></div><Badge variant="secondary" className="no-print" data-testid="badge-count">{total}</Badge></div>
+    <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
+      <h2 id="taxonomy-scope-heading" className="text-base font-semibold">About this collection</h2>
+      <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">{listingData.scopeIntro}</p>
+    </section>
     <div className="flex flex-col gap-4"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} data-testid="input-search-resources" /></div>
       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="h-10 rounded-md border bg-background px-3" value={selection} onChange={(event) => { setSelection(event.target.value); setPage(1); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
       <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => { setTags(value); setPage(1); }} onSortChange={(value) => { setSort(value); setPage(1); }} showCountSorts={false} />

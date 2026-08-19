@@ -343,7 +343,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAwesomeListDiscoveryRoutes(app, exportContext);
 
   // These crawler-facing routes are deliberately not mounted under /api.
-  registerNonApiRoutes(app, { legacyRepo, learningJourneyRepo });
+  registerNonApiRoutes(app, {
+    legacyRepo,
+    learningJourneyRepo,
+    resourceRepo,
+    categoryRepo,
+  });
 
   registerRecommendationRoutes(app, {
     isAuthenticated,

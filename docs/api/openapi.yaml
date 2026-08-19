@@ -7480,51 +7480,37 @@ components:
             items:
               type: string
               maxLength: 512
-    get_3a__2f_api_2f_awesome-list_2f_listing.Query:
+    AwesomeListListingQuery:
       type: object
       properties:
-        page:
+        level:
           type: string
-          pattern: ^\d+$
-        limit:
-          type: string
-          pattern: ^\d+$
-        offset:
-          type: string
-          pattern: ^\d+$
-        afterSeq:
-          type: string
-          pattern: ^\d+$
-        jobId:
-          type: string
-          pattern: ^\d+$
-        resourceId:
-          type: string
-          pattern: ^\d+$
-        categoryId:
-          type: string
-          pattern: ^\d+$
-        subcategoryId:
-          type: string
-          pattern: ^\d+$
-        per_page:
-          type: string
-          pattern: ^\d+$
-        cursor:
+          enum:
+            - category
+            - subcategory
+            - sub-subcategory
+        slug:
           type: string
           minLength: 1
           maxLength: 512
-      additionalProperties:
-        anyOf:
-          - type: string
-            minLength: 1
-            maxLength: 512
-          - type: string
-            maxLength: 0
-          - type: array
-            items:
-              type: string
-              maxLength: 512
+        page:
+          type: string
+          pattern: ^\d+$
+        subcategory:
+          type: string
+          minLength: 1
+          maxLength: 512
+        subSubcategory:
+          type: string
+          minLength: 1
+          maxLength: 512
+        general:
+          type: string
+          enum:
+            - '1'
+      required:
+        - level
+        - slug
     AwesomeListListingResponse:
       type: object
       properties:
@@ -7571,6 +7557,8 @@ components:
           type: integer
           minimum: 0
           maximum: 9007199254740991
+        scopeIntro:
+          type: string
         scope:
           type: object
           properties:
@@ -7642,6 +7630,7 @@ components:
         - totalPages
         - totalAll
         - generalCount
+        - scopeIntro
         - scope
         - children
         - tags
@@ -30984,71 +30973,53 @@ paths:
       tags:
         - awesome-list
       parameters:
+        - name: level
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - category
+              - subcategory
+              - sub-subcategory
+        - name: slug
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
         - name: page
           in: query
           required: false
           schema:
             type: string
             pattern: ^\d+$
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: afterSeq
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: jobId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: resourceId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: categoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: subcategoryId
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: per_page
-          in: query
-          required: false
-          schema:
-            type: string
-            pattern: ^\d+$
-        - name: cursor
+        - name: subcategory
           in: query
           required: false
           schema:
             type: string
             minLength: 1
             maxLength: 512
+        - name: subSubcategory
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+        - name: general
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - '1'
       x-domain: awesome-list
       x-middleware: []
       x-contract-schemas:
-        query: get_3a__2f_api_2f_awesome-list_2f_listing.Query
+        query: AwesomeListListingQuery
   /api/switch-list:
     post:
       operationId: post:/api/switch-list

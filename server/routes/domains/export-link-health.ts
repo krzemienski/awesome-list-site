@@ -61,6 +61,7 @@ import type { RequestHandler } from "express";
 import crypto from "crypto";
 import { sql } from "drizzle-orm";
 import type { Resource } from "@shared/schema";
+import { taxonomyScopeIntro } from "@shared/seo-content-templates";
 import { normalizeGithubRepoInput } from "@shared/validation";
 import { db } from "../../db";
 import { storage } from "../../storage";
@@ -1421,6 +1422,22 @@ export function registerAwesomeListDiscoveryRoutes(
       const total = scoped.length;
       const totalPages = Math.max(1, Math.ceil(total / LISTING_PAGE_SIZE));
       const start = (parsedPage - 1) * LISTING_PAGE_SIZE;
+      const scopeIntro = taxonomyScopeIntro({
+        name: match.name,
+        level,
+        totalResources: allResources.length,
+        parentNames:
+          level === "category"
+            ? []
+            : [
+                match.category?.name,
+                level === "sub-subcategory" ? match.subcategory?.name : undefined,
+              ].filter((name): name is string => Boolean(name)),
+        childNames: children
+          .filter((child: any) => child.count > 0)
+          .map((child: any) => child.name),
+        formats: allResources.map((resource: any) => resource.resourceFormat),
+      });
       const body = JSON.stringify({
         level,
         node: { name: match.name, slug },
@@ -1436,6 +1453,7 @@ export function registerAwesomeListDiscoveryRoutes(
         totalPages,
         totalAll: allResources.length,
         generalCount: directResources.size,
+        scopeIntro,
         scope: { ignoredSubcategory, ignoredSubSubcategory, generalIgnored },
         children,
         tags,

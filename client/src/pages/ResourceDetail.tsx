@@ -43,6 +43,15 @@ import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 import type { BookmarkCollection } from "@/types/bookmarks";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
+import { resourceFactsSummary } from "@shared/seo-content-templates";
+import {
+  RESOURCE_FORMAT_LABELS,
+  RESOURCE_PROVIDER_LABELS,
+  RESOURCE_SKILL_LEVEL_LABELS,
+  type ResourceFormat,
+  type ResourceProvider,
+  type ResourceSkillLevel,
+} from "@shared/resourceFacets";
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -769,6 +778,74 @@ export default function ResourceDetail() {
                 </CardDescription>
               </div>
 
+              <Separator />
+
+              <div data-seo-section="resource-details">
+                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <FolderTree className="h-4 w-4 text-primary" />
+                  Resource details
+                </h2>
+                <dl className="grid gap-3 text-sm sm:grid-cols-[9rem_minmax(0,1fr)]">
+                  <dt className="font-medium text-muted-foreground">Category path</dt>
+                  <dd className="flex flex-wrap items-center gap-1 min-w-0">
+                    {[resource.category, resource.subcategory, resource.subSubcategory]
+                      .filter(Boolean)
+                      .map((part, index, parts) => (
+                        <span key={part} className="inline-flex items-center gap-1 min-w-0">
+                          <span className="break-words">{part}</span>
+                          {index < parts.length - 1 && (
+                            <>
+                              <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />
+                              {" "}
+                            </>
+                          )}
+                        </span>
+                      ))}
+                  </dd>
+                  <dt className="font-medium text-muted-foreground">Provider</dt>
+                  <dd>
+                    {RESOURCE_PROVIDER_LABELS[
+                      (resource.provider ?? "unknown") as ResourceProvider
+                    ] ?? "Not yet classified"}
+                  </dd>
+                  <dt className="font-medium text-muted-foreground">Format</dt>
+                  <dd>
+                    {RESOURCE_FORMAT_LABELS[
+                      (resource.resourceFormat ?? "unknown") as ResourceFormat
+                    ] ?? "Not yet classified"}
+                  </dd>
+                  <dt className="font-medium text-muted-foreground">Skill level</dt>
+                  <dd>
+                    {RESOURCE_SKILL_LEVEL_LABELS[
+                      (resource.skillLevel ?? "unknown") as ResourceSkillLevel
+                    ] ?? "Not yet classified"}
+                  </dd>
+                </dl>
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                  {resourceFactsSummary({
+                    title: resource.title,
+                    taxonomy: [
+                      resource.category,
+                      resource.subcategory,
+                      resource.subSubcategory,
+                    ].filter((value): value is string => Boolean(value)),
+                    provider:
+                      RESOURCE_PROVIDER_LABELS[
+                        (resource.provider ?? "unknown") as ResourceProvider
+                      ] ?? "Not yet classified",
+                    format:
+                      RESOURCE_FORMAT_LABELS[
+                        (resource.resourceFormat ?? "unknown") as ResourceFormat
+                      ] ?? "Not yet classified",
+                    skillLevel:
+                      RESOURCE_SKILL_LEVEL_LABELS[
+                        (resource.skillLevel ?? "unknown") as ResourceSkillLevel
+                      ] ?? "Not yet classified",
+                    tags,
+                  })}
+                </p>
+              </div>
+
               {scrapedDescription && scrapedDescription !== resource.description && (
                 <>
                   <Separator />
@@ -806,7 +883,7 @@ export default function ResourceDetail() {
               {tags && tags.length > 0 && (
                 <>
                   <Separator />
-                  <div>
+                  <div data-seo-section="resource-tags">
                     <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                       <Tag className="h-4 w-4 text-primary" />
                       Tags

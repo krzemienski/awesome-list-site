@@ -114,7 +114,7 @@ export class CategoryRepository {
   async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category> {
     const [updatedCategory] = await db
       .update(categories)
-      .set(category)
+      .set({ ...category, updatedAt: new Date() })
       .where(eq(categories.id, id))
       .returning();
     if (updatedCategory) invalidatePublicCache('category-mutation');
@@ -282,7 +282,16 @@ export class CategoryRepository {
       }
     }
 
-    const [newSubcategory] = await db.insert(subcategories).values(subcategory).returning();
+    const [newSubcategory] = await db.transaction(async (tx) => {
+      const created = await tx.insert(subcategories).values(subcategory).returning();
+      if (subcategory.categoryId != null) {
+        await tx
+          .update(categories)
+          .set({ updatedAt: new Date() })
+          .where(eq(categories.id, subcategory.categoryId));
+      }
+      return created;
+    });
     invalidatePublicCache('category-mutation');
     return newSubcategory;
   }
@@ -294,11 +303,26 @@ export class CategoryRepository {
    * @returns Updated subcategory object
    */
   async updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory> {
-    const [updatedSubcategory] = await db
-      .update(subcategories)
-      .set(subcategory)
-      .where(eq(subcategories.id, id))
-      .returning();
+    const existing = await this.getSubcategory(id);
+    const [updatedSubcategory] = await db.transaction(async (tx) => {
+      const updated = await tx
+        .update(subcategories)
+        .set({ ...subcategory, updatedAt: new Date() })
+        .where(eq(subcategories.id, id))
+        .returning();
+      const parentIds = new Set(
+        [existing?.categoryId, updated[0]?.categoryId].filter(
+          (parentId): parentId is number => parentId != null,
+        ),
+      );
+      for (const parentId of parentIds) {
+        await tx
+          .update(categories)
+          .set({ updatedAt: new Date() })
+          .where(eq(categories.id, parentId));
+      }
+      return updated;
+    });
     if (updatedSubcategory) invalidatePublicCache('category-mutation');
     return updatedSubcategory;
   }
@@ -326,7 +350,15 @@ export class CategoryRepository {
       throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${subSubcategoryList.length} sub-subcategories`);
     }
 
-    await db.delete(subcategories).where(eq(subcategories.id, id));
+    await db.transaction(async (tx) => {
+      await tx.delete(subcategories).where(eq(subcategories.id, id));
+      if (subcategory.categoryId != null) {
+        await tx
+          .update(categories)
+          .set({ updatedAt: new Date() })
+          .where(eq(categories.id, subcategory.categoryId));
+      }
+    });
     invalidatePublicCache('category-mutation');
   }
 
@@ -445,7 +477,16 @@ export class CategoryRepository {
       }
     }
 
-    const [newSubSubcategory] = await db.insert(subSubcategories).values(subSubcategory).returning();
+    const [newSubSubcategory] = await db.transaction(async (tx) => {
+      const created = await tx.insert(subSubcategories).values(subSubcategory).returning();
+      if (subSubcategory.subcategoryId != null) {
+        await tx
+          .update(subcategories)
+          .set({ updatedAt: new Date() })
+          .where(eq(subcategories.id, subSubcategory.subcategoryId));
+      }
+      return created;
+    });
     invalidatePublicCache('category-mutation');
     return newSubSubcategory;
   }
@@ -457,11 +498,26 @@ export class CategoryRepository {
    * @returns Updated sub-subcategory object
    */
   async updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory> {
-    const [updatedSubSubcategory] = await db
-      .update(subSubcategories)
-      .set(subSubcategory)
-      .where(eq(subSubcategories.id, id))
-      .returning();
+    const existing = await this.getSubSubcategory(id);
+    const [updatedSubSubcategory] = await db.transaction(async (tx) => {
+      const updated = await tx
+        .update(subSubcategories)
+        .set({ ...subSubcategory, updatedAt: new Date() })
+        .where(eq(subSubcategories.id, id))
+        .returning();
+      const parentIds = new Set(
+        [existing?.subcategoryId, updated[0]?.subcategoryId].filter(
+          (parentId): parentId is number => parentId != null,
+        ),
+      );
+      for (const parentId of parentIds) {
+        await tx
+          .update(subcategories)
+          .set({ updatedAt: new Date() })
+          .where(eq(subcategories.id, parentId));
+      }
+      return updated;
+    });
     if (updatedSubSubcategory) invalidatePublicCache('category-mutation');
     return updatedSubSubcategory;
   }
@@ -483,7 +539,15 @@ export class CategoryRepository {
       throw new Error(`Cannot delete sub-subcategory "${subSubcategory.name}" because it has ${resourceCount} resources`);
     }
 
-    await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
+    await db.transaction(async (tx) => {
+      await tx.delete(subSubcategories).where(eq(subSubcategories.id, id));
+      if (subSubcategory.subcategoryId != null) {
+        await tx
+          .update(subcategories)
+          .set({ updatedAt: new Date() })
+          .where(eq(subcategories.id, subSubcategory.subcategoryId));
+      }
+    });
     invalidatePublicCache('category-mutation');
   }
 

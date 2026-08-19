@@ -6,6 +6,9 @@ export interface Resource {
   category: string;
   subcategory?: string;
   subSubcategory?: string;
+  resourceFormat?: string;
+  provider?: string;
+  skillLevel?: string;
   tags?: string[];
   status?: string;
   submittedBy?: string | null;

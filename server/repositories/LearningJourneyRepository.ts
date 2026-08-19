@@ -173,6 +173,10 @@ export class LearningJourneyRepository {
           .set({ stepNumber: i + 1 })
           .where(eq(journeySteps.id, orderedStepIds[i]));
       }
+      await tx
+        .update(learningJourneys)
+        .set({ updatedAt: new Date() })
+        .where(eq(learningJourneys.id, journeyId));
     });
 
     return this.listJourneySteps(journeyId);
@@ -222,6 +226,10 @@ export class LearningJourneyRepository {
           .set({ stepNumber })
           .where(eq(journeySteps.id, id));
       }
+      await tx
+        .update(learningJourneys)
+        .set({ updatedAt: new Date() })
+        .where(eq(learningJourneys.id, journeyId));
     });
 
     return this.listJourneySteps(journeyId);
@@ -310,8 +318,14 @@ export class LearningJourneyRepository {
    * @returns The created step
    */
   async createJourneyStep(step: InsertJourneyStep): Promise<JourneyStep> {
-    const [newStep] = await db.insert(journeySteps).values(step).returning();
-    return newStep;
+    return db.transaction(async (tx) => {
+      const [newStep] = await tx.insert(journeySteps).values(step).returning();
+      await tx
+        .update(learningJourneys)
+        .set({ updatedAt: new Date() })
+        .where(eq(learningJourneys.id, step.journeyId));
+      return newStep;
+    });
   }
 
   /**
@@ -321,12 +335,20 @@ export class LearningJourneyRepository {
    * @returns The updated step
    */
   async updateJourneyStep(id: number, step: Partial<InsertJourneyStep>): Promise<JourneyStep> {
-    const [updatedStep] = await db
-      .update(journeySteps)
-      .set(step)
-      .where(eq(journeySteps.id, id))
-      .returning();
-    return updatedStep;
+    return db.transaction(async (tx) => {
+      const [updatedStep] = await tx
+        .update(journeySteps)
+        .set(step)
+        .where(eq(journeySteps.id, id))
+        .returning();
+      if (updatedStep) {
+        await tx
+          .update(learningJourneys)
+          .set({ updatedAt: new Date() })
+          .where(eq(learningJourneys.id, updatedStep.journeyId));
+      }
+      return updatedStep;
+    });
   }
 
   /**
@@ -334,7 +356,18 @@ export class LearningJourneyRepository {
    * @param id - Step ID to delete
    */
   async deleteJourneyStep(id: number): Promise<void> {
-    await db.delete(journeySteps).where(eq(journeySteps.id, id));
+    await db.transaction(async (tx) => {
+      const [deletedStep] = await tx
+        .delete(journeySteps)
+        .where(eq(journeySteps.id, id))
+        .returning({ journeyId: journeySteps.journeyId });
+      if (deletedStep) {
+        await tx
+          .update(learningJourneys)
+          .set({ updatedAt: new Date() })
+          .where(eq(learningJourneys.id, deletedStep.journeyId));
+      }
+    });
   }
 
   /**

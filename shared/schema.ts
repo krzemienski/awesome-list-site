@@ -447,6 +447,7 @@ export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // R5-002 (run24): drizzle-zod only enforces column TYPES — <script> names,
@@ -492,6 +493,7 @@ export const subcategories = pgTable("subcategories", {
   name: text("name").notNull(),
   slug: text("slug").notNull(),
   categoryId: integer("category_id").references(() => categories.id, { onDelete: "cascade" }),
+  updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   // BUG #3 FIX: Prevent duplicate subcategories within same category
   unique("subcategories_slug_category_unique").on(table.slug, table.categoryId),
@@ -536,6 +538,7 @@ export const subSubcategories = pgTable("sub_subcategories", {
   name: text("name").notNull(),
   slug: text("slug").notNull(),
   subcategoryId: integer("subcategory_id").references(() => subcategories.id, { onDelete: "cascade" }),
+  updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   // Prevent duplicate sub-subcategories within same subcategory
   unique("sub_subcategories_slug_subcategory_unique").on(table.slug, table.subcategoryId),
