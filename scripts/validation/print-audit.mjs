@@ -59,6 +59,42 @@ async function firstCategoryRoute() {
 const results = [];
 const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} ${k} :: ${detail}`); };
 
+// Search starts with six skeletons while its catalog request is in flight.
+// Do not measure those placeholders as a real empty result: wait for an
+// explicit terminal UI state, reloading a bounded number of times only for
+// loading/transient-error states. An actual "no results" state returns without
+// retrying so the unchanged card assertions below still fail for our known-good
+// query rather than being silently accepted.
+async function waitForSearchResultState(page, route) {
+  if (!route.startsWith('/search')) return { ready: true, state: 'not-search' };
+  const terminal = '[data-testid="text-result-count"], [data-testid="text-no-results"], [data-testid="search-results-error"]';
+  let last = 'still loading';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const found = await page.waitForSelector(terminal, { timeout: 30000 }).then(() => true).catch(() => false);
+    if (found) {
+      const state = await page.evaluate(() => {
+        if (document.querySelector('[data-testid="text-result-count"]')) return 'populated';
+        if (document.querySelector('[data-testid="text-no-results"]')) return 'empty';
+        return 'error';
+      });
+      if (state !== 'error') {
+        console.log(`search readiness: ${state} after attempt ${attempt}`);
+        return { ready: true, state };
+      }
+      last = 'search error state';
+    } else {
+      last = 'loading state did not settle within 30s';
+    }
+    if (attempt < 3) {
+      console.warn(`search readiness: ${last}; reloading (${attempt}/2)`);
+      await page.waitForTimeout(attempt * 5000);
+      await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 }).catch(error => { last = error.message; });
+    }
+  }
+  console.warn(`search readiness: failed after bounded retries (${last})`);
+  return { ready: false, state: last };
+}
+
 const browser = await launchBrowserWithLease(
   chromium,
   { headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] },
@@ -160,11 +196,14 @@ async function printCheck(ctx, route, name, checks, pdfOpts = {}) {
     () => ((document.getElementById('root')?.innerText || '').trim().length > 300),
     null, { timeout: 30000 }
   ).catch(() => {});
+  const readiness = await waitForSearchResultState(page, route);
   await page.waitForTimeout(1500);
   await page.emulateMedia({ media: 'print' });
   await page.waitForTimeout(300);
   for (const c of checks) {
-    const r = await page.evaluate(c.fn);
+    const r = readiness.ready
+      ? await page.evaluate(c.fn)
+      : { pass: false, detail: `not measured: search never reached a loaded state (${readiness.state})` };
     log(`${name}:${c.id}`, r.pass, r.detail);
   }
   const rc = await page.evaluate(contentPrints);

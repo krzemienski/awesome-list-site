@@ -101,6 +101,39 @@ const goto = async (page, route) => {
   throw new Error(`Unable to load ${route} for tablet audit (${last})`);
 };
 
+// Search starts with skeleton cards. Wait for the page to declare a populated,
+// empty, or error result state before measuring the grid. Only loading and
+// transient error states are reloaded; a definitive empty result proceeds to
+// the existing grid assertion, which correctly fails for this known-good query.
+const waitForSearchResultState = async (page) => {
+  const terminal = '[data-testid="text-result-count"], [data-testid="text-no-results"], [data-testid="search-results-error"]';
+  let last = 'still loading';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const found = await page.waitForSelector(terminal, { timeout: 30000 }).then(() => true).catch(() => false);
+    if (found) {
+      const state = await page.evaluate(() => {
+        if (document.querySelector('[data-testid="text-result-count"]')) return 'populated';
+        if (document.querySelector('[data-testid="text-no-results"]')) return 'empty';
+        return 'error';
+      });
+      if (state !== 'error') {
+        console.log(`search readiness: ${state} after attempt ${attempt}`);
+        return { ready: true, state };
+      }
+      last = 'search error state';
+    } else {
+      last = 'loading state did not settle within 30s';
+    }
+    if (attempt < 3) {
+      console.warn(`search readiness: ${last}; reloading (${attempt}/2)`);
+      await page.waitForTimeout(attempt * 5000);
+      await page.reload({ waitUntil: 'domcontentloaded', timeout: 45000 }).catch(error => { last = error.message; });
+    }
+  }
+  console.warn(`search readiness: failed after bounded retries (${last})`);
+  return { ready: false, state: last };
+};
+
 // Shared in-page helpers (serialized into evaluate calls).
 const IN_BOUNDS = `(els, vw) => {
   const doc = document.documentElement;
@@ -271,14 +304,16 @@ for (const w of [768, 320]) {
 for (const w of [768, 320]) {
   const { ctx, page } = await newPage(w, 900);
   await goto(page, '/search?q=video');
-  await page.waitForSelector('[data-testid="text-result-count"], [data-testid="text-no-results"]', { timeout: 30000 }).catch(() => {});
+  const readiness = await waitForSearchResultState(page);
   await page.waitForTimeout(600);
-  const r = await page.evaluate(() => {
-    const grid = [...document.querySelectorAll('div.grid')].find(g => /auto-fill/.test(getComputedStyle(g).gridTemplateColumns) || g.children.length > 0 && getComputedStyle(g).display === 'grid' && g.querySelector('[data-testid^="card-"], a'));
-    if (!grid) return { found: false };
-    const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').map(parseFloat).filter(n => n > 0);
-    return { found: true, cols: cols.length, min: Math.round(Math.min(...cols)), items: grid.children.length };
-  });
+  const r = readiness.ready
+    ? await page.evaluate(() => {
+      const grid = [...document.querySelectorAll('div.grid')].find(g => /auto-fill/.test(getComputedStyle(g).gridTemplateColumns) || g.children.length > 0 && getComputedStyle(g).display === 'grid' && g.querySelector('[data-testid^="card-"], a'));
+      if (!grid) return { found: false };
+      const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').map(parseFloat).filter(n => n > 0);
+      return { found: true, cols: cols.length, min: Math.round(Math.min(...cols)), items: grid.children.length };
+    })
+    : { found: false, notMeasured: `search never reached a loaded state (${readiness.state})` };
   const pass = w === 768 ? r.found && r.min >= 280 : r.found && r.cols === 1;
   log(`search-grid@${w}`, pass, JSON.stringify(r));
   if (!pass) await page.screenshot({ path: `${OUT}/search-${w}.png` }).catch(() => {});
