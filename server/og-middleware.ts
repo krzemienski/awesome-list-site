@@ -418,7 +418,43 @@ function safeDecode(segment: string): string {
   }
 }
 
+// F027 first line of defense: cap concurrent UNCACHED route resolutions so a
+// crawler burst can never queue more DB work than the pg pool (max 8) can
+// absorb inside its 3s acquire window. A 12-way crawl of an all-cold cache
+// (exactly what a gate run or a fresh Googlebot sweep is) previously piled up
+// enough acquire waiters that a handful of routes 503'd even with the retry
+// ladder above — the retry lands while the pool is STILL saturated because the
+// crawl keeps pushing. Capping at 5 leaves pool headroom for interactive
+// traffic and keeps worst-case acquire waits well inside the 3s window.
+// Cached hits never touch this gate. Slot-transfer release (a freed slot goes
+// directly to the next waiter) keeps the count exact under interleaving.
+const UNCACHED_RESOLVE_LIMIT = 5;
+let uncachedResolveActive = 0;
+const uncachedResolveWaiters: Array<() => void> = [];
+
+function releaseUncachedResolveSlot(): void {
+  const next = uncachedResolveWaiters.shift();
+  if (next) {
+    next(); // hand the slot straight to the next waiter; active count unchanged
+    return;
+  }
+  uncachedResolveActive--;
+}
+
 async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
+  if (uncachedResolveActive < UNCACHED_RESOLVE_LIMIT) {
+    uncachedResolveActive++;
+  } else {
+    await new Promise<void>((resolve) => uncachedResolveWaiters.push(resolve));
+  }
+  try {
+    return await resolveRouteUncachedInner(url);
+  } finally {
+    releaseUncachedResolveSlot();
+  }
+}
+
+async function resolveRouteUncachedInner(url: string): Promise<ResolvedRoute> {
   const path = url.split("?")[0].replace(/\/+$/, "") || "/";
   const page = parsePage(url);
 
