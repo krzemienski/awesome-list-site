@@ -563,12 +563,14 @@
     "evidence": [
       "seo-snapshot 2026-08-19T15-02 run: 45 failures, 27x 503 on /tag/* pages",
       "app log: 'timeout exceeded when trying to connect' from pool acquire during 12-way bursts (pool max=8, acquire timeout 3000ms)",
-      "post-fix gate 2026-08-19T15-22-38: 0 failures, 100.00% schema pass (2324/2324); warm burst harness 24/24 OK"
+      "post-fix gate 2026-08-19T15-22-38: 0 failures, 100.00% schema pass (2324/2324); warm burst harness 24/24 OK",
+      "cold-cache reruns 2026-08-19T15-38-17 (3x503) and 15-42-11 (5x503) exposed warm-cache flattery of the ladder-only fix",
+      "post-semaphore cold-boot gate 2026-08-19T15-49-44: 0 failures, 100.00% (2324/2324)"
     ],
     "suggested_fix": "Retry saturation-class failures (SQLSTATE 53300, pool acquire timeout, publicCache rebuild-capacity) inside og-middleware with short backoff before emitting the bounded 503; keep outage classes (lock/statement timeout) fail-fast so resilience budgets hold.",
     "status": "fixed",
     "introduced_by": null,
-    "fixed_in_commit": "c578e561",
-    "resolution": "isRetryableSaturationFailure + resolveRouteWithSaturationRetry two-step backoff ladder (250-500ms, then 1000-1500ms); outage classes excluded by construction. Gate progression 45 -> 5 -> 1 -> 0 failures."
+    "fixed_in_commit": "c578e561 + 8434806e",
+    "resolution": "isRetryableSaturationFailure + resolveRouteWithSaturationRetry two-step backoff ladder (250-500ms, then 1000-1500ms); outage classes excluded by construction. Gate progression 45 -> 5 -> 1 -> 0 failures. Cold-cache solo reruns then showed the ladder alone was insufficient (3-5 tag 503s when every route resolves cold; the earlier 0-failure run was flattered by a warm cache). Added an uncached-resolution semaphore (cap 5 < pool 8) in og-middleware so a 12-way crawl cannot flood the acquire queue. Cold-boot confirmation run 2026-08-19T15-49-44: 0 failures, 100.00% schema (2324/2324), parity 20/20."
   }
 ]

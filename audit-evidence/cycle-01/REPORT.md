@@ -57,7 +57,7 @@ Phase 4 closed every one of them: 20 fixed (code, data, or infra), 3 closed by d
 
 ## Verification highlights
 
-- seo-snapshot gate (2026-08-19T15-22-38): **0 structural failures, 100.00% schema pass (2324/2324), 0 duplicate title clusters** — down from 45 failures pre-fix (F027 saturation-retry ladder + F004 title clamp).
+- seo-snapshot gate (cold-boot confirmation 2026-08-19T15-49-44; earlier warm run 15-22-38): **0 structural failures, 100.00% schema pass (2324/2324), 0 duplicate title clusters** — down from 45 failures pre-fix (F027 saturation-retry ladder + F004 title clamp).
 - Client fix sweep (Playwright, headless Chromium): 10/10 PASS — F009 both viewports overlap 0px, F013 recovery CTAs, F014 breadcrumb, F015 min button 40px, F019 Escape clear, F020 locale formatting, F021 no title flash on /notifications and /onboarding, F011/F012 no bare 'Unknown'.
 - Admin sweep (throwaway Clerk admin): F016 forced-abort error banner + Retry recovery PASS; F017 16 tabs all >= 40px at 375px PASS.
 - F010 share: 'Link copied' toast + clipboard verified; original repro attributed to consent-banner click interception (F009 class).
@@ -72,4 +72,4 @@ Phase 4 closed every one of them: 20 fixed (code, data, or infra), 3 closed by d
 ## Residual risk / follow-ups
 
 - F005/F006 are data fixes applied to the dev DB; the production mirror lands with the next republish (follow-up task).
-- Tag-page prerender under crawler burst is now retry-protected; if 503s ever recur at higher load, the next lever is a small in-process semaphore on uncached route resolutions (documented in F027).
+- Tag-page prerender is protected twice over: the saturation retry ladder plus an in-process semaphore capping concurrent uncached route resolutions at 5 (below the pg pool of 8). Cold-boot gate run 2026-08-19T15-49-44 passed with zero failures.
