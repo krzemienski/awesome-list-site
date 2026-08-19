@@ -125,12 +125,16 @@
           };
           var fnt = null;
           try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
+          if (!Object.prototype.hasOwnProperty.call(FONT_STACKS, fnt)) fnt = 'system';
+          root.setAttribute('data-font', fnt);
           if (fnt && FONT_STACKS[fnt]) {
             // Run22 BUG-015: body text uses --font-body (not --font-sans);
             // set both, matching applyFontOverride in font-options.ts.
             root.style.setProperty('--font-body', FONT_STACKS[fnt]);
             root.style.setProperty('--font-sans', FONT_STACKS[fnt]);
           }
+           // Font assets remain optional until after the first paint. The app
+           // applies a selected picker font and system display font on idle.
         } catch (e) {}
       })();
     </script>
@@ -244,6 +248,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Load only the primary body face before first paint. Optional display,
+         mono, and theme/picker faces are loaded on demand by the app. -->
     <!-- BUG-014: load the primary font stylesheet directly. The previous
          rel="preload" + inline onload="..." swap relied on an inline event
          handler, which a nonce-based CSP (no 'unsafe-inline') blocks — nonces
@@ -252,26 +258,7 @@
          control. Same URL for all clients, so the old <noscript> duplicate is
          no longer needed. -->
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
-    <script>
-      (function () {
-        // Run22 BUG-015: DM Sans + Source Sans 3 are offered by the font
-        // picker (FONT_OPTIONS) but were never loaded — picking them fell
-        // back to system-ui silently.
-        var ALT_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap';
-        function loadAltFonts() {
-          var link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = ALT_FONTS_URL;
-          document.head.appendChild(link);
-        }
-        if (document.readyState === 'complete') {
-          loadAltFonts();
-        } else {
-          window.addEventListener('load', loadAltFonts, { once: true });
-        }
-      })();
-    </script>
+           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
   </head>
   <body>
     <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.

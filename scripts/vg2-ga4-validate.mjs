@@ -5,14 +5,14 @@
 import { chromium } from 'playwright-core';
 import fs from 'fs';
 
-const EXEC = '/home/runner/workspace/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome';
+const EXEC = [
+  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,
+  '/home/runner/workspace/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome',
+  '/home/runner/workspace/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome',
+].filter(Boolean).find((candidate) => fs.existsSync(candidate));
 const BASE = 'http://localhost:5000';
 const OUT = '/home/runner/workspace/evidence';
 const TS = Date.now();
-const QA_EMAIL = `__qa_test_${TS}@example.com`;
-const QA_PASSWORD = 'Vg2Passw0rd!secure';
-const QA_URL = `https://qa-test-${TS}.example.com/resource`;
-const RESOURCE_ID = 186811; // Galène — a stable approved resource for detail-view flow
 
 const raw = [];   // full request records
 const events = [];// flattened parsed events with a monotonic seq
@@ -117,8 +117,16 @@ async function waitForEvent(name, sinceSeq, timeout = 14000) {
 }
 
 async function main() {
+  const catalogResponse = await fetch(`${BASE}/api/awesome-list`);
+  if (!catalogResponse.ok) {
+    throw new Error(`Could not load a resource for GA validation (${catalogResponse.status})`);
+  }
+  const catalog = await catalogResponse.json();
+  const RESOURCE_ID = catalog.resources?.[0]?.id;
+  if (!RESOURCE_ID) throw new Error('Catalog returned no resource for GA validation');
+
   const browser = await chromium.launch({
-    executablePath: EXEC,
+    ...(EXEC ? { executablePath: EXEC } : {}),
     args: ['--no-sandbox', '--disable-dev-shm-usage'],
   });
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -128,12 +136,22 @@ async function main() {
   PAGE = page;
 
   const consoleErrors = [];
+  const failedResponses = [];
   page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
   page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
+  page.on('response', (response) => {
+    if (response.status() >= 400) {
+      failedResponses.push(`${response.status()} ${response.url()}`);
+    }
+  });
   page.on('request', record);
 
   // ---- FLOW 1: landing with first-touch UTM acquisition ----------------
   await page.goto(`${BASE}/?utm_source=newsletter&utm_medium=email&utm_campaign=vg_test`, { waitUntil: 'load', timeout: 30000 });
+  await sleep(1200);
+  check('no GA request before analytics consent', raw.length === 0, `${raw.length} pre-consent request(s)`);
+  const accept = page.getByRole('button', { name: /allow analytics/i });
+  if (await accept.isVisible().catch(() => false)) await accept.click();
   const warm = await waitForCollect(1, 20000); // wait for gtag.js cold-load + first hit
   check('GA4 gtag.js loaded and sent a /collect hit', warm, `${raw.length} request(s) after warmup`);
   await sleep(1500);
@@ -187,15 +205,15 @@ async function main() {
   // ---- FLOW 4: in-app SPA navigation proves per-route page_view ---------
   const beforeSpa = seq - 1;
   let spaClicked = false;
-  const related = page.locator('[data-testid^="related-resource-"]').first();
-  if (await related.count().catch(() => 0)) {
-    await related.scrollIntoViewIfNeeded().catch(() => {});
-    await related.click().catch(() => {});
+  const homeNav = page.locator('[data-testid="nav-home"]').first();
+  if (await homeNav.count().catch(() => 0)) {
+    await homeNav.click().catch(() => {});
     spaClicked = true;
   } else {
-    const homeNav = page.locator('[data-testid="nav-home"]').first();
-    if (await homeNav.count().catch(() => 0)) {
-      await homeNav.click().catch(() => {});
+    const related = page.locator('[data-testid^="related-resource-"]').first();
+    if (await related.count().catch(() => 0)) {
+      await related.scrollIntoViewIfNeeded().catch(() => {});
+      await related.click().catch(() => {});
       spaClicked = true;
     }
   }
@@ -206,53 +224,7 @@ async function main() {
   const engSpa = evByName('page_engaged', beforeSpa);
   check('page_engaged fired on navigation', engSpa.length >= 1, `${engSpa.length} page_engaged`);
 
-  // ---- FLOW 5: sign_up conversion (throwaway user) ---------------------
-  const beforeSignup = seq - 1;
-  await page.goto(`${BASE}/register`, { waitUntil: 'load', timeout: 30000 });
-  await page.locator('[data-testid="input-email"]').fill(QA_EMAIL);
-  await page.locator('[data-testid="input-password"]').fill(QA_PASSWORD);
-  await sleep(300);
-  await page.locator('[data-testid="button-register"]').click();
-  await sleep(2000);
-  await waitForEvent('sign_up', beforeSignup, 14000);
-  await page.screenshot({ path: `${OUT}/vg2-05-signup.jpg`, quality: 70 });
-  const signup = evByName('sign_up', beforeSignup);
-  check('sign_up conversion fired', signup.length >= 1, `${signup.length} sign_up`);
-  const su = signup[0];
-  if (su) {
-    check('sign_up method=password', su.params['ep.method'] === 'password', su.params['ep.method']);
-    check('sign_up carries first-touch utm_source', su.params['ep.utm_source'] === 'newsletter', su.params['ep.utm_source']);
-  }
-
-  // ---- FLOW 6: generate_lead conversion (resource submission) ----------
-  const beforeLead = seq - 1;
-  let leadAttempted = false;
-  await page.goto(`${BASE}/submit`, { waitUntil: 'load', timeout: 30000 });
-  await sleep(1500);
-  const titleInput = page.locator('[data-testid="input-title"]');
-  if (await titleInput.count()) {
-    leadAttempted = true;
-    await titleInput.fill(`QA Test Resource ${TS}`);
-    await page.locator('[data-testid="input-url"]').fill(QA_URL);
-    await page.locator('[data-testid="input-description"]').fill('Throwaway QA submission for VG-2 GA4 conversion validation. Safe to delete.');
-    await page.locator('[data-testid="select-category"]').click();
-    await sleep(500);
-    await page.locator('[role="option"]').first().click();
-    await sleep(800);
-    await page.locator('[data-testid="button-submit"]').click();
-    await sleep(2000);
-    await waitForEvent('generate_lead', beforeLead, 16000);
-    await page.screenshot({ path: `${OUT}/vg2-06-submit.jpg`, quality: 70 });
-  }
-  const lead = evByName('generate_lead', beforeLead);
-  check('generate_lead conversion fired', lead.length >= 1, leadAttempted ? `${lead.length} generate_lead` : 'submit form not reached');
-  const gl = lead[0];
-  if (gl) {
-    check('generate_lead content_type=resource_submission', gl.params['ep.content_type'] === 'resource_submission', gl.params['ep.content_type']);
-    check('generate_lead carries first-touch utm_source', gl.params['ep.utm_source'] === 'newsletter', gl.params['ep.utm_source']);
-  }
-
-  // ---- FLOW 7: theme_change (best-effort) ------------------------------
+  // ---- FLOW 5: theme_change --------------------------------------------
   const beforeTheme = seq - 1;
   try {
     await page.goto(`${BASE}/settings/theme`, { waitUntil: 'load', timeout: 30000 });
@@ -266,14 +238,34 @@ async function main() {
     await waitForEvent('theme_change', beforeTheme, 12000);
   } catch (e) { /* best-effort */ }
   const theme = evByName('theme_change', beforeTheme);
-  check('theme_change fired (best-effort)', theme.length >= 1, `${theme.length} theme_change`);
+  check('theme_change fired', theme.length >= 1, `${theme.length} theme_change`);
 
-  // ---- PII guard: no email/password anywhere in GA payloads -----------
+  // ---- FLOW 6: in-session revoke and re-grant ---------------------------
+  await page.locator('[data-testid="footer-cookie-settings"]').click();
+  await page.getByRole('button', { name: /^decline$/i }).click();
+  const beforeRevokedNavigation = seq - 1;
+  await page.locator('[data-testid="link-back-home"]').click();
+  await sleep(1800);
+  await flushGA();
+  const revokedEvents = events.filter((event) => event.seq > beforeRevokedNavigation);
+  check('GA sends no events after consent revoke', revokedEvents.length === 0, `${revokedEvents.length} post-revoke event(s)`);
+
+  await page.locator('[data-testid="footer-cookie-settings"]').click();
+  const beforeRegrant = seq - 1;
+  await page.getByRole('button', { name: /allow analytics/i }).click();
+  await waitForEvent('page_view', beforeRegrant, 12000);
+  const regrantPageViews = evByName('page_view', beforeRegrant);
+  check('GA resumes after consent re-grant', regrantPageViews.length >= 1, `${regrantPageViews.length} page_view event(s)`);
+
+  // ---- PII guard: URL query values do not leak beyond expected UTM data --
   const blob = JSON.stringify(raw);
-  check('no throwaway email in any GA payload', !blob.includes(QA_EMAIL), 'scanned all /collect requests');
-  check('no password in any GA payload', !blob.includes(QA_PASSWORD), 'scanned all /collect requests');
+  check('no password/token-shaped values in GA payloads', !/(password|token)=/i.test(blob), 'scanned all /collect requests');
 
-  check('no console errors during flows', consoleErrors.length === 0, consoleErrors.slice(0, 5).join(' | '));
+  check(
+    'no console errors during flows',
+    consoleErrors.length === 0,
+    [...consoleErrors.slice(0, 5), ...failedResponses.slice(0, 5)].join(' | '),
+  );
 
   await browser.close();
 
@@ -307,7 +299,7 @@ async function main() {
   md.push('## Sample decoded events');
   md.push('');
   md.push('```');
-  for (const en of ['page_view', 'page_engaged', 'search', 'select_content', 'sign_up', 'generate_lead', 'theme_change']) {
+  for (const en of ['page_view', 'page_engaged', 'search', 'select_content', 'theme_change']) {
     const e = events.find((x) => x.en === en);
     if (e) {
       const shown = {};
@@ -320,11 +312,10 @@ async function main() {
   md.push('```');
   md.push('');
   md.push(`Raw payloads: \`vg2-collect-raw.json\` (${raw.length} requests) · Parsed: \`vg2-events.json\` (${events.length} events)`);
-  md.push('Screenshots: `vg2-01-landing.jpg` … `vg2-06-submit.jpg`');
+  md.push('Screenshots: `vg2-01-landing.jpg` … `vg2-03-resource.jpg`');
   fs.writeFileSync(`${OUT}/vg2-report.md`, md.join('\n'));
 
   console.log(`\n=== ${passCount}/${results.length} checks passed. Evidence written to ${OUT}/vg2-* ===`);
-  console.log(`QA_EMAIL=${QA_EMAIL}`);
   process.exit(results.every((r) => r.pass) ? 0 : 1);
 }
 

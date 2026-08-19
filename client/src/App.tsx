@@ -4,7 +4,6 @@ import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { dark } from "@clerk/themes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
@@ -748,14 +747,6 @@ function Router() {
 function App() {
   const [, setLocation] = useLocation();
 
-  useEffect(() => {
-    if (!import.meta.env.VITE_GA_MEASUREMENT_ID) {
-      console.warn("Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID");
-    } else {
-      initGA();
-    }
-  }, []);
-
   // R4-057: the server (og-middleware) injects a full crawl-time meta set into
   // <head>; after hydration react-helmet renders its own tags (marked with
   // data-react-helmet), leaving DUPLICATE title/description/og/twitter tags in
@@ -821,8 +812,8 @@ function App() {
           dedupe/cleanup rules. */}
       <GuestBookmarkMerge />
       <ThemeProvider>
-        {/* BUG-020 (run13): analytics consent banner — gtag loads only after
-            an explicit Accept (initGA is consent-gated).
+        {/* BUG-020 (run13): analytics consent banner — analytics loads only
+            after an explicit grant through the shared post-paint coordinator.
             BUG-054 (run26): rendered AFTER the router so the layout's
             "Skip to main content" link is the document's FIRST tab stop
             (run22 had it first in DOM, which put 3 banner controls ahead of

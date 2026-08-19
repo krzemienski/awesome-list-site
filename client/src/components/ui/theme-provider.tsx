@@ -10,6 +10,7 @@ import {
   type Accent,
 } from "@/lib/design-system";
 import { safeGetItem } from "@/lib/safeStorage";
+import { loadDesignSystemFont } from "@/lib/font-options";
 
 type ThemeProviderState = {
   systemId: string;
@@ -60,6 +61,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setSystem = useCallback((id: string) => {
     if (!(id in DESIGN_SYSTEMS)) return;
+    loadDesignSystemFont(id);
     setSystemId(id);
     /* On system change, nudge the accent to the system's natural default
        only if the user is still on the previous system's natural default.

@@ -75,6 +75,22 @@ export default defineConfig({
     emptyOutDir: true,
     // Logical source keys make bundle budgets stable across hashed filenames.
     manifest: true,
+    rollupOptions: {
+      output: {
+        // Rollup otherwise absorbs each manual chunk's transitive imports into
+        // that chunk. For route-only features this can create entry imports
+        // back to chart/PDF vendors, undoing the isolation policy.
+        onlyExplicitManualChunks: true,
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("framer-motion")) return "vendor-animation";
+          if (id.includes("recharts")) return "vendor-charts";
+          if (id.includes("blurhash")) return "vendor-blurhash";
+          if (id.includes("jspdf") || id.includes("html2canvas")) return "vendor-pdf";
+          if (id.includes("/remark") || id.includes("unist-util-visit")) return "vendor-markdown";
+        },
+      },
+    },
   },
   server: {
     watch: {

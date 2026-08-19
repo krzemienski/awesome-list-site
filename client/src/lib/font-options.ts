@@ -21,8 +21,49 @@ export const FONT_OPTIONS: FontOption[] = [
 
 export const FONT_LS_KEY = "ds-font-override";
 
+const FONT_STYLESHEETS: Record<string, string> = {
+  inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+  "dm-sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
+  "source-sans": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap",
+  "ibm-plex": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+  jetbrains: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap",
+};
+
+const SYSTEM_STYLESHEETS: Record<string, string> = {
+  editorial: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&display=swap",
+  terminal: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap",
+  geist: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap",
+  brutalist: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap",
+  swiss: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap",
+};
+
+function loadStylesheet(href: string): void {
+  const alreadyLoaded = Array.from(
+    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
+  ).some((link) => link.href === href);
+  if (alreadyLoaded) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = href;
+  link.dataset.fontHref = href;
+  document.head.appendChild(link);
+}
+
+/** Load an optional picker font only after a visitor has selected it. */
+export function loadFontOverride(id: string): void {
+  const href = FONT_STYLESHEETS[id];
+  if (href) loadStylesheet(href);
+}
+
+/** Load the selected design system's display font after the first paint. */
+export function loadDesignSystemFont(systemId: string): void {
+  const href = SYSTEM_STYLESHEETS[systemId];
+  if (href) loadStylesheet(href);
+}
+
 export function applyFontOverride(id: string): void {
   const opt = FONT_OPTIONS.find((f) => f.id === id) ?? FONT_OPTIONS[0];
+  document.documentElement.setAttribute("data-font", opt.id);
   // Run22 BUG-015: body text renders with `var(--font-body)` (index.css +
   // design-system.css), NOT `--font-sans` — setting only --font-sans was a
   // silent no-op. Override BOTH: --font-body drives the actual body/UI text,
@@ -33,5 +74,6 @@ export function applyFontOverride(id: string): void {
   } else {
     document.documentElement.style.setProperty("--font-body", opt.stack);
     document.documentElement.style.setProperty("--font-sans", opt.stack);
+    loadFontOverride(opt.id);
   }
 }

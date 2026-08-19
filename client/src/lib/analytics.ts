@@ -19,6 +19,7 @@ declare global {
   interface Window {
     dataLayer: Array<unknown>;
     gtag: (...args: unknown[]) => void;
+    [key: `ga-disable-${string}`]: boolean | undefined;
   }
 }
 
@@ -64,17 +65,26 @@ const domainOf = (url: string): string | undefined => {
 // runs child effects (Router/useAnalytics) before parent effects (App), so a
 // mount-only init would drop the initial page_view.
 let gaInitialized = false;
-export const initGA = () => {
-  if (gaInitialized) return;
 
-  // BUG-020 (run13): never load gtag without explicit consent. The consent
-  // banner calls initGA() again right after the visitor accepts.
+const pendingEvents: Array<{
+  name: string;
+  params: Record<string, unknown>;
+}> = [];
+export const initGA = () => {
   if (getAnalyticsConsent() !== 'granted') return;
 
   const measurementId = getMeasurementId();
 
   if (!measurementId) {
     console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
+    return;
+  }
+
+  // Re-grant after an in-session revoke: gtag is already configured, so
+  // restore both Google's kill switch and Consent Mode without reloading it.
+  window[`ga-disable-${measurementId}`] = false;
+  if (gaInitialized) {
+    window.gtag?.('consent', 'update', { analytics_storage: 'granted' });
     return;
   }
 
@@ -106,6 +116,7 @@ export const initGA = () => {
     window.dataLayer.push(arguments);
   };
   window.gtag('js', new Date());
+  window.gtag('consent', 'default', { analytics_storage: 'granted' });
   const configParams: Record<string, unknown> = { send_page_view: false };
   if (import.meta.env.DEV) configParams.debug_mode = true;
   // Audit 2 BUG-039: _ga* cookies default to secure:false. gtag exposes
@@ -116,9 +127,17 @@ export const initGA = () => {
     configParams.cookie_flags = 'SameSite=Lax;Secure';
   }
   window.gtag('config', measurementId, configParams);
+  const queued = pendingEvents.splice(0);
+  for (const event of queued) sendEvent(event.name, event.params);
 };
 
-// Standard GA4 context attached to every event.
+/** Stop GA immediately after an in-session consent revoke. */
+export const optOutGA = () => {
+  pendingEvents.length = 0;
+  const measurementId = getMeasurementId();
+  if (measurementId) window[`ga-disable-${measurementId}`] = true;
+  window.gtag?.('consent', 'update', { analytics_storage: 'denied' });
+};
 const baseContext = (): Record<string, unknown> => {
   if (typeof window === 'undefined') return {};
   return {
@@ -136,7 +155,15 @@ const baseContext = (): Record<string, unknown> => {
  * module funnel through here.
  */
 export const sendEvent = (name: string, params: Record<string, unknown> = {}) => {
-  if (typeof window === 'undefined' || !window.gtag) return;
+  if (typeof window === 'undefined') return;
+  if (getAnalyticsConsent() !== 'granted') return;
+  if (!window.gtag) {
+    // With a persisted grant, React can emit its initial page_view before the
+    // deferred post-paint SDK bootstrap. Preserve those events without ever
+    // queueing anything before consent.
+    pendingEvents.push({ name, params });
+    return;
+  }
 
   const merged: Record<string, unknown> = { ...baseContext(), ...params };
   Object.keys(merged).forEach((key) => {

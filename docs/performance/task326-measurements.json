@@ -1,0 +1,100 @@
+{
+  "task": "Shrink first-load JavaScript and fonts",
+  "measuredAt": "2026-08-19",
+  "bundle": {
+    "source": "scripts/validation/bundle-budget.mjs --check",
+    "baselineCommit": "b79375f22d0607d6126308d8fc9b95864ae74f85",
+    "before": {
+      "rawBytes": 930462,
+      "gzipBytes": 275991,
+      "brotliBytes": 228296
+    },
+    "after": {
+      "rawBytes": 600641,
+      "gzipBytes": 184665,
+      "brotliBytes": 155687
+    },
+    "reductionPercent": {
+      "raw": 35.4,
+      "gzip": 33.1,
+      "brotli": 31.8
+    },
+    "initialModuleCount": 264,
+    "forbiddenFeaturePatternsChecked": 11,
+    "forbiddenFeatureMatches": 0
+  },
+  "mobile": {
+    "profile": {
+      "viewport": "390x844",
+      "cpuSlowdownMultiplier": 4,
+      "downloadKbps": 1600,
+      "uploadKbps": 750,
+      "latencyMs": 150,
+      "runs": 3,
+      "aggregation": "median"
+    },
+    "before": {
+      "source": "Committed pre-task mobile reference in docs/performance/task301-measurements.json",
+      "domContentLoadedMs": 1975,
+      "homeReadyMs": 2689,
+      "scriptEvaluationMs": 520,
+      "taskDurationMs": 994,
+      "scriptTransferBytes": 260698,
+      "decodedScriptBytes": 855672,
+      "categoryReadyMs": 6537,
+      "categoryTransitionMs": 3884,
+      "categoryScriptEvaluationMs": 965,
+      "categoryTaskDurationMs": 2955,
+      "categoryScriptTransferBytes": 557248,
+      "categoryDecodedScriptBytes": 1160013,
+      "fontStylesheetRequests": 2,
+      "fontRequestNote": "The task-start HTML loaded the blocking families stylesheet plus an eager post-load alternate-families stylesheet."
+    },
+    "after": {
+      "source": "PERF_BASE_URL=http://127.0.0.1:5101 PERF_RUNS=3 node scripts/validation/mobile-performance-audit.mjs --json",
+      "domContentLoadedMs": 1513,
+      "homeReadyMs": 2437,
+      "scriptEvaluationMs": 490,
+      "taskDurationMs": 1070,
+      "scriptTransferBytes": 203394,
+      "decodedScriptBytes": 643451,
+      "fontStylesheetRequests": 1,
+      "fontRequests": 1,
+      "fontTransferBytes": 49961,
+      "categoryReadyMs": 4090,
+      "categoryTransitionMs": 1653,
+      "categoryScriptEvaluationMs": 1017,
+      "categoryTaskDurationMs": 2088,
+      "categoryScriptTransferBytes": 392057,
+      "categoryDecodedScriptBytes": 820614
+    },
+    "improvementPercent": {
+      "domContentLoadedMs": 23.4,
+      "homeReadyMs": 9.4,
+      "scriptEvaluationMs": 5.8,
+      "taskDurationMs": -7.6,
+      "scriptTransferBytes": 22.0,
+      "decodedScriptBytes": 24.8,
+      "categoryReadyMs": 37.4,
+      "categoryTransitionMs": 57.4,
+      "categoryScriptEvaluationMs": -5.4,
+      "categoryTaskDurationMs": 29.3,
+      "categoryScriptTransferBytes": 29.6,
+      "categoryDecodedScriptBytes": 29.3
+    }
+  },
+  "analytics": {
+    "command": "node scripts/vg2-ga4-validate.mjs",
+    "result": "19/19 PASS",
+    "preConsentGARequests": 0,
+    "postRevokeExternalAmplitudeRequests": 0,
+    "amplitudeRegrant": "PASS",
+    "postConsentEventsVerified": [
+      "page_view",
+      "page_engaged",
+      "search",
+      "select_content",
+      "theme_change"
+    ]
+  }
+}

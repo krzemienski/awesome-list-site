@@ -43,6 +43,9 @@ try {
     const cdp = await context.newCDPSession(page);
     const scriptRequests = new Set();
     let scriptTransferBytes = 0;
+    const fontStylesheetRequests = new Set();
+    const fontRequests = new Set();
+    let fontTransferBytes = 0;
 
     await cdp.send("Network.enable");
     await cdp.send("Network.clearBrowserCache");
@@ -56,11 +59,18 @@ try {
     });
     await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
     await cdp.send("Performance.enable");
-    cdp.on("Network.responseReceived", ({ requestId, type }) => {
+    cdp.on("Network.responseReceived", ({ requestId, type, response }) => {
       if (type === "Script") scriptRequests.add(requestId);
+      if (type === "Stylesheet" && response.url.startsWith("https://fonts.googleapis.com/")) {
+        fontStylesheetRequests.add(requestId);
+      }
+      if (type === "Font") fontRequests.add(requestId);
     });
     cdp.on("Network.loadingFinished", ({ requestId, encodedDataLength }) => {
       if (scriptRequests.has(requestId)) scriptTransferBytes += encodedDataLength;
+      if (fontStylesheetRequests.has(requestId) || fontRequests.has(requestId)) {
+        fontTransferBytes += encodedDataLength;
+      }
     });
 
     await page.goto(`${baseUrl}/`, {
@@ -68,7 +78,7 @@ try {
       timeout: 60_000,
     });
     const consent = page.getByRole("button", {
-      name: /reject non-essential/i,
+      name: /decline|reject non-essential/i,
     });
     if (await consent.isVisible().catch(() => false)) await consent.click();
 
@@ -115,6 +125,9 @@ try {
       taskDurationMs: Math.round(homeMetric("TaskDuration") * 1000),
       scriptTransferBytes: Math.round(homeScriptTransferBytes),
       decodedScriptBytes: Math.round(homeNavigation.decodedScriptBytes),
+      fontStylesheetRequests: fontStylesheetRequests.size,
+      fontRequests: fontRequests.size,
+      fontTransferBytes: Math.round(fontTransferBytes),
       categoryReadyMs: Math.round(categoryReadyMs),
       categoryTransitionMs: Math.round(categoryReadyMs - homeReadyMs),
       categoryScriptEvaluationMs: Math.round(
@@ -141,6 +154,9 @@ const metrics = [
   "taskDurationMs",
   "scriptTransferBytes",
   "decodedScriptBytes",
+  "fontStylesheetRequests",
+  "fontRequests",
+  "fontTransferBytes",
   "categoryReadyMs",
   "categoryTransitionMs",
   "categoryScriptEvaluationMs",

@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "commit": "62e36d7880bf617539a4b2b7926b395c77ff07a4",
+    "commit": "b79375f22d0607d6126308d8fc9b95864ae74f85",
     "initial": {
-      "rawBytes": 1257018,
-      "gzipBytes": 372294,
-      "brotliBytes": 302232
+      "rawBytes": 930462,
+      "gzipBytes": 275991,
+      "brotliBytes": 228296
     }
   },
   "initial": {
-    "maxRawBytes": 960000,
-    "maxGzipBytes": 285000,
-    "maxBrotliBytes": 236000
+    "maxRawBytes": 650000,
+    "maxGzipBytes": 200000,
+    "maxBrotliBytes": 168000
   },
   "maxAsyncChunk": {
     "maxGzipBytes": 180000,
@@ -61,6 +61,11 @@
     "(^|/)client/src/components/ui/ai-recommendations-panel\\.tsx$",
     "(^|/)jspdf/",
     "(^|/)html2canvas/",
-    "(^|/)recharts/"
+    "(^|/)recharts/",
+    "(^|/)framer-motion/",
+    "(^|/)react-blurhash/",
+    "(^|/)blurhash/",
+    "(^|/)remark(?:-parse)?/",
+    "(^|/)unist-util-visit/"
   ]
 }

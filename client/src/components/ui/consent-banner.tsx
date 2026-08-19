@@ -5,9 +5,12 @@ import {
   getAnalyticsConsent,
   setAnalyticsConsent,
   initGA,
+  optOutGA,
+  trackPageView,
 } from "@/lib/analytics";
 import { initMixpanel, optOutMixpanel } from "@/lib/mixpanel";
 import { initPosthog, optOutPosthog } from "@/lib/posthog";
+import { initAmplitude, optOutAmplitude } from "@/lib/amplitude";
 
 // R5-025 (run24): custom event that re-opens the consent banner. Dispatched
 // by the "Cookie settings" links in Footer and /privacy via
@@ -118,12 +121,17 @@ export default function ConsentBanner() {
       initGA();
       initMixpanel();
       initPosthog();
+      initAmplitude();
+      // The initial mount happened before this first-time grant, so it could
+      // not queue a page view. Record the current page once consent exists.
+      trackPageView(window.location.href);
     } else {
-      // Task #232: consent revoked (possibly after a prior grant via Cookie
-      // settings) — stop Mixpanel tracking and clear its stored state. GA
-      // already no-ops via its own consent gate on next load.
+      // Consent revoked (possibly after a prior grant via Cookie settings):
+      // stop every vendor immediately and clear any app-side pending events.
+      optOutGA();
       optOutMixpanel();
       optOutPosthog();
+      optOutAmplitude();
     }
   };
 

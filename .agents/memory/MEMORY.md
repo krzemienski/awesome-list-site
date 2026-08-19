@@ -84,3 +84,4 @@
 - [HTTP cache edge rewrite](http-cache-edge-rewrite.md) — Google-Frontend can downgrade a cookie-less first asset response to private when it emits GAESA; verify origin policy separately.
 - [SPA guest route document gates](spa-guest-route-document-gates.md) — server auth redirects run before React; local-state guest routes must receive the SPA shell while APIs stay protected.
 - [pg_trgm indexable recovery](pg-trgm-indexable-recovery.md) — GIN trigram indexes need %, <%, or <<% candidate predicates; word_similarity() comparisons scan despite the index.
+- [Amplitude consent teardown](amplitude-consent-teardown.md) — core opt-out does not cancel sub-SDK work; gate each transport and count only completed external requests.

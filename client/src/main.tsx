@@ -12,18 +12,67 @@ import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
 import { needsCorpusRoute } from "./lib/static-data";
+import { loadDesignSystemFont, loadFontOverride } from "./lib/font-options";
 
-// Initialize GA before React renders so window.gtag exists in time for the very
-// first page_view (React runs child effects before parent effects, so App's
-// mount effect fires too late for Router/useAnalytics's initial page_view).
-initGA();
-// Mixpanel too (same consent gate — both no-op until the visitor accepts the
-// consent banner, which calls these again after "Accept").
-initMixpanel();
-initPosthog();
-// Amplitude — per explicit user decision this runs immediately (NOT
-// consent-gated like the three above).
-initAmplitude();
+function afterFirstPaint(callback: () => void): void {
+  const scheduleIdle = () => {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(callback, { timeout: 1500 });
+    } else {
+      globalThis.setTimeout(callback, 0);
+    }
+  };
+
+  // rAF callbacks can run before the browser produces an actual paint
+  // (notably in headless/background contexts). Use the buffered Paint Timing
+  // signal so persisted-consent SDKs cannot race ahead of first content.
+  if (performance.getEntriesByName("first-contentful-paint").length > 0) {
+    scheduleIdle();
+    return;
+  }
+  const fallback = () => {
+    requestAnimationFrame(() => requestAnimationFrame(scheduleIdle));
+  };
+  if (
+    typeof PerformanceObserver !== "undefined" &&
+    PerformanceObserver.supportedEntryTypes?.includes("paint")
+  ) {
+    const observer = new PerformanceObserver((list) => {
+      if (!list.getEntries().some((entry) => entry.name === "first-contentful-paint")) return;
+      observer.disconnect();
+      scheduleIdle();
+    });
+    try {
+      observer.observe({ type: "paint", buffered: true });
+      return;
+    } catch {
+      observer.disconnect();
+    }
+  }
+
+  // Older browsers without Paint Timing retain the best available handoff.
+  fallback();
+}
+
+let selectedSystemAtBoot: string | null = null;
+let fontOverrideAtBoot: string | null = null;
+try {
+  selectedSystemAtBoot = localStorage.getItem("ds-system");
+  fontOverrideAtBoot = localStorage.getItem("ds-font-override");
+} catch {
+  // Storage can be unavailable in hardened/private browsing contexts.
+}
+
+// Analytics SDKs are all consent-gated and deferred until the first painted
+// frame. The consent banner invokes these immediately after an explicit grant.
+afterFirstPaint(() => {
+  initGA();
+  initMixpanel();
+  initPosthog();
+  initAmplitude();
+  if (selectedSystemAtBoot) loadDesignSystemFont(selectedSystemAtBoot);
+  if (fontOverrideAtBoot) loadFontOverride(fontOverrideAtBoot);
+});
 
 // Force dark theme immediately
 document.documentElement.classList.add('dark');
@@ -79,7 +128,9 @@ if (window.__INITIAL_DATA__) {
 
 const rootElement = document.getElementById("root")!;
 
-// Task #172 — kill the paint→blank→paint flash on slow connections.
+// Preserve crawler-injected content until React Query has supplied the page's
+// real data. This is event-driven: no DOM MutationObserver or 100ms polling is
+// left running during boot.
 // og-middleware injects real SEO content (#ssr-seo-content + its scoped
 // <style>) into #root. createRoot().render() wipes #root, so on throttled
 // loads users saw content appear (~0.7s), vanish at React mount (~1.5s), and
@@ -101,57 +152,23 @@ const rootElement = document.getElementById("root")!;
     // Move the scoped <style> siblings too, so the overlay keeps its styling.
     const nodes = Array.from(rootElement.childNodes);
     for (const n of nodes) overlay.appendChild(n);
-    // Run22 BUG-009 + Run23 NB-035: once React renders the page's real <h1>
-    // underneath the overlay, the overlay's SSR <h1> would make the DOM
-    // contain two H1s — so it gets demoted to a visually-identical <div>
-    // (.ssr-h1 rule ships in the injected scoped <style>). Run22 demoted it
-    // EAGERLY at boot, which opened a zero-h1 window (~460ms; ~1s on slow-3G)
-    // between boot and React's first h1 commit. Now a MutationObserver
-    // demotes it at the exact moment React's h1 appears — observers fire as
-    // microtasks after the DOM mutation, BEFORE the next paint, so no painted
-    // frame ever shows zero or two H1s. Non-JS crawlers never execute any of
-    // this and still see the semantic <h1> in the raw HTML.
-    const demoteSsrH1 = () => {
-      const ssrH1 = overlay.querySelector("h1");
-      if (!ssrH1) return;
+    // JavaScript clients only see this visual hold; crawlers retain the raw
+    // semantic h1. Demote before React mounts so the live DOM never has two h1s.
+    const ssrH1 = overlay.querySelector("h1");
+    if (ssrH1) {
       const div = document.createElement("div");
       div.className = "ssr-h1";
       while (ssrH1.firstChild) div.appendChild(ssrH1.firstChild);
       ssrH1.replaceWith(div);
-    };
-    const h1Observer = new MutationObserver(() => {
-      if (rootElement.querySelector("h1")) {
-        demoteSsrH1();
-        h1Observer.disconnect();
-      }
-    });
-    h1Observer.observe(rootElement, { childList: true, subtree: true });
+    }
     document.body.appendChild(overlay);
 
-    const start = Date.now();
-    let dataSettledAt = 0;
-
     const remove = () => {
-      clearInterval(timer);
-      h1Observer.disconnect();
+      unsubscribe();
+      window.clearTimeout(timeout);
       overlay.remove();
     };
-    const timer = window.setInterval(() => {
-      const elapsed = Date.now() - start;
-      // Real listing content rendered → swap immediately. Run23 NB-017: home
-      // and /categories render TaxonomyCards (link-category-* /
-      // category-card-*), not ResourceCards — match those too so the overlay
-      // lifts on first paint instead of waiting out the settle grace below.
-      if (
-        rootElement.querySelector(
-          '[data-testid^="card-resource"], [data-testid^="link-category-"], [data-testid^="category-card-"]',
-        )
-      ) {
-        return remove();
-      }
-      // Watch the query cache directly (no body-stream races). Taxonomy pages
-      // settle on their paged listing query; Advanced settles on the corpus;
-      // all remaining routes use the lightweight nav tree.
+    const isSettled = () => {
       const taxonomy = /^\/(category|subcategory|sub-subcategory)\//.test(window.location.pathname);
       const settleKey = taxonomy
         ? undefined
@@ -159,43 +176,19 @@ const rootElement = document.getElementById("root")!;
       const matchingQueries = taxonomy
         ? queryClient.getQueryCache().findAll({ queryKey: ["awesome-list-listing"] })
         : [];
-      if (
-        !dataSettledAt &&
-        (taxonomy
-          ? matchingQueries.some((query) => query.state.data !== undefined)
-          : settleKey && queryClient.getQueryData(settleKey) !== undefined)
-      ) {
-        dataSettledAt = Date.now();
-      }
-      // R5-006 (run24): the catalog query FAILING must also lift the hold —
-      // the SPA renders its styled error card + Retry underneath, and the
-      // overlay used to sit on top of it until the hard cap, trapping users
-      // on a frozen unstyled snapshot during outages.
-      if (
-        taxonomy
-          ? matchingQueries.some((query) => query.state.status === "error")
-          : settleKey && queryClient.getQueryState(settleKey)?.status === "error"
-      ) {
-        return remove();
-      }
-      const reactCommitted = !!rootElement.firstElementChild;
-      // Routes without resource cards (static pages, detail views): once React
-      // has committed AND the catalog payload has landed, the data-driven
-      // render commits within a tick — swap on the next poll. Run23 NB-017:
-      // grace trimmed 600ms → 100ms (plus the 100ms poll interval) so the
-      // overlay stops eating clicks ~840ms after the app was ready.
-      if (
-        reactCommitted &&
-        dataSettledAt &&
-        Date.now() - dataSettledAt > 100
-      ) {
-        return remove();
-      }
-      // Hard cap: never trap the user on the static overlay. R5-006: 8s → 3s;
-      // with the error-path lift above this only fires for hung requests, and
-      // 3s of skeleton beats 8s of frozen snapshot.
-      if (elapsed > 3000) return remove();
-    }, 100);
+      return taxonomy
+        ? matchingQueries.some((query) => query.state.data !== undefined || query.state.status === "error")
+        : !!settleKey && (
+          queryClient.getQueryData(settleKey) !== undefined ||
+          queryClient.getQueryState(settleKey)?.status === "error"
+        );
+    };
+    const handoff = () => {
+      if (isSettled()) requestAnimationFrame(remove);
+    };
+    const unsubscribe = queryClient.getQueryCache().subscribe(handoff);
+    const timeout = window.setTimeout(remove, 3000);
+    handoff();
   } catch {
     // If anything goes wrong, fall back to the old behavior (React wipes #root).
   }
