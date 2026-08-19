@@ -1,10 +1,10 @@
 ---
 name: Cold-cache gate flattery
-description: A crawl/SEO gate passing right after a warm-up harness proves nothing; confirm on a cold boot. Retry ladders lose to sustained saturation.
+description: A crawl/SEO gate passing after warm-up proves nothing; confirm cold, bound uncached work, and fail local admission overflow immediately.
 ---
 
 **Rule:** Never accept a crawl-gate pass as proof if a warm-up burst (or a prior run) populated the route cache first. The honest confirmation is a fresh server boot (empty publicCache) + solo gate run.
 
-**Why:** The og-middleware saturation-retry ladder showed "0 failures" only because /tmp/burst.mjs had warmed the deep-tag routes minutes earlier. Cold solo reruns produced 3-5 random tag 503s per run — the ladder's ~2s of backoff cannot outlast a sustained 12-way crawl saturating an 8-connection pool, because during a gate crawl EVERY route resolves cold (TTL 60s << crawl duration).
+**Why:** A saturation-retry ladder showed "0 failures" only after another harness had warmed deep routes. Cold solo reruns still produced random 503s. The first bounded queue then remained vulnerable because local overflow entered the same retry ladder, turning rejected work into backoff timers.
 
-**How to apply:** For any "fixed the 503s under load" claim: restart the server, wait ~90s for background init, run the gate solo. The durable fix for crawl-vs-pool saturation is capping concurrent uncached route resolutions BELOW the pool size (slot-transfer semaphore in og-middleware, limit 5 < pool 8); retries are only the second line of defense. Also: never overlap scratch-DB gates (migration-drift, boot-safety run DDL on the same Neon instance) with a crawl gate — that alone produces 503 false-fails.
+**How to apply:** For any "fixed the 503s under load" claim, restart the server, let background initialization settle, and run the gate solo. Cap active uncached work below database capacity, bound and cancel waiters, and treat local admission overflow as non-retryable. Reserve retries for downstream transient saturation. Never overlap scratch-database gates with a crawl gate; shared contention produces false failures.
