@@ -86,3 +86,4 @@
 - [SPA guest route document gates](spa-guest-route-document-gates.md) — server auth redirects run before React; local-state guest routes must receive the SPA shell while APIs stay protected.
 - [pg_trgm indexable recovery](pg-trgm-indexable-recovery.md) — GIN trigram indexes need %, <%, or <<% candidate predicates; word_similarity() comparisons scan despite the index.
 - [Amplitude consent teardown](amplitude-consent-teardown.md) — core opt-out does not cancel sub-SDK work; gate each transport and count only completed external requests.
+- [Reserved characters in SPA routes](reserved-character-spa-routes.md) — encode canonical path segments once; dotted routes need exemptions from asset detection, and percent escapes must not be lowercased.

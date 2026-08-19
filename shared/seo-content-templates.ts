@@ -23,6 +23,13 @@ export interface ResourceFactsInput {
   tags?: string[];
 }
 
+export interface TagIntroInput {
+  name: string;
+  totalResources: number;
+  categoryNames?: string[];
+  formats?: string[];
+}
+
 function list(items: string[], limit = 4): string {
   const values = [...new Set(items.map((item) => item.trim()).filter(Boolean))]
     .slice(0, limit);
@@ -67,6 +74,24 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
   ].filter(Boolean);
 
   return [lead, ...details].join(" ");
+}
+
+export function tagScopeIntro(input: TagIntroInput): string {
+  const total = Number.isFinite(input.totalResources)
+    ? Math.max(0, input.totalResources)
+    : 0;
+  const categories = list(input.categoryNames ?? [], 3);
+  const formats = list(
+    (input.formats ?? [])
+      .filter((format) => format && format !== "unknown")
+      .map(formatLabel),
+    3,
+  );
+  return [
+    `${input.name} brings together ${total.toLocaleString("en-US")} curated resource${total === 1 ? "" : "s"} for video developers.`,
+    categories ? `Explore projects and guidance across ${categories}.` : "",
+    formats ? `Available formats include ${formats}.` : "",
+  ].filter(Boolean).join(" ");
 }
 
 export function resourceFactsSummary(input: ResourceFactsInput): string {

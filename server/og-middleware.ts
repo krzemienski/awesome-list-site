@@ -25,13 +25,22 @@ import {
   journeySeoDescription,
   pagedSeoTitleCore,
   pagedSeoDescription,
+  tagSeoDescription,
+  tagSeoTitleCore,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
   RESOURCE_PROVIDER_LABELS,
   RESOURCE_SKILL_LEVEL_LABELS,
 } from "@shared/resourceFacets";
-import { taxonomyScopeIntro } from "@shared/seo-content-templates";
+import { tagScopeIntro, taxonomyScopeIntro } from "@shared/seo-content-templates";
+import {
+  normalizeTagFilter,
+  normalizeTagPathSegment,
+  TAG_LANDING_MIN_RESOURCES,
+  tagDisplayName,
+  tagLandingPath,
+} from "@shared/tagNormalize";
 import {
   renderHomeContent,
   renderTaxonomyContent,
@@ -944,6 +953,130 @@ function homeShellChrome(): string {
     return { meta: notFoundMeta(path), found: false };
   }
 
+  // /tag/:slug — real landing pages for every known normalized tag. Tags with
+  // fewer than TAG_LANDING_MIN_RESOURCES remain useful/filterable but noindex;
+  // the qualifying set is the same one emitted by the sitemap.
+  const tagMatch = path.match(/^\/tag\/([^\/]+)$/);
+  if (tagMatch) {
+    const slug = normalizeTagPathSegment(tagMatch[1]);
+    if (!slug) return { meta: notFoundMeta(path), found: false };
+    try {
+      const result = await storage.listResources({
+        status: "approved",
+        tags: [slug],
+        offset: (page - 1) * LISTING_PAGE_SIZE,
+        limit: LISTING_PAGE_SIZE,
+        includeFacets: true,
+      } as any) as Awaited<ReturnType<typeof storage.listResources>> & {
+        facets?: {
+          categories?: Array<{ value: string; count: number }>;
+        };
+      };
+      if (result.total === 0) {
+        return { meta: notFoundMeta(path), found: false };
+      }
+      const totalPages = Math.max(1, Math.ceil(result.total / LISTING_PAGE_SIZE));
+      if (page > totalPages) {
+        return { meta: notFoundMeta(path), found: false };
+      }
+
+      const name = tagDisplayName(slug);
+      const canonicalPath = tagLandingPath(slug);
+      const m = defaultMeta(canonicalPath);
+      m.title = `${pagedSeoTitleCore(tagSeoTitleCore(name), page)} — ${SITE_NAME}`;
+      m.description = pagedSeoDescription(
+        tagSeoDescription(name, result.total),
+        page,
+        totalPages,
+      );
+      m.image = ogImage(canonicalPath);
+      m.type = "website";
+      if (result.total < TAG_LANDING_MIN_RESOURCES) {
+        m.noindex = true;
+        m.follow = true;
+      } else if (page > 1) {
+        m.url = abs(`${canonicalPath}?page=${page}`);
+      }
+
+      const pageResources = result.resources;
+      const categoryFacets =
+        ((result as any).facets?.categories as Array<{ value: string; count: number }> | undefined)
+          ?.filter((item) => item.value)
+          .slice(0, 6) ?? [];
+      const relatedTagCounts = new Map<string, number>();
+      for (const resource of pageResources as any[]) {
+        const tags = Array.isArray(resource?.metadata?.tags)
+          ? resource.metadata.tags
+          : [];
+        for (const value of tags) {
+          if (typeof value !== "string") continue;
+          const related = normalizeTagFilter(value);
+          if (!related || related === slug) continue;
+          relatedTagCounts.set(related, (relatedTagCounts.get(related) ?? 0) + 1);
+        }
+      }
+      const relatedTags = [...relatedTagCounts.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, 8);
+      const crumbs = [
+        { name: "Home", path: "/" },
+        { name, path: canonicalPath },
+      ];
+      if (!m.noindex) {
+        m.structuredData = [
+          collectionPageSchema({
+            name,
+            description: m.description,
+            path: page > 1 ? `${canonicalPath}?page=${page}` : canonicalPath,
+            numberOfItems: result.total,
+            items: pageResources.map((resource: any) => ({
+              name: resource.title,
+              path: `/resource/${resource.id}`,
+            })),
+            firstPosition: (page - 1) * LISTING_PAGE_SIZE + 1,
+          }),
+          breadcrumbSchema(crumbs),
+        ];
+      }
+      const bodyHtml = renderTaxonomyContent({
+        heading: name,
+        description: m.description,
+        intro: tagScopeIntro({
+          name,
+          totalResources: result.total,
+          categoryNames: categoryFacets.map((item) => item.value),
+          formats: pageResources.map((resource: any) => resource.resourceFormat),
+        }),
+        introKind: "tag-intro",
+        crumbs,
+        relatedLinks: [
+          ...categoryFacets.map((item) => ({
+            name: item.value,
+            href: `/category/${item.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`,
+            count: item.count,
+          })),
+          ...relatedTags.map(([related, count]) => ({
+            name: `#${tagDisplayName(related)}`,
+            href: tagLandingPath(related),
+            count,
+          })),
+        ],
+        resources: pageResources.map((resource: any) => ({
+          id: resource.id,
+          title: resource.title,
+          description: resource.description,
+        })),
+        totalResources: result.total,
+        page,
+        basePath: canonicalPath,
+      });
+      return { meta: m, found: true, bodyHtml };
+    } catch (error) {
+      rethrowBoundedDependencyFailure(error);
+      return { meta: defaultMeta(path), found: true };
+    }
+  }
+
   // /subcategory/:slug — found only if the subcategory slug exists.
   const subMatch = path.match(/^\/subcategory\/([^\/]+)$/);
   if (subMatch) {
@@ -1653,7 +1786,7 @@ export function ogInjectionMiddleware() {
       urlPath.startsWith("/@") ||
       urlPath.startsWith("/src/") ||
       urlPath.startsWith("/node_modules") ||
-      /\.[a-z0-9]+$/i.test(urlPath)
+      (/\.[a-z0-9]+$/i.test(urlPath) && !urlPath.startsWith("/tag/"))
     ) {
       return next();
     }
@@ -1669,7 +1802,7 @@ export function ogInjectionMiddleware() {
       const trimmed =
         urlPath.length > 1 ? urlPath.replace(/\/+$/, "") || "/" : urlPath;
       let redirectTo: string | null = trimmed !== urlPath ? trimmed : null;
-      if (/[A-Z]/.test(trimmed)) {
+      if (/[A-Z]/.test(trimmed) && !trimmed.startsWith("/tag/")) {
         const lower = trimmed.toLowerCase();
         try {
           if ((await resolveRoute(lower)).found) redirectTo = lower;
@@ -1684,6 +1817,17 @@ export function ogInjectionMiddleware() {
         // "/" so the Location header can only ever be same-origin.
         redirectTo = redirectTo.replace(/^[\/\\]+/, "/");
         return res.redirect(301, redirectTo + suffix);
+      }
+    }
+
+    // Singular/plural and separator aliases resolve to one canonical tag URL.
+    const tagAliasMatch = urlPath.match(/^\/tag\/([^\/]+)$/);
+    if (tagAliasMatch) {
+      const canonicalTag = normalizeTagPathSegment(tagAliasMatch[1]);
+      const canonicalPath = canonicalTag ? tagLandingPath(canonicalTag) : "";
+      if (canonicalPath && canonicalPath !== urlPath) {
+        const search = (req.originalUrl || req.url).split("?")[1];
+        return res.redirect(301, canonicalPath + (search ? `?${search}` : ""));
       }
     }
 
@@ -1920,7 +2064,7 @@ export function ogInjectionMiddleware() {
       }
     }
 
-    // BUG-027 (audit 2): honest ?page= handling on the three taxonomy listing
+    // BUG-027 (audit 2): honest ?page= handling on indexable listing
     // prefixes. An explicit ?page=1 duplicates the param-less canonical → 301
     // (other params preserved); anything the SHARED strict rule
     // (shared/page-param.ts parseUrlPageStrict — the exact verdict the
@@ -1931,7 +2075,7 @@ export function ogInjectionMiddleware() {
     // /search keeps the client's clamp behaviour on purpose (noindex, lenient
     // parsePageNumber on both passes), and every other route ignores ?page.
     let forcedNotFound = false;
-    if (/^\/(?:category|subcategory|sub-subcategory)\/[^\/]+$/.test(urlPath)) {
+    if (/^\/(?:category|subcategory|sub-subcategory|tag)\/[^\/]+$/.test(urlPath)) {
       const qs = (req.originalUrl || req.url).split("?")[1] || "";
       const params = new URLSearchParams(qs);
       const rawPage = params.get("page");

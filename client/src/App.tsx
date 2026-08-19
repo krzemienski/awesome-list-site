@@ -34,6 +34,7 @@ const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 const Category = lazy(() => import("@/pages/Category"));
 const Subcategory = lazy(() => import("@/pages/Subcategory"));
 const SubSubcategory = lazy(() => import("@/pages/SubSubcategory"));
+const TagLanding = lazy(() => import("@/pages/TagLanding"));
 const ResourceDetail = lazy(() => import("@/pages/ResourceDetail"));
 const Categories = lazy(() => import("@/pages/Categories"));
 const About = lazy(() => import("@/pages/About"));
@@ -303,11 +304,12 @@ import {
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy)\/?$/,
   // Task #307: Clerk-hosted auth pages, including OAuth/verification sub-paths.
   /^\/(sign-in|sign-up)(\/.*)?$/,
   /^\/auth\/(login|register)\/?$/,
   /^\/category\/[^/]+(\/[^/]+)?$/,
+  /^\/tag\/[^/]+$/,
   /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
   /^\/resource\/[^/]+$/,
   /^\/journey\/[^/]+$/,
@@ -662,6 +664,7 @@ function Router() {
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
         <Route path="/category/:slug" component={Category} />
+        <Route path="/tag/:slug" component={TagLanding} />
         <Route path="/categories" component={() => (
           <Categories
             nav={nav}

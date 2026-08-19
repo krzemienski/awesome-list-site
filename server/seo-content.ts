@@ -1,5 +1,6 @@
 // Server-side prerendered content for indexable public routes (Task #80).
 import { resourceFactsSummary } from "@shared/seo-content-templates";
+import { tagLandingPath } from "@shared/tagNormalize";
 //
 // Why this exists: the app is a Vite SPA whose initial HTML is an empty
 // `<div id="root"><!--app-html--></div>` shell. Non-JavaScript crawlers (GPTBot,
@@ -322,10 +323,18 @@ export function renderTaxonomyContent(opts: {
   heading: string;
   description: string;
   intro: string;
+  introKind?: "taxonomy-intro" | "tag-intro";
   crumbs: Crumb[];
   childKind?: "subcategory" | "sub-subcategory";
   children?: { name: string; slug: string; count: number }[];
+  relatedLinks?: { name: string; href: string; count?: number }[];
   resources?: { id: number; title: string; description?: string }[];
+  /**
+   * When present, `resources` is already the requested page slice and this is
+   * the authoritative collection total. Taxonomy tree callers omit it and let
+   * this renderer slice their complete flattened resource list.
+   */
+  totalResources?: number;
   page?: number;
   basePath?: string;
 }): string {
@@ -338,15 +347,23 @@ export function renderTaxonomyContent(opts: {
       label: c.name,
       meta: `${count(c.count)} resources`,
     }));
+  const relatedLinks: LinkItem[] = (opts.relatedLinks ?? []).map((item) => ({
+    href: internalHref(item.href),
+    label: item.name,
+    meta: typeof item.count === "number" ? `${count(item.count)} resources` : undefined,
+  }));
 
   // BUG-001/004/010: paginate the resource list so ?page=N returns a distinct
   // slice and every resource is reachable (not just the first 100).
   const allRes = opts.resources ?? [];
-  const total = allRes.length;
+  const hasPageSlice = typeof opts.totalResources === "number";
+  const total = hasPageSlice ? Math.max(0, opts.totalResources ?? 0) : allRes.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const page = Math.min(Math.max(1, opts.page ?? 1), totalPages);
   const startIdx = (page - 1) * PAGE_SIZE;
-  const pageRes = allRes.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageRes = hasPageSlice
+    ? allRes.slice(0, PAGE_SIZE)
+    : allRes.slice(startIdx, startIdx + PAGE_SIZE);
   const resLinks: LinkItem[] = pageRes.map((r) => ({
     href: internalHref(`/resource/${r.id}`),
     label: r.title,
@@ -365,9 +382,10 @@ export function renderTaxonomyContent(opts: {
     crumbsHtml(opts.crumbs) +
       `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
-      `<section data-seo-section="taxonomy-intro"><h2>About this collection</h2><p>${escapeHtml(opts.intro)}</p></section>` +
+      `<section data-seo-section="${opts.introKind ?? "taxonomy-intro"}"><h2>About this collection</h2><p>${escapeHtml(opts.intro)}</p></section>` +
       (childLinks.length ? `<h2>${childHeading}</h2>${linkList(childLinks)}` : "") +
-      (resLinks.length ? `<h2>${resHeading}</h2>${linkList(resLinks)}${pager}` : ""),
+      (relatedLinks.length ? `<section data-seo-section="related-topics"><h2>Explore related topics</h2>${linkList(relatedLinks)}</section>` : "") +
+      (resLinks.length ? `<section data-seo-section="listing-resources"><h2>${resHeading}</h2>${linkList(resLinks)}${pager}</section>` : ""),
   );
 }
 
@@ -476,7 +494,7 @@ export function renderResourceContent(opts: {
     `<dt>Skill level</dt><dd>${escapeHtml(opts.skillLevel)}</dd>`,
   ].join("");
   const tagItems = (opts.tags ?? []).map((tag) => ({
-    href: internalHref(`/?tags=${encodeURIComponent(tag)}`),
+    href: internalHref(tagLandingPath(tag)),
     label: tag,
   }));
   const tags = tagItems.length

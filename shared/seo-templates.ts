@@ -249,6 +249,15 @@ export function categorySeoDescription(
     : `Browse ${count} curated ${name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
 }
 
+// Tag landing pages ----------------------------------------------------------
+export function tagSeoTitleCore(name: string): string {
+  return `${name} Video Resources & Tools`;
+}
+
+export function tagSeoDescription(name: string, count: number): string {
+  return `Browse ${count} curated ${name} resources, tools, libraries, and guides for video developers on ${SITE_NAME}.`;
+}
+
 // Taxonomy listings ----------------------------------------------------------
 // Child listing titles need enough parent context to describe the search intent
 // but must remain within the 44-char core budget left by the brand suffix.

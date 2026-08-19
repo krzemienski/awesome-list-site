@@ -24,6 +24,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { deslugify } from "@/lib/utils";
+import { normalizeTagPathSegment, tagDisplayName } from "@shared/tagNormalize";
 import { useQuery } from "@tanstack/react-query";
 
 interface AppHeaderProps {
@@ -88,6 +89,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     submit: "Submit Resource",
     journeys: "Learning Journeys",
     journey: "Journey",
+    tag: "Tag",
     collection: "Shared collection",
     "continue-learning": "Continue Learning",
     login: "Sign in",
@@ -169,6 +171,13 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
       // Share ids are opaque capabilities, not useful labels. Avoid both a
       // dead intermediate /collection link and exposing the raw identifier.
       crumbs.push({ label: "Shared collection", href: path });
+    } else if (segments[0] === "tag") {
+      // Tag pages have no useful /tag index, so keep a single live crumb
+      // rather than inserting a dead intermediate link.
+      crumbs.push({
+        label: tagDisplayName(normalizeTagPathSegment(segments[1])) || "Not found",
+        href: path,
+      });
     } else {
       crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: `/${segments[0]}` });
       crumbs.push({ label: deslugify(segments[1]), href: path });

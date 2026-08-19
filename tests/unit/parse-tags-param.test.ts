@@ -8,6 +8,10 @@
 
 import { describe, it, expect } from 'vitest';
 import { parseTagsParam } from '../../client/src/lib/tags';
+import {
+  normalizeTagPathSegment,
+  tagLandingPath,
+} from '../../shared/tagNormalize';
 
 const p = (qs: string) => parseTagsParam(new URLSearchParams(qs));
 
@@ -50,5 +54,20 @@ describe('parseTagsParam', () => {
   it('returns [] when no tag params are present', () => {
     expect(p('')).toEqual([]);
     expect(p('sort=name-asc&page=2')).toEqual([]);
+  });
+});
+
+describe('tag landing paths', () => {
+  it('round-trips reserved characters through one canonical URL segment', () => {
+    for (const tag of ['C++', 'H.264', 'Node.js', '100%', 'video/tools']) {
+      const path = tagLandingPath(tag);
+      const segment = path.slice('/tag/'.length);
+      expect(segment).not.toContain('/');
+      expect(normalizeTagPathSegment(segment)).toBe(normalizeTagPathSegment(encodeURIComponent(tag)));
+    }
+  });
+
+  it('returns an empty identity for malformed percent encoding', () => {
+    expect(normalizeTagPathSegment('broken%')).toBe('');
   });
 });

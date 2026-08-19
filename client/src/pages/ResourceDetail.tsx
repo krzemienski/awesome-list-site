@@ -52,6 +52,7 @@ import {
   type ResourceProvider,
   type ResourceSkillLevel,
 } from "@shared/resourceFacets";
+import { tagLandingPath } from "@shared/tagNormalize";
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -889,10 +890,8 @@ export default function ResourceDetail() {
                       Tags
                     </h2>
                     <div className="flex flex-wrap gap-2">
-                      {/* BUG-039 (run13): tags link to the home catalog
-                          pre-filtered on that tag (?tags= is read on mount). */}
                       {tags.map((tag, index) => (
-                        <Link key={index} href={`/?tags=${encodeURIComponent(tag)}`}>
+                        <Link key={index} href={tagLandingPath(tag)}>
                           <Badge
                             variant="outline"
                             className="text-xs border-primary/30 text-primary cursor-pointer hover:bg-primary/10"

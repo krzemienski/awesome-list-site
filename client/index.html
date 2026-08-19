@@ -156,6 +156,7 @@
         try {
           var pth = location.pathname;
           var taxonomyMatch = pth.match(/^\/(category|subcategory|sub-subcategory)\/([^/]+)$/);
+          var tagMatch = pth.match(/^\/tag\/([^/]+)$/);
           var searchParams = new URLSearchParams(location.search);
           var needsCorpus = pth === '/advanced' || (
             !!taxonomyMatch &&
@@ -166,6 +167,15 @@
             var p = fetch('/api/awesome-list', { credentials: 'same-origin' });
             window.__awesomeListEarlyFetch = p;
             p.catch(function () {});
+          } else if (tagMatch) {
+            var tagPage = searchParams.get('page') || '1';
+            if (/^[1-9]\d*$/.test(tagPage)) {
+              var tagOffset = (Number(tagPage) - 1) * 24;
+              var tagUrl = '/api/resources?tags=' + encodeURIComponent(decodeURIComponent(tagMatch[1])) + '&limit=24&offset=' + tagOffset + '&facets=true';
+              var tagFetch = fetch(tagUrl, { credentials: 'same-origin' });
+              window.__tagListingEarlyFetch = { url: tagUrl, promise: tagFetch };
+              tagFetch.catch(function () {});
+            }
           } else if (taxonomyMatch) {
             var level = taxonomyMatch[1] === 'sub-subcategory' ? 'sub-subcategory' : taxonomyMatch[1];
             var page = searchParams.get('page');

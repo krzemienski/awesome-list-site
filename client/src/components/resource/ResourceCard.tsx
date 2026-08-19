@@ -10,6 +10,7 @@ import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { cn } from "@/lib/utils";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
+import { tagLandingPath } from "@shared/tagNormalize";
 
 interface ResourceCardProps {
   resource: {
@@ -27,9 +28,8 @@ interface ResourceCardProps {
   fullResource?: Resource;
   className?: string;
   onClick?: () => void;
-  /** BUG-018 (run14): when provided, tag pills become buttons that apply the
-   * tag as a filter on the hosting page; otherwise they link to the
-   * tag-filtered home view. */
+  /** When provided, normal clicks still apply the hosting page's filter while
+   * each pill remains a crawlable link to its canonical tag landing page. */
   onTagClick?: (tag: string) => void;
   /** Public read-only collections hide account/edit actions while preserving
    * the card's real detail and external links. */
@@ -271,37 +271,24 @@ function ResourceCard({
               hosting page (onTagClick) or link to the tag-filtered home. */}
           {resource.tags && resource.tags.length > 0 && (
             <>
-              {(showAllTags ? resource.tags : resource.tags.slice(0, 3)).map((tag) =>
-                onTagClick ? (
-                  <button
-                    key={tag}
-                    type="button"
-                    className="relative z-10 inline-flex items-center min-h-[32px]"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onTagClick(tag);
-                    }}
-                    data-testid={`tag-pill-${resource.id}-${tag}`}
-                    aria-label={`Filter by tag ${tag}`}
-                  >
-                    <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
-                      #{tag}
-                    </Badge>
-                  </button>
-                ) : (
-                  <Link
-                    key={tag}
-                    href={`/?tags=${encodeURIComponent(tag)}`}
-                    className="relative z-10 inline-flex items-center min-h-[32px]"
-                    data-testid={`tag-pill-${resource.id}-${tag}`}
-                    aria-label={`Browse resources tagged ${tag}`}
-                  >
-                    <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
-                      #{tag}
-                    </Badge>
-                  </Link>
-                ),
-              )}
+              {(showAllTags ? resource.tags : resource.tags.slice(0, 3)).map((tag) => (
+                <Link
+                  key={tag}
+                  href={tagLandingPath(tag)}
+                  className="relative z-10 inline-flex items-center min-h-[32px]"
+                  onClick={onTagClick ? (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onTagClick(tag);
+                  } : undefined}
+                  data-testid={`tag-pill-${resource.id}-${tag}`}
+                  aria-label={onTagClick ? `Filter by tag ${tag}` : `Browse resources tagged ${tag}`}
+                >
+                  <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                    #{tag}
+                  </Badge>
+                </Link>
+              ))}
               {/* Run15 BUG-022: "+N more" is now a real control — clicking it
                   reveals the remaining tags (and can collapse them again). */}
               {resource.tags.length > 3 && (

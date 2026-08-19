@@ -12,6 +12,15 @@ export const TAG_PLURAL_KEEP = new Set([
   "axios", "redis", "postgres", "jenkins", "devops", "chaos",
 ]);
 
+/** Minimum approved-resource count for an indexable tag landing page. */
+export const TAG_LANDING_MIN_RESOURCES = 5;
+
+const TAG_DISPLAY_ACRONYMS = new Set([
+  "ai", "api", "av1", "cdn", "dash", "drm", "ffmpeg", "hls", "hdr", "hevc",
+  "html5", "ios", "mpeg", "obs", "ott", "rtmp", "sdk", "srt", "ssai",
+  "vmaf", "vp9", "webrtc",
+]);
+
 export function normalizeTagFilter(tag: string): string {
   const folded = tag.trim().toLowerCase().replace(/[\s_]+/g, "-");
   if (TAG_PLURAL_KEEP.has(folded)) return folded;
@@ -22,6 +31,33 @@ export function normalizeTagFilter(tag: string): string {
     return folded.slice(0, -1);
   }
   return folded;
+}
+
+/** Decode a route segment and return its canonical tag identity. */
+export function normalizeTagPathSegment(segment: string): string {
+  try {
+    return normalizeTagFilter(decodeURIComponent(segment));
+  } catch {
+    return "";
+  }
+}
+
+/** Build the one canonical, URL-segment-safe landing-page path for a tag. */
+export function tagLandingPath(tag: string): string {
+  return `/tag/${encodeURIComponent(normalizeTagFilter(tag))}`;
+}
+
+/** Human-readable label for a canonical tag slug. */
+export function tagDisplayName(tag: string): string {
+  return normalizeTagFilter(tag)
+    .split("-")
+    .filter(Boolean)
+    .map((word) =>
+      TAG_DISPLAY_ACRONYMS.has(word)
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join(" ");
 }
 
 /**

@@ -30,6 +30,10 @@ import {
   LISTING_PAGE_SIZE,
   type ListingLevel,
 } from "../seo-content";
+import {
+  TAG_LANDING_MIN_RESOURCES,
+  tagLandingPath,
+} from "@shared/tagNormalize";
 import { isDatabaseUnavailableError } from "../db/errors";
 import { ServiceUnavailableError } from "../middleware/errors";
 import type {
@@ -165,6 +169,7 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
           status: "approved",
           limit: 10_000,
           sort: "newest",
+          includeFacets: true,
         }),
         categoryRepo.listCategories(),
         categoryRepo.listSubcategories(),
@@ -320,6 +325,18 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
           resourceById.get(Number(resource.id))?.updatedAt,
         );
       });
+
+      // Canonical tag landing pages. The facet query uses the same normalized
+      // tag identity and approved-resource predicate as /tag/:slug resolution.
+      for (const tag of approvedResourceResult.facets?.tags ?? []) {
+        if (tag.count < TAG_LANDING_MIN_RESOURCES) continue;
+        const basePath = tagLandingPath(tag.value);
+        addUrl(basePath, 'weekly', '0.5');
+        const totalPages = Math.ceil(tag.count / LISTING_PAGE_SIZE);
+        for (let page = 2; page <= totalPages; page++) {
+          addUrl(`${basePath}?page=${page}`, 'weekly', '0.4');
+        }
+      }
     } catch (error) {
       console.error('Error adding category/resource URLs to sitemap:', error);
     }

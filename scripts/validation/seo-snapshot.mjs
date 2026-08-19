@@ -177,6 +177,9 @@ function extractCrawlerContent(html) {
     mainLinks: [...new Set(links)],
     seoSections: {
       taxonomyIntro: markedSection("taxonomy-intro"),
+      tagIntro: markedSection("tag-intro"),
+      relatedTopics: markedSection("related-topics"),
+      listingResources: markedSection("listing-resources"),
       resourceDetails: markedSection("resource-details"),
       resourceTags: markedSection("resource-tags"),
       journeySyllabus: markedSection("journey-syllabus"),
@@ -191,6 +194,7 @@ function routeType(p) {
   if (p.startsWith("/category/")) return "category";
   if (p.startsWith("/subcategory/")) return "subcategory";
   if (p.startsWith("/sub-subcategory/")) return "sub-subcategory";
+  if (p.startsWith("/tag/")) return "tag";
   if (p.startsWith("/resource/")) return "resource";
   if (p.startsWith("/journey/")) return "journey";
   return "static";
@@ -201,6 +205,7 @@ const COLLECTION_TYPES = new Set([
   "category",
   "subcategory",
   "sub-subcategory",
+  "tag",
 ]);
 const RESOURCE_ENTITY_TYPES = new Set([
   "CreativeWork",
@@ -281,13 +286,32 @@ async function loadCorpus() {
     };
   });
   if (LIMIT > 0) entries = entries.slice(0, LIMIT);
-  // Probes — invariants that must hold OUTSIDE the sitemap set.
+  // Probes — invariants that must hold OUTSIDE the sitemap set. Discover one
+  // rare tag from the canonical approved-resource facets when available so the
+  // threshold/noindex side of the tag contract is covered without hard-coding
+  // catalog data.
+  let subThresholdTag = null;
+  try {
+    const facetResponse = await fetch(`${BASE}/api/resources?limit=1&facets=true`);
+    if (facetResponse.ok) {
+      const facetBody = await facetResponse.json();
+      subThresholdTag = facetBody?.facets?.tags?.find(
+        (tag) => Number(tag.count) > 0 && Number(tag.count) < 5,
+      )?.value ?? null;
+    }
+  } catch {
+    // Optional probe only; sitemap fetch remains the authoritative corpus.
+  }
   const probes = [
     { pathq: "/search", kind: "noindex" },
     { pathq: "/sign-in", kind: "noindex" },
+    ...(subThresholdTag
+      ? [{ pathq: `/tag/${encodeURIComponent(subThresholdTag)}`, kind: "noindex" }]
+      : []),
     { pathq: "/resource/999999999", kind: "404" },
     { pathq: "/journey/999999999", kind: "404" },
     { pathq: "/category/definitely-not-a-real-slug", kind: "404" },
+    { pathq: "/tag/definitely-not-a-real-tag", kind: "404" },
     { pathq: "/totally-unknown-route-xyz", kind: "404" },
   ].map((p) => ({
     loc: siteOrigin + p.pathq,
@@ -623,8 +647,8 @@ function paritySample(pages) {
   const sample = [];
   for (const [key, list] of byType) {
     sample.push(list[0]);
-    // two resources + two of each taxonomy level for better coverage
-    if (["resource", "category", "subcategory", "sub-subcategory", "journey"].includes(key) && list.length > 1)
+    // two resources + two of each taxonomy/tag level for better coverage
+    if (["resource", "category", "subcategory", "sub-subcategory", "tag", "journey"].includes(key) && list.length > 1)
       sample.push(list[Math.floor(list.length / 2)]);
   }
   return sample;
@@ -699,6 +723,9 @@ async function runParity(pages) {
           };
           return {
             taxonomyIntro: snapshot("taxonomy-intro"),
+            tagIntro: snapshot("tag-intro"),
+            relatedTopics: snapshot("related-topics"),
+            listingResources: snapshot("listing-resources"),
             resourceDetails: snapshot("resource-details"),
             resourceTags: snapshot("resource-tags"),
             journeySyllabus: snapshot("journey-syllabus"),
@@ -723,7 +750,7 @@ async function runParity(pages) {
         mismatches.push(`canonical: server="${s.canonical}" client="${dom.canonical}"`);
       if (dom.jsonLdCount !== s.ld.length)
         mismatches.push(`JSON-LD blocks: server=${s.ld.length} client=${dom.jsonLdCount}`);
-      const requiredHeading = ["resource", "category", "subcategory", "sub-subcategory"].includes(s.type)
+      const requiredHeading = ["resource", "category", "subcategory", "sub-subcategory", "tag"].includes(s.type)
         ? s.type === "resource" ? "Resource details" : "About this collection"
         : s.type === "journey" ? "Learning Path" : null;
       if (requiredHeading) {
@@ -745,6 +772,13 @@ async function runParity(pages) {
           "taxonomy intro",
           s.seoSections?.taxonomyIntro?.paragraphs ?? null,
           dom.seoSections.taxonomyIntro?.paragraphs ?? null,
+        );
+      }
+      if (s.type === "tag") {
+        exact(
+          "tag intro",
+          s.seoSections?.tagIntro?.paragraphs ?? null,
+          dom.seoSections.tagIntro?.paragraphs ?? null,
         );
       }
       if (s.type === "resource") {
@@ -874,8 +908,17 @@ for (const r of pages) {
         if (entity.about) enrichment.aboutCount++;
         if (entity.isPartOf) enrichment.isPartOfCount++;
       }
+      const tagLinks = r.seoSections?.resourceTags?.links ?? [];
+      if (GATE && tagLinks.some((link) => !link.href.startsWith("/tag/"))) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-resource-tag-link",
+          detail: `non-canonical tag hrefs=${tagLinks.map((link) => link.href).join(" | ")}`,
+        });
+      }
     }
-    if (["category", "subcategory", "sub-subcategory"].includes(r.type) &&
+    if (["category", "subcategory", "sub-subcategory", "tag"].includes(r.type) &&
         GATE && !headingTexts.has("About this collection")) {
       failures.push({
         url: r.pathq,
@@ -883,6 +926,76 @@ for (const r of pages) {
         code: "crawler-taxonomy-intro",
         detail: "missing About this collection heading",
       });
+    }
+    if (r.type === "tag" && GATE) {
+      const resourceLinks = (r.mainLinks ?? []).filter((href) => href.startsWith("/resource/"));
+      const relatedLinks = r.seoSections?.relatedTopics?.links ?? [];
+      const listing = r.seoSections?.listingResources;
+      const itemList = findTop(r.ld ?? [], "CollectionPage")?.mainEntity;
+      const itemCount = Array.isArray(itemList?.itemListElement)
+        ? itemList.itemListElement.length
+        : 0;
+      const totalItems = Number(itemList?.numberOfItems ?? 0);
+      const expectedStart = (r.page - 1) * PAGE_SIZE + 1;
+      const expectedEnd = expectedStart + itemCount - 1;
+      const expectedSummary = `showing ${expectedStart}–${expectedEnd} of ${totalItems}`;
+      if (!r.seoSections?.tagIntro?.paragraphs?.length) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-tag-intro",
+          detail: "missing data-derived tag intro",
+        });
+      }
+      if (!resourceLinks.length) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-tag-resources",
+          detail: "tag page has no resource links",
+        });
+      }
+      if (!listing?.text?.toLowerCase().includes(expectedSummary)) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-tag-page-summary",
+          detail: `missing "${expectedSummary}" in ${JSON.stringify(listing?.text ?? "")}`,
+        });
+      }
+      const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+      const expectedPrevious = r.page > 1
+        ? (r.page === 2 ? r.path : `${r.path}?page=${r.page - 1}`)
+        : null;
+      const expectedNext = r.page < totalPages
+        ? `${r.path}?page=${r.page + 1}`
+        : null;
+      if (expectedPrevious && !listing?.links?.some((link) => link.href === expectedPrevious)) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-tag-prev-link",
+          detail: `missing previous-page href ${expectedPrevious}`,
+        });
+      }
+      if (expectedNext && !listing?.links?.some((link) => link.href === expectedNext)) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-tag-next-link",
+          detail: `missing next-page href ${expectedNext}`,
+        });
+      }
+      if (!relatedLinks.some((link) =>
+        link.href.startsWith("/category/") || link.href.startsWith("/tag/")
+      )) {
+        failures.push({
+          url: r.pathq,
+          type: r.type,
+          code: "crawler-tag-related-links",
+          detail: "tag page has no related category/tag links",
+        });
+      }
     }
     if (COLLECTION_TYPES.has(r.type)) {
       const list = findTop(r.ld ?? [], "CollectionPage")?.mainEntity;
