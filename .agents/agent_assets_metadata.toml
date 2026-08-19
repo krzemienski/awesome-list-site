@@ -282,3 +282,10 @@ id = "Om_mfWHGBimKqe9l72TDh"
 uri = "file://exports/production-readiness-audit-skill.zip"
 type = "unspecified"
 title = "Production Readiness Audit skill (zip)"
+
+[[outputs]]
+id = "kZhE399yQM73H8KzCP4Nt"
+uri = "file://audit-evidence/VERDICT.md"
+type = "text"
+title = "Full UI/UX Audit — Final Verdict"
+description = "PASS: zero open CRITICAL, HIGH, or MEDIUM findings after a clean confirmation pass."
