@@ -87,6 +87,10 @@ args = "prefs-revision-races"
 task = "workflow.run"
 args = "response-contract-drift"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "seo-snapshot"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -255,6 +259,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run validate:response-contracts"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "seo-snapshot"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/seo-snapshot.mjs --gate --parity"
 
 [workflows.workflow.metadata]
 isValidation = true

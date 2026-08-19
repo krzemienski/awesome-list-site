@@ -17,7 +17,16 @@ import {
   clampSeoDescription,
   ogImagePath,
   subSubcategorySeoTitleCore,
+  subcategorySeoTitleCore,
+  subcategorySeoDescription,
+  subSubcategorySeoDescription,
+  journeysHubDescription,
+  resourceSeoDescription,
+  journeySeoDescription,
+  pagedSeoTitleCore,
+  pagedSeoDescription,
 } from "@shared/seo-templates";
+import { RESOURCE_PROVIDER_LABELS } from "@shared/resourceFacets";
 import {
   renderHomeContent,
   renderTaxonomyContent,
@@ -277,6 +286,8 @@ function collectionPageSchema(opts: {
   description: string;
   path: string;
   numberOfItems?: number;
+  items?: { name: string; path: string }[];
+  firstPosition?: number;
 }) {
   const cp: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -288,7 +299,20 @@ function collectionPageSchema(opts: {
     isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL + "/" },
   };
   if (typeof opts.numberOfItems === "number") {
-    cp.mainEntity = { "@type": "ItemList", numberOfItems: opts.numberOfItems };
+    cp.mainEntity = {
+      "@type": "ItemList",
+      numberOfItems: opts.numberOfItems,
+      ...(opts.items?.length
+        ? {
+            itemListElement: opts.items.map((item, index) => ({
+              "@type": "ListItem",
+              position: (opts.firstPosition ?? 1) + index,
+              name: item.name,
+              item: abs(item.path),
+            })),
+          }
+        : {}),
+    };
   }
   return cp;
 }
@@ -518,7 +542,7 @@ function homeShellChrome(): string {
     },
     "/journeys": {
       title: `Learning Journeys — ${SITE_NAME}`,
-      description: `Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines.`,
+      description: journeysHubDescription,
     },
     "/submit": {
       title: submitSeoTitle,
@@ -634,6 +658,10 @@ function homeShellChrome(): string {
             description: m.description,
             path,
             numberOfItems: published.length,
+            items: published.map((j: any) => ({
+              name: j.title,
+              path: `/journey/${j.id}`,
+            })),
           }),
           breadcrumbSchema([
             { name: "Home", path: "/" },
@@ -863,6 +891,10 @@ function homeShellChrome(): string {
           description: m.description,
           path,
           numberOfItems: cats.length,
+          items: cats.map((c) => ({
+            name: c.name,
+            path: `/category/${c.slug}`,
+          })),
         }),
         breadcrumbSchema([
           { name: "Home", path: "/" },
@@ -901,19 +933,10 @@ function homeShellChrome(): string {
       const found = findCategory(await getTreeCached(), slug);
       if (found) {
         const m = defaultMeta(path);
-        m.title = `${categorySeoTitleCore(found.name, slug)} — ${SITE_NAME}`;
-        m.description = categorySeoDescription(found.name, slug, found.count);
+        const titleCore = categorySeoTitleCore(found.name, slug);
+        m.title = `${titleCore} — ${SITE_NAME}`;
         m.image = ogImage(found.path);
         m.type = "website"; // R5-052: listing/detail pages are not articles
-        m.structuredData = [
-          collectionPageSchema({
-            name: found.name,
-            description: m.description,
-            path,
-            numberOfItems: found.count,
-          }),
-          breadcrumbSchema(found.crumbs),
-        ];
         // BUG-007 (audit 2): the SSR list must mirror the hydrated client page
         // EXACTLY — same source (the deduped tree that /api/awesome-list serves
         // to the client), same flatten order, same 24-per-page slice — so curl
@@ -932,6 +955,30 @@ function homeShellChrome(): string {
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
         }
+        m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
+        m.description = pagedSeoDescription(
+          categorySeoDescription(found.name, slug, found.count),
+          page,
+          totalPages,
+        );
+        const pageResources = flat.slice(
+          (page - 1) * LISTING_PAGE_SIZE,
+          page * LISTING_PAGE_SIZE,
+        );
+        m.structuredData = [
+          collectionPageSchema({
+            name: found.name,
+            description: m.description,
+            path: page > 1 ? `${path}?page=${page}` : path,
+            numberOfItems: found.count,
+            items: pageResources.map((r: any) => ({
+              name: r.title,
+              path: `/resource/${r.id}`,
+            })),
+            firstPosition: (page - 1) * LISTING_PAGE_SIZE + 1,
+          }),
+          breadcrumbSchema(found.crumbs),
+        ];
         // BUG-012 (audit 2): page 2+ self-canonicalizes (?page=N) instead of
         // pointing at page 1, so paginated listings are indexable; the sitemap
         // lists the same ?page=N URLs (routes.ts) — indexable set == sitemap.
@@ -973,19 +1020,11 @@ function homeShellChrome(): string {
       const found = findSubcategory(await getTreeCached(), slug);
       if (found) {
         const m = defaultMeta(path);
-        m.title = `${found.name} — ${SITE_NAME}`;
-        m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
+        const categoryName = found.crumbs[1]?.name ?? "Video Development";
+        const categorySlug = found.crumbs[1]?.path?.split("/").pop();
+        const titleCore = subcategorySeoTitleCore(found.name, categoryName, categorySlug);
         m.image = ogImage(found.path);
         m.type = "website"; // R5-052: listing/detail pages are not articles
-        m.structuredData = [
-          collectionPageSchema({
-            name: found.name,
-            description: m.description,
-            path,
-            numberOfItems: found.count,
-          }),
-          breadcrumbSchema(found.crumbs),
-        ];
         // BUG-007 (audit 2): mirror the hydrated client page exactly — same
         // tree source, same flatten order, same 24-per-page slice (the old
         // BUG-001 listResources fetch ordered differently at 100/page).
@@ -999,6 +1038,30 @@ function homeShellChrome(): string {
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
         }
+        m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
+        m.description = pagedSeoDescription(
+          subcategorySeoDescription(found.name, categoryName, found.count),
+          page,
+          totalPages,
+        );
+        const pageResources = flat.slice(
+          (page - 1) * LISTING_PAGE_SIZE,
+          page * LISTING_PAGE_SIZE,
+        );
+        m.structuredData = [
+          collectionPageSchema({
+            name: found.name,
+            description: m.description,
+            path: page > 1 ? `${path}?page=${page}` : path,
+            numberOfItems: found.count,
+            items: pageResources.map((r: any) => ({
+              name: r.title,
+              path: `/resource/${r.id}`,
+            })),
+            firstPosition: (page - 1) * LISTING_PAGE_SIZE + 1,
+          }),
+          breadcrumbSchema(found.crumbs),
+        ];
         // BUG-012 (audit 2): page 2+ self-canonicalizes (see category branch).
         if (page > 1) {
           m.url = abs(`${path}?page=${page}`);
@@ -1045,19 +1108,9 @@ function homeShellChrome(): string {
         // R5-049: shared builder also dedupes the identical child/parent case
         // ("CDN Integration – CDN Integration" stutter).
         const parentSubName = found.crumbs[2]?.name;
-        m.title = `${subSubcategorySeoTitleCore(found.name, parentSubName)} — ${SITE_NAME}`;
-        m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
+        const titleCore = subSubcategorySeoTitleCore(found.name, parentSubName);
         m.image = ogImage(found.path);
         m.type = "website"; // R5-052: listing/detail pages are not articles
-        m.structuredData = [
-          collectionPageSchema({
-            name: found.name,
-            description: m.description,
-            path,
-            numberOfItems: found.count,
-          }),
-          breadcrumbSchema(found.crumbs),
-        ];
         // BUG-007 (audit 2): mirror the hydrated client page exactly — the
         // node's own tree resources, 24 per page (the old BUG-001 fetch pulled
         // the parent category's approved set at 100/page in a different order
@@ -1072,6 +1125,34 @@ function homeShellChrome(): string {
         if (page > totalPages) {
           return { meta: notFoundMeta(path), found: false };
         }
+        m.title = `${pagedSeoTitleCore(titleCore, page)} — ${SITE_NAME}`;
+        m.description = pagedSeoDescription(
+          subSubcategorySeoDescription(
+            found.name,
+            parentSubName ?? "video development",
+            found.count,
+          ),
+          page,
+          totalPages,
+        );
+        const pageResources = flat.slice(
+          (page - 1) * LISTING_PAGE_SIZE,
+          page * LISTING_PAGE_SIZE,
+        );
+        m.structuredData = [
+          collectionPageSchema({
+            name: found.name,
+            description: m.description,
+            path: page > 1 ? `${path}?page=${page}` : path,
+            numberOfItems: found.count,
+            items: pageResources.map((r: any) => ({
+              name: r.title,
+              path: `/resource/${r.id}`,
+            })),
+            firstPosition: (page - 1) * LISTING_PAGE_SIZE + 1,
+          }),
+          breadcrumbSchema(found.crumbs),
+        ];
         // BUG-012 (audit 2): page 2+ self-canonicalizes (see category branch).
         if (page > 1) {
           m.url = abs(`${path}?page=${page}`);
@@ -1115,9 +1196,7 @@ function homeShellChrome(): string {
         if (resource && resource.status === "approved") {
           const m = defaultMeta(path);
           m.title = `${resource.title} — ${SITE_NAME}`;
-          m.description =
-            (resource.description || "").slice(0, 280) ||
-            `${resource.title} on ${SITE_NAME} — curated video development resource.`;
+          m.description = resourceSeoDescription(resource.title, resource.description);
           m.image = (resource as any).imageUrl || ogImage(path);
           m.type = "website"; // R5-052: listing/detail pages are not articles
           const crumbs: Crumb[] = [{ name: "Home", path: "/" }];
@@ -1158,22 +1237,72 @@ function homeShellChrome(): string {
             rethrowBoundedDependencyFailure(error);
           }
           crumbs.push({ name: resource.title });
+          const tags = await storage.getResourceTags(resource.id);
+          const format = (resource as any).resourceFormat ?? "unknown";
+          const entityTypeByFormat: Record<string, string> = {
+            video: "VideoObject",
+            course: "Course",
+            article: "TechArticle",
+            book: "Book",
+            dataset: "Dataset",
+            tool: "SoftwareApplication",
+            library: "SoftwareApplication",
+            player: "SoftwareApplication",
+            sdk: "SoftwareApplication",
+            "api-service": "SoftwareApplication",
+            platform: "SoftwareApplication",
+          };
+          const taxonomyCrumbs = crumbs.slice(1, -1);
+          const deepestTaxonomy = taxonomyCrumbs.at(-1);
+          const provider = (resource as any).provider;
+          const resourceEntity: Record<string, unknown> = {
+            "@type": entityTypeByFormat[format] ?? "CreativeWork",
+            name: resource.title,
+            ...(resource.description
+              ? { description: String(resource.description).slice(0, 500) }
+              : {}),
+            url: resource.url,
+            ...(provider && provider !== "unknown"
+              ? {
+                  provider: {
+                    "@type": "Organization",
+                    name: RESOURCE_PROVIDER_LABELS[provider as keyof typeof RESOURCE_PROVIDER_LABELS] ?? provider,
+                  },
+                }
+              : {}),
+            ...(tags.length ? { keywords: tags.map((tag) => tag.name).join(", ") } : {}),
+            ...(taxonomyCrumbs.length
+              ? {
+                  about: taxonomyCrumbs.map((crumb) => ({
+                    "@type": "Thing",
+                    name: crumb.name,
+                    ...(crumb.path ? { url: abs(crumb.path) } : {}),
+                  })),
+                }
+              : {}),
+            ...(deepestTaxonomy?.path
+              ? {
+                  isPartOf: {
+                    "@type": "CollectionPage",
+                    name: deepestTaxonomy.name,
+                    url: abs(deepestTaxonomy.path),
+                  },
+                }
+              : {}),
+            ...((resource as any).skillLevel && (resource as any).skillLevel !== "unknown"
+              ? { educationalLevel: (resource as any).skillLevel }
+              : {}),
+            ...(entityTypeByFormat[format] === "SoftwareApplication"
+              ? { applicationCategory: "MultimediaApplication" }
+              : {}),
+            ...((resource as any).imageUrl ? { image: (resource as any).imageUrl } : {}),
+          };
           m.structuredData = [
             webPageSchema({
               name: resource.title,
               description: m.description,
               path,
-              mainEntity: {
-                "@type": "CreativeWork",
-                name: resource.title,
-                ...(resource.description
-                  ? { description: String(resource.description).slice(0, 500) }
-                  : {}),
-                url: resource.url,
-                ...((resource as any).imageUrl
-                  ? { image: (resource as any).imageUrl }
-                  : {}),
-              },
+              mainEntity: resourceEntity,
             }),
             breadcrumbSchema(crumbs),
           ];
@@ -1247,11 +1376,16 @@ function homeShellChrome(): string {
           // for short names (2 of 5 journeys), so the emitted template
           // differed per record. Emit "<Name> — Awesome Video" for all.
           m.title = `${journey.title} — ${SITE_NAME}`;
-          m.description = journey.description
-            ? String(journey.description).slice(0, 280)
-            : `Multi-step learning journey on ${SITE_NAME}: ${journey.title}.`;
+          m.description = journeySeoDescription(journey.title, journey.description);
           m.image = ogImage(path);
           m.type = "website"; // R5-052: listing/detail pages are not articles
+          const steps = await storage.listJourneySteps(journey.id);
+          const logicalSteps = [...new Map(
+            [...steps]
+              .sort((a: any, b: any) => a.stepNumber - b.stepNumber || a.id - b.id)
+              .map((step: any) => [step.stepNumber, step]),
+          ).values()];
+          const duration = String((journey as any).estimatedDuration ?? "").match(/^(\d+)\s*hours?$/i);
           m.structuredData = [
             webPageSchema({
               name: journey.title,
@@ -1264,6 +1398,23 @@ function homeShellChrome(): string {
                   ? { description: String(journey.description).slice(0, 500) }
                   : {}),
                 provider: orgSchema(),
+                ...(journey.difficulty && journey.difficulty !== "unknown"
+                  ? { educationalLevel: journey.difficulty }
+                  : {}),
+                ...(journey.category
+                  ? { about: { "@type": "Thing", name: journey.category } }
+                  : {}),
+                isAccessibleForFree: true,
+                ...(duration ? { timeRequired: `PT${duration[1]}H` } : {}),
+                ...(logicalSteps.length
+                  ? {
+                      syllabusSections: logicalSteps.map((step: any) => ({
+                        "@type": "Syllabus",
+                        name: step.title,
+                        ...(step.description ? { description: step.description } : {}),
+                      })),
+                    }
+                  : {}),
               },
             }),
             breadcrumbSchema([

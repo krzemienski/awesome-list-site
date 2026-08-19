@@ -17,7 +17,12 @@ import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { ArrowLeft, Search } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
-import { subSubcategorySeoTitleCore } from "@shared/seo-templates";
+import {
+  subSubcategorySeoTitleCore,
+  subSubcategorySeoDescription,
+  pagedSeoTitleCore,
+  pagedSeoDescription,
+} from "@shared/seo-templates";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
@@ -368,8 +373,15 @@ export default function SubSubcategory() {
         // exactly (two-pass parity) so same-named nodes get unique titles.
         // R5-049: routed through the SAME shared builder the server uses so
         // identical child/parent names dedupe on both passes.
-        title={subSubcategorySeoTitleCore(subSubcategoryName, subcategoryName)}
-        description={`Browse ${allResources.length} curated ${subSubcategoryName.toLowerCase()} resources in the ${subcategoryName} category on Awesome Video.`}
+        title={pagedSeoTitleCore(
+          subSubcategorySeoTitleCore(subSubcategoryName, subcategoryName),
+          currentPage,
+        )}
+        description={pagedSeoDescription(
+          subSubcategorySeoDescription(subSubcategoryName, subcategoryName, allResources.length),
+          currentPage,
+          Math.max(1, Math.ceil(allResources.length / PAGE_SIZE)),
+        )}
         category={subSubcategoryName}
         resourceCount={allResources.length}
         // BUG-012 (audit 2): page 2+ self-canonicalizes (?page=N), mirroring

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
+import { resourceSeoDescription } from "@shared/seo-templates";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import {
   ArrowLeft,
@@ -491,7 +492,7 @@ export default function ResourceDetail() {
     <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
       <SEOHead 
         title={`${resource.title}`}
-        description={resource.description || scrapedDescription || `View details for ${resource.title}`}
+        description={resourceSeoDescription(resource.title, resource.description)}
       />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

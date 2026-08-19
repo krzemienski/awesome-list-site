@@ -23,6 +23,12 @@ import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
+import {
+  subcategorySeoTitleCore,
+  subcategorySeoDescription,
+  pagedSeoTitleCore,
+  pagedSeoDescription,
+} from "@shared/seo-templates";
 
 // Run16 BUG-051: same page size as Category so subcategory lists paginate
 // instead of rendering hundreds of cards at once.
@@ -454,8 +460,15 @@ export default function Subcategory() {
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       <SEOHead
-        title={subcategoryName}
-        description={`Browse ${allResources.length} curated ${subcategoryName.toLowerCase()} resources in the ${categoryName} category on Awesome Video.`}
+        title={pagedSeoTitleCore(
+          subcategorySeoTitleCore(subcategoryName, categoryName, parentCategory?.slug),
+          currentPage,
+        )}
+        description={pagedSeoDescription(
+          subcategorySeoDescription(subcategoryName, categoryName, allResources.length),
+          currentPage,
+          Math.max(1, Math.ceil(allResources.length / PAGE_SIZE)),
+        )}
         category={subcategoryName}
         resourceCount={allResources.length}
         // BUG-012 (audit 2): page 2+ self-canonicalizes (?page=N), mirroring

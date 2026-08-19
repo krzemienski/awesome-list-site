@@ -10,6 +10,11 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Rich structured data & SERP templates (August 19, 2026)
+- The server-only SEO pipeline now emits page-specific `ItemList` entries for category and journey listings, enriched resource entities (provider, taxonomy, tags, skill level, format-aware type), and Course syllabi from logical journey steps. Client pages still emit no JSON-LD.
+- `shared/seo-templates.ts` now owns hierarchy-aware listing text, resource/journey fallbacks, and pagination variants. Server crawl HTML and hydrated client heads use the same functions, preserving two-pass title/description parity.
+- `scripts/validation/seo-snapshot.mjs` is the registered `seo-snapshot` validation gate. It crawls the sitemap corpus plus noindex/404 probes, validates head/schema shape, measures duplicate text, and optionally checks hydrated parity. Before/after evidence lives in `reports/seo/`.
+
 
 ### Listing navigation & URL params — Task 261 (August 3, 2026)
 - **One page rule everywhere**: `shared/page-param.ts` holds BOTH `?page=` rules, consumed by `server/og-middleware.ts` (crawler pass) and `client/src/lib/page-param.ts` (hydrated pass) so the two passes can never disagree about one URL. LENIENT `parsePageNumber` (Number()-based so `1e3` ≡ `1000`; int32 `MAX_PAGE` cap) governs every go-to-page input and `/search` URLs (noindex — both passes clamp out-of-range, never 404). STRICT `parseUrlPageStrict` (canonical decimals only) governs taxonomy listing URLs (`/category|subcategory|sub-subcategory`): the crawler pass soft-404s `1e3`/`007`/`abc`/`0` (and 301s `?page=1` to the param-less canonical), and the client renders the same verdict as page 1 + notice. URL-sourced corrections show a dismissible `notice-page-adjusted` bar — never a silent rewrite — and correction fires even on zero-result filtered listings (one empty page). Locked by `tests/unit/page-param.test.ts` incl. a cross-pass lockstep table.

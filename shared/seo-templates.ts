@@ -249,6 +249,73 @@ export function categorySeoDescription(
     : `Browse ${count} curated ${name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
 }
 
+// Taxonomy listings ----------------------------------------------------------
+// Child listing titles need enough parent context to describe the search intent
+// but must remain within the 44-char core budget left by the brand suffix.
+const CATEGORY_INTENT_NOUNS: Record<string, string> = {
+  "intro-learning": "courses & guides",
+  "community-events": "communities & events",
+  "protocols-transport": "specs & tools",
+  "standards-industry": "specs & docs",
+};
+
+export function subcategorySeoTitleCore(
+  name: string,
+  categoryName?: string | null,
+  categorySlug?: string | null,
+): string {
+  const intent = (categorySlug && CATEGORY_INTENT_NOUNS[categorySlug]) || "tools & guides";
+  const parent = categoryName ? `${name} — ${categoryName} ${intent}` : `${name} ${intent}`;
+  if (parent.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length) return parent;
+  const concise = `${name} ${intent}`;
+  return concise.length <= SEO_TITLE_MAX - BRAND_SUFFIX.length ? concise : name;
+}
+
+export function subcategorySeoDescription(
+  name: string,
+  categoryName: string,
+  count: number,
+): string {
+  return `Explore ${count} curated ${name} resources in ${categoryName} — tools, guides, and references for video developers on ${SITE_NAME}.`;
+}
+
+export function subSubcategorySeoDescription(
+  name: string,
+  parentName: string,
+  count: number,
+): string {
+  return `Explore ${count} curated ${name} resources within ${parentName} — practical tools and guides for video developers on ${SITE_NAME}.`;
+}
+
+export const journeysHubDescription =
+  `Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines.`;
+
+export function resourceSeoDescription(title: string, description?: string | null): string {
+  return (description || "").slice(0, 280) || `${title} on ${SITE_NAME} — curated video development resource.`;
+}
+
+export function journeySeoDescription(title: string, description?: string | null): string {
+  return (description || "").slice(0, 280) || `Multi-step learning journey on ${SITE_NAME}: ${title}.`;
+}
+
+// Sitemap pagination URLs are individually canonical and indexable. Prefixing
+// the page number makes otherwise identical listing descriptions distinct while
+// retaining it if the description must be truncated at the SERP budget.
+export function pagedSeoTitleCore(core: string, page: number): string {
+  if (page < 2) return core;
+  const pageSuffix = ` — Page ${page}`;
+  const budget = SEO_TITLE_MAX - BRAND_SUFFIX.length - pageSuffix.length;
+  return `${clampAtWord(core, Math.max(1, budget))}${pageSuffix}`;
+}
+
+export function pagedSeoDescription(
+  description: string,
+  page: number,
+  totalPages: number,
+): string {
+  return page < 2 ? description : `Page ${page} of ${totalPages}: ${description}`;
+}
+
 // Static utility pages ---------------------------------------------------
 // Shared verbatim between server/og-middleware.ts (crawl-time HTML) and the
 // client pages' SEOHead usage (post-hydration DOM) so both passes agree.

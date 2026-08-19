@@ -28,6 +28,7 @@ import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
 import SEOHead from "@/components/layout/SEOHead";
 import { isLogicalJourneyStepComplete } from "@shared/journeyProgress";
+import { journeySeoDescription } from "@shared/seo-templates";
 
 interface JourneyStep {
   id: number;
@@ -355,7 +356,7 @@ export default function JourneyDetail() {
           rendered a different template. */}
       <SEOHead
         title={journey.title}
-        description={journey.description || `Multi-step learning journey on Awesome Video: ${journey.title}.`}
+        description={journeySeoDescription(journey.title, journey.description)}
       />
       
       {/* Back Button */}

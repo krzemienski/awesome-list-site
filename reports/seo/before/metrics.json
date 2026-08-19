@@ -1,0 +1,55 @@
+{
+  "generatedAt": "2026-08-19T03:29:00.149Z",
+  "base": "http://127.0.0.1:5000",
+  "siteOrigin": "https://awesome.video",
+  "mode": {
+    "gate": false,
+    "parity": true,
+    "limit": null
+  },
+  "corpus": {
+    "total": 2058,
+    "sitemap": 2051,
+    "probes": 7,
+    "fetchErrors": 0,
+    "byType": {
+      "home": 1,
+      "categories-hub": 1,
+      "journeys-hub": 1,
+      "static": 5,
+      "category": 79,
+      "subcategory": 107,
+      "sub-subcategory": 36,
+      "resource": 1816,
+      "journey": 5
+    }
+  },
+  "schema": {
+    "passRate": 1,
+    "failingUrls": 0,
+    "failureCount": 2,
+    "warningCount": 0,
+    "resourceEntityTypes": {
+      "CreativeWork": 1816
+    },
+    "journeysWithSyllabus": "0/5",
+    "collectionsWithItemListElement": 0,
+    "resourceEnrichment": {
+      "providerCount": 0,
+      "keywordsCount": 0,
+      "aboutCount": 0,
+      "isPartOfCount": 0,
+      "itemListElementPages": 0
+    }
+  },
+  "duplicates": {
+    "titleRate": 0.0634,
+    "titleDupUrls": 130,
+    "descriptionRate": 0.0575,
+    "descriptionDupUrls": 118
+  },
+  "parity": {
+    "sampled": 17,
+    "failed": 7
+  }
+}

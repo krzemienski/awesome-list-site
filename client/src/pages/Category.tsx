@@ -8,7 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SEOHead from "@/components/layout/SEOHead";
-import { categorySeoTitleCore, categorySeoDescription } from "@shared/seo-templates";
+import {
+  categorySeoTitleCore,
+  categorySeoDescription,
+  pagedSeoTitleCore,
+  pagedSeoDescription,
+} from "@shared/seo-templates";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ViewModeToggle, ViewMode, isLayoutViewMode } from "@/components/ui/view-mode-toggle";
 import ResourceCard from "@/components/resource/ResourceCard";
@@ -640,8 +645,12 @@ export default function Category() {
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       <SEOHead
-        title={categorySeoTitleCore(categoryName, slug)}
-        description={categorySeoDescription(categoryName, slug, allResources.length)}
+        title={pagedSeoTitleCore(categorySeoTitleCore(categoryName, slug), currentPage)}
+        description={pagedSeoDescription(
+          categorySeoDescription(categoryName, slug, allResources.length),
+          currentPage,
+          Math.max(1, Math.ceil(allResources.length / PAGE_SIZE)),
+        )}
         category={categoryName}
         resourceCount={allResources.length}
         // BUG-012 (audit 2): page 2+ self-canonicalizes (?page=N), mirroring

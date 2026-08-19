@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { journeysHubDescription } from "@shared/seo-templates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -98,7 +99,7 @@ export default function Journeys() {
       <div className="container mx-auto px-4 py-8 max-w-7xl" aria-busy={true} aria-live="polite">
         <SEOHead
           title="Learning Journeys"
-          description="Explore structured learning paths to master new skills"
+          description={journeysHubDescription}
         />
         <div className="mb-8">
           <Skeleton className="h-10 w-64 mb-4" />
@@ -117,7 +118,7 @@ export default function Journeys() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <SEOHead
         title="Learning Journeys"
-        description="Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines. Learn on Awesome Video."
+        description={journeysHubDescription}
       />
       
       {/* Header */}
