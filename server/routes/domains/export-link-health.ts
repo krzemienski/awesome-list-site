@@ -73,6 +73,16 @@ import { checkResourceLinks, formatLinkCheckReport } from "../../validation/link
 import { seedDatabase } from "../../seed";
 import { buildCanonicalTagMap, canonicalizeTagArray } from "../../lib/tagCanonicalize";
 import { getPublicCacheValue } from "../../cache/publicCache";
+import {
+  LISTING_PAGE_SIZE,
+  countNodeResources,
+  findCategory,
+  findSubcategory,
+  findSubSubcategory,
+  flattenListingResources,
+  type ListingLevel,
+} from "../../seo-content";
+import { normalizeTagFilter } from "@shared/tagNormalize";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
 import { runHeavyWork, startHeavyWork } from "../../ops/heavyWork";
@@ -1208,6 +1218,147 @@ export function registerAwesomeListDiscoveryRoutes(
     } catch (error) {
       console.error('Error building awesome-list nav:', error);
       sendOperationalFailure(res, error, 'Failed to build navigation tree');
+    }
+  });
+
+  // Taxonomy pages need exactly one tree-ordered resource slice. The crawler
+  // uses the same cached tree and flattenListingResources(), so page N has one
+  // authoritative order for both SSR and the live React view.
+  app.get("/api/awesome-list/listing", resourceReadLimiter, async (req, res) => {
+    try {
+      const level = req.query.level;
+      const slug = req.query.slug;
+      if (
+        (level !== "category" && level !== "subcategory" && level !== "sub-subcategory") ||
+        typeof slug !== "string"
+      ) {
+        return res.status(400).json({ message: "level and slug are required" });
+      }
+
+      const parsedPage = Number(req.query.page ?? "1");
+      if (!Number.isSafeInteger(parsedPage) || parsedPage < 1) {
+        return res.status(400).json({ message: "page must be a positive integer" });
+      }
+
+      const tree = await legacyRepo.getAwesomeListFromDatabase();
+      const match =
+        level === "category"
+          ? findCategory(tree, slug)
+          : level === "subcategory"
+            ? findSubcategory(tree, slug)
+            : findSubSubcategory(tree, slug);
+      if (!match) return res.status(404).json({ message: "Taxonomy node not found" });
+
+      const allResources = flattenListingResources(match.node, level as ListingLevel);
+      const requestedSubcategory =
+        typeof req.query.subcategory === "string" ? req.query.subcategory : undefined;
+      const requestedSubSubcategory =
+        typeof req.query.subSubcategory === "string" ? req.query.subSubcategory : undefined;
+      const requestedGeneral = req.query.general === "1";
+      const directResources = new Set(
+        (match.node?.resources ?? []).map((item: any) => `${item?.id ?? ""}|${item?.url ?? ""}`),
+      );
+
+      const children =
+        level === "category"
+          ? (match.node.subcategories ?? []).map((sub: any) => ({
+              name: sub.name,
+              slug: sub.slug,
+              count: countNodeResources(sub),
+              subSubcategories: (sub.subSubcategories ?? []).map((subSub: any) => ({
+                name: subSub.name,
+                slug: subSub.slug,
+                count: countNodeResources(subSub),
+              })),
+            }))
+          : level === "subcategory"
+            ? (match.node.subSubcategories ?? []).map((subSub: any) => ({
+                name: subSub.name,
+                slug: subSub.slug,
+                count: countNodeResources(subSub),
+              }))
+            : [];
+      const validSubcategory =
+        level === "category" &&
+        requestedSubcategory &&
+        children.some((child: any) => child.name === requestedSubcategory);
+      const validSubSubcategory =
+        level === "category" &&
+        requestedSubcategory &&
+        requestedSubSubcategory &&
+        children.some((child: any) =>
+          child.name === requestedSubcategory &&
+          child.subSubcategories.some((subSub: any) => subSub.name === requestedSubSubcategory),
+        );
+      const validChild =
+        level === "subcategory" &&
+        requestedSubcategory &&
+        children.some((child: any) => child.name === requestedSubcategory);
+      const ignoredSubcategory = Boolean(
+        requestedSubcategory &&
+          !((level === "category" && validSubcategory) || (level === "subcategory" && validChild)),
+      );
+      const ignoredSubSubcategory = Boolean(
+        requestedSubSubcategory && !(level === "category" && validSubSubcategory),
+      );
+      const generalIgnored = requestedGeneral && directResources.size === 0;
+
+      let scoped = allResources;
+      if (requestedGeneral && !generalIgnored) {
+        scoped = scoped.filter((item: any) => directResources.has(`${item?.id ?? ""}|${item?.url ?? ""}`));
+      } else if (level === "category" && validSubcategory) {
+        scoped = scoped.filter((item: any) =>
+          item.subcategory === requestedSubcategory &&
+          (!requestedSubSubcategory || !validSubSubcategory || item.subSubcategory === requestedSubSubcategory),
+        );
+      } else if (level === "subcategory" && validChild) {
+        scoped = scoped.filter((item: any) => item.subSubcategory === requestedSubcategory);
+      }
+
+      const tagCounts = new Map<string, number>();
+      for (const item of allResources) {
+        const seen = new Set<string>();
+        for (const rawTag of item.metadata?.tags ?? item.tags ?? []) {
+          const tag = level === "category" ? normalizeTagFilter(String(rawTag)) : String(rawTag);
+          if (!tag || seen.has(tag)) continue;
+          seen.add(tag);
+          tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+        }
+      }
+      const tags = [...tagCounts.entries()]
+        .map(([tag, count]) => ({ tag, count }))
+        .sort((a, b) => b.count - a.count);
+      const total = scoped.length;
+      const totalPages = Math.max(1, Math.ceil(total / LISTING_PAGE_SIZE));
+      const start = (parsedPage - 1) * LISTING_PAGE_SIZE;
+      const body = JSON.stringify({
+        level,
+        node: { name: match.name, slug },
+        parents: {
+          category: match.category ? { name: match.category.name, slug: match.category.slug } : undefined,
+          subcategory: match.subcategory
+            ? { name: match.subcategory.name, slug: match.subcategory.slug }
+            : undefined,
+        },
+        page: parsedPage,
+        pageSize: LISTING_PAGE_SIZE,
+        total,
+        totalPages,
+        totalAll: allResources.length,
+        generalCount: directResources.size,
+        scope: { ignoredSubcategory, ignoredSubSubcategory, generalIgnored },
+        children,
+        tags,
+        resources: scoped.slice(start, start + LISTING_PAGE_SIZE),
+      });
+      const etag = '"' + crypto.createHash("sha1").update(body).digest("hex") + '"';
+      res.set("ETag", etag);
+      res.set("Cache-Control", "public, max-age=0, must-revalidate");
+      if (req.headers["if-none-match"] === etag) return res.status(304).end();
+      return res.type("application/json").send(body);
+    } catch (error) {
+      console.error("Error building awesome-list listing:", error);
+      sendOperationalFailure(res, error, "Failed to build taxonomy listing");
     }
   });
 

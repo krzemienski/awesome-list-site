@@ -149,16 +149,21 @@ const rootElement = document.getElementById("root")!;
       ) {
         return remove();
       }
-      // Watch the query cache directly (no body-stream races). Run22 BUG-008:
-      // listing routes settle on the full catalog under ["awesome-list-data"];
-      // all other routes no longer fetch the corpus, so they settle on the
-      // lightweight nav tree under ["awesome-list-nav"] instead.
-      const settleKey = needsCorpusRoute(window.location.pathname)
-        ? ["awesome-list-data"]
-        : ["awesome-list-nav"];
+      // Watch the query cache directly (no body-stream races). Taxonomy pages
+      // settle on their paged listing query; Advanced settles on the corpus;
+      // all remaining routes use the lightweight nav tree.
+      const taxonomy = /^\/(category|subcategory|sub-subcategory)\//.test(window.location.pathname);
+      const settleKey = taxonomy
+        ? undefined
+        : needsCorpusRoute(window.location.pathname) ? ["awesome-list-data"] : ["awesome-list-nav"];
+      const matchingQueries = taxonomy
+        ? queryClient.getQueryCache().findAll({ queryKey: ["awesome-list-listing"] })
+        : [];
       if (
         !dataSettledAt &&
-        queryClient.getQueryData(settleKey) !== undefined
+        (taxonomy
+          ? matchingQueries.some((query) => query.state.data !== undefined)
+          : settleKey && queryClient.getQueryData(settleKey) !== undefined)
       ) {
         dataSettledAt = Date.now();
       }
@@ -166,7 +171,11 @@ const rootElement = document.getElementById("root")!;
       // the SPA renders its styled error card + Retry underneath, and the
       // overlay used to sit on top of it until the hard cap, trapping users
       // on a frozen unstyled snapshot during outages.
-      if (queryClient.getQueryState(settleKey)?.status === "error") {
+      if (
+        taxonomy
+          ? matchingQueries.some((query) => query.state.status === "error")
+          : settleKey && queryClient.getQueryState(settleKey)?.status === "error"
+      ) {
         return remove();
       }
       const reactCommitted = !!rootElement.firstElementChild;

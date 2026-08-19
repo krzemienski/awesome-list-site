@@ -17,6 +17,87 @@
 
 export type Crumb = { name: string; path?: string };
 
+export type TaxonomyMatch = {
+  name: string;
+  path: string;
+  count: number;
+  crumbs: Crumb[];
+  node: any;
+  category?: any;
+  subcategory?: any;
+};
+
+/** Count the resources in a node and every descendant, in tree order. */
+export function countNodeResources(node: any): number {
+  let total = Array.isArray(node?.resources) ? node.resources.length : 0;
+  for (const sub of node?.subcategories ?? []) total += countNodeResources(sub);
+  for (const subSub of node?.subSubcategories ?? []) total += countNodeResources(subSub);
+  return total;
+}
+
+export function findCategory(tree: any, slug: string): TaxonomyMatch | null {
+  const category = (tree?.categories ?? []).find((item: any) => item.slug === slug);
+  if (!category) return null;
+  const path = `/category/${category.slug}`;
+  return {
+    name: category.name,
+    path,
+    count: countNodeResources(category),
+    crumbs: [{ name: "Home", path: "/" }, { name: category.name, path }],
+    node: category,
+    category,
+  };
+}
+
+export function findSubcategory(tree: any, slug: string): TaxonomyMatch | null {
+  for (const category of tree?.categories ?? []) {
+    const subcategory = (category.subcategories ?? []).find((item: any) => item.slug === slug);
+    if (!subcategory) continue;
+    const path = `/subcategory/${subcategory.slug}`;
+    return {
+      name: subcategory.name,
+      path,
+      count: countNodeResources(subcategory),
+      crumbs: [
+        { name: "Home", path: "/" },
+        { name: category.name, path: `/category/${category.slug}` },
+        { name: subcategory.name, path },
+      ],
+      node: subcategory,
+      category,
+      subcategory,
+    };
+  }
+  return null;
+}
+
+export function findSubSubcategory(tree: any, slug: string): TaxonomyMatch | null {
+  for (const category of tree?.categories ?? []) {
+    for (const subcategory of category.subcategories ?? []) {
+      const subSubcategory = (subcategory.subSubcategories ?? []).find(
+        (item: any) => item.slug === slug,
+      );
+      if (!subSubcategory) continue;
+      const path = `/sub-subcategory/${subSubcategory.slug}`;
+      return {
+        name: subSubcategory.name,
+        path,
+        count: countNodeResources(subSubcategory),
+        crumbs: [
+          { name: "Home", path: "/" },
+          { name: category.name, path: `/category/${category.slug}` },
+          { name: subcategory.name, path: `/subcategory/${subcategory.slug}` },
+          { name: subSubcategory.name, path },
+        ],
+        node: subSubcategory,
+        category,
+        subcategory,
+      };
+    }
+  }
+  return null;
+}
+
 export function escapeHtml(s: unknown): string {
   return String(s ?? "")
     .replace(/&/g, "&amp;")

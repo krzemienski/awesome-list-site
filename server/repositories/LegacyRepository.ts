@@ -101,7 +101,10 @@ export class LegacyRepository {
       .select()
       .from(resources)
       .where(eq(resources.status, 'approved'))
-      .orderBy(asc(resources.title));
+      // Taxonomy listings are sliced both by the crawler renderer and by the
+      // paged public API. A numeric tie-breaker makes those page boundaries
+      // deterministic when two approved resources share a title.
+      .orderBy(asc(resources.title), asc(resources.id));
 
     // Dedup by normalized URL (BUG-005). Duplicate rows for the same resource
     // (same URL, different id/description) inflate category/subcategory counts

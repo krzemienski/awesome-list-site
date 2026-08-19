@@ -172,6 +172,26 @@ async function main() {
     auditHeaders,
   );
   await check("GET /api/resources", "/api/resources", 200);
+  // Resolve a real taxonomy slug first so this checks the named listing
+  // response schema against an actual 24-card page rather than a 404.
+  try {
+    const navRes = await fetch(`${base}/api/awesome-list/nav`);
+    const nav = (await navRes.json()) as { categories?: Array<{ slug?: string }> };
+    const slug = nav.categories?.[0]?.slug;
+    if (!slug) throw new Error("nav response had no category slug");
+    await check(
+      "GET /api/awesome-list/listing (first category)",
+      `/api/awesome-list/listing?level=category&slug=${encodeURIComponent(slug)}&page=1`,
+      200,
+    );
+  } catch (error) {
+    checks.push({
+      label: "GET /api/awesome-list/listing",
+      status: 0,
+      ok: false,
+      detail: error instanceof Error ? error.message : String(error),
+    });
+  }
   await check("GET /api/recommendations", "/api/recommendations", 200);
   await check(
     "GET /api/admin/pending-resources (audit-key)",

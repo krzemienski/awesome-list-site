@@ -91,6 +91,14 @@ args = "response-contract-drift"
 task = "workflow.run"
 args = "seo-snapshot"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "taxonomy-listing-parity"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "taxonomy-no-corpus-fetch"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -270,6 +278,28 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/seo-snapshot.mjs --gate --parity"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "taxonomy-listing-parity"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/taxonomy-listing-parity.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "taxonomy-no-corpus-fetch"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/taxonomy-no-corpus-fetch.mjs"
 
 [workflows.workflow.metadata]
 isValidation = true

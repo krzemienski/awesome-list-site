@@ -4,6 +4,11 @@
 
 A production-ready React application for browsing and discovering over 2,600 curated video development resources. The project uses PostgreSQL as the single source of truth for all data, providing a modern, mobile-optimized user interface with advanced search and filtering capabilities, dark theme support, and Google Analytics tracking. Features include AI-powered learning platform capabilities, user authentication, admin panel, and bidirectional GitHub synchronization for `awesome-list` repositories. The business vision is to create a leading platform for video development education and resource discovery, leveraging AI for personalized learning paths and an engaged community.
 
+
+## Taxonomy listing API
+
+- `GET /api/awesome-list/listing?level=category|subcategory|sub-subcategory&slug=<slug>&page=<n>` returns one deterministic 24-resource taxonomy page, totals, child counts, tags, and parent metadata. It slices the same cached tree and tree order as crawler prerendering; default category browsing must use this endpoint rather than `/api/awesome-list`.
+
 **Production Status**: ✅ Production-ready as of December 4, 2025. All critical bugs fixed, database integrity verified (0 orphaned resources), comprehensive error handling implemented.
 
 ## Recent Changes

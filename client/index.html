@@ -141,11 +141,9 @@
       // shot) so warm loads don't serialize bundle-parse -> fetch. The catch
       // only silences unhandled-rejection noise; consumers handle errors.
       (function () {
-        // Run22 BUG-008: the nav tree (~few KB) is needed by the chrome on
-        // every page, so always early-fetch it. The full 2.7MB corpus is only
-        // early-fetched on routes whose content renders resource listings —
-        // keep this route list in sync with needsCorpusRoute() in
-        // client/src/lib/static-data.ts.
+          // The nav tree (~few KB) is needed by chrome on every page. Default
+          // taxonomy views prefetch one 24-card listing slice; the full corpus
+          // remains reserved for Advanced browse and taxonomy filter modes.
         try {
           var n = fetch('/api/awesome-list/nav', { credentials: 'same-origin' });
           window.__awesomeListNavEarlyFetch = n;
@@ -153,19 +151,38 @@
         } catch (e) {}
         try {
           var pth = location.pathname;
-          // Run23 R-06: '/' and '/categories' are nav-only now.
-          // Run23 NB-010: '/recommendations' removed — anonymous visitors
-          // never render the corpus there; the authed panel fetches it
-          // lazily once auth resolves.
-          var needsCorpus =
-            pth === '/advanced' ||
-            pth.indexOf('/category/') === 0 ||
-            pth.indexOf('/subcategory/') === 0 ||
-            pth.indexOf('/sub-subcategory/') === 0;
+          var taxonomyMatch = pth.match(/^\/(category|subcategory|sub-subcategory)\/([^/]+)$/);
+          var searchParams = new URLSearchParams(location.search);
+          var needsCorpus = pth === '/advanced' || (
+            !!taxonomyMatch &&
+            (!!searchParams.get('search') || !!searchParams.get('tags') || !!searchParams.get('tag') ||
+             !!searchParams.get('sortBy') || !!searchParams.get('sort'))
+          );
           if (needsCorpus) {
             var p = fetch('/api/awesome-list', { credentials: 'same-origin' });
             window.__awesomeListEarlyFetch = p;
             p.catch(function () {});
+          } else if (taxonomyMatch) {
+            var level = taxonomyMatch[1] === 'sub-subcategory' ? 'sub-subcategory' : taxonomyMatch[1];
+            var page = searchParams.get('page');
+            if (!page || /^[1-9]\d*$/.test(page)) {
+              var listingParams = new URLSearchParams({ level: level, slug: decodeURIComponent(taxonomyMatch[2]), page: page || '1' });
+              var subcategory = searchParams.get('subcategory');
+              if (subcategory) {
+                if (level === 'category' && subcategory.indexOf(' › ') !== -1) {
+                  var pieces = subcategory.split(' › ');
+                  listingParams.set('subcategory', pieces[0]);
+                  listingParams.set('subSubcategory', pieces[1]);
+                } else {
+                  listingParams.set('subcategory', subcategory);
+                }
+              }
+              if (searchParams.get('filter') === 'general' || searchParams.get('view') === 'general') listingParams.set('general', '1');
+              var listingUrl = '/api/awesome-list/listing?' + listingParams.toString();
+              var listingPromise = fetch(listingUrl, { credentials: 'same-origin' });
+              window.__awesomeListListingEarlyFetch = { url: listingUrl, promise: listingPromise };
+              listingPromise.catch(function () {});
+            }
           }
         } catch (e) {}
         // Task #307: the Task-169 auth early-fetch was removed — the Clerk

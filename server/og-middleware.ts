@@ -38,6 +38,10 @@ import {
   renderCategoriesContent,
   flattenListingResources,
   LISTING_PAGE_SIZE,
+  countNodeResources,
+  findCategory,
+  findSubcategory,
+  findSubSubcategory,
 } from "./seo-content";
 import { buildRelatedResources } from "./services/relatedResources";
 import { CollectionRepository } from "./repositories/CollectionRepository";
@@ -335,95 +339,9 @@ function webPageSchema(opts: {
   if (opts.mainEntity) wp.mainEntity = opts.mainEntity;
   return wp;
 }
-
-// Recursive count of distinct resources under a taxonomy node. The hierarchical
-// tree (getAwesomeListFromDatabase) places every approved resource in exactly
-// ONE node, so summing each level's own `resources` array yields the accurate
-// total — unlike the prior `listResources({ status: "published" })` lookup,
-// which returned 0 because public resources are status "approved".
-function countNodeResources(node: any): number {
-  let n = Array.isArray(node?.resources) ? node.resources.length : 0;
-  for (const s of node?.subcategories ?? []) n += countNodeResources(s);
-  for (const ss of node?.subSubcategories ?? []) n += countNodeResources(ss);
-  return n;
-}
-
-// The shared public cache inside LegacyRepository coalesces and invalidates
-// this tree together with the JSON catalog/nav and route metadata.
 async function getTreeCached(): Promise<any> {
   return storage.getAwesomeListFromDatabase();
 }
-
-type TaxoMatch = {
-  name: string;
-  path: string;
-  count: number;
-  crumbs: Crumb[];
-  node: any;
-};
-
-function findCategory(tree: any, slug: string): TaxoMatch | null {
-  const cat = (tree?.categories ?? []).find((c: any) => c.slug === slug);
-  if (!cat) return null;
-  const path = `/category/${cat.slug}`;
-  return {
-    name: cat.name,
-    path,
-    count: countNodeResources(cat),
-    crumbs: [{ name: "Home", path: "/" }, { name: cat.name, path }],
-    node: cat,
-  };
-}
-
-function findSubcategory(tree: any, slug: string): TaxoMatch | null {
-  for (const cat of tree?.categories ?? []) {
-    const sub = (cat.subcategories ?? []).find((s: any) => s.slug === slug);
-    if (sub) {
-      const path = `/subcategory/${sub.slug}`;
-      return {
-        name: sub.name,
-        path,
-        count: countNodeResources(sub),
-        crumbs: [
-          { name: "Home", path: "/" },
-          { name: cat.name, path: `/category/${cat.slug}` },
-          { name: sub.name, path },
-        ],
-        node: sub,
-      };
-    }
-  }
-  return null;
-}
-
-function findSubSubcategory(tree: any, slug: string): TaxoMatch | null {
-  for (const cat of tree?.categories ?? []) {
-    for (const sub of cat.subcategories ?? []) {
-      const ss = (sub.subSubcategories ?? []).find((x: any) => x.slug === slug);
-      if (ss) {
-        const path = `/sub-subcategory/${ss.slug}`;
-        return {
-          name: ss.name,
-          path,
-          count: countNodeResources(ss),
-          crumbs: [
-            { name: "Home", path: "/" },
-            { name: cat.name, path: `/category/${cat.slug}` },
-            { name: sub.name, path: `/subcategory/${sub.slug}` },
-            { name: ss.name, path },
-          ],
-          node: ss,
-        };
-      }
-    }
-  }
-  return null;
-}
-
-// Decode a URL path segment without throwing on malformed percent-encoding.
-// A malformed segment (e.g. an incomplete "%E0%A4") can never match a real
-// slug/id, so returning the raw value lets the existence check fall through to
-// a proper soft-404 instead of bubbling a URIError up to the fail-open catch.
 function safeDecode(segment: string): string {
   try {
     return decodeURIComponent(segment);

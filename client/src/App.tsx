@@ -547,10 +547,9 @@ function Router() {
     staleTime: 1000 * 60 * 60,
   });
 
-  // Run23 R-06: '/' and '/categories' left needsCorpusRoute — Home/Categories
-  // render from the nav tree; Home lazily fetches the corpus itself only when
-  // a tag filter activates. This app-level query remains the warm-start for
-  // the listing routes (category/subcategory/sub-subcategory/advanced/recs).
+  // The corpus is only a warm-start for Advanced browse. Taxonomy pages fetch
+  // one server-paged tree slice and opt into this query themselves only after
+  // an in-page search, tag filter, or alternate sort is active.
   const corpusNeeded = needsCorpusRoute(location);
   const { error } = useQuery({
     queryKey: ["awesome-list-data"],

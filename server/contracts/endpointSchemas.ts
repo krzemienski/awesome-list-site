@@ -234,10 +234,24 @@ const journeyItemSchema = z
 
 const journeysListResponseSchema = z.array(journeyItemSchema);
 
-// ---------------------------------------------------------------------------
-// Registration
-// ---------------------------------------------------------------------------
-
+const awesomeListListingResponseSchema = z.object({
+  level: z.enum(["category", "subcategory", "sub-subcategory"]),
+  node: z.object({ name: z.string(), slug: z.string() }),
+  page: z.number().int().positive(),
+  pageSize: z.literal(24),
+  total: z.number().int().nonnegative(),
+  totalPages: z.number().int().positive(),
+  totalAll: z.number().int().nonnegative(),
+  generalCount: z.number().int().nonnegative(),
+  scope: z.object({
+    ignoredSubcategory: z.boolean(),
+    ignoredSubSubcategory: z.boolean(),
+    generalIgnored: z.boolean(),
+  }),
+  children: z.array(z.object({ name: z.string(), slug: z.string(), count: z.number() }).passthrough()),
+  tags: z.array(z.object({ tag: z.string(), count: z.number() })),
+  resources: z.array(publicResourceSchema),
+}).passthrough();
 /**
  * Register structural 200 schemas for all key endpoints. Must be called
  * before `installApiContractRegistration` so that when the auto-installer
@@ -298,5 +312,11 @@ export function registerCoreEndpointSchemas(): void {
     name: "JourneysListResponse",
     description: "Full journey list with per-journey step and enrolment counts",
     schema: journeysListResponseSchema,
+  });
+
+  setRouteResponseSchema("get", "/api/awesome-list/listing", {
+    name: "AwesomeListListingResponse",
+    description: "One deterministic, tree-ordered taxonomy page with metadata for browse controls",
+    schema: awesomeListListingResponseSchema,
   });
 }

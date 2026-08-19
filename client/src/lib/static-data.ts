@@ -116,12 +116,63 @@ export function needsCorpusRoute(pathname: string): boolean {
   // Home lazily pulls the corpus ONLY when a tag filter activates.
   // Run23 NB-010: '/recommendations' removed — anonymous visitors render only
   // /api/recommendations; the authed panel's query pulls the corpus lazily.
-  return (
-    pathname === '/advanced' ||
-    pathname.startsWith('/category/') ||
-    pathname.startsWith('/subcategory/') ||
-    pathname.startsWith('/sub-subcategory/')
-  );
+  return pathname === '/advanced';
+}
+
+export type ListingLevel = "category" | "subcategory" | "sub-subcategory";
+
+export interface AwesomeListListing {
+  level: ListingLevel;
+  node: { name: string; slug: string };
+  parents: {
+    category?: { name: string; slug: string };
+    subcategory?: { name: string; slug: string };
+  };
+  page: number;
+  pageSize: 24;
+  total: number;
+  totalPages: number;
+  totalAll: number;
+  generalCount: number;
+  scope: {
+    ignoredSubcategory: boolean;
+    ignoredSubSubcategory: boolean;
+    generalIgnored: boolean;
+  };
+  children: Array<{
+    name: string;
+    slug: string;
+    count: number;
+    subSubcategories?: Array<{ name: string; slug: string; count: number }>;
+  }>;
+  tags: Array<{ tag: string; count: number }>;
+  resources: any[];
+}
+
+export async function fetchListingPage(
+  level: ListingLevel,
+  slug: string,
+  page: number,
+  options: { subcategory?: string; subSubcategory?: string; general?: boolean } = {},
+): Promise<AwesomeListListing> {
+  const params = new URLSearchParams({ level, slug, page: String(page) });
+  if (options.subcategory) params.set("subcategory", options.subcategory);
+  if (options.subSubcategory) params.set("subSubcategory", options.subSubcategory);
+  if (options.general) params.set("general", "1");
+  const url = `/api/awesome-list/listing?${params.toString()}`;
+  if (typeof window !== "undefined") {
+    const early = (window as any).__awesomeListListingEarlyFetch;
+    if (early?.url === url && early.promise) {
+      (window as any).__awesomeListListingEarlyFetch = undefined;
+      const response = await early.promise;
+      if (response.ok) return response.json();
+    }
+  }
+  const response = await fetchWithTimeout(url, AWESOME_LIST_TIMEOUT_MS);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} ${response.statusText || ""} from ${url}`.trim());
+  }
+  return response.json();
 }
 
 export async function fetchAwesomeListNav(): Promise<AwesomeListNav> {

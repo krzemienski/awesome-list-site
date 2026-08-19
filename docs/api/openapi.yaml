@@ -7467,6 +7467,173 @@ components:
             items:
               type: string
               maxLength: 512
+    get_3a__2f_api_2f_awesome-list_2f_listing.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 512
+          - type: string
+            maxLength: 0
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    AwesomeListListingResponse:
+      type: object
+      properties:
+        level:
+          type: string
+          enum:
+            - category
+            - subcategory
+            - sub-subcategory
+        node:
+          type: object
+          properties:
+            name:
+              type: string
+            slug:
+              type: string
+          required:
+            - name
+            - slug
+          additionalProperties: false
+        page:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 9007199254740991
+        pageSize:
+          type: number
+          enum:
+            - 24
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        totalPages:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 9007199254740991
+        totalAll:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        generalCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        scope:
+          type: object
+          properties:
+            ignoredSubcategory:
+              type: boolean
+            ignoredSubSubcategory:
+              type: boolean
+            generalIgnored:
+              type: boolean
+          required:
+            - ignoredSubcategory
+            - ignoredSubSubcategory
+            - generalIgnored
+          additionalProperties: false
+        children:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              slug:
+                type: string
+              count:
+                type: number
+            required:
+              - name
+              - slug
+              - count
+            additionalProperties: {}
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              tag:
+                type: string
+              count:
+                type: number
+            required:
+              - tag
+              - count
+            additionalProperties: false
+        resources:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              status:
+                type: string
+            required:
+              - id
+              - title
+              - url
+              - status
+            additionalProperties: {}
+      required:
+        - level
+        - node
+        - page
+        - pageSize
+        - total
+        - totalPages
+        - totalAll
+        - generalCount
+        - scope
+        - children
+        - tags
+        - resources
+      additionalProperties: {}
     post_3a__2f_api_2f_switch-list.Query:
       type: object
       properties:
@@ -30729,6 +30896,146 @@ paths:
       x-middleware: []
       x-contract-schemas:
         query: get_3a__2f_api_2f_awesome-list_2f_nav.Query
+  /api/awesome-list/listing:
+    get:
+      operationId: get:/api/awesome-list/listing
+      responses:
+        '200':
+          description: One deterministic, tree-ordered taxonomy page with metadata for browse controls
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AwesomeListListingResponse'
+        '304':
+          description: Successful response with no body
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - awesome-list
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      x-domain: awesome-list
+      x-middleware: []
+      x-contract-schemas:
+        query: get_3a__2f_api_2f_awesome-list_2f_listing.Query
   /api/switch-list:
     post:
       operationId: post:/api/switch-list
