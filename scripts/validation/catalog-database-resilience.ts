@@ -366,6 +366,10 @@ async function main() {
       const admissionRejection = saturatedPages.reduce((fastest, current) =>
         current.durationMs < fastest.durationMs ? current : fastest,
       );
+      // 80 distinct routes exceed both the five active uncached resolutions
+      // and the 32-waiter queue. Local queue overflow must fail fast instead of
+      // occupying retry timers; downstream pool/public-cache saturation keeps
+      // its separate bounded retry behavior.
       assert(
         admissionRejection.durationMs < 1_000,
         `no immediate HTTP cache-admission rejection observed (${admissionRejection.durationMs}ms)`,

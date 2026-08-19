@@ -143,9 +143,64 @@ function isRetryableSaturationFailure(error: unknown): boolean {
   );
 }
 
+function routeResolutionAbortedError(): ServiceUnavailableError {
+  return new ServiceUnavailableError("Route resolution request was aborted");
+}
+
+function throwIfRouteResolutionAborted(signal?: AbortSignal): void {
+  if (signal?.aborted) throw routeResolutionAbortedError();
+}
+
+async function waitForRouteResolution<T>(
+  promise: Promise<T>,
+  signal?: AbortSignal,
+): Promise<T> {
+  if (!signal) return promise;
+  throwIfRouteResolutionAborted(signal);
+
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(routeResolutionAbortedError());
+    signal.addEventListener("abort", onAbort, { once: true });
+    promise.then(
+      (value) => {
+        signal.removeEventListener("abort", onAbort);
+        resolve(value);
+      },
+      (error) => {
+        signal.removeEventListener("abort", onAbort);
+        reject(error);
+      },
+    );
+  });
+}
+
+async function waitForSaturationBackoff(
+  delayMs: number,
+  signal?: AbortSignal,
+): Promise<void> {
+  if (!signal) {
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    return;
+  }
+  throwIfRouteResolutionAborted(signal);
+
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, delayMs);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(routeResolutionAbortedError());
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
 async function resolveRouteWithSaturationRetry(
   url: string,
   urlPath: string,
+  signal?: AbortSignal,
 ): Promise<ResolvedRoute> {
   // Two escalating backoffs: the first rides out a momentary acquire-queue
   // spike; the second (~1.2s) outlasts a sustained crawler burst window in
@@ -157,8 +212,10 @@ async function resolveRouteWithSaturationRetry(
   ];
   for (let attempt = 0; ; attempt++) {
     try {
-      return await resolveRoute(url);
+      throwIfRouteResolutionAborted(signal);
+      return await waitForRouteResolution(resolveRoute(url, signal), signal);
     } catch (error) {
+      throwIfRouteResolutionAborted(signal);
       if (attempt >= backoffsMs.length || !isRetryableSaturationFailure(error)) {
         throw error;
       }
@@ -169,7 +226,7 @@ async function resolveRouteWithSaturationRetry(
         `— retry ${attempt + 1}/${backoffsMs.length} in ${delayMs}ms:`,
         String((error as any)?.message ?? error),
       );
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      await waitForSaturationBackoff(delayMs, signal);
     }
   }
 }
@@ -233,7 +290,10 @@ function parseQueryParam(url: string): string {
   return (new URLSearchParams(q).get("q") || "").trim().slice(0, 100);
 }
 
-async function resolveRoute(url: string): Promise<ResolvedRoute> {
+async function resolveRoute(
+  url: string,
+  signal?: AbortSignal,
+): Promise<ResolvedRoute> {
   const cleanPath = url.split("?")[0].replace(/\/+$/, "") || "/";
   // /search is query-driven with an unbounded key space — never cache it
   // (cache poisoning / unbounded memory). Always bypass the cache.
@@ -243,7 +303,7 @@ async function resolveRoute(url: string): Promise<ResolvedRoute> {
     // just-unpublished or deleted collection reachable for another 60 seconds.
     cleanPath.startsWith("/collection/")
   ) {
-    return resolveRouteUncached(url);
+    return resolveRouteUncached(url, signal);
   }
   // Only ?page= differentiates cacheable routes; fold it into the key so page 2
   // is not served page 1's cached body (BUG-001). All other params are ignored.
@@ -253,7 +313,7 @@ async function resolveRoute(url: string): Promise<ResolvedRoute> {
     namespace: "route-meta",
     key,
     ttlMs: 60_000,
-    load: () => resolveRouteUncached(url),
+    load: () => resolveRouteUncached(url, signal),
   });
 }
 
@@ -426,28 +486,81 @@ function safeDecode(segment: string): string {
 // ladder above — the retry lands while the pool is STILL saturated because the
 // crawl keeps pushing. Capping at 5 leaves pool headroom for interactive
 // traffic and keeps worst-case acquire waits well inside the 3s window.
-// Cached hits never touch this gate. Slot-transfer release (a freed slot goes
-// directly to the next waiter) keeps the count exact under interleaving.
+// Cached hits never touch this gate. The pending queue is also bounded and
+// abort-aware so a burst of unique /search or revocable /collection routes
+// cannot retain unlimited promises or later execute work for disconnected
+// clients. Slot-transfer release keeps the active count exact.
 const UNCACHED_RESOLVE_LIMIT = 5;
+const UNCACHED_RESOLVE_MAX_WAITERS = 32;
 let uncachedResolveActive = 0;
-const uncachedResolveWaiters: Array<() => void> = [];
 
-function releaseUncachedResolveSlot(): void {
-  const next = uncachedResolveWaiters.shift();
-  if (next) {
-    next(); // hand the slot straight to the next waiter; active count unchanged
-    return;
-  }
-  uncachedResolveActive--;
+interface UncachedResolveWaiter {
+  resolve: () => void;
+  reject: (error: Error) => void;
+  signal?: AbortSignal;
+  onAbort?: () => void;
 }
 
-async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
+const uncachedResolveWaiters: UncachedResolveWaiter[] = [];
+
+function routeResolutionCapacityError(): ServiceUnavailableError {
+  return new ServiceUnavailableError(
+    "Uncached route resolution capacity is temporarily full",
+  );
+}
+
+function acquireUncachedResolveSlot(signal?: AbortSignal): Promise<void> {
+  throwIfRouteResolutionAborted(signal);
+
   if (uncachedResolveActive < UNCACHED_RESOLVE_LIMIT) {
     uncachedResolveActive++;
-  } else {
-    await new Promise<void>((resolve) => uncachedResolveWaiters.push(resolve));
+    return Promise.resolve();
   }
+  if (uncachedResolveWaiters.length >= UNCACHED_RESOLVE_MAX_WAITERS) {
+    return Promise.reject(routeResolutionCapacityError());
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const waiter: UncachedResolveWaiter = { resolve, reject, signal };
+    if (signal) {
+      waiter.onAbort = () => {
+        const index = uncachedResolveWaiters.indexOf(waiter);
+        if (index === -1) return;
+        uncachedResolveWaiters.splice(index, 1);
+        reject(routeResolutionAbortedError());
+      };
+      signal.addEventListener("abort", waiter.onAbort, { once: true });
+    }
+    uncachedResolveWaiters.push(waiter);
+  });
+}
+
+function releaseUncachedResolveSlot(): void {
+  for (;;) {
+    const next = uncachedResolveWaiters.shift();
+    if (!next) {
+      uncachedResolveActive--;
+      return;
+    }
+    if (next.onAbort) {
+      next.signal?.removeEventListener("abort", next.onAbort);
+    }
+    if (next.signal?.aborted) {
+      next.reject(routeResolutionAbortedError());
+      continue;
+    }
+    next.resolve(); // transfer the slot; active count remains unchanged
+    return;
+  }
+}
+
+async function resolveRouteUncached(
+  url: string,
+  signal?: AbortSignal,
+): Promise<ResolvedRoute> {
+  await acquireUncachedResolveSlot(signal);
   try {
+    throwIfRouteResolutionAborted(signal);
     return await resolveRouteUncachedInner(url);
   } finally {
     releaseUncachedResolveSlot();
@@ -2207,17 +2320,23 @@ export function ogInjectionMiddleware() {
       meta = notFoundMeta(urlPath);
       notFound = true;
     } else {
+      const routeResolutionAbort = new AbortController();
+      const abortRouteResolution = () => routeResolutionAbort.abort();
+      req.once("aborted", abortRouteResolution);
+      res.once("close", abortRouteResolution);
       try {
         // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
         // render search results; resolveRoute keys its cache on path + page.
         const resolved = await resolveRouteWithSaturationRetry(
           req.originalUrl || req.url,
           urlPath,
+          routeResolutionAbort.signal,
         );
         meta = resolved.meta;
         notFound = !resolved.found;
         bodyHtml = resolved.bodyHtml;
       } catch (e) {
+        if (req.aborted || res.destroyed) return;
         if (isBoundedDependencyFailure(e)) {
           console.warn(
             "[og-middleware] bounded dependency failure for",
@@ -2233,6 +2352,9 @@ export function ogInjectionMiddleware() {
         // Fail open: never demote a real page to 404 on a transient lookup error.
         meta = defaultMeta(urlPath);
         notFound = false;
+      } finally {
+        req.off("aborted", abortRouteResolution);
+        res.off("close", abortRouteResolution);
       }
     }
 

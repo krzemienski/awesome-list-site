@@ -148,6 +148,13 @@
       "when": 1787140800000,
       "tag": "0044_taxonomy_updated_at",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1787157000000,
+      "tag": "0045_audit_catalog_data_fixes",
+      "breakpoints": true
     }
   ]
 }
