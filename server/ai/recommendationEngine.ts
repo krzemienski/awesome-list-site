@@ -381,8 +381,10 @@ export class RecommendationEngine {
                           Object.keys(enrichedProfile.ratings).length === 0 &&
                           bookmarks.length === 0;
 
-      // Debug: Log cold-start detection
-      console.log('[COLD-START DEBUG]', {
+      // Debug: Log cold-start detection (audit cycle-01 F007: dev-only —
+      // production must not spam per-request behavioral debug lines).
+      const debugRecommendations = process.env.NODE_ENV !== 'production';
+      if (debugRecommendations) console.log('[COLD-START DEBUG]', {
         userId: enrichedProfile.userId,
         viewHistoryLength: enrichedProfile.viewHistory.length,
         completedResourcesLength: enrichedProfile.completedResources.length,
@@ -419,7 +421,7 @@ export class RecommendationEngine {
           }
         }
 
-        console.log('[PERSONALIZATION DEBUG]', {
+        if (debugRecommendations) console.log('[PERSONALIZATION DEBUG]', {
           userId: enrichedProfile.userId,
           totalResources: resources.length,
           eligibleResources: eligibleResources.length,
@@ -438,7 +440,7 @@ export class RecommendationEngine {
 
       // For cold-start users, use popular resources as recommendations
       if (isColdStart) {
-        console.log('[COLD-START] Generating popular resources for new user:', enrichedProfile.userId);
+        if (debugRecommendations) console.log('[COLD-START] Generating popular resources for new user:', enrichedProfile.userId);
         // Run16 BUG-004: the cold-start path previously ignored the user's
         // explicitly selected preferred categories entirely (they only fed the
         // rule-based scorer, which cold-start never reaches) and hard-coded
