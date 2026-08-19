@@ -110,6 +110,13 @@ export function clampSeoTitle(title: string): string {
       if (bare.length <= budget) return bare + BRAND_SUFFIX;
       return clampAtWord(bare, budget) + BRAND_SUFFIX;
     }
+    // Audit cycle-01 F004: the 43-char post-suffix core budget truncates
+    // BEFORE the words that distinguish sibling resources (9 URLs collided
+    // into 3 identical SERP titles, corpus-proven). When the core alone
+    // overflows that budget, boilerplate yields before content: drop the
+    // brand suffix entirely and give the core the full SERP budget — the
+    // same philosophy as the JOURNEY_SUFFIX rule above.
+    if (core.length > budget) return clampAtWord(core, SEO_TITLE_MAX);
     return clampAtWord(core, budget) + BRAND_SUFFIX;
   }
   return clampAtWord(t, SEO_TITLE_MAX);
