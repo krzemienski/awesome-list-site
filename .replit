@@ -358,7 +358,7 @@ integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0
 
 [postMerge]
 path = "scripts/post-merge.sh"
-timeoutMs = 20000
+timeoutMs = 90000
 
 [userenv]
 
