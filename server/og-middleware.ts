@@ -1992,6 +1992,16 @@ export function ogInjectionMiddleware() {
           return (origEnd as any)(Buffer.concat(chunks), ...args);
         }
       }
+      // Task #327: HEAD responses for HTML documents carry no body chunks, so
+      // they skip the buffered-rewrite branch above — and used to leak
+      // sendFile's template validators (ETag/Last-Modified) plus a cacheable
+      // default Cache-Control, contradicting the GET contract. Nonce'd HTML is
+      // no-store on every method.
+      if (req.method === "HEAD" && checkHtml()) {
+        res.removeHeader("etag");
+        res.removeHeader("last-modified");
+        res.setHeader("Cache-Control", "no-store");
+      }
       return (origEnd as any)(chunk, ...args);
     } as any;
 

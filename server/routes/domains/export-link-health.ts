@@ -74,6 +74,10 @@ import { seedDatabase } from "../../seed";
 import { buildCanonicalTagMap, canonicalizeTagArray } from "../../lib/tagCanonicalize";
 import { getPublicCacheValue } from "../../cache/publicCache";
 import {
+  CATALOG_CACHE_CONTROL,
+  UNCACHED_CATALOG_CACHE_CONTROL,
+} from "../../http-cache-policy";
+import {
   LISTING_PAGE_SIZE,
   countNodeResources,
   findCategory,
@@ -97,7 +101,6 @@ import type {
   AdminRepository,
   LegacyRepository,
 } from "../../repositories";
-
 /**
  * Explicit dependency context for the export/link-health/GitHub-sync routes
  * and the public awesome-list/discovery routes. Everything the handlers need —
@@ -1082,14 +1085,98 @@ export function registerAwesomeListDiscoveryRoutes(
           },
         });
         res.set('ETag', payload.etag);
-        res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+        res.set('Cache-Control', CATALOG_CACHE_CONTROL);
         if (req.headers['if-none-match'] === payload.etag) {
           return res.status(304).end();
         }
         return res.type('application/json').send(payload.body);
       }
 
-      // Filtered responses are request-specific and deliberately not cached.
+      // Task #327: filtered variants used to bypass the server cache entirely
+      // — every request re-fetched the tree, re-filtered it, and paid a full
+      // multi-MB JSON.stringify + weak-ETag digest. The taxonomy is a small
+      // fixed set, so any variant whose every provided slug resolves through
+      // the static slug→title maps is cached under a filter-aware key with
+      // the same generation/TTL/coalescing machinery as the unfiltered body.
+      // Slugs OUTSIDE the maps (typos, probes, array-shaped params) would
+      // hand attackers an unbounded cache-key space, so they keep the
+      // uncached legacy path below.
+      const categorySlug = typeof category === 'string' ? category : undefined;
+      const subcategorySlug = typeof subcategory === 'string' ? subcategory : undefined;
+      const subSubcategorySlug =
+        typeof subSubcategory === 'string' ? subSubcategory : undefined;
+
+      // The slug→title helpers return their input verbatim when it is not in
+      // the map, so `resolved !== slug` doubles as a membership test. A
+      // hypothetical identity mapping would merely leave that variant
+      // uncached — a safe degradation.
+      const categoryTitle = categorySlug ? getCategoryTitleFromSlug(categorySlug) : undefined;
+      const subcategoryTitle = subcategorySlug
+        ? getSubcategoryTitleFromSlug(subcategorySlug)
+        : undefined;
+      const subSubcategoryTitle = subSubcategorySlug
+        ? getSubSubcategoryTitleFromSlug(subSubcategorySlug)
+        : undefined;
+
+      const allProvidedSlugsKnown = Boolean(
+        (!category || (categorySlug && categoryTitle !== categorySlug)) &&
+          (!subcategory || (subcategorySlug && subcategoryTitle !== subcategorySlug)) &&
+          (!subSubcategory ||
+            (subSubcategorySlug && subSubcategoryTitle !== subSubcategorySlug)),
+      );
+
+      if (allProvidedSlugsKnown) {
+        const variantKey = `filtered:${categorySlug ?? ''}|${subcategorySlug ?? ''}|${subSubcategorySlug ?? ''}`;
+        const payload = await getPublicCacheValue({
+          namespace: 'catalog-body',
+          key: variantKey,
+          ttlMs: 60_000,
+          load: async () => {
+            // Tree fetch stays INSIDE the generation-checked loader (see the
+            // unfiltered branch above for why).
+            const data = await legacyRepo.getAwesomeListFromDatabase();
+            if (!data?.resources?.length) {
+              throw new Error('No awesome list data available');
+            }
+            let filteredResources = data.resources;
+            if (categoryTitle) {
+              filteredResources = filteredResources.filter(
+                (resource: any) => resource.category === categoryTitle,
+              );
+            }
+            if (subcategoryTitle) {
+              filteredResources = filteredResources.filter(
+                (resource: any) => resource.subcategory === subcategoryTitle,
+              );
+            }
+            if (subSubcategoryTitle) {
+              filteredResources = filteredResources.filter(
+                (resource: any) => resource.subSubcategory === subSubcategoryTitle,
+              );
+            }
+            // Key order matches the legacy res.json path below: the spread
+            // keeps `resources` in its original position, so cached and
+            // uncached bodies are byte-identical for the same filter set.
+            const body = JSON.stringify({ ...data, resources: filteredResources });
+            console.log(
+              `📊 /api/awesome-list rebuild [${variantKey}]: ${filteredResources.length} resources, ${data.categories.length} categories`,
+            );
+            return {
+              body,
+              etag: '"' + crypto.createHash('sha1').update(body).digest('hex') + '"',
+            };
+          },
+        });
+        res.set('ETag', payload.etag);
+        res.set('Cache-Control', CATALOG_CACHE_CONTROL);
+        if (req.headers['if-none-match'] === payload.etag) {
+          return res.status(304).end();
+        }
+        return res.type('application/json').send(payload.body);
+      }
+
+      // Variants outside the known taxonomy are request-specific and
+      // deliberately not server-cached (unbounded key space).
       const data = await legacyRepo.getAwesomeListFromDatabase();
       if (!data?.resources?.length) {
         console.warn('⚠️ No resources in database - database may need seeding');
@@ -1133,6 +1220,8 @@ export function registerAwesomeListDiscoveryRoutes(
       };
       
       console.log(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', UNCACHED_CATALOG_CACHE_CONTROL);
       res.json(filteredData);
     } catch (error) {
       console.error('Error processing awesome list:', error);
@@ -1210,7 +1299,8 @@ export function registerAwesomeListDiscoveryRoutes(
         },
       });
       res.set('ETag', payload.etag);
-      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       if (req.headers['if-none-match'] === payload.etag) {
         return res.status(304).end();
       }

@@ -26,6 +26,7 @@ import {
   getClerkProxyHost,
 } from "./middlewares/clerkProxyMiddleware";
 import { clerkUserContext, hasValidAuditKey } from "./clerkAuth";
+import { HASHED_ASSET_CACHE_CONTROL } from "./http-cache-policy";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -140,7 +141,7 @@ app.use((req, res, next) => {
 // hashed /assets/* (extension'd paths) keep normal conditional caching.
 app.use((req, _res, next) => {
   if (
-    req.method === "GET" &&
+    (req.method === "GET" || req.method === "HEAD") &&
     !req.path.startsWith("/api") &&
     (!path.extname(req.path) || req.path.endsWith(".html"))
   ) {
@@ -508,11 +509,23 @@ app.use((req, res, next) => {
     // (server/vite.ts, unmodifiable) mounts express.static with the default
     // maxAge=0 — and send() overwrites any pre-set Cache-Control — so a
     // dedicated static handler for /assets must run FIRST.
+    //
+    // Task #327: the policy is pinned EXPLICITLY via setHeaders (send emits
+    // its own header first, then the 'headers' hook overrides) instead of
+    // trusting send's option-derived string. Prod diagnosis (Aug 19, 2026):
+    // the "private, max-age=31536000, immutable" seen at the edge is NOT app
+    // config — Replit's Google-Frontend edge injects a GAESA session-affinity
+    // cookie on each cookie-less first response and downgrades that one
+    // response to `private` (Set-Cookie rule); cookie-carrying requests get
+    // this origin header verbatim. See server/http-cache-policy.ts.
     app.use(
       "/assets",
       express.static(path.resolve(import.meta.dirname, "public", "assets"), {
         immutable: true,
         maxAge: "1y",
+        setHeaders: (res) => {
+          res.setHeader("Cache-Control", HASHED_ASSET_CACHE_CONTROL);
+        },
       }),
     );
     // NB-009 (run18): unknown FILE-LIKE paths (/.env, /backup.zip, dead hashed

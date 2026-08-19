@@ -78,6 +78,7 @@ import {
 import { parseTagFilterValues } from "@shared/tagNormalize";
 import { parseBoundedInt, PG_INT_MAX } from "../../validation/inputs";
 import { trackServerEvent } from "../../lib/mixpanelServer";
+import { CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { ensureMinDescription, decodeResourceTextFields } from "../../github/importHygiene";
 import { buildRelatedResources } from "../../services/relatedResources";
@@ -1058,7 +1059,8 @@ export function registerCatalogContributionsRoutes(
           }));
         },
       });
-      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(enriched);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -1097,7 +1099,8 @@ export function registerCatalogContributionsRoutes(
           };
         },
       });
-      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(payload);
     } catch (error) {
       console.error('Error aggregating tags:', error);
@@ -1139,7 +1142,8 @@ export function registerCatalogContributionsRoutes(
         ttlMs: 60_000,
         load: () => categoryRepo.listSubcategories(categoryId),
       });
-      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(subcategories);
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -1180,7 +1184,8 @@ export function registerCatalogContributionsRoutes(
         ttlMs: 60_000,
         load: () => categoryRepo.listSubSubcategories(subcategoryId),
       });
-      res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', CATALOG_CACHE_CONTROL);
       res.json(subSubcategories);
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);

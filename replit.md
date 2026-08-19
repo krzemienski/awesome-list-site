@@ -5,6 +5,15 @@
 A production-ready React application for browsing and discovering over 2,600 curated video development resources. The project uses PostgreSQL as the single source of truth for all data, providing a modern, mobile-optimized user interface with advanced search and filtering capabilities, dark theme support, and Google Analytics tracking. Features include AI-powered learning platform capabilities, user authentication, admin panel, and bidirectional GitHub synchronization for `awesome-list` repositories. The business vision is to create a leading platform for video development education and resource discovery, leveraging AI for personalized learning paths and an engaged community.
 
 
+### HTTP delivery cache contract (August 19, 2026)
+- **HTML is always `no-store` and has no validators** (GET and HEAD): each document carries a unique CSP nonce, so a cached body paired with a fresh header would block its inline bootstrap scripts.
+- **Hashed `/assets/*` are `public, max-age=31536000, immutable`**; filenames are content-addressed. A first-response `private` header seen at the platform edge is the Google Frontend/GAESA session-affinity `Set-Cookie` rewrite, not origin policy; cookie-carrying requests preserve the public origin header.
+- **Catalog/taxonomy reads** (`/api/awesome-list`, known taxonomy-filter variants, nav, category/tag trees) use `public, max-age=60, must-revalidate` plus ETags. Unknown filter slugs retain `max-age=0` so they cannot create unbounded server-cache keys.
+- **Anonymous `/api/public/*` successful reads** use `public, max-age=60` and ETag revalidation; resource 404s are `no-store` so an approval can become visible immediately. Authenticated responses remain non-public.
+- Run `npm run validate:cache-headers` for the dev-server matrix or the registered `cache-headers` validation for a build + local production-server matrix. Run `npm run validate:pool` for the 20-way faceted-listing burst probe.
+
+**Production Status**: ✅ Production-ready as of December 4, 2025. All critical bugs fixed, database integrity verified (0 orphaned resources), comprehensive error handling implemented.
+
 ## Taxonomy listing API
 
 - `GET /api/awesome-list/listing?level=category|subcategory|sub-subcategory&slug=<slug>&page=<n>` returns one deterministic 24-resource taxonomy page, totals, child counts, tags, and parent metadata. It slices the same cached tree and tree order as crawler prerendering; default category browsing must use this endpoint rather than `/api/awesome-list`.

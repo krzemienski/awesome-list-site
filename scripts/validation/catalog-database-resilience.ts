@@ -417,11 +417,15 @@ async function main() {
       `PASS recovery/no-late-write: readiness 200 in ${recovered.durationMs}ms; row count stayed 0`,
     );
 
-    const heldClients = await Promise.all([
-      pool.connect(),
-      pool.connect(),
-      pool.connect(),
-    ]);
+    // Keep this test tied to the configured pool rather than the historic
+    // max=3. Task #327 intentionally raised the main pool to 8 so concurrent
+    // faceted listings (three parallel queries each) do not self-starve; the
+    // resilience gate must still prove that a truly exhausted configured pool
+    // fails as a bounded database-unavailable error.
+    const configuredPoolMax = Number((pool as any).options?.max ?? 8);
+    const heldClients = await Promise.all(
+      Array.from({ length: configuredPoolMax }, () => pool.connect()),
+    );
     try {
       const startedAt = Date.now();
       const exhaustedResult = await resourceRepo

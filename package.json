@@ -27,7 +27,9 @@
     "perf:mobile": "node scripts/validation/mobile-performance-audit.mjs",
     "digest:dispatch": "tsx scripts/run-digest-dispatch.ts",
     "audit:sidebar": "bash scripts/audit-sidebar.sh",
-    "check:awesome-bot": "bash scripts/check-awesome-bot.sh"
+    "check:awesome-bot": "bash scripts/check-awesome-bot.sh",
+    "validate:cache-headers": "node scripts/validation/http-cache-headers.mjs",
+    "validate:pool": "node scripts/validation/db-pool-probe.mjs"
   },
   "dependencies": {
     "@amplitude/unified": "^1.1.28",

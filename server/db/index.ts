@@ -11,13 +11,27 @@ import {
 import { isDatabaseUnavailableError } from './errors';
 import { markRequestDatabaseUnavailable } from '../ops/requestContext';
 
-// Create PostgreSQL connection with limited pool for Neon serverless
+// Create PostgreSQL connection pool for Neon serverless.
+//
+// Task #327 pool sizing, justified against measured endpoint concurrency:
+// - One faceted listing (ResourceRepository.listResources) runs THREE
+//   concurrent queries (count + page + facets via Promise.all), so the old
+//   max=3 let a SINGLE request occupy the whole pool and a handful of
+//   concurrent listings exhaust it (3s acquisition timeouts under burst).
+// - A cold catalog-tree rebuild takes 4 sequential queries; taxonomy loaders
+//   add 1-2 more. max=8 lets ~2-3 faceted listings plus background work
+//   overlap without queueing anywhere near the 3s acquisition bound
+//   (validated by scripts/validation/db-pool-probe.mjs: 20 concurrent
+//   faceted listings, zero acquisition timeouts).
+// - Budget per instance = 8 here + 2 in the rate-limit store's dedicated
+//   pool (server/middleware/pgRateLimitStore.ts) = 10; even several
+//   Autoscale instances stay far below Neon's >100 connection ceiling.
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: 3, // Conservative limit for Neon free tier
+  max: 8,
   idleTimeoutMillis: 30000,
-  // Bound pool acquisition and server execution. A blocked three-connection
-  // pool must fail predictably instead of leaving HTTP requests hanging.
+  // Bound pool acquisition and server execution. A saturated pool must fail
+  // predictably instead of leaving HTTP requests hanging.
   connectionTimeoutMillis: 3000,
   statement_timeout: 8000,
   query_timeout: 10000,

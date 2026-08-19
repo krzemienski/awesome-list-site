@@ -34,6 +34,10 @@ import { freeTierLimiter } from "../middleware/rateLimit";
 import { requireApiKey } from "../middleware/apiAuth";
 import { stripInternalResourceFields } from "../lib/publicResource";
 import { parseBoundedInt } from "../validation/inputs";
+import {
+  PUBLIC_API_CACHE_CONTROL,
+  PUBLIC_API_ERROR_CACHE_CONTROL,
+} from "../http-cache-policy";
 
 /**
  * Register all public API routes
@@ -185,6 +189,10 @@ export function registerPublicApiRoutes(app: Express): void {
       // promise page/limit/totalPages in the response envelope, but the
       // storage layer only returns { resources, total } — emit the full
       // documented contract.
+      // Task #327 cache contract: anonymous read-only data — allow 60s of
+      // browser/shared caching; Express's default weak ETag provides 304
+      // revalidation afterwards. See server/http-cache-policy.ts.
+      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
       res.json({
         ...result,
         page,
@@ -271,15 +279,21 @@ export function registerPublicApiRoutes(app: Express): void {
 
       const resource = await storage.getResource(id);
 
+      // Task #327: a 404 is heuristically cacheable (RFC 9111) and can flip to
+      // 200 the moment a resource is approved — never let caches pin misses.
       if (!resource) {
+        res.set('Cache-Control', PUBLIC_API_ERROR_CACHE_CONTROL);
         return res.status(404).json({ message: 'Resource not found' });
       }
 
       // Only return approved resources via public API
       if (resource.status !== 'approved') {
+        res.set('Cache-Control', PUBLIC_API_ERROR_CACHE_CONTROL);
         return res.status(404).json({ message: 'Resource not found' });
       }
 
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
       res.json(stripInternalResourceFields(resource));
     } catch (error) {
       console.error('Error fetching public resource:', error);
@@ -331,6 +345,8 @@ export function registerPublicApiRoutes(app: Express): void {
   app.get('/api/public/categories', freeTierLimiter, async (req: Request, res: Response) => {
     try {
       const categories = await storage.listCategories();
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
       res.json({ categories });
     } catch (error) {
       console.error('Error fetching public categories:', error);
@@ -382,6 +398,8 @@ export function registerPublicApiRoutes(app: Express): void {
   app.get('/api/public/tags', freeTierLimiter, async (req: Request, res: Response) => {
     try {
       const tags = await storage.listTags();
+      // Task #327 cache contract: see server/http-cache-policy.ts.
+      res.set('Cache-Control', PUBLIC_API_CACHE_CONTROL);
       res.json({ tags });
     } catch (error) {
       console.error('Error fetching public tags:', error);

@@ -99,6 +99,14 @@ args = "taxonomy-listing-parity"
 task = "workflow.run"
 args = "taxonomy-no-corpus-fetch"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "cache-headers"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "pool-probe"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -300,6 +308,28 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/taxonomy-no-corpus-fetch.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "cache-headers"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build && node scripts/validation/http-cache-headers.mjs --spawn"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "pool-probe"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PROBE_ROUNDS=3 PROBE_CONCURRENCY=20 npm run validate:pool"
 
 [workflows.workflow.metadata]
 isValidation = true

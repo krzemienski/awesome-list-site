@@ -47,7 +47,13 @@ type CacheMetrics = {
 };
 
 const MAX_ENTRIES = 512;
-const MAX_BYTES = 24 * 1024 * 1024;
+// A serialized filtered catalog variant includes the full category tree as
+// well as its filtered flat resource list (roughly 1–3 MB depending on the
+// branch). The previous 24 MB cap evicted useful hot variants after only a
+// handful of filters, defeating Task #327's coalesced 60-second cache. 48 MB
+// holds the corpus/tree/nav plus several popular variants, while the bounded
+// LRU still protects the process from unbounded memory use.
+const MAX_BYTES = 48 * 1024 * 1024;
 const MAX_IN_FLIGHT = 64;
 
 const entries = new Map<string, CacheEntry<unknown>>();
