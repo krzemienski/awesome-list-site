@@ -862,6 +862,18 @@ export function registerAdminContentRoutes(
       // step with submit/admin-edit/AI imports).
       const validatedData = decodeResourceTextFields(validationResult.data);
 
+      // Audit cycle-01 F022 (slice of task #216): resources.url is UNIQUE —
+      // an admin-created duplicate used to die as an unhandled 23505 → opaque
+      // "Failed to create resource" 500. Same pre-check + actionable 409 as
+      // the admin edit path above.
+      const duplicate = await resourceRepo.getResourceByUrl(validatedData.url);
+      if (duplicate) {
+        return res.status(409).json({
+          message: `Another resource already uses this URL (id ${duplicate.id}: "${duplicate.title}"). URLs must be unique.`,
+          conflictingResourceId: duplicate.id,
+        });
+      }
+
       const resolvedCategory = validatedData.category || 'General Tools';
       const resolvedSubcategory = validatedData.subcategory || null;
       let resolvedSubSubcategory = validatedData.subSubcategory || null;
@@ -899,7 +911,12 @@ export function registerAdminContentRoutes(
       );
       
       res.status(201).json(newResource);
-    } catch (error) {
+    } catch (error: any) {
+      // Race window: two concurrent creates can both pass the pre-check; the
+      // loser's unique-violation is still a duplicate, not a server fault.
+      if (error?.code === '23505' && String(error?.constraint ?? '').includes('url')) {
+        return res.status(409).json({ message: 'Another resource already uses this URL. URLs must be unique.' });
+      }
       console.error('Error creating resource:', error);
       res.status(500).json({ message: 'Failed to create resource' });
     }
