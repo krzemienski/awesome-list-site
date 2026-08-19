@@ -22,8 +22,8 @@ Phase 4 closed every one of them: 20 fixed (code, data, or infra), 3 closed by d
 | ID | Severity | Title | Commit |
 |---|---|---|---|
 | F004 | MEDIUM | clampSeoTitle brand-suffix budget collides distinct resources into identical serialized titles (9 URLs, 3 clusters) | a8ef90b1 |
-| F005 | MEDIUM | Twitch transmuxing pair + Medium mirrors put the distinguishing "Part N" at char 64+, unclampable under any SERP budget | data-fix (dev DB) |
-| F006 | LOW | Stored resource URL carries tracking parameters (resource 185760) | data-fix (dev DB) |
+| F005 | MEDIUM | Twitch transmuxing pair + Medium mirrors put the distinguishing "Part N" at char 64+, unclampable under any SERP budget | 7ee568c5 |
+| F006 | LOW | Stored resource URL carries tracking parameters (resource 185760) | 7ee568c5 |
 | F007 | LOW | Verbose [COLD-START DEBUG] console logging runs in production | bd773ccb |
 | F008 | HIGH | Tag slug/title mis-singularized: '#video analysis' links to /tag/video-analysi and renders h1 'Video Analysi' (wrong data shown on public SEO page) | c0e247cb |
 | F009 | HIGH | Cookie consent banner overlays and blocks the sign-up 'Continue' button (P0 account-creation CTA unclickable on first visit) | 8058378d |
@@ -40,7 +40,7 @@ Phase 4 closed every one of them: 20 fixed (code, data, or infra), 3 closed by d
 | F021 | LOW | document.title briefly flashes 'Page Not Found' on guarded /notifications and /onboarding before AuthGuard redirect resolves | c578e561 |
 | F022 | MEDIUM | Duplicate-URL on admin resource create returns 500 Internal Server Error instead of an explicit 409/duplicate message | 93fb2258 |
 | F023 | MEDIUM | Malformed percent-escape in path returns HTTP 500 on /api/resources/:id (and /related); singular alias correctly returns 404 | da4abce4 |
-| F027 | MEDIUM | Deep tag-page prerenders returned 503 under sustained crawler concurrency (pg pool acquire timeouts surfaced as bounded dependency failures) | c578e561 |
+| F027 | MEDIUM | Deep tag-page prerenders returned 503 under sustained crawler concurrency (pg pool acquire timeouts surfaced as bounded dependency failures) | c578e561 + 8434806e + 7ee568c5 |
 
 ## Closed by design
 
@@ -57,7 +57,7 @@ Phase 4 closed every one of them: 20 fixed (code, data, or infra), 3 closed by d
 
 ## Verification highlights
 
-- seo-snapshot gate (cold-boot confirmation 2026-08-19T15-49-44; earlier warm run 15-22-38): **0 structural failures, 100.00% schema pass (2324/2324), 0 duplicate title clusters** — down from 45 failures pre-fix (F027 saturation-retry ladder + F004 title clamp).
+- seo-snapshot gate (final cold-boot confirmation 2026-08-19T16-44-57): **0 structural failures, 100.00% schema pass (2324/2324), 0 duplicate title clusters, 20/20 hydration parity** — down from 45 failures pre-fix.
 - Client fix sweep (Playwright, headless Chromium): 10/10 PASS — F009 both viewports overlap 0px, F013 recovery CTAs, F014 breadcrumb, F015 min button 40px, F019 Escape clear, F020 locale formatting, F021 no title flash on /notifications and /onboarding, F011/F012 no bare 'Unknown'.
 - Admin sweep (throwaway Clerk admin): F016 forced-abort error banner + Retry recovery PASS; F017 16 tabs all >= 40px at 375px PASS.
 - F010 share: 'Link copied' toast + clipboard verified; original repro attributed to consent-banner click interception (F009 class).
@@ -71,5 +71,23 @@ Phase 4 closed every one of them: 20 fixed (code, data, or infra), 3 closed by d
 
 ## Residual risk / follow-ups
 
-- F005/F006 are data fixes applied to the dev DB; the production mirror lands with the next republish (follow-up task).
-- Tag-page prerender is protected twice over: the saturation retry ladder plus an in-process semaphore capping concurrent uncached route resolutions at 5 (below the pg pool of 8). Cold-boot gate run 2026-08-19T15-49-44 passed with zero failures.
+- F005/F006 are encoded in journaled, idempotent migration `0045_audit_catalog_data_fixes.sql`; the normal publish path applies the corrections to production.
+- Tag-page prerender keeps bounded retries for downstream transient saturation, while the uncached-resolution semaphore caps active work and abort-aware waiters. Local overflow fails immediately rather than accumulating retry timers.
+
+## Clean confirmation pass
+
+The August 19 confirmation pass found no new application finding and met the
+binding `critical-high-medium` exit threshold without relaxation. Evidence:
+
+- cold-boot SEO snapshot: 2,332 URLs, 0 errors, 2,324/2,324 schema, 20/20 parity;
+- print 49/49, responsive 32/32, tablet 21/21, URL state 31/31, collections 12/12;
+- typo search 30/30, cache contract 30/30, pool burst 60/60;
+- real database-lock resilience: 80/80 bounded SSR 503s, in-flight rebuilds
+  stayed at or below 64, overflow failed in 29ms, readiness recovered to 200
+  in 26ms, and no late write remained;
+- final QA teardown: 0 `__qa_test_*` users and 0 QA resources.
+
+The final resilience gate distinguishes local admission overflow from downstream
+transient saturation. Local queue overflow must return within one second and
+passed in 29ms; only downstream pool/public-cache saturation retains the bounded
+retry ladder.
