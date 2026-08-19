@@ -317,17 +317,17 @@ export class ResourceRepository {
         case "relevance":
         default:
           // NB-013 (run18): when searching without an explicit sort, rank by
-          // relevance — exact title match first, then title prefix, then title
-          // substring, then description/url-only matches — instead of raw
-          // recency (an exact "FFmpeg" title used to land at position ~158).
+          // relevance — exact title match first, then the existing full-text
+          // and trigram signals. This prevents a prefix match (for example,
+          // "ffmpeg-wasm") from outranking a direct "FFmpeg" lookup.
           if (strictSearchCondition) {
             const q = normalizedSearch.toLowerCase();
             return [
               asc(sql`CASE WHEN ${strictSearchCondition} THEN 0 ELSE 1 END`),
+              asc(sql`CASE WHEN lower(${resources.title}) = ${q} THEN 0 ELSE 1 END`),
               desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`),
               desc(sql`word_similarity(${q}, lower(${resources.title}))`),
               desc(sql`similarity(lower(${resources.title}), ${q})`),
-              asc(sql`CASE WHEN lower(${resources.title}) = ${q} THEN 0 ELSE 1 END`),
               asc(sql`length(${resources.title})`),
               asc(sql`lower(${resources.title})`),
               asc(resources.id),
