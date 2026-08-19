@@ -18,7 +18,7 @@ import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { Paginator } from "@/components/ui/paginator";
 import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/SearchFilters";
 import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
-import { trackSearch } from "@/lib/analytics";
+import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
@@ -30,6 +30,16 @@ const readState = (search: string): State => {
   return { q: query, category: p.get("category") ?? "", subcategory: p.get("subcategory") ?? "", subSubcategory: p.get("subSubcategory") ?? "", tags: parseTagsParam(p).map(normalizeTag), provider: p.get("provider") ?? "", format: p.get("format") ?? "", skillLevel: p.get("skillLevel") ?? "", sort: p.get("sort") ?? "relevance", page: parsePageFromSearch(search).page };
 };
 const facetState = (s: State) => [s.category, s.subcategory, s.subSubcategory, s.provider, s.format, s.skillLevel].some(Boolean) || s.tags.length > 0;
+const searchFilterSignature = (s: State) => JSON.stringify([
+  s.category,
+  s.subcategory,
+  s.subSubcategory,
+  s.tags.map(normalizeTag).sort(),
+  s.provider,
+  s.format,
+  s.skillLevel,
+  s.sort,
+]);
 
 export default function Search() {
   const searchString = useSearch();
@@ -40,6 +50,15 @@ export default function Search() {
   const pristine = useRef(true);
   const preservePageNoticeRef = useRef(false);
   const lastTrackedSearchIntentRef = useRef("");
+  const resultsRef = useRef<HTMLElement>(null);
+  const pendingResultsFocusRef = useRef(false);
+  const pendingAnalyticsRef = useRef<{
+    signature: string;
+    type: string;
+    value: string;
+    kind: "filter" | "sort" | "tag";
+    tagAction?: "apply" | "remove";
+  } | null>(null);
   useEffect(() => inputRef.current?.focus(), []);
   // The URL is the source of truth for reloads, router links, and Back/Forward.
   // Wouter's useSearch reacts to both its own navigation and patched History
@@ -85,6 +104,31 @@ export default function Search() {
       updates.subSubcategory = null;
     }
     setState(next);
+    if (key !== "q" && key !== "page") {
+      if (key === "sort" && typeof value === "string") {
+        pendingAnalyticsRef.current = { signature: searchFilterSignature(next), type: "sort", value, kind: "sort" };
+      } else if (key === "tags" && Array.isArray(value)) {
+        const previous = new Set(state.tags.map(normalizeTag));
+        const incoming = new Set(value.map(normalizeTag));
+        const added = value.find(tag => !previous.has(normalizeTag(tag)));
+        const removed = state.tags.find(tag => !incoming.has(normalizeTag(tag)));
+        pendingAnalyticsRef.current = {
+          signature: searchFilterSignature(next),
+          type: "tag",
+          value: added ?? removed ?? "multiple",
+          kind: "tag",
+          tagAction: added ? "apply" : "remove",
+        };
+      } else if (typeof value === "string") {
+        pendingAnalyticsRef.current = {
+          signature: searchFilterSignature(next),
+          type: key,
+          value: value || "cleared",
+          kind: "filter",
+        };
+      }
+      pendingResultsFocusRef.current = true;
+    }
     if (key === "sort" && value === "relevance") updates.sort = null;
     writeFilterParams(updates, "push");
     setPageNotice(null);
@@ -108,6 +152,13 @@ export default function Search() {
       page: 1,
     };
     setState(next);
+    pendingAnalyticsRef.current = {
+      signature: searchFilterSignature(next),
+      type: "all",
+      value: "cleared",
+      kind: "filter",
+    };
+    pendingResultsFocusRef.current = true;
     writeFilterParams({
       q: input || null,
       search: null,
@@ -157,10 +208,24 @@ export default function Search() {
     lastTrackedSearchIntentRef.current = intent;
     trackSearch(normalized, data.total, "search_page");
   }, [data, normalized, state.category, state.format, state.provider, state.skillLevel, state.sort, state.subSubcategory, state.subcategory, state.tags]);
+  useEffect(() => {
+    const pending = pendingAnalyticsRef.current;
+    if (!pending || !data || pending.signature !== searchFilterSignature(state)) return;
+    if (pending.kind === "sort") trackSortChange(pending.value, "search_page", data.total);
+    else if (pending.kind === "tag") trackTagInteraction(pending.value, pending.tagAction ?? "apply", "search_page", data.total);
+    else trackFilterUsage(pending.type, pending.value, data.total, "search_page");
+    pendingAnalyticsRef.current = null;
+  }, [data, state]);
+  useEffect(() => {
+    if (!pendingResultsFocusRef.current || query.isLoading || !data) return;
+    pendingResultsFocusRef.current = false;
+    const timer = window.setTimeout(() => resultsRef.current?.focus({ preventScroll: true }), 250);
+    return () => window.clearTimeout(timer);
+  }, [data, query.isLoading]);
   const lastFacets = useRef<ResourceSearchFacets>();
   if (data?.facets) lastFacets.current = data.facets;
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
-  const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: "smooth" }); };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); n > 1 ? p.set("page", String(n)) : p.delete("page"); return `/search?${p.toString()}`; };
   const invalid = query.error instanceof ApiError && query.error.status === 400;
   return <div className="space-y-6">
@@ -171,7 +236,7 @@ export default function Search() {
     </header>
     <ActiveFilters state={state} onChange={update} onClear={() => clearFilters()} />
     {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 underline" onClick={() => setPageNotice(null)} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
-    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={state} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><main className="min-w-0 flex-1">
+    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={state} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><main ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
       {!shouldShowResults ? <Card data-testid="text-search-prompt"><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold">{normalized.length === 1 ? "Keep typing to search" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">{normalized.length === 1 ? "Type at least 2 characters, or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</p><Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button></CardContent></Card>
       : query.isLoading ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>
       : query.isError ? <Card><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent)]" /><p className="text-sm text-muted-foreground">{invalid ? query.error.message : "Search failed. Please try again."}</p><Button variant="outline" onClick={invalid ? clearInvalidRequest : () => query.refetch()} data-testid={invalid ? "button-clear-invalid-filters" : "button-retry-search"}>{invalid ? "Clear invalid filters" : "Try again"}</Button></CardContent></Card>

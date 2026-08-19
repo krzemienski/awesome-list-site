@@ -1,6 +1,5 @@
-// Task #254: 375px touch-target sweep (32px floor, WCAG 2.5.8 inline-link
-// exception) across the surfaces run26 never measured: /profile, /admin,
-// /journeys/:id, /submit, /theme-settings, /advanced, /resource/:id.
+// 375px touch-target sweep (32px floor, WCAG 2.5.8 inline-link exception).
+// Search and taxonomy filter drawers also get a keyboard-operability/focus pass.
 // Requires the dev server on :5000 and ADMIN_PASSWORD. Exits 1 on any violation.
 import fs from 'fs';
 import path from 'path';
@@ -42,6 +41,20 @@ async function firstResourceId() {
 async function firstJourneyId() {
   const r = await fetch(`${BASE}/api/journeys`).then(x => x.json()).catch(() => null);
   return r?.[0]?.id ?? 7;
+}
+async function firstTaxonomyRoutes() {
+  const raw = await fetch(`${BASE}/api/awesome-list`).then(x => x.json()).catch(() => null);
+  const categories = raw?.categories ?? raw?.data?.categories ?? [];
+  const category = categories.find(item => item?.slug) ?? categories[0];
+  const subcategories = category?.subcategories ?? [];
+  const subcategory = subcategories.find(item => item?.slug) ?? subcategories[0];
+  const subSubcategories = subcategory?.subSubcategories ?? [];
+  const subSubcategory = subSubcategories.find(item => item?.slug) ?? subSubcategories[0];
+  return [
+    category?.slug ? `/category/${category.slug}` : null,
+    subcategory?.slug ? `/subcategory/${subcategory.slug}` : null,
+    subSubcategory?.slug ? `/sub-subcategory/${subSubcategory.slug}` : null,
+  ].filter(Boolean);
 }
 
 const browser = await chromium.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] });
@@ -121,8 +134,11 @@ const ctx = await newAdminContext();
 const page = await ctx.newPage();
 const rid = await firstResourceId();
 const jid = await firstJourneyId();
+const taxonomyRoutes = await firstTaxonomyRoutes();
 
 const routes = [
+  '/search?provider=unknown',
+  ...taxonomyRoutes,
   '/profile',
   '/admin',
   `/journey/${jid}`,
@@ -147,6 +163,71 @@ for (const route of routes) {
   if (!pass) failures += violations.length;
   console.log(`${pass ? 'PASS' : 'FAIL'} ${route} :: ${violations.length} violations`);
   for (const v of violations) console.log(`   - <${v.tag}> ${v.w}x${v.h} "${v.text}" [${v.testid}] ${v.cls}`);
+
+  // Search/taxonomy: open the mobile filter drawer, sweep the controls, then
+  // activate a facet with Space and require focus to land on the results region.
+  if (route === '/search?provider=unknown' || route.startsWith('/category/') || route.startsWith('/subcategory/') || route.startsWith('/sub-subcategory/')) {
+    const trigger = page.getByTestId('button-open-filters');
+    if (!(await trigger.isVisible().catch(() => false))) {
+      failures += 1;
+      report[`${route}::filter-keyboard`] = [{ error: 'mobile filter trigger not visible' }];
+      console.log(`FAIL ${route} filter keyboard :: mobile filter trigger not visible`);
+    } else {
+      await trigger.click();
+      await page.waitForTimeout(350);
+      const drawerViolations = await page.evaluate(PROBE);
+      report[`${route}::filter-drawer`] = drawerViolations;
+      failures += drawerViolations.length;
+      console.log(`${drawerViolations.length === 0 ? 'PASS' : 'FAIL'} ${route} filter drawer :: ${drawerViolations.length} violations`);
+      for (const v of drawerViolations) console.log(`   - <${v.tag}> ${v.w}x${v.h} "${v.text}" [${v.testid}] ${v.cls}`);
+
+      const rows = page.locator(
+        '[data-testid^="facet-provider-"], [data-testid^="facet-format-"], [data-testid^="facet-skill-level-"], button[aria-label$="tag filter"]',
+      );
+      const visibleRows = [];
+      for (let i = 0; i < await rows.count(); i++) {
+        const row = rows.nth(i);
+        if (await row.isVisible().catch(() => false)) visibleRows.push(row);
+      }
+      const semanticFailures = [];
+      for (const row of visibleRows) {
+        const semantics = await row.evaluate(el => ({
+          tag: el.tagName.toLowerCase(),
+          disabled: el.hasAttribute('disabled'),
+          label: el.getAttribute('aria-label') || el.textContent?.trim() || '',
+        }));
+        if (semantics.tag !== 'button' || semantics.disabled) semanticFailures.push(semantics);
+      }
+      if (visibleRows.length === 0) semanticFailures.push({ error: 'no visible facet rows' });
+
+      let target = visibleRows[0];
+      for (const row of visibleRows) {
+        if ((await row.getAttribute('data-testid') || '').startsWith('facet-provider-')) {
+          target = row;
+          break;
+        }
+      }
+      if (target) {
+        await target.focus();
+        await page.keyboard.press('Space');
+        await page.waitForTimeout(1200);
+        const focusOk = await page.evaluate(() => {
+          const active = document.activeElement;
+          return active?.matches('[data-testid="taxonomy-results-region"], main[aria-label="Search results"]') ?? false;
+        });
+        if (!focusOk) {
+          semanticFailures.push({
+            error: 'focus did not move to results after keyboard filter activation',
+            active: await page.evaluate(() => document.activeElement?.outerHTML?.slice(0, 180) || ''),
+          });
+        }
+      }
+      report[`${route}::filter-keyboard`] = semanticFailures;
+      failures += semanticFailures.length;
+      console.log(`${semanticFailures.length === 0 ? 'PASS' : 'FAIL'} ${route} filter keyboard :: ${semanticFailures.length} violations`);
+      for (const failure of semanticFailures) console.log(`   - ${JSON.stringify(failure)}`);
+    }
+  }
 
   // Admin: also sweep each tab panel
   if (route === '/admin') {

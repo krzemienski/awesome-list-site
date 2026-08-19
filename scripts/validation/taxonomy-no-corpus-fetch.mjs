@@ -179,6 +179,25 @@ try {
     );
   }
   console.log("ok valid parent + invalid nested child retains parent scope with API parity");
+
+  const facetResponse = await (await fetch(
+    `${base}/api/resources?category=${encodeURIComponent(category.slug)}&facets=true&limit=1`,
+  )).json();
+  const pagedProvider = facetResponse.facets?.providers?.find((item) => item.count > 24);
+  if (!pagedProvider) throw new Error(`Category ${category.name} has no provider facet with a second page`);
+  await page.goto(
+    `${base}/category/${encodeURIComponent(category.slug)}?provider=${encodeURIComponent(pagedProvider.value)}&page=2`,
+    { waitUntil: "networkidle" },
+  );
+  await page.waitForSelector('[data-testid^="card-resource-"]');
+  const filteredPage = new URL(page.url()).searchParams.get("page");
+  const pageIndicator = await page.locator('[data-testid="text-page-indicator"]').textContent();
+  if (filteredPage !== "2" || !pageIndicator?.includes("Page 2 of")) {
+    throw new Error(
+      `Filtered deep link was clamped before facets settled: page=${filteredPage} indicator=${pageIndicator}`,
+    );
+  }
+  console.log("ok filtered taxonomy deep link retains page 2 while facets load");
 } finally {
   await browser.close();
 }

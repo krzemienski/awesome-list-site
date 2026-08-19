@@ -436,11 +436,6 @@ export const trackError = (errorType: string, errorMessage: string) => {
   sendEvent('error', { error_type: errorType, error_message: errorMessage });
 };
 
-// ---------------------------------------------------------------------------
-// Preserved-but-unwired helpers (intentionally retained for future use; see
-// docs/ANALYTICS.md). They route through the enriched pipeline via trackEvent.
-// ---------------------------------------------------------------------------
-
 export const trackListSwitch = (fromList: string, toList: string) => {
   trackEvent('list_switch', 'navigation', `${fromList} -> ${toList}`);
 };
@@ -452,13 +447,29 @@ export const trackLayoutChange = (layout: string) => {
 export const trackFilterUsage = (
   filterType: string,
   filterValue: string,
-  resultCount: number
+  resultCount: number,
+  surface = 'unknown',
 ) => {
-  trackEvent('filter_applied', 'engagement', `${filterType}: ${filterValue}`, resultCount);
+  const properties = {
+    filter_type: filterType,
+    filter_value: filterValue,
+    result_count: resultCount,
+    zero_results: resultCount === 0,
+    surface,
+  };
+  sendEvent('filter_applied', properties);
+  mpTrack('filter_applied', properties);
 };
 
-export const trackSortChange = (sortType: string) => {
-  trackEvent('sort_change', 'ui_interaction', sortType);
+export const trackSortChange = (sortType: string, surface = 'unknown', resultCount?: number) => {
+  const properties = {
+    sort_type: sortType,
+    surface,
+    result_count: resultCount,
+    zero_results: resultCount === 0,
+  };
+  sendEvent('sort_change', properties);
+  mpTrack('sort_changed', properties);
 };
 
 export const trackPopoverView = (resourceTitle: string, category: string) => {
@@ -492,8 +503,16 @@ export const trackExportAction = (format: string, itemCount: number) => {
   trackEvent('export_action', 'data_export', format, itemCount);
 };
 
-export const trackTagInteraction = (tag: string, action: string) => {
-  trackEvent('tag_interaction', 'navigation', `${action}: ${tag}`);
+export const trackTagInteraction = (tag: string, action: string, surface = 'unknown', resultCount?: number) => {
+  const properties = {
+    tag,
+    action,
+    surface,
+    result_count: resultCount,
+    zero_results: resultCount === 0,
+  };
+  sendEvent('tag_interaction', properties);
+  mpTrack('tag_interaction', properties);
 };
 
 export const trackSessionQuality = (metrics: {

@@ -3,10 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { SlidersHorizontal, X, ChevronDown, Search } from "lucide-react";
+import { SlidersHorizontal, X, ChevronDown, Search, Check } from "lucide-react";
 import { normalizeTag } from "@/lib/tags";
 
 interface AdvancedFilterProps {
@@ -22,6 +21,7 @@ interface AdvancedFilterProps {
    * no-ops — hide them there.
    */
   showCountSorts?: boolean;
+  showTagFilter?: boolean;
 }
 
 export default function AdvancedFilter({
@@ -31,6 +31,7 @@ export default function AdvancedFilter({
   onTagsChange,
   onSortChange,
   showCountSorts = true,
+  showTagFilter = true,
 }: AdvancedFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(true);
@@ -72,7 +73,7 @@ export default function AdvancedFilter({
       {/* Run16 BUG-052: pages whose resources carry no tags used to silently
           omit the control, which read as an inconsistency across taxonomy
           pages — show it disabled with an explanation instead. */}
-      {availableTags.length === 0 && (
+      {showTagFilter && availableTags.length === 0 && (
         <>
           {/* BUG-028 (run26): the explanation moved OUT of the button into an
               aria-describedby target — the sr-only span inside the button made
@@ -95,7 +96,7 @@ export default function AdvancedFilter({
           </span>
         </>
       )}
-      {availableTags.length > 0 && (
+      {showTagFilter && availableTags.length > 0 && (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="min-h-[44px] flex-1 sm:flex-none">
@@ -162,23 +163,24 @@ export default function AdvancedFilter({
                   )}
                   <div className="space-y-1">
                     {visibleTags.map(({ tag, count }) => (
-                      <div
+                      <button
+                        type="button"
                         key={tag}
-                        className="flex items-center space-x-2 p-2 hover:bg-accent cursor-pointer rounded-sm min-h-[44px]"
+                        className="flex w-full items-center space-x-2 rounded-sm p-2 text-left hover:bg-accent min-h-[44px]"
                         onClick={() => toggleTag(tag)}
+                        aria-pressed={isSelected(tag)}
+                        aria-label={`${isSelected(tag) ? "Remove" : "Apply"} ${tag} tag filter`}
                       >
-                        <Checkbox
-                          aria-label={`Filter by ${tag}`}
-                          checked={isSelected(tag)}
-                          onCheckedChange={() => toggleTag(tag)}
-                        />
+                        <span aria-hidden="true" className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border ${isSelected(tag) ? "border-primary bg-primary text-primary-foreground" : "border-primary"}`}>
+                          {isSelected(tag) && <Check className="h-3 w-3" />}
+                        </span>
                         <div className="flex-1 flex items-center justify-between">
                           <span className="text-sm">{tag}</span>
                           <Badge variant="secondary" className="ml-2 text-xs">
                             {count}
                           </Badge>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                   {hiddenCount > 0 && (
@@ -218,30 +220,22 @@ export default function AdvancedFilter({
         </SelectContent>
       </Select>
 
-      {hasSelectedFilters && (
+      {showTagFilter && hasSelectedFilters && (
         <div className="flex gap-1.5 flex-wrap items-center w-full sm:w-auto">
           <span className="text-xs text-muted-foreground">Active:</span>
           {selectedTags.map((tag) => (
-            <Badge
+            <button
+              type="button"
               key={tag}
-              variant="default"
-              className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground px-3 py-1 min-h-[32px] flex items-center gap-1 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex min-h-11 items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground touch-manipulation hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => toggleTag(tag)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  toggleTag(tag);
-                }
-              }}
               aria-label={`Remove ${tag} filter`}
             >
               {tag}
               <X className="h-3 w-3" />
-            </Badge>
+            </button>
           ))}
-          <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs min-h-[32px] px-2">
+          <Button variant="ghost" size="sm" onClick={clearAll} className="min-h-11 px-2 text-xs">
             Clear
           </Button>
         </div>

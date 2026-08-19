@@ -251,6 +251,11 @@ export class ResourceRepository {
     if (strictSearchCondition && strictProbe) {
       const fuzzyNeedle = normalizedSearch.toLowerCase();
       const fuzzyCompactNeedle = fuzzyNeedle.replace(/[^\p{L}\p{N}]+/gu, "");
+      // pg_trgm operators are overloaded. Bound parameters otherwise arrive as
+      // `unknown`, so a true no-match fallback can fail operator resolution
+      // (`text % unknown`) instead of returning an empty result set.
+      const fuzzyNeedleSql = sql`${fuzzyNeedle}::text`;
+      const fuzzyCompactNeedleSql = sql`${fuzzyCompactNeedle}::text`;
       const compactTitle = sql`lower(regexp_replace(${resources.title}, '[^a-zA-Z0-9]+', '', 'g'))`;
       const transpositionTsQuery = Array.from(new Set(ftsTerms.flatMap((term) => {
         const chars = Array.from(term);
@@ -265,23 +270,23 @@ export class ResourceRepository {
         .select({ id: resources.id })
         .from(resources)
         .where(and(...fuzzyCandidateScope))
-        .orderBy(sql`${compactTitle} <-> ${fuzzyCompactNeedle}`)
+        .orderBy(sql`${compactTitle} <-> ${fuzzyCompactNeedleSql}`)
         .limit(50);
       const indexedFuzzyCondition = sql`(
-        ${resources.title} % ${fuzzyNeedle}
-        OR ${fuzzyNeedle} <% ${resources.title}
-        OR ${fuzzyNeedle} <<% ${resources.title}
-        OR ${compactTitle} % ${fuzzyCompactNeedle}
+        ${resources.title} % ${fuzzyNeedleSql}
+        OR ${fuzzyNeedleSql} <% ${resources.title}
+        OR ${fuzzyNeedleSql} <<% ${resources.title}
+        OR ${compactTitle} % ${fuzzyCompactNeedleSql}
         OR ${resources.searchTsv} @@ to_tsquery('english', ${transpositionTsQuery})
-        OR ${resources.description} % ${fuzzyNeedle}
-        OR ${fuzzyNeedle} <% ${resources.description}
-        OR ${resources.url} % ${fuzzyNeedle}
-        OR ${fuzzyNeedle} <% ${resources.url}
+        OR ${resources.description} % ${fuzzyNeedleSql}
+        OR ${fuzzyNeedleSql} <% ${resources.description}
+        OR ${resources.url} % ${fuzzyNeedleSql}
+        OR ${fuzzyNeedleSql} <% ${resources.url}
       )`;
       extendedFuzzyCondition = sql`(
         ${indexedFuzzyCondition}
         OR (
-          similarity(${compactTitle}, ${fuzzyCompactNeedle}) >= 0.2
+          similarity(${compactTitle}, ${fuzzyCompactNeedleSql}) >= 0.2
           AND ${resources.id} IN (${nearestTitleCandidates})
         )
       )`;

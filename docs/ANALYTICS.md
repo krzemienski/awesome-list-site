@@ -131,14 +131,15 @@ No personally identifiable information is ever sent to GA4:
 This is enforced by test: the validation harness scans every raw `/g/collect`
 request body for the throwaway email and password and fails if either appears.
 
-## Preserved-but-unwired helpers
+## Interaction helpers
 
-`analytics.ts` retains several helpers with **no current call sites**, kept for
-future instrumentation without re-plumbing the pipeline: `trackListSwitch`,
-`trackLayoutChange`, `trackFilterUsage`, `trackSortChange`, `trackPopoverView`,
+Search and taxonomy browse pages call `trackFilterUsage`, `trackSortChange`, and
+`trackTagInteraction` with their surface, resulting resource count, and
+zero-result state. `analytics.ts` also retains helpers for future instrumentation
+without re-plumbing the pipeline: `trackListSwitch`, `trackLayoutChange`, `trackPopoverView`,
 `trackMobileInteraction`, `trackEngagementTime`, `trackScrollDepth`,
 `trackShareAction`, `trackKeyboardShortcut`, `trackExportAction`,
-`trackTagInteraction`, `trackSessionQuality`, and `trackCopyAction`. The
+`trackSessionQuality`, and `trackCopyAction`. The
 `use-session-analytics.tsx` hook (Core Web Vitals + global JS-error capture) is
 also defined but not mounted, so LCP/FID/CLS and `javascript_error` events do not
 fire today. These are intentional — wire them up when the corresponding UI/metric
