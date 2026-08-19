@@ -24,6 +24,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { launchBrowserWithLease } from './playwright-launch-lease.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { chromium } = await import(path.join(ROOT, 'node_modules/playwright/index.mjs'));
@@ -57,7 +58,11 @@ function chromePath() {
 const results = [];
 const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} ${k} :: ${detail}`); };
 
-const browser = await chromium.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+const browser = await launchBrowserWithLease(
+  chromium,
+  { headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] },
+  'tablet-audit',
+);
 
 // Fresh context per surface: consent must be UNDECIDED (localStorage empty) so
 // the banner is present for the clearance/hit-test checks, and the sidebar

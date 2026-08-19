@@ -37,6 +37,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -631,7 +632,11 @@ function paritySample(pages) {
 
 async function runParity(pages) {
   const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
-  const browser = await chromium.launch({ executablePath: chromePath(), headless: true });
+  const browser = await launchBrowserWithLease(
+    chromium,
+    { executablePath: chromePath(), headless: true },
+    "seo-snapshot-parity",
+  );
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await ctx.newPage();
   const results = [];

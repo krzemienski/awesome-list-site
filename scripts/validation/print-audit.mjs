@@ -5,6 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { launchBrowserWithLease } from './playwright-launch-lease.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { chromium } = await import(path.join(ROOT, 'node_modules/playwright/index.mjs'));
@@ -58,7 +59,11 @@ async function firstCategoryRoute() {
 const results = [];
 const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} ${k} :: ${detail}`); };
 
-const browser = await chromium.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+const browser = await launchBrowserWithLease(
+  chromium,
+  { headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] },
+  'print-audit',
+);
 
 // Auth: the Clerk migration removed /api/auth/local/login and express-session,
 // so there is no password+cookie login anymore. Authenticated checks instead

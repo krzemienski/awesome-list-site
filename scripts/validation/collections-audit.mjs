@@ -8,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
+import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
@@ -206,11 +207,15 @@ let ownerContext;
 let anonymousContext;
 
 try {
-  browser = await chromium.launch({
-    headless: true,
-    executablePath: chromePath(),
-    args: ["--no-sandbox", "--disable-dev-shm-usage"],
-  });
+  browser = await launchBrowserWithLease(
+    chromium,
+    {
+      headless: true,
+      executablePath: chromePath(),
+      args: ["--no-sandbox", "--disable-dev-shm-usage"],
+    },
+    "collections-audit",
+  );
   ownerContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const request = ownerContext.request;
 

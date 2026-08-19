@@ -4,6 +4,7 @@
  * plus one paged listing, never the complete /api/awesome-list corpus.
  */
 import { chromium } from "playwright";
+import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
 
 const base = process.env.BASE_URL ?? "http://127.0.0.1:5000";
 const executablePath =
@@ -14,7 +15,11 @@ const nav = await (await fetch(`${base}/api/awesome-list/nav`)).json();
 const slug = nav.categories?.find((category) => category.resourceCount > 0)?.slug;
 if (!slug) throw new Error("Nav response has no non-empty category");
 
-const browser = await chromium.launch({ headless: true, executablePath });
+const browser = await launchBrowserWithLease(
+  chromium,
+  { headless: true, executablePath },
+  "taxonomy-no-corpus-fetch",
+);
 try {
   const page = await browser.newPage();
   const requests = [];
