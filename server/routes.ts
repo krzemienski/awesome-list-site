@@ -223,6 +223,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // globally in server/index.ts (clerkMiddleware + clerkUserContext). The
   // requireAuth gate imported above is passed to domain registrars below.
 
+  // Audit cycle-01 F023: a path segment with malformed percent-encoding
+  // (e.g. /api/resources/%zz) used to throw URIError inside Express's param
+  // decoder on whichever unconstrained route matched first → opaque 500,
+  // while sibling aliases 404ed. If the raw path can't decode, no route
+  // param can either — answer the canonical API 404 before any router runs.
+  // (Mirrors the malformed-encoding guard on the static-file path in
+  // server/index.ts.)
+  app.use('/api', (req, res, next) => {
+    try {
+      decodeURIComponent(req.path);
+    } catch {
+      return res.status(404).json({ message: 'Not found' });
+    }
+    return next();
+  });
+
   // Historical compatibility: notification API routes and the two unsubscribe
   // HTML routes are mounted before the /api backstop limiter.
   registerNotificationRoutes(app, isAuthenticated, isAdmin);
