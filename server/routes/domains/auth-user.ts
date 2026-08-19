@@ -4,7 +4,7 @@
  * ----------------------------------------------------------------------------
  *
  * Task #307 (Clerk migration): the legacy local-auth + Replit-OIDC surface
- * (local login, register, forgot/reset password, logout, logout-all,
+ * (local login, register, forgot/reset password, current-device logout,
  * replit-probe) is gone — Clerk owns credentials, sessions, sign-in/sign-up
  * UI, and password reset. What remains is the app-identity surface the SPA
  * uses to learn about the CURRENT user's application columns (role,
@@ -14,6 +14,7 @@
  *   GET  /api/auth/user    — canonical: always 200 { user, isAuthenticated }
  *   GET  /api/auth/me      — deprecated REST alias (401 style)
  *   GET  /api/auth/status  — deprecated lightweight probe
+ *   POST /api/auth/logout-all — revoke every active Clerk session
  *
  * Session state comes from `req.dbUser`, resolved by clerkUserContext
  * (server/clerkAuth.ts) after clerkMiddleware verifies the Clerk session.

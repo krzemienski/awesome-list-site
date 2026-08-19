@@ -207,20 +207,13 @@ npx playwright install --with-deps
 npm run test:e2e
 ```
 
-`playwright.config.ts` is configured to build the app once and serve it on
-`http://localhost:5000` for you (`npm run build && NODE_ENV=test node dist/index.js`),
-so you do not need to start a server yourself. We deliberately use the
-production build instead of `npm run dev` because Vite's middleware-mode
-dev server lazily compiles each ES module on first request and triggers
-periodic full-page reloads as it discovers new dependencies, which makes
-`page.waitForLoadState('networkidle')` (used throughout the spec files)
-unreliable. The first run is slower because of the build; subsequent runs
-reuse the existing `dist/` output.
+`playwright.config.ts` starts `npm run dev` on `http://localhost:5000` for you,
+so you do not need to start a server yourself. The specs use explicit
+DOM/content assertions rather than `networkidle`, which keeps Vite's HMR
+connection from making load checks flaky.
 
-If you already have a server running on `:5000` (e.g. `npm run dev` for
-manual debugging), Playwright will reuse it locally — set
-`reuseExistingServer: false` in the config if you want it to always
-rebuild.
+If you already have a server running on `:5000`, Playwright reuses it locally.
+CI always starts the configured dev server.
 
 To run a single spec or filter by title:
 
@@ -503,7 +496,7 @@ If you encounter issues not covered here:
 
 ---
 
-**Last Updated:** 2026-07-21
+**Last Updated:** 2026-08-19
 **ESLint Version:** 9.x (see package.json)
 **Prettier Version:** 3.x (see package.json)
 **TypeScript Version:** 5.6.3

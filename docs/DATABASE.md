@@ -2,9 +2,9 @@
 
 Schema and migration reference for the Awesome Video resource platform.
 
-> **Source of truth:** [`shared/schema.ts`](../shared/schema.ts). Every table, column,
-> index, and Zod insert schema is defined there and this document mirrors it. When the
-> two disagree, `shared/schema.ts` wins — update this file to match.
+> **Source of truth:** [`shared/schema.ts`](../shared/schema.ts). It defines the
+> complete table, column, index, relation, and Zod inventory. This guide explains
+> the operational model and major entities; when the two disagree, the schema wins.
 
 ## Overview
 
@@ -14,26 +14,27 @@ Schema and migration reference for the Awesome Video resource platform.
 - **Schema management:** `drizzle-kit push` in development; journaled SQL migrations in
   `migrations/` applied by a boot-time migrator in production (see
   [Migrations & schema changes](#migrations--schema-changes)).
-- **Tables:** 29 `pgTable` definitions in `shared/schema.ts`.
+- **Tables:** 38 `pgTable` definitions in `shared/schema.ts`.
 
-The schema supports: user authentication (Replit OAuth + local password), a 3-level
-category taxonomy, a resource approval workflow, crowdsourced edit suggestions, a full
-audit trail, learning journeys, AI enrichment/research jobs, GitHub import/export, link
-health scanning, and API keys for programmatic access.
+The schema supports the local application identity bridged from Clerk, a 3-level
+category taxonomy, resource moderation, crowdsourced edits, audit history,
+bookmark collections, learning journeys, notifications and digests, recommendations,
+AI enrichment/research jobs, GitHub import/export, link-health scans, shared
+rate limiting, and API keys.
 
 ---
 
 ## Table catalog
 
-All 29 tables, grouped by domain. Drizzle export name → SQL table name.
+All 38 tables, grouped by domain. Drizzle export name → SQL table name.
 
 **Auth & users**
 | Export | SQL table | Purpose |
 |--------|-----------|---------|
-| `sessions` | `sessions` | Express session store (connect-pg-simple) |
-| `users` | `users` | User accounts (OAuth + local auth), roles |
+| `sessions` | `sessions` | Legacy pre-Clerk session rows; no active reader/writer |
+| `users` | `users` | Clerk bridge identity snapshots and application roles |
 | `apiKeys` | `api_keys` | Hashed API keys for programmatic access |
-| `passwordResetTokens` | `password_reset_tokens` | Single-use hashed reset tokens |
+| `passwordResetTokens` | `password_reset_tokens` | Legacy pre-Clerk reset tokens; no active reader/writer |
 
 **Content & taxonomy**
 | Export | SQL table | Purpose |
@@ -64,8 +65,20 @@ All 29 tables, grouped by domain. Drizzle export name → SQL table name.
 |--------|-----------|---------|
 | `userFavorites` | `user_favorites` | Favorited resources |
 | `userBookmarks` | `user_bookmarks` | Bookmarked resources (with notes) |
+| `bookmarkCollections` | `bookmark_collections` | User-owned bookmark collections |
+| `bookmarkCollectionItems` | `bookmark_collection_items` | Bookmark↔collection membership |
 | `userPreferences` | `user_preferences` | Recommendation preferences |
 | `userInteractions` | `user_interactions` | Behavioral analytics events |
+| `userRecommendationFeedback` | `user_recommendation_feedback` | Per-resource recommendation feedback |
+
+**Notifications & digests**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `notificationPreferences` | `notification_preferences` | User reminder/digest settings |
+| `digestUnsubscribeTokens` | `digest_unsubscribe_tokens` | Hashed one-time digest unsubscribe links |
+| `inAppNotifications` | `in_app_notifications` | User notification inbox |
+| `digestJobs` | `digest_jobs` | Claimed digest-delivery jobs |
+| `digestAttempts` | `digest_attempts` | Per-channel delivery outcomes |
 
 **GitHub sync**
 | Export | SQL table | Purpose |
@@ -87,6 +100,11 @@ All 29 tables, grouped by domain. Drizzle export name → SQL table name.
 |--------|-----------|---------|
 | `linkHealthJobs` | `link_health_jobs` | Link-scan job runs |
 | `linkHealthChecks` | `link_health_checks` | Per-URL scan results |
+
+**Operations**
+| Export | SQL table | Purpose |
+|--------|-----------|---------|
+| `rateLimitHits` | `rate_limit_hits` | Shared PostgreSQL-backed rate-limit windows |
 
 ---
 
@@ -137,7 +155,9 @@ erDiagram
 ## Auth & users
 
 ### sessions
-Express session storage for Passport.js (`connect-pg-simple`).
+Legacy storage from the retired Passport/Express-session stack. Clerk now owns
+sessions; the application does not read or write this table. It is retained to
+avoid a destructive migration solely for cleanup.
 
 | Column | Type | Constraints | Notes |
 |--------|------|-------------|-------|
@@ -146,13 +166,15 @@ Express session storage for Passport.js (`connect-pg-simple`).
 | expire | timestamp | NOT NULL | Expiry (indexed: `IDX_session_expire`) |
 
 ### users
-Supports Replit OAuth (email, no password) and local auth (bcrypt password).
+Stores application authorization/profile data for Clerk users. For migrated
+accounts, `id` is the bridge identifier carried in Clerk session claims. The
+nullable `password` column is legacy data and is not a sign-in credential.
 
 | Column | Type | Constraints | Notes |
 |--------|------|-------------|-------|
 | id | varchar | PK, default `gen_random_uuid()` | UUID |
-| email | varchar | UNIQUE | Login email |
-| password | varchar | nullable | bcrypt hash (local auth only) |
+| email | varchar | UNIQUE | Identity snapshot and collision guard |
+| password | varchar | nullable | Legacy pre-Clerk hash; unused for sign-in |
 | first_name | varchar | | |
 | last_name | varchar | | |
 | profile_image_url | varchar | | |
@@ -180,9 +202,8 @@ plaintext key is shown once at creation.
 Indexes: `idx_api_keys_user_id`, `idx_api_keys_key`, `idx_api_keys_expires_at`.
 
 ### password_reset_tokens
-Single-use, hashed tokens for the self-service "forgot password" flow. A token is valid
-only while `used_at IS NULL AND expires_at > now()`, and is atomically claimed at
-redemption. Cascade-deletes with the owning user.
+Legacy self-service reset rows from before Clerk. Clerk owns password reset now,
+and current application code does not create or redeem these rows.
 
 | Column | Type | Constraints | Notes |
 |--------|------|-------------|-------|
@@ -211,10 +232,15 @@ Core content entity. Supports the 3-level taxonomy and an approval workflow.
 | category | text | NOT NULL | Matches `categories.name` (text, not FK) |
 | subcategory | text | nullable | |
 | sub_subcategory | text | nullable | |
-| status | text | default `'approved'` | `pending`, `approved`, `rejected`, `archived` |
+| resource_format | text | NOT NULL, default `'unknown'`, CHECK | Curated discovery facet |
+| provider | text | NOT NULL, default `'unknown'`, CHECK | Curated discovery facet |
+| skill_level | text | NOT NULL, default `'unknown'`, CHECK | Curated discovery facet |
+| status | text | default `'approved'` | `pending`, `approved`, `rejected`, `withdrawn`, `archived` |
 | submitted_by | varchar | FK → users.id, CASCADE | |
 | approved_by | varchar | FK → users.id | |
 | approved_at | timestamp | nullable | |
+| contributor_rejection_reason | text | nullable | Contributor-facing copy only |
+| status_changed_at | timestamp | nullable | Durable contributor lifecycle timestamp |
 | github_synced | boolean | default false | |
 | last_synced_at | timestamp | nullable | |
 | metadata | jsonb | default `{}` | AI enrichment data, etc. |
@@ -222,15 +248,18 @@ Core content entity. Supports the 3-level taxonomy and an approval workflow.
 | updated_at | timestamp | default now | |
 | search_tsv | tsvector | GENERATED ALWAYS | Full-text index over title+description+url (BUG-018, `migrations/0029_search_fts.sql`) |
 
-Indexes: `idx_resources_status`, `idx_resources_status_category`, `idx_resources_category`,
-and a GIN index `idx_resources_search_tsv` on the generated `search_tsv` column.
+Indexes cover status/category browsing, contributor status history, generated
+full-text search, trigram title/description/URL search, compact-title similarity,
+and approved-only format/provider/skill facets. The three discovery facets have
+CHECK constraints whose values are defined in `shared/resourceFacets.ts`.
 
 **Categories are referenced by text**, not foreign keys — `resources.category`/`subcategory`/`sub_subcategory`
 match the corresponding taxonomy row's `name`. This keeps imports and taxonomy evolution flexible.
 
-**Approval workflow:** submissions start `pending` (public submissions) or `approved`
-(admin/import); admins move them to `approved`/`rejected`; archived rows are hidden but
-retained. Public read endpoints serve `status = 'approved'`.
+**Approval workflow:** submissions start `pending` (public submissions) or
+`approved` (admin/import); admins move them to `approved`/`rejected`, contributors
+can withdraw eligible submissions, and archived rows are hidden but retained.
+Public read endpoints serve `status = 'approved'`.
 
 ### categories
 | Column | Type | Constraints |

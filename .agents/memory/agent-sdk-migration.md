@@ -10,6 +10,7 @@ Used to run the admin Researcher + Enrichment agents as a real multi-agent syste
 ## Dependency reality
 - Recent agent SDK (0.3.150+) **hard-peers `zod ^4.0.0` + `@anthropic-ai/sdk >=0.93.0` + `@modelcontextprotocol/sdk ^1.29.0`**.
 - **Current state (July 2026): the app is zod v4** (`zod ^4.4.3`, `drizzle-zod ^0.8.3`) — the earlier "keep zod v3" decision was superseded by a full v4 migration. Keep `.npmrc` `legacy-peer-deps=true` anyway; other transitive peers still conflict on install.
+- **Clean-install mismatch diagnostic:** a "missing transitive packages" lockfile error can be install-policy drift rather than lock corruption. **Why:** npm 10 produced a different peer graph when one clean environment ignored the project's peer policy, even though the same lock passed elsewhere. **How to apply:** compare effective npm configuration and Node/npm versions across environments before regenerating a lockfile.
 - SDK upgraded to **0.3.220** (July 2026): additive `terminal_reason` on the result message — map it as supplementary context only; `subtype`/`is_error` remain the authoritative failure signals.
 
 ## Runtime facts (verified by spike in-container)

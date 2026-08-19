@@ -25,12 +25,10 @@ Registered in `client/src/App.tsx` (Wouter). Admin and most non-browse pages are
 | `pages/Journeys.tsx` | `/journeys` | Learning journeys list |
 | `pages/JourneyDetail.tsx` | `/journey/:id` | Journey details |
 | `pages/SubmitResource.tsx` | `/submit` | Resource submission form |
-| `pages/Login.tsx` | `/login` | Sign in |
-| `pages/Register.tsx` | `/register` | Sign up |
-| `pages/ForgotPassword.tsx` | `/forgot-password` | Request password reset |
-| `pages/ResetPassword.tsx` | `/reset-password` | Complete password reset |
+| `/login`, `/register`, `/forgot-password`, `/reset-password` | — | Legacy URL redirects to `/sign-in` / `/sign-up` (Clerk); no standalone page files |
+| `/sign-in`, `/sign-up` | — | Clerk-hosted auth (inline `SignInPage` / `SignUpPage` in `App.tsx`) |
 | `pages/Profile.tsx` | `/profile` | User profile (auth) |
-| `pages/Bookmarks.tsx` | `/bookmarks` | User bookmarks (auth) |
+| `pages/BookmarksGate.tsx` | `/bookmarks` | User bookmarks (auth + guest merge) |
 | `pages/Settings.tsx` | `/settings` | User settings |
 | `pages/ThemeSettings.tsx` | `/settings/theme` | Theme / design-system settings |
 | `pages/About.tsx` | `/about` | About page |
@@ -97,9 +95,8 @@ Registered in `client/src/App.tsx` (Wouter). Admin and most non-browse pages are
 ### Authentication
 | File | Purpose |
 |------|---------|
-| `replitAuth.ts` | Replit OIDC OAuth setup + session store |
-| `localAuth.ts` | Local email/password auth |
-| `passwordUtils.ts` | bcrypt password hashing |
+| `clerkAuth.ts` | Clerk OIDC middleware + `requireAuth` gate + per-request user context |
+| `passwordUtils.ts` | Retained pre-Clerk password helpers; no active auth consumer |
 
 ### AI Services (server/ai/)
 | File | Purpose |
@@ -140,7 +137,7 @@ routes stay outside API routers, and operations fallbacks remain last.
 
 | File | Owned surface |
 |------|---------------|
-| `routes/domains/auth-user.ts` | Local/session auth, account identity, password reset |
+| `routes/domains/auth-user.ts` | Clerk-backed app identity, deprecated identity probes, all-session revocation |
 | `routes/domains/catalog-contributions.ts` | Public catalog/search, resources, submissions, edit suggestions |
 | `routes/domains/user-features.ts` | Favorites, bookmarks, collections, preferences, account contributions |
 | `routes/domains/journeys-recommendations.ts` | Journeys, progress, recommendations, learning paths, interactions |
@@ -213,10 +210,11 @@ helpers from past QA runs. The durable, canonical scripts are:
 > order.
 
 ### Authentication
-- OAuth: `server/replitAuth.ts`
-- Local: `server/localAuth.ts`
+- Clerk middleware + user context: `server/clerkAuth.ts` (mounted globally in `server/index.ts`)
+- Retained legacy password utility (not wired into Clerk authentication):
+  `server/passwordUtils.ts`
 - Frontend: `client/src/hooks/useAuth.ts`
-- Login page: `client/src/pages/Login.tsx`
+- Sign-in/sign-up: inline `SignInPage` / `SignUpPage` components in `client/src/App.tsx` (Clerk-hosted)
 
 ### Resource CRUD
 - API: `server/routes/domains/catalog-contributions.ts` and `admin-content.ts`
@@ -257,22 +255,11 @@ helpers from past QA runs. The durable, canonical scripts are:
 - Data access: `server/repositories/UserFeatureRepository.ts`
 
 ### Learning Journeys
-- API: `server/routes.ts` — grep `"/api/journeys"`
+- API: `server/routes/domains/journeys-recommendations.ts`
 - Pages: `client/src/pages/Journeys.tsx`, `JourneyDetail.tsx`
 
 ## Database Tables
 
-Defined in `shared/schema.ts` (29 tables). See [DATABASE.md](./DATABASE.md) for full column
-detail. Export name → SQL table:
-
-- `users` → `users`, `sessions` → `sessions`, `apiKeys` → `api_keys`, `passwordResetTokens` → `password_reset_tokens`
-- `resources` → `resources` (+ generated `search_tsv`)
-- `categories`, `subcategories`, `subSubcategories` → `sub_subcategories`
-- `tags` → `tags`, `resourceTags` → `resource_tags`, `awesomeLists` → `awesome_lists`
-- `resourceEdits` → `resource_edits`, `resourceAuditLog` → `resource_audit_log`
-- `learningJourneys` → `learning_journeys`, `journeySteps` → `journey_steps`, `userJourneyProgress` → `user_journey_progress`
-- `userFavorites` → `user_favorites`, `userBookmarks` → `user_bookmarks`, `userPreferences` → `user_preferences`, `userInteractions` → `user_interactions`
-- `githubSyncQueue` → `github_sync_queue`, `githubSyncHistory` → `github_sync_history`
-- `enrichmentJobs` → `enrichment_jobs`, `enrichmentQueue` → `enrichment_queue`
-- `researchJobs` → `research_jobs`, `researchDiscoveries` → `research_discoveries`, `agentEvents` → `agent_events`
-- `linkHealthJobs` → `link_health_jobs`, `linkHealthChecks` → `link_health_checks`
+`shared/schema.ts` is the authority for all 38 `pgTable` definitions. See
+[DATABASE.md](./DATABASE.md) for the complete export-to-SQL inventory and
+migration workflow; this code map intentionally does not duplicate it.

@@ -1,22 +1,22 @@
-# Authentication session policy
+# Authentication and session policy
 
-Awesome Video uses server-side PostgreSQL sessions identified by the
-`connect.sid` cookie.
+Clerk owns credentials, browser session cookies, sign-in/sign-up, password
+reset, current-device sign-out, and session lifetime. The application does not
+run Express sessions and does not store active sessions in PostgreSQL.
 
-- **Lifetime:** authenticated browser sessions expire 24 hours after creation.
-- **Cookie protections:** `HttpOnly`, `SameSite=Lax`, and `Secure` in production.
-- **Concurrency:** each account may have at most three active sessions. A new
-  login beyond that limit revokes the oldest older session.
-- **Current-device sign out:** `POST /api/auth/logout` destroys the current
-  server session, clears the cookie, and only then reports success.
-- **All-device revocation:** `POST /api/auth/logout-all` and the Profile page's
-  **Sign out all devices** action revoke every server session for the account.
-- **Credential changes:** password reset revokes every session; password change
-  revokes every session except the current one.
-- **CSRF:** auth and admin mutations require a same-origin `Origin` header.
-  Every cookie-authenticated mutation follows the same rule. Cross-site
-  `Origin` or `Sec-Fetch-Site` values are rejected, and GET requests never
-  mutate authentication state.
+The application-specific policy is:
 
-The client confirms `/api/auth/user` reports an unauthenticated state before it
-clears local identity state or navigates away after sign out.
+- `clerkMiddleware` verifies Clerk session claims.
+- `clerkUserContext` resolves the local `users` row used for roles and
+  application data. First-time users are provisioned from trusted claims; an
+  email collision with another local row fails closed.
+- `GET /api/auth/user` is the canonical identity endpoint and always returns
+  `200` with `{ user, isAuthenticated }`.
+- `POST /api/auth/logout-all` uses Clerk's backend API to revoke every active
+  session for the caller. Current-device sign-out is handled by Clerk's client.
+- Cookie-authenticated mutations pass the application's same-origin CSRF checks.
+- The `sessions` and `password_reset_tokens` tables are retained legacy schema
+  artifacts; current authentication code does not read or write them.
+
+See [ENVIRONMENT.md](./ENVIRONMENT.md) for required Clerk keys and
+[API.md](./API.md) for generated API-contract entry points.

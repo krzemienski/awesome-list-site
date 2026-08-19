@@ -10,10 +10,10 @@ REST API for the Awesome Video Resource Viewer.
   API. This page is a curated human overview; when in doubt, trust the
   live spec.
 
-The server registers 183 concrete API method/path pairs. This document covers the **public API** in
-full plus a verified map of the authenticated and admin surface — it does not
-enumerate every internal route. Use `/api/docs` for the exact request/response
-schemas.
+This document covers the public developer API in full and gives a navigational
+map of the larger application API. It deliberately does not freeze a total route
+count or duplicate every internal operation; use generated OpenAPI for exact
+methods, auth, parameters, and schemas.
 
 ---
 
@@ -36,7 +36,7 @@ authentication (free tier) or with an API key for higher limits. Only
 | Parameter | Type | Default | Notes |
 |-----------|------|---------|-------|
 | `page` | integer ≥ 1 | 1 | Invalid values → `400` |
-| `limit` | integer 1–100 | 20 | Clamped to 100 |
+| `limit` | positive integer | 20 | Values above 100 are clamped to 100; invalid/non-positive values → `400` |
 | `category` | string | – | Filter by category name |
 | `subcategory` | string | – | Filter by subcategory name |
 | `search` | string | – | Search title/description |
@@ -46,10 +46,10 @@ Response envelope:
 ```json
 {
   "resources": [ /* Resource[] */ ],
-  "total": 2282,
+  "total": 123,
   "page": 1,
   "limit": 20,
-  "totalPages": 115
+  "totalPages": 7
 }
 ```
 
@@ -112,10 +112,14 @@ email/password login endpoint was removed.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/auth/user` | Current user (returns `null` when anonymous) |
+| GET | `/api/auth/user` | Always `200`; `{ user: null, isAuthenticated: false }` when anonymous |
+| GET | `/api/auth/me` | Deprecated current-user alias (401 when anonymous) |
+| GET | `/api/auth/status` | Deprecated lightweight auth probe |
+| POST | `/api/auth/logout-all` | Revoke all active Clerk sessions for the caller |
 
 > Sign-in, sign-out, and session management go through Clerk's hosted flow;
-> check `/api/docs` and `server/routes.ts` for the current auth routes.
+> check `/api/docs` and `server/routes/domains/auth-user.ts` for the current
+> application identity routes.
 
 ---
 
@@ -134,6 +138,7 @@ email/password login endpoint was removed.
 | GET | `/api/journeys` | List learning journeys (`?category=`) |
 | GET | `/api/journeys/:id` | Journey with steps |
 | GET | `/api/github/awesome-lists` | Browse awesome lists (discovery) |
+| GET | `/api/public/collections/:shareId` | Read a published bookmark collection |
 
 ### SEO / crawler endpoints (non-`/api`)
 
@@ -180,16 +185,25 @@ email/password login endpoint was removed.
 | POST | `/api/resources/:id/edits` | Suggest an edit to a resource |
 | GET/POST/DELETE | `/api/favorites`, `/api/favorites/:resourceId` | Manage favorites |
 | GET/POST/DELETE | `/api/bookmarks`, `/api/bookmarks/:resourceId` | Manage bookmarks |
+| GET/POST/PATCH/DELETE | `/api/collections`, `/api/collections/:collectionId` | Manage bookmark collections |
+| PUT | `/api/collections/reorder` | Reorder collections |
+| POST/DELETE | `/api/collections/:collectionId/items/:resourceId` | Manage collection membership |
+| POST/DELETE | `/api/collections/:collectionId/publish` | Publish or unpublish a collection |
+| PATCH/POST | `/api/bookmarks/:resourceId/state`, `/api/bookmarks/bulk` | Bookmark queue/bulk actions |
+| GET/PUT | `/api/notification-preferences` | Reminder/digest preferences |
+| GET/PATCH/POST | `/api/notifications`, `/api/notifications/:id/read`, `/api/notifications/read-all` | Notification inbox |
+| GET | `/api/digests/preview` | Preview the caller's next digest |
 | GET | `/api/user/progress` | Learning progress |
 | GET | `/api/user/submissions` | Submitted resources |
+| GET | `/api/user/contributions` | Contribution history |
 | GET | `/api/user/journeys` | Started journeys |
 | POST | `/api/journeys/:id/start` | Start a journey |
 | PUT/GET | `/api/journeys/:id/progress` | Update / read journey progress |
 | GET/POST/DELETE | `/api/user/api-keys`, `/api/user/api-keys/:id` | Manage API keys |
-| POST | `/api/user/change-password` | Change password |
 | PATCH | `/api/user/profile` | Update profile |
 | POST | `/api/claude/analyze` | AI URL analysis (rate-limited) |
-| GET/POST | `/api/recommendations`, `/api/recommendations/feedback` | Recommendations |
+| GET/POST | `/api/recommendations` | Recommendations |
+| GET/PUT/POST | `/api/recommendations/feedback`, `/api/recommendations/:resourceId/feedback` | Recommendation feedback |
 | GET/POST | `/api/learning-paths/suggested`, `/api/learning-paths/generate` | Learning paths |
 | POST | `/api/interactions` | Record a user interaction |
 
@@ -201,7 +215,7 @@ Edit suggestions accept a whitelisted set of fields: `title`, `description`,
 ## Admin endpoints (`isAdmin` required)
 
 All require an authenticated admin session. A representative map (see `/api/docs`
-and `server/routes.ts` for the complete set):
+and `server/routes/domains/` for the complete set):
 
 **Dashboard & users**
 
@@ -262,7 +276,8 @@ The same GET/POST/PATCH/DELETE pattern applies to
 | POST | `/api/enrichment/start` |
 | GET | `/api/enrichment/jobs`, `/api/enrichment/jobs/:id` |
 | DELETE | `/api/enrichment/jobs/:id` |
-| POST | `/api/researcher/start` |
+| POST | `/api/researcher/start`, `/api/researcher/discoveries/approve-all` |
+| GET | `/api/researcher/brief` |
 | GET | `/api/researcher/jobs`, `/api/researcher/jobs/:id`, `/api/researcher/discoveries` |
 | DELETE | `/api/researcher/jobs/:id` |
 | POST | `/api/researcher/discoveries/:id/approve` \| `/reject` |
@@ -317,7 +332,7 @@ interface Resource {
   category: string;
   subcategory: string | null;
   subSubcategory: string | null;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'archived';
   metadata: Record<string, unknown> | null;
   createdAt: string;
   updatedAt: string;

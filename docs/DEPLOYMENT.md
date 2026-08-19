@@ -35,21 +35,20 @@ Key runtime facts (verified against the code in this repo):
   (`server/migrate.ts`) applies `migrations/` before the server listens, and the
   process refuses to start if migrations fail. Ship the `migrations/` folder with
   the app (the `Dockerfile` already copies it).
-- **Seeding**: on first boot (dev or prod) the app seeds categories/resources and
-  the admin account **only when the database is empty**; it never overwrites
-  existing data.
-- **Health**: `GET /api/health` returns `{"status":"ok"}` (HTTP 200). There is no
-  `/health` route.
-- **Replit-optional**: Replit OAuth and the Replit Vite plugins load only when
-  `REPL_ID` is set; otherwise the app uses local username/password auth. It runs
-  anywhere without Replit.
+- **Seeding**: on first boot (dev or prod) the app seeds categories/resources
+  only when the database is empty; it never overwrites existing catalog data.
+- **Health**: `/api/health` and `/api/health/live` are process liveness;
+  `/api/health/ready` checks migration state plus a bounded database probe.
+- **Authentication**: Clerk owns credentials and sessions in every environment.
+  `REPL_ID` only controls Replit development plugins.
 
 ## Prerequisites
 
 1. **A PostgreSQL database** — managed (Neon, Supabase, RDS, Cloud SQL, Azure) or
    self-hosted (see [DOCKER.md](./DOCKER.md)).
-2. **Environment variables** — at minimum `DATABASE_URL`, `NODE_ENV=production`,
-   and `SESSION_SECRET` (see [Environment Variables](#environment-variables)).
+2. **Environment variables** — at minimum `DATABASE_URL`,
+   `VITE_CLERK_PUBLISHABLE_KEY` at build time, and
+   `CLERK_PUBLISHABLE_KEY`/`CLERK_SECRET_KEY` at runtime.
 3. **A platform account** for wherever you deploy.
 
 ## Replit Deployment
@@ -57,25 +56,25 @@ Key runtime facts (verified against the code in this repo):
 Replit is the primary deployment target for this project (`.replit` is
 preconfigured).
 
-- **Build** runs the pre-publish gate: `bash scripts/pre-publish-gate.sh`, which
-  executes, in order — `tsc` typecheck → migration-drift check
-  (`scripts/check-migration-drift.ts`) → print-audit → responsive-audit →
-  `npm run build`. Any failing step blocks the publish.
+- **Build** runs `bash scripts/pre-publish-gate.sh --publish`: typecheck,
+  journal-only migration-drift validation, production build, then the bundle
+  budget. It deliberately does not boot the app or touch the production
+  database during the build. Print and responsive audits are separate
+  validation workflows; non-publish preflight runs them when a dev app is
+  already serving on port 5000.
 - **Run**: `npm run start`.
 - **Target**: `autoscale`, exposing internal port 5000 as external port 80.
 
 Steps:
 
 1. Open the project on Replit.
-2. Set **Secrets** (Tools → Secrets): `DATABASE_URL`, `SESSION_SECRET`,
-   Clerk keys, and any optional feature keys (see
-   [ENVIRONMENT.md](./ENVIRONMENT.md)). `NODE_ENV=production` is set by the run
-   command. The pre-publish gate's browser audits need an admin session (their
-   sign-in is being migrated to Clerk under a separate task).
+2. Add Replit PostgreSQL (or another reachable PostgreSQL provider), then set
+   the Clerk keys and any optional feature keys in **Secrets**. The application
+   receives `DATABASE_URL` from the database integration.
 3. Click **Deploy**. The build gate runs; on success the app is published.
 
-Replit does not provide managed PostgreSQL — use Neon or another external
-provider for `DATABASE_URL`.
+Replit provides managed PostgreSQL with separate development and production
+databases. An external PostgreSQL provider also works.
 
 ## Docker / Self-Hosting
 
@@ -87,9 +86,10 @@ See **[DOCKER.md](./DOCKER.md)** for the full guide, including a runnable local
 recipe, the required env vars, and verification steps. Quick start:
 
 ```bash
-export SESSION_SECRET="$(openssl rand -base64 32)"
+# Put VITE_CLERK_PUBLISHABLE_KEY, CLERK_PUBLISHABLE_KEY, and
+# CLERK_SECRET_KEY in .env first.
 docker compose up -d --build
-curl http://localhost:5000/api/health   # -> {"status":"ok"}
+curl http://localhost:5000/api/health/ready
 ```
 
 ## Railway
@@ -101,7 +101,7 @@ Railway builds the `Dockerfile` directly (`railway.json` is preconfigured):
   "build": { "builder": "DOCKERFILE", "dockerfilePath": "Dockerfile" },
   "deploy": {
     "startCommand": "node dist/index.js",
-    "healthcheckPath": "/api/health",
+    "healthcheckPath": "/api/health/ready",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
@@ -114,8 +114,10 @@ Steps:
 1. Create a project from your GitHub repo at [railway.app](https://railway.app).
 2. Add a **PostgreSQL** plugin (Railway sets `DATABASE_URL` automatically) or point
    `DATABASE_URL` at an external database.
-3. Set variables: `NODE_ENV=production`, `SESSION_SECRET`, and your Clerk keys.
-4. Deploy — Railway builds the Dockerfile and health-checks `/api/health`.
+3. Set `NODE_ENV=production`, `DATABASE_URL` if it was not injected, and the
+   Clerk build/runtime keys.
+4. Deploy — Railway builds the Dockerfile and health-checks
+   `/api/health/ready`.
 
 ## Vercel
 
@@ -133,15 +135,17 @@ as Vercel serverless functions):
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
-  "framework": null
+  "framework": null,
+  "regions": ["iad1"],
+  "env": { "NODE_ENV": "production" }
 }
 ```
 
 As-is, a Vercel deploy serves only the static frontend from `dist/public`; the
 API will not run. To actually host the backend on Vercel you would need to wrap
 the Express app in a serverless handler under `api/` (e.g. an `api/index.ts`
-shim) — that work has not been done. If you attempt it, set `DATABASE_URL` (use
-a pooled connection such as Neon) and `SESSION_SECRET` in the Vercel dashboard.
+shim) — that work has not been done. The checked-in configuration remains
+static-only; no backend runtime variables are consumed by that static deploy.
 
 ## Other Container Platforms
 
@@ -150,14 +154,17 @@ Run, AWS ECS/Fargate, Azure Container Apps, Fly.io, etc.). The general recipe:
 
 1. Build and push the image:
    ```bash
-   docker build -t <registry>/awesome-list-site:latest .
+   docker build \
+     --build-arg VITE_CLERK_PUBLISHABLE_KEY="$VITE_CLERK_PUBLISHABLE_KEY" \
+     --build-arg VITE_CLERK_PROXY_URL="${VITE_CLERK_PROXY_URL:-/api/__clerk}" \
+     -t <registry>/awesome-list-site:latest .
    docker push <registry>/awesome-list-site:latest
    ```
 2. Deploy it with:
    - **Port** `5000` (or set `PORT`).
-   - **Env** `NODE_ENV=production`, `DATABASE_URL`, `SESSION_SECRET`, and your
-     Clerk keys.
-   - **Health check** path `/api/health`.
+   - **Env** `NODE_ENV=production`, `DATABASE_URL`,
+     `CLERK_PUBLISHABLE_KEY`, and `CLERK_SECRET_KEY`.
+   - **Readiness check** path `/api/health/ready`.
 3. Provision a managed PostgreSQL and set `DATABASE_URL` (use connection pooling
    for serverless container runtimes).
 
@@ -188,7 +195,9 @@ Required for any deployment:
 ```bash
 DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
 NODE_ENV=production
-SESSION_SECRET=<openssl rand -base64 32>   # express-session will not start without it
+VITE_CLERK_PUBLISHABLE_KEY=pk_...          # build time
+CLERK_PUBLISHABLE_KEY=pk_...               # runtime
+CLERK_SECRET_KEY=sk_...                    # runtime, server-only
 ```
 
 Optional feature keys (AI enrichment, GitHub import/export, analytics, etc.) are
@@ -199,18 +208,21 @@ env, or a Docker `.env` file / `--env`.
 
 ## Health Checks
 
-```bash
-GET /api/health   ->   200 {"status":"ok"}
+```text
+GET /api/health       -> 200 {"status":"ok"}      # liveness alias
+GET /api/health/live  -> 200 {"status":"ok"}      # process-only
+GET /api/health/ready -> 200 {"status":"ready"}   # DB/migrations ready
 ```
 
-The endpoint reports process liveness only (no database/version fields). Point
-platform health checks at `/api/health`:
+Use liveness to decide whether the process should be restarted. Use readiness
+to decide whether it should receive traffic; readiness returns `503` while
+migrations or the bounded catalog-database probe are unavailable.
 
 - **Replit**: automatic.
-- **Railway**: `healthcheckPath: "/api/health"` in `railway.json`.
-- **Docker**: built into the `Dockerfile` `HEALTHCHECK`.
+- **Railway**: `healthcheckPath: "/api/health/ready"` in `railway.json`.
+- **Docker**: readiness is built into the `Dockerfile` `HEALTHCHECK`.
 - **Container platforms**: configure the target group / probe path to
-  `/api/health`.
+  `/api/health/ready`; configure a separate liveness probe when supported.
 
 There is also `GET /api/health/ai` for AI-service status (public callers get
 availability only; detailed stats require an admin session).
@@ -224,8 +236,9 @@ npm install
 npm run build
 ```
 
-**App exits on start** — usually a missing `SESSION_SECRET` (express-session
-throws) or an unreachable `DATABASE_URL`. Check the logs and confirm both are set.
+**App exits on start** — check `DATABASE_URL`, migration logs, and server Clerk
+keys. A client that renders a missing-key error was built without
+`VITE_CLERK_PUBLISHABLE_KEY`.
 
 **Migrations fail on boot** — the process exits by design if migrations fail.
 Verify `DATABASE_URL`, that the DB user can create/alter tables, and that the

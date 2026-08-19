@@ -1,14 +1,12 @@
 # Environment Variables
 
-Complete reference for every environment variable read by this application. The
-list below is grep-verified against `server/`, `shared/`, and `client/src/` — if
-a variable is not documented here, the code does not read it.
+Canonical, categorized reference for supported application and durable-script
+configuration. Executable reads in `server/`, `client/`, `scripts/`, and
+deployment configuration remain authoritative.
 
 - **Server/shared** variables are read via `process.env.*` at runtime.
-- **Frontend** (`VITE_*`) variables are read by `server/config.ts` and, for a
-  small subset, directly in the browser via `import.meta.env.*` (they are baked
-  into the client bundle at build time, so they must be present when `vite build`
-  runs).
+- **Frontend** (`VITE_*`) variables are baked into the client bundle at build
+  time through `server/config.ts` and/or direct `import.meta.env.*` reads.
 
 There is no `.env.example` in the repo. Create a `.env` at the project root (it
 is git-ignored) using the templates at the end of this file. On Replit, set
@@ -20,12 +18,15 @@ these in the **Secrets** pane instead of a file.
 
 | Variable | Required | Default | Read in |
 |----------|----------|---------|---------|
-| `DATABASE_URL` | ✅ | – | `server/db/index.ts`, `server/migrate.ts`, `server/replitAuth.ts` |
-| `SESSION_SECRET` | ✅ | – | `server/replitAuth.ts` |
-| `NODE_ENV` | ⚠️ recommended | `development` | `server/index.ts`, `server/replitAuth.ts` |
+| `DATABASE_URL` | ✅ | – | `server/db/index.ts`, `server/migrate.ts` |
+| `CLERK_PUBLISHABLE_KEY` | ✅ server | – | `server/index.ts` |
+| `CLERK_SECRET_KEY` | ✅ server | – | Clerk middleware/proxy and validation scripts |
+| `VITE_CLERK_PUBLISHABLE_KEY` | ✅ build | – | `client/src/App.tsx` |
+| `VITE_CLERK_PROXY_URL` | ❌ | direct Clerk | `client/src/App.tsx` |
+| `NODE_ENV` | ⚠️ recommended | `development` | server, build, and scripts |
 | `PORT` | ❌ | `5000` | `server/index.ts` |
-| `REPL_ID` | ❌ (Replit OAuth) | – | `server/replitAuth.ts`, `server/routes.ts` |
-| `ISSUER_URL` | ❌ | `https://replit.com/oidc` | `server/replitAuth.ts` |
+| `REPL_ID` | ❌ | – | `vite.config.ts` (Replit development plugins only) |
+| `ADMIN_PASSWORD` | ❌ (audits) | – | audit-key middleware and preflight scripts |
 | `AWESOME_RAW_URL` | ❌ | avelino/awesome-go README | `server/config.ts`, `server/routes.ts` |
 | `SITE_URL` | ❌ | request host | `server/routes.ts` |
 | `PUBLIC_SITE_URL` | ❌ | `https://awesome.video` | `server/index.ts`, `server/og-middleware.ts` |
@@ -41,23 +42,26 @@ these in the **Secrets** pane instead of a file.
 | `GITHUB_PERSONAL_ACCESS_TOKEN` | ❌ | – | `server/github/client.ts`, `server/github/replitConnection.ts` |
 | `GITHUB_PUSH_TOKEN` | ❌ | – | `server/github/client.ts`, `server/github/replitConnection.ts` |
 | `GITHUB_REPO_URL` | ❌ | – | `server/routes.ts` |
+| `EXPORT_LINK_CHECK` | ❌ | – | GitHub export/link-gate code |
 | `VITE_SITE_TITLE` | ❌ | `Awesome Go` | `server/config.ts` |
 | `VITE_SITE_DESCRIPTION` | ❌ | see below | `server/config.ts` |
 | `VITE_SITE_URL` | ❌ | `http://localhost:5000` | `server/config.ts`, client (`import.meta.env`) |
 | `VITE_DEFAULT_THEME` | ❌ | `auto` | `server/config.ts` |
 | `VITE_GA_MEASUREMENT_ID` | ❌ | – (empty) | `server/config.ts`, `client/src/lib/analytics.ts` |
+| `VITE_AMPLITUDE_API_KEY` | ❌ | – | Amplitude browser analytics |
+| `VITE_MIXPANEL_TOKEN` / `MIXPANEL_TOKEN` | ❌ | – | Mixpanel browser/server analytics |
+| `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | ❌ | – | PostHog browser analytics |
 
-The browser reads only three of these directly through `import.meta.env`:
-`VITE_SITE_URL`, `VITE_GA_MEASUREMENT_ID`, and Vite's built-in `DEV` flag.
+Only `VITE_*` values are exposed to the browser, and they are fixed when the
+Vite bundle is built. Never put a server secret in a `VITE_*` variable.
 
 ---
 
 ## Core (required to boot)
 
 ### `DATABASE_URL`
-PostgreSQL connection string used by Drizzle ORM for all queries, by the boot
-migrator, and by the `connect-pg-simple` session store. The server cannot start
-without it.
+PostgreSQL connection string used by Drizzle ORM and the production boot
+migrator. The server cannot start without it.
 
 ```bash
 # Local Postgres
@@ -66,13 +70,18 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/awesome_list"
 DATABASE_URL="postgresql://user:pass@ep-xyz.neon.tech/db?sslmode=require"
 ```
 
-### `SESSION_SECRET`
-Secret used to sign session cookies (`express-session`). Use a long random
-string; changing it invalidates all existing sessions. Never commit it.
+### Clerk keys
 
-```bash
-SESSION_SECRET="$(openssl rand -base64 32)"
-```
+Clerk owns credentials, sign-in/sign-up UI, password reset, cookies, and session
+revocation in every environment:
+
+- `VITE_CLERK_PUBLISHABLE_KEY`: public browser key, required at build time.
+- `CLERK_PUBLISHABLE_KEY`: server middleware publishable key.
+- `CLERK_SECRET_KEY`: server-only backend key.
+- `VITE_CLERK_PROXY_URL`: optional browser proxy path, commonly `/api/__clerk`.
+
+There is no `SESSION_SECRET`, Express session store, local password login, or
+Replit-OIDC authentication mode.
 
 ---
 
@@ -80,8 +89,8 @@ SESSION_SECRET="$(openssl rand -base64 32)"
 
 ### `NODE_ENV`
 `development` | `production` | `test`. In `production` the boot migrator runs
-before the server accepts traffic, cookies are hardened, and logging is reduced.
-Defaults to `development`.
+before the server accepts traffic and the built frontend is served from
+`dist/public`. Defaults to `development`.
 
 ### `PORT`
 HTTP port for the Express server. Defaults to `5000`. Most hosts set this
@@ -89,25 +98,16 @@ automatically — do not override it on Replit/Railway/Vercel.
 
 ---
 
-## Admin bootstrap
+## Admin access and audit automation
 
-Authentication is handled by Clerk; there is no local password login and no
-`ADMIN_PASSWORD` variable. To make an account an admin, sign in once via Clerk,
-then set `role = 'admin'` on the corresponding row in the `users` table.
+To make an account an admin, sign in once through Clerk, then set `role =
+'admin'` on the corresponding `users` row.
 
----
-
-## Replit authentication (optional)
-
-Only needed when running the Replit OpenID Connect login flow. On Replit these
-are provided by the platform; elsewhere the app uses local email/password auth
-and neither is required.
-
-### `REPL_ID`
-Replit application ID used as the OIDC client ID and logout redirect.
-
-### `ISSUER_URL`
-OIDC issuer discovery URL. Defaults to `https://replit.com/oidc`.
+`ADMIN_PASSWORD` is an optional audit-only secret. When it is configured,
+database seeding creates a fixed legacy admin row for the
+`X-Admin-Audit-Key` validation bypass. The key is compared from the environment
+and is never stored as a user password; it does not enable local sign-in.
+`REPL_ID` only enables Replit development-time Vite plugins.
 
 ---
 
@@ -190,6 +190,10 @@ for write/export operations.
 Default repository URL used as a fallback for export operations
 (`server/routes.ts`).
 
+### `EXPORT_LINK_CHECK`
+Set to `1` to enable live outbound-link checking during export. Leave unset for
+the normal deterministic export path.
+
 ---
 
 ## Frontend (`VITE_*`)
@@ -205,6 +209,11 @@ directly in the browser.
 | `VITE_SITE_URL` | Base URL for canonical/OG (also client-side) | `http://localhost:5000` |
 | `VITE_DEFAULT_THEME` | Initial theme (`light` \| `dark` \| `auto`) | `auto` |
 | `VITE_GA_MEASUREMENT_ID` | Google Analytics 4 ID (also client-side) | – |
+| `VITE_AMPLITUDE_API_KEY` | Amplitude project key | – |
+| `VITE_MIXPANEL_TOKEN` | Mixpanel public project token | – |
+| `MIXPANEL_TOKEN` | Optional server-side Mixpanel token override | – |
+| `VITE_POSTHOG_KEY` | PostHog project key | – |
+| `VITE_POSTHOG_HOST` | PostHog ingestion host | provider default |
 
 ---
 
@@ -215,7 +224,10 @@ directly in the browser.
 ```bash
 # Required
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/awesome_list"
-SESSION_SECRET="change-me-use-a-long-random-string"
+CLERK_PUBLISHABLE_KEY="pk_..."
+CLERK_SECRET_KEY="sk_..."
+VITE_CLERK_PUBLISHABLE_KEY="pk_..."
+VITE_CLERK_PROXY_URL="/api/__clerk"
 
 # Runtime
 NODE_ENV="development"
@@ -241,7 +253,10 @@ PORT="5000"
 
 ```bash
 DATABASE_URL="postgresql://user:pass@host:5432/db"
-SESSION_SECRET="a-long-random-secret"
+CLERK_PUBLISHABLE_KEY="pk_..."
+CLERK_SECRET_KEY="sk_..."
+VITE_CLERK_PUBLISHABLE_KEY="pk_..."
+VITE_CLERK_PROXY_URL="/api/__clerk"
 NODE_ENV="production"
 
 # Public URLs (match your domain)
@@ -255,8 +270,8 @@ VITE_SITE_TITLE="Your Site Title"
 # VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
 ```
 
-On Replit, `DATABASE_URL`, `REPL_ID`, and `PORT` are provided automatically; set
-`SESSION_SECRET` and any optional keys in the Secrets pane.
+On Replit, adding PostgreSQL supplies `DATABASE_URL`; set the Clerk keys and any
+optional integration values in Secrets.
 
 ---
 
@@ -264,8 +279,10 @@ On Replit, `DATABASE_URL`, `REPL_ID`, and `PORT` are provided automatically; set
 
 - **Server won't start / "DATABASE_URL"** — set a valid PostgreSQL URL; Neon
   requires `?sslmode=require`.
-- **Users logged out on every restart** — `SESSION_SECRET` is unset or changing
-  between restarts; set a stable value.
+- **Clerk UI fails to initialize** — ensure `VITE_CLERK_PUBLISHABLE_KEY` was
+  present during the latest client build.
+- **Authenticated API calls fail** — verify the server-side Clerk publishable
+  and secret keys belong to the same Clerk instance as the browser key.
 - **AI features disabled** — set `AI_INTEGRATIONS_ANTHROPIC_API_KEY` (and
   `AI_INTEGRATIONS_OPENAI_API_KEY` for embeddings).
 - **GitHub sync failing** — set a token with repo scope and verify it hasn't

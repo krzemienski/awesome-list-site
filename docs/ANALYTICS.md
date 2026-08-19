@@ -53,13 +53,12 @@ the `ae` flag appeared alongside our manual one on the one true SPA navigation).
 
 ### Initialization order (important)
 
-`initGA()` is **idempotent** and is called at module load in `client/src/main.tsx`
-**before React renders**. This is deliberate: React runs child effects
-(Router → `useAnalytics`) *before* parent effects (`App`), so a mount-only init
-would leave `window.gtag` undefined when the very first `page_view` fires and the
-event would be dropped. Initializing pre-render guarantees the initial
-`page_view` (with landing-page UTMs) is captured. `App.tsx` still calls
-`initGA()` in an effect as a safety net — it no-ops after the first call.
+`initGA()` is **idempotent** and is called in `client/src/main.tsx` inside an
+`afterFirstPaint()` callback — deferred until after the first contentful paint
+(via `PerformanceObserver` on the `"paint"` entry, with a double-rAF fallback).
+All analytics SDKs are consent-gated and deferred to this same callback. Because
+`initGA` is idempotent, any code path that calls it earlier (e.g. after an
+explicit consent grant) is safe — subsequent calls are no-ops.
 
 gtag is configured with **`send_page_view: false`** so page views come from a
 single source (`use-analytics`), giving exactly one `page_view` per navigation.
@@ -74,8 +73,8 @@ In DEV, `debug_mode: true` is added so events appear in GA4 DebugView.
 | `page_view` | Every navigation — `use-analytics` on mount + route change | `page_location`, `page_path`, `page_title`, `page_referrer` |
 | `search` | Search dialog, once per debounced query — `search-dialog.tsx` | `search_term`, `result_count` |
 | `select_content` | Resource detail page mount — `ResourceDetail.tsx` | `content_type: "resource"`, `content_id`, `content_name`, `content_category` |
-| `login` | Successful email/password login — `Login.tsx` | `method: "password"` + acquisition |
-| `sign_up` | Successful registration — `Register.tsx` | `method: "password"` + acquisition |
+| `login` | Successful login — `trackLogin()` in `client/src/lib/analytics.ts` (defined; not currently wired to a call site after Clerk migration) | `method` + acquisition |
+| `sign_up` | Successful registration — `trackSignUp()` in `client/src/lib/analytics.ts` (defined; not currently wired to a call site after Clerk migration) | `method` + acquisition |
 | `generate_lead` | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
 | `share` | Share button on a resource — `ResourceDetail.tsx` | `method: "web_share" \| "clipboard"`, `content_type`, `content_id` |
 

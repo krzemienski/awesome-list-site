@@ -30,7 +30,7 @@ run and **verifying a build without the Replit environment**.
   - [Install Docker Desktop](https://docs.docker.com/get-docker/) (macOS/Windows)
   - [Install Docker Engine](https://docs.docker.com/engine/install/) (Linux)
 - **Docker Compose**: v2 (included with Docker Desktop; the `docker compose`
-  subcommand). The legacy `docker-compose` v1 binary also works.
+  subcommand).
 - **Git**: For cloning the repository
 
 Verify your installation:
@@ -47,23 +47,23 @@ The `Dockerfile` is a two-stage build that mirrors the real `npm run build`:
 - **Node 20** (`node:20-alpine`) in both stages — matches the project's target runtime.
 - **Builder stage**: `npm ci`, copy source, `npm run build`. That command runs
   `vite build` (frontend → `dist/public/`) followed by `esbuild server/index.ts`
-  (server bundle → `dist/index.js`).
+  (server bundle → `dist/index.js`). The build requires the public
+  `VITE_CLERK_PUBLISHABLE_KEY` argument.
 - **Production stage**: `npm ci --omit=dev`, then copies `dist/`, plus `server/`,
   `shared/`, `migrations/`, `drizzle.config.ts`, and `tsconfig.json`.
   - `migrations/` is required: in production the server runs a **boot-time
     migrator** (`server/migrate.ts`) before it starts listening.
-  - `drizzle.config.ts` + `tsconfig.json` let you run `npm run db:push` inside the
-    container if you ever need to.
+  - Development-only tools such as `drizzle-kit` are not installed in the
+    production image; schema changes arrive through journaled migrations.
 - `ENV NODE_ENV=production`, `EXPOSE 5000`, and a `HEALTHCHECK` that polls
-  `http://localhost:$PORT/api/health`.
+  `http://localhost:$PORT/api/health/ready`.
 - `CMD ["node", "dist/index.js"]`.
 
 The container **listens on port 5000** by default; override with the `PORT`
 environment variable.
 
-> The image runs as `root` by default. To harden a production image, add a
-> `USER node` line before `CMD` (the `node` user exists in the base image) or run
-> the container with `--user`. See [Production Deployment](#production-deployment).
+> The production stage runs as the non-root `node` user provided by the
+> official Node image; copied runtime files are owned by that user.
 
 ## Quick Start
 
@@ -73,13 +73,14 @@ environment variable.
    cd awesome-list-site
    ```
 
-2. **Set the required secrets.** `docker-compose.yml` ships with sane defaults for
-   `DATABASE_URL`, `NODE_ENV`, and `PORT`, and reads `SESSION_SECRET`
-   from your shell or a `.env` file (see
-   [Environment Variables](#environment-variables)). Create a `.env` next to
-   `docker-compose.yml`:
+2. **Set the required Clerk keys.** `docker-compose.yml` supplies the local
+   `DATABASE_URL`, `NODE_ENV`, and `PORT`; create a `.env` next to
+   `docker-compose.yml` (see [Environment Variables](#environment-variables)):
    ```env
-   SESSION_SECRET=replace-with-openssl-rand-base64-32
+   VITE_CLERK_PUBLISHABLE_KEY=pk_...
+   CLERK_PUBLISHABLE_KEY=pk_...
+   CLERK_SECRET_KEY=sk_...
+   VITE_CLERK_PROXY_URL=/api/__clerk
    ```
 
 3. **Start the application**:
@@ -91,21 +92,24 @@ The app is available at `http://localhost:5000` once the containers are healthy
 (typically 30–60 seconds). Verify:
 
 ```bash
-curl http://localhost:5000/api/health
-# -> {"status":"ok"}
+curl http://localhost:5000/api/health/live
+curl http://localhost:5000/api/health/ready
 ```
 
 ## Environment Variables
 
-`docker-compose.yml` sets the always-needed values and forwards two secrets from
-your environment / `.env` file:
+`docker-compose.yml` sets local database/runtime values and forwards Clerk
+build/runtime keys from `.env`:
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string. Compose wires the app to its `postgres` service automatically. |
 | `NODE_ENV` | Yes | Set to `production` — this is what enables the boot migrator. |
 | `PORT` | No | Listen port (default `5000`). |
-| `SESSION_SECRET` | **Yes** | `express-session` refuses to start without it. Generate with `openssl rand -base64 32`. |
+| `VITE_CLERK_PUBLISHABLE_KEY` | **Yes (build)** | Public key compiled into the Vite bundle. |
+| `CLERK_PUBLISHABLE_KEY` | **Yes (runtime)** | Server Clerk publishable key. |
+| `CLERK_SECRET_KEY` | **Yes (runtime)** | Server-only Clerk backend key. |
+| `VITE_CLERK_PROXY_URL` | No | Browser proxy path; Compose defaults to `/api/__clerk`. |
 
 Optional feature flags (only needed if you use those features):
 
@@ -118,12 +122,12 @@ OPENAI_API_KEY=...
 GITHUB_TOKEN=...
 ```
 
-The complete, grep-verified list of environment variables lives in
+The canonical categorized environment-variable reference lives in
 [ENVIRONMENT.md](./ENVIRONMENT.md).
 
 **Security notes**
 - **Never commit your `.env`** to version control.
-- Use a strong, random `SESSION_SECRET`: `openssl rand -base64 32`.
+- Keep `CLERK_SECRET_KEY` server-only.
 - Keep API keys secret and rotate them regularly.
 
 ## Runnable local recipe
@@ -131,8 +135,7 @@ The complete, grep-verified list of environment variables lives in
 A complete, from-scratch local run with database, migrations, and seeding:
 
 ```bash
-# 1. Provide the session secret (or put it in a .env file)
-export SESSION_SECRET="$(openssl rand -base64 32)"
+# 1. Put the Clerk keys shown above in .env
 
 # 2. Build and start Postgres + the app
 docker compose up -d --build
@@ -143,7 +146,8 @@ docker compose logs -f app
 #   Look for: "Running database migrations..." / "Migrations completed successfully"
 
 # 4. Confirm it is serving
-curl http://localhost:5000/api/health          # -> {"status":"ok"}
+curl http://localhost:5000/api/health/live
+curl http://localhost:5000/api/health/ready
 open http://localhost:5000                      # homepage
 
 # 5. Sign in via Clerk, then grant your account the admin role in the DB:
@@ -156,8 +160,8 @@ Notes:
   existing data, so restarts preserve your changes.
 - Authentication is Clerk-based; there is no local admin password.
 - To re-run seeding manually against a running container, use the admin API
-  (`POST /api/admin/seed-database`) or `docker compose exec app npm run db:push`
-  for schema-only sync.
+  (`POST /api/admin/seed-database`). Do not run development `db:push` against a
+  production container.
 
 ## Docker Commands
 
@@ -242,10 +246,8 @@ docker compose exec app node -v
 
 ## Verifying a Docker run
 
-Use these steps to confirm a Docker deployment works end to end. A convenience
-script, `scripts/verify-docker-deployment.sh`, exists but predates the current
-routes — prefer the manual steps below, which target the real `/api/health`
-endpoint.
+Use these steps to confirm a Docker deployment works end to end. The maintained
+`scripts/verify-docker-deployment.sh` automates the same checks.
 
 1. **Clean start**
    ```bash
@@ -264,12 +266,13 @@ endpoint.
    # -> /var/run/postgresql:5432 - accepting connections
    ```
 
-4. **Health endpoint** — returns HTTP 200 with `{"status":"ok"}`:
+4. **Liveness and readiness**:
    ```bash
-   curl -i http://localhost:5000/api/health
+   curl -i http://localhost:5000/api/health/live
+   curl -i http://localhost:5000/api/health/ready
    ```
-   > The endpoint reports process liveness only; it does not include database or
-   > version fields.
+   > Liveness is process-only. Readiness checks migration state and a bounded
+   > database/catalog query, returning `503` while the app cannot serve traffic.
 
 5. **Migrations recorded** — Drizzle keeps its journal in the `drizzle` schema:
    ```bash
@@ -297,17 +300,16 @@ endpoint.
 **Success criteria**
 
 - `docker compose up -d` starts both services and they report healthy.
-- `GET /api/health` returns `200` with `{"status":"ok"}`.
+- Liveness returns `200` with `{"status":"ok"}` and readiness returns `200`
+  with `{"status":"ready",...}`.
 - The frontend is reachable at `http://localhost:5000`.
 - `drizzle.__drizzle_migrations` exists and the app log shows no error stack traces.
 
 ## Verifying a build without Replit
 
-The build and server run **without** the `REPL_ID` environment variable — the
-Replit-only Vite plugins are `optionalDependencies`, dynamically imported in
-`vite.config.ts` only when `REPL_ID` is defined, and Replit OAuth is skipped in
-`server/routes.ts` when `REPL_ID` is absent (local username/password auth is
-always set up). This is exactly the code path Docker uses.
+The build and server run **without** `REPL_ID`. The Replit-only Vite plugins are
+dynamically imported only when it is defined; authentication remains Clerk-based
+in both cases.
 
 To verify a clean, non-Replit build on any machine (script equivalent:
 `scripts/verify-non-replit-build.sh`):
@@ -317,7 +319,9 @@ To verify a clean, non-Replit build on any machine (script equivalent:
 unset REPL_ID
 rm -rf dist/
 
-# 2. Build
+# 2. Build with the browser's Clerk publishable key
+export VITE_CLERK_PUBLISHABLE_KEY="pk_..."
+export VITE_CLERK_PROXY_URL="/api/__clerk"
 npm run build
 
 # 3. Confirm artifacts
@@ -325,18 +329,19 @@ ls dist/index.js dist/public/index.html   # both must exist
 
 # 4. Run in production mode against a Postgres database
 export DATABASE_URL="postgresql://user:pass@host:5432/db"
-export SESSION_SECRET="$(openssl rand -base64 32)"
+export CLERK_PUBLISHABLE_KEY="pk_..."
+export CLERK_SECRET_KEY="sk_..."
 NODE_ENV=production npm run start
 
 # 5. In another shell
-curl http://localhost:5000/api/health      # -> {"status":"ok"}
+curl http://localhost:5000/api/health/live
+curl http://localhost:5000/api/health/ready
 curl -s http://localhost:5000/ | head -c 40 # HTML (<!doctype html> ...)
 ```
 
 **Expected:** `npm run build` completes with no "Cannot find module
 '@replit/…'" errors, `dist/index.js` + `dist/public/` are produced, the server
-starts and serves `/api/health` and the SPA, and the login page offers local
-auth (not Replit OAuth).
+starts and serves the health endpoints and SPA, and Clerk initializes.
 
 ## Troubleshooting
 
@@ -358,12 +363,13 @@ docker compose restart postgres
 
 ### App exits immediately
 
-Most often a missing `SESSION_SECRET` (express-session throws on boot) or an
-unreachable `DATABASE_URL`.
+Check `DATABASE_URL`, migration output, and the Clerk runtime keys. A
+missing-key page in the browser means the image was built without
+`VITE_CLERK_PUBLISHABLE_KEY`.
 
 ```bash
 docker compose logs app          # read the stack trace
-docker compose exec app env | grep -E 'SESSION_SECRET|DATABASE_URL|NODE_ENV'
+docker compose exec app env | grep -E 'CLERK_PUBLISHABLE_KEY|DATABASE_URL|NODE_ENV'
 ```
 
 ### Migrations didn't run
@@ -390,7 +396,8 @@ docker compose up -d
 ```bash
 docker compose logs app
 docker compose ps
-curl http://localhost:5000/api/health
+curl http://localhost:5000/api/health/live
+curl http://localhost:5000/api/health/ready
 ```
 
 ## Production Deployment
@@ -398,7 +405,10 @@ curl http://localhost:5000/api/health
 ### Build and push an image
 
 ```bash
-docker build -t awesome-list-site:latest .
+docker build \
+  --build-arg VITE_CLERK_PUBLISHABLE_KEY="$VITE_CLERK_PUBLISHABLE_KEY" \
+  --build-arg VITE_CLERK_PROXY_URL="${VITE_CLERK_PROXY_URL:-/api/__clerk}" \
+  -t awesome-list-site:latest .
 docker tag awesome-list-site:latest your-registry.com/awesome-list-site:latest
 docker push your-registry.com/awesome-list-site:latest
 ```
@@ -412,9 +422,8 @@ works on any container platform (Cloud Run, ECS, Container Apps). See
 1. **Use an external, managed PostgreSQL** rather than the bundled Compose
    database. Set `DATABASE_URL` accordingly (append `?sslmode=require` for most
    managed providers).
-2. **Provide secrets at runtime** — `SESSION_SECRET` (required) and your Clerk
-   keys for authentication. Prefer your platform's secret
-   store or Docker secrets over baking them into the image.
+2. **Provide Clerk server keys at runtime** and the public Clerk key as a build
+   argument. Prefer your platform's secret store for `CLERK_SECRET_KEY`.
 3. **Set resource limits** in `docker-compose.yml`:
    ```yaml
    services:
@@ -425,9 +434,8 @@ works on any container platform (Cloud Run, ECS, Container Apps). See
              cpus: '2'
              memory: 2G
    ```
-4. **Run as non-root** — add `USER node` before `CMD` in the `Dockerfile`, or run
-   with `--user node`.
-5. **Configure health checks** on `/api/health` (already built into the
+4. **Run as non-root** — the checked-in image already uses `USER node`.
+5. **Configure readiness checks** on `/api/health/ready` (already built into the
    `Dockerfile` `HEALTHCHECK`; also referenced by `railway.json`).
 6. **Structured logging** via a log driver:
    ```yaml
@@ -442,9 +450,8 @@ works on any container platform (Cloud Run, ECS, Container Apps). See
 
 ### Scaling
 
-The app keeps sessions in PostgreSQL (`connect-pg-simple`), so multiple replicas
-can share state as long as they share one database. For horizontal scaling use an
-external PostgreSQL plus a load balancer in front of the replicas.
+Clerk owns browser sessions, so replicas do not need a shared application
+session store. They still share PostgreSQL for catalog and user application data.
 
 ## Additional Resources
 

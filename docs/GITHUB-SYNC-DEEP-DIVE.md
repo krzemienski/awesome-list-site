@@ -612,7 +612,7 @@ The validation system uses **awesome-lint** - the official linter for awesome li
 
 **awesome-list-item**
 - Each resource must be a list item (`- `)
-- Must have format: `- [Title](URL) - Description.`
+- Must have format: ``- [Title](https://example.com) - Description.``
 - Description must end with period
 - No duplicate URLs within the list
 
@@ -826,7 +826,7 @@ Common issues and solutions for GitHub sync operations.
 2. Fix errors in the source repository (or fork it)
 3. Common fixes:
    - Add table of contents
-   - Fix list item format: `- [Title](url) - Description.`
+   - Fix list item format: ``- [Title](https://example.com) - Description.``
    - Add awesome badge
 4. Or use **Strict Mode** disabled if you want to import with warnings
 
@@ -886,7 +886,7 @@ Line 45: [awesome-list-item] Description should end with period
 **Cause:** GitHub token doesn't have write permissions.
 
 **Solution:**
-1. For Replit OAuth: Re-authorize with `repo` scope
+1. For the Replit GitHub connection: reconnect it with repository write access
 2. For personal tokens: Generate new token with `repo` permissions
 3. Verify token in: Admin → Settings → GitHub Integration
 

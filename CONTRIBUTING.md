@@ -74,9 +74,10 @@ function Component({ title, onClick }: Props) {
 ### Database Changes
 
 1. Update schema in `shared/schema.ts`
-2. Run `npm run db:push` to apply
-3. Update relevant storage methods
-4. Test migrations thoroughly
+2. Run `npm run db:push` to sync your local dev database (fast iteration; no migration file is created)
+3. When the change needs to ship to production, also run `npx drizzle-kit generate` to write a new `migrations/NNNN_*.sql` and update `migrations/meta/_journal.json`, then commit both files — the boot-time migrator applies them on deploy
+4. Update relevant storage methods
+5. Test migrations thoroughly
 
 ### Adding Dependencies
 

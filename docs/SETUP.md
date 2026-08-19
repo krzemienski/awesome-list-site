@@ -10,8 +10,8 @@ the same port (`5000`).
 - **PostgreSQL 14+** (local install, Docker, or a managed provider such as Neon)
 - **Git**
 
-On Replit, `DATABASE_URL`, `PORT`, and `REPL_ID` are provided automatically —
-skip the manual database/env steps and just set your secrets.
+On Replit, adding PostgreSQL provides `DATABASE_URL`; set the Clerk keys and
+optional integration values in Secrets.
 
 ## Quick start
 
@@ -23,7 +23,10 @@ npm install
 #    There is no .env.example shipped — the minimum is:
 cat > .env <<'EOF'
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/awesome_list"
-SESSION_SECRET="change-me-use-a-long-random-string"
+CLERK_PUBLISHABLE_KEY="pk_..."
+CLERK_SECRET_KEY="sk_..."
+VITE_CLERK_PUBLISHABLE_KEY="pk_..."
+VITE_CLERK_PROXY_URL="/api/__clerk"
 NODE_ENV="development"
 EOF
 
@@ -51,7 +54,7 @@ npm run db:studio        # open Drizzle Studio (GUI)
 - In **production** (`NODE_ENV=production`), the server runs SQL migrations from
   `migrations/` automatically at boot before accepting traffic.
 
-## Seeding & admin account
+## Seeding & admin access
 
 - **Auto-seed on first boot**: when the database is empty the server seeds
   categories and sample resources.
@@ -59,6 +62,10 @@ npm run db:studio        # open Drizzle Studio (GUI)
   password login. Sign in through the site's normal Clerk flow, then grant the
   account the `admin` role in the `users` table (e.g. via SQL:
   `UPDATE users SET role = 'admin' WHERE email = '<your-email>'`).
+- **Audit key**: when `ADMIN_PASSWORD` is set, database seeding creates the
+  legacy audit-only admin row used by `X-Admin-Audit-Key` validation requests.
+  The key stays in the environment; it is not stored as a user password and
+  cannot be used to sign in.
 - **Manual re-seed** (admin session required):
 
   ```bash
@@ -82,8 +89,8 @@ npm run db:studio        # open Drizzle Studio (GUI)
 | `npm run test:e2e` | Playwright end-to-end tests |
 | `npm run audit:sidebar` | Sidebar/navigation audit script |
 
-> Only these scripts exist in `package.json`. Do not assume a `seed` or `migrate`
-> npm script — use the flows described above.
+> See `package.json` for the complete current command inventory. There is no
+> generic `seed` or `migrate` npm script; use the flows described above.
 
 ## Project structure
 
@@ -127,8 +134,9 @@ Integration and e2e tests expect a reachable PostgreSQL database. Point
 
 ## Troubleshooting
 
-- **`npm run dev` exits immediately** — check `DATABASE_URL` and `SESSION_SECRET`
-  are set; the server refuses to start without a usable database connection.
+- **`npm run dev` exits immediately** — check `DATABASE_URL` and the Clerk keys;
+  the server requires a usable database and the client requires its publishable
+  key at build/dev time.
 - **Schema errors / missing tables** — run `npm run db:push`.
 - **Port 5000 in use** — set `PORT` in `.env` (note: on Replit the platform sets
   the port for you).

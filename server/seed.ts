@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import { db } from "./db";
 import { categories, subcategories, subSubcategories, resources, users, resourceEdits, tags, resourceTags } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import { hashPassword } from "./passwordUtils";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
 import { invalidatePublicCache } from "./cache/publicCache";
@@ -210,38 +209,43 @@ export interface SeedResult {
 async function seedAdminUser(): Promise<boolean> {
   try {
     const adminEmail = "admin@example.com";
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    const auditKey = process.env.ADMIN_PASSWORD;
 
-    if (!adminPassword || adminPassword.length < 8) {
+    if (!auditKey || auditKey.length < 8) {
       console.warn(
-        `⚠️  ADMIN_PASSWORD is not set (or is shorter than 8 characters) — skipping admin user creation. ` +
-        `Set the ADMIN_PASSWORD secret to seed the local admin account (${adminEmail}).`
+        `⚠️  ADMIN_PASSWORD is not set (or is shorter than 8 characters) — skipping audit admin row creation. ` +
+        `Set the ADMIN_PASSWORD secret to enable the audit-key bridge (${adminEmail}).`
       );
       return false;
     }
 
     const existingAdmin = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
-    
+
     if (existingAdmin.length > 0) {
-      console.log(`ℹ️  Admin user already exists (${adminEmail})`);
+      if (existingAdmin[0].password) {
+        await db
+          .update(users)
+          .set({ password: null })
+          .where(eq(users.email, adminEmail));
+        console.log(`ℹ️  Cleared legacy password hash from audit admin row (${adminEmail})`);
+      } else {
+        console.log(`ℹ️  Audit admin row already exists (${adminEmail})`);
+      }
       return false;
     }
-    
-    const hashedPassword = await hashPassword(adminPassword);
-    
+
     await db.insert(users).values({
       email: adminEmail,
-      password: hashedPassword,
       firstName: "Admin",
       lastName: "User",
       role: "admin",
     });
-    
+
     console.log(`\n${'='.repeat(60)}`);
-    console.log(`🔐 ADMIN USER CREATED`);
+    console.log(`🔐 AUDIT ADMIN ROW CREATED`);
     console.log(`${'='.repeat(60)}`);
     console.log(`Email: ${adminEmail}`);
-    console.log(`Password: (value of the ADMIN_PASSWORD secret — never logged)`);
+    console.log(`Credential: none (ADMIN_PASSWORD remains an environment-only audit key)`);
     console.log(`${'='.repeat(60)}\n`);
 
     return true;
@@ -550,7 +554,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
 
     console.log("\n✅ Database seeding completed!");
     console.log(`📊 Summary:`);
-    console.log(`  - Admin user: ${result.adminUserCreated ? 'created' : 'already exists'}`);
+    console.log(`  - Audit admin row: ${result.adminUserCreated ? 'created' : 'already exists or disabled'}`);
     console.log(`  - Categories: ${result.categoriesInserted} inserted`);
     console.log(`  - Subcategories: ${result.subcategoriesInserted} inserted`);
     console.log(`  - Sub-subcategories: ${result.subSubcategoriesInserted} inserted`);

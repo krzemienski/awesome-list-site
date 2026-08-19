@@ -32,12 +32,14 @@ All endpoints require `isAuthenticated` + `isAdmin`.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/researcher/start` | Start a research job. Body: `{ prompt, categoryFocus?, maxBudgetUsd?, maxTurns? }`. Prompt must be at least 10 characters. Returns `{ success, jobId, message }`. |
-| `GET` | `/api/researcher/jobs` | List research jobs. |
+| `POST` | `/api/researcher/start` | Start a research job. Body: `{ prompt?, categoryFocus?, maxBudgetUsd?, maxTurns?, targetDiscoveries?, scoutModel? }`. Omit `prompt` (or leave it blank) to have the server auto-generate a research brief; supply it to use a custom prompt (min 10 visible characters, max 4000). Returns `{ success, jobId, message }`. |
+| `GET` | `/api/researcher/brief` | Preview the auto-generated research brief without starting a job. Returns `{ success, brief, angle }`. |
+| `GET` | `/api/researcher/jobs` | List research jobs. Accepts `?limit` (1–200, default 20). Returns `{ jobs, total }`. |
 | `GET` | `/api/researcher/jobs/:id` | Get a single job, with an `isActive` flag indicating whether the orchestrator is still running it. |
-| `GET` | `/api/researcher/jobs/:id/events` | Stream/poll the event log for a job (progress updates shown in the Researcher tab). |
+| `GET` | `/api/researcher/jobs/:id/events` | Poll the event log for a job (progress updates shown in the Researcher tab). Accepts `?afterSeq`. |
 | `DELETE` | `/api/researcher/jobs/:id` | Cancel a running job. |
 | `GET` | `/api/researcher/discoveries?jobId=` | List discoveries. With `jobId`, returns discoveries for that job; without it, returns all pending discoveries. |
+| `POST` | `/api/researcher/discoveries/approve-all` | Bulk-approve all pending discoveries. Optional body: `{ jobId }` to scope to one job. |
 | `POST` | `/api/researcher/discoveries/:id/approve` | Approve a discovery and insert it as a resource. |
 | `POST` | `/api/researcher/discoveries/:id/reject` | Reject a discovery. Body: `{ reason }`. |
 

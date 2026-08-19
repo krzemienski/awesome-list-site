@@ -36,6 +36,7 @@ tabbed interface. The tabs, in order, are:
 | **Users** | Manage users and roles |
 | **GitHub** | Import/export sync with GitHub repositories |
 | **Link Health** | Scan resource URLs for broken links |
+| **Digests** | Email digest queue health and scheduling |
 | **Audit** | Browse the admin action audit log |
 
 Summary stats (total resources, pending approvals, users, learning journeys)

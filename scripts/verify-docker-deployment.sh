@@ -54,19 +54,20 @@ if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/
 fi
 print_success "Docker Compose is installed"
 
-# Check if .env file exists, if not use docker-compose defaults
+# Clerk keys are required by docker-compose.yml.
 if [ ! -f .env ]; then
-    print_warning ".env file not found, using docker-compose.yml defaults"
+    print_error ".env file not found (Clerk publishable and secret keys are required)"
+    exit 1
 fi
 
 # Step 2: Clean up any existing containers
 print_step "Step 2: Cleaning up existing containers..."
-docker-compose down -v 2>/dev/null || true
+docker compose down -v 2>/dev/null || true
 print_success "Cleanup complete"
 
 # Step 3: Start services
-print_step "Step 3: Starting services with docker-compose up -d..."
-if docker-compose up -d; then
+print_step "Step 3: Starting services with docker compose up -d..."
+if docker compose up -d; then
     print_success "Services started successfully"
 else
     print_error "Failed to start services"
@@ -79,7 +80,7 @@ echo "Waiting for PostgreSQL to be ready..."
 MAX_RETRIES=30
 RETRY_COUNT=0
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if docker-compose exec -T postgres pg_isready -U postgres &> /dev/null; then
+    if docker compose exec -T postgres pg_isready -U postgres &> /dev/null; then
         print_success "PostgreSQL is ready"
         break
     fi
@@ -90,7 +91,7 @@ done
 
 if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
     print_error "PostgreSQL failed to start in time"
-    docker-compose logs postgres
+    docker compose logs postgres
     exit 1
 fi
 
@@ -98,14 +99,14 @@ fi
 print_step "Step 5: Waiting for application to start..."
 sleep 5  # Give app time to run migrations and start
 
-# Step 6: Check health endpoint
-print_step "Step 6: Testing health check endpoint..."
+# Step 6: Check process liveness and database readiness
+print_step "Step 6: Testing liveness and readiness endpoints..."
 MAX_RETRIES=20
 RETRY_COUNT=0
 HEALTH_CHECK_PASSED=false
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/health 2>/dev/null || echo "000")
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health/ready 2>/dev/null || echo "000")
 
     if [ "$HTTP_STATUS" = "200" ]; then
         HEALTH_CHECK_PASSED=true
@@ -119,33 +120,33 @@ done
 echo ""
 
 if [ "$HEALTH_CHECK_PASSED" = true ]; then
-    print_success "Health check endpoint returned 200 OK"
+    print_success "Readiness endpoint returned 200 OK"
 
-    # Get health check response
-    HEALTH_RESPONSE=$(curl -s http://localhost:5000/health)
-    echo "Health check response: $HEALTH_RESPONSE"
+    LIVENESS_RESPONSE=$(curl -s http://localhost:5000/api/health/live)
+    READINESS_RESPONSE=$(curl -s http://localhost:5000/api/health/ready)
+    echo "Liveness response: $LIVENESS_RESPONSE"
+    echo "Readiness response: $READINESS_RESPONSE"
 
-    # Verify it contains expected fields
-    if echo "$HEALTH_RESPONSE" | grep -q "status"; then
-        print_success "Health response contains 'status' field"
+    if echo "$LIVENESS_RESPONSE" | grep -q '"status":"ok"'; then
+        print_success "Process liveness is OK"
     else
-        print_error "Health response missing 'status' field"
+        print_error "Unexpected liveness response"
     fi
 
-    if echo "$HEALTH_RESPONSE" | grep -q "database"; then
-        print_success "Health response contains 'database' field"
+    if echo "$READINESS_RESPONSE" | grep -q '"status":"ready"'; then
+        print_success "Database-dependent readiness is OK"
     else
-        print_error "Health response missing 'database' field"
+        print_error "Unexpected readiness response"
     fi
 else
-    print_error "Health check endpoint did not return 200 OK (got $HTTP_STATUS)"
+    print_error "Readiness endpoint did not return 200 OK (got $HTTP_STATUS)"
     print_warning "Application logs:"
-    docker-compose logs app | tail -20
+    docker compose logs app | tail -20
 fi
 
 # Step 7: Verify database migrations ran
 print_step "Step 7: Verifying database migrations..."
-MIGRATION_LOGS=$(docker-compose logs app | grep -i "migration" || echo "")
+MIGRATION_LOGS=$(docker compose logs app | grep -i "migration" || echo "")
 if [ -n "$MIGRATION_LOGS" ]; then
     print_success "Found migration logs"
     echo "$MIGRATION_LOGS"
@@ -154,7 +155,7 @@ else
 fi
 
 # Check if migrations table exists
-MIGRATIONS_TABLE_EXISTS=$(docker-compose exec -T postgres psql -U postgres -d awesome_list -c "\dt __drizzle_migrations" 2>&1 | grep -c "__drizzle_migrations" || echo "0")
+MIGRATIONS_TABLE_EXISTS=$(docker compose exec -T postgres psql -U postgres -d awesome_list -c "\dt drizzle.__drizzle_migrations" 2>&1 | grep -c "__drizzle_migrations" || echo "0")
 if [ "$MIGRATIONS_TABLE_EXISTS" -gt 0 ]; then
     print_success "Migrations table exists in database"
 else
@@ -181,7 +182,7 @@ fi
 
 # Step 10: Show running containers
 print_step "Step 10: Listing running containers..."
-docker-compose ps
+docker compose ps
 
 # Step 11: Summary
 print_step "Verification Summary"
@@ -191,21 +192,22 @@ if [ "$VERIFICATION_PASSED" = true ]; then
     echo ""
     echo "You can now:"
     echo "  - Access the app at: http://localhost:5000"
-    echo "  - Check health at: http://localhost:5000/health"
-    echo "  - View logs: docker-compose logs -f app"
+    echo "  - Check liveness at: http://localhost:5000/api/health/live"
+    echo "  - Check readiness at: http://localhost:5000/api/health/ready"
+    echo "  - View logs: docker compose logs -f app"
     echo ""
     echo "To stop the services:"
-    echo "  docker-compose down"
+    echo "  docker compose down"
     echo ""
     echo "To stop and remove volumes:"
-    echo "  docker-compose down -v"
+    echo "  docker compose down -v"
 else
     print_error "Some verification steps failed. Please review the output above."
     echo ""
     echo "Troubleshooting:"
-    echo "  - View app logs: docker-compose logs app"
-    echo "  - View database logs: docker-compose logs postgres"
-    echo "  - Check all logs: docker-compose logs"
+    echo "  - View app logs: docker compose logs app"
+    echo "  - View database logs: docker compose logs postgres"
+    echo "  - Check all logs: docker compose logs"
 fi
 echo "=================================="
 
@@ -215,7 +217,7 @@ read -p "Do you want to stop the containers now? (y/N) " -n 1 -r
 echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     print_step "Stopping containers..."
-    docker-compose down
+    docker compose down
     print_success "Containers stopped"
 fi
 

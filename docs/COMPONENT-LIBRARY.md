@@ -49,7 +49,7 @@ Components live under `client/src/components/`:
 | `admin/` | Admin dashboard tabs & managers (`AdminStats`, `ResourceManager`, `CategoryManager`, `UsersTab`, `GitHubSyncPanel`, `ResearcherTab`, `LinkHealthDashboard`, …). |
 | `ai/` | AI feature cards: `LearningPathCard`, `RecommendationCard`, `MobileBottomSheet`. |
 | `auth/` | Route guards: `AuthGuard`, `AdminGuard`. |
-| `profile/` | `ChangePasswordForm`. |
+| `profile/` | `AccountSecurityCard` (replaced `ChangePasswordForm` after Clerk migration). |
 | `animations/` | `sidebar-morphing`. |
 | `ErrorBoundary.tsx` | Top-level React error boundary. |
 

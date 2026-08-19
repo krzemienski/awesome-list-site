@@ -44,11 +44,11 @@ below.
 | `resource_link_opened` | Outbound resource link clicked | `resource_title`, `link_url`, `link_domain`, `category` | `trackResourceClick` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |
 | `category_viewed` | Category navigation | `category` | `trackCategoryView` |
-| `sign_up_completed` | Account created (server-confirmed) | `sign_up_method` (`'password'` \| `'replit'`), acquisition, `tracked_from: 'server'` | **server** — register handler (`server/routes.ts`) + OIDC callback (`server/replitAuth.ts`) |
-| `logged_in` | Login succeeded | `login_method`, acquisition | `trackLogin` |
+| `sign_up_completed` | Clerk user is first provisioned into the application DB | `sign_up_method: 'clerk'`, acquisition, `tracked_from: 'server'` | **server** — Clerk JIT provisioning (`server/clerkAuth.ts`) |
+| `logged_in` | Reserved helper; not currently wired after the Clerk migration | `login_method`, acquisition | `trackLogin` |
 | `resource_bookmarked` / `resource_unbookmarked` | Bookmark toggle server-confirmed | `resource_id` | `useResourceToggle` (choke point, all surfaces) |
 | `resource_favorited` / `resource_unfavorited` | Favorite toggle server-confirmed | `resource_id` | `useResourceToggle` |
-| `resource_submitted` | Resource submission accepted | `content_type`, `category`, acquisition, `tracked_from: 'server'` (no PII) | **server** — resource-submit handler (`server/routes.ts`) |
+| `resource_submitted` | Resource submission accepted | `content_type`, `category`, acquisition, `tracked_from: 'server'` (no PII) | **server** — `routes/domains/catalog-contributions.ts` |
 | `resource_edit_submitted` | Edit suggestion accepted | `resource_id` | `suggest-edit-dialog` |
 | `content_shared` | Share action | `share_method`, `content_type`, `content_id` | `trackShare` |
 | `journey_started` | Genuinely new enrollment (listing one-click start or detail start button; resume re-POSTs never re-fire) | `journey_id`, `journey_title`, `total_steps` | `lib/analytics.ts trackJourneyStart` (Task #330) |
@@ -66,8 +66,9 @@ audiences, undercounting client-only conversions. The fix (Task #233):
 
 - **Module**: `server/lib/mixpanelServer.ts` — `trackServerEvent()` posts to
   Mixpanel's HTTP ingestion API (`api.mixpanel.com/track`) fire-and-forget.
-- **Events**: `sign_up_completed` (register handler) and `resource_submitted`
-  (resource-submit handler) are emitted **only** server-side. The client
+- **Events**: `sign_up_completed` (Clerk JIT provisioning) and
+  `resource_submitted` (resource-submit handler) are emitted **only**
+  server-side. The client
   helpers (`trackSignUp` / `trackGenerateLead`) still fire the GA4 halves but
   deliberately no longer call `mpTrack` for these — one producer per event, so
   there is nothing to dedup. Server events carry `tracked_from: 'server'` and
@@ -88,19 +89,10 @@ audiences, undercounting client-only conversions. The fix (Task #233):
 - **Token**: server reads `MIXPANEL_TOKEN` (optional server-only override) or
   the shared `VITE_MIXPANEL_TOKEN` from env — never hardcoded, never shipped
   in any new client code.
-- **Replit OIDC sign-ups (Task #235)**: first-time Replit-login account
-  creation also fires `sign_up_completed` (`sign_up_method: 'replit'`) from
-  the OIDC verify callback (`server/replitAuth.ts`). The redirect flow can't
-  carry custom headers, so right before navigating to `/api/login` the client
-  POSTs its consent state to `/api/auth/oidc-analytics-consent` via
-  `primeOidcAnalyticsConsent()` (`client/src/lib/mixpanel.ts`), reusing the
-  same consent/distinct-id headers as the register path. The endpoint is
-  CSRF-safe (same-origin check + custom headers) and authoritative: no
-  consent → flags cleared → no event. The verify callback consumes the flags
-  one-shot with a 15-minute TTL and emits only when the upsert **atomically**
-  reports it created the account (`xmax = 0`), so subsequent logins and
-  retried callbacks never fire it. Account creation is confirmed
-  server-side, so the event is emitted regardless of ad blockers.
+- **Clerk sign-ups**: the first request that successfully creates the local
+  Clerk bridge row emits `sign_up_completed` with `sign_up_method: 'clerk'`.
+  Consent and acquisition arrive through the same validated request headers;
+  existing users and failed email-collision provisioning do not emit it.
 
 ## Adding a new event
 

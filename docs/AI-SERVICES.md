@@ -1,8 +1,11 @@
 # AI Services
 
 Reference for the AI features in the Awesome Video Resource Viewer. All AI code
-lives under `server/ai/`; all HTTP handlers live in the single file
-`server/routes.ts` (registered via `registerRoutes(app)`).
+lives under `server/ai/`; HTTP handlers are registered in domain files:
+enrichment + researcher routes in `server/routes/domains/ai-jobs.ts`,
+single-URL Claude analysis in `server/routes/domains/admin-content.ts`, and
+recommendation routes in `server/routes/domains/journeys-recommendations.ts`
+(all composed by `registerRoutes` in `server/routes.ts`).
 
 AI is **optional**. Every service degrades gracefully when its API key is
 missing — the app keeps working, and AI-only actions return a clear

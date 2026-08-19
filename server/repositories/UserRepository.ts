@@ -8,15 +8,16 @@
  *
  * KEY OPERATIONS:
  * - getUser: Retrieve user by ID
- * - upsertUser: Create or update user (with first-user admin bootstrap)
+ * - upsertUser: Create or update a Clerk-provisioned application user
  * - getUserByEmail: Retrieve user by email address
  * - listUsers: Paginated user listing
  * - updateUserRole: Update user's role (admin/user)
  *
  * DESIGN NOTES:
- * - First user created is automatically assigned admin role
+ * - New Clerk-provisioned users default to the user role
+ * - Admin and moderator roles are granted explicitly
  * - Uses Drizzle ORM for type-safe database operations
- * - Supports OAuth-based user management (no passwords)
+ * - Stores application profile/role data, never Clerk credentials
  * ============================================================================
  */
 
@@ -49,12 +50,11 @@ export class UserRepository {
   /**
    * Create or update a user (upsert operation)
    *
-   * Note: there is intentionally NO first-user admin bootstrap here. Admin
-   * accounts are provisioned exclusively by the env-driven seeding path
-   * (seedAdminUser + ADMIN_PASSWORD secret) or by an existing admin via the
-   * role-management API. Auto-promoting the first registrant would let an
-   * anonymous caller of the public register endpoint claim admin on a fresh
-   * database.
+   * Note: there is intentionally NO first-user admin bootstrap here. Normal
+   * admin access is a Clerk user whose local row is explicitly granted the
+   * admin role. The env-driven seed path creates only the fixed audit-key
+   * bridge row; it does not create a password credential. Auto-promoting the
+   * first registrant would let an anonymous caller claim admin on a fresh DB.
    * @param userData - User data to insert or update
    * @returns The created or updated user
    */
@@ -83,7 +83,7 @@ export class UserRepository {
    * Upsert that also reports whether the row was CREATED by this call, read
    * atomically from the insert itself (`xmax = 0` is true only for a freshly
    * inserted row, false when ON CONFLICT updated an existing one). Used by the
-   * OIDC sign-in path (Task #235) so the sign_up_completed conversion fires
+   * account-provisioning path so the sign_up_completed conversion fires
    * exactly once even under concurrent/retried callbacks — a separate
    * read-then-upsert could double-report creation.
    * @param userData - User data to insert or update

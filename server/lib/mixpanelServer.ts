@@ -110,13 +110,9 @@ export function trackServerEvent(
 }
 
 /**
- * Same fire-and-forget ingest, but for callers that have ALREADY verified
- * analytics consent through a non-header channel. The Replit OIDC flow is the
- * one such caller: browser redirects carry no custom headers, so consent (and
- * the client's Mixpanel distinct_id) travel via a one-shot session flag set on
- * a Clerk-era caller with its own consent channel. Never call this without a verified
- * consent signal — the header gate in trackServerEvent() is bypassed here by
- * design, not by accident.
+ * Same fire-and-forget ingest for callers that have already verified consent
+ * through another authoritative channel. Never call this without a verified
+ * consent signal: it deliberately bypasses trackServerEvent's header gate.
  */
 export function trackConsentedServerEvent(
   event: string,

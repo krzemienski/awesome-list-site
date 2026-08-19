@@ -1,6 +1,11 @@
 import bcrypt from 'bcryptjs';
 import { visibleLength, passwordVisibleCheck } from '@shared/validation';
 
+/**
+ * Legacy pre-Clerk password helpers. No active authentication route imports
+ * this module; Clerk owns credential creation, validation, and password reset.
+ */
+
 const SALT_ROUNDS = 10;
 
 export async function hashPassword(password: string): Promise<string> {

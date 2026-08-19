@@ -60,7 +60,7 @@ A production-ready React application for browsing and discovering 2,200+ curated
 | **Backend** | Express.js, TypeScript, Drizzle ORM |
 | **Database** | PostgreSQL (Neon-backed) |
 | **AI** | Anthropic Claude API |
-| **Auth** | Replit OAuth, local email/password |
+| **Auth** | Clerk (email, OAuth via Clerk) |
 
 ## Quick Start
 
@@ -94,7 +94,7 @@ npm run start
 | [SETUP.md](docs/SETUP.md) | Development environment setup |
 | [ENVIRONMENT.md](docs/ENVIRONMENT.md) | Environment variables reference |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
-| [API.md](docs/API.md) | Complete API reference |
+| [API.md](docs/API.md) | API conventions and generated-contract entry points |
 | [API Documentation](/api/docs) | Interactive OpenAPI documentation |
 | [ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrator documentation |
 | [CODE-MAP.md](docs/CODE-MAP.md) | Codebase navigation guide |
@@ -107,14 +107,16 @@ See the [full documentation index](docs/README.md) for all guides (database, dep
 ```
 ├── client/src/           # React frontend
 │   ├── components/       # Reusable UI components
-│   ├── pages/            # Route pages (26 pages)
+│   ├── pages/            # Route pages
 │   ├── hooks/            # Custom React hooks
 │   └── lib/              # Utilities
 ├── server/               # Express backend
 │   ├── ai/               # AI services (Claude, enrichment)
 │   ├── github/           # GitHub sync integration
 │   ├── validation/       # awesome-lint, link checking
-│   ├── routes.ts         # API endpoints (145 routes)
+│   ├── routes.ts         # Route composition root
+│   ├── routes/domains/   # Domain route owners
+│   ├── contracts/        # Guards, response contracts, OpenAPI generation
 │   └── storage.ts        # Database layer
 ├── shared/               # Shared types and schemas
 │   └── schema.ts         # Drizzle schema, Zod validation
@@ -150,7 +152,7 @@ Exports pass all awesome-lint rules except:
 ## Environment Variables
 
 This project requires several environment variables to run. See [ENVIRONMENT.md](docs/ENVIRONMENT.md) for:
-- Complete list of required and optional variables
+- Required values and supported optional integrations
 - Detailed descriptions and configuration examples
 - Platform-specific setup instructions
 - Security best practices
@@ -171,13 +173,13 @@ Access admin panel at `/admin` after login.
 |----------|-----------|
 | Resources | CRUD, search, filtering |
 | Categories | 3-level hierarchy management |
-| Auth | OAuth, local, session management |
+| Auth | Clerk-backed identity and session revocation |
 | Admin | User management, curation, audit |
 | GitHub | Import, export, sync queue |
 | AI | Claude analysis, batch enrichment |
 | Validation | awesome-lint, link checking |
 
-See [API.md](docs/API.md) for complete reference.
+See [API.md](docs/API.md) for conventions and the generated OpenAPI entry points.
 
 ## Contributing
 

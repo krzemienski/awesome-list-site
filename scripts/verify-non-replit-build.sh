@@ -52,6 +52,14 @@ else
 fi
 echo ""
 
+# The browser bundle always uses Clerk, including non-Replit deployments.
+if [ -z "${VITE_CLERK_PUBLISHABLE_KEY:-}" ]; then
+    print_status 1 "VITE_CLERK_PUBLISHABLE_KEY is required for the client build"
+fi
+if [ -z "${CLERK_PUBLISHABLE_KEY:-}" ] || [ -z "${CLERK_SECRET_KEY:-}" ]; then
+    print_status 1 "CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY are required at runtime"
+fi
+
 # Step 3: Run the build
 echo "Step 3: Running npm run build without REPL_ID..."
 echo "----------------------------------------"
@@ -97,7 +105,7 @@ WAITED=0
 SERVER_STARTED=false
 
 while [ $WAITED -lt $MAX_WAIT ]; do
-    if curl -s http://localhost:5000/health > /dev/null 2>&1; then
+    if curl -s http://localhost:5000/api/health/ready > /dev/null 2>&1; then
         SERVER_STARTED=true
         break
     fi
@@ -113,9 +121,9 @@ if [ "$SERVER_STARTED" = true ]; then
     # Step 7: Verify health endpoint
     echo ""
     echo "Step 7: Verifying health endpoint..."
-    HEALTH_RESPONSE=$(curl -s http://localhost:5000/health)
-    if echo "$HEALTH_RESPONSE" | grep -q '"status":"ok"'; then
-        print_status 0 "Health endpoint returned OK status"
+    HEALTH_RESPONSE=$(curl -s http://localhost:5000/api/health/ready)
+    if echo "$HEALTH_RESPONSE" | grep -q '"status":"ready"'; then
+        print_status 0 "Readiness endpoint returned ready status"
         echo "Response: $HEALTH_RESPONSE"
     else
         print_warning "Health endpoint returned unexpected response"

@@ -19,7 +19,7 @@ graph TB
 
     subgraph Server["Express.js Server"]
         Routes["API Routes<br/>(RESTful)"]
-        Auth["Passport.js<br/>(Authentication)"]
+        Auth["Clerk middleware<br/>(Authentication)"]
         Middleware["Middleware<br/>(Validation, Auth)"]
         Repos["Repositories<br/>(Repository Pattern)"]
         ORM["Drizzle ORM<br/>(Type-safe SQL)"]
@@ -30,11 +30,13 @@ graph TB
     subgraph External["External Services"]
         DB["PostgreSQL<br/>(Database)"]
         GH["GitHub API<br/>(Sync)"]
+        Clerk["Clerk<br/>(Identity & sessions)"]
         Claude["Claude API<br/>(Anthropic)"]
     end
 
     Client -->|HTTP| Routes
     Client -->|HTTP| Auth
+    Auth -->|verify| Clerk
     Routes -->|Query| Repos
     Auth -->|Query| Repos
     Repos -->|Query| ORM
@@ -66,7 +68,7 @@ graph TB
 | Express.js | HTTP server |
 | TypeScript | Type safety |
 | Drizzle ORM | Database ORM |
-| Passport.js | Authentication |
+| Clerk Express SDK | Authentication and session verification |
 | Zod | Schema validation |
 | Remark | Markdown parsing |
 
@@ -82,7 +84,7 @@ graph TB
 | Anthropic Claude | AI analysis, enrichment & agent research |
 | OpenAI | Embeddings & optional AI features |
 | GitHub API | Repository sync |
-| Replit Auth (OIDC) | OAuth authentication |
+| Clerk | Credentials, sign-in/sign-up UI, and sessions |
 | Google Analytics | Usage analytics |
 
 ### Rendering & theming
@@ -142,11 +144,13 @@ graph TB
 │   │   ├── linkChecker.ts
 │   │   └── inputs.ts
 │   ├── db/                 # Drizzle connection (pg pool)
-│   ├── routes.ts           # API route definitions
+│   ├── routes.ts           # Route composition root
+│   ├── routes/domains/     # Domain-owned API registrars
+│   ├── contracts/          # Guards, response contracts, OpenAPI generation
 │   ├── storage.ts          # IStorage facade over repositories
 │   ├── migrate.ts          # Boot-time migration runner
-│   ├── replitAuth.ts       # OAuth configuration
-│   ├── localAuth.ts        # Local auth for dev
+│   ├── clerkAuth.ts        # Clerk-to-local-user bridge and auth gates
+│   ├── health.ts           # Database-dependent readiness probe
 │   ├── og-middleware.ts    # Crawler SSR-lite (meta injection)
 │   └── index.ts            # Server entry point
 ├── shared/                 # Shared code
@@ -187,7 +191,7 @@ server/
 #### Benefits
 
 1. **Separation of Concerns**: Database queries are isolated from business logic
-2. **Testability**: Repositories can be mocked for unit testing
+2. **Validation**: Repository behavior can be exercised independently of route composition
 3. **Maintainability**: Centralized data access patterns
 4. **Type Safety**: Drizzle ORM provides full TypeScript type inference
 5. **Reusability**: Common queries are defined once and reused across services
@@ -323,9 +327,8 @@ sequenceDiagram
 
     Note over C,E: Subsequent Requests (Protected)
     C->>E: GET /api/admin/* (with cookie)
-    E->>S: Validate session
-    S-->>E: Session valid
-    E->>E: Check req.isAuthenticated()
+    E->>E: Verify Clerk session and resolve req.dbUser
+    E->>E: Apply isAuthenticated / isAdmin
     E-->>C: Protected data
 ```
 
@@ -392,12 +395,12 @@ flowchart TD
 ### Core Tables
 
 **users**
-- Primary user accounts (Replit OAuth or local)
+- Clerk bridge identity and local application roles/profile fields
 - Roles: user, admin, moderator
 
 **resources**
 - Core resource entries
-- Status: pending, approved, rejected
+- Status: pending, approved, rejected, archived
 - Metadata stored as JSONB
 
 **categories / subcategories / sub_subcategories**
@@ -416,8 +419,13 @@ flowchart TD
 **learning_journeys / journey_steps / user_journey_progress**
 - Learning path functionality
 
-**user_favorites / user_bookmarks / user_preferences / user_interactions**
-- User engagement, personalization, and behavioral analytics
+**user_favorites / user_bookmarks / bookmark_collections / bookmark_collection_items /
+user_preferences / user_interactions / user_recommendation_feedback**
+- User engagement, organization, personalization, and recommendation feedback
+
+**notification_preferences / digest_unsubscribe_tokens / in_app_notifications /
+digest_jobs / digest_attempts**
+- Reminder settings, in-app notifications, and digest delivery
 
 **github_sync_queue / github_sync_history**
 - GitHub sync state management
@@ -431,20 +439,24 @@ flowchart TD
 **link_health_jobs / link_health_checks**
 - Link-health scanning results
 
-**api_keys / password_reset_tokens**
-- Programmatic API access and self-service password reset
+**api_keys**
+- Programmatic public-API access
+
+**sessions / password_reset_tokens**
+- Retained legacy pre-Clerk rows; not active auth/session storage
 
 **tags / resource_tags**
 - Tag management (many-to-many)
 
-> The full 29-table schema is documented in [DATABASE.md](./DATABASE.md).
+> The complete 38-table inventory is documented in [DATABASE.md](./DATABASE.md);
+> `shared/schema.ts` remains authoritative for columns and indexes.
 
 ## Security Measures
 
 ### Authentication
-- Passport.js session management
-- bcrypt password hashing (local auth)
-- Session stored in PostgreSQL
+- Clerk verifies credentials and sessions
+- `clerkUserContext` resolves a local application user on each relevant request
+- Email collisions during just-in-time provisioning fail closed
 - HTTPS enforced in production
 
 ### Authorization
@@ -482,17 +494,18 @@ flowchart TD
 
 ## Environment Variables
 
-See [ENVIRONMENT.md](./ENVIRONMENT.md) for the canonical, complete list. A representative
+See [ENVIRONMENT.md](./ENVIRONMENT.md) for the canonical categorized list. A representative
 subset:
 
 ```bash
 # Database
 DATABASE_URL=postgresql://...
 
-# Authentication (Replit OIDC + sessions)
-REPL_ID=...
-ISSUER_URL=https://replit.com/oidc   # default
-SESSION_SECRET=...
+# Authentication (Clerk)
+VITE_CLERK_PUBLISHABLE_KEY=...
+CLERK_PUBLISHABLE_KEY=...
+CLERK_SECRET_KEY=...
+VITE_CLERK_PROXY_URL=/api/__clerk    # optional proxy path
 
 # AI (managed Anthropic key preferred; ANTHROPIC_API_KEY as fallback)
 AI_INTEGRATIONS_ANTHROPIC_API_KEY=...
@@ -522,4 +535,5 @@ The application is designed for Replit deployment:
 - Console logging for debugging
 - Audit log for resource changes
 - Google Analytics for frontend tracking
-- Health endpoint: `GET /api/health`
+- Process liveness: `GET /api/health` or `GET /api/health/live`
+- Database/migration readiness: `GET /api/health/ready`
