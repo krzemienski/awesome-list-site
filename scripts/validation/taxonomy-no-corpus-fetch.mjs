@@ -18,9 +18,11 @@ const browser = await chromium.launch({ headless: true, executablePath });
 try {
   const page = await browser.newPage();
   const requests = [];
+  const resourceRequests = [];
   page.on("request", (request) => {
     const url = new URL(request.url());
     if (url.pathname.startsWith("/api/awesome-list")) requests.push(url.pathname + url.search);
+    if (url.pathname === "/api/resources") resourceRequests.push(url.pathname + url.search);
   });
   await page.goto(`${base}/category/${encodeURIComponent(slug)}`, { waitUntil: "networkidle" });
   await page.waitForSelector('[data-testid^="card-resource-"], [data-testid="empty-resources"]');
@@ -32,9 +34,10 @@ try {
   }
   console.log(`ok default category requested ${listing.length} listing slice(s), zero full corpora`);
 
-  const parent = nav.categories
-    ?.flatMap((category) => category.subcategories ?? [])
-    .find((subcategory) => subcategory.subSubcategories?.some((child) => child.resourceCount > 0));
+  const parentMatch = nav.categories
+    ?.flatMap((category) => (category.subcategories ?? []).map((subcategory) => ({ category, subcategory })))
+    .find(({ subcategory }) => subcategory.subSubcategories?.some((child) => child.resourceCount > 0));
+  const parent = parentMatch?.subcategory;
   const child = parent?.subSubcategories?.find((item) => item.resourceCount > 0);
   if (!parent || !child) throw new Error("Nav response has no selectable sub-subcategory");
   const childListing = await (await fetch(
@@ -50,7 +53,16 @@ try {
   if (!titles.some((text) => text.includes(title))) {
     throw new Error(`Corpus-mode child filter lost ${child.name}; rendered titles: ${titles.join(", ")}`);
   }
-  console.log(`ok subcategory child + search retains ${child.name} resource`);
+  const scopedSearchRequest = resourceRequests.find((request) => request.includes("search="));
+  if (!scopedSearchRequest || !parentMatch) throw new Error("Subcategory search did not request /api/resources");
+  const scopedSearchUrl = new URL(scopedSearchRequest, base);
+  if (
+    scopedSearchUrl.searchParams.get("category") !== parentMatch.category.slug ||
+    scopedSearchUrl.searchParams.get("subcategory") !== parent.slug
+  ) {
+    throw new Error(`Subcategory search lost parent scope: ${scopedSearchRequest}`);
+  }
+  console.log(`ok subcategory child + search retains ${parentMatch.category.slug} / ${parent.slug} scope`);
 } finally {
   await browser.close();
 }

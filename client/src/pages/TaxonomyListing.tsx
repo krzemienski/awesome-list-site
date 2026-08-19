@@ -26,6 +26,10 @@ import NotFound from "@/pages/not-found";
 import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
+import { apiRequest } from "@/lib/queryClient";
+import { trackSearch } from "@/lib/analytics";
+import { useDebounce } from "@/hooks/useDebounce";
+import { normalizeSearchQuery } from "@shared/searchNormalize";
 import {
   fetchListingPage,
   fetchStaticAwesomeList,
@@ -86,7 +90,10 @@ export default function TaxonomyListing({ level }: Props) {
   const [notice, setNotice] = useState<string | null>(pageNoticeFor(initialPage));
   const [selection, setSelection] = useState(params.get("subcategory") ?? "all");
   const general = params.get("filter") === "general" || params.get("view") === "general" || selection === "__general__";
-  const corpusMode = Boolean(searchTerm.trim() || tags.length || sort !== "default");
+  const normalizedSearch = normalizeSearchQuery(searchTerm);
+  const debouncedSearch = normalizeSearchQuery(useDebounce(searchTerm, 300));
+  const serverSearchActive = debouncedSearch.length > 0;
+  const corpusMode = !normalizedSearch && Boolean(tags.length || sort !== "default");
   const pageOptions = useMemo(() => {
     if (level === "category") {
       const [subcategory, subSubcategory] = selection.split(" › ");
@@ -118,6 +125,46 @@ export default function TaxonomyListing({ level }: Props) {
     [corpus.data, level, slug],
   );
   const listingData = listing.data;
+  const taxonomySearchUrl = useMemo(() => {
+    if (!serverSearchActive || !listingData) return "";
+    const query = new URLSearchParams({
+      page: String(page),
+      limit: String(PAGE_SIZE),
+      search: debouncedSearch,
+    });
+    if (level === "category") {
+      query.set("category", slug);
+      if (general) query.set("generalScope", "category");
+      else if (selection !== "all") {
+        const [subcategory, subSubcategory] = selection.split(" › ");
+        query.set("subcategory", subcategory);
+        if (subSubcategory) query.set("subSubcategory", subSubcategory);
+      }
+    } else if (level === "subcategory") {
+      if (listingData.parents.category?.slug) query.set("category", listingData.parents.category.slug);
+      query.set("subcategory", slug);
+      if (general) query.set("generalScope", "subcategory");
+      else if (selection !== "all") query.set("subSubcategory", selection);
+    } else {
+      if (listingData.parents.category?.name) query.set("category", listingData.parents.category.name);
+      if (listingData.parents.subcategory?.name) query.set("subcategory", listingData.parents.subcategory.name);
+      query.set("subSubcategory", listingData.node.name);
+    }
+    if (tags.length) query.set("tags", tags.join(","));
+    if (sort !== "default") query.set("sort", sort);
+    return `/api/resources?${query.toString()}`;
+  }, [debouncedSearch, general, level, listingData, page, selection, serverSearchActive, slug, sort, tags]);
+  const taxonomySearch = useQuery<{
+    resources: any[];
+    total: number;
+    search?: { mode: "fts" | "fuzzy"; suggestion?: string };
+  }>({
+    queryKey: [taxonomySearchUrl],
+    queryFn: () => apiRequest(taxonomySearchUrl, { method: "GET" }),
+    enabled: Boolean(taxonomySearchUrl),
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+  });
   const fullResources = useMemo(() => {
     if (!corpusNode) return [];
     let result = [...corpusNode.resources];
@@ -129,10 +176,6 @@ export default function TaxonomyListing({ level }: Props) {
         ? result.filter((r: any) => r.subSubcategory === sub)
         : result.filter((r: any) => r.subcategory === sub && (!subSub || r.subSubcategory === subSub));
     }
-    if (searchTerm.trim()) {
-      const q = searchTerm.trim().toLowerCase();
-      result = result.filter((r: any) => r.title.toLowerCase().includes(q) || String(r.description ?? "").toLowerCase().includes(q));
-    }
     if (tags.length) {
       const wanted = tags.map(normalizeTag);
       result = result.filter((r: any) => (r.tags ?? r.metadata?.tags ?? []).some((tag: string) => wanted.includes(normalizeTag(tag))));
@@ -140,17 +183,29 @@ export default function TaxonomyListing({ level }: Props) {
     if (sort === "name-asc") result.sort((a: any, b: any) => a.title.localeCompare(b.title));
     if (sort === "name-desc") result.sort((a: any, b: any) => b.title.localeCompare(a.title));
     return result;
-  }, [corpusNode, general, searchTerm, selection, sort, tags]);
-  const total = corpusMode ? fullResources.length : listingData?.total ?? 0;
+  }, [corpusNode, general, selection, sort, tags]);
+  const total = serverSearchActive ? taxonomySearch.data?.total ?? 0 : corpusMode ? fullResources.length : listingData?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
-  const resources = corpusMode
+  const resources = serverSearchActive
+    ? taxonomySearch.data?.resources ?? []
+    : corpusMode
     ? fullResources.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
     : listingData?.resources ?? [];
-  const name = corpusMode ? corpusNode?.node.name : listingData?.node.name;
-  const parentCategory = corpusMode ? corpusNode?.category : listingData?.parents.category;
-  const parentSubcategory = corpusMode ? corpusNode?.subcategory : listingData?.parents.subcategory;
-  const loading = (listing.isLoading && !listingData) || (corpusMode && corpus.isLoading);
+  const name = listingData?.node.name;
+  const parentCategory = listingData?.parents.category;
+  const parentSubcategory = listingData?.parents.subcategory;
+  const loading = (listing.isLoading && !listingData) || (corpusMode && corpus.isLoading) || (serverSearchActive && taxonomySearch.isLoading);
+  const lastTrackedSearchIntentRef = useRef("");
+
+  useEffect(() => {
+    if (serverSearchActive && taxonomySearch.data && !taxonomySearch.isPlaceholderData) {
+      const intent = JSON.stringify([debouncedSearch, level, slug, general, selection, tags, sort]);
+      if (lastTrackedSearchIntentRef.current === intent) return;
+      lastTrackedSearchIntentRef.current = intent;
+      trackSearch(debouncedSearch, taxonomySearch.data.total, `taxonomy_${level}`);
+    }
+  }, [debouncedSearch, general, level, selection, serverSearchActive, slug, sort, tags, taxonomySearch.data, taxonomySearch.isPlaceholderData]);
 
   const urlSyncInitialized = useRef(false);
   const popNavigation = useRef(false);
@@ -200,7 +255,7 @@ export default function TaxonomyListing({ level }: Props) {
   }, []);
 
   if (loading) return <div className="space-y-6" aria-busy="true"><SEOHead title="Loading resources" description="Loading Awesome Video resources." /><PageHeaderSkeleton /><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
-  if (listing.error || corpus.error) return <div className="py-12 text-center"><h2 className="text-xl font-semibold">Error Loading Resources</h2><p className="text-muted-foreground">Please try again.</p></div>;
+  if (listing.error || corpus.error || taxonomySearch.error) return <div className="py-12 text-center"><h2 className="text-xl font-semibold">Error Loading Resources</h2><p className="text-muted-foreground">Please try again.</p></div>;
   if (!listingData || !name) return <NotFound />;
 
   const optionChildren = listingData.children.flatMap((child: any) => [
@@ -240,7 +295,8 @@ export default function TaxonomyListing({ level }: Props) {
     <div className="flex items-center justify-between gap-2"><p className="text-sm text-muted-foreground" data-testid="text-results-count">Showing {total === 0 ? "0" : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, total)}`} of {total} resources</p><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div>
     {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
     {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 underline" onClick={() => { setSelection("all"); setPage(1); }}>Remove it</button></div>}
-    {resources.length === 0 ? <div className="py-12 text-center" data-testid="empty-resources"><h3 className="text-lg font-semibold">No resources found</h3><p className="text-muted-foreground">Try adjusting your filters to see more results.</p></div> :
+    {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
+    {resources.length === 0 ? <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-resources"><h3 className="text-lg font-semibold">No resources found</h3><p className="text-muted-foreground">Try adjusting your filters to see more results.</p><div className="flex flex-wrap justify-center gap-2"><Button variant="outline" onClick={() => { setSelection("all"); setTags([]); setSort("default"); setPage(1); }}>Clear filters</Button>{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); }}>Clear search</Button>}{normalizedSearch && <Button asChild variant="link"><Link href={`/search?q=${encodeURIComponent(normalizedSearch)}`}>Search all of Awesome Video</Link></Button>}</div></div> :
       <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4" : view === "list" ? "flex flex-col gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>{resources.map((resource: any, index: number) => {
         const normalized = { id: String(resource.id ?? ""), title: resource.title, url: resource.url, description: resource.description ?? "" };
         if (view === "list") return <ResourceListRow key={`${normalized.id}-${index}`} resource={normalized} />;

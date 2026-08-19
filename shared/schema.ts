@@ -293,6 +293,13 @@ export const resources = pgTable(
       table.createdAt,
     ),
     index("idx_resources_search_tsv").using("gin", table.searchTsv),
+    index("idx_resources_title_trgm").using("gin", table.title.asc().op("gin_trgm_ops")),
+    index("idx_resources_description_trgm").using("gin", table.description.asc().op("gin_trgm_ops")),
+    index("idx_resources_url_trgm").using("gin", table.url.asc().op("gin_trgm_ops")),
+    index("idx_resources_title_compact_trgm").using(
+      "gist",
+      sql`lower(regexp_replace(${table.title}, '[^a-zA-Z0-9]+', '', 'g')) gist_trgm_ops`,
+    ),
     // Public search always gates on approved status. Partial indexes keep the
     // facet indexes small and match that hot query predicate.
     index("idx_resources_approved_format").on(table.resourceFormat).where(sql`${table.status} = 'approved'`),

@@ -114,7 +114,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   // result, choosing "View all", or Enter-fallback to /search.
   useEffect(() => {
     if (!trimmed || trimmed.length < 2 || !data) return;
-    trackSearch(trimmed, data.resources.length);
+    trackSearch(trimmed, data.total, 'search_palette');
   }, [trimmed, data]);
 
   // R2-L10: load persisted recent searches whenever the dialog opens.

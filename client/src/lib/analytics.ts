@@ -350,9 +350,10 @@ export const trackResourceClick = (
 };
 
 // Track site search (GA4 recommended `search` with search_term).
-export const trackSearch = (searchTerm: string, resultCount: number) => {
-  sendEvent('search', { search_term: searchTerm, result_count: resultCount });
-  mpTrack('search_performed', { search_term: searchTerm, result_count: resultCount });
+export const trackSearch = (searchTerm: string, resultCount: number, surface = 'search_page') => {
+  const properties = { search_term: searchTerm, result_count: resultCount, surface };
+  sendEvent('search', properties);
+  mpTrack('search_performed', properties);
 };
 
 // Track category navigation.

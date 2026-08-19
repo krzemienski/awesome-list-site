@@ -744,6 +744,19 @@ components:
             - totalPages
             - hasMore
           additionalProperties: false
+        search:
+          type: object
+          properties:
+            mode:
+              type: string
+              enum:
+                - fts
+                - fuzzy
+            suggestion:
+              type: string
+          required:
+            - mode
+          additionalProperties: false
       required:
         - resources
         - total

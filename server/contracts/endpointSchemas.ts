@@ -104,6 +104,10 @@ const resourcesListResponseSchema = z.object({
     totalPages: z.number(),
     hasMore: z.boolean(),
   }),
+  search: z.object({
+    mode: z.enum(["fts", "fuzzy"]),
+    suggestion: z.string().optional(),
+  }).optional(),
 });
 
 // ---------------------------------------------------------------------------

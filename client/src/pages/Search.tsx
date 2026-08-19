@@ -18,6 +18,7 @@ import type { ResourceSearchFacets } from "@shared/resourceFacets";
 import { Paginator } from "@/components/ui/paginator";
 import SearchFilters, { ActiveFilters, sortLabels } from "@/components/search/SearchFilters";
 import { parsePageFromSearch, pageNoticeFor } from "@/lib/page-param";
+import { trackSearch } from "@/lib/analytics";
 
 type State = { q: string; category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string; page: number };
 const PAGE_SIZE = 24;
@@ -38,6 +39,7 @@ export default function Search() {
   const inputRef = useRef<HTMLInputElement>(null);
   const pristine = useRef(true);
   const preservePageNoticeRef = useRef(false);
+  const lastTrackedSearchIntentRef = useRef("");
   useEffect(() => inputRef.current?.focus(), []);
   // The URL is the source of truth for reloads, router links, and Back/Forward.
   // Wouter's useSearch reacts to both its own navigation and patched History
@@ -63,10 +65,11 @@ export default function Search() {
   const update = (key: keyof State, value: string | string[]) => {
     // A discrete filter action commits any pending debounced search draft so
     // the URL and visible input cannot diverge.
-    const next = { ...state, q: input, [key]: value, page: 1 } as State;
+    const committedQuery = key === "q" && typeof value === "string" ? value : input;
+    const next = { ...state, q: committedQuery, [key]: value, page: 1 } as State;
     const updates: Record<string, string | null> = {
       [key]: Array.isArray(value) ? value.join(",") : value,
-      q: input || null,
+      q: committedQuery || null,
       search: null,
       page: null,
     };
@@ -135,8 +138,25 @@ export default function Search() {
   const queryUrl = useMemo(() => { const p = new URLSearchParams({ page: String(state.page), limit: String(PAGE_SIZE), facets: "true" }); if (normalized && (normalized.length >= 2 || canBrowse)) p.set("search", normalized); if (state.category) p.set("category", state.category); if (state.subcategory) p.set("subcategory", state.subcategory); if (state.subSubcategory) p.set("subSubcategory", state.subSubcategory); if (state.tags.length) p.set("tags", state.tags.join(",")); if (state.provider) p.set("provider", state.provider); if (state.format) p.set("format", state.format); if (state.skillLevel) p.set("skillLevel", state.skillLevel); if (state.sort !== "relevance") p.set("sort", state.sort); return `/api/resources?${p.toString()}`; }, [normalized, canBrowse, state]);
   // Fetch the unfiltered first page even while the prompt is visible. Its rows
   // stay hidden, but its facet metadata makes filter-only browsing possible.
-  const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), staleTime: 60_000 });
+  const query = useQuery<{ resources: DbResource[]; total: number; facets: ResourceSearchFacets; search?: { mode: "fts" | "fuzzy"; suggestion?: string } }>({ queryKey: [queryUrl], queryFn: () => apiRequest(queryUrl, { method: "GET" }), staleTime: 60_000 });
   const data = query.data; const results = data?.resources ?? []; const total = data?.total ?? 0; const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE)); const safePage = Math.min(state.page, totalPages);
+  useEffect(() => {
+    if (normalized.length < 2 || !data) return;
+    const intent = JSON.stringify([
+      normalized,
+      state.category,
+      state.subcategory,
+      state.subSubcategory,
+      state.tags,
+      state.provider,
+      state.format,
+      state.skillLevel,
+      state.sort,
+    ]);
+    if (lastTrackedSearchIntentRef.current === intent) return;
+    lastTrackedSearchIntentRef.current = intent;
+    trackSearch(normalized, data.total, "search_page");
+  }, [data, normalized, state.category, state.format, state.provider, state.skillLevel, state.sort, state.subSubcategory, state.subcategory, state.tags]);
   const lastFacets = useRef<ResourceSearchFacets>();
   if (data?.facets) lastFacets.current = data.facets;
   useEffect(() => { if (data && state.page > totalPages) { preservePageNoticeRef.current = true; setState(s => ({ ...s, page: totalPages })); writeFilterParams({ page: totalPages > 1 ? String(totalPages) : null }, "replace"); setPageNotice(`Page ${state.page} is beyond the available results. Showing page ${totalPages}.`); } }, [data, state.page, totalPages]);
@@ -155,8 +175,8 @@ export default function Search() {
       {!shouldShowResults ? <Card data-testid="text-search-prompt"><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold">{normalized.length === 1 ? "Keep typing to search" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">{normalized.length === 1 ? "Type at least 2 characters, or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</p><Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button></CardContent></Card>
       : query.isLoading ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>
       : query.isError ? <Card><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent)]" /><p className="text-sm text-muted-foreground">{invalid ? query.error.message : "Search failed. Please try again."}</p><Button variant="outline" onClick={invalid ? clearInvalidRequest : () => query.refetch()} data-testid={invalid ? "button-clear-invalid-filters" : "button-retry-search"}>{invalid ? "Clear invalid filters" : "Try again"}</Button></CardContent></Card>
-      : results.length === 0 ? <Card><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold" data-testid="text-no-results">{normalized || canBrowse ? "No resources match this combination" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">Try broadening your filters or search terms.</p><div className="flex gap-2"><Button variant="outline" onClick={() => clearFilters()}>Clear filters</Button><Button variant="ghost" onClick={clearSearch}>Clear search</Button></div></CardContent></Card>
-      : <><p className="mb-4 text-sm text-muted-foreground" data-testid="text-result-count">{totalPages > 1 ? `Page ${safePage} of ${totalPages} · showing ${(safePage - 1) * PAGE_SIZE + 1}–${(safePage - 1) * PAGE_SIZE + results.length} of ${total} results` : `${total} result${total === 1 ? "" : "s"}`}{normalized ? ` for “${normalized}”` : ""}</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">{results.map(r => <ResourceCard key={r.id} resource={{ id: String(r.id), name: r.title, url: r.url, description: r.description ?? undefined, category: r.category ?? undefined }} fullResource={r} />)}</div><Paginator currentPage={safePage} totalPages={totalPages} makeHref={makePageHref} onNavigate={gotoPage} className="pt-4" testIds={{ container: "search-pagination", prev: "button-search-prev", next: "button-search-next", jump: "input-search-page-jump" }} /></>}
+       : results.length === 0 ? <Card><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold" data-testid="text-no-results">{normalized || canBrowse ? "No resources match this combination" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">Try broadening your filters or search terms.</p><div className="flex gap-2"><Button variant="outline" onClick={() => clearFilters()}>Clear filters</Button><Button variant="ghost" onClick={clearSearch}>Clear search</Button></div></CardContent></Card>
+       : <>{data?.search?.mode === "fuzzy" && data.search.suggestion && <div className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm" role="status" data-testid="notice-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setInput(data.search!.suggestion!); update("q", data.search!.suggestion!); }}>{data.search.suggestion}</Button><span>?</span></div>}<p className="mb-4 text-sm text-muted-foreground" data-testid="text-result-count">{totalPages > 1 ? `Page ${safePage} of ${totalPages} · showing ${(safePage - 1) * PAGE_SIZE + 1}–${(safePage - 1) * PAGE_SIZE + results.length} of ${total} results` : `${total} result${total === 1 ? "" : "s"}`}{normalized ? ` for “${normalized}”` : ""}</p><div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]">{results.map(r => <ResourceCard key={r.id} resource={{ id: String(r.id), name: r.title, url: r.url, description: r.description ?? undefined, category: r.category ?? undefined }} fullResource={r} />)}</div><Paginator currentPage={safePage} totalPages={totalPages} makeHref={makePageHref} onNavigate={gotoPage} className="pt-4" testIds={{ container: "search-pagination", prev: "button-search-prev", next: "button-search-next", jump: "input-search-page-jump" }} /></>}
     </main></div>
   </div>;
 }

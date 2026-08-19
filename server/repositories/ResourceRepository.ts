@@ -37,7 +37,7 @@ import {
   type InsertResource,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, sql, asc, desc, like, ilike, or, inArray } from "drizzle-orm";
+import { eq, and, sql, asc, desc, like, inArray, isNull, getTableColumns } from "drizzle-orm";
 import { tokenizeSearchQuery } from "@shared/searchNormalize";
 import { decodeResourceTextFields } from "../github/importHygiene";
 import { invalidatePublicCache } from "../cache/publicCache";
@@ -69,9 +69,68 @@ export interface ListResourceOptions {
   provider?: ResourceProvider;
   resourceFormat?: ResourceFormat;
   skillLevel?: ResourceSkillLevel;
+  /** Limit results to resources attached directly to this taxonomy level. */
+  generalScope?: "category" | "subcategory";
   includeFacets?: boolean;
   /** R3-H08: whitelisted sort order; unknown/absent falls back to newest-first. */
   sort?: "relevance" | "name-asc" | "name-desc" | "newest" | "oldest";
+}
+
+export type ResourceSearchMetadata = {
+  mode: "fts" | "fuzzy";
+  suggestion?: string;
+};
+
+function damerauLevenshtein(left: string, right: string): number {
+  const rows = left.length + 1;
+  const cols = right.length + 1;
+  const matrix = Array.from({ length: rows }, () => Array<number>(cols).fill(0));
+  for (let row = 0; row < rows; row++) matrix[row][0] = row;
+  for (let col = 0; col < cols; col++) matrix[0][col] = col;
+  for (let row = 1; row < rows; row++) {
+    for (let col = 1; col < cols; col++) {
+      const cost = left[row - 1] === right[col - 1] ? 0 : 1;
+      matrix[row][col] = Math.min(
+        matrix[row - 1][col] + 1,
+        matrix[row][col - 1] + 1,
+        matrix[row - 1][col - 1] + cost,
+      );
+      if (
+        row > 1 &&
+        col > 1 &&
+        left[row - 1] === right[col - 2] &&
+        left[row - 2] === right[col - 1]
+      ) {
+        matrix[row][col] = Math.min(matrix[row][col], matrix[row - 2][col - 2] + 1);
+      }
+    }
+  }
+  return matrix[left.length][right.length];
+}
+
+function bestSearchSuggestion(query: string, titles: string[]): string | undefined {
+  const needle = query.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+  if (!needle) return undefined;
+  let best: { display: string; score: number; lengthDelta: number } | undefined;
+  for (const title of titles) {
+    const words = title.match(/[\p{L}\p{N}]+/gu) ?? [];
+    const candidates: string[][] = [];
+    for (let start = 0; start < words.length; start++) {
+      for (let size = 1; size <= 3 && start + size <= words.length; size++) {
+        candidates.push(words.slice(start, start + size));
+      }
+    }
+    for (const parts of candidates) {
+      const normalized = parts.join("").toLowerCase();
+      const distance = damerauLevenshtein(needle, normalized);
+      const score = distance / Math.max(needle.length, normalized.length);
+      const lengthDelta = Math.abs(needle.length - normalized.length);
+      if (!best || score < best.score || (score === best.score && lengthDelta < best.lengthDelta)) {
+        best = { display: parts.join(" "), score, lengthDelta };
+      }
+    }
+  }
+  return best?.display;
 }
 
 /**
@@ -87,6 +146,7 @@ export class ResourceRepository {
     resources: Resource[];
     total: number;
     facets?: ResourceSearchFacets;
+    search?: ResourceSearchMetadata;
   }> {
     const {
       page = 1,
@@ -101,6 +161,7 @@ export class ResourceRepository {
       provider,
       resourceFormat,
       skillLevel,
+      generalScope,
       sort,
       includeFacets = false,
     } = options;
@@ -109,19 +170,17 @@ export class ResourceRepository {
     let query = db.select().from(resources).$dynamic();
     let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources).$dynamic();
 
-    // Run16 BUG-044: %, _ and \ are LIKE metacharacters — a search for "___"
-    // used to match EVERY 3+-char row (66KB response). Escape them so the
-    // user's literal text is what gets matched (PG default escape is \).
-    // Audit2 BUG-011/020/021: the matcher is TOKENIZED — the query is
-    // normalized (control chars stripped, whitespace collapsed, edge quotes
-    // dropped) and split on spaces; every token must appear somewhere in
-    // title/description/url (AND of per-token ORs). "ffmpeg hls" and
-    // "hls ffmpeg" return the same set, doubled spaces and wrapping quotes
-    // no longer zero out matches, and a single-token query builds exactly
-    // the same predicate as before (per-word result counts unchanged).
+    // Build an ANDed prefix tsquery once. It maps directly to the search_tsv
+    // GIN index and preserves the established order-independent token policy.
     const searchTokens = tokenizeSearchQuery(search);
     const normalizedSearch = searchTokens.join(" ");
-    const escapeLike = (s: string) => s.replace(/[\\%_]/g, (m) => `\\${m}`);
+    const ftsTerms = searchTokens
+      .map((token) => token.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, ""))
+      .filter(Boolean);
+    const tsQuery = ftsTerms.map((term) => `${term}:*`).join(" & ");
+    const strictSearchCondition = tsQuery
+      ? sql`${resources.searchTsv} @@ to_tsquery('english', ${tsQuery})`
+      : undefined;
     const safeMetadataTags = sql`CASE
       WHEN jsonb_typeof(${resources.metadata}->'tags') = 'array'
       THEN ${resources.metadata}->'tags'
@@ -158,6 +217,7 @@ export class ResourceRepository {
 
     const buildConditions = (
       omit?: "category" | "subcategory" | "subSubcategory" | "tags" | "provider" | "resourceFormat" | "skillLevel",
+      searchCondition: ReturnType<typeof sql> | undefined = strictSearchCondition,
     ) => {
       const conditions = [];
       if (status) conditions.push(eq(resources.status, status));
@@ -168,28 +228,69 @@ export class ResourceRepository {
       if (provider && omit !== "provider") conditions.push(eq(resources.provider, provider));
       if (resourceFormat && omit !== "resourceFormat") conditions.push(eq(resources.resourceFormat, resourceFormat));
       if (skillLevel && omit !== "skillLevel") conditions.push(eq(resources.skillLevel, skillLevel));
+      if (generalScope === "category") conditions.push(isNull(resources.subcategory));
+      if (generalScope === "subcategory") conditions.push(isNull(resources.subSubcategory));
       if (tags.length > 0 && omit !== "tags") {
         const canonicalTags = Array.from(new Set(tags.map(normalizeTagFilter)));
         conditions.push(tagExists(sql`${canonicalTagSql} IN (${sql.join(canonicalTags.map((v) => sql`${v}`), sql`, `)})`));
       }
-      if (searchTokens.length > 0) {
-        conditions.push(
-          and(
-            ...searchTokens.map((tok) => {
-              const esc = escapeLike(tok);
-              return or(
-                ilike(resources.title, `%${esc}%`),
-                ilike(resources.description, `%${esc}%`),
-                ilike(resources.url, `%${esc}%`)
-              );
-            })
-          )
-        );
-      }
+      if (searchCondition) conditions.push(searchCondition);
       return conditions;
     };
 
-    const conditions = buildConditions();
+    const strictConditions = buildConditions(undefined, strictSearchCondition);
+    const strictProbe = strictSearchCondition
+      ? db.select({ id: resources.id }).from(resources).where(and(...strictConditions)).limit(1)
+      : undefined;
+    let activeSearchCondition = strictSearchCondition;
+    let extendedFuzzyCondition: ReturnType<typeof sql> | undefined;
+
+    // The fallback decision is part of the SQL predicate instead of a serial
+    // preflight round trip. Strict rows always win; fuzzy rows become eligible
+    // only when the same scoped strict query has no match.
+    if (strictSearchCondition && strictProbe) {
+      const fuzzyNeedle = normalizedSearch.toLowerCase();
+      const fuzzyCompactNeedle = fuzzyNeedle.replace(/[^\p{L}\p{N}]+/gu, "");
+      const compactTitle = sql`lower(regexp_replace(${resources.title}, '[^a-zA-Z0-9]+', '', 'g'))`;
+      const transpositionTsQuery = Array.from(new Set(ftsTerms.flatMap((term) => {
+        const chars = Array.from(term);
+        return chars.slice(0, -1).map((_, index) => {
+          const variant = [...chars];
+          [variant[index], variant[index + 1]] = [variant[index + 1], variant[index]];
+          return `${variant.join("")}:*`;
+        });
+      }))).slice(0, 64).join(" | ");
+      const fuzzyCandidateScope = buildConditions(undefined, sql`TRUE`);
+      const nearestTitleCandidates = db
+        .select({ id: resources.id })
+        .from(resources)
+        .where(and(...fuzzyCandidateScope))
+        .orderBy(sql`${compactTitle} <-> ${fuzzyCompactNeedle}`)
+        .limit(50);
+      const indexedFuzzyCondition = sql`(
+        ${resources.title} % ${fuzzyNeedle}
+        OR ${fuzzyNeedle} <% ${resources.title}
+        OR ${fuzzyNeedle} <<% ${resources.title}
+        OR ${compactTitle} % ${fuzzyCompactNeedle}
+        OR ${resources.searchTsv} @@ to_tsquery('english', ${transpositionTsQuery})
+        OR ${resources.description} % ${fuzzyNeedle}
+        OR ${fuzzyNeedle} <% ${resources.description}
+        OR ${resources.url} % ${fuzzyNeedle}
+        OR ${fuzzyNeedle} <% ${resources.url}
+      )`;
+      extendedFuzzyCondition = sql`(
+        ${indexedFuzzyCondition}
+        OR (
+          similarity(${compactTitle}, ${fuzzyCompactNeedle}) >= 0.2
+          AND ${resources.id} IN (${nearestTitleCandidates})
+        )
+      )`;
+      activeSearchCondition = sql`(
+        ${strictSearchCondition}
+        OR (NOT EXISTS (${strictProbe}) AND ${indexedFuzzyCondition})
+      )`;
+    }
+    const conditions = buildConditions(undefined, activeSearchCondition);
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
@@ -214,51 +315,32 @@ export class ResourceRepository {
           // relevance — exact title match first, then title prefix, then title
           // substring, then description/url-only matches — instead of raw
           // recency (an exact "FFmpeg" title used to land at position ~158).
-          if (searchTokens.length > 0) {
-            // Task 265: rank TOKEN coverage first so "ffmpeg hls" and
-            // "hls ffmpeg" produce the SAME order. Tier by how many tokens
-            // appear in the title (all > some > none). Multi-token queries
-            // must use only order-invariant tie-breakers (a phrase-based
-            // tie-breaker would still promote different titles per word
-            // order), so within a tier they fall through to title + id.
-            // Single-token queries keep the original exact > prefix >
-            // substring > none phrase ranking — same ordering as before.
+          if (strictSearchCondition) {
             const q = normalizedSearch.toLowerCase();
-            const escapedPhrase = escapeLike(normalizedSearch);
-            const prefix = `${escapedPhrase.toLowerCase()}%`;
-            const substr = `%${escapedPhrase.toLowerCase()}%`;
-            const titleTokenHits = sql.join(
-              searchTokens.map(
-                (tok) =>
-                  sql`(CASE WHEN ${resources.title} ILIKE ${`%${escapeLike(tok)}%`} THEN 1 ELSE 0 END)`
-              ),
-              sql` + `
-            );
-            // Rank by the actual hit count descending (not a collapsed
-            // all/some/none tier) so, e.g., a 2-of-3 title match outranks a
-            // 1-of-3 match. For single-token queries this is the same
-            // in-title (1) vs not (0) split as before.
-            const coverageTier = desc(sql`(${titleTokenHits})`);
-            const phraseTier = asc(sql`CASE
-              WHEN lower(${resources.title}) = ${q} THEN 0
-              WHEN lower(${resources.title}) LIKE ${prefix} THEN 1
-              WHEN lower(${resources.title}) LIKE ${substr} THEN 2
-              ELSE 3 END`);
-            return searchTokens.length === 1
-              ? [coverageTier, phraseTier, asc(sql`lower(${resources.title})`), asc(resources.id)]
-              : [coverageTier, asc(sql`lower(${resources.title})`), asc(resources.id)];
+            return [
+              asc(sql`CASE WHEN ${strictSearchCondition} THEN 0 ELSE 1 END`),
+              desc(sql`ts_rank_cd(${resources.searchTsv}, to_tsquery('english', ${tsQuery}))`),
+              desc(sql`word_similarity(${q}, lower(${resources.title}))`),
+              desc(sql`similarity(lower(${resources.title}), ${q})`),
+              asc(sql`CASE WHEN lower(${resources.title}) = ${q} THEN 0 ELSE 1 END`),
+              asc(sql`length(${resources.title})`),
+              asc(sql`lower(${resources.title})`),
+              asc(resources.id),
+            ];
           }
           return [desc(resources.createdAt), desc(resources.id)];
       }
     })();
 
-    const whereSql = (omit?: Parameters<typeof buildConditions>[0]) => {
-      const facetConditions = buildConditions(omit);
-      return facetConditions.length > 0 ? and(...facetConditions)! : sql`true`;
-    };
-
-    const facetPromise: Promise<ResourceSearchFacets | undefined> = includeFacets
-      ? db.execute(sql`
+    const getFacetPromise = (
+      facetSearchCondition: ReturnType<typeof sql> | undefined,
+    ): Promise<ResourceSearchFacets | undefined> => {
+      if (!includeFacets) return Promise.resolve(undefined);
+      const whereSql = (omit?: Parameters<typeof buildConditions>[0]) => {
+        const facetConditions = buildConditions(omit, facetSearchCondition);
+        return facetConditions.length > 0 ? and(...facetConditions)! : sql`true`;
+      };
+      return db.execute(sql`
           SELECT facet, value, count
           FROM (
             SELECT 'category'::text AS facet, ${resources.category} AS value, count(*)::int AS count
@@ -326,15 +408,87 @@ export class ResourceRepository {
             }
           }
           return facets;
+        });
+    };
+    const facetPromise = getFacetPromise(activeSearchCondition);
+
+    if (strictSearchCondition) {
+      // Search pages get rows + total + mode from one SQL statement. The
+      // window count avoids a second network round trip to the remote Postgres
+      // service, which dominates latency far more than ranking 2k local rows.
+      const searchQuery = db
+        .select({
+          ...getTableColumns(resources),
+          searchTotal: sql<number>`count(*) over()::int`,
+          strictMatch: strictSearchCondition,
         })
-      : Promise.resolve(undefined);
+        .from(resources)
+        .where(and(...conditions))
+        .orderBy(...orderBy)
+        .limit(limit)
+        .offset(offset);
+      let [searchRows, facets] = await Promise.all([searchQuery, facetPromise]);
+      let total = searchRows[0]?.searchTotal ?? 0;
+      // Preserve honest pagination for a now-out-of-range offset. This rare
+      // recovery query is intentionally not paid on normal page-one searches.
+      if (searchRows.length === 0 && offset > 0) {
+        const [totalResult] = await countQuery;
+        total = totalResult.count;
+      }
+      let searchMetadata: ResourceSearchMetadata = {
+        mode: searchRows[0]?.strictMatch ? "fts" : "fuzzy",
+      };
+      // The indexed operators intentionally use conservative thresholds. If
+      // they find fewer than two rows, broaden only this rare miss via the
+      // compact-title GiST nearest-neighbour index (e.g. obsstuido, vidoe).
+      if (searchMetadata.mode === "fuzzy" && total === 0 && extendedFuzzyCondition) {
+        const recoveryConditions = buildConditions(undefined, extendedFuzzyCondition);
+        const recoveryCountQuery = db
+          .select({ count: sql<number>`count(*)::int` })
+          .from(resources)
+          .where(and(...recoveryConditions));
+        const recoveryQuery = db
+          .select({
+            ...getTableColumns(resources),
+            searchTotal: sql<number>`count(*) over()::int`,
+            strictMatch: sql<boolean>`false`,
+          })
+          .from(resources)
+          .where(and(...recoveryConditions))
+          .orderBy(...orderBy)
+          .limit(limit)
+          .offset(offset);
+        [searchRows, facets] = await Promise.all([
+          recoveryQuery,
+          getFacetPromise(extendedFuzzyCondition),
+        ]);
+        total = searchRows[0]?.searchTotal ?? 0;
+        if (searchRows.length === 0 && offset > 0) {
+          const [totalResult] = await recoveryCountQuery;
+          total = totalResult.count;
+        }
+        searchMetadata = { mode: "fuzzy" };
+      }
+      const resourceList = searchRows.map(({ searchTotal: _total, strictMatch: _strict, ...resource }) => resource);
+      if (searchMetadata.mode === "fuzzy" && resourceList[0]?.title) {
+        searchMetadata.suggestion = bestSearchSuggestion(
+          normalizedSearch,
+          resourceList.map((resource) => resource.title),
+        );
+      }
+      return {
+        resources: resourceList,
+        total,
+        ...(facets ? { facets } : {}),
+        search: searchMetadata,
+      };
+    }
 
     const [[totalResult], resourceList, facets] = await Promise.all([
       countQuery,
       query.orderBy(...orderBy).limit(limit).offset(offset),
       facetPromise,
     ]);
-
     return { resources: resourceList, total: totalResult.count, ...(facets ? { facets } : {}) };
   }
 

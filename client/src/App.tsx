@@ -43,7 +43,6 @@ const Profile = lazy(() => import("@/pages/Profile"));
 const Contributions = lazy(() => import("@/pages/Contributions"));
 
 const BookmarksGate = lazy(() => import("@/pages/BookmarksGate"));
-const BookmarksGate = lazy(() => import("@/pages/BookmarksGate"));
 const PublicCollection = lazy(() => import("@/pages/PublicCollection"));
 const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
 const Journeys = lazy(() => import("@/pages/Journeys"));

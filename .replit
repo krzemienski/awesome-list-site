@@ -107,6 +107,10 @@ args = "cache-headers"
 task = "workflow.run"
 args = "pool-probe"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "search-typos"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -330,6 +334,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "PROBE_ROUNDS=3 PROBE_CONCURRENCY=20 npm run validate:pool"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "search-typos"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:search-typos"
 
 [workflows.workflow.metadata]
 isValidation = true

@@ -317,6 +317,14 @@ export function registerCatalogContributionsRoutes(
       // display NAME (e.g. subSubcategory=AV1), matching the existing
       // subcategory behaviour, so pass it straight through to listResources.
       const subSubcategory = firstQueryValue(req.query.subSubcategory);
+      const rawGeneralScope = firstQueryValue(req.query.generalScope);
+      if (rawGeneralScope !== undefined && rawGeneralScope !== 'category' && rawGeneralScope !== 'subcategory') {
+        return res.status(400).json({
+          error: 'invalid_general_scope',
+          message: 'generalScope must be category or subcategory',
+          allowed: ['category', 'subcategory'],
+        });
+      }
 
       // R3-H08: server-side sort with allow-list; unknown values 400 (mirrors
       // the invalid_status pattern) so callers learn the valid options.
@@ -361,6 +369,7 @@ export function registerCatalogContributionsRoutes(
         provider: provider || undefined,
         resourceFormat: resourceFormat || undefined,
         skillLevel: skillLevel || undefined,
+        generalScope: rawGeneralScope as "category" | "subcategory" | undefined,
         includeFacets,
         sort,
       });
@@ -433,7 +442,7 @@ export function registerCatalogContributionsRoutes(
         }
         offset = Number(s);
       }
-      const { resources, total } = await resourceRepo.listResources({
+      const { resources, total, search } = await resourceRepo.listResources({
         page: 1,
         offset,
         limit,
@@ -454,7 +463,7 @@ export function registerCatalogContributionsRoutes(
       // NB-021: honest pagination metadata — repeat with offset=nextOffset
       // until nextOffset is null to retrieve every promised match.
       const nextOffset = offset + resources.length < total ? offset + resources.length : null;
-      res.json({ query: q, total, limit, offset, nextOffset, results: results.map(toPublicResource) });
+      res.json({ query: q, total, limit, offset, nextOffset, results: results.map(toPublicResource), search });
     } catch (error) {
       console.error('Error searching resources:', error);
       sendOperationalFailure(res, error, 'Failed to search resources');
