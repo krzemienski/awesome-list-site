@@ -31,9 +31,24 @@ import {
   type InsertJourneyStep,
   type UserJourneyProgress,
 } from "@shared/schema";
-import { areAllLogicalJourneyStepsComplete } from "@shared/journeyProgress";
+import {
+  areAllLogicalJourneyStepsComplete,
+  groupLogicalJourneySteps,
+  isLogicalJourneyStepComplete,
+} from "@shared/journeyProgress";
 import { db } from "../db";
-import { eq, and, asc, desc, inArray } from "drizzle-orm";
+import { eq, and, asc, desc, inArray, getTableColumns, sql } from "drizzle-orm";
+
+export type JourneyStartResult = {
+  progress: UserJourneyProgress;
+  created: boolean;
+};
+
+export type JourneyProgressUpdateResult = {
+  progress: UserJourneyProgress | undefined;
+  logicalStepBecameComplete: boolean;
+  journeyBecameComplete: boolean;
+};
 
 /**
  * Repository class for learning journey-related database operations
@@ -359,8 +374,11 @@ export class LearningJourneyRepository {
    * @param journeyId - Journey ID
    * @returns The created or updated progress record
    */
-  async startUserJourney(userId: string, journeyId: number): Promise<UserJourneyProgress> {
-    const [progress] = await db
+  async startUserJourney(userId: string, journeyId: number): Promise<JourneyStartResult> {
+    // `xmax = 0` is evaluated by PostgreSQL in the same UPSERT that creates or
+    // resumes progress. A client-side !isEnrolled check races stale tabs; this
+    // authoritative flag does not (only the INSERT winner sees created=true).
+    const [row] = await db
       .insert(userJourneyProgress)
       .values({
         userId,
@@ -371,9 +389,13 @@ export class LearningJourneyRepository {
         target: [userJourneyProgress.userId, userJourneyProgress.journeyId],
         set: { lastAccessedAt: new Date() }
       })
-      .returning();
+      .returning({
+        ...getTableColumns(userJourneyProgress),
+        created: sql<boolean>`(xmax = 0)`,
+      });
 
-    return progress;
+    const { created, ...progress } = row;
+    return { progress: progress as UserJourneyProgress, created };
   }
 
   /**
@@ -385,7 +407,11 @@ export class LearningJourneyRepository {
    * @returns The updated progress record
    */
   async updateUserJourneyProgress(userId: string, journeyId: number, stepId: number): Promise<UserJourneyProgress> {
-    return this.updateUserJourneyProgressBatch(userId, journeyId, [stepId]);
+    const result = await this.updateUserJourneyProgressBatch(userId, journeyId, [stepId]);
+    if (!result.progress) {
+      throw new Error('Journey progress does not exist');
+    }
+    return result.progress;
   }
 
   /**
@@ -401,7 +427,7 @@ export class LearningJourneyRepository {
     journeyId: number,
     stepIds: number[],
     completed?: boolean,
-  ): Promise<UserJourneyProgress> {
+  ): Promise<JourneyProgressUpdateResult> {
     // Run22 BUG-006: a step id sent to journey N's progress endpoint must
     // actually belong to journey N — otherwise a client can pollute progress
     // with foreign step ids (breaking completion math on BOTH journeys' UIs).
@@ -419,65 +445,79 @@ export class LearningJourneyRepository {
       throw err;
     }
 
-    // First get current progress
-    const [current] = await db
-      .select()
-      .from(userJourneyProgress)
-      .where(
-        and(
-          eq(userJourneyProgress.userId, userId),
-          eq(userJourneyProgress.journeyId, journeyId)
+    // Serialize same-user/journey writes. This avoids lost JSONB updates and
+    // makes each transition flag truthful across stale tabs and devices.
+    return db.transaction(async (tx) => {
+      const [current] = await tx
+        .select()
+        .from(userJourneyProgress)
+        .where(
+          and(
+            eq(userJourneyProgress.userId, userId),
+            eq(userJourneyProgress.journeyId, journeyId)
+          )
         )
-      );
+        .for('update');
 
-    // Toggle: adding a step marks it complete; sending the same step id again
-    // removes it so users can un-complete a step and reduce their progress.
-    // With an explicit `completed` flag the ids are unioned/removed instead,
-    // which is idempotent even if rows drifted into a mixed state.
-    // Run22 BUG-006: seed only with ids that are still valid steps of THIS
-    // journey — any orphan ids stored before this guard existed (or left
-    // behind by step deletions) are dropped on the next successful write.
-    const completedSet = new Set(
-      (current?.completedSteps ?? []).map((id) => Number(id)).filter((id) => validIds.has(id)),
-    );
-    for (const stepId of stepIds) {
-      if (completed === true) {
-        completedSet.add(stepId);
-      } else if (completed === false) {
-        completedSet.delete(stepId);
-      } else if (completedSet.has(stepId)) {
-        completedSet.delete(stepId);
-      } else {
-        completedSet.add(stepId);
+      if (!current) {
+        return {
+          progress: undefined,
+          logicalStepBecameComplete: false,
+          journeyBecameComplete: false,
+        };
       }
-    }
-    const completedSteps = Array.from(completedSet);
 
-    // The same logical-step rule powers writes, summary reads, and the detail
-    // UI: required rows when present, otherwise every row in an all-optional
-    // group. This prevents completedAt from disagreeing with Resume.
-    const allCompleted = areAllLogicalJourneyStepsComplete(
-      allSteps,
-      completedSet,
-    );
+      const beforeCompletedSet = new Set(
+        (current.completedSteps ?? []).map((id) => Number(id)).filter((id) => validIds.has(id)),
+      );
+      const completedSet = new Set(beforeCompletedSet);
+      for (const stepId of stepIds) {
+        if (completed === true) {
+          completedSet.add(stepId);
+        } else if (completed === false) {
+          completedSet.delete(stepId);
+        } else if (completedSet.has(stepId)) {
+          completedSet.delete(stepId);
+        } else {
+          completedSet.add(stepId);
+        }
+      }
+      const completedSteps = Array.from(completedSet);
+      const wasJourneyComplete = areAllLogicalJourneyStepsComplete(allSteps, beforeCompletedSet);
+      const allCompleted = areAllLogicalJourneyStepsComplete(allSteps, completedSet);
+      const touchedStepIds = new Set(stepIds);
+      const logicalStepBecameComplete =
+        completed === true &&
+        groupLogicalJourneySteps(allSteps)
+          .filter(({ rows }) => rows.some((row) => touchedStepIds.has(row.id)))
+          .some(
+            ({ rows }) =>
+              !isLogicalJourneyStepComplete(rows, beforeCompletedSet) &&
+              isLogicalJourneyStepComplete(rows, completedSet),
+          );
 
-    const [updated] = await db
-      .update(userJourneyProgress)
-      .set({
-        currentStepId: stepIds[stepIds.length - 1],
-        completedSteps,
-        lastAccessedAt: new Date(),
-        completedAt: allCompleted ? new Date() : null
-      })
-      .where(
-        and(
-          eq(userJourneyProgress.userId, userId),
-          eq(userJourneyProgress.journeyId, journeyId)
+      const [updated] = await tx
+        .update(userJourneyProgress)
+        .set({
+          currentStepId: stepIds[stepIds.length - 1],
+          completedSteps,
+          lastAccessedAt: new Date(),
+          completedAt: allCompleted ? new Date() : null
+        })
+        .where(
+          and(
+            eq(userJourneyProgress.userId, userId),
+            eq(userJourneyProgress.journeyId, journeyId)
+          )
         )
-      )
-      .returning();
+        .returning();
 
-    return updated;
+      return {
+        progress: updated,
+        logicalStepBecameComplete,
+        journeyBecameComplete: !wasJourneyComplete && allCompleted,
+      };
+    });
   }
 
   /**

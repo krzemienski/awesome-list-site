@@ -79,6 +79,16 @@ In DEV, `debug_mode: true` is added so events appear in GA4 DebugView.
 | `generate_lead` | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
 | `share` | Share button on a resource — `ResourceDetail.tsx` | `method: "web_share" \| "clipboard"`, `content_type`, `content_id` |
 
+### Learning-journey funnel (Task #330)
+
+Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_complete` → `journey_complete`.
+
+| Event | Fires when / where | Key params |
+|---|---|---|
+| `journey_start` | Genuinely NEW enrollment only — listing one-click start (`Journeys.tsx`) or detail start button (`JourneyDetail.tsx`). Resume re-POSTs (Continue CTA, `useResumeJourney`) never re-fire it. | `journey_id`, `journey_title`, `total_steps` |
+| `journey_step_complete` | Logical step marked complete, server-confirmed — one event per logical step (up to 3 row ids written together), never per row | `journey_id`, `journey_title`, `step_number`, `step_position`, `total_steps` |
+| `journey_complete` | Server-confirmed transition of `completedAt` null → set in the PUT progress response (re-saves of an already-complete journey never re-fire) | `journey_id`, `journey_title`, `total_steps` |
+
 ### Retained custom events (names preserved for dashboard continuity, now enriched)
 
 | Event | Fires when / where | Key params |

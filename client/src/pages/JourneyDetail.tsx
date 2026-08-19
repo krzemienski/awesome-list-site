@@ -26,6 +26,11 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
+import {
+  trackJourneyStart,
+  trackJourneyStepComplete,
+  trackJourneyComplete,
+} from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { isLogicalJourneyStepComplete } from "@shared/journeyProgress";
 import { journeySeoDescription } from "@shared/seo-templates";
@@ -86,6 +91,12 @@ export default function JourneyDetail() {
     },
   });
 
+  // Task #330: logical step count (distinct stepNumbers) for funnel events —
+  // the same accounting the server uses for stepCount, never raw row count.
+  const totalLogicalSteps = new Set(
+    (journey?.steps || []).map((s) => s.stepNumber),
+  ).size;
+
   // Resume links target a logical stepNumber (not an underlying row id). The
   // element mounts after the journey query resolves, so perform the hash scroll
   // and keyboard focus here rather than relying on the browser's initial-load
@@ -108,7 +119,16 @@ export default function JourneyDetail() {
         method: 'POST',
       });
     },
-    onSuccess: () => {
+    onSuccess: (data: { created?: boolean }) => {
+      // A stale detail tab can still show this button after another device
+      // enrolled. Track only the UPSERT's server-authoritative creation flag.
+      if (data.created) {
+        trackJourneyStart({
+          journeyId: String(id),
+          journeyTitle: journey?.title ?? "",
+          totalSteps: totalLogicalSteps,
+        });
+      }
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
       // NB-018 (run23): Profile's "My Journeys" card reads /api/user/journeys —
@@ -138,12 +158,24 @@ export default function JourneyDetail() {
   // mark all of its row ids — otherwise the journey can never finalize.
   // NB-024/NB-059 (run24): latest desired toggle recorded while a PUT is in
   // flight; onSettled converges toward it with at most one follow-up PUT.
-  const pendingDesiredRef = useRef<{ stepIds: number[]; completed: boolean } | null>(null);
+  const pendingDesiredRef = useRef<{
+    stepIds: number[];
+    completed: boolean;
+    stepNumber: number;
+    stepPosition: number;
+  } | null>(null);
 
   // Run17 BUG-016: all row ids go in ONE PUT (stepIds + explicit completed
   // flag) instead of a sequential per-row PUT loop (3 writes per click).
   const completeStepMutation = useMutation({
-    mutationFn: async ({ stepIds, completed }: { stepIds: number[]; completed: boolean }) => {
+    // stepNumber/stepPosition ride along for funnel events only — the API
+    // payload stays { stepIds, completed }.
+    mutationFn: async ({ stepIds, completed }: {
+      stepIds: number[];
+      completed: boolean;
+      stepNumber: number;
+      stepPosition: number;
+    }) => {
       return await apiRequest(`/api/journeys/${id}/progress`, {
         method: 'PUT',
         body: JSON.stringify({ stepIds, completed }),
@@ -155,7 +187,14 @@ export default function JourneyDetail() {
     // Run22 BUG-035: optimistic toggle — flip completedSteps in the cache
     // immediately (feedback well under 300ms instead of waiting ~1.4s for the
     // PUT + refetch), snapshot for rollback on a real failure.
-    onMutate: async ({ stepIds, completed }: { stepIds: number[]; completed: boolean }) => {
+    onMutate: async ({ stepIds, completed }: {
+      stepIds: number[];
+      completed: boolean;
+      stepNumber: number;
+      stepPosition: number;
+    }) => {
+      // (stepNumber/stepPosition are analytics-only; the cache flip below
+      // operates purely on row ids.)
       await queryClient.cancelQueries({ queryKey: [`/api/journeys/${id}`] });
       const previous = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
       if (previous?.progress) {
@@ -170,14 +209,42 @@ export default function JourneyDetail() {
       }
       return { previous };
     },
-    onSuccess: (_data, vars) => {
-      // Task #232: Mixpanel journey engagement (one event per logical-step
-      // toggle, never per row id — the 3 row ids of a logical step are one
-      // user action).
-      mpTrack(vars.completed ? 'journey_step_completed' : 'journey_step_uncompleted', {
-        journey_id: String(id),
-        step_row_count: vars.stepIds.length,
-      });
+    onSuccess: (data, vars, context) => {
+      const transition = data as {
+        logicalStepBecameComplete?: boolean;
+        journeyBecameComplete?: boolean;
+      };
+      // Task #232/#330: one funnel event per logical-step transition, never
+      // per row id. The server serializes writes and reports the transition,
+      // preventing duplicate events from stale tabs/retried idempotent PUTs.
+      if (vars.completed && transition.logicalStepBecameComplete) {
+        trackJourneyStepComplete({
+          journeyId: String(id),
+          journeyTitle: journey?.title ?? "",
+          stepNumber: vars.stepNumber,
+          stepPosition: vars.stepPosition,
+          totalSteps: totalLogicalSteps,
+          stepRowCount: vars.stepIds.length,
+        });
+      } else {
+        // Un-complete is not part of the GA4 funnel — Mixpanel-only signal
+        // (pre-existing event name preserved for dashboard continuity).
+        mpTrack('journey_step_uncompleted', {
+          journey_id: String(id),
+          journey_title: journey?.title,
+          step_number: vars.stepNumber,
+          step_row_count: vars.stepIds.length,
+        });
+      }
+      // Completion is likewise server-authoritative rather than inferred from
+      // a potentially stale cache snapshot.
+      if (vars.completed && transition.journeyBecameComplete) {
+        trackJourneyComplete({
+          journeyId: String(id),
+          journeyTitle: journey?.title ?? "",
+          totalSteps: totalLogicalSteps,
+        });
+      }
       toast({
         title: "Progress Updated",
         description: "Your journey progress has been saved.",
@@ -225,12 +292,17 @@ export default function JourneyDetail() {
   //   attribute, to avoid dropping focus to <body>).
   // - NB-060: when offline, tell the user immediately and DO NOT fire the
   //   mutation (no silent queue that surprises them with a toast on reconnect).
-  const handleToggleStep = (stepIds: number[], completed: boolean) => {
+  const handleToggleStep = (
+    stepIds: number[],
+    completed: boolean,
+    stepNumber: number,
+    stepPosition: number,
+  ) => {
     // NB-024/NB-059 (run24): a click during an in-flight PUT flips the cache
     // optimistically and records the desired final state; the mutation's
     // onSettled converges with one follow-up PUT (latest wins).
     if (completeStepMutation.isPending) {
-      pendingDesiredRef.current = { stepIds, completed };
+      pendingDesiredRef.current = { stepIds, completed, stepNumber, stepPosition };
       const previous = queryClient.getQueryData<Journey>([`/api/journeys/${id}`]);
       if (previous?.progress) {
         const current = (previous.progress.completedSteps || []).map(Number);
@@ -252,7 +324,7 @@ export default function JourneyDetail() {
       });
       return;
     }
-    completeStepMutation.mutate({ stepIds, completed });
+    completeStepMutation.mutate({ stepIds, completed, stepNumber, stepPosition });
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -598,7 +670,7 @@ export default function JourneyDetail() {
                               "min-h-[44px]",
                               completeStepMutation.isPending && "opacity-60",
                             )}
-                            onClick={() => handleToggleStep(step.rowIds, true)}
+                            onClick={() => handleToggleStep(step.rowIds, true, step.stepNumber, index + 1)}
                             aria-disabled={completeStepMutation.isPending}
                             aria-busy={completeStepMutation.isPending}
                             data-testid={`button-complete-step-${step.stepNumber}`}
@@ -621,7 +693,7 @@ export default function JourneyDetail() {
                               "min-h-[44px] px-2 text-green-500 hover:text-green-600",
                               completeStepMutation.isPending && "opacity-60",
                             )}
-                            onClick={() => handleToggleStep(step.rowIds, false)}
+                            onClick={() => handleToggleStep(step.rowIds, false, step.stepNumber, index + 1)}
                             aria-disabled={completeStepMutation.isPending}
                             aria-busy={completeStepMutation.isPending}
                             data-testid={`button-uncomplete-step-${step.stepNumber}`}

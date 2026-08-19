@@ -240,6 +240,83 @@ export const trackShare = (
 };
 
 // ---------------------------------------------------------------------------
+// Learning-journey funnel (Task #330): journey_start → journey_step_complete
+// → journey_complete. Every event carries journey id + title; step events add
+// the logical step position so the funnel can segment by depth. GA4 names use
+// the funnel verbs from the task spec; Mixpanel mirrors keep the established
+// snake_case object_action convention (journey_step_completed predates this
+// task — its name is preserved for dashboard continuity).
+// ---------------------------------------------------------------------------
+
+type JourneyEventInfo = {
+  journeyId: string | number;
+  journeyTitle: string;
+  totalSteps?: number;
+};
+
+// Fired ONLY on genuinely new enrollment (listing one-click start + detail
+// start button). Resume paths (Continue CTA, useResumeJourney) re-POST the
+// idempotent start endpoint to bump lastAccessedAt but must NOT re-fire this.
+export const trackJourneyStart = ({ journeyId, journeyTitle, totalSteps }: JourneyEventInfo) => {
+  sendEvent('journey_start', {
+    journey_id: String(journeyId),
+    journey_title: journeyTitle,
+    total_steps: totalSteps,
+  });
+  mpTrack('journey_started', {
+    journey_id: String(journeyId),
+    journey_title: journeyTitle,
+    total_steps: totalSteps,
+  });
+};
+
+// One event per LOGICAL step (a logical step spans up to 3 DB rows; the caller
+// completes all row ids together — step_row_count records how many).
+export const trackJourneyStepComplete = ({
+  journeyId,
+  journeyTitle,
+  totalSteps,
+  stepNumber,
+  stepPosition,
+  stepRowCount,
+}: JourneyEventInfo & {
+  stepNumber: number;
+  stepPosition?: number;
+  stepRowCount?: number;
+}) => {
+  sendEvent('journey_step_complete', {
+    journey_id: String(journeyId),
+    journey_title: journeyTitle,
+    step_number: stepNumber,
+    step_position: stepPosition,
+    total_steps: totalSteps,
+  });
+  mpTrack('journey_step_completed', {
+    journey_id: String(journeyId),
+    journey_title: journeyTitle,
+    step_number: stepNumber,
+    step_position: stepPosition,
+    total_steps: totalSteps,
+    step_row_count: stepRowCount,
+  });
+};
+
+// Fired on the server-confirmed transition of completedAt null → set (the PUT
+// progress response), never re-fired for already-complete journeys.
+export const trackJourneyComplete = ({ journeyId, journeyTitle, totalSteps }: JourneyEventInfo) => {
+  sendEvent('journey_complete', {
+    journey_id: String(journeyId),
+    journey_title: journeyTitle,
+    total_steps: totalSteps,
+  });
+  mpTrack('journey_completed', {
+    journey_id: String(journeyId),
+    journey_title: journeyTitle,
+    total_steps: totalSteps,
+  });
+};
+
+// ---------------------------------------------------------------------------
 // Retained custom events (names preserved, params enriched)
 // ---------------------------------------------------------------------------
 

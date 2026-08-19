@@ -215,8 +215,10 @@ const adminStatsResponseSchema = z
 
 /**
  * Each journey item spreads the raw DB row and appends stepCount,
- * completedStepCount, and isEnrolled.  We assert those three derived fields
- * plus the core identity fields; everything else passes through.
+ * completedStepCount, isEnrolled, and nextStepNumber (Task #330: the first
+ * incomplete logical step the listing CTA deep-links to; null when the
+ * journey is fully complete or has no steps).  We assert those derived
+ * fields plus the core identity fields; everything else passes through.
  */
 const journeyItemSchema = z
   .object({
@@ -226,6 +228,7 @@ const journeyItemSchema = z
     stepCount: z.number(),
     completedStepCount: z.number(),
     isEnrolled: z.boolean(),
+    nextStepNumber: z.number().nullable(),
   })
   .passthrough();
 

@@ -68,16 +68,6 @@ export function registerJourneyRoutes(
   // journey_steps stores multiple rows per logical stepNumber. The imported
   // helper is shared with write-time completion and Journey Detail so grouped
   // progress cannot drift across surfaces.
-  function countLogicalJourneySteps(
-    steps: Array<{ id: number; stepNumber: number | string; isOptional?: boolean | null }>,
-    completedRowIds: Set<number>,
-  ): { totalSteps: number; completedSteps: number } {
-    const { totalSteps, completedSteps } = summarizeLogicalJourneySteps(
-      steps,
-      completedRowIds,
-    );
-    return { totalSteps, completedSteps };
-  }
 
   // --- Learning Journey Routes ---
   
@@ -122,16 +112,25 @@ export function registerJourneyRoutes(
           // Run17 BUG-003: completedSteps stores step ROW ids while stepCount
           // counts logical steps (distinct stepNumbers). Counting raw rows mixed
           // units and produced >100% progress (e.g. 18 rows / 6 steps = 300%).
-          // BUG-063 (run25): delegated to the shared countLogicalJourneySteps
+          // BUG-063 (run25): delegated to the shared summarizeLogicalJourneySteps
           // helper so /api/user/progress derives time from the SAME accounting.
-          const completedRowIds = new Set<number>(progress?.completedSteps ?? []);
-          const { completedSteps: completedStepCount } = countLogicalJourneySteps(steps, completedRowIds);
+          const completedRowIds = new Set<number>(
+            (progress?.completedSteps ?? []).map(Number),
+          );
+          const { completedSteps: completedStepCount, nextStep } =
+            summarizeLogicalJourneySteps(steps, completedRowIds);
           
           return {
             ...journey,
             stepCount: uniqueStepNumbers.size,
             completedStepCount,
-            isEnrolled: !!progress
+            isEnrolled: !!progress,
+            // Task #330: one-click start/continue deep-link target — the first
+            // incomplete logical step (null once every step is complete or the
+            // journey has no steps). Uses the SAME grouped-step accounting as
+            // completedStepCount so the listing CTA can never point past the
+            // journey's real next step.
+            nextStepNumber: nextStep?.stepNumber ?? null
           };
         });
         
@@ -148,11 +147,16 @@ export function registerJourneyRoutes(
               .filter(n => !isNaN(n))
           );
           
+          // Task #330: with no progress the "next" step is simply the first
+          // logical step — same field shape as the authenticated branch.
+          const { nextStep } = summarizeLogicalJourneySteps(steps, new Set());
+
           return {
             ...journey,
             stepCount: uniqueStepNumbers.size,
             completedStepCount: 0,
-            isEnrolled: false
+            isEnrolled: false,
+            nextStepNumber: nextStep?.stepNumber ?? null
           };
         });
         
@@ -221,8 +225,8 @@ export function registerJourneyRoutes(
         return res.status(404).json({ message: 'Journey not found' });
       }
       
-      const progress = await learningJourneyRepo.startUserJourney(userId, journeyId);
-      res.json(progress);
+      const { progress, created } = await learningJourneyRepo.startUserJourney(userId, journeyId);
+      res.json({ ...progress, created });
     } catch (error) {
       console.error('Error starting journey:', error);
       res.status(500).json({ message: 'Failed to start journey' });
@@ -262,17 +266,21 @@ export function registerJourneyRoutes(
         return res.status(400).json({ message: 'completed must be a boolean' });
       }
 
-      const progress = await learningJourneyRepo.updateUserJourneyProgressBatch(
+      const result = await learningJourneyRepo.updateUserJourneyProgressBatch(
         userId, journeyId, ids, completed,
       );
       // Run22 BUG-032 (same no-op class): the batch update only UPDATEs an
       // existing progress row — if the user never started this journey there
       // is no row, nothing was written, and `progress` is undefined. That must
       // not masquerade as a 200 success.
-      if (!progress) {
+      if (!result.progress) {
         return res.status(409).json({ message: 'Journey not started — start the journey before updating progress' });
       }
-      res.json(progress);
+      res.json({
+        ...result.progress,
+        logicalStepBecameComplete: result.logicalStepBecameComplete,
+        journeyBecameComplete: result.journeyBecameComplete,
+      });
     } catch (error: any) {
       // Run22 BUG-006: step ids that belong to a different journey are a
       // client error, not a server fault — reject without storing anything.

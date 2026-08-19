@@ -5,6 +5,7 @@
 - [Server-authoritative JSON-LD](jsonld-server-authority.md) — og-middleware emits route JSON-LD; client SEOHead ships none, so the two pipelines never produce conflicting graphs.
 - [Resource browsing parity](resource-browsing-parity.md) — listing pages share ResourceCard; SSR prerender must flatten the SAME tree the client fetches (24/page lockstep), not a parallel DB query.
 - [Journey step data shape](journey-step-data-shape.md) — journey steps stored as up to 3 rows per logical stepNumber; UI must group by stepNumber AND completion must mark ALL row ids or completedAt never fires.
+- [Journey funnel transition authority](journey-funnel-transition-authority.md) — idempotent start/progress analytics must use atomic server transition flags; stale client state double-counts.
 - [Drizzle double .where() override](drizzle-where-override.md) — a 2nd .where() silently replaces the 1st (drops the predicate); always combine with a single .where(and(...)).
 - [wouter useLocation() no query](wouter-location-no-query.md) — useLocation() is path-only; URL-sync guards must compare window.location.pathname+search or query-clears never apply.
 - [Resource delete FK cleanup](resource-delete-fk-cleanup.md) — deleting a resource needs audit-log-before-delete + manual cleanup of child FKs lacking ON DELETE (resource_edits, research_discoveries.created_resource_id) or it throws a false 500.

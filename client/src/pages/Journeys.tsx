@@ -1,6 +1,6 @@
 import { JourneyCardSkeleton } from "@/components/ui/skeletons";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { journeysHubDescription } from "@shared/seo-templates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy } from "lucide-react";
+import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
+import { trackJourneyStart } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
 
@@ -27,6 +31,9 @@ interface Journey {
   stepCount?: number;
   completedStepCount?: number;
   isEnrolled?: boolean;
+  // Task #330: first incomplete logical step (server-computed with the same
+  // grouped-step accounting as completedStepCount); null when complete/empty.
+  nextStepNumber?: number | null;
 }
 
 export default function Journeys() {
@@ -50,11 +57,80 @@ export default function Journeys() {
     setSelectedCategory(fromUrl && fromUrl.trim() !== "" ? fromUrl : "all");
   });
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
   // Fetch all published journeys (includes enrollment and progress data)
   const { data: journeys = [], isLoading: journeysLoading } = useQuery<Journey[]>({
     queryKey: ['/api/journeys'],
   });
+
+  // Deep-link target for start/continue: the first incomplete logical step,
+  // falling back to the journey top when there's nothing to jump to.
+  const journeyNextStepHref = (journey: Journey) =>
+    journey.nextStepNumber != null
+      ? `/journey/${journey.id}#step-${journey.nextStepNumber}`
+      : `/journey/${journey.id}`;
+
+  // Task #330: one-click start — the listing CTA enrolls signed-in users
+  // directly (previously it just navigated and enrollment needed a second
+  // click on the detail page), then lands them on their first step.
+  const startJourneyMutation = useMutation({
+    mutationFn: async (journey: Journey) => {
+      const result = await apiRequest(
+        `/api/journeys/${journey.id}/start`,
+        { method: 'POST' },
+      ) as { created: boolean };
+      return { journey, created: result.created };
+    },
+    onSuccess: ({ journey, created }) => {
+      // The list can be stale in another tab. Only the PostgreSQL UPSERT's
+      // authoritative created flag means this request truly enrolled the user.
+      if (created) {
+        trackJourneyStart({
+          journeyId: journey.id,
+          journeyTitle: journey.title,
+          totalSteps: journey.stepCount,
+        });
+      }
+      // Same cache set the detail page's start button invalidates (NB-018).
+      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${journey.id}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/journeys'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/continue-learning'] });
+      toast({
+        title: "Journey Started!",
+        description: "You've successfully enrolled in this learning journey.",
+      });
+      setLocation(journeyNextStepHref(journey));
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to Start Journey",
+        description: humanizeApiError(error, "Something went wrong. Please try again."),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleJourneyCta = (journey: Journey, enrolled: boolean, progressPercent: number) => {
+    // Anonymous visitors keep the read-only detail view with its sign-in
+    // explainer — enrollment requires an account.
+    if (!isAuthenticated) {
+      setLocation(`/journey/${journey.id}`);
+      return;
+    }
+    if (enrolled) {
+      // Already enrolled: never re-POST start (and never re-fire
+      // journey_start) — completed journeys open at the top for review,
+      // in-progress ones jump straight to the next incomplete step.
+      setLocation(
+        progressPercent === 100 ? `/journey/${journey.id}` : journeyNextStepHref(journey),
+      );
+      return;
+    }
+    if (startJourneyMutation.isPending) return;
+    startJourneyMutation.mutate(journey);
+  };
 
   // Get unique categories from journeys. Filter out empty/nullish values:
   // Radix <SelectItem> throws at render time on an empty-string value, and with
@@ -190,6 +266,9 @@ export default function Journeys() {
             const progressPercent = journey.stepCount && journey.stepCount > 0
               ? Math.round(((journey.completedStepCount || 0) / journey.stepCount) * 100)
               : 0;
+            const isStartingThis =
+              startJourneyMutation.isPending &&
+              startJourneyMutation.variables?.id === journey.id;
 
             return (
               <Card 
@@ -297,7 +376,11 @@ export default function Journeys() {
                       enrolled ? "bg-primary/20 hover:bg-primary/30 text-primary" : ""
                     )}
                     variant={enrolled ? "outline" : "default"}
-                    onClick={() => setLocation(`/journey/${journey.id}`)}
+                    // Task #330: one-click start/continue — signed-in users
+                    // enroll right here (or jump to their next incomplete
+                    // step); anonymous users still get the read-only view.
+                    onClick={() => handleJourneyCta(journey, enrolled, progressPercent)}
+                    disabled={isStartingThis}
                     data-testid={`button-view-journey-${journey.id}`}
                     // BUG-037 (audit2): five cards all announced an identical
                     // "Start Journey" — the accessible name now appends the
@@ -322,7 +405,12 @@ export default function Journeys() {
                         Journey" on journeys the user had never actually begun.
                         Run21 R4-075: a 100%-complete journey gets its own
                         Completed-state label instead of still saying "Continue". */}
-                    {enrolled && progressPercent === 100 ? (
+                    {isStartingThis ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 shrink-0 animate-spin" />
+                        <span className="text-left">Starting Journey...</span>
+                      </>
+                    ) : enrolled && progressPercent === 100 ? (
                       <>
                         <Trophy className="h-4 w-4 mr-2 shrink-0" />
                         <span className="text-left">Completed · Review</span>

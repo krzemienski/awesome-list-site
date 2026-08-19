@@ -3295,6 +3295,9 @@ components:
             type: number
           isEnrolled:
             type: boolean
+          nextStepNumber:
+            nullable: true
+            type: number
         required:
           - id
           - title
@@ -3302,6 +3305,7 @@ components:
           - stepCount
           - completedStepCount
           - isEnrolled
+          - nextStepNumber
         additionalProperties: {}
     get_3a__2f_api_2f_journeys_2f__7b_id_7d_.Params:
       type: object

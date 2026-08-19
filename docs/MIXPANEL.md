@@ -51,7 +51,9 @@ below.
 | `resource_submitted` | Resource submission accepted | `content_type`, `category`, acquisition, `tracked_from: 'server'` (no PII) | **server** — resource-submit handler (`server/routes.ts`) |
 | `resource_edit_submitted` | Edit suggestion accepted | `resource_id` | `suggest-edit-dialog` |
 | `content_shared` | Share action | `share_method`, `content_type`, `content_id` | `trackShare` |
-| `journey_step_completed` / `journey_step_uncompleted` | Logical journey step toggled (server-confirmed; one event per logical step, not per row) | `journey_id`, `step_row_count` | `JourneyDetail` |
+| `journey_started` | Genuinely new enrollment (listing one-click start or detail start button; resume re-POSTs never re-fire) | `journey_id`, `journey_title`, `total_steps` | `lib/analytics.ts trackJourneyStart` (Task #330) |
+| `journey_step_completed` / `journey_step_uncompleted` | Logical journey step toggled (server-confirmed; one event per logical step, not per row) | `journey_id`, `journey_title`, `step_number`, `step_position`, `total_steps`, `step_row_count` (uncompleted omits `step_position`/`total_steps`) | `JourneyDetail` via `trackJourneyStepComplete` / inline `mpTrack` |
+| `journey_completed` | Server-confirmed `completedAt` transition null → set (PUT progress response; never re-fired for already-complete journeys) | `journey_id`, `journey_title`, `total_steps` | `JourneyDetail` via `trackJourneyComplete` (Task #330) |
 
 All events also carry auto props `platform: 'web'` and `page_path` from `mpTrack`.
 
