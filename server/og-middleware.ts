@@ -120,6 +120,60 @@ function rethrowBoundedDependencyFailure(error: unknown): void {
   if (isBoundedDependencyFailure(error)) throw error;
 }
 
+// Crawler-burst saturation — pool acquire-queue timeout (connectionTimeoutMillis),
+// Neon connection-slot exhaustion (SQLSTATE 53300), or the public cache's
+// in-flight rebuild cap — is transient by nature: the queue drains within a few
+// hundred ms once the burst passes. One short retry converts those into
+// successful renders instead of 503ing real crawlers mid-burst.
+// Lock/statement timeouts (55P03/57014) and connection-loss classes are
+// deliberately EXCLUDED: during a genuine outage the first attempt already
+// consumes the ~2s bounded-failure windows the resilience gate budgets
+// (<6s total), and a retry there would double them.
+function isRetryableSaturationFailure(error: unknown): boolean {
+  const code = String(
+    (error as any)?.code ?? (error as any)?.cause?.code ?? "",
+  );
+  if (code === "53300") return true; // too_many_connections
+  const message = String((error as any)?.message ?? "").toLowerCase();
+  return (
+    // pg-pool acquire-queue timeout (pool saturated, DB itself healthy)
+    message.includes("timeout exceeded when trying to connect") ||
+    // publicCache MAX_IN_FLIGHT guard (rebuild burst, instant rejection)
+    message.includes("rebuild capacity is temporarily full")
+  );
+}
+
+async function resolveRouteWithSaturationRetry(
+  url: string,
+  urlPath: string,
+): Promise<ResolvedRoute> {
+  // Two escalating backoffs: the first rides out a momentary acquire-queue
+  // spike; the second (~1.2s) outlasts a sustained crawler burst window in
+  // which the whole 3s connection queue stayed full. Only crawler-facing
+  // prerender pays this latency, and only under saturation.
+  const backoffsMs = [
+    250 + Math.floor(Math.random() * 250),
+    1000 + Math.floor(Math.random() * 500),
+  ];
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await resolveRoute(url);
+    } catch (error) {
+      if (attempt >= backoffsMs.length || !isRetryableSaturationFailure(error)) {
+        throw error;
+      }
+      const delayMs = backoffsMs[attempt];
+      console.warn(
+        "[og-middleware] saturation failure for",
+        urlPath,
+        `— retry ${attempt + 1}/${backoffsMs.length} in ${delayMs}ms:`,
+        String((error as any)?.message ?? error),
+      );
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+}
+
 /** A resolved route: its metadata plus whether the route actually exists. */
 interface ResolvedRoute {
   meta: RouteMeta;
@@ -522,6 +576,22 @@ function homeShellChrome(): string {
       title: `Bookmarks — ${SITE_NAME}`,
       description: `Your saved video development resources on ${SITE_NAME}.`,
       // Personalized, auth-gated account page — noindex like /profile.
+      noindex: true,
+    },
+    // F021: these two guarded routes had no server meta, so the SPA shell
+    // shipped the 404 title and signed-out visitors saw a "Page Not Found"
+    // title flash before AuthGuard redirected. Titles mirror the client
+    // SEOHead exactly (two-pass parity).
+    "/notifications": {
+      title: `Notifications — ${SITE_NAME}`,
+      description: `Your ${SITE_NAME} updates.`,
+      // Personalized, auth-gated page — noindex like /profile.
+      noindex: true,
+    },
+    "/onboarding": {
+      title: `Learning Preferences — ${SITE_NAME}`,
+      description: `Tell ${SITE_NAME} what you want to learn to personalize recommendations.`,
+      // Personalized, auth-gated setup flow — noindex like /profile.
       noindex: true,
     },
     "/settings": {
@@ -2104,7 +2174,10 @@ export function ogInjectionMiddleware() {
       try {
         // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
         // render search results; resolveRoute keys its cache on path + page.
-        const resolved = await resolveRoute(req.originalUrl || req.url);
+        const resolved = await resolveRouteWithSaturationRetry(
+          req.originalUrl || req.url,
+          urlPath,
+        );
         meta = resolved.meta;
         notFound = !resolved.found;
         bodyHtml = resolved.bodyHtml;
@@ -2113,6 +2186,7 @@ export function ogInjectionMiddleware() {
           console.warn(
             "[og-middleware] bounded dependency failure for",
             urlPath,
+            String((e as any)?.message ?? e),
           );
           return res
             .status(503)
