@@ -168,7 +168,7 @@ export default function ResourceManager() {
     return `/api/admin/resources?${params.toString()}`;
   };
 
-  const { data, isLoading } = useQuery<ResourcesResponse>({
+  const { data, isLoading, isError, refetch } = useQuery<ResourcesResponse>({
     queryKey: ['/api/admin/resources', page, limit, debouncedSearch, categoryFilter, statusFilter, sort],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -894,6 +894,30 @@ export default function ResourceManager() {
               wrapper grows to full table width and never scrolls horizontally —
               Actions were physically unreachable at 375/768px. A native
               overflow-auto div scrolls BOTH axes. */}
+          {/* F016: a failed fetch used to leave a silent empty table — surface
+              the error and offer a retry (stale rows stay visible if we have
+              them via placeholderData). */}
+          {isError && (
+            <div
+              role="alert"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3"
+              data-testid="banner-resources-error"
+            >
+              <p className="text-sm text-[var(--text)]">
+                {data
+                  ? "Refreshing the resource list failed — showing the last loaded results."
+                  : "Couldn't load resources. Check your connection and try again."}
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                data-testid="button-resources-retry"
+              >
+                Retry
+              </Button>
+            </div>
+          )}
           <div className="h-[600px] overflow-auto">
             <Table>
               <TableHeader>

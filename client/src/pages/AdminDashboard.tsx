@@ -242,7 +242,9 @@ export default function AdminDashboard() {
             AND 375px. Tabs now wrap onto extra rows so every tab is always
             visible; the scroller class is kept only as a safety net. */}
         <div className="w-full pb-2 admin-tab-scroller">
-          <TabsList className="flex flex-wrap h-auto w-full justify-start gap-1">
+          {/* F017: keep every trigger a comfortable ≥40px touch target at the
+              usage site (the global ui/tabs default is h-9/36px). */}
+          <TabsList className="flex flex-wrap h-auto w-full justify-start gap-1 [&>[role=tab]]:min-h-10">
             <TabsTrigger value="approvals" className="whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>

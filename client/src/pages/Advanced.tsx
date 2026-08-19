@@ -223,7 +223,7 @@ export default function Advanced() {
                 <Card className="lg:col-span-1">
                   <CardContent className="p-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">{resources.length}</div>
+                      <div className="text-2xl font-bold text-blue-600">{resources.length.toLocaleString()}</div>
                       <div className="text-sm text-muted-foreground">Resources</div>
                     </div>
                   </CardContent>

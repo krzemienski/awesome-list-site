@@ -400,7 +400,10 @@ function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
 
 function SignInPage() {
   return (
-    <div className="flex justify-center py-10" data-testid="page-sign-in">
+    <div
+      className="flex justify-center pt-10 pb-[calc(2.5rem+var(--consent-banner-h,0px))]"
+      data-testid="page-sign-in"
+    >
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
       <SEOHead title="Sign In" noindex />
       <SignIn
@@ -414,7 +417,12 @@ function SignInPage() {
 
 function SignUpPage() {
   return (
-    <div className="flex justify-center py-10" data-testid="page-sign-up">
+    <div
+      // F009: bottom padding reserves real flow space for the fixed consent
+      // banner so the Clerk card's Continue button can never sit underneath it.
+      className="flex justify-center pt-10 pb-[calc(2.5rem+var(--consent-banner-h,0px))]"
+      data-testid="page-sign-up"
+    >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
       <SEOHead title="Create an Account" noindex />
       <SignUp

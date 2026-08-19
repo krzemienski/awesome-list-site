@@ -372,7 +372,7 @@ export default function Journeys() {
                 <CardFooter>
                   <Button 
                     className={cn(
-                      "w-full group h-auto min-h-9 whitespace-normal",
+                      "w-full group h-auto min-h-10 whitespace-normal",
                       enrolled ? "bg-primary/20 hover:bg-primary/30 text-primary" : ""
                     )}
                     variant={enrolled ? "outline" : "default"}

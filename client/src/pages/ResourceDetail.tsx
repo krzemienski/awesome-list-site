@@ -962,10 +962,12 @@ export default function ResourceDetail() {
               in the QA audit). */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
+              {/* F018: a real heading (CardTitle renders a div) so the section
+                  shows up in the document outline / screen-reader rotor. */}
+              <h2 className="text-lg font-semibold leading-none tracking-tight flex items-center gap-2">
                 <FolderTree className="h-4 w-4 text-primary" />
                 Related Resources
-              </CardTitle>
+              </h2>
               <CardDescription>
                 Resources you might find interesting
               </CardDescription>

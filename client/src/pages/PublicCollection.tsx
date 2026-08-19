@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { BookOpen, FolderOpen } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ResourceCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import type { PublicCollection as PublicCollectionData } from "@/types/bookmarks";
@@ -61,6 +63,15 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
             <p className="max-w-md text-muted-foreground">
               This link may be invalid, deleted, or no longer shared by its owner.
             </p>
+            {/* F013: dead-end recovery — give the visitor somewhere to go. */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild data-testid="button-collection-browse">
+                <Link href="/">Browse resources</Link>
+              </Button>
+              <Button asChild variant="outline" data-testid="button-collection-journeys">
+                <Link href="/journeys">Explore journeys</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

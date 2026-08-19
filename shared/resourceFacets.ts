@@ -85,7 +85,7 @@ export interface ResourceSearchFacets {
 }
 
 export const RESOURCE_FORMAT_LABELS: Record<ResourceFormat, string> = {
-  unknown: "Unknown",
+  unknown: "Not yet classified",
   tool: "Tool",
   library: "Library",
   player: "Player",
@@ -103,7 +103,7 @@ export const RESOURCE_FORMAT_LABELS: Record<ResourceFormat, string> = {
 };
 
 export const RESOURCE_PROVIDER_LABELS: Record<ResourceProvider, string> = {
-  unknown: "Unknown",
+  unknown: "Not yet classified",
   "self-hosted": "Self-hosted",
   github: "GitHub",
   youtube: "YouTube",
@@ -121,7 +121,7 @@ export const RESOURCE_PROVIDER_LABELS: Record<ResourceProvider, string> = {
 };
 
 export const RESOURCE_SKILL_LEVEL_LABELS: Record<ResourceSkillLevel, string> = {
-  unknown: "Unknown",
+  unknown: "Not yet classified",
   beginner: "Beginner",
   intermediate: "Intermediate",
   advanced: "Advanced",

@@ -21,7 +21,7 @@ type Props = {
 };
 type Count = { value: string; count: number };
 
-const label = (value: string) => value === "unknown" ? "Unknown" : value.replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+const label = (value: string) => value === "unknown" ? "Not yet classified" : value.replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 const fieldLabel = (value: string) => value
   .replace(/([a-z])([A-Z])/g, "$1 $2")
   .replace(/[-_]/g, " ")

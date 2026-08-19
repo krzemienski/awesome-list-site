@@ -93,6 +93,8 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     collection: "Shared collection",
     "continue-learning": "Continue Learning",
     login: "Sign in",
+    "sign-in": "Sign in",
+    "sign-up": "Create account",
     settings: "Settings",
     notifications: "Notifications",
     onboarding: "Learning preferences",
