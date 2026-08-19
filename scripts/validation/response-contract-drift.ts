@@ -105,9 +105,30 @@ async function main() {
     res.status(401).json({ probe: true });
   });
 
-  const server = await registerRoutes(app);
+  let server: import("node:http").Server;
+  try {
+    server = await registerRoutes(app);
+  } catch (bootError) {
+    console.warn = originalWarn;
+    console.error(
+      `[drift gate] server failed to start: ${bootError instanceof Error ? bootError.message : String(bootError)}`,
+    );
+    process.exit(1);
+  }
 
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once("error", reject);
+      server.listen(0, "127.0.0.1", resolve);
+    });
+  } catch (listenError) {
+    console.warn = originalWarn;
+    console.error(
+      `[drift gate] server failed to bind: ${listenError instanceof Error ? listenError.message : String(listenError)}`,
+    );
+    process.exit(1);
+  }
+
   const { port } = server.address() as AddressInfo;
   const base = `http://127.0.0.1:${port}`;
 
