@@ -292,8 +292,11 @@ let initialFacets = null;
     params.get('sort') === 'name-asc';
   log('facets:url-state-restored', restored,
     `location.search="${search}"`);
-  log('facets:unknown-chips-visible', /Format: Unknown/i.test(chips || '') &&
-    /Provider: Unknown/i.test(chips || '') && /Skill level: Unknown/i.test(chips || ''),
+  // F011 renamed the unknown-bucket chip label from "Unknown" to "Not yet
+  // classified" — assert the new canonical label (intent unchanged: all three
+  // unknown-bucket chips must be visible and labeled).
+  log('facets:unknown-chips-visible', /Format: Not yet classified/i.test(chips || '') &&
+    /Provider: Not yet classified/i.test(chips || '') && /Skill level: Not yet classified/i.test(chips || ''),
     `chips="${(chips || '').replace(/\s+/g, ' ').slice(0, 180)}"`);
   log('facets:filter-only-results', cards > 0, `${cards} cards rendered without q`);
   await page.screenshot({ path: `${OUT}/smart-facets.png`, fullPage: true }).catch(() => {});
@@ -437,7 +440,7 @@ let initialFacets = null;
     const restoredHref = await page.locator('[data-testid^="link-resource-title-"]').first().getAttribute('href');
     log('facets:back-forward-restores',
       !!categoryValue && /Category:/i.test(backChips || '') && !/Provider:/i.test(backChips || '') &&
-        /Provider: Unknown/i.test(restoredChips || '') &&
+        /Provider: Not yet classified/i.test(restoredChips || '') &&
         backHref === categoryFirstHref && restoredHref === forwardHref,
       `category="${categoryValue}", backRowsMatch=${backHref === categoryFirstHref}, forwardRowsMatch=${restoredHref === forwardHref}`);
   }
