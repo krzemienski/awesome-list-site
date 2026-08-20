@@ -1,0 +1,46 @@
+{
+  "tabs": {
+    "Explorer": {
+      "activated": true,
+      "panelSnippet": "Interactive Category ExplorerAdvanced search and filtering capabilities with real-time category statistics and interactive exploration9Categories1,816Resources1535Unique Tags92SubcategoriesCategory ExplorerDiscover and explore 9 categories with 1816 "
+    },
+    "Metrics": {
+      "activated": true,
+      "panelSnippet": "Community Metrics & ContributionsTrack community engagement, popular resources, and contribution patternsOverviewContributorsPopularCategoriesTotal Resources1816+0 this weekActive Contributors1Across 9 categoriesNew This Week+0resources addedRecent A"
+    },
+    "Export": {
+      "activated": true,
+      "panelSnippet": "Multi-Format Export SystemExport your curated lists in multiple formats including Markdown, JSON, CSV, YAML, HTML, and PDF with advanced filtering options📝MarkdownGitHub-ready⚡JSONAPI-friendly📊CSVSpreadsheet📄PDFProfessional🌐HTMLWeb-ready⚙️YAMLCon"
+    },
+    "Recommendations": {
+      "activated": true,
+      "panelSnippet": "Personalized RecommendationsAccount preferences, learning activity, and your feedback shape these picks.Using your account activityAdd learning preferences for more precise matches. Existing activity and feedback still shape your results.Choose learn"
+    },
+    "recommendations": {
+      "activated": true,
+      "panelSnippet": "Personalized RecommendationsAccount preferences, learning activity, and your feedback shape these picks.Using your account activityAdd learning preferences for more precise matches. Existing activity and feedback still shape your results.Choose learn"
+    },
+    "Recommend": {
+      "activated": true,
+      "panelSnippet": "Personalized RecommendationsAccount preferences, learning activity, and your feedback shape these picks.Using your account activityAdd learning preferences for more precise matches. Existing activity and feedback still shape your results.Choose learn"
+    }
+  },
+  "tabList": [
+    {
+      "text": "Explorer",
+      "selected": "true"
+    },
+    {
+      "text": "Metrics",
+      "selected": "false"
+    },
+    {
+      "text": "Export",
+      "selected": "false"
+    },
+    {
+      "text": "AI Recommendations",
+      "selected": "false"
+    }
+  ]
+}

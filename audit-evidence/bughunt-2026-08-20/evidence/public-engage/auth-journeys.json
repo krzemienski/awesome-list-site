@@ -1,0 +1,41 @@
+{
+  "journeys": {
+    "cardCount": 5,
+    "mentionsProgress": false,
+    "snippet": "Learning JourneysExplore structured learning paths to master new skills step by stepFilter by category:All Categories5 journeys availableintermediateBuilding Your First Streaming PlatformAssemble a working end-to-end streaming stack: ingest with RTMP or SRT, transcode into an ABR ladder, package for HLS/DASH, and deliver through a CDN. Covers origin servers, caching strategy, and the tradeoffs of "
+  },
+  "signIn": {
+    "title": "Sign In — Awesome Video",
+    "h1": "Welcome back",
+    "inputs": [
+      {
+        "type": "text",
+        "name": "identifier",
+        "label": null,
+        "ph": "Enter your email address"
+      },
+      {
+        "type": "password",
+        "name": "password",
+        "label": null,
+        "ph": "Enter your password"
+      }
+    ],
+    "hasSignUpLink": 1
+  },
+  "notifications": {
+    "url": "http://127.0.0.1:5000/sign-in?redirect_url=%2Fnotifications",
+    "h1": "Welcome back",
+    "snippet": "Welcome backSign in to continue to Awesome VideoorEmail addressPasswordContinueDon’t have an account?Sign upDevelopment mode"
+  },
+  "onboarding": {
+    "url": "http://127.0.0.1:5000/sign-in?redirect_url=%2Fonboarding",
+    "h1": "Welcome back",
+    "snippet": "Welcome backSign in to continue to Awesome VideoorEmail addressPasswordContinueDon’t have an account?Sign upDevelopment mode"
+  },
+  "bookmarks": {
+    "url": "http://127.0.0.1:5000/sign-in?redirect_url=%2Fbookmarks",
+    "snippet": "<div style=\"max-width:640px;margin:80px auto;padding:24px;font-family:'JetBrains Mono',monospace;color:#e6e6e6;background:#000;border:1px solid #333;\"> <p style=\"font-size:20px;font-weight:700;margin:0 0 12px;\">Awesome Video</p> <p style=\"margin:0 0 8px;\">This app requires JavaScript to browse the 2"
+  },
+  "errs": {}
+}

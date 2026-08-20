@@ -1,0 +1,177 @@
+{
+  "partition": "admin-core",
+  "qaArtifacts": { "users": [], "resources": [] },
+  "notes": "No __qa_test_ users or resources were created by this run (POST /api/resources requires a Clerk user session, which is CORS-blocked in dev). Observation for the lead: an existing '__qa_test_...@example.com' user (masked '_***@example.com', joined Aug 20 2026) still lingers in the admin Users list, and the 'Total Users' stat climbed from 6 -> 11 across this session as anonymous Clerk placeholder users auto-provisioned — related to proposed Task #214. Not filed as a discrete bug (env/platform-driven). Console errors from x-admin-audit-key font preflight and Clerk JS load are artifacts of the audit auth header / bot-blocked Clerk in dev and were excluded per gotchas.",
+  "findings": [
+    {
+      "id": "P1-01",
+      "title": "Resource count formatting is inconsistent within Admin (stats card & table footer omit the thousands separator; table header includes it)",
+      "severity": "LOW",
+      "kind": "content",
+      "route": "/admin (Overview) and /admin?tab=resources",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /admin as admin",
+        "Read the 'Live Resources' stat card -> renders '1816'",
+        "Click the Resources tab; read the header description -> 'Manage all 1,993 resources in the database'",
+        "Read the pagination footer -> 'Showing 1 - 25 of 1993 resources'"
+      ],
+      "expected": "All resource counts use one consistent number format (thousands separators applied everywhere, e.g. 1,816 / 1,993).",
+      "actual": "AdminStats card ('1816', ResourceManager footer '1993') omit the comma while the ResourceManager header ('1,993') includes it — code: AdminStats.tsx line 146 and ResourceManager.tsx line 1044 use raw values, line 672/673 uses .toLocaleString().",
+      "evidence": [
+        "/tmp/bughunt/admin-core/resources-1440-header-footer.png",
+        "/tmp/bughunt/admin-core/overview-1440-statscard.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-02",
+      "title": "Taxonomy 'Create category' dialog closes and discards typed input when server-side validation fails (empty / duplicate name / duplicate slug)",
+      "severity": "MEDIUM",
+      "kind": "functional",
+      "route": "/admin?tab=categories",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /admin?tab=categories",
+        "Click 'Add' (button-create-category)",
+        "Type name 'PersistTest' and slug 'encoding-codecs' (a slug already in use)",
+        "Click 'Create' (button-confirm-create)"
+      ],
+      "expected": "A validation error is shown and the dialog stays open with the user's entered values so they can correct the offending field.",
+      "actual": "A destructive toast ('The slug \"encoding-codecs\" is already in use') flashes, but the create dialog closes immediately and all typed input is lost. Verified at t=100..2000ms the dialog and its inputs are gone. Same behavior for empty name/slug ('Name, Slug are required') and duplicate name ('A category named \"Media Tools\" already exists'). No category was actually created (count stayed 9).",
+      "evidence": [
+        "/tmp/bughunt/admin-core/categories-1440-dupslug-persist.png",
+        "/tmp/bughunt/admin-core/categories-1440-dupslug.png",
+        "/tmp/bughunt/admin-core/categories-1440-dupname.png",
+        "/tmp/bughunt/admin-core/categories-1440-empty.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-03",
+      "title": "Taxonomy 'Edit category' dialog closes and discards edits when validation fails (empty name)",
+      "severity": "MEDIUM",
+      "kind": "functional",
+      "route": "/admin?tab=categories",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /admin?tab=categories",
+        "Click the pencil/edit button on any category row (e.g. button-edit-1091)",
+        "Clear the Name field",
+        "Click Save/Confirm"
+      ],
+      "expected": "Validation error shown and the edit dialog stays open so the user can restore the name.",
+      "actual": "The edit dialog closes immediately (afterEmptySubmit dialog absent), discarding the in-progress edit; only a transient toast is shown. Reproduced on two consecutive attempts. Category name unchanged in DB (no data mutated).",
+      "evidence": [
+        "/tmp/bughunt/admin-core/categories-1440-edit-emptyname-1.png",
+        "/tmp/bughunt/admin-core/categories-1440-edit-emptyname-2.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-04",
+      "title": "'Rejected' stat deep-link produces a non-round-tripping URL; the rejected filter is lost on reload",
+      "severity": "MEDIUM",
+      "kind": "functional",
+      "route": "/admin -> click '177 rejected' -> /admin#resources",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /admin as admin",
+        "Click the '177 rejected' link (link-stat-rejected) on the Live Resources card",
+        "Observe Resources tab opens with status filter = Rejected, footer 'Showing 1 - 25 of 177 resources', URL becomes /admin#resources",
+        "Reload the page"
+      ],
+      "expected": "The filtered state either persists on reload or the URL reflects it (e.g. /admin?tab=resources&status=rejected, which does work when typed directly).",
+      "actual": "After reload the Resources tab is active but the status filter resets to 'All Status' (footer jumps to 'Showing 1 - 25 of 1993 resources'). The deep-link sets ?status=rejected via replaceState but the subsequent onNavigate('resources') overwrites the URL to '#resources', dropping the param, so the filtered view cannot be reloaded, shared, or bookmarked. Reproduced twice.",
+      "evidence": [
+        "/tmp/bughunt/admin-core/resources-1440-rejected-reload.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-05",
+      "title": "Resources table footer uses plural 'resources' when exactly one result matches ('Showing 1 - 1 of 1 resources')",
+      "severity": "LOW",
+      "kind": "content",
+      "route": "/admin?tab=resources",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /admin?tab=resources",
+        "Search 'js_mse_eme' (a single-match query) and press Enter",
+        "Read the pagination footer"
+      ],
+      "expected": "Singular noun for one result, e.g. 'Showing 1 - 1 of 1 resource'.",
+      "actual": "Footer reads 'Showing 1 - 1 of 1 resources' (wrong plural). ResourceManager.tsx line 1044 hardcodes 'resources' with no count-aware pluralization. Reproduced with two different single-match queries (js_mse_eme, srtdroid).",
+      "evidence": [
+        "/tmp/bughunt/admin-core/resources-1440-singular.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-06",
+      "title": "Resource edit dialog drops keyboard focus to <body> on close instead of returning it to the triggering row button",
+      "severity": "MEDIUM",
+      "kind": "a11y",
+      "route": "/admin?tab=resources",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /admin?tab=resources",
+        "Click a row's edit button (e.g. button-edit-188015) — focus correctly moves into the dialog title field",
+        "Close the dialog via Escape (also reproduced via the Cancel button)"
+      ],
+      "expected": "On close, focus returns to the edit button that opened the dialog (standard modal focus restoration) so keyboard/AT users keep their place in the table.",
+      "actual": "activeElement after close is document.body (isTrigger:false, isBody:true) for both Escape and Cancel paths. The shared single Dialog is not tied to a per-row trigger and has no onCloseAutoFocus restoration, so focus is lost. Reproduced 3x (esc, cancel, esc).",
+      "evidence": [
+        "/tmp/bughunt/admin-core/resources-1440-editdialog.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-07",
+      "title": "Inconsistent validation-failure UX between admin dialogs: ResourceManager edit dialog stays open with an inline error, but taxonomy create/edit dialogs close and drop input",
+      "severity": "LOW",
+      "kind": "usability",
+      "route": "/admin?tab=resources vs /admin?tab=categories",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /admin?tab=resources, edit a resource, clear the Title, click Save -> inline error 'Title is required', dialog STAYS OPEN",
+        "Open /admin?tab=categories, add/edit a category, submit invalid -> toast error, dialog CLOSES and input is lost"
+      ],
+      "expected": "Consistent validation-failure behavior across all admin dialogs (keep the dialog open and surface the error in-place).",
+      "actual": "ResourceManager edit dialog keeps the dialog open and shows a persistent inline field error; the GenericCrudManager taxonomy dialogs close on validation failure with only a transient toast, discarding the user's work. Two different, conflicting patterns for the same kind of interaction.",
+      "evidence": [
+        "/tmp/bughunt/admin-core/resources-1440-edit-validation.png",
+        "/tmp/bughunt/admin-core/categories-1440-dupslug-persist.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-08",
+      "title": "Resources table row action buttons (edit/delete) are below the 44px touch-target width on mobile",
+      "severity": "LOW",
+      "kind": "a11y",
+      "route": "/admin?tab=resources",
+      "viewport": "375x667 (isMobile, hasTouch)",
+      "reproSteps": [
+        "Open /admin?tab=resources on a 375x667 mobile viewport (isMobile:true, hasTouch:true)",
+        "Scroll the table horizontally to the Actions column",
+        "Measure the edit and delete icon buttons' bounding boxes"
+      ],
+      "expected": "Interactive touch targets are at least 44x44 CSS px (WCAG 2.5.5 / mobile HIG).",
+      "actual": "Edit button is 42x44 and Delete button is 40x44 — both narrower than 44px, so the tappable width falls under the recommended minimum on touch. Measured identically on two runs.",
+      "evidence": [
+        "/tmp/bughunt/admin-core/resources-375-actions.png",
+        "/tmp/bughunt/admin-core/resources-375.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    }
+  ]
+}

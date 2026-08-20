@@ -1,0 +1,15 @@
+{
+  "journeyDialog": {
+    "groups": 18,
+    "title": "Steps · Video Streaming Fundamentals",
+    "textLen": 3487
+  },
+  "auditInvalidFilter": {
+    "netErrors": [
+      "400 http://127.0.0.1:5000/api/admin/audit-logs?limit=50&offset=0&resourceId=99999999999"
+    ],
+    "errorShown": true,
+    "emptyShown": false,
+    "rangeText": null
+  }
+}

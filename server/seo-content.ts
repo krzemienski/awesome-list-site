@@ -487,11 +487,26 @@ export function renderResourceContent(opts: {
       ? `<a href="${internalHref(crumb.path)}">${escapeHtml(crumb.name)}</a>`
       : escapeHtml(crumb.name),
   ).join('<span class="ssr-sep">›</span>');
+  // P-07 parity: mirror the client's classification collapse (ResourceDetail
+  // classificationRows) — only surface provider/format/skill rows that are
+  // actually classified; when every dimension is unclassified show a single
+  // "Classification: Not yet classified" row. Crawler pass and hydrated DOM
+  // must stay structurally identical (seo-snapshot hydration-parity gate).
+  const UNCLASSIFIED = "Not yet classified";
+  const classificationRows = [
+    { label: "Provider", value: opts.provider },
+    { label: "Format", value: opts.format },
+    { label: "Skill level", value: opts.skillLevel },
+  ].filter((row) => row.value && row.value !== UNCLASSIFIED);
+  const allUnclassified = classificationRows.length === 0;
+  const classificationFacts = allUnclassified
+    ? `<dt>Classification</dt><dd>${UNCLASSIFIED}</dd>`
+    : classificationRows
+        .map((row) => `<dt>${row.label}</dt><dd>${escapeHtml(row.value)}</dd>`)
+        .join("");
   const facts = [
     taxonomy ? `<dt>Category path</dt><dd>${taxonomy}</dd>` : "",
-    `<dt>Provider</dt><dd>${escapeHtml(opts.provider)}</dd>`,
-    `<dt>Format</dt><dd>${escapeHtml(opts.format)}</dd>`,
-    `<dt>Skill level</dt><dd>${escapeHtml(opts.skillLevel)}</dd>`,
+    classificationFacts,
   ].join("");
   const tagItems = (opts.tags ?? []).map((tag) => ({
     href: internalHref(tagLandingPath(tag)),
@@ -500,7 +515,7 @@ export function renderResourceContent(opts: {
   const tags = tagItems.length
     ? `<section data-seo-section="resource-tags"><h2>Tags</h2>${linkList(tagItems)}</section>`
     : "";
-  const factsSummary = resourceFactsSummary({
+  const fullFactsSummary = resourceFactsSummary({
     title: opts.heading,
     taxonomy: opts.crumbs.slice(1, -1).map((crumb) => crumb.name),
     provider: opts.provider,
@@ -508,6 +523,14 @@ export function renderResourceContent(opts: {
     skillLevel: opts.skillLevel,
     tags: opts.tags,
   });
+  // P-07 parity: when every classification dimension is unclassified, drop the
+  // "Provider: … Format: … Skill level: …" filler sentence — same regex as the
+  // client (ResourceDetail.tsx) so the paragraph stays byte-identical.
+  const factsSummary = allUnclassified
+    ? fullFactsSummary
+        .replace(/\s*Provider: [^.]*\. Format: [^.]*\. Skill level: [^.]*\./, "")
+        .trim()
+    : fullFactsSummary;
   // BUG-007: related resource links so non-JS crawlers see internal links out to
   // similar/prerequisite/next-step resources instead of a dead-end page.
   const relatedItems: LinkItem[] = (opts.related ?? []).map((r) => ({

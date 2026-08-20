@@ -1045,6 +1045,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  // P1-02/03/07: dialog-level validation banner, mirroring ResourceManager's
+  // `formError`. Client-side validation failures (required/name-slug/field
+  // errors) and server 400s render here inline INSTEAD of a transient toast,
+  // so the dialog stays open with the user's input intact for correction.
+  const [formError, setFormError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
@@ -1754,14 +1759,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setFileData({});
       setFilePreviews({});
       setValidationErrors({});
+      setFormError(null);
     },
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
-      toast({
-        title: "Error",
-        description: humanizeApiError(error, `Failed to create ${entityName.toLowerCase()}`),
-        variant: "destructive"
-      });
+      // P1-02/07: keep the dialog open and show the server rejection inline so
+      // the operator can correct the offending field (matches ResourceManager).
+      setFormError(humanizeApiError(error, `Failed to create ${entityName.toLowerCase()}`));
     }
   });
 
@@ -1812,14 +1816,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setFileData({});
       setFilePreviews({});
       setValidationErrors({});
+      setFormError(null);
     },
     onError: (error: any) => {
       // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
-      toast({
-        title: "Error",
-        description: humanizeApiError(error, `Failed to update ${entityName.toLowerCase()}`),
-        variant: "destructive"
-      });
+      // P1-03/07: inline banner, dialog stays open (matches ResourceManager).
+      setFormError(humanizeApiError(error, `Failed to update ${entityName.toLowerCase()}`));
     }
   });
 
@@ -2109,18 +2111,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         return field;
       });
 
-      toast({
-        title: "Validation Error",
-        description: `${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`,
-        variant: "destructive"
-      });
+      // P1-02/07: keep the dialog open with an inline banner instead of a
+      // transient toast that vanished along with the user's typed input.
+      setFormError(`${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`);
       return;
     }
 
     // Run16 BUG-033: length + duplicate checks before hitting the API.
     const nameSlugError = validateNameSlug();
     if (nameSlugError) {
-      toast({ title: "Validation Error", description: nameSlugError, variant: "destructive" });
+      setFormError(nameSlugError);
       return;
     }
 
@@ -2132,13 +2132,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         const customField = customFields.find(f => f.name === fieldName);
         return customField?.label.replace(" *", "") || fieldName;
       });
-      toast({
-        title: "Validation Error",
-        description: `Please fix the following fields: ${errorFields.join(", ")}`,
-        variant: "destructive"
-      });
+      setFormError(`Please fix the following fields: ${errorFields.join(", ")}`);
       return;
     }
+
+    // A submit attempt passed client validation — clear any stale banner.
+    setFormError(null);
 
     // Build payload (FormData if files present, otherwise JSON)
     if (shouldUseFormData && Object.values(fileData).some(f => f !== null)) {
@@ -2225,18 +2224,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         return field;
       });
 
-      toast({
-        title: "Validation Error",
-        description: `${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`,
-        variant: "destructive"
-      });
+      // P1-03/07: inline banner, dialog stays open (see handleCreate).
+      setFormError(`${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`);
       return;
     }
 
     // Run16 BUG-033: length + duplicate checks (excluding the row itself).
     const nameSlugError = validateNameSlug(selectedItem.id);
     if (nameSlugError) {
-      toast({ title: "Validation Error", description: nameSlugError, variant: "destructive" });
+      setFormError(nameSlugError);
       return;
     }
 
@@ -2248,13 +2244,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         const customField = customFields.find(f => f.name === fieldName);
         return customField?.label.replace(" *", "") || fieldName;
       });
-      toast({
-        title: "Validation Error",
-        description: `Please fix the following fields: ${errorFields.join(", ")}`,
-        variant: "destructive"
-      });
+      setFormError(`Please fix the following fields: ${errorFields.join(", ")}`);
       return;
     }
+
+    // Passed client validation — clear any stale banner before the request.
+    setFormError(null);
 
     // Build payload (FormData if files present, otherwise JSON)
     if (shouldUseFormData && Object.values(fileData).some(f => f !== null)) {
@@ -2339,6 +2334,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     setFormData(initialFormData);
     setFileData({});
     setFilePreviews({});
+    setValidationErrors({});
+    setFormError(null);
     setCreateDialogOpen(true);
   };
 
@@ -2397,6 +2394,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     setFormData(newFormData);
     setFileData({});
     setFilePreviews({});
+    setValidationErrors({});
+    setFormError(null);
     setEditDialogOpen(true);
   };
 
@@ -2797,6 +2796,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {createDialogDescription}
             </DialogDescription>
           </DialogHeader>
+          {/* P1-02/07: dialog-level validation banner — stays until corrected. */}
+          {formError && (
+            <div
+              role="alert"
+              className="rounded border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              data-testid="error-create-form"
+            >
+              {formError}
+            </div>
+          )}
           <div className="space-y-4 py-4">
             {parents.map((parent, index) => {
               const options = getFilteredParentOptions(parent.fieldName);
@@ -3006,6 +3015,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               onClick={() => {
                 setCreateDialogOpen(false);
                 setValidationErrors({});
+                setFormError(null);
               }}
               data-testid="button-cancel-create"
             >
@@ -3033,6 +3043,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {editDialogDescription}
             </DialogDescription>
           </DialogHeader>
+          {/* P1-03/07: dialog-level validation banner — stays until corrected. */}
+          {formError && (
+            <div
+              role="alert"
+              className="rounded border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              data-testid="error-edit-form"
+            >
+              {formError}
+            </div>
+          )}
           <div className="space-y-4 py-4">
             {parents.map((parent, index) => {
               const options = getFilteredParentOptions(parent.fieldName);
@@ -3250,6 +3270,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               onClick={() => {
                 setEditDialogOpen(false);
                 setValidationErrors({});
+                setFormError(null);
               }}
               data-testid="button-cancel-edit"
             >

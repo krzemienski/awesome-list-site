@@ -15,8 +15,9 @@ import { tagScopeIntro } from "@shared/seo-content-templates";
 import {
   pagedSeoDescription,
   pagedSeoTitleCore,
+  tagDisplayNameBranded,
   tagSeoDescription,
-  tagSeoTitleCore,
+  tagTitleCoreDeduped,
 } from "@shared/seo-templates";
 import {
   normalizeTagFilter,
@@ -34,6 +35,11 @@ interface TagListingResponse {
   facets?: {
     categories?: Array<{ value: string; count: number }>;
   };
+}
+
+// P-05 (same class): pluralize the noun to match the count.
+function resourceNoun(count: number): string {
+  return count === 1 ? "resource" : "resources";
 }
 
 function resourceTags(resource: any): string[] {
@@ -91,8 +97,8 @@ export default function TagLanding() {
   const totalPages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
   if (page > totalPages) return <NotFound />;
 
-  const name = tagDisplayName(slug);
-  const titleCore = tagSeoTitleCore(name);
+  const name = tagDisplayNameBranded(slug);
+  const titleCore = tagTitleCoreDeduped(name);
   const description = tagSeoDescription(name, data.total);
   const categories = (data.facets?.categories ?? []).filter((item) => item.value).slice(0, 6);
   const relatedTags = (() => {
@@ -135,7 +141,7 @@ export default function TagLanding() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="display-h text-2xl sm:text-3xl">{name}</h1>
-          <p className="text-sm text-muted-foreground">{data.total} resources available</p>
+          <p className="text-sm text-muted-foreground">{data.total} {resourceNoun(data.total)} available</p>
         </div>
         <Badge variant="secondary" data-testid="badge-count">{data.total}</Badge>
       </div>
@@ -166,7 +172,7 @@ export default function TagLanding() {
         </div>
       )}
       <p className="text-sm text-muted-foreground" data-testid="text-results-count">
-        Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total} resources
+        Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total} {resourceNoun(data.total)}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {data.resources.map((resource, index) => (

@@ -1,0 +1,19 @@
+{
+  "settingsAnon": {
+    "bodySnippet": "BackSettingsManage your preferences and account. Pick a section below.AppearanceSwitch design system, accent color, and font.Sign in for moreAccount, security, bookmarks, and personalized recommendations are available once you sign in.Sign in",
+    "hasLearningPrefSection": false,
+    "mentionsSignIn": true
+  },
+  "hashAnchor": {
+    "sectionExists": false,
+    "scrollY": 0
+  },
+  "about": {
+    "resourceCounts": [],
+    "hasFaq": true
+  },
+  "privacy": {
+    "lastUpdated": "Last updated: July 16, 20261. What we collectBrowsing"
+  },
+  "errsByRoute": {}
+}

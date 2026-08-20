@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,12 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isExporting, setIsExporting] = useState(false);
+  // ADM-06: synchronous in-flight guard (mirrors the public exporter in
+  // components/ui/export-tools.tsx). `isExporting` is React state set
+  // asynchronously, so a rapid double-click can land the second click before
+  // the re-render disables the button — firing two POSTs, two downloads and
+  // two audit-log rows. The ref flips synchronously so the second call bails.
+  const exportingRef = useRef(false);
   const [showErrors, setShowErrors] = useState(false);
   const [showWarnings, setShowWarnings] = useState(false);
   // Run23 NB-040: explicit confirmation before starting validation/link-check jobs.
@@ -58,6 +64,9 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
   const validationStatus = propValidationStatus || fetchedValidationStatus;
 
   const handleExport = async () => {
+    // ADM-06: bail synchronously if an export is already in flight.
+    if (exportingRef.current) return;
+    exportingRef.current = true;
     try {
       setIsExporting(true);
       const response = await fetch('/api/admin/export', {
@@ -96,6 +105,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       });
     } finally {
       setIsExporting(false);
+      exportingRef.current = false;
     }
   };
 

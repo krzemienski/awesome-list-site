@@ -68,8 +68,23 @@ function taxonomyFilterSignature(next: TaxonomyFilterSnapshot) {
   ]);
 }
 
+// fetchListingPage throws `Error("HTTP 404 ... from /api/awesome-list/listing…")`
+// for an unknown top-level slug. Detect that specific status so an invalid
+// category/subcategory renders the polished not-found page instead of the
+// transient "Please try again" error state.
+function isNotFoundError(error: unknown): boolean {
+  return error instanceof Error && /^HTTP 404\b/.test(error.message);
+}
+
 function routeFor(level: ListingLevel, slug: string) {
   return `/${level === "category" ? "category" : level === "subcategory" ? "subcategory" : "sub-subcategory"}/${slug}`;
+}
+
+// P-05: single-resource pages read "1 resources available" / "of 1 resources".
+// Pluralize the noun to match the count (the "About this collection" prose
+// already does this correctly).
+function resourceNoun(count: number): string {
+  return count === 1 ? "resource" : "resources";
 }
 
 export default function TaxonomyListing({ level }: Props) {
@@ -286,6 +301,11 @@ export default function TaxonomyListing({ level }: Props) {
   }, []);
 
   if (loading) return <div className="space-y-6" aria-busy="true"><SEOHead title="Loading resources" description="Loading Awesome Video resources." /><PageHeaderSkeleton /><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
+  // An unknown top-level slug 404s from the listing endpoint. Treat that as a
+  // real not-found page (with navigation), not a transient "please try again"
+  // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
+  // still surface the retry-able error state.
+  if (isNotFoundError(listing.error)) return <NotFound />;
   if (listing.error || taxonomySearch.error) return <div className="py-12 text-center"><h2 className="text-xl font-semibold">Error Loading Resources</h2><p className="text-muted-foreground">Please try again.</p></div>;
   if (!listingData || !name) return <NotFound />;
 
@@ -408,7 +428,7 @@ export default function TaxonomyListing({ level }: Props) {
   return <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
     <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} />
     <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]"><Link href={back}><ArrowLeft className="h-4 w-4" />Back to {level === "category" ? "Home" : parentCategory?.name ?? "Category"}</Link></Button>
-    <div className="flex items-start justify-between gap-3"><div><h1 className="display-h text-2xl sm:text-3xl">{name}</h1><p className="text-sm text-muted-foreground">{total === listingData.totalAll ? `${total} resources available` : `${total} of ${listingData.totalAll} resources shown`}</p></div><Badge variant="secondary" className="no-print" data-testid="badge-count">{total}</Badge></div>
+    <div className="flex items-start justify-between gap-3"><div><h1 className="display-h text-2xl sm:text-3xl">{name}</h1><p className="text-sm text-muted-foreground">{total === listingData.totalAll ? `${total} ${resourceNoun(total)} available` : `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} shown`}</p></div><Badge variant="secondary" className="no-print" data-testid="badge-count">{total}</Badge></div>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
       <h2 id="taxonomy-scope-heading" className="text-base font-semibold">About this collection</h2>
       <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">{listingData.scopeIntro}</p>
@@ -422,7 +442,7 @@ export default function TaxonomyListing({ level }: Props) {
       <SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets />
       <main className="min-w-0 flex-1">
         <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
-          <div className="flex items-center justify-between gap-2"><h2 id="taxonomy-results-heading" className="text-sm font-medium text-muted-foreground" data-testid="text-results-count">Showing {total === 0 ? "0" : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, total)}`} of {total} resources</h2><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div>
+          <div className="flex items-center justify-between gap-2"><h2 id="taxonomy-results-heading" className="text-sm font-medium text-muted-foreground" data-testid="text-results-count">Showing {total === 0 ? "0" : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, total)}`} of {total} {resourceNoun(total)}</h2><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 min-h-8 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 min-h-8 underline" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}

@@ -270,13 +270,20 @@ export default function BatchEnrichmentPanel() {
   // failure from the operator's perspective — badge it as failed.
   // Run17 BUG-029: same for a "completed" job that had work to do but never
   // processed anything (0/N) — "completed" there contradicted the counts.
+  // ADM-05: but a completed job whose processed resources were all SKIPPED
+  // (0 successful, 0 failed — nothing to do, e.g. already enriched) is NOT a
+  // failure. Only treat 0-successful as failed when there were real failures
+  // or nothing was processed at all. Skipped != failed.
   const effectiveStatus = (job: EnrichmentJob) => {
-    if (
-      job.status === 'completed' &&
-      ((job.processedResources || 0) > 0 || (job.totalResources || 0) > 0) &&
-      (job.successfulResources || 0) === 0
-    ) {
-      return 'failed';
+    if (job.status === 'completed') {
+      const processed = job.processedResources || 0;
+      const total = job.totalResources || 0;
+      const successful = job.successfulResources || 0;
+      const failed = job.failedResources || 0;
+      const nothingProcessed = processed === 0 && total > 0;
+      if (successful === 0 && (failed > 0 || nothingProcessed)) {
+        return 'failed';
+      }
     }
     return job.status;
   };
@@ -691,6 +698,15 @@ export default function BatchEnrichmentPanel() {
                           /* R2-M05: no resources processed → no meaningful rate. */
                           <Badge variant="outline" className="text-muted-foreground">
                             N/A
+                          </Badge>
+                        ) : (job.successfulResources || 0) === 0 &&
+                            (job.failedResources || 0) === 0 &&
+                            (job.skippedResources || 0) > 0 ? (
+                          /* ADM-05: every processed resource was SKIPPED (nothing
+                             to do), none failed — a red "0/N ok (0%)" misrepresents
+                             a clean run as a failure. Report the skips honestly. */
+                          <Badge variant="outline" className="border-yellow-500 text-yellow-500" data-testid={`skipped-rate-${job.id}`}>
+                            {job.skippedResources} skipped
                           </Badge>
                         ) : (
                           /* Run17 BUG-029: show the fraction the rate is over —

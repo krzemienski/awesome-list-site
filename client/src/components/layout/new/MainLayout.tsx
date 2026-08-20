@@ -200,6 +200,9 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
               <Link href="/privacy" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-privacy">
                 Privacy
               </Link>
+              <Link href="/code-of-conduct" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-code-of-conduct">
+                Code of Conduct
+              </Link>
               {/* R5-025 (run24): in-product consent-reset path — re-opens the
                   analytics consent banner so a persisted choice can be changed. */}
               <button

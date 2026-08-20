@@ -1,0 +1,177 @@
+{
+  "partition": "public-browse (anonymous visitor: home, categories, category/subcategory pages, resource detail, tag pages, search page + cmd-K palette, pagination/filters, breadcrumbs, sidebar counts)",
+  "qaArtifacts": { "users": [], "resources": [] },
+  "findings": [
+    {
+      "id": "P-01",
+      "title": "Search page SUBCATEGORY facet counts detach from their labels and overlap the result cards",
+      "severity": "MEDIUM",
+      "kind": "visual",
+      "route": "/search?q=ffmpeg",
+      "viewport": "1440x900 desktop",
+      "reproSteps": [
+        "Go to /search?q=ffmpeg (any query that returns results)",
+        "Observe the left 'Narrow results' rail: CATEGORY facet counts are right-aligned correctly inside the rail",
+        "Scroll the SUBCATEGORY facet section: its count numbers (e.g. 79, 13, 5) render far to the right at x=692, outside the rail, floating on top of the result cards near 'ffmpeg-static'/'View Details'"
+      ],
+      "expected": "Subcategory facet counts stay right-aligned within the facet rail, like the category facet counts",
+      "actual": "Subcategory facet count spans (button uses flex/justify-between/w-full but overflows the rail width) land at x~692 overlapping the middle result-card column; measured span.text '79' at x=692,y=649 and '13' at x=692,y=693, parent BUTTON class 'flex min-h-11 w-full items-center justify-between'",
+      "evidence": [
+        "/tmp/bughunt/public-browse/search-facet-zoom.png",
+        "/tmp/bughunt/public-browse/search-facet-overlap-full.png",
+        "/tmp/bughunt/public-browse/search-ffmpeg-desktop.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P-02",
+      "title": "Invalid category/subcategory slugs show transient-looking 'Error Loading Resources / Please try again' with no navigation, instead of a proper 404 like resource pages",
+      "severity": "MEDIUM",
+      "kind": "usability",
+      "route": "/category/<bad-slug>, /subcategory/<bad-slug>",
+      "viewport": "1440x900 desktop",
+      "reproSteps": [
+        "Visit /category/does-not-exist-xyz (HTTP 404) — page body shows 'Error Loading Resources / Please try again.' with no Home/Browse button",
+        "Visit /subcategory/does-not-exist-xyz — same 'Error Loading Resources / Please try again.'",
+        "Compare with /resource/99999999 (also 404) which shows a polished 'Page Not Found' card with 'Browse all categories' and 'Go Home' buttons"
+      ],
+      "expected": "A non-existent category/subcategory should present the same clear 'Page Not Found' state (with navigation) as a non-existent resource; a transient 'Please try again' message wrongly implies a network glitch the user should retry",
+      "actual": "category/subcategory 404s render 'Error Loading Resources / Please try again' (errLoad=true, pleaseRetry=true, pageNotFound=false, hasGoHome=false) with no recovery affordance; resource 404 renders 'Page Not Found' + Go Home/Browse buttons",
+      "evidence": [
+        "/tmp/bughunt/public-browse/notfound-bad-category.png",
+        "/tmp/bughunt/public-browse/errstate-cat.png",
+        "/tmp/bughunt/public-browse/errstate-sub.png",
+        "/tmp/bughunt/public-browse/notfound-bad-resource-id.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P-03",
+      "title": "Tag landing pages corrupt brand/acronym casing (FFmpeg -> FFMPEG, WebAssembly -> Webassembly) in both the visible H1 and the prerendered og:title",
+      "severity": "LOW",
+      "kind": "content",
+      "route": "/tag/FFmpeg, /tag/WebAssembly",
+      "viewport": "1440x900 desktop",
+      "reproSteps": [
+        "Visit /tag/FFmpeg -> H1 reads 'FFMPEG' (textTransform:none, so it is the real string), <title> 'FFMPEG Video Resources & Tools'",
+        "Visit /tag/WebAssembly -> H1 reads 'Webassembly', title 'Webassembly Video Resources & Tools'",
+        "curl -A Googlebot /tag/WebAssembly follows 301 to /tag/webassembly and its prerendered og:title is 'Webassembly Video Resources & Tools — Awesome Video'"
+      ],
+      "expected": "Tag display should preserve the canonical tag casing: 'FFmpeg', 'WebAssembly'",
+      "actual": "Casing is normalized inconsistently (FFmpeg->all caps, WebAssembly->title case), losing correct brand capitalization; propagates into <title> and og:title seen by crawlers",
+      "evidence": [
+        "/tmp/bughunt/public-browse/tag-FFmpeg-desktop.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P-04",
+      "title": "Multi-word tag pages produce awkward duplicated 'Video' in the title: 'Video Streaming Video Resources & Tools'",
+      "severity": "LOW",
+      "kind": "content",
+      "route": "/tag/video%20streaming",
+      "viewport": "1440x900 desktop",
+      "reproSteps": [
+        "Visit /tag/video streaming",
+        "Observe document.title = 'Video Streaming Video Resources & Tools — Awesome Video'"
+      ],
+      "expected": "Title template should avoid word repetition when the tag already contains 'Video' (e.g. 'Video Streaming Resources & Tools')",
+      "actual": "The fixed 'X Video Resources & Tools' template concatenates blindly, yielding 'Video Streaming Video Resources & Tools'",
+      "evidence": [
+        "/tmp/bughunt/public-browse/tag-streaming-desktop.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P-05",
+      "title": "Single-resource subcategory pages show incorrect plural: '1 resources available' and 'Showing 1-1 of 1 resources'",
+      "severity": "LOW",
+      "kind": "content",
+      "route": "/subcategory/online-forums, /subcategory/software-codecs",
+      "viewport": "1440x900 desktop",
+      "reproSteps": [
+        "Visit /subcategory/online-forums (contains exactly 1 resource)",
+        "Header reads '1 resources available'; result count reads 'Showing 1-1 of 1 resources'",
+        "Note the 'About this collection' prose on the same page correctly says 'includes 1 curated resource' (singular) — inconsistent within the page",
+        "Repeat on /subcategory/software-codecs (also 1 resource) — same '1 resources'"
+      ],
+      "expected": "Singular noun for a count of 1: '1 resource available', 'Showing 1-1 of 1 resource'",
+      "actual": "Header and 'Showing' labels always use plural 'resources' regardless of count; only the About paragraph pluralizes correctly",
+      "evidence": [
+        "/tmp/bughunt/public-browse/subcat-online-forums.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P-06",
+      "title": "Public /api/awesome-list tree is stale/incomplete: 1,461 resources vs 1,816 shown everywhere else on the site (missing ~355 resources and whole subcategories)",
+      "severity": "MEDIUM",
+      "kind": "api",
+      "route": "/api/awesome-list",
+      "viewport": "n/a (API + rendered counts)",
+      "reproSteps": [
+        "GET /api/awesome-list and sum resources across the tree -> 1461",
+        "GET /api/resources?limit=1 -> total 1816; home/category cards/sidebar all show 1,816",
+        "Per-category the tree undercounts vs the site: encoding-codecs tree=266 vs UI 333; players-clients tree=152 vs UI 239; protocols-transport tree=110 vs UI 213",
+        "Subcategories present in the live UI (e.g. Online Forums under Community Groups, 1 resource) are entirely absent from the /api/awesome-list tree"
+      ],
+      "expected": "The public cached tree API should reflect the same approved catalog the UI shows (1,816 resources, all subcategories/sub-subcategories)",
+      "actual": "Tree returns 1,461 resources, undercounts every category, and omits multiple subcategories/sub-subcategories that exist and render in the UI; site-map states the tree 'carries real numeric DB ids usable for navigation', so consumers relying on it get an incomplete catalog",
+      "evidence": [
+        "/tmp/bughunt/public-browse/tree.json",
+        "/tmp/bughunt/public-browse/home-desktop.png",
+        "/tmp/bughunt/public-browse/category_encoding-codecs-desktop.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P-07",
+      "title": "Provider/Format/Skill-level filters are inert: every resource is 'Not yet classified', so each facet offers a single useless option and the resource prose repeats the filler 3x",
+      "severity": "LOW",
+      "kind": "usability",
+      "route": "/category/:slug (filters) and /resource/:id",
+      "viewport": "1440x900 desktop",
+      "reproSteps": [
+        "Open any category page (e.g. /category/encoding-codecs): PROVIDER 'Not yet classified' 333, FORMAT 'Not yet classified' 333, SKILL LEVEL 'Not yet classified' 333 — the only option in each facet",
+        "Confirm globally: /api/awesome-list shows resourceFormat/provider/skillLevel = 'unknown' for all 1,461 tree resources; /api/resources/184792 also 'unknown' for all three",
+        "Open any resource detail (e.g. /resource/186391): Provider/Format/Skill level all 'Not yet classified' AND the auto-generated paragraph reads 'Provider: Not yet classified. Format: Not yet classified. Skill level: Not yet classified.'"
+      ],
+      "expected": "Filters added for provider/format/skill should offer meaningful choices; if 100% of the catalog is unclassified, these facets should be hidden and the filler should not be surfaced 3x in human-readable prose",
+      "actual": "All three facets contain only 'Not yet classified' (equal to total), so filtering does nothing; the resource SEO/description paragraph repeats 'Not yet classified' three times on every resource",
+      "evidence": [
+        "/tmp/bughunt/public-browse/category-filters.png",
+        "/tmp/bughunt/public-browse/resource-manytags-scrolled.png",
+        "/tmp/bughunt/public-browse/category_encoding-codecs-desktop.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P-08",
+      "title": "Case-variant tag URLs both resolve to the same page (/tag/FFmpeg and /tag/ffmpeg render identical content), plus 301 lowercasing only fires for mixed-case via crawler path",
+      "severity": "LOW",
+      "kind": "functional",
+      "route": "/tag/FFmpeg vs /tag/ffmpeg",
+      "viewport": "1440x900 desktop",
+      "reproSteps": [
+        "In-app SPA navigation to /tag/FFmpeg renders H1 'FFMPEG', 78 results",
+        "SPA navigation to /tag/ffmpeg renders the identical page (H1 'FFMPEG', 78 results) — two client URLs, same content",
+        "curl -A Googlebot /tag/WebAssembly returns 301 -> /tag/webassembly (server canonicalizes for crawlers), but the SPA itself keeps whichever mixed-case path the user landed on"
+      ],
+      "expected": "One canonical tag URL; client should also normalize/redirect mixed-case tag paths to the canonical lowercase to avoid duplicate landing pages",
+      "actual": "Both /tag/FFmpeg and /tag/ffmpeg serve full identical pages client-side (duplicate landing surfaces); canonicalization only happens on the server 301 path",
+      "evidence": [
+        "/tmp/bughunt/public-browse/tag-FFmpeg-desktop.png",
+        "/tmp/bughunt/public-browse/tag-ffmpeg-desktop.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    }
+  ]
+}

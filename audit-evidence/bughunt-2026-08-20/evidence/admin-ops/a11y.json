@@ -1,0 +1,126 @@
+{
+  "githubMobileTouch": {
+    "totalBtns": 30,
+    "small": [
+      {
+        "t": "A",
+        "w": 36,
+        "h": 44
+      },
+      {
+        "t": "Live Resources",
+        "w": 120,
+        "h": 32
+      },
+      {
+        "t": "177 rejected",
+        "w": 76,
+        "h": 32
+      },
+      {
+        "t": "Approvals",
+        "w": 93,
+        "h": 40
+      },
+      {
+        "t": "Edits",
+        "w": 58,
+        "h": 40
+      },
+      {
+        "t": "Enrichment",
+        "w": 125,
+        "h": 40
+      },
+      {
+        "t": "Researcher",
+        "w": 123,
+        "h": 40
+      },
+      {
+        "t": "Export",
+        "w": 70,
+        "h": 40
+      },
+      {
+        "t": "Database",
+        "w": 91,
+        "h": 40
+      },
+      {
+        "t": "Resources",
+        "w": 96,
+        "h": 40
+      },
+      {
+        "t": "Categories",
+        "w": 99,
+        "h": 40
+      },
+      {
+        "t": "Subcategories",
+        "w": 124,
+        "h": 40
+      },
+      {
+        "t": "Sub-Subcats",
+        "w": 111,
+        "h": 40
+      },
+      {
+        "t": "Journeys",
+        "w": 104,
+        "h": 40
+      },
+      {
+        "t": "Users",
+        "w": 63,
+        "h": 40
+      }
+    ]
+  },
+  "githubContrastSamples": [
+    {
+      "text": "Latest error: Orphaned by server restart",
+      "color": "rgb(255, 92, 122)",
+      "bg": "rgba(244, 243, 238, 0.024)",
+      "fontSize": "14px",
+      "ratio": 2.68
+    },
+    {
+      "text": "Next steps: if errors mention credential",
+      "color": "rgb(255, 92, 122)",
+      "bg": "rgba(244, 243, 238, 0.024)",
+      "fontSize": "12px",
+      "ratio": 2.68
+    },
+    {
+      "text": "Orphaned by server restart",
+      "color": "rgb(244, 243, 238)",
+      "bg": "rgba(244, 243, 238, 0.024)",
+      "fontSize": "14px",
+      "ratio": 1
+    },
+    {
+      "text": "Orphaned by server restart",
+      "color": "rgb(255, 92, 122)",
+      "bg": "oklab(0.96353 -0.00081563 0.00668102 / 0.0117647)",
+      "fontSize": "12px",
+      "ratio": null
+    },
+    {
+      "text": "Orphaned by server restart",
+      "color": "rgb(255, 92, 122)",
+      "bg": "oklab(0.96353 -0.00081563 0.00668102 / 0.0117647)",
+      "fontSize": "12px",
+      "ratio": null
+    },
+    {
+      "text": "Orphaned by server restart",
+      "color": "rgb(255, 92, 122)",
+      "bg": "oklab(0.96353 -0.00081563 0.00668102 / 0.0117647)",
+      "fontSize": "12px",
+      "ratio": null
+    }
+  ]
+}

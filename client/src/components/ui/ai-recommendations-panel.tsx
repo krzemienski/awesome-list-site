@@ -194,7 +194,21 @@ export default function AIRecommendationsPanel({
     }
   };
 
-  const retry = () => refreshRecommendations(effectiveProfile);
+  // Anonymous visitors have no account: their refresh must hit the anon-safe
+  // GET path (POST /api/recommendations is auth-gated and 401s). Passing no
+  // profile makes the hook use GET; a profile forces the authed POST.
+  const retry = () =>
+    refreshRecommendations(isAuthenticated ? effectiveProfile : undefined);
+
+  // Same safe-return pattern the legacy /login redirect uses: only an internal
+  // absolute path (not "//" or "/\") is carried back as redirect_url.
+  const currentPath =
+    typeof window !== "undefined"
+      ? window.location.pathname + window.location.search
+      : "/advanced";
+  const signInHref = /^\/(?![/\\])/.test(currentPath)
+    ? `/sign-in?redirect_url=${encodeURIComponent(currentPath)}`
+    : "/sign-in";
 
   return (
     <div className="space-y-6">
@@ -203,10 +217,12 @@ export default function AIRecommendationsPanel({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Personalized Recommendations
+              {isAuthenticated ? "Personalized Recommendations" : "Popular Recommendations"}
             </CardTitle>
             <CardDescription>
-              Account preferences, learning activity, and your feedback shape these picks.
+              {isAuthenticated
+                ? "Account preferences, learning activity, and your feedback shape these picks."
+                : "Popular picks from across the catalog. Sign in to personalize them with your preferences and activity."}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -215,14 +231,18 @@ export default function AIRecommendationsPanel({
       <Card className="no-print">
         <CardHeader>
           <CardTitle className="text-lg">
-            {hasSavedPreferences
-              ? "Using your saved learning profile"
-              : "Using your account activity"}
+            {!isAuthenticated
+              ? "Popular across the catalog"
+              : hasSavedPreferences
+                ? "Using your saved learning profile"
+                : "Using your account activity"}
           </CardTitle>
           <CardDescription>
-            {hasSavedPreferences
-              ? "These results use your saved topics, goals, formats, skill level, and available time."
-              : "Add learning preferences for more precise matches. Existing activity and feedback still shape your results."}
+            {!isAuthenticated
+              ? "These are popularity-based picks — not personalized. Sign in to tailor them to your topics, goals, and activity."
+              : hasSavedPreferences
+                ? "These results use your saved topics, goals, formats, skill level, and available time."
+                : "Add learning preferences for more precise matches. Existing activity and feedback still shape your results."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -245,13 +265,21 @@ export default function AIRecommendationsPanel({
             </div>
           ) : null}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Button asChild variant="outline">
-              <Link href="/settings#learning-preferences">
-                {hasSavedPreferences
-                  ? "Edit learning preferences"
-                  : "Choose learning preferences"}
-              </Link>
-            </Button>
+            {isAuthenticated ? (
+              <Button asChild variant="outline">
+                <Link href="/settings#learning-preferences">
+                  {hasSavedPreferences
+                    ? "Edit learning preferences"
+                    : "Choose learning preferences"}
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild variant="outline">
+                <Link href={signInHref} data-testid="link-sign-in-personalize">
+                  Sign in to personalize
+                </Link>
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"
@@ -356,7 +384,9 @@ export default function AIRecommendationsPanel({
               Building your recommendations…
             </CardTitle>
             <CardDescription>
-              Matching saved preferences and feedback with catalog resources.
+              {isAuthenticated
+                ? "Matching saved preferences and feedback with catalog resources."
+                : "Finding popular resources from across the catalog."}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
@@ -389,10 +419,14 @@ export default function AIRecommendationsPanel({
           <div>
             <h2 className="flex items-center gap-2 text-xl font-semibold">
               <Target className="h-5 w-5 text-primary" />
-              Your personalized recommendations
+              {isAuthenticated
+                ? "Your personalized recommendations"
+                : "Popular recommendations"}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {visibleRecommendations.length} resources selected from real profile and catalog signals.
+              {isAuthenticated
+                ? `${visibleRecommendations.length} resources selected from real profile and catalog signals.`
+                : `${visibleRecommendations.length} popular resources from across the catalog. Sign in to personalize them.`}
             </p>
           </div>
           <div className="grid items-stretch gap-4 md:grid-cols-2">
@@ -434,11 +468,26 @@ export default function AIRecommendationsPanel({
           <AlertTitle>No unseen recommendations right now</AlertTitle>
           <AlertDescription className="space-y-3">
             <p>
-              Restore hidden items, update your preferences, or try again to look for new catalog matches.
+              {isAuthenticated
+                ? "Restore hidden items, update your preferences, or try again to look for new catalog matches."
+                : "Try again to look for new catalog matches, or sign in to personalize these picks with your preferences and activity."}
             </p>
-            <Button type="button" size="sm" variant="outline" onClick={retry}>
-              Try again
-            </Button>
+            {isAuthenticated ? (
+              <Button type="button" size="sm" variant="outline" onClick={retry}>
+                Try again
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button type="button" size="sm" variant="outline" onClick={retry}>
+                  Try again
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href={signInHref} data-testid="link-sign-in-empty-state">
+                    Sign in to personalize
+                  </Link>
+                </Button>
+              </div>
+            )}
           </AlertDescription>
         </Alert>
       ) : null}

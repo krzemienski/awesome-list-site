@@ -57,6 +57,7 @@ const Notifications = lazy(() => import("@/pages/Notifications"));
 const Onboarding = lazy(() => import("@/pages/Onboarding"));
 const Terms = lazy(() => import("@/pages/Terms"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
+const CodeOfConduct = lazy(() => import("@/pages/CodeOfConduct"));
 const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
 
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
@@ -304,7 +305,7 @@ import {
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|tag|recommendations|search|about|advanced|submit|journeys|journey|continue-learning|profile|contributions|bookmarks|favorites|account|admin|settings|notifications|onboarding|resource|terms|privacy|code-of-conduct)\/?$/,
   // Task #307: Clerk-hosted auth pages, including OAuth/verification sub-paths.
   /^\/(sign-in|sign-up)(\/.*)?$/,
   /^\/auth\/(login|register)\/?$/,
@@ -695,6 +696,7 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/terms" component={Terms} />
         <Route path="/privacy" component={Privacy} />
+        <Route path="/code-of-conduct" component={CodeOfConduct} />
         <Route path="/advanced" component={Advanced} />
         <Route path="/submit" component={SubmitResource} />
         <Route path="/journeys" component={Journeys} />

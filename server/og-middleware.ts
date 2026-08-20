@@ -25,8 +25,9 @@ import {
   journeySeoDescription,
   pagedSeoTitleCore,
   pagedSeoDescription,
+  tagDisplayNameBranded,
   tagSeoDescription,
-  tagSeoTitleCore,
+  tagTitleCoreDeduped,
 } from "@shared/seo-templates";
 import {
   RESOURCE_FORMAT_LABELS,
@@ -41,6 +42,7 @@ import {
   tagDisplayName,
   tagLandingPath,
 } from "@shared/tagNormalize";
+
 import {
   renderHomeContent,
   renderTaxonomyContent,
@@ -671,6 +673,13 @@ function homeShellChrome(): string {
       title: `Privacy Policy — ${SITE_NAME}`,
       description: `How ${SITE_NAME} handles your data: what we collect, how it's used, and the analytics choices you control.`,
     },
+    // Companion legal/community page — indexable + listed in the sitemap.
+    // Title/description mirror the client CodeOfConduct SEOHead exactly
+    // (two-pass parity).
+    "/code-of-conduct": {
+      title: `Code of Conduct — ${SITE_NAME}`,
+      description: `The standards of behavior we expect from everyone who participates in ${SITE_NAME} — a free, community-curated directory of video development resources.`,
+    },
     "/advanced": {
       title: advancedSeoTitle,
       description: advancedSeoDescription,
@@ -1199,10 +1208,10 @@ function homeShellChrome(): string {
         return { meta: notFoundMeta(path), found: false };
       }
 
-      const name = tagDisplayName(slug);
+      const name = tagDisplayNameBranded(slug);
       const canonicalPath = tagLandingPath(slug);
       const m = defaultMeta(canonicalPath);
-      m.title = `${pagedSeoTitleCore(tagSeoTitleCore(name), page)} — ${SITE_NAME}`;
+      m.title = `${pagedSeoTitleCore(tagTitleCoreDeduped(name), page)} — ${SITE_NAME}`;
       m.description = pagedSeoDescription(
         tagSeoDescription(name, result.total),
         page,

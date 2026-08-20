@@ -1,0 +1,42 @@
+{
+  "github": {
+    "overflow": {
+      "scrollW": 375,
+      "clientW": 375,
+      "overflowsX": false
+    },
+    "errors": []
+  },
+  "enrichment": {
+    "overflow": {
+      "scrollW": 375,
+      "clientW": 375,
+      "overflowsX": false
+    },
+    "errors": [
+      "PAGEERROR: Clerk: Failed to load Clerk JS, failed to load script: https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js\n\n(code=\"failed_to_load_clerk_js\")\n\n"
+    ]
+  },
+  "journeys": {
+    "overflow": {
+      "scrollW": 375,
+      "clientW": 375,
+      "overflowsX": false
+    },
+    "errors": []
+  },
+  "audit": {
+    "overflow": {
+      "scrollW": 375,
+      "clientW": 375,
+      "overflowsX": false
+    },
+    "errors": []
+  },
+  "auditLong": {
+    "hasLongContent": false,
+    "info": null,
+    "panelScrollW": 311,
+    "panelClientW": 311
+  }
+}

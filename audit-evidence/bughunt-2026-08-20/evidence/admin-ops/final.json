@@ -1,0 +1,19 @@
+{
+  "github": {
+    "lastImport": {
+      "text": "Last Import May 20, 2026, 08:42 AM  Orphaned by server restart  +0 Added ~0 Updated -0 Removed 0 Total",
+      "iconClass": "lucide lucide-circle-check h-4 w-4"
+    },
+    "orphanRowCount": 20
+  },
+  "exportMarkdown": {
+    "downloads": 1,
+    "toastTexts": [
+      "Export Successful\nAwesome list markdown file has been downloaded."
+    ]
+  },
+  "exportConfirm": {
+    "dlgOpen": true,
+    "dlgClosedAfterCancel": true
+  }
+}

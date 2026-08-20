@@ -1,0 +1,27 @@
+{
+  "bookmarks": {
+    "finalUrl": "http://127.0.0.1:5000/sign-in?redirect_url=%2Fbookmarks",
+    "title": "Sign In — Awesome Video",
+    "h1": "Welcome back",
+    "visibleText": "Authentication Required Please sign in to access this page Skip to main content Toggle sidebar AWESOME.VIDEO Home Sign in Search resources... / Sign in Navigation Home Submit Resource Learning Journeys Advanced Theme BROWSE Categories · 9 1,816 resources Community & Events 80 Community Groups 40 Online Forums 1 Events & Conferences 40 Podcasts & Webinars 1 Encoding & Codecs 333 Benchmarking & Perf",
+    "rawShellVisible": false
+  },
+  "signInLabels": [
+    {
+      "name": "identifier",
+      "type": "text",
+      "id": "identifier-field",
+      "ariaLabel": null,
+      "labelledby": null,
+      "associatedLabel": "Email address"
+    },
+    {
+      "name": "password",
+      "type": "password",
+      "id": "password-field",
+      "ariaLabel": null,
+      "labelledby": null,
+      "associatedLabel": "Password"
+    }
+  ]
+}

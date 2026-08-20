@@ -423,6 +423,9 @@ export function registerExportLinkHealthRoutes(
             id: 1_000_000 + q.id,
             repositoryUrl: q.repositoryUrl,
             direction: q.action,
+            // ADM-03/04: carry the outcome so the UI can badge failed/orphaned
+            // rows honestly instead of rendering every row as a success.
+            status: q.status,
             commitSha: md.commitSha ?? null,
             commitMessage: md.commitMessage ?? (q.status === 'failed' ? (q.errorMessage || 'Sync failed') : null),
             commitUrl: null,
@@ -438,20 +441,29 @@ export function registerExportLinkHealthRoutes(
       // Run23 NB-038: canonical history rows carry a full resource `snapshot`
       // jsonb (2.7MB total on prod). The list view only needs summary fields;
       // snapshots remain in the DB for on-demand use.
-      const historySummaries = history.map(h => ({
-        id: h.id,
-        repositoryUrl: h.repositoryUrl,
-        direction: h.direction,
-        commitSha: h.commitSha,
-        commitMessage: h.commitMessage,
-        commitUrl: h.commitUrl,
-        resourcesAdded: h.resourcesAdded,
-        resourcesUpdated: h.resourcesUpdated,
-        resourcesRemoved: h.resourcesRemoved,
-        totalResources: h.totalResources,
-        performedBy: h.performedBy,
-        createdAt: h.createdAt,
-      }));
+      const historySummaries = history.map(h => {
+        // ADM-03/04: canonical history rows have no status column — the
+        // outcome is recorded in metadata.outcome ('completed' | 'partial' |
+        // 'failed'). Surface it as `status` so failed/orphaned rows are
+        // badged like the Recent Sync Jobs section, not shown as successes.
+        const outcome = (h.metadata as any)?.outcome;
+        const status = outcome === 'failed' ? 'failed' : 'completed';
+        return {
+          id: h.id,
+          repositoryUrl: h.repositoryUrl,
+          direction: h.direction,
+          status,
+          commitSha: h.commitSha,
+          commitMessage: h.commitMessage,
+          commitUrl: h.commitUrl,
+          resourcesAdded: h.resourcesAdded,
+          resourcesUpdated: h.resourcesUpdated,
+          resourcesRemoved: h.resourcesRemoved,
+          totalResources: h.totalResources,
+          performedBy: h.performedBy,
+          createdAt: h.createdAt,
+        };
+      });
 
       res.json([...historySummaries, ...fromQueue].sort((a: any, b: any) =>
         new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
@@ -543,8 +555,46 @@ export function registerExportLinkHealthRoutes(
         const syncQueue = await githubSyncRepo.getGithubSyncQueue();
         const users = await userRepo.listUsers(1, 10000);
       
-      const resources = allResources.resources;
+      // ADM-02: strip the internal Postgres full-text `searchTsv` tsvector
+      // column from every exported resource. It is the one genuinely
+      // internal-only column (the shared public serializer in
+      // server/lib/publicResource.ts strips it too, alongside moderation
+      // fields this admin backup legitimately keeps — so we strip only the
+      // tsvector here rather than routing a full backup through the public
+      // choke point). The raw tsvector ("'android':8 'applic':11 …") has no
+      // documentation value in a downloadable backup.
+      const resources = allResources.resources.map((r: any) => {
+        const { searchTsv, ...rest } = r;
+        return rest;
+      });
       const usersList = users.users;
+
+      // ADM-01: the `tags` table is empty on this deployment — tags live as
+      // string arrays inside each resource's metadata.tags (the same source
+      // /api/admin/enrichment/coverage counts). A backup that reported
+      // stats.tags:0 / data.tags:[] while ~1,148 resources are demonstrably
+      // tagged was misleading. Derive the real distinct tag collection from
+      // the resource metadata so the backup reflects the actual tag data.
+      // Canonical DB `tags` rows (if any exist) take precedence by name.
+      const tagCollection = (() => {
+        const byName = new Map<string, { id: number | string; name: string; slug: string }>();
+        for (const t of tags as any[]) {
+          byName.set(t.name, { id: t.id, name: t.name, slug: t.slug });
+        }
+        let derivedSeq = 0;
+        for (const r of resources as any[]) {
+          const metaTags = r.metadata?.tags;
+          if (!Array.isArray(metaTags)) continue;
+          for (const raw of metaTags) {
+            if (typeof raw !== 'string') continue;
+            const name = raw.trim();
+            if (!name || byName.has(name)) continue;
+            const slug = normalizeTagFilter(name);
+            byName.set(name, { id: `metadata:${slug || ++derivedSeq}`, name, slug });
+          }
+        }
+        return Array.from(byName.values()).sort((a, b) => a.name.localeCompare(b.name));
+      })();
 
       // Get journey steps for each journey
       const journeyIds = learningJourneys.map((j: any) => j.id);
@@ -598,12 +648,18 @@ export function registerExportLinkHealthRoutes(
         exportedAt: new Date().toISOString(),
         version: '1.0.0',
         schema: {
-          resources: "id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
-          categories: "id, name, slug",
-          subcategories: "id, name, slug, categoryId",
-          subSubcategories: "id, name, slug, subcategoryId",
+          // ADM-02: field list matches Object.keys(data.resources[0]) exactly
+          // (the internal `searchTsv` tsvector is stripped above and omitted here).
+          resources: "id, title, url, description, category, subcategory, subSubcategory, resourceFormat, provider, skillLevel, status, submittedBy, approvedBy, approvedAt, contributorRejectionReason, statusChangedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
+          // ADM-02: the category tree is emitted nested under data.categoryHierarchy
+          // (category → subcategories[] → subSubcategories[]); there are no
+          // flat categories/subcategories/subSubcategories keys in `data`.
+          categoryHierarchy: "id, name, slug, subcategories:[{ id, name, slug, categoryId, subSubcategories:[{ id, name, slug, subcategoryId }] }]",
+          // ADM-01: distinct tags in use, derived from resources[].metadata.tags
+          // (the canonical `tags` table is empty on this deployment). Derived
+          // entries carry a synthetic "metadata:<slug>" id.
           tags: "id, name, slug",
-          learningJourneys: "id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt"
+          learningJourneys: "id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt, steps"
         },
         stats: {
           resources: resources.length,
@@ -611,7 +667,8 @@ export function registerExportLinkHealthRoutes(
           categories: categories.length,
           subcategories: subcategories.length,
           subSubcategories: subSubcategories.length,
-          tags: tags.length,
+          // ADM-01: count the real distinct tags in use, not the empty table.
+          tags: tagCollection.length,
           learningJourneys: learningJourneys.length,
           users: usersList.length,
           syncQueueItems: syncQueue.length
@@ -619,7 +676,8 @@ export function registerExportLinkHealthRoutes(
         data: {
           resources,
           categoryHierarchy,
-          tags,
+          // ADM-01: real distinct tags derived from resource metadata.
+          tags: tagCollection,
           learningJourneys: journeysWithSteps,
           syncQueue,
           users: sanitizedUsers

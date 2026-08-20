@@ -1,0 +1,98 @@
+{
+  "partition": "/admin operational tabs (Metrics, Researcher read-only, Audit, Exports, Link health, GitHub sync read-only, Journeys editor, Enrichment) at desktop 1440x900 + mobile 375x667",
+  "qaArtifacts": {
+    "users": [],
+    "resources": []
+  },
+  "notes": "HUNT-ONLY. Created no users/resources. Two POST /api/admin/export calls (curl) + the ExportTab double-click repro created transient catalog.exported audit-log rows only (server-side, immutable log, net-neutral). Did NOT delete the pre-existing __qa_test_hunt4_ user (another agent's). Excluded per gotchas: Clerk/CORS/ERR_FAILED console noise, ResearcherTab React.Fragment data-replit-metadata dev-plugin warning, includeLicense code-only path, published-vs-approved, masked CSV emails, slug stability, roving-tabindex tabs, 40px tab / 32px stat touch targets (prior-audit-accepted), Total Users 6-vs-7 QA-test-user timing churn, GitHub '31 of 38 failed' dedup counts (accurate).",
+  "findings": [
+    {
+      "id": "ADM-01",
+      "title": "JSON backup export reports tags:0 / empty tags[] despite ~1148 tagged resources (contradicts Enrichment tab 1,047 @ 57.7%)",
+      "severity": "MEDIUM",
+      "category": "api/content",
+      "surface": "Admin > Export (/api/admin/export-json) vs Admin > Enrichment (/api/admin/enrichment/coverage)",
+      "description": "The admin JSON backup returns stats.tags:0 and a top-level data.tags:[] empty array, and its schema block documents a 'tags' section (id,name,slug) that is never populated. Yet the same export embeds tags inside resources[].metadata.tags: ~1148 resources are tagged (1673 distinct tag strings). The Enrichment tab and /api/admin/enrichment/coverage report 1,047 of 1,816 approved resources tagged (57.7%). So the dedicated tags collection and the stats.tags count are wrong/empty while tag data demonstrably exists elsewhere in the very same payload and in the Enrichment surface.",
+      "evidence": ["export.json", "export-fresh.json", "enrich-details.json"],
+      "reproSteps": "GET /api/admin/export-json (X-Admin-Audit-Key) -> stats.tags:0, data.tags:[]; compare GET /api/admin/enrichment/coverage -> tagged:1047, coveragePct:57.7. Reproduced on two separate fetches (export.json, export-fresh.json).",
+      "reproduced": 2
+    },
+    {
+      "id": "ADM-02",
+      "title": "JSON backup schema doc mismatches actual data keys and leaks internal searchTsv column",
+      "severity": "MEDIUM",
+      "category": "api/content",
+      "surface": "Admin > Export (/api/admin/export-json)",
+      "description": "The export's self-describing schema block documents sections named 'categories' / 'subcategories' / 'subSubcategories' and a resources field list of 16 columns. But (a) the actual data object has NO categories/subcategories/subSubcategories keys — the category tree is under data.categoryHierarchy (nested), so a consumer following schema looks up keys that do not exist; and (b) each exported resource actually carries 6 fields the schema omits (provider, resourceFormat, skillLevel, contributorRejectionReason, statusChangedAt, plus the internal Postgres full-text tsvector column searchTsv). The raw tsvector (e.g. \"'android':8 'applic':11 'github.com':13 ...\") is an internal implementation detail leaking into a downloadable backup with no documentation value.",
+      "evidence": ["export-fresh.json", "export.json"],
+      "reproSteps": "GET /api/admin/export-json; diff schema.resources field list against Object.keys(data.resources[0]) -> 6 undocumented fields incl searchTsv; note schema.categories/subcategories/subSubcategories reference keys absent from data (real key is categoryHierarchy). Reproduced twice.",
+      "reproduced": 2
+    },
+    {
+      "id": "ADM-03",
+      "title": "GitHub 'Last Import' card renders a green success checkmark on a FAILED / orphaned import",
+      "severity": "MEDIUM",
+      "category": "usability/visual",
+      "surface": "Admin > GitHub > Sync Status ('Last Import' Alert), GitHubSyncPanel.tsx ~L317-319",
+      "description": "The 'Last Import' summary uses syncHistory[0] and renders it inside an Alert with a green CheckCircle2 (lucide-circle-check) icon regardless of outcome. The current lastSync is a failure: message 'Orphaned by server restart', +0 Added / ~0 Updated / -0 Removed / 0 Total. A failed/orphaned import is shown with an unconditional success checkmark, contradicting the red 'failed' badges in the 'Sync Status' / 'Recent Sync Jobs' section on the same tab.",
+      "evidence": ["github-lastimport-1440.png", "github-syncstatus-crop-1440.png", "github-375-active.png"],
+      "reproSteps": "Open /admin#github; inspect 'Last Import' Alert icon class = 'lucide lucide-circle-check' while its own text reads 'Orphaned by server restart' / 0 Total. Confirmed via rendered DOM icon class and source. Visible at 1440 and 375.",
+      "reproduced": 2
+    },
+    {
+      "id": "ADM-04",
+      "title": "GitHub 'Sync History' rows have no failure/status indicator; cross-surface inconsistency with 'Recent Sync Jobs'",
+      "severity": "MEDIUM",
+      "category": "usability/api",
+      "surface": "Admin > GitHub > Sync History (/api/github/sync-history) vs Recent Sync Jobs (/api/github/sync-status), GitHubSyncPanel.tsx ~L439-482",
+      "description": "/api/github/sync-history deliberately drops the status field, so ~20 'Orphaned by server restart' failure rows render identically to successful rows (only a direction icon + commit message, no red X or 'failed' badge). The 'Recent Sync Jobs' section directly above, fed by /api/github/sync-status, shows explicit red 'failed' badges (31 failed of 38). Same underlying jobs, two surfaces, opposite failure legibility.",
+      "evidence": ["github-375-active.png", "github2.json", "adm-final output (orphanRowCount:20)"],
+      "reproSteps": "Open /admin#github; Sync History lists ~20 orphaned rows with no status indicator; Recent Sync Jobs shows badge '31 failed'. Confirmed via DOM + API twice.",
+      "reproduced": 2
+    },
+    {
+      "id": "ADM-05",
+      "title": "Enrichment job that COMPLETED with a skipped resource is badged 'failed' / '0% ok'",
+      "severity": "MEDIUM",
+      "category": "usability/content",
+      "surface": "Admin > Enrichment > Job History row vs View Details dialog, BatchEnrichmentPanel.tsx (effectiveStatus L273-282, calculateSuccessRate L249-253)",
+      "description": "Job #21 is status:completed with totalResources 1, processed 1, successful 0, FAILED 0, SKIPPED 1, no errorMessage — its single resource was skipped (nothing to do), not failed. But the Job History table badges it 'failed' (effectiveStatus treats completed+0-successful as failed) and shows Success Rate '0/1 ok (0%)' in red. The View Details dialog for the same job correctly shows '0 Failed / 1 Skipped'. Skipped != failed, so a clean completed run is reported as a red failed / 0%-success job, contradicting its own details dialog.",
+      "evidence": ["job21.json", "enrichment-job21-failed-badge-1440.png", "enrich-details.json", "enrichment-details-1440.png"],
+      "reproSteps": "Open /admin#enrichment; job #21 row shows 'failed' + '0/1 ok (0%)'. GET /api/enrichment/jobs/21 -> completed, failed:0, skipped:1. Open View Details -> '0 Failed / 1 Skipped'. Reproduced twice.",
+      "reproduced": 2
+    },
+    {
+      "id": "ADM-06",
+      "title": "Admin 'Export Markdown' button double-fires (2 POST + 2 downloads + 2 audit rows) on rapid double-click",
+      "severity": "MEDIUM",
+      "category": "functional",
+      "surface": "Admin > Export > Export Markdown button, ExportTab.tsx handleExport L60-99",
+      "description": "handleExport guards only with disabled={isExporting}, set via async React state before the fetch. A rapid double-click lands the second click before the re-render disables the button, so two POST /api/admin/export requests fire and two markdown files download. Each POST also does the heavy full-catalog export and writes a catalog.exported audit-log row, so a double-click doubles the server work and pollutes the audit log with a duplicate entry. The sibling public exporter (export-tools.tsx) added a synchronous exportingRef guard for exactly this race; ExportTab lacks it.",
+      "evidence": ["dblclick.json"],
+      "reproSteps": "Open /admin#export; rapid double-click 'Export Markdown'. Observed posts:2, downloads:2. Reproduced in two independent trials (TRIAL1 & TRIAL2 both 2/2).",
+      "reproduced": 2
+    },
+    {
+      "id": "ADM-07",
+      "title": "Journey 'Video Streaming Fundamentals' shows 18 steps with triplicated titles instead of 6 grouped steps",
+      "severity": "LOW",
+      "category": "content/data",
+      "surface": "Admin > Journeys > Steps editor AND public /journey/6 (both /api/admin/journeys/6 and /api/journeys/6)",
+      "description": "Journey 6 has 6 distinct topics but each topic is stored as THREE separate stepNumbers (each a distinct logical step linking 1 resource) rather than one logical step grouping 3 resources. Result: 18 steps where steps 1-3 are all titled 'Introduction to Video Streaming' with identical descriptions, 4-6 all 'Understanding Video Codecs', etc. The other 4 journeys correctly group 3 resources under one logical step (stepCount 6). Both the admin Steps dialog and the public journey page render 18 numbered steps with triplicate titles/descriptions.",
+      "evidence": ["journeys-steps-dialog-1440.png", "journey6-public-1440.png", "journey6.json"],
+      "reproSteps": "GET /api/journeys/6 -> 18 steps, stepNumbers 1..18, titles repeat in triplets. Public /journey/6 renders 'Introduction to Video Streaming' x3, 'Understanding Video Codecs' x3, '18 steps'. Admin Steps dialog shows 18 groups. Confirmed via API, public DOM, and admin dialog.",
+      "reproduced": 2
+    },
+    {
+      "id": "ADM-08",
+      "title": "Audit-log Resource ID filter: out-of-range/invalid value yields misleading 'server error — try again'",
+      "severity": "LOW",
+      "category": "usability",
+      "surface": "Admin > Audit > Resource ID filter (type=number input, no bounds), AuditTab.tsx / /api/admin/audit-logs",
+      "description": "The 'Filter by Resource ID...' input is type=number with no max/validation. Entering an out-of-range value (e.g. 99999999999, beyond int4) or an invalid one (0) sends resourceId to /api/admin/audit-logs which returns 400. The UI shows an error alert reading 'Couldn't load the audit log — The server returned an error while fetching entries. Your filter is still applied — try again.' with a 'Try again' button. This blames the server and invites a retry, but it is a client-input validation problem — retrying with the same value fails identically (retry loop). Client-side range validation (or treating out-of-range as an empty result) would avoid the misleading scary error.",
+      "evidence": ["auditfilter.json", "audit-invalid-filter-1440.png"],
+      "reproSteps": "Open /admin#audit; type 99999999999 (or 0) in Resource ID filter, click Search. Observe 400 + alert-audit-error 'The server returned an error ... try again'. Reproduced with 99999999999 twice and with 0 once.",
+      "reproduced": 2
+    }
+  ]
+}

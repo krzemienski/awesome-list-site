@@ -10,6 +10,8 @@
 // truthful as the directory grows. Titles deliberately carry NO count, so title
 // parity can never drift even if the two count sources momentarily disagree.
 
+import { tagDisplayName } from "./tagNormalize";
+
 const SITE_NAME = "Awesome Video";
 
 // SERP display budgets (R4-025/026) ------------------------------------------
@@ -259,6 +261,57 @@ export function categorySeoDescription(
 // Tag landing pages ----------------------------------------------------------
 export function tagSeoTitleCore(name: string): string {
   return `${name} Video Resources & Tools`;
+}
+
+// tagDisplayName() blindly Title-Cases (or UPPER-cases known acronyms), which
+// corrupts real brand capitalisation (ffmpeg -> "FFMPEG", webassembly ->
+// "Webassembly"). This curated map restores the canonical casing for brands
+// whose display form is neither plain Title Case nor an all-caps acronym.
+// Keyed by the normalized tag slug (lowercase, hyphenated). Lives HERE — the
+// shared two-pass parity home — so the client H1/title (TagLanding.tsx) and
+// the server og:title (og-middleware.ts) stay byte-identical by construction.
+const TAG_BRAND_CASING: Record<string, string> = {
+  ffmpeg: "FFmpeg",
+  webassembly: "WebAssembly",
+  webgl: "WebGL",
+  webgpu: "WebGPU",
+  webrtc: "WebRTC",
+  webvtt: "WebVTT",
+  javascript: "JavaScript",
+  typescript: "TypeScript",
+  nodejs: "Node.js",
+  "node-js": "Node.js",
+  graphql: "GraphQL",
+  postgresql: "PostgreSQL",
+  mysql: "MySQL",
+  openai: "OpenAI",
+  youtube: "YouTube",
+  gstreamer: "GStreamer",
+  libvpx: "libvpx",
+  libav: "libav",
+  macos: "macOS",
+  ios: "iOS",
+  tvos: "tvOS",
+  ipados: "iPadOS",
+  dashjs: "dash.js",
+  "dash-js": "dash.js",
+  hlsjs: "hls.js",
+  "hls-js": "hls.js",
+  videojs: "Video.js",
+  "video-js": "Video.js",
+};
+
+/** Branded, casing-correct display name for a tag slug (see TAG_BRAND_CASING). */
+export function tagDisplayNameBranded(slug: string): string {
+  return TAG_BRAND_CASING[slug] ?? tagDisplayName(slug);
+}
+
+// The fixed "X Video Resources & Tools" template duplicated the word "Video"
+// for tags that already contain it ("Video Streaming Video Resources"). Drop
+// the inserted "Video" whenever the tag name already carries it.
+export function tagTitleCoreDeduped(name: string): string {
+  if (/\bvideo\b/i.test(name)) return `${name} Resources & Tools`;
+  return tagSeoTitleCore(name);
 }
 
 export function tagSeoDescription(name: string, count: number): string {

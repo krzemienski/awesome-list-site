@@ -1,0 +1,191 @@
+{
+  "partition": "engagement + auth + settings (journeys, journey detail, advanced/recommendations, submit, sign-in/up, profile, settings, theme, static pages, notifications, onboarding, bookmarks)",
+  "qaArtifacts": {
+    "users": [
+      "Clerk throwaway users created with external_id/email prefix '__qa_test_hunt4_' (email pattern __qa_test_hunt4_<ts>@example.com). Used ONLY for API-level Bearer-token auth checks (journey start/progress, preferences, bookmarks, favorites, contributions, submissions, recommendations). ALL deleted from Clerk and their local `users` rows + user_id child rows swept. Verified net-zero: `users WHERE id/email LIKE '__qa_test_hunt4_%'` = 0 at end of session."
+    ],
+    "resources": []
+  },
+  "findings": [
+    {
+      "id": "P1-01",
+      "title": "Journey 6 'Video Streaming Fundamentals' shows 18 steps (with every step title triplicated) while all other journeys show 6 grouped logical steps — list card and detail page both wrong, inconsistent with siblings",
+      "severity": "HIGH",
+      "kind": "content",
+      "route": "/journeys and /journey/6",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "GET /api/journeys -> journey 6 stepCount=18; journeys 7/8/9/10 stepCount=6",
+        "GET /api/journeys/6 -> 18 step rows but only 6 distinct titles (each of 6 logical steps has 3 rows). The other journeys collapse their 3-rows-per-step into 6 logical steps; journey 6's rows carry distinct stepNumbers 1..18 so the group-aware UI never collapses them.",
+        "Open /journeys: the 'Video Streaming Fundamentals' card renders '18 steps'; every other card renders '6 steps'.",
+        "Open /journey/6: header badge reads '18 steps'; the Learning Path syllabus renders 18 step cards where each title ('Introduction to Video Streaming', 'Understanding Video Codecs', ...) appears 3 times in a row.",
+        "Contrast /journey/7: badge '6 steps', 6 syllabus cards, 6 distinct titles (correct)."
+      ],
+      "expected": "Journey 6 should present 6 logical steps consistently on both the list card and detail page (like every other journey), grouping its 3-rows-per-step; a learner should not see the same step title listed three times.",
+      "actual": "Journey 6 reports and renders 18 steps with each of its 6 titles repeated 3x; the list card ('18 steps') and detail badge ('18 steps') both disagree with the group-aware convention used by journeys 7-10 ('6 steps'). '8-10 hours' duration paired with '18 steps' also reads inconsistently vs siblings.",
+      "evidence": [
+        "/tmp/bughunt/public-engage/journey6-syllabus.png",
+        "/tmp/bughunt/public-engage/journey7-syllabus.png",
+        "/tmp/bughunt/public-engage/journeys-stepcount-list.png",
+        "/tmp/bughunt/public-engage/stepcount-parity.json"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-02",
+      "title": "Anonymous 'Refresh recommendations' button on /advanced fires an authenticated-only request and returns 401 (console error + network 4xx during a normal anon flow)",
+      "severity": "MEDIUM",
+      "kind": "functional",
+      "route": "/advanced?tab=recommendations",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "As an anonymous visitor open /advanced and activate the 'AI Recommendations' tab (aria-selected asserted).",
+        "The panel renders a 'Refresh recommendations' button (data-testid=button-generate-recommendations) that is enabled for anon.",
+        "Click it.",
+        "Network: GET /api/recommendations?limit=10&refresh=true -> 401 Unauthorized; browser console logs 'Failed to load resource: 401'.",
+        "Panel then flips to the error state: 'Recommendations couldn\u2019t be refreshed \u2014 You need to be signed in to do that. Please sign in and try again.'"
+      ],
+      "expected": "An anonymous user should not be shown an enabled control that fires an authenticated-only endpoint and 401s; the panel should gate behind sign-in (or hide/disable Refresh) rather than surfacing a 401 + console error on a normal click.",
+      "actual": "Anon click triggers a 401 on /api/recommendations and a console error, then shows a post-hoc 'You need to be signed in' error.",
+      "evidence": [
+        "/tmp/bughunt/public-engage/advanced-rec-anon-401-error.png",
+        "/tmp/bughunt/public-engage/rec-refresh-loginlink.json"
+      ],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized) (GET /api/recommendations?limit=10&refresh=true)"
+      ],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-03",
+      "title": "Anonymous /advanced Recommendations copy claims the visitor is signed in ('Using your account activity', 'your feedback shape these picks') with no sign-in prompt",
+      "severity": "MEDIUM",
+      "kind": "content",
+      "route": "/advanced?tab=recommendations",
+      "viewport": "1440x900 and 375x667",
+      "reproSteps": [
+        "As anonymous, open /advanced, activate 'AI Recommendations'.",
+        "Header reads 'Personalized Recommendations \u2014 Account preferences, learning activity, and your feedback shape these picks.'",
+        "Card reads 'Using your account activity' / 'Add learning preferences for more precise matches. Existing activity and feedback still shape your results.'",
+        "No sign-in prompt appears anywhere in the panel (mentionsSignIn=false).",
+        "Same misleading copy reproduced at mobile 375x667."
+      ],
+      "expected": "For a visitor with no account, the copy must not assert 'your account activity', 'your feedback', or 'saved preferences shape your results'; it should honestly say results are non-personalized and prompt sign-in.",
+      "actual": "Anon sees possessive/account-implying copy as if signed in, with no account and no sign-in CTA in the panel.",
+      "evidence": [
+        "/tmp/bughunt/public-engage/advanced-desktop-rec-anon-full.png",
+        "/tmp/bughunt/public-engage/advanced-mobile-rec-anon.png",
+        "/tmp/bughunt/public-engage/rec-anon.json"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-04",
+      "title": "Anonymous 'Choose learning preferences' link on Recommendations is a dead end \u2014 /settings#learning-preferences has no learning-preferences section for anon",
+      "severity": "LOW",
+      "kind": "usability",
+      "route": "/advanced?tab=recommendations -> /settings#learning-preferences",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "As anonymous on /advanced Recommendations, note the 'Choose learning preferences' button links to /settings#learning-preferences.",
+        "Navigate to /settings#learning-preferences as anon.",
+        "The #learning-preferences section does NOT exist (sectionExists=false), page does not scroll (scrollY=0); anon Settings only shows 'Appearance' and a 'Sign in for more' card."
+      ],
+      "expected": "The recommendations CTA for anon should route to sign-in (or Settings should reveal/anchor the learning-preferences area behind a sign-in prompt), not to an anchor that is absent for the anonymous state.",
+      "actual": "Anon lands on /settings with no #learning-preferences target and no learning-preferences UI; the CTA leads nowhere useful.",
+      "evidence": [
+        "/tmp/bughunt/public-engage/settings-desktop-anon.png",
+        "/tmp/bughunt/public-engage/settings-static.json"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-05",
+      "title": "Anonymous Recommendations empty state instructs the visitor to 'update your preferences' \u2014 an action unavailable to anonymous users",
+      "severity": "LOW",
+      "kind": "content",
+      "route": "/advanced?tab=recommendations",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "As anonymous, open /advanced Recommendations tab.",
+        "Because no recommendations are generated for anon, the empty state 'No unseen recommendations right now' renders.",
+        "Its guidance reads 'Restore hidden items, update your preferences, or try again to look for new catalog matches.'"
+      ],
+      "expected": "The empty-state guidance for an anonymous user should not tell them to restore hidden items / update preferences (both require an account); it should prompt sign-in.",
+      "actual": "Anon is told to perform account-only actions (restore hidden items, update preferences) with no sign-in path.",
+      "evidence": [
+        "/tmp/bughunt/public-engage/advanced-desktop-rec-anon-full.png",
+        "/tmp/bughunt/public-engage/rec-anon.json"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-06",
+      "title": "Journey 6 detail syllabus lists each step title three times consecutively (18 near-identical cards) \u2014 confusing learning-path presentation",
+      "severity": "LOW",
+      "kind": "usability",
+      "route": "/journey/6",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Open /journey/6.",
+        "In the 'Learning Path' section, count syllabus step headings: 18 h3 headings but only 6 distinct titles \u2014 'Introduction to Video Streaming' appears 3 times in a row, then 'Understanding Video Codecs' 3 times, etc.",
+        "Compare /journey/7 where 6 headings map to 6 distinct titles."
+      ],
+      "expected": "Each logical step should appear once in the syllabus (its 1-3 constituent resource rows nested under a single step), as journeys 7-10 do.",
+      "actual": "Journey 6 renders each logical step as three separate, identically-titled step cards, so the learning path shows the same step title repeated three times consecutively.",
+      "evidence": [
+        "/tmp/bughunt/public-engage/journey6-syllabus.png",
+        "/tmp/bughunt/public-engage/stepcount-parity.json"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-07",
+      "title": "/code-of-conduct returns a 404 'Page Not Found' though it is enumerated as a public route in the surface map (route absent from router and sitemap)",
+      "severity": "LOW",
+      "kind": "functional",
+      "route": "/code-of-conduct",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "Navigate to /code-of-conduct in the SPA.",
+        "Page renders 'Page Not Found' (title 'Page Not Found \u2014 Awesome Video') and the network shows a 404 for the route.",
+        "Reproduced twice via curl: HTTP 404 both times. Not present in the client router or sitemap.xml."
+      ],
+      "expected": "Either the /code-of-conduct page exists (it is listed as a public route) or it is not advertised as a public surface. A documented public route should not 404.",
+      "actual": "The documented public route /code-of-conduct 404s. (Note: no rendered UI link points to it \u2014 footer links only About/Terms/Privacy \u2014 so user impact is limited to typed/bookmarked/documented URLs.)",
+      "evidence": [
+        "/tmp/bughunt/public-engage/anon-sweep.json"
+      ],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found) (/code-of-conduct)"
+      ],
+      "confidence": "reproduced-twice"
+    },
+    {
+      "id": "P1-08",
+      "title": "Cross-surface login-link inconsistency: /submit uses '/sign-in?redirect_url=%2Fsubmit' while /journey/:id anon gate uses a bare setLocation('/login') (extra legacy redirect hop, no post-login return)",
+      "severity": "LOW",
+      "kind": "usability",
+      "route": "/submit vs /journey/6",
+      "viewport": "1440x900",
+      "reproSteps": [
+        "On /submit as anon, the 'Login required' banner links to /sign-in?redirect_url=%2Fsubmit (deep link with return URL).",
+        "On /journey/6 as anon, the 'log in' button calls setLocation('/login'), which is a LegacyAuthRedirect to /sign-in with NO redirect_url \u2014 after sign-in the user is not returned to the journey.",
+        "Clicked the journey 'log in' button: navigation lands on /sign-in (no redirect_url query)."
+      ],
+      "expected": "Both anon gates should route to the same auth surface with a redirect_url back to the originating page, so a user returns to the journey/submit form after signing in.",
+      "actual": "The journey gate loses the return path (goes to /login -> /sign-in with no redirect_url), while /submit preserves it \u2014 an inconsistent, lossy login hand-off across two engagement surfaces.",
+      "evidence": [
+        "/tmp/bughunt/public-engage/rec-refresh-loginlink.json",
+        "/tmp/bughunt/public-engage/journey6-desktop-anon.png"
+      ],
+      "consoleErrors": [],
+      "confidence": "reproduced-twice"
+    }
+  ]
+}

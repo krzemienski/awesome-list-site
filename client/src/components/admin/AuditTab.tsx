@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Search, RefreshCw, AlertCircle } from "lucide-react";
+import { parseIntInRange, PG_INT4_MAX } from "@shared/validation";
 
 interface AuditLogEntry {
   id: number;
@@ -78,9 +79,21 @@ export default function AuditTab() {
     refetchOnWindowFocus: true,
   });
 
+  // ADM-08: validate the Resource ID filter client-side against the SAME rule
+  // the server enforces (positive integer within int4). An out-of-range value
+  // (99999999999) or 0 used to reach the API, 400, and surface a misleading
+  // "server error — try again" alert that failed identically on every retry.
+  // A blank filter is valid (means "no filter").
+  const trimmedFilter = resourceIdFilter.trim();
+  const resourceIdInvalid =
+    trimmedFilter.length > 0 &&
+    parseIntInRange(trimmedFilter, { min: 1, max: PG_INT4_MAX }) === null;
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setAppliedFilter(resourceIdFilter);
+    // Client-side gate: never send an out-of-range/invalid id to the server.
+    if (resourceIdInvalid) return;
+    setAppliedFilter(trimmedFilter);
     setAppliedLimit(limit);
     setOffset(0);
   };
@@ -141,7 +154,24 @@ export default function AuditTab() {
               onChange={(e) => setResourceIdFilter(e.target.value)}
               className="pl-10"
               type="number"
+              min={1}
+              max={PG_INT4_MAX}
+              aria-invalid={resourceIdInvalid}
+              aria-describedby={resourceIdInvalid ? "audit-resource-id-error" : undefined}
+              data-testid="input-audit-resource-id"
             />
+            {/* ADM-08: honest inline validation instead of a misleading
+                server-error alert after a failed request. */}
+            {resourceIdInvalid && (
+              <p
+                id="audit-resource-id-error"
+                role="alert"
+                className="mt-1 text-xs font-medium text-destructive"
+                data-testid="error-audit-resource-id"
+              >
+                Enter a Resource ID between 1 and {PG_INT4_MAX.toLocaleString()}.
+              </p>
+            )}
           </div>
           {/* Run16 BUG-040: apply the row limit immediately on change — it
               previously only took effect after also pressing Search. */}
@@ -158,7 +188,7 @@ export default function AuditTab() {
               ))}
             </SelectContent>
           </Select>
-          <Button type="submit" variant="outline" size="icon" aria-label="Search">
+          <Button type="submit" variant="outline" size="icon" aria-label="Search" disabled={resourceIdInvalid}>
             <Search className="h-4 w-4" />
           </Button>
           {appliedFilter && (

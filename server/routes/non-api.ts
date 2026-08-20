@@ -154,6 +154,7 @@ ${date ? `    <lastmod>${date}</lastmod>\n` : ""}    <changefreq>${changefreq}</
     // (indexable set stays equal to the sitemap).
     addUrl('/terms', 'yearly', '0.3');
     addUrl('/privacy', 'yearly', '0.3');
+    addUrl('/code-of-conduct', 'yearly', '0.3');
 
     // Category taxonomy + every approved resource detail page.
     try {

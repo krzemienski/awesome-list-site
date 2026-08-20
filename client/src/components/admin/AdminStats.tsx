@@ -56,7 +56,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                       onNavigate?.("approvals");
                     }}
                   >
-                    +{pendingCount} pending
+                    +{pendingCount.toLocaleString()} pending
                   </button>
                 ) : null}
                 {pendingCount && rejectedCount ? " · " : null}
@@ -73,7 +73,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                       onNavigate?.("resources");
                     }}
                   >
-                    {rejectedCount} rejected
+                    {rejectedCount.toLocaleString()} rejected
                   </button>
                 ) : null}
               </>
@@ -143,7 +143,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                 className="font-display font-medium text-3xl tracking-tight tabular-nums text-[var(--text)]"
                 data-testid={testId}
               >
-                {isLoading ? "—" : value || 0}
+                {isLoading ? "—" : (value ?? 0).toLocaleString()}
               </div>
               {!isLoading && sublabel && (
                 <div className="text-xs text-[var(--text-2)] mt-1">{sublabel}</div>

@@ -1,0 +1,344 @@
+{
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": null,
+      "disabled": false,
+      "testid": "mobile-drawer-trigger",
+      "text": "Toggle sidebar"
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": null,
+      "disabled": false,
+      "testid": null,
+      "text": "Search resources...Search.../"
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": null,
+      "disabled": false,
+      "testid": null,
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": null,
+      "disabled": false,
+      "testid": null,
+      "text": "Sign in"
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-community-events",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-community-groups",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-events-conferences",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-encoding-codecs",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-codecs",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-containerization-packaging-tools",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-encoding-tools",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-general-tools",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-infrastructure-delivery",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-cdn-integration-distribution",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-cloud-cdn",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-streaming-servers",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-intro-learning",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-webinars-conference-talks",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-media-tools",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-ads-qoe",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-audio-subtitles",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-players-clients",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-hardware-players",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-mobile-web-players",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-smart-tv-players",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-protocols-transport",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-adaptive-streaming",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-transport-protocols",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "toggle-cat-standards-industry",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-best-practices-guidelines",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-industry-forums-standards-bodies",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "expand-sub-specs-standards",
+      "text": ""
+    },
+    {
+      "tag": "INPUT",
+      "name": "title",
+      "type": null,
+      "disabled": false,
+      "testid": "input-title",
+      "text": ""
+    },
+    {
+      "tag": "INPUT",
+      "name": "url",
+      "type": "url",
+      "disabled": false,
+      "testid": "input-url",
+      "text": ""
+    },
+    {
+      "tag": "TEXTAREA",
+      "name": "description",
+      "type": null,
+      "disabled": false,
+      "testid": "input-description",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "select-category",
+      "text": "Select a category"
+    },
+    {
+      "tag": "INPUT",
+      "name": "tags",
+      "type": null,
+      "disabled": false,
+      "testid": "input-tags",
+      "text": ""
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "submit",
+      "disabled": true,
+      "testid": "button-submit",
+      "text": "Submit Resource"
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "button-cancel",
+      "text": "Cancel"
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": "button",
+      "disabled": false,
+      "testid": "footer-cookie-settings",
+      "text": "Cookie settings"
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": null,
+      "disabled": false,
+      "testid": "consent-decline",
+      "text": "Decline"
+    },
+    {
+      "tag": "BUTTON",
+      "name": null,
+      "type": null,
+      "disabled": false,
+      "testid": "consent-accept",
+      "text": "Allow analytics"
+    }
+  ],
+  "bodyMentions": {
+    "signInBanner": true,
+    "snippet": "Skip to main content\nToggle sidebar\nAWESOME.VIDEO\nHome\nSubmit Resource\nSearch resources...\n/\nSign in\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nBROWSE\nCategories · 9\n1,816 resources\nCommunity & Events\n80\nCommunity Groups\n40\nOnline Forums\n1\nEvents & Conferences\n40\nPodcasts & Webinars\n1\nEncoding & Codecs\n333\nBenchmarking & Performance Tools for Codecs\n2\nCloud-Based Encoding Solutions\n9\nCodecs\n23\nAV1\n5\nHEVC\n10\nVP9\n1\nComparative Analysis of Codecs\n1\nContainerization & Packaging Tools\n19\nOrigin Servers\n1\nEncoding Tools\n120\nFFmpeg\n50\nFFmpeg-Based Tools\n14\nHardware Accelerated T"
+  }
+}

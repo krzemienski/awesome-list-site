@@ -1,0 +1,70 @@
+{
+  "realisticKbd": {
+    "checkedId": "accent-option-crimson",
+    "before": "accent-option-crimson",
+    "after": "accent-option-magenta",
+    "moved": true
+  },
+  "accentContrast": [
+    {
+      "id": "crimson",
+      "accent": "#ff3d52",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 6.04
+    },
+    {
+      "id": "magenta",
+      "accent": "#ec4899",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 5.95
+    },
+    {
+      "id": "orange",
+      "accent": "#ff7a3d",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 8.1
+    },
+    {
+      "id": "amber",
+      "accent": "#ffb84d",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 12.22
+    },
+    {
+      "id": "emerald",
+      "accent": "#34d08c",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 10.55
+    },
+    {
+      "id": "matrix",
+      "accent": "#00ff88",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 15.66
+    },
+    {
+      "id": "cyan",
+      "accent": "#5eddf2",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 13.1
+    },
+    {
+      "id": "violet",
+      "accent": "#9d4edd",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 4.57
+    },
+    {
+      "id": "lime",
+      "accent": "#aaff00",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 17.01
+    },
+    {
+      "id": "rose",
+      "accent": "#ff7a8a",
+      "bodyBg": "rgb(0, 0, 0)",
+      "ratioVsBody": 8.4
+    }
+  ]
+}

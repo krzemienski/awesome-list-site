@@ -1,0 +1,74 @@
+{
+  "results": {
+    "/journeys": {
+      "title": "Learning Journeys — Awesome Video",
+      "h1": "Learning Journeys",
+      "bodyLen": 7923
+    },
+    "/journey/6": {
+      "title": "Video Streaming Fundamentals — Awesome Video",
+      "h1": "Video Streaming Fundamentals",
+      "bodyLen": 14215
+    },
+    "/journey/7": {
+      "title": "Building Your First Streaming Platform — Awesome Video",
+      "h1": "Building Your First Streaming Platform",
+      "bodyLen": 13448
+    },
+    "/advanced": {
+      "title": "Advanced — Awesome Video",
+      "h1": "Advanced Features",
+      "bodyLen": 18486
+    },
+    "/submit": {
+      "title": "Submit a Resource — Awesome Video",
+      "h1": "Submit a Resource",
+      "bodyLen": 7071
+    },
+    "/profile": {
+      "title": "Sign In — Awesome Video",
+      "h1": "Welcome back",
+      "bodyLen": 6257
+    },
+    "/settings": {
+      "title": "Settings — Awesome Video",
+      "h1": "Settings",
+      "bodyLen": 6377
+    },
+    "/settings/theme": {
+      "title": "Theme Settings — Awesome Video",
+      "h1": "Theme Settings",
+      "bodyLen": 8182
+    },
+    "/about": {
+      "title": "About — Awesome Video",
+      "h1": "About",
+      "bodyLen": 12389
+    },
+    "/privacy": {
+      "title": "Privacy Policy — Awesome Video",
+      "h1": "Privacy Policy",
+      "bodyLen": 9014
+    },
+    "/code-of-conduct": {
+      "title": "Page Not Found — Awesome Video",
+      "h1": "Page Not Found",
+      "bodyLen": 6358
+    },
+    "/sign-in": {
+      "title": "Sign In — Awesome Video",
+      "h1": "Welcome back",
+      "bodyLen": 6257
+    },
+    "/sign-up": {
+      "title": "Create an Account — Awesome Video",
+      "h1": "Create your account",
+      "bodyLen": 6290
+    }
+  },
+  "errs": {
+    "http://127.0.0.1:5000/code-of-conduct": [
+      "CONSOLE: Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  }
+}

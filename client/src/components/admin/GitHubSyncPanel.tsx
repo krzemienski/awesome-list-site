@@ -20,6 +20,9 @@ import { normalizeGithubRepoInput } from "@shared/validation";
 interface SyncHistory {
   id: number;
   direction: string;
+  // ADM-03/04: sync-history rows now carry their outcome so failed/orphaned
+  // syncs are badged honestly instead of rendered as successes.
+  status?: string;
   commitSha?: string;
   commitMessage?: string;
   commitUrl?: string;
@@ -314,14 +317,24 @@ export default function GitHubSyncPanel() {
                 </AlertDescription>
               </Alert>
             )}
-            {lastSync && (
-              <Alert>
-                <CheckCircle2 className="h-4 w-4" />
+            {lastSync && (() => {
+              // ADM-03: badge the Last Import/Export by its real outcome — a
+              // failed/orphaned sync must not render a green success checkmark.
+              const lastSyncFailed = lastSync.status === 'failed';
+              return (
+              <Alert variant={lastSyncFailed ? 'destructive' : undefined} data-testid="alert-last-sync">
+                {lastSyncFailed ? <XCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                 <AlertDescription className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">
                         Last {lastSync.direction === 'export' ? 'Export' : 'Import'}
                     </span>
+                    {lastSyncFailed && (
+                      <Badge variant="destructive" data-testid="badge-last-sync-failed">
+                        <XCircle className="h-3 w-3 mr-1" />
+                        failed
+                      </Badge>
+                    )}
                     <Badge variant="outline">
                       <Clock className="h-3 w-3 mr-1" />
                       {formatSyncDate(lastSync.createdAt)}
@@ -369,7 +382,8 @@ export default function GitHubSyncPanel() {
                   )}
                 </AlertDescription>
               </Alert>
-            )}
+              );
+            })()}
 
             {syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
@@ -436,8 +450,13 @@ export default function GitHubSyncPanel() {
           <CardContent>
             <ScrollArea className="h-[300px]">
               <div className="space-y-4">
-                {syncHistory.map((sync) => (
-                  <div key={sync.id} className="border rounded-lg p-4 space-y-2">
+                {syncHistory.map((sync) => {
+                  // ADM-04: Sync History rows must carry the same failure
+                  // legibility as Recent Sync Jobs — a failed/orphaned row
+                  // gets a red badge + icon instead of reading like a success.
+                  const syncFailed = sync.status === 'failed';
+                  return (
+                  <div key={sync.id} className="border rounded-lg p-4 space-y-2" data-testid={`sync-history-row-${sync.id}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {sync.direction === 'export' ? (
@@ -446,6 +465,20 @@ export default function GitHubSyncPanel() {
                           <Download className="h-4 w-4 text-primary" />
                         )}
                         <span className="font-semibold capitalize">{sync.direction}</span>
+                        {sync.status && (
+                          <Badge
+                            variant={syncFailed ? 'destructive' : 'default'}
+                            className="text-xs"
+                            data-testid={`badge-sync-history-status-${sync.id}`}
+                          >
+                            {syncFailed ? (
+                              <XCircle className="h-3 w-3 mr-1" />
+                            ) : (
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                            )}
+                            {sync.status}
+                          </Badge>
+                        )}
                       </div>
                       <span className="text-xs text-muted-foreground">
                         {formatSyncDate(sync.createdAt)}
@@ -479,7 +512,8 @@ export default function GitHubSyncPanel() {
                       </Button>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </ScrollArea>
           </CardContent>

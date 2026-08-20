@@ -526,7 +526,19 @@ export default function JourneyDetail() {
                     text stays inline so the sentence prints grammatically. */}
                 Please <button 
                   className="print-keep-text underline font-medium min-h-[44px] px-2 inline-flex items-center"
-                  onClick={() => setLocation('/login')}
+                  onClick={() => {
+                    // P1-08: mirror /submit's auth hand-off — route to the
+                    // canonical /sign-in with a redirect_url back to this
+                    // journey (same /^\/(?![/\\])/ safe-path guard the legacy
+                    // /login redirect uses) instead of a bare /login hop that
+                    // dropped the return path after sign-in.
+                    const current = window.location.pathname + window.location.search;
+                    const safe = /^\/(?![/\\])/.test(current)
+                      ? `/sign-in?redirect_url=${encodeURIComponent(current)}`
+                      : '/sign-in';
+                    setLocation(safe);
+                  }}
+                  data-testid="button-login-journey"
                 >
                   log in
                 </button> to start this journey and track your progress.

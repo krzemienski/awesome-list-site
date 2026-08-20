@@ -1,0 +1,24 @@
+{
+  "state": {
+    "afterClicks": {
+      "hash": "#enrichment",
+      "active": "tab-enrichment"
+    },
+    "afterReload": {
+      "hash": "#enrichment",
+      "active": "tab-enrichment"
+    },
+    "back1": {
+      "hash": "#journeys",
+      "active": "tab-journeys"
+    },
+    "back2": {
+      "hash": "#github",
+      "active": "tab-github"
+    },
+    "fwd1": {
+      "hash": "#journeys",
+      "active": "tab-journeys"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "listCards": {
+    "6": {
+      "steps": "18",
+      "title": "Video Streaming Fundamentals"
+    },
+    "7": {
+      "steps": "6",
+      "title": "Building Your First Streaming Platform"
+    },
+    "8": {
+      "steps": "6",
+      "title": "FFmpeg Mastery"
+    },
+    "9": {
+      "steps": "6",
+      "title": "Advanced Live Streaming Architecture"
+    },
+    "10": {
+      "steps": "6",
+      "title": "DRM & Content Protection"
+    }
+  },
+  "detailLogicalStepHeadings": [
+    "Learning Path",
+    "Introduction to Video Streaming",
+    "Introduction to Video Streaming",
+    "Introduction to Video Streaming",
+    "Understanding Video Codecs",
+    "Understanding Video Codecs",
+    "Understanding Video Codecs",
+    "Streaming Protocols Overview",
+    "Streaming Protocols Overview",
+    "Streaming Protocols Overview",
+    "Players and Playback Basics",
+    "Players and Playback Basics",
+    "Players and Playback Basics",
+    "Video Formats and Containers",
+    "Video Formats and Containers",
+    "Video Formats and Containers",
+    "Putting It All Together",
+    "Putting It All Together",
+    "Putting It All Together"
+  ]
+}

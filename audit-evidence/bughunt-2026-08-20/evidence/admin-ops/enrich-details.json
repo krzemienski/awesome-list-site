@@ -1,0 +1,6 @@
+{
+  "dlg": {
+    "text": "Job Details #21\nConfiguration\nFilter\nunenriched\nBatch Size\n5\nModel\nclaude-haiku-4-5 (default)\nBase URL\nPlatform default\nAuth Token\nPlatform key\nStatistics\n1\nTotal\n1\nProcessed\n0\nSuccessful\n0\nFailed\n1\nSkipped\nCommunication Graph\norchestrator\nsubagent\ntool\nNo agent activity recorded.\nAgent Events (structured)\n0 events\nNo events recorded.\nClose"
+  },
+  "pageErrs": []
+}

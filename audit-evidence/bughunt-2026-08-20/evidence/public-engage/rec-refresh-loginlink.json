@@ -1,0 +1,15 @@
+{
+  "chooseHref": "/settings#learning-preferences",
+  "console": [
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+  ],
+  "afterRefresh": "Personalized RecommendationsAccount preferences, learning activity, and your feedback shape these picks.Using your account activityAdd learning preferences for more precise matches. Existing activity and feedback still shape your results.Choose learning preferencesRefresh recommendationsRecommendati",
+  "netErrsAfterRefresh": [
+    "401 http://127.0.0.1:5000/api/recommendations?limit=10&refresh=true"
+  ],
+  "journeyLoginBtnExists": true,
+  "journeyLoginNavTo": "http://127.0.0.1:5000/sign-in",
+  "netErrs": [
+    "401 http://127.0.0.1:5000/api/recommendations?limit=10&refresh=true"
+  ]
+}

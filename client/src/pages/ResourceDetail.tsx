@@ -2,7 +2,7 @@ import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, Fragment } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -475,6 +475,21 @@ export default function ResourceDetail() {
   const urlScraped = metadata?.urlScraped;
   const tags = metadata?.tags as string[] | undefined;
 
+  // P-07: only surface provider/format/skill rows that are actually classified.
+  // When every dimension is "unknown" the metadata list collapses to a single
+  // "Not yet classified" note instead of three identical filler rows.
+  const classificationRows = [
+    { label: "Provider", raw: resource?.provider, labels: RESOURCE_PROVIDER_LABELS },
+    { label: "Format", raw: resource?.resourceFormat, labels: RESOURCE_FORMAT_LABELS },
+    { label: "Skill level", raw: resource?.skillLevel, labels: RESOURCE_SKILL_LEVEL_LABELS },
+  ]
+    .filter((row) => row.raw && row.raw !== "unknown")
+    .map((row) => ({
+      label: row.label,
+      value: (row.labels as Record<string, string>)[row.raw as string] ?? String(row.raw),
+    }));
+  const allUnclassified = classificationRows.length === 0;
+
   const filteredRelatedResources = (relatedResources?.similar ?? [])
     .slice(0, 6)
     .map((item) => ({ ...item.resource, score: item.score, reasons: item.reasons }));
@@ -803,47 +818,59 @@ export default function ResourceDetail() {
                         </span>
                       ))}
                   </dd>
-                  <dt className="font-medium text-muted-foreground">Provider</dt>
-                  <dd>
-                    {RESOURCE_PROVIDER_LABELS[
-                      (resource.provider ?? "unknown") as ResourceProvider
-                    ] ?? "Not yet classified"}
-                  </dd>
-                  <dt className="font-medium text-muted-foreground">Format</dt>
-                  <dd>
-                    {RESOURCE_FORMAT_LABELS[
-                      (resource.resourceFormat ?? "unknown") as ResourceFormat
-                    ] ?? "Not yet classified"}
-                  </dd>
-                  <dt className="font-medium text-muted-foreground">Skill level</dt>
-                  <dd>
-                    {RESOURCE_SKILL_LEVEL_LABELS[
-                      (resource.skillLevel ?? "unknown") as ResourceSkillLevel
-                    ] ?? "Not yet classified"}
-                  </dd>
+                  {classificationRows.length > 0 ? (
+                    classificationRows.map((row) => (
+                      <Fragment key={row.label}>
+                        <dt className="font-medium text-muted-foreground">{row.label}</dt>
+                        <dd>{row.value}</dd>
+                      </Fragment>
+                    ))
+                  ) : (
+                    <>
+                      {/* P-07: provider/format/skill are all unclassified — show
+                          the "Not yet classified" note ONCE instead of three
+                          identical rows. */}
+                      <dt className="font-medium text-muted-foreground">Classification</dt>
+                      <dd>Not yet classified</dd>
+                    </>
+                  )}
                 </dl>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  {resourceFactsSummary({
-                    title: resource.title,
-                    taxonomy: [
-                      resource.category,
-                      resource.subcategory,
-                      resource.subSubcategory,
-                    ].filter((value): value is string => Boolean(value)),
-                    provider:
-                      RESOURCE_PROVIDER_LABELS[
-                        (resource.provider ?? "unknown") as ResourceProvider
-                      ] ?? "Not yet classified",
-                    format:
-                      RESOURCE_FORMAT_LABELS[
-                        (resource.resourceFormat ?? "unknown") as ResourceFormat
-                      ] ?? "Not yet classified",
-                    skillLevel:
-                      RESOURCE_SKILL_LEVEL_LABELS[
-                        (resource.skillLevel ?? "unknown") as ResourceSkillLevel
-                      ] ?? "Not yet classified",
-                    tags,
-                  })}
+                  {(() => {
+                    const summary = resourceFactsSummary({
+                      title: resource.title,
+                      taxonomy: [
+                        resource.category,
+                        resource.subcategory,
+                        resource.subSubcategory,
+                      ].filter((value): value is string => Boolean(value)),
+                      provider:
+                        RESOURCE_PROVIDER_LABELS[
+                          (resource.provider ?? "unknown") as ResourceProvider
+                        ] ?? "Not yet classified",
+                      format:
+                        RESOURCE_FORMAT_LABELS[
+                          (resource.resourceFormat ?? "unknown") as ResourceFormat
+                        ] ?? "Not yet classified",
+                      skillLevel:
+                        RESOURCE_SKILL_LEVEL_LABELS[
+                          (resource.skillLevel ?? "unknown") as ResourceSkillLevel
+                        ] ?? "Not yet classified",
+                      tags,
+                    });
+                    // P-07: when every classification dimension is unclassified,
+                    // drop the "Provider: … Format: … Skill level: …" filler
+                    // sentence so the prose doesn't repeat "Not yet classified"
+                    // three times. Curated resources keep the full sentence.
+                    return allUnclassified
+                      ? summary
+                          .replace(
+                            /\s*Provider: [^.]*\. Format: [^.]*\. Skill level: [^.]*\./,
+                            "",
+                          )
+                          .trim()
+                      : summary;
+                  })()}
                 </p>
               </div>
 

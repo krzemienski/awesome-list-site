@@ -84,7 +84,13 @@ export default function ResourceManager() {
     return () => clearTimeout(t);
   }, [search]);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  // P1-04: seed the status filter from ?status= on first load so a deep-link
+  // (the dashboard's "N rejected" stat) and a plain reload/bookmark of
+  // /admin?tab=resources&status=rejected both land on the same filtered table.
+  const [statusFilter, setStatusFilter] = useState<string>(() => {
+    const s = new URLSearchParams(window.location.search).get("status");
+    return s && STATUS_OPTIONS.some(o => o.value === s) ? s : "";
+  });
 
   // Task 275: mirror the effective page into ?page= (replaceState, no history
   // spam) so the paginator's hrefs stay honest and refresh keeps your place.
@@ -97,7 +103,21 @@ export default function ResourceManager() {
     else url.searchParams.delete("page");
     window.history.replaceState({}, "", url.pathname + url.search + url.hash);
   }, [page]);
-  
+
+  // P1-04: keep ?status= in sync with the active status filter (replaceState,
+  // no history spam) so the deep-linked/filtered view round-trips on reload,
+  // share, and bookmark — and clearing the filter removes the param instead of
+  // leaving a stale ?status=rejected behind.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const current = url.searchParams.get("status");
+    const want = statusFilter || null;
+    if (current === want) return;
+    if (want) url.searchParams.set("status", want);
+    else url.searchParams.delete("status");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+  }, [statusFilter]);
+
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -401,7 +421,16 @@ export default function ResourceManager() {
     });
   };
 
+  // P1-06: remember the control that opened the (shared) edit dialog so focus
+  // returns there on close (Radix onCloseAutoFocus) instead of falling to
+  // <body> — keyboard/AT users keep their place in the table row.
+  const editTriggerRef = useRef<HTMLElement | null>(null);
+
   const openEditDialog = (resource: Resource) => {
+    // Capture the triggering row button (falls back to null for the
+    // deep-link path, where there is no in-page trigger to restore to).
+    const active = document.activeElement;
+    editTriggerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     setSelectedResource(resource);
     // BUG-049: fresh dialog, fresh error state.
     setFieldErrors({});
@@ -438,16 +467,9 @@ export default function ResourceManager() {
     if (deepLinkHandled.current) return;
     deepLinkHandled.current = true;
     const params = new URLSearchParams(window.location.search);
-    // Run16 BUG-029: ?status=rejected|pending|approved pre-filters the table
-    // (used by the dashboard's "N rejected" stat sublabel deep-link). The
-    // param is stripped so refreshes don't re-apply a stale filter.
-    const statusParam = params.get("status");
-    if (statusParam && STATUS_OPTIONS.some(s => s.value === statusParam)) {
-      setStatusFilter(statusParam);
-      const url = new URL(window.location.href);
-      url.searchParams.delete("status");
-      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-    }
+    // P1-04: ?status=rejected|pending|approved is seeded into `statusFilter`'s
+    // initial state (above) and kept in the URL by the sync effect, so the
+    // filtered view round-trips on reload/share/bookmark. Nothing to strip here.
     const rid = parseInt(params.get("resourceId") || "", 10);
     if (!rid || Number.isNaN(rid)) return;
     const stripParam = () => {
@@ -1005,9 +1027,12 @@ export default function ResourceManager() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
+                        {/* P1-08: enforce a ≥44px square touch target on mobile
+                            (WCAG 2.5.5) — size="sm" left them 40–42px wide. */}
                         <Button
                           variant="outline"
                           size="sm"
+                          className="min-h-11 min-w-11"
                           onClick={() => openEditDialog(resource)}
                           aria-label={`Edit ${resource.title || `resource #${resource.id}`}`}
                           data-testid={`button-edit-${resource.id}`}
@@ -1017,6 +1042,7 @@ export default function ResourceManager() {
                         <Button
                           variant="destructive"
                           size="sm"
+                          className="min-h-11 min-w-11"
                           onClick={() => openDeleteDialog(resource)}
                           aria-label={`Delete ${resource.title || `resource #${resource.id}`}`}
                           data-testid={`button-delete-${resource.id}`}
@@ -1039,9 +1065,11 @@ export default function ResourceManager() {
           <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
             <div className="flex items-center gap-3">
               <div className="text-sm text-[var(--text-2)]">
+                {/* P1-01: thousands separators everywhere (matches the header
+                    and stats card). P1-05: count-aware noun — "1 resource". */}
                 {(data?.total || 0) === 0
                   ? "0 resources"
-                  : `Showing ${((page - 1) * limit) + 1} - ${Math.min(page * limit, data?.total || 0)} of ${data?.total || 0} resources`}
+                  : `Showing ${(((page - 1) * limit) + 1).toLocaleString()} - ${Math.min(page * limit, data?.total || 0).toLocaleString()} of ${(data?.total || 0).toLocaleString()} ${(data?.total || 0) === 1 ? 'resource' : 'resources'}`}
               </div>
               <Select value={String(limit)} onValueChange={(v) => { setLimit(parseInt(v, 10)); setPage(1); }}>
                 {/* Run17 BUG-034: shrink-0 — flexbox squeezed the trigger below w-28
@@ -1083,7 +1111,20 @@ export default function ResourceManager() {
         {/* NB-005 (run18): cap height to the small-viewport unit (svh accounts
             for mobile URL bars) and scroll internally so every field + the
             Save/Cancel footer stay reachable at 812×375 landscape. */}
-        <DialogContent className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]">
+        {/* P1-06: restore focus to the row's edit button on close. Radix's
+            default drops focus to <body> because this one Dialog is shared
+            across rows rather than nested under a per-row trigger. */}
+        <DialogContent
+          className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]"
+          onCloseAutoFocus={(e) => {
+            const trigger = editTriggerRef.current;
+            if (trigger && document.contains(trigger)) {
+              e.preventDefault();
+              trigger.focus();
+            }
+            editTriggerRef.current = null;
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Pencil className="h-5 w-5" />

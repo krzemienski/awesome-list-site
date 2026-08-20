@@ -35,12 +35,22 @@ const options = (counts: Count[] | undefined, selected: string | string[], label
   return [...values].map(([value, count]) => ({ value, count, label: labels?.[value] ?? label(value) }));
 };
 
-function FacetList({ title, items, value, onSelect, testid }: { title: string; items: { value: string; count: number; label: string }[]; value: string; onSelect: (v: string) => void; testid: string }) {
+function FacetList({ title, items, value, onSelect, testid, collapseInert = false }: { title: string; items: { value: string; count: number; label: string }[]; value: string; onSelect: (v: string) => void; testid: string; collapseInert?: boolean }) {
   if (!items.length) return null;
-  return <fieldset className="space-y-1" data-testid={testid}><legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{title}</legend>
+  // P-07: when the ONLY option a facet offers is "Not yet classified" (i.e. the
+  // whole catalog is unclassified for this dimension), the filter can't narrow
+  // anything — collapse the group so the taxonomy-page sidebar isn't cluttered
+  // with an inert, single-option filler row. Only applied on taxonomy listings
+  // (collapseInert): the /search page keeps every facet clickable so the
+  // ?provider=unknown deep-link workflow (pinned by url-params-audit) still
+  // works. A deep-linked ?provider=unknown selection still renders here (so its
+  // active state / removal chip stays reachable); the API + chips are untouched.
+  const onlyUnclassified = items.every((item) => item.value === "unknown");
+  if (collapseInert && onlyUnclassified && value !== "unknown") return null;
+  return <fieldset className="min-w-0 space-y-1" data-testid={testid}><legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{title}</legend>
     <div className={cn(items.length > 6 && "max-h-64 overflow-y-auto overscroll-contain pr-1")}>
       {items.map(item => <button type="button" key={item.value} onClick={() => onSelect(value === item.value ? "" : item.value)} className={cn("flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm transition-colors hover:bg-muted", value === item.value && "bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)]")} aria-pressed={value === item.value} aria-label={`${value === item.value ? "Remove" : "Apply"} ${item.label} ${title.toLowerCase()} filter, ${item.count} results`} data-testid={`facet-${testid}-${item.value}`}>
-        <span className="flex min-w-0 items-center gap-2">{value === item.value ? <Check className="h-3.5 w-3.5 shrink-0" /> : <span className="w-3.5" />}<span className="truncate">{item.label}</span></span><span className="font-mono text-xs text-muted-foreground">{item.count}</span>
+        <span className="flex min-w-0 items-center gap-2">{value === item.value ? <Check className="h-3.5 w-3.5 shrink-0" /> : <span className="w-3.5" />}<span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span>
       </button>)}
     </div>
   </fieldset>;
@@ -64,14 +74,14 @@ export default function SearchFilters({ state, facets, onChange, onClear, hideTa
     {!hideTaxonomyFacets && <FacetList title="Category" items={options(facets?.categories, state.category)} value={state.category} onSelect={v => applyChange("category", v)} testid="category" />}
     {!hideTaxonomyFacets && <FacetList title="Subcategory" items={options(facets?.subcategories, state.subcategory)} value={state.subcategory} onSelect={v => applyChange("subcategory", v)} testid="subcategory" />}
     {!hideTaxonomyFacets && <FacetList title="Sub-subcategory" items={options(facets?.subSubcategories, state.subSubcategory)} value={state.subSubcategory} onSelect={v => applyChange("subSubcategory", v)} testid="sub-subcategory" />}
-    <FacetList title="Provider" items={options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS)} value={state.provider} onSelect={v => applyChange("provider", v)} testid="provider" />
-    <FacetList title="Format" items={options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS)} value={state.format} onSelect={v => applyChange("format", v)} testid="format" />
-    <FacetList title="Skill level" items={options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS)} value={state.skillLevel} onSelect={v => applyChange("skillLevel", v)} testid="skill-level" />
-    <fieldset className="space-y-2"><legend className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Tags</legend>
+    <FacetList title="Provider" items={options(facets?.providers, state.provider, RESOURCE_PROVIDER_LABELS)} value={state.provider} onSelect={v => applyChange("provider", v)} testid="provider" collapseInert={hideTaxonomyFacets} />
+    <FacetList title="Format" items={options(facets?.formats, state.format, RESOURCE_FORMAT_LABELS)} value={state.format} onSelect={v => applyChange("format", v)} testid="format" collapseInert={hideTaxonomyFacets} />
+    <FacetList title="Skill level" items={options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS)} value={state.skillLevel} onSelect={v => applyChange("skillLevel", v)} testid="skill-level" collapseInert={hideTaxonomyFacets} />
+    <fieldset className="min-w-0 space-y-2"><legend className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Tags</legend>
       <div className="relative"><Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" /><Input value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Find a tag" className="h-11 pl-8" aria-label="Search tags" data-testid="input-search-tags" /></div>
       <div className="max-h-56 overflow-y-auto pr-1">{tags.slice(0, 80).map(item => {
         const selected = state.tags.some(t => t.toLowerCase() === item.value.toLowerCase());
-        return <button type="button" key={item.value} className="flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-muted" aria-pressed={selected} aria-label={`${selected ? "Remove" : "Apply"} ${item.label} tag filter`} onClick={() => applyChange("tags", selected ? state.tags.filter(t => t.toLowerCase() !== item.value.toLowerCase()) : [...state.tags, item.value])}><span className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border", selected && "border-[var(--accent)] bg-[var(--accent)] text-black")}>{selected && <Check className="h-3 w-3" />}</span><span className="truncate">{item.label}</span></span><span className="font-mono text-xs text-muted-foreground">{item.count}</span></button>;
+        return <button type="button" key={item.value} className="flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-muted" aria-pressed={selected} aria-label={`${selected ? "Remove" : "Apply"} ${item.label} tag filter`} onClick={() => applyChange("tags", selected ? state.tags.filter(t => t.toLowerCase() !== item.value.toLowerCase()) : [...state.tags, item.value])}><span className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border", selected && "border-[var(--accent)] bg-[var(--accent)] text-black")}>{selected && <Check className="h-3 w-3" />}</span><span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span></button>;
       })}</div>
       {tags.length > 80 && <p className="px-2 text-xs text-muted-foreground">Showing 80 tags. Refine your tag search to see more.</p>}
     </fieldset>
