@@ -89,3 +89,5 @@
 - [Reserved characters in SPA routes](reserved-character-spa-routes.md) — encode canonical path segments once; dotted routes need exemptions from asset detection, and percent escapes must not be lowercased.
 - [Drizzle PostgreSQL array binds](drizzle-postgres-array-binds.md) — raw JS arrays become SQL records; bind trusted numeric IDs as one PG array literal for ANY predicates reused across query branches.
 - [Cold-cache gate flattery](cold-cache-gate-flattery.md) — a crawl gate passing right after a warm-up burst proves nothing; confirm cold-boot solo (ladders lose to sustained saturation — cap uncached resolutions below the pool).
+- [Tags source of truth](tags-metadata-source.md) — the tags table is EMPTY; real tags live in resources.metadata.tags jsonb; derive from there, never the table.
+- [Toast wipes dialog state](dialog-toast-remount.md) — toast() on validation error inside admin dialogs remounts and wipes typed input; use inline banners in-dialog.

@@ -73,3 +73,5 @@ first (`SELECT id, step_number ... WHERE journey_id=N`) and restore `step_number
 via a direct DB `UPDATE ... CASE id` afterward — there is no unique constraint on
 `(journeyId, stepNumber)`, so a plain CASE update works. There is no
 create-journey endpoint, only step endpoints.
+
+**Drift mode seen in the wild:** a journey's rows can drift to SEQUENTIAL step_numbers (1..18, one per row) instead of grouped (6 step_numbers × 3 rows), which triplicates the step list in the UI and the crawler syllabus. Fix = idempotent data-only migration renumbering `step_number = ((rn-1)/3)+1` scoped to that journey_id, guarded so grouped data is a no-op. Progress rows reference step IDs, not numbers, so renumbering is safe for them.
