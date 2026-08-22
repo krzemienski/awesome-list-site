@@ -1,3 +1,4 @@
+import "dotenv/config";
 // Repeatable responsive/a11y validation (from fix-evidence-v3/run24d/responsive-audit.mjs).
 // Guards: profile header overlap 640..1440 (R5-026), tablist radius when wrapped (R5-054),
 // mobile breadcrumb at 375/320 + desktop crumb titles (R5-057), forced-colors button borders (R5-056).

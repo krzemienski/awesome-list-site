@@ -33,3 +33,15 @@ guard); anonymous visitors and prod-without-the-secret can never exercise it.
   workarounds are obsolete.
 - Registration-based scripts (throwaway-user flows) can't use this — they need a
   Clerk-era replacement for the removed register endpoint.
+- **Where the key lives in dev:** task environments may lack the ADMIN_PASSWORD
+  secret entirely. Supply it via the gitignored `.env` (dotenv is loaded by the
+  server AND by the audit scripts themselves — scripts read process.env for the
+  header, so a server-only env var isn't enough). NEVER use setEnvVars for it:
+  development env vars are written in plaintext into the committed `.replit`,
+  which is a versioned-credential leak (code review rejects it; rotate by
+  deleting the var and restarting so the fail-closed bypass goes dead).
+- A durable QA admin account exists for browser-based admin testing (Clerk
+  password sign-in, pre-provisioned `role=admin` row bridged via external_id);
+  its email/password live in the gitignored `.env` as TEST_ADMIN_EMAIL /
+  TEST_ADMIN_PASSWORD. In prod the same sign-in JIT-provisions a plain `user`
+  row — elevation there still needs an existing prod admin.

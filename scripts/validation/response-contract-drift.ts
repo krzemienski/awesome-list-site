@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import "dotenv/config";
 /**
  * Response-contract drift gate (sibling of openapi-drift).
  *

@@ -98,6 +98,8 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     settings: "Settings",
     notifications: "Notifications",
     onboarding: "Learning preferences",
+    // Task #346: living design-system showcase.
+    "design-system": "Design System",
   };
   // Taxonomy routes get a real parent chain resolved from the tree.
   if (

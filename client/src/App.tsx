@@ -50,6 +50,7 @@ const JourneyDetail = lazy(() => import("@/pages/JourneyDetail"));
 
 const ContinueLearning = lazy(() => import("@/pages/ContinueLearning"));
 const ThemeSettings = lazy(() => import("@/pages/ThemeSettings"));
+const DesignSystemShowcase = lazy(() => import("@/pages/DesignSystemShowcase"));
 const Recommendations = lazy(() => import("@/pages/Recommendations"));
 const Search = lazy(() => import("@/pages/Search"));
 const Settings = lazy(() => import("@/pages/Settings"));
@@ -317,6 +318,8 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/collection\/[^/]+$/,
   /^\/admin\/[^/]+$/,
   /^\/settings\/theme\/?$/,
+  // Task #346: living design-system showcase.
+  /^\/design-system\/?$/,
 ];
 
 // Task #307 — Clerk auth wiring. REQUIRED canonical constants (copy-verbatim
@@ -741,6 +744,7 @@ function Router() {
           </AdminGuard>
         )} />
         <Route path="/settings/theme" component={ThemeSettings} />
+        <Route path="/design-system" component={DesignSystemShowcase} />
         <Route path="/settings" component={Settings} />
         <Route path="/onboarding" component={() => (
           <AuthGuard>

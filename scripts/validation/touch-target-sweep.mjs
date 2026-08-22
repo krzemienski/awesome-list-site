@@ -1,3 +1,4 @@
+import "dotenv/config";
 // 375px touch-target sweep (32px floor, WCAG 2.5.8 inline-link exception).
 // Search and taxonomy filter drawers also get a keyboard-operability/focus pass.
 // Requires the dev server on :5000 and ADMIN_PASSWORD. Exits 1 on any violation.

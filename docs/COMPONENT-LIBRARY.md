@@ -44,13 +44,18 @@ Components live under `client/src/components/`:
 | Directory | What's in it |
 |---|---|
 | `ui/` | shadcn/ui primitives + a few app-specific composite widgets (see below). |
-| `resource/` | Resource-facing widgets: `ResourceCard`, `FavoriteButton`, `BookmarkButton`, `ShareButton`, `resource-view-modes`. |
+| `resource/` | Resource-facing widgets: `ResourceCard`, `FavoriteButton`, `BookmarkButton`, `BookmarkNotesDialog`, `ShareButton`, `resource-view-modes`. |
 | `layout/` | `Footer`, `SEOHead`, and `layout/new/` (`MainLayout`, `AppHeader`, `AppSidebar`). |
-| `admin/` | Admin dashboard tabs & managers (`AdminStats`, `ResourceManager`, `CategoryManager`, `UsersTab`, `GitHubSyncPanel`, `ResearcherTab`, `LinkHealthDashboard`, …). |
+| `admin/` | Admin dashboard tabs & managers (`AdminStats`, `ResourceManager`, `CategoryManager`, `UsersTab`, `GitHubSyncPanel`, `ResearcherTab`, `LinkHealthDashboard`, `BatchEnrichmentPanel`, `DigestQueueHealth`, `GenericCrudManager`, …) — see `admin/README.md`. |
 | `ai/` | AI feature cards: `LearningPathCard`, `RecommendationCard`, `MobileBottomSheet`. |
-| `auth/` | Route guards: `AuthGuard`, `AdminGuard`. |
+| `auth/` | Route guards + auth helpers: `AuthGuard`, `AdminGuard`, `GuestBookmarkMerge`. |
 | `profile/` | `AccountSecurityCard` (replaced `ChangePasswordForm` after Clerk migration). |
+| `learning/` | `ContinueLearningPreview` (journeys/continue-learning surface). |
+| `notifications/` | `NotificationPreferencesCard`. |
+| `onboarding/` | `learning-preferences-form`. |
+| `search/` | `SearchFilters`. |
 | `animations/` | `sidebar-morphing`. |
+| `BrandMark.tsx` | The brand tile (stays rounded in 0-radius systems — brand kit, not a bug). |
 | `ErrorBoundary.tsx` | Top-level React error boundary. |
 
 ---
@@ -67,9 +72,17 @@ Standard shadcn/ui primitives present in the repo. Import from
   `tooltip`, `dropdown-menu`, `context-menu`, `menubar`, `command`.
 - **Layout & navigation:** `card`, `separator`, `tabs`, `accordion`, `collapsible`,
   `scroll-area`, `resizable`, `sidebar`, `navigation-menu`, `breadcrumb`, `carousel`,
-  `aspect-ratio`.
+  `aspect-ratio`, `paginator`.
 - **Data display & feedback:** `table`, `badge`, `avatar`, `alert`, `progress`,
-  `skeleton`, `calendar`, `chart`, `toast` + `toaster`.
+  `skeleton`, `skeletons` (app skeleton compositions), `calendar`, `chart`,
+  `toast` + `toaster`.
+
+**Design-system hooks.** `Button` emits `data-ds-variant="<variant>"` and `Badge`
+emits `data-ds="chip"` for its DS variants `chip` / `accent`, so the per-system skins
+in `design-system.css` restyle them automatically (terminal brackets, brutalist slabs,
+swiss hairlines). Interactive cards add `data-ds="card-hover"` (see `ResourceCard` /
+`TaxonomyCard`). Details: [`docs/DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md) §7, contract:
+[`docs/AGENTS.md`](AGENTS.md).
 
 ### Forms
 
@@ -98,7 +111,11 @@ These are project widgets that live alongside the primitives:
   **`resource-recommendations`** — AI recommendation surfaces.
 - **`export-tools`**, **`color-palette-generator`**, **`consent-banner`**,
   **`user-preferences`**, **`micro-interactions`**, **`suggest-edit-dialog`**,
-  **`breadcrumbs`**, **`theme-provider`**.
+  **`breadcrumbs`**, **`theme-provider`**, **`scrubbed-params-notice`**.
+
+Living design-system surfaces: the theme picker at `/settings/theme`
+(`pages/ThemeSettings.tsx`) and the token/component showcase at `/design-system`
+(`pages/DesignSystemShowcase.tsx`).
 
 ---
 

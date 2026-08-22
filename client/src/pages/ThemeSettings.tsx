@@ -126,6 +126,14 @@ export default function ThemeSettings() {
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
         </p>
+        {/* Task #346: living showcase — full token catalog + component anatomy. */}
+        <Link
+          href="/design-system"
+          className="inline-flex items-center gap-1.5 text-sm text-[var(--accent)] hover:underline mt-2 min-h-[44px]"
+          data-testid="link-design-system-showcase"
+        >
+          Explore the full design-system showcase →
+        </Link>
       </div>
 
       {/* System Picker — 5 cards */}

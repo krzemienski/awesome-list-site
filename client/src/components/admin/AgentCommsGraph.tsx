@@ -20,11 +20,15 @@ const TYPE_LAYER: Record<NodeType, number> = {
   tool: 2,
 };
 
+// DS-OK: role colors mirror the DS chart/status constants verbatim
+// (#5eddf2 cyan info / #9d4edd violet info / #34d08c ok — see
+// client/src/lib/charts/palette.ts and docs/DESIGN-SYSTEM.md §5); three
+// distinct hues are required to tell the roles apart in every accent.
 const TYPE_STROKE: Record<NodeType, string> = {
-  orchestrator: "#60a5fa",
-  system: "#60a5fa",
-  subagent: "#c084fc",
-  tool: "#22d3ee",
+  orchestrator: "#5eddf2",
+  system: "#5eddf2",
+  subagent: "#9d4edd",
+  tool: "#34d08c",
 };
 
 const TYPE_LABEL: Record<NodeType, string> = {
@@ -34,8 +38,9 @@ const TYPE_LABEL: Record<NodeType, string> = {
   tool: "tool",
 };
 
-const EDGE_DELEGATION = "#c084fc";
-const EDGE_TOOL = "#22d3ee";
+// DS-OK: edge colors follow the node role colors above (DS constants).
+const EDGE_DELEGATION = "#9d4edd";
+const EDGE_TOOL = "#34d08c";
 
 interface GNode {
   id: string;

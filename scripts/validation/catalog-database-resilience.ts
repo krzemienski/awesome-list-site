@@ -26,6 +26,8 @@ import { CategoryRepository } from "../../server/repositories/CategoryRepository
 import { LegacyRepository } from "../../server/repositories/LegacyRepository";
 import { ResourceRepository } from "../../server/repositories/ResourceRepository";
 import { isDatabaseUnavailableError } from "../../server/db/errors";
+// @ts-expect-error — plain .mjs helper, scripts/ is outside tsconfig include
+import { acquireGateLease } from "./gate-lease.mjs";
 
 const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:5000";
 
@@ -53,6 +55,12 @@ async function fetchTimed(path: string) {
 async function main() {
   assert(process.env.DATABASE_URL, "DATABASE_URL is required");
   assert(process.env.ADMIN_PASSWORD, "ADMIN_PASSWORD is required");
+  // This gate takes a REAL ACCESS EXCLUSIVE lock on live tables. Hold the
+  // db-heavy lease for the whole run so crawl gates (seo-snapshot,
+  // search-typos) never see the outage — their queued backlog otherwise also
+  // breaks this gate's own post-outage recovery assertion.
+  const releaseGateLease = await acquireGateLease("db-heavy", "catalog-database-resilience");
+  process.on("exit", releaseGateLease);
   const legacyRepo = new LegacyRepository();
   const categoryRepo = new CategoryRepository();
   const resourceRepo = new ResourceRepository();

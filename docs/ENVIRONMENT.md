@@ -107,7 +107,15 @@ To make an account an admin, sign in once through Clerk, then set `role =
 database seeding creates a fixed legacy admin row for the
 `X-Admin-Audit-Key` validation bypass. The key is compared from the environment
 and is never stored as a user password; it does not enable local sign-in.
+In development it belongs in the gitignored `.env` (loaded via `dotenv/config`
+by both the server and the validation scripts) — never in `.replit`, which is
+committed to the repository.
 `REPL_ID` only enables Replit development-time Vite plugins.
+
+For browser-based admin testing there is a durable QA admin account
+(Clerk password sign-in, pre-provisioned `role = 'admin'` row bridged via
+Clerk `external_id`). Its credentials live in the gitignored `.env` as
+`TEST_ADMIN_EMAIL` / `TEST_ADMIN_PASSWORD`.
 
 ---
 

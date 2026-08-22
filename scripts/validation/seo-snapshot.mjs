@@ -38,6 +38,14 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
+import { acquireGateLease } from "./gate-lease.mjs";
+
+// Serialize against the DB-outage resilience gate (and other crawls): its
+// ACCESS EXCLUSIVE lock 503s every SSR route this crawl touches.
+{
+  const releaseGateLease = await acquireGateLease("db-heavy", "seo-snapshot");
+  process.on("exit", releaseGateLease);
+}
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 

@@ -115,6 +115,10 @@ args = "pool-probe"
 task = "workflow.run"
 args = "search-typos"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "ds-showcase"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -353,6 +357,17 @@ args = "npm run validate:search-typos"
 [workflows.workflow.metadata]
 isValidation = true
 
+[[workflows.workflow]]
+name = "ds-showcase"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/design-system-showcase.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
 [agent]
 integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0", "javascript_anthropic_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0", "github:1.0.0"]
 
@@ -364,3 +379,5 @@ timeoutMs = 90000
 
 [userenv.shared]
 VITE_SITE_URL = "https://awesome.video"
+
+[userenv.development]

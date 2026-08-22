@@ -80,7 +80,7 @@
 - [z.json() wire vs memory](zod-json-wire-vs-memory.md) — res.json-wrapper validation sees pre-serialization bodies; z.json() rejects Dates → false mismatch spam; validate JSON.stringify-ability instead.
 - [Clerk backend-session API checks](clerk-backend-session-api-checks.md) — mint real throwaway-user sessions via Clerk backend API (users→sessions→tokens, external_id = bridge id); ~60s JWTs, sweep by __qa_test prefix.
 - [Validation workflow registration](validation-workflow-registration.md) — drift gates are validation workflows via setValidationCommand (configureWorkflow hits the 10-workflow cap); in-process contract harness must install+probe before registerRoutes.
-- [Completion gate DB contention](completion-gate-db-contention.md) — Chromium leases serialize browsers, not DB-heavy gates; prove 503-only failures by clean, sequential reruns before changing unrelated code.
+- [Completion gate DB contention](completion-gate-db-contention.md) — DB-outage + crawl gates must share the "db-heavy" file lease (gate-lease.mjs); fixed sleep staggers lose the race as the suite grows.
 - [Link Health scan lifecycle](link-health-scan-lifecycle.md) — dashboard flags = latest COMPLETED job only; URL fixes need a fresh ~90-min scan; "suspect" = off-domain redirect, repoint to final host.
 - [HTTP cache edge rewrite](http-cache-edge-rewrite.md) — Google-Frontend can downgrade a cookie-less first asset response to private when it emits GAESA; verify origin policy separately.
 - [SPA guest route document gates](spa-guest-route-document-gates.md) — server auth redirects run before React; local-state guest routes must receive the SPA shell while APIs stay protected.
@@ -90,4 +90,5 @@
 - [Drizzle PostgreSQL array binds](drizzle-postgres-array-binds.md) — raw JS arrays become SQL records; bind trusted numeric IDs as one PG array literal for ANY predicates reused across query branches.
 - [Cold-cache gate flattery](cold-cache-gate-flattery.md) — a crawl gate passing right after a warm-up burst proves nothing; confirm cold-boot solo (ladders lose to sustained saturation — cap uncached resolutions below the pool).
 - [Tags source of truth](tags-metadata-source.md) — the tags table is EMPTY; real tags live in resources.metadata.tags jsonb; derive from there, never the table.
+- [New SPA route registration](spa-new-route-registration.md) — a wouter Route alone 404s: also add KNOWN_ROUTE_PATTERNS (App.tsx), AppHeader crumb labels, og-middleware staticRoutes + SEOHead parity.
 - [Toast wipes dialog state](dialog-toast-remount.md) — toast() on validation error inside admin dialogs remounts and wipes typed input; use inline banners in-dialog.

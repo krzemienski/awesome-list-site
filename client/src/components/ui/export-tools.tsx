@@ -276,6 +276,8 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(awesomeList.title)}</title>
+    <!-- DS-OK: standalone user-download document (opens outside the app);
+         deliberately a neutral light print-style sheet, not the app DS. -->
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }

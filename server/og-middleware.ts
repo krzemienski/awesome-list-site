@@ -764,6 +764,15 @@ function homeShellChrome(): string {
       // Utility settings page with no search value — noindex.
       noindex: true,
     },
+    "/design-system": {
+      // Task #346: living design-system showcase (tokens, type scale, core
+      // components). Title/description mirror the client SEOHead exactly
+      // (two-pass parity). Internal reference page — noindex keeps the
+      // indexable set equal to the sitemap.
+      title: `Design System — ${SITE_NAME}`,
+      description: `The ${SITE_NAME} design system — 5 systems × 10 accents, live tokens, type scale, and core components.`,
+      noindex: true,
+    },
     "/recommendations": {
       // R3-21: count-honest label — recommendations may be rule-based, so the
       // page no longer claims "AI-Powered" (kept in lockstep with the client

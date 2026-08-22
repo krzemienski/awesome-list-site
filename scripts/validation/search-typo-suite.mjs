@@ -4,6 +4,14 @@
  * approved resource title; no fixtures or mocked responses are involved.
  */
 import { performance } from "node:perf_hooks";
+import { acquireGateLease } from "./gate-lease.mjs";
+
+// Serialize against the DB-outage resilience gate: its ACCESS EXCLUSIVE lock
+// makes the readiness probe below fail its stability window.
+{
+  const releaseGateLease = await acquireGateLease("db-heavy", "search-typos");
+  process.on("exit", releaseGateLease);
+}
 
 const base = process.env.BASE_URL ?? "http://127.0.0.1:5000";
 const MIN_TOP_FIVE_RATE = 0.8;

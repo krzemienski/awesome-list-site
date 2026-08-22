@@ -1,3 +1,4 @@
+import "dotenv/config";
 // Repeatable print-stylesheet validation (from fix-evidence-v3/run24d/print-audit.mjs).
 // Guards the delicate @media print rules: select un-clamp exception, sidebar/header
 // shell hide, no-print/print-only pairs, print-keep-text button exemption.
