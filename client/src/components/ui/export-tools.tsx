@@ -269,33 +269,142 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
   };
 
   const generateHTML = (resources: Resource[]): string => {
-    /* MR-DS-17 — DS-OK: standalone exported HTML, no runtime DS */
+    /* MR-DS-17 — DS-OK: standalone exported HTML (opens outside the app, no
+       runtime DS). Task 348: the sheet below inlines the Editorial + Crimson
+       token CONSTANTS from docs/DESIGN-SYSTEM.md (§3–5) so downloaded lists
+       read as awesome.video content. Exports never theme-switch, so pinning
+       the site-default system+accent as hex literals is intentional. A
+       @media print block flips to a light ink-saving palette. */
     let content = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(awesomeList.title)}</title>
-    <!-- DS-OK: standalone user-download document (opens outside the app);
-         deliberately a neutral light print-style sheet, not the app DS. -->
+    <!-- DS-OK: standalone user-download document. Inlined Editorial + Crimson
+         design-system constants (docs/DESIGN-SYSTEM.md) — no external assets,
+         no runtime switching. -->
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        h2 { color: #666; margin-top: 30px; }
-        .resource { margin-bottom: 10px; padding: 10px; border-left: 3px solid #007acc; background: #f9f9f9; }
-        .resource-title { font-weight: bold; margin-bottom: 5px; }
-        .resource-description { color: #666; margin-bottom: 5px; }
-        .tags { margin-top: 5px; }
-        .tag { background: #e1e8ed; padding: 2px 6px; border-radius: 3px; font-size: 12px; margin-right: 5px; }
-        .footer { margin-top: 40px; text-align: center; color: #999; font-size: 14px; }
+        :root {
+            --bg: #000000;
+            --text: #f4f3ee;
+            --text-2: rgba(244, 243, 238, 0.66);
+            --text-3: rgba(244, 243, 238, 0.52);
+            --surface: rgba(244, 243, 238, 0.025);
+            --surface-2: rgba(244, 243, 238, 0.05);
+            --border: rgba(244, 243, 238, 0.08);
+            --border-strong: rgba(244, 243, 238, 0.16);
+            --accent: #ff3d52;
+            --accent-2: #b84dff;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            background-image: radial-gradient(ellipse 60% 40% at 85% 0%, rgba(255, 61, 82, 0.07), transparent 60%),
+                              radial-gradient(ellipse 50% 35% at 10% 100%, rgba(184, 77, 255, 0.06), transparent 60%);
+            background-attachment: fixed;
+            color: var(--text);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px 32px;
+            line-height: 1.6;
+        }
+        .eyebrow {
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin: 0 0 12px;
+        }
+        h1 {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 40px;
+            letter-spacing: -0.02em;
+            line-height: 1.04;
+            margin: 0 0 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-strong);
+        }
+        .list-description { color: var(--text-2); margin: 0 0 8px; }
+        h2 {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 24px;
+            letter-spacing: -0.02em;
+            line-height: 1.04;
+            color: var(--text);
+            margin: 40px 0 16px;
+        }
+        h2::before { content: '— '; color: var(--accent); }
+        a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+        a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+        .resource {
+            margin-bottom: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+        }
+        .resource-title { font-weight: 600; margin-bottom: 4px; }
+        .resource-category {
+            color: var(--text-3);
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .resource-description { color: var(--text-2); font-size: 14px; margin-bottom: 4px; }
+        .tags { margin-top: 8px; }
+        .tag {
+            display: inline-block;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-2);
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin: 0 6px 6px 0;
+        }
+        .footer {
+            margin-top: 48px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-3);
+            font-size: 13px;
+        }
+        @media print {
+            :root {
+                --bg: #ffffff;
+                --text: #111110;
+                --text-2: rgba(17, 17, 16, 0.72);
+                --text-3: rgba(17, 17, 16, 0.56);
+                --surface: rgba(17, 17, 16, 0.03);
+                --surface-2: rgba(17, 17, 16, 0.06);
+                --border: rgba(17, 17, 16, 0.16);
+                --border-strong: rgba(17, 17, 16, 0.32);
+            }
+            body { background-image: none; padding: 0; }
+            .resource { break-inside: avoid; }
+            a { border-bottom: none; text-decoration: underline; }
+        }
     </style>
 </head>
 <body>
+    <p class="eyebrow">awesome.video</p>
     <h1>${escapeHtml(awesomeList.title)}</h1>`;
 
     if (exportOptions.includeDescriptions) {
       // NB-010 (run18): escape all content-derived interpolations.
-      content += `<p>${escapeHtml(awesomeList.description)}</p>`;
+      content += `<p class="list-description">${escapeHtml(awesomeList.description)}</p>`;
     }
 
     if (exportOptions.groupByCategory) {
