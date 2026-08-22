@@ -229,12 +229,12 @@ isValidation = true
 name = "task302-build"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build"
-
 [workflows.workflow.metadata]
 isValidation = true
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/build-dist.mjs"
 
 [[workflows.workflow]]
 name = "task302-boot-safety"
@@ -328,12 +328,12 @@ isValidation = true
 name = "cache-headers"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build && node scripts/validation/http-cache-headers.mjs --spawn"
-
 [workflows.workflow.metadata]
 isValidation = true
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/http-cache-headers.mjs --spawn --build"
 
 [[workflows.workflow]]
 name = "pool-probe"

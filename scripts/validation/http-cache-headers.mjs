@@ -29,8 +29,10 @@ import { spawn } from 'node:child_process';
 import http from 'node:http';
 import { setTimeout as sleep } from 'node:timers/promises';
 import fs from 'node:fs';
+import { acquireGateLease } from './gate-lease.mjs';
 
 const SPAWN = process.argv.includes('--spawn');
+const BUILD = process.argv.includes('--build');
 const PORT = process.env.CACHE_MATRIX_PORT || '5093';
 let BASE = process.env.BASE_URL || 'http://127.0.0.1:5000';
 let publicApiRequest = 0;
@@ -96,6 +98,25 @@ function header(res, name) {
 
 async function main() {
   if (SPAWN) {
+    // dist/ is shared mutable state: the completion runner starts every gate
+    // in parallel, and a concurrent `npm run build` (task302-build) rewriting
+    // dist/index.js while we boot it produces a truncated module
+    // ("SyntaxError: Unexpected end of input"). Hold the "dist" lease across
+    // our own build AND the boot+probe so no other gate touches dist/ mid-run.
+    const releaseDistLease = await acquireGateLease('dist', 'http-cache-headers');
+    process.on('exit', () => { try { releaseDistLease(); } catch { /* released */ } });
+    if (BUILD) {
+      console.log('Building dist/ under the dist lease …');
+      const code = await new Promise((resolve) => {
+        const build = spawn('npm', ['run', 'build'], { stdio: 'inherit' });
+        build.on('exit', (c) => resolve(c ?? 1));
+        build.on('error', () => resolve(1));
+      });
+      if (code !== 0) {
+        console.error(`FATAL: npm run build failed (exit ${code}).`);
+        process.exit(1);
+      }
+    }
     if (!fs.existsSync('dist/index.js')) {
       console.error('FATAL: dist/index.js missing — run `npm run build` first.');
       process.exit(1);

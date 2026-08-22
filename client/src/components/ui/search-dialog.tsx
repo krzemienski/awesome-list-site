@@ -291,7 +291,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                   <span className="text-xs text-muted-foreground uppercase tracking-[0.14em]">Recent searches</span>
                   <button
                     type="button"
-                    className="text-xs text-muted-foreground hover:text-[color:var(--text)] flex items-center gap-1"
+                    className="text-xs text-muted-foreground hover:text-[color:var(--text)] flex min-h-6 items-center gap-1"
                     onClick={() => {
                       try {
                         localStorage.removeItem(RECENT_SEARCHES_KEY);

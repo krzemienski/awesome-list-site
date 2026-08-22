@@ -9,16 +9,32 @@
 > (PASS / FIX / FAIL) plus a numbered fix-list ranked by severity.
 >
 > **What it isn't:** a visual reviewer. This is structural/contract. Visual
-> taste is in `docs/02-principles.md`.
+> taste is in `docs/DESIGN-SYSTEM.md` §8.
+
+**Know your target before you start.** There are two kinds of surface, with
+different mechanics but one contract:
+
+1. **The shipped app** (`client/`) — consumes the DS through **shadcn
+   primitives + the Tailwind bridge** (`client/src/index.css`), with
+   per-system skins keyed on data hooks (`data-ds-variant`, `data-ds="chip"`,
+   `data-ds="card-hover"`). There is **no** `design-systems.js` script tag and
+   almost no raw `.btn`/`.input` usage — that is correct, not a violation.
+2. **Standalone HTML artifacts** (exports, mockups, one-pagers) — load
+   `design-system.css` via `<link>` (or inline tokens) and may use the raw DS
+   classes (`.btn`, `.chip`, `.card`) directly, per `docs/AGENTS.md` §5.
+
+The consumption contract is `docs/AGENTS.md`; the token catalog is
+`docs/DESIGN-SYSTEM.md`. Audit against those, not against the retired handoff
+prototype.
 
 ---
 
 ## How to invoke this skill
 
-1. Confirm you can see the target files. If the user gave you a single
-   page, you need its HTML and any CSS it references. If they gave you a
-   whole codebase, find the `<head>` of the root layout file plus the main
-   stylesheet.
+1. Confirm you can see the target files. For the app, that's
+   `client/index.html`, `client/src/index.css`,
+   `client/src/styles/design-system.css`, and the page's components. For a
+   standalone artifact, its HTML plus any CSS it references.
 2. Run the **11 audit stages** below, in order. Don't skip ahead.
 3. For each finding, tag with severity: 🔴 **BLOCK**, 🟡 **FIX**, 🟢 **NIT**.
 4. At the end, produce the **verdict block** (template at the bottom).
@@ -26,30 +42,41 @@
 If any 🔴 BLOCK fails, the verdict is **FAIL** — the page is not DS-compliant.
 If only 🟡 or 🟢 fail, the verdict is **FIX**. All green → **PASS**.
 
+Formal audits verify the shipped default (Editorial + Crimson) per
+`replit.md`; stage 11 cycles the other four systems.
+
 ---
 
 ## Stage 1 · Are the system files even loaded?
 
 **Severity if missing: 🔴 BLOCK**
 
-Check `<head>` (or equivalent) for:
+**In the app**, the load path is:
 
-- [ ] **CSS:** a `<link rel="stylesheet">` pointing at a file containing
-  the `:root { --bg: …; }` token block. Common names:
-  `styles.css`, `design-system.css`, `theme.css`.
-- [ ] **JS:** a `<script>` tag loading the systems definitions
-  (`design-systems.jsx` or `design-system.js`). It should expose
-  `window.DESIGN_SYSTEMS`, `window.ACCENTS`,
-  `window.SYSTEM_DEFAULT_ACCENT`, `window.applyDesignSystem`.
+- [ ] **CSS:** `client/src/styles/design-system.css` is imported at the **top**
+  of `client/src/index.css` (foundation order — it must precede the Tailwind
+  layers or the bridge resolves against nothing). Vite bundles it; in dev it
+  arrives as an injected `<style>` tag, so do **not** expect a
+  `<link rel="stylesheet">` in the served HTML.
+- [ ] **JS:** `client/src/lib/design-system.ts` mirrors the definitions onto
+  `window.DESIGN_SYSTEMS`, `window.ACCENTS`, `window.SYSTEM_DEFAULT_ACCENT`,
+  and `window.applyDesignSystem` at module load — there is no
+  `design-systems.js` script tag, and its absence is not a finding.
 
-**How to verify in DevTools:**
+**In a standalone artifact**, expect a `<link>` to a stylesheet containing the
+`:root { --bg: …; }` token block (or the tokens inlined), per
+`docs/AGENTS.md` §5.
+
+**How to verify in DevTools (both targets):**
 ```js
-typeof window.applyDesignSystem === 'function'  // → true
+typeof window.applyDesignSystem === 'function'  // → true (app; artifacts may omit JS)
 Object.keys(window.DESIGN_SYSTEMS).length        // → 5
 window.ACCENTS.length                            // → 10
+getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()  // → '#000000' or '#000'
 ```
 
-If false / 0 — the system isn't loaded. Stop the audit and report.
+If `--bg` is empty, the stylesheet isn't loaded (or loads after something
+that clobbers it). Stop the audit and report.
 
 ---
 
@@ -65,34 +92,34 @@ getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()  // �
 
 All three must resolve.
 
-If `--bg` is missing or empty, `applyDesignSystem()` never ran. Common
-cause: the call is in a deferred script / `useEffect` running after the
-audit, or it's been omitted entirely.
+In the app the attributes are set by the pre-paint boot script in
+`client/index.html` (stage 3), **not** by `applyDesignSystem()` — that
+function only runs when the user switches themes. If the attributes are
+missing, the boot script was removed or errored.
 
 ---
 
-## Stage 3 · Is the boot synchronous? (No-FOUT check)
+## Stage 3 · Is the boot synchronous? (No-FOUC check)
 
 **Severity if deferred: 🟡 FIX**
 
-The apply call must happen **before first paint**. Inspect the source:
+`data-system` / `data-accent` must be on `<html>` **before first paint**.
 
-✅ **Good** — synchronous `<script>` in `<head>`:
-```html
-<head>
-  <script src="design-systems.js"></script>
-  <script>applyDesignSystem('editorial', 'crimson');</script>
-</head>
-```
+✅ **Good** — the app's pattern (inline synchronous `<script>` in
+`client/index.html`): reads localStorage keys `ds-system` / `ds-accent`
+(plus `ds-font-override`), validates against **inline** system/accent ID
+lists, falls back to Editorial + Crimson, and sets the attributes before any
+module loads. The inline ID lists and font map are hand-synced with
+`client/src/lib/design-system.ts` / `font-options.ts` — flag drift between
+them.
 
-❌ **Bad** — deferred / module / `useEffect`:
-```html
-<script type="module" src="design-systems.js"></script>
-<!-- or apply inside a React useEffect — runs after first paint -->
-```
+❌ **Bad** — applying the system from a deferred/module script or inside a
+React `useEffect` (runs after first paint → theme flash), or an inline boot
+that depends on `window.applyDesignSystem` (which only exists after module
+load).
 
-If bad, flag: "Page will flash default theme on load. Move
-`applyDesignSystem` call into a synchronous inline `<script>` in `<head>`."
+New HTML entry points must copy the `client/index.html` boot pattern —
+FOUC-free boot is non-negotiable (`docs/AGENTS.md` §5).
 
 ---
 
@@ -105,10 +132,14 @@ document.querySelector('.page')   // → element
 document.querySelector('.grain')  // → element
 ```
 
-Both should exist. Without `.page`, the system's atmosphere
-(`--bg-atmosphere` radial/scanline/grid) doesn't render. Without
+In the app, `MainLayout` renders both — every in-app page inherits them.
+Standalone artifacts must render their own. Without `.page`, the system's
+atmosphere (`--bg-atmosphere` radial/scanline/grid) doesn't render. Without
 `.grain`, the SVG noise overlay is absent — Brutalist and Terminal lose
 their tactility.
+
+Also flag per-page backgrounds that occlude the atmosphere
+(`docs/AGENTS.md` §5).
 
 ---
 
@@ -116,99 +147,206 @@ their tactility.
 
 **Severity: 🟡 FIX per occurrence**
 
-This is the most important stage. Every hex code and px number outside
-`design-system.js` and the `[data-system="…"]` skin block is a violation.
+This is the most important stage. Every color, radius, shadow, and font must
+resolve through a DS token — via bridged Tailwind utilities (`bg-card`,
+`text-muted-foreground`, `rounded-lg`…), arbitrary-value token refs
+(`bg-[var(--surface-3)]`), or DS component classes. See `docs/AGENTS.md` §1.
 
 ### How to run
 
-Search all CSS files (excluding the design-system files themselves):
-
 ```bash
-# Hex colors
-rg --type css '#[0-9a-fA-F]{3,8}\b' src/ \
-  --glob '!design-system.css' \
-  --glob '!design-systems.js'
+# Hex colors in app code (excluding the DS sources of truth)
+rg '#[0-9a-fA-F]{3,8}\b' client/src \
+  --glob '!client/src/styles/design-system.css' \
+  --glob '!client/src/index.css' \
+  --glob '!client/src/lib/charts/palette.ts'
 
-# Pixel values for spacing/radius/border (be lenient — some pxs are fine)
-rg --type css 'border(-radius)?:\s*\d+px' src/ \
-  --glob '!design-system.css'
+# Tailwind palette classes (bg-zinc-900, text-red-500, …) — forbidden
+rg -n '\b(bg|text|border|ring|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b' client/src
 
-# Font families
-rg --type css "font-family:\s*['\"]" src/ \
-  --glob '!design-system.css'
+# Raw radii / borders that bypass the ladders
+rg 'border(-radius)?:\s*\d+px|rounded-\[\d+px\]' client/src \
+  --glob '!client/src/styles/design-system.css'
+
+# Raw font-family strings
+rg "font-family:\s*['\"]" client/src \
+  --glob '!client/src/styles/design-system.css' \
+  --glob '!client/index.html'
 ```
 
-Search all inline styles in JSX / Vue / HTML:
-
-```bash
-rg "style=\{?\{[^}]*#[0-9a-fA-F]{3,6}" src/
-rg "color:\s*['\"]#[0-9a-fA-F]{3,6}" src/
-```
+For standalone artifacts, run the same scans over the artifact's files,
+excluding the design-system stylesheet itself.
 
 ### Acceptable hardcoded values
 
-These pass:
+These pass — each is tagged `/* DS-OK: reason */` at its definition site:
 
-- `#0a0a0a` inside `.btn.primary { color: #0a0a0a; }` — the text color *on*
-  the accent, intentionally dark.
-- `#000`, `#fff` in SVG `<svg>` elements that need fixed paint.
-- Status colors `#34d08c` / `#ffb84d` / `#ff5c7a` — these are global
-  semantics, not theme.
-- Anything inside `design-systems.js` (the source of truth).
-- Anything inside a `[data-system="…"]` skin block in styles.css —
-  intentional per-system overrides.
+- The global status constants `#34d08c` (ok) / `#ffb84d` (warn) / `#ff5c7a`
+  (bad) — semantics, not theme.
+- The on-accent inks `#000000` / `#0a0a0a` (text sitting on accent fills).
+- `CHART_PALETTE` entries in `client/src/lib/charts/palette.ts` (recharts
+  can't read CSS vars from prop strings).
+- The bridge block in `client/src/index.css`.
+- `[data-system="…"]` skin blocks inside
+  `client/src/styles/design-system.css` — intentional per-system overrides.
+- The hand-synced font map in the `client/index.html` boot script.
+- `#000`/`#fff` in SVG elements that need fixed paint.
+
+An untagged literal is a finding even if it happens to match a token value.
+If you find a `/* DS-OK: … */` comment, skip it.
 
 ### Suggest fixes per occurrence
 
 | If you see | Suggest |
 |------------|---------|
-| `color: #fff` (or near-white) | `color: var(--text)` |
-| `color: rgba(255,255,255,0.66)` | `color: var(--text-2)` |
-| `color: rgba(255,255,255,0.4)` | `color: var(--text-3)` |
-| `background: #14141a` | `background: var(--bg-2)` |
-| `background: rgba(255,255,255,0.05)` | `background: var(--surface)` or `--surface-2` |
-| `border: 1px solid rgba(255,255,255,0.08)` | `border: var(--border-w) solid var(--border)` |
-| `border-radius: 12px` | `border-radius: var(--radius)` |
-| `border-radius: 8px` | `border-radius: var(--radius-sm)` |
-| `font-family: 'Inter', sans-serif` | `font-family: var(--font-body)` |
-| `font-family: 'Fraunces'` | `font-family: var(--font-display)` |
-| `box-shadow: 0 6px 24px …` | `box-shadow: var(--shadow)` |
+| `color: #fff` (or near-white) | `text-foreground` / `color: var(--text)` |
+| `color: rgba(255,255,255,0.66)` | `text-[color:var(--text-2)]` |
+| `background: #14141a` | `bg-[var(--bg-2)]` |
+| `background: rgba(255,255,255,0.05)` | `bg-card` / `bg-[var(--surface)]` |
+| `border: 1px solid rgba(255,255,255,0.08)` | `border border-border` (bridge) |
+| `border-radius: 12px` / `rounded-[12px]` | `rounded-lg` (→ `--radius`) |
+| `border-radius: 8px` | `rounded-sm` (→ `--radius-sm`) |
+| `rounded-full` on chips | `rounded-[var(--radius-pill)]` / Badge `chip` variant |
+| `text-red-500`, `bg-zinc-900`, … | status constant or bridge utility |
+| `font-family: 'Inter', sans-serif` | `font-sans` (→ `--font-body`) |
+| `font-family: 'Fraunces'` | `font-display` / `.display-h` |
+| `box-shadow: 0 6px 24px …` | `shadow-[var(--shadow)]` |
 
 ---
 
-## Stage 6 · Component class compliance
+## Stage 6 · Component compliance (the app contract)
 
 **Severity: 🟡 FIX per offending element**
 
-Audit interactive elements. Use the design-system classes:
+The app never uses raw `.btn`/`.input`/`.chip` classes — shadcn primitives
+from `@/components/ui/*` are pre-bridged, and per-system skins key on data
+hooks emitted by those primitives:
+
+| Hook | Emitted by | Meaning |
+|---|---|---|
+| `data-ds-variant="<variant>"` | every `Button` (and `AlertDialogAction`/`AlertDialogCancel`, which compose `buttonVariants()`) | button skins; primary extras target `default`/`outline` |
+| `data-ds="chip"` | `Badge` variants `chip` / `accent` **only** | chip skins (Terminal brackets, Geist sentence case…) |
+| `data-ds="card-hover"` | interactive cards (`ResourceCard`, `TaxonomyCard`, showcase specimens) | per-system hover (lift / glow / slab / color-only) |
+
+### Button sweep
 
 ```js
-/* Buttons */
-const buttons = document.querySelectorAll('button');
-const stray = [...buttons].filter(b =>
-  !b.closest('.tabs') && /* tabs use .tab */
-  !b.closest('.mobile-drawer') &&
-  ![...b.classList].some(c => c.startsWith('btn') || c.startsWith('tab') || c.startsWith('icon-btn'))
+const stray = [...document.querySelectorAll('button')].filter(b =>
+  /* 1 · shadcn Button / buttonVariants() — skins hook on this */
+  !b.hasAttribute('data-ds-variant') &&
+  /* 2 · other shadcn/Radix primitives from @/components/ui
+         (tabs, switch, checkbox, select, accordion, cmdk, carousel…) */
+  !b.matches('[data-state], [data-radix-collection-item], [cmdk-item], [role="switch"], [role="checkbox"], [role="tab"], [role="combobox"]') &&
+  !b.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+  !(b.closest('[role="dialog"]') && b.querySelector('.sr-only')) && // Dialog/Sheet close ✕
+  /* 3 · known composite chrome (verified compliant — list below) */
+  !b.closest('.accordion-item') &&                        // AppSidebar taxonomy rows
+  b.getAttribute('aria-label') !== 'Open search' &&       // AppHeader search chip
+  !b.hasAttribute('aria-pressed') &&                      // facet/tag filter toggle rows
+  !b.closest('[data-testid="active-filter-chips"]') &&    // active-filter removal chips
+  !/^Remove .+ filter$/.test(b.getAttribute('aria-label') || '') && // ditto (advanced filter)
+  !b.closest('[data-ds="card-hover"]') &&                 // in-card chrome (tag expanders)
+  !['footer-cookie-settings',                             // small tokenized text buttons
+    'button-clear-recent-searches',
+    'button-dismiss-scrubbed-params'].includes(b.getAttribute('data-testid')) &&
+  /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
+  ![...b.classList].some(c => /^(btn|tab|icon-btn)/.test(c))
 );
-stray.length  // → should be 0
+stray  // → [] expected on the app's public routes; triage any hit with the ladder below
 ```
 
-Same for:
+A remaining hit is an **automatic 🟡 FIX only if it carries palette classes,
+literal hex/rgb colors, or raw radii** (cross-check with stage 5). A hit
+styled entirely through bridge utilities / `var(--token)` refs is *candidate
+composite chrome* — walk the ladder, and if it qualifies, add it to the
+known list below instead of re-flagging it every run.
 
-- **Inputs:** any `<input>` / `<select>` / `<textarea>` must have `.input` /
-  `.select` / `.textarea` class.
-- **Cards:** any clickable container with a hover state should be `.card
-  .hoverable`.
-- **Status badges:** use `.chip` (+`.ok/.warn/.bad/.accent/.muted`).
-- **Section labels:** mono uppercase eyebrows should use `.eyebrow`.
-- **Keyboard hints:** use `.kbd`.
+### Triage ladder for a hit — walk it before calling anything a violation
+
+1. **Does it render from `@/components/ui/*`?** (trace via `data-testid` or
+   React DevTools). shadcn primitives are compliant by construction — e.g.
+   the Dialog close ✕. Not a finding.
+2. **Is it on the known-composite-chrome list below?** Not a finding.
+3. **Is it fully tokenized composite chrome?** A raw `<button>`/`<a>` is
+   compliant when (a) its layout can't be expressed by the `Button`
+   primitive (multi-part rows, pill with embedded `<kbd>`…), **and** (b)
+   every color/border/radius resolves through bridge utilities or
+   `var(--token)` refs, **and** (c) it keeps the global focus-visible ring
+   and meets its target floor: **≥44px for standalone controls**, or the
+   **≥24px text-link hit area** (`docs/AGENTS.md` §3) for inline
+   text-link-style buttons (plain/underlined text inside banners, footers,
+   list headers). If it merely duplicates a plain button role, suggest the
+   primitive as a 🟢 NIT — not a FIX.
+4. **Otherwise** it's a 🟡 FIX: rebuild on the primitive, or tokenize.
+
+### Known composite chrome — recognized compliant, do NOT re-flag
+
+- **AppSidebar taxonomy rows**
+  (`client/src/components/layout/new/AppSidebar.tsx`): the accordion
+  category/subcategory rows and their chevron disclosure buttons
+  (`data-testid="toggle-cat-*"`, `"expand-sub-*"`), sub-item links, and the
+  nav-error Retry button. Fully tokenized; a `Button` can't express these
+  multi-part rows.
+- **AppHeader search trigger chip**
+  (`client/src/components/layout/new/AppHeader.tsx`,
+  `aria-label="Open search"`): tokenized pill with embedded `<kbd>` hint.
+- **Filter facet/tag toggle rows**
+  (`client/src/components/search/SearchFilters.tsx`,
+  `client/src/components/ui/advanced-filter.tsx`): full-width
+  checkbox-style rows with counts, marked `aria-pressed`; tokenized
+  (`hover:bg-muted`, `var(--accent)` refs, on-accent `text-black`).
+- **Active-filter removal chips** — only render once a filter is applied,
+  so sweep with a facet/tag active too: the chip strip inside
+  `data-testid="active-filter-chips"` (`SearchFilters.ActiveFilters`,
+  tokenized `var(--surface)`/`var(--border)`/`var(--accent)`, `min-h-11`)
+  and the `aria-label="Remove <tag> filter"` chips in
+  `advanced-filter.tsx` (bridge `bg-primary`, `min-h-11`).
+- **In-card tag expanders** (`ResourceCard`'s "+N more",
+  `data-testid="button-more-tags-*"`): inline text buttons inside
+  `data-ds="card-hover"` cards.
+- **Small tokenized text buttons** in DS-owned chrome — inline
+  text-link-style controls that follow the ≥24px text-link hit-area floor
+  (`docs/AGENTS.md` §3), not the 44px standalone floor:
+  - the footer "Cookie settings" button (`MainLayout`,
+    `data-testid="footer-cookie-settings"`, 44px),
+  - the search dialog's "Clear" recent-searches button
+    (`data-testid="button-clear-recent-searches"`, `min-h-6` = 24px),
+  - the scrubbed-params banner Dismiss
+    (`data-testid="button-dismiss-scrubbed-params"`, `min-h-8` = 32px —
+    meets the text-link floor).
+
+### Same idea for the rest
+
+- **Inputs:** `<input>`/`<select>`/`<textarea>` should be the shadcn
+  `Input`/`Select`/`Textarea` primitives (bridge classes like
+  `border-input`). Raw `.input`/`.select` classes belong to standalone
+  artifacts only.
+- **Badges:** DS chips must be `Badge` variant `chip`/`accent` (emits
+  `data-ds="chip"`). Admin status badges intentionally keep plain shadcn
+  variants (`replit.md` MR-DS-13 #5) — not a finding.
+- **Cards:** any clickable/hoverable card carries `data-ds="card-hover"`.
+- **Section labels:** mono uppercase eyebrows use `.eyebrow`.
+- **Page titles:** `h1`s use `.display-h` (never `font-sans`/`font-medium`
+  pinned on them).
+- **Keyboard hints:** `.kbd`, or a fully tokenized `<kbd>` (the header's
+  `/` hint is the reference).
 
 ### Forbidden patterns
 
-- ❌ Custom button classes with their own colors (`.my-blue-btn`,
-  `.action`).
-- ❌ Hardcoded badges (`<span style="background: red">`).
-- ❌ `<div class="section-title">` instead of `<div class="eyebrow">`.
+- ❌ Hand-rolled buttons, dialogs, dropdowns, or tabs that duplicate a shadcn
+  primitive with their own colors (`.my-blue-btn`, `.action`).
+- ❌ Hardcoded badges (`<span style="background: red">`, palette-class
+  badges).
+- ❌ Setting `data-ds` / `data-ds-variant` by hand on non-primitive elements
+  to silence the audit — the hooks are emitted by the primitives.
+
+### Intentional divergences — never flag (per `replit.md` MR-DS-13 #5)
+
+- `secondary`/`ghost`/`destructive` buttons keep plain shadcn styling (skins
+  only restyle `default`/`outline`).
+- Non-DS admin badge variants.
+- The BrandMark tile stays rounded in 0-radius systems (brand kit, not a
+  radius bug).
 
 ---
 
@@ -238,10 +376,10 @@ buttons, decorative borders — flag it. Accent is reserved for:
 - Primary buttons (one per surface).
 - Active nav indicator.
 - Eyebrows.
-- `.live-dot`, `.caret`.
+- `.live-dot`, `.caret`, live indicators.
 - Active tab underline.
-- `.card.glow:hover` halo.
-- `::selection`.
+- Focus rings, `::selection`.
+- Key data points in charts; sparing `<em>` emphasis in display copy.
 
 Anything else using accent is a violation.
 
@@ -274,10 +412,13 @@ counts, captions), never body copy.
 
 **Severity: 🟡 FIX**
 
-Verify the active system's fonts are actually loaded. In DevTools:
+Verify the active system's fonts actually loaded. Note the app's loading
+model: **only Inter loads pre-paint** (`client/index.html`); the active
+system's display/body faces and any font override load on demand via
+`client/src/lib/font-options.ts`. So wait for loading to settle first:
 
 ```js
-const sys = document.documentElement.getAttribute('data-system');
+await document.fonts.ready;
 const stack = getComputedStyle(document.documentElement)
                 .getPropertyValue('--font-display').trim();
 const family = stack.split(',')[0].replace(/['"]/g, '').trim();
@@ -285,38 +426,46 @@ document.fonts.check(`16px "${family}"`);  // → true
 ```
 
 If false, the font failed to load. Check:
-- The `<link href="https://fonts.googleapis.com/…">` includes that family.
-- The family name in the link query matches the token's family name.
-- Network tab shows no 4xx on the font file.
+- `FONT_URLS` in `client/src/lib/font-options.ts` has an entry for the
+  active system, and the family name in the URL matches the token's family.
+- Network tab shows no 4xx on the font request.
+- For standalone artifacts: the `<link
+  href="https://fonts.googleapis.com/…">` includes that family.
 
-Common miss: shipping Editorial but forgetting Fraunces in the Google
-Fonts request; Fraunces falls back to Georgia and the whole magazine vibe
-collapses.
+Common miss: shipping Editorial but failing the Fraunces request; Fraunces
+falls back to Georgia and the whole magazine vibe collapses.
 
 ---
 
-## Stage 10 · Per-system skin block intact?
+## Stage 10 · Per-system skin blocks intact?
 
 **Severity: 🔴 BLOCK**
 
-The `[data-system="…"]` block at the bottom of `styles.css` (~lines
-650-678) must exist. Without it:
+Skins live in `client/src/styles/design-system.css` in **two parallel
+forms**, and both must survive:
 
-- Terminal chips lose their `[brackets]`.
-- Brutalist cards lose the `4px 4px 0 0` offset shadow on hover.
-- Swiss switches from hairlines to 1px borders (the system collapses to
-  generic).
+1. **Raw DS-class skins** (`[data-system="…"] .chip/.btn/.card…`) — for
+   static surfaces and showcase helpers.
+2. **Shadcn bridge skins** (`[data-system="…"] [data-ds-variant=…]`,
+   `[data-ds="chip"]`, `[data-ds="card-hover"]`) — the same extras for the
+   app's primitives.
 
-Verify by searching:
+Without them: Terminal chips lose their `[brackets]`, Brutalist cards lose
+the `4px 4px 0 0` offset slab, Swiss falls back from hairlines to 1px
+borders — the systems collapse to generic.
+
+Verify by counting:
 
 ```bash
-rg '\[data-system="(editorial|terminal|geist|brutalist|swiss)"\]' styles.css | wc -l
+rg '\[data-system="(editorial|terminal|geist|brutalist|swiss)"\]' \
+  client/src/styles/design-system.css | wc -l   # expected ≥ 60 (~80 today)
+
+rg 'data-ds' client/src/styles/design-system.css | wc -l   # expected ≥ 15 (~25 today)
 ```
 
-Expected: ≥ 15 (each system has multiple selectors).
-
-If the count is 0 or very low, the skin block was stripped during a
-minification or refactor. Restore from `design-system.css` upstream.
+If either count is 0 or collapses, a skin layer was stripped during a
+refactor. If only the second is low, shadcn primitives silently lose their
+per-system extras even though raw-class skins look intact.
 
 ---
 
@@ -324,7 +473,8 @@ minification or refactor. Restore from `design-system.css` upstream.
 
 **Severity: 🔴 BLOCK if visible bugs**
 
-The real test: cycle through all five systems. Run in DevTools:
+The real test: cycle through all five systems. Run in DevTools (or cycle at
+`/settings/theme` / `/design-system`):
 
 ```js
 for (const id of ['editorial','terminal','geist','brutalist','swiss']) {
@@ -335,16 +485,18 @@ for (const id of ['editorial','terminal','geist','brutalist','swiss']) {
 }
 ```
 
+Restore Editorial + Crimson when done — it's the shipped default.
+
 What to look for:
 
 | Symptom | Diagnosis | Fix |
 |---------|-----------|-----|
 | Page looks the same in all 5 | Components have hardcoded styles — Stage 5 was incomplete. | Re-run hardcoded-value scan, replace with tokens. |
 | Some elements break only in Brutalist | Border-width token (`--border-w`) is being ignored — element has a hardcoded `1px` border. | Token-ize the border. |
-| Square corners appear only in Terminal but not Brutalist | `--radius` token unused; element has hardcoded `border-radius`. | Replace with `var(--radius)` or `var(--radius-sm)`. |
-| Chip brackets missing in Terminal | Per-system skin block stripped. | Stage 10 fix. |
+| Square corners appear only in Terminal but not Brutalist | `--radius` token unused; element has hardcoded `border-radius`. | Replace with `rounded-lg`/`rounded-sm` or `var(--radius)`. |
+| Chip brackets missing in Terminal on shadcn Badges | Bridge skins stripped, or the Badge isn't the `chip`/`accent` variant (no `data-ds="chip"`). | Stage 10 / Stage 6 fix. |
 | Page looks black/empty | `--bg-atmosphere` not rendering — `.page` wrapper missing. | Stage 4 fix. |
-| Font reverts to fallback | Family not in fonts request. | Stage 9 fix. |
+| Font reverts to fallback | Family failed to load. | Stage 9 fix. |
 
 ---
 
@@ -403,12 +555,17 @@ typeof window.applyDesignSystem === 'function'                          // 1. JS
 !!document.documentElement.getAttribute('data-system')                  // 2. system applied
 !!getComputedStyle(document.documentElement).getPropertyValue('--bg')   // 3. tokens applied
 !!document.querySelector('.page') && !!document.querySelector('.grain') // 4. chrome present
-[...document.styleSheets].some(s => {                                   // 5. skin block present
+[...document.querySelectorAll('style')].some(s =>                       // 5. skin blocks present
+  s.textContent.includes('[data-system=')) ||
+[...document.styleSheets].some(s => {
   try { return [...s.cssRules].some(r =>
     r.selectorText && r.selectorText.includes('[data-system='))
   } catch (e) { return false; }
 })
 ```
+
+(Check `<style>` textContent first: Vite-injected sheets can be opaque to
+CSSOM `cssRules` in dev.)
 
 Five `true` → "looks plausible, run the full audit before shipping."
 Any `false` → start at the failing stage.
@@ -420,13 +577,14 @@ Any `false` → start at the failing stage.
 - **Don't auto-fix.** Report findings; let the user (or a separate skill)
   apply fixes. Auto-edits to legacy CSS frequently break adjacent things.
 - **Be specific.** Don't say "use tokens." Say `replace #f4f3ee with
-  var(--text) on line 247 of app-styles.css`.
+  var(--text) on line 247 of client/src/pages/Home.tsx`.
 - **Cite stages.** Each finding includes the stage number so the user can
   re-read the rule.
 - **Don't grade visuals.** This skill is structural. If the user wants
   "does this look good," that's a separate evaluation.
-- **Respect intentional escapes.** If you find a `/* DS-OK: intentional */`
-  comment near a hardcoded value, skip it.
+- **Respect intentional escapes.** `/* DS-OK: … */` comments, the stage-6
+  known composite chrome, and the `replit.md` MR-DS-13 intentional
+  divergences are all deliberate — check them before flagging.
 
 ---
 
@@ -439,6 +597,8 @@ Any `false` → start at the failing stage.
 
 ---
 
-**Source of truth:** the design system specs in `/docs` and the
-contract in `HANDOFF.md`. If this skill conflicts with those, those win
-and this file should be updated.
+**Source of truth:** `docs/DESIGN-SYSTEM.md` (token catalog),
+`docs/AGENTS.md` (consumption contract), and
+`docs/COMPONENT-LIBRARY.md` (component inventory) — and the code wins over
+all docs. If this skill conflicts with those, those win and this file
+should be updated.

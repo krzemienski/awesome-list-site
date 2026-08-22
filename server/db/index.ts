@@ -55,6 +55,18 @@ function markTransientRequestFailure(error: unknown): void {
 // transactions. Only the SQL command is retained; SQL text, parameters,
 // connection strings, and row data are never logged or exposed.
 pool.on('connect', (client: any) => {
+  // A checked-out client (e.g. mid-Drizzle-transaction) that receives a
+  // server-side FATAL (25P03 idle-in-transaction timeout, Neon connection
+  // termination) emits 'error' on the Client itself, not the pool. Without a
+  // listener that unhandled 'error' event crashes the whole process — seen
+  // under full validation-gate load. The in-flight query still rejects
+  // through the normal promise path; this listener only absorbs the
+  // connection-level event and records it.
+  client.on('error', (err: unknown) => {
+    recordPoolError();
+    markTransientRequestFailure(err);
+    console.error('Database client error:', { code: (err as any)?.code ?? 'unknown' });
+  });
   const originalQuery = client.query.bind(client);
   client.query = (...args: any[]) => {
     const startedAt = Date.now();

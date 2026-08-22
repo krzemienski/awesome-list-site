@@ -20,6 +20,8 @@
  * Usage: BASE_URL=http://127.0.0.1:5000 node scripts/validation/db-pool-probe.mjs
  */
 
+import { acquireGateLease } from './gate-lease.mjs';
+
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:5000';
 const CONCURRENCY = Number(process.env.PROBE_CONCURRENCY || 20);
 const ROUNDS = Number(process.env.PROBE_ROUNDS || 3);
@@ -72,6 +74,11 @@ async function main() {
     console.error(`FATAL: server not reachable at ${BASE}. Start the app workflow first.`);
     process.exit(1);
   }
+
+  // Serialize with other DB-heavy gates (the resilience gate's LOCK TABLE
+  // outage window turns a concurrent burst round into a wall of 503s).
+  const releaseGateLease = await acquireGateLease('db-heavy', 'db-pool-probe');
+  process.on('exit', () => { try { releaseGateLease(); } catch { /* already released */ } });
 
   const runTag = Date.now().toString(36);
   console.log(`Pool probe against ${BASE}: ${ROUNDS} rounds × ${CONCURRENCY} concurrent faceted listings (each = 3 parallel DB ops)\n`);
