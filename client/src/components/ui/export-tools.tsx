@@ -540,6 +540,19 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           const maxWidth = pageWidth - margin * 2;
           let y = margin;
 
+          /* Task 350 — DS-OK: standalone user-download document. Editorial +
+             Crimson print palette from docs/DESIGN-SYSTEM.md (§3–5), mirroring
+             generateHTML's @media print block: near-black ink on white paper,
+             crimson accent, ink-alpha secondary tones flattened onto white.
+             "times" stands in for the Fraunces display font — jsPDF only
+             embeds its 3 standard families, and the DS fallback stack is
+             Georgia/'Times New Roman'/serif. */
+          const INK: [number, number, number] = [17, 17, 16]; // --text #111110
+          const INK_2: [number, number, number] = [84, 84, 83]; // rgba(17,17,16,.72) on white
+          const INK_3: [number, number, number] = [122, 122, 121]; // rgba(17,17,16,.56) on white
+          const CRIMSON: [number, number, number] = [255, 61, 82]; // --accent #ff3d52
+          const RULE: [number, number, number] = [179, 179, 178]; // border-strong on white
+
           const ensureRoom = (needed: number) => {
             if (y + needed > pageHeight - margin) {
               doc.addPage();
@@ -551,10 +564,11 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             size: number,
             style: "normal" | "bold",
             gapAfter: number,
-            rgb: [number, number, number] = [20, 20, 20],
+            rgb: [number, number, number] = INK,
+            font: "helvetica" | "times" = "helvetica",
           ) => {
             doc.setFontSize(size);
-            doc.setFont("helvetica", style);
+            doc.setFont(font, style);
             doc.setTextColor(rgb[0], rgb[1], rgb[2]);
             const lines = doc.splitTextToSize(String(text ?? ""), maxWidth) as string[];
             const lineHeight = size * 1.35;
@@ -566,31 +580,67 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             y += gapAfter;
           };
 
-          writeLines(awesomeList.title, 20, "bold", 6);
+          // Eyebrow brand mark — crimson uppercase, mirrors the HTML export header.
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(CRIMSON[0], CRIMSON[1], CRIMSON[2]);
+          doc.text("AWESOME.VIDEO", margin, y, { charSpace: 1.5 });
+          y += 9 * 1.35 + 4;
+
+          writeLines(awesomeList.title, 20, "bold", 8, INK, "times");
+          // h1 border-bottom rule, as in the HTML export.
+          doc.setDrawColor(RULE[0], RULE[1], RULE[2]);
+          doc.setLineWidth(0.75);
+          doc.line(margin, y - 4, margin + maxWidth, y - 4);
+          y += 6;
           if (exportOptions.includeDescriptions && awesomeList.description) {
-            writeLines(awesomeList.description, 11, "normal", 8, [90, 90, 90]);
+            writeLines(awesomeList.description, 11, "normal", 8, INK_2);
           }
           writeLines(
             `${resources.length} resources — exported ${new Date().toLocaleDateString()}`,
             9,
             "normal",
             14,
-            [130, 130, 130],
+            INK_3,
           );
+
+          // Category h2 — serif display heading with a crimson "— " prefix,
+          // mirroring the HTML export's h2::before accent.
+          const writeCategoryHeading = (category: string) => {
+            ensureRoom(34);
+            y += 8;
+            const size = 15;
+            const lineHeight = size * 1.35;
+            doc.setFontSize(size);
+            doc.setFont("times", "bold");
+            const dash = "\u2014 ";
+            const dashWidth = doc.getTextWidth(dash);
+            const lines = doc.splitTextToSize(String(category ?? ""), maxWidth - dashWidth) as string[];
+            ensureRoom(lineHeight);
+            doc.setTextColor(CRIMSON[0], CRIMSON[1], CRIMSON[2]);
+            doc.text(dash, margin, y);
+            doc.setTextColor(INK[0], INK[1], INK[2]);
+            for (let i = 0; i < lines.length; i++) {
+              if (i > 0) ensureRoom(lineHeight);
+              doc.text(lines[i], margin + dashWidth, y);
+              y += lineHeight;
+            }
+            y += 8;
+          };
 
           const writeResource = (resource: Resource, showCategory: boolean) => {
             writeLines(resource.title, 11, "bold", 0);
             if (showCategory) {
-              writeLines(resource.category, 8, "normal", 0, [130, 130, 130]);
+              writeLines(resource.category.toUpperCase(), 8, "normal", 0, INK_3);
             }
             const hasDesc = exportOptions.includeDescriptions && !!resource.description;
-            writeLines(resource.url, 9, "normal", hasDesc ? 0 : 2, [0, 90, 160]);
+            writeLines(resource.url, 9, "normal", hasDesc ? 0 : 2, CRIMSON);
             if (hasDesc) {
-              writeLines(resource.description!, 9, "normal", 2, [90, 90, 90]);
+              writeLines(resource.description!, 9, "normal", 2, INK_2);
             }
             const tags = getResourceTags(resource);
             if (exportOptions.includeTags && tags.length) {
-              writeLines(`Tags: ${tags.join(", ")}`, 8, "normal", 2, [130, 130, 130]);
+              writeLines(`Tags: ${tags.join(", ")}`, 8, "normal", 2, INK_3);
             }
             y += 4;
           };
@@ -612,9 +662,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
               return acc;
             }, {} as Record<string, Resource[]>);
             for (const [category, categoryResources] of Object.entries(categorizedResources)) {
-              ensureRoom(34);
-              y += 8;
-              writeLines(category, 15, "bold", 8);
+              writeCategoryHeading(category);
               for (const resource of categoryResources) {
                 writeResource(resource, false);
                 await maybeYield();
