@@ -129,6 +129,83 @@ export function collectStrayChips() {
   };
 }
 
+// Stage-6 "Same idea for the rest" · page titles: every <h1> must use the
+// .display-h helper (per-system display-font switching keys on it) and must
+// not pin a body font/weight (font-sans/font-medium) on top of the display
+// tokens. Screen-reader-only titles are invisible — no display font to
+// switch — so they're the one exclusion.
+export function collectStrayH1s() {
+  // STAGE6-H1-FILTER-START — keep byte-for-byte aligned with SKILL.md stage 6
+  const stray = [...document.querySelectorAll('h1')].filter(h =>
+    /* 1 · the DS display-heading helper — per-system display fonts key on it,
+           and pinning font-sans/font-medium over it defeats the tokens */
+    (!h.classList.contains('display-h') ||
+      h.classList.contains('font-sans') ||
+      h.classList.contains('font-medium')) &&
+    /* 2 · screen-reader-only page titles (invisible — nothing to switch) */
+    !h.classList.contains('sr-only')
+  );
+  // STAGE6-H1-FILTER-END
+  return {
+    total: document.querySelectorAll('h1').length,
+    strays: stray.map(h => ({
+      tag: 'h1',
+      testid: h.getAttribute('data-testid') || null,
+      ariaLabel: h.getAttribute('aria-label') || null,
+      classPrefix: String(h.className || '').trim().slice(0, 120) || null,
+      text: (h.textContent || '').trim().slice(0, 60) || null,
+    })),
+  };
+}
+
+// Stage-6 "Same idea for the rest" · section labels: anything rendered as a
+// mono UPPERCASE label (the eyebrow look) must be the .eyebrow helper —
+// hand-pinned font-mono/uppercase combos skip the per-system tracking,
+// size-step, and accent treatment. Mono+uppercase that is NOT a section
+// label is excluded: Badge chips (primitive emits it), keyboard-hint
+// clusters (<kbd>/.kbd and their sibling captions like "esc · to close"),
+// and code/reference chrome.
+export function collectStrayEyebrows() {
+  // STAGE6-EYEBROW-FILTER-START — keep byte-for-byte aligned with SKILL.md stage 6
+  const eyebrowish = (el) => {
+    if (el.childElementCount > 2) return false;
+    const text = (el.textContent || '').trim();
+    if (!text || text.length > 60) return false;             // labels are short
+    const s = getComputedStyle(el);
+    if (s.textTransform !== 'uppercase') return false;        // all-caps via CSS
+    if (!/mono|menlo|consolas|courier/i.test(s.fontFamily)) return false;
+    if (parseFloat(s.fontSize) > 14) return false;            // label scale
+    return el.getBoundingClientRect().height > 0;             // visible
+  };
+  const stray = [...document.querySelectorAll('p, div, span, a, h2, h3, h4, h5, h6, legend, figcaption')].filter(el =>
+    eyebrowish(el) &&
+    /* 1 · the DS eyebrow helper (self, or child bits like the ── dash) */
+    !el.closest('.eyebrow') &&
+    /* 2 · chips/badges — mono+uppercase comes from the Badge primitive */
+    !el.closest('[data-ds="chip"]') &&
+    !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
+    /* 3 · keyboard hints + code samples — mono by nature, not section labels
+           (covers the <kbd> itself, wrappers around one, and sibling captions
+           like the search dialog's "esc · to close") */
+    !el.closest('code, pre, kbd, .kbd') &&
+    !el.querySelector('kbd, .kbd') &&
+    !(el.parentElement && el.parentElement.querySelector(':scope > kbd, :scope > .kbd')) &&
+    /* 4 · shadcn/Radix + reference sidebar chrome */
+    !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]')
+  );
+  // STAGE6-EYEBROW-FILTER-END
+  return {
+    total: document.querySelectorAll('.eyebrow').length,
+    strays: stray.map(el => ({
+      tag: el.tagName.toLowerCase(),
+      testid: el.getAttribute('data-testid') || null,
+      ariaLabel: el.getAttribute('aria-label') || null,
+      classPrefix: String(el.className || '').trim().slice(0, 120) || null,
+      text: (el.textContent || '').trim().slice(0, 60) || null,
+    })),
+  };
+}
+
 // Stage-6 "Same idea for the rest" · cards: any clickable/hoverable card
 // (shadcn Card renders the bg-card bridge class) must carry
 // data-ds="card-hover" so the per-system hover skins apply.

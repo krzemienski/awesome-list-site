@@ -11,6 +11,10 @@
 //     primitive ("### Chip sweep")
 //   · cards   — clickable/hoverable bg-card surfaces missing
 //     data-ds="card-hover" ("### Card sweep")
+//   · h1s     — page titles missing .display-h, or pinning font-sans /
+//     font-medium over it ("### Page-title sweep", task #356)
+//   · eyebrows — hand-pinned mono-uppercase section labels that skip
+//     .eyebrow ("### Eyebrow sweep", task #356)
 // Any hit fails the gate with a readable list (data-testid / aria-label /
 // class prefix / text).
 //
@@ -38,7 +42,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { launchBrowserWithLease } from './playwright-launch-lease.mjs';
-import { collectStrayButtons, collectStrayInputs, collectStrayChips, collectStrayCards } from './ds-button-filter.mjs';
+import { collectStrayButtons, collectStrayInputs, collectStrayChips, collectStrayCards, collectStrayH1s, collectStrayEyebrows } from './ds-button-filter.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { chromium } = await import(path.join(ROOT, 'node_modules/playwright/index.mjs'));
@@ -68,6 +72,8 @@ const SWEEPS = [
   { kind: 'inputs', heading: '### Input sweep', marker: 'STAGE6-INPUT-FILTER', collect: collectStrayInputs },
   { kind: 'chips', heading: '### Chip sweep', marker: 'STAGE6-CHIP-FILTER', collect: collectStrayChips },
   { kind: 'cards', heading: '### Card sweep', marker: 'STAGE6-CARD-FILTER', collect: collectStrayCards },
+  { kind: 'h1s', heading: '### Page-title sweep', marker: 'STAGE6-H1-FILTER', collect: collectStrayH1s },
+  { kind: 'eyebrows', heading: '### Eyebrow sweep', marker: 'STAGE6-EYEBROW-FILTER', collect: collectStrayEyebrows },
 ];
 {
   const SKILL = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md');
@@ -265,9 +271,12 @@ try {
     }
     for (const { kind } of SWEEPS) {
       const sweep = sweeps[kind];
-      // Only the button sweep doubles as the render-sanity probe: every route
-      // has DS-hooked buttons, but zero inputs/chips/cards can be legitimate.
-      const sane = kind !== 'buttons' || (sweep.total > 0 && sweep.dsVariantCount > 0);
+      // The button sweep doubles as the render-sanity probe (every route has
+      // DS-hooked buttons) and every swept page must render a visible <h1>;
+      // zero inputs/chips/cards/eyebrows can be legitimate.
+      const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
+        : kind === 'h1s' ? sweep.total > 0
+        : true;
       const pass = sane && sweep.strays.length === 0;
       if (pass) {
         const hooked = kind === 'buttons' ? `${sweep.dsVariantCount} DS-hooked of ${sweep.total}` : `${sweep.total} DS-hooked`;
@@ -278,6 +287,32 @@ try {
         await page.screenshot({ path: path.join(OUT, `${route.name}-${kind}.png`), fullPage: true }).catch(() => {});
         strayReport(`route-${route.name}-${kind}`, route.path, kind, sweep);
       }
+    }
+    // Detector canaries for the two newest collectors (task #356): once, on
+    // the home route, inject a synthetic off-system h1 and a hand-pinned
+    // mono-uppercase label and prove both filters flag them — the eyebrow
+    // sweep is heuristic (computed styles), so a silent no-match regression
+    // would otherwise pass vacuously forever.
+    if (route.name === 'home') {
+      const caught = await page.evaluate(({ collectH1s, collectEyebrows }) => {
+        const h1 = document.createElement('h1');
+        h1.textContent = 'QA canary rogue title';
+        const label = document.createElement('span');
+        label.style.cssText = "font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px";
+        label.textContent = 'qa canary rogue label';
+        document.body.append(h1, label);
+        try {
+          const h1Caught = new Function(`return (${collectH1s})()`)().strays.some(s => s.text === 'QA canary rogue title');
+          const eyebrowCaught = new Function(`return (${collectEyebrows})()`)().strays.some(s => s.text === 'qa canary rogue label');
+          return { h1Caught, eyebrowCaught };
+        } finally { h1.remove(); label.remove(); }
+      }, { collectH1s: collectStrayH1s.toString(), collectEyebrows: collectStrayEyebrows.toString() });
+      log('canary-h1s', caught.h1Caught, caught.h1Caught
+        ? 'synthetic h1 without .display-h was flagged by the page-title filter'
+        : 'DETECTOR BLIND: a synthetic h1 without .display-h was NOT flagged');
+      log('canary-eyebrows', caught.eyebrowCaught, caught.eyebrowCaught
+        ? 'synthetic mono-uppercase label without .eyebrow was flagged by the eyebrow filter'
+        : 'DETECTOR BLIND: a synthetic mono-uppercase label without .eyebrow was NOT flagged');
     }
   }
 

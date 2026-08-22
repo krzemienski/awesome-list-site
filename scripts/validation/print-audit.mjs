@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { launchBrowserWithLease } from './playwright-launch-lease.mjs';
+import { acquireGateLease } from './gate-lease.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { chromium } = await import(path.join(ROOT, 'node_modules/playwright/index.mjs'));
@@ -95,6 +96,14 @@ async function waitForSearchResultState(page, route) {
   console.warn(`search readiness: failed after bounded retries (${last})`);
   return { ready: false, state: last };
 }
+
+// This is a crawl-style gate: the catalog-database-resilience gate takes a
+// REAL ACCESS EXCLUSIVE table lock mid-run, and a page loaded during that
+// outage prints an empty catalog (0 card titles) — a false FAIL. Serialize
+// against the DB-outage/crawl gates via the shared "db-heavy" lease
+// (acquired BEFORE the browser lease, same order as seo-snapshot, so the
+// two leases can never deadlock).
+const releaseGateLease = await acquireGateLease('db-heavy', 'print-audit');
 
 const browser = await launchBrowserWithLease(
   chromium,
@@ -292,4 +301,5 @@ fs.writeFileSync(`${OUT}/print-audit.json`, JSON.stringify(results, null, 2));
 const fails = results.filter(r => !r.pass);
 console.log(`\nTOTAL ${results.length}, FAIL ${fails.length} (evidence: ${OUT})`);
 await browser.close();
+releaseGateLease();
 process.exit(fails.length ? 1 : 0);

@@ -356,13 +356,21 @@ known list below instead of re-flagging it every run.
 - **Keyboard hints:** `.kbd`, or a fully tokenized `<kbd>` (the header's
   `/` hint is the reference).
 
-The input/chip/card halves of this are enforced automatically by the same
-`ds-button-sweep` gate as the button filter: the three snippets below have
-executable copies in `scripts/validation/ds-button-filter.mjs`
-(`collectStrayInputs` / `collectStrayChips` / `collectStrayCards`, between
-the `STAGE6-INPUT-FILTER` / `STAGE6-CHIP-FILTER` / `STAGE6-CARD-FILTER`
-markers), and the gate fails if the literals here and there drift apart.
-Change both files in the same commit.
+The input/chip/card/page-title/eyebrow parts of this are enforced
+automatically by the same `ds-button-sweep` gate as the button filter: the
+five snippets below have executable copies in
+`scripts/validation/ds-button-filter.mjs` (`collectStrayInputs` /
+`collectStrayChips` / `collectStrayCards` / `collectStrayH1s` /
+`collectStrayEyebrows`, between the `STAGE6-INPUT-FILTER` /
+`STAGE6-CHIP-FILTER` / `STAGE6-CARD-FILTER` / `STAGE6-H1-FILTER` /
+`STAGE6-EYEBROW-FILTER` markers), and the gate fails if the literals here
+and there drift apart. Change both files in the same commit. The gate also
+runs detector canaries for the two newest filters (a synthetic off-system
+`h1` and a hand-pinned mono-uppercase label injected on the home route must
+be flagged), so a heuristic no-match regression can't pass vacuously. Only
+the **keyboard hints** rule stays manual — "fully tokenized" isn't
+detectable from computed styles, so triage `<kbd>` by eye against the
+header's `/` reference.
 
 ### Input sweep
 
@@ -447,6 +455,78 @@ const stray = [...document.querySelectorAll('*')].filter(el =>
 );
 stray  // → [] expected; a hit is an interactive card missing data-ds="card-hover"
 ```
+
+### Page-title sweep
+
+```js
+const stray = [...document.querySelectorAll('h1')].filter(h =>
+  /* 1 · the DS display-heading helper — per-system display fonts key on it,
+         and pinning font-sans/font-medium over it defeats the tokens */
+  (!h.classList.contains('display-h') ||
+    h.classList.contains('font-sans') ||
+    h.classList.contains('font-medium')) &&
+  /* 2 · screen-reader-only page titles (invisible — nothing to switch) */
+  !h.classList.contains('sr-only')
+);
+stray  // → [] expected; a hit is a page title that skips the display tokens
+```
+
+`sr-only` is the one exclusion: SubmitResource, ResourceDetail's loading
+state, and AdminDashboard render invisible screen-reader titles where no
+display font can matter. Every *visible* `h1` must carry `.display-h` and
+must not pin `font-sans`/`font-medium` back over it — either breaks the
+per-system display-font switching. The gate additionally requires each swept
+route to render at least one `h1` (a zero-`h1` page is a vacuous sweep, and
+a page-structure bug anyway).
+
+### Eyebrow sweep
+
+```js
+const eyebrowish = (el) => {
+  if (el.childElementCount > 2) return false;
+  const text = (el.textContent || '').trim();
+  if (!text || text.length > 60) return false;             // labels are short
+  const s = getComputedStyle(el);
+  if (s.textTransform !== 'uppercase') return false;        // all-caps via CSS
+  if (!/mono|menlo|consolas|courier/i.test(s.fontFamily)) return false;
+  if (parseFloat(s.fontSize) > 14) return false;            // label scale
+  return el.getBoundingClientRect().height > 0;             // visible
+};
+const stray = [...document.querySelectorAll('p, div, span, a, h2, h3, h4, h5, h6, legend, figcaption')].filter(el =>
+  eyebrowish(el) &&
+  /* 1 · the DS eyebrow helper (self, or child bits like the ── dash) */
+  !el.closest('.eyebrow') &&
+  /* 2 · chips/badges — mono+uppercase comes from the Badge primitive */
+  !el.closest('[data-ds="chip"]') &&
+  !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
+  /* 3 · keyboard hints + code samples — mono by nature, not section labels
+         (covers the <kbd> itself, wrappers around one, and sibling captions
+         like the search dialog's "esc · to close") */
+  !el.closest('code, pre, kbd, .kbd') &&
+  !el.querySelector('kbd, .kbd') &&
+  !(el.parentElement && el.parentElement.querySelector(':scope > kbd, :scope > .kbd')) &&
+  /* 4 · shadcn/Radix + reference sidebar chrome */
+  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]')
+);
+stray  // → [] expected; a hit is a hand-pinned mono-uppercase label that skipped .eyebrow
+```
+
+A hit is a section label styled by hand (`font-mono` + `uppercase` +
+tracking pinned per-element) instead of `.eyebrow` — it skips the
+per-system `--eyebrow-tracking`/`--mono-size-step` switching and the skins'
+eyebrow treatments (Terminal's `> ` prompt, Swiss's muted weight). Excluded
+mono-uppercase that is *not* a section label:
+
+- **Badge chips** — `data-ds="chip"` (and their inner bits) plus the
+  `badgeVariants` base signature (`rounded-full` + `focus:ring-ring`, same
+  as the chip sweep's exclusion 2): the mono-uppercase look there is emitted
+  by the primitive itself.
+- **Keyboard-hint clusters** — the search dialog's `esc` + "to close"
+  caption and the header's `/` hint: `<kbd>`/`.kbd` themselves, small
+  wrappers around one, and direct siblings of one. `<code>`/`<pre>` samples
+  are likewise mono by nature.
+- **Reference sidebar chrome** (`[data-sidebar]`, e.g. the BROWSE header
+  block) and cmdk/popper containers, as in the other sweeps.
 
 ### Forbidden patterns
 
