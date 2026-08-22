@@ -21,6 +21,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getDifficultyColor } from "@/lib/difficulty";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -327,19 +328,6 @@ export default function JourneyDetail() {
     completeStepMutation.mutate({ stepIds, completed, stepNumber, stepPosition });
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-500/10 text-green-500 border-green-500/30";
-      case "intermediate":
-        return "bg-yellow-500/10 text-yellow-500 border-yellow-500/30";
-      case "advanced":
-        return "bg-red-500/10 text-red-500 border-red-500/30";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
-
   if (journeyLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl" aria-busy={true} aria-live="polite">
@@ -464,7 +452,7 @@ export default function JourneyDetail() {
               {isCompleted && (
                 <Badge 
                   variant="outline"
-                  className="bg-green-500/10 text-green-500 border-green-500/30"
+                  className="bg-[#34d08c]/10 text-[#34d08c] border-[#34d08c]/30" // DS-OK: status ok — completed
                   data-testid="badge-journey-completed"
                 >
                   <Trophy className="h-3 w-3 mr-1" />
@@ -583,7 +571,7 @@ export default function JourneyDetail() {
                   tabIndex={-1}
                   className={cn(
                     "scroll-mt-24 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
-                    isStepCompleted && "border-green-500/30 bg-green-500/5",
+                    isStepCompleted && "border-[#34d08c]/30 bg-[#34d08c]/5", // DS-OK: status ok — completed step
                     isCurrentStep && !isStepCompleted && "border-primary/50 shadow-lg"
                   )}
                   data-testid={`card-step-${step.stepNumber}`}
@@ -593,8 +581,8 @@ export default function JourneyDetail() {
                       {/* Step Number/Status */}
                       <div className={cn(
                         "flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm",
-                        isStepCompleted 
-                          ? "bg-green-500 text-white" 
+                        isStepCompleted
+                          ? "bg-[#34d08c] text-black" // DS-OK: status ok fill + on-accent ink
                           : "bg-muted text-muted-foreground"
                       )}>
                         {isStepCompleted ? (
@@ -702,7 +690,7 @@ export default function JourneyDetail() {
                           <Button
                             variant="ghost"
                             className={cn(
-                              "min-h-[44px] px-2 text-green-500 hover:text-green-600",
+                              "min-h-[44px] px-2 text-[#34d08c] hover:text-[#34d08c]/80", // DS-OK: status ok
                               completeStepMutation.isPending && "opacity-60",
                             )}
                             onClick={() => handleToggleStep(step.rowIds, false, step.stepNumber, index + 1)}
@@ -730,11 +718,11 @@ export default function JourneyDetail() {
         )}
       </div>
 
-      {/* Completion Message */}
+      {/* Completion Message — DS-OK: status ok, journey-complete celebration surface */}
       {isCompleted && (
-        <Card className="mt-8 bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/30">
+        <Card className="mt-8 bg-gradient-to-r from-[#34d08c]/10 to-[#34d08c]/5 border-[#34d08c]/30">
           <CardContent className="p-6 text-center">
-            <Trophy className="h-12 w-12 text-green-500 mx-auto mb-4" />
+            <Trophy className="h-12 w-12 text-[#34d08c] mx-auto mb-4" />
             <h3 className="text-xl font-bold mb-2">🎉 Congratulations!</h3>
             <p className="text-muted-foreground">
               You've completed the "{journey.title}" learning journey!

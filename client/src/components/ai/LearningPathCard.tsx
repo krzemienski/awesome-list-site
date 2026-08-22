@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, BookOpen, Target, ChevronRight, Award, BarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getDifficultyColor } from "@/lib/difficulty";
 
 /**
  * LearningPathCard - AI-based learning path recommendation display component
@@ -44,23 +45,11 @@ function LearningPathCard({
   onViewDetails,
   className
 }: LearningPathCardProps) {
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-500/10 text-green-500 border-green-500/30";
-      case "intermediate":
-        return "bg-yellow-500/10 text-yellow-500 border-yellow-500/30";
-      case "advanced":
-        return "bg-red-500/10 text-red-500 border-red-500/30";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
-
   const getMatchColor = (percentage: number) => {
-    if (percentage >= 80) return "text-green-500";
-    if (percentage >= 60) return "text-yellow-500";
-    return "text-orange-500";
+    // DS status constants, not palette classes (SKILL.md stage 5):
+    if (percentage >= 80) return "text-[#34d08c]"; // DS-OK: status ok
+    if (percentage >= 60) return "text-[#ffb84d]"; // DS-OK: status warn
+    return "text-[#ff5c7a]"; // DS-OK: status bad — low match
   };
 
   return (

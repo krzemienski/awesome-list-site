@@ -10,6 +10,7 @@ import { journeysHubDescription } from "@shared/seo-templates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getDifficultyColor } from "@/lib/difficulty";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -143,19 +144,6 @@ export default function Journeys() {
   const filteredJourneys = selectedCategory === "all" 
     ? journeys 
     : journeys.filter(j => j.category === selectedCategory);
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-500/10 text-green-500 border-green-500/30";
-      case "intermediate":
-        return "bg-yellow-500/10 text-yellow-500 border-yellow-500/30";
-      case "advanced":
-        return "bg-red-500/10 text-red-500 border-red-500/30";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
 
   const getDifficultyIcon = (difficulty: string) => {
     switch (difficulty) {
