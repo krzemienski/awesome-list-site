@@ -235,9 +235,13 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
   /* 1 · shadcn Button / buttonVariants() — skins hook on this */
   !b.hasAttribute('data-ds-variant') &&
   /* 2 · other shadcn/Radix primitives from @/components/ui
-         (tabs, switch, checkbox, select, accordion, cmdk, carousel…) */
+         (tabs, switch, checkbox, select, accordion, cmdk, carousel…).
+         NB: overlay CONTAINERS (cmdk palette, popover/dropdown popper
+         content) are NOT blanket-excluded — a button inside an open
+         overlay must qualify one-by-one like everything else, so rogues
+         in dialogs/popovers/menus are reportable. */
   !b.matches('[data-state], [data-radix-collection-item], [cmdk-item], [role="switch"], [role="checkbox"], [role="tab"], [role="combobox"]') &&
-  !b.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+  !b.closest('[data-sidebar]') &&
   !(b.closest('[role="dialog"]') && b.querySelector('.sr-only')) && // Dialog/Sheet close ✕
   /* 3 · known composite chrome (verified compliant — list below) */
   !b.closest('.accordion-item') &&                        // AppSidebar taxonomy rows
@@ -262,6 +266,16 @@ stray  // → [] expected on the app's public routes; triage any hit with the la
 > two stay literal-for-literal in sync (the gate fails on drift). If you
 > change any exclusion here — including the known-composite-chrome list —
 > update `ds-button-filter.mjs` in the same commit, and vice versa.
+>
+> The gate also sweeps with the high-traffic **overlays open** (buttons in
+> closed overlays never exist in the static DOM): the header search command
+> dialog (cmdk, with seeded recent searches), the Home "Filter by Tag"
+> popover, and the /search mobile Filters sheet — so hand-rolled buttons in
+> dialog footers, popover bodies, and sheets are caught too. Overlay
+> interiors are swept button-by-button (no container-level blanket
+> exclusion), and each overlay scenario runs a **detector canary**: it
+> injects a synthetic rogue button inside the open overlay and fails unless
+> the filter flags it, so a scenario can never pass while quietly blind.
 
 A remaining hit is an **automatic 🟡 FIX only if it carries palette classes,
 literal hex/rgb colors, or raw radii** (cross-check with stage 5). A hit

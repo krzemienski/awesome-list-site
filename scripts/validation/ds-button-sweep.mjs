@@ -22,6 +22,16 @@
 // chips (which only render once a filter is applied — see the skill's
 // "Known composite chrome" note) are actually present and exercised.
 //
+// Task #352: the static DOM never renders buttons inside CLOSED overlays,
+// so a second scenario list opens the high-traffic ones before running the
+// same filter: the header search command dialog (cmdk), the Home "Filter by
+// Tag" popover, and the /search mobile Filters sheet. Overlay interiors are
+// swept button-by-button (the filter deliberately has NO container-level
+// blanket exclusion for cmdk/popper content). Each scenario asserts the
+// overlay actually activated (data-state="open" + buttons inside it) AND
+// runs a detector canary — a synthetic rogue button injected inside the
+// open overlay must be flagged — so a scenario can never pass while blind.
+//
 // Requires the dev server on :5000 (public routes, no login). Exits 1 on
 // any failure. Evidence: /tmp/validation/ds-button-sweep.
 import fs from 'fs';
@@ -147,10 +157,64 @@ const browser = await launchBrowserWithLease(
   { headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] },
   'ds-button-sweep',
 );
-try {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+// ---------------------------------------------------------------------------
+// Overlay scenarios (task #352): buttons inside CLOSED overlays never exist
+// in the static DOM, so each scenario opens one high-traffic overlay before
+// running the SAME collectStrayButtons() filter. `open` clicks the trigger;
+// `openedSelector` is the condition-based activation proof (Radix data-state
+// / rendered overlay content — never a fixed sleep); `scope` is the overlay
+// container whose button count must be > 0 or the scenario is vacuous.
+// Every scenario navigates fresh (page.goto), so no close choreography is
+// needed — Radix's body pointer-events lock through close animations (see
+// prior flake notes) can never eat the next scenario's trigger click.
+// ---------------------------------------------------------------------------
+const DESKTOP = { width: 1280, height: 900 };
+const MOBILE = { width: 390, height: 844 };
+const OVERLAYS = [
+  {
+    // Header search chip → Radix Dialog wrapping cmdk. Exercises the
+    // [cmdk-root] exclusion, the Dialog close ✕ (sr-only) exclusion, and —
+    // via seeded recent searches — the button-clear-recent-searches testid.
+    name: 'search-dialog',
+    path: '/',
+    viewport: DESKTOP,
+    setup: async (page) => {
+      await page.evaluate(() => localStorage.setItem('recent-searches', JSON.stringify(['hls', 'codec'])));
+    },
+    open: async (page) => { await page.click('button[aria-label="Open search"]'); },
+    openedSelector: '[role="dialog"][data-state="open"] [cmdk-root]',
+    alsoExpect: '[data-testid="button-clear-recent-searches"]',
+    scope: '[role="dialog"][data-state="open"]',
+  },
+  {
+    // Home "Filter by Tag" popover (client/src/components/ui/advanced-filter.tsx).
+    // Exercises the [data-radix-popper-content-wrapper] exclusion plus the
+    // aria-pressed tag toggle rows and the Collapsible trigger (data-state).
+    name: 'tag-filter-popover',
+    path: '/',
+    viewport: DESKTOP,
+    open: async (page) => { await page.click('button:not([disabled]):has-text("Filter by Tag")'); },
+    openedSelector: '[data-radix-popper-content-wrapper] button[aria-pressed]',
+    scope: '[data-radix-popper-content-wrapper]',
+  },
+  {
+    // /search mobile "Filters" Sheet (SearchFilters.tsx, lg:hidden → needs a
+    // phone viewport). A real Radix Sheet: exercises the Sheet close ✕
+    // (sr-only in [role="dialog"]) and the aria-pressed facet rows.
+    name: 'filters-sheet',
+    path: '/search?q=video',
+    viewport: MOBILE,
+    open: async (page) => { await page.click('[data-testid="button-open-filters"]'); },
+    openedSelector: '[role="dialog"][data-state="open"] button[aria-pressed]',
+    alsoExpect: '[role="dialog"][data-state="open"] [data-testid="input-search-tags"]',
+    scope: '[role="dialog"][data-state="open"]',
+  },
+];
 
-  const sweepRoute = async (route) => {
+try {
+  const page = await browser.newPage({ viewport: DESKTOP });
+
+  const gotoAndSettle = async (route) => {
     await page.goto(`${BASE}${route.path}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForSelector('.page', { timeout: 30000 });
     // Content rendered = at least one DS-hooked primitive button on screen.
@@ -161,11 +225,15 @@ try {
     await page.waitForFunction(() => !document.querySelector('.ssr-chrome'), null, { timeout: 30000 });
     if (route.expect) await page.waitForSelector(route.expect, { timeout: 20000 });
     await page.waitForTimeout(600); // settle async chunks (cards, facets)
-    const runAll = async () => {
-      const out = {};
-      for (const { kind, collect } of SWEEPS) out[kind] = await page.evaluate(collect);
-      return out;
-    };
+  };
+
+  const runAll = async () => {
+    const out = {};
+    for (const { kind, collect } of SWEEPS) out[kind] = await page.evaluate(collect);
+    return out;
+  };
+
+  const confirmedSweeps = async () => {
     let sweeps = await runAll();
     if (Object.values(sweeps).some(s => s.strays.length > 0)) {
       // Confirm before failing: transient pre-hydration/loading chrome can
@@ -176,6 +244,15 @@ try {
     }
     return sweeps;
   };
+
+  const sweepRoute = async (route) => {
+    await gotoAndSettle(route);
+    return confirmedSweeps();
+  };
+
+  const strayReport = (name, routePath, kind, sweep) =>
+    log(name, false, `${routePath} — ${sweep.strays.length} stray ${kind} match no DS hook/exclusion:\n${sweep.strays.map((s, i) =>
+      `  ${i + 1}. ${s.tag ? `tag=${s.tag} ` : ''}testid=${s.testid ?? '—'} aria-label=${s.ariaLabel ?? '—'} text=${JSON.stringify(s.text ?? '')} class=${s.classPrefix ?? '—'}`).join('\n')}\n  → triage with the stage-6 ladder in .agents/skills/verify-design-system/SKILL.md; if it is new compliant composite chrome, add it to BOTH the skill list and scripts/validation/ds-button-filter.mjs`);
 
   for (const route of ROUTES) {
     let sweeps;
@@ -199,9 +276,75 @@ try {
         log(`route-${route.name}-${kind}`, false, `${route.path} — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
       } else {
         await page.screenshot({ path: path.join(OUT, `${route.name}-${kind}.png`), fullPage: true }).catch(() => {});
-        const list = sweep.strays.map((s, i) =>
-          `  ${i + 1}. ${s.tag ? `tag=${s.tag} ` : ''}testid=${s.testid ?? '—'} aria-label=${s.ariaLabel ?? '—'} text=${JSON.stringify(s.text ?? '')} class=${s.classPrefix ?? '—'}`).join('\n');
-        log(`route-${route.name}-${kind}`, false, `${route.path} — ${sweep.strays.length} stray ${kind} match no DS hook/exclusion:\n${list}\n  → triage with the stage-6 ladder in .agents/skills/verify-design-system/SKILL.md; if it is new compliant composite chrome, add it to BOTH the skill list and scripts/validation/ds-button-filter.mjs`);
+        strayReport(`route-${route.name}-${kind}`, route.path, kind, sweep);
+      }
+    }
+  }
+
+  const sweepOverlay = async (o) => {
+    await page.setViewportSize(o.viewport);
+    await gotoAndSettle(o);
+    if (o.setup) await o.setup(page);
+    await o.open(page);
+    // Condition-based activation wait — Radix animates open/close and keeps
+    // body pointer-events locked mid-transition, so wait on rendered overlay
+    // content, never a fixed sleep.
+    await page.waitForSelector(o.openedSelector, { timeout: 15000 });
+    if (o.alsoExpect) await page.waitForSelector(o.alsoExpect, { timeout: 15000 });
+    await page.waitForTimeout(400); // settle async overlay content (tag lists, facets)
+    const overlayButtons = await page.evaluate(
+      (scope) => document.querySelectorAll(`${scope} button`).length, o.scope);
+    const sweeps = await confirmedSweeps();
+    // Detector canary: inject a synthetic rogue button INSIDE the open
+    // overlay and prove the button filter flags it. Rendered-button counts
+    // alone don't prove coverage — a blanket container exclusion would
+    // render this whole scenario blind while still "passing" (review of
+    // #352).
+    const CANARY_ID = 'qa-canary-rogue-button';
+    await page.evaluate(({ scope, id }) => {
+      const host = document.querySelector(scope);
+      if (!host) return;
+      const rogue = document.createElement('button');
+      rogue.type = 'button';
+      rogue.setAttribute('data-testid', id);
+      rogue.textContent = 'QA canary rogue';
+      host.appendChild(rogue);
+    }, { scope: o.scope, id: CANARY_ID });
+    const canarySweep = await page.evaluate(collectStrayButtons);
+    await page.evaluate((id) => document.querySelector(`[data-testid="${id}"]`)?.remove(), CANARY_ID);
+    const canaryCaught = canarySweep.strays.some((s) => s.testid === CANARY_ID);
+    return { sweeps, overlayButtons, canaryCaught };
+  };
+
+  for (const o of OVERLAYS) {
+    let sweeps, overlayButtons, canaryCaught;
+    try {
+      ({ sweeps, overlayButtons, canaryCaught } = await sweepOverlay(o));
+    } catch (e) {
+      try { ({ sweeps, overlayButtons, canaryCaught } = await sweepOverlay(o)); }
+      catch (e2) { log(`overlay-${o.name}`, false, `overlay sweep failed twice (trigger/overlay missing?): ${e2.message.split('\n')[0]}`); continue; }
+    }
+    // Harness-verified activation: the overlay must actually contribute
+    // buttons to the sweep AND the canary rogue injected inside it must be
+    // detectable, or the scenario proved nothing. All four filter kinds run
+    // with the overlay open (overlays contain inputs/chips too).
+    const sane = sweeps.buttons.total > 0 && sweeps.buttons.dsVariantCount > 0 && overlayButtons > 0;
+    if (!sane) {
+      log(`overlay-${o.name}`, false, `${o.path} — vacuous overlay sweep (total=${sweeps.buttons.total}, dsVariant=${sweeps.buttons.dsVariantCount}, overlayButtons=${overlayButtons})`);
+      continue;
+    }
+    if (!canaryCaught) {
+      log(`overlay-${o.name}`, false, `${o.path} — DETECTOR BLIND: a synthetic rogue button injected inside the open overlay was NOT flagged by the stage-6 filter; an exclusion is blanket-covering this overlay's interior`);
+      continue;
+    }
+    for (const { kind } of SWEEPS) {
+      const sweep = sweeps[kind];
+      if (sweep.strays.length === 0) {
+        const extra = kind === 'buttons' ? `overlay open (${overlayButtons} button(s) inside), canary rogue detected, ` : '';
+        log(`overlay-${o.name}-${kind}`, true, `${o.path} — ${extra}0 stray ${kind} of ${sweep.total} total`);
+      } else {
+        await page.screenshot({ path: path.join(OUT, `overlay-${o.name}-${kind}.png`), fullPage: true }).catch(() => {});
+        strayReport(`overlay-${o.name}-${kind}`, o.path, kind, sweep);
       }
     }
   }

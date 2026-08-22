@@ -18,9 +18,13 @@ export function collectStrayButtons() {
     /* 1 · shadcn Button / buttonVariants() — skins hook on this */
     !b.hasAttribute('data-ds-variant') &&
     /* 2 · other shadcn/Radix primitives from @/components/ui
-           (tabs, switch, checkbox, select, accordion, cmdk, carousel…) */
+           (tabs, switch, checkbox, select, accordion, cmdk, carousel…).
+           NB: overlay CONTAINERS (cmdk palette, popover/dropdown popper
+           content) are NOT blanket-excluded — a button inside an open
+           overlay must qualify one-by-one like everything else, so rogues
+           in dialogs/popovers/menus are reportable. */
     !b.matches('[data-state], [data-radix-collection-item], [cmdk-item], [role="switch"], [role="checkbox"], [role="tab"], [role="combobox"]') &&
-    !b.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+    !b.closest('[data-sidebar]') &&
     !(b.closest('[role="dialog"]') && b.querySelector('.sr-only')) && // Dialog/Sheet close ✕
     /* 3 · known composite chrome (verified compliant — list in SKILL.md) */
     !b.closest('.accordion-item') &&                        // AppSidebar taxonomy rows
