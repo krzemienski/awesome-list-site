@@ -1,17 +1,22 @@
-// Automated stage-6 stray-button gate (task #349).
+// Automated stage-6 stray-primitive gate (task #349; extended by #353).
 //
-// Runs the EXACT "Stage 6 · Button sweep" filter from
-// .agents/skills/verify-design-system/SKILL.md (executable copy in
+// Runs the EXACT stage-6 filters from
+// .agents/skills/verify-design-system/SKILL.md (executable copies in
 // ./ds-button-filter.mjs) against the key public routes in headless
-// Chromium. A hand-rolled, non-tokenized <button> that matches none of:
-//   data-ds-variant · shadcn/Radix primitive attributes · the known
-//   composite-chrome exclusions · raw DS classes
-// fails the gate with a readable list (data-testid / aria-label / class
-// prefix / text).
+// Chromium:
+//   · buttons — hand-rolled, non-tokenized <button>s ("### Button sweep")
+//   · inputs  — raw <input>/<select>/<textarea> that aren't the shadcn
+//     primitives ("### Input sweep")
+//   · chips   — pill-styled spans/divs built by hand instead of the Badge
+//     primitive ("### Chip sweep")
+//   · cards   — clickable/hoverable bg-card surfaces missing
+//     data-ds="card-hover" ("### Card sweep")
+// Any hit fails the gate with a readable list (data-testid / aria-label /
+// class prefix / text).
 //
-// Also enforces filter parity: the string/regex literals in the shared
-// module must equal the ones in the skill's fenced snippet, so the skill
-// and this gate cannot drift silently.
+// Also enforces filter parity: the string/regex literals in each shared
+// module region must equal the ones in the skill's matching fenced snippet,
+// so the skill and this gate cannot drift silently.
 //
 // Two routes load with an active tag filter so the active-filter removal
 // chips (which only render once a filter is applied — see the skill's
@@ -23,7 +28,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { launchBrowserWithLease } from './playwright-launch-lease.mjs';
-import { collectStrayButtons } from './ds-button-filter.mjs';
+import { collectStrayButtons, collectStrayInputs, collectStrayChips, collectStrayCards } from './ds-button-filter.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { chromium } = await import(path.join(ROOT, 'node_modules/playwright/index.mjs'));
@@ -43,10 +48,17 @@ function chromePath() {
 }
 
 // ---------------------------------------------------------------------------
-// Drift guard: the shared module's filter literals must match the skill's
-// stage-6 snippet. Compares the set of quoted strings + /^…/ regex literals
-// (the drift-prone part: selectors, aria-labels, testids, class prefixes).
+// Drift guard: each shared-module filter's literals must match the skill's
+// matching stage-6 snippet. Compares the set of quoted strings + /^…/ regex
+// literals (the drift-prone part: selectors, aria-labels, testids, class
+// prefixes) per filter.
 // ---------------------------------------------------------------------------
+const SWEEPS = [
+  { kind: 'buttons', heading: '### Button sweep', marker: 'STAGE6-FILTER', collect: collectStrayButtons },
+  { kind: 'inputs', heading: '### Input sweep', marker: 'STAGE6-INPUT-FILTER', collect: collectStrayInputs },
+  { kind: 'chips', heading: '### Chip sweep', marker: 'STAGE6-CHIP-FILTER', collect: collectStrayChips },
+  { kind: 'cards', heading: '### Card sweep', marker: 'STAGE6-CARD-FILTER', collect: collectStrayCards },
+];
 {
   const SKILL = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md');
   const MODULE = path.join(ROOT, 'scripts/validation/ds-button-filter.mjs');
@@ -63,21 +75,23 @@ function chromePath() {
   };
 
   const skillSrc = fs.readFileSync(SKILL, 'utf8');
-  const snippet = skillSrc.match(/### Button sweep\s+```js\n([\s\S]*?)```/)?.[1];
   const moduleSrc = fs.readFileSync(MODULE, 'utf8');
-  const region = moduleSrc.match(/STAGE6-FILTER-START[^\n]*\n([\s\S]*?)\/\/ STAGE6-FILTER-END/)?.[1];
+  for (const { kind, heading, marker } of SWEEPS) {
+    const snippet = skillSrc.match(new RegExp(`${heading}\\s+\`\`\`js\\n([\\s\\S]*?)\`\`\``))?.[1];
+    const region = moduleSrc.match(new RegExp(`${marker}-START[^\\n]*\\n([\\s\\S]*?)// ${marker}-END`))?.[1];
 
-  if (!snippet || !region) {
-    log('filter-parity', false, `could not locate ${!snippet ? 'the "### Button sweep" js snippet in SKILL.md' : 'the STAGE6-FILTER markers in ds-button-filter.mjs'}`);
-  } else {
-    const a = literalTokens(snippet);
-    const b = literalTokens(region);
-    const onlySkill = [...a].filter(t => !b.has(t));
-    const onlyModule = [...b].filter(t => !a.has(t));
-    log('filter-parity', onlySkill.length === 0 && onlyModule.length === 0,
-      onlySkill.length === 0 && onlyModule.length === 0
-        ? `${a.size} filter literals identical in SKILL.md stage 6 and ds-button-filter.mjs`
-        : `DRIFT — update both files together. Only in SKILL.md: ${JSON.stringify(onlySkill)}; only in ds-button-filter.mjs: ${JSON.stringify(onlyModule)}`);
+    if (!snippet || !region) {
+      log(`filter-parity-${kind}`, false, `could not locate ${!snippet ? `the "${heading}" js snippet in SKILL.md` : `the ${marker} markers in ds-button-filter.mjs`}`);
+    } else {
+      const a = literalTokens(snippet);
+      const b = literalTokens(region);
+      const onlySkill = [...a].filter(t => !b.has(t));
+      const onlyModule = [...b].filter(t => !a.has(t));
+      log(`filter-parity-${kind}`, onlySkill.length === 0 && onlyModule.length === 0,
+        onlySkill.length === 0 && onlyModule.length === 0
+          ? `${a.size} filter literals identical in SKILL.md stage 6 ("${heading.slice(4)}") and ds-button-filter.mjs`
+          : `DRIFT — update both files together. Only in SKILL.md: ${JSON.stringify(onlySkill)}; only in ds-button-filter.mjs: ${JSON.stringify(onlyModule)}`);
+    }
   }
 }
 
@@ -147,37 +161,48 @@ try {
     await page.waitForFunction(() => !document.querySelector('.ssr-chrome'), null, { timeout: 30000 });
     if (route.expect) await page.waitForSelector(route.expect, { timeout: 20000 });
     await page.waitForTimeout(600); // settle async chunks (cards, facets)
-    let sweep = await page.evaluate(collectStrayButtons);
-    if (sweep.strays.length > 0) {
+    const runAll = async () => {
+      const out = {};
+      for (const { kind, collect } of SWEEPS) out[kind] = await page.evaluate(collect);
+      return out;
+    };
+    let sweeps = await runAll();
+    if (Object.values(sweeps).some(s => s.strays.length > 0)) {
       // Confirm before failing: transient pre-hydration/loading chrome can
       // linger when the whole validation suite saturates the machine. A real
-      // hand-rolled button is still there 3s later.
+      // hand-rolled element is still there 3s later.
       await page.waitForTimeout(3000);
-      sweep = await page.evaluate(collectStrayButtons);
+      sweeps = await runAll();
     }
-    return sweep;
+    return sweeps;
   };
 
   for (const route of ROUTES) {
-    let sweep;
+    let sweeps;
     try {
-      sweep = await sweepRoute(route);
+      sweeps = await sweepRoute(route);
     } catch (e) {
       // Cold-boot renders can flake right after a server restart — retry once.
-      try { sweep = await sweepRoute(route); }
+      try { sweeps = await sweepRoute(route); }
       catch (e2) { log(`route-${route.name}`, false, `sweep failed twice: ${e2.message.split('\n')[0]}`); continue; }
     }
-    const sane = sweep.total > 0 && sweep.dsVariantCount > 0;
-    const pass = sane && sweep.strays.length === 0;
-    if (pass) {
-      log(`route-${route.name}`, true, `${route.path} — 0 stray of ${sweep.total} buttons (${sweep.dsVariantCount} DS-hooked)`);
-    } else if (!sane) {
-      log(`route-${route.name}`, false, `${route.path} — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
-    } else {
-      await page.screenshot({ path: path.join(OUT, `${route.name}.png`), fullPage: true }).catch(() => {});
-      const list = sweep.strays.map((s, i) =>
-        `  ${i + 1}. testid=${s.testid ?? '—'} aria-label=${s.ariaLabel ?? '—'} text=${JSON.stringify(s.text ?? '')} class=${s.classPrefix ?? '—'}`).join('\n');
-      log(`route-${route.name}`, false, `${route.path} — ${sweep.strays.length} stray button(s) match no DS hook/exclusion:\n${list}\n  → triage with the stage-6 ladder in .agents/skills/verify-design-system/SKILL.md; if it is new compliant composite chrome, add it to BOTH the skill list and scripts/validation/ds-button-filter.mjs`);
+    for (const { kind } of SWEEPS) {
+      const sweep = sweeps[kind];
+      // Only the button sweep doubles as the render-sanity probe: every route
+      // has DS-hooked buttons, but zero inputs/chips/cards can be legitimate.
+      const sane = kind !== 'buttons' || (sweep.total > 0 && sweep.dsVariantCount > 0);
+      const pass = sane && sweep.strays.length === 0;
+      if (pass) {
+        const hooked = kind === 'buttons' ? `${sweep.dsVariantCount} DS-hooked of ${sweep.total}` : `${sweep.total} DS-hooked`;
+        log(`route-${route.name}-${kind}`, true, `${route.path} — 0 stray ${kind} (${hooked})`);
+      } else if (!sane) {
+        log(`route-${route.name}-${kind}`, false, `${route.path} — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
+      } else {
+        await page.screenshot({ path: path.join(OUT, `${route.name}-${kind}.png`), fullPage: true }).catch(() => {});
+        const list = sweep.strays.map((s, i) =>
+          `  ${i + 1}. ${s.tag ? `tag=${s.tag} ` : ''}testid=${s.testid ?? '—'} aria-label=${s.ariaLabel ?? '—'} text=${JSON.stringify(s.text ?? '')} class=${s.classPrefix ?? '—'}`).join('\n');
+        log(`route-${route.name}-${kind}`, false, `${route.path} — ${sweep.strays.length} stray ${kind} match no DS hook/exclusion:\n${list}\n  → triage with the stage-6 ladder in .agents/skills/verify-design-system/SKILL.md; if it is new compliant composite chrome, add it to BOTH the skill list and scripts/validation/ds-button-filter.mjs`);
+      }
     }
   }
 } finally {

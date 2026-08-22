@@ -331,13 +331,108 @@ known list below instead of re-flagging it every run.
   artifacts only.
 - **Badges:** DS chips must be `Badge` variant `chip`/`accent` (emits
   `data-ds="chip"`). Admin status badges intentionally keep plain shadcn
-  variants (`replit.md` MR-DS-13 #5) — not a finding.
+  variants (`replit.md` MR-DS-13 #5) — not a finding. Per the canonical
+  `.chip` → `Badge` mapping in `replit.md`, ANY `Badge` variant is the
+  compliant primitive; the violation is a pill styled by hand on a raw
+  `<span>`/`<div>`.
 - **Cards:** any clickable/hoverable card carries `data-ds="card-hover"`.
 - **Section labels:** mono uppercase eyebrows use `.eyebrow`.
 - **Page titles:** `h1`s use `.display-h` (never `font-sans`/`font-medium`
   pinned on them).
 - **Keyboard hints:** `.kbd`, or a fully tokenized `<kbd>` (the header's
   `/` hint is the reference).
+
+The input/chip/card halves of this are enforced automatically by the same
+`ds-button-sweep` gate as the button filter: the three snippets below have
+executable copies in `scripts/validation/ds-button-filter.mjs`
+(`collectStrayInputs` / `collectStrayChips` / `collectStrayCards`, between
+the `STAGE6-INPUT-FILTER` / `STAGE6-CHIP-FILTER` / `STAGE6-CARD-FILTER`
+markers), and the gate fails if the literals here and there drift apart.
+Change both files in the same commit.
+
+### Input sweep
+
+```js
+const stray = [...document.querySelectorAll('input, select, textarea')].filter(el =>
+  /* 1 · shadcn Input / Textarea / SelectTrigger — bridge border classes */
+  !el.classList.contains('border-input') &&
+  !el.classList.contains('border-[var(--border-strong)]') &&
+  /* 2 · primitives / non-text controls that legitimately wrap raw inputs */
+  !el.matches('[cmdk-input], [type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"]') &&
+  !el.classList.contains('sr-only') &&                    // peer-hidden toggle inputs
+  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+  /* 3 · known tokenized native controls (verified compliant — list below) */
+  el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
+  /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
+  ![...el.classList].some(c => /^(input|select|textarea)$/.test(c))
+);
+stray  // → [] expected; triage hits with the stage-6 ladder above
+```
+
+Known tokenized native controls (the input analogue of the composite-chrome
+list): the `TaxonomyListing` subcategory scope filter
+(`data-testid="select-subcategory-filter"`) is a native `<select>` — fully
+tokenized (`min-h-11 rounded-md border bg-background`), and shadcn's
+`SelectTrigger` is a combobox `<button>`, so this native control keeps
+plain-option semantics for its long, count-annotated option list.
+
+### Chip sweep
+
+```js
+const chipShaped = (el) => {
+  if (el.childElementCount > 2) return false;
+  const text = (el.textContent || '').trim();
+  if (!text || text.length > 40) return false;
+  const s = getComputedStyle(el);
+  const h = el.getBoundingClientRect().height;
+  if (h === 0 || h > 40) return false;                    // chips are small
+  if ((parseFloat(s.borderRadius) || 0) < h / 2 - 1) return false; // pill radius
+  if (parseFloat(s.fontSize) > 13) return false;          // text-xs and below
+  if (!/^(inline|flex)/.test(s.display)) return false;
+  return s.backgroundColor !== 'rgba(0, 0, 0, 0)' ||      // filled or bordered
+    (parseFloat(s.borderTopWidth) > 0 && s.borderTopColor !== 'rgba(0, 0, 0, 0)');
+};
+const stray = [...document.querySelectorAll('span, div, a')].filter(el =>
+  chipShaped(el) &&
+  /* 1 · DS chips — Badge chip/accent variants, skins hook on this */
+  el.getAttribute('data-ds') !== 'chip' &&
+  /* 2 · plain shadcn Badge variants — intentional divergence (MR-DS-13 #5) */
+  !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
+  /* 3 · shadcn/Radix chrome that renders pill-shaped bits */
+  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
+  /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
+  !el.classList.contains('chip') &&
+  !el.classList.contains('kbd')
+);
+stray  // → [] expected; a hit is a hand-rolled pill that skipped Badge
+```
+
+Exclusion 2 encodes MR-DS-13 #5 up front: plain-variant `Badge`s (admin
+status badges, count badges, the difficulty/`View Details` chips) keep
+shadcn styling by design — `rounded-full` + `focus:ring-ring` together are
+the `badgeVariants` base signature, so anything built on the primitive is
+excluded and only hand-styled pills remain.
+
+### Card sweep
+
+```js
+const stray = [...document.querySelectorAll('*')].filter(el =>
+  /* candidates: shadcn Card / bg-card surfaces */
+  el.classList.contains('bg-card') &&
+  /* interactive = clickable or link-wrapped (static cards are fine bare) */
+  (getComputedStyle(el).cursor === 'pointer' ||
+    !!el.closest('a, button') ||
+    el.matches('[role="button"], [role="link"], [tabindex]:not([tabindex="-1"])')) &&
+  /* 1 · the hook itself — per-system hover skins key on this */
+  el.getAttribute('data-ds') !== 'card-hover' &&
+  !el.closest('[data-ds="card-hover"]') &&                // inner bg-card bits of a hooked card
+  /* 2 · shadcn/Radix chrome (popovers, dialogs, sidebar) */
+  !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper], [role="dialog"]') &&
+  /* 3 · raw DS classes (standalone artifacts / showcase helpers) */
+  !el.classList.contains('card')
+);
+stray  // → [] expected; a hit is an interactive card missing data-ds="card-hover"
+```
 
 ### Forbidden patterns
 
