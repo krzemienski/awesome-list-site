@@ -119,6 +119,10 @@ args = "search-typos"
 task = "workflow.run"
 args = "ds-showcase"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "ds-button-sweep"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -364,6 +368,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/design-system-showcase.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "ds-button-sweep"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/ds-button-sweep.mjs"
 
 [workflows.workflow.metadata]
 isValidation = true

@@ -255,6 +255,14 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
 stray  // → [] expected on the app's public routes; triage any hit with the ladder below
 ```
 
+> **This filter is enforced automatically.** The `ds-button-sweep` validation
+> gate runs this exact filter headlessly on the key public routes:
+> `scripts/validation/ds-button-filter.mjs` is the executable copy of the
+> snippet above, and `scripts/validation/ds-button-sweep.mjs` verifies the
+> two stay literal-for-literal in sync (the gate fails on drift). If you
+> change any exclusion here — including the known-composite-chrome list —
+> update `ds-button-filter.mjs` in the same commit, and vice versa.
+
 A remaining hit is an **automatic 🟡 FIX only if it carries palette classes,
 literal hex/rgb colors, or raw radii** (cross-check with stage 5). A hit
 styled entirely through bridge utilities / `var(--token)` refs is *candidate
