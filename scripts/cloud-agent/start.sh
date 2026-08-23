@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Cloud Agent start phase: per-boot reconciliation. Refreshes .env from the
-# current environment (so secrets added after the build take effect), starts the
-# PostgreSQL cluster, and ensures the schema is current. Returns once the
-# database is ready; the dev server itself runs as a terminal.
+# Cloud Agent start phase: per-boot startup. Refreshes .env from the current
+# environment (so secrets added after the build take effect), starts the
+# PostgreSQL cluster, ensures the schema is current, then launches the app in
+# the foreground (Express API + Vite client on :5000). The dev server stays
+# attached so its logs and lifecycle remain visible to the agent.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,4 +23,8 @@ pg_provision
 echo "==> Ensuring database schema is current"
 npm run db:push
 
-echo "Cloud Agent start complete. Launch the app with: npm run dev"
+echo "==> Starting the dev server (Express + Vite on :5000)"
+# Replace the shell with the dev server so it remains the attached foreground
+# process for this boot. On first boot against an empty catalog the server
+# auto-seeds the ~1,934 curated resources before serving.
+exec npm run dev
