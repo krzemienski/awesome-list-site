@@ -360,7 +360,7 @@ export default function Onboarding() {
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--accent)]">
+          <p className="eyebrow">
             Optional setup
           </p>
           <h1

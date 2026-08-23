@@ -437,7 +437,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
         >
           <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="min-w-0">
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--accent)]">
+              <p className="eyebrow">
                 Optional · about two minutes
               </p>
               <h2 className="mt-1 font-sans text-lg font-semibold">
