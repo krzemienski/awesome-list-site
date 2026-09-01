@@ -17,7 +17,7 @@ export default function Terms() {
           <FileText className="h-6 w-6 text-[var(--accent)]" />
           Terms of Use
         </h1>
-        <p className="text-sm text-[color:var(--text-3)]">Last updated: July 16, 2026</p>
+        <p className="text-sm text-[color:var(--text-3)]">Last updated: September 1, 2026</p>
       </div>
 
       <Card>
@@ -85,9 +85,17 @@ export default function Terms() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-base font-semibold text-[color:var(--text)]">7. Contact</h2>
+            <h2 className="text-base font-semibold text-[color:var(--text)]">7. Governing law</h2>
             <p>
-              Questions about these terms can be submitted by{" "}
+              These terms are governed by the laws of New York, United States,
+              without regard to its conflict-of-laws principles.
+            </p>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-[color:var(--text)]">8. Contact</h2>
+            <p>
+              For legal, abuse, or terms questions,{" "}
               <a
                 href="https://github.com/krzemienski/awesome-video/issues"
                 target="_blank"
@@ -95,7 +103,7 @@ export default function Terms() {
                 className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-terms-contact"
               >
-                opening an issue on the project's GitHub repository
+                open an issue on the project's GitHub repository
               </a>
               . Issues are public, so do not include private or sensitive
               personal information.

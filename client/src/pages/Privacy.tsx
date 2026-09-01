@@ -17,7 +17,7 @@ export default function Privacy() {
           <Shield className="h-6 w-6 text-[var(--accent)]" />
           Privacy Policy
         </h1>
-        <p className="text-sm text-[color:var(--text-3)]">Last updated: July 16, 2026</p>
+        <p className="text-sm text-[color:var(--text-3)]">Last updated: September 1, 2026</p>
       </div>
 
       <Card>
@@ -217,6 +217,24 @@ export default function Privacy() {
             <p>
               We may update this policy from time to time. Material changes
               will be reflected by the "Last updated" date above.
+            </p>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-[color:var(--text)]">7. Contact</h2>
+            <p>
+              For privacy, legal, or abuse questions,{" "}
+              <a
+                href="https://github.com/krzemienski/awesome-video/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                data-testid="link-privacy-contact"
+              >
+                open an issue on the project's GitHub repository
+              </a>
+              . Issues are public, so do not include private or sensitive
+              personal information.
             </p>
           </section>
         </CardContent>
