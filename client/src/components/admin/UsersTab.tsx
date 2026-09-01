@@ -206,10 +206,11 @@ export default function UsersTab() {
                 { key: "createdAt", label: "Joined" },
               ] as const).map(col => (
                 <TableHead key={col.key}>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => toggleSort(col.key)}
-                    className="inline-flex items-center gap-1 min-h-[32px] hover:text-foreground transition-colors"
+                    className="inline-flex h-auto items-center gap-1 p-0 min-h-[32px] font-medium hover:bg-transparent hover:text-foreground transition-colors"
                     aria-label={`Sort by ${col.label}`}
                     data-testid={`button-sort-${col.key}`}
                   >
@@ -217,7 +218,7 @@ export default function UsersTab() {
                     {sortBy === col.key
                       ? (sortDir === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />)
                       : <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />}
-                  </button>
+                  </Button>
                 </TableHead>
               ))}
               <TableHead>Actions</TableHead>
@@ -267,17 +268,19 @@ export default function UsersTab() {
                         </span>
                         {/* R4-041: aria-label includes a row identifier so repeated controls
                             have unique accessible names (masked email keeps PII out of the DOM). */}
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="icon"
                           onClick={() => toggleReveal(user.id)}
-                          className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:text-foreground transition-colors"
+                          className="inline-flex h-8 w-8 items-center justify-center min-h-[32px] min-w-[32px] text-muted-foreground/70 hover:bg-transparent hover:text-foreground transition-colors"
                           aria-label={`${revealedIds.has(user.id) ? "Hide" : "Reveal"} email for ${
                             `${user.firstName || ''} ${user.lastName || ''}`.trim() || maskEmail(user.email)
                           }`}
                           data-testid={`button-toggle-email-${user.id}`}
                         >
                           {revealedIds.has(user.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                        </button>
+                        </Button>
                       </span>
                     ) : "—"}
                   </TableCell>

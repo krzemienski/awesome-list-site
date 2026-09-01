@@ -63,8 +63,8 @@ export function collectStrayInputs() {
     !el.classList.contains('border-input') &&
     !el.classList.contains('border-[var(--border-strong)]') &&
     /* 2 · primitives / non-text controls that legitimately wrap raw inputs */
-    !el.matches('[cmdk-input], [type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"]') &&
-    !el.classList.contains('sr-only') &&                    // peer-hidden toggle inputs
+    !el.matches('[cmdk-input], [type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"], select[aria-hidden="true"]') &&
+    !el.classList.contains('sr-only') &&                    // peer-hidden toggle inputs (select[aria-hidden] = Radix Select's off-screen native bridge)
     !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
     /* 3 · known tokenized native controls (verified compliant — list in SKILL.md) */
     el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter

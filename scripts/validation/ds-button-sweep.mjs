@@ -60,6 +60,21 @@
 // they can never pass blind. Collection rows cascade with the QA user in
 // the finally teardown.
 //
+// Task #363: the admin panel needs admin privileges, so a fifth scenario
+// creates a SECOND disposable Clerk user under its own sub-prefix
+// (__qa_test_ds_admin_), signs in through the same UI flow, elevates the
+// JIT-provisioned local row to role='admin' directly in the DB (roles are
+// local app state read fresh per request — see
+// .agents/memory/audit-key-header-auth.md for why the header path isn't used:
+// ADMIN_PASSWORD isn't guaranteed in task envs, and the role-elevated user
+// exercises the REAL signed-in admin chrome), seeds one pending resource so
+// the approvals queue renders row chrome, and runs the SAME six filters on
+// every admin tab (approvals … audit). Tab activation is harness-verified
+// (aria-selected + a panel-specific selector) and the detector canary runs on
+// the approvals tab. Teardown in finally sweeps ONLY this scenario's
+// __qa_test_ds_admin_ prefix (never __qa_test_% wholesale — parallel gates
+// own their own prefixes), including the FK refs an admin row can acquire.
+//
 // Requires the dev server on :5000 plus CLERK_SECRET_KEY (disposable authed
 // user) and DATABASE_URL (seeding + guaranteed teardown). Exits 1 on any
 // failure. Evidence: /tmp/validation/ds-button-sweep.
@@ -430,16 +445,12 @@ try {
   }
 
   // -------------------------------------------------------------------------
-  // Authed scenario (task #360): sweep the key signed-in routes as a
-  // disposable Clerk user. Same six filters, same reporting; the expect
-  // selectors double as signed-in render proof (each is authed-only UI).
+  // Shared Clerk plumbing for the two signed-in scenarios (#360 authed user,
+  // #363 admin user). Each scenario owns a distinct __qa_test_ sub-prefix and
+  // purges ONLY that prefix, so neither can clobber the other — or a
+  // concurrently running gate (e.g. collections-audit) — mid-flight.
   // -------------------------------------------------------------------------
-  const PREFIX = '__qa_test_ds_sweep_';
-  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-  // +clerk_test emails accept the fixed OTP 424242 on the dev instance.
-  const email = `${PREFIX}${suffix}+clerk_test@example.com`;
-  const password = `DsSweep-${suffix}!`;
-  const NOTIF_TITLE = `QA sweep notification ${suffix}`;
+  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 
   const clerkApi = async (method, route, body) => {
     const res = await fetch(`https://api.clerk.com/v1${route}`, {
@@ -451,13 +462,53 @@ try {
     if (!res.ok) throw new Error(`Clerk ${method} ${route} -> ${res.status}: ${JSON.stringify(data).slice(0, 300)}`);
     return data;
   };
-  // Remove this run's user AND residue from previously aborted runs. Scoped
-  // to THIS gate's prefix so a concurrently running audit's QA user (e.g.
-  // collections-audit) is never clobbered mid-flight.
-  const purgeClerkQaUsers = async () => {
-    const matches = await clerkApi('GET', `/users?query=${encodeURIComponent(PREFIX)}&limit=100`);
+  // Remove one scenario's user AND residue from previously aborted runs.
+  const purgeClerkQaUsers = async (prefix) => {
+    const matches = await clerkApi('GET', `/users?query=${encodeURIComponent(prefix)}&limit=100`);
     for (const u of Array.isArray(matches) ? matches : []) await clerkApi('DELETE', `/users/${u.id}`).catch(() => {});
   };
+
+  // Drive the real Clerk sign-in UI (post-Clerk there is no local login
+  // API). Headless/new-device sessions land on the client-trust OTP step
+  // (+clerk_test emails accept the fixed OTP 424242 on the dev instance).
+  const signInWithClerk = async (pageToAuth, email, password) => {
+    await pageToAuth.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const identifier = pageToAuth.locator('input[name="identifier"]');
+    await identifier.waitFor({ timeout: 30000 });
+    await identifier.fill(email);
+    await pageToAuth.keyboard.press('Enter');
+    const passwordField = pageToAuth.locator('input[name="password"]');
+    await passwordField.waitFor({ timeout: 30000 });
+    await passwordField.fill(password);
+    await pageToAuth.keyboard.press('Enter');
+    const otp = pageToAuth.locator('input[aria-label="Enter verification code"]');
+    if (await otp.waitFor({ timeout: 20000 }).then(() => true).catch(() => false)) {
+      await otp.click();
+      await pageToAuth.keyboard.type('424242', { delay: 120 });
+    }
+    const deadline = Date.now() + 60000;
+    let authenticated = false;
+    while (Date.now() < deadline && !authenticated) {
+      authenticated = await pageToAuth.evaluate(async () => {
+        const r = await fetch('/api/auth/user', { credentials: 'include' });
+        return (await r.json().catch(() => null))?.isAuthenticated === true;
+      });
+      if (!authenticated) await pageToAuth.waitForTimeout(1500);
+    }
+    if (!authenticated) throw new Error('Clerk UI sign-in did not produce an authenticated session');
+  };
+
+  // -------------------------------------------------------------------------
+  // Authed scenario (task #360): sweep the key signed-in routes as a
+  // disposable Clerk user. Same six filters, same reporting; the expect
+  // selectors double as signed-in render proof (each is authed-only UI).
+  // -------------------------------------------------------------------------
+  const PREFIX = '__qa_test_ds_sweep_';
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const email = `${PREFIX}${suffix}+clerk_test@example.com`;
+  const password = `DsSweep-${suffix}!`;
+  const NOTIF_TITLE = `QA sweep notification ${suffix}`;
+
   const purgeLocalQaUsers = async () => {
     const users = await pool.query('SELECT id FROM users WHERE email LIKE $1', [`${PREFIX}%`]);
     for (const { id } of users.rows) await pool.query('DELETE FROM sessions WHERE sess::text LIKE $1', [`%${id}%`]);
@@ -465,44 +516,15 @@ try {
     await pool.query('DELETE FROM users WHERE email LIKE $1', [`${PREFIX}%`]);
   };
 
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
   let authedContext = null;
   try {
-    await purgeClerkQaUsers();
+    await purgeClerkQaUsers(PREFIX);
     await purgeLocalQaUsers();
     await clerkApi('POST', '/users', { email_address: [email], password, skip_password_checks: true });
 
     authedContext = await browser.newContext({ viewport: DESKTOP });
     const authedPage = await authedContext.newPage();
-
-    // Drive the real Clerk sign-in UI (post-Clerk there is no local login
-    // API). Headless/new-device sessions land on the client-trust OTP step.
-    await authedPage.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    const identifier = authedPage.locator('input[name="identifier"]');
-    await identifier.waitFor({ timeout: 30000 });
-    await identifier.fill(email);
-    await authedPage.keyboard.press('Enter');
-    const passwordField = authedPage.locator('input[name="password"]');
-    await passwordField.waitFor({ timeout: 30000 });
-    await passwordField.fill(password);
-    await authedPage.keyboard.press('Enter');
-    const otp = authedPage.locator('input[aria-label="Enter verification code"]');
-    if (await otp.waitFor({ timeout: 20000 }).then(() => true).catch(() => false)) {
-      await otp.click();
-      await authedPage.keyboard.type('424242', { delay: 120 });
-    }
-    {
-      const deadline = Date.now() + 60000;
-      let authenticated = false;
-      while (Date.now() < deadline && !authenticated) {
-        authenticated = await authedPage.evaluate(async () => {
-          const r = await fetch('/api/auth/user', { credentials: 'include' });
-          return (await r.json().catch(() => null))?.isAuthenticated === true;
-        });
-        if (!authenticated) await authedPage.waitForTimeout(1500);
-      }
-      if (!authenticated) throw new Error('Clerk UI sign-in did not produce an authenticated session');
-    }
+    await signInWithClerk(authedPage, email, password);
 
     // JIT provisioning created the local row during the auth poll above.
     const userId = (await pool.query('SELECT id FROM users WHERE email = $1', [email])).rows[0]?.id;
@@ -710,12 +732,190 @@ try {
   } finally {
     await authedContext?.close().catch(() => {});
     try {
-      await purgeClerkQaUsers().catch((e) => log('authed-teardown-clerk', false, e.message));
+      await purgeClerkQaUsers(PREFIX).catch((e) => log('authed-teardown-clerk', false, e.message));
       await purgeLocalQaUsers();
       const residue = await pool.query('SELECT count(*)::int AS count FROM users WHERE email LIKE $1', [`${PREFIX}%`]);
       log('authed-teardown', residue.rows[0].count === 0, `remaining ${PREFIX}* users=${residue.rows[0].count}`);
     } catch (e) {
       log('authed-teardown', false, e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Admin scenario (task #363): sweep every admin dashboard tab as a
+  // role-elevated disposable Clerk user. Sign-in reuses the same UI flow;
+  // the JIT-provisioned local row is then elevated to role='admin' directly
+  // in the DB (role is local app state, read fresh per request), and a fresh
+  // /admin load picks it up. One pending resource is seeded so the approvals
+  // queue renders row chrome (approve/reject buttons, status badges).
+  // -------------------------------------------------------------------------
+  const ADMIN_PREFIX = '__qa_test_ds_admin_';
+  const adminSuffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const adminEmail = `${ADMIN_PREFIX}${adminSuffix}+clerk_test@example.com`;
+  const adminPassword = `DsAdmin-${adminSuffix}!`;
+
+  // Scoped teardown for the admin prefix. An admin-role user can acquire FK
+  // refs a plain user never gets (see .agents/memory/qa-throwaway-user-teardown.md
+  // for the derivation): resource_edits.submitted_by RESTRICTs, several
+  // *_by columns lack ON DELETE, and resource_audit_log is SET NULL (delete
+  // explicitly for true net-zero). The sweep itself is read-only, but the
+  // teardown must also clear residue from aborted runs that may have clicked.
+  const purgeLocalAdminQa = async () => {
+    const ids = (await pool.query('SELECT id FROM users WHERE email LIKE $1', [`${ADMIN_PREFIX}%`])).rows.map(r => r.id);
+    if (ids.length > 0) {
+      await pool.query('DELETE FROM resource_edits WHERE submitted_by = ANY($1)', [ids]);
+      await pool.query('UPDATE resource_edits SET handled_by = NULL WHERE handled_by = ANY($1)', [ids]);
+      await pool.query('UPDATE resources SET approved_by = NULL WHERE approved_by = ANY($1)', [ids]);
+      await pool.query('UPDATE github_sync_history SET performed_by = NULL WHERE performed_by = ANY($1)', [ids]);
+      await pool.query('UPDATE enrichment_jobs SET started_by = NULL WHERE started_by = ANY($1)', [ids]);
+      await pool.query('UPDATE research_jobs SET started_by = NULL WHERE started_by = ANY($1)', [ids]);
+      await pool.query('DELETE FROM resource_audit_log WHERE performed_by = ANY($1)', [ids]);
+      for (const id of ids) await pool.query('DELETE FROM sessions WHERE sess::text LIKE $1', [`%${id}%`]);
+    }
+    // Seeded pending resource (+ residue where the user row is already gone —
+    // resources.submitted_by cascades, so aborted-run rows can outlive users
+    // only via this URL-scoped sweep).
+    await pool.query('DELETE FROM resources WHERE url LIKE $1', [`%${ADMIN_PREFIX}%`]);
+    await pool.query('DELETE FROM users WHERE email LIKE $1', [`${ADMIN_PREFIX}%`]);
+  };
+
+  let adminContext = null;
+  try {
+    await purgeClerkQaUsers(ADMIN_PREFIX);
+    await purgeLocalAdminQa();
+    await clerkApi('POST', '/users', { email_address: [adminEmail], password: adminPassword, skip_password_checks: true });
+
+    adminContext = await browser.newContext({ viewport: DESKTOP });
+    const adminPage = await adminContext.newPage();
+    await signInWithClerk(adminPage, adminEmail, adminPassword);
+
+    // JIT provisioning created the local row (role='user'); elevate it.
+    const adminUserId = (await pool.query('SELECT id FROM users WHERE email = $1', [adminEmail])).rows[0]?.id;
+    if (!adminUserId) throw new Error('local user row missing after Clerk sign-in (JIT provisioning)');
+    await pool.query(`UPDATE users SET role = 'admin' WHERE id = $1`, [adminUserId]);
+
+    // Seed one pending resource so the approvals queue renders row chrome.
+    const seedCategory = (await pool.query(
+      `SELECT category FROM resources WHERE status = 'approved' AND category IS NOT NULL LIMIT 1`,
+    )).rows[0]?.category;
+    if (!seedCategory) throw new Error('no approved resource to borrow a category from for the pending seed');
+    const pendingId = (await pool.query(
+      `INSERT INTO resources (title, url, description, category, status, submitted_by)
+       VALUES ($1, $2, 'Seeded by the ds-button-sweep admin scenario.', $3, 'pending', $4)
+       RETURNING id`,
+      [`${ADMIN_PREFIX}${adminSuffix} pending resource`, `https://example.com/${ADMIN_PREFIX}${adminSuffix}`, seedCategory, adminUserId],
+    )).rows[0].id;
+
+    // Every admin tab, with a panel-specific selector proving the section's
+    // real content mounted (Radix Tabs unmount inactive panels, so each tab
+    // is a distinct DOM). Selectors chosen to render without extra data —
+    // except approvals, which waits for the seeded pending row.
+    const ADMIN_TABS = [
+      { slug: 'approvals', expect: `[data-testid="row-pending-resource-${pendingId}"]` },
+      { slug: 'edits', expect: '[data-testid="button-refresh-pending-edits"]' },
+      { slug: 'enrichment', expect: '[data-testid="button-start-enrichment"]' },
+      { slug: 'researcher', expect: '[data-testid="button-generate-brief"]' },
+      { slug: 'export', expect: 'button:has-text("Export Markdown")' },
+      { slug: 'database', expect: '[data-testid="button-seed-database"]' },
+      { slug: 'resources', expect: '[data-testid="button-add-resource"]' },
+      { slug: 'categories', expect: '[data-testid="content-categories"][data-state="active"] button[data-ds-variant]' },
+      { slug: 'subcategories', expect: '[data-testid="content-subcategories"][data-state="active"] button[data-ds-variant]' },
+      { slug: 'subsubcategories', expect: '[data-testid="content-subsubcategories"][data-state="active"] button[data-ds-variant]' },
+      { slug: 'journeys', expect: '[data-testid="journey-steps-manager"]' },
+      { slug: 'users', expect: '[data-testid="input-user-search"]' },
+      { slug: 'github', expect: '[data-testid="button-export-github"]' },
+      { slug: 'linkhealth', expect: 'text=Link Health Summary' },
+      { slug: 'digests', expect: '[data-testid="card-digest-queue-health"]' },
+      { slug: 'audit', expect: '[data-testid="input-audit-resource-id"]' },
+    ];
+
+    const gotoAdmin = async () => {
+      await adminPage.goto(`${BASE}/admin`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      // AdminGuard verifies role, then the dashboard shows a stats spinner
+      // before the tab strip mounts — wait for the strip, not just the shell.
+      await adminPage.waitForSelector('[data-testid="tab-approvals"]', { timeout: 30000 });
+      await adminPage.waitForFunction(() => document.querySelectorAll('button[data-ds-variant]').length > 0, null, { timeout: 30000 });
+      await adminPage.waitForTimeout(600);
+    };
+    await gotoAdmin();
+
+    const sweepAdminTab = async (tab) => {
+      await adminPage.click(`[data-testid="tab-${tab.slug}"]`);
+      // Harness-verified activation: the trigger must actually select AND the
+      // panel's own content selector must appear, or the scenario is vacuous.
+      await adminPage.waitForSelector(`[data-testid="tab-${tab.slug}"][aria-selected="true"]`, { timeout: 15000 });
+      await adminPage.waitForSelector(tab.expect, { timeout: 30000 });
+      await adminPage.waitForTimeout(600); // settle async panel content
+      return confirmedSweeps(adminPage);
+    };
+
+    for (const tab of ADMIN_TABS) {
+      let sweeps;
+      try {
+        sweeps = await sweepAdminTab(tab);
+      } catch (e) {
+        // Reload /admin once and retry — cold panels can flake under load.
+        try { await gotoAdmin(); sweeps = await sweepAdminTab(tab); }
+        catch (e2) { log(`admin-${tab.slug}`, false, `admin tab sweep failed twice: ${e2.message.split('\n')[0]}`); continue; }
+      }
+      for (const { kind } of SWEEPS) {
+        const sweep = sweeps[kind];
+        const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
+          : kind === 'h1s' ? sweep.total > 0
+          : true;
+        const pass = sane && sweep.strays.length === 0;
+        if (pass) {
+          const hooked = kind === 'buttons' ? `${sweep.dsVariantCount} DS-hooked of ${sweep.total}` : `${sweep.total} DS-hooked`;
+          log(`admin-${tab.slug}-${kind}`, true, `/admin#${tab.slug} (admin) — 0 stray ${kind} (${hooked})`);
+        } else if (!sane) {
+          log(`admin-${tab.slug}-${kind}`, false, `/admin#${tab.slug} (admin) — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
+        } else {
+          await adminPage.screenshot({ path: path.join(OUT, `admin-${tab.slug}-${kind}.png`), fullPage: true }).catch(() => {});
+          strayReport(`admin-${tab.slug}-${kind}`, `/admin#${tab.slug} (admin)`, kind, sweep);
+        }
+      }
+      // Detector canary on an admin route: a synthetic rogue button and a
+      // hand-pinned mono-uppercase label injected on the approvals tab must
+      // be flagged, or the admin half of the gate is passing blind.
+      if (tab.slug === 'approvals') {
+        const caught = await adminPage.evaluate(({ collectButtons, collectEyebrows, id }) => {
+          const rogue = document.createElement('button');
+          rogue.type = 'button';
+          rogue.setAttribute('data-testid', id);
+          rogue.textContent = 'QA canary rogue';
+          const label = document.createElement('span');
+          label.style.cssText = "font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px";
+          label.textContent = 'qa canary rogue label';
+          document.body.append(rogue, label);
+          try {
+            const buttonCaught = new Function(`return (${collectButtons})()`)().strays.some(s => s.testid === id);
+            const eyebrowCaught = new Function(`return (${collectEyebrows})()`)().strays.some(s => s.text === 'qa canary rogue label');
+            return { buttonCaught, eyebrowCaught };
+          } finally { rogue.remove(); label.remove(); }
+        }, { collectButtons: collectStrayButtons.toString(), collectEyebrows: collectStrayEyebrows.toString(), id: 'qa-canary-rogue-admin' });
+        log('canary-admin-buttons', caught.buttonCaught, caught.buttonCaught
+          ? 'synthetic rogue button on the admin approvals tab was flagged by the button filter'
+          : 'DETECTOR BLIND: a synthetic rogue button on an admin route was NOT flagged');
+        log('canary-admin-eyebrows', caught.eyebrowCaught, caught.eyebrowCaught
+          ? 'synthetic mono-uppercase label on the admin approvals tab was flagged by the eyebrow filter'
+          : 'DETECTOR BLIND: a synthetic mono-uppercase label on an admin route was NOT flagged');
+      }
+    }
+  } catch (e) {
+    log('admin-scenario', false, `admin sweep failed: ${e.message.split('\n')[0]}`);
+  } finally {
+    await adminContext?.close().catch(() => {});
+    try {
+      await purgeClerkQaUsers(ADMIN_PREFIX).catch((e) => log('admin-teardown-clerk', false, e.message));
+      await purgeLocalAdminQa();
+      const residue = await pool.query(
+        'SELECT (SELECT count(*) FROM users WHERE email LIKE $1)::int AS users, (SELECT count(*) FROM resources WHERE url LIKE $2)::int AS resources',
+        [`${ADMIN_PREFIX}%`, `%${ADMIN_PREFIX}%`],
+      );
+      log('admin-teardown', residue.rows[0].users === 0 && residue.rows[0].resources === 0,
+        `remaining ${ADMIN_PREFIX}* users=${residue.rows[0].users}, seeded resources=${residue.rows[0].resources}`);
+    } catch (e) {
+      log('admin-teardown', false, e instanceof Error ? e.message : String(e));
     }
     await pool.end().catch(() => {});
   }

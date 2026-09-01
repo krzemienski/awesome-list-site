@@ -40,6 +40,13 @@ guard); anonymous visitors and prod-without-the-secret can never exercise it.
   development env vars are written in plaintext into the committed `.replit`,
   which is a versioned-credential leak (code review rejects it; rotate by
   deleting the var and restarting so the fail-closed bypass goes dead).
+- Gates that need a BROWSER session with admin UI (not just API calls) should
+  create a disposable Clerk user (+clerk_test / OTP 424242), sign in through the
+  real UI, then `UPDATE users SET role='admin'` on the JIT-provisioned row —
+  role is app-local state read fresh per request, so the next full page load
+  renders admin chrome. This works in task envs where ADMIN_PASSWORD is absent;
+  tear down under a scoped `__qa_test_<gate>_` sub-prefix (admin users can
+  acquire extra FK refs — see qa-throwaway-user-teardown.md).
 - A durable QA admin account exists for browser-based admin testing (Clerk
   password sign-in, pre-provisioned `role=admin` row bridged via external_id);
   its email/password live in the gitignored `.env` as TEST_ADMIN_EMAIL /

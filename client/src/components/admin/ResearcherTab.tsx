@@ -661,10 +661,11 @@ export default function ResearcherTab() {
                 </div>
 
                 <div className="rounded-md border">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => setShowAdvanced(v => !v)}
-                    className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
+                    className="flex h-auto w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
                     data-testid="button-toggle-advanced-researcher"
                   >
                     <span className="flex items-center gap-2">
@@ -672,7 +673,7 @@ export default function ResearcherTab() {
                       Custom Model &amp; Endpoint (optional)
                     </span>
                     {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  </button>
+                  </Button>
                   {showAdvanced && (
                     <div className="space-y-3 border-t px-3 py-3">
                       <div>

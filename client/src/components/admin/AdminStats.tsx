@@ -115,6 +115,11 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                 ? "cursor-pointer transition-colors hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
                 : undefined
             }
+            // Stage-6 card sweep (task #363): every clickable/hoverable
+            // bg-card surface must carry the card-hover hook so per-system
+            // hover skins apply — this also marks the nested deep-link
+            // buttons below as in-card chrome for the button sweep.
+            data-ds={clickable ? "card-hover" : undefined}
             data-testid={clickable ? `stat-card-${tab}` : undefined}
           >
             <CardHeader className="pb-2">

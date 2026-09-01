@@ -311,6 +311,16 @@ stray  // → [] expected on the app's public routes; triage any hit with the la
 > exclusion), and each overlay scenario runs a **detector canary**: it
 > injects a synthetic rogue button inside the open overlay and fails unless
 > the filter flags it, so a scenario can never pass while quietly blind.
+>
+> Signed-in chrome is covered too: an **authed scenario** creates a
+> disposable Clerk user and sweeps `/notifications`, `/onboarding`,
+> signed-in `/`, `/bookmarks`, and `/settings`, and an **admin scenario**
+> (task #363) elevates a second disposable user to `role='admin'` and sweeps
+> every `/admin` dashboard tab (approvals → audit), seeding one pending
+> resource so the approvals queue renders row chrome. Both scenarios verify
+> activation (authed-only / panel-specific selectors), run detector
+> canaries on a representative route, and tear their `__qa_test_` sub-prefix
+> down in `finally`.
 
 A remaining hit is an **automatic 🟡 FIX only if it carries palette classes,
 literal hex/rgb colors, or raw radii** (cross-check with stage 5). A hit
@@ -415,8 +425,8 @@ const stray = [...document.querySelectorAll('input, select, textarea')].filter(e
   !el.classList.contains('border-input') &&
   !el.classList.contains('border-[var(--border-strong)]') &&
   /* 2 · primitives / non-text controls that legitimately wrap raw inputs */
-  !el.matches('[cmdk-input], [type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"]') &&
-  !el.classList.contains('sr-only') &&                    // peer-hidden toggle inputs
+  !el.matches('[cmdk-input], [type="hidden"], [type="checkbox"], [type="radio"], [type="range"], [type="file"], select[aria-hidden="true"]') &&
+  !el.classList.contains('sr-only') &&                    // peer-hidden toggle inputs (select[aria-hidden] = Radix Select's off-screen native bridge)
   !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
   /* 3 · known tokenized native controls (verified compliant — list below) */
   el.getAttribute('data-testid') !== 'select-subcategory-filter' && // TaxonomyListing scope filter
