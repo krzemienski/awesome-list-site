@@ -19,6 +19,8 @@ QA/validation sessions register throwaway users named `__qa_test_<timestamp>_<pu
 
 **Don't guess FK column names — derive them.** A teardown assuming `resource_edits.user_id` aborted the whole transaction (`column "user_id" does not exist`; real columns are `submitted_by`/`handled_by`). Before writing the sweep, list every FK pointing at users with information_schema (`constraint_column_usage` where `table_name='users'` joined to `key_column_usage`) and generate the DELETE/NULL statements from that list — the FK set also drifts as tables are added (e.g. `password_reset_tokens.user_id`, `user_preferences.user_id`).
 
+**Scope the purge when gates run concurrently.** A *gate that runs inside the parallel completion suite* must create and purge under its own sub-prefix (e.g. `__qa_test_ds_sweep_%`, `__qa_test_collections_audit_%`), never `__qa_test_%` wholesale — a broad sweep deletes a concurrently running gate's live QA user mid-flight and fails that gate spuriously. The full `__qa_test_%` sweep above is for *interactive/session-end* cleanup, when nothing else is running.
+
 **Verification gotchas:**
 - `POST /api/recommendations/feedback` returns 200 even for a **bogus/non-existent userId** — `recordFeedback` swallows the FK failure in its try/catch. A 200 alone does NOT prove persistence; re-POST with a real user id and confirm the `resource_audit_log` + `user_interactions` rows exist.
 - Bash `UID` is a readonly builtin (OS uid, e.g. 1000); assigning `UID=<registered-id>` silently fails and your test posts `userId:"1000"`. Use any other var name (e.g. `QUID`).

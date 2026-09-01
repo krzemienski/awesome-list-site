@@ -412,6 +412,7 @@ export default function Bookmarks() {
           <button
             key={key}
             type="button"
+            data-ds="card-hover"
             className="min-h-[72px] border bg-card px-4 py-3 text-left transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={() => {
               if (key === "active" || key === "archived") {
@@ -434,6 +435,7 @@ export default function Bookmarks() {
           <div className="sticky top-24 space-y-2 border bg-card p-3">
             <button
               type="button"
+              aria-pressed={collectionFilter === "all"}
               className={`flex min-h-11 w-full items-center justify-between px-3 text-left text-sm ${
                 collectionFilter === "all" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
               }`}
@@ -449,6 +451,7 @@ export default function Bookmarks() {
               <div key={collection.id} className="flex items-center gap-1">
                 <button
                   type="button"
+                  aria-pressed={collectionFilter === String(collection.id)}
                   className={`min-h-11 min-w-0 flex-1 px-3 text-left text-sm ${
                     collectionFilter === String(collection.id)
                       ? "bg-primary text-primary-foreground"

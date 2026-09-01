@@ -36,12 +36,27 @@
 // runs a detector canary — a synthetic rogue button injected inside the
 // open overlay must be flagged — so a scenario can never pass while blind.
 //
-// Requires the dev server on :5000 (public routes, no login). Exits 1 on
-// any failure. Evidence: /tmp/validation/ds-button-sweep.
+// Task #360: the anonymous sweep can never see signed-in chrome, so a third
+// scenario creates a disposable Clerk user (+clerk_test email, fixed OTP
+// 424242 on the dev instance), signs in through the real UI, seeds the
+// minimal rows conditional UI needs (one in_app_notifications row so the
+// kind label renders; one bookmark so the library grid renders), and runs
+// the SAME six filters on the key signed-in routes: /notifications,
+// /onboarding, signed-in /, /bookmarks, /settings. Everything is torn down
+// in finally (Clerk user + local rows, sweeping this scenario's __qa_test_
+// prefix, residue from aborted runs included). Detector-canary discipline:
+// a synthetic rogue button AND a rogue mono-uppercase label injected on
+// /notifications must be flagged, so the authed sweep can never pass blind.
+//
+// Requires the dev server on :5000 plus CLERK_SECRET_KEY (disposable authed
+// user) and DATABASE_URL (seeding + guaranteed teardown). Exits 1 on any
+// failure. Evidence: /tmp/validation/ds-button-sweep.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import pg from 'pg';
 import { launchBrowserWithLease } from './playwright-launch-lease.mjs';
+import { acquireGateLease } from './gate-lease.mjs';
 import { collectStrayButtons, collectStrayInputs, collectStrayChips, collectStrayCards, collectStrayH1s, collectStrayEyebrows } from './ds-button-filter.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -50,6 +65,15 @@ const { chromium } = await import(path.join(ROOT, 'node_modules/playwright/index
 const BASE = process.env.AUDIT_BASE_URL || process.env.BASE_URL || 'http://localhost:5000';
 const OUT = '/tmp/validation/ds-button-sweep';
 fs.mkdirSync(OUT, { recursive: true });
+
+// Fail closed: without these the signed-in half of the gate cannot run, and
+// a silently anonymous-only sweep would defeat the point of task #360.
+for (const key of ['CLERK_SECRET_KEY', 'DATABASE_URL']) {
+  if (!process.env[key]) {
+    console.error(`FATAL: ${key} is required (authed signed-in sweep + guaranteed QA teardown)`);
+    process.exit(1);
+  }
+}
 
 const results = [];
 const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} ${k} :: ${detail}`); };
@@ -158,6 +182,14 @@ const ROUTES = [
   { name: 'categories', path: '/categories' },
 ];
 
+// The authed scenario signs in and JIT-provisions its user through the live
+// DB; a concurrent resilience outage (real ACCESS EXCLUSIVE lock) would break
+// the multi-step sign-in mid-flow. Hold the shared db-heavy lease, acquired
+// BEFORE the browser lease so the lock order matches print-audit (gate lease
+// first, then browser) and the two leases can never deadlock against it.
+const releaseGateLease = await acquireGateLease('db-heavy', 'ds-button-sweep');
+process.on('exit', releaseGateLease);
+
 const browser = await launchBrowserWithLease(
   chromium,
   { headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--disable-dev-shm-usage'] },
@@ -220,40 +252,40 @@ const OVERLAYS = [
 try {
   const page = await browser.newPage({ viewport: DESKTOP });
 
-  const gotoAndSettle = async (route) => {
-    await page.goto(`${BASE}${route.path}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForSelector('.page', { timeout: 30000 });
+  const gotoAndSettle = async (pg, route) => {
+    await pg.goto(`${BASE}${route.path}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await pg.waitForSelector('.page', { timeout: 30000 });
     // Content rendered = at least one DS-hooked primitive button on screen.
-    await page.waitForFunction(() => document.querySelectorAll('button[data-ds-variant]').length > 0, null, { timeout: 30000 });
+    await pg.waitForFunction(() => document.querySelectorAll('button[data-ds-variant]').length > 0, null, { timeout: 30000 });
     // og-middleware prerenders crawler chrome (.ssr-chrome: drawer ☰ + search
     // submit) that hydration replaces; sweep only the hydrated app — the
     // manual DevTools stage-6 sweep never sees this shell either.
-    await page.waitForFunction(() => !document.querySelector('.ssr-chrome'), null, { timeout: 30000 });
-    if (route.expect) await page.waitForSelector(route.expect, { timeout: 20000 });
-    await page.waitForTimeout(600); // settle async chunks (cards, facets)
+    await pg.waitForFunction(() => !document.querySelector('.ssr-chrome'), null, { timeout: 30000 });
+    if (route.expect) await pg.waitForSelector(route.expect, { timeout: 20000 });
+    await pg.waitForTimeout(600); // settle async chunks (cards, facets)
   };
 
-  const runAll = async () => {
+  const runAll = async (pg) => {
     const out = {};
-    for (const { kind, collect } of SWEEPS) out[kind] = await page.evaluate(collect);
+    for (const { kind, collect } of SWEEPS) out[kind] = await pg.evaluate(collect);
     return out;
   };
 
-  const confirmedSweeps = async () => {
-    let sweeps = await runAll();
+  const confirmedSweeps = async (pg) => {
+    let sweeps = await runAll(pg);
     if (Object.values(sweeps).some(s => s.strays.length > 0)) {
       // Confirm before failing: transient pre-hydration/loading chrome can
       // linger when the whole validation suite saturates the machine. A real
       // hand-rolled element is still there 3s later.
-      await page.waitForTimeout(3000);
-      sweeps = await runAll();
+      await pg.waitForTimeout(3000);
+      sweeps = await runAll(pg);
     }
     return sweeps;
   };
 
-  const sweepRoute = async (route) => {
-    await gotoAndSettle(route);
-    return confirmedSweeps();
+  const sweepRoute = async (pg, route) => {
+    await gotoAndSettle(pg, route);
+    return confirmedSweeps(pg);
   };
 
   const strayReport = (name, routePath, kind, sweep) =>
@@ -263,10 +295,10 @@ try {
   for (const route of ROUTES) {
     let sweeps;
     try {
-      sweeps = await sweepRoute(route);
+      sweeps = await sweepRoute(page, route);
     } catch (e) {
       // Cold-boot renders can flake right after a server restart — retry once.
-      try { sweeps = await sweepRoute(route); }
+      try { sweeps = await sweepRoute(page, route); }
       catch (e2) { log(`route-${route.name}`, false, `sweep failed twice: ${e2.message.split('\n')[0]}`); continue; }
     }
     for (const { kind } of SWEEPS) {
@@ -318,7 +350,7 @@ try {
 
   const sweepOverlay = async (o) => {
     await page.setViewportSize(o.viewport);
-    await gotoAndSettle(o);
+    await gotoAndSettle(page, o);
     if (o.setup) await o.setup(page);
     await o.open(page);
     // Condition-based activation wait — Radix animates open/close and keeps
@@ -329,7 +361,7 @@ try {
     await page.waitForTimeout(400); // settle async overlay content (tag lists, facets)
     const overlayButtons = await page.evaluate(
       (scope) => document.querySelectorAll(`${scope} button`).length, o.scope);
-    const sweeps = await confirmedSweeps();
+    const sweeps = await confirmedSweeps(page);
     // Detector canary: inject a synthetic rogue button INSIDE the open
     // overlay and prove the button filter flags it. Rendered-button counts
     // alone don't prove coverage — a blanket container exclusion would
@@ -382,6 +414,179 @@ try {
         strayReport(`overlay-${o.name}-${kind}`, o.path, kind, sweep);
       }
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Authed scenario (task #360): sweep the key signed-in routes as a
+  // disposable Clerk user. Same six filters, same reporting; the expect
+  // selectors double as signed-in render proof (each is authed-only UI).
+  // -------------------------------------------------------------------------
+  const PREFIX = '__qa_test_ds_sweep_';
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  // +clerk_test emails accept the fixed OTP 424242 on the dev instance.
+  const email = `${PREFIX}${suffix}+clerk_test@example.com`;
+  const password = `DsSweep-${suffix}!`;
+  const NOTIF_TITLE = `QA sweep notification ${suffix}`;
+
+  const clerkApi = async (method, route, body) => {
+    const res = await fetch(`https://api.clerk.com/v1${route}`, {
+      method,
+      headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`, 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(`Clerk ${method} ${route} -> ${res.status}: ${JSON.stringify(data).slice(0, 300)}`);
+    return data;
+  };
+  // Remove this run's user AND residue from previously aborted runs. Scoped
+  // to THIS gate's prefix so a concurrently running audit's QA user (e.g.
+  // collections-audit) is never clobbered mid-flight.
+  const purgeClerkQaUsers = async () => {
+    const matches = await clerkApi('GET', `/users?query=${encodeURIComponent(PREFIX)}&limit=100`);
+    for (const u of Array.isArray(matches) ? matches : []) await clerkApi('DELETE', `/users/${u.id}`).catch(() => {});
+  };
+  const purgeLocalQaUsers = async () => {
+    const users = await pool.query('SELECT id FROM users WHERE email LIKE $1', [`${PREFIX}%`]);
+    for (const { id } of users.rows) await pool.query('DELETE FROM sessions WHERE sess::text LIKE $1', [`%${id}%`]);
+    // in_app_notifications + bookmarks cascade on the user row.
+    await pool.query('DELETE FROM users WHERE email LIKE $1', [`${PREFIX}%`]);
+  };
+
+  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  let authedContext = null;
+  try {
+    await purgeClerkQaUsers();
+    await purgeLocalQaUsers();
+    await clerkApi('POST', '/users', { email_address: [email], password, skip_password_checks: true });
+
+    authedContext = await browser.newContext({ viewport: DESKTOP });
+    const authedPage = await authedContext.newPage();
+
+    // Drive the real Clerk sign-in UI (post-Clerk there is no local login
+    // API). Headless/new-device sessions land on the client-trust OTP step.
+    await authedPage.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const identifier = authedPage.locator('input[name="identifier"]');
+    await identifier.waitFor({ timeout: 30000 });
+    await identifier.fill(email);
+    await authedPage.keyboard.press('Enter');
+    const passwordField = authedPage.locator('input[name="password"]');
+    await passwordField.waitFor({ timeout: 30000 });
+    await passwordField.fill(password);
+    await authedPage.keyboard.press('Enter');
+    const otp = authedPage.locator('input[aria-label="Enter verification code"]');
+    if (await otp.waitFor({ timeout: 20000 }).then(() => true).catch(() => false)) {
+      await otp.click();
+      await authedPage.keyboard.type('424242', { delay: 120 });
+    }
+    {
+      const deadline = Date.now() + 60000;
+      let authenticated = false;
+      while (Date.now() < deadline && !authenticated) {
+        authenticated = await authedPage.evaluate(async () => {
+          const r = await fetch('/api/auth/user', { credentials: 'include' });
+          return (await r.json().catch(() => null))?.isAuthenticated === true;
+        });
+        if (!authenticated) await authedPage.waitForTimeout(1500);
+      }
+      if (!authenticated) throw new Error('Clerk UI sign-in did not produce an authenticated session');
+    }
+
+    // JIT provisioning created the local row during the auth poll above.
+    const userId = (await pool.query('SELECT id FROM users WHERE email = $1', [email])).rows[0]?.id;
+    if (!userId) throw new Error('local user row missing after Clerk sign-in (JIT provisioning)');
+
+    // Seed the minimal rows conditional UI needs: one notification (the kind
+    // label + row chrome only render when a row exists) and one bookmark
+    // (the /bookmarks library grid + controls only render with content).
+    const catalog = await fetch(`${BASE}/api/resources?limit=1`).then(r => r.json());
+    const resourceId = (catalog?.resources ?? catalog ?? [])[0]?.id;
+    if (!resourceId) throw new Error('no approved catalog resource available to seed against');
+    await pool.query(
+      `INSERT INTO in_app_notifications (user_id, kind, title, description, href, resource_id, idempotency_key, expires_at)
+       VALUES ($1, 'new_resource', $2, 'Seeded by the ds-button-sweep authed scenario.', $3, $4, $5, now() + interval '1 day')`,
+      [userId, NOTIF_TITLE, `/resource/${resourceId}`, resourceId, `${PREFIX}${suffix}`],
+    );
+    const bookmarked = await authedContext.request.fetch(`${BASE}/api/bookmarks/${resourceId}`, {
+      method: 'POST',
+      headers: { Origin: BASE, 'Content-Type': 'application/json' },
+      data: { notes: `ds-sweep seed ${suffix}` },
+    });
+    if (!bookmarked.ok()) throw new Error(`seed bookmark failed: ${bookmarked.status()} ${(await bookmarked.text()).slice(0, 200)}`);
+
+    const AUTHED_ROUTES = [
+      // Fresh user with no saved preferences → the signed-in-only onboarding
+      // invitation card proves this is the authed Home branch.
+      { name: 'authed-home', path: '/', expect: '[data-testid="card-onboarding-invitation"]' },
+      { name: 'authed-notifications', path: '/notifications', expect: `text=${NOTIF_TITLE}` },
+      { name: 'authed-onboarding', path: '/onboarding', expect: '[data-testid="button-skip-onboarding"]' },
+      { name: 'authed-bookmarks', path: '/bookmarks', expect: `[data-testid="bookmark-card-${resourceId}"]` },
+      { name: 'authed-settings', path: '/settings', expect: '[data-testid="link-settings-account"]' },
+    ];
+
+    for (const route of AUTHED_ROUTES) {
+      let sweeps;
+      try {
+        sweeps = await sweepRoute(authedPage, route);
+      } catch (e) {
+        try { sweeps = await sweepRoute(authedPage, route); }
+        catch (e2) { log(`route-${route.name}`, false, `sweep failed twice: ${e2.message.split('\n')[0]}`); continue; }
+      }
+      for (const { kind } of SWEEPS) {
+        const sweep = sweeps[kind];
+        const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
+          : kind === 'h1s' ? sweep.total > 0
+          : true;
+        const pass = sane && sweep.strays.length === 0;
+        if (pass) {
+          const hooked = kind === 'buttons' ? `${sweep.dsVariantCount} DS-hooked of ${sweep.total}` : `${sweep.total} DS-hooked`;
+          log(`route-${route.name}-${kind}`, true, `${route.path} (signed in) — 0 stray ${kind} (${hooked})`);
+        } else if (!sane) {
+          log(`route-${route.name}-${kind}`, false, `${route.path} (signed in) — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
+        } else {
+          await authedPage.screenshot({ path: path.join(OUT, `${route.name}-${kind}.png`), fullPage: true }).catch(() => {});
+          strayReport(`route-${route.name}-${kind}`, `${route.path} (signed in)`, kind, sweep);
+        }
+      }
+      // Detector canary on an authed route: a synthetic rogue button and a
+      // hand-pinned mono-uppercase label injected on /notifications must be
+      // flagged, or the signed-in half of the gate is passing blind.
+      if (route.name === 'authed-notifications') {
+        const caught = await authedPage.evaluate(({ collectButtons, collectEyebrows, id }) => {
+          const rogue = document.createElement('button');
+          rogue.type = 'button';
+          rogue.setAttribute('data-testid', id);
+          rogue.textContent = 'QA canary rogue';
+          const label = document.createElement('span');
+          label.style.cssText = "font-family:'JetBrains Mono',monospace;text-transform:uppercase;font-size:11px";
+          label.textContent = 'qa canary rogue label';
+          document.body.append(rogue, label);
+          try {
+            const buttonCaught = new Function(`return (${collectButtons})()`)().strays.some(s => s.testid === id);
+            const eyebrowCaught = new Function(`return (${collectEyebrows})()`)().strays.some(s => s.text === 'qa canary rogue label');
+            return { buttonCaught, eyebrowCaught };
+          } finally { rogue.remove(); label.remove(); }
+        }, { collectButtons: collectStrayButtons.toString(), collectEyebrows: collectStrayEyebrows.toString(), id: 'qa-canary-rogue-authed' });
+        log('canary-authed-buttons', caught.buttonCaught, caught.buttonCaught
+          ? 'synthetic rogue button on signed-in /notifications was flagged by the button filter'
+          : 'DETECTOR BLIND: a synthetic rogue button on a signed-in route was NOT flagged');
+        log('canary-authed-eyebrows', caught.eyebrowCaught, caught.eyebrowCaught
+          ? 'synthetic mono-uppercase label on signed-in /notifications was flagged by the eyebrow filter'
+          : 'DETECTOR BLIND: a synthetic mono-uppercase label on a signed-in route was NOT flagged');
+      }
+    }
+  } catch (e) {
+    log('authed-scenario', false, `authed sweep failed: ${e.message.split('\n')[0]}`);
+  } finally {
+    await authedContext?.close().catch(() => {});
+    try {
+      await purgeClerkQaUsers().catch((e) => log('authed-teardown-clerk', false, e.message));
+      await purgeLocalQaUsers();
+      const residue = await pool.query('SELECT count(*)::int AS count FROM users WHERE email LIKE $1', [`${PREFIX}%`]);
+      log('authed-teardown', residue.rows[0].count === 0, `remaining ${PREFIX}* users=${residue.rows[0].count}`);
+    } catch (e) {
+      log('authed-teardown', false, e instanceof Error ? e.message : String(e));
+    }
+    await pool.end().catch(() => {});
   }
 } finally {
   await browser.close();

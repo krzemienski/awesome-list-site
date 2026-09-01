@@ -422,7 +422,9 @@ const stray = [...document.querySelectorAll('span, div, a')].filter(el =>
   !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
   /* 3 · shadcn/Radix chrome that renders pill-shaped bits */
   !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
-  /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
+  /* 4 · known composite chrome (verified compliant — list in SKILL.md) */
+  el.getAttribute('data-testid') !== 'badge-notification-count' && // AppHeader bell unread count dot
+  /* 5 · raw DS classes (standalone artifacts / showcase helpers) */
   !el.classList.contains('chip') &&
   !el.classList.contains('kbd')
 );
@@ -434,6 +436,12 @@ status badges, count badges, the difficulty/`View Details` chips) keep
 shadcn styling by design — `rounded-full` + `focus:ring-ring` together are
 the `badgeVariants` base signature, so anything built on the primitive is
 excluded and only hand-styled pills remain.
+
+Exclusion 4 is the AppHeader notification bell's unread-count dot
+(`data-testid="badge-notification-count"`, signed-in header only): a 16px
+absolutely-positioned counter overlaid on the bell `Button`. It is fully
+tokenized (`bg-[var(--accent)]`) but deliberately NOT the Badge primitive —
+Badge's padding/type scale cannot collapse to a 16px dot.
 
 ### Card sweep
 

@@ -17,3 +17,10 @@ either takes a real DB outage or crawls many SSR routes, add it to that lease
 group instead of tuning sleep offsets — fixed staggers lose the race as the
 suite grows. Verify with a deliberate parallel run of the contentious trio,
 not solo reruns.
+
+**Lock ordering:** a gate that holds BOTH the db-heavy lease and the Playwright
+browser lease must acquire the gate lease FIRST, then the browser (print-audit,
+ds-button-sweep do this). Acquiring them in the opposite order can deadlock
+against a gate using the established order. Multi-step authed browser flows
+(Clerk sign-in + JIT provisioning) cannot tolerate a DB outage mid-flow, so
+any gate that signs in belongs in the db-heavy group.

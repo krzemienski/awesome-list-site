@@ -112,7 +112,9 @@ export function collectStrayChips() {
     !(el.classList.contains('rounded-full') && el.classList.contains('focus:ring-ring')) &&
     /* 3 · shadcn/Radix chrome that renders pill-shaped bits */
     !el.closest('[data-sidebar], [cmdk-root], [data-radix-popper-content-wrapper]') &&
-    /* 4 · raw DS classes (standalone artifacts / showcase helpers) */
+    /* 4 · known composite chrome (verified compliant — list in SKILL.md) */
+    el.getAttribute('data-testid') !== 'badge-notification-count' && // AppHeader bell unread count dot
+    /* 5 · raw DS classes (standalone artifacts / showcase helpers) */
     !el.classList.contains('chip') &&
     !el.classList.contains('kbd')
   );

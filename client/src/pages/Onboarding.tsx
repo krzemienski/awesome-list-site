@@ -295,7 +295,7 @@ export default function Onboarding() {
     return (
       <Card className="mx-auto max-w-xl p-6 text-center" role="alert">
         <SEOHead title="Learning Preferences" noindex />
-        <h1 className="font-sans text-xl font-semibold">
+        <h1 className="display-h text-xl">
           We couldn’t load your preferences
         </h1>
         <p className="mt-2 text-sm text-[color:var(--text-2)]">
@@ -325,7 +325,7 @@ export default function Onboarding() {
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="mt-6 font-sans text-3xl font-bold outline-none"
+            className="display-h mt-6 text-3xl outline-none"
           >
             Your learning profile is ready
           </h1>
@@ -366,20 +366,22 @@ export default function Onboarding() {
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="mt-1 font-sans text-2xl font-bold outline-none sm:text-3xl"
+            className="display-h mt-1 text-2xl outline-none sm:text-3xl"
           >
             {activeStep.title}
           </h1>
         </div>
-        <button
+        <Button
           type="button"
+          variant="link"
+          size="sm"
           onClick={() => void handleSkip()}
           disabled={isSaving}
-          className="min-h-[44px] px-2 text-sm text-[color:var(--text-2)] underline underline-offset-4 hover:text-[var(--text)]"
+          className="px-2 text-sm font-normal text-[color:var(--text-2)] underline hover:text-[var(--text)]"
           data-testid="button-skip-onboarding"
         >
           Save and browse later
-        </button>
+        </Button>
       </div>
 
       <div aria-label={`Step ${step} of ${ONBOARDING_STEP_COUNT}`}>
