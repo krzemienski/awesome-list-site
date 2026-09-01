@@ -58,11 +58,17 @@ export const DESIGN_SYSTEMS: Record<string, DesignSystem> = {
 };
 
 export const ACCENTS: Accent[] = [
+  // Swatch metadata for the /settings/theme picker, which paints all ten
+  // accents at once. Only the ACTIVE accent's --accent/--accent-2 are readable
+  // at runtime, so every accent's paint has to be inlined here, mirroring the
+  // :root[data-accent="…"] blocks in client/src/styles/design-system.css.
+  // DS-OK: mirrored DS accent constants — keep the two files in sync.
   { id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' },
   { id: 'magenta', name: 'Magenta', primary: '#ec4899', secondary: '#f472b6' },
   { id: 'orange',  name: 'Orange',  primary: '#ff7a3d', secondary: '#ffb84d' },
   { id: 'amber',   name: 'Amber',   primary: '#ffb84d', secondary: '#ffd86b' },
   { id: 'emerald', name: 'Emerald', primary: '#34d08c', secondary: '#5ee6b8' },
+  // DS-OK: mirrored DS accent constants (continued — see the note above).
   { id: 'matrix',  name: 'Matrix',  primary: '#00ff88', secondary: '#39ff14' },
   { id: 'cyan',    name: 'Cyan',    primary: '#5eddf2', secondary: '#7dd3fc' },
   { id: 'violet',  name: 'Violet',  primary: '#9d4edd', secondary: '#c77dff' },

@@ -345,8 +345,8 @@ if (!clerkPubKey) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env file");
 }
 
-// Branded appearance: the app is dark-only with a red accent (--accent:
-// #E50914 in the design system) and square corners throughout.
+// Branded appearance: the app is dark-only with a red accent and square
+// corners throughout.
 const clerkAppearance = {
   theme: dark,
   options: {
@@ -354,6 +354,10 @@ const clerkAppearance = {
     logoLinkUrl: basePath || "/",
     logoImageUrl: `${window.location.origin}${basePath}/favicon.svg`,
   },
+  // Clerk's appearance API takes literal color strings only: it parses them in
+  // JS to derive its own hover/active/alpha ramps, and the hosted widget paints
+  // with its own stylesheet, so var(--…) DS refs resolve to nothing here.
+  // DS-OK: Clerk-only literal ramp, matched to the dark app shell it sits on.
   variables: {
     colorPrimary: "#E50914",
     colorBackground: "#0a0a0a",
@@ -365,13 +369,14 @@ const clerkAppearance = {
     // OAuth provider marks default to dark ink. Keep the dark card treatment,
     // but invert those marks so Apple, GitHub, and other monochrome providers
     // remain visible against their near-black buttons.
+    // DS-OK: same Clerk literal-color constraint as `variables` above.
     socialButtonsBlockButton: {
       color: "#f5f5f5",
       borderColor: "#2a2a2a",
       minHeight: "40px",
     },
     socialButtonsBlockButtonText: {
-      color: "#f5f5f5",
+      color: "#f5f5f5", // DS-OK: Clerk literal-color constraint (see above)
     },
     socialButtonsProviderIcon: {
       filter: "brightness(0) invert(1)",

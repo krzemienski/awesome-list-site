@@ -1,56 +1,7 @@
 {
   "palette-classes": {},
-  "hex-colors": {
-    "client/src/App.tsx": {
-      "#0a0a0a": 1,
-      "#2a2a2a": 1,
-      "#a3a3a3": 1,
-      "#e50914": 2,
-      "#f5f5f5": 3
-    },
-    "client/src/components/BrandMark.tsx": {
-      "#000000": 1,
-      "#ff3d52": 1
-    },
-    "client/src/components/admin/AgentCommsGraph.tsx": {
-      "#34d08c": 1,
-      "#5eddf2": 1,
-      "#9d4edd": 1
-    },
-    "client/src/components/layout/SEOHead.tsx": {
-      "#ff3d52": 2
-    },
-    "client/src/lib/design-system.ts": {
-      "#00ff88": 2,
-      "#34d08c": 1,
-      "#39ff14": 1,
-      "#5eddf2": 1,
-      "#5ee6b8": 1,
-      "#7dd3fc": 1,
-      "#9d4edd": 1,
-      "#aaff00": 1,
-      "#b84dff": 1,
-      "#c77dff": 1,
-      "#ec4899": 1,
-      "#f472b6": 1,
-      "#ff3d52": 1,
-      "#ff7a3d": 1,
-      "#ff7a8a": 1,
-      "#ffb3c1": 1,
-      "#ffb84d": 2,
-      "#ffd86b": 1
-    }
-  },
+  "hex-colors": {},
   "rgb-colors": {},
-  "raw-radii": {
-    "client/src/components/ui/export-tools.tsx": {
-      "border-radius: 999px": 1,
-      "border: 1px": 2
-    },
-    "client/src/index.css": {
-      "border-radius: 4px": 1,
-      "border: 1px": 1
-    }
-  },
+  "raw-radii": {},
   "font-family": {}
 }

@@ -186,7 +186,7 @@ export default function SEOHead({
       )}
 
       {/* Additional SEO Meta Tags */}
-      {/* MR-DS-04/05 — literal required (meta can't read CSS vars); matches DS --accent */}
+      {/* DS-OK: MR-DS-04/05 — literal required (meta can't read CSS vars); matches DS --accent */}
       <meta name="theme-color" content="#ff3d52" />
       <meta name="msapplication-TileColor" content="#ff3d52" />
       <meta name="application-name" content={SITE_NAME} />

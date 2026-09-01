@@ -20,10 +20,11 @@ const TYPE_LAYER: Record<NodeType, number> = {
   tool: 2,
 };
 
-// DS-OK: role colors mirror the DS chart/status constants verbatim
-// (#5eddf2 cyan info / #9d4edd violet info / #34d08c ok — see
-// client/src/lib/charts/palette.ts and docs/DESIGN-SYSTEM.md §5); three
-// distinct hues are required to tell the roles apart in every accent.
+// Node role colors are DS status/info semantics (cyan info / violet info /
+// ok), mirrored verbatim from client/src/lib/charts/palette.ts and
+// docs/DESIGN-SYSTEM.md §5. Three distinct hues are required to tell the roles
+// apart under every accent, so they cannot track var(--accent).
+// DS-OK: mirrored DS status/info constants — semantics, not themeable paint.
 const TYPE_STROKE: Record<NodeType, string> = {
   orchestrator: "#5eddf2",
   system: "#5eddf2",

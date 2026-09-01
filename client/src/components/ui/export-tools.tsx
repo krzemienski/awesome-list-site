@@ -298,6 +298,8 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             --accent-2: #b84dff; /* DS-OK: standalone export DS accent-2 */
             --radius: 12px;
             --radius-sm: 8px;
+            --radius-pill: 999px;
+            --border-w: 1px;
             --font-body: 'Inter', system-ui, -apple-system, sans-serif;
             --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
         }
@@ -350,7 +352,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         .resource {
             margin-bottom: 12px;
             padding: 14px 16px;
-            border: 1px solid var(--border);
+            border: var(--border-w) solid var(--border);
             border-left: 3px solid var(--accent);
             border-radius: var(--radius-sm);
             background: var(--surface);
@@ -368,10 +370,10 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         .tag {
             display: inline-block;
             background: var(--surface-2);
-            border: 1px solid var(--border);
+            border: var(--border-w) solid var(--border);
             color: var(--text-2);
             padding: 2px 10px;
-            border-radius: 999px;
+            border-radius: var(--radius-pill);
             font-size: 12px;
             margin: 0 6px 6px 0;
         }

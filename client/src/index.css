@@ -140,7 +140,10 @@ vite-plugin-checker-error-overlay {
 }
 .admin-tab-scroller::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--accent) 40%, transparent);
-  border-radius: 4px;
+  /* Pill ladder: 999px on an 8px-tall thumb renders exactly the same fully
+     rounded cap the old raw 4px did, and squares off in the square-edged
+     skins (terminal/brutalist) like every other pill. */
+  border-radius: var(--radius-pill);
 }
 .admin-tab-scroller::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--accent) 60%, transparent);
@@ -156,7 +159,10 @@ vite-plugin-checker-error-overlay {
 @media (forced-colors: active) {
   button,
   [role="button"] {
-    border: 1px solid ButtonText;
+    /* Border WIDTH rides the DS ladder (--border-w: 1px, 2px in brutalist) so
+       the HC affordance matches the skin; the COLOR must stay the ButtonText
+       system color — forced-colors ignores author colors anyway. */
+    border: var(--border-w) solid ButtonText;
   }
 }
 

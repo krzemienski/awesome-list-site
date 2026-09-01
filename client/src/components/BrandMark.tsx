@@ -7,7 +7,7 @@
  * generated brand outputs — if the mark changes, regenerate the brand kit via
  * scripts/brand/build-brand-assets.mjs and re-mirror the paths here.
  *
- * Divergence from the exported brand kit (intentional, MR-DS-13 spirit): the
+ * DS-OK — divergence from the exported brand kit (intentional, MR-DS-13): the
  * exported assets are locked to Editorial+Crimson (#ff3d52); in-app chrome is a
  * product surface, so border + glyphs track var(--accent) while the tile fill
  * stays literal #000 (all five runtime skins are dark). On the default
@@ -22,13 +22,16 @@ export function BrandMark({ className }: { className?: string }) {
       focusable="false"
       data-testid="brand-mark"
     >
+      {/* DS-OK: fixed brand paint — the monogram tile stays literal black in
+          every runtime skin (all five are dark), while the border and glyphs
+          track var(--accent). Mirrors brand/logo/svg/mark-small.svg. */}
       <rect
+        fill="#000000"
         x="2.5"
         y="2.5"
         width="71"
         height="71"
         rx="16"
-        fill="#000000"
         stroke="var(--accent)"
         strokeWidth="5"
       />

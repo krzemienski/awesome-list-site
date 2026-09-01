@@ -8,3 +8,11 @@ The documented stage-5 palette scan (`(bg|text|border|ring|fill|stroke)-<hue>-<s
 **Why:** A full palette migration verified "clean" by the documented regex was rejected in completion review because tier-badge gradients (`from-yellow-400 to-yellow-600`, …) survived untouched.
 
 **How to apply:** Any raw-palette sweep or regression gate must extend the prefix alternation to at least `from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset`. Also remember comments count: a code comment naming a palette class (e.g. "the old bg-blue-500 override") matches line-based scans — reword it.
+
+## DS-OK tagging quirks (same gate)
+
+The escape-hatch tag is a plain substring search with a fixed 5-line **lookback**, so a tag exempts only itself and the next 5 lines.
+
+- Put the tag on the **LAST** line of a justification block comment. A tag opening a 4-line block silently leaves anything past the 5th line below it exposed — a 10-entry constant table needs a second tag mid-array (one every 5 entries).
+- The prose of the justification is itself scanned. Naming the literals you are excusing ("mirrors #34d08c ok / #5eddf2 info") only stays clean while the tag is above them; move the tag down and the comment becomes the violation. Safest: describe the values by name, not by literal.
+- Only the hex and rgb detectors honor the tag. Raw radii, border widths, and font-family have **no** escape hatch — the options there are a token ref or excluding the whole file. `var(--radius-pill)` on an element whose height equals twice the old raw radius is a pixel-identical swap, and `var(--border-w)` covers `border: 1px`.
