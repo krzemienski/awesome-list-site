@@ -41,20 +41,7 @@
       "#ffd86b": 1
     }
   },
-  "rgb-colors": {
-    "client/src/components/admin/AgentCommsGraph.tsx": {
-      "rgba(0,0,0,0.55)": 1
-    },
-    "client/src/components/layout/new/AppSidebar.tsx": {
-      "rgba(255,255,255,0.04)": 1
-    },
-    "client/src/components/ui/export-tools.tsx": {
-      "rgba(17,17,16,0.32)": 1,
-      "rgba(184,77,255,0.06)": 1,
-      "rgba(244,243,238,0.16)": 1,
-      "rgba(255,61,82,0.07)": 1
-    }
-  },
+  "rgb-colors": {},
   "raw-radii": {
     "client/src/components/ui/export-tools.tsx": {
       "border-radius: 999px": 1,

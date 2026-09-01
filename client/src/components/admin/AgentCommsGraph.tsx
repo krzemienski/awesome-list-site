@@ -263,7 +263,8 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
                     width={NODE_W}
                     height={NODE_H}
                     rx={7}
-                    fill="rgba(0,0,0,0.55)"
+                    fill="var(--bg)"
+                    fillOpacity={0.55}
                     stroke={stroke}
                     strokeWidth={1.5}
                   />

@@ -296,7 +296,7 @@ function CategoryAccordion({
               borderRadius: 6,
               background: isActive
                 ? "color-mix(in srgb, var(--accent) 22%, transparent)"
-                : "rgba(255,255,255,0.04)",
+                : "color-mix(in srgb, var(--text) 4%, transparent)",
               color: isActive ? "var(--accent)" : "var(--text-2)",
             }}
           >

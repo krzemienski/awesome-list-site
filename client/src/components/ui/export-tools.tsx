@@ -293,7 +293,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             --surface: rgba(244, 243, 238, 0.025);
             --surface-2: rgba(244, 243, 238, 0.05);
             --border: rgba(244, 243, 238, 0.08);
-            --border-strong: rgba(244, 243, 238, 0.16);
+            --border-strong: rgba(244, 243, 238, 0.16); /* DS-OK: standalone export DS border ladder */
             --accent: #ff3d52; /* DS-OK: standalone export DS accent */
             --accent-2: #b84dff; /* DS-OK: standalone export DS accent-2 */
             --radius: 12px;
@@ -305,6 +305,8 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         body {
             font-family: var(--font-body);
             background: var(--bg);
+            /* DS-OK: standalone export — DS accent/accent-2 ambient gradients at
+               fixed export alphas (no runtime tokens in a downloaded file) */
             background-image: radial-gradient(ellipse 60% 40% at 85% 0%, rgba(255, 61, 82, 0.07), transparent 60%),
                               radial-gradient(ellipse 50% 35% at 10% 100%, rgba(184, 77, 255, 0.06), transparent 60%);
             background-attachment: fixed;
@@ -390,7 +392,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
                 --surface: rgba(17, 17, 16, 0.03);
                 --surface-2: rgba(17, 17, 16, 0.06);
                 --border: rgba(17, 17, 16, 0.16);
-                --border-strong: rgba(17, 17, 16, 0.32);
+                --border-strong: rgba(17, 17, 16, 0.32); /* DS-OK: standalone print ink ladder */
             }
             body { background-image: none; padding: 0; }
             .resource { break-inside: avoid; }
