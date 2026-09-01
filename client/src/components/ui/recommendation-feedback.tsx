@@ -22,6 +22,10 @@ interface RecommendationFeedbackProps {
   onFeedbackChange?: (feedback: RecommendationFeedbackValue | null) => void;
 }
 
+/**
+ * Feedback selections use the global DS status/info constants rather than
+ * raw palette utilities.
+ */
 const FEEDBACK_OPTIONS: {
   value: RecommendationFeedbackValue;
   label: string;
@@ -31,19 +35,19 @@ const FEEDBACK_OPTIONS: {
   {
     value: "helpful",
     label: "Helpful",
-    activeClass: "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    activeClass: "border-[#34d08c]/50 bg-[#34d08c]/10 text-[#34d08c]", // DS-OK: status ok
     icon: ThumbsUp,
   },
   {
     value: "not_for_me",
     label: "Not for me",
-    activeClass: "border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200",
+    activeClass: "border-[#ffb84d]/50 bg-[#ffb84d]/10 text-[#ffb84d]", // DS-OK: status warn
     icon: ThumbsDown,
   },
   {
     value: "already_known",
     label: "Already know this",
-    activeClass: "border-sky-500/50 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    activeClass: "border-[#5eddf2]/50 bg-[#5eddf2]/10 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
     icon: BookCheck,
   },
   {

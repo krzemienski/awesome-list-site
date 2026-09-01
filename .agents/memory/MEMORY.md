@@ -92,3 +92,4 @@
 - [Tags source of truth](tags-metadata-source.md) — the tags table is EMPTY; real tags live in resources.metadata.tags jsonb; derive from there, never the table.
 - [New SPA route registration](spa-new-route-registration.md) — a wouter Route alone 404s: also add KNOWN_ROUTE_PATTERNS (App.tsx), AppHeader crumb labels, og-middleware staticRoutes + SEOHead parity.
 - [Toast wipes dialog state](dialog-toast-remount.md) — toast() on validation error inside admin dialogs remounts and wipes typed input; use inline banners in-dialog.
+- [Palette scans miss gradient stops](palette-scan-gradient-stops.md) — the stage-5 regex skips from/via/to (+divide/outline/shadow/...); extend the prefix list or gradients slip through; comments naming palette classes also match.

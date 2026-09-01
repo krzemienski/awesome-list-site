@@ -57,6 +57,26 @@ interface JobStatusResponse {
   job: EnrichmentJob;
 }
 
+/**
+ * Enrichment colors use the global DS status constants:
+ * DS-OK: #34d08c ok / #ffb84d warn / #ff5c7a bad / #5eddf2 info.
+ */
+const JOB_PROCESSING_CLASS = 'bg-[#5eddf2] text-black hover:bg-[#5eddf2]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
+const JOB_COMPLETED_CLASS = 'bg-[#34d08c] text-black hover:bg-[#34d08c]/90'; // DS-OK: status ok
+const JOB_FAILED_CLASS = 'bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90'; // DS-OK: status bad
+const INFO_PANEL_CLASS = 'border-[#5eddf2]/20'; // DS-OK: cyan info (DS chart/info constant)
+const WARN_PANEL_CLASS = 'border-[#ffb84d]/20 bg-[#ffb84d]/5'; // DS-OK: status warn
+const OK_TEXT_CLASS = 'text-[#34d08c]'; // DS-OK: status ok
+const WARN_TEXT_CLASS = 'text-[#ffb84d]'; // DS-OK: status warn
+const BAD_TEXT_CLASS = 'text-[#ff5c7a]'; // DS-OK: status bad
+const INFO_TEXT_CLASS = 'text-[#5eddf2]'; // DS-OK: cyan info (DS chart/info constant)
+const OK_BORDER_CLASS = 'border-[#34d08c]/20'; // DS-OK: status ok
+const WARN_BORDER_CLASS = 'border-[#ffb84d]/20'; // DS-OK: status warn
+const BAD_BORDER_CLASS = 'border-[#ff5c7a]/20'; // DS-OK: status bad
+const OK_OUTLINE_CLASS = 'border-[#34d08c] text-[#34d08c]'; // DS-OK: status ok
+const WARN_OUTLINE_CLASS = 'border-[#ffb84d] text-[#ffb84d]'; // DS-OK: status warn
+const BAD_OUTLINE_CLASS = 'border-[#ff5c7a] text-[#ff5c7a]'; // DS-OK: status bad
+
 export default function BatchEnrichmentPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -231,13 +251,13 @@ export default function BatchEnrichmentPanel() {
   const getStatusBadgeClassName = (status: string) => {
     switch (status) {
       case 'processing':
-        return 'bg-blue-500 hover:bg-blue-600 animate-pulse';
+        return JOB_PROCESSING_CLASS;
       case 'completed':
-        return 'bg-green-500 hover:bg-green-600';
+        return JOB_COMPLETED_CLASS;
       case 'failed':
-        return 'bg-red-500 hover:bg-red-600';
+        return JOB_FAILED_CLASS;
       case 'cancelled':
-        return 'bg-gray-600 text-white hover:bg-gray-700'; /* WP-6 a11y: gray-500 + --text was ~4.4:1; gray-600 + white is ~7.6:1 */
+        return 'bg-secondary text-foreground hover:bg-secondary/80'; /* WP-6 a11y: contrast is now driven by the paired DS surface and text tokens. */
       default:
         return '';
     }
@@ -479,7 +499,7 @@ export default function BatchEnrichmentPanel() {
             </Button>
             
             {hasActiveJob && (
-              <Alert className="flex-1 ml-4 border-yellow-500/20 bg-yellow-500/5">
+              <Alert className={`flex-1 ml-4 ${WARN_PANEL_CLASS}`}>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   A job is currently running. Please wait for it to complete.
@@ -491,14 +511,14 @@ export default function BatchEnrichmentPanel() {
       </Card>
 
       {activeJob && (
-        <Card className="border-blue-500/20">
+        <Card className={INFO_PANEL_CLASS}>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <RefreshCw className="h-5 w-5 animate-spin text-blue-500" />
+                <RefreshCw className={`h-5 w-5 animate-spin ${INFO_TEXT_CLASS}`} />
                 Active Job Monitor
               </span>
-              <Badge className="bg-blue-500 hover:bg-blue-600 animate-pulse">
+              <Badge className={JOB_PROCESSING_CLASS}>
                 Processing
               </Badge>
             </CardTitle>
@@ -529,19 +549,19 @@ export default function BatchEnrichmentPanel() {
                 <div className="text-xs text-muted-foreground">Processed</div>
               </div>
               <div>
-                <div className="text-2xl font-bold font-mono text-green-500">
+                <div className={`text-2xl font-bold font-mono ${OK_TEXT_CLASS}`}>
                   {activeJob.successfulResources || 0}
                 </div>
                 <div className="text-xs text-muted-foreground">Successful</div>
               </div>
               <div>
-                <div className="text-2xl font-bold font-mono text-red-500">
+                <div className={`text-2xl font-bold font-mono ${BAD_TEXT_CLASS}`}>
                   {activeJob.failedResources || 0}
                 </div>
                 <div className="text-xs text-muted-foreground">Failed</div>
               </div>
               <div>
-                <div className="text-2xl font-bold font-mono text-yellow-500">
+                <div className={`text-2xl font-bold font-mono ${WARN_TEXT_CLASS}`}>
                   {activeJob.skippedResources || 0}
                 </div>
                 <div className="text-xs text-muted-foreground">Skipped</div>
@@ -705,7 +725,7 @@ export default function BatchEnrichmentPanel() {
                           /* ADM-05: every processed resource was SKIPPED (nothing
                              to do), none failed — a red "0/N ok (0%)" misrepresents
                              a clean run as a failure. Report the skips honestly. */
-                          <Badge variant="outline" className="border-yellow-500 text-yellow-500" data-testid={`skipped-rate-${job.id}`}>
+                           <Badge variant="outline" className={WARN_OUTLINE_CLASS} data-testid={`skipped-rate-${job.id}`}>
                             {job.skippedResources} skipped
                           </Badge>
                         ) : (
@@ -714,9 +734,9 @@ export default function BatchEnrichmentPanel() {
                              contradiction when only the processed subset
                              succeeded before the job died. */
                           <Badge variant="outline" className={
-                            calculateSuccessRate(job) >= 90 ? 'border-green-500 text-green-500' :
-                            calculateSuccessRate(job) >= 70 ? 'border-yellow-500 text-yellow-500' :
-                            'border-red-500 text-red-500'
+                             calculateSuccessRate(job) >= 90 ? OK_OUTLINE_CLASS :
+                             calculateSuccessRate(job) >= 70 ? WARN_OUTLINE_CLASS :
+                             BAD_OUTLINE_CLASS
                           }>
                             {Math.min(job.successfulResources || 0, displayProcessed(job))}/{displayProcessed(job)} ok ({calculateSuccessRate(job)}%)
                           </Badge>
@@ -811,20 +831,20 @@ export default function BatchEnrichmentPanel() {
                       </div>
                       <div className="text-xs text-muted-foreground">Processed</div>
                     </div>
-                    <div className="text-center p-3 border rounded border-green-500/20">
-                      <div className="text-2xl font-bold font-mono text-green-500">
+                    <div className={`text-center p-3 border rounded ${OK_BORDER_CLASS}`}>
+                      <div className={`text-2xl font-bold font-mono ${OK_TEXT_CLASS}`}>
                         {selectedJobData.job.successfulResources || 0}
                       </div>
                       <div className="text-xs text-muted-foreground">Successful</div>
                     </div>
-                    <div className="text-center p-3 border rounded border-red-500/20">
-                      <div className="text-2xl font-bold font-mono text-red-500">
+                    <div className={`text-center p-3 border rounded ${BAD_BORDER_CLASS}`}>
+                      <div className={`text-2xl font-bold font-mono ${BAD_TEXT_CLASS}`}>
                         {selectedJobData.job.failedResources || 0}
                       </div>
                       <div className="text-xs text-muted-foreground">Failed</div>
                     </div>
-                    <div className="text-center p-3 border rounded border-yellow-500/20">
-                      <div className="text-2xl font-bold font-mono text-yellow-500">
+                    <div className={`text-center p-3 border rounded ${WARN_BORDER_CLASS}`}>
+                      <div className={`text-2xl font-bold font-mono ${WARN_TEXT_CLASS}`}>
                         {selectedJobData.job.skippedResources || 0}
                       </div>
                       <div className="text-xs text-muted-foreground">Skipped</div>
@@ -837,7 +857,7 @@ export default function BatchEnrichmentPanel() {
                     <Separator />
                     <div>
                       <h3 className="font-semibold mb-2 flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        <CheckCircle2 className={`h-4 w-4 ${OK_TEXT_CLASS}`} />
                         Processed Resources ({selectedJobData.job.processedResourceIds.length})
                       </h3>
                       <div className="flex flex-wrap gap-2">
@@ -861,7 +881,7 @@ export default function BatchEnrichmentPanel() {
                     <Separator />
                     <div>
                       <h3 className="font-semibold mb-2 flex items-center gap-2">
-                        <AlertCircle className="h-4 w-4 text-red-500" />
+                        <AlertCircle className={`h-4 w-4 ${BAD_TEXT_CLASS}`} />
                         Failed Resources ({selectedJobData.job.failedResourceIds.length})
                       </h3>
                       <div className="flex flex-wrap gap-2">
@@ -884,7 +904,7 @@ export default function BatchEnrichmentPanel() {
                   <>
                     <Separator />
                     <div>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2 text-red-500">
+                      <h3 className={`font-semibold mb-2 flex items-center gap-2 ${BAD_TEXT_CLASS}`}>
                         <AlertCircle className="h-4 w-4" />
                         Error Message
                       </h3>

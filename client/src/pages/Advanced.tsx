@@ -223,7 +223,7 @@ export default function Advanced() {
                 <Card className="lg:col-span-1">
                   <CardContent className="p-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">{resources.length.toLocaleString()}</div>
+                      <div className="text-2xl font-bold text-[#5eddf2]">{/* DS-OK: cyan info (DS chart/info constant) */}{resources.length.toLocaleString()}</div>
                       <div className="text-sm text-muted-foreground">Resources</div>
                     </div>
                   </CardContent>
@@ -231,7 +231,7 @@ export default function Advanced() {
                 <Card className="lg:col-span-1">
                   <CardContent className="p-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">
+                      <div className="text-2xl font-bold text-[#34d08c]"> {/* DS-OK: status ok */}
                         {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? [])).size}
                       </div>
                       <div className="text-sm text-muted-foreground">Unique Tags</div>
@@ -241,7 +241,7 @@ export default function Advanced() {
                 <Card className="lg:col-span-1">
                   <CardContent className="p-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600">
+                      <div className="text-2xl font-bold text-[#9d4edd]"> {/* DS-OK: violet info (DS chart/info constant) */}
                         {categories.reduce((sum, cat) => sum + (cat.subcategories?.length || 0), 0)}
                       </div>
                       <div className="text-sm text-muted-foreground">Subcategories</div>

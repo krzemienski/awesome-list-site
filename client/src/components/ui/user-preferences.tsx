@@ -421,11 +421,11 @@ export default function UserPreferences({
 
               <Separator />
 
-              <div className="p-4 bg-blue-50 dark:bg-blue-950">
-                <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
+              <div className="p-4 bg-[#5eddf2]/10">{/* DS-OK: cyan info (DS chart/info constant) */}
+                <h4 className="font-medium text-[#5eddf2] mb-2">{/* DS-OK: cyan info (DS chart/info constant) */}
                   How Recommendations Work
                 </h4>
-                <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Your preferences shape what we recommend</li>
                   <li>• We track your interaction patterns to improve suggestions</li>
                   <li>• Learning paths are created based on your skill level and goals</li>

@@ -258,7 +258,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 {validationStatus.awesomeLint.valid ? (
-                  <Badge variant="default" className="bg-green-600 hover:bg-green-600">
+                  <Badge variant="default" className={"bg-[#34d08c] text-black hover:bg-[#34d08c]" /* DS-OK: status ok */}>
                     <CheckCircle2 className="mr-1 h-3 w-3" />
                     Passed
                   </Badge>
@@ -279,18 +279,18 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   {/* Run16 BUG-073: expanders get a ≥44px touch target. */}
                   <button
                     onClick={() => setShowErrors(!showErrors)}
-                    className="flex min-h-11 items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300"
+                    className={"flex min-h-11 items-center gap-2 text-sm font-semibold text-[#ff5c7a] hover:text-[#ff5c7a]/80" /* DS-OK: status bad */}
                   >
                     {showErrors ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     Errors ({validationStatus.awesomeLint.errors.length})
                   </button>
                   {showErrors && (
                     /* R5-040: same rule-grouping as warnings. */
-                    <ScrollArea className="h-48 rounded-md border border-red-500/20 p-3">
+                    <ScrollArea className={"h-48 rounded-md border border-[#ff5c7a]/20 p-3" /* DS-OK: status bad */}>
                       {groupByRule(validationStatus.awesomeLint.errors).map(([rule, items]) => (
                         <div key={rule} className="mb-3 text-sm" data-testid={`error-group-${rule}`}>
-                          <div className="flex items-center gap-2 font-semibold text-red-400">
-                            <XCircle className="h-4 w-4 text-red-500 shrink-0" />
+                          <div className={"flex items-center gap-2 font-semibold text-[#ff5c7a]" /* DS-OK: status bad */}>
+                            <XCircle className={"h-4 w-4 text-[#ff5c7a] shrink-0" /* DS-OK: status bad */} />
                             <span className="font-mono text-xs">{rule}</span>
                             <Badge variant="outline" className="text-[10px]">{items.length}</Badge>
                           </div>
@@ -314,7 +314,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   {/* Run16 BUG-073: 140×20px expander → ≥44px touch target. */}
                   <button
                     onClick={() => setShowWarnings(!showWarnings)}
-                    className="flex min-h-11 items-center gap-2 text-sm font-semibold text-yellow-400 hover:text-yellow-300"
+                    className={"flex min-h-11 items-center gap-2 text-sm font-semibold text-[#ffb84d] hover:text-[#ffb84d]/80" /* DS-OK: status warn */}
                   >
                     {showWarnings ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     Warnings ({validationStatus.awesomeLint.warnings.length})
@@ -322,11 +322,11 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   {showWarnings && (
                     /* R5-040: grouped by rule (rule × count headings) instead
                        of a flat repeat-heavy list. */
-                    <ScrollArea className="h-48 rounded-md border border-yellow-500/20 p-3">
+                    <ScrollArea className={"h-48 rounded-md border border-[#ffb84d]/20 p-3" /* DS-OK: status warn */}>
                       {groupByRule(validationStatus.awesomeLint.warnings).map(([rule, items]) => (
                         <div key={rule} className="mb-3 text-sm" data-testid={`warning-group-${rule}`}>
-                          <div className="flex items-center gap-2 font-semibold text-yellow-400">
-                            <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
+                          <div className={"flex items-center gap-2 font-semibold text-[#ffb84d]" /* DS-OK: status warn */}>
+                            <AlertTriangle className={"h-4 w-4 text-[#ffb84d] shrink-0" /* DS-OK: status warn */} />
                             <span className="font-mono text-xs">{rule}</span>
                             <Badge variant="outline" className="text-[10px]">{items.length}</Badge>
                           </div>
@@ -361,19 +361,19 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <div className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <div className="text-2xl font-bold text-green-500">
+                  <div className={"text-2xl font-bold text-[#34d08c]" /* DS-OK: status ok */}>
                     {validationStatus.linkCheck.validLinks}
                   </div>
                   <div className="text-xs text-[var(--text-2)]">Valid Links</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-red-500">
+                  <div className={"text-2xl font-bold text-[#ff5c7a]" /* DS-OK: status bad */}>
                     {validationStatus.linkCheck.brokenLinks}
                   </div>
                   <div className="text-xs text-[var(--text-2)]">Broken Links</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-yellow-500">
+                  <div className={"text-2xl font-bold text-[#ffb84d]" /* DS-OK: status warn */}>
                     {validationStatus.linkCheck.redirects}
                   </div>
                   <div className="text-xs text-[var(--text-2)]">Redirects</div>
@@ -389,15 +389,15 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               {validationStatus.linkCheck.brokenResources &&
                validationStatus.linkCheck.brokenResources.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-red-400">
+                  <h4 className={"text-sm font-semibold text-[#ff5c7a]" /* DS-OK: status bad */}>
                     Broken Links ({validationStatus.linkCheck.brokenResources.length})
                   </h4>
-                  <ScrollArea className="h-64 rounded-md border border-red-500/20">
+                  <ScrollArea className={"h-64 rounded-md border border-[#ff5c7a]/20" /* DS-OK: status bad */}>
                     <div className="p-3">
                       {validationStatus.linkCheck.brokenResources.map((link, i) => (
                         <div key={i} className="mb-3 pb-3 border-b border-[var(--border)] last:border-0">
                           <div className="flex items-start gap-2">
-                            <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                            <XCircle className={"h-4 w-4 text-[#ff5c7a] mt-0.5 shrink-0" /* DS-OK: status bad */} />
                             <div className="flex-1">
                               <div className="font-semibold text-sm text-[var(--text)]">
                                 {link.resourceTitle || 'Unknown Resource'}
@@ -405,7 +405,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                               <div className="text-xs text-[var(--text-2)] font-mono break-all">
                                 {link.url}
                               </div>
-                              <div className="text-xs text-red-400 mt-1">
+                              <div className={"text-xs text-[#ff5c7a] mt-1" /* DS-OK: status bad */}>
                                 {link.status} {link.statusText}
                                 {link.error && ` - ${link.error}`}
                               </div>

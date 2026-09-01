@@ -232,7 +232,7 @@ export default function AnalyticsDashboard({
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4 text-blue-500" />
+                <Globe className="h-4 w-4 text-[#5eddf2]" />{/* DS-OK: cyan info (DS chart/info constant) */}
                 <div>
                   <div className="text-2xl font-bold">{analyticsData.totalResources}</div>
                   <div className="text-xs text-muted-foreground">Total Resources</div>
@@ -244,7 +244,7 @@ export default function AnalyticsDashboard({
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-green-500" />
+                <Tag className="h-4 w-4 text-[#34d08c]" />{/* DS-OK: status ok */}
                 <div>
                   <div className="text-2xl font-bold">{analyticsData.totalCategories}</div>
                   <div className="text-xs text-muted-foreground">Categories</div>
@@ -256,7 +256,7 @@ export default function AnalyticsDashboard({
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-purple-500" />
+                <Eye className="h-4 w-4 text-[#9d4edd]" />{/* DS-OK: violet info (DS chart/info constant) */}
                 <div>
                   <div className="text-2xl font-bold">{analyticsData.totalViews.toLocaleString()}</div>
                   <div className="text-xs text-muted-foreground">Total Views</div>
@@ -268,7 +268,7 @@ export default function AnalyticsDashboard({
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-orange-500" />
+                <TrendingUp className="h-4 w-4 text-[#ffb84d]" />{/* DS-OK: status warn */}
                 <div>
                   <div className="text-2xl font-bold">{analyticsData.popularResources.filter(r => r.trending).length}</div>
                   <div className="text-xs text-muted-foreground">Trending</div>
@@ -490,7 +490,7 @@ export default function AnalyticsDashboard({
                               <div className="text-sm text-muted-foreground">{term.count} searches</div>
                             </div>
                             <div className={`text-sm font-medium ${
-                              term.growth > 0 ? 'text-green-500' : term.growth < 0 ? 'text-red-500' : 'text-[var(--text-2)]'
+                              term.growth > 0 ? 'text-[#34d08c]' : term.growth < 0 ? 'text-[#ff5c7a]' : 'text-[var(--text-2)]' // DS-OK: status ok / status bad
                             }`}>
                               {term.growth > 0 ? '+' : ''}{term.growth}%
                             </div>

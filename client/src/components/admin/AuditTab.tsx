@@ -30,23 +30,22 @@ interface AuditLogsResponse {
   total: number;
 }
 
-/* WP-6 a11y: per-color ink baked into each entry — white on -500 mid-tones was
-   2.3–4.4:1; black ink passes AA (≥4.5:1) on all light/mid tones, white kept
-   only on the dark reds. DS §7: accent-tone surfaces take black ink. */
+/* WP-6 a11y: per-color ink is baked into each entry. Black ink passes AA on
+   every DS status/info surface. These are global semantic DS constants. */
 const ACTION_COLORS: Record<string, string> = {
-  created: "bg-green-500 text-black",
-  updated: "bg-blue-500 text-black",
-  approved: "bg-emerald-500 text-black",
-  rejected: "bg-red-500 text-black",
-  deleted: "bg-red-700 text-white",
-  synced: "bg-purple-500 text-black",
-  ai_enriched: "bg-cyan-500 text-black",
-  ai_enrichment_failed: "bg-orange-500 text-black",
-  edit_suggested: "bg-yellow-500 text-black",
-  edit_approved: "bg-emerald-600 text-black",
-  edit_rejected: "bg-red-600 text-white",
-  bulk_import: "bg-indigo-500 text-black",
-  status_changed: "bg-amber-500 text-black",
+  created: "bg-[#34d08c] text-black", // DS-OK: status ok
+  updated: "bg-[#5eddf2] text-black", // DS-OK: cyan info (DS chart/info constant)
+  approved: "bg-[#34d08c] text-black", // DS-OK: status ok
+  rejected: "bg-[#ff5c7a] text-black", // DS-OK: status bad
+  deleted: "bg-[#ff5c7a] text-black", // DS-OK: status bad
+  synced: "bg-[#9d4edd] text-black", // DS-OK: violet info (DS chart/info constant)
+  ai_enriched: "bg-[#5eddf2] text-black", // DS-OK: cyan info (DS chart/info constant)
+  ai_enrichment_failed: "bg-[#ffb84d] text-black", // DS-OK: status warn
+  edit_suggested: "bg-[#ffb84d] text-black", // DS-OK: status warn
+  edit_approved: "bg-[#34d08c] text-black", // DS-OK: status ok
+  edit_rejected: "bg-[#ff5c7a] text-black", // DS-OK: status bad
+  bulk_import: "bg-[#9d4edd] text-black", // DS-OK: violet info (DS chart/info constant)
+  status_changed: "bg-[#ffb84d] text-black", // DS-OK: status warn
 };
 
 const LIMIT_OPTIONS = ["25", "50", "100", "200"];
@@ -268,7 +267,7 @@ export default function AuditTab() {
                   >
                     <TableCell className="text-xs text-muted-foreground">{log.id}</TableCell>
                     <TableCell>
-                      <Badge className={`${ACTION_COLORS[log.action] || 'bg-gray-600 text-white'} text-xs`}>
+                      <Badge className={`${ACTION_COLORS[log.action] || 'bg-muted text-foreground'} text-xs`}>
                         {log.action.replace(/_/g, ' ')}
                       </Badge>
                     </TableCell>

@@ -6,24 +6,31 @@ import { Label } from "@/components/ui/label";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import type { AgentEvent } from "@shared/schema";
 
+/**
+ * Agent actors and event kinds use the global DS status/info constants.
+ * Related event variants retain hierarchy through opacity.
+ */
 const ACTOR_TYPE_STYLES: Record<string, string> = {
-  orchestrator: "border-blue-500/50 text-blue-300",
-  subagent: "border-purple-500/50 text-purple-300",
-  tool: "border-cyan-500/50 text-cyan-300",
-  system: "border-yellow-500/50 text-yellow-300",
+  orchestrator: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+  subagent: "border-[#9d4edd]/50 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
+  tool: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+  system: "border-[#ffb84d]/50 text-[#ffb84d]", // DS-OK: status warn
 };
 
 const EVENT_TYPE_STYLES: Record<string, string> = {
-  lifecycle: "border-yellow-500/50 text-yellow-400",
-  message: "border-blue-500/50 text-blue-300",
+  lifecycle: "border-[#ffb84d]/50 text-[#ffb84d]", // DS-OK: status warn
+  message: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
   thinking: "border-muted-foreground/40 text-muted-foreground",
-  tool_call: "border-cyan-500/50 text-cyan-400",
-  tool_result: "border-green-500/50 text-green-400",
-  delegation: "border-purple-500/50 text-purple-400",
-  delegation_result: "border-purple-400/30 text-purple-300",
-  result: "border-green-600/60 text-green-400",
-  error: "border-red-500/50 text-red-400",
+  tool_call: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "border-[#34d08c]/50 text-[#34d08c]", // DS-OK: status ok
+  delegation: "border-[#9d4edd]/50 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
+  delegation_result: "border-[#9d4edd]/30 text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
+  result: "border-[#34d08c]/60 text-[#34d08c]", // DS-OK: status ok
+  error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
 };
+
+const DELEGATION_TARGET_TEXT = "text-[#9d4edd]/80"; // DS-OK: violet info (DS chart/info constant)
+const TRUNCATION_TEXT = "text-[#ffb84d]/80"; // DS-OK: status warn
 
 interface AgentEventLogProps {
   jobType: "research" | "enrichment";
@@ -114,7 +121,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                       {ev.eventType}
                     </Badge>
                     {ev.targetActor && (
-                      <span className="text-purple-300 shrink-0">→ {ev.targetActor}</span>
+                      <span className={`${DELEGATION_TARGET_TEXT} shrink-0`}>→ {ev.targetActor}</span>
                     )}
                     {(() => {
                       const clean = sanitizeText(ev.summary);
@@ -171,7 +178,7 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                       <pre className="pl-[72px] mt-1 text-[10px] text-muted-foreground whitespace-pre-wrap break-all">
                         {truncated ? raw.slice(0, DETAIL_MAX) : raw}
                         {truncated && (
-                          <span className="text-yellow-500/80">
+                          <span className={TRUNCATION_TEXT}>
                             {`\n… (truncated ${(raw.length - DETAIL_MAX).toLocaleString()} more characters)`}
                           </span>
                         )}

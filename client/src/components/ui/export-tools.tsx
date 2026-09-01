@@ -286,16 +286,16 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
          no runtime switching. -->
     <style>
         :root {
-            --bg: #000000;
-            --text: #f4f3ee;
+            --bg: #000000; /* DS-OK: standalone export DS background */
+            --text: #f4f3ee; /* DS-OK: standalone export DS text */
             --text-2: rgba(244, 243, 238, 0.66);
             --text-3: rgba(244, 243, 238, 0.52);
             --surface: rgba(244, 243, 238, 0.025);
             --surface-2: rgba(244, 243, 238, 0.05);
             --border: rgba(244, 243, 238, 0.08);
             --border-strong: rgba(244, 243, 238, 0.16);
-            --accent: #ff3d52;
-            --accent-2: #b84dff;
+            --accent: #ff3d52; /* DS-OK: standalone export DS accent */
+            --accent-2: #b84dff; /* DS-OK: standalone export DS accent-2 */
             --radius: 12px;
             --radius-sm: 8px;
             --font-body: 'Inter', system-ui, -apple-system, sans-serif;
@@ -383,8 +383,8 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         }
         @media print {
             :root {
-                --bg: #ffffff;
-                --text: #111110;
+                --bg: #ffffff; /* DS-OK: standalone print background */
+                --text: #111110; /* DS-OK: standalone print ink */
                 --text-2: rgba(17, 17, 16, 0.72);
                 --text-3: rgba(17, 17, 16, 0.56);
                 --surface: rgba(17, 17, 16, 0.03);
@@ -547,10 +547,10 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
              "times" stands in for the Fraunces display font — jsPDF only
              embeds its 3 standard families, and the DS fallback stack is
              Georgia/'Times New Roman'/serif. */
-          const INK: [number, number, number] = [17, 17, 16]; // --text #111110
+          const INK: [number, number, number] = [17, 17, 16]; // DS-OK: --text #111110
           const INK_2: [number, number, number] = [84, 84, 83]; // rgba(17,17,16,.72) on white
           const INK_3: [number, number, number] = [122, 122, 121]; // rgba(17,17,16,.56) on white
-          const CRIMSON: [number, number, number] = [255, 61, 82]; // --accent #ff3d52
+          const CRIMSON: [number, number, number] = [255, 61, 82]; // DS-OK: --accent #ff3d52
           const RULE: [number, number, number] = [179, 179, 178]; // border-strong on white
 
           const ensureRoom = (needed: number) => {
@@ -875,7 +875,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         {/* Export Summary */}
         <div className="p-4 bg-muted">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="h-4 w-4 text-green-600" />
+            <CheckCircle className="h-4 w-4 text-[#34d08c]" />{/* DS-OK: status ok */}
             <span className="text-sm font-medium">Export Summary</span>
           </div>
           <div className="text-sm text-muted-foreground space-y-1">

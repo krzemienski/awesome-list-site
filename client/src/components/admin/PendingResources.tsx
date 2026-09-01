@@ -226,7 +226,7 @@ export default function PendingResources() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-500" />
+            <CheckCircle2 className={"h-5 w-5 text-[#34d08c]" /* DS-OK: status ok */} />
             Pending Approvals
           </CardTitle>
           <CardDescription>Resources awaiting admin review</CardDescription>
@@ -414,7 +414,7 @@ export default function PendingResources() {
                         <Button
                           variant="default"
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700"
+                          className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
                           onClick={() => handleApproveClick(resource)}
                           disabled={approveMutation.isPending}
                           aria-label={`Approve ${resource.title}`}
@@ -592,7 +592,7 @@ export default function PendingResources() {
             <AlertDialogAction
               onClick={handleApproveConfirm}
               disabled={approveMutation.isPending}
-              className="bg-green-600 hover:bg-green-700"
+              className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
               data-testid="button-confirm-approve"
             >
               {approveMutation.isPending ? "Approving..." : "Approve"}

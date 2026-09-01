@@ -435,7 +435,7 @@ export default function SubmitResource() {
       return apiRequest('/api/resources', {
         method: 'POST',
         // serverConversionHeaders: consent + Mixpanel distinct-id so the
-        // server can emit the resource_submitted conversion (Task #233).
+        // server can emit the resource_submitted conversion (Task 233).
         headers: serverConversionHeaders(),
         body: JSON.stringify({
           title: data.title,
@@ -531,19 +531,19 @@ export default function SubmitResource() {
         <h1 className="sr-only">Submit a Resource</h1>
         {/* Success Message */}
         {showSuccess && (
-          <Card className="mb-6 border-green-500/20 bg-green-500/5">
+          <Card className="mb-6 border-[#34d08c]/20 bg-[#34d08c]/5"> {/* DS-OK: status ok */}
             <CardHeader>
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-6 w-6 text-green-500" />
+                <CheckCircle className="h-6 w-6 text-[#34d08c]" /> {/* DS-OK: status ok */}
                 <div>
-                  <CardTitle className="text-green-500">Submission Successful!</CardTitle>
+                  <CardTitle className="text-[#34d08c]">Submission Successful!</CardTitle> {/* DS-OK: status ok */}
                   <CardDescription>
                     Your resource is pending review. You can submit another resource below.
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="flex flex-col gap-3 border-t border-green-500/20 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <CardContent className="flex flex-col gap-3 border-t border-[#34d08c]/20 pt-4 sm:flex-row sm:items-center sm:justify-between"> {/* DS-OK: status ok */}
               <p className="text-sm text-muted-foreground">
                 Track review status and outcomes in your private contribution timeline.
               </p>
@@ -602,9 +602,9 @@ export default function SubmitResource() {
                   </AlertDescription>
                 </Alert>
               ) : !isAuthenticated ? (
-                <Alert className="mb-6 border-yellow-500/50 bg-yellow-500/10" data-testid="alert-login-required">
-                  <LogIn className="h-4 w-4 text-yellow-500" />
-                  <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
+                <Alert className="mb-6 border-[#ffb84d]/50 bg-[#ffb84d]/10" data-testid="alert-login-required"> {/* DS-OK: status warn */}
+                  <LogIn className="h-4 w-4 text-[#ffb84d]" /> {/* DS-OK: status warn */}
+                  <AlertTitle className="text-[#ffb84d]">Login required to submit</AlertTitle> {/* DS-OK: status warn */}
                   <AlertDescription>
                     The form below is read-only. Please{" "}
                     <a href="/sign-in?redirect_url=%2Fsubmit" className="inline-flex items-center min-h-[24px] align-middle underline" data-testid="link-login">log in</a>{" "}
@@ -664,9 +664,9 @@ export default function SubmitResource() {
 
                       {/* Duplicate URL Warning */}
                       {duplicateResource && (
-                        <Alert className="mt-2 border-yellow-500/50 bg-yellow-500/10">
-                          <AlertCircle className="h-4 w-4 text-yellow-500" />
-                          <AlertTitle className="text-yellow-500">Duplicate URL Detected</AlertTitle>
+                        <Alert className="mt-2 border-[#ffb84d]/50 bg-[#ffb84d]/10"> {/* DS-OK: status warn */}
+                          <AlertCircle className="h-4 w-4 text-[#ffb84d]" /> {/* DS-OK: status warn */}
+                          <AlertTitle className="text-[#ffb84d]">Duplicate URL Detected</AlertTitle> {/* DS-OK: status warn */}
                           <AlertDescription>
                             {/* Run16 BUG-061: the server hard-blocks duplicate
                                 URLs with a 409 — the old copy promised "you
@@ -895,10 +895,10 @@ export default function SubmitResource() {
         </Card>
 
         {/* Info Card */}
-        <Card className="mt-6 border-blue-500/20">
+        <Card className="mt-6 border-[#5eddf2]/20"> {/* DS-OK: cyan info (DS chart/info constant) */}
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <AlertCircle className="h-5 w-5 text-blue-500" />
+              <AlertCircle className="h-5 w-5 text-[#5eddf2]" /> {/* DS-OK: cyan info (DS chart/info constant) */}
               Submission Guidelines
             </CardTitle>
           </CardHeader>

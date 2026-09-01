@@ -21,6 +21,7 @@ import {
   Brain
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { getDifficultyColor } from "@/lib/difficulty";
 import { useAuth } from "@/hooks/useAuth";
 import { Resource } from "@/types/awesome-list";
 
@@ -158,19 +159,10 @@ export default function RecommendationPanel({
     onStartLearningPath?.(pathId);
   };
 
-  const getSkillLevelColor = (level: string) => {
-    switch (level) {
-      case 'beginner': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'intermediate': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-      case 'advanced': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
-      default: return 'bg-[var(--surface-2)] text-[var(--text-2)]';
-    }
-  };
-
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return 'text-green-600 dark:text-green-400';
-    if (confidence >= 0.6) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
+    if (confidence >= 0.8) return 'text-[#34d08c]'; // DS-OK: status ok
+    if (confidence >= 0.6) return 'text-[#ffb84d]'; // DS-OK: status warn
+    return 'text-[#ff5c7a]'; // DS-OK: status bad
   };
 
   if (!initStatus) {
@@ -239,7 +231,7 @@ export default function RecommendationPanel({
                                   {rec.category}
                                 </Badge>
                                 {rec.aiGenerated && (
-                                  <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                  <Badge variant="secondary" className="text-xs bg-[#5eddf2]/10 text-[#5eddf2]">{/* DS-OK: cyan info (DS chart/info constant) */}
                                     AI Enhanced
                                   </Badge>
                                 )}
@@ -319,7 +311,7 @@ export default function RecommendationPanel({
                                   {path.description}
                                 </p>
                               </div>
-                              <Badge className={getSkillLevelColor(path.skillLevel)}>
+                              <Badge className={getDifficultyColor(path.skillLevel)}>
                                 {path.skillLevel}
                               </Badge>
                             </div>
@@ -374,7 +366,7 @@ export default function RecommendationPanel({
                                         <div>
                                           <span className="font-medium">Skill Level:</span>
                                           <br />
-                                          <Badge className={getSkillLevelColor(selectedPath.skillLevel)}>
+                                          <Badge className={getDifficultyColor(selectedPath.skillLevel)}>
                                             {selectedPath.skillLevel}
                                           </Badge>
                                         </div>

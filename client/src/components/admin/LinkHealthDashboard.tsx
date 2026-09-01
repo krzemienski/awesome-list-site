@@ -49,6 +49,24 @@ interface BrokenLinksResponse {
   })[];
 }
 
+/**
+ * Link-health colors use the global DS status constants:
+ * DS-OK: #34d08c ok / #ffb84d warn / #ff5c7a bad / #5eddf2 info / #9d4edd info-2.
+ */
+const JOB_PROCESSING_CLASS = 'bg-[#5eddf2] text-black hover:bg-[#5eddf2]/90 animate-pulse'; // DS-OK: cyan info (DS chart/info constant)
+const JOB_COMPLETED_CLASS = 'bg-[#34d08c] text-black hover:bg-[#34d08c]/90'; // DS-OK: status ok
+const JOB_FAILED_CLASS = 'bg-[#ff5c7a] text-black hover:bg-[#ff5c7a]/90'; // DS-OK: status bad
+const OK_TEXT_CLASS = 'text-[#34d08c]'; // DS-OK: status ok
+const WARN_TEXT_CLASS = 'text-[#ffb84d]'; // DS-OK: status warn
+const BAD_TEXT_CLASS = 'text-[#ff5c7a]'; // DS-OK: status bad
+const INFO_TEXT_CLASS = 'text-[#5eddf2]'; // DS-OK: cyan info (DS chart/info constant)
+const INFO2_TEXT_CLASS = 'text-[#9d4edd]'; // DS-OK: violet info (DS chart/info constant)
+const INFO_PANEL_CLASS = 'border-[#5eddf2]/20 bg-[#5eddf2]/5'; // DS-OK: cyan info (DS chart/info constant)
+const OK_OUTLINE_CLASS = 'border-[#34d08c] text-[#34d08c]'; // DS-OK: status ok
+const WARN_OUTLINE_CLASS = 'border-[#ffb84d] text-[#ffb84d]'; // DS-OK: status warn
+const BAD_OUTLINE_CLASS = 'border-[#ff5c7a] text-[#ff5c7a]'; // DS-OK: status bad
+const INFO2_OUTLINE_CLASS = 'border-[#9d4edd] text-[#9d4edd]'; // DS-OK: violet info (DS chart/info constant)
+
 export default function LinkHealthDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -187,13 +205,13 @@ export default function LinkHealthDashboard() {
   const getStatusBadgeClassName = (status: string) => {
     switch (status) {
       case 'processing':
-        return 'bg-blue-500 hover:bg-blue-600 animate-pulse';
+        return JOB_PROCESSING_CLASS;
       case 'completed':
-        return 'bg-green-500 hover:bg-green-600';
+        return JOB_COMPLETED_CLASS;
       case 'failed':
-        return 'bg-red-500 hover:bg-red-600';
+        return JOB_FAILED_CLASS;
       case 'cancelled':
-        return 'bg-gray-500 hover:bg-gray-600';
+        return 'bg-muted text-foreground hover:bg-muted/80';
       default:
         return '';
     }
@@ -202,17 +220,17 @@ export default function LinkHealthDashboard() {
   const getHealthStatusIcon = (status: string) => {
     switch (status) {
       case 'healthy':
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+        return <CheckCircle2 className={`h-4 w-4 ${OK_TEXT_CLASS}`} />;
       case 'redirect':
-        return <TrendingUp className="h-4 w-4 text-yellow-500" />;
+        return <TrendingUp className={`h-4 w-4 ${WARN_TEXT_CLASS}`} />;
       case 'broken':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className={`h-4 w-4 ${BAD_TEXT_CLASS}`} />;
       case 'timeout':
-        return <Clock className="h-4 w-4 text-orange-500" />;
+        return <Clock className={`h-4 w-4 ${WARN_TEXT_CLASS}`} />;
       case 'dns_failure':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
+        return <AlertCircle className={`h-4 w-4 ${BAD_TEXT_CLASS}`} />;
       case 'suspect':
-        return <AlertTriangle className="h-4 w-4 text-purple-500" />;
+        return <AlertTriangle className={`h-4 w-4 ${INFO2_TEXT_CLASS}`} />;
       default:
         return <Info className="h-4 w-4" />;
     }
@@ -221,17 +239,17 @@ export default function LinkHealthDashboard() {
   const getHealthStatusBadge = (status: string) => {
     switch (status) {
       case 'healthy':
-        return 'border-green-500 text-green-500';
+        return OK_OUTLINE_CLASS;
       case 'redirect':
-        return 'border-yellow-500 text-yellow-500';
+        return WARN_OUTLINE_CLASS;
       case 'broken':
-        return 'border-red-500 text-red-500';
+        return BAD_OUTLINE_CLASS;
       case 'timeout':
-        return 'border-orange-500 text-orange-500';
+        return WARN_OUTLINE_CLASS;
       case 'dns_failure':
-        return 'border-red-500 text-red-500';
+        return BAD_OUTLINE_CLASS;
       case 'suspect':
-        return 'border-purple-500 text-purple-500';
+        return INFO2_OUTLINE_CLASS;
       default:
         return '';
     }
@@ -322,25 +340,25 @@ export default function LinkHealthDashboard() {
                   <div className="text-xs text-muted-foreground">Total Links</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-green-500" data-testid="counter-healthy-links">
+                  <div className={`text-2xl font-bold font-mono ${OK_TEXT_CLASS}`} data-testid="counter-healthy-links">
                     {summaryCounts.healthy}
                   </div>
                   <div className="text-xs text-muted-foreground">Healthy</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-red-500" data-testid="counter-broken-links">
+                  <div className={`text-2xl font-bold font-mono ${BAD_TEXT_CLASS}`} data-testid="counter-broken-links">
                     {summaryCounts.broken}
                   </div>
                   <div className="text-xs text-muted-foreground">Broken</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-yellow-500" data-testid="counter-redirect-links">
+                  <div className={`text-2xl font-bold font-mono ${WARN_TEXT_CLASS}`} data-testid="counter-redirect-links">
                     {summaryCounts.redirect}
                   </div>
                   <div className="text-xs text-muted-foreground">Redirects</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold font-mono text-orange-500" data-testid="counter-timeout-links">
+                  <div className={`text-2xl font-bold font-mono ${WARN_TEXT_CLASS}`} data-testid="counter-timeout-links">
                     {summaryCounts.timeout}
                   </div>
                   <div className="text-xs text-muted-foreground">Timeouts</div>
@@ -348,7 +366,7 @@ export default function LinkHealthDashboard() {
                 <div>
                   {/* R4-001/023: 200-OK links flagged by the takeover / intent-flip
                       / parked-domain heuristics — need human review. */}
-                  <div className="text-2xl font-bold font-mono text-purple-500" data-testid="counter-suspect-links">
+                  <div className={`text-2xl font-bold font-mono ${INFO2_TEXT_CLASS}`} data-testid="counter-suspect-links">
                     {summaryCounts.suspect}
                   </div>
                   <div className="text-xs text-muted-foreground">Suspect</div>
@@ -368,7 +386,7 @@ export default function LinkHealthDashboard() {
                   </div>
                 </div>
                 {/* BUG-024 (run19): default themed Button — the hardcoded
-                    bg-blue-500 override was off-theme against the DS accent. */}
+                    blue palette override was off-theme against the DS accent. */}
                 <Button
                   onClick={() => setConfirmRun(true)}
                   disabled={isActiveJob || runCheckMutation.isPending}
@@ -388,7 +406,7 @@ export default function LinkHealthDashboard() {
               </div>
 
               {isActiveJob && (
-                <Alert className="border-blue-500/20 bg-blue-500/5">
+                <Alert className={INFO_PANEL_CLASS}>
                   <Info className="h-4 w-4" />
                   <AlertDescription>
                     Link health check is currently running. Please wait for it to complete.
@@ -584,7 +602,7 @@ export default function LinkHealthDashboard() {
                             href={check.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hover:underline text-blue-500"
+                            className={`hover:underline ${INFO_TEXT_CLASS}`}
                           >
                             {check.url}
                           </a>

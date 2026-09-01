@@ -130,7 +130,7 @@ export default function ResourceRecommendations({
             </div>
             <div className="flex flex-wrap gap-1">
               {item.reasons.slice(0, 2).map((reason, index) => (
-                <span key={index} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+                <span key={index} className="text-xs bg-[#5eddf2]/10 text-[#5eddf2] px-2 py-0.5 rounded">{/* DS-OK: cyan info (DS chart/info constant) */}
                   {reason}
                 </span>
               ))}
@@ -260,7 +260,7 @@ export default function ResourceRecommendations({
             <TabsContent value="similar" className="mt-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
-                  <Target className="h-4 w-4 text-blue-600" />
+                  <Target className="h-4 w-4 text-[#5eddf2]" />{/* DS-OK: cyan info (DS chart/info constant) */}
                   <span className="text-sm font-medium">Similar Resources</span>
                   <Badge variant="outline" className="text-xs">
                     {recommendations.similar.length} found
@@ -284,7 +284,7 @@ export default function ResourceRecommendations({
             <TabsContent value="prerequisites" className="mt-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
-                  <ArrowRight className="h-4 w-4 text-green-600 rotate-180" />
+                  <ArrowRight className="h-4 w-4 text-[#34d08c] rotate-180" />{/* DS-OK: status ok */}
                   <span className="text-sm font-medium">Prerequisites</span>
                   <Badge variant="outline" className="text-xs">
                     {recommendations.prerequisites.length} found
@@ -313,7 +313,7 @@ export default function ResourceRecommendations({
             <TabsContent value="nextSteps" className="mt-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-[#9d4edd]" />{/* DS-OK: violet info (DS chart/info constant) */}
                   <span className="text-sm font-medium">Next Steps</span>
                   <Badge variant="outline" className="text-xs">
                     {recommendations.nextSteps.length} found

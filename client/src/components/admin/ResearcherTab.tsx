@@ -51,12 +51,48 @@ import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 
+const INFO_STATUS_BADGE = "bg-[#5eddf2]/20 text-[#5eddf2] border-[#5eddf2]/30"; // DS-OK: cyan info (DS chart/info constant)
+const OK_STATUS_BADGE = "bg-[#34d08c]/20 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
+const WARN_OUTLINE = "border-[#ffb84d]/30 text-[#ffb84d]"; // DS-OK: status warn
+const OK_OUTLINE = "text-xs shrink-0 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
+const WARN_TEXT = "text-[#ffb84d]"; // DS-OK: status warn
+const INFO_BORDER = "border-[#5eddf2]/20"; // DS-OK: cyan info (DS chart/info constant)
+const OK_SOLID_BUTTON = "bg-[#34d08c] text-black hover:bg-[#34d08c]/90"; // DS-OK: status ok
+const OK_TEXT = "text-[#34d08c]"; // DS-OK: status ok
+const BAD_TEXT = "text-[#ff5c7a]"; // DS-OK: status bad
+
+/**
+ * Agent roles use the global DS status/info constants. Related role variants
+ * retain hierarchy through opacity rather than separate palette shades.
+ */
+const AGENT_ROLE_BADGE_STYLES: Record<string, string> = {
+  error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
+  tool_error: "border-[#ff5c7a]/50 text-[#ff5c7a]", // DS-OK: status bad
+  system: "border-[#ffb84d]/50 text-[#ffb84d]", // DS-OK: status warn
+  tool_call: "border-[#5eddf2]/50 text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "border-[#34d08c]/50 text-[#34d08c]", // DS-OK: status ok
+  web_search: "border-[#9d4edd]/50 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
+  web_search_result: "border-[#9d4edd]/30 text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
+  assistant: "border-[#5eddf2]/50 text-[#5eddf2]/80", // DS-OK: cyan info (DS chart/info constant)
+};
+
+const AGENT_ROLE_TEXT_STYLES: Record<string, string> = {
+  error: "text-[#ff5c7a]", // DS-OK: status bad
+  tool_error: "text-[#ff5c7a]", // DS-OK: status bad
+  system: "text-[#ffb84d]", // DS-OK: status warn
+  tool_call: "text-[#5eddf2]", // DS-OK: cyan info (DS chart/info constant)
+  tool_result: "text-[#34d08c]", // DS-OK: status ok
+  web_search: "text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
+  web_search_result: "text-[#9d4edd]/80", // DS-OK: violet info (DS chart/info constant)
+  assistant: "text-[#5eddf2]/80", // DS-OK: cyan info (DS chart/info constant)
+};
+
 function getStatusBadge(status: string) {
   switch (status) {
     case "processing":
-      return <Badge variant="default" className="bg-blue-500/20 text-blue-400 border-blue-500/30"><Activity className="w-3 h-3 mr-1 animate-pulse" />Running</Badge>;
+      return <Badge variant="default" className={INFO_STATUS_BADGE}><Activity className="w-3 h-3 mr-1 animate-pulse" />Running</Badge>;
     case "completed":
-      return <Badge variant="default" className="bg-green-500/20 text-green-400 border-green-500/30"><CheckCircle2 className="w-3 h-3 mr-1" />Completed</Badge>;
+      return <Badge variant="default" className={OK_STATUS_BADGE}><CheckCircle2 className="w-3 h-3 mr-1" />Completed</Badge>;
     case "failed":
       return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Failed</Badge>;
     case "cancelled":
@@ -88,9 +124,9 @@ function formatCost(value: string | number | null | undefined): string {
 function getDiscoveryStatusBadge(status: string) {
   switch (status) {
     case "pending_review":
-      return <Badge variant="outline" className="border-yellow-500/30 text-yellow-400"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+      return <Badge variant="outline" className={WARN_OUTLINE}><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
     case "approved":
-      return <Badge variant="default" className="bg-green-500/20 text-green-400 border-green-500/30"><ThumbsUp className="w-3 h-3 mr-1" />Approved</Badge>;
+      return <Badge variant="default" className={OK_STATUS_BADGE}><ThumbsUp className="w-3 h-3 mr-1" />Approved</Badge>;
     case "rejected":
       return <Badge variant="destructive"><ThumbsDown className="w-3 h-3 mr-1" />Rejected</Badge>;
     default:
@@ -115,7 +151,7 @@ function getVerificationBadges(d: ResearchDiscovery) {
     );
   } else if (v.liveness === "ok") {
     badges.push(
-      <Badge key="ok" variant="outline" className="text-xs shrink-0 text-green-400 border-green-500/30" data-testid={`badge-verification-ok-${d.id}`}>
+      <Badge key="ok" variant="outline" className={OK_OUTLINE} data-testid={`badge-verification-ok-${d.id}`}>
         <CheckCircle2 className="w-3 h-3 mr-1" />Link OK
       </Badge>
     );
@@ -130,7 +166,7 @@ function getVerificationBadges(d: ResearchDiscovery) {
     }
     if (v.github.archived) {
       badges.push(
-        <Badge key="archived" variant="outline" className="text-xs shrink-0 text-yellow-500 border-yellow-500/30">
+        <Badge key="archived" variant="outline" className={`text-xs shrink-0 ${WARN_OUTLINE}`}>
           <Archive className="w-3 h-3 mr-1" />Archived repo
         </Badge>
       );
@@ -492,7 +528,7 @@ export default function ResearcherTab() {
                       as a mysteriously disabled Launch button. WS1: empty is
                       valid (server auto-generates the brief). */}
                   <p
-                    className={`text-xs mt-1 ${prompt.trim().length > 0 && prompt.trim().length < 10 ? "text-yellow-500" : "text-muted-foreground"}`}
+                    className={`text-xs mt-1 ${prompt.trim().length > 0 && prompt.trim().length < 10 ? WARN_TEXT : "text-muted-foreground"}`}
                     data-testid="text-prompt-hint"
                   >
                     {prompt.trim().length === 0
@@ -576,7 +612,7 @@ export default function ResearcherTab() {
                       const invalid = !Number.isInteger(t) || t <= 0;
                       return (
                         <p
-                          className={`text-xs mt-1 ${invalid ? "text-yellow-500" : "text-muted-foreground"}`}
+                          className={`text-xs mt-1 ${invalid ? WARN_TEXT : "text-muted-foreground"}`}
                           data-testid="text-turns-hint"
                         >
                           {invalid
@@ -612,7 +648,7 @@ export default function ResearcherTab() {
                       const invalid = !Number.isInteger(t) || t <= 0 || t > 1000;
                       return (
                         <p
-                          className={`text-xs mt-1 ${invalid ? "text-yellow-500" : "text-muted-foreground"}`}
+                          className={`text-xs mt-1 ${invalid ? WARN_TEXT : "text-muted-foreground"}`}
                           data-testid="text-target-hint"
                         >
                           {invalid
@@ -768,7 +804,7 @@ export default function ResearcherTab() {
                       const log = (job.agentLog as Array<{ role: string; content: string; timestamp: string }> | null) || [];
                       const last = ((job as any).agentLogLast as { role: string; content: string; timestamp: string } | null) ?? log[log.length - 1];
                       return (
-                        <Card key={job.id} className="border-blue-500/20">
+                        <Card key={job.id} className={INFO_BORDER}>
                           <CardContent className="p-4 space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">Job #{job.id}</span>
@@ -846,7 +882,7 @@ export default function ResearcherTab() {
                 {pendingDiscoveries && pendingDiscoveries.length > 0 && (
                   <Button
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700 shrink-0"
+                    className={`${OK_SOLID_BUTTON} shrink-0`}
                     onClick={() => setConfirmApproveAll(true)}
                     disabled={approveAllMutation.isPending}
                     data-testid="button-approve-all"
@@ -919,7 +955,7 @@ export default function ResearcherTab() {
                             <Button
                               size="sm"
                               variant="default"
-                              className="bg-green-600 hover:bg-green-700"
+                              className={OK_SOLID_BUTTON}
                               onClick={() => approveMutation.mutate(d.id)}
                               disabled={approveMutation.isPending}
                             >
@@ -1012,9 +1048,9 @@ export default function ResearcherTab() {
                               <span className="text-muted-foreground">—</span>
                             ) : (
                               <>
-                                <span className="text-green-400">{job.approvedDiscoveries || 0}</span>
+                                <span className={OK_TEXT}>{job.approvedDiscoveries || 0}</span>
                                 {' / '}
-                                <span className="text-red-400">{job.rejectedDiscoveries || 0}</span>
+                                <span className={BAD_TEXT}>{job.rejectedDiscoveries || 0}</span>
                                 {/* BUG-017 (run25): found = approved + rejected
                                     + pending must reconcile VISIBLY. */}
                                 {(() => {
@@ -1149,7 +1185,7 @@ export default function ResearcherTab() {
                   <div className="text-xs text-muted-foreground">Discovered</div>
                 </div>
                 <div className="text-center p-2 border rounded">
-                  <div className="text-lg font-bold text-green-400">{selectedJob.approvedDiscoveries || 0}</div>
+                  <div className={`text-lg font-bold ${OK_TEXT}`}>{selectedJob.approvedDiscoveries || 0}</div>
                   <div className="text-xs text-muted-foreground">Approved</div>
                 </div>
                 <div className="text-center p-2 border rounded">
@@ -1254,39 +1290,12 @@ export default function ResearcherTab() {
                         </span>
                         <Badge
                           variant="outline"
-                          className={
-                            "shrink-0 h-5 text-[10px] " +
-                            (entry.role === 'error' || entry.role === 'tool_error'
-                              ? 'border-red-500/50 text-red-400'
-                              : entry.role === 'system'
-                              ? 'border-yellow-500/50 text-yellow-400'
-                              : entry.role === 'tool_call'
-                              ? 'border-cyan-500/50 text-cyan-400'
-                              : entry.role === 'tool_result'
-                              ? 'border-green-500/50 text-green-400'
-                              : entry.role === 'web_search'
-                              ? 'border-purple-500/50 text-purple-400'
-                              : entry.role === 'web_search_result'
-                              ? 'border-purple-400/30 text-purple-300'
-                              : entry.role === 'assistant'
-                              ? 'border-blue-500/50 text-blue-300'
-                              : '')
-                          }
+                          className={"shrink-0 h-5 text-[10px] " + (AGENT_ROLE_BADGE_STYLES[entry.role] || '')}
                         >
                           {entry.role}
                         </Badge>
                         <span
-                          className={
-                            'whitespace-pre-wrap break-words break-all flex-1 min-w-0 ' +
-                            (entry.role === 'error' || entry.role === 'tool_error' ? 'text-red-400' :
-                             entry.role === 'system' ? 'text-yellow-300' :
-                             entry.role === 'tool_call' ? 'text-cyan-300' :
-                             entry.role === 'tool_result' ? 'text-green-300' :
-                             entry.role === 'web_search' ? 'text-purple-300' :
-                             entry.role === 'web_search_result' ? 'text-purple-200' :
-                             entry.role === 'assistant' ? 'text-blue-200' :
-                             'text-foreground')
-                          }
+                          className={'whitespace-pre-wrap break-words break-all flex-1 min-w-0 ' + (AGENT_ROLE_TEXT_STYLES[entry.role] || 'text-foreground')}
                         >
                           {entry.content}
                         </span>
@@ -1326,11 +1335,11 @@ export default function ResearcherTab() {
                         </div>
                         {d.status === 'pending_review' && (
                           <div className="flex gap-1 ml-2">
-                            <Button size="sm" variant="ghost" className="text-green-400 h-7"
+                            <Button size="sm" variant="ghost" className={`${OK_TEXT} h-7`}
                               onClick={() => approveMutation.mutate(d.id)}>
                               <ThumbsUp className="w-3 h-3" />
                             </Button>
-                            <Button size="sm" variant="ghost" className="text-red-400 h-7"
+                            <Button size="sm" variant="ghost" className={`${BAD_TEXT} h-7`}
                               onClick={() => setRejectDialogId(d.id)}>
                               <ThumbsDown className="w-3 h-3" />
                             </Button>

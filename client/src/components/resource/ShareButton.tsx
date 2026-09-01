@@ -101,7 +101,7 @@ export default function ShareButton({
 
       {/* Ripple effect on click */}
       {isSharing && (
-        <span className="absolute inset-0 animate-ping rounded-full bg-blue-500 opacity-20" />
+        <span className="absolute inset-0 animate-ping rounded-full bg-[var(--accent)] opacity-20" />
       )}
     </Button>
   );

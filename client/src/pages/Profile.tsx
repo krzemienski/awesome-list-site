@@ -298,7 +298,7 @@ export default function Profile({ user }: ProfileProps) {
       label: "Learning Streak",
       value: `${progress?.streakDays || 0}d`,
       icon: Trophy,
-      color: "text-yellow-500",
+      color: "text-[#ffb84d]", // DS-OK: status warn
       // BUG-052 (run14): streak counts consecutive days signed in, not
       // resources viewed — say so, or "2d streak / 0 viewed" reads broken.
       hint: "Consecutive days signed in",
@@ -309,7 +309,7 @@ export default function Profile({ user }: ProfileProps) {
       label: "Journeys Completed",
       value: progress?.completedResources || 0,
       icon: Target,
-      color: "text-green-500",
+      color: "text-[#34d08c]", // DS-OK: status ok
       hint: "Learning journeys finished",
     }
   ];

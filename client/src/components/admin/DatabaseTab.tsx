@@ -58,6 +58,14 @@ interface SeedDatabaseResponse {
 }
 
 /**
+ * Database operation feedback uses the global DS status constants:
+ * DS-OK: #34d08c ok / #ffb84d warn.
+ */
+const SUCCESS_ALERT_CLASS = "border-[#34d08c]/20 bg-[#34d08c]/5"; // DS-OK: status ok
+const OK_TEXT_CLASS = "text-[#34d08c]"; // DS-OK: status ok
+const WARN_TEXT_CLASS = "text-[#ffb84d]"; // DS-OK: status warn
+
+/**
  * @description Manages database seeding operations for the admin dashboard.
  * Provides functionality to seed and clear/reseed the database with video resources.
  * Extracted from the main Admin Dashboard component for better code organization.
@@ -182,8 +190,8 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           </div>
 
           {seedDatabaseMutation.isSuccess && seedDatabaseMutation.data && (
-            <Alert className="border-green-500/20 bg-green-500/5">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <Alert className={SUCCESS_ALERT_CLASS}>
+              <CheckCircle2 className={`h-4 w-4 ${OK_TEXT_CLASS}`} />
               <AlertTitle>Seeding Completed Successfully</AlertTitle>
               <AlertDescription>
                 <div className="mt-2 space-y-1 text-sm">
@@ -212,7 +220,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                     </span>
                   </div>
                   {seedDatabaseMutation.data.totalErrors > 0 && (
-                    <div className="flex justify-between text-yellow-400">
+                    <div className={`flex justify-between ${WARN_TEXT_CLASS}`}>
                       <span>Errors:</span>
                       <span className="font-mono font-semibold">
                         {seedDatabaseMutation.data.totalErrors}

@@ -213,7 +213,7 @@ export function AnimatedResourceCard({
                     animate={{ scale: 1 }}
                     transition={{ delay: prefersReducedMotion ? 0 : 0.2 }}
                   >
-                    <Badge variant="default" className="text-xs bg-orange-500">
+                    <Badge variant="default" className="text-xs bg-[#ffb84d] text-black">{/* DS-OK: status warn */}
                       <TrendingUp className="h-3 w-3 mr-1" />
                       Trending
                     </Badge>

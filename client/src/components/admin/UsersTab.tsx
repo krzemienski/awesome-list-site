@@ -30,11 +30,11 @@ interface UsersResponse {
   total: number;
 }
 
-/* WP-6 a11y: black ink on mid-tone badges — white was 3.7–2.2:1 (fails AA). */
+/* WP-6 a11y: black ink passes AA on these global DS status/info constants. */
 const ROLE_COLORS: Record<string, string> = {
-  admin: "bg-red-500 text-black",
-  moderator: "bg-yellow-500 text-black",
-  user: "bg-blue-500 text-black",
+  admin: "bg-[#ff5c7a] text-black", // DS-OK: status bad
+  moderator: "bg-[#ffb84d] text-black", // DS-OK: status warn
+  user: "bg-[#5eddf2] text-black", // DS-OK: cyan info (DS chart/info constant)
 };
 
 export default function UsersTab() {
@@ -282,7 +282,7 @@ export default function UsersTab() {
                     ) : "—"}
                   </TableCell>
                   <TableCell>
-                    <Badge className={`${ROLE_COLORS[user.role || 'user'] || 'bg-gray-600 text-white'}`}>
+                    <Badge className={`${ROLE_COLORS[user.role || 'user'] || 'bg-muted text-foreground'}`}>
                       <Shield className="h-3 w-3 mr-1" />
                       {user.role || 'user'}
                     </Badge>

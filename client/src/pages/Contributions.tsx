@@ -151,6 +151,13 @@ function readState(search: string): FilterState {
   };
 }
 
+/**
+ * Contribution statuses use the global DS status constants rather than raw
+ * palette classes.
+ *
+ * DS-OK: global status constants #34d08c (ok) / #ffb84d (warn) / #ff5c7a (bad)
+ * DS-OK: #9d4edd (violet info) — semantics, not theme.
+ */
 const statusConfig: Record<
   ContributionStatus,
   {
@@ -164,35 +171,34 @@ const statusConfig: Record<
     label: "Pending",
     description: "Waiting for moderator review.",
     className:
-      "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+      "border-[#ffb84d]/40 bg-[#ffb84d]/10 text-[#ffb84d]", // DS-OK: status warn
     icon: Clock3,
   },
   approved: {
     label: "Approved",
     description: "Accepted by a moderator.",
     className:
-      "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+      "border-[#34d08c]/40 bg-[#34d08c]/10 text-[#34d08c]", // DS-OK: status ok
     icon: CheckCircle2,
   },
   rejected: {
     label: "Rejected",
     description: "Not accepted after review.",
     className:
-      "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-300",
+      "border-[#ff5c7a]/40 bg-[#ff5c7a]/10 text-[#ff5c7a]", // DS-OK: status bad
     icon: XCircle,
   },
   withdrawn: {
     label: "Withdrawn",
     description: "Withdrawn by you before review.",
-    className:
-      "border-slate-500/40 bg-slate-500/10 text-slate-700 dark:text-slate-300",
+    className: "border-border bg-muted text-muted-foreground",
     icon: Undo2,
   },
   superseded: {
     label: "Superseded",
     description: "The resource changed before this work could be handled.",
     className:
-      "border-violet-500/40 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+      "border-[#9d4edd]/40 bg-[#9d4edd]/10 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
     icon: RefreshCw,
   },
 };

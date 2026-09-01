@@ -46,7 +46,7 @@ function DiffValue({ value }: { value: string | number | null }) {
     <>
       <span className="break-all">{text}</span>
       {count > 0 && (
-        <span className="ml-1 inline-block align-middle rounded bg-yellow-500/15 px-1 text-[10px] font-medium uppercase tracking-wide text-yellow-600 dark:text-yellow-400">
+        <span className={"ml-1 inline-block align-middle rounded bg-[#ffb84d]/15 px-1 text-[10px] font-medium uppercase tracking-wide text-[#ffb84d]" /* DS-OK: status warn */}>
           {visibleRest === "" ? "invisible characters only" : `${count} invisible char${count === 1 ? "" : "s"}`}
         </span>
       )}
@@ -202,14 +202,14 @@ export default function PendingEdits() {
 
   const renderDiff = (changes: Record<string, { old: string | number | null; new: string | number | null }>) => {
     return Object.entries(changes).map(([field, { old: oldValue, new: newValue }]) => (
-      <div key={field} className="border-l-4 border-yellow-500 pl-3 py-2 mb-2">
+      <div key={field} className={"border-l-4 border-[#ffb84d] pl-3 py-2 mb-2" /* DS-OK: status warn */}>
         <p className="text-sm font-semibold capitalize">{field}</p>
         <div className="mt-1 space-y-1">
-          <p className="text-sm text-red-600 dark:text-red-400">
+          <p className={"text-sm text-[#ff5c7a]" /* DS-OK: status bad */}>
             <span className="font-mono">- </span>
             <DiffValue value={oldValue} />
           </p>
-          <p className="text-sm text-green-600 dark:text-green-400">
+          <p className={"text-sm text-[#34d08c]" /* DS-OK: status ok */}>
             <span className="font-mono">+ </span>
             <DiffValue value={newValue} />
           </p>
@@ -247,7 +247,7 @@ export default function PendingEdits() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-500" />
+            <CheckCircle2 className={"h-5 w-5 text-[#34d08c]" /* DS-OK: status ok */} />
             Pending Edits
           </CardTitle>
           <CardDescription>Edit suggestions awaiting review</CardDescription>
@@ -337,7 +337,7 @@ export default function PendingEdits() {
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         {hasConflict(edit) && (
-                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                          <AlertTriangle className={"h-4 w-4 text-[#ffb84d]" /* DS-OK: status warn */} />
                         )}
                         <div>
                           <p>{edit.resource?.title || 'Unknown Resource'}</p>
@@ -364,7 +364,7 @@ export default function PendingEdits() {
                     <TableCell>
                       {edit.claudeMetadata ? (
                         <div className="flex items-center gap-1">
-                          <Sparkles className="h-4 w-4 text-purple-500" />
+                          <Sparkles className={"h-4 w-4 text-[#9d4edd]" /* DS-OK: violet info (DS chart/info constant) */} />
                           <span className="text-xs">
                             {Math.round((edit.claudeMetadata.confidence || 0) * 100)}%
                           </span>
@@ -393,7 +393,7 @@ export default function PendingEdits() {
                         <Button
                           variant="default"
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className={"bg-[#34d08c] hover:bg-[#34d08c]/90 text-black" /* DS-OK: status ok */}
                           onClick={() => handleApproveClick(edit)}
                           disabled={approveMutation.isPending}
                           aria-label={`Approve edit for ${edit.resource?.title || 'resource'}`}
@@ -441,14 +441,14 @@ export default function PendingEdits() {
           {selectedEdit && (
             <div className="space-y-4">
               {hasConflict(selectedEdit) && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div className={"bg-[#ffb84d]/10 border border-[#ffb84d]/30 rounded-lg p-4" /* DS-OK: status warn */}>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 mt-0.5" />
+                    <AlertTriangle className={"h-5 w-5 text-[#ffb84d] mt-0.5" /* DS-OK: status warn */} />
                     <div>
-                      <h4 className="font-semibold text-yellow-900 dark:text-yellow-100">
+                      <h4 className={"font-semibold text-[#ffb84d]" /* DS-OK: status warn */}>
                         Conflict Detected
                       </h4>
-                      <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-1">
+                      <p className="text-sm text-foreground mt-1">
                         The resource has been modified since this edit was suggested. 
                         Review changes carefully before approving.
                       </p>
@@ -476,10 +476,10 @@ export default function PendingEdits() {
               {selectedEdit.claudeMetadata && (
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-purple-500" />
+                    <Sparkles className={"h-4 w-4 text-[#9d4edd]" /* DS-OK: violet info (DS chart/info constant) */} />
                     AI Analysis
                   </h3>
-                  <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 space-y-2">
+                  <div className={"bg-[#9d4edd]/10 rounded-lg p-3 space-y-2" /* DS-OK: violet info (DS chart/info constant) */}>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Confidence</span>
                       <Badge variant="secondary">
@@ -527,7 +527,7 @@ export default function PendingEdits() {
             <AlertDialogDescription>
               {editToApprove && hasConflict(editToApprove) ? (
                 <div className="space-y-2">
-                  <div className="flex items-start gap-2 text-yellow-600 dark:text-yellow-500">
+                  <div className={"flex items-start gap-2 text-[#ffb84d]" /* DS-OK: status warn */}>
                     <AlertTriangle className="h-4 w-4 mt-0.5" />
                     <span>
                       Warning: The resource has been modified since this edit was created.
@@ -547,7 +547,7 @@ export default function PendingEdits() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApproveConfirm}
-              className="bg-green-600 hover:bg-green-700"
+              className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
               data-testid="button-confirm-approve-edit"
             >
               Approve & Merge
