@@ -1,7 +1,6 @@
 import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
-import NotFound from "@/pages/not-found";
 import { useState, useEffect, useMemo, useRef, Fragment } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -518,9 +517,40 @@ export default function ResourceDetail() {
   }
 
   if (error || !resource) {
-    // BUG-031 (run13): use the shared 404 template (with a contextual
-    // heading) so every not-found surface renders the same card.
-    return <NotFound heading="Resource Not Found" />;
+    const requestedIdentifier = id || "unknown";
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-10rem)] px-4">
+        <SEOHead
+          title="Resource Not Found"
+          description={`The requested resource "${requestedIdentifier}" could not be found on Awesome Video.`}
+          noindex
+        />
+        <Card className="w-full max-w-lg" data-testid="resource-not-found">
+          <CardHeader>
+            <CardTitle>Resource Not Found</CardTitle>
+            <CardDescription>
+              We couldn't find the resource requested as{" "}
+              <span className="font-medium text-foreground break-all">
+                {requestedIdentifier}
+              </span>
+              . It may have been removed or its link may be incorrect.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3 sm:flex-row">
+            <Button asChild variant="outline" className="min-h-10">
+              <Link href="/categories" data-testid="link-not-found-categories">
+                Browse categories
+              </Link>
+            </Button>
+            <Button asChild className="min-h-10">
+              <Link href="/search" data-testid="link-not-found-search">
+                Search resources
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

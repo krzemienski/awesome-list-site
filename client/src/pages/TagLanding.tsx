@@ -154,13 +154,13 @@ export default function TagLanding() {
           <h2 id="related-topics-heading" className="text-base font-semibold">Explore related topics</h2>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
-              <Link key={category.value} href={`/category/${slugify(category.value)}`}>
-                <Badge variant="secondary">{category.value} ({category.count})</Badge>
+              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="inline-flex min-h-10 items-center">
+                <Badge variant="secondary" className="min-h-10 px-3">{category.value} ({category.count})</Badge>
               </Link>
             ))}
             {relatedTags.map(([related, count]) => (
-              <Link key={related} href={tagLandingPath(related)}>
-                <Badge variant="outline">#{tagDisplayName(related)} ({count})</Badge>
+              <Link key={related} href={tagLandingPath(related)} className="inline-flex min-h-10 items-center">
+                <Badge variant="outline" className="min-h-10 px-3">#{tagDisplayName(related)} ({count})</Badge>
               </Link>
             ))}
           </div>

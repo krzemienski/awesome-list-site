@@ -26,21 +26,44 @@ export default function Privacy() {
             <h2 className="text-base font-semibold text-[color:var(--text)]">1. What we collect</h2>
             <p>
               Browsing anonymously requires no personal data. If you create an
-              account we store your email address, an optional display name,
-              a securely hashed password (for email sign-ups), and your
-              activity on the site: bookmarks, favorites, learning-journey
-              progress, and resource submissions.
+              account, Clerk provides the sign-in interface and manages your
+              credentials, authentication sessions, and session tokens. Awesome
+              Video does not receive or use your password for sign-in. Clerk
+              sends us the identity details needed to connect your account,
+              including your account identifier and, when available, your email
+              address, name, and profile image. We store a local account record
+              with those details, your role, and your activity on the site:
+              bookmarks, favorites, learning-journey progress, preferences, and
+              resource submissions. A nullable password field retained from the
+              site's pre-Clerk authentication system may remain on legacy
+              account records, but it is not used for authentication.
+            </p>
+            <p>
+              Clerk acts as our authentication service provider and processes
+              sign-in details, credentials, sessions, and tokens on our behalf.
+              Clerk may also process information under its own privacy terms
+              when you use its authentication services.
             </p>
           </section>
 
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">2. Analytics</h2>
             <p>
-              We use Google Analytics to understand aggregate usage — which
-              pages are visited and which resources are popular. Analytics
-              only runs after you accept it in the consent banner, and you can
-              decline without losing any functionality. We do not send
-              personally identifying information to analytics.
+              We use Google Analytics 4, Mixpanel, PostHog, and Amplitude to
+              understand how the site is used, including page visits, popular
+              resources, interactions, performance, and errors. PostHog and
+              Amplitude may also provide session-replay features; PostHog masks
+              page text and all form inputs in those recordings. These services
+              only load after you accept analytics in the consent banner, and
+              you can decline without losing site functionality.
+            </p>
+            <p>
+              Analytics data can include usage events, technical and device
+              information, pseudonymous identifiers, and your account
+              identifier when you are signed in. After consent, Mixpanel may
+              also receive your name and email address as account profile
+              properties. Mixpanel stores its browser identifier in local
+              storage rather than a cookie.
             </p>
             {/* R5-025 (run24): in-product consent-reset control — re-opens the
                 banner so a persisted Accept/Decline can be changed anytime. */}
@@ -65,37 +88,44 @@ export default function Privacy() {
               your analytics consent choice are stored in your browser's local
               storage (not cookies). The cookies you may see are:
             </p>
-            {/* NB-035 (run18): replaced the vague cookie paragraph with an
-                accurate breakdown — connect.sid is our session auth cookie,
-                GAESA is set by the Google App Engine hosting edge (not us, not
-                for tracking), and the _ga* analytics cookies are only set after
-                you consent. */}
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs sm:text-sm border-collapse" data-testid="table-cookies">
-                <thead>
+              <table className="block w-full text-left text-xs sm:table sm:text-sm border-collapse" data-testid="table-cookies">
+                <thead className="hidden sm:table-header-group">
                   <tr className="border-b border-[var(--border)] text-[color:var(--text)]">
                     <th className="py-2 pr-4 font-semibold align-top">Cookie</th>
                     <th className="py-2 pr-4 font-semibold align-top">Purpose</th>
                     <th className="py-2 font-semibold align-top">Lifetime</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr className="border-b border-[var(--border)]">
-                    <td className="py-2 pr-4 align-top font-mono">connect.sid</td>
-                    <td className="py-2 pr-4 align-top">
-                      Session cookie that keeps you signed in after you log in.
-                      Only set once you have an account and sign in.
+                <tbody className="block sm:table-row-group">
+                  <tr className="block border-b border-[var(--border)] py-2 sm:table-row sm:py-0">
+                    <td className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
+                      <span className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
+                      __session*
                     </td>
-                    <td className="py-2 align-top">Persists for 7 days</td>
+                    <td className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
+                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
+                      Clerk authentication cookie. Clerk uses it to maintain and
+                      verify your signed-in session; the name may include an
+                      instance suffix.
+                    </td>
+                    <td className="block py-1 align-top sm:table-cell sm:py-2">
+                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
+                      Managed by Clerk according to the authentication session
+                    </td>
                   </tr>
                   {/* Run22 BUG-051: full GAESA disclosure — retention and
                       user-control details match the live cookie attributes
                       (expires ~30 days, path=/, set on the first response
                       before any consent because it comes from the edge, not
                       our application). */}
-                  <tr className="border-b border-[var(--border)]">
-                    <td className="py-2 pr-4 align-top font-mono">GAESA</td>
-                    <td className="py-2 pr-4 align-top">
+                  <tr className="block border-b border-[var(--border)] py-2 sm:table-row sm:py-0">
+                    <td className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
+                      <span className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
+                      GAESA
+                    </td>
+                    <td className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
+                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
                       Infrastructure cookie set by our hosting edge (Google App
                       Engine), not by this application. It supports request
                       routing between the edge and our servers — we do not use
@@ -107,25 +137,34 @@ export default function Privacy() {
                       the site keeps working; the edge may simply set a fresh
                       one on a later visit.
                     </td>
-                    <td className="py-2 align-top">About 30 days from your last visit</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 pr-4 align-top font-mono">_ga, _ga_*</td>
-                    <td className="py-2 pr-4 align-top">
-                      Google Analytics cookies that measure aggregate usage.
-                      These are only set after you accept analytics in the
-                      consent banner; decline and they are never created.
+                    <td className="block py-1 align-top sm:table-cell sm:py-2">
+                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
+                      About 30 days from your last visit
                     </td>
-                    <td className="py-2 align-top">
-                      _ga up to 2 years; _ga_* up to 2 years
+                  </tr>
+                  <tr className="block py-2 sm:table-row sm:py-0">
+                    <td className="block py-1 align-top font-mono sm:table-cell sm:py-2 sm:pr-4">
+                      <span className="mb-1 block font-sans font-semibold text-[color:var(--text)] sm:hidden">Cookie</span>
+                      _ga*, ph_*, AMP_*, AMP_MKTG_*
+                    </td>
+                    <td className="block py-1 align-top sm:table-cell sm:py-2 sm:pr-4">
+                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Purpose</span>
+                      Cookies used by Google Analytics, PostHog, and Amplitude
+                      for analytics identifiers and session continuity. They
+                      are only set after you accept analytics; declining keeps
+                      these services from loading.
+                    </td>
+                    <td className="block py-1 align-top sm:table-cell sm:py-2">
+                      <span className="mb-1 block font-semibold text-[color:var(--text)] sm:hidden">Lifetime</span>
+                      Set and managed by the relevant analytics provider
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <p>
-              Third-party sign-in providers may also set their own cookies while
-              you authenticate with them.
+              Clerk and any sign-in method you choose through Clerk may set
+              additional cookies while you authenticate.
             </p>
           </section>
 

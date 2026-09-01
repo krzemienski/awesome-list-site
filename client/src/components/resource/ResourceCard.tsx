@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, useRef, memo } from "react";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +47,7 @@ function ResourceCard({
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   // Run15 BUG-022: expandable tag row ("+N more" reveals the hidden tags)
   const [showAllTags, setShowAllTags] = useState(false);
 
@@ -105,13 +106,16 @@ function ResourceCard({
   // BUG-003 (run22): the 2-line clamp lives on the anchor itself, not only the
   // h2 — an inline-block child inside a -webkit-box parent defeats
   // -webkit-line-clamp (all lines render, no ellipsis). line-clamp's box is
-  // block-level, so the BUG-049 py-1/-my-1 hit-box still holds.
+  // block-level; min-h-10 keeps the title target large without padding extra
+  // text into the clamp box (which would expose part of a third line).
   const titleContent = onClick ? (
-    resource.name
+    <span className="line-clamp-2 break-words min-h-10">
+      {resource.name}
+    </span>
   ) : isValidDbResource ? (
     <Link
       href={`/resource/${resource.id}`}
-      className="line-clamp-2 break-words py-1.5 -my-1.5 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="line-clamp-2 break-words min-h-10 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -121,7 +125,7 @@ function ResourceCard({
       href={resource.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="line-clamp-2 break-words py-1.5 -my-1.5 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="line-clamp-2 break-words min-h-10 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -132,6 +136,7 @@ function ResourceCard({
 
   return (
     <Card 
+      ref={cardRef}
       className={cn(
         "group relative hover:border-primary/50 transition-all cursor-pointer",
         className
@@ -150,7 +155,7 @@ function ResourceCard({
             /* NB-050 (run18): allow titles to wrap to two lines with an
                ellipsis (break-words) instead of hard-clipping mid-word in the
                grid; the native title tooltip still reveals the full text. */
-            className="text-lg font-semibold leading-tight tracking-tight line-clamp-2 break-words flex-1 min-w-0"
+            className="text-lg font-semibold leading-tight tracking-tight break-words flex-1 min-w-0 min-h-10"
             title={resource.name}
           >
             {titleContent}

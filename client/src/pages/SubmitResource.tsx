@@ -633,7 +633,7 @@ export default function SubmitResource() {
                           data-testid="input-title"
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
                         A clear, descriptive title for the resource (1-200 characters)
                       </FormDescription>
                       <FormMessage />
@@ -657,7 +657,7 @@ export default function SubmitResource() {
                           data-testid="input-url"
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
                         Must be a valid HTTPS URL
                       </FormDescription>
                       <FormMessage />
@@ -698,7 +698,7 @@ export default function SubmitResource() {
                           data-testid="input-description"
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
                         Provide a detailed description (10-1000 characters)
                       </FormDescription>
                       <FormMessage />
@@ -729,7 +729,7 @@ export default function SubmitResource() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>
+                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
                         Choose the most relevant category for this resource
                       </FormDescription>
                       <FormMessage />
@@ -759,7 +759,7 @@ export default function SubmitResource() {
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormDescription>
+                        <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
                           Narrow down the classification (optional)
                         </FormDescription>
                         <FormMessage />
@@ -790,7 +790,7 @@ export default function SubmitResource() {
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormDescription>
+                        <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
                           Further specify the topic (optional)
                         </FormDescription>
                         <FormMessage />
@@ -813,7 +813,7 @@ export default function SubmitResource() {
                           data-testid="input-tags"
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
                         Add up to 10 tags, separated by commas
                       </FormDescription>
                       <FormMessage />

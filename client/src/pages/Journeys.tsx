@@ -294,14 +294,19 @@ export default function Journeys() {
                         at two lines (line-clamp-2) with word-boundary wrapping. */}
                     <Link
                       href={`/journey/${journey.id}`}
-                      className="hover:underline hover:text-[var(--accent)] transition-colors line-clamp-2 break-words min-h-[32px] text-left"
+                      className="hover:underline hover:text-[var(--accent)] transition-colors line-clamp-2 break-words min-h-10 text-left"
                       title={journey.title}
                       data-testid={`link-journey-title-${journey.id}`}
                     >
                       {journey.title}
                     </Link>
                   </h2>
-                  <CardDescription className="line-clamp-3">
+                  {/* Full text is shown (no clamp), so an unbreakable token in a
+                      description must not be able to widen the card. */}
+                  <CardDescription
+                    className="min-w-0 break-words [overflow-wrap:anywhere]"
+                    data-testid={`description-journey-${journey.id}`}
+                  >
                     {journey.description}
                   </CardDescription>
                 </CardHeader>

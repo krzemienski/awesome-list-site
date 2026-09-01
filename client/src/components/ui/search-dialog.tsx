@@ -259,11 +259,11 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                           data-testid={`search-result-${index}`}
                         >
                           <div className="font-medium text-sm">{resource.title}</div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-sm text-foreground/80">
                             {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''}
                           </div>
                           {resource.description && (
-                            <div className="text-xs text-muted-foreground line-clamp-2">
+                            <div className="text-sm text-foreground/80 line-clamp-2">
                               {resource.description}
                             </div>
                           )}
@@ -331,22 +331,21 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
           </CommandList>
         </Command>
         
-        {/* BUG-035 (audit2): the footer "Cancel" button duplicated the
-            dialog's corner ✕ (and Escape) with no functional difference —
-            one dismiss control remains. The esc hint is keyboard/desktop
-            metadata, so the emptied footer hides below sm entirely. */}
-        <DialogFooter className="hidden sm:flex items-center justify-start gap-2">
-          <div
-            className="flex items-center gap-2 text-xs uppercase tracking-[0.18em]"
-            style={{ color: 'var(--text-2)', fontFamily: 'var(--font-mono)' }}
-          >
-            <kbd
-              className="px-1.5 py-0.5 rounded border"
-              style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
-            >
-              esc
-            </kbd>
-            <span>to close</span>
+        {/* The command palette supports these keys through cmdk/Radix. Keep
+            the hints visible at every viewport so keyboard behavior is
+            discoverable without adding duplicate controls. */}
+        <DialogFooter className="flex-row flex-wrap items-center justify-start gap-x-4 gap-y-2">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <kbd className="rounded border border-border bg-card px-1.5 py-0.5">↑ ↓</kbd>
+            <span>navigate</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <kbd className="rounded border border-border bg-card px-1.5 py-0.5">enter</kbd>
+            <span>select</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <kbd className="rounded border border-border bg-card px-1.5 py-0.5">esc</kbd>
+            <span>close</span>
           </div>
         </DialogFooter>
       </DialogContent>

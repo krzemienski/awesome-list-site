@@ -83,6 +83,24 @@ export default function Terms() {
               use the site after a change means you accept the updated terms.
             </p>
           </section>
+
+          <section className="space-y-2">
+            <h2 className="text-base font-semibold text-[color:var(--text)]">7. Contact</h2>
+            <p>
+              Questions about these terms can be submitted by{" "}
+              <a
+                href="https://github.com/krzemienski/awesome-video/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                data-testid="link-terms-contact"
+              >
+                opening an issue on the project's GitHub repository
+              </a>
+              . Issues are public, so do not include private or sensitive
+              personal information.
+            </p>
+          </section>
         </CardContent>
       </Card>
     </div>

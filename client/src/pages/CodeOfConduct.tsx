@@ -58,10 +58,20 @@ export default function CodeOfConduct() {
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">4. Reporting and enforcement</h2>
             <p>
-              If you experience or witness a violation, contact the maintainer
-              so it can be addressed. We may edit or remove submissions and
+              If you experience or witness a violation,{" "}
+              <a
+                href="https://github.com/krzemienski/awesome-video/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                data-testid="link-code-of-conduct-report"
+              >
+                open an issue on the project's GitHub repository
+              </a>
+              . Issues are public, so do not include private or sensitive
+              personal information. We may edit or remove submissions and
               suspend accounts that abuse the service, disrupt it, or breach
-              this code. Enforcement is handled fairly and confidentially.
+              this code.
             </p>
           </section>
 

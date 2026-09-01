@@ -85,6 +85,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     contributions: "Contributions",
     bookmarks: "Bookmarks",
     about: "About",
+    "code-of-conduct": "Code of Conduct",
     advanced: "Advanced",
     submit: "Submit Resource",
     journeys: "Learning Journeys",
@@ -306,11 +307,9 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
           layout.jsx Header: logo tile + AWESOME.VIDEO mono wordmark,
           12px/700/tracking 1.8). Wordmark hides below lg to avoid crowding
           the breadcrumb + search + action cluster. */}
-      {/* BUG-024 (run26): min-w-[32px] — the icon-only brand link measured
-          28px wide, under the 32px touch-target floor. */}
       <Link
         href="/"
-        className="flex items-center justify-center gap-2.5 shrink-0 no-underline min-h-[44px] min-w-[32px]"
+        className="hidden min-[360px]:flex items-center justify-center gap-2.5 shrink-0 no-underline min-h-[44px] min-w-10"
         aria-label="Awesome Video — home"
         data-testid="header-brand"
       >
@@ -438,22 +437,17 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
 
       {/* R5-057 (run24): below md the full trail used to be display:none —
           deep pages had NO location cue at 375/320 (findability gap). Show a
-          compact current-page crumb on small screens; it truncates and yields
-          space to the search/actions cluster. */}
+          compact current-page crumb on small screens. Narrow-screen secondary
+          chrome yields space so realistic page names remain visible in full. */}
       {crumbs.length > 1 && (
         <nav
           aria-label="Current page"
-          className="flex md:hidden min-w-0 shrink items-center text-sm text-muted-foreground"
+          className="flex md:hidden min-w-0 shrink items-center text-xs text-muted-foreground"
           data-testid="breadcrumb-mobile-current"
         >
-          {/* BUG-050 (run26): tighter caps — at 320px the 38vw crumb left the
-              search pill's flex-basis at 0 so its intrinsic ~26px overflowed
-              INTO the Theme/Sign-in cluster (flex children overlap when a
-              zero-width container's content can't shrink). 30vw at 375 and a
-              48px hard cap under 360px keep every header control disjoint. */}
           <span
             aria-current="page"
-            className="truncate max-w-[30vw] max-[359px]:max-w-[48px] text-foreground"
+            className="truncate max-w-[40vw] text-foreground"
             title={crumbs[crumbs.length - 1].label}
           >
             {crumbs[crumbs.length - 1].label}
@@ -501,7 +495,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         <Button
           variant="ghost"
           size="icon"
-          className="hidden h-9 w-9 min-h-[44px] min-w-[44px] relative touch-manipulation min-[360px]:inline-flex"
+          className="hidden h-9 w-9 min-h-[44px] min-w-[44px] relative touch-manipulation sm:inline-flex"
           onClick={() => setLocation("/settings/theme")}
           title="Theme Settings"
           aria-label="Theme Settings"

@@ -398,9 +398,7 @@ export default function About() {
           <div className="space-y-6">
             {aboutFaqs.map((faq) => (
               <div key={faq.question} className="space-y-1.5">
-                {/* Run15 BUG-028: h2 keeps the heading outline sequential —
-                    the page's only H1 is the hero; CardTitles are divs. */}
-                <h2 className="font-semibold text-sm">{faq.question}</h2>
+                <h3 className="font-semibold text-sm">{faq.question}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
                   {faq.answer}
                 </p>

@@ -89,8 +89,6 @@ export default function GuestBookmarks() {
   const count = entries.length;
 
   if (count === 0) {
-    // Reachable only by removing the last save while on the page (the route
-    // gate keeps first-time save-less guests on the classic auth redirect).
     return (
       <div className="space-y-6">
         <SEOHead
@@ -105,10 +103,21 @@ export default function GuestBookmarks() {
           <h1 className="text-2xl font-bold mb-2">Nothing saved on this device</h1>
           <p className="text-muted-foreground mb-5">
             Tap the bookmark icon on any resource to save it — no account needed.
+            Sign in to keep your saves across devices.
           </p>
-          <Button asChild className="min-h-11">
-            <Link href="/">Explore resources</Link>
-          </Button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button asChild className="min-h-11">
+              <Link href="/">Explore resources</Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="min-h-11"
+              onClick={() => goAuth("/sign-in")}
+              data-testid="button-guest-empty-signin"
+            >
+              <LogIn className="mr-2 h-4 w-4" aria-hidden="true" /> Sign in
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -207,6 +216,7 @@ export default function GuestBookmarks() {
           <Button
             variant="outline"
             size="sm"
+            className="min-h-10"
             onClick={retryFailed}
             data-testid="button-guest-retry-failed"
           >

@@ -18,7 +18,13 @@ import {
   Lightbulb,
   Sparkles,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  FileText,
+  Code,
+  Database,
+  File,
+  BookOpen,
+  Settings
 } from "lucide-react";
 import { AwesomeList } from "@/types/awesome-list";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -287,37 +293,40 @@ export default function Advanced() {
                   matching format in the export panel below. */}
               <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
                 {([
-                  { format: "Markdown", value: "markdown", icon: "📝", desc: "GitHub-ready" },
-                  { format: "JSON", value: "json", icon: "⚡", desc: "API-friendly" },
-                  { format: "CSV", value: "csv", icon: "📊", desc: "Spreadsheet" },
-                  { format: "PDF", value: "pdf", icon: "📄", desc: "Professional" },
-                  { format: "HTML", value: "html", icon: "🌐", desc: "Web-ready" },
-                  { format: "YAML", value: "yaml", icon: "⚙️", desc: "Config files" }
-                ] as const).map(item => (
-                  <button
-                    key={item.format}
-                    type="button"
-                    onClick={() => setExportFormat(item.value)}
-                    aria-pressed={exportFormat === item.value}
-                    aria-label={`Select ${item.format} export format`}
-                    className="text-left"
-                    data-testid={`button-format-${item.value}`}
-                  >
-                    <Card
-                      className={
-                        exportFormat === item.value
-                          ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
-                          : "hover:border-[var(--accent)] transition-colors cursor-pointer"
-                      }
+                  { format: "Markdown", value: "markdown", icon: FileText, desc: "GitHub-ready" },
+                  { format: "JSON", value: "json", icon: Code, desc: "API-friendly" },
+                  { format: "CSV", value: "csv", icon: Database, desc: "Spreadsheet" },
+                  { format: "PDF", value: "pdf", icon: File, desc: "Professional" },
+                  { format: "HTML", value: "html", icon: BookOpen, desc: "Web-ready" },
+                  { format: "YAML", value: "yaml", icon: Settings, desc: "Config files" }
+                ] as const).map(item => {
+                  const FormatIcon = item.icon;
+                  return (
+                    <button
+                      key={item.format}
+                      type="button"
+                      onClick={() => setExportFormat(item.value)}
+                      aria-pressed={exportFormat === item.value}
+                      aria-label={`Select ${item.format} export format`}
+                      className="text-left"
+                      data-testid={`button-format-${item.value}`}
                     >
-                      <CardContent className="p-3 text-center">
-                        <div className="text-2xl mb-1">{item.icon}</div>
-                        <div className="font-medium text-sm">{item.format}</div>
-                        <div className="text-xs text-muted-foreground">{item.desc}</div>
-                      </CardContent>
-                    </Card>
-                  </button>
-                ))}
+                      <Card
+                        className={
+                          exportFormat === item.value
+                            ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
+                            : "hover:border-[var(--accent)] transition-colors cursor-pointer"
+                        }
+                      >
+                        <CardContent className="p-3 text-center">
+                          <FormatIcon className="mx-auto mb-1 h-6 w-6" aria-hidden="true" />
+                          <div className="font-medium text-sm">{item.format}</div>
+                          <div className="text-xs text-muted-foreground">{item.desc}</div>
+                        </CardContent>
+                      </Card>
+                    </button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

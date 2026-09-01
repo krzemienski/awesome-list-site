@@ -70,6 +70,10 @@
     @apply border-border;
   }
 
+  html {
+    color-scheme: dark;
+  }
+
   html, body {
     background-color: var(--bg);
     color: var(--text);

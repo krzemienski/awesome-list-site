@@ -2,6 +2,7 @@ import { useState, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useFavoriteToggle } from "@/hooks/useResourceToggle";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface FavoriteButtonProps {
@@ -26,6 +27,14 @@ function FavoriteButton({
 }: FavoriteButtonProps) {
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialCount);
+  const { isAuthenticated } = useAuth();
+
+  // Favorites are account-only while bookmarks work for guests, so the two
+  // otherwise-identical icon buttons must say which is which. Owned here (not
+  // patched onto the DOM by a parent) so the name follows auth state.
+  const favoriteLabel = isFavorited
+    ? (isAuthenticated ? "Remove from favorites" : "Remove from account favorites — sign in required")
+    : (isAuthenticated ? "Add to favorites" : "Favorite to your account — sign in required");
 
   const favorite = useFavoriteToggle({
     resourceId,
@@ -74,7 +83,8 @@ function FavoriteButton({
       onClick={handleClick}
       aria-disabled={favorite.isPending}
       aria-busy={favorite.isPending}
-      aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+      aria-label={favoriteLabel}
+      title={favoriteLabel}
       aria-pressed={isFavorited}
       data-testid="button-favorite"
     >

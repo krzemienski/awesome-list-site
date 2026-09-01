@@ -50,12 +50,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("light");
-    root.classList.add("dark");
-  }, []);
-
-  useEffect(() => {
     applyDesignSystem(systemId, accentId);
   }, [systemId, accentId]);
 

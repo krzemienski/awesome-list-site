@@ -368,12 +368,36 @@ const clerkAppearance = {
     socialButtonsBlockButton: {
       color: "#f5f5f5",
       borderColor: "#2a2a2a",
+      minHeight: "40px",
     },
     socialButtonsBlockButtonText: {
       color: "#f5f5f5",
     },
     socialButtonsProviderIcon: {
       filter: "brightness(0) invert(1)",
+    },
+    // Clerk's default control height renders ~32px, below the 40px touch
+    // minimum the rest of the app holds to. Raise the interactive surfaces
+    // (submit, inputs, OTP cells, and the footer sign-up/sign-in switch)
+    // without altering the branded look.
+    formButtonPrimary: {
+      minHeight: "40px",
+    },
+    formFieldInput: {
+      minHeight: "40px",
+    },
+    otpCodeFieldInput: {
+      minHeight: "40px",
+      minWidth: "40px",
+    },
+    footerActionLink: {
+      display: "inline-flex",
+      alignItems: "center",
+      minHeight: "40px",
+    },
+    identityPreviewEditButton: {
+      minHeight: "40px",
+      minWidth: "40px",
     },
   },
 } as const;

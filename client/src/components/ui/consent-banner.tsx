@@ -86,10 +86,38 @@ export default function ConsentBanner() {
   // wraps on small screens).
   useEffect(() => {
     if (choiceMade) return;
+    const root = document.getElementById("root");
+    const insetParent = document.querySelector("footer")?.parentElement;
+    const insetEl = insetParent instanceof HTMLElement ? insetParent : null;
+
+    // Snapshot every inline property this effect is about to take ownership of.
+    // Blanking them on cleanup would erase whatever another layout feature had
+    // set; restoring the captured value is ownership-safe.
+    const prev = {
+      rootDisplay: root?.style.display ?? "",
+      rootFlexDirection: root?.style.flexDirection ?? "",
+      bodyPaddingBottom: document.body.style.paddingBottom,
+      insetPaddingBottom: insetEl?.style.paddingBottom ?? "",
+      bannerH: document.documentElement.style.getPropertyValue("--consent-banner-h"),
+    };
+
     const applyPadding = () => {
       const h = bannerRef.current?.offsetHeight ?? 0;
       const pad = h > 0 ? `${h}px` : "";
-      document.body.style.paddingBottom = pad;
+      const reserveViewport = window.innerWidth < 640;
+      if (reserveViewport) {
+        if (root) {
+          root.style.display = "flex";
+          root.style.flexDirection = "column";
+        }
+        document.body.style.paddingBottom = prev.bodyPaddingBottom;
+      } else {
+        if (root) {
+          root.style.display = prev.rootDisplay;
+          root.style.flexDirection = prev.rootFlexDirection;
+        }
+        document.body.style.paddingBottom = pad;
+      }
       // BUG-026 (run19): expose the banner height so the toast viewport can
       // lift itself above the banner (toast z-[100] > banner z-50, so without
       // an offset toasts cover the Accept/Decline buttons).
@@ -99,7 +127,7 @@ export default function ConsentBanner() {
       // padding alone never lifts the footer above the fixed banner — pad
       // the footer's flow container too.
       const inset = document.querySelector("footer")?.parentElement;
-      if (inset instanceof HTMLElement) inset.style.paddingBottom = pad;
+      if (inset instanceof HTMLElement) inset.style.paddingBottom = reserveViewport ? "" : pad;
     };
     applyPadding();
     window.addEventListener("resize", applyPadding);
@@ -107,6 +135,11 @@ export default function ConsentBanner() {
       window.removeEventListener("resize", applyPadding);
       document.body.style.paddingBottom = "";
       document.documentElement.style.removeProperty("--consent-banner-h");
+      const root = document.getElementById("root");
+      if (root) {
+        root.style.display = "";
+        root.style.flexDirection = "";
+      }
       const inset = document.querySelector("footer")?.parentElement;
       if (inset instanceof HTMLElement) inset.style.paddingBottom = "";
     };
@@ -147,7 +180,7 @@ export default function ConsentBanner() {
         role="region"
         aria-label="Analytics consent"
         tabIndex={-1}
-        className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none"
+        className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:fixed sm:inset-x-0 sm:bottom-0 sm:z-50 sm:border-b-0 sm:border-t"
         data-testid="consent-banner"
       >
         <div className="mx-auto flex w-full max-w-[1280px] max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
@@ -155,7 +188,7 @@ export default function ConsentBanner() {
             Analytics cookies?{" "}
             <Link
               href="/privacy"
-              className="inline-flex items-center min-h-[24px] align-middle underline hover:text-[color:var(--text)]"
+              className="inline-flex min-h-10 items-center align-middle underline hover:text-[color:var(--text)]"
               data-testid="consent-privacy-link"
             >
               Privacy
@@ -191,7 +224,7 @@ export default function ConsentBanner() {
       role="region"
       aria-label="Analytics consent"
       tabIndex={-1}
-      className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none"
+      className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:fixed sm:inset-x-0 sm:bottom-0 sm:z-50 sm:border-b-0 sm:border-t"
       data-testid="consent-banner"
     >
       {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second
@@ -200,14 +233,17 @@ export default function ConsentBanner() {
           reachable by scrolling. */}
       <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         <p className="text-xs sm:text-sm text-[color:var(--text-2)] flex-1">
-          We use Google Analytics to understand aggregate usage — only if you
-          allow it.{" "}
-          <span className="hidden sm:inline">No personal data is sent either way. </span>
+          We use analytics (Google Analytics, Mixpanel, PostHog and Amplitude)
+          to understand how the site is used — only if you allow it.{" "}
+          <span className="hidden sm:inline">
+            Decline and none of them load. Allow and, if you are signed in,
+            your name and email are attached to your analytics profile.{" "}
+          </span>
           See our{" "}
           {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
           <Link
             href="/privacy"
-            className="underline hover:text-[color:var(--text)] inline-flex items-center min-h-[32px] align-middle"
+            className="underline hover:text-[color:var(--text)] inline-flex min-h-10 items-center align-middle"
             data-testid="consent-privacy-link"
           >
             Privacy Policy

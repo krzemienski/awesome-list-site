@@ -190,11 +190,12 @@ export default function ContinueLearning() {
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)]">
               <LogIn className="h-6 w-6 text-[var(--accent)]" />
             </div>
-            <CardTitle className="text-2xl">Your progress lives with your account</CardTitle>
+            <h1 className="text-2xl font-semibold leading-none tracking-tight">
+              Your progress lives with your account
+            </h1>
             <CardDescription className="max-w-xl text-base">
-              Sign in to see the journeys you started, your exact next step,
-              recently opened resources, and completed milestones. We won't make
-              private learning requests until you sign in.
+              Sign in to resume your journeys, pick up at your next step, and
+              revisit resources you've opened.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap justify-center gap-3 pb-10">

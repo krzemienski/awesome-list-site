@@ -336,7 +336,7 @@ function CategoryAccordion({
               aria-expanded={isOpen}
               aria-controls={`accordion-body-${catSlug}`}
               data-testid={`toggle-cat-${catSlug}`}
-              className="inline-flex items-center justify-center w-6 min-w-[24px] min-h-[44px] rounded-sm text-[var(--text-3)] hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              className="inline-flex items-center justify-center w-10 min-w-10 min-h-[44px] -mx-2 rounded-sm text-[var(--text-3)] hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <ChevronRight className={cn("size-3 shrink-0 chevron-rotate", isOpen && "rotate-90")} />
             </button>
@@ -399,8 +399,7 @@ function CategoryAccordion({
                         aria-expanded={subOpen}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
-                        className="shrink-0 inline-flex items-center justify-center rounded-md hover:bg-[var(--surface)] text-[var(--text-3)] hover:text-[var(--text)]"
-                        style={{ width: 24, minHeight: 44 }}
+                        className="shrink-0 inline-flex items-center justify-center w-10 min-w-10 min-h-[44px] -mx-2 rounded-md hover:bg-[var(--surface)] text-[var(--text-3)] hover:text-[var(--text)]"
                       >
                         <ChevronRight className={cn("size-3 chevron-rotate", subOpen && "rotate-90")} />
                       </button>

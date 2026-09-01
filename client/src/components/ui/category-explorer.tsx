@@ -263,7 +263,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
 
             <div className="flex items-center space-x-2">
               <Checkbox
-                className="h-8 w-8"
+                className="h-10 w-10"
                 id="subcategories"
                 aria-label="Show subcategories"
                 checked={showSubcategories}
@@ -323,7 +323,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                   handleSearchChange("");
                   setSelectedTags([]);
                 }}
-                className="h-6 px-2 text-xs"
+                className="min-h-10 px-2 text-xs"
               >
                 Clear all
               </Button>
@@ -364,8 +364,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate(`/category/${category.slug}`)}
-                        // BUG-048 (run18): min-h keeps the inline title link a ≥24px tap target.
-                        className="p-0 h-auto min-h-[32px] font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
+                        // BUG-048 (run18): min-h keeps the inline title link a tap
+                        // target; raised to the app-wide 40px touch minimum.
+                        className="p-0 h-auto min-h-10 font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
                       >
                         {category.name}
                       </Button>
@@ -435,7 +436,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex min-h-[32px] items-center text-foreground hover:text-primary transition-colors font-medium"
+                        className="inline-flex min-h-10 items-center text-foreground hover:text-primary transition-colors font-medium"
                       >
                         {resource.title}
                       </a>
@@ -472,7 +473,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               // long chip labels rigid — one wide chip overflowed the
                               // card and clipped past the tablet viewport edge. Chips
                               // now cap at the card width and wrap their text.
-                              className="min-h-[32px] h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
+                              className="min-h-10 h-auto px-2 text-xs max-w-full whitespace-normal text-left justify-start"
                             >
                               {subcategory.name} ({getTotalResourceCount(subcategory)})
                             </Button>
