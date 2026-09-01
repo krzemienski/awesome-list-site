@@ -55,7 +55,19 @@ function fail(messages: string[]): never {
 
 async function main() {
   const app = express();
-  await registerRoutes(app);
+  // Boot failures must be unambiguous: without this guard, a throw from
+  // registerRoutes() falls through to the generic main().catch and prints a
+  // raw stack that reads like a gate bug rather than a server boot failure
+  // (and looks nothing like a schema mismatch either). Mirrors the same
+  // guard in response-contract-drift.ts.
+  try {
+    await registerRoutes(app);
+  } catch (bootError) {
+    console.error(
+      `[drift gate] server failed to start: ${bootError instanceof Error ? bootError.message : String(bootError)}`,
+    );
+    process.exit(1);
+  }
 
   const routes = collectExpressRoutes(app);
   const apiRoutes = routes.filter((route) => route.path.startsWith("/api"));
