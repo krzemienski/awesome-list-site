@@ -69,6 +69,16 @@
 // AlertDialog (sweep only — never confirmed) with the same activation-proof
 // + rogue-button-canary discipline.
 //
+// Task #372: the shared link's actual destination — the anonymous public
+// shared-collection page at /collection/:shareId — never appears in the
+// static route list (it needs a live published collection). The authed
+// scenario captures the shareId from the publish response and sweeps
+// /collection/:shareId with the SAME six filters in a FRESH non-authed
+// browser context (proven anonymous via /api/auth/user), while the seeded
+// collection is still published. Activation proof: the seeded bookmark's
+// rendered ResourceCard + the collection title in the page <h1>, so the
+// sweep can never pass on the not-found branch or a half-rendered page.
+//
 // Task #363: the admin panel needs admin privileges, so a fifth scenario
 // creates a SECOND disposable Clerk user under its own sub-prefix
 // (__qa_test_ds_admin_), signs in through the same UI flow, elevates the
@@ -585,6 +595,12 @@ try {
       headers: { Origin: BASE, 'Content-Type': 'application/json' },
     });
     if (!publishedCollection.ok()) throw new Error(`seed collection publish failed: ${publishedCollection.status()} ${(await publishedCollection.text()).slice(0, 200)}`);
+    // Task #372: the publish response carries shareId (+ publicUrl built from
+    // SITE_URL, which may point at prod) — keep the shareId and build the
+    // local path from it so the anonymous public-page sweep hits THIS server.
+    const publishedBody = await publishedCollection.json().catch(() => null);
+    const shareId = publishedBody?.shareId;
+    if (!shareId) throw new Error(`publish response returned no shareId (got ${JSON.stringify(publishedBody).slice(0, 200)}) — cannot sweep the public shared-collection page`);
 
     const AUTHED_ROUTES = [
       // Fresh user with no saved preferences → the signed-in-only onboarding
@@ -776,6 +792,61 @@ try {
           strayReport(`overlay-${o.name}-${kind}`, `${o.path} (signed in)`, kind, sweep);
         }
       }
+    }
+
+    // -----------------------------------------------------------------------
+    // Task #372: sweep the page the shared link actually leads to — the
+    // anonymous public shared-collection view at /collection/:shareId — the
+    // way a visitor sees it: a FRESH non-authed context (no cookies, no
+    // session). Must run HERE, while the seeded collection is still
+    // published; teardown below cascades the published state away.
+    // -----------------------------------------------------------------------
+    const publicRoute = {
+      name: 'public-collection',
+      path: `/collection/${encodeURIComponent(shareId)}`,
+      // Activation proof: the seeded bookmark's rendered ResourceCard AND the
+      // collection title in the <h1> — the not-found / empty branches render
+      // neither, so this sweep can never pass vacuously.
+      expect: `[data-testid="card-resource-${resourceId}"]`,
+      expectAll: [`h1:has-text("${COLLECTION_NAME}")`],
+    };
+    const publicContext = await browser.newContext({ viewport: DESKTOP });
+    try {
+      const publicPage = await publicContext.newPage();
+      let sweeps;
+      try {
+        sweeps = await sweepRoute(publicPage, publicRoute);
+      } catch (e) {
+        try { sweeps = await sweepRoute(publicPage, publicRoute); }
+        catch (e2) { throw new Error(`public shared-collection sweep failed twice: ${e2.message.split('\n')[0]}`); }
+      }
+      // Prove the context really is anonymous — if this context somehow had a
+      // session, the sweep would not represent what visitors see.
+      const authState = await publicPage.evaluate(async () => {
+        const r = await fetch('/api/auth/user', { credentials: 'include' });
+        return (await r.json().catch(() => null))?.isAuthenticated === true;
+      });
+      log('route-public-collection-anonymous', !authState, authState
+        ? `${publicRoute.path} — context is UNEXPECTEDLY authenticated; this sweep does not represent the anonymous visitor view`
+        : `${publicRoute.path} — swept in a fresh non-authed context (/api/auth/user reports anonymous)`);
+      for (const { kind } of SWEEPS) {
+        const sweep = sweeps[kind];
+        const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
+          : kind === 'h1s' ? sweep.total > 0
+          : true;
+        const pass = sane && sweep.strays.length === 0;
+        if (pass) {
+          const hooked = kind === 'buttons' ? `${sweep.dsVariantCount} DS-hooked of ${sweep.total}` : `${sweep.total} DS-hooked`;
+          log(`route-public-collection-${kind}`, true, `${publicRoute.path} (anonymous public) — 0 stray ${kind} (${hooked})`);
+        } else if (!sane) {
+          log(`route-public-collection-${kind}`, false, `${publicRoute.path} (anonymous public) — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
+        } else {
+          await publicPage.screenshot({ path: path.join(OUT, `public-collection-${kind}.png`), fullPage: true }).catch(() => {});
+          strayReport(`route-public-collection-${kind}`, `${publicRoute.path} (anonymous public)`, kind, sweep);
+        }
+      }
+    } finally {
+      await publicContext.close().catch(() => {});
     }
   } catch (e) {
     log('authed-scenario', false, `authed sweep failed: ${e.message.split('\n')[0]}`);
