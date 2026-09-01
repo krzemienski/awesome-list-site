@@ -174,6 +174,29 @@ rg "font-family:\s*['\"]" client/src \
   --glob '!client/index.html'
 ```
 
+> **These scans are enforced automatically for the app.** The
+> `palette-drift` validation gate (`scripts/validation/palette-drift.mjs`)
+> runs all four regexes above over `client/src` on every validation run and
+> fails on any NEW hit. Pre-existing hits (the site-wide sweep is landing
+> incrementally) are pinned in
+> `scripts/validation/palette-drift-baseline.json` keyed by
+> (detector, file, matched token) with per-token counts — every individual
+> match counts, so appending a second forbidden class to a line that already
+> carries a legacy hit, or swapping a legacy token for a different forbidden
+> one, fails even though line totals are unchanged. The baseline is an
+> explicit allowlist that may only shrink: cleaning hits makes the gate
+> demand `node scripts/validation/palette-drift.mjs --update-baseline`
+> (commit the shrunken baseline alongside), and that command itself refuses
+> to write while any count sits above the baseline, so it cannot launder new
+> violations in. Hex lines tagged `/* DS-OK: reason */` on the same line or
+> within the previous 5 lines are exempt, matching the "Acceptable hardcoded
+> values" list below; 3–4-digit all-numeric `#307`-style issue references
+> are ignored. The gate self-tests its detectors and ratchet classifier
+> against known-bad/known-good canary samples on every run, so a regex
+> regression cannot pass vacuously. A manual stage-5 audit still adds value
+> for rgb()/rgba() literals and standalone artifacts, which the gate does
+> not cover.
+
 For standalone artifacts, run the same scans over the artifact's files,
 excluding the design-system stylesheet itself.
 

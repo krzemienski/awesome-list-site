@@ -1,0 +1,378 @@
+{
+  "palette-classes": {
+    "client/src/components/admin/AgentEventLog.tsx": {
+      "border-blue-500": 2,
+      "border-cyan-500": 2,
+      "border-green-500": 1,
+      "border-green-600": 1,
+      "border-purple-400": 1,
+      "border-purple-500": 2,
+      "border-red-500": 1,
+      "border-yellow-500": 2,
+      "text-blue-300": 2,
+      "text-cyan-300": 1,
+      "text-cyan-400": 1,
+      "text-green-400": 2,
+      "text-purple-300": 3,
+      "text-purple-400": 1,
+      "text-red-400": 1,
+      "text-yellow-300": 1,
+      "text-yellow-400": 1,
+      "text-yellow-500": 1
+    },
+    "client/src/components/admin/AuditTab.tsx": {
+      "bg-amber-500": 1,
+      "bg-blue-500": 1,
+      "bg-cyan-500": 1,
+      "bg-emerald-500": 1,
+      "bg-emerald-600": 1,
+      "bg-gray-600": 1,
+      "bg-green-500": 1,
+      "bg-indigo-500": 1,
+      "bg-orange-500": 1,
+      "bg-purple-500": 1,
+      "bg-red-500": 1,
+      "bg-red-600": 1,
+      "bg-red-700": 1,
+      "bg-yellow-500": 1
+    },
+    "client/src/components/admin/BatchEnrichmentPanel.tsx": {
+      "bg-blue-500": 2,
+      "bg-blue-600": 2,
+      "bg-gray-600": 1,
+      "bg-gray-700": 1,
+      "bg-green-500": 1,
+      "bg-green-600": 1,
+      "bg-red-500": 1,
+      "bg-red-600": 1,
+      "bg-yellow-500": 1,
+      "border-blue-500": 1,
+      "border-green-500": 2,
+      "border-red-500": 2,
+      "border-yellow-500": 4,
+      "text-blue-500": 1,
+      "text-green-500": 4,
+      "text-red-500": 5,
+      "text-yellow-500": 4
+    },
+    "client/src/components/admin/DatabaseTab.tsx": {
+      "bg-green-500": 1,
+      "border-green-500": 1,
+      "text-green-500": 1,
+      "text-yellow-400": 1
+    },
+    "client/src/components/admin/ExportTab.tsx": {
+      "bg-green-600": 2,
+      "border-red-500": 2,
+      "border-yellow-500": 1,
+      "text-green-500": 1,
+      "text-red-300": 1,
+      "text-red-400": 4,
+      "text-red-500": 3,
+      "text-yellow-300": 1,
+      "text-yellow-400": 2,
+      "text-yellow-500": 2
+    },
+    "client/src/components/admin/GenericCrudManager.tsx": {
+      "bg-green-50": 2,
+      "bg-green-950": 2,
+      "bg-red-50": 2,
+      "bg-red-950": 2,
+      "text-amber-600": 2,
+      "text-green-400": 1,
+      "text-green-700": 1,
+      "text-red-400": 1,
+      "text-red-500": 1,
+      "text-red-700": 1
+    },
+    "client/src/components/admin/GitHubSyncPanel.tsx": {
+      "text-green-500": 3,
+      "text-red-500": 3,
+      "text-yellow-500": 3
+    },
+    "client/src/components/admin/LinkHealthDashboard.tsx": {
+      "bg-blue-500": 3,
+      "bg-blue-600": 1,
+      "bg-gray-500": 1,
+      "bg-gray-600": 1,
+      "bg-green-500": 1,
+      "bg-green-600": 1,
+      "bg-red-500": 1,
+      "bg-red-600": 1,
+      "border-blue-500": 1,
+      "border-green-500": 1,
+      "border-orange-500": 1,
+      "border-purple-500": 1,
+      "border-red-500": 2,
+      "border-yellow-500": 1,
+      "text-blue-500": 1,
+      "text-green-500": 3,
+      "text-orange-500": 3,
+      "text-purple-500": 3,
+      "text-red-500": 5,
+      "text-yellow-500": 3
+    },
+    "client/src/components/admin/PendingEdits.tsx": {
+      "bg-green-600": 2,
+      "bg-green-700": 2,
+      "bg-purple-50": 1,
+      "bg-purple-900": 1,
+      "bg-yellow-50": 1,
+      "bg-yellow-500": 1,
+      "bg-yellow-900": 1,
+      "border-yellow-200": 1,
+      "border-yellow-500": 1,
+      "border-yellow-800": 1,
+      "text-green-400": 1,
+      "text-green-500": 1,
+      "text-green-600": 1,
+      "text-purple-500": 2,
+      "text-red-400": 1,
+      "text-red-600": 1,
+      "text-yellow-100": 1,
+      "text-yellow-200": 1,
+      "text-yellow-400": 1,
+      "text-yellow-500": 3,
+      "text-yellow-600": 3,
+      "text-yellow-800": 1,
+      "text-yellow-900": 1
+    },
+    "client/src/components/admin/PendingResources.tsx": {
+      "bg-green-600": 2,
+      "bg-green-700": 2,
+      "text-green-500": 1
+    },
+    "client/src/components/admin/ResearcherTab.tsx": {
+      "bg-blue-500": 1,
+      "bg-green-500": 2,
+      "bg-green-600": 2,
+      "bg-green-700": 2,
+      "border-blue-500": 3,
+      "border-cyan-500": 1,
+      "border-green-500": 4,
+      "border-purple-400": 1,
+      "border-purple-500": 1,
+      "border-red-500": 1,
+      "border-yellow-500": 3,
+      "text-blue-200": 1,
+      "text-blue-300": 1,
+      "text-blue-400": 1,
+      "text-cyan-300": 1,
+      "text-cyan-400": 1,
+      "text-green-300": 1,
+      "text-green-400": 7,
+      "text-purple-200": 1,
+      "text-purple-300": 2,
+      "text-purple-400": 1,
+      "text-red-400": 4,
+      "text-yellow-300": 1,
+      "text-yellow-400": 2,
+      "text-yellow-500": 4
+    },
+    "client/src/components/admin/ResourceManager.tsx": {
+      "bg-green-500": 3,
+      "bg-green-600": 1,
+      "bg-green-700": 1,
+      "bg-red-500": 4,
+      "bg-red-600": 1,
+      "bg-yellow-500": 3,
+      "bg-yellow-600": 1,
+      "bg-yellow-700": 1,
+      "border-green-500": 1,
+      "border-red-500": 1,
+      "border-yellow-500": 1,
+      "text-green-400": 1,
+      "text-red-400": 2,
+      "text-yellow-400": 1
+    },
+    "client/src/components/admin/UsersTab.tsx": {
+      "bg-blue-500": 1,
+      "bg-gray-600": 1,
+      "bg-red-500": 1,
+      "bg-yellow-500": 1
+    },
+    "client/src/components/resource/ShareButton.tsx": {
+      "bg-blue-500": 1
+    },
+    "client/src/components/ui/analytics-dashboard.tsx": {
+      "text-blue-500": 1,
+      "text-green-500": 2,
+      "text-orange-500": 1,
+      "text-purple-500": 1,
+      "text-red-500": 1
+    },
+    "client/src/components/ui/community-metrics.tsx": {
+      "text-blue-500": 1,
+      "text-blue-600": 1,
+      "text-green-500": 1,
+      "text-green-600": 4,
+      "text-orange-600": 1,
+      "text-red-500": 1,
+      "text-yellow-600": 1
+    },
+    "client/src/components/ui/export-tools.tsx": {
+      "text-green-600": 1
+    },
+    "client/src/components/ui/micro-interactions.tsx": {
+      "bg-orange-500": 1
+    },
+    "client/src/components/ui/recommendation-feedback.tsx": {
+      "bg-amber-500": 1,
+      "bg-emerald-500": 1,
+      "bg-sky-500": 1,
+      "border-amber-500": 1,
+      "border-emerald-500": 1,
+      "border-sky-500": 1,
+      "text-amber-200": 1,
+      "text-amber-800": 1,
+      "text-emerald-300": 1,
+      "text-emerald-700": 1,
+      "text-sky-300": 1,
+      "text-sky-700": 1
+    },
+    "client/src/components/ui/recommendation-panel.tsx": {
+      "bg-blue-100": 2,
+      "bg-blue-900": 2,
+      "bg-green-100": 1,
+      "bg-green-900": 1,
+      "bg-purple-100": 1,
+      "bg-purple-900": 1,
+      "text-blue-300": 2,
+      "text-blue-700": 1,
+      "text-blue-800": 1,
+      "text-green-300": 1,
+      "text-green-400": 1,
+      "text-green-600": 1,
+      "text-green-800": 1,
+      "text-purple-300": 1,
+      "text-purple-800": 1,
+      "text-red-400": 1,
+      "text-red-600": 1,
+      "text-yellow-400": 1,
+      "text-yellow-600": 1
+    },
+    "client/src/components/ui/resource-recommendations.tsx": {
+      "bg-blue-50": 1,
+      "text-blue-600": 1,
+      "text-blue-700": 1,
+      "text-green-600": 1,
+      "text-purple-600": 1
+    },
+    "client/src/components/ui/toast.tsx": {
+      "ring-red-400": 1,
+      "text-red-300": 1,
+      "text-red-50": 1
+    },
+    "client/src/components/ui/user-preferences.tsx": {
+      "bg-blue-50": 1,
+      "bg-blue-950": 1,
+      "text-blue-100": 1,
+      "text-blue-200": 1,
+      "text-blue-800": 1,
+      "text-blue-900": 1
+    },
+    "client/src/pages/Advanced.tsx": {
+      "text-blue-600": 1,
+      "text-green-600": 1,
+      "text-purple-600": 1
+    },
+    "client/src/pages/ContinueLearning.tsx": {
+      "text-green-500": 1
+    },
+    "client/src/pages/Contributions.tsx": {
+      "bg-amber-500": 1,
+      "bg-emerald-500": 1,
+      "bg-red-500": 1,
+      "bg-slate-500": 1,
+      "bg-violet-500": 1,
+      "border-amber-500": 1,
+      "border-emerald-500": 1,
+      "border-red-500": 1,
+      "border-slate-500": 1,
+      "border-violet-500": 1,
+      "text-amber-300": 1,
+      "text-amber-700": 1,
+      "text-emerald-300": 1,
+      "text-emerald-700": 1,
+      "text-red-300": 1,
+      "text-red-700": 1,
+      "text-slate-300": 1,
+      "text-slate-700": 1,
+      "text-violet-300": 1,
+      "text-violet-700": 1
+    },
+    "client/src/pages/Profile.tsx": {
+      "text-green-500": 1,
+      "text-yellow-500": 1
+    },
+    "client/src/pages/SubmitResource.tsx": {
+      "bg-green-500": 1,
+      "bg-yellow-500": 2,
+      "border-blue-500": 1,
+      "border-green-500": 2,
+      "border-yellow-500": 2,
+      "text-blue-500": 1,
+      "text-green-500": 2,
+      "text-yellow-500": 4
+    }
+  },
+  "hex-colors": {
+    "client/src/App.tsx": {
+      "#0a0a0a": 1,
+      "#2a2a2a": 1,
+      "#a3a3a3": 1,
+      "#e50914": 2,
+      "#f5f5f5": 3
+    },
+    "client/src/components/BrandMark.tsx": {
+      "#000000": 1,
+      "#ff3d52": 1
+    },
+    "client/src/components/admin/AgentCommsGraph.tsx": {
+      "#34d08c": 1,
+      "#5eddf2": 1,
+      "#9d4edd": 1
+    },
+    "client/src/components/layout/SEOHead.tsx": {
+      "#ff3d52": 2
+    },
+    "client/src/components/ui/export-tools.tsx": {
+      "#111110": 2,
+      "#b84dff": 1,
+      "#f4f3ee": 1,
+      "#ff3d52": 2,
+      "#ffffff": 1
+    },
+    "client/src/lib/design-system.ts": {
+      "#00ff88": 2,
+      "#34d08c": 1,
+      "#39ff14": 1,
+      "#5eddf2": 1,
+      "#5ee6b8": 1,
+      "#7dd3fc": 1,
+      "#9d4edd": 1,
+      "#aaff00": 1,
+      "#b84dff": 1,
+      "#c77dff": 1,
+      "#ec4899": 1,
+      "#f472b6": 1,
+      "#ff3d52": 1,
+      "#ff7a3d": 1,
+      "#ff7a8a": 1,
+      "#ffb3c1": 1,
+      "#ffb84d": 2,
+      "#ffd86b": 1
+    }
+  },
+  "raw-radii": {
+    "client/src/components/ui/export-tools.tsx": {
+      "border-radius: 999px": 1,
+      "border: 1px": 2
+    },
+    "client/src/index.css": {
+      "border-radius: 4px": 1,
+      "border: 1px": 1
+    }
+  },
+  "font-family": {}
+}
