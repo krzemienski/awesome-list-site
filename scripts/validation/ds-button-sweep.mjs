@@ -60,6 +60,15 @@
 // they can never pass blind. Collection rows cascade with the QA user in
 // the finally teardown.
 //
+// Task #367: the last conditional /bookmarks surfaces. The seeded collection
+// is published (POST /api/collections/:id/publish) so the share controls
+// ("Copy link" / "Unpublish" + public-link line) render on
+// /bookmarks?collection=<id> and are swept by the route pass (expectAll
+// proves they rendered), and two more authed interaction scenarios open the
+// per-bookmark Note dialog (BookmarkNotesDialog) and the delete-collection
+// AlertDialog (sweep only — never confirmed) with the same activation-proof
+// + rogue-button-canary discipline.
+//
 // Task #363: the admin panel needs admin privileges, so a fifth scenario
 // creates a SECOND disposable Clerk user under its own sub-prefix
 // (__qa_test_ds_admin_), signs in through the same UI flow, elevates the
@@ -566,6 +575,17 @@ try {
     });
     if (!addedToCollection.ok()) throw new Error(`seed collection item failed: ${addedToCollection.status()} ${(await addedToCollection.text()).slice(0, 200)}`);
 
+    // Task #367: publish the seeded collection so the share controls
+    // ("Copy link" / "Unpublish" + the public-link line) render on
+    // /bookmarks?collection=<id> and get swept — they only exist while
+    // publishedAt + publicUrl are set. The published state cascades with
+    // the collection row (and the QA user) in teardown.
+    const publishedCollection = await authedContext.request.fetch(`${BASE}/api/collections/${collectionId}/publish`, {
+      method: 'POST',
+      headers: { Origin: BASE, 'Content-Type': 'application/json' },
+    });
+    if (!publishedCollection.ok()) throw new Error(`seed collection publish failed: ${publishedCollection.status()} ${(await publishedCollection.text()).slice(0, 200)}`);
+
     const AUTHED_ROUTES = [
       // Fresh user with no saved preferences → the signed-in-only onboarding
       // invitation card proves this is the authed Home branch.
@@ -582,12 +602,20 @@ try {
         expectAll: [`[aria-label="Move ${COLLECTION_NAME} up"]`, `[aria-label="Move ${COLLECTION_NAME} down"]`],
       },
       // Selecting the collection renders the management button strip
-      // (rename / archive / publish / delete) above the grid.
+      // (rename / archive / delete) above the grid; because the seed
+      // collection is published (task #367), the strip must ALSO show the
+      // share controls ("Copy link" / "Unpublish") and the public-link
+      // line — expectAll makes a sweep without them fail, not pass vacuously.
       {
         name: 'authed-bookmarks-collection',
         path: `/bookmarks?collection=${collectionId}`,
         expect: 'section[aria-label="Selected collection controls"]',
-        expectAll: [`[data-testid="bookmark-card-${resourceId}"]`],
+        expectAll: [
+          `[data-testid="bookmark-card-${resourceId}"]`,
+          'button:has-text("Copy link")',
+          'button:has-text("Unpublish")',
+          'text=Public read-only link',
+        ],
       },
       { name: 'authed-settings', path: '/settings', expect: '[data-testid="link-settings-account"]' },
     ];
@@ -672,6 +700,28 @@ try {
         open: async (p) => { await p.click('button:has-text("New collection")'); },
         openedSelector: '[role="dialog"][data-state="open"] #collection-name',
         scope: '[role="dialog"][data-state="open"]',
+      },
+      {
+        // Task #367: bookmark card "Note" button → the shared
+        // BookmarkNotesDialog (textarea + cancel/save footer).
+        name: 'authed-note-dialog',
+        path: '/bookmarks',
+        expect: `[data-testid="bookmark-card-${resourceId}"]`,
+        open: async (p) => { await p.click(`[data-testid="bookmark-card-${resourceId}"] button:has-text("Note")`); },
+        openedSelector: '[role="dialog"][data-state="open"] [data-testid="textarea-bookmark-notes"]',
+        scope: '[role="dialog"][data-state="open"]',
+      },
+      {
+        // Task #367: management strip "Delete" → the delete-collection
+        // AlertDialog (cancel + destructive confirm). Sweep only — the
+        // confirm button is NEVER clicked, so the seeded collection
+        // survives for teardown to cascade.
+        name: 'authed-delete-collection-confirm',
+        path: `/bookmarks?collection=${collectionId}`,
+        expect: 'section[aria-label="Selected collection controls"]',
+        open: async (p) => { await p.click('section[aria-label="Selected collection controls"] button:has-text("Delete")'); },
+        openedSelector: '[role="alertdialog"][data-state="open"] button[data-ds-variant]',
+        scope: '[role="alertdialog"][data-state="open"]',
       },
     ];
 
