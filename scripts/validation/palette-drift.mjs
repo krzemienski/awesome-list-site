@@ -5,6 +5,10 @@
 // .agents/skills/verify-design-system/SKILL.md over client/src:
 //   · palette  — raw Tailwind palette classes (bg-zinc-900, text-red-500, …)
 //   · hex      — hex color literals outside the DS sources of truth
+//   · rgb      — rgb()/rgba() literals (task #361 — the skill's stage-5
+//     regexes never covered these, so rgba(20,20,26,0.8) used to sail past);
+//     token-derived composition like rgba(var(--accent-rgb), 0.4) is exempt
+//     by construction, and DS-OK tagging works exactly as for hex
 //   · radii    — raw border-radius / border px values that bypass the ladders
 //   · font     — raw font-family strings
 //
@@ -36,12 +40,16 @@
 // current token count exceeds the existing baseline, so the documented
 // command can never be used to launder a fresh violation into the
 // allowlist. Initializing a missing baseline requires the explicit --init
-// flag.
+// flag; the same flag also permits initializing the section for a NEWLY
+// ADDED detector (a scan id absent from the baseline file entirely) —
+// increases inside a scan section that already exists are still refused,
+// so --init cannot launder regressions in the established detectors.
 //
-// DS-OK escape hatch (hex scan only, per the skill's "Acceptable hardcoded
-// values"): a hex line is exempt when "DS-OK" appears on the SAME line or
-// within the previous 5 lines (block-level tags like the JourneyDetail
-// celebration surface or the showcase status-constant table).
+// DS-OK escape hatch (hex + rgb scans, per the skill's "Acceptable
+// hardcoded values"): a line is exempt when "DS-OK" appears on the SAME
+// line or within the previous 5 lines (block-level tags like the
+// JourneyDetail celebration surface or the showcase status-constant
+// table).
 //
 // Detector canaries run on every invocation: each regex, the DS-OK /
 // task-number classifiers, per-match counting (several tokens on one line),
@@ -73,6 +81,11 @@ const DS_OK_LOOKBACK = 5; // lines above a hex hit that a /* DS-OK: … */ tag m
 // ---------------------------------------------------------------------------
 const PALETTE_RE = /\b(bg|text|border|ring|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b/g;
 const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
+// rgb()/rgba() literals. One level of nested parens is tolerated so that a
+// truncated match of rgba(var(--x), 0.4) can never smuggle the var() ref out
+// of the token; case-insensitive because CSS is. `\b` keeps color-mix(in
+// srgb, …) from matching — no word boundary between "s" and "rgb".
+const RGB_RE = /\brgba?\(\s*(?:[^()]|\([^()]*\))*\)/gi;
 const RADII_RE = /border(-radius)?:\s*\d+px|rounded-\[\d+px\]/g;
 const FONT_RE = /font-family:\s*['"]/g;
 
@@ -97,6 +110,24 @@ function hexLineTokens(lines, i) {
   return tokens.map((t) => t.toLowerCase()); // case-insensitive identity (#E50914 ≡ #e50914)
 }
 
+// rgb()/rgba() literals with the same DS-OK same-line / 5-line-lookback
+// exemption as hex. Token-derived composition — any match whose body
+// references a CSS custom property via var(--…) — is genuinely on-system
+// (the color comes FROM a token) and is whitelisted by construction rather
+// than baselined. Identity strips ALL whitespace (rgba(255, 255, 255, .5) ≡
+// rgba(255,255,255,.5)) and lowercases, so reformatting never churns the
+// baseline.
+function rgbLineTokens(lines, i) {
+  const tokens = [...lines[i].matchAll(RGB_RE)]
+    .map((m) => m[0])
+    .filter((t) => !/var\(\s*--/i.test(t));
+  if (!tokens.length) return [];
+  for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
+    if (lines[j].includes('DS-OK')) return [];
+  }
+  return tokens.map((t) => t.replace(/\s+/g, '').toLowerCase());
+}
+
 const SCANS = [
   {
     id: 'palette-classes',
@@ -113,6 +144,16 @@ const SCANS = [
       'client/src/lib/charts/palette.ts',
     ],
     lineTokens: hexLineTokens,
+  },
+  {
+    id: 'rgb-colors',
+    label: 'rgb()/rgba() literals (untagged, not var(--…)-composed)',
+    excludes: [
+      'client/src/styles/design-system.css',
+      'client/src/index.css',
+      'client/src/lib/charts/palette.ts',
+    ],
+    lineTokens: rgbLineTokens,
   },
   {
     id: 'raw-radii',
@@ -132,10 +173,12 @@ const SCANS = [
 // Detector canaries — fail loudly if any classifier stops classifying.
 // ---------------------------------------------------------------------------
 function runCanaries() {
-  const palette = (s) => SCANS[0].lineTokens([s], 0);
+  const byId = (id) => SCANS.find((s) => s.id === id);
+  const palette = (s) => byId('palette-classes').lineTokens([s], 0);
   const hex = (src, i = 0) => { const lines = src.split('\n'); return hexLineTokens(lines, i); };
-  const radii = (s) => SCANS[2].lineTokens([s], 0);
-  const font = (s) => SCANS[3].lineTokens([s], 0);
+  const rgb = (src, i = 0) => { const lines = src.split('\n'); return rgbLineTokens(lines, i); };
+  const radii = (s) => byId('raw-radii').lineTokens([s], 0);
+  const font = (s) => byId('font-family').lineTokens([s], 0);
   const eq = (a, b, what) => {
     if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`canary: ${what} → ${JSON.stringify(a)}, expected ${JSON.stringify(b)}`);
   };
@@ -153,6 +196,17 @@ function runCanaries() {
   eq(hex('text-[#34d08c] // DS-OK: status ok'), [], 'same-line DS-OK');
   eq(hex('/* DS-OK: status constants */\na\nb\nc\nd\ncolor: #34d08c', 5), [], '5-line DS-OK lookback');
   eq(hex('/* DS-OK: status constants */\na\nb\nc\nd\ne\ncolor: #34d08c', 6), ['#34d08c'], 'DS-OK lookback capped at 5 lines');
+
+  eq(rgb('background: rgba(20,20,26,0.8)'), ['rgba(20,20,26,0.8)'], 'rgba literal');
+  eq(rgb('color: rgb(255, 61, 82)'), ['rgb(255,61,82)'], 'rgb literal (ws-stripped identity)');
+  eq(rgb('style={{ color: "RGBA(255, 255, 255, 0.66)" }}'), ['rgba(255,255,255,0.66)'], 'inline style + case-insensitive identity');
+  eq(rgb('rgba(0,0,0,0.1) rgba(0,0,0,0.2)'), ['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.2)'], 'two rgb tokens on one line');
+  eq(rgb('background: rgba(var(--accent-rgb), 0.4)'), [], 'token-derived rgba(var(--…)) composition is on-system');
+  eq(rgb('color: rgb(var(--status-ok-rgb) / 0.5)'), [], 'token-derived rgb(var(--…)/alpha) is on-system');
+  eq(rgb('color-mix(in srgb, var(--accent) 22%, transparent)'), [], 'color-mix srgb is not an rgb() literal');
+  eq(rgb('fill="rgba(0,0,0,0.55)" // DS-OK: fixed scrim'), [], 'same-line DS-OK');
+  eq(rgb('/* DS-OK: overlay ladder */\na\nb\nc\nd\nbackground: rgba(0,0,0,0.55)', 5), [], '5-line DS-OK lookback');
+  eq(rgb('/* DS-OK: overlay ladder */\na\nb\nc\nd\ne\nbackground: rgba(0,0,0,0.55)', 6), ['rgba(0,0,0,0.55)'], 'DS-OK lookback capped at 5 lines');
 
   eq(radii('rounded-[12px]'), ['rounded-[12px]'], 'raw radius');
   eq(radii('border-radius:   8px;'), ['border-radius: 8px'], 'raw border-radius (ws-normalized)');
@@ -199,6 +253,29 @@ function runCanaries() {
   );
   eq(d.increases, [], 'unchanged baseline: no increases');
   eq(d.decreases, [], 'unchanged baseline: no decreases');
+
+  // --update-baseline write decision (the per-scan --init path):
+  // 6 · established sections unchanged + a NEW detector's hits — --init must
+  //     write (initialize the new section) even with zero decreases…
+  const priorNoRgb = { 'palette-classes': { 'a.tsx': { 'bg-red-500': 1 } } };
+  const withRgb = { 'palette-classes': { 'a.tsx': { 'bg-red-500': 1 } }, 'rgb-colors': { 'b.tsx': { 'rgba(0,0,0,0.5)': 1 } } };
+  let u = classifyUpdate(priorNoRgb, withRgb, true);
+  eq(u.increases, [], 'init: new-detector hits are not refusable increases');
+  eq(u.initSections.includes('rgb-colors'), true, 'init: missing section is initialized');
+  eq(u.shouldWrite, true, 'init: initialization alone justifies the write');
+  // 7 · …but WITHOUT --init the same state refuses (increases in the new section).
+  u = classifyUpdate(priorNoRgb, withRgb, false);
+  eq(u.increases.map(key), ['b.tsx|rgba(0,0,0,0.5)|0->1'], 'no init: new-detector hits refuse');
+  eq(u.shouldWrite, false, 'no init: refused state never writes');
+  // 8 · --init still refuses an increase inside an EXISTING section.
+  u = classifyUpdate(priorNoRgb, { 'palette-classes': { 'a.tsx': { 'bg-red-500': 2 } }, 'rgb-colors': {} }, true);
+  eq(u.increases.map(key), ['a.tsx|bg-red-500|1->2'], 'init cannot launder an established-section increase');
+  eq(u.shouldWrite, false, 'init + established increase: no write');
+  // 9 · fully unchanged baseline with all sections present: nothing to do.
+  const full = {}; for (const s of SCANS) full[s.id] = {};
+  u = classifyUpdate(full, full, true);
+  eq(u.initSections, [], 'complete baseline: nothing to initialize');
+  eq(u.shouldWrite, false, 'complete unchanged baseline: no write');
 }
 
 // ---------------------------------------------------------------------------
@@ -270,6 +347,23 @@ const totalOf = (counts) => Object.values(counts).reduce(
   (n, files) => n + Object.values(files).reduce(
     (m, tokens) => m + Object.values(tokens).reduce((a, b) => a + b, 0), 0), 0);
 
+// Decide what an --update-baseline run against an EXISTING baseline may do.
+// A scan id absent from the baseline file entirely is a NEWLY ADDED detector,
+// not a regression in an established one: under --init (and only --init) its
+// hits are pinned as that section's initialization — and that initialization
+// alone justifies a write even when no established section has decreases.
+// Increases inside a scan section that already exists are refused regardless
+// of --init, so the flag can never launder regressions in the established
+// detectors. Shared with the canaries so the write decision is tested, not
+// just the diff.
+function classifyUpdate(prior, counts, init) {
+  const missing = SCANS.map((s) => s.id).filter((id) => !Object.prototype.hasOwnProperty.call(prior, id));
+  let { increases, decreases } = diffAgainstBaseline(prior, counts);
+  if (init) increases = increases.filter((v) => !missing.includes(v.scanId));
+  const initSections = init ? missing : [];
+  return { increases, decreases, initSections, shouldWrite: !increases.length && (decreases.length > 0 || initSections.length > 0) };
+}
+
 runCanaries();
 console.log('PASS canaries :: all stage-5 detectors + ratchet classifier verified against known-bad/known-good samples');
 
@@ -285,7 +379,11 @@ if (UPDATE) {
   }
   if (exists) {
     const prior = JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8'));
-    const { increases, decreases } = diffAgainstBaseline(prior, counts);
+    // classifyUpdate holds the whole write decision (see its comment) and is
+    // canary-tested, including: --init pinning a newly added detector's
+    // section even with zero decreases elsewhere, and --init still refusing
+    // increases inside established sections.
+    const { increases, decreases, initSections, shouldWrite } = classifyUpdate(prior, counts, INIT);
     if (increases.length) {
       console.error('FAIL update-baseline :: REFUSING to write — the allowlist only ever shrinks, and the');
       console.error('     working tree currently has hits ABOVE the pinned baseline. Fix these first');
@@ -296,12 +394,18 @@ if (UPDATE) {
           console.error(`         ${v.rel}:${hit.line}: ${hit.text}`);
         }
       }
+      if (increases.some((v) => !Object.prototype.hasOwnProperty.call(prior, v.scanId))) {
+        console.error('     (hits in a scan section absent from the baseline are a newly added detector —');
+        console.error('      pin them explicitly with: node scripts/validation/palette-drift.mjs --update-baseline --init)');
+      }
       process.exit(1);
     }
-    if (!decreases.length) {
+    if (!shouldWrite) {
       console.log('update-baseline :: nothing to ratchet — counts already equal the baseline.');
+      if (!INIT) console.log('     (initializing a newly added detector\'s section additionally requires --init)');
       process.exit(0);
     }
+    if (initSections.length) console.log(`update-baseline :: initializing new detector section(s): ${initSections.join(', ')}`);
   }
   fs.writeFileSync(BASELINE_PATH, JSON.stringify(counts, null, 2) + '\n');
   console.log(`baseline ${exists ? 'ratcheted down' : 'initialized'} at ${path.relative(ROOT, BASELINE_PATH)} (${totalOf(counts)} legacy matches pinned)`);

@@ -172,11 +172,19 @@ rg 'border(-radius)?:\s*\d+px|rounded-\[\d+px\]' client/src \
 rg "font-family:\s*['\"]" client/src \
   --glob '!client/src/styles/design-system.css' \
   --glob '!client/index.html'
+
+# rgb()/rgba() literals (inline style values included) — off-system colors
+# hiding from the hex scan. rgba(var(--…))-composed values are on-system.
+rg -i '\brgba?\(' client/src \
+  --glob '!client/src/styles/design-system.css' \
+  --glob '!client/src/index.css' \
+  --glob '!client/src/lib/charts/palette.ts' \
+  | rg -v 'var\(\s*--'
 ```
 
 > **These scans are enforced automatically for the app.** The
 > `palette-drift` validation gate (`scripts/validation/palette-drift.mjs`)
-> runs all four regexes above over `client/src` on every validation run and
+> runs all five regexes above over `client/src` on every validation run and
 > fails on any NEW hit. Pre-existing hits (the site-wide sweep is landing
 > incrementally) are pinned in
 > `scripts/validation/palette-drift-baseline.json` keyed by
@@ -191,11 +199,15 @@ rg "font-family:\s*['\"]" client/src \
 > violations in. Hex lines tagged `/* DS-OK: reason */` on the same line or
 > within the previous 5 lines are exempt, matching the "Acceptable hardcoded
 > values" list below; 3–4-digit all-numeric `#307`-style issue references
-> are ignored. The gate self-tests its detectors and ratchet classifier
+> are ignored. The rgb()/rgba() scan shares the same DS-OK exemption, and
+> whitelists token-derived composition by construction — any match whose
+> body references `var(--…)` (e.g. `rgba(var(--accent-rgb), 0.4)`) is
+> on-system, since the color comes FROM a token; its match identity strips
+> whitespace and lowercases, so reformatting a pinned literal never churns
+> the baseline. The gate self-tests its detectors and ratchet classifier
 > against known-bad/known-good canary samples on every run, so a regex
 > regression cannot pass vacuously. A manual stage-5 audit still adds value
-> for rgb()/rgba() literals and standalone artifacts, which the gate does
-> not cover.
+> for standalone artifacts, which the gate does not cover.
 
 For standalone artifacts, run the same scans over the artifact's files,
 excluding the design-system stylesheet itself.
