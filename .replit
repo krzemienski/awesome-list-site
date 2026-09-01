@@ -127,6 +127,10 @@ args = "ds-button-sweep"
 task = "workflow.run"
 args = "palette-drift"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "dead-components"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -394,6 +398,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/palette-drift.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "dead-components"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/dead-components.mjs"
 
 [workflows.workflow.metadata]
 isValidation = true

@@ -1,0 +1,27 @@
+{
+  "_comment": "Pinned exceptions for scripts/validation/dead-components.mjs (task #365). Every entry is a component file that is UNREACHABLE from client/index.html and server/ — pre-existing dead code found when the gate was introduced. This list is MECHANICALLY shrink-only: the gate carries a frozen manifest of exactly these paths and fails on any entry outside it, so adding or substituting entries here does nothing but fail the gate (allowlist-growth). The only allowed edit is REMOVING an entry together with deleting its dead file; stale pins (file reachable again, or deleted with the entry left behind) also fail.",
+  "exceptions": [
+    { "file": "client/src/components/admin/types/crud-config.ts", "reason": "pre-existing dead at gate introduction (task 365): types module whose last importer was removed; pending deletion sweep" },
+    { "file": "client/src/components/ai/LearningPathCard.tsx", "reason": "pre-existing dead at gate introduction (task 365): no importer anywhere; pending deletion sweep" },
+    { "file": "client/src/components/ai/MobileBottomSheet.tsx", "reason": "pre-existing dead at gate introduction (task 365): no importer anywhere; pending deletion sweep" },
+    { "file": "client/src/components/animations/sidebar-morphing.tsx", "reason": "pre-existing dead at gate introduction (task 365): no importer anywhere; pending deletion sweep" },
+    { "file": "client/src/components/layout/Footer.tsx", "reason": "pre-existing dead at gate introduction (task 365): no importer anywhere (site chrome renders without it); pending deletion sweep" },
+    { "file": "client/src/components/resource/ShareButton.tsx", "reason": "pre-existing dead at gate introduction (task 365): no importer anywhere; pending deletion sweep" },
+    { "file": "client/src/components/ui/accordion.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/aspect-ratio.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/breadcrumbs.tsx", "reason": "pre-existing dead at gate introduction (task 365): superseded by ui/breadcrumb.tsx (the imported one); pending deletion sweep" },
+    { "file": "client/src/components/ui/calendar.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/carousel.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/chart.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/color-palette-generator.tsx", "reason": "pre-existing dead at gate introduction (task 365): no importer anywhere; sole importer of ui/slider.tsx (dead cluster); pending deletion sweep" },
+    { "file": "client/src/components/ui/context-menu.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/drawer.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/hover-card.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/input-otp.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/menubar.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/navigation-menu.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/resizable.tsx", "reason": "pre-existing dead at gate introduction (task 365): unused shadcn primitive; pending deletion sweep" },
+    { "file": "client/src/components/ui/slider.tsx", "reason": "pre-existing dead at gate introduction (task 365): only importer is the equally dead ui/color-palette-generator.tsx (dead cluster); pending deletion sweep" },
+    { "file": "client/src/components/ui/tag-filter.tsx", "reason": "pre-existing dead at gate introduction (task 365): no importer anywhere (filter tags are built client-side elsewhere); pending deletion sweep" }
+  ]
+}

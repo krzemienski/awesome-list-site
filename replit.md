@@ -24,6 +24,9 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Dead-component gate — Task 365 (September 1, 2026)
+- `scripts/validation/dead-components.mjs` is the registered `dead-components` validation gate. It builds the real module-reachability graph (static/dynamic/re-export/require/`ssrLoadModule` edges; `@/`, `@shared/`, `/src/`, and NodeNext `.js`→`.ts` resolution; comments stripped) from `client/index.html` + every `server/` file, and fails when any file under `client/src/components/` becomes unreachable — including mutually-importing dead clusters a naive "who imports it" grep would miss. 22 pre-existing dead files are pinned with reasons in `scripts/validation/dead-components-allowlist.json`; the exception universe is frozen as a manifest inside the gate script, so adding or substituting allowlist entries fails (`allowlist-growth`) — the only allowed edit is removing an entry together with deleting its file (stale pins — reachable-again or deleted files — also fail). Newly dead components can never be pinned; delete them or restore their importer. Run it after removing a component's last importer.
+
 ### Rich structured data & SERP templates (August 19, 2026)
 - The server-only SEO pipeline now emits page-specific `ItemList` entries for category and journey listings, enriched resource entities (provider, taxonomy, tags, skill level, format-aware type), and Course syllabi from logical journey steps. Client pages still emit no JSON-LD.
 - `shared/seo-templates.ts` now owns hierarchy-aware listing text, resource/journey fallbacks, and pagination variants. Server crawl HTML and hydrated client heads use the same functions, preserving two-pass title/description parity.

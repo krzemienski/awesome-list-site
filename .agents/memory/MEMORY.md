@@ -93,3 +93,4 @@
 - [New SPA route registration](spa-new-route-registration.md) — a wouter Route alone 404s: also add KNOWN_ROUTE_PATTERNS (App.tsx), AppHeader crumb labels, og-middleware staticRoutes + SEOHead parity.
 - [Toast wipes dialog state](dialog-toast-remount.md) — toast() on validation error inside admin dialogs remounts and wipes typed input; use inline banners in-dialog.
 - [Palette scans miss gradient stops](palette-scan-gradient-stops.md) — the stage-5 regex skips from/via/to (+divide/outline/shadow/...); extend the prefix list or gradients slip through; comments naming palette classes also match.
+- [Dead-code reachability gate](dead-code-reachability-gate.md) — dead-file detection = BFS from execution roots (importer-count misses mutual-import clusters); strip comments + try .js→.ts swap or JSDoc examples/NodeNext specs false-fail.
