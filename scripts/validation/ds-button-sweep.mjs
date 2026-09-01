@@ -48,6 +48,18 @@
 // a synthetic rogue button AND a rogue mono-uppercase label injected on
 // /notifications must be flagged, so the authed sweep can never pass blind.
 //
+// Task #364: the /bookmarks collection chrome only renders once a collection
+// exists / rows are selected, so the authed scenario also seeds one bookmark
+// collection (POST /api/collections) containing the seeded bookmark. That
+// makes the per-collection sidebar rows + their reorder arrow buttons render
+// on /bookmarks, and /bookmarks?collection=<id> renders the collection
+// management button strip (rename/archive/publish/delete). Two authed
+// interaction scenarios then sweep the remaining conditional chrome: the
+// bulk-selection action bar (select-all → bulk controls) and the "New
+// collection" dialog, each with the overlay-style rogue-button canary so
+// they can never pass blind. Collection rows cascade with the QA user in
+// the finally teardown.
+//
 // Requires the dev server on :5000 plus CLERK_SECRET_KEY (disposable authed
 // user) and DATABASE_URL (seeding + guaranteed teardown). Exits 1 on any
 // failure. Evidence: /tmp/validation/ds-button-sweep.
@@ -262,6 +274,7 @@ try {
     // manual DevTools stage-6 sweep never sees this shell either.
     await pg.waitForFunction(() => !document.querySelector('.ssr-chrome'), null, { timeout: 30000 });
     if (route.expect) await pg.waitForSelector(route.expect, { timeout: 20000 });
+    for (const sel of route.expectAll ?? []) await pg.waitForSelector(sel, { timeout: 20000 });
     await pg.waitForTimeout(600); // settle async chunks (cards, facets)
   };
 
@@ -513,13 +526,47 @@ try {
     });
     if (!bookmarked.ok()) throw new Error(`seed bookmark failed: ${bookmarked.status()} ${(await bookmarked.text()).slice(0, 200)}`);
 
+    // Task #364: seed one collection holding the bookmark so the /bookmarks
+    // collection chrome (sidebar rows + reorder arrows; management strip when
+    // selected) actually renders. Rows cascade with the QA user in teardown.
+    const COLLECTION_NAME = `QA sweep collection ${suffix}`;
+    const createdCollection = await authedContext.request.fetch(`${BASE}/api/collections`, {
+      method: 'POST',
+      headers: { Origin: BASE, 'Content-Type': 'application/json' },
+      data: { name: COLLECTION_NAME },
+    });
+    if (!createdCollection.ok()) throw new Error(`seed collection failed: ${createdCollection.status()} ${(await createdCollection.text()).slice(0, 200)}`);
+    const collectionId = (await createdCollection.json())?.id;
+    if (!collectionId) throw new Error('seed collection returned no id');
+    const addedToCollection = await authedContext.request.fetch(`${BASE}/api/collections/${collectionId}/items/${resourceId}`, {
+      method: 'POST',
+      headers: { Origin: BASE, 'Content-Type': 'application/json' },
+    });
+    if (!addedToCollection.ok()) throw new Error(`seed collection item failed: ${addedToCollection.status()} ${(await addedToCollection.text()).slice(0, 200)}`);
+
     const AUTHED_ROUTES = [
       // Fresh user with no saved preferences → the signed-in-only onboarding
       // invitation card proves this is the authed Home branch.
       { name: 'authed-home', path: '/', expect: '[data-testid="card-onboarding-invitation"]' },
       { name: 'authed-notifications', path: '/notifications', expect: `text=${NOTIF_TITLE}` },
       { name: 'authed-onboarding', path: '/onboarding', expect: '[data-testid="button-skip-onboarding"]' },
-      { name: 'authed-bookmarks', path: '/bookmarks', expect: `[data-testid="bookmark-card-${resourceId}"]` },
+      // expectAll proves the collection sidebar row + its reorder arrows
+      // rendered alongside the library grid (task #364) — a vacuous sweep
+      // without the collection chrome cannot pass.
+      {
+        name: 'authed-bookmarks',
+        path: '/bookmarks',
+        expect: `[data-testid="bookmark-card-${resourceId}"]`,
+        expectAll: [`[aria-label="Move ${COLLECTION_NAME} up"]`, `[aria-label="Move ${COLLECTION_NAME} down"]`],
+      },
+      // Selecting the collection renders the management button strip
+      // (rename / archive / publish / delete) above the grid.
+      {
+        name: 'authed-bookmarks-collection',
+        path: `/bookmarks?collection=${collectionId}`,
+        expect: 'section[aria-label="Selected collection controls"]',
+        expectAll: [`[data-testid="bookmark-card-${resourceId}"]`],
+      },
       { name: 'authed-settings', path: '/settings', expect: '[data-testid="link-settings-account"]' },
     ];
 
@@ -572,6 +619,90 @@ try {
         log('canary-authed-eyebrows', caught.eyebrowCaught, caught.eyebrowCaught
           ? 'synthetic mono-uppercase label on signed-in /notifications was flagged by the eyebrow filter'
           : 'DETECTOR BLIND: a synthetic mono-uppercase label on a signed-in route was NOT flagged');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Authed interaction scenarios (task #364): the bulk-selection action bar
+    // only renders once a bookmark is selected, and the "New collection"
+    // dialog only exists while open. Same pattern as the anonymous OVERLAYS
+    // list: condition-based activation proof, scope button count > 0, and a
+    // rogue-button canary inside the scope so the scenario can never pass
+    // blind behind a blanket exclusion.
+    // -----------------------------------------------------------------------
+    const AUTHED_OVERLAYS = [
+      {
+        // Select-all checkbox → the bulk action bar (status/move/tag/archive
+        // controls) renders inside the "Bulk bookmark actions" section.
+        name: 'authed-bulk-bar',
+        path: '/bookmarks',
+        expect: `[data-testid="bookmark-card-${resourceId}"]`,
+        open: async (p) => { await p.click('[role="checkbox"][aria-label="Select all visible bookmarks"]'); },
+        openedSelector: '[aria-label="Bulk queue status"]',
+        scope: 'section[aria-label="Bulk bookmark actions"]',
+      },
+      {
+        // Header "New collection" button → the create/rename collection
+        // Radix Dialog (name input + cancel/submit).
+        name: 'authed-new-collection-dialog',
+        path: '/bookmarks',
+        expect: `[data-testid="bookmark-card-${resourceId}"]`,
+        open: async (p) => { await p.click('button:has-text("New collection")'); },
+        openedSelector: '[role="dialog"][data-state="open"] #collection-name',
+        scope: '[role="dialog"][data-state="open"]',
+      },
+    ];
+
+    const sweepAuthedOverlay = async (o) => {
+      await gotoAndSettle(authedPage, o);
+      await o.open(authedPage);
+      await authedPage.waitForSelector(o.openedSelector, { timeout: 15000 });
+      await authedPage.waitForTimeout(400); // settle conditional chrome
+      const scopeButtons = await authedPage.evaluate(
+        (scope) => document.querySelectorAll(`${scope} button`).length, o.scope);
+      const sweeps = await confirmedSweeps(authedPage);
+      const CANARY_ID = 'qa-canary-rogue-authed-overlay';
+      await authedPage.evaluate(({ scope, id }) => {
+        const host = document.querySelector(scope);
+        if (!host) return;
+        const rogue = document.createElement('button');
+        rogue.type = 'button';
+        rogue.setAttribute('data-testid', id);
+        rogue.textContent = 'QA canary rogue';
+        host.appendChild(rogue);
+      }, { scope: o.scope, id: CANARY_ID });
+      const canarySweep = await authedPage.evaluate(collectStrayButtons);
+      await authedPage.evaluate((id) => document.querySelector(`[data-testid="${id}"]`)?.remove(), CANARY_ID);
+      const canaryCaught = canarySweep.strays.some((s) => s.testid === CANARY_ID);
+      return { sweeps, scopeButtons, canaryCaught };
+    };
+
+    for (const o of AUTHED_OVERLAYS) {
+      let sweeps, scopeButtons, canaryCaught;
+      try {
+        ({ sweeps, scopeButtons, canaryCaught } = await sweepAuthedOverlay(o));
+      } catch (e) {
+        try { ({ sweeps, scopeButtons, canaryCaught } = await sweepAuthedOverlay(o)); }
+        catch (e2) { log(`overlay-${o.name}`, false, `authed overlay sweep failed twice (trigger/chrome missing?): ${e2.message.split('\n')[0]}`); continue; }
+      }
+      const sane = sweeps.buttons.total > 0 && sweeps.buttons.dsVariantCount > 0 && scopeButtons > 0;
+      if (!sane) {
+        log(`overlay-${o.name}`, false, `${o.path} (signed in) — vacuous sweep (total=${sweeps.buttons.total}, dsVariant=${sweeps.buttons.dsVariantCount}, scopeButtons=${scopeButtons})`);
+        continue;
+      }
+      if (!canaryCaught) {
+        log(`overlay-${o.name}`, false, `${o.path} (signed in) — DETECTOR BLIND: a synthetic rogue button injected inside ${o.scope} was NOT flagged by the stage-6 filter; an exclusion is blanket-covering this chrome`);
+        continue;
+      }
+      for (const { kind } of SWEEPS) {
+        const sweep = sweeps[kind];
+        if (sweep.strays.length === 0) {
+          const extra = kind === 'buttons' ? `chrome active (${scopeButtons} button(s) in scope), canary rogue detected, ` : '';
+          log(`overlay-${o.name}-${kind}`, true, `${o.path} (signed in) — ${extra}0 stray ${kind} of ${sweep.total} total`);
+        } else {
+          await authedPage.screenshot({ path: path.join(OUT, `overlay-${o.name}-${kind}.png`), fullPage: true }).catch(() => {});
+          strayReport(`overlay-${o.name}-${kind}`, `${o.path} (signed in)`, kind, sweep);
+        }
       }
     }
   } catch (e) {

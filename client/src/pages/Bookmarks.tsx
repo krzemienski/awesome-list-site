@@ -469,24 +469,26 @@ export default function Bookmarks() {
                   </span>
                 </button>
                 <div className="flex" aria-label={`Reorder ${collection.name}`}>
-                  <button
+                  <Button
                     type="button"
-                    className="inline-flex min-h-11 min-w-11 items-center justify-center hover:bg-muted disabled:opacity-30"
+                    variant="ghost"
+                    size="icon"
                     aria-label={`Move ${collection.name} up`}
                     disabled={index === 0 || actionMutation.isPending}
                     onClick={() => reorderCollection(index, -1)}
                   >
                     <ArrowUp className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
-                    className="inline-flex min-h-11 min-w-11 items-center justify-center hover:bg-muted disabled:opacity-30"
+                    variant="ghost"
+                    size="icon"
                     aria-label={`Move ${collection.name} down`}
                     disabled={index === collections.length - 1 || actionMutation.isPending}
                     onClick={() => reorderCollection(index, 1)}
                   >
                     <ArrowDown className="h-4 w-4" aria-hidden="true" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
