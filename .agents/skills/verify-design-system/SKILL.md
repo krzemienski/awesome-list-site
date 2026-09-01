@@ -111,7 +111,9 @@ missing, the boot script was removed or errored.
 lists, falls back to Editorial + Crimson, and sets the attributes before any
 module loads. The inline ID lists and font map are hand-synced with
 `client/src/lib/design-system.ts` / `font-options.ts` — flag drift between
-them.
+them. The **accent** half of that sync is enforced automatically by the
+`accent-drift` gate (see "Acceptable hardcoded values" below); the system
+and font lists are still eyes-only.
 
 ❌ **Bad** — applying the system from a deferred/module script or inside a
 React `useEffect` (runs after first paint → theme flash), or an inline boot
@@ -225,6 +227,22 @@ These pass — each is tagged `/* DS-OK: reason */` at its definition site:
 - `[data-system="…"]` skin blocks inside
   `client/src/styles/design-system.css` — intentional per-system overrides.
 - The hand-synced font map in the `client/index.html` boot script.
+- The ten accent swatches in the `ACCENTS` array of
+  `client/src/lib/design-system.ts` — only the ACTIVE accent's
+  `--accent`/`--accent-2` are readable at runtime, so the `/settings/theme`
+  picker has to inline all ten. **Enforced, not trusted:** the
+  `accent-drift` validation gate (`scripts/validation/accent-drift.mjs`)
+  parses the `:root[data-accent="…"]` blocks out of
+  `client/src/styles/design-system.css`, the `ACCENTS` array out of
+  `design-system.ts`, and the pre-paint id allowlist out of
+  `client/index.html`, and fails when an accent id exists in only some of
+  them, when a `primary`/`secondary` disagrees with `--accent`/`--accent-2`,
+  when `:root`'s default pair stops matching `DEFAULT_ACCENT`, or when the
+  boot fallback id drifts. Hex identity is normalized (`#0f8` ≡ `#00ff88`);
+  a notation swap (hex ↔ `rgb()`) fails on purpose. Either parser finding
+  zero accents is itself a failure, so renaming the array or the selector
+  can never make the gate pass vacuously. Adding an accent means editing
+  all three files.
 - `#000`/`#fff` in SVG elements that need fixed paint.
 
 An untagged literal is a finding even if it happens to match a token value.

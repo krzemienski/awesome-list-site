@@ -62,6 +62,10 @@ export const ACCENTS: Accent[] = [
   // accents at once. Only the ACTIVE accent's --accent/--accent-2 are readable
   // at runtime, so every accent's paint has to be inlined here, mirroring the
   // :root[data-accent="…"] blocks in client/src/styles/design-system.css.
+  // The mirror is enforced: the `accent-drift` validation gate
+  // (scripts/validation/accent-drift.mjs) fails when an id or a value here
+  // disagrees with that stylesheet or with the pre-paint allowlist in
+  // client/index.html.
   // DS-OK: mirrored DS accent constants — keep the two files in sync.
   { id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' },
   { id: 'magenta', name: 'Magenta', primary: '#ec4899', secondary: '#f472b6' },

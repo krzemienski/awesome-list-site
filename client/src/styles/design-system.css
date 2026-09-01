@@ -703,6 +703,12 @@ button { font-family: inherit; }
    ACCENT PALETTE — 10 accents shared across all systems.
    Crimson (#ff3d52 / #b84dff) is the :root default; the nine others
    override --accent + --accent-2 via attribute-selector specificity.
+
+   These blocks are mirrored by the ACCENTS swatch array in
+   client/src/lib/design-system.ts (the /settings/theme picker) and by the
+   pre-paint id allowlist in client/index.html. The `accent-drift`
+   validation gate (scripts/validation/accent-drift.mjs) fails on any
+   disagreement — add/edit/remove an accent in ALL THREE places.
    ===================================================================== */
 
 :root[data-accent="crimson"]  { --accent: #ff3d52; --accent-2: #b84dff; }
