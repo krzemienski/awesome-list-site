@@ -42,8 +42,9 @@
 //
 // Intentional exceptions are pinned in dead-components-allowlist.json
 // ({ file, reason } entries), and the exception UNIVERSE is mechanically
-// shrink-only: FROZEN_EXCEPTIONS below is the trusted manifest of the 22
-// pre-existing dead files found when the gate was introduced (task #365).
+// shrink-only: FROZEN_EXCEPTIONS below is the trusted manifest of pre-existing
+// dead files found when the gate was introduced (task #365) — originally 22,
+// all deleted in the task #369 sweep, so the universe is now empty.
 // The JSON allowlist may only ever be a SUBSET of that frozen set — an entry
 // naming any other path (a new pin, or a substitution swapped in for a
 // removed one) fails the gate, so a newly dead component can never be
@@ -94,30 +95,9 @@ const SCAN_EXTS = new Set([...CODE_EXTS, '.html']);
 // SUBSET of these paths; anything else is a new pin / substitution and FAILS.
 // This list must only ever SHRINK (remove a line when its file is deleted).
 // ---------------------------------------------------------------------------
-const FROZEN_EXCEPTIONS = new Set([
-  'client/src/components/admin/types/crud-config.ts',
-  'client/src/components/ai/LearningPathCard.tsx',
-  'client/src/components/ai/MobileBottomSheet.tsx',
-  'client/src/components/animations/sidebar-morphing.tsx',
-  'client/src/components/layout/Footer.tsx',
-  'client/src/components/resource/ShareButton.tsx',
-  'client/src/components/ui/accordion.tsx',
-  'client/src/components/ui/aspect-ratio.tsx',
-  'client/src/components/ui/breadcrumbs.tsx',
-  'client/src/components/ui/calendar.tsx',
-  'client/src/components/ui/carousel.tsx',
-  'client/src/components/ui/chart.tsx',
-  'client/src/components/ui/color-palette-generator.tsx',
-  'client/src/components/ui/context-menu.tsx',
-  'client/src/components/ui/drawer.tsx',
-  'client/src/components/ui/hover-card.tsx',
-  'client/src/components/ui/input-otp.tsx',
-  'client/src/components/ui/menubar.tsx',
-  'client/src/components/ui/navigation-menu.tsx',
-  'client/src/components/ui/resizable.tsx',
-  'client/src/components/ui/slider.tsx',
-  'client/src/components/ui/tag-filter.tsx',
-]);
+// All 22 original entries were deleted in the task #369 sweep — the universe
+// is now EMPTY, so no allowlist entry can ever excuse a dead component again.
+const FROZEN_EXCEPTIONS = new Set([]);
 
 // Entries in the JSON allowlist that are NOT part of the frozen manifest —
 // attempted new pins or substitutions. Shared by gate mode and the canaries
