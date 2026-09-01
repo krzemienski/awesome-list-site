@@ -1155,7 +1155,6 @@ export default function ResourceManager() {
                 id="edit-title"
                 value={editForm.title}
                 onChange={(e) => { clearFieldError('title'); setEditForm(f => ({ ...f, title: e.target.value })); }}
-                className="bg-[var(--bg-2)] border-[var(--border)]"
                 aria-invalid={!!fieldErrors.title}
                 aria-describedby={fieldErrors.title ? "edit-title-error" : undefined}
                 data-testid="input-edit-title"
@@ -1172,7 +1171,6 @@ export default function ResourceManager() {
                 id="edit-url"
                 value={editForm.url}
                 onChange={(e) => { clearFieldError('url'); setEditForm(f => ({ ...f, url: e.target.value })); }}
-                className="bg-[var(--bg-2)] border-[var(--border)]"
                 aria-invalid={!!fieldErrors.url}
                 aria-describedby={fieldErrors.url ? "edit-url-error" : undefined}
                 data-testid="input-edit-url"
@@ -1189,7 +1187,6 @@ export default function ResourceManager() {
                 id="edit-description"
                 value={editForm.description}
                 onChange={(e) => { clearFieldError('description'); setEditForm(f => ({ ...f, description: e.target.value })); }}
-                className="bg-[var(--bg-2)] border-[var(--border)]"
                 rows={3}
                 aria-invalid={!!fieldErrors.description}
                 aria-describedby={fieldErrors.description ? "edit-description-error" : undefined}
@@ -1208,7 +1205,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-category">
+                  <SelectTrigger data-testid="select-edit-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1224,7 +1221,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-status">
+                  <SelectTrigger data-testid="select-edit-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1243,7 +1240,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-subcategory">
+                  <SelectTrigger data-testid="select-edit-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1260,7 +1257,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-subsubcategory">
+                  <SelectTrigger data-testid="select-edit-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1278,7 +1275,7 @@ export default function ResourceManager() {
                   value={editForm.resourceFormat}
                   onValueChange={(v) => setEditForm(f => ({ ...f, resourceFormat: v as ResourceFormat }))}
                 >
-                  <SelectTrigger id="edit-resource-format" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-resource-format">
+                  <SelectTrigger id="edit-resource-format" className="min-h-11" data-testid="select-edit-resource-format">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1294,7 +1291,7 @@ export default function ResourceManager() {
                   value={editForm.provider}
                   onValueChange={(v) => setEditForm(f => ({ ...f, provider: v as ResourceProvider }))}
                 >
-                  <SelectTrigger id="edit-provider" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-provider">
+                  <SelectTrigger id="edit-provider" className="min-h-11" data-testid="select-edit-provider">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1310,7 +1307,7 @@ export default function ResourceManager() {
                   value={editForm.skillLevel}
                   onValueChange={(v) => setEditForm(f => ({ ...f, skillLevel: v as ResourceSkillLevel }))}
                 >
-                  <SelectTrigger id="edit-skill-level" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-skill-level">
+                  <SelectTrigger id="edit-skill-level" className="min-h-11" data-testid="select-edit-skill-level">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1375,7 +1372,6 @@ export default function ResourceManager() {
                 id="create-title"
                 value={editForm.title}
                 onChange={(e) => { clearFieldError('title'); setEditForm(f => ({ ...f, title: e.target.value })); }}
-                className="bg-[var(--bg-2)] border-[var(--border)]"
                 placeholder="e.g., Video.js Player"
                 aria-invalid={!!fieldErrors.title}
                 aria-describedby={fieldErrors.title ? "create-title-error" : undefined}
@@ -1393,7 +1389,6 @@ export default function ResourceManager() {
                 id="create-url"
                 value={editForm.url}
                 onChange={(e) => { clearFieldError('url'); setEditForm(f => ({ ...f, url: e.target.value })); }}
-                className="bg-[var(--bg-2)] border-[var(--border)]"
                 placeholder="https://github.com/..."
                 aria-invalid={!!fieldErrors.url}
                 aria-describedby={fieldErrors.url ? "create-url-error" : undefined}
@@ -1411,7 +1406,6 @@ export default function ResourceManager() {
                 id="create-description"
                 value={editForm.description}
                 onChange={(e) => { clearFieldError('description'); setEditForm(f => ({ ...f, description: e.target.value })); }}
-                className="bg-[var(--bg-2)] border-[var(--border)]"
                 rows={3}
                 placeholder="Brief description of the resource..."
                 aria-invalid={!!fieldErrors.description}
@@ -1431,7 +1425,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-category">
+                  <SelectTrigger data-testid="select-create-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1447,7 +1441,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-status">
+                  <SelectTrigger data-testid="select-create-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1466,7 +1460,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-subcategory">
+                  <SelectTrigger data-testid="select-create-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1483,7 +1477,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-subsubcategory">
+                  <SelectTrigger data-testid="select-create-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1501,7 +1495,7 @@ export default function ResourceManager() {
                   value={editForm.resourceFormat}
                   onValueChange={(v) => setEditForm(f => ({ ...f, resourceFormat: v as ResourceFormat }))}
                 >
-                  <SelectTrigger id="create-resource-format" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-resource-format">
+                  <SelectTrigger id="create-resource-format" className="min-h-11" data-testid="select-create-resource-format">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1517,7 +1511,7 @@ export default function ResourceManager() {
                   value={editForm.provider}
                   onValueChange={(v) => setEditForm(f => ({ ...f, provider: v as ResourceProvider }))}
                 >
-                  <SelectTrigger id="create-provider" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-provider">
+                  <SelectTrigger id="create-provider" className="min-h-11" data-testid="select-create-provider">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1533,7 +1527,7 @@ export default function ResourceManager() {
                   value={editForm.skillLevel}
                   onValueChange={(v) => setEditForm(f => ({ ...f, skillLevel: v as ResourceSkillLevel }))}
                 >
-                  <SelectTrigger id="create-skill-level" className="min-h-11 bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-skill-level">
+                  <SelectTrigger id="create-skill-level" className="min-h-11" data-testid="select-create-skill-level">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

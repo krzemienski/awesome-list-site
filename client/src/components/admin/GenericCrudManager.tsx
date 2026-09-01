@@ -2531,14 +2531,17 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   data-testid={`input-search-${testIdEntityPlural}`}
                 />
                 {searchQuery && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                    className="absolute right-1 top-1/2 h-8 w-8 min-h-8 min-w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
                     data-testid="button-clear-search"
                   >
                     <X className="h-4 w-4" />
-                  </button>
+                  </Button>
                 )}
               </div>
             )}

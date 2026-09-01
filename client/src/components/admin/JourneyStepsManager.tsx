@@ -543,15 +543,17 @@ function StepsDialog({
                           <ExternalLink className="h-3 w-3" />
                           #{row.resourceId}
                           {group.rows.length > 1 && (
-                            <button
+                            <Button
                               type="button"
+                              variant="ghost"
+                              size="icon"
                               onClick={() => setRemovingRow(row)}
-                              className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
+                              className="h-8 w-8 min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
                               aria-label={`Remove resource #${row.resourceId} from this step`}
                               data-testid={`step-remove-resource-${row.id}`}
                             >
                               <X className="h-3 w-3" />
-                            </button>
+                            </Button>
                           )}
                         </Badge>
                       ))}

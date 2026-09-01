@@ -80,8 +80,12 @@
 // sweep can never pass on the not-found branch or a half-rendered page.
 //
 // Task #363: the admin panel needs admin privileges, so a fifth scenario
-// creates a SECOND disposable Clerk user under its own sub-prefix
-// (__qa_test_ds_admin_), signs in through the same UI flow, elevates the
+// signs in as a reusable QA admin. Its stable identity intentionally sits
+// outside the __qa_test_ namespace so concurrent net-zero cleanup cannot
+// delete it mid-run; only this scenario's seeded rows use the scoped
+// __qa_test_ds_admin_ prefix. The user is found-or-created via the Clerk API
+// with its password rotated to a fresh random value every run, so no
+// credential is ever stored. It signs in through the same UI flow, elevates the
 // JIT-provisioned local row to role='admin' directly in the DB (roles are
 // local app state read fresh per request — see
 // .agents/memory/audit-key-header-auth.md for why the header path isn't used:
@@ -93,6 +97,22 @@
 // the approvals tab. Teardown in finally sweeps ONLY this scenario's
 // __qa_test_ds_admin_ prefix (never __qa_test_% wholesale — parallel gates
 // own their own prefixes), including the FK refs an admin row can acquire.
+//
+// Task #368: the admin tab sweep (#363) only scans each tab's static panel
+// DOM — dialogs that exist only while open are never rendered. A set of
+// admin overlay scenarios therefore opens the key admin pop-ups and runs the
+// SAME six filters with each one open: the add-resource dialog, the
+// edit-resource dialog, the pending-resource detail dialog (opened from the
+// seeded pending row), one taxonomy delete-confirmation dialog (opened on a
+// seeded empty QA category — resourceCount must be 0 or the delete trigger
+// is disabled — and always CANCELLED, never confirmed), and the journey step
+// editor (steps dialog → Add step). Every scenario starts from a fresh
+// /admin load so Radix's close-animation pointer-events lock can never eat
+// the next trigger click; explicit dismissals condition-wait on dialog
+// detach, never a fixed sleep. Each overlay repeats the rogue-button canary
+// inside its open scope, so no scenario can pass while a blanket exclusion
+// blinds it. The QA category is torn down with the rest of the
+// __qa_test_ds_admin_ prefix in finally.
 //
 // Requires the dev server on :5000 plus CLERK_SECRET_KEY (disposable authed
 // user) and DATABASE_URL (seeding + guaranteed teardown). Exits 1 on any
@@ -481,10 +501,28 @@ try {
     if (!res.ok) throw new Error(`Clerk ${method} ${route} -> ${res.status}: ${JSON.stringify(data).slice(0, 300)}`);
     return data;
   };
+  const listClerkUsers = async () => {
+    const users = [];
+    for (let offset = 0; offset < 1000; offset += 100) {
+      const page = await clerkApi('GET', `/users?limit=100&offset=${offset}`);
+      if (!Array.isArray(page)) break;
+      users.push(...page);
+      if (page.length < 100) break;
+    }
+    return users;
+  };
+
   // Remove one scenario's user AND residue from previously aborted runs.
-  const purgeClerkQaUsers = async (prefix) => {
-    const matches = await clerkApi('GET', `/users?query=${encodeURIComponent(prefix)}&limit=100`);
-    for (const u of Array.isArray(matches) ? matches : []) await clerkApi('DELETE', `/users/${u.id}`).catch(() => {});
+  // Clerk's `query` search is fuzzy AND can omit underscore-heavy emails, so
+  // enumerate and enforce the exact prefix locally before any deletion.
+  // `keepEmail` exempts a persistent user when one is supplied.
+  const purgeClerkQaUsers = async (prefix, keepEmail) => {
+    for (const u of await listClerkUsers()) {
+      const emails = (u.email_addresses ?? []).map((a) => a.email_address);
+      if (!emails.some((address) => address.startsWith(prefix))) continue;
+      if (keepEmail && emails.includes(keepEmail)) continue;
+      await clerkApi('DELETE', `/users/${u.id}`).catch(() => {});
+    }
   };
 
   // Drive the real Clerk sign-in UI (post-Clerk there is no local login
@@ -872,7 +910,11 @@ try {
   // -------------------------------------------------------------------------
   const ADMIN_PREFIX = '__qa_test_ds_admin_';
   const adminSuffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-  const adminEmail = `${ADMIN_PREFIX}${adminSuffix}+clerk_test@example.com`;
+  // Reuse ONE persistent QA admin across runs instead of creating/deleting a
+  // fresh Clerk user every time. It is deliberately outside __qa_test_ so a
+  // concurrent interactive net-zero sweep cannot invalidate its Clerk
+  // session. Seeded rows remain scoped under ADMIN_PREFIX and are net-zero.
+  const adminEmail = 'ds-button-sweep-admin+clerk_test@example.com';
   const adminPassword = `DsAdmin-${adminSuffix}!`;
 
   // Scoped teardown for the admin prefix. An admin-role user can acquire FK
@@ -882,21 +924,28 @@ try {
   // explicitly for true net-zero). The sweep itself is read-only, but the
   // teardown must also clear residue from aborted runs that may have clicked.
   const purgeLocalAdminQa = async () => {
-    const ids = (await pool.query('SELECT id FROM users WHERE email LIKE $1', [`${ADMIN_PREFIX}%`])).rows.map(r => r.id);
-    if (ids.length > 0) {
-      await pool.query('DELETE FROM resource_edits WHERE submitted_by = ANY($1)', [ids]);
-      await pool.query('UPDATE resource_edits SET handled_by = NULL WHERE handled_by = ANY($1)', [ids]);
-      await pool.query('UPDATE resources SET approved_by = NULL WHERE approved_by = ANY($1)', [ids]);
-      await pool.query('UPDATE github_sync_history SET performed_by = NULL WHERE performed_by = ANY($1)', [ids]);
-      await pool.query('UPDATE enrichment_jobs SET started_by = NULL WHERE started_by = ANY($1)', [ids]);
-      await pool.query('UPDATE research_jobs SET started_by = NULL WHERE started_by = ANY($1)', [ids]);
-      await pool.query('DELETE FROM resource_audit_log WHERE performed_by = ANY($1)', [ids]);
-      for (const id of ids) await pool.query('DELETE FROM sessions WHERE sess::text LIKE $1', [`%${id}%`]);
+    const rows = (await pool.query('SELECT id, email FROM users WHERE email LIKE $1', [`${ADMIN_PREFIX}%`])).rows;
+    // Every ADMIN_PREFIX user is residue from the old disposable-user scheme
+    // or an aborted run. The reusable admin has a separate stable identity.
+    const removable = rows.map(r => r.id);
+    if (removable.length > 0) {
+      await pool.query('DELETE FROM resource_edits WHERE submitted_by = ANY($1)', [removable]);
+      await pool.query('UPDATE resource_edits SET handled_by = NULL WHERE handled_by = ANY($1)', [removable]);
+      await pool.query('UPDATE resources SET approved_by = NULL WHERE approved_by = ANY($1)', [removable]);
+      await pool.query('UPDATE github_sync_history SET performed_by = NULL WHERE performed_by = ANY($1)', [removable]);
+      await pool.query('UPDATE enrichment_jobs SET started_by = NULL WHERE started_by = ANY($1)', [removable]);
+      await pool.query('UPDATE research_jobs SET started_by = NULL WHERE started_by = ANY($1)', [removable]);
+      await pool.query('DELETE FROM resource_audit_log WHERE performed_by = ANY($1)', [removable]);
     }
+    // Clear stale sessions belonging to disposable prefix users.
+    for (const { id } of rows) await pool.query('DELETE FROM sessions WHERE sess::text LIKE $1', [`%${id}%`]);
     // Seeded pending resource (+ residue where the user row is already gone —
     // resources.submitted_by cascades, so aborted-run rows can outlive users
     // only via this URL-scoped sweep).
     await pool.query('DELETE FROM resources WHERE url LIKE $1', [`%${ADMIN_PREFIX}%`]);
+    // Seeded empty QA category for the delete-confirmation overlay (task
+    // #368) — cancelled in-scenario, so the row survives until this sweep.
+    await pool.query('DELETE FROM categories WHERE name LIKE $1', [`${ADMIN_PREFIX}%`]);
     await pool.query('DELETE FROM users WHERE email LIKE $1', [`${ADMIN_PREFIX}%`]);
   };
 
@@ -904,11 +953,54 @@ try {
   try {
     await purgeClerkQaUsers(ADMIN_PREFIX);
     await purgeLocalAdminQa();
-    await clerkApi('POST', '/users', { email_address: [adminEmail], password: adminPassword, skip_password_checks: true });
+    // Find-or-create the persistent QA admin, rotating its password to this
+    // run's random value either way (so no credential is ever stored). If its
+    // Clerk record was removed but the local bridge row survived, restore the
+    // same external_id; otherwise ensureDbUser correctly fails closed on the
+    // email collision and the harness can never authenticate.
+    const localAdmin = (await pool.query('SELECT id FROM users WHERE email = $1 LIMIT 1', [adminEmail])).rows[0];
+    const existingAdmin = (await listClerkUsers()).find(
+      (user) => (user.email_addresses ?? []).some((address) => address.email_address === adminEmail),
+    );
+    if (existingAdmin) {
+      await clerkApi('PATCH', `/users/${existingAdmin.id}`, {
+        password: adminPassword,
+        skip_password_checks: true,
+        ...(localAdmin ? { external_id: localAdmin.id } : {}),
+      });
+      console.log(`admin scenario: reusing persistent QA admin (Clerk ${existingAdmin.id}), password rotated`);
+    } else {
+      await clerkApi('POST', '/users', {
+        email_address: [adminEmail],
+        password: adminPassword,
+        skip_password_checks: true,
+        ...(localAdmin ? { external_id: localAdmin.id } : {}),
+      });
+      console.log(localAdmin
+        ? 'admin scenario: restored missing Clerk identity against the existing local admin bridge'
+        : 'admin scenario: persistent QA admin not found — created it (reused on future runs)');
+    }
 
-    adminContext = await browser.newContext({ viewport: DESKTOP });
-    const adminPage = await adminContext.newPage();
-    await signInWithClerk(adminPage, adminEmail, adminPassword);
+    let adminPage = null;
+    const openFreshAdminSession = async () => {
+      await adminContext?.close().catch(() => {});
+      let lastError;
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        adminContext = await browser.newContext({ viewport: DESKTOP });
+        adminPage = await adminContext.newPage();
+        try {
+          await signInWithClerk(adminPage, adminEmail, adminPassword);
+          return;
+        } catch (error) {
+          lastError = error;
+          await adminContext.close().catch(() => {});
+          adminContext = null;
+          adminPage = null;
+        }
+      }
+      throw lastError;
+    };
+    await openFreshAdminSession();
 
     // JIT provisioning created the local row (role='user'); elevate it.
     const adminUserId = (await pool.query('SELECT id FROM users WHERE email = $1', [adminEmail])).rows[0]?.id;
@@ -925,6 +1017,17 @@ try {
        VALUES ($1, $2, 'Seeded by the ds-button-sweep admin scenario.', $3, 'pending', $4)
        RETURNING id`,
       [`${ADMIN_PREFIX}${adminSuffix} pending resource`, `https://example.com/${ADMIN_PREFIX}${adminSuffix}`, seedCategory, adminUserId],
+    )).rows[0].id;
+
+    // Task #368: seed one EMPTY category so the taxonomy delete-confirmation
+    // dialog can actually open — GenericCrudManager disables the per-row
+    // delete trigger whenever resourceCount > 0, and every real category has
+    // resources. The scenario only ever opens the confirm and clicks Cancel;
+    // the row itself is deleted in the finally teardown (name-prefixed).
+    const qaCategoryName = `${ADMIN_PREFIX}${adminSuffix} category`;
+    const qaCategoryId = (await pool.query(
+      `INSERT INTO categories (name, slug) VALUES ($1, $2) RETURNING id`,
+      [qaCategoryName, `qa-ds-admin-${adminSuffix.replace(/_/g, '-')}`],
     )).rows[0].id;
 
     // Every admin tab, with a panel-specific selector proving the section's
@@ -1022,6 +1125,161 @@ try {
           : 'DETECTOR BLIND: a synthetic mono-uppercase label on an admin route was NOT flagged');
       }
     }
+
+    // -----------------------------------------------------------------------
+    // Admin overlay scenarios (task #368): the tab sweep above only sees each
+    // panel's static DOM — dialogs render nothing while closed. Open the key
+    // admin pop-ups and run the SAME six filters with each one open. Every
+    // scenario starts from a fresh /admin load (same rationale as the
+    // anonymous OVERLAYS list: no close choreography → Radix's pointer-events
+    // lock through close animations can never eat the next trigger click);
+    // where a scenario dismisses in-flow (the delete confirm, the step
+    // editor), it condition-waits on the dialog detaching, never a sleep.
+    // Nothing is ever confirmed/submitted — dialogs are opened, swept,
+    // canaried, and cancelled.
+    // -----------------------------------------------------------------------
+    const ADMIN_OVERLAYS = [
+      {
+        // Resources tab → "Add Resource" → the create-resource Radix Dialog
+        // (title/url/description inputs + category/status Select triggers).
+        name: 'admin-add-resource-dialog',
+        tab: 'resources',
+        tabExpect: '[data-testid="button-add-resource"]',
+        open: async (p) => { await p.click('[data-testid="button-add-resource"]'); },
+        openedSelector: '[role="dialog"][data-state="open"] [data-testid="input-create-title"]',
+        scope: '[role="dialog"][data-state="open"]',
+      },
+      {
+        // Resources tab → any row's edit pencil → the edit-resource Dialog
+        // (same field set pre-filled + "Save Changes"). locator.click()
+        // auto-waits for the row chrome to finish loading.
+        name: 'admin-edit-resource-dialog',
+        tab: 'resources',
+        tabExpect: '[data-testid="button-add-resource"]',
+        open: async (p) => { await p.locator('[data-testid^="button-edit-"]').first().click(); },
+        openedSelector: '[role="dialog"][data-state="open"] [data-testid="input-edit-title"]',
+        scope: '[role="dialog"][data-state="open"]',
+      },
+      {
+        // Approvals tab → the seeded pending row's "View" → the read-only
+        // Resource Details dialog. Approve/reject live OUTSIDE this dialog,
+        // so opening it can never mutate the queue.
+        name: 'admin-pending-detail-dialog',
+        tab: 'approvals',
+        tabExpect: `[data-testid="row-pending-resource-${pendingId}"]`,
+        open: async (p) => { await p.click(`[data-testid="button-view-details-${pendingId}"]`); },
+        openedSelector: '[role="dialog"][data-state="open"] [data-testid="button-close-details"]',
+        scope: '[role="dialog"][data-state="open"]',
+      },
+      {
+        // Categories tab → search for the seeded empty QA category (the list
+        // paginates at 10/page, so the row may not be on page 1) → its delete
+        // trigger (enabled only because resourceCount is 0) → the AlertDialog
+        // confirm. Dismissed via Cancel + detach wait — NEVER confirmed.
+        name: 'admin-category-delete-confirm',
+        tab: 'categories',
+        tabExpect: '[data-testid="input-search-categories"]',
+        open: async (p) => {
+          await p.fill('[data-testid="input-search-categories"]', qaCategoryName);
+          await p.waitForSelector(`[data-testid="row-category-${qaCategoryId}"]`, { timeout: 15000 });
+          await p.click(`[data-testid="button-delete-${qaCategoryId}"]`);
+        },
+        openedSelector: '[data-testid="dialog-delete-category"] [data-testid="button-cancel-delete"]',
+        scope: '[data-testid="dialog-delete-category"]',
+        dismiss: async (p) => {
+          await p.click('[data-testid="button-cancel-delete"]');
+          await p.waitForSelector('[data-testid="dialog-delete-category"]', { state: 'detached', timeout: 15000 });
+        },
+      },
+      {
+        // Journeys tab → first journey's "Steps" → the steps dialog → "Add
+        // step" → the step editor (title/description inputs, optional
+        // checkbox, resource picker toggle). Both nested dialogs are open
+        // during the sweep, so the steps dialog's own chrome is swept too.
+        // Cancelled without submitting; scope is the inner editor.
+        name: 'admin-journey-step-editor',
+        tab: 'journeys',
+        tabExpect: '[data-testid="journey-steps-manager"]',
+        open: async (p) => {
+          await p.locator('[data-testid^="edit-steps-"]').first().click();
+          await p.waitForSelector('[data-testid="steps-dialog"] [data-testid="add-step-button"]', { timeout: 15000 });
+          await p.click('[data-testid="add-step-button"]');
+        },
+        openedSelector: '[data-testid="step-editor-dialog"] [data-testid="step-editor-submit"]',
+        scope: '[data-testid="step-editor-dialog"]',
+        dismiss: async (p) => {
+          await p.click('[data-testid="step-editor-dialog"] button:has-text("Cancel")');
+          await p.waitForSelector('[data-testid="step-editor-dialog"]', { state: 'detached', timeout: 15000 });
+        },
+      },
+    ];
+
+    // The static 16-tab sweep is long enough for Clerk's dev-browser session
+    // to age out under load. Start overlays in a fresh browser context rather
+    // than trying to repair stale Clerk cookies in place.
+    await openFreshAdminSession();
+
+    const sweepAdminOverlay = async (o) => {
+      await gotoAdmin();
+      await adminPage.click(`[data-testid="tab-${o.tab}"]`);
+      await adminPage.waitForSelector(`[data-testid="tab-${o.tab}"][aria-selected="true"]`, { timeout: 15000 });
+      await adminPage.waitForSelector(o.tabExpect, { timeout: 30000 });
+      await adminPage.waitForTimeout(400); // settle async panel content
+      await o.open(adminPage);
+      await adminPage.waitForSelector(o.openedSelector, { timeout: 15000 });
+      await adminPage.waitForTimeout(400); // settle async overlay content
+      const scopeButtons = await adminPage.evaluate(
+        (scope) => document.querySelectorAll(`${scope} button`).length, o.scope);
+      const sweeps = await confirmedSweeps(adminPage);
+      // Detector canary inside the open overlay: same discipline as every
+      // other overlay scenario — a blanket exclusion covering this dialog's
+      // interior must fail the gate, not silently pass it.
+      const CANARY_ID = 'qa-canary-rogue-admin-overlay';
+      await adminPage.evaluate(({ scope, id }) => {
+        const host = document.querySelector(scope);
+        if (!host) return;
+        const rogue = document.createElement('button');
+        rogue.type = 'button';
+        rogue.setAttribute('data-testid', id);
+        rogue.textContent = 'QA canary rogue';
+        host.appendChild(rogue);
+      }, { scope: o.scope, id: CANARY_ID });
+      const canarySweep = await adminPage.evaluate(collectStrayButtons);
+      await adminPage.evaluate((id) => document.querySelector(`[data-testid="${id}"]`)?.remove(), CANARY_ID);
+      const canaryCaught = canarySweep.strays.some((s) => s.testid === CANARY_ID);
+      if (o.dismiss) await o.dismiss(adminPage);
+      return { sweeps, scopeButtons, canaryCaught };
+    };
+
+    for (const o of ADMIN_OVERLAYS) {
+      let sweeps, scopeButtons, canaryCaught;
+      try {
+        ({ sweeps, scopeButtons, canaryCaught } = await sweepAdminOverlay(o));
+      } catch (e) {
+        // Retry once from a fresh /admin load — cold panels flake under load.
+        try { ({ sweeps, scopeButtons, canaryCaught } = await sweepAdminOverlay(o)); }
+        catch (e2) { log(`overlay-${o.name}`, false, `admin overlay sweep failed twice (trigger/dialog missing?): ${e2.message.split('\n')[0]}`); continue; }
+      }
+      const sane = sweeps.buttons.total > 0 && sweeps.buttons.dsVariantCount > 0 && scopeButtons > 0;
+      if (!sane) {
+        log(`overlay-${o.name}`, false, `/admin#${o.tab} (admin) — vacuous overlay sweep (total=${sweeps.buttons.total}, dsVariant=${sweeps.buttons.dsVariantCount}, scopeButtons=${scopeButtons})`);
+        continue;
+      }
+      if (!canaryCaught) {
+        log(`overlay-${o.name}`, false, `/admin#${o.tab} (admin) — DETECTOR BLIND: a synthetic rogue button injected inside ${o.scope} was NOT flagged by the stage-6 filter; an exclusion is blanket-covering this overlay's interior`);
+        continue;
+      }
+      for (const { kind } of SWEEPS) {
+        const sweep = sweeps[kind];
+        if (sweep.strays.length === 0) {
+          const extra = kind === 'buttons' ? `overlay open (${scopeButtons} button(s) inside), canary rogue detected, ` : '';
+          log(`overlay-${o.name}-${kind}`, true, `/admin#${o.tab} (admin) — ${extra}0 stray ${kind} of ${sweep.total} total`);
+        } else {
+          await adminPage.screenshot({ path: path.join(OUT, `overlay-${o.name}-${kind}.png`), fullPage: true }).catch(() => {});
+          strayReport(`overlay-${o.name}-${kind}`, `/admin#${o.tab} (admin, ${o.name} open)`, kind, sweep);
+        }
+      }
+    }
   } catch (e) {
     log('admin-scenario', false, `admin sweep failed: ${e.message.split('\n')[0]}`);
   } finally {
@@ -1030,11 +1288,11 @@ try {
       await purgeClerkQaUsers(ADMIN_PREFIX).catch((e) => log('admin-teardown-clerk', false, e.message));
       await purgeLocalAdminQa();
       const residue = await pool.query(
-        'SELECT (SELECT count(*) FROM users WHERE email LIKE $1)::int AS users, (SELECT count(*) FROM resources WHERE url LIKE $2)::int AS resources',
+        'SELECT (SELECT count(*) FROM users WHERE email LIKE $1)::int AS users, (SELECT count(*) FROM resources WHERE url LIKE $2)::int AS resources, (SELECT count(*) FROM categories WHERE name LIKE $1)::int AS categories',
         [`${ADMIN_PREFIX}%`, `%${ADMIN_PREFIX}%`],
       );
-      log('admin-teardown', residue.rows[0].users === 0 && residue.rows[0].resources === 0,
-        `remaining ${ADMIN_PREFIX}* users=${residue.rows[0].users}, seeded resources=${residue.rows[0].resources}`);
+      log('admin-teardown', residue.rows[0].users === 0 && residue.rows[0].resources === 0 && residue.rows[0].categories === 0,
+        `remaining ${ADMIN_PREFIX}* users=${residue.rows[0].users}, seeded resources=${residue.rows[0].resources}, seeded categories=${residue.rows[0].categories} (reusable QA admin retained separately)`);
     } catch (e) {
       log('admin-teardown', false, e instanceof Error ? e.message : String(e));
     }
