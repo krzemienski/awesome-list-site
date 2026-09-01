@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Dead-component gate (task #365).
+// Dead-code gate (task #365; scope widened past components/ in task #370).
 //
 // Task 362 found five components under client/src/components/ui/ that nothing
 // imported — yet every design-system sweep, typecheck, and styling gate kept
@@ -7,11 +7,28 @@
 // in the validation suite noticed when a component lost its last importer.
 //
 // This gate builds the real module-reachability graph and fails when any file
-// under client/src/components/ becomes unreachable from the app's execution
-// roots:
+// in the checked scope becomes unreachable from the app's execution roots:
 //   · client/index.html            (script src="/src/main.tsx" — the SPA)
 //   · every file under server/     (og-middleware, ssr-dev's
 //                                    ssrLoadModule('/src/entry-server.tsx'), …)
+//
+// The checked scope is the whole front-end + shared module surface — all of
+// client/src/ (components, pages, hooks, lib, types, config, …) and shared/ —
+// not just components/: the graph always knew about a dead page or helper, it
+// simply never reported one, so unused pages/hooks/lib modules kept costing
+// every typecheck and audit. Widening it (task #370) exposed five pre-existing
+// dead hooks/lib files, all deleted in that same change rather than pinned.
+//
+// Deliberately OUT of scope:
+//   · server/    — every server file is itself a root, so "unreachable" can
+//                  never happen there and would be meaningless if it did.
+//   · *.d.ts     — ambient declarations are pulled in by tsc through tsconfig
+//                  "include", never by an import edge, so having no importer
+//                  is their normal state (client/env.d.ts also sits outside
+//                  client/src/ and is skipped by the prefix alone).
+//   · non-code assets (.css/.svg/.json) — not walked as modules at all.
+// The script file and its registered workflow keep the historical
+// "dead-components" name so the validation registration stays stable.
 //
 // Reachability — not "who greps for the filename" — is the identity, so a
 // CLUSTER of components that only import each other is correctly flagged the
@@ -44,17 +61,19 @@
 // ({ file, reason } entries), and the exception UNIVERSE is mechanically
 // shrink-only: FROZEN_EXCEPTIONS below is the trusted manifest of pre-existing
 // dead files found when the gate was introduced (task #365) — originally 22,
-// all deleted in the task #369 sweep, so the universe is now empty.
+// all deleted in the task #369 sweep, so the universe is now empty and the
+// task #370 widening deliberately left it empty (the five files it exposed
+// were deleted, not pinned).
 // The JSON allowlist may only ever be a SUBSET of that frozen set — an entry
 // naming any other path (a new pin, or a substitution swapped in for a
-// removed one) fails the gate, so a newly dead component can never be
+// removed one) fails the gate, so a newly dead file can never be
 // laundered into the allowlist in the same change that killed it. Growing
 // the universe requires editing THIS script's manifest, which is a visible,
 // out-of-band act (the same trust boundary as palette-drift's diff logic
 // living in its gate script).
 //
 // The allowlist is honest in every direction:
-//   · a dead component NOT in the allowlist            → FAIL (new dead code —
+//   · a dead file NOT in the allowlist                 → FAIL (new dead code —
 //     delete the file; it cannot be pinned)
 //   · an allowlist entry outside the frozen manifest   → FAIL (attempted new
 //     pin or substitution)
@@ -65,10 +84,11 @@
 //
 // Detector canaries run on every invocation: import extraction (static,
 // multi-line, side-effect, re-export, dynamic, require, ssrLoadModule),
-// specifier resolution (alias / index / extension / root-relative), and BFS
-// reachability incl. the mutually-referencing dead-cluster case are asserted
-// against synthetic samples first, so a detector regression can never pass
-// vacuously.
+// specifier resolution (alias / index / extension / root-relative), the
+// checked-scope predicate (pages/hooks/lib/shared in, server/ and *.d.ts out),
+// and BFS reachability incl. the mutually-referencing dead-cluster case are
+// asserted against synthetic samples first, so a detector regression can never
+// pass vacuously.
 //
 // Usage:
 //   node scripts/validation/dead-components.mjs           # gate mode
@@ -82,12 +102,23 @@ const CLIENT = path.join(ROOT, 'client');
 const CLIENT_SRC = path.join(CLIENT, 'src');
 const SERVER = path.join(ROOT, 'server');
 const SHARED = path.join(ROOT, 'shared');
-const COMPONENTS_REL = 'client/src/components/';
+// Checked scope (task #370): every front-end and shared module, not just
+// components/. server/ is excluded because each of its files is a root.
+const SCOPE_RELS = ['client/src/', 'shared/'];
 const ALLOWLIST_PATH = path.join(ROOT, 'scripts/validation/dead-components-allowlist.json');
 const LIST = process.argv.includes('--list');
 
 const CODE_EXTS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs'];
 const SCAN_EXTS = new Set([...CODE_EXTS, '.html']);
+
+// Is this repo-relative path (posix separators) part of the checked scope?
+// *.d.ts is exempt everywhere: ambient declarations are loaded by tsc through
+// tsconfig "include" and legitimately have no importer, so flagging them would
+// be a permanent false positive.
+function inScope(rel) {
+  if (rel.endsWith('.d.ts')) return false;
+  return SCOPE_RELS.some((prefix) => rel.startsWith(prefix));
+}
 
 // ---------------------------------------------------------------------------
 // Trusted frozen exception manifest — the 22 pre-existing dead files found at
@@ -96,7 +127,10 @@ const SCAN_EXTS = new Set([...CODE_EXTS, '.html']);
 // This list must only ever SHRINK (remove a line when its file is deleted).
 // ---------------------------------------------------------------------------
 // All 22 original entries were deleted in the task #369 sweep — the universe
-// is now EMPTY, so no allowlist entry can ever excuse a dead component again.
+// is now EMPTY, so no allowlist entry can ever excuse a dead file again.
+// Widening the checked scope (task #370) exposed five more pre-existing dead
+// files (four hooks + one lib module); they were DELETED in that change rather
+// than added here, so the manifest stayed empty.
 const FROZEN_EXCEPTIONS = new Set([]);
 
 // Entries in the JSON allowlist that are NOT part of the frozen manifest —
@@ -299,6 +333,21 @@ function runCanaries() {
   eq(resolveSpecifier('react', imp, fset).kind, 'external', 'bare specifier is external');
   eq(resolveSpecifier('./no-such-file', imp, fset).kind, 'unresolved', 'missing target is unresolved');
 
+  // Checked scope: the whole client/src + shared surface is in, server/ (all
+  // roots) and ambient declarations are out.
+  eq(inScope('client/src/components/ui/button.tsx'), true, 'component in scope');
+  eq(inScope('client/src/pages/Home.tsx'), true, 'page in scope');
+  eq(inScope('client/src/hooks/use-thing.tsx'), true, 'hook in scope');
+  eq(inScope('client/src/lib/helper.ts'), true, 'lib helper in scope');
+  eq(inScope('client/src/types/awesome-list.ts'), true, 'types module in scope');
+  eq(inScope('shared/schema.ts'), true, 'shared module in scope');
+  eq(inScope('server/routes.ts'), false, 'server file (a root) is out of scope');
+  eq(inScope('client/env.d.ts'), false, 'client/ outside src/ is out of scope');
+  eq(inScope('client/src/types/vite-env.d.ts'), false, 'ambient .d.ts inside scope is exempt');
+  eq(inScope('shared/globals.d.ts'), false, 'ambient .d.ts in shared/ is exempt');
+  eq(inScope('scripts/validation/dead-components.mjs'), false, 'tooling is out of scope');
+  eq(inScope('client/src-legacy/x.ts'), false, 'prefix match is directory-bounded');
+
   // Shrink-only allowlist contract: the frozen manifest rejects any attempted
   // NEW pin and any SUBSTITUTION, while permitting removal of resolved entries.
   const frozen = new Set(['client/src/components/ui/legacy-a.tsx', 'client/src/components/ui/legacy-b.tsx']);
@@ -324,7 +373,7 @@ function runCanaries() {
 // Run.
 // ---------------------------------------------------------------------------
 runCanaries();
-console.log('PASS canaries :: extraction + resolution + reachability verified against synthetic samples');
+console.log('PASS canaries :: extraction + resolution + scope + reachability verified against synthetic samples');
 
 if (!fs.existsSync(ALLOWLIST_PATH)) {
   console.error('FAIL :: allowlist missing — create scripts/validation/dead-components-allowlist.json ({"exceptions": []})');
@@ -351,25 +400,32 @@ if (!roots.some((r) => r === indexHtml)) {
 
 const reachable = reachableFrom(roots, edges);
 
-const componentFiles = [...files]
-  .filter((f) => path.relative(ROOT, f).replaceAll(path.sep, '/').startsWith(COMPONENTS_REL))
-  .filter((f) => CODE_EXTS.includes(path.extname(f)));
+const scopedFiles = [...files]
+  .filter((f) => CODE_EXTS.includes(path.extname(f)))
+  .filter((f) => inScope(path.relative(ROOT, f).replaceAll(path.sep, '/')));
 
-const dead = componentFiles
+const dead = scopedFiles
   .filter((f) => !reachable.has(f))
   .map((f) => path.relative(ROOT, f).replaceAll(path.sep, '/'))
   .sort();
 
 if (LIST) {
   console.log(`graph: ${files.size} files, roots: ${roots.length}, reachable: ${reachable.size}`);
-  console.log(`component files under ${COMPONENTS_REL}: ${componentFiles.length}`);
+  console.log(`in-scope files (${SCOPE_RELS.join(', ')}, excl. *.d.ts): ${scopedFiles.length}`);
+  const byDir = new Map();
+  for (const f of scopedFiles) {
+    const rel = path.relative(ROOT, f).replaceAll(path.sep, '/');
+    const key = rel.startsWith('shared/') ? 'shared/' : rel.split('/').slice(0, 3).join('/') + '/';
+    byDir.set(key, (byDir.get(key) ?? 0) + 1);
+  }
+  for (const [dir, n] of [...byDir].sort()) console.log(`  ${dir}: ${n}`);
 }
 
 let failures = 0;
 
 for (const rel of frozenViolations) {
   console.error(`FAIL allowlist-growth :: ${rel} is not in the frozen exception manifest — the allowlist`);
-  console.error('       only ever SHRINKS. New dead components must be fixed or deleted, never pinned.');
+  console.error('       only ever SHRINKS. New dead files must be fixed or deleted, never pinned.');
   exceptions.delete(rel); // it must not excuse a dead file below
   failures++;
 }
@@ -384,13 +440,13 @@ if (unresolved.length) {
 
 const newlyDead = dead.filter((rel) => !exceptions.has(rel));
 for (const rel of newlyDead) {
-  console.error(`FAIL dead-component :: ${rel} is unreachable from client/index.html and server/`);
+  console.error(`FAIL dead-file :: ${rel} is unreachable from client/index.html and server/`);
   failures++;
 }
 if (newlyDead.length) {
   console.error('       No static or dynamic import chain from any execution root reaches these files,');
-  console.error('       so no user can ever see them — but every sweep/typecheck/styling gate still pays');
-  console.error('       for them. Re-import the component if it was meant to be used, or delete the');
+  console.error('       so no user can ever run them — but every sweep/typecheck/styling gate still pays');
+  console.error('       for them. Re-import the module if it was meant to be used, or delete the');
   console.error('       file (git keeps history). It can NOT be pinned: the allowlist universe is');
   console.error('       frozen at gate introduction and only ever shrinks.');
 }
@@ -407,10 +463,10 @@ for (const [rel, reason] of exceptions) {
 }
 
 if (failures) {
-  console.error(`\n${failures} dead-component failure(s).`);
+  console.error(`\n${failures} dead-code failure(s).`);
   process.exit(1);
 }
 
 const pinned = dead.filter((rel) => exceptions.has(rel));
-console.log(`PASS dead-components :: ${componentFiles.length} component file(s) checked, ${componentFiles.length - dead.length} reachable, ${pinned.length} pinned exception(s)`);
+console.log(`PASS dead-components :: ${scopedFiles.length} in-scope file(s) checked (${SCOPE_RELS.join(' + ')}), ${scopedFiles.length - dead.length} reachable, ${pinned.length} pinned exception(s)`);
 for (const rel of pinned) console.log(`       pinned: ${rel} — ${exceptions.get(rel)}`);

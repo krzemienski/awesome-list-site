@@ -16,4 +16,9 @@ description: Why unused-component detection must be graph reachability from exec
 
 Direction of error matters: after comment stripping, remaining string-literal false matches only make files look MORE alive (safe); missing an edge kind falsely kills a live file (unsafe) — so treat unresolved non-bare specifiers as failures, never silently.
 
+**Scope the gate to the whole app surface, not one directory.** Flag every module under the front-end source root and the shared root; the reachability graph already contains them, so limiting the *reported* set to `components/` is a pure blind spot — dead pages, hooks, and lib helpers survive indefinitely. Two exemptions are principled, not convenience:
+- server files are themselves BFS roots, so "unreachable" is impossible there;
+- `*.d.ts` ambient declarations are loaded by tsc via tsconfig `include`, never by an import edge, so importer-less is their normal state (flagging them is a permanent false positive).
+Directory prefixes must keep their trailing slash or a sibling like `src-legacy/` silently joins the scope. Widening exposed a handful of long-dead hooks/lib files; deleting them beats pinning, and a doc that documents a dead file as "defined but not mounted" needs the same sweep.
+
 **Allowlist contract:** a repo-mutable JSON allowlist alone fails code review — a newly dead file could be pinned in the same change that killed it. Freeze the exception universe as a manifest inside the gate script (allowlist must be a subset; new paths AND substitutions fail), so growing it requires a visible out-of-band edit to the gate itself, and canary the new-pin/substitution/removal cases.

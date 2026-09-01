@@ -138,11 +138,15 @@ zero-result state. `analytics.ts` also retains helpers for future instrumentatio
 without re-plumbing the pipeline: `trackListSwitch`, `trackLayoutChange`, `trackPopoverView`,
 `trackMobileInteraction`, `trackEngagementTime`, `trackScrollDepth`,
 `trackShareAction`, `trackKeyboardShortcut`, `trackExportAction`,
-`trackSessionQuality`, and `trackCopyAction`. The
-`use-session-analytics.tsx` hook (Core Web Vitals + global JS-error capture) is
-also defined but not mounted, so LCP/FID/CLS and `javascript_error` events do not
-fire today. These are intentional — wire them up when the corresponding UI/metric
-is ready.
+`trackSessionQuality`, and `trackCopyAction`. Keeping these helpers is
+intentional — wire them up when the corresponding UI/metric is ready.
+
+A `use-session-analytics.tsx` hook (Core Web Vitals + global JS-error capture)
+used to sit alongside them, defined but never mounted; the widened dead-code
+gate (task #370) found it unreachable and it was deleted, so LCP/FID/CLS and
+`javascript_error` events still do not fire today. Mounting that behaviour again
+means writing it into a component that is actually rendered — an unreferenced
+hook file will fail the `dead-components` gate.
 
 ## Validation (real GA4 network, no mocks)
 
