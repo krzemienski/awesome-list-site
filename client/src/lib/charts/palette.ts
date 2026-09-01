@@ -1,5 +1,5 @@
 // MR-DS-09 — Single source of truth for chart colors.
-// Extracted from analytics-dashboard.tsx + LinkHealthDashboard.tsx so DS
+// Extracted from LinkHealthDashboard.tsx so DS
 // compliance sweeps see exactly one palette declaration. All values are
 // either DS accents (--accent / --accent-2) or DS status semantics
 // (#34d08c ok / #ff5c7a bad / #ffb84d warn / #5eddf2 info / #9d4edd info-2)

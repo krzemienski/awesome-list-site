@@ -105,12 +105,12 @@ These are project widgets that live alongside the primitives:
 - **`view-mode-toggle`** — grid/list/compact toggle for resource listings.
 - **`category-explorer`**, **`taxonomy-card`**, **`tag-filter`**, **`advanced-filter`** —
   taxonomy/browse UI.
-- **`analytics-dashboard`**, **`community-metrics`** — admin/analytics charts (recharts,
+- **`community-metrics`** — admin/analytics charts (recharts,
   colors from `client/src/lib/charts/palette.ts`).
-- **`ai-recommendations-panel`**, **`recommendation-panel`**, **`recommendation-feedback`**,
-  **`resource-recommendations`** — AI recommendation surfaces.
+- **`ai-recommendations-panel`**, **`recommendation-feedback`** — AI recommendation
+  surfaces.
 - **`export-tools`**, **`color-palette-generator`**, **`consent-banner`**,
-  **`user-preferences`**, **`micro-interactions`**, **`suggest-edit-dialog`**,
+  **`suggest-edit-dialog`**,
   **`breadcrumbs`**, **`theme-provider`**, **`scrubbed-params-notice`**.
 
 Living design-system surfaces: the theme picker at `/settings/theme`
