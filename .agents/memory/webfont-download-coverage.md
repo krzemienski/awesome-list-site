@@ -33,6 +33,12 @@ The saved design-system id is read twice: by the pre-paint boot script, which PA
 Measure instead: render the same string with the declared stack, with the wanted family forced alone, and with the stack's generic fallback. The declared stack must measure exactly like the forced family and differently from the generic.
 
 **Why:** Google serves some families (Fraunces) as one static `@font-face` per weight, and the browser downloads only the weights the page actually paints. A synthetic probe at a weight nothing paints therefore measures like a fallback even though the loader is correct — `await document.fonts.load("<weight> <size> <family>")` before measuring, or the probe accuses a working fix.
+
+Run each design system's paint probe in a fresh browser document. Switching systems in one document leaves every earlier stylesheet registered, so a shared family loaded by an earlier system can make a later system pass even when its own loader dropped that family.
+
+**Why:** Font-face availability is document-scoped and cumulative. A sequential switch sweep masked a missing Swiss mono loader because Terminal had already registered the same face.
+
+**How to apply:** Set the target system in storage before navigation, open a fresh context/page, and measure there. Mutation-probe a loader copy with one family removed; a same-page switch sweep is not valid evidence.
 ## A parity gate cannot see a typo both sides share
 
 Comparing a stack against its stylesheet URL only catches the two sides *disagreeing*. A family misspelled in BOTH (stack "'Gesit', sans-serif" + family=Gesit) agrees with itself and passes, while the font host answers 400 and the face never arrives. Closing that needs a live fetch: HTTP 200 **and** an @font-face declaring every family the URL asked for, since a 200 can still be an error page, an empty body, or a different family.
