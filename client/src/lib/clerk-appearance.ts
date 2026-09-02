@@ -1,4 +1,4 @@
-/* =====================================================================
+/* ─────────────────────────────────────────────────────────────────────
    CLERK APPEARANCE — DESIGN-SYSTEM TOKEN BRIDGE (task #376)
 
    Clerk's hosted widget paints from its own stylesheet, and its appearance
@@ -23,7 +23,7 @@
 
    Re-resolving whenever data-system / data-accent flip on <html> keeps the
    auth screens tracking the visitor's selection like every other page.
-   ===================================================================== */
+   ───────────────────────────────────────────────────────────────────── */
 import { useEffect, useMemo, useState } from "react";
 import { dark } from "@clerk/themes";
 import { brandMarkDataUri } from "@/lib/brand-mark";
@@ -233,12 +233,23 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       // it is the corner a visitor actually sees; pin it to the card token and
       // let Clerk's slightly tighter inner step nest inside it as designed.
       ...(radii.card ? { cardBox: { borderRadius: radii.card } } : {}),
-      // OAuth provider marks default to dark ink. Keep the dark card
-      // treatment, but invert those marks so Apple, GitHub, and other
-      // monochrome providers remain visible against their near-black buttons.
+      // Clerk picks the OAuth button VARIANT itself — the labelled row
+      // ("Continue with GitHub") when few providers are enabled, the mark-only
+      // square once there are several — and the element keys are
+      // variant-specific: whichever variant Clerk did NOT render leaves its key
+      // dormant. This card enables four providers and renders the ICON variant
+      // (confirmed against the live DOM: `.cl-socialButtonsIconButton`), which
+      // is why a `socialButtonsBlockButton`-only treatment left them at Clerk's
+      // ~32px default while every other control on the card sat at 40px. Both
+      // keys carry the same treatment so it survives a provider being added or
+      // removed in the Clerk dashboard.
       // (No borderColor here: Clerk draws these buttons at border-width 0 and
       // rings them from `colorBorder`, which task #390 now maps, so a
       // per-element override would only be a dormant second source of truth.)
+      socialButtonsIconButton: {
+        ...(palette.ink ? { color: palette.ink } : {}),
+        minHeight: "40px",
+      },
       socialButtonsBlockButton: {
         ...(palette.ink ? { color: palette.ink } : {}),
         minHeight: "40px",
@@ -246,8 +257,19 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       socialButtonsBlockButtonText: {
         ...(palette.ink ? { color: palette.ink } : {}),
       },
+      // The provider marks are not <img> tags any more: Clerk paints the
+      // monochrome ones (Apple, GitHub, X) as CSS masks FILLED with
+      // `colorForeground` — already the DS --text ink resolved above — and
+      // serves Google's as its full-colour brand image. Both are correct as
+      // painted, so the only job left here is to switch off the inversion the
+      // `dark` base theme still ships for a few providers
+      // (`providerIcon__apple` / `__github`): written for the image era, it now
+      // flips the DS ink fill to near-black and renders those two marks
+      // invisible on the near-black button. The previous
+      // `brightness(0) invert(1)` hid that by forcing every mark to flat white
+      // instead — off-token, and with Google's mark flattened to a blob.
       socialButtonsProviderIcon: {
-        filter: "brightness(0) invert(1)",
+        filter: "none",
       },
       // Clerk's default control height renders ~32px, below the 40px touch
       // minimum the rest of the app holds to. Raise the interactive surfaces

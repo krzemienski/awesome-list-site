@@ -50,6 +50,30 @@ variant (`.cl-socialButtonsIconButton`), and vice versa. An override can sit
 dormant for months while the code reads as if it were applied. Always confirm
 which variant the live widget rendered before trusting an element override.
 
+**How to apply:** style BOTH variant keys. Clerk chooses the variant from how many
+providers the dashboard has enabled, so the live answer can change with no code
+change on this side.
+
+
+## Provider marks are painted, not shipped as images
+The current widget draws a monochrome provider mark (Apple, GitHub, X) as a CSS
+`mask-image` FILLED with `background-color: colorForeground`, and a brand-colour
+one (Google) as a plain `background-image`. Both are already correct on a dark
+card — the mask picks up whatever ink `colorForeground` was mapped to.
+
+**Why:** the `dark` base theme in `@clerk/themes` still carries image-era
+`providerIcon__apple` / `__github` / `__vercel` / `__okx_wallet`
+`filter: invert(1)` rules. Against a mask fill that inversion flips a light ink to
+near-black, so those marks vanish on a dark card; a compensating
+`brightness(0) invert(1)` then hides the problem by forcing every mark to flat
+white — off-token, and it flattens the colour ones to a blob.
+
+**How to apply:** set `socialButtonsProviderIcon: { filter: "none" }` and let the
+mask fill do the work. An appearance override on the GENERIC key beats the base
+theme's per-provider key, so one rule neutralises them all. Verify by sampling the
+brightest painted pixel inside the icon's rect from a raw screenshot buffer — the
+computed `background-color` reads correct even while a filter paints the opposite.
+
 ## Verification notes
 - Measure RENDERED pixels (screenshot + raw buffer), not just the computed value
   of the variable: the variable can be correct while the painted result is
