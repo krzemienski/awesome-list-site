@@ -1,6 +1,10 @@
 #!/bin/bash
-# Docker Deployment End-to-End Verification Script
-# This script verifies that Docker deployment works correctly
+# Manual runbook: Docker deployment end-to-end verification.
+#
+# Run from the repository root on a machine with Docker Compose when validating
+# a self-hosted/container deployment. It needs Docker, Docker Compose, curl,
+# psql, and Clerk values in .env. The clean-start step runs `docker compose
+# down -v`, which deletes the local Compose database volume.
 
 set -e  # Exit on error
 

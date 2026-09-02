@@ -108,8 +108,8 @@ curl -X POST http://localhost:5000/api/resources \
 ### Validation Testing
 
 ```bash
-# Test awesome-lint compliance
-npx tsx scripts/test-awesome-lint.ts
+# Validate exported Awesome-list links (requires the documented awesome_bot setup)
+npm run check:awesome-bot
 ```
 
 ## Pull Request Process

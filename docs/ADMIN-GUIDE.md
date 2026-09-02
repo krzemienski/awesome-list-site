@@ -213,6 +213,11 @@ result. The linter lives in `server/validation/awesomeLint.ts`.
 Link scans can also run on a schedule (`server/jobs/linkHealthScheduler.ts`);
 the service lives in `server/services/linkHealthService.ts`.
 
+For a complete, resumable production URL sweep outside the admin UI, run
+`npx tsx scripts/prod-link-scan.ts` from the repository root. It performs
+read-only network checks and stores progress under `.local/prod-link-scan/`;
+rerun it to continue a scan that reaches its time budget.
+
 ### Acting on Broken Links
 - Review the broken-link report on the Link Health tab
 - Delete or update broken resources

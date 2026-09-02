@@ -355,8 +355,8 @@ Complete change history. Survives resource and user deletion.
 
 Design: `resource_id`/`performed_by` use `SET NULL` on delete so the log persists;
 `original_resource_id` is denormalized and never cleared, so history stays queryable even
-after a resource is removed. (See `scripts/migrate-audit-log-original-resource-id.ts` for
-the one-off backfill.)
+after a resource is removed. The original backfill was a completed one-off and is
+not retained as an active script.
 
 ---
 
@@ -674,9 +674,10 @@ npx tsx scripts/check-migration-drift.ts   # exit 0 = clean, 1 = drift
 
 ### One-off data migrations
 For data transformations (backfills, dedupe, normalization) that aren't plain schema DDL,
-add a script under `scripts/` (e.g. `scripts/migrate-audit-log-original-resource-id.ts`)
-and run it once with `npx tsx scripts/<name>.ts`. Make these idempotent — check state
-before writing and verify counts afterward.
+prefer a journaled migration or an audited admin operation. If a temporary script is
+unavoidable, document its runbook, make it idempotent, verify counts afterward, and
+delete or archive it once the operation is complete rather than leaving a dormant
+one-off in the active `scripts/` directory.
 
 ---
 

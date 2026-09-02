@@ -1,7 +1,14 @@
-// VG-2: Real-browser GA4 validation. Launches the pinned Chromium build,
-// drives real user flows against the running dev server, and captures every
-// GA4 /g/collect request off the wire. No mocks, no stubs — this asserts on
-// the actual network payloads GA4 receives.
+// Manual runbook: VG-2 real-browser GA4 validation.
+//
+// Run `node scripts/vg2-ga4-validate.mjs` after analytics instrumentation
+// changes, with the development server running on localhost:5000. It needs
+// the pinned Playwright Chromium and, for the auth flows, Clerk test keys.
+// The harness uses real GA4 requests and creates throwaway QA data; run
+// scripts/vg2-teardown.ts afterward if cleanup did not complete automatically.
+//
+// Real-browser validation launches the pinned Chromium build, drives real user
+// flows, and captures every GA4 /g/collect request off the wire. No mocks, no
+// stubs — this asserts on the actual network payloads GA4 receives.
 import { chromium } from 'playwright-core';
 import fs from 'fs';
 

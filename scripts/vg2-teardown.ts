@@ -1,3 +1,8 @@
+// Manual runbook: clean up throwaway data created by vg2-ga4-validate.mjs.
+//
+// Run `npx tsx scripts/vg2-teardown.ts` from the repository root after a GA4
+// validation run when its automatic cleanup did not finish. It needs the
+// development DATABASE_URL and deletes only the harness's QA users/resources.
 import { db } from "../server/db";
 import { users, resources } from "../shared/schema";
 import { like, or } from "drizzle-orm";

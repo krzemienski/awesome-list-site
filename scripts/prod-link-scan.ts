@@ -1,3 +1,12 @@
+/**
+ * Manual runbook: resumable production link scan.
+ *
+ * Run this from the repository root when a full production URL sweep is
+ * needed, usually after a link-health investigation. It queries
+ * https://awesome.video and writes resumable progress/results under
+ * .local/prod-link-scan/. The scan requires network access and may take
+ * multiple invocations; it does not modify production data.
+ */
 import { checkResourceLinks, type LinkCheckResult } from "../server/validation/linkChecker";
 import fs from "fs";
 import { fetchWith429Retry } from "./lib/fetch429.mjs";

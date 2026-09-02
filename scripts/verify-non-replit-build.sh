@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Verification script for subtask-6-2: Verify build works without Replit environment
-# This script tests that the application builds and starts successfully without REPL_ID
+# Manual runbook: verify a non-Replit build and local production start.
+#
+# Run from the repository root when checking a container/non-Replit release.
+# It needs Node/npm, curl, PostgreSQL, and VITE_CLERK_PUBLISHABLE_KEY,
+# CLERK_PUBLISHABLE_KEY, and CLERK_SECRET_KEY. It removes the local dist/
+# directory before rebuilding and starts a temporary local server on port 5000.
 
 set -e  # Exit on error
 
