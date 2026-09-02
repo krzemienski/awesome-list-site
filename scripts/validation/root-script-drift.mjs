@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Stray-root-script gate (task #387).
+// Stray-script gate (task #387).
 //
 // Task #375 deleted the last loose one-off script from the repository root
 // (.t264.mjs — an assertion-free Playwright probe, hardcoded to prod, run by
@@ -11,7 +11,8 @@
 // reading as supported tooling.
 //
 // This gate closes that blind spot. Every executable/script file sitting
-// directly in the repository root must be reachable by something MACHINE-READABLE:
+// directly in the repository root OR directly under scripts/ must be reachable
+// by something MACHINE-READABLE:
 //   · npm-script       — named in a package.json "scripts" command
 //   · package-manifest — named in another package.json field (main/bin/…)
 //   · workflow         — named in .replit (workflow task, run, deploy build)
@@ -72,11 +73,12 @@
 // probes look supported; only something that actually runs or loads the file
 // keeps it alive here.
 //
-// CHAINING RULE: root files may import each other (a config loading a sibling
-// config), but two stray root scripts importing each other must not bootstrap
-// themselves into looking alive. So a root→root import is evidence only when
-// the importing root file is itself referenced by an execution tree, a command
-// surface or the config manifest — reachability from real roots, never a cycle.
+// CHAINING RULE: checked files may import each other (a config loading a sibling
+// config, or one active script loading another), but two stray scripts importing
+// each other must not bootstrap themselves into looking alive. So a candidate
+// import is evidence only when the importing candidate is itself referenced by
+// an execution tree, command surface, or manifest — reachability from real
+// roots, never a cycle.
 //
 // Auto-discovered tool configs (eslint.config.js, postcss.config.js, the .ts
 // configs) are named by nothing, so they are pinned in ROOT_CONFIG_MANIFEST
@@ -87,10 +89,12 @@
 // exemption universe is a visible, out-of-band edit to the gate itself — the
 // same trust boundary dead-components.mjs uses for its frozen exceptions.
 //
-// Scope is executable/script files directly in the root — the JS/TS family
-// (.js/.mjs/.cjs/.jsx/.ts/.mts/.cts/.tsx), shell (.sh), and Python (.py) —
-// not recursive: scripts/ is where one-off tooling belongs, and files git
-// already ignores are skipped (they never enter the repository).
+// Scope is executable/script files directly in the root or directly under
+// scripts/ — the JS/TS family (.js/.mjs/.cjs/.jsx/.ts/.mts/.cts/.tsx), shell
+// (.sh), and Python (.py) — not recursive. scripts/validation/ and other
+// nested directories are execution trees, while scripts/archive/ is excluded
+// from both candidate discovery and import reachability. Files git already
+// ignores are skipped (they never enter the repository).
 // *.d.ts is exempt: ambient declarations are pulled in through tsconfig
 // "include", never by a reference.
 //
@@ -148,6 +152,8 @@ const CODE_EXTS = ['.js', '.mjs', '.cjs', '.jsx', '.ts', '.mts', '.cts', '.tsx']
 // Keep root-only executable/script detection broader than the source-tree
 // scanner: a one-off .sh or .py is just as stray as a one-off JS/TS file.
 const CHECKED_EXTS = new Set([...CODE_EXTS, '.sh', '.py']);
+const ACTIVE_SCRIPT_DIR = 'scripts';
+const ARCHIVE_DIR = path.join('scripts', 'archive');
 
 // ---------------------------------------------------------------------------
 // Trusted manifest of auto-discovered root tool configs. Each entry is honored
@@ -165,6 +171,56 @@ const ROOT_CONFIG_MANIFEST = [
   { file: 'playwright.config.ts', pkg: '@playwright/test', note: 'auto-discovered by `playwright test` (npm run test:e2e)' },
   { file: 'drizzle.config.ts', pkg: 'drizzle-kit', note: 'auto-discovered by drizzle-kit push/studio (npm run db:push)' },
   { file: 'tailwind.config.ts', pkg: 'tailwindcss', note: 'Tailwind config (also named by components.json)' },
+];
+
+// Manual runbooks cannot be discovered by a tool, so they need an explicit
+// out-of-band pin. Keep the reason beside the pin: a bare allowlist would let
+// completed one-offs accumulate in the active scripts directory unnoticed.
+const MANUAL_RUNBOOK_MANIFEST = [
+  {
+    file: 'scripts/migrate.ts',
+    note: 'retained standalone migration runner for non-Replit/self-hosted recovery',
+  },
+  {
+    file: 'scripts/prod-link-scan.ts',
+    note: 'retained resumable production URL sweep; read-only and intentionally run by hand',
+  },
+  {
+    file: 'scripts/verify-docker-deployment.sh',
+    note: 'retained self-hosted Docker deployment verification runbook',
+  },
+  {
+    file: 'scripts/verify-non-replit-build.sh',
+    note: 'retained non-Replit production build verification runbook',
+  },
+  {
+    file: 'scripts/vg2-ga4-validate.mjs',
+    note: 'retained real-browser GA4 validation runbook, invoked after analytics changes',
+  },
+  {
+    file: 'scripts/vg2-teardown.ts',
+    note: 'retained cleanup runbook for the GA4 validation harness when automatic cleanup is incomplete',
+  },
+  {
+    file: 'scripts/export-openapi-yaml.ts',
+    note: 'retained on-demand OpenAPI artifact export used when refreshing checked-in API documentation',
+  },
+  {
+    file: 'scripts/test-feedback-loop.ts',
+    note: 'retained opt-in database-backed recommendation regression probe with QA-only teardown',
+  },
+  {
+    file: 'scripts/dedup-reject.ts',
+    note: 'retained idempotent rollback/audit runbook for the documented duplicate-resource corrections',
+  },
+  {
+    file: 'scripts/fix-dead-links-task286.ts',
+    note: 'retained idempotent audit trail for the documented task-286 URL corrections',
+  },
+  {
+    file: 'scripts/run3-cleanup-dev.ts',
+    note: 'retained dry-run-first development cleanup runbook for repeat QA-residue removal',
+  },
 ];
 
 // Execution trees: walked for CODE files, which contribute IMPORT EDGES ONLY.
@@ -191,11 +247,16 @@ const ROOT_SURFACE_FILES = [
 
 // Single predicate so the canaries can assert exactly what may vouch for a file.
 function isCommandSurface(rel) {
+  if (isArchivePath(rel)) return false;
   if (ROOT_SURFACE_FILES.includes(rel)) return true;
   const ext = path.extname(rel);
   if (COMMAND_SURFACE_DIRS.some((d) => rel.startsWith(`${d}/`))) return COMMAND_SURFACE_EXTS.has(ext);
   if (SHELL_ONLY_DIRS.some((d) => rel.startsWith(`${d}/`))) return ext === '.sh';
   return false;
+}
+
+function isArchivePath(rel) {
+  return rel === ARCHIVE_DIR || rel.startsWith(`${ARCHIVE_DIR}/`);
 }
 
 // ---------------------------------------------------------------------------
@@ -279,6 +340,7 @@ const pushRef = (list, where, text) => {
 function extractReplit(doc, out) {
   for (const c of asCommands(doc?.run)) pushRef(out.commands, 'run', c);
   for (const p of asPaths(doc?.entrypoint)) pushRef(out.paths, 'entrypoint', p);
+  for (const p of asPaths(doc?.postMerge?.path)) pushRef(out.paths, 'postMerge.path', p);
   const deployment = isObj(doc?.deployment) ? doc.deployment : {};
   for (const key of ['run', 'build']) {
     for (const c of asCommands(deployment[key])) pushRef(out.commands, `deployment.${key}`, c);
@@ -693,13 +755,19 @@ function extractRelativeSpecifiers(source) {
 // point at a .ts source (server/vite-dev.ts imports "../vite.config").
 function resolveRootTarget(spec, importerAbs, rootFileNames) {
   const base = path.resolve(path.dirname(importerAbs), spec);
-  if (path.dirname(base) !== ROOT) return null;
-  const stem = path.basename(base);
+  const relBase = path.relative(ROOT, base).replaceAll(path.sep, '/');
+  const parent = path.posix.dirname(relBase);
+  if (parent !== '.' && parent !== ACTIVE_SCRIPT_DIR) return null;
+  if (isArchivePath(relBase)) return null;
+  const stem = path.posix.basename(relBase);
   const stemExt = path.extname(stem);
-  const candidates = !stemExt || CODE_EXTS.includes(stemExt) ? [stem] : [];
+  const prefix = parent === '.' ? '' : `${parent}/`;
+  const candidates = !stemExt || CODE_EXTS.includes(stemExt) ? [`${prefix}${stem}`] : [];
   const swap = stem.match(/^(.*)\.(js|jsx|mjs|cjs)$/);
-  if (swap) candidates.push(`${swap[1]}.ts`, `${swap[1]}.tsx`);
-  for (const ext of CODE_EXTS) candidates.push(stem + ext);
+  if (swap) {
+    candidates.push(`${prefix}${swap[1]}.ts`, `${prefix}${swap[1]}.tsx`);
+  }
+  for (const ext of CODE_EXTS) candidates.push(`${prefix}${stem}${ext}`);
   for (const cand of candidates) if (rootFileNames.has(cand)) return cand;
   return null;
 }
@@ -711,10 +779,15 @@ function resolveRootTarget(spec, importerAbs, rootFileNames) {
 // rootEdges:   Map<rootFileName, Set<rootFileName>> edges from other root files
 // deps:        Set<string> of declared package names
 // ---------------------------------------------------------------------------
-function directEvidence(name, { surfaces, importedBy, deps, npmScripts, pkgFields }) {
+function directEvidence(name, { surfaces, importedBy, deps, npmScripts, pkgFields, manualRunbooks = MANUAL_RUNBOOK_MANIFEST }) {
   const config = ROOT_CONFIG_MANIFEST.find((e) => e.file === name);
   if (config && deps.has(config.pkg)) {
     return { kind: 'recognized-config', where: `${config.pkg} — ${config.note}` };
+  }
+
+  const manual = manualRunbooks.find((e) => e.file === name);
+  if (manual && typeof manual.note === 'string' && manual.note.trim()) {
+    return { kind: 'manual-runbook', where: manual.note.trim() };
   }
 
   for (const [scriptName, command] of npmScripts) {
@@ -757,12 +830,19 @@ function directEvidence(name, { surfaces, importedBy, deps, npmScripts, pkgField
       why: `pinned in ROOT_CONFIG_MANIFEST as a config for "${config.pkg}", but "${config.pkg}" is no longer a declared dependency`,
     };
   }
+  if (manual) {
+    return {
+      kind: 'stray',
+      why: 'listed in MANUAL_RUNBOOK_MANIFEST without a documented non-empty reason',
+    };
+  }
   return { kind: 'stray', why: null };
 }
 
-// Root→root import edges are resolved by reachability, never by mutual assent:
-// an edge only counts once its SOURCE is known-alive, so a cycle of otherwise
-// unreferenced root scripts stays stray no matter how they import each other.
+// Candidate→candidate import edges are resolved by reachability, never by
+// mutual assent: an edge only counts once its SOURCE is known-alive, so a cycle
+// of otherwise unreferenced scripts stays stray no matter how they import each
+// other.
 function classifyAll(names, ctx) {
   const results = new Map(names.map((name) => [name, directEvidence(name, ctx)]));
   const rootEdges = ctx.rootEdges ?? new Map();
@@ -796,6 +876,8 @@ function* walk(dir, exts) {
     if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'build') continue;
     if (entry.name.startsWith('.')) continue; // .cache, .git, … (top-level .github is passed in explicitly)
     const full = path.join(dir, entry.name);
+    const rel = path.relative(ROOT, full).replaceAll(path.sep, '/');
+    if (isArchivePath(rel)) continue;
     if (entry.isDirectory()) yield* walk(full, exts);
     else if (exts.has(path.extname(entry.name))) yield full;
   }
@@ -810,6 +892,22 @@ function rootCodeFiles() {
     .sort();
 }
 
+function activeScriptFiles() {
+  const dir = path.join(ROOT, ACTIVE_SCRIPT_DIR);
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  return entries
+    .filter((e) => e.isFile())
+    .map((e) => e.name)
+    .filter((n) => CHECKED_EXTS.has(path.extname(n)) && !n.endsWith('.d.ts'))
+    .map((n) => `${ACTIVE_SCRIPT_DIR}/${n}`)
+    .sort();
+}
+
 // Files git already ignores never enter the repository, so they cannot "pile
 // up" in it. If git is unavailable the set is empty — the stricter direction.
 function gitIgnoredNames(names) {
@@ -819,7 +917,7 @@ function gitIgnoredNames(names) {
   return new Set(res.stdout.split('\n').map((s) => s.trim()).filter(Boolean));
 }
 
-function collect(rootFileNames) {
+function collect(candidateNames) {
   const surfaces = [];
   const parseFailures = []; // a surface the gate cannot read is a gate failure
   const importedBy = new Map(); // edges from the execution trees
@@ -859,8 +957,8 @@ function collect(rootFileNames) {
     const full = path.join(ROOT, dir);
     if (fs.existsSync(full)) codeAbs.push(...walk(full, new Set(CODE_EXTS)));
   }
-  const rootAbs = [...rootFileNames].map((name) => path.join(ROOT, name));
-  for (const abs of [...codeAbs, ...rootAbs]) {
+  const candidateAbs = [...candidateNames].map((name) => path.join(ROOT, name));
+  for (const abs of new Set([...codeAbs, ...candidateAbs])) {
     let raw;
     try {
       raw = fs.readFileSync(abs, 'utf8');
@@ -868,12 +966,12 @@ function collect(rootFileNames) {
       continue;
     }
     const rel = absToRel(abs);
-    const self = path.basename(rel);
-    const fromRoot = path.dirname(abs) === ROOT;
+    const self = rel;
+    const isCandidate = candidateNames.has(self);
     for (const spec of extractRelativeSpecifiers(raw)) {
-      const target = resolveRootTarget(spec, abs, rootFileNames);
+      const target = resolveRootTarget(spec, abs, candidateNames);
       if (!target || target === self) continue;
-      if (fromRoot) {
+      if (isCandidate) {
         if (!rootEdges.has(target)) rootEdges.set(target, new Set());
         rootEdges.get(target).add(self);
       } else if (!importedBy.has(target)) {
@@ -973,6 +1071,7 @@ function runCanaries() {
   eq(kindsOf('.replit', 'run = "npm run dev"\n[[workflows.workflow]]\nname = "probe.mjs"\nauthor = 12345\n'), false, 'a .replit workflow display NAME vouches for nothing');
   eq(kindsOf('.replit', '[[workflows.workflow.tasks]]\ntask = "shell.exec"\nargs = "node probe.mjs"\n'), true, 'a .replit shell.exec args line counts');
   eq(kindsOf('.replit', '[deployment]\nbuild = ["bash", "probe.mjs"]\n'), true, 'a .replit array command counts');
+  eq(kindsOf('.replit', '[postMerge]\npath = "probe.mjs"\n'), true, 'a .replit postMerge path counts');
   eq(kindsOf('.github/workflows/ci.yml', 'name: probe.mjs\njobs:\n  a:\n    steps:\n      - name: probe.mjs\n        run: npm test\n'), false, 'CI display names vouch for nothing');
   eq(kindsOf('.github/workflows/ci.yml', 'jobs:\n  a:\n    steps:\n      - run: |\n          npm ci\n          node probe.mjs\n'), true, 'a CI run: step counts');
   eq(kindsOf('.github/workflows/ci.yml', 'jobs:\n  a:\n    steps:\n      - run: echo probe.mjs\n'), false, 'an echo inside a CI step is not an invocation');
@@ -1070,6 +1169,11 @@ function runCanaries() {
   const nonCodeRootNames = new Set(['probe.py', 'probe.sh']);
   eq(resolveRootTarget('../probe', importer, nonCodeRootNames), null, 'an extensionless JS import cannot resolve a Python or shell script');
   eq(resolveRootTarget('../probe.py', importer, nonCodeRootNames), null, 'an explicit non-JS import cannot resolve a Python script');
+  const scriptNames = new Set(['scripts/probe.mjs', 'scripts/thing.ts']);
+  const scriptImporter = path.join(ROOT, 'scripts', 'validation', 'probe.mjs');
+  eq(resolveRootTarget('../probe.mjs', scriptImporter, scriptNames), 'scripts/probe.mjs', 'a validation import resolves to an active script');
+  eq(resolveRootTarget('../scripts/probe.mjs', importer, scriptNames), 'scripts/probe.mjs', 'a source-tree import resolves to an active script');
+  eq(resolveRootTarget('../archive/probe.mjs', scriptImporter, new Set(['scripts/archive/probe.mjs'])), null, 'archive scripts never resolve as active scripts');
 
   // End-to-end classification against synthetic surfaces.
   const ctx = (over = {}) => ({
@@ -1097,6 +1201,20 @@ function runCanaries() {
   eq(kindOf('probe.mjs', surfaceOf('.github/workflows/test.yml', 'jobs:\n  a:\n    steps:\n      - run: node probe.mjs\n')), 'tooling', 'CI reference keeps it');
   eq(kindOf('probe.mjs', surfaceOf('.github/workflows/test.yml', 'jobs:\n  a:\n    steps:\n      - name: node probe.mjs\n        run: npm test\n')), 'stray', 'a CI step title does not keep it');
   eq(kindOf('probe.mjs', { npmScripts: [['other', 'node scripts/probe.mjs']] }), 'stray', 'a scripts/ namesake does not rescue the root copy');
+  eq(referencesName('node scripts/probe.mjs', 'scripts/probe.mjs'), true, 'active script path is matched');
+  eq(referencesName('node scripts/probe.mjs.bak', 'scripts/probe.mjs'), false, 'active script suffix near-miss does not count');
+  eq(runs('node scripts/probe.mjs', 'scripts/probe.mjs'), true, 'node runs an active script path');
+  eq(runs('node scripts/other.mjs', 'scripts/probe.mjs'), false, 'another active script path does not count');
+  eq(kindOf('scripts/probe.mjs'), 'stray', 'an unreferenced active script is stray');
+  eq(kindOf('scripts/probe.mjs', { npmScripts: [['probe', 'node scripts/probe.mjs']] }), 'npm-script', 'an npm script keeps an active script');
+  eq(kindOf('scripts/probe.mjs', surfaceOf('.replit', '[[workflows.workflow.tasks]]\ntask = "shell.exec"\nargs = "node scripts/probe.mjs"\n')), 'workflow', 'a Replit shell workflow keeps an active script');
+  eq(kindOf('scripts/probe.mjs', surfaceOf('.github/workflows/test.yml', 'jobs:\n  a:\n    steps:\n      - run: node scripts/probe.mjs\n')), 'tooling', 'a CI command keeps an active script');
+  eq(kindOf('scripts/probe.mjs', { importedBy: new Map([['scripts/probe.mjs', 'scripts/validation/x.mjs']]) }), 'import', 'a real import keeps an active script');
+  const manualRunbook = MANUAL_RUNBOOK_MANIFEST[0].file;
+  eq(kindOf(manualRunbook), 'manual-runbook', 'a documented manual runbook is pinned');
+  eq(kindOf('scripts/probe.mjs', { manualRunbooks: [{ file: 'scripts/probe.mjs', note: 'synthetic manual reason' }] }), 'manual-runbook', 'a documented manual reason can pin a runbook');
+  eq(kindOf('scripts/probe.mjs', { manualRunbooks: [{ file: 'scripts/probe.mjs', note: '   ' }] }), 'stray', 'a manual pin without a documented reason cannot pass');
+  eq(isCommandSurface('scripts/archive/old.sh'), false, 'archive scripts are not command surfaces');
 
   // package.json is read field by field: only fields that npm resolves to a
   // file may vouch. Metadata mentioning the name certifies nothing.
@@ -1131,7 +1249,8 @@ function runCanaries() {
   eq(kindOf('eslint.config.js', { deps: new Set(['vite']) }), 'stray', 'manifest config whose package is gone is stray');
   eq(kindOf('tailwind.config.ts'), 'recognized-config', 'ts config in the manifest passes');
 
-  // Root→root edges resolve by reachability, so a cycle cannot bootstrap itself…
+  // Candidate→candidate edges resolve by reachability, so a cycle cannot
+  // bootstrap itself…
   const cycle = classifyAll(['a.mjs', 'b.mjs'], ctx({
     rootEdges: new Map([['a.mjs', new Set(['b.mjs'])], ['b.mjs', new Set(['a.mjs'])]]),
   }));
@@ -1141,6 +1260,17 @@ function runCanaries() {
     rootEdges: new Map([['vite.config.ts', new Set(['probe.mjs'])]]),
   }));
   eq(oneWay.get('probe.mjs').kind, 'stray', 'importing a live config does not rescue the importer');
+  const scriptCycle = classifyAll(['scripts/a.mjs', 'scripts/b.mjs'], ctx({
+    rootEdges: new Map([
+      ['scripts/a.mjs', new Set(['scripts/b.mjs'])],
+      ['scripts/b.mjs', new Set(['scripts/a.mjs'])],
+    ]),
+  }));
+  eq(
+    [scriptCycle.get('scripts/a.mjs').kind, scriptCycle.get('scripts/b.mjs').kind],
+    ['stray', 'stray'],
+    'two active scripts importing each other stay stray',
+  );
   // …while a genuinely reachable root file does vouch for what it loads.
   const chained = classifyAll(['helper.mjs', 'vite.config.ts'], ctx({
     rootEdges: new Map([['helper.mjs', new Set(['vite.config.ts'])]]),
@@ -1152,16 +1282,18 @@ function runCanaries() {
 // Run.
 // ---------------------------------------------------------------------------
 runCanaries();
-console.log('PASS canaries :: reference matching + comment stripping + root-import resolution + manifest condition verified against synthetic samples');
+console.log('PASS canaries :: reference matching + comment stripping + candidate-import resolution + manifest conditions verified against synthetic samples');
 
-const allRootFiles = rootCodeFiles();
-const ignored = gitIgnoredNames(allRootFiles);
-const checked = allRootFiles.filter((n) => !ignored.has(n));
+const rootFiles = rootCodeFiles();
+const activeScripts = activeScriptFiles();
+const allCandidates = [...rootFiles, ...activeScripts];
+const ignored = gitIgnoredNames(allCandidates);
+const checked = allCandidates.filter((n) => !ignored.has(n));
 
-// The gate must never pass vacuously: the root has always held tool configs,
-// so an empty checked set means the scan itself broke (wrong cwd, bad walk).
+// The gate must never pass vacuously: the root has always held tool configs and
+// scripts/ has active tooling, so an empty set means discovery broke.
 if (!checked.length) {
-  console.error('FAIL scan-empty :: no root executable/script files found at all — the scan is broken, not the repo clean.');
+  console.error('FAIL scan-empty :: no root or active scripts/ executable files found — the scan is broken, not the repo clean.');
   process.exit(1);
 }
 
@@ -1185,34 +1317,39 @@ const stray = results.filter((r) => r.kind === 'stray');
 if (LIST) {
   console.log(`command surfaces: ${surfaces.length} file(s) (root configs, ${COMMAND_SURFACE_DIRS.join(', ')}, ${SHELL_ONLY_DIRS.join(', ')}/**/*.sh)`);
   console.log(`import edges parsed from: ${codeCount} source file(s) across ${IMPORT_TREE_DIRS.join(', ')}`);
-  console.log(`root executable/script files: ${allRootFiles.length} (${ignored.size} git-ignored, ${checked.length} checked)`);
+  console.log(`candidate executable/script files: ${allCandidates.length} (${rootFiles.length} root, ${activeScripts.length} active scripts/, ${ignored.size} git-ignored, ${checked.length} checked)`);
   const manifestAbsent = ROOT_CONFIG_MANIFEST.filter((e) => !checked.includes(e.file)).map((e) => e.file);
   if (manifestAbsent.length) console.log(`manifest entries with no file present: ${manifestAbsent.join(', ')}`);
+  const runbookAbsent = MANUAL_RUNBOOK_MANIFEST.filter((e) => !checked.includes(e.file)).map((e) => e.file);
+  if (runbookAbsent.length) console.log(`manual-runbook entries with no file present: ${runbookAbsent.join(', ')}`);
 }
 
 for (const r of stray) {
-  console.error(`FAIL stray-root-script :: ${r.name}`);
+  console.error(`FAIL stray-script :: ${r.name}`);
   if (r.why) console.error(`       ${r.why}`);
   else {
     console.error('       Nothing machine-readable references it: no npm script (package.json), no');
     console.error('       workflow (.replit), no CI/container/tooling config, no import edge from');
     console.error('       client/server/shared/scripts/tests/migrations (or from a root file that is');
-    console.error('       itself reachable), and it is not a recognized tool config. A mention in a');
-    console.error('       doc, a comment or a plain source string is deliberately not a reference.');
+    console.error('       itself reachable), and it is neither a recognized tool config nor a pinned');
+    console.error('       manual runbook. A mention in prose, a comment, or a plain source string is');
+    console.error('       deliberately not a reference.');
   }
 }
 if (stray.length) {
   console.error('');
-  console.error('       A one-off probe at the repository root reads as supported tooling in the first');
-  console.error('       `ls` and in security-scan output, and no other gate can see it. Fix by one of:');
+  console.error('       An unreferenced root or active scripts/ file reads as supported tooling while');
+  console.error('       no command or import keeps it alive. Fix by one of:');
   console.error('         · wire it to an npm script or a validation workflow, or import it;');
-  console.error('         · move it under scripts/ — that is where one-off tooling belongs;');
+  console.error('         · move a completed historical helper under scripts/archive/;');
   console.error('         · delete it (git keeps the history);');
+  console.error('         · if it is a legitimate manual runbook, document why it remains and pin it');
+  console.error('           in MANUAL_RUNBOOK_MANIFEST in this gate;');
   console.error('         · if it is a genuine auto-discovered tool config, add it to');
   console.error('           ROOT_CONFIG_MANIFEST in this gate together with the package that loads it.');
-  console.error(`\n${stray.length} stray root script(s).`);
+  console.error(`\n${stray.length} stray script(s).`);
   process.exit(1);
 }
 
-console.log(`PASS root-script-drift :: ${checked.length} root executable/script file(s) checked, 0 stray${ignored.size ? `, ${ignored.size} git-ignored` : ''}`);
+console.log(`PASS root-script-drift :: ${checked.length} root + active scripts/ executable file(s) checked, 0 stray${ignored.size ? `, ${ignored.size} git-ignored` : ''}`);
 for (const r of results) console.log(`       ${r.name} — ${r.kind}: ${r.where}`);
