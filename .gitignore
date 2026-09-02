@@ -113,7 +113,13 @@ plans/
 /hunt-workspace/
 /_validation/
 /_planning/
-/artifacts/
+# The component preview sandbox is maintained source; keep other artifacts ignored.
+/artifacts/*
+!/artifacts/mockup-sandbox/
+!/artifacts/mockup-sandbox/**
+/artifacts/mockup-sandbox/node_modules/
+/artifacts/mockup-sandbox/dist/
+/artifacts/mockup-sandbox/.tsbuildinfo
 /banks/
 repomix-output.xml
 
