@@ -87,8 +87,9 @@ const browser = await launchBrowserWithLease(
   "sticky-preview-audit",
 );
 
-try {
-  const context = await browser.newContext({ viewport: { width: 375, height: 812 } });
+async function auditViewport(width, height, expectedOffset) {
+  const label = `@${width}`;
+  const context = await browser.newContext({ viewport: { width, height } });
   const page = await context.newPage();
   try {
     await gotoPage(page, "/settings/theme");
@@ -99,7 +100,7 @@ try {
     }).then(() => true).catch(() => false);
 
     if (!previewReady) {
-      log("theme-sticky-preview-present@375", false, "sticky preview was not rendered");
+      log(`theme-sticky-preview-present${label}`, false, "sticky preview was not rendered");
     } else {
       const before = await page.evaluate((selector) => {
         const preview = document.querySelector(selector);
@@ -117,6 +118,7 @@ try {
           previewHeight: previewRect.height,
           headerBottom: headerRect.bottom,
           position: getComputedStyle(preview).position,
+           stickyTop: getComputedStyle(preview).top,
           overflowX: mainStyle.overflowX,
           overflowY: mainStyle.overflowY,
         };
@@ -125,16 +127,17 @@ try {
       const stylePass = Boolean(
         before &&
           before.position === "sticky" &&
+          before.stickyTop === `${expectedOffset}px` &&
           before.overflowX === "clip" &&
           before.overflowY === "visible" &&
           before.previewHeight > 0 &&
           before.documentHeight > before.viewportHeight,
       );
       log(
-        "theme-sticky-preview-css@375",
+        `theme-sticky-preview-css${label}`,
         stylePass,
         before
-          ? `position=${before.position} mainOverflow=${before.overflowX}/${before.overflowY} documentHeight=${before.documentHeight}`
+          ? `position=${before.position} top=${before.stickyTop} expectedTop=${expectedOffset}px mainOverflow=${before.overflowX}/${before.overflowY} documentHeight=${before.documentHeight}`
           : "main, header, or preview not found",
       );
 
@@ -165,24 +168,33 @@ try {
           after &&
           after.scrollY > 0 &&
           after.previewTop >= -tolerance &&
+          Math.abs(after.previewTop - expectedOffset) <= tolerance &&
+          Math.abs(after.headerBottom - expectedOffset) <= tolerance &&
           Math.abs(after.previewTop - after.headerBottom) <= tolerance &&
           after.previewBottom > after.previewTop,
       );
       log(
-        "theme-sticky-preview-scroll@375",
+        `theme-sticky-preview-scroll${label}`,
         scrollPass,
         after
-          ? `scrollY=${Math.round(after.scrollY)} previewTop=${Math.round(after.previewTop)} headerBottom=${Math.round(after.headerBottom)}`
+          ? `scrollY=${Math.round(after.scrollY)} previewTop=${Math.round(after.previewTop)} expectedTop=${expectedOffset} headerBottom=${Math.round(after.headerBottom)}`
           : "preview or header not found after scroll",
       );
 
       if (!scrollPass) {
-        await page.screenshot({ path: `${OUT}/theme-sticky-preview-scroll.png` }).catch(() => {});
+        await page.screenshot({ path: `${OUT}/theme-sticky-preview-scroll-${width}.png` }).catch(() => {});
       }
     }
   } finally {
     await context.close().catch(() => {});
   }
+}
+
+try {
+  // Keep the existing phone regression check intact, and also exercise the
+  // visible md breakpoint where both the header and preview use a 60px offset.
+  await auditViewport(375, 812, 56);
+  await auditViewport(768, 900, 60);
 } finally {
   fs.writeFileSync(`${OUT}/sticky-preview-audit.json`, JSON.stringify(results, null, 2));
   await browser.close();
