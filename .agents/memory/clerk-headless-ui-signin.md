@@ -18,6 +18,25 @@ configuration, or the code Clerk documents for `+clerk_test` addresses; never
 store verification values in memory. Always delete the throwaway identity and
 matching database row.
 
+## Recovery routing and completion
+
+**Rule:** The current Clerk recovery UI can keep both “Forgot Password?” and
+its email-code verification screen at `/sign-in/factor-one`; do not require a
+`forgot-password` or `verify` path segment. Require the whole flow to remain
+under `/sign-in`, confirm the verification field actually appeared, and treat
+the resulting authenticated session as completion even when Clerk does not
+show a new-password form.
+
+**Why:** A real browser recovery run restored the account directly after the
+email-code challenge. A validator that assumed route names or a mandatory
+new-password screen falsely failed a working configured flow.
+
+**How to apply:** Assert the canonical `/sign-in` prefix at each recovery step,
+wait for Clerk’s accessible verification input before typing, then race the
+configured outcomes: an authenticated session or a visible new-password form.
+The browser global exposes `Clerk.user` reliably here; `Clerk.isLoaded` may be
+undefined and must not gate the completion check.
+
 ## Getting past the bot gate
 
 **Rule:** Only **sign-up** invokes the captcha — `SignIn.create` has no captcha

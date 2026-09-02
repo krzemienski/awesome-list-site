@@ -1,6 +1,7 @@
-// Repeatable real-browser validation for Clerk's deep-page return contract.
-// Starts logged out on /submit, follows its sign-in link, completes a real
-// Clerk test login, and verifies the browser returns to /submit.
+// Repeatable real-browser validation for Clerk's sign-in, deep-page return,
+// and account-recovery contracts. Starts logged out on /submit, follows its
+// sign-in link, completes a real Clerk test login, verifies the browser returns
+// to /submit, then signs out and completes Clerk's email-code recovery flow.
 //
 // Requires the development server on :5000, DATABASE_URL, and CLERK_SECRET_KEY.
 // Evidence is written only to /tmp/validation/auth-return-audit.
@@ -143,6 +144,93 @@ async function signInWithClerk(page, email, password) {
   }
 }
 
+async function waitForAuthenticatedSession(page, expectedPath) {
+  const deadline = Date.now() + 90_000;
+  let authState = null;
+  while (Date.now() < deadline) {
+    authState = await page.evaluate(async () => {
+      const response = await fetch("/api/auth/user", { credentials: "include" });
+      return response.json().catch(() => null);
+    });
+    const pathMatches =
+      expectedPath === undefined || new URL(page.url()).pathname === expectedPath;
+    if (pathMatches && authState?.isAuthenticated === true) break;
+    await page.waitForTimeout(1_000);
+  }
+  return authState;
+}
+
+async function recoverWithClerk(page, email, replacementPassword) {
+  await gotoPage(page, "/sign-in");
+  const identifier = page.locator('input[name="identifier"]');
+  await identifier.waitFor({ timeout: 30_000 });
+  await identifier.fill(email);
+  await page.keyboard.press("Enter");
+
+  const passwordField = page.locator('input[name="password"]');
+  await passwordField.waitFor({ timeout: 30_000 });
+  await page.getByText(/forgot password/i).first().click();
+
+  const recoveryPath = new URL(page.url()).pathname;
+  const recoveryHeading = page.getByRole("heading", { name: /forgot password/i });
+  const recoveryVisible = await recoveryHeading
+    .waitFor({ state: "visible", timeout: 30_000 })
+    .then(() => true)
+    .catch(() => false);
+  log(
+    "clerk-recovery:canonical-entry",
+    recoveryPath.startsWith("/sign-in") && recoveryVisible,
+    `path=${recoveryPath} recovery_ui=${recoveryVisible}`,
+  );
+  await page.screenshot({ path: `${OUT}/account-recovery-entry.png`, fullPage: true });
+
+  const emailCodeButton = page.getByRole("button", { name: /^email code to /i }).first();
+  await emailCodeButton.waitFor({ state: "visible", timeout: 30_000 });
+  await emailCodeButton.click();
+
+  const otp = page.locator('input[aria-label="Enter verification code"]');
+  const verificationVisible = await otp
+    .waitFor({ state: "visible", timeout: 30_000 })
+    .then(() => true)
+    .catch(() => false);
+  const verificationPath = new URL(page.url()).pathname;
+  log(
+    "clerk-recovery:canonical-verification",
+    verificationPath.startsWith("/sign-in") && verificationVisible,
+    `path=${verificationPath} code_input=${verificationVisible}`,
+  );
+  await page.screenshot({
+    path: `${OUT}/account-recovery-verification.png`,
+    fullPage: true,
+  });
+  if (!verificationVisible) {
+    throw new Error("Clerk recovery did not expose its verification-code field");
+  }
+
+  await otp.click();
+  await page.keyboard.type("424242", { delay: 120 });
+
+  const newPassword = page.getByLabel(/new password/i).first();
+  await Promise.race([
+    page.waitForFunction(() => Boolean(window.Clerk?.user), null, { timeout: 30_000 }),
+    newPassword.waitFor({ state: "visible", timeout: 30_000 }),
+  ]);
+  if (!(await page.evaluate(() => Boolean(window.Clerk?.user)))) {
+    await newPassword.fill(replacementPassword);
+    const confirmPassword = page.getByLabel(/confirm password/i).first();
+    if (await confirmPassword.isVisible().catch(() => false)) {
+      await confirmPassword.fill(replacementPassword);
+    }
+    await page
+      .getByRole("button", { name: /^(continue|reset password)$/i })
+      .first()
+      .click();
+    await page.waitForFunction(() => Boolean(window.Clerk?.user), null, {
+      timeout: 30_000,
+    });
+  }
+}
+
 const pool = new Pool({ connectionString: DATABASE_URL });
 const results = [];
 const log = (name, pass, detail) => {
@@ -226,18 +314,7 @@ try {
 
   await signInWithClerk(page, email, password);
 
-  const returnDeadline = Date.now() + 90_000;
-  let authState = null;
-  while (Date.now() < returnDeadline) {
-    authState = await page.evaluate(async () => {
-      const response = await fetch("/api/auth/user", { credentials: "include" });
-      return response.json().catch(() => null);
-    });
-    if (new URL(page.url()).pathname === "/submit" && authState?.isAuthenticated === true) {
-      break;
-    }
-    await page.waitForTimeout(1_000);
-  }
+  const authState = await waitForAuthenticatedSession(page, "/submit");
 
   const returnedPath = new URL(page.url()).pathname;
   log(
@@ -246,6 +323,22 @@ try {
     `path=${returnedPath} authenticated=${authState?.isAuthenticated}`,
   );
   await page.screenshot({ path: `${OUT}/auth-return.png`, fullPage: true });
+
+  await page.evaluate(async () => {
+    await window.Clerk?.signOut?.();
+  });
+  await page.waitForFunction(() => !window.Clerk?.user, null, { timeout: 30_000 });
+
+  const replacementPassword = `AuthRecoveryAudit-${suffix}!`;
+  await recoverWithClerk(page, email, replacementPassword);
+  const recoveryAuthState = await waitForAuthenticatedSession(page);
+  const recoveryCompleted = recoveryAuthState?.isAuthenticated === true;
+  log(
+    "clerk-recovery:authenticated",
+    recoveryCompleted,
+    `path=${new URL(page.url()).pathname} authenticated=${recoveryAuthState?.isAuthenticated}`,
+  );
+  await page.screenshot({ path: `${OUT}/account-recovery-complete.png`, fullPage: true });
 } catch (error) {
   console.error("AUDIT ERROR:", error);
   log("audit:uncaught", false, error instanceof Error ? error.message : String(error));
