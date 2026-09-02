@@ -155,6 +155,10 @@ args = "root-script-drift"
 task = "workflow.run"
 args = "guest-recommendations"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "theme-registry-types"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -521,6 +525,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run validate:guest-recommendations"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "theme-registry-types"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:theme-registry-types"
 
 [workflows.workflow.metadata]
 isValidation = true

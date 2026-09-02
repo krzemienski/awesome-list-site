@@ -29,7 +29,32 @@ export interface Accent {
   secondary: string;
 }
 
-export const THEME_FALLBACK_REGISTRY = {
+interface ThemeRegistryShape {
+  defaultSystem: string;
+  defaultAccent: string;
+  systems: readonly (DesignSystem & {
+    id: string;
+    defaultAccent: string;
+  })[];
+  accents: readonly Accent[];
+}
+
+type ThemeRegistryWithKnownReferences<T extends ThemeRegistryShape> =
+  Exclude<T['defaultSystem'], T['systems'][number]['id']> extends never
+    ? Exclude<T['defaultAccent'], T['accents'][number]['id']> extends never
+      ? Exclude<T['systems'][number]['defaultAccent'], T['accents'][number]['id']> extends never
+        ? T
+        : never
+      : never
+    : never;
+
+function defineThemeFallbackRegistry<const T extends ThemeRegistryShape>(
+  registry: T & ThemeRegistryWithKnownReferences<T>,
+): T {
+  return registry;
+}
+
+export const THEME_FALLBACK_REGISTRY = defineThemeFallbackRegistry({
   defaultSystem: 'editorial',
   defaultAccent: 'crimson',
   systems: [
@@ -83,13 +108,13 @@ export const THEME_FALLBACK_REGISTRY = {
     { id: 'lime',    name: 'Lime',    primary: '#aaff00', secondary: '#00ff88' },
     { id: 'rose',    name: 'Rose',    primary: '#ff7a8a', secondary: '#ffb3c1' },
   ],
-} as const;
+});
 
 export type DesignSystemId = (typeof THEME_FALLBACK_REGISTRY.systems)[number]['id'];
 export type AccentId = (typeof THEME_FALLBACK_REGISTRY.accents)[number]['id'];
 
 export const DESIGN_SYSTEMS: Record<DesignSystemId, DesignSystem> = Object.fromEntries(
-  THEME_FALLBACK_REGISTRY.systems.map(({ id, defaultAccent: _defaultAccent, ...system }) => [id, system]),
+  THEME_FALLBACK_REGISTRY.systems.map(({ id, name, tag, desc }) => [id, { name, tag, desc }]),
 ) as Record<DesignSystemId, DesignSystem>;
 
 export const ACCENTS: Accent[] = THEME_FALLBACK_REGISTRY.accents.map((accent) => ({ ...accent }));
