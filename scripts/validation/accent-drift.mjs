@@ -235,6 +235,17 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as cheerio from 'cheerio';
 import esbuild from 'esbuild';
+import {
+  MINIMAL_TOKEN_SYSTEMS,
+  declaresCustomProperty,
+  findStaleMinimalTokenSystems,
+  findMissingSystemTokens,
+  formatMissingSystemTokensMessage,
+  parseCssCustomProperties,
+  parseCssSystemBlocks,
+  sharedSystemTokens,
+  validateMinimalTokenSystems,
+} from './design-system-token-contract.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TS_REL = 'client/src/lib/design-system.ts';
@@ -267,18 +278,10 @@ const BASE_ROOT_PAINTED_SYSTEMS = new Map([
 // Escape hatch: systems intentionally using a deliberately minimal token set
 // ---------------------------------------------------------------------------
 // A system may intentionally share most of the default look, but that choice
-// must be recorded here with the same discipline as BASE_ROOT_PAINTED_SYSTEMS.
-// The reasoned entry excuses only the shared-token contract below; it never
-// excuses a missing/empty block, an unoffered id, or a stale pin.
-const MINIMAL_TOKEN_SYSTEMS = new Map([
-  // ['example', 'Written reason: this system intentionally changes only ...'],
-]);
-
-// A new one-token block must not weaken the peer contract for every established
-// system. A property belongs to the contract when at least this proportion of
-// offered, non-exempt peer blocks declares it.
-const SHARED_TOKEN_PEER_RATIO = 0.75;
-
+// must be recorded in the shared MINIMAL_TOKEN_SYSTEMS table imported above,
+// with the same discipline as BASE_ROOT_PAINTED_SYSTEMS. The reasoned entry
+// excuses only the shared-token contract below; it never excuses a
+// missing/empty block, an unoffered id, or a stale pin.
 // ---------------------------------------------------------------------------
 // Color identity
 // ---------------------------------------------------------------------------
@@ -643,17 +646,8 @@ function parseTsDefaultSystem(tsSrc) {
 
 // :root[data-system="id"] { … } token blocks — the ~30 overrides that make a
 // system look like itself. Anchored exactly like the accent parser, so only a
-// bare attribute rule counts: the PER-SYSTEM COMPONENT SKINS further down the
-// same stylesheet are written as `[data-system="…"] .card` descendant rules,
-// which reshape individual components rather than carrying the system's
-// tokens, and a `:root[data-system="…"] .card` rule is a skin too.
-const SYSTEM_BLOCK_RE = /^[ \t]*:root\[data-system=["']([A-Za-z0-9_-]+)["']\]\s*\{([^}]*)\}/gm;
-
 function parseCssSystems(cssSrc) {
-  const src = stripComments(cssSrc);
-  const out = new Map();
-  for (const m of src.matchAll(SYSTEM_BLOCK_RE)) out.set(m[1], m[2]);
-  return out;
+  return parseCssSystemBlocks(cssSrc);
 }
 
 // Component skins use descendant selectors rather than the bare
@@ -691,52 +685,6 @@ function parseCssSystemFonts(cssSrc) {
   const out = new Map();
   for (const [id, body] of parseCssSystems(cssSrc)) out.set(id, parseCssFontTokens(body));
   return out;
-}
-
-// Read every custom property a token block declares. This is deliberately
-// broader than the font-token reader: the whole set is the contract that keeps
-// a new system from silently inheriting most of the default look.
-function parseCssCustomProperties(body) {
-  return new Set(
-    [...String(body ?? '').matchAll(/(?:^|[\s;{])(--[\w-]+)\s*:/g)].map((m) => m[1]),
-  );
-}
-
-// A token block earns its keep by DECLARING something. An empty block is a
-// system that paints exactly like the default — the same defect as a missing
-// block, wearing a selector.
-function declaresCustomProperty(body) {
-  return parseCssCustomProperties(body).size > 0;
-}
-
-// The common token set comes from the established peers, not from every CSS
-// block: a newly added half-finished block must not vote its own omissions into
-// the baseline. The caller supplies offered ids so dead paint can never become
-// a peer.
-function sharedSystemTokens(systemIds, cssBlocks, excludedIds = new Set()) {
-  const candidates = systemIds.filter(
-    (id) => cssBlocks.has(id) && declaresCustomProperty(cssBlocks.get(id)) && !excludedIds.has(id),
-  );
-  const declarationCounts = new Map(
-    candidates.map((id) => [id, parseCssCustomProperties(cssBlocks.get(id)).size]),
-  );
-  // Use the lower median as the minimum size of an established peer. This
-  // filters a newly added small block (and a partially deleted block) before
-  // either can weaken the contract used to judge the other systems.
-  const sortedCounts = [...declarationCounts.values()].sort((a, b) => a - b);
-  const medianCount = sortedCounts.length ? sortedCounts[Math.floor((sortedCounts.length - 1) / 2)] : 0;
-  const peerIds = candidates.filter((id) => declarationCounts.get(id) >= medianCount);
-  const counts = new Map();
-  for (const id of peerIds) {
-    for (const token of parseCssCustomProperties(cssBlocks.get(id))) {
-      counts.set(token, (counts.get(token) ?? 0) + 1);
-    }
-  }
-  const minimumPeers = Math.ceil(peerIds.length * SHARED_TOKEN_PEER_RATIO);
-  const tokens = new Set(
-    [...counts].filter(([, count]) => count >= minimumPeers).map(([token]) => token),
-  );
-  return { peerIds, tokens };
 }
 
 // SYSTEM_DEFAULT_ACCENT: Record<string, string> in design-system.ts — a flat
@@ -1259,29 +1207,19 @@ function compareSystemPaint(systemIds, cssBlocks, baseRootPainted, minimalTokenS
 
   // Minimal-token exemptions are checked before they are allowed to influence
   // the peer contract. A reason-less or stale entry is never an exemption.
-  const minimalTokenExempt = new Set();
-  for (const [id, reason] of minimalTokenSystems) {
-    const written = String(reason ?? '').trim();
-    if (!written) {
-      failures.push({
-        kind: 'minimal-system-exemption',
-        id,
-        message: `design system "${id}" is pinned in MINIMAL_TOKEN_SYSTEMS with no written reason — write why its intentionally minimal token set is sufficient or delete the entry`,
-      });
-      continue;
-    }
-    if (!offered.has(id)) {
-      failures.push({
-        kind: 'minimal-system-exemption',
-        id,
-        message: `design system "${id}" is pinned in MINIMAL_TOKEN_SYSTEMS but DESIGN_SYSTEMS no longer offers it — drop the stale entry (reason was: ${written})`,
-      });
-      continue;
-    }
-    const body = cssBlocks.get(id);
-    if (body == null || !declaresCustomProperty(body)) continue;
-    minimalTokenExempt.add(id);
-  }
+  const minimalValidation = validateMinimalTokenSystems(
+    [...offered],
+    cssBlocks,
+    minimalTokenSystems,
+  );
+  failures.push(
+    ...minimalValidation.failures.map(({ id, message }) => ({
+      kind: 'minimal-system-exemption',
+      id,
+      message,
+    })),
+  );
+  const minimalTokenExempt = minimalValidation.exemptIds;
 
   for (const id of [...new Set([...offered, ...cssBlocks.keys()])].sort()) {
     if (!cssBlocks.has(id)) {
@@ -1310,7 +1248,7 @@ function compareSystemPaint(systemIds, cssBlocks, baseRootPainted, minimalTokenS
     }
   }
 
-  const { tokens: sharedTokens } = sharedSystemTokens(
+  const { tokens: sharedTokens, missingBySystem } = findMissingSystemTokens(
     [...offered],
     cssBlocks,
     new Set([...exempt, ...minimalTokenExempt]),
@@ -1322,33 +1260,30 @@ function compareSystemPaint(systemIds, cssBlocks, baseRootPainted, minimalTokenS
   for (const id of offered) {
     const body = cssBlocks.get(id);
     if (body == null || !declaresCustomProperty(body) || exempt.has(id) || minimalTokenExempt.has(id)) continue;
-    const declared = parseCssCustomProperties(body);
-    const missing = [...sharedTokens].filter((token) => !declared.has(token)).sort();
-    if (missing.length) {
+    const missing = missingBySystem.get(id);
+    if (missing) {
       failures.push({
         kind: 'system-token-contract',
         id,
-        message: `design system "${id}" declares ${declared.size} custom propert${declared.size === 1 ? 'y' : 'ies'}, but its established peers agree on ${sharedTokens.size}; missing shared token(s): ${missing.join(', ')} — add them to :root[data-system="${id}"], or record a written reason in MINIMAL_TOKEN_SYSTEMS if this smaller look is intentional`,
+        message: formatMissingSystemTokensMessage(id, missing.declaredCount, sharedTokens.size, missing.missing),
       });
     }
   }
 
   // Once a minimal system grows to satisfy the peer contract, its exemption
   // has done its job and must be removed rather than becoming permanent debt.
-  if (sharedTokens.size) {
-    for (const id of minimalTokenExempt) {
-      const declared = parseCssCustomProperties(cssBlocks.get(id));
-      const missing = [...sharedTokens].filter((token) => !declared.has(token));
-      if (!missing.length) {
-        const reason = String(minimalTokenSystems.get(id)).trim();
-        failures.push({
-          kind: 'minimal-system-exemption',
-          id,
-          message: `design system "${id}" is pinned in MINIMAL_TOKEN_SYSTEMS but now declares the full shared token contract — drop the stale entry (reason was: ${reason})`,
-        });
-      }
-    }
-  }
+  failures.push(
+    ...findStaleMinimalTokenSystems(
+      minimalTokenExempt,
+      cssBlocks,
+      sharedTokens,
+      minimalTokenSystems,
+    ).map(({ id, message }) => ({
+      kind: 'minimal-system-exemption',
+      id,
+      message,
+    })),
+  );
 
   return failures;
 }

@@ -158,6 +158,7 @@ const CHECKED_EXTS = new Set([...CODE_EXTS, '.sh', '.py']);
 // ---------------------------------------------------------------------------
 const ROOT_CONFIG_MANIFEST = [
   { file: 'eslint.config.js', pkg: 'eslint', note: 'flat config auto-discovered by `eslint .` (npm run lint)' },
+  { file: 'stylelint.config.mjs', pkg: 'stylelint', note: 'auto-discovered by `stylelint` (npm run lint:css and editor diagnostics)' },
   { file: 'postcss.config.js', pkg: 'postcss', note: 'auto-discovered by the PostCSS/Tailwind pipeline during vite build' },
   { file: 'vite.config.ts', pkg: 'vite', note: 'auto-discovered by vite dev/build' },
   { file: 'vitest.config.ts', pkg: 'vitest', note: 'auto-discovered by `vitest run` (npm run test:unit / test:integration)' },
