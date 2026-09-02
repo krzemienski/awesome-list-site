@@ -1,7 +1,7 @@
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import "./lib/design-system";
+import { resolveSystemId } from "./lib/design-system";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -70,7 +70,12 @@ afterFirstPaint(() => {
   initMixpanel();
   initPosthog();
   initAmplitude();
-  if (selectedSystemAtBoot) loadDesignSystemFont(selectedSystemAtBoot);
+  // #411: resolve the saved system the same way the pre-paint boot script and
+  // ThemeProvider do. A first visit (no ds-system yet), a saved id the app no
+  // longer offers, and junk in localStorage all PAINT as DEFAULT_SYSTEM, so
+  // passing the raw value through skipped that system's webfonts entirely —
+  // its display and mono faces were named by the CSS and never downloaded.
+  loadDesignSystemFont(resolveSystemId(selectedSystemAtBoot));
   if (fontOverrideAtBoot) loadFontOverride(fontOverrideAtBoot);
 });
 

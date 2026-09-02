@@ -6,6 +6,7 @@ import {
   DEFAULT_SYSTEM,
   DEFAULT_ACCENT,
   applyDesignSystem,
+  isSystemId,
   type DesignSystem,
   type Accent,
 } from "@/lib/design-system";
@@ -42,7 +43,7 @@ function readInitial(key: string, fallback: string, valid: (v: string) => boolea
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [systemId, setSystemId] = useState<string>(() =>
-    readInitial("ds-system", DEFAULT_SYSTEM, (v) => v in DESIGN_SYSTEMS)
+    readInitial("ds-system", DEFAULT_SYSTEM, isSystemId)
   );
 
   const [accentId, setAccentId] = useState<string>(() =>
@@ -54,7 +55,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [systemId, accentId]);
 
   const setSystem = useCallback((id: string) => {
-    if (!(id in DESIGN_SYSTEMS)) return;
+    if (!isSystemId(id)) return;
     loadDesignSystemFont(id);
     setSystemId(id);
     /* On system change, nudge the accent to the system's natural default

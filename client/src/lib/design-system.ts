@@ -112,6 +112,31 @@ export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {
 export const DEFAULT_SYSTEM = 'editorial';
 export const DEFAULT_ACCENT = 'crimson';
 
+/**
+ * Is this string one of the systems we actually offer?
+ *
+ * OWN properties only. `id in DESIGN_SYSTEMS` and `DESIGN_SYSTEMS[id] ? …`
+ * both say yes to inherited keys — 'toString', 'constructor', '__proto__' —
+ * and a stored `ds-system` is arbitrary text: anyone can type one into
+ * localStorage, and a retired system id ages into the same state. Those
+ * values PAINT as DEFAULT_SYSTEM (the pre-paint boot script in
+ * client/index.html resolves against a literal id list) while a prototype
+ * -chain test resolves them as themselves, so the two halves disagree and
+ * the loader looks up a stylesheet that cannot exist: the page paints
+ * Editorial with none of Editorial's faces downloaded (#411).
+ */
+export function isSystemId(id: string | null | undefined): boolean {
+  // hasOwnProperty.call, not Object.hasOwn: this runs on the boot path, and
+  // Object.hasOwn is ES2022 — Vite's default build target still includes
+  // Safari 14, where it is undefined and would throw before anything renders.
+  return typeof id === 'string' && Object.prototype.hasOwnProperty.call(DESIGN_SYSTEMS, id);
+}
+
+/** The offered system this stored value means — DEFAULT_SYSTEM if it means none. */
+export function resolveSystemId(id: string | null | undefined): string {
+  return isSystemId(id) ? (id as string) : DEFAULT_SYSTEM;
+}
+
 declare global {
   interface Window {
     DESIGN_SYSTEMS?: typeof DESIGN_SYSTEMS;
@@ -122,7 +147,7 @@ declare global {
 }
 
 export function applyDesignSystem(systemId: string, accentId: string): { system: string; accent: string } {
-  const resolvedSystem = DESIGN_SYSTEMS[systemId] ? systemId : DEFAULT_SYSTEM;
+  const resolvedSystem = resolveSystemId(systemId);
   const validAccent = ACCENTS.find((x) => x.id === accentId);
   const fallbackAccentId = SYSTEM_DEFAULT_ACCENT[resolvedSystem] || DEFAULT_ACCENT;
   const resolvedAccent = (validAccent && validAccent.id) || fallbackAccentId;

@@ -57,16 +57,26 @@ const FONT_STYLESHEETS: Record<string, string> = {
 };
 
 // RULE (enforced by the same gate): exactly one entry per DESIGN_SYSTEMS id in
-// `client/src/lib/design-system.ts` — every system's display face is a
-// webfont. A system missing here still has its family named by the
-// :root[data-system="…"] block in client/src/styles/design-system.css, but
-// nothing downloads it, so the system paints in that declaration's fallback.
+// `client/src/lib/design-system.ts`, and that ONE stylesheet fetches EVERY
+// family the system names — --font-display, --font-body AND --font-mono in
+// its :root[data-system="…"] block in client/src/styles/design-system.css
+// (:root itself for the default system) — minus whatever the always-on
+// pre-paint <link> in client/index.html already carries (Inter). A system
+// missing here, or an entry that skips one of the three tokens, still has
+// that family NAMED by the CSS while nothing downloads it, so those surfaces
+// paint in the declaration's fallback: mono text falls through to the
+// browser's ui-monospace with nothing in the UI to notice. #411: --font-mono
+// was exactly that gap in four of the five systems.
+//
+// One multi-`family=` URL per system keeps the fix free: still a single
+// request, made after the first paint, only for the system in use — no new
+// pre-paint blocking request for a face only some systems need.
 const SYSTEM_STYLESHEETS: Record<string, string> = {
-  editorial: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&display=swap",
+  editorial: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap",
   terminal: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap",
-  geist: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap",
-  brutalist: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap",
-  swiss: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap",
+  geist: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap",
+  brutalist: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&display=swap",
+  swiss: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap",
 };
 
 function loadStylesheet(href: string): void {
@@ -87,7 +97,7 @@ export function loadFontOverride(id: string): void {
   if (href) loadStylesheet(href);
 }
 
-/** Load the selected design system's display font after the first paint. */
+/** Load every webfont the selected design system names, after the first paint. */
 export function loadDesignSystemFont(systemId: string): void {
   const href = SYSTEM_STYLESHEETS[systemId];
   if (href) loadStylesheet(href);
