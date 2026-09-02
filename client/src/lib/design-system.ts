@@ -29,6 +29,12 @@ export interface Accent {
   secondary: string;
 }
 
+// The five system ids are mirrored by the pre-paint SYSTEMS allowlist in
+// client/index.html — a system missing from that list is rejected before
+// React boots, so choosing it would silently reset to DEFAULT_SYSTEM on the
+// next reload. The mirror is enforced: the `accent-drift` validation gate
+// (scripts/validation/accent-drift.mjs) fails when a system id or the boot
+// fallback here and there disagree.
 export const DESIGN_SYSTEMS: Record<string, DesignSystem> = {
   editorial: {
     name: 'Editorial',

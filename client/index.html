@@ -115,6 +115,10 @@
           // apply --font-sans pre-paint on EVERY route, so the override
           // persists across hard reloads regardless of which page boots.
           // Must match FONT_OPTIONS in client/src/lib/font-options.ts (source of truth).
+          // Enforced, not trusted (task #388): the `accent-drift` validation
+          // gate (scripts/validation/accent-drift.mjs) fails when an id or a
+          // stack here disagrees with FONT_OPTIONS — as it does for SYSTEMS
+          // vs DESIGN_SYSTEMS and ACCENTS vs the accent registry above.
 
           var FONT_STACKS = {
             'system':       '',

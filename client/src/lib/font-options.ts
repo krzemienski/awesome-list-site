@@ -6,7 +6,13 @@
  * cannot import TS modules because it runs before bundle resolution).
  *
  * When editing FONT_OPTIONS, keep the inline map in `client/index.html` in
- * sync by hand — there is no build step to catch drift between the two.
+ * sync by hand — there is no build step to catch drift between the two, but
+ * there IS a gate: the `accent-drift` validation gate
+ * (`scripts/validation/accent-drift.mjs`) parses both and fails when a font
+ * id exists in only one of them, when a stack disagrees, or when the boot
+ * script's fallback id stops being FONT_OPTIONS[0] (the option
+ * `applyFontOverride` falls back to). A font missing from the boot map is
+ * silently reset to the fallback on the next reload.
  */
 export type FontOption = { id: string; name: string; stack: string };
 

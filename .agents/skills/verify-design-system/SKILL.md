@@ -110,10 +110,12 @@ missing, the boot script was removed or errored.
 (plus `ds-font-override`), validates against **inline** system/accent ID
 lists, falls back to Editorial + Crimson, and sets the attributes before any
 module loads. The inline ID lists and font map are hand-synced with
-`client/src/lib/design-system.ts` / `font-options.ts` — flag drift between
-them. The **accent** half of that sync is enforced automatically by the
-`accent-drift` gate (see "Acceptable hardcoded values" below); the system
-and font lists are still eyes-only.
+`client/src/lib/design-system.ts` / `font-options.ts`. All three halves of
+that sync — accents, systems, and fonts — are now enforced automatically by
+the `accent-drift` gate (see "Acceptable hardcoded values" below), so drift
+is a failing check rather than something to eyeball here. An id or stack
+that exists in only one side is what makes a saved theme choice "not
+stick" after a reload.
 
 ❌ **Bad** — applying the system from a deferred/module script or inside a
 React `useEffect` (runs after first paint → theme flash), or an inline boot
@@ -238,7 +240,18 @@ or within the 5 lines above the value):
 - The bridge block in `client/src/index.css`.
 - `[data-system="…"]` skin blocks inside
   `client/src/styles/design-system.css` — intentional per-system overrides.
-- The hand-synced font map in the `client/index.html` boot script.
+- The hand-synced font map in the `client/index.html` boot script — and its
+  sibling `SYSTEMS` id list. **Enforced, not trusted:** the same
+  `accent-drift` gate parses `FONT_OPTIONS` out of
+  `client/src/lib/font-options.ts` (its own header calls itself the source of
+  truth) and `DESIGN_SYSTEMS`/`DEFAULT_SYSTEM` out of `design-system.ts`, and
+  fails when a font id or a system id exists in only one side, when a boot
+  `FONT_STACKS` stack disagrees with the matching `FONT_OPTIONS` stack, when
+  the boot fallback system id ≠ `DEFAULT_SYSTEM`, or when the boot fallback
+  font id ≠ `FONT_OPTIONS[0].id` (what `applyFontOverride()` falls back to).
+  Stack identity is normalized only for the cosmetics CSS itself ignores
+  (quote character, whitespace, comma spacing, case); a reordered or dropped
+  family FAILs. Adding a system or a font means editing both files.
 - The ten accent swatches in the `ACCENTS` array of
   `client/src/lib/design-system.ts` — only the ACTIVE accent's
   `--accent`/`--accent-2` are readable at runtime, so the `/settings/theme`
