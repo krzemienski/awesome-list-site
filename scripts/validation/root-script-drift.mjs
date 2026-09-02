@@ -149,11 +149,70 @@ const ROOT = path.resolve(path.dirname(SELF), '..', '..');
 const LIST = process.argv.includes('--list');
 
 const CODE_EXTS = ['.js', '.mjs', '.cjs', '.jsx', '.ts', '.mts', '.cts', '.tsx'];
-// Keep root-only executable/script detection broader than the source-tree
-// scanner: a one-off .sh or .py is just as stray as a one-off JS/TS file.
-const CHECKED_EXTS = new Set([...CODE_EXTS, '.sh', '.py']);
 const ACTIVE_SCRIPT_DIR = 'scripts';
 const ARCHIVE_DIR = path.join('scripts', 'archive');
+
+// `.replit`'s modules are the source of truth for which interpreters are
+// enabled. Keep a policy for every enabled module family here so adding a
+// future interpreter cannot silently leave its root-level script extension
+// outside the scan. Non-interpreter modules still get an explicit decision:
+// they do not add a root-level script extension or file-argument runtime.
+//
+// Each interpreter policy carries a canary. The canary is intentionally
+// machine-readable (an npm script command), so adding an extension requires
+// proving both that an unreferenced file is stray and that a real reference
+// keeps it alive.
+const REPLIT_MODULE_POLICIES = [
+  {
+    family: 'nodejs',
+    extensions: CODE_EXTS,
+    runtimes: ['node', 'nodejs', 'npx', 'tsx', 'ts-node', 'bun', 'deno', 'nodemon', 'pm2', 'vite-node'],
+    canary: { file: 'probe.mjs', runtime: 'node' },
+  },
+  {
+    family: 'python',
+    extensions: ['.py'],
+    runtimes: ['python', 'python3', 'python3.11'],
+    canary: { file: 'probe.py', runtime: 'python' },
+  },
+  { family: 'web', extensions: [], runtimes: [], decision: 'platform module; no root-level script extension' },
+  { family: 'postgresql', extensions: [], runtimes: [], decision: 'service module; no root-level script extension' },
+];
+
+const CHECKED_EXTS = new Set([
+  ...REPLIT_MODULE_POLICIES.flatMap((policy) => policy.extensions),
+  '.sh',
+]);
+
+function policyForReplitModule(moduleName) {
+  if (typeof moduleName !== 'string') return null;
+  return REPLIT_MODULE_POLICIES.find(
+    (policy) => moduleName === policy.family || moduleName.startsWith(`${policy.family}-`),
+  ) ?? null;
+}
+
+function parseReplitModules(content) {
+  try {
+    const doc = toml.parse(content);
+    if (!Array.isArray(doc?.modules) || !doc.modules.every((module) => typeof module === 'string')) {
+      return { modules: [], error: 'modules must be an array of strings' };
+    }
+    return { modules: doc.modules, error: null };
+  } catch (err) {
+    return { modules: [], error: `unparseable TOML (${err.message.split('\n')[0]})` };
+  }
+}
+
+function validateReplitModuleCoverage(modules) {
+  const unknown = modules.filter((moduleName) => !policyForReplitModule(moduleName));
+  if (unknown.length) {
+    return {
+      error: `no root-script policy for enabled .replit module(s): ${unknown.join(', ')}`,
+      unknown,
+    };
+  }
+  return { error: null, unknown: [] };
+}
 
 // ---------------------------------------------------------------------------
 // Trusted manifest of auto-discovered root tool configs. Each entry is honored
@@ -448,9 +507,8 @@ function schemaFor(rel) {
   return null;
 }
 // Heads that RUN a file argument rather than merely printing or moving it.
-const JS_RUNTIMES = new Set(['node', 'nodejs', 'npx', 'tsx', 'ts-node', 'bun', 'deno', 'nodemon', 'pm2', 'vite-node']);
-const PYTHON_RUNTIMES = new Set(['python', 'python3', 'python3.11']);
-const FILE_ARG_RUNTIMES = new Set([...JS_RUNTIMES, ...PYTHON_RUNTIMES]);
+const JS_RUNTIMES = new Set(REPLIT_MODULE_POLICIES.find((policy) => policy.family === 'nodejs').runtimes);
+const FILE_ARG_RUNTIMES = new Set(REPLIT_MODULE_POLICIES.flatMap((policy) => policy.runtimes));
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh']);
 // Wrappers run ANOTHER command and say nothing themselves, so they are peeled
 // off and the real head is judged: `env echo probe.mjs` is still just an echo.
@@ -1195,6 +1253,27 @@ function runCanaries() {
   eq(kindOf('probe.py', { npmScripts: [['probe', 'python probe.py']] }), 'npm-script', 'a Python npm script keeps it');
   eq(kindOf('probe.py', surfaceOf('.replit', '[[workflows.workflow.tasks]]\ntask = "shell.exec"\nargs = "python3 probe.py"\n')), 'workflow', 'a Python workflow keeps it');
   eq(kindOf('probe.py', surfaceOf('Dockerfile', 'COPY probe.py ./')), 'tooling', 'Dockerfile reference keeps a root Python script');
+
+  // Every enabled .replit module family must have an explicit policy. The
+  // interpreter policies also carry both sides of the extension contract:
+  // an unreferenced file is stray, while a machine-readable command reference
+  // keeps that same extension alive.
+  const currentModules = parseReplitModules('modules = ["nodejs-20", "web", "python-3.11", "postgresql-16"]');
+  eq(currentModules.error, null, 'the .replit module canary parses');
+  eq(validateReplitModuleCoverage(currentModules.modules).error, null, 'current .replit modules have explicit policies');
+  eq(validateReplitModuleCoverage([...currentModules.modules, 'ruby-3.3']).error !== null, true, 'a new interpreter requires an explicit policy');
+  for (const policy of REPLIT_MODULE_POLICIES) {
+    if (!policy.canary) continue;
+    const { file, runtime } = policy.canary;
+    eq(policy.extensions.includes(path.extname(file)), true, `${policy.family} policy covers its canary extension`);
+    eq(kindOf(file), 'stray', `${policy.family} canary file is stray when unreferenced`);
+    eq(
+      kindOf(file, { npmScripts: [['runtime-canary', `${runtime} ${file}`]] }),
+      'npm-script',
+      `${policy.family} canary file is kept by a machine-readable command`,
+    );
+  }
+
   eq(kindOf('probe.mjs', surfaceOf('.replit', 'name = "probe.mjs"')), 'stray', 'a workflow display name does not keep it');
   eq(kindOf('probe.mjs', surfaceOf('.replit', 'this is not toml\nargs = "node probe.mjs"\n')), 'stray', 'a corrupt .replit cannot keep a root script alive');
   eq(kindOf('probe.mjs', { importedBy: new Map([['probe.mjs', 'server/index.ts']]) }), 'import', 'import edge from an execution tree keeps it');
@@ -1284,6 +1363,26 @@ function runCanaries() {
 runCanaries();
 console.log('PASS canaries :: reference matching + comment stripping + candidate-import resolution + manifest conditions verified against synthetic samples');
 
+const replitPath = path.join(ROOT, '.replit');
+let replitContent;
+try {
+  replitContent = fs.readFileSync(replitPath, 'utf8');
+} catch {
+  console.error('FAIL runtime-coverage :: .replit is missing — enabled interpreter coverage cannot be established.');
+  process.exit(1);
+}
+const replitModules = parseReplitModules(replitContent);
+if (replitModules.error) {
+  console.error(`FAIL runtime-coverage :: ${replitModules.error}`);
+  process.exit(1);
+}
+const moduleCoverage = validateReplitModuleCoverage(replitModules.modules);
+if (moduleCoverage.error) {
+  console.error(`FAIL runtime-coverage :: ${moduleCoverage.error}`);
+  console.error('       Add an explicit module policy with its root script extension and canaries.');
+  process.exit(1);
+}
+
 const rootFiles = rootCodeFiles();
 const activeScripts = activeScriptFiles();
 const allCandidates = [...rootFiles, ...activeScripts];
@@ -1315,6 +1414,14 @@ const results = checked.map((name) => ({ name, ...verdicts.get(name) }));
 const stray = results.filter((r) => r.kind === 'stray');
 
 if (LIST) {
+  console.log(
+    `replit module coverage: ${replitModules.modules
+      .map((moduleName) => {
+        const policy = policyForReplitModule(moduleName);
+        return `${moduleName} → ${policy.extensions.join(', ') || 'no root script extension'}`;
+      })
+      .join('; ')}`,
+  );
   console.log(`command surfaces: ${surfaces.length} file(s) (root configs, ${COMMAND_SURFACE_DIRS.join(', ')}, ${SHELL_ONLY_DIRS.join(', ')}/**/*.sh)`);
   console.log(`import edges parsed from: ${codeCount} source file(s) across ${IMPORT_TREE_DIRS.join(', ')}`);
   console.log(`candidate executable/script files: ${allCandidates.length} (${rootFiles.length} root, ${activeScripts.length} active scripts/, ${ignored.size} git-ignored, ${checked.length} checked)`);
