@@ -21,6 +21,7 @@
     "validate:openapi": "tsx scripts/validation/openapi-drift.ts",
     "validate:response-contracts": "tsx scripts/validation/response-contract-drift.ts",
     "validate:search-typos": "node scripts/validation/search-typo-suite.mjs",
+    "validate:guest-recommendations": "node scripts/validation/guest-recommendations.mjs",
     "validate:standalone-palette-drift": "node scripts/validation/standalone-palette-drift.mjs",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",

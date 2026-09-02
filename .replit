@@ -147,6 +147,10 @@ args = "dead-exports"
 task = "workflow.run"
 args = "root-script-drift"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "guest-recommendations"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -491,6 +495,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/sticky-preview-audit.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "guest-recommendations"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:guest-recommendations"
 
 [workflows.workflow.metadata]
 isValidation = true

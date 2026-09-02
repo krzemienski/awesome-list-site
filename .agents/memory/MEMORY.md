@@ -103,3 +103,4 @@
 - [Webfont download coverage](webfont-download-coverage.md) — naming a family in a stack or a --font-* var renders nothing by itself; three separate loaders fetch faces and none owns the whole set.
 - [App-shell bottom bar](app-shell-bottom-bar.md) — an app-level bottom bar belongs in the shell column as its own row; every other row must fill what the column leaves, never claim the viewport.
 - [Vite SPA curl smoke checks](vite-spa-curl-smoke-checks.md) — curl sees only the static HTML shell; assert shell markers and route status, not copy rendered later by React.
+- [Browser response state assertions](browser-response-state-assertions.md) — shared response helpers validate transport/shape; scenarios own populated-vs-empty cardinality assertions.
