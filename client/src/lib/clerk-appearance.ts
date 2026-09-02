@@ -16,6 +16,11 @@
    unparseable simply leaves that variable unset — Clerk then falls back to
    its own dark-theme default rather than to an off-system literal.
 
+   The corner radius rides along the same way (task #404): it is a length
+   rather than a color, so it skips the canonicaliser and is read straight
+   off <html> — but it is still a DS token, not the 0px literal the widget
+   used to be pinned to while every other surface on the site rounded.
+
    Re-resolving whenever data-system / data-accent flip on <html> keeps the
    auth screens tracking the visitor's selection like every other page.
    ===================================================================== */
@@ -55,6 +60,31 @@ const TOKENS = {
 const RAMPED_ROLES = new Set<keyof typeof TOKENS>(["border"]);
 export type DesignSystemPalette = Partial<Record<keyof typeof TOKENS, string>>;
 
+/** DS corner radii, keyed by the surface they round. Task #404: these are
+ *  LENGTHS, not colors — a custom property comes back from
+ *  `getComputedStyle` as authored, so they are read straight off <html> and
+ *  never touch the color canonicaliser above. */
+const RADIUS_TOKENS = {
+  /** Cards and other large surfaces (12px on the default system). */
+  card: "--radius",
+  /** Controls: buttons, inputs, OTP cells (8px on the default system). */
+  control: "--radius-sm",
+} as const;
+
+type DesignSystemRadii = Partial<Record<keyof typeof RADIUS_TOKENS, string>>;
+
+/** Everything the widget reads off <html>: the colors Clerk re-parses plus
+ *  the corner radii it rounds with. */
+type DesignSystemTokens = { palette: DesignSystemPalette; radii: DesignSystemRadii };
+
+/** A plain, non-negative CSS length. Clerk does not hand `borderRadius`
+ *  straight to CSS — it splits the value into number + unit and derives its
+ *  own sm/lg/xl steps from it, so a `calc()`, a `clamp()` or a unitless
+ *  number would come back out as `NaNpx`. Anything that is not a simple
+ *  length therefore leaves the variable unset, exactly as an unparseable
+ *  color does, and Clerk keeps its own default. */
+const CSS_LENGTH = /^(?:\d+(?:\.\d+)?|\.\d+)(?:px|rem|em)$/;
+
 /** Parses any CSS color notation by handing it to the browser: the CSSOM
  *  silently drops a value it cannot parse, so an empty `style.color`
  *  afterwards is the "not a color" signal. */
@@ -92,8 +122,10 @@ function toHex(channels: Channels, backdrop: Channels): string {
 /** Reads the active DS tokens off <html>. Returns only the roles that
  *  resolved, so a missing token never overwrites a Clerk default with
  *  `undefined`. */
-function resolveDesignSystemPalette(): DesignSystemPalette {
-  if (typeof document === "undefined" || typeof window === "undefined") return {};
+function resolveDesignSystemTokens(): DesignSystemTokens {
+  if (typeof document === "undefined" || typeof window === "undefined") {
+    return { palette: {}, radii: {} };
+  }
 
   const root = document.documentElement;
   const probe = document.createElement("span");
@@ -118,21 +150,38 @@ function resolveDesignSystemPalette(): DesignSystemPalette {
         ? toHex([channels[0], channels[1], channels[2], 1], backdrop)
         : toHex(channels, backdrop);
     }
-    return palette;
+
+    const radii: DesignSystemRadii = {};
+    for (const [surface, token] of Object.entries(RADIUS_TOKENS) as [
+      keyof typeof RADIUS_TOKENS,
+      string,
+    ][]) {
+      const length = tokens.getPropertyValue(token).trim();
+      if (CSS_LENGTH.test(length)) radii[surface] = length;
+    }
+
+    return { palette, radii };
   } finally {
     probe.remove();
   }
 }
 
-function samePalette(a: DesignSystemPalette, b: DesignSystemPalette): boolean {
-  return (Object.keys(TOKENS) as (keyof typeof TOKENS)[]).every((role) => a[role] === b[role]);
+function sameTokens(a: DesignSystemTokens, b: DesignSystemTokens): boolean {
+  return (
+    (Object.keys(TOKENS) as (keyof typeof TOKENS)[]).every(
+      (role) => a.palette[role] === b.palette[role],
+    ) &&
+    (Object.keys(RADIUS_TOKENS) as (keyof typeof RADIUS_TOKENS)[]).every(
+      (surface) => a.radii[surface] === b.radii[surface],
+    )
+  );
 }
 
-/** Builds the Clerk appearance object from a resolved DS palette. Clerk's
+/** Builds the Clerk appearance object from resolved DS tokens. Clerk's
  *  `dark` base theme supplies everything not listed here (including the
  *  on-accent ink, which it already keeps at black — the same choice the DS
  *  makes for accent CTAs). */
-function buildClerkAppearance(palette: DesignSystemPalette, basePath: string) {
+function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: string) {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   // The card's mark is an IMAGE URL to Clerk, not a node, so it cannot follow
@@ -167,9 +216,23 @@ function buildClerkAppearance(palette: DesignSystemPalette, basePath: string) {
       ...(palette.fieldSurface ? { colorInput: palette.fieldSurface } : {}),
       ...(palette.ink ? { colorInputForeground: palette.ink } : {}),
       ...(palette.border ? { colorBorder: palette.border } : {}),
-      borderRadius: "0px",
+      // Task #404: the widget used to be pinned to square corners while every
+      // other surface on the site rounds with the active system. Clerk derives
+      // its whole radius ladder from this one base, so it gets the DS CONTROL
+      // radius (buttons, inputs, OTP cells sit at the same step as the rest of
+      // the app's controls) and the card is pinned separately below — Clerk's
+      // own card step is a multiple of the base, which would overshoot the DS
+      // card token. Terminal and Brutalist author 0px, so they stay square.
+      ...(radii.control ? { borderRadius: radii.control } : {}),
     },
     elements: {
+      // Task #404: Clerk rounds the card at TWICE the base above (its own
+      // ladder step), which overshoots the DS card token — 16px against the
+      // 12px every other card on the page sits at. `cardBox` is the outer,
+      // clipping surface (it wraps the card and the sign-up footer strip), so
+      // it is the corner a visitor actually sees; pin it to the card token and
+      // let Clerk's slightly tighter inner step nest inside it as designed.
+      ...(radii.card ? { cardBox: { borderRadius: radii.card } } : {}),
       // OAuth provider marks default to dark ink. Keep the dark card
       // treatment, but invert those marks so Apple, GitHub, and other
       // monochrome providers remain visible against their near-black buttons.
@@ -220,12 +283,12 @@ function buildClerkAppearance(palette: DesignSystemPalette, basePath: string) {
  *  attributes are the real source of truth anyway — the pre-paint boot
  *  script in index.html sets them before React exists. */
 export function useClerkAppearance(basePath: string) {
-  const [palette, setPalette] = useState<DesignSystemPalette>(() => resolveDesignSystemPalette());
+  const [tokens, setTokens] = useState<DesignSystemTokens>(() => resolveDesignSystemTokens());
 
   useEffect(() => {
     const sync = () => {
-      const next = resolveDesignSystemPalette();
-      setPalette((prev) => (samePalette(prev, next) ? prev : next));
+      const next = resolveDesignSystemTokens();
+      setTokens((prev) => (sameTokens(prev, next) ? prev : next));
     };
 
     // The dev server injects stylesheets from JS, so the first render can
@@ -242,5 +305,5 @@ export function useClerkAppearance(basePath: string) {
 
   // Identity has to stay stable across unrelated re-renders: ClerkProvider
   // pushes the appearance into the widget from an effect keyed on this object.
-  return useMemo(() => buildClerkAppearance(palette, basePath), [palette, basePath]);
+  return useMemo(() => buildClerkAppearance(tokens, basePath), [tokens, basePath]);
 }

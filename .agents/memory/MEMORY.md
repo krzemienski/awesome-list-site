@@ -95,6 +95,6 @@
 - [Palette scans miss gradient stops](palette-scan-gradient-stops.md) — the stage-5 regex skips from/via/to (+divide/outline/shadow/...); extend the prefix list or gradients slip through; comments naming palette classes also match.
 - [Dead-code reachability gate](dead-code-reachability-gate.md) — dead-file detection = BFS from execution roots (importer-count misses mutual-import clusters); strip comments + try .js→.ts swap or JSDoc examples/NodeNext specs false-fail.
 - [ARIA names belong to the component](aria-ownership-in-component.md) — parent MutationObserver patching a child's aria-label goes stale after in-place auth/state change; compute the name in the control itself.
-- [Clerk appearance alpha ramp](clerk-appearance-alpha-ramp.md) — Clerk re-tints `colorBorder` to 3–28% (pass border ink at FULL opacity), paints rings as box-shadow so `borderColor` overrides are inert, and element keys are variant-specific.
+- [Clerk appearance alpha ramp](clerk-appearance-alpha-ramp.md) — Clerk re-tints `colorBorder` to 3–28% (pass border ink at FULL opacity), derives a radius ladder from one base (card = 2×), and paints rings as box-shadow so `borderColor` is inert.
 - [Dark-only means color-scheme, not light tokens](dark-only-color-scheme.md) — "light mode broken" findings are by design (0 `.light` selectors); the real defect is an undeclared `color-scheme`.
 - [Drift-gate mutation probing](drift-gate-mutation-probing.md) — prove a gate fails by mutating a /tmp copy of its inputs; parser-rot short-circuits parity checks, and literals need unescaping first.

@@ -27,6 +27,23 @@ Clerk renders its controls at `border-width: 0` and draws the visible ring with
 `box-shadow`. A per-element `borderColor` in `appearance.elements` therefore does
 nothing — it looks correct in review and paints nothing.
 
+## `borderRadius` is a base, not the rendered corner
+The widget derives a whole radius ladder from the single `borderRadius`
+variable: controls (inputs, buttons, OTP cells) land on the base itself, the
+inner `.cl-card` on ~1.33×, and the outer `.cl-cardBox` — the clipping surface
+whose corner a visitor actually sees, wrapping card + footer strip — on 2×.
+
+**Why:** handing it a design-system *card* radius makes every control too round,
+and handing it the *control* radius leaves the card 2× rounder than the cards
+next to it. Neither single value reproduces a two-step radius ladder.
+
+**How to apply:** pass the control radius as the base and pin `cardBox` to the
+card radius in `appearance.elements`; unlike `borderColor`, a radius override IS
+honoured (the ring is a box-shadow, which follows the element's own radius).
+Clerk splits the base into number + unit for that math, so `calc()`, `clamp()`
+or a unitless value comes back out as `NaNpx` — hand it a plain length or leave
+the variable unset.
+
 ## Element keys are variant-specific
 `socialButtonsBlockButton` styles do not apply when Clerk renders the icon-button
 variant (`.cl-socialButtonsIconButton`), and vice versa. An override can sit
