@@ -21,6 +21,7 @@
    ===================================================================== */
 import { useEffect, useMemo, useState } from "react";
 import { dark } from "@clerk/themes";
+import { brandMarkDataUri } from "@/lib/brand-mark";
 
 /** Red / green / blue channels (0–255) plus alpha (0–1). */
 type Channels = [number, number, number, number];
@@ -120,12 +121,22 @@ function samePalette(a: DesignSystemPalette, b: DesignSystemPalette): boolean {
 export function buildClerkAppearance(palette: DesignSystemPalette, basePath: string) {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
+  // The card's mark is an IMAGE URL to Clerk, not a node, so it cannot follow
+  // var(--accent) the way <BrandMark> does in the site header — which is why
+  // it used to be the only crimson thing left on a Matrix or Violet card.
+  // Serialise the same geometry with the resolved accent baked in. The static
+  // brand file (locked to Editorial+Crimson, and still the browser-tab
+  // favicon) stays the fallback for when the accent token does not resolve.
+  const logoImageUrl =
+    (palette.accent ? brandMarkDataUri(palette.accent) : null) ??
+    `${origin}${basePath}/favicon.svg`;
+
   return {
     theme: dark,
     options: {
       logoPlacement: "inside" as const,
       logoLinkUrl: basePath || "/",
-      logoImageUrl: `${origin}${basePath}/favicon.svg`,
+      logoImageUrl,
     },
     variables: {
       ...(palette.accent ? { colorPrimary: palette.accent } : {}),

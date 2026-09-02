@@ -2,48 +2,42 @@
  * Official awesome.video brand mark ("Inverted Monogram"), rendered inline so
  * chrome usage can track the active design-system accent via var(--accent).
  *
- * Geometry is a 1:1 mirror of the generated asset brand/logo/svg/mark-small.svg
- * (black rx16 tile, 5-unit border, outlined "AV" glyph paths). Never edit the
- * generated brand outputs — if the mark changes, regenerate the brand kit via
- * scripts/brand/build-brand-assets.mjs and re-mirror the paths here.
- *
- * DS-OK — divergence from the exported brand kit (intentional, MR-DS-13): the
- * exported assets are locked to Editorial+Crimson (#ff3d52); in-app chrome is a
- * product surface, so border + glyphs track var(--accent) while the tile fill
- * stays literal #000 (all five runtime skins are dark). On the default
- * Editorial+Crimson skin this renders the exact official mark.
+ * Geometry comes from @/lib/brand-mark, which is also what the Clerk auth card
+ * serialises into an accent-colored data URI (task #389) — the two surfaces
+ * share one copy of the path data so they cannot drift apart.
  */
+import {
+  BRAND_MARK_GLYPHS,
+  BRAND_MARK_TILE,
+  BRAND_MARK_TILE_FILL,
+  BRAND_MARK_VIEWBOX,
+} from "@/lib/brand-mark";
+
 export function BrandMark({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 76 76"
+      viewBox={BRAND_MARK_VIEWBOX}
       className={className}
       aria-hidden="true"
       focusable="false"
       data-testid="brand-mark"
     >
-      {/* DS-OK: fixed brand paint — the monogram tile stays literal black in
-          every runtime skin (all five are dark), while the border and glyphs
-          track var(--accent). Mirrors brand/logo/svg/mark-small.svg. */}
+      {/* The tile fill is fixed brand paint (see BRAND_MARK_TILE_FILL); the
+          border and glyphs track var(--accent). */}
       <rect
-        fill="#000000"
-        x="2.5"
-        y="2.5"
-        width="71"
-        height="71"
-        rx="16"
+        fill={BRAND_MARK_TILE_FILL}
+        x={BRAND_MARK_TILE.x}
+        y={BRAND_MARK_TILE.y}
+        width={BRAND_MARK_TILE.width}
+        height={BRAND_MARK_TILE.height}
+        rx={BRAND_MARK_TILE.rx}
         stroke="var(--accent)"
-        strokeWidth="5"
+        strokeWidth={BRAND_MARK_TILE.strokeWidth}
       />
       <g fill="var(--accent)">
-        <path
-          transform="translate(12.34 51.00) scale(0.016602 -0.016602)"
-          d="M439 0L47 0L544 1490L1017 1490L1529 0L1133 0L926 651Q876 814 829.500 997.500Q783 1181 736 1378L815 1378Q770 1180 728 996.500Q686 813 639 651ZM1192 317L385 317L385 587L1192 587Z"
-        />
-        <path
-          transform="translate(37.50 51.00) scale(0.016602 -0.016602)"
-          d="M1031 0L559 0L47 1490L444 1490L651 839Q700 677 745.500 499Q791 321 837 124L760 124Q805 322 848 499.500Q891 677 938 839L1137 1490L1529 1490Z"
-        />
+        {BRAND_MARK_GLYPHS.map((glyph) => (
+          <path key={glyph.transform} transform={glyph.transform} d={glyph.d} />
+        ))}
       </g>
     </svg>
   );
