@@ -65,6 +65,10 @@ args = "collections-audit"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
+args = "auth-return-audit"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
 args = "task302-typecheck"
 
 [[workflows.workflow.tasks]]
@@ -234,6 +238,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/collections-audit.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "auth-return-audit"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:auth-return"
 
 [workflows.workflow.metadata]
 isValidation = true

@@ -31,7 +31,8 @@
     "check:awesome-bot": "bash scripts/check-awesome-bot.sh",
     "validate:cache-headers": "node scripts/validation/http-cache-headers.mjs",
     "validate:pool": "node scripts/validation/db-pool-probe.mjs",
-    "validate:webfont-fetch": "node scripts/validation/accent-drift.mjs --network"
+    "validate:webfont-fetch": "node scripts/validation/accent-drift.mjs --network",
+    "validate:auth-return": "node scripts/validation/auth-return-audit.mjs"
   },
   "dependencies": {
     "@amplitude/unified": "^1.1.28",
