@@ -139,6 +139,10 @@ args = "accent-drift"
 task = "workflow.run"
 args = "dead-exports"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "root-script-drift"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -439,6 +443,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/validation/dead-exports.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "root-script-drift"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/root-script-drift.mjs"
 
 [workflows.workflow.metadata]
 isValidation = true
