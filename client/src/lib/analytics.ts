@@ -426,8 +426,8 @@ export const trackApiPerformance = (
   });
 };
 
-// Track Core Web Vitals. LCP/FID are milliseconds; CLS is a unitless score, so
-// retain enough precision for the score to remain useful in GA4.
+// Track Core Web Vitals. LCP/FID/INP are milliseconds; CLS is a unitless score,
+// so retain enough precision for the score to remain useful in GA4.
 export const trackPerformance = (metric: string, value: number) => {
   if (!Number.isFinite(value)) return;
   const normalizedMetric = metric.toLowerCase();

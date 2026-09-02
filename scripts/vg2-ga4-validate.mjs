@@ -184,6 +184,18 @@ async function waitForEvent(name, sinceSeq, timeout = 14000) {
   return false;
 }
 
+async function waitForPerformanceMetric(metricName, sinceSeq, timeout = 14000) {
+  const start = Date.now();
+  const hasMetric = () =>
+    evByName('performance', sinceSeq).some((event) => event.params['ep.metric_name'] === metricName);
+  if (hasMetric()) return true;
+  while (Date.now() - start < timeout) {
+    await flushGA();
+    if (hasMetric()) return true;
+  }
+  return false;
+}
+
 // Clerk's OTP field is a row of single-character inputs that auto-advance, so
 // the code has to be typed key by key into the focused control (a bulk fill()
 // lands entirely in the first box). Returns false when no code step appeared —
@@ -300,11 +312,21 @@ async function main() {
   // prove the mounted capture reaches the real /g/collect endpoint. The thrown
   // message deliberately contains a query-shaped value; only its safe shape
   // may appear in the captured payload.
-  await waitForEvent('performance', -1, 12000);
+  // INP is finalized after an interaction and when the page becomes hidden.
+  // Create a real keyboard interaction after the consent-gated observer mounts,
+  // then let flushGA() trigger the same visibility transition used by browsers.
+  const beforeInp = seq - 1;
+  await page.keyboard.press('/');
+  const inpReached = await waitForPerformanceMetric('inp', beforeInp, 12000);
+  const inpEvents = evByName('performance', beforeInp).filter(
+    (event) => event.params['ep.metric_name'] === 'inp',
+  );
+  check('INP reached GA4 after a real interaction', inpReached && inpEvents.length >= 1, `${inpEvents.length} inp event(s)`);
   const performanceEvents = evByName('performance');
   check('Core Web Vitals reached GA4 after consent', performanceEvents.length >= 1, `${performanceEvents.length} performance event(s)`);
   const metricNames = new Set(performanceEvents.map((e) => e.params['ep.metric_name']));
-  check('performance event carries a supported metric name', [...metricNames].some((name) => ['lcp', 'fid', 'cls'].includes(name)), [...metricNames].join(', ') || 'none');
+  check('performance event carries a supported metric name', [...metricNames].some((name) => ['lcp', 'fid', 'inp', 'cls'].includes(name)), [...metricNames].join(', ') || 'none');
+
   const beforeBrowserError = seq - 1;
   await page.evaluate((message) => {
     setTimeout(() => {
@@ -344,8 +366,8 @@ async function main() {
     evByName('performance').map((e) => e.params['ep.metric_name']),
   );
   check(
-    'LCP, FID, and CLS all reached GA4',
-    ['lcp', 'fid', 'cls'].every((name) => flushedVitalNames.has(name)),
+    'LCP, FID, INP, and CLS all reached GA4',
+    ['lcp', 'fid', 'inp', 'cls'].every((name) => flushedVitalNames.has(name)),
     [...flushedVitalNames].join(', ') || 'none',
   );
 

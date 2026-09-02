@@ -51,7 +51,8 @@ the `ae` flag appeared alongside our manual one on the one true SPA navigation).
 - **`client/src/hooks/use-analytics.tsx`** — fires exactly one `page_view` per
   navigation (mount + every route change) and a `page_engaged` (with dwell time)
   when leaving a page or hiding the tab. After consent, the same mounted hook
-  reports Core Web Vitals (LCP/CLS/FID) and global JavaScript errors. Mounted
+  reports Core Web Vitals (LCP/CLS/INP) and global JavaScript errors. The
+  historical FID signal is also retained when the browser supports it. Mounted
   once in `App.tsx`.
 
 ### Initialization order (important)
@@ -100,7 +101,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |
-| `performance` | Core Web Vitals after analytics consent — `use-analytics.tsx` | `metric_name: "lcp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/FID, unitless score for CLS) |
+| `performance` | Core Web Vitals after analytics consent — `use-analytics.tsx` | `metric_name: "lcp" \| "inp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/INP/FID, unitless score for CLS) |
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
 | `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out save toggle (on-device store, Task #329) — `useResourceToggle` guest branch | `resource_id`, `guest_saved_count` |
@@ -109,6 +110,15 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 
 > Note: `scroll` and `user_engagement` events that appear in GA are produced by
 > GA4 **Enhanced Measurement** automatically, not by app code.
+
+### FID to INP transition
+
+Google replaced First Input Delay (FID) with **Interaction to Next Paint (INP)**
+as the responsiveness Core Web Vital. The mounted, consent-gated performance
+capture therefore reports `inp` using the current `web-vitals` package. The
+existing `fid` observer remains intentionally enabled where the browser exposes
+the `first-input` PerformanceObserver entry, preserving historical dashboard
+continuity while the dashboard transitions to INP.
 
 ### First-touch acquisition
 
@@ -163,8 +173,8 @@ Chromium through real user flows, intercepts every `/g/collect` request, decodes
 the batched event payloads, and asserts on event names, parameters, de-duplication,
 and the absence of PII.
 
-Flows exercised: landing (with UTM query) → consent-gated performance and
-deliberate browser-error capture → search → resource detail view → in-app SPA
+Flows exercised: landing (with UTM query) → consent-gated performance and a real
+interaction for INP → deliberate browser-error capture → search → resource detail view → in-app SPA
 navigation → theme change → taxonomy page → Clerk sign-up → signed-in reload →
 Clerk sign-in → consent revoke and re-grant.
 

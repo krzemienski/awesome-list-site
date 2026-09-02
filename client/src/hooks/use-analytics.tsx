@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { onCLS, onLCP } from 'web-vitals';
+import { onCLS, onINP, onLCP } from 'web-vitals';
 import {
   getAnalyticsConsent,
   trackError,
@@ -74,6 +74,7 @@ export const useAnalytics = () => {
         vitalsStartedRef.current = true;
         onLCP((metric) => trackPerformance('lcp', metric.value));
         onCLS((metric) => trackPerformance('cls', metric.value));
+        onINP((metric) => trackPerformance('inp', metric.value));
 
         // FID was the signal used by the original instrumentation. Keep
         // reporting it for dashboard continuity even though modern browsers
