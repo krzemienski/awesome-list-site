@@ -40,7 +40,7 @@ interface AIRecommendationsPanelProps {
 export default function AIRecommendationsPanel({
   showHeader = true,
 }: AIRecommendationsPanelProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const { userProfile: localProfile, isLoaded: localProfileLoaded } =
     useUserProfile();
@@ -109,17 +109,18 @@ export default function AIRecommendationsPanel({
 
   useEffect(() => {
     if (
-      !isAuthenticated
+      authLoading
       || !localProfileLoaded
-      || preferencesLoading
+      || (isAuthenticated && preferencesLoading)
       || !effectiveProfile.userId
       || generatedKeyRef.current === generationKey
     ) {
       return;
     }
     generatedKeyRef.current = generationKey;
-    generateRecommendations(effectiveProfile);
+    generateRecommendations(isAuthenticated ? effectiveProfile : undefined);
   }, [
+    authLoading,
     isAuthenticated,
     localProfileLoaded,
     preferencesLoading,
