@@ -38,7 +38,7 @@ jspm_packages/
 .eslintcache
 
 # IDE and editor files
-.vscode/
+.vscode/*
 !.vscode/settings.json
 .idea/
 *.swp
