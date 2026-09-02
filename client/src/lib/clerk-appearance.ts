@@ -291,6 +291,9 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
         minHeight: "40px",
       },
       identityPreviewEditButton: {
+        // Confirmed on Clerk's live email-code verification variant: this is
+        // the rendered edit-email key (the client-trust OTP variant omits the
+        // edit affordance entirely).
         minHeight: "40px",
         minWidth: "40px",
       },

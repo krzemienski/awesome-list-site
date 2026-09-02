@@ -18,6 +18,20 @@ configuration, or the code Clerk documents for `+clerk_test` addresses; never
 store verification values in memory. Always delete the throwaway identity and
 matching database row.
 
+## Verification variants expose different controls
+
+**Rule:** The password-first client-trust OTP step renders the six code cells
+but no edit-identity affordance. To validate both the OTP cells and Clerk's
+`identityPreviewEditButton`, enter the email-code recovery branch and inspect
+that live verification screen before completing or abandoning the attempt.
+
+**Why:** Treating every OTP screen as equivalent made a valid appearance key
+look dormant: the control was absent from that variant rather than renamed.
+
+**How to apply:** Choose the auth branch that actually renders every control
+under test, prove the live `cl-*` element key, move the pointer away, and measure
+the rendered box instead of inferring dimensions from the appearance object.
+
 ## Recovery routing and completion
 
 **Rule:** The current Clerk recovery UI can keep both “Forgot Password?” and

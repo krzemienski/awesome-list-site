@@ -528,6 +528,111 @@ try {
   // Drive the real Clerk sign-in UI (post-Clerk there is no local login
   // API). Headless/new-device sessions land on the client-trust OTP step
   // (+clerk_test emails accept the fixed OTP 424242 on the dev instance).
+  const measureClerkVerificationControls = async (pageToAuth) => {
+    // Keep the pointer away from Clerk controls: its hover ring changes the
+    // computed box while the code step is being inspected.
+    await pageToAuth.mouse.move(0, 0);
+    const measurements = await pageToAuth.evaluate(() => {
+      const MIN_TOUCH_TARGET = 40;
+      const elementKey = (element) => {
+        const classes = [...element.classList];
+        const clerkClass = classes.find((name) => name.startsWith('cl-'));
+        return clerkClass?.replace(/^cl-/, '').split('__')[0] ?? null;
+      };
+      const root = document.querySelector('.cl-rootBox') ?? document;
+      const controls = [
+        {
+          expectedKey: 'otpCodeFieldInput',
+          label: 'verification-code cell',
+          elements: [...root.querySelectorAll('.cl-otpCodeFieldInput')],
+        },
+        {
+          expectedKey: 'identityPreviewEditButton',
+          label: 'edit-email control',
+          elements: [...root.querySelectorAll('.cl-identityPreviewEditButton')],
+        },
+      ];
+
+      return {
+        controls: controls.map(({ expectedKey, label, elements }) => ({
+          expectedKey,
+          label,
+          count: elements.length,
+          rendered: elements.map((element) => {
+            const rect = element.getBoundingClientRect();
+            const styles = window.getComputedStyle(element);
+            return {
+              tag: element.tagName.toLowerCase(),
+              elementKey: elementKey(element),
+              className: element.className,
+              width: Math.round(rect.width * 100) / 100,
+              height: Math.round(rect.height * 100) / 100,
+              minWidth: styles.minWidth,
+              minHeight: styles.minHeight,
+            };
+          }),
+          passes: elements.length > 0 && elements.every((element) => {
+            const rect = element.getBoundingClientRect();
+            return rect.width >= MIN_TOUCH_TARGET && rect.height >= MIN_TOUCH_TARGET;
+          }),
+        })),
+      };
+    });
+
+    const missing = measurements.controls.filter((control) => control.count === 0);
+    const undersized = measurements.controls.flatMap((control) =>
+      control.rendered
+        .filter((element) => element.width < 40 || element.height < 40)
+        .map((element) => `${control.label} ${element.elementKey ?? control.expectedKey}=${element.width}x${element.height}px`),
+    );
+    const detail = measurements.controls
+      .map((control) => `${control.label} (${control.expectedKey}): ${control.rendered.length > 0
+        ? control.rendered.map((element) => `${element.elementKey ?? 'unknown-key'}=${element.width}x${element.height}px`).join(', ')
+        : 'not rendered'}`)
+      .join('; ');
+    log('clerk-verification-controls', missing.length === 0 && undersized.length === 0,
+      missing.length > 0
+        ? `LIVE DOM missing ${missing.map((control) => control.label).join(', ')}; ${detail}`
+        : undersized.length > 0
+          ? `LIVE DOM touch target below 40px: ${undersized.join(', ')}; ${detail}`
+          : `LIVE DOM measured at or above 40px: ${detail}`);
+
+    // Keep the complete measurements in results.json as durable evidence, not
+    // just the compact console line above.
+    results.push({
+      k: 'clerk-verification-controls-evidence',
+      pass: missing.length === 0 && undersized.length === 0,
+      detail: measurements,
+    });
+    await pageToAuth.screenshot({
+      path: path.join(OUT, 'clerk-verification-code-step.png'),
+      fullPage: true,
+    });
+  };
+
+  // Reach the EMAIL-CODE variant specifically: the password-first
+  // client-trust OTP screen renders the code cells but intentionally has no
+  // edit-email affordance. Clerk's recovery flow exposes the real code step
+  // that carries both live appearance keys, so this is the only non-vacuous
+  // place to verify identityPreviewEditButton.
+  const openClerkVerificationCodeStep = async (pageToAuth, email) => {
+    await pageToAuth.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const identifier = pageToAuth.locator('input[name="identifier"]');
+    await identifier.waitFor({ timeout: 30000 });
+    await identifier.fill(email);
+    await pageToAuth.keyboard.press('Enter');
+    await pageToAuth.locator('input[name="password"]').waitFor({ timeout: 30000 });
+    await pageToAuth.getByText(/forgot password/i).first().click();
+    const emailCodeButton = pageToAuth.getByRole('button', { name: /^email code to /i }).first();
+    await emailCodeButton.waitFor({ state: 'visible', timeout: 30000 });
+    await emailCodeButton.click();
+    await pageToAuth.locator('input[aria-label="Enter verification code"]').waitFor({
+      state: 'visible',
+      timeout: 30000,
+    });
+    await measureClerkVerificationControls(pageToAuth);
+  };
+
   const signInWithClerk = async (pageToAuth, email, password) => {
     await pageToAuth.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     const identifier = pageToAuth.locator('input[name="identifier"]');
@@ -581,6 +686,7 @@ try {
 
     authedContext = await browser.newContext({ viewport: DESKTOP });
     const authedPage = await authedContext.newPage();
+    await openClerkVerificationCodeStep(authedPage, email);
     await signInWithClerk(authedPage, email, password);
 
     // JIT provisioning created the local row during the auth poll above.
