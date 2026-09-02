@@ -23,22 +23,19 @@ import {
 } from './design-system-stage5.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const ARTIFACTS_ROOT = path.join(ROOT, 'artifacts');
+const SKILL_PATH = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md');
+const STANDALONE_SCOPE = {
+  roots: ['awesome-list-site-ds', 'artifacts/*/.replit-artifact/artifact.toml'],
+  sourceExtensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.scss', '.html', '.svg', '.md'],
+  ignoredDirectories: ['.git', 'dist', 'node_modules', 'uploads', 'docs'],
+  tokenSourceExclusions: ['**/design-system.css', 'awesome-list-site-ds/styles.css', 'artifacts/*/src/index.css'],
+};
+const LEGACY_ROOT_REL = STANDALONE_SCOPE.roots.find((root) => !root.includes('*'));
+const MANIFEST_ROOT_PATTERN = STANDALONE_SCOPE.roots.find((root) => root.includes('*'));
+const ARTIFACTS_ROOT = path.join(ROOT, MANIFEST_ROOT_PATTERN.split('/*/')[0]);
 const BASELINE_PATH = path.join(ROOT, 'scripts/validation/standalone-palette-drift-baseline.json');
-const SOURCE_EXTS = new Set([
-  '.ts',
-  '.tsx',
-  '.js',
-  '.jsx',
-  '.mjs',
-  '.cjs',
-  '.css',
-  '.scss',
-  '.html',
-  '.svg',
-  '.md',
-]);
-const IGNORED_DIRS = new Set(['.git', 'dist', 'node_modules', 'uploads', 'docs']);
+const SOURCE_EXTS = new Set(STANDALONE_SCOPE.sourceExtensions);
+const IGNORED_DIRS = new Set(STANDALONE_SCOPE.ignoredDirectories);
 const UPDATE = process.argv.includes('--update-baseline');
 
 function assertEqual(actual, expected, label) {
@@ -77,17 +74,25 @@ function runCanaries() {
   assertEqual(lineHasReasonedDsOkTag('/* DS-OK: fixed export brand paint */'), true, 'reasoned block marker');
   assertEqual(hasDsOkTag(['/* DS-OK: fixed export brand paint */', 'a', 'b', 'c', 'd', 'value'], 5), true, 'five-line lookback');
   assertEqual(hasDsOkTag(['/* DS-OK */', 'a', 'b', 'c', 'd', 'value'], 5), false, 'bare marker is not an exemption');
+  assertEqual(
+    isBareMarkerFinding(path.join(ROOT, 'artifacts/example/my-design-system.css'), '/* DS-OK */'),
+    true,
+    'similarly suffixed consumer stylesheet remains scanned and reports a bare marker',
+  );
   assertEqual(DS_OK_LOOKBACK, 5, 'shared lookback limit');
   assertEqual(
-    collectBareMarkersFromLines('surface.tsx', ['/* DS-OK */', 'const value = true;']).map((finding) => finding.line),
+    collectBareMarkersFromLines(path.join(ROOT, 'surface.tsx'), ['/* DS-OK */', 'const value = true;']).map((finding) => finding.line),
     [1],
     'bare marker fails without an attached hardcoded value',
   );
   assertEqual(
-    collectBareMarkersFromLines('surface.tsx', ['/* DS-OK: fixed export brand paint */']).length,
+    collectBareMarkersFromLines(path.join(ROOT, 'surface.tsx'), ['/* DS-OK: fixed export brand paint */']).length,
     0,
     'reasoned marker is accepted by standalone-wide pass',
   );
+  assertEqual(isDesignSystemSource(path.join(ROOT, 'artifacts/example/design-system.css')), true, 'design-system token source exclusion');
+  assertEqual(isDesignSystemSource(path.join(ROOT, 'artifacts/example/src/index.css')), true, 'artifact token source exclusion');
+  assertEqual(isDesignSystemSource(path.join(ROOT, 'artifacts/example/src/my-design-system.css')), false, 'suffixed consumer stylesheet stays scanned');
 
   const baseline = emptyCounts();
   baseline['hex-colors']['surface.tsx'] = { '#34d08c': 1 };
@@ -109,13 +114,77 @@ function formatDiff(value) {
   return `${value.scanId}|${value.rel}|${value.token}|${value.base}->${value.cur}`;
 }
 
+function lineNumberAt(text, index) {
+  return text.slice(0, index).split('\n').length;
+}
+
+function extractDocumentedScope(skillText) {
+  const marker = '<!-- standalone-palette-drift-scope';
+  const markerIndex = skillText.indexOf(marker);
+  if (markerIndex === -1) {
+    throw new Error(`could not find the standalone scan scope contract in ${path.relative(ROOT, SKILL_PATH)}`);
+  }
+
+  const endIndex = skillText.indexOf('-->', markerIndex);
+  if (endIndex === -1) {
+    throw new Error(`could not find the end of the standalone scan scope contract in ${path.relative(ROOT, SKILL_PATH)}`);
+  }
+
+  const section = skillText.slice(markerIndex + marker.length, endIndex);
+  const documented = {};
+  for (const [, key, rawValue] of section.matchAll(/^\s*>?\s*(roots|sourceExtensions|ignoredDirectories|tokenSourceExclusions)\s*=\s*(\[[^\n]+\])\s*$/gm)) {
+    documented[key] = JSON.parse(rawValue);
+  }
+
+  const missing = Object.keys(STANDALONE_SCOPE).filter((key) => !Object.hasOwn(documented, key));
+  if (missing.length) {
+    throw new Error(`standalone scan scope contract is missing ${missing.join(', ')} in ${path.relative(ROOT, SKILL_PATH)}`);
+  }
+
+  return {
+    values: documented,
+    line: lineNumberAt(skillText, markerIndex),
+  };
+}
+
+function checkStandaloneScopeParity() {
+  const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
+  const documented = extractDocumentedScope(skillText);
+  const mismatches = Object.keys(STANDALONE_SCOPE).filter((key) =>
+    JSON.stringify(documented.values[key]) !== JSON.stringify(STANDALONE_SCOPE[key]),
+  );
+
+  if (!skillText.includes('npm run validate:standalone-palette-drift')) {
+    mismatches.push('validator command');
+  }
+
+  if (mismatches.length) {
+    console.error('FAIL standalone-scope-parity :: documented and executable artifact scan contracts differ');
+    console.error(`  documented ${path.relative(ROOT, SKILL_PATH)}:${documented.line}`);
+    for (const key of mismatches) {
+      if (key === 'validator command') {
+        console.error('    validator command: missing `npm run validate:standalone-palette-drift`');
+      } else {
+        console.error(`    ${key}: documented ${JSON.stringify(documented.values[key])}, executable ${JSON.stringify(STANDALONE_SCOPE[key])}`);
+      }
+    }
+    console.error('  Update the guidance and executable scope together so standalone audits cannot drift.');
+    process.exit(1);
+  }
+
+  console.log(
+    `PASS standalone-scope-parity :: ${path.relative(ROOT, SKILL_PATH)}:${documented.line} matches ` +
+      'the executable artifact discovery and exclusion contract',
+  );
+}
+
 function hasArtifactManifest(dir) {
   return fs.existsSync(path.join(dir, '.replit-artifact', 'artifact.toml'));
 }
 
 function discoverRoots() {
   const roots = [];
-  const legacyStandalone = path.join(ROOT, 'awesome-list-site-ds');
+  const legacyStandalone = path.join(ROOT, LEGACY_ROOT_REL);
   if (fs.existsSync(legacyStandalone)) roots.push(legacyStandalone);
 
   if (fs.existsSync(ARTIFACTS_ROOT)) {
@@ -138,22 +207,34 @@ function* walk(dir) {
   }
 }
 
-function isDesignSystemSource(file, root) {
-  const relative = path.relative(root, file).split(path.sep).join('/');
-  const rootName = path.basename(root);
-
-  // These are token definitions, not standalone page/component consumers.
-  // Keep the paths narrow so a future exported page cannot hide behind a
-  // broad filename or directory allowlist.
-  if (rootName === 'awesome-list-site-ds' && relative === 'styles.css') return true;
-  if (rootName !== 'awesome-list-site-ds' && relative === 'src/index.css') return true;
-  return path.basename(file).toLowerCase() === 'design-system.css';
+function isDesignSystemSource(file) {
+  const relative = path.relative(ROOT, file).split(path.sep).join('/').toLowerCase();
+  // These files are the standalone token sources themselves, not consumers.
+  // Keep the exclusion narrow so a bare tag in an exported page or component
+  // cannot hide behind a whole directory/file allowlist.
+  return STANDALONE_SCOPE.tokenSourceExclusions.some((exclusion) => {
+    const normalized = exclusion.toLowerCase();
+    if (normalized.startsWith('**/')) {
+      return path.posix.basename(relative) === normalized.slice(3);
+    }
+    if (!normalized.includes('*')) return relative === normalized;
+    const pattern = normalized
+      .split('/')
+      .map((segment) => segment === '*' ? '[^/]+' : segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('/');
+    return new RegExp(`^${pattern}$`).test(relative);
+  });
 }
 
-function collectBareMarkersFromLines(relative, lines) {
+function isBareMarkerFinding(file, line) {
+  return !isDesignSystemSource(file) && lineHasBareDsOkTag(line);
+}
+
+function collectBareMarkersFromLines(file, lines) {
   const findings = [];
+  const relative = path.relative(ROOT, file);
   for (let i = 0; i < lines.length; i++) {
-    if (!lineHasBareDsOkTag(lines[i])) continue;
+    if (!isBareMarkerFinding(file, lines[i])) continue;
     findings.push({
       file: relative,
       line: i + 1,
@@ -172,11 +253,11 @@ function collect(roots) {
 
   for (const root of roots) {
     for (const file of walk(root)) {
-      if (isDesignSystemSource(file, root)) continue;
+      if (isDesignSystemSource(file)) continue;
       fileCount++;
       const relative = path.relative(ROOT, file);
       const lines = fs.readFileSync(file, 'utf8').split('\n');
-      bareMarkers.push(...collectBareMarkersFromLines(relative, lines));
+      bareMarkers.push(...collectBareMarkersFromLines(file, lines));
       for (const scan of STAGE5_SCANS) {
         for (let i = 0; i < lines.length; i++) {
           for (const token of scan.lineTokens(lines, i)) {
@@ -256,6 +337,7 @@ function totalOf(counts) {
   );
 }
 
+checkStandaloneScopeParity();
 runCanaries();
 console.log('PASS canaries :: standalone Stage 5 detectors, DS-OK parser, and shrink-only ratchet verified');
 

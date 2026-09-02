@@ -228,6 +228,14 @@ rg -i '\brgba?\(' client/src \
 > `awesome-list-site-ds` standalone root and every manifest-backed root under
 > `artifacts/`, excludes only the token source stylesheet, and fails on bare
 > or punctuation-only `DS-OK` markers with the same written-reason rule.
+> Its executable scope contract is checked against this guidance on every run:
+>
+> <!-- standalone-palette-drift-scope
+> roots = ["awesome-list-site-ds", "artifacts/*/.replit-artifact/artifact.toml"]
+> sourceExtensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".css", ".scss", ".html", ".svg", ".md"]
+> ignoredDirectories = [".git", "dist", "node_modules", "uploads", "docs"]
+> tokenSourceExclusions = ["**/design-system.css", "awesome-list-site-ds/styles.css", "artifacts/*/src/index.css"]
+> -->
 
 For standalone artifacts, run the same scans over the artifact's files,
 excluding the design-system stylesheet itself.
