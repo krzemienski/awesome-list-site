@@ -81,13 +81,47 @@
     font-family: var(--font-body);
   }
 
-  /* BUG-006 (audit2): the fixed consent banner hides whatever a scroll-into-view
-     lands behind it — keyboard Tab focus, anchor navigation, and automation all
-     use the native "scroll into view" algorithm, which honors scroll-margin.
-     Reserve the banner's live height (0px once dismissed) so scrolled-to
-     elements always settle above the banner instead of underneath it. */
+  /* App shell layout. #root is the app's single column: the page chrome
+     (header / sidebar / main / footer) fills it and an optional app-level
+     bottom bar — today the analytics consent banner — occupies the last row.
+     Declaring the column HERE, instead of letting the bar write inline
+     display/flex-direction onto #root at runtime, is what lets the bar reserve
+     its own space in normal flow:
+       - below 640px the bar sets `order: -1` and sits in flow at the top,
+         scrolling away with the page;
+       - from 640px up it is `position: sticky; bottom: 0` — still in flow, so
+         page content and the footer can never end up underneath it, while
+         staying visually pinned to the bottom of the viewport.
+     min-height keeps the column viewport-tall on short pages so a sticky bar
+     lands at the bottom edge there too.
+     Contract for the rows: a row must NOT claim a viewport height of its own
+     (min-h-svh & co). It fills what the column leaves — MainLayout passes
+     flex-1 for exactly that reason. A row that claims 100svh pushes the bar's
+     row past the fold, and on a short page the sticky bar is then pulled back
+     up over the end of that row (the footer) until the user scrolls. */
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  /* App shell contract. --app-bottom-inset is the height of that bottom bar
+     (0px when there is none), published by useAppBottomInset(). Normal flow
+     already accounts for the bar, so only viewport-FIXED UI needs this: the
+     toast viewport, the back-to-top button, the fixed sidebar column, and the
+     scroll-into-view rule below. Readers get a generic "the shell has N pixels
+     of bottom inset" value — none of them has to know which bar is showing. */
+  :root {
+    --app-bottom-inset: 0px;
+  }
+
+  /* BUG-006 (audit2): a bottom bar hides whatever a scroll-into-view lands
+     behind it — keyboard Tab focus, anchor navigation, and automation all use
+     the native "scroll into view" algorithm, which honors scroll-margin.
+     Reserve the live inset (0px with no bar) so scrolled-to elements always
+     settle above the bar instead of underneath it. */
   * {
-    scroll-margin-bottom: var(--consent-banner-h, 0px);
+    scroll-margin-bottom: var(--app-bottom-inset, 0px);
   }
 
   code, pre, kbd, samp {
@@ -262,7 +296,14 @@ vite-plugin-checker-error-overlay {
   }
 
   /* h-svh/min-h-svh wrappers pin layout to the SCREEN viewport height inside
-     paged media; let them size to content instead. */
+     paged media; let them size to content instead. The same applies to the
+     #root app-shell column: block layout fragments across sheets predictably,
+     and the bottom-bar row it exists for is hidden in print anyway. */
+  #root {
+    display: block !important;
+    min-height: 0 !important;
+  }
+
   [class*="h-svh"],
   [class*="min-h-svh"] {
     height: auto !important;

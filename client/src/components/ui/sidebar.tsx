@@ -328,7 +328,11 @@ const Sidebar = React.forwardRef<
             // (--header-height set by the layout; falls back to 0 for legacy
             // shells). The spacer height must match the fixed panel or the
             // page gains phantom scroll equal to the header height.
-            "duration-200 relative h-[calc(100svh-var(--header-height,0px))] bg-transparent transition-[width] ease-linear",
+            // This one IS in flow, so unlike the fixed panel it must also give
+            // back the shell's --app-bottom-inset: claiming the whole viewport
+            // here would make every page taller than the shell has to give,
+            // pushing a shell bottom row past the fold.
+            "duration-200 relative h-[calc(100svh-var(--header-height,0px)-var(--app-bottom-inset,0px))] bg-transparent transition-[width] ease-linear",
             side === "right" && "rotate-180"
           )}
           style={{
@@ -348,11 +352,12 @@ const Sidebar = React.forwardRef<
             // (reference .sidebar/.icon-rail: sticky top:60px, height
             // calc(100vh - 60px)). Header is z-30, sidebar stays under it.
             "duration-200 fixed top-[var(--header-height,0px)] bottom-0 z-10 hidden h-[calc(100svh-var(--header-height,0px))] transition-[left,right,width] ease-linear md:flex",
-            // Audit2 BUG-006: while the consent banner is visible it overlays
-            // the bottom of this fixed column — reserve the banner's height
-            // (var set by consent-banner.tsx) so the last sidebar links stay
-            // scrollable into view and clickable instead of sitting under it.
-            "pb-[var(--consent-banner-h,0px)]",
+            // Audit2 BUG-006: this column is fixed to the SCREEN, so the app
+            // shell's flow layout cannot move it clear of an app-level bottom
+            // bar overlaying the viewport's bottom edge. Reserve the shell's
+            // --app-bottom-inset (0px when there is no bar) so the last sidebar
+            // links stay scrollable into view and clickable.
+            "pb-[var(--app-bottom-inset,0px)]",
             side === "left" && "left-0 border-r",
             side === "right" && "right-0 border-l",
             (variant === "floating" || variant === "inset") && "p-2",

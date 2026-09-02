@@ -9,6 +9,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
 import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
+import { acquireGateLease } from "./gate-lease.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
@@ -206,6 +207,14 @@ let browser;
 let ownerContext;
 let anonymousContext;
 
+// This gate signs a user in through the Clerk UI and then reads its own writes
+// back, so it can tolerate neither the ACCESS EXCLUSIVE lock the DB-resilience
+// gate takes mid-run nor the pool saturation of the crawl gates: both turn into
+// a chooser that never finishes loading or a membership read that lands before
+// the write. Serialize against them via the shared "db-heavy" lease, acquired
+// BEFORE the browser lease (same order as print-audit, so they cannot deadlock).
+const releaseGateLease = await acquireGateLease("db-heavy", "collections-audit");
+
 try {
   browser = await launchBrowserWithLease(
     chromium,
@@ -353,6 +362,11 @@ try {
   await page.getByRole("button", { name: "Add bookmark" }).click();
   await page.getByText("Add to collections (optional)").waitFor({ timeout: 20_000 });
   const chooser = page.getByLabel(`Add bookmark to ${collectionName}`);
+  // The dialog renders "Add to collections (optional)" before the collections
+  // query resolves ("Loading collections…"), so waiting for that heading is not
+  // enough: under a saturated pool the rows appear seconds later and measuring
+  // straight away times out inside boundingBox.
+  await chooser.waitFor({ state: "visible", timeout: 60_000 });
   const chooserBox = await chooser.locator("xpath=..").boundingBox();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -365,8 +379,21 @@ try {
   await chooser.click();
   await page.getByTestId("button-save-without-notes").click();
   await page.getByText("Add Bookmark").waitFor({ state: "hidden", timeout: 20_000 });
-  const saved = await requestJson(request, "GET", "/api/bookmarks");
-  const mobileSaved = saved.data.find((item) => item.id === mobileResource.id);
+  // The dialog closes as soon as the bookmark mutation settles; collection
+  // membership is sent as separate, deliberately un-awaited requests (see the
+  // `void Promise.allSettled([...])` in ResourceDetail). Reading /api/bookmarks
+  // the instant the dialog hides races those writes and reports collectionIds=[]
+  // whenever the machine is busy — e.g. the whole validation suite running in
+  // parallel. Poll until the membership lands; the check still fails if it never
+  // does.
+  let mobileSaved;
+  const membershipDeadline = Date.now() + 20_000;
+  while (Date.now() < membershipDeadline) {
+    const saved = await requestJson(request, "GET", "/api/bookmarks");
+    mobileSaved = saved.data.find((item) => item.id === mobileResource.id);
+    if (mobileSaved?.collectionIds?.includes(collectionId)) break;
+    await page.waitForTimeout(500);
+  }
   log(
     "mobile:membership-persisted",
     mobileSaved?.collectionIds?.includes(collectionId) === true,
@@ -393,6 +420,7 @@ try {
     log("teardown:zero-qa-users", false, error instanceof Error ? error.message : String(error));
   }
   await pool.end();
+  releaseGateLease();
 }
 
 const failed = results.filter((result) => !result.pass);

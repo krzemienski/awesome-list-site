@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useAppBottomInset } from "@/hooks/use-app-bottom-inset";
 import {
   getAnalyticsConsent,
   setAnalyticsConsent,
@@ -38,7 +39,22 @@ export default function ConsentBanner() {
     typeof window !== "undefined" &&
     (window.innerWidth < 360 || window.innerHeight < 500);
   const [isCompact, setIsCompact] = useState(isCompactViewport);
-  const bannerRef = useRef<HTMLDivElement>(null);
+  const bannerRef = useRef<HTMLDivElement | null>(null);
+  // Two consumers of the same node: `bannerRef` for the focus move on re-open,
+  // and state so the inset hook re-observes if React ever swaps the element.
+  const [bannerEl, setBannerEl] = useState<HTMLDivElement | null>(null);
+  const attachBanner = useCallback((node: HTMLDivElement | null) => {
+    bannerRef.current = node;
+    setBannerEl(node);
+  }, []);
+
+  // Task #380: the banner no longer reaches into layout it does not own. It is
+  // a row of the #root column (index.css) — `order-first` in flow at the top
+  // below 640px, `sticky bottom-0` from 640px up — so normal flow keeps page
+  // content and the footer clear of it without any padding written onto body,
+  // #root or the footer's container. The one thing flow cannot move is
+  // viewport-fixed UI, which reads the shell's --app-bottom-inset instead.
+  useAppBottomInset(bannerEl, !choiceMade);
 
   useEffect(() => {
     const onResize = () => setIsCompact(isCompactViewport());
@@ -79,78 +95,6 @@ export default function ConsentBanner() {
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
   }, []);
 
-  // BUG-004 (run14): the fixed banner overlapped page content (footer links,
-  // bottom pagination) until a choice was made. While visible, pad the body
-  // by the banner's real height so everything stays reachable; restore on
-  // dismiss/unmount. Re-measures on resize (height changes when the flex row
-  // wraps on small screens).
-  useEffect(() => {
-    if (choiceMade) return;
-    const root = document.getElementById("root");
-    const insetParent = document.querySelector("footer")?.parentElement;
-    const insetEl = insetParent instanceof HTMLElement ? insetParent : null;
-
-    // Snapshot every inline property this effect is about to take ownership of.
-    // Blanking them on cleanup would erase whatever another layout feature had
-    // set; restoring the captured value is ownership-safe.
-    const prev = {
-      rootDisplay: root?.style.display ?? "",
-      rootFlexDirection: root?.style.flexDirection ?? "",
-      bodyPaddingBottom: document.body.style.paddingBottom,
-      insetPaddingBottom: insetEl?.style.paddingBottom ?? "",
-      bannerH: document.documentElement.style.getPropertyValue("--consent-banner-h"),
-    };
-
-    const applyPadding = () => {
-      const h = bannerRef.current?.offsetHeight ?? 0;
-      const pad = h > 0 ? `${h}px` : "";
-      const reserveViewport = window.innerWidth < 640;
-      if (reserveViewport) {
-        if (root) {
-          root.style.display = "flex";
-          root.style.flexDirection = "column";
-        }
-        document.body.style.paddingBottom = prev.bodyPaddingBottom;
-      } else {
-        if (root) {
-          root.style.display = prev.rootDisplay;
-          root.style.flexDirection = prev.rootFlexDirection;
-        }
-        document.body.style.paddingBottom = pad;
-      }
-      // BUG-026 (run19): expose the banner height so the toast viewport can
-      // lift itself above the banner (toast z-[100] > banner z-50, so without
-      // an offset toasts cover the Accept/Decline buttons).
-      document.documentElement.style.setProperty("--consent-banner-h", pad || "0px");
-      // The sidebar layout's inset column overflows body's own box (body is
-      // viewport-height while the grid content scrolls past it), so body
-      // padding alone never lifts the footer above the fixed banner — pad
-      // the footer's flow container too.
-      const inset = document.querySelector("footer")?.parentElement;
-      if (inset instanceof HTMLElement) inset.style.paddingBottom = reserveViewport ? "" : pad;
-    };
-    applyPadding();
-    window.addEventListener("resize", applyPadding);
-    return () => {
-      window.removeEventListener("resize", applyPadding);
-      // Restore the snapshot rather than blanking: another layout feature may
-      // own one of these inline values, and "" would silently erase it.
-      document.body.style.paddingBottom = prev.bodyPaddingBottom;
-      if (prev.bannerH) {
-        document.documentElement.style.setProperty("--consent-banner-h", prev.bannerH);
-      } else {
-        document.documentElement.style.removeProperty("--consent-banner-h");
-      }
-      const rootEl = document.getElementById("root");
-      if (rootEl) {
-        rootEl.style.display = prev.rootDisplay;
-        rootEl.style.flexDirection = prev.rootFlexDirection;
-      }
-      const inset = document.querySelector("footer")?.parentElement;
-      if (inset instanceof HTMLElement) inset.style.paddingBottom = prev.insetPaddingBottom;
-    };
-  }, [choiceMade]);
-
   if (choiceMade) return null;
 
   const decide = (value: "granted" | "denied") => {
@@ -177,16 +121,16 @@ export default function ConsentBanner() {
   // NB-003 (run18): condensed single-row bar for <360px viewports. Reduced
   // padding, trimmed copy and inline Accept/Decline buttons keep the banner
   // short (and max-h capped) so it no longer covers the centred /login submit
-  // button at 320×568. The body/footer padding effect above still runs, so the
-  // form stays fully reachable while the bar is visible.
+  // button at 320×568. The bar is in flow either way, so the form keeps its
+  // own space; the compact variant just gives the page more of the viewport.
   if (isCompact) {
     return (
       <div
-        ref={bannerRef}
+        ref={attachBanner}
         role="region"
         aria-label="Analytics consent"
         tabIndex={-1}
-        className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:fixed sm:inset-x-0 sm:bottom-0 sm:z-50 sm:border-b-0 sm:border-t"
+        className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none sm:border-b-0 sm:border-t"
         data-testid="consent-banner"
       >
         <div className="mx-auto flex w-full max-w-[1280px] max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
@@ -226,17 +170,16 @@ export default function ConsentBanner() {
 
   return (
     <div
-      ref={bannerRef}
+      ref={attachBanner}
       role="region"
       aria-label="Analytics consent"
       tabIndex={-1}
-      className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:fixed sm:inset-x-0 sm:bottom-0 sm:z-50 sm:border-b-0 sm:border-t"
+      className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none sm:border-b-0 sm:border-t"
       data-testid="consent-banner"
     >
       {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second
-          sentence hidden on xs) so the fixed banner obscures less of the
-          viewport at 375px; body/footer padding above keeps everything
-          reachable by scrolling. */}
+          sentence hidden on xs) so the bar takes less of the viewport at
+          375px, where it sits in flow at the top and scrolls away. */}
       <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         <p className="text-xs sm:text-sm text-[color:var(--text-2)] flex-1">
           We use analytics (Google Analytics, Mixpanel, PostHog and Amplitude)

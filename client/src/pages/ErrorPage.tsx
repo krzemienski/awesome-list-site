@@ -14,8 +14,10 @@ export default function ErrorPage({ error }: ErrorPageProps) {
     window.location.reload();
   };
   
+  // min-h-full: fill <main>, which already fills the app shell, rather than
+  // claiming a viewport height the shell may not have to give.
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
+    <div className="flex items-center justify-center min-h-full">
       <Helmet>
         <title>Error — Awesome Video</title>
         <meta name="robots" content="noindex, nofollow" />

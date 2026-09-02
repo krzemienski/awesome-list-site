@@ -28,7 +28,9 @@ function BackToTop() {
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="Back to top"
       data-testid="button-back-to-top"
-      className="fixed bottom-[calc(1.5rem+var(--consent-banner-h,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
+      // Fixed to the SCREEN, so it is lifted by the app shell's
+      // --app-bottom-inset (0px unless an app-level bottom bar is showing).
+      className="fixed bottom-[calc(1.5rem+var(--app-bottom-inset,0px))] right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
     >
       <ArrowUp className="h-5 w-5" />
     </Button>
@@ -124,7 +126,15 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
       // brand (reference layout.jsx Header), and the sidebar/icon-rail starts
       // BELOW it (reference .sidebar/.icon-rail: sticky top:60px). The
       // --header-height var drives the fixed sidebar offset in ui/sidebar.tsx.
-      className="flex-col"
+      //
+      // flex-1 + min-h-[auto] (overriding SidebarProvider's own min-h-svh):
+      // this region is a ROW of the #root shell column (see index.css), so it
+      // must consume the column's REMAINING height, not claim a full viewport
+      // for itself. Claiming 100svh here would push the shell's optional
+      // bottom row past the fold, and on a short page a first paint would show
+      // that row over the end of this one. Growing past the column on long
+      // pages still works: a flex item never shrinks below its content.
+      className="flex-col flex-1 min-h-[auto]"
       style={{ "--header-height": "60px" } as React.CSSProperties}
     >
       {/* CC-17 — Skip-link is the first focusable element on every page. */}

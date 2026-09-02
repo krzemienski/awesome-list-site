@@ -372,7 +372,7 @@ function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
 function SignInPage() {
   return (
     <div
-      className="flex justify-center pt-10 pb-[calc(2.5rem+var(--consent-banner-h,0px))]"
+      className="flex justify-center py-10"
       data-testid="page-sign-in"
     >
       {/* Title mirrors the og-middleware /sign-in template (two-pass parity). */}
@@ -389,9 +389,10 @@ function SignInPage() {
 function SignUpPage() {
   return (
     <div
-      // F009: bottom padding reserves real flow space for the fixed consent
-      // banner so the Clerk card's Continue button can never sit underneath it.
-      className="flex justify-center pt-10 pb-[calc(2.5rem+var(--consent-banner-h,0px))]"
+      // F009: the Clerk card's Continue button used to sit under the fixed
+      // consent banner. The banner is now an in-flow row of the app shell
+      // (index.css `#root`), so plain page padding is all this needs.
+      className="flex justify-center py-10"
       data-testid="page-sign-up"
     >
       {/* Title mirrors the og-middleware /sign-up template (two-pass parity). */}
@@ -465,7 +466,10 @@ function Logout() {
     };
   }, [signOut]);
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    // min-h-full, not min-h-screen: this screen renders inside the app shell's
+    // <main>, and a row that claims a viewport height of its own pushes the
+    // shell's bottom bar row past the fold.
+    <div className="min-h-full flex items-center justify-center bg-background">
       <div className="text-center">
         {error ? (
           <>

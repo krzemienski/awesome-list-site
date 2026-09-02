@@ -3,9 +3,11 @@
 // layout & a11y fixes: /advanced tabs+chips in-bounds @768/320, sidebar
 // auto-collapsed @768, microtext >=12px, single "Toggle sidebar" label + no
 // active rail, unique aria-labels on repeated Explore/Journey buttons, home
-// CTA reachable via hit-test @768/320, consent-banner clearance (body/footer
-// padding == banner height, global scroll-margin-bottom rule effective,
-// elementFromPoint never lands on the banner), search grid >=280px cols @768
+// CTA reachable via hit-test @768/320, consent-banner clearance (banner is an
+// in-flow sticky shell row reserving its own space — nothing else is padded —
+// global scroll-margin-bottom rule effective, elementFromPoint never lands on
+// the banner, and on a short route the footer already clears the bar at FIRST
+// PAINT, before any scrolling), search grid >=280px cols @768
 // and single col @320, exactly one search-dialog dismiss control, drawer rows
 // >=44px @375, theme preview inert + text >=12px, back links >=24px.
 //
@@ -14,8 +16,8 @@
 //   passes behavior:'instant' before measuring.
 // - Chromium is launched with the explicit executablePath found under
 //   .cache/ms-playwright (installed revision differs from the package's pin).
-// - The consent banner exposes its height as --consent-banner-h and a global
-//   `* { scroll-margin-bottom: var(--consent-banner-h, 0px) }` rule in
+// - The app shell exposes the bottom bar's height as --app-bottom-inset and a
+//   global `* { scroll-margin-bottom: var(--app-bottom-inset, 0px) }` rule in
 //   client/src/index.css keeps scroll-into-view targets clear of the banner;
 //   this script asserts that rule stays effective.
 //
@@ -244,24 +246,40 @@ for (const w of [768, 320]) {
     });
     log('microtext-home@768', micro.checked > 20 && micro.badCount === 0, `checked=${micro.checked} under12px=${micro.badCount} ${micro.bad.join(' | ')}`);
 
-    // ---- consent clearance: padding == banner height, scroll-margin rule, hit-test ----
+    // ---- consent clearance: in-flow reservation, shell inset, scroll-margin ----
     const consent = await page.evaluate(() => {
       const banner = document.querySelector('[data-testid="consent-banner"]');
       if (!banner) return { banner: false };
       const h = banner.offsetHeight;
-      const varH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--consent-banner-h')) || 0;
+      // Task #380: the banner is an in-flow (sticky) row of the #root column,
+      // so the document reserves its height by itself. Nothing outside the
+      // banner may be padded to make room for it.
+      const position = getComputedStyle(banner).position;
+      const rootDisplay = getComputedStyle(document.getElementById('root')).display;
       const bodyPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
       const inset = document.querySelector('footer')?.parentElement;
       const insetPad = inset ? parseFloat(getComputedStyle(inset).paddingBottom) || 0 : -1;
-      // Global `* { scroll-margin-bottom: var(--consent-banner-h,0px) }` rule
-      // must stay effective — sample an arbitrary in-flow element.
+      // Scrolled to the very bottom the footer must still END above the banner.
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
+      const footer = document.querySelector('footer');
+      const footerBottom = footer ? Math.round(footer.getBoundingClientRect().bottom) : -1;
+      const bannerTop = Math.round(banner.getBoundingClientRect().top);
+      // The shell publishes the bar height as --app-bottom-inset for the
+      // viewport-FIXED UI that flow cannot move (toast viewport, back-to-top,
+      // fixed sidebar column) and for the global scroll-margin rule below.
+      const insetVar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-bottom-inset')) || 0;
       const sample = document.querySelector('footer a') || document.querySelector('main');
       const scrollMargin = sample ? parseFloat(getComputedStyle(sample).scrollMarginBottom) || 0 : -1;
-      return { banner: true, h, varH, bodyPad, insetPad, scrollMargin };
+      return { banner: true, h, position, rootDisplay, bodyPad, insetPad, footerBottom, bannerTop, insetVar, scrollMargin };
     });
     const near = (a, b) => Math.abs(a - b) <= 2;
-    log('consent-padding@768', consent.banner && consent.h > 0 && near(consent.varH, consent.h) && near(consent.bodyPad, consent.h) && near(consent.insetPad, consent.h),
+    log('consent-inflow@768',
+      consent.banner && consent.h > 0 && consent.position === 'sticky' &&
+      consent.bodyPad === 0 && consent.insetPad === 0 &&
+      consent.footerBottom > 0 && consent.footerBottom <= consent.bannerTop + 1,
       JSON.stringify(consent));
+    log('consent-shell-inset@768', consent.banner && near(consent.insetVar, consent.h),
+      `--app-bottom-inset=${consent.insetVar} bannerH=${consent.h}`);
     log('consent-scroll-margin@768', consent.banner && near(consent.scrollMargin, consent.h),
       `scrollMarginBottom=${consent.scrollMargin} bannerH=${consent.h} (global * rule in index.css)`);
 
@@ -298,6 +316,84 @@ for (const w of [768, 320]) {
   log(`home-cta@${w}`, cta.found && cta.inBounds && cta.hitOk && !cta.onBanner, JSON.stringify(cta));
   if (w === 320) await page.screenshot({ path: `${OUT}/home-320.png` }).catch(() => {});
   await ctx.close();
+}
+
+// ---- short page, FIRST PAINT: the shell must reserve the bar's row before
+// any scrolling. Every shell row has to fill what the column leaves; a row that
+// claims a viewport height of its own pushes the bar's row past the fold, and
+// the sticky bar is then pulled back up over the end of the page (the footer)
+// until the user scrolls. Checked with scrollY still 0, unlike the checks above
+// which scroll to the document bottom first. ----
+for (const [w, h] of [[1024, 768], [1280, 900]]) {
+  const { ctx, page } = await newPage(w, h);
+  await goto(page, '/not-found');
+  await page.waitForSelector('[data-testid="consent-banner"]', { timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(1200);
+  const first = await page.evaluate(() => {
+    const banner = document.querySelector('[data-testid="consent-banner"]');
+    const footer = document.querySelector('footer');
+    if (!banner || !footer) return { banner: !!banner, footer: !!footer };
+    const fr = footer.getBoundingClientRect();
+    const br = banner.getBoundingClientRect();
+    const covered = [];
+    for (const el of footer.querySelectorAll('a, button')) {
+      const r = el.getBoundingClientRect();
+      const at = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      if (!at || !(at === el || el.contains(at) || at.contains(el))) {
+        covered.push(`${(el.textContent || '').trim().slice(0, 18)}=>${at ? (banner.contains(at) ? 'BANNER' : at.tagName) : 'offscreen'}`);
+      }
+    }
+    return {
+      banner: true, footer: true, scrollY: Math.round(window.scrollY),
+      vh: window.innerHeight, docH: document.documentElement.scrollHeight,
+      fits: document.documentElement.scrollHeight <= window.innerHeight + 1,
+      footerBottom: Math.round(fr.bottom), bannerTop: Math.round(br.top),
+      clears: fr.bottom <= br.top + 1, covered,
+    };
+  });
+  const pass = first.banner && first.footer && first.scrollY === 0 &&
+    first.fits && first.clears && first.covered.length === 0;
+  log(`consent-shortpage-initial@${w}x${h}`, pass, JSON.stringify(first));
+  if (!pass) await page.screenshot({ path: `${OUT}/shortpage-${w}x${h}.png` }).catch(() => {});
+  await ctx.close();
+}
+
+// ---- static: no screen inside the app shell may claim a viewport height ----
+// The bottom bar is a row of the #root column, so a row that sizes itself to the
+// viewport pushes the bar's row past the fold and the sticky bar is drawn back
+// over the end of the page until the user scrolls. The live checks above can only
+// prove this for routes a crawler can sit on; screens like /logout (it signs out
+// and replaces the location within a few hundred ms) or the auth/admin guards
+// (they need a specific session state) are unreachable that way, so the shape is
+// enforced at the source for every screen at once.
+{
+  // `max-h-screen` is deliberately not matched: capping a fixed overlay is fine.
+  const VIEWPORT_CLAIM =
+    /(?<!max-)\b(?:min-)?h-(?:screen|svh|dvh|\[(?:100[sd]?vh|calc\(100[sd]?vh[^\]]*)\])/g;
+  // Elements flow cannot move, so they may not be sized by it either.
+  const ALLOW = new Map([
+    ['client/src/components/ui/sidebar.tsx', 'fixed sidebar column + its in-flow spacer, which already subtracts --app-bottom-inset'],
+    ['client/src/components/ui/toast.tsx', 'fixed toast viewport'],
+  ]);
+  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    return entry.isDirectory() ? walk(full) : (entry.name.endsWith('.tsx') ? [full] : []);
+  });
+  const offenders = [];
+  for (const file of walk(path.join(ROOT, 'client/src'))) {
+    const rel = path.relative(ROOT, file).split(path.sep).join('/');
+    if (ALLOW.has(rel)) continue;
+    const source = fs.readFileSync(file, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/(^|[^:"'`\\])\/\/.*$/gm, '$1');
+    const seen = new Set(source.match(VIEWPORT_CLAIM) || []);
+    for (const hit of seen) offenders.push(`${rel} :: ${hit}`);
+  }
+  log(
+    'shell-no-viewport-claims',
+    offenders.length === 0,
+    offenders.length ? offenders.join(' | ') : `clean (${ALLOW.size} fixed-position files allowed)`,
+  );
 }
 
 // ---- search grid: >=280px cols @768, single col @320 ----

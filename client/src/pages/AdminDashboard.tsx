@@ -167,7 +167,7 @@ export default function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-full flex items-center justify-center bg-background">
         <h1 className="sr-only">Admin Dashboard</h1>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
     // for the frame where this branch is still mounted — never a dead end.
     const sessionExpired = error instanceof ApiError && error.status === 401;
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-full flex items-center justify-center bg-background">
         <div className="text-center max-w-md px-4">
           <Shield className="h-12 w-12 text-[var(--accent)] mx-auto mb-4" />
           {sessionExpired ? (

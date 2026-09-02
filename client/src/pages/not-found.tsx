@@ -30,8 +30,11 @@ export default function NotFound({ suggestion }: NotFoundProps) {
     reportDeadLink(path, document.referrer);
   }, []);
 
+  // min-h-full, not a 100vh calc: <main> already fills whatever the app shell
+  // leaves (see index.css), so filling main centers this card without claiming
+  // a viewport height the shell may not have to give.
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
+    <div className="flex items-center justify-center min-h-full">
       {/* R5-050: ONE 404 head shared by every not-found surface (unknown path,
           unknown taxonomy slug, unknown resource) — mirrors the server's
           notFoundMeta: same title/description/noindex, og tags kept, og:url

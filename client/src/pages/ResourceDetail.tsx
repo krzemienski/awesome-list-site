@@ -519,7 +519,7 @@ export default function ResourceDetail() {
   if (error || !resource) {
     const requestedIdentifier = id || "unknown";
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-10rem)] px-4">
+      <div className="flex items-center justify-center min-h-full px-4">
         <SEOHead
           title="Resource Not Found"
           description={`The requested resource "${requestedIdentifier}" could not be found on Awesome Video.`}
