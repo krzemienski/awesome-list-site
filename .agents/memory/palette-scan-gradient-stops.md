@@ -16,3 +16,11 @@ The escape-hatch tag is a plain substring search with a fixed 5-line **lookback*
 - Put the tag on the **LAST** line of a justification block comment. A tag opening a 4-line block silently leaves anything past the 5th line below it exposed — a 10-entry constant table needs a second tag mid-array (one every 5 entries).
 - The prose of the justification is itself scanned. Naming the literals you are excusing ("mirrors #34d08c ok / #5eddf2 info") only stays clean while the tag is above them; move the tag down and the comment becomes the violation. Safest: describe the values by name, not by literal.
 - Only the hex and rgb detectors honor the tag. Raw radii, border widths, and font-family have **no** escape hatch — the options there are a token ref or excluding the whole file. `var(--radius-pill)` on an element whose height equals twice the old raw radius is a pixel-identical swap, and `var(--border-w)` covers `border: 1px`.
+
+## Runtime-composed colors trip the rgb detector
+
+Code that BUILDS a color string at runtime is scanned as source text, so a template literal of the form `rgb(` + interpolations + `)` matches the rgb detector and counts as a hardcoded literal — the `var(--…)` whitelist only spares matches whose body literally contains a custom-property ref, which an interpolated one does not.
+
+**Why:** Resolving design tokens in JS (for a third-party widget that cannot read `var(--…)`) is the on-system fix, yet emitting the result in functional notation makes the gate call it drift.
+
+**How to apply:** Have runtime color builders emit **hex** (`"#" + channel pairs`) instead of functional notation — `#${…}` matches no detector, so no DS-OK tag is needed. Regex literals that PARSE such notation are safe as written with an escaped paren (`rgba?\(`), because the detector needs an unescaped `(` right after the name.

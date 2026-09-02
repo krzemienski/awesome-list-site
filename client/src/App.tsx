@@ -2,12 +2,12 @@ import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode 
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
-import { dark } from "@clerk/themes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAnalytics } from "./hooks/use-analytics";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
 import { useCrossTabSync } from "./lib/crossTabSync";
+import { useClerkAppearance } from "./lib/clerk-appearance";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
 import MainLayout from "@/components/layout/new/MainLayout";
@@ -344,68 +344,6 @@ function stripBase(path: string): string {
 if (!clerkPubKey) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env file");
 }
-
-// Branded appearance: the app is dark-only with a red accent and square
-// corners throughout.
-const clerkAppearance = {
-  theme: dark,
-  options: {
-    logoPlacement: "inside" as const,
-    logoLinkUrl: basePath || "/",
-    logoImageUrl: `${window.location.origin}${basePath}/favicon.svg`,
-  },
-  // Clerk's appearance API takes literal color strings only: it parses them in
-  // JS to derive its own hover/active/alpha ramps, and the hosted widget paints
-  // with its own stylesheet, so var(--…) DS refs resolve to nothing here.
-  // DS-OK: Clerk-only literal ramp, matched to the dark app shell it sits on.
-  variables: {
-    colorPrimary: "#E50914",
-    colorBackground: "#0a0a0a",
-    colorForeground: "#f5f5f5",
-    colorMutedForeground: "#a3a3a3",
-    borderRadius: "0px",
-  },
-  elements: {
-    // OAuth provider marks default to dark ink. Keep the dark card treatment,
-    // but invert those marks so Apple, GitHub, and other monochrome providers
-    // remain visible against their near-black buttons.
-    // DS-OK: same Clerk literal-color constraint as `variables` above.
-    socialButtonsBlockButton: {
-      color: "#f5f5f5",
-      borderColor: "#2a2a2a",
-      minHeight: "40px",
-    },
-    socialButtonsBlockButtonText: {
-      color: "#f5f5f5", // DS-OK: Clerk literal-color constraint (see above)
-    },
-    socialButtonsProviderIcon: {
-      filter: "brightness(0) invert(1)",
-    },
-    // Clerk's default control height renders ~32px, below the 40px touch
-    // minimum the rest of the app holds to. Raise the interactive surfaces
-    // (submit, inputs, OTP cells, and the footer sign-up/sign-in switch)
-    // without altering the branded look.
-    formButtonPrimary: {
-      minHeight: "40px",
-    },
-    formFieldInput: {
-      minHeight: "40px",
-    },
-    otpCodeFieldInput: {
-      minHeight: "40px",
-      minWidth: "40px",
-    },
-    footerActionLink: {
-      display: "inline-flex",
-      alignItems: "center",
-      minHeight: "40px",
-    },
-    identityPreviewEditButton: {
-      minHeight: "40px",
-      minWidth: "40px",
-    },
-  },
-} as const;
 
 const clerkLocalization = {
   signIn: {
@@ -792,6 +730,9 @@ function Router() {
 
 function App() {
   const [, setLocation] = useLocation();
+  // Task #376: the Clerk widget paints from resolved DS tokens and re-resolves
+  // when the visitor changes system/accent at /settings/theme.
+  const clerkAppearance = useClerkAppearance(basePath);
 
   // R4-057: the server (og-middleware) injects a full crawl-time meta set into
   // <head>; after hydration react-helmet renders its own tags (marked with
