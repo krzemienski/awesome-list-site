@@ -7,20 +7,20 @@ import {
   DEFAULT_ACCENT,
   applyDesignSystem,
   isSystemId,
-  type DesignSystem,
-  type Accent,
+  type DesignSystemId,
+  type AccentId,
 } from "@/lib/design-system";
 import { safeGetItem } from "@/lib/safeStorage";
 import { loadDesignSystemFont } from "@/lib/font-options";
 
 type ThemeProviderState = {
-  systemId: string;
-  accentId: string;
+  systemId: DesignSystemId;
+  accentId: AccentId;
   setSystem: (id: string) => void;
   setAccent: (id: string) => void;
-  systems: Record<string, DesignSystem>;
-  accents: Accent[];
-  systemDefaultAccent: Record<string, string>;
+  systems: typeof DESIGN_SYSTEMS;
+  accents: typeof ACCENTS;
+  systemDefaultAccent: typeof SYSTEM_DEFAULT_ACCENT;
 };
 
 const initialState: ThemeProviderState = {
@@ -35,19 +35,27 @@ const initialState: ThemeProviderState = {
 
 export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-function readInitial(key: string, fallback: string, valid: (v: string) => boolean): string {
+function readInitial<T extends string>(
+  key: string,
+  fallback: T,
+  valid: (v: string) => v is T,
+): T {
   if (typeof window === "undefined") return fallback;
   const saved = safeGetItem(key);
   return saved && valid(saved) ? saved : fallback;
 }
 
+function isAccentId(id: string): id is AccentId {
+  return ACCENTS.some((a) => a.id === id);
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [systemId, setSystemId] = useState<string>(() =>
+  const [systemId, setSystemId] = useState<DesignSystemId>(() =>
     readInitial("ds-system", DEFAULT_SYSTEM, isSystemId)
   );
 
-  const [accentId, setAccentId] = useState<string>(() =>
-    readInitial("ds-accent", DEFAULT_ACCENT, (v) => ACCENTS.some((a) => a.id === v))
+  const [accentId, setAccentId] = useState<AccentId>(() =>
+    readInitial("ds-accent", DEFAULT_ACCENT, isAccentId)
   );
 
   useEffect(() => {
@@ -69,7 +77,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [systemId]);
 
   const setAccent = useCallback((id: string) => {
-    if (!ACCENTS.some((a) => a.id === id)) return;
+    if (!isAccentId(id)) return;
     setAccentId(id);
   }, []);
 

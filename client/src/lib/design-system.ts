@@ -41,7 +41,7 @@ export interface Accent {
 // theme that sticks and does nothing. Editorial is the documented exception:
 // the bare :root block carries its tokens, so the gate exempts it by name,
 // with a written reason.
-export const DESIGN_SYSTEMS: Record<string, DesignSystem> = {
+export const DESIGN_SYSTEMS = {
   editorial: {
     name: 'Editorial',
     tag: 'Magazine · Fraunces',
@@ -67,9 +67,11 @@ export const DESIGN_SYSTEMS: Record<string, DesignSystem> = {
     tag: 'Grid · Manrope',
     desc: 'Tight Swiss grid — hairline rules, lining figures, clinical whitespace.',
   },
-};
+} as const satisfies Record<string, DesignSystem>;
 
-export const ACCENTS: Accent[] = [
+export type DesignSystemId = keyof typeof DESIGN_SYSTEMS;
+
+export const ACCENTS = [
   // Swatch metadata for the /settings/theme picker, which paints all ten
   // accents at once. Only the ACTIVE accent's --accent/--accent-2 are readable
   // at runtime, so every accent's paint has to be inlined here, mirroring the
@@ -90,7 +92,9 @@ export const ACCENTS: Accent[] = [
   { id: 'violet',  name: 'Violet',  primary: '#9d4edd', secondary: '#c77dff' },
   { id: 'lime',    name: 'Lime',    primary: '#aaff00', secondary: '#00ff88' },
   { id: 'rose',    name: 'Rose',    primary: '#ff7a8a', secondary: '#ffb3c1' },
-];
+] as const satisfies readonly Accent[];
+
+export type AccentId = (typeof ACCENTS)[number]['id'];
 
 // The accent each system is meant to arrive with. Read as
 // `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT` by applyDesignSystem() below
@@ -101,7 +105,7 @@ export const ACCENTS: Accent[] = [
 // entry, when an entry names a system that no longer exists, or when an entry
 // names an accent id that is not in ACCENTS. Adding a system means adding a
 // row here too.
-export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {
+export const SYSTEM_DEFAULT_ACCENT: Record<DesignSystemId, AccentId> = {
   editorial: 'crimson',
   terminal:  'matrix',
   geist:     'cyan',
@@ -109,8 +113,8 @@ export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {
   swiss:     'orange',
 };
 
-export const DEFAULT_SYSTEM = 'editorial';
-export const DEFAULT_ACCENT = 'crimson';
+export const DEFAULT_SYSTEM: DesignSystemId = 'editorial';
+export const DEFAULT_ACCENT: AccentId = 'crimson';
 
 /**
  * Is this string one of the systems we actually offer?
@@ -125,7 +129,7 @@ export const DEFAULT_ACCENT = 'crimson';
  * the loader looks up a stylesheet that cannot exist: the page paints
  * Editorial with none of Editorial's faces downloaded (#411).
  */
-export function isSystemId(id: string | null | undefined): boolean {
+export function isSystemId(id: string | null | undefined): id is DesignSystemId {
   // hasOwnProperty.call, not Object.hasOwn: this runs on the boot path, and
   // Object.hasOwn is ES2022 — Vite's default build target still includes
   // Safari 14, where it is undefined and would throw before anything renders.
@@ -133,8 +137,8 @@ export function isSystemId(id: string | null | undefined): boolean {
 }
 
 /** The offered system this stored value means — DEFAULT_SYSTEM if it means none. */
-export function resolveSystemId(id: string | null | undefined): string {
-  return isSystemId(id) ? (id as string) : DEFAULT_SYSTEM;
+export function resolveSystemId(id: string | null | undefined): DesignSystemId {
+  return isSystemId(id) ? id : DEFAULT_SYSTEM;
 }
 
 declare global {

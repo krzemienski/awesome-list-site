@@ -596,7 +596,7 @@ function parseCssRootFonts(cssSrc) {
 // secondary never breaks the parse (only losing a field does — and that
 // FAILs, it does not silently skip the entry).
 function parseTsAccents(tsSrc) {
-  const m = /export\s+const\s+ACCENTS\s*:\s*Accent\[\]\s*=\s*\[([\s\S]*?)\n\];/.exec(tsSrc);
+  const m = /export\s+const\s+ACCENTS\s*(?::\s*Accent\[\])?\s*=\s*\[([\s\S]*?)\n\]\s*(?:as\s+const\s*)?(?:satisfies\s+[^;]+)?;/.exec(tsSrc);
   if (!m) return { accents: new Map(), malformed: [], found: false };
   const body = stripComments(m[1]);
   const accents = new Map();
@@ -629,21 +629,21 @@ function parseBootAccents(htmlSrc) {
 }
 
 function parseTsDefaultAccent(tsSrc) {
-  const m = /export\s+const\s+DEFAULT_ACCENT\s*=\s*['"]([^'"]+)['"]/.exec(tsSrc);
+  const m = /export\s+const\s+DEFAULT_ACCENT\s*(?::[^=]+)?=\s*['"]([^'"]+)['"]/.exec(tsSrc);
   return m ? m[1] : null;
 }
 
 // DESIGN_SYSTEMS: Record<string, DesignSystem> in design-system.ts — only the
 // keys matter here; the labels/taglines are picker copy, not boot state.
 function parseTsDesignSystems(tsSrc) {
-  const m = /export\s+const\s+DESIGN_SYSTEMS\s*(?::[^=]*)?=\s*\{([\s\S]*?)\n\};/.exec(tsSrc);
+  const m = /export\s+const\s+DESIGN_SYSTEMS\s*(?::[^=]*)?=\s*\{([\s\S]*?)\n\}\s*(?:as\s+const\s*)?(?:satisfies\s+[^;]+)?;/.exec(tsSrc);
   if (!m) return { ids: [], malformed: [], found: false };
   const { entries, malformed } = parseObjectEntries(m[1]);
   return { ids: [...entries.keys()], malformed, found: true };
 }
 
 function parseTsDefaultSystem(tsSrc) {
-  const m = /export\s+const\s+DEFAULT_SYSTEM\s*=\s*['"]([^'"]+)['"]/.exec(tsSrc);
+  const m = /export\s+const\s+DEFAULT_SYSTEM\s*(?::[^=]+)?=\s*['"]([^'"]+)['"]/.exec(tsSrc);
   return m ? m[1] : null;
 }
 
@@ -3005,7 +3005,7 @@ const cssAccents = parseCssAccents(cssSrc);
 
 // Parser-rot guards: a rename or reformat must break the gate LOUDLY rather
 // than reduce it to comparing two empty sets.
-if (!found) fail('parser-rot', `could not locate "export const ACCENTS: Accent[] = [ … ];" in ${TS_REL}`);
+if (!found) fail('parser-rot', `could not locate the ACCENTS registry in ${TS_REL}`);
 if (!tsAccents.size) fail('parser-rot', `parsed ZERO accents out of ACCENTS in ${TS_REL}`);
 if (!cssAccents.size) fail('parser-rot', `parsed ZERO :root[data-accent="…"] blocks out of ${CSS_REL}`);
 for (const obj of malformed) {

@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { FONT_OPTIONS, FONT_LS_KEY, applyFontOverride } from "@/lib/font-options";
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
+import { isSystemId } from "@/lib/design-system";
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
@@ -43,7 +44,7 @@ export default function ThemeSettings() {
 
   const handlePickSystem = (id: string) => {
     setSystem(id);
-    const label = systems[id]?.name ?? id;
+    const label = isSystemId(id) ? systems[id].name : id;
     trackThemeChange(label, 'system');
     toast({ title: "Design system applied", description: `${label} is now active.` });
   };
