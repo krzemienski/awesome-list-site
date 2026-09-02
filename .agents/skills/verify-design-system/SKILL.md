@@ -198,10 +198,20 @@ rg -i '\brgba?\(' client/src \
 > demand `node scripts/validation/palette-drift.mjs --update-baseline`
 > (commit the shrunken baseline alongside), and that command itself refuses
 > to write while any count sits above the baseline, so it cannot launder new
-> violations in. Hex lines tagged `/* DS-OK: reason */` on the same line or
+> violations in. Lines tagged `/* DS-OK: reason */` on the same line or
 > within the previous 5 lines are exempt, matching the "Acceptable hardcoded
 > values" list below; 3–4-digit all-numeric `#307`-style issue references
-> are ignored. The rgb()/rgba() scan shares the same DS-OK exemption, and
+> are ignored. All four value scans — hex, rgb/rgba, raw radii/borders and
+> font-family — honor the same tag, so a value that genuinely cannot ride
+> the token ladder (a webkit scrollbar thumb, a forced-colors border, a
+> literal stack in a standalone export document) can stay put with a written
+> reason instead of being converted or hidden behind a whole-file exclusion,
+> which would also mask every future violation in that file. Raw Tailwind
+> palette classes are the one detector with no escape hatch — there is
+> nothing to justify. The 5-line lookback is a hard cap: a tag further above
+> does not reach the hit, so a long justified block needs a tag roughly
+> every 5 entries, and the tag's own prose is scanned too (describe values
+> by name, not by literal). The rgb()/rgba() scan additionally
 > whitelists token-derived composition by construction — any match whose
 > body references `var(--…)` (e.g. `rgba(var(--accent-rgb), 0.4)`) is
 > on-system, since the color comes FROM a token; its match identity strips
@@ -216,7 +226,9 @@ excluding the design-system stylesheet itself.
 
 ### Acceptable hardcoded values
 
-These pass — each is tagged `/* DS-OK: reason */` at its definition site:
+These pass — each is tagged `/* DS-OK: reason */` at its definition site
+(the tag covers colors, radii/borders and font-family alike, on its own line
+or within the 5 lines above the value):
 
 - The global status constants `#34d08c` (ok) / `#ffb84d` (warn) / `#ff5c7a`
   (bad) — semantics, not theme.
@@ -244,6 +256,11 @@ These pass — each is tagged `/* DS-OK: reason */` at its definition site:
   can never make the gate pass vacuously. Adding an accent means editing
   all three files.
 - `#000`/`#fff` in SVG elements that need fixed paint.
+- A radius, border width or font stack that genuinely has no ladder step —
+  e.g. a `::-webkit-scrollbar-thumb` corner or a forced-colors
+  (Windows High Contrast) border — *when the tag states why*. Convert it to
+  `var(--radius-…)` / `var(--border-w)` first; the tag is for the cases
+  where converting would change how it looks.
 
 An untagged literal is a finding even if it happens to match a token value.
 If you find a `/* DS-OK: … */` comment, skip it.

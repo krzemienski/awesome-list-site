@@ -11,6 +11,8 @@
 //     by construction, and DS-OK tagging works exactly as for hex
 //   · radii    — raw border-radius / border px values that bypass the ladders
 //   · font     — raw font-family strings
+// (all four value detectors — hex, rgb, radii, font — honor the same DS-OK
+// tag; see the escape-hatch note below)
 //
 // Ratchet model (the site-wide sweep, task #357, is still in flight):
 // pre-existing hits are pinned in palette-drift-baseline.json as an explicit
@@ -45,11 +47,19 @@
 // increases inside a scan section that already exists are still refused,
 // so --init cannot launder regressions in the established detectors.
 //
-// DS-OK escape hatch (hex + rgb scans, per the skill's "Acceptable
-// hardcoded values"): a line is exempt when "DS-OK" appears on the SAME
-// line or within the previous 5 lines (block-level tags like the
+// DS-OK escape hatch (hex + rgb + radii + font scans, per the skill's
+// "Acceptable hardcoded values"): a line is exempt when "DS-OK" appears on
+// the SAME line or within the previous 5 lines (block-level tags like the
 // JourneyDetail celebration surface or the showcase status-constant
-// table).
+// table). Task #378 extended it from the two color detectors to raw radii
+// and font-family: a value that genuinely cannot ride the token ladder (a
+// webkit scrollbar thumb, a forced-colors border) previously had no honest
+// middle option between converting it — sometimes changing how it looks —
+// and excluding the whole file, which also hides every FUTURE violation in
+// that file. A tagged line still owes a written reason next to the tag; the
+// gate does not parse the prose, the reviewer reads it.
+// Only the palette-class detector has no escape hatch: a raw Tailwind
+// palette class is never the right answer, so there is nothing to justify.
 //
 // Detector canaries run on every invocation: each regex, the DS-OK /
 // task-number classifiers, per-match counting (several tokens on one line),
@@ -101,12 +111,23 @@ function hexTokenIsColor(token) {
   return false;
 }
 
+// The DS-OK escape hatch, shared by EVERY value detector (hex, rgb, radii,
+// font) so the exemption rules can never drift apart between them: a hit is
+// exempt when the literal "DS-OK" appears on the same line or within the
+// previous DS_OK_LOOKBACK lines. Plain substring search — the written reason
+// travels with the tag for the reviewer, not for the gate. The lookback is a
+// hard cap: a tag N>5 lines above a hit does not reach it (so a long
+// justified block needs a tag every 5 entries).
+function hasDsOkTag(lines, i) {
+  for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
+    if (lines[j].includes('DS-OK')) return true;
+  }
+  return false;
+}
+
 function hexLineTokens(lines, i) {
   const tokens = [...lines[i].matchAll(HEX_RE)].map((m) => m[0]).filter(hexTokenIsColor);
-  if (!tokens.length) return [];
-  for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
-    if (lines[j].includes('DS-OK')) return [];
-  }
+  if (!tokens.length || hasDsOkTag(lines, i)) return [];
   return tokens.map((t) => t.toLowerCase()); // case-insensitive identity (#E50914 ≡ #e50914)
 }
 
@@ -121,11 +142,24 @@ function rgbLineTokens(lines, i) {
   const tokens = [...lines[i].matchAll(RGB_RE)]
     .map((m) => m[0])
     .filter((t) => !/var\(\s*--/i.test(t));
-  if (!tokens.length) return [];
-  for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
-    if (lines[j].includes('DS-OK')) return [];
-  }
+  if (!tokens.length || hasDsOkTag(lines, i)) return [];
   return tokens.map((t) => t.replace(/\s+/g, '').toLowerCase());
+}
+
+// Raw radii / border px values and raw font-family strings. Same DS-OK
+// same-line / 5-line-lookback exemption as the color detectors (task #378):
+// the honest middle option for a value that legitimately cannot ride the
+// ladder, instead of excluding the whole file from the scan.
+function radiiLineTokens(lines, i) {
+  const tokens = [...lines[i].matchAll(RADII_RE)].map((m) => normalizeWs(m[0]));
+  if (!tokens.length || hasDsOkTag(lines, i)) return [];
+  return tokens;
+}
+
+function fontLineTokens(lines, i) {
+  const tokens = [...lines[i].matchAll(FONT_RE)].map((m) => normalizeWs(m[0]));
+  if (!tokens.length || hasDsOkTag(lines, i)) return [];
+  return tokens;
 }
 
 const SCANS = [
@@ -157,15 +191,15 @@ const SCANS = [
   },
   {
     id: 'raw-radii',
-    label: 'raw border-radius / border px values',
+    label: 'raw border-radius / border px values (untagged — no DS-OK within 5 lines)',
     excludes: ['client/src/styles/design-system.css'],
-    lineTokens: (lines, i) => [...lines[i].matchAll(RADII_RE)].map((m) => normalizeWs(m[0])),
+    lineTokens: radiiLineTokens,
   },
   {
     id: 'font-family',
-    label: 'raw font-family strings',
+    label: 'raw font-family strings (untagged — no DS-OK within 5 lines)',
     excludes: ['client/src/styles/design-system.css'],
-    lineTokens: (lines, i) => [...lines[i].matchAll(FONT_RE)].map((m) => normalizeWs(m[0])),
+    lineTokens: fontLineTokens,
   },
 ];
 
@@ -177,8 +211,8 @@ function runCanaries() {
   const palette = (s) => byId('palette-classes').lineTokens([s], 0);
   const hex = (src, i = 0) => { const lines = src.split('\n'); return hexLineTokens(lines, i); };
   const rgb = (src, i = 0) => { const lines = src.split('\n'); return rgbLineTokens(lines, i); };
-  const radii = (s) => byId('raw-radii').lineTokens([s], 0);
-  const font = (s) => byId('font-family').lineTokens([s], 0);
+  const radii = (src, i = 0) => byId('raw-radii').lineTokens(src.split('\n'), i);
+  const font = (src, i = 0) => byId('font-family').lineTokens(src.split('\n'), i);
   const eq = (a, b, what) => {
     if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`canary: ${what} → ${JSON.stringify(a)}, expected ${JSON.stringify(b)}`);
   };
@@ -211,8 +245,25 @@ function runCanaries() {
   eq(radii('rounded-[12px]'), ['rounded-[12px]'], 'raw radius');
   eq(radii('border-radius:   8px;'), ['border-radius: 8px'], 'raw border-radius (ws-normalized)');
   eq(radii('rounded-lg rounded-[var(--radius-pill)]'), [], 'ladder radii');
+  // Task #378 — the DS-OK escape hatch now covers radii/borders too, with the
+  // same same-line + 5-line-lookback rules (and the same hard cap) as hex/rgb.
+  eq(radii('border-radius: 3px; /* DS-OK: webkit scrollbar thumb, below the smallest ladder step */'), [], 'same-line DS-OK exempts a raw radius');
+  eq(radii('border: 2px solid ButtonText; /* DS-OK: Windows High Contrast forced-colors outline */'), [], 'same-line DS-OK exempts a raw border width');
+  eq(radii('/* DS-OK: forced-colors block — widths must be literal */\na\nb\nc\nd\nborder: 2px solid ButtonText;', 5), [], '5-line DS-OK lookback (radii)');
+  eq(radii('/* DS-OK: forced-colors block — widths must be literal */\na\nb\nc\nd\ne\nborder: 2px solid ButtonText;', 6), ['border: 2px'], 'DS-OK lookback capped at 5 lines (radii)');
+
   eq(font("font-family: 'Inter', sans-serif"), ["font-family: '"], 'raw font-family');
   eq(font('font-family: var(--font-body)'), [], 'tokenized font-family');
+  eq(font("font-family: 'Courier New', monospace; /* DS-OK: literal fallback stack for the code sample */"), [], 'same-line DS-OK exempts a raw font-family');
+  eq(font("/* DS-OK: standalone export document, no DS vars available */\na\nb\nc\nd\nfont-family: 'Georgia', serif;", 5), [], '5-line DS-OK lookback (font)');
+  eq(font("/* DS-OK: standalone export document, no DS vars available */\na\nb\nc\nd\ne\nfont-family: 'Georgia', serif;", 6), ["font-family: '"], 'DS-OK lookback capped at 5 lines (font)');
+
+  // The tag is a shared helper (hasDsOkTag) — assert the classifier itself so
+  // a detector wired to a private copy of the lookback shows up here.
+  eq(hasDsOkTag(['/* DS-OK: reason */'], 0), true, 'DS-OK helper: same line');
+  eq(hasDsOkTag('/* DS-OK: reason */\na\nb\nc\nd\ne'.split('\n'), 5), true, 'DS-OK helper: 5 lines below the tag');
+  eq(hasDsOkTag('/* DS-OK: reason */\na\nb\nc\nd\ne\nf'.split('\n'), 6), false, 'DS-OK helper: 6 lines below is out of reach');
+  eq(hasDsOkTag(['plain line'], 0), false, 'DS-OK helper: untagged line');
 
   // Ratchet classifier — the same diff drives gate mode AND the shrink-only
   // --update-baseline refusal. Verify every evasion vector on synthetic data:
@@ -428,7 +479,9 @@ for (const v of increases) {
 if (increases.length) {
   console.error('       Fix: route through DS tokens (bridge utilities, var(--token) refs, status');
   console.error('       constants) per .agents/skills/verify-design-system/SKILL.md stage 5.');
-  console.error('       Truly intentional hex needs a /* DS-OK: reason */ tag at the definition site.');
+  console.error('       A genuinely intentional hex/rgb/radius/font-family value needs a');
+  console.error('       /* DS-OK: written reason */ tag on the same line or within the 5 lines');
+  console.error('       above it. Raw Tailwind palette classes have no escape hatch.');
 }
 for (const v of decreases) {
   console.error(`FAIL ${v.scanId} :: ${v.rel} — "${v.token}" down to ×${v.cur} from baseline ×${v.base}. Good news, but the`);
