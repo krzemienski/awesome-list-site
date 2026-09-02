@@ -70,6 +70,11 @@
 //        system's families. Those requests are pre-paint and unconditional —
 //        every visitor pays for them whatever system is active — so they may
 //        carry the default system's faces and nothing else
+//  12 · server/index.ts    both Content-Security-Policy header blocks. Every
+//        font stylesheet host above must be allowed by style-src, both CSP
+//        copies must agree, and the live response's font-file hosts must be
+//        allowed by font-src or the browser blocks a download this gate just
+//        proved exists
 //
 // Checks (each FAILs with the id and both sides' literal values):
 //   · id-parity      — an accent id present in only one of the accent sources
@@ -122,6 +127,9 @@
 //   · static-font-scope — an always-on pre-paint <link> in the HTML shell
 //     fetches a family the DEFAULT system does not name, i.e. every visitor
 //     blocks on a face only some systems use
+//   · csp-parity / stylesheet-csp — the two server CSP blocks disagree, or a
+//     FONT_STYLESHEETS / SYSTEM_STYLESHEETS / pre-paint stylesheet URL is not
+//     allowed by style-src and therefore cannot reach the browser
 //   · system-id-resolution — a stored `ds-system` value is validated with a
 //     prototype-chain test ("toString" in DESIGN_SYSTEMS, DESIGN_SYSTEMS[id]
 //     ? …) instead of the shared own-property resolver, so junk resolves as
@@ -136,6 +144,8 @@
 //     under --network: a stylesheet URL that does not answer 200, answers
 //     200 with no @font-face at all, or answers 200 without declaring one of
 //     the families its own URL asks for (see the probe section below)
+//   · font-csp — OPT-IN, only under --network: an @font-face src: url(...)
+//     points at a host the server's font-src policy does not allow
 //
 // For a design system the families are read from the CSS, never from the
 // DESIGN_SYSTEMS `tag` beside each id: that tag is picker copy, not a family
@@ -165,8 +175,10 @@
 // fetches every FONT_STYLESHEETS entry, every SYSTEM_STYLESHEETS entry, and
 // every <link rel="stylesheet"> in client/index.html, and requires each to
 // answer HTTP 200 *and* declare an @font-face font-family for EVERY family
-// its own URL asks for. A 200 that quietly serves nothing (an error page, an
-// empty body, the wrong family) is a failure, not a pass.
+// its own URL asks for. Every font file URL in those @font-face blocks must
+// also be allowed by the font-src parsed from both server CSP blocks. A 200
+// that quietly serves nothing (an error page, an empty body, the wrong family,
+// or a browser-blocked font host) is a failure, not a pass.
 //
 // It is deliberately NOT registered as a validation command and NOT reached
 // by the default run: the `accent-drift` gate runs this file with no
@@ -213,6 +225,7 @@ const TS_REL = 'client/src/lib/design-system.ts';
 const CSS_REL = 'client/src/styles/design-system.css';
 const HTML_REL = 'client/index.html';
 const FONTS_REL = 'client/src/lib/font-options.ts';
+const SERVER_REL = 'server/index.ts';
 
 // ---------------------------------------------------------------------------
 // Escape hatch: systems intentionally painted by the BASE :root block
@@ -625,6 +638,57 @@ function parseHtmlStylesheetLinks(htmlSrc) {
   return hrefs;
 }
 
+// The CSP is written twice in server/index.ts: once for the first middleware
+// stack and once for the fallback stack. Read the actual directive literals
+// rather than copying their current hosts into this gate. The returned
+// `sources` retain CSP keywords such as 'self'; `hosts` contains only the
+// absolute HTTP(S) source expressions that can authorize an external URL.
+function parseCspHostAllowlists(serverSrc) {
+  const src = stripComments(serverSrc);
+  const headers = [...src.matchAll(/setHeader\s*\(\s*["']Content-Security-Policy["']/g)];
+  const directives = { styleSrc: [], fontSrc: [] };
+  const literalRe = /(["'`])((?:\\.|(?!\1)[\s\S])*)\1/g;
+
+  for (const header of headers) {
+    const arrayStart = src.indexOf('[', header.index + header[0].length);
+    if (arrayStart < 0) continue;
+    let depth = 0;
+    let arrayEnd = -1;
+    for (let i = arrayStart; i < src.length; i++) {
+      if (src[i] === '"' || src[i] === "'" || src[i] === '`') {
+        i = endOfString(src, i);
+        continue;
+      }
+      if (src[i] === '[') depth++;
+      else if (src[i] === ']' && --depth === 0) {
+        arrayEnd = i;
+        break;
+      }
+    }
+    if (arrayEnd < 0) continue;
+
+    for (const match of src.slice(arrayStart + 1, arrayEnd).matchAll(literalRe)) {
+      const value = match[2].trim();
+      const directive = /^(style-src|font-src)\s+([^;]+)/i.exec(value);
+      if (!directive) continue;
+      const key = directive[1].toLowerCase() === 'style-src' ? 'styleSrc' : 'fontSrc';
+      const sources = directive[2].trim().split(/\s+/).filter(Boolean);
+      const hosts = sources
+        .filter((source) => /^https?:\/\//i.test(source))
+        .map((source) => {
+          try {
+            return new URL(source).origin;
+          } catch {
+            return source;
+          }
+        });
+      directives[key].push({ sources, hosts });
+    }
+  }
+
+  return { headerCount: headers.length, ...directives };
+}
+
 // The pre-paint boot script's FONT_STACKS map (id → stack applied to
 // --font-body/--font-sans before React) + the id an unknown saved font is
 // silently rewritten to.
@@ -634,6 +698,101 @@ function parseBootFonts(htmlSrc) {
   if (!m) return { stacks: new Map(), malformed: [], found: false, fallback: fb ? fb[1] : null };
   const { entries, malformed } = parseObjectStringEntries(m[1]);
   return { stacks: entries, malformed, found: true, fallback: fb ? fb[1] : null };
+}
+
+function cspSourceAllowsUrl(href, directives) {
+  const value = String(href).trim();
+  let parsed;
+  try {
+    parsed = new URL(value, 'https://csp-self.invalid');
+  } catch {
+    return false;
+  }
+
+  const isRelative = !/^[a-z][a-z\d+\-.]*:/i.test(value) && !value.startsWith('//');
+  for (const directive of directives) {
+    if (isRelative && directive.sources.includes("'self'")) return true;
+    for (const source of directive.sources) {
+      if (!/^https?:\/\//i.test(source)) continue;
+      let allowed;
+      try {
+        allowed = new URL(source);
+      } catch {
+        continue;
+      }
+      if (allowed.origin === parsed.origin) return true;
+      if (allowed.hostname.startsWith('*.') && parsed.protocol === allowed.protocol && parsed.hostname.endsWith(allowed.hostname.slice(1))) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function compareCspHostAllowlists(parsed) {
+  const failures = [];
+  const expectedBlocks = parsed.headerCount;
+
+  if (!expectedBlocks) {
+    failures.push({
+      kind: 'parser-rot',
+      message: `could not locate any Content-Security-Policy header blocks in ${SERVER_REL} — the CSP parser went vacuous`,
+    });
+  }
+
+  for (const [key, label] of [
+    ['styleSrc', 'style-src'],
+    ['fontSrc', 'font-src'],
+  ]) {
+    const entries = parsed[key];
+    if (!entries.length) {
+      failures.push({
+        kind: 'parser-rot',
+        message: `could not locate any ${label} directive in ${SERVER_REL} — the CSP parser went vacuous`,
+      });
+      continue;
+    }
+    if (expectedBlocks && entries.length !== expectedBlocks) {
+      failures.push({
+        kind: 'csp-parity',
+        message: `${SERVER_REL} has ${expectedBlocks} Content-Security-Policy header block(s) but ${entries.length} ${label} directive(s) — every block must declare the same font policy`,
+      });
+    }
+    for (const entry of entries) {
+      if (!entry.hosts.length) {
+        failures.push({
+          kind: 'parser-rot',
+          message: `${label} in ${SERVER_REL} declares zero absolute CSP hosts — an empty allowlist cannot prove any stylesheet/font URL is permitted`,
+        });
+      }
+    }
+    const first = entries[0];
+    const expected = [...first.sources].sort().join('\u0000');
+    for (let i = 1; i < entries.length; i++) {
+      const actual = [...entries[i].sources].sort().join('\u0000');
+      if (actual !== expected) {
+        failures.push({
+          kind: 'csp-parity',
+          message: `${label} allowlists disagree between CSP blocks in ${SERVER_REL} — block 1 has ${first.sources.join(' ')}, block ${i + 1} has ${entries[i].sources.join(' ')}`,
+        });
+      }
+    }
+  }
+
+  return failures;
+}
+
+function compareStylesheetCsp(targets, styleDirectives) {
+  const failures = [];
+  for (const target of targets) {
+    if (cspSourceAllowsUrl(target.href, styleDirectives)) continue;
+    failures.push({
+      kind: 'stylesheet-csp',
+      id: target.id,
+      message: `${target.label} → ${target.href} is not allowed by the site's style-src policy in ${SERVER_REL} — the browser will block this stylesheet and ${target.consequence}`,
+    });
+  }
+  return failures;
 }
 
 // ---------------------------------------------------------------------------
@@ -937,6 +1096,20 @@ function parseServedFamilies(cssBody) {
   return { families, blocks };
 }
 
+// The font-src policy applies to the actual font files named by each served
+// @font-face block, not just to the stylesheet URL. Keep every url() so a
+// response that mixes an allowed and a blocked CDN cannot pass accidentally.
+function parseServedFontSources(cssBody) {
+  const src = stripCssComments(cssBody);
+  const urls = [];
+  for (const block of src.matchAll(/@font-face\s*\{([^}]*)\}/gi)) {
+    for (const match of block[1].matchAll(/url\(\s*(?:(['"])(.*?)\1|([^'")\s]+))\s*\)/gi)) {
+      urls.push(match[2] ?? match[3]);
+    }
+  }
+  return urls;
+}
+
 // One probed URL vs the response it got. Split out from the fetch so the
 // canaries can drive it with the synthetic responses a live run must never
 // wave through: the 400 error page a misspelled family= earns, an empty 200,
@@ -974,6 +1147,20 @@ function compareServedFamilies(target, response) {
         message: `${where} asks for "${family}" but the response declares @font-face for ${servedList} — the requested family never arrives, so ${target.consequence}`,
       });
     }
+  }
+  return failures;
+}
+
+function compareServedFontSources(target, response, fontDirectives) {
+  if (response.error || response.status !== 200) return [];
+  const failures = [];
+  for (const href of parseServedFontSources(response.body)) {
+    if (cspSourceAllowsUrl(href, fontDirectives)) continue;
+    failures.push({
+      kind: 'font-csp',
+      id: target.id,
+      message: `${target.label} → ${target.href} serves font file ${href}, which is not allowed by the site's font-src policy in ${SERVER_REL} — the browser will block the face and ${target.consequence}`,
+    });
   }
   return failures;
 }
@@ -1810,6 +1997,55 @@ function runCanaries() {
   eq(parseStylesheetFamilies(parsedLinks[0]), ['Inter'], 'an &amp;-escaped href still splits into its family= parameters');
   eq(parseHtmlStylesheetLinks('<html><head></head></html>'), [], 'a shell with no stylesheet link is detectable, not an empty pass');
 
+  // CSP parser + stylesheet source comparator. The real server has one CSP
+  // block in each middleware stack, so both copies are represented here.
+  const cspSample = [
+    'res.setHeader("Content-Security-Policy", [',
+    `  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",`,
+    `  "font-src 'self' https://fonts.gstatic.com",`,
+    '].join("; "));',
+    'res.setHeader("Content-Security-Policy", [',
+    `  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",`,
+    `  "font-src 'self' https://fonts.gstatic.com",`,
+    '].join("; "));',
+  ].join('\n');
+  const parsedCsp = parseCspHostAllowlists(cspSample);
+  eq(parsedCsp.headerCount, 2, 'both CSP header blocks located');
+  eq(
+    parsedCsp.styleSrc.map((entry) => entry.hosts),
+    [['https://fonts.googleapis.com'], ['https://fonts.googleapis.com']],
+    'style-src hosts parsed from both blocks',
+  );
+  eq(
+    parsedCsp.fontSrc.map((entry) => entry.hosts),
+    [['https://fonts.gstatic.com'], ['https://fonts.gstatic.com']],
+    'font-src hosts parsed from both blocks',
+  );
+  eq(compareCspHostAllowlists(parsedCsp), [], 'matching CSP blocks pass');
+  eq(
+    compareCspHostAllowlists(
+      parseCspHostAllowlists(
+        `res.setHeader("Content-Security-Policy", ["style-src 'self'", "font-src 'self'"].join("; "));`,
+      ),
+    ).map((f) => f.kind),
+    ['parser-rot', 'parser-rot'],
+    'CSP directives with zero absolute hosts fail instead of passing vacuously',
+  );
+  const cspStyleTarget = {
+    id: 'font:inter',
+    label: 'FONT_STYLESHEETS["inter"]',
+    href: 'https://fonts.googleapis.com/css2?family=Inter',
+    consequence: 'the face never arrives',
+  };
+  eq(compareStylesheetCsp([cspStyleTarget], parsedCsp.styleSrc), [], 'a stylesheet host allowed by style-src passes');
+  eq(
+    compareStylesheetCsp([{ ...cspStyleTarget, href: 'https://fonts.bunny.net/css?family=Inter' }], parsedCsp.styleSrc).map(
+      (f) => f.kind,
+    ),
+    ['stylesheet-csp'],
+    'a stylesheet host outside style-src is caught',
+  );
+
   // Served-response parser — what the offline checks structurally cannot see.
   const cssResponseSample = [
     '/* cyrillic */',
@@ -1823,6 +2059,11 @@ function runCanaries() {
   const servedSample = parseServedFamilies(cssResponseSample);
   eq([...servedSample.families].sort(), ['instrument serif', 'inter'], 'every @font-face family read — quoted or bare — and deduped');
   eq(servedSample.blocks, 3, 'every @font-face block counted, multi-line included');
+  eq(
+    parseServedFontSources(cssResponseSample),
+    ['https://fonts.gstatic.com/s/inter/v20/a.woff2'],
+    'font file URLs read from each @font-face src declaration',
+  );
   eq(
     parseServedFamilies("@font-face { src: url(https://fonts.gstatic.com/a.woff2); }").families.size,
     0,
@@ -1840,6 +2081,23 @@ function runCanaries() {
     consequence: 'the option paints in its fallback face',
   };
   eq(compareServedFamilies(probeTarget, { status: 200, body: cssResponseSample }), [], 'a 200 declaring the requested family passes');
+  eq(
+    compareServedFontSources(probeTarget, { status: 200, body: cssResponseSample }, parsedCsp.fontSrc),
+    [],
+    'a served font URL allowed by font-src passes',
+  );
+  eq(
+    compareServedFontSources(
+      probeTarget,
+      {
+        status: 200,
+        body: "@font-face { font-family: Inter; src: url('https://fonts.bunny.net/inter.woff2') format('woff2'); }",
+      },
+      parsedCsp.fontSrc,
+    ).map((f) => f.kind),
+    ['font-csp'],
+    'a served font URL outside font-src is caught',
+  );
   eq(
     compareServedFamilies(probeTarget, { status: 400, body: '<!DOCTYPE html><html lang=en>' }).map((f) => f.kind),
     ['webfont-http'],
@@ -2109,9 +2367,12 @@ const tsSrc = read(TS_REL);
 const cssSrc = read(CSS_REL);
 const htmlSrc = read(HTML_REL);
 const fontsSrc = read(FONTS_REL);
+const serverSrc = read(SERVER_REL);
 
 const failures = [];
 const fail = (kind, message) => failures.push({ kind, message });
+const csp = parseCspHostAllowlists(serverSrc);
+failures.push(...compareCspHostAllowlists(csp));
 
 const { accents: tsAccents, malformed, found } = parseTsAccents(tsSrc);
 const cssAccents = parseCssAccents(cssSrc);
@@ -2348,6 +2609,27 @@ if (tsSystems.ids.length && defaultSystemId) {
 const cssRootFonts = parseCssRootFonts(cssSrc);
 const cssSystemFonts = parseCssSystemFonts(cssSrc);
 const staticFontHrefs = parseHtmlStylesheetLinks(htmlSrc);
+const stylesheetCspTargets = [
+  ...[...fontSheets.entries].map(([id, href]) => ({
+    id: `font:${id}`,
+    label: `FONT_STYLESHEETS["${id}"] in ${FONTS_REL}`,
+    href,
+    consequence: `choosing font option "${id}" keeps rendering in the fallback face`,
+  })),
+  ...[...systemSheets.entries].map(([id, href]) => ({
+    id: `system:${id}`,
+    label: `SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL}`,
+    href,
+    consequence: `design system "${id}" paints in its fallback face`,
+  })),
+  ...staticFontHrefs.map((href, index) => ({
+    id: `html:pre-paint:${index + 1}`,
+    label: `pre-paint <link rel="stylesheet"> #${index + 1} in ${HTML_REL}`,
+    href,
+    consequence: 'the first paint uses the next family in the stack',
+  })),
+];
+failures.push(...compareStylesheetCsp(stylesheetCspTargets, csp.styleSrc));
 
 if (!cssRootFonts) {
   fail('parser-rot', `could not locate the bare ":root { … }" token block in ${CSS_REL} to read its --font-* declarations`);
@@ -2416,6 +2698,9 @@ for (const id of tsFonts.fonts.keys()) {
 }
 console.log(
   `PASS system-stylesheet :: ${systemSheets.entries.size} stylesheet(s) fetched, one per DESIGN_SYSTEMS id — ${[...systemSheets.entries.keys()].join(', ')}`,
+);
+console.log(
+  `PASS font-csp :: ${stylesheetCspTargets.length} stylesheet URL(s) are allowed by style-src; ${csp.styleSrc.length} style-src and ${csp.fontSrc.length} font-src directive(s) agree across ${csp.headerCount} CSP block(s) in ${SERVER_REL}`,
 );
 const alwaysOnFamilies = staticFontHrefs.flatMap(parseStylesheetFamilies);
 console.log(
@@ -2516,6 +2801,7 @@ for (let i = 0; i < verifiable.length; i++) {
   const target = verifiable[i];
   const response = responses[i];
   probeFailures.push(...compareServedFamilies(target, response));
+  probeFailures.push(...compareServedFontSources(target, response, csp.fontSrc));
   const served = response.status === 200 ? parseServedFamilies(response.body) : { families: new Set(), blocks: 0 };
   const status = response.error ? `ERR(${response.error})` : String(response.status);
   console.log(
@@ -2537,5 +2823,5 @@ if (probeFailures.length) {
 }
 
 console.log(
-  `\nPASS webfont-fetch :: ${verifiable.length} stylesheet URL(s) each answered HTTP 200 and declared an @font-face for every family they request`,
+  `\nPASS webfont-fetch :: ${verifiable.length} stylesheet URL(s) each answered HTTP 200, declared every requested family, and served font files allowed by font-src`,
 );
