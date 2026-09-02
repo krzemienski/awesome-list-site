@@ -313,6 +313,7 @@ async function loadCorpus() {
   const probes = [
     { pathq: "/search", kind: "noindex" },
     { pathq: "/sign-in", kind: "noindex" },
+    { pathq: "/logout", kind: "noindex" },
     ...(subThresholdTag
       ? [{ pathq: `/tag/${encodeURIComponent(subThresholdTag)}`, kind: "noindex" }]
       : []),

@@ -709,6 +709,13 @@ function homeShellChrome(): string {
       // Utility auth page — noindex for the same reason as /sign-in.
       noindex: true,
     },
+    "/logout": {
+      title: `Sign Out — ${SITE_NAME}`,
+      description: `Sign out of your ${SITE_NAME} account.`,
+      // Utility auth page with no search value — noindex, but still found so
+      // direct navigations receive HTTP 200 while Clerk completes sign-out.
+      noindex: true,
+    },
     "/profile": {
       title: `Profile — ${SITE_NAME}`,
       description: `Your ${SITE_NAME} profile, bookmarks, and learning progress.`,
@@ -2176,12 +2183,14 @@ export function ogInjectionMiddleware() {
       // this never hijacks the /journey/:id detail route.
       return res.redirect(301, "/journeys");
     }
-    // R5-051: ONE bare-prefix policy — all three taxonomy prefixes without a
-    // slug 301 to the category index (/categories), not home or a 404.
+    // R5-051: ONE bare-prefix policy — taxonomy prefixes without a slug 301
+    // to the category index (/categories), not home or a 404. /tag is included
+    // because the client treats the bare path as a known route.
     if (
       urlPath === "/category" ||
       urlPath === "/subcategory" ||
-      urlPath === "/sub-subcategory"
+      urlPath === "/sub-subcategory" ||
+      urlPath === "/tag"
     ) {
       return res.redirect(301, "/categories");
     }
