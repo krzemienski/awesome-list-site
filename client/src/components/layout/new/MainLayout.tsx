@@ -122,10 +122,10 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
       // to 188px. ui/sidebar.tsx additionally force-collapses when a viewport
       // ENTERS that range carrying a stale expanded preference.
       defaultOpen={typeof window !== "undefined" && window.innerWidth >= 1024}
-      // DS shell parity: column layout — the full-width 60px header owns the
-      // brand (reference layout.jsx Header), and the sidebar/icon-rail starts
-      // BELOW it (reference .sidebar/.icon-rail: sticky top:60px). The
-      // --header-height var drives the fixed sidebar offset in ui/sidebar.tsx.
+      // DS shell parity: column layout — the full-width header owns the brand
+      // (reference layout.jsx Header), and the sidebar/icon-rail starts BELOW
+      // it. Keep the responsive header height in one shell variable so the
+      // header, sticky previews, and sidebar all clear the same offset.
       //
       // flex-1 + min-h-[auto] (overriding SidebarProvider's own min-h-svh):
       // this region is a ROW of the #root shell column (see index.css), so it
@@ -134,8 +134,7 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
       // bottom row past the fold, and on a short page a first paint would show
       // that row over the end of this one. Growing past the column on long
       // pages still works: a flex item never shrinks below its content.
-      className="flex-col flex-1 min-h-[auto]"
-      style={{ "--header-height": "60px" } as React.CSSProperties}
+      className="flex-col flex-1 min-h-[auto] [--header-height:56px] md:[--header-height:60px]"
     >
       {/* CC-17 — Skip-link is the first focusable element on every page. */}
       <a href="#main" className="skip-link">Skip to main content</a>

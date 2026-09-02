@@ -148,9 +148,9 @@ export default function ThemeSettings() {
           second false affordance. */}
       <div
         // Pinned BELOW the app header, which is itself sticky at top-0 with a
-        // higher z-index and is 56px tall (60px from md). At top-0 this strip
-        // would sit underneath it and never be seen.
-        className="no-print sticky top-14 z-20 -mx-4 border-b border-[color:var(--border)] bg-[var(--surface)] px-4 py-2 sm:-mx-6 sm:px-6 md:top-[60px] lg:hidden"
+        // higher z-index. The shared shell variable keeps this offset aligned
+        // with the header at every responsive breakpoint.
+        className="no-print sticky top-[var(--header-height)] z-20 -mx-4 border-b border-[color:var(--border)] bg-[var(--surface)] px-4 py-2 sm:-mx-6 sm:px-6 lg:hidden"
         data-testid="theme-sticky-preview"
       >
         <div className="flex items-center gap-3">

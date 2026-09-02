@@ -297,7 +297,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
   // (shrink-0) always fits.
   return (
     <>
-    <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 lg:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-[var(--header-height)] items-center gap-2 lg:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
       <SidebarTrigger
         className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]"
         data-testid="mobile-drawer-trigger"
