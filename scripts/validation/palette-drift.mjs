@@ -75,6 +75,14 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  DS_OK_RE,
+  DS_OK_LOOKBACK,
+  hasBareDsOkTag,
+  hasDsOkTag,
+  lineHasBareDsOkTag,
+  lineHasReasonedDsOkTag,
+} from './design-system-stage5.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SRC = path.join(ROOT, 'client/src');
@@ -84,8 +92,6 @@ const SKILL_PATH = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md
 const UPDATE = process.argv.includes('--update-baseline');
 
 const SCAN_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.scss', '.html', '.svg', '.md']);
-const DS_OK_LOOKBACK = 5; // lines above a hit that a /* DS-OK: reason */ tag may sit
-
 // ---------------------------------------------------------------------------
 // The stage-5 scans (regex literals mirror SKILL.md "How to run" verbatim).
 // `excludes` are the skill's rg --glob '!…' lists, relative to repo root.
@@ -171,54 +177,6 @@ function hexTokenIsColor(token) {
   const digits = token.slice(1);
   if (digits.length === 6 || digits.length === 8) return true;
   if ((digits.length === 3 || digits.length === 4) && /[a-fA-F]/.test(digits)) return true;
-  return false;
-}
-
-// The DS-OK escape hatch, shared by EVERY value detector (hex, rgb, radii,
-// font) so the exemption rules can never drift apart between them: a hit is
-// exempt when a DS-OK tag with at least one non-punctuation character after
-// the marker appears on the same line or within the previous
-// DS_OK_LOOKBACK lines. The lookback is a hard cap: a tag N>5 lines above a
-// hit does not reach it (so a long justified block needs a tag every 5
-// entries). A bare or punctuation-only marker is deliberately not an
-// exemption.
-const DS_OK_RE = /DS-OK\b/g;
-
-function dsOkReasonText(line, markerStart, markerEnd) {
-  const blockStart = line.lastIndexOf('/*', markerStart);
-  const blockEndBefore = line.lastIndexOf('*/', markerStart);
-  if (blockStart > blockEndBefore) {
-    const blockEnd = line.indexOf('*/', markerEnd);
-    return line.slice(markerEnd, blockEnd === -1 ? line.length : blockEnd);
-  }
-  return line.slice(markerEnd);
-}
-
-function dsOkTagHasReason(line, markerStart, markerEnd) {
-  return /[^\p{P}\s]/u.test(dsOkReasonText(line, markerStart, markerEnd));
-}
-
-function lineHasReasonedDsOkTag(line) {
-  return [...line.matchAll(DS_OK_RE)].some((match) =>
-    dsOkTagHasReason(line, match.index, match.index + match[0].length));
-}
-
-function lineHasBareDsOkTag(line) {
-  return [...line.matchAll(DS_OK_RE)].some((match) =>
-    !dsOkTagHasReason(line, match.index, match.index + match[0].length));
-}
-
-function hasDsOkTag(lines, i) {
-  for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
-    if (lineHasReasonedDsOkTag(lines[j])) return true;
-  }
-  return false;
-}
-
-function hasBareDsOkTag(lines, i) {
-  for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
-    if (lineHasBareDsOkTag(lines[j])) return true;
-  }
   return false;
 }
 

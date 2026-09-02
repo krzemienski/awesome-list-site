@@ -223,7 +223,11 @@ rg -i '\brgba?\(' client/src \
 > the baseline. The gate self-tests its detectors and ratchet classifier
 > against known-bad/known-good canary samples on every run, so a regex
 > regression cannot pass vacuously. A manual stage-5 audit still adds value
-> for standalone artifacts, which the gate does not cover.
+> for standalone artifacts, run
+> `npm run validate:standalone-palette-drift`. That check discovers the
+> `awesome-list-site-ds` standalone root and every manifest-backed root under
+> `artifacts/`, excludes only the token source stylesheet, and fails on bare
+> or punctuation-only `DS-OK` markers with the same written-reason rule.
 
 For standalone artifacts, run the same scans over the artifact's files,
 excluding the design-system stylesheet itself.

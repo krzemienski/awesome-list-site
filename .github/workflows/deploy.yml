@@ -35,6 +35,9 @@ jobs:
       run: npx tsx scripts/build-static.ts
       env:
         VITE_STATIC_BUILD: 'true'
+
+    - name: Validate standalone design-system exceptions
+      run: npm run validate:standalone-palette-drift
         
     - name: Build React application
       timeout-minutes: 20

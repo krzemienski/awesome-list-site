@@ -430,6 +430,17 @@ args = "node scripts/validation/palette-drift.mjs"
 isValidation = true
 
 [[workflows.workflow]]
+name = "standalone-palette-drift"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/standalone-palette-drift.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
 name = "dead-components"
 author = "agent"
 

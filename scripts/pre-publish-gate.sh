@@ -6,8 +6,9 @@
 #   2. migration-drift  — scripts/check-migration-drift.ts
 #   3. print-audit      — scripts/validation/print-audit.mjs      (headless Chromium)
 #   4. responsive-audit — scripts/validation/responsive-audit.mjs (headless Chromium)
-#   5. npm run build    — the actual production build
-#   6. bundle-budget    — deterministic entry/major-route size + isolation gate
+#   5. standalone-palette-drift — reasoned DS-OK markers in exports/mockups
+#   6. npm run build    — the actual production build
+#   7. bundle-budget    — deterministic entry/major-route size + isolation gate
 #
 # The two browser audits need the app already serving on :5000 (the dev
 # workspace's "Start application" workflow). In the publish build container
@@ -99,10 +100,14 @@ else
   echo "[pre-publish] SKIP print-audit + responsive-audit — no app on :5000 (publish build container; these run as dev workflows instead)"
 fi
 
-# 5. Production build
+# 5. Standalone design-system exceptions. This is source-only and safe in the
+# publish container: it opens no network or database connection.
+run_step standalone-palette-drift npm run validate:standalone-palette-drift
+
+# 6. Production build
 run_step build npm run build
 
-# 6. The report consumes Vite's logical manifest and module inventory emitted
+# 7. The report consumes Vite's logical manifest and module inventory emitted
 # by the production build above. It must run after (never before) that build.
 run_step bundle-budget npm run bundle:budget
 
