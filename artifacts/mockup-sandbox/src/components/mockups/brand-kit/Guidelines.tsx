@@ -6,7 +6,7 @@ export function Guidelines() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-      
+
       <style>{`
         .font-sans { font-family: 'Inter', sans-serif; }
         .font-display { font-family: 'Fraunces', serif; }
@@ -34,7 +34,7 @@ export function Guidelines() {
         <section className="space-y-6">
           <h2 className="font-mono text-muted text-sm uppercase tracking-wider">01. Voice & Tone</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
+
             <div className="bg-surface border-hairline rounded-[14px] p-6 space-y-6">
               <h3 className="font-sans font-bold text-lg text-ink">Precise</h3>
               <p className="font-sans text-sm text-muted">Say the codec or the standard. Avoid vague "cutting-edge" marketing speak. Be a reliable narrator.</p>
@@ -87,7 +87,7 @@ export function Guidelines() {
         <section className="space-y-6">
           <h2 className="font-mono text-muted text-sm uppercase tracking-wider">02. Accessibility</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+
             <div className="bg-surface border-hairline rounded-[14px] p-6 space-y-4">
               <h3 className="font-sans font-bold text-lg text-ink mb-4">Contrast on Black (#000000)</h3>
               <table className="w-full text-left font-mono text-sm border-collapse">

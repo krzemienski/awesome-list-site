@@ -29,7 +29,7 @@ export function ColorType() {
             <ColorSwatch name="Surface" hex="#0e0d0c" oklch="oklch(0.17 0.003 84)" color="#0e0d0c" border />
             <ColorSwatch name="Hairline" hex="rgba(244,243,238,0.12)" oklch="-" color="rgba(244,243,238,0.12)" bg="#000" border />
             <div />
-            
+
             <ColorSwatch name="Ink (Primary)" hex="#f4f3ee" oklch="oklch(0.962 0.005 106)" color="#f4f3ee" textColor="#000" />
             <ColorSwatch name="Muted" hex="#a8a4a0" oklch="oklch(0.723 0.008 84)" color="#a8a4a0" textColor="#000" />
             <div />
@@ -137,8 +137,8 @@ export function ColorType() {
 function ColorSwatch({ name, hex, oklch, color, textColor = "#f4f3ee", bg, border }: any) {
   return (
     <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 overflow-hidden flex flex-col">
-      <div 
-        className="h-32 w-full p-4 flex items-end" 
+      <div
+        className="h-32 w-full p-4 flex items-end"
         style={{ backgroundColor: bg || color, borderBottom: border ? '1px solid rgba(244,243,238,0.12)' : 'none' }}
       >
         <div className="w-8 h-8 rounded-full shadow-inner" style={{ backgroundColor: color, border: border ? '1px solid rgba(244,243,238,0.2)' : 'none' }} />

@@ -21,7 +21,7 @@ export function LogoSystem() {
         <section className="space-y-12">
           <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-24 flex items-center justify-center gap-16 relative overflow-hidden">
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#f4f3ee 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-            
+
             <svg viewBox="0 0 76 76" className="w-[220px] h-[220px]">
               <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
               <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
@@ -46,18 +46,18 @@ export function LogoSystem() {
               <h2 className="font-sans font-bold text-2xl tracking-[-0.01em]">Construction</h2>
               <div className="h-px w-full bg-[#f4f3ee]/10 mt-6" />
             </header>
-            
+
             <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-12 flex justify-center relative">
               <div className="relative">
                 <div className="absolute -inset-4 border border-[#5eddf2]/30 border-dashed" />
                 <div className="absolute top-0 bottom-0 left-1/2 w-px bg-[#5eddf2]/30" />
                 <div className="absolute left-0 right-0 top-1/2 h-px bg-[#5eddf2]/30" />
-                
+
                 <svg viewBox="0 0 76 76" className="w-[160px] h-[160px] relative z-10">
                   <rect x="2" y="2" width="72" height="72" rx="16" fill="rgba(0,0,0,0.5)" stroke="#ff3d52" strokeWidth="4"/>
                   <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
                 </svg>
-                
+
                 <div className="absolute -left-12 top-1/2 -translate-y-1/2 font-mono text-xs text-[#5eddf2]">76</div>
                 <div className="absolute left-1/2 -bottom-8 -translate-x-1/2 font-mono text-xs text-[#5eddf2]">76</div>
                 <div className="absolute -right-24 top-4 font-mono text-xs text-[#5eddf2]">stroke: 4</div>
@@ -71,7 +71,7 @@ export function LogoSystem() {
               <h2 className="font-sans font-bold text-2xl tracking-[-0.01em]">Clearspace</h2>
               <div className="h-px w-full bg-[#f4f3ee]/10 mt-6" />
             </header>
-            
+
             <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-12 flex justify-center items-center h-[282px]">
               <div className="relative p-12 border border-[#b84dff]/40 border-dashed">
                 <svg viewBox="0 0 76 76" className="w-[100px] h-[100px]">
@@ -156,7 +156,7 @@ export function LogoSystem() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-[#0e0d0c] h-40 border border-[#f4f3ee]/10 rounded-[14px] flex items-center justify-center">
               <div className="flex items-baseline scale-[0.6]">
                 <svg viewBox="0 0 76 76" className="w-[76px] h-[76px]">

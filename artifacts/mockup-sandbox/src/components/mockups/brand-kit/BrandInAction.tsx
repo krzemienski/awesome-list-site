@@ -6,7 +6,7 @@ export function BrandInAction() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-      
+
       <style>{`
         .font-sans { font-family: 'Inter', sans-serif; }
         .font-display { font-family: 'Fraunces', serif; }
@@ -32,7 +32,7 @@ export function BrandInAction() {
           <div className="border-hairline rounded-[14px] p-8 bg-surface">
             <div className="relative w-full max-w-[800px] aspect-[1200/630] bg-[#000000] border-hairline rounded-[14px] overflow-hidden flex flex-col justify-between p-12">
               <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[80%] bg-[#ff3d52] opacity-20 blur-[120px] rounded-full pointer-events-none"></div>
-              
+
               <div className="space-y-8 z-10">
                 <p className="font-display italic text-accent-tint text-lg uppercase tracking-[3px]">CODECS · AWESOME VIDEO</p>
                 <div className="w-16 h-[2px] bg-[#ff3d52]"></div>
@@ -114,7 +114,7 @@ export function BrandInAction() {
           <h2 className="font-mono text-muted text-sm uppercase tracking-wider">04. Social Avatar Set</h2>
           <div className="border-hairline rounded-[14px] p-12 bg-surface">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              
+
               {/* GitHub */}
               <div className="flex flex-col items-center gap-6">
                 <svg width="120" height="120" viewBox="0 0 76 76" className="rounded-full overflow-hidden border-hairline">

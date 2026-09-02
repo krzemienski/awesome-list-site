@@ -204,7 +204,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd artifacts/mockup-sandbox && PORT=23636 BASE_PATH=/__mockup/ npm run dev"
+args = "cd artifacts/mockup-sandbox && npm ci --ignore-scripts && PORT=23636 BASE_PATH=/__mockup/ npm run dev"
 waitForPort = 23636
 
 [workflows.workflow.metadata]

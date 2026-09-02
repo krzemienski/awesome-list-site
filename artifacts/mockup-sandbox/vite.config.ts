@@ -27,6 +27,14 @@ if (!basePath) {
   );
 }
 
+const allowedHosts = [
+  "localhost",
+  "127.0.0.1",
+  "[::1]",
+  ".replit.dev",
+  ".repl.co",
+];
+
 export default defineConfig({
   base: basePath,
   plugins: [
@@ -59,7 +67,7 @@ export default defineConfig({
     port,
     strictPort: true,
     host: "0.0.0.0",
-    allowedHosts: true,
+    allowedHosts,
     fs: {
       strict: true,
     },
@@ -67,6 +75,6 @@ export default defineConfig({
   preview: {
     port,
     host: "0.0.0.0",
-    allowedHosts: true,
+    allowedHosts,
   },
 });
