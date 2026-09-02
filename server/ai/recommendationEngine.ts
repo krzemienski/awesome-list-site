@@ -6,7 +6,6 @@ import type {
 } from '@shared/recommendations';
 import {
   generateAIRecommendations as generateClaudeRecommendations,
-  generateAILearningPaths,
   calculateSkillMatch,
   calculateGoalsMatch,
   calculateTypeMatch,
@@ -108,18 +107,6 @@ export function calculateRecommendationFeedbackAdjustment(
   );
 }
 
-export interface LearningPathRecommendation {
-  id: number | string;
-  title: string;
-  difficulty: string;
-  duration: string;
-  resourceCount: number;
-  matchScore: number; // 0-100
-  category?: string;
-  description?: string;
-  resources?: Resource[];
-}
-
 export function calculateColdStartBlend(
   resource: Resource,
   profile: Pick<
@@ -164,10 +151,8 @@ export class RecommendationEngine {
     userProfile: UserProfile,
     limit: number = 10,
     forceRefresh: boolean = false,
-    includeLearningPaths: boolean = true
   ): Promise<{
     recommendations: RecommendationResult[];
-    learningPaths: LearningPathRecommendation[];
   }> {
     // FIXED: Clone profile before merging (done early so cache hit also uses enriched profile)
     // Ensure all required fields have default values
@@ -289,11 +274,8 @@ export class RecommendationEngine {
     if (!forceRefresh) {
       const cached = this.recommendationCache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-        // Also get learning paths using enriched profile
-        const learningPaths = includeLearningPaths ? await this.generateLearningPathRecommendations(enrichedProfile) : [];
         return {
-          recommendations: cached.recommendations,
-          learningPaths
+          recommendations: cached.recommendations
         };
       }
     }
@@ -538,11 +520,8 @@ export class RecommendationEngine {
           timestamp: Date.now()
         });
 
-        const learningPaths = includeLearningPaths ? await this.generateLearningPathRecommendations(enrichedProfile) : [];
-
         return {
-          recommendations,
-          learningPaths
+          recommendations
         };
       }
 
@@ -641,13 +620,8 @@ export class RecommendationEngine {
         timestamp: Date.now()
       });
 
-      // Generate learning path recommendations (skipped when the caller does
-      // not consume them — avoids a blocking ~9s Claude call on the hot path)
-      const learningPaths = includeLearningPaths ? await this.generateLearningPathRecommendations(enrichedProfile) : [];
-
       return {
-        recommendations,
-        learningPaths
+        recommendations
       };
 
     } catch (error) {
@@ -904,75 +878,6 @@ export class RecommendationEngine {
       // Fallback: return random sample of resources
       const shuffled = [...resources].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, limit);
-    }
-  }
-
-  /**
-   * Generate learning path recommendations
-   */
-  private async generateLearningPathRecommendations(
-    userProfile: UserProfile
-  ): Promise<LearningPathRecommendation[]> {
-    try {
-      // Check if we should use AI or fallback
-      if (claudeService.isAvailable()) {
-        const { resources } = await storage.listResources({
-          status: 'approved',
-          limit: 500
-        });
-
-        const aiPaths = await generateAILearningPaths(userProfile, resources);
-        
-        return aiPaths.map(path => ({
-          id: path.id,
-          title: path.title,
-          difficulty: path.skillLevel,
-          duration: path.estimatedHours ? `${path.estimatedHours}h` : '20h',
-          resourceCount: path.resources?.length || 6,
-          matchScore: Math.round(path.matchScore * 100),
-          category: path.category,
-          description: path.description,
-          resources: path.resources
-        }));
-      }
-
-      // Fallback to database learning journeys
-      const journeys = await storage.listLearningJourneys();
-      
-      // Filter and score based on user profile
-      const scoredJourneys = journeys.map(journey => {
-        let score = 50; // Base score
-
-        // Category match
-        if (userProfile.preferredCategories.includes(journey.category)) {
-          score += 30;
-        }
-
-        // Skill level match
-        if (journey.difficulty === userProfile.skillLevel) {
-          score += 20;
-        }
-
-        return {
-          id: journey.id,
-          title: journey.title,
-          difficulty: journey.difficulty || 'intermediate',
-          duration: journey.estimatedDuration || '20h',
-          resourceCount: 6, // Default
-          matchScore: Math.min(score, 100),
-          category: journey.category,
-          description: journey.description
-        };
-      });
-
-      // Sort by match score and return top 5
-      return scoredJourneys
-        .sort((a, b) => b.matchScore - a.matchScore)
-        .slice(0, 5);
-
-    } catch (error) {
-      console.error('Error generating learning path recommendations:', error);
-      return [];
     }
   }
 

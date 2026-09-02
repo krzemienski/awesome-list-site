@@ -39,7 +39,7 @@ Models (as configured in code):
 | `urlScraper.ts` | `fetchUrlMetadata()` — fetch page title/description/OG/favicon |
 | `embeddingService.ts` | OpenAI embeddings + cache (singleton `embeddingService`) |
 | `recommendationEngine.ts` | Personalized recommendations, hybrid AI + rule-based scoring (singleton `recommendationEngine`) |
-| `recommendations.ts` | Recommendation scoring helpers + `generateAIRecommendations()` / `generateAILearningPaths()` |
+| `recommendations.ts` | Recommendation scoring helpers + `generateAIRecommendations()` |
 | `researchService.ts` | AI research agent that discovers new candidate resources (singleton `researchService`) |
 | `webResearch.ts` | `WebResearchService` helper used during research |
 | `agentRuntime.ts` | Agent config parsing, model resolution, base-URL validation/preflight |
@@ -98,7 +98,7 @@ multi-factor score (skill match, goals match, resource-type match, popularity,
 and semantic similarity when embeddings are available). `recommendations.ts`
 holds the pure scoring helpers (`calculateSkillMatch`, `calculateGoalsMatch`,
 `calculateTypeMatch`, `buildRecommendationReason`) plus
-`generateAIRecommendations()` / `generateAILearningPaths()` and rule-based
+`generateAIRecommendations()` and rule-based
 fallbacks. When AI is unavailable the engine falls back to rule-based scoring.
 
 ## Research agent

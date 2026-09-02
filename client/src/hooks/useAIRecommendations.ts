@@ -41,21 +41,8 @@ export interface RecommendationResult {
   personalized: boolean;
 }
 
-export interface LearningPathRecommendation {
-  id: number | string;
-  title: string;
-  difficulty: string;
-  duration: string;
-  resourceCount: number;
-  matchScore: number; // 0-100
-  category?: string;
-  description?: string;
-  resources?: Resource[];
-}
-
 export interface RecommendationsResponse {
   recommendations: RecommendationResult[];
-  learningPaths: LearningPathRecommendation[];
 }
 
 interface UseAIRecommendationsOptions {
@@ -80,34 +67,16 @@ function isRecommendationResult(value: unknown): value is RecommendationResult {
   );
 }
 
-function isLearningPathRecommendation(
-  value: unknown,
-): value is LearningPathRecommendation {
-  if (!isRecord(value)) return false;
-  return (
-    (typeof value.id === "number" || typeof value.id === "string")
-    && typeof value.title === "string"
-    && typeof value.difficulty === "string"
-    && typeof value.duration === "string"
-    && typeof value.resourceCount === "number"
-    && typeof value.matchScore === "number"
-  );
-}
-
 function normalizeRecommendationsResponse(raw: unknown): RecommendationsResponse {
   if (Array.isArray(raw)) {
     return {
       recommendations: raw.filter(isRecommendationResult),
-      learningPaths: [],
     };
   }
-  if (!isRecord(raw)) return { recommendations: [], learningPaths: [] };
+  if (!isRecord(raw)) return { recommendations: [] };
   return {
     recommendations: Array.isArray(raw.recommendations)
       ? raw.recommendations.filter(isRecommendationResult)
-      : [],
-    learningPaths: Array.isArray(raw.learningPaths)
-      ? raw.learningPaths.filter(isLearningPathRecommendation)
       : [],
   };
 }
@@ -282,10 +251,6 @@ export function useAIRecommendations(
   return {
     // Data
     recommendations,
-    learningPaths:
-      localCache?.learningPaths
-      ?? recommendationsMutation.data?.learningPaths
-      ?? [],
     
     // Actions
     generateRecommendations: (profile?: UserProfile) =>

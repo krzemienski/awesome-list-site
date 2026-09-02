@@ -26,18 +26,6 @@ interface AIRecommendationResponse {
   confidenceLevel: number;
 }
 
-interface AILearningPathResponse {
-  title: string;
-  description: string;
-  category: string;
-  skillLevel: string;
-  estimatedHours: number;
-  prerequisites: string[];
-  learningObjectives: string[];
-  matchScore: number;
-  matchReasons: string[];
-}
-
 /**
  * Extract JSON from Claude's response, handling markdown code fences and extra text
  */
@@ -443,21 +431,6 @@ export function buildRecommendationReason(
   return buildRecommendationExplanation(resource, profile, comps).summary;
 }
 
-export interface AILearningPath {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  skillLevel: string;
-  estimatedHours: number;
-  resources: Resource[];
-  prerequisites: string[];
-  learningObjectives: string[];
-  matchScore: number;
-  matchReasons: string[];
-  aiGenerated: boolean;
-}
-
 /**
  * Generate AI-powered personalized recommendations using Claude
  */
@@ -602,103 +575,6 @@ Respond in JSON format:
 }
 
 /**
- * Generate AI-powered learning paths using Claude
- */
-export async function generateAILearningPaths(
-  userProfile: UserProfile,
-  availableResources: Resource[]
-): Promise<AILearningPath[]> {
-  try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      console.warn('Anthropic API key not configured, falling back to rule-based learning paths');
-      return generateFallbackLearningPaths(userProfile, availableResources);
-    }
-
-    const prompt = `Create personalized learning paths for this user based on their profile and available resources.
-
-USER PROFILE:
-- Skill Level: ${userProfile.skillLevel}
-- Learning Goals: ${userProfile.learningGoals.join(', ')}
-- Preferred Categories: ${userProfile.preferredCategories.join(', ')}
-- Time Commitment: ${userProfile.timeCommitment}
-
-AVAILABLE RESOURCE CATEGORIES:
-${Array.from(new Set(availableResources.map(r => r.category))).slice(0, 10).join(', ')}
-
-Create 3 learning paths that would help this user achieve their goals. Each path should:
-1. Have a clear progression from current skill level
-2. Include 4-6 resources in logical order
-3. Match their time commitment and interests
-4. Have clear learning objectives
-
-Respond in JSON format:
-{
-  "learningPaths": [
-    {
-      "title": "Path name",
-      "description": "What this path teaches",
-      "category": "main category", 
-      "skillLevel": "target skill level",
-      "estimatedHours": 20,
-      "prerequisites": ["prerequisite knowledge"],
-      "learningObjectives": ["objective 1", "objective 2"],
-      "matchScore": 0.85,
-      "matchReasons": ["why this matches the user"]
-    }
-  ]
-}`;
-
-    const response = await anthropic.messages.create({
-      model: DEFAULT_MODEL_STR,
-      system: "You are an expert learning path designer for video development technologies. Create structured, progressive learning experiences that match user skill levels and goals.",
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 2000
-    });
-
-    // Extract JSON from response using robust extraction
-    const firstContent = response.content[0];
-    const jsonText = firstContent && 'text' in firstContent ? firstContent.text : '{}';
-    const result = extractJSON(jsonText) as { learningPaths?: AILearningPathResponse[] };
-
-    const learningPaths: AILearningPath[] = result.learningPaths?.map((path: AILearningPathResponse, index: number) => {
-      // Find relevant resources for this path
-      const pathResources = availableResources
-        .filter(r => r.category === path.category || 
-                    userProfile.preferredCategories.includes(r.category || ''))
-        .slice(0, 6);
-
-      return {
-        id: `ai_path_${path.category?.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}_${index}`,
-        title: path.title || 'AI-Generated Learning Path',
-        description: path.description || 'Personalized learning path',
-        category: path.category || 'General',
-        skillLevel: path.skillLevel || userProfile.skillLevel,
-        estimatedHours: path.estimatedHours || 20,
-        resources: pathResources,
-        prerequisites: path.prerequisites || [],
-        learningObjectives: path.learningObjectives || [],
-        matchScore: Math.max(0, Math.min(1, path.matchScore || 0.8)),
-        matchReasons: path.matchReasons || ['AI-generated match'],
-        aiGenerated: true
-      };
-    }) || [];
-
-    return learningPaths;
-
-  } catch (error: unknown) {
-    console.warn('AI learning path generation failed:', error instanceof Error ? error.message : 'Unknown error');
-    const fallbackPaths = generateFallbackLearningPaths(userProfile, availableResources);
-    console.log(`Generated ${fallbackPaths.length} fallback paths in AI system`);
-    return fallbackPaths;
-  }
-}
-
-/**
  * Fallback recommendations when AI is not available
  */
 function generateFallbackRecommendations(
@@ -752,83 +628,4 @@ function generateFallbackRecommendations(
   return recommendations
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
-}
-
-/**
- * Fallback learning paths when AI is not available
- */
-export function generateFallbackLearningPaths(
-  userProfile: UserProfile,
-  availableResources: Resource[]
-): AILearningPath[] {
-  console.log(`Generating fallback learning paths for user with ${userProfile.preferredCategories.length} preferred categories`);
-  const paths: AILearningPath[] = [];
-  
-  // Get available categories from resources
-  const availableCategories = Array.from(new Set(availableResources.map(r => r.category).filter(Boolean)));
-  console.log(`Available categories: ${availableCategories.slice(0, 5).join(', ')}... (${availableCategories.length} total)`);
-  
-  // Use preferred categories first, then popular categories if none are set
-  let categoriesToUse = userProfile.preferredCategories.length > 0 
-    ? userProfile.preferredCategories 
-    : availableCategories.slice(0, 3); // Use first 3 categories if no preferences
-    
-  console.log(`Categories to use for paths: ${categoriesToUse.join(', ')}`);
-  
-  // Create paths based on categories
-  categoriesToUse.slice(0, 3).forEach((category, index) => {
-    const categoryResources = availableResources
-      .filter(r => r.category === category)
-      .slice(0, 6);
-      
-    if (categoryResources.length > 0) {
-      const isPreferred = userProfile.preferredCategories.includes(category);
-      paths.push({
-        id: `fallback_path_${category.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}_${index}`,
-        title: `${category} Learning Path`,
-        description: isPreferred 
-          ? `Comprehensive learning path for ${category} based on your interests`
-          : `Popular learning path for ${category} - great for ${userProfile.skillLevel} developers`,
-        category,
-        skillLevel: userProfile.skillLevel,
-        estimatedHours: userProfile.timeCommitment === 'daily' ? 15 : userProfile.timeCommitment === 'weekly' ? 25 : 20,
-        resources: categoryResources,
-        prerequisites: userProfile.skillLevel === 'beginner' ? ['Basic programming knowledge'] : [],
-        learningObjectives: [
-          `Master ${category} concepts and fundamentals`,
-          `Apply ${category} in practical projects`,
-          `Understand best practices in ${category}`
-        ],
-        matchScore: isPreferred ? 0.9 : 0.6,
-        matchReasons: isPreferred 
-          ? [`Matches your interest in ${category}`, `Aligned with your ${userProfile.skillLevel} skill level`]
-          : [`Popular category for ${userProfile.skillLevel} developers`, `Good foundation for video development`],
-        aiGenerated: false
-      });
-    }
-  });
-  
-  // If still no paths (shouldn't happen with available resources), create a general path
-  if (paths.length === 0 && availableResources.length > 0) {
-    paths.push({
-      id: `fallback_general_path_${Date.now()}`,
-      title: 'Video Development Fundamentals',
-      description: 'Essential resources for video development and streaming technologies',
-      category: 'General',
-      skillLevel: userProfile.skillLevel,
-      estimatedHours: 20,
-      resources: availableResources.slice(0, 8),
-      prerequisites: userProfile.skillLevel === 'beginner' ? ['Basic programming knowledge'] : [],
-      learningObjectives: [
-        'Understand video development basics',
-        'Learn key video technologies',
-        'Build practical skills'
-      ],
-      matchScore: 0.5,
-      matchReasons: ['Comprehensive introduction to video development'],
-      aiGenerated: false
-    });
-  }
-  
-  return paths;
 }

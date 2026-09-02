@@ -675,8 +675,7 @@ export function registerRecommendationRoutes(
       const result = await recommendationEngine.generateRecommendations(
         userProfile,
         limit,
-        false,
-        false // learning paths aren't used by this endpoint — skip the blocking AI call
+        false
       );
 
       // NB-015 (run23): pass embedded resources through the public serializer.
@@ -734,8 +733,7 @@ export function registerRecommendationRoutes(
       const result = await recommendationEngine.generateRecommendations(
         userProfile,
         limit,
-        forceRefresh,
-        false // learning paths aren't used by this endpoint — skip the blocking AI call
+        forceRefresh
       );
 
       // NB-015 (run23): pass embedded resources through the public serializer.

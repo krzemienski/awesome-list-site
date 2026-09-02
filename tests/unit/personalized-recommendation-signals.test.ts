@@ -85,7 +85,6 @@ describe('personalized onboarding recommendation signals', () => {
         profile([], []),
         5,
         true,
-        false,
       ),
     ).rejects.toBe(failure);
 
@@ -100,7 +99,6 @@ describe('personalized onboarding recommendation signals', () => {
           { resource: { id: 1 }, feedback: null },
           { resource: { id: 2 }, feedback: null },
         ],
-        learningPaths: [],
       },
       timestamp: 1,
     });
