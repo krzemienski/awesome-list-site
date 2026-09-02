@@ -79,22 +79,26 @@ const SYSTEM_STYLESHEETS: Record<string, string> = {
   swiss: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap",
 };
 
-function loadStylesheet(href: string): void {
+function loadStylesheet(href: string, fontOptionId?: string): void {
   const alreadyLoaded = Array.from(
     document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
-  ).some((link) => link.href === href);
-  if (alreadyLoaded) return;
+  ).find((link) => link.href === href);
+  if (alreadyLoaded) {
+    if (fontOptionId) alreadyLoaded.dataset.fontOption = fontOptionId;
+    return;
+  }
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = href;
   link.dataset.fontHref = href;
+  if (fontOptionId) link.dataset.fontOption = fontOptionId;
   document.head.appendChild(link);
 }
 
 /** Load an optional picker font only after a visitor has selected it. */
 export function loadFontOverride(id: string): void {
   const href = FONT_STYLESHEETS[id];
-  if (href) loadStylesheet(href);
+  if (href) loadStylesheet(href, id);
 }
 
 /** Load every webfont the selected design system names, after the first paint. */

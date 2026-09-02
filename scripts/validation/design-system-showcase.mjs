@@ -18,6 +18,10 @@
 // 5. The active system's Google Fonts loader requests every inventoried weight;
 //    a temporary URL mutation proves a missing weight names its system, token,
 //    and weight instead of passing because the family itself is present.
+// 6. Every non-system font override selected in the picker paints its intended
+//    body family at every meaningful body weight. Its own loader is scoped
+//    separately from the always-on/system loaders, and a temporary URL mutation
+//    proves a missing weight names the option id and weight.
 //
 // Requires the dev server on :5000 (public route, no login). Exits 1 on any
 // failure. Evidence: /tmp/validation/ds-showcase.
@@ -94,11 +98,17 @@ try {
 
   const SYSTEMS = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];
   const perSystem = {};
-  const paintFonts = async (targetPage = page, systemId, retry = true) => {
+  const paintFonts = async (
+    targetPage = page,
+    selectionId,
+    retry = true,
+    tokenNames = null,
+    loaderScope = 'all',
+  ) => {
     const deadline = Date.now() + (retry ? 15000 : 1);
     let last = [];
     while (Date.now() < deadline) {
-      last = await targetPage.evaluate(async (activeSystemId) => {
+      last = await targetPage.evaluate(async ({ activeSelectionId, requestedTokenNames, requestedLoaderScope }) => {
         const GENERIC_FAMILIES = new Set([
           'serif',
           'sans-serif',
@@ -119,6 +129,9 @@ try {
           { token: '--font-body', surface: 'body' },
           { token: '--font-mono', surface: 'mono' },
         ];
+        const tokensToCheck = requestedTokenNames
+          ? FONT_TOKENS.filter(({ token }) => requestedTokenNames.includes(token))
+          : FONT_TOKENS;
         const SAMPLE = 'Aa Bb Cc Dd Ee Ff Gg Hh 0123456789 — @#$%';
 
         const splitStack = (stack) => {
@@ -203,6 +216,7 @@ try {
           }
         };
         const loaderHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')]
+          .filter((link) => requestedLoaderScope !== 'font-override' || link.dataset.fontOption === activeSelectionId)
           .map((link) => link.href || link.getAttribute('href') || '')
           .filter(Boolean);
         for (const href of loaderHrefs) parseLoaderHref(href);
@@ -239,7 +253,7 @@ try {
         const results = [];
         try {
           const rootStyle = getComputedStyle(document.documentElement);
-          for (const { token, surface } of FONT_TOKENS) {
+            for (const { token, surface } of tokensToCheck) {
             const stack = rootStyle.getPropertyValue(token).trim();
             const families = splitStack(stack);
             const primary = families[0] ? unquote(families[0]) : '';
@@ -293,7 +307,10 @@ try {
             }
             result.weights = [...paintedWeights].sort((a, b) => a - b);
             if (!result.weights.length) {
-              result.error = `system "${activeSystemId}" token ${token} (${surface}) paints no meaningful text`;
+               const selectionLabel = requestedLoaderScope === 'font-override'
+                 ? `font override "${activeSelectionId}"`
+                 : `system "${activeSelectionId}"`;
+               result.error = `${selectionLabel} token ${token} (${surface}) paints no meaningful text`;
               results.push(result);
               continue;
             }
@@ -318,8 +335,11 @@ try {
             result.missingWeights = result.weights.filter((weight) => !covers(primary, weight));
             if (result.missingWeights.length) {
               result.pass = false;
+              const selectionLabel = requestedLoaderScope === 'font-override'
+                ? `font override "${activeSelectionId}"`
+                : `system "${activeSelectionId}"`;
               result.error =
-                `system "${activeSystemId}" token ${token} (${surface}) loader for "${primary}" is missing weight(s) ${result.missingWeights.join(', ')}`;
+                `${selectionLabel} token ${token} (${surface}) loader for "${primary}" is missing weight(s) ${result.missingWeights.join(', ')}`;
             }
             if (!result.pass) {
               result.error ||= `declared=${result.declaredWidth} forced=${result.forcedWidth} fallback=${result.fallbackWidth}`;
@@ -330,8 +350,13 @@ try {
           probe.remove();
         }
         return results;
-      }, systemId);
-      if (!retry || (last.length === 3 && last.every((result) => result.pass))) return last;
+      }, {
+        activeSelectionId: selectionId,
+        requestedTokenNames: tokenNames,
+        requestedLoaderScope: loaderScope,
+      });
+      const expectedCount = tokenNames ? tokenNames.length : 3;
+      if (!retry || (last.length === expectedCount && last.every((result) => result.pass))) return last;
       await new Promise((resolve) => setTimeout(resolve, 250));
     }
     return last;
@@ -373,6 +398,162 @@ try {
     });
     await page.screenshot({ path: path.join(OUT, `${id}.png`) });
   }
+
+  // The picker replaces --font-body after selection, while the system sweep
+  // above deliberately clears that override. Exercise every actual picker
+  // option in a fresh document so a previously registered face cannot mask a
+  // missing optional-font weight. The option buttons are the runtime registry
+  // here rather than a second hard-coded list.
+  const pickerContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const pickerPage = await pickerContext.newPage();
+  await pickerPage.goto(`${BASE}/settings/theme`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await pickerPage.waitForSelector('[data-testid="font-picker"]', { timeout: 30000 });
+  const fontOptionIds = await pickerPage.evaluate(() =>
+    [...document.querySelectorAll('[data-testid^="font-option-"]')]
+      .map((button) => button.getAttribute('data-testid')?.replace('font-option-', ''))
+      .filter((id) => id && id !== 'system'),
+  );
+  await pickerContext.close();
+  log(
+    'font-override-registry',
+    fontOptionIds.length > 0,
+    fontOptionIds.length > 0
+      ? `${fontOptionIds.length} non-system picker option(s): ${fontOptionIds.join(', ')}`
+      : 'the font picker exposes no non-system options',
+  );
+
+  for (const optionId of fontOptionIds) {
+    const optionContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const optionPage = await optionContext.newPage();
+    try {
+      await optionPage.goto(`${BASE}/settings/theme`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await optionPage.waitForSelector(`[data-testid="font-option-${optionId}"]`, { timeout: 30000 });
+      const intended = await optionPage.evaluate((id) => {
+        const button = document.querySelector(`[data-testid="font-option-${id}"]`);
+        const specimen = button?.querySelector('p');
+        const stack = specimen?.getAttribute('style')?.match(/font-family:\s*([^;]+)/i)?.[1]?.trim() || '';
+        const primary = stack.replace(/^(['"])(.*)\1$/, '$2').split(',')[0].trim();
+        return { primary, stack };
+      }, optionId);
+      await optionPage.click(`[data-testid="font-option-${optionId}"]`);
+      await optionPage.waitForFunction(
+        (id) => document.documentElement.getAttribute('data-font') === id,
+        optionId,
+        { timeout: 5000 },
+      );
+      await optionPage.goto(`${BASE}/design-system`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      await optionPage.waitForSelector('[data-testid="text-ds-title"]', { timeout: 30000 });
+      await optionPage.waitForFunction(
+        (id) => document.documentElement.getAttribute('data-font') === id,
+        optionId,
+        { timeout: 5000 },
+      );
+      const overrideResults = await paintFonts(
+        optionPage,
+        optionId,
+        true,
+        ['--font-body'],
+        'font-override',
+      );
+      const bodyResult = overrideResults.find((result) => result.token === '--font-body');
+      const intendedFamily =
+        String(intended.primary || '').replace(/["']/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+      const paintedFamily =
+        String(bodyResult?.primary || '').replace(/["']/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+      const pass =
+        overrideResults.length === 1 &&
+        bodyResult?.pass &&
+        intendedFamily.length > 0 &&
+        paintedFamily === intendedFamily;
+      log(
+        `font-override-paint-${optionId}`,
+        Boolean(pass),
+        pass
+          ? `${intended.primary} body painted [${bodyResult.weights.join(', ')}]`
+          : `FAILED (${bodyResult?.error || `intended ${intended.primary || '(unknown)'} but painted ${bodyResult?.primary || '(none)'}`})`,
+      );
+    } finally {
+      await optionContext.close();
+    }
+  }
+
+  // Mutation proof for an optional picker font. Only the link marked by
+  // loadFontOverride() is included in this check; the always-on Inter link
+  // must not be able to hide a missing optional weight.
+  const optionMutationId = fontOptionIds[0];
+  let optionMutationTarget = null;
+  let optionMutationPage = null;
+  let optionMutationContext = null;
+  if (optionMutationId) {
+    optionMutationContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    optionMutationPage = await optionMutationContext.newPage();
+    await optionMutationPage.goto(`${BASE}/settings/theme`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await optionMutationPage.waitForSelector(`[data-testid="font-option-${optionMutationId}"]`, { timeout: 30000 });
+    await optionMutationPage.click(`[data-testid="font-option-${optionMutationId}"]`);
+    await optionMutationPage.waitForFunction(
+      (id) => document.documentElement.getAttribute('data-font') === id,
+      optionMutationId,
+      { timeout: 5000 },
+    );
+    await optionMutationPage.goto(`${BASE}/design-system`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await optionMutationPage.waitForSelector('[data-testid="text-ds-title"]', { timeout: 30000 });
+    await optionMutationPage.waitForSelector(
+      `link[data-font-option="${optionMutationId}"]`,
+      { state: 'attached', timeout: 15000 },
+    );
+    const optionMutationBaseline = await paintFonts(
+      optionMutationPage,
+      optionMutationId,
+      true,
+      ['--font-body'],
+      'font-override',
+    );
+    const requiredWeights =
+      optionMutationBaseline.find((result) => result.token === '--font-body')?.weights || [];
+    optionMutationTarget = await optionMutationPage.evaluate(({ id, requiredWeights: required }) => {
+      const link = [...document.querySelectorAll('link[data-font-option]')]
+        .find((candidate) => candidate.dataset.fontOption === id);
+      if (!link) return null;
+      const original = link.getAttribute('href') || link.href;
+      const href = new URL(original, location.href);
+      const families = href.searchParams.getAll('family');
+      const first = families.find((family) => /(?:^|[:,])wght@/.test(family));
+      if (!first) return null;
+      const staticSpec = /^(.*:wght@)(\d+(?:\.\d+)?(?:;\d+(?:\.\d+)?)+)$/.exec(first);
+      if (!staticSpec) return null;
+      const requested = staticSpec[2].split(';').map(Number);
+      const weight = [...required].reverse().find((candidate) => requested.includes(candidate));
+      if (!Number.isFinite(weight)) return null;
+      const mutatedFamily = `${staticSpec[1]}${requested.filter((candidate) => candidate !== weight).join(';')}`;
+      href.searchParams.delete('family');
+      for (const family of families) {
+        href.searchParams.append('family', family === first ? mutatedFamily : family);
+      }
+      link.setAttribute('href', href.toString());
+      return { id, original, mutated: href.toString(), weight };
+    }, { id: optionMutationId, requiredWeights });
+  }
+  const optionMutationResult = optionMutationTarget
+    ? await paintFonts(optionMutationPage, optionMutationId, false, ['--font-body'], 'font-override')
+    : [];
+  if (optionMutationTarget) {
+    await optionMutationPage.evaluate(({ id, original }) => {
+      const link = [...document.querySelectorAll('link[data-font-option]')]
+        .find((candidate) => candidate.dataset.fontOption === id);
+      if (link) link.setAttribute('href', original);
+    }, optionMutationTarget);
+  }
+  const optionMutated = optionMutationResult.find(
+    (result) => result.missingWeights?.includes(optionMutationTarget?.weight),
+  );
+  log(
+    'font-override-paint-mutation-detection',
+    Boolean(optionMutationTarget && optionMutated && !optionMutated.pass),
+    optionMutationTarget && optionMutated
+      ? `font option=${optionMutationTarget.id} token=${optionMutated.token} weight=${optionMutationTarget.weight} was ${optionMutated.pass ? 'not detected' : 'detected'} after removing it from the loader URL`
+      : 'could not remove a requested static weight from an optional font loader URL',
+  );
+  if (optionMutationContext) await optionMutationContext.close();
 
   // Not one frozen snapshot: radius and display face must vary across systems.
   const radii = new Set(Object.values(perSystem).map(s => s.radius));

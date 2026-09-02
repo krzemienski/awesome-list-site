@@ -56,3 +56,11 @@ Google Fonts css2 weight parsing has three cases: discrete `wght@400;600`, inclu
 **Why:** rendered-width checks prove the primary family paints, but synthesized bold has the same family metrics and slips through. Browser serialization and cumulative `FontFaceSet` state make naive comparisons and post-load mutations falsely reassuring.
 
 **How to apply:** report failures with system, token, and numeric weight. Interpret ranges inclusively, treat axis tuples by the `wght` column rather than position, and validate the mutated URL inventory instead of expecting the browser to unload a previously registered face.
+
+## Deduplicated loaders still need provenance
+
+An optional font loader may reuse a stylesheet URL that is already present in the HTML shell. If runtime validation scopes coverage to the selected option, the deduplication path must annotate the existing link with the same option provenance it would put on a newly created link.
+
+**Why:** Inter's optional picker URL can be byte-for-byte identical to the always-on Inter URL. Returning early on that duplicate preserves network efficiency but otherwise makes the option look loaderless to a correctly isolated gate.
+
+**How to apply:** keep one request, but attach option ownership before returning from the duplicate-link path. Wait for the non-rendered link to be attached (not visible) before mutation checks, because optional loaders run after first paint.
