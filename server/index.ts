@@ -137,6 +137,8 @@ app.use(
 // static client/index.html boot scripts and the SSR shell <style>), so inline
 // code executes under 'nonce-<value>' instead of the blanket 'unsafe-inline'.
 app.use((_req, res, next) => {
+  const nonce = crypto.randomBytes(16).toString("base64");
+  res.locals.cspNonce = nonce;
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader(
@@ -163,7 +165,6 @@ app.use((_req, res, next) => {
   // BUG-014: per-request CSP nonce, applied to script-src and style-src. Always
   // generated (even in dev) so downstream middleware can read it unconditionally;
   // the CSP header itself stays production-only per the BUG-019 rationale above.
-  const nonce = String(res.locals.cspNonce || "");
   if (process.env.NODE_ENV === "production") {
     res.setHeader("X-Frame-Options", "DENY");
     // Run16 BUG-094 set an app-level HSTS header, but Replit's edge already
