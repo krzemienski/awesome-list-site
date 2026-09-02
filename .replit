@@ -473,6 +473,17 @@ args = "node scripts/validation/root-script-drift.mjs"
 [workflows.workflow.metadata]
 isValidation = true
 
+[[workflows.workflow]]
+name = "sticky-preview-audit"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/sticky-preview-audit.mjs"
+
+[workflows.workflow.metadata]
+isValidation = true
+
 [agent]
 integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0", "javascript_anthropic_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0", "github:1.0.0"]
 
