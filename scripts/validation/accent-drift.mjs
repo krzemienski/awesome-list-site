@@ -1,17 +1,12 @@
 #!/usr/bin/env node
-// Theme drift gate (tasks #377, #388, #399).
+// Theme drift gate (tasks #377, #388, #399, #429).
 //
 // The inline boot script in client/index.html paints the theme BEFORE React
-// loads: it reads ds-system / ds-accent / ds-font-override out of localStorage
-// and validates each saved choice against a hand-copied list — SYSTEMS,
-// ACCENTS, FONT_STACKS. Anything a list does not know is silently replaced by
-// the fallback, so a design system, accent, or font that exists in the app but
-// is missing from (or disagrees with) the boot script looks to a visitor like
-// a choice that "won't stick" after a reload. Task #371 tagged the accent
-// literals DS-OK with a "keep the two files in sync" note; a note is not a
-// check. This is the check, for all three lists — and for the stylesheet maps
-// that fetch the faces those lists name, whose omission is quieter still: the
-// choice sticks, it just never paints in the typeface it promised.
+// loads. Vite now replaces one marker with THEME_BOOT_DATA derived from
+// THEME_FALLBACK_REGISTRY, so system/accent ids and fallbacks are generated
+// from the runtime source instead of copied into HTML. Font overrides still
+// use an inline FONT_STACKS map. This gate verifies the generated-theme source
+// contract plus the remaining stylesheet/font mirrors.
 //
 // Sources compared (every one is a hand-maintained copy of ONE registry, and
 // every pair below has silently drifted-by-omission before):
@@ -21,12 +16,11 @@
 //        default pair, which the CSS itself documents as Crimson's values
 //        (i.e. DEFAULT_ACCENT's) and which paints before any data-accent
 //        attribute exists
-//   4 · client/index.html  the pre-paint boot script's ACCENTS id allowlist +
-//        its hard-coded fallback id — an accent missing from that list is
-//        rejected before React boots, so the picker would offer an accent
-//        that silently resets to the fallback on the next reload
-//   5 · design-system.ts   DESIGN_SYSTEMS + DEFAULT_SYSTEM  ↔  the boot
-//        script's SYSTEMS allowlist + its hard-coded fallback system id
+//   4 · design-system.ts   THEME_FALLBACK_REGISTRY is the source for
+//        ACCENTS / DESIGN_SYSTEMS / SYSTEM_DEFAULT_ACCENT / DEFAULT_* and the
+//        generated THEME_BOOT_DATA consumed by client/index.html
+//   5 · client/index.html  the pre-paint script keeps exactly one Vite marker
+//        and reads ids/fallbacks only from the injected THEME_BOOT object
 //   6 · design-system.css  :root[data-system="…"] token blocks  ↔
 //        DESIGN_SYSTEMS — agreeing on an id is not the same as having a
 //        LOOK. The block IS the treatment, so a system the picker offers
@@ -86,12 +80,11 @@
 //   · id-parity      — an accent id present in only one of the accent sources
 //   · swatch-value   — primary ≠ --accent, or secondary ≠ --accent-2
 //   · root-default   — :root's --accent/--accent-2 ≠ DEFAULT_ACCENT's pair
-//   · boot-allowlist — an accent id in only one of ACCENTS / the boot list
-//   · boot-fallback  — index.html's fallback accent id ≠ DEFAULT_ACCENT
-//   · system-parity  — a system id in only one of DESIGN_SYSTEMS / the boot
-//     SYSTEMS allowlist
-//   · system-fallback— the boot fallback system id ≠ DEFAULT_SYSTEM, or
-//     DEFAULT_SYSTEM is not one of DESIGN_SYSTEMS
+//   · boot-registry  — a derived runtime export or THEME_BOOT_DATA disagrees
+//     with THEME_FALLBACK_REGISTRY
+//   · boot-generation — client/index.html lost the Vite marker, regained a
+//     hand-copied list/fallback, or no longer consumes injected fields
+//   · system-fallback— DEFAULT_SYSTEM is not one of DESIGN_SYSTEMS
 //   · system-paint   — a DESIGN_SYSTEMS id with no :root[data-system="…"]
 //     token block, a block whose id the picker never offers (dead paint),
 //     or a block that declares no custom property at all (an empty block
@@ -249,6 +242,7 @@ const CSS_REL = 'client/src/styles/design-system.css';
 const HTML_REL = 'client/index.html';
 const FONTS_REL = 'client/src/lib/font-options.ts';
 const SERVER_REL = 'server/index.ts';
+const VITE_REL = 'vite.config.ts';
 
 // ---------------------------------------------------------------------------
 // Escape hatch: systems intentionally painted by the BASE :root block
@@ -801,6 +795,138 @@ function parseBootSystems(htmlSrc) {
   const ids = list ? [...list[1].matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]) : null;
   const fb = /SYSTEMS\.indexOf\(\s*sys\s*\)\s*===?\s*-1\s*\)\s*sys\s*=\s*['"]([^'"]+)['"]/.exec(htmlSrc);
   return { ids, fallback: fb ? fb[1] : null };
+}
+
+const THEME_BOOT_MARKER = '__AWESOME_VIDEO_THEME_BOOT__';
+
+function parseThemeRegistry(tsSrc) {
+  let exports_;
+  try {
+    exports_ = loadTsExports(TS_REL, tsSrc);
+  } catch (err) {
+    return { found: false, issues: [`could not execute ${TS_REL}: ${err.message}`] };
+  }
+
+  const registry = exports_.THEME_FALLBACK_REGISTRY;
+  if (!registry || typeof registry !== 'object') {
+    return { found: false, issues: [`${TS_REL} does not export THEME_FALLBACK_REGISTRY`] };
+  }
+
+  const issues = [];
+  const systems = new Map();
+  const accents = new Map();
+  const systemDefaultAccents = new Map();
+  const expectedAccentExports = [];
+
+  if (!Array.isArray(registry.systems)) {
+    issues.push('THEME_FALLBACK_REGISTRY.systems is not an array');
+  } else {
+    for (const system of registry.systems) {
+      if (
+        !system || typeof system !== 'object' ||
+        !['id', 'name', 'tag', 'desc', 'defaultAccent'].every((field) => typeof system[field] === 'string' && system[field])
+      ) {
+        issues.push(`malformed system entry: ${JSON.stringify(system)}`);
+        continue;
+      }
+      if (systems.has(system.id)) issues.push(`duplicate system id "${system.id}"`);
+      systems.set(system.id, { name: system.name, tag: system.tag, desc: system.desc });
+      systemDefaultAccents.set(system.id, system.defaultAccent);
+    }
+  }
+
+  if (!Array.isArray(registry.accents)) {
+    issues.push('THEME_FALLBACK_REGISTRY.accents is not an array');
+  } else {
+    for (const accent of registry.accents) {
+      if (
+        !accent || typeof accent !== 'object' ||
+        !['id', 'name', 'primary', 'secondary'].every((field) => typeof accent[field] === 'string' && accent[field])
+      ) {
+        issues.push(`malformed accent entry: ${JSON.stringify(accent)}`);
+        continue;
+      }
+      if (accents.has(accent.id)) issues.push(`duplicate accent id "${accent.id}"`);
+      accents.set(accent.id, { primary: accent.primary, secondary: accent.secondary });
+      expectedAccentExports.push({
+        id: accent.id,
+        name: accent.name,
+        primary: accent.primary,
+        secondary: accent.secondary,
+      });
+    }
+  }
+
+  const defaultSystem = typeof registry.defaultSystem === 'string' ? registry.defaultSystem : null;
+  const defaultAccent = typeof registry.defaultAccent === 'string' ? registry.defaultAccent : null;
+  if (!defaultSystem) issues.push('THEME_FALLBACK_REGISTRY.defaultSystem is not a non-empty string');
+  if (!defaultAccent) issues.push('THEME_FALLBACK_REGISTRY.defaultAccent is not a non-empty string');
+
+  const expectedBootData = {
+    systems: [...systems.keys()],
+    accents: [...accents.keys()],
+    defaultSystem,
+    defaultAccent,
+  };
+  const actualBootData = exports_.THEME_BOOT_DATA;
+  if (JSON.stringify(actualBootData) !== JSON.stringify(expectedBootData)) {
+    issues.push(`THEME_BOOT_DATA is stale: expected ${JSON.stringify(expectedBootData)}, received ${JSON.stringify(actualBootData)}`);
+  }
+
+  const exportedSystems = exports_.DESIGN_SYSTEMS;
+  if (!exportedSystems || JSON.stringify(exportedSystems) !== JSON.stringify(Object.fromEntries(systems))) {
+    issues.push('DESIGN_SYSTEMS metadata is not derived from THEME_FALLBACK_REGISTRY.systems');
+  }
+  const exportedAccents = exports_.ACCENTS;
+  if (!Array.isArray(exportedAccents) || JSON.stringify(exportedAccents) !== JSON.stringify(expectedAccentExports)) {
+    issues.push('ACCENTS metadata is not derived from THEME_FALLBACK_REGISTRY.accents');
+  }
+  if (JSON.stringify(exports_.SYSTEM_DEFAULT_ACCENT) !== JSON.stringify(Object.fromEntries(systemDefaultAccents))) {
+    issues.push('SYSTEM_DEFAULT_ACCENT is not derived from THEME_FALLBACK_REGISTRY.systems');
+  }
+  if (exports_.DEFAULT_SYSTEM !== defaultSystem) {
+    issues.push(`DEFAULT_SYSTEM is "${exports_.DEFAULT_SYSTEM}" instead of registry defaultSystem "${defaultSystem}"`);
+  }
+  if (exports_.DEFAULT_ACCENT !== defaultAccent) {
+    issues.push(`DEFAULT_ACCENT is "${exports_.DEFAULT_ACCENT}" instead of registry defaultAccent "${defaultAccent}"`);
+  }
+
+  return {
+    found: true,
+    issues,
+    systems,
+    accents,
+    systemDefaultAccents,
+    defaultSystem,
+    defaultAccent,
+    bootData: actualBootData,
+  };
+}
+
+function checkThemeBootGeneration(htmlSrc, viteSrc) {
+  const issues = [];
+  const markerCount = htmlSrc.split(THEME_BOOT_MARKER).length - 1;
+  if (markerCount !== 1) {
+    issues.push(`${HTML_REL} must contain exactly one ${THEME_BOOT_MARKER} marker; found ${markerCount}`);
+  }
+  if (/\bvar\s+(?:SYSTEMS|ACCENTS)\s*=\s*\[/.test(htmlSrc)) {
+    issues.push(`${HTML_REL} contains a hand-maintained SYSTEMS/ACCENTS allowlist instead of generated THEME_BOOT data`);
+  }
+  for (const field of ['systems', 'accents', 'defaultSystem', 'defaultAccent']) {
+    if (!new RegExp(`\\bTHEME_BOOT\\.${field}\\b`).test(htmlSrc)) {
+      issues.push(`${HTML_REL} does not consume generated THEME_BOOT.${field}`);
+    }
+  }
+  if (!/\bimport\s*\{[^}]*\bTHEME_BOOT_DATA\b[^}]*\}\s*from\s*["']\.\/client\/src\/lib\/design-system["']/.test(viteSrc)) {
+    issues.push(`${VITE_REL} does not import THEME_BOOT_DATA from ${TS_REL}`);
+  }
+  if (!viteSrc.includes(`const marker = "${THEME_BOOT_MARKER}"`) || !viteSrc.includes('JSON.stringify(THEME_BOOT_DATA)')) {
+    issues.push(`${VITE_REL} does not serialize THEME_BOOT_DATA for the ${THEME_BOOT_MARKER} marker`);
+  }
+  if (!/\bplugins\s*:\s*\[[\s\S]*?\bthemeBootRegistry\(\)/.test(viteSrc)) {
+    issues.push(`${VITE_REL} does not register themeBootRegistry() in the Vite plugin pipeline`);
+  }
+  return issues;
 }
 
 // Every <link> carrying the `stylesheet` rel token in an HTML source. HTML
@@ -2283,6 +2409,54 @@ function runCanaries() {
   eq(parsedBootFonts.fallback, 'system', 'boot font fallback parsed');
   eq(parseBootFonts('<html></html>'), { stacks: new Map(), malformed: [], found: false, fallback: null }, 'absent FONT_STACKS map is detectable');
 
+  // Generated theme boot contract.
+  const registryModule = (bootDefaultAccent = 'crimson') => [
+    'export const THEME_FALLBACK_REGISTRY = {',
+    "  defaultSystem: 'editorial',",
+    "  defaultAccent: 'crimson',",
+    "  systems: [{ id: 'editorial', name: 'Editorial', tag: 'Magazine', desc: 'Baseline', defaultAccent: 'crimson' }],",
+    "  accents: [{ id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' }],",
+    '};',
+    "export const DESIGN_SYSTEMS = { editorial: { name: 'Editorial', tag: 'Magazine', desc: 'Baseline' } };",
+    "export const ACCENTS = [{ id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' }];",
+    "export const SYSTEM_DEFAULT_ACCENT = { editorial: 'crimson' };",
+    "export const DEFAULT_SYSTEM = 'editorial';",
+    "export const DEFAULT_ACCENT = 'crimson';",
+    `export const THEME_BOOT_DATA = { systems: ['editorial'], accents: ['crimson'], defaultSystem: 'editorial', defaultAccent: '${bootDefaultAccent}' };`,
+  ].join('\n');
+  eq(parseThemeRegistry(registryModule()).issues, [], 'theme registry and every derived export agree');
+  eq(
+    parseThemeRegistry(registryModule('matrix')).issues.some((issue) => issue.includes('THEME_BOOT_DATA is stale')),
+    true,
+    'stale generated boot data is caught with an explicit failure',
+  );
+  const generatedHtml = [
+    `var THEME_BOOT = ${THEME_BOOT_MARKER};`,
+    'THEME_BOOT.systems; THEME_BOOT.accents;',
+    'THEME_BOOT.defaultSystem; THEME_BOOT.defaultAccent;',
+  ].join('\n');
+  const generatedVite = [
+    'import { THEME_BOOT_DATA } from "./client/src/lib/design-system";',
+    'function themeBootRegistry() {',
+    `  const marker = "${THEME_BOOT_MARKER}";`,
+    '  const bootData = JSON.stringify(THEME_BOOT_DATA);',
+    '}',
+    'const config = { plugins: [themeBootRegistry()] };',
+  ].join('\n');
+  eq(checkThemeBootGeneration(generatedHtml, generatedVite), [], 'Vite theme marker generation contract passes');
+  eq(
+    checkThemeBootGeneration(generatedHtml.replace(THEME_BOOT_MARKER, '{}'), generatedVite)
+      .some((issue) => issue.includes('exactly one')),
+    true,
+    'a missing generation marker fails clearly',
+  );
+  eq(
+    checkThemeBootGeneration(`${generatedHtml}\nvar ACCENTS = ['crimson'];`, generatedVite)
+      .some((issue) => issue.includes('hand-maintained')),
+    true,
+    'a reintroduced hand-maintained boot allowlist fails clearly',
+  );
+
   // Comparator — every drift shape the gate exists to catch.
   const good = new Map([
     ['crimson', { primary: '#ff3d52', secondary: '#b84dff' }],
@@ -2994,31 +3168,44 @@ const cssSrc = read(CSS_REL);
 const htmlSrc = read(HTML_REL);
 const fontsSrc = read(FONTS_REL);
 const serverSrc = read(SERVER_REL);
+const viteSrc = read(VITE_REL);
 
 const failures = [];
 const fail = (kind, message) => failures.push({ kind, message });
 const csp = parseCspHostAllowlists(serverSrc);
 failures.push(...compareCspHostAllowlists(csp));
 
-const { accents: tsAccents, malformed, found } = parseTsAccents(tsSrc);
+const themeRegistry = parseThemeRegistry(tsSrc);
+const tsAccents = themeRegistry.accents ?? new Map();
+const tsSystems = {
+  ids: [...(themeRegistry.systems ?? new Map()).keys()],
+  malformed: [],
+  found: themeRegistry.found,
+};
+const defaultSystemId = themeRegistry.defaultSystem ?? null;
+const defaultAccentId = themeRegistry.defaultAccent ?? null;
+const tsSystemDefaultAccents = {
+  accents: themeRegistry.systemDefaultAccents ?? new Map(),
+  malformed: [],
+  found: themeRegistry.found,
+};
 const cssAccents = parseCssAccents(cssSrc);
 
-// Parser-rot guards: a rename or reformat must break the gate LOUDLY rather
+if (!themeRegistry.found) fail('parser-rot', `could not load THEME_FALLBACK_REGISTRY from ${TS_REL}`);
+for (const issue of themeRegistry.issues ?? []) fail('boot-registry', issue);
+for (const issue of checkThemeBootGeneration(htmlSrc, viteSrc)) fail('boot-generation', issue);
+
+// Parser-rot guards: an empty registry must break the gate LOUDLY rather
 // than reduce it to comparing two empty sets.
-if (!found) fail('parser-rot', `could not locate the ACCENTS registry in ${TS_REL}`);
-if (!tsAccents.size) fail('parser-rot', `parsed ZERO accents out of ACCENTS in ${TS_REL}`);
+if (!tsAccents.size) fail('parser-rot', `parsed ZERO accents out of THEME_FALLBACK_REGISTRY in ${TS_REL}`);
 if (!cssAccents.size) fail('parser-rot', `parsed ZERO :root[data-accent="…"] blocks out of ${CSS_REL}`);
-for (const obj of malformed) {
-  fail('parser-rot', `ACCENTS entry in ${TS_REL} is missing id/primary/secondary: ${obj}`);
-}
 
 failures.push(...compareAccents(tsAccents, cssAccents));
 
 // :root's pre-attribute default pair must be DEFAULT_ACCENT's swatch.
-const defaultAccentId = parseTsDefaultAccent(tsSrc);
 const rootDefault = parseCssRootDefault(cssSrc);
 if (!defaultAccentId) {
-  fail('parser-rot', `could not locate "export const DEFAULT_ACCENT = …" in ${TS_REL}`);
+  fail('parser-rot', `THEME_FALLBACK_REGISTRY.defaultAccent is unavailable in ${TS_REL}`);
 } else if (!rootDefault) {
   fail('parser-rot', `could not locate the bare ":root { … }" token block in ${CSS_REL}`);
 } else {
@@ -3040,76 +3227,17 @@ if (!defaultAccentId) {
   }
 }
 
-// The pre-paint boot allowlist gates which accent ids survive a reload.
-const boot = parseBootAccents(htmlSrc);
-if (!boot.ids || !boot.ids.length) {
-  fail('parser-rot', `could not locate the pre-paint "var ACCENTS = [ … ]" allowlist in ${HTML_REL}`);
-} else {
-  const bootSet = new Set(boot.ids);
-  for (const id of tsAccents.keys()) {
-    if (!bootSet.has(id)) {
-      fail(
-        'boot-allowlist',
-        `accent "${id}" is offered by the picker but is missing from the pre-paint ACCENTS allowlist in ${HTML_REL} — it would be reset to the fallback on the next reload`,
-      );
-    }
-  }
-  for (const id of bootSet) {
-    if (!tsAccents.has(id)) {
-      fail('boot-allowlist', `accent "${id}" is in the pre-paint ACCENTS allowlist in ${HTML_REL} but not in ACCENTS in ${TS_REL}`);
-    }
-  }
-}
-if (defaultAccentId && boot.fallback && boot.fallback !== defaultAccentId) {
-  fail(
-    'boot-fallback',
-    `${HTML_REL} falls back to "${boot.fallback}" pre-paint but DEFAULT_ACCENT in ${TS_REL} is "${defaultAccentId}"`,
-  );
-}
-if (!boot.fallback) {
-  fail('parser-rot', `could not locate the pre-paint accent fallback assignment in ${HTML_REL}`);
-}
-
 // ---------------------------------------------------------------------------
-// Design systems: DESIGN_SYSTEMS vs the pre-paint SYSTEMS allowlist, and
-// DEFAULT_SYSTEM vs the id the boot script rewrites an unknown choice to.
+// Design systems: registry ids/defaults vs the CSS blocks that paint them.
 // ---------------------------------------------------------------------------
-const tsSystems = parseTsDesignSystems(tsSrc);
-const bootSystems = parseBootSystems(htmlSrc);
-const defaultSystemId = parseTsDefaultSystem(tsSrc);
 const cssSystems = parseCssSystems(cssSrc);
 const cssSystemSkins = parseCssSystemSkins(cssSrc);
 
-if (!tsSystems.found) fail('parser-rot', `could not locate "export const DESIGN_SYSTEMS … = { … };" in ${TS_REL}`);
-if (!tsSystems.ids.length) fail('parser-rot', `parsed ZERO systems out of DESIGN_SYSTEMS in ${TS_REL}`);
-for (const part of tsSystems.malformed) {
-  fail('parser-rot', `DESIGN_SYSTEMS entry in ${TS_REL} is not an "id: { … }" pair: ${part}`);
-}
-if (!bootSystems.ids || !bootSystems.ids.length) {
-  fail('parser-rot', `could not locate the pre-paint "var SYSTEMS = [ … ]" allowlist in ${HTML_REL}`);
-} else if (tsSystems.ids.length) {
-  failures.push(
-    ...compareIdSets(
-      'system-parity',
-      bootSystems.ids,
-      tsSystems.ids,
-      (id) => `design system "${id}" is in the pre-paint SYSTEMS allowlist in ${HTML_REL} but not in DESIGN_SYSTEMS in ${TS_REL} — the picker can never offer it`,
-      (id) => `design system "${id}" is offered by DESIGN_SYSTEMS in ${TS_REL} but is missing from the pre-paint SYSTEMS allowlist in ${HTML_REL} — choosing it would silently reset to the fallback system on the next reload`,
-    ),
-  );
-}
+if (!tsSystems.ids.length) fail('parser-rot', `parsed ZERO systems out of THEME_FALLBACK_REGISTRY in ${TS_REL}`);
 if (!defaultSystemId) {
-  fail('parser-rot', `could not locate "export const DEFAULT_SYSTEM = …" in ${TS_REL}`);
+  fail('parser-rot', `THEME_FALLBACK_REGISTRY.defaultSystem is unavailable in ${TS_REL}`);
 } else if (tsSystems.ids.length && !tsSystems.ids.includes(defaultSystemId)) {
   fail('system-fallback', `DEFAULT_SYSTEM "${defaultSystemId}" in ${TS_REL} is not one of the DESIGN_SYSTEMS entries`);
-}
-if (!bootSystems.fallback) {
-  fail('parser-rot', `could not locate the pre-paint system fallback assignment in ${HTML_REL}`);
-} else if (defaultSystemId && bootSystems.fallback !== defaultSystemId) {
-  fail(
-    'system-fallback',
-    `${HTML_REL} falls back to design system "${bootSystems.fallback}" pre-paint but DEFAULT_SYSTEM in ${TS_REL} is "${defaultSystemId}"`,
-  );
 }
 
 // …and the paint itself: an id both lists agree on still has no LOOK until
@@ -3130,10 +3258,8 @@ if (!cssSystemSkins.length) {
 // Per-system default accents: SYSTEM_DEFAULT_ACCENT must name every design
 // system exactly once, and every accent it names must be a real ACCENTS id.
 // ---------------------------------------------------------------------------
-const tsSystemDefaultAccents = parseTsSystemDefaultAccents(tsSrc);
-
 if (!tsSystemDefaultAccents.found) {
-  fail('parser-rot', `could not locate "export const SYSTEM_DEFAULT_ACCENT … = { … };" in ${TS_REL}`);
+  fail('parser-rot', `could not derive SYSTEM_DEFAULT_ACCENT from THEME_FALLBACK_REGISTRY in ${TS_REL}`);
 } else if (!tsSystemDefaultAccents.accents.size) {
   fail('parser-rot', `parsed ZERO entries out of SYSTEM_DEFAULT_ACCENT in ${TS_REL}`);
 }
@@ -3320,10 +3446,10 @@ if (cssRootFonts?.size && tsSystems.ids.length) {
 if (failures.length) {
   for (const f of failures) console.error(`FAIL ${f.kind} :: ${f.message}`);
   console.error(`\n${failures.length} theme-drift failure(s).`);
-  console.error(`       The picker swatches (${TS_REL}), the paint (${CSS_REL}),`);
-  console.error(`       and the font stacks (${FONTS_REL}) are hand-copied mirrors of one theme`);
-  console.error('       registry — fix ALL affected sides together, and keep the pre-paint');
-  console.error(`       SYSTEMS / ACCENTS / FONT_STACKS lists in ${HTML_REL} in step.`);
+  console.error(`       Theme ids/defaults come from THEME_FALLBACK_REGISTRY in ${TS_REL};`);
+  console.error(`       ${VITE_REL} must inject its derived THEME_BOOT_DATA into ${HTML_REL}.`);
+  console.error(`       Picker swatches still mirror the paint in ${CSS_REL}, and font stacks`);
+  console.error(`       in ${FONTS_REL} still mirror the pre-paint FONT_STACKS map.`);
   console.error('       A stack is only half of a webfont: the FONT_STYLESHEETS /');
   console.error(`       SYSTEM_STYLESHEETS maps in ${FONTS_REL} are what fetch the face,`);
   console.error('       so a stylesheet fix has to land with every stack fix.');
@@ -3334,11 +3460,12 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`PASS id-parity :: ${tsAccents.size} accent(s) present in ACCENTS, :root[data-accent] blocks, and the pre-paint allowlist`);
+console.log(`PASS boot-generation :: ${tsSystems.ids.length} system id(s), ${tsAccents.size} accent id(s), and both fallbacks are generated from THEME_FALLBACK_REGISTRY into the inline pre-paint script`);
+console.log(`PASS id-parity :: ${tsAccents.size} accent(s) present in THEME_FALLBACK_REGISTRY, derived ACCENTS, and :root[data-accent] blocks`);
 for (const [id, v] of tsAccents) console.log(`       ${id.padEnd(8)} ${v.primary} / ${v.secondary}`);
 console.log(`PASS root-default :: :root paints DEFAULT_ACCENT "${defaultAccentId}" (${rootDefault.primary} / ${rootDefault.secondary})`);
 console.log(
-  `PASS system-parity :: ${tsSystems.ids.length} system(s) present in DESIGN_SYSTEMS and the pre-paint SYSTEMS allowlist — ${tsSystems.ids.join(', ')} (fallback "${defaultSystemId}")`,
+  `PASS system-parity :: ${tsSystems.ids.length} system(s) present in THEME_FALLBACK_REGISTRY and derived DESIGN_SYSTEMS — ${tsSystems.ids.join(', ')} (fallback "${defaultSystemId}")`,
 );
 console.log(
   `PASS system-paint :: ${cssSystems.size} :root[data-system="…"] token block(s) — ${[...cssSystems.keys()].join(', ')}; painted by the bare :root instead: ${[...BASE_ROOT_PAINTED_SYSTEMS.keys()].join(', ') || '(none)'}`,
@@ -3397,7 +3524,7 @@ for (const id of [...tsSystems.ids].sort()) {
   const href = systemSheets.entries.get(id);
   console.log(`       ${id.padEnd(10)} ${asked.padEnd(52)} → ${href ? parseStylesheetFamilies(href).join(' + ') : '(no stylesheet)'}`);
 }
-console.log('\nPASS accent-drift :: picker swatches, painted accent tokens, the pre-paint system/font lists, and the stylesheets that fetch those faces all agree');
+console.log('\nPASS accent-drift :: the generated pre-paint theme registry, picker swatches, painted tokens, font map, and stylesheets all agree');
 
 // ---------------------------------------------------------------------------
 // Live webfont probe — opt-in, and never from the registered gate

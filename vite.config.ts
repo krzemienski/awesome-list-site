@@ -1,6 +1,10 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import {
+  THEME_BOOT_DATA,
+  THEME_FALLBACK_REGISTRY,
+} from "./client/src/lib/design-system";
 
 const workspaceRoot = path.resolve(import.meta.dirname);
 
@@ -42,9 +46,35 @@ function bundleModuleManifest(): Plugin {
   };
 }
 
+function themeBootRegistry(): Plugin {
+  const marker = "__AWESOME_VIDEO_THEME_BOOT__";
+  const registrySystemIds = THEME_FALLBACK_REGISTRY.systems.map(({ id }) => id);
+  const registryAccentIds = THEME_FALLBACK_REGISTRY.accents.map(({ id }) => id);
+  if (
+    JSON.stringify(THEME_BOOT_DATA.systems) !== JSON.stringify(registrySystemIds) ||
+    JSON.stringify(THEME_BOOT_DATA.accents) !== JSON.stringify(registryAccentIds) ||
+    THEME_BOOT_DATA.defaultSystem !== THEME_FALLBACK_REGISTRY.defaultSystem ||
+    THEME_BOOT_DATA.defaultAccent !== THEME_FALLBACK_REGISTRY.defaultAccent
+  ) {
+    throw new Error("THEME_BOOT_DATA is stale relative to THEME_FALLBACK_REGISTRY");
+  }
+  const bootData = JSON.stringify(THEME_BOOT_DATA);
+
+  return {
+    name: "theme-boot-registry",
+    transformIndexHtml(html) {
+      if (!html.includes(marker)) {
+        throw new Error(`theme-boot-registry marker ${marker} is missing from client/index.html`);
+      }
+      return html.replaceAll(marker, bootData);
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     react(),
+    themeBootRegistry(),
     bundleModuleManifest(),
     ...(process.env.REPL_ID !== undefined
       ? [

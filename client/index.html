@@ -98,13 +98,16 @@
     <script>
       (function () {
         try {
-          var SYSTEMS = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];
-          var ACCENTS  = ['crimson', 'magenta', 'orange', 'amber', 'emerald', 'matrix', 'cyan', 'violet', 'lime', 'rose'];
+          // Vite replaces this marker from THEME_FALLBACK_REGISTRY-derived
+          // data before serving/building the HTML. Keeping the script inline
+          // preserves the current no-flash behavior without a second network
+          // request or a hand-maintained list of theme ids.
+          var THEME_BOOT = __AWESOME_VIDEO_THEME_BOOT__;
           var sys = null, acc = null;
           try { sys = localStorage.getItem('ds-system'); } catch (_) {}
           try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
-          if (SYSTEMS.indexOf(sys) === -1) sys = 'editorial';
-          if (ACCENTS.indexOf(acc)  === -1) acc = 'crimson';
+          if (THEME_BOOT.systems.indexOf(sys) === -1) sys = THEME_BOOT.defaultSystem;
+          if (THEME_BOOT.accents.indexOf(acc)  === -1) acc = THEME_BOOT.defaultAccent;
           var root = document.documentElement;
           root.setAttribute('data-system', sys);
           root.setAttribute('data-accent', acc);

@@ -1,4 +1,4 @@
-/* =====================================================================
+/* ---------------------------------------------------------------------
    AWESOME.VIDEO DESIGN SYSTEM — RUNTIME APPLIER
    Five systems × ten accents (Editorial / Terminal / Geist / Brutalist /
    Swiss × Crimson / Magenta / Orange / Amber / Emerald / Matrix / Cyan /
@@ -10,11 +10,11 @@
    only needs to toggle the two attributes on <html> and persist the
    selection to localStorage — no inline style writes, no FOUC.
 
-   The DESIGN_SYSTEMS / ACCENTS / SYSTEM_DEFAULT_ACCENT dictionaries here
-   exist purely so the picker UI at /settings/theme can render labels,
-   taglines, descriptions, and accent swatches. They mirror the handoff
-   project/design-system.js metadata verbatim.
-   ===================================================================== */
+   THEME_FALLBACK_REGISTRY is the source of truth for the picker metadata,
+   system accents, and first-visit defaults. The derived exports below keep
+   the existing picker/runtime API stable, while Vite injects the same
+   registry into the pre-paint boot script.
+   --------------------------------------------------------------------- */
 
 export interface DesignSystem {
   name: string;
@@ -29,92 +29,85 @@ export interface Accent {
   secondary: string;
 }
 
-// The five system ids are mirrored by the pre-paint SYSTEMS allowlist in
-// client/index.html — a system missing from that list is rejected before
-// React boots, so choosing it would silently reset to DEFAULT_SYSTEM on the
-// next reload. The mirror is enforced: the `accent-drift` validation gate
-// (scripts/validation/accent-drift.mjs) fails when a system id or the boot
-// fallback here and there disagree.
-// The id is only half of it: each system's LOOK is a :root[data-system="…"]
-// token block in client/src/styles/design-system.css, and the same gate fails
-// when one is missing — an id both lists agree on but nothing paints is a
-// theme that sticks and does nothing. Editorial is the documented exception:
-// the bare :root block carries its tokens, so the gate exempts it by name,
-// with a written reason.
-export const DESIGN_SYSTEMS = {
-  editorial: {
-    name: 'Editorial',
-    tag: 'Magazine · Fraunces',
-    desc: 'Refined editorial — italic Fraunces drops, warm ink, generous leading.',
-  },
-  terminal: {
-    name: 'Terminal',
-    tag: 'CRT · IBM Plex Mono',
-    desc: 'Mono-first terminal — square edges, scanlines, blinking carets.',
-  },
-  geist: {
-    name: 'Geist',
-    tag: 'Modern · Geist Sans',
-    desc: 'Vercel-clean — neutral, soft 8px radii, quiet hover glow.',
-  },
-  brutalist: {
-    name: 'Brutalist',
-    tag: 'Slab · Instrument Serif',
-    desc: 'Concrete slab — hard 2px borders, offset shadows, monumental serif.',
-  },
-  swiss: {
-    name: 'Swiss',
-    tag: 'Grid · Manrope',
-    desc: 'Tight Swiss grid — hairline rules, lining figures, clinical whitespace.',
-  },
-} as const satisfies Record<string, DesignSystem>;
+export const THEME_FALLBACK_REGISTRY = {
+  defaultSystem: 'editorial',
+  defaultAccent: 'crimson',
+  systems: [
+    {
+      id: 'editorial',
+      name: 'Editorial',
+      tag: 'Magazine · Fraunces',
+      desc: 'Refined editorial — italic Fraunces drops, warm ink, generous leading.',
+      defaultAccent: 'crimson',
+    },
+    {
+      id: 'terminal',
+      name: 'Terminal',
+      tag: 'CRT · IBM Plex Mono',
+      desc: 'Mono-first terminal — square edges, scanlines, blinking carets.',
+      defaultAccent: 'matrix',
+    },
+    {
+      id: 'geist',
+      name: 'Geist',
+      tag: 'Modern · Geist Sans',
+      desc: 'Vercel-clean — neutral, soft 8px radii, quiet hover glow.',
+      defaultAccent: 'cyan',
+    },
+    {
+      id: 'brutalist',
+      name: 'Brutalist',
+      tag: 'Slab · Instrument Serif',
+      desc: 'Concrete slab — hard 2px borders, offset shadows, monumental serif.',
+      defaultAccent: 'amber',
+    },
+    {
+      id: 'swiss',
+      name: 'Swiss',
+      tag: 'Grid · Manrope',
+      desc: 'Tight Swiss grid — hairline rules, lining figures, clinical whitespace.',
+      defaultAccent: 'orange',
+    },
+  ],
+  accents: [
+    // DS-OK: picker swatches mirror the enforced --accent token registry.
+    { id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' },
+    { id: 'magenta', name: 'Magenta', primary: '#ec4899', secondary: '#f472b6' },
+    { id: 'orange',  name: 'Orange',  primary: '#ff7a3d', secondary: '#ffb84d' },
+    { id: 'amber',   name: 'Amber',   primary: '#ffb84d', secondary: '#ffd86b' },
+    { id: 'emerald', name: 'Emerald', primary: '#34d08c', secondary: '#5ee6b8' },
+    // DS-OK: picker swatches mirror the enforced --accent token registry.
+    { id: 'matrix',  name: 'Matrix',  primary: '#00ff88', secondary: '#39ff14' },
+    { id: 'cyan',    name: 'Cyan',    primary: '#5eddf2', secondary: '#7dd3fc' },
+    { id: 'violet',  name: 'Violet',  primary: '#9d4edd', secondary: '#c77dff' },
+    { id: 'lime',    name: 'Lime',    primary: '#aaff00', secondary: '#00ff88' },
+    { id: 'rose',    name: 'Rose',    primary: '#ff7a8a', secondary: '#ffb3c1' },
+  ],
+} as const;
 
-export type DesignSystemId = keyof typeof DESIGN_SYSTEMS;
+export type DesignSystemId = (typeof THEME_FALLBACK_REGISTRY.systems)[number]['id'];
+export type AccentId = (typeof THEME_FALLBACK_REGISTRY.accents)[number]['id'];
 
-export const ACCENTS = [
-  // Swatch metadata for the /settings/theme picker, which paints all ten
-  // accents at once. Only the ACTIVE accent's --accent/--accent-2 are readable
-  // at runtime, so every accent's paint has to be inlined here, mirroring the
-  // :root[data-accent="…"] blocks in client/src/styles/design-system.css.
-  // The mirror is enforced: the `accent-drift` validation gate
-  // (scripts/validation/accent-drift.mjs) fails when an id or a value here
-  // disagrees with that stylesheet or with the pre-paint allowlist in
-  // client/index.html.
-  // DS-OK: mirrored DS accent constants — keep the two files in sync.
-  { id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' },
-  { id: 'magenta', name: 'Magenta', primary: '#ec4899', secondary: '#f472b6' },
-  { id: 'orange',  name: 'Orange',  primary: '#ff7a3d', secondary: '#ffb84d' },
-  { id: 'amber',   name: 'Amber',   primary: '#ffb84d', secondary: '#ffd86b' },
-  { id: 'emerald', name: 'Emerald', primary: '#34d08c', secondary: '#5ee6b8' },
-  // DS-OK: mirrored DS accent constants (continued — see the note above).
-  { id: 'matrix',  name: 'Matrix',  primary: '#00ff88', secondary: '#39ff14' },
-  { id: 'cyan',    name: 'Cyan',    primary: '#5eddf2', secondary: '#7dd3fc' },
-  { id: 'violet',  name: 'Violet',  primary: '#9d4edd', secondary: '#c77dff' },
-  { id: 'lime',    name: 'Lime',    primary: '#aaff00', secondary: '#00ff88' },
-  { id: 'rose',    name: 'Rose',    primary: '#ff7a8a', secondary: '#ffb3c1' },
-] as const satisfies readonly Accent[];
+export const DESIGN_SYSTEMS: Record<DesignSystemId, DesignSystem> = Object.fromEntries(
+  THEME_FALLBACK_REGISTRY.systems.map(({ id, defaultAccent: _defaultAccent, ...system }) => [id, system]),
+) as Record<DesignSystemId, DesignSystem>;
 
-export type AccentId = (typeof ACCENTS)[number]['id'];
+export const ACCENTS: Accent[] = THEME_FALLBACK_REGISTRY.accents.map((accent) => ({ ...accent }));
 
-// The accent each system is meant to arrive with. Read as
-// `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT` by applyDesignSystem() below
-// and by the theme provider, so a system with no entry here quietly keeps
-// whatever accent is already active instead of its own intended look. That is
-// enforced, not trusted: the `accent-drift` validation gate
-// (scripts/validation/accent-drift.mjs) fails when a DESIGN_SYSTEMS id has no
-// entry, when an entry names a system that no longer exists, or when an entry
-// names an accent id that is not in ACCENTS. Adding a system means adding a
-// row here too.
-export const SYSTEM_DEFAULT_ACCENT: Record<DesignSystemId, AccentId> = {
-  editorial: 'crimson',
-  terminal:  'matrix',
-  geist:     'cyan',
-  brutalist: 'amber',
-  swiss:     'orange',
-};
+export const SYSTEM_DEFAULT_ACCENT: Record<DesignSystemId, AccentId> = Object.fromEntries(
+  THEME_FALLBACK_REGISTRY.systems.map(({ id, defaultAccent }) => [id, defaultAccent]),
+) as Record<DesignSystemId, AccentId>;
 
-export const DEFAULT_SYSTEM: DesignSystemId = 'editorial';
-export const DEFAULT_ACCENT: AccentId = 'crimson';
+export const DEFAULT_SYSTEM = THEME_FALLBACK_REGISTRY.defaultSystem;
+export const DEFAULT_ACCENT = THEME_FALLBACK_REGISTRY.defaultAccent;
+
+/** Data injected by Vite into client/index.html before the first paint. */
+export const THEME_BOOT_DATA = {
+  systems: Object.keys(DESIGN_SYSTEMS),
+  accents: ACCENTS.map(({ id }) => id),
+  defaultSystem: DEFAULT_SYSTEM,
+  defaultAccent: DEFAULT_ACCENT,
+} as const;
 
 /**
  * Is this string one of the systems we actually offer?
