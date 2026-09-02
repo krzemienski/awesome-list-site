@@ -219,8 +219,8 @@ for (const w of [768, 320]) {
 }
 
 // ---- home: microtext >=12px, CTA hit-test @768 + @320, consent clearance ----
-for (const w of [768, 320]) {
-  const { ctx, page } = await newPage(w, w === 320 ? 568 : 900);
+for (const w of [768, 375, 320]) {
+  const { ctx, page } = await newPage(w, w === 375 ? 812 : w === 320 ? 568 : 900);
   await goto(page, '/');
   await page.waitForSelector('[data-testid="consent-banner"]', { timeout: 15000 }).catch(() => {});
   await page.waitForTimeout(1200);
@@ -299,6 +299,75 @@ for (const w of [768, 320]) {
     });
     log('consent-hittest@768', hit.ok, hit.why);
     await page.screenshot({ path: `${OUT}/home-consent-768.png` }).catch(() => {});
+  } else if (w === 375) {
+    // ---- consent clearance: the phone variant must remain normal flow ----
+    // At phone widths the banner is ordered before the rest of the shell and
+    // scrolls away with the document. This guards against a stray `sm:` class
+    // or breakpoint change pinning it over the footer again.
+    const consent = await page.evaluate(() => {
+      const banner = document.querySelector('[data-testid="consent-banner"]');
+      const footer = document.querySelector('footer');
+      if (!banner || !footer) return { banner: false, footer: !!footer };
+
+      const footerContainer = footer.parentElement;
+      const initial = {
+        scrollY: Math.round(window.scrollY),
+        bannerTop: Math.round(banner.getBoundingClientRect().top),
+        bannerBottom: Math.round(banner.getBoundingClientRect().bottom),
+        position: getComputedStyle(banner).position,
+      };
+      const bodyPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+      const footerPad = footerContainer
+        ? parseFloat(getComputedStyle(footerContainer).paddingBottom) || 0
+        : -1;
+      const insetRaw = getComputedStyle(document.documentElement)
+        .getPropertyValue('--app-bottom-inset')
+        .trim();
+
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
+      const footerLinks = [...footer.querySelectorAll('a')];
+      const hitTestable = footerLinks.filter((link) => {
+        const r = link.getBoundingClientRect();
+        if (r.width <= 0 || r.height <= 0 || r.top < 0 || r.bottom > window.innerHeight) return false;
+        const at = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return !!at && (at === link || link.contains(at) || at.contains(link));
+      });
+      const bottom = {
+        scrollY: Math.round(window.scrollY),
+        bannerTop: Math.round(banner.getBoundingClientRect().top),
+        bannerBottom: Math.round(banner.getBoundingClientRect().bottom),
+        footerLinks: footerLinks.length,
+        hitTestable: hitTestable.length,
+      };
+
+      return {
+        banner: true,
+        initial,
+        bottom,
+        bodyPad,
+        footerPad,
+        insetRaw,
+        insetVar: parseFloat(insetRaw) || 0,
+      };
+    });
+    const initialFlow = consent.banner &&
+      consent.initial.scrollY === 0 &&
+      consent.initial.bannerTop === 0 &&
+      consent.initial.position === 'relative';
+    const scrolledAway = consent.banner && consent.bottom.bannerBottom <= 0;
+    log('consent-inflow@375', initialFlow && scrolledAway, JSON.stringify(consent));
+    log(
+      'consent-shell-inset@375',
+      consent.banner && consent.insetRaw === '0px' && consent.insetVar === 0 &&
+        consent.bodyPad === 0 && consent.footerPad === 0,
+      `--app-bottom-inset=${consent.insetRaw} bodyPad=${consent.bodyPad} footerPad=${consent.footerPad}`,
+    );
+    log(
+      'consent-footer-hittest@375',
+      consent.banner && consent.bottom.footerLinks > 0 &&
+        consent.bottom.hitTestable === consent.bottom.footerLinks,
+      `footerLinks=${consent.bottom.footerLinks} hitTestable=${consent.bottom.hitTestable} bannerBottom=${consent.bottom.bannerBottom}`,
+    );
   }
 
   // ---- home CTA reachable (hit-test) with the banner still visible ----
