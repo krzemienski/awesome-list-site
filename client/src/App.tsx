@@ -648,6 +648,9 @@ function Router() {
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
         <Route path="/category/:slug" component={Category} />
+        <Route path="/tag">
+          <Redirect to="/categories" replace />
+        </Route>
         <Route path="/tag/:slug" component={TagLanding} />
         <Route path="/categories" component={() => (
           <Categories
