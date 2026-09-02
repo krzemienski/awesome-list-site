@@ -6,7 +6,7 @@
 #   2. migration-drift  — scripts/check-migration-drift.ts
 #   3. print-audit      — scripts/validation/print-audit.mjs      (headless Chromium)
 #   4. responsive-audit — scripts/validation/responsive-audit.mjs (headless Chromium)
-#   5. standalone-palette-drift — reasoned DS-OK markers in exports/mockups
+#   5. standalone-palette-drift — hardcoded design-value ratchet for exports/mockups
 #   6. npm run build    — the actual production build
 #   7. bundle-budget    — deterministic entry/major-route size + isolation gate
 #
@@ -100,7 +100,7 @@ else
   echo "[pre-publish] SKIP print-audit + responsive-audit — no app on :5000 (publish build container; these run as dev workflows instead)"
 fi
 
-# 5. Standalone design-system exceptions. This is source-only and safe in the
+# 5. Standalone design-system drift. This is source-only and safe in the
 # publish container: it opens no network or database connection.
 run_step standalone-palette-drift npm run validate:standalone-palette-drift
 

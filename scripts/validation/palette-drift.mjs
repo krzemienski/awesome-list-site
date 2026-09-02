@@ -82,12 +82,19 @@ import {
   hasDsOkTag,
   lineHasBareDsOkTag,
   lineHasReasonedDsOkTag,
+  PALETTE_RE,
+  STAGE5_SCANS,
+  hexLineTokens,
+  rgbLineTokens,
+  radiiLineTokens,
+  fontLineTokens,
 } from './design-system-stage5.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SRC = path.join(ROOT, 'client/src');
 const BASELINE_PATH = path.join(ROOT, 'scripts/validation/palette-drift-baseline.json');
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
+const STAGE5_PATH = path.join(ROOT, 'scripts/validation/design-system-stage5.mjs');
 const SKILL_PATH = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md');
 const UPDATE = process.argv.includes('--update-baseline');
 
@@ -98,18 +105,6 @@ const SCAN_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css',
 // Each detector returns the array of matched TOKENS on a line (one entry per
 // individual match — a line with three palette classes yields three tokens).
 // ---------------------------------------------------------------------------
-const PALETTE_RE = /\b(bg|text|border(?:-[xytrblse])?|ring|fill|stroke|from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset|inset-ring|inset-shadow)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b/g;
-const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
-// rgb()/rgba() literals. One level of nested parens is tolerated so that a
-// truncated match of rgba(var(--x), 0.4) can never smuggle the var() ref out
-// of the token; case-insensitive because CSS is. `\b` keeps color-mix(in
-// srgb, …) from matching — no word boundary between "s" and "rgb".
-const RGB_RE = /\brgba?\(\s*(?:[^()]|\([^()]*\))*\)/gi;
-const RADII_RE = /border(-radius)?:\s*\d+px|rounded-\[\d+px\]/g;
-const FONT_RE = /font-family:\s*['"]/g;
-
-const normalizeWs = (s) => s.replace(/\s+/g, ' ');
-
 // The Stage 5 instructions intentionally show the palette scan as an `rg`
 // command, while this gate uses a JavaScript RegExp. Compare their pattern
 // sources at runtime so changing one copy cannot silently leave the other
@@ -147,18 +142,18 @@ function extractDocumentedPaletteRegex(skillText) {
 
 function checkPaletteRegexParity() {
   const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
-  const scriptText = fs.readFileSync(SCRIPT_PATH, 'utf8');
+  const stage5Text = fs.readFileSync(STAGE5_PATH, 'utf8');
   const documented = extractDocumentedPaletteRegex(skillText);
-  const executableLine = scriptText.split('\n').findIndex((line) => line.includes('const PALETTE_RE =')) + 1;
+  const executableLine = stage5Text.split('\n').findIndex((line) => line.includes('const PALETTE_RE =')) + 1;
   if (executableLine === 0) {
-    throw new Error(`could not locate PALETTE_RE in ${path.relative(ROOT, SCRIPT_PATH)}`);
+    throw new Error(`could not locate PALETTE_RE in ${path.relative(ROOT, STAGE5_PATH)}`);
   }
 
   if (documented.source !== PALETTE_RE.source) {
     console.error('FAIL palette-regex-parity :: documented and executable Stage 5 palette regexes differ');
     console.error(`  documented ${path.relative(ROOT, SKILL_PATH)}:${documented.line}`);
     console.error(`    ${documented.source}`);
-    console.error(`  executable ${path.relative(ROOT, SCRIPT_PATH)}:${executableLine}`);
+    console.error(`  executable ${path.relative(ROOT, STAGE5_PATH)}:${executableLine}`);
     console.error(`    ${PALETTE_RE.source}`);
     console.error('  Update both copies together so manual and automated palette audits agree.');
     process.exit(1);
@@ -166,97 +161,18 @@ function checkPaletteRegexParity() {
 
   console.log(
     `PASS palette-regex-parity :: ${path.relative(ROOT, SKILL_PATH)}:${documented.line} matches ` +
-      `${path.relative(ROOT, SCRIPT_PATH)}:${executableLine}`,
+      `${path.relative(ROOT, STAGE5_PATH)}:${executableLine}`,
   );
 }
 
-// A raw #… token is a COLOR candidate (vs a "Task #307" issue reference)
-// when it has 6 or 8 hex digits, or 3–4 digits containing a hex letter.
-// 3–4 all-numeric tokens (#307, #4181) are issue refs, not colors.
-function hexTokenIsColor(token) {
-  const digits = token.slice(1);
-  if (digits.length === 6 || digits.length === 8) return true;
-  if ((digits.length === 3 || digits.length === 4) && /[a-fA-F]/.test(digits)) return true;
-  return false;
-}
-
-function hexLineTokens(lines, i) {
-  const tokens = [...lines[i].matchAll(HEX_RE)].map((m) => m[0]).filter(hexTokenIsColor);
-  if (!tokens.length || hasDsOkTag(lines, i)) return [];
-  return tokens.map((t) => t.toLowerCase()); // case-insensitive identity (#E50914 ≡ #e50914)
-}
-
-// rgb()/rgba() literals with the same DS-OK same-line / 5-line-lookback
-// exemption as hex. Token-derived composition — any match whose body
-// references a CSS custom property via var(--…) — is genuinely on-system
-// (the color comes FROM a token) and is whitelisted by construction rather
-// than baselined. Identity strips ALL whitespace (rgba(255, 255, 255, .5) ≡
-// rgba(255,255,255,.5)) and lowercases, so reformatting never churns the
-// baseline.
-function rgbLineTokens(lines, i) {
-  const tokens = [...lines[i].matchAll(RGB_RE)]
-    .map((m) => m[0])
-    .filter((t) => !/var\(\s*--/i.test(t));
-  if (!tokens.length || hasDsOkTag(lines, i)) return [];
-  return tokens.map((t) => t.replace(/\s+/g, '').toLowerCase());
-}
-
-// Raw radii / border px values and raw font-family strings. Same DS-OK
-// same-line / 5-line-lookback exemption as the color detectors (task #378):
-// the honest middle option for a value that legitimately cannot ride the
-// ladder, instead of excluding the whole file from the scan.
-function radiiLineTokens(lines, i) {
-  const tokens = [...lines[i].matchAll(RADII_RE)].map((m) => normalizeWs(m[0]));
-  if (!tokens.length || hasDsOkTag(lines, i)) return [];
-  return tokens;
-}
-
-function fontLineTokens(lines, i) {
-  const tokens = [...lines[i].matchAll(FONT_RE)].map((m) => normalizeWs(m[0]));
-  if (!tokens.length || hasDsOkTag(lines, i)) return [];
-  return tokens;
-}
-
-const SCANS = [
-  {
-    id: 'palette-classes',
-    label: 'raw Tailwind palette classes',
-    excludes: [],
-    lineTokens: (lines, i) => [...lines[i].matchAll(PALETTE_RE)].map((m) => m[0]),
-  },
-  {
-    id: 'hex-colors',
-    label: 'hex color literals (untagged — no reasoned DS-OK within 5 lines)',
-    excludes: [
-      'client/src/styles/design-system.css',
-      'client/src/index.css',
-      'client/src/lib/charts/palette.ts',
-    ],
-    lineTokens: hexLineTokens,
-  },
-  {
-    id: 'rgb-colors',
-    label: 'rgb()/rgba() literals (untagged, not var(--…)-composed, no reasoned DS-OK)',
-    excludes: [
-      'client/src/styles/design-system.css',
-      'client/src/index.css',
-      'client/src/lib/charts/palette.ts',
-    ],
-    lineTokens: rgbLineTokens,
-  },
-  {
-    id: 'raw-radii',
-    label: 'raw border-radius / border px values (untagged — no reasoned DS-OK within 5 lines)',
-    excludes: ['client/src/styles/design-system.css'],
-    lineTokens: radiiLineTokens,
-  },
-  {
-    id: 'font-family',
-    label: 'raw font-family strings (untagged — no reasoned DS-OK within 5 lines)',
-    excludes: ['client/src/styles/design-system.css'],
-    lineTokens: fontLineTokens,
-  },
-];
+const SCANS = STAGE5_SCANS.map((scan) => ({
+  ...scan,
+  excludes: scan.id === 'hex-colors' || scan.id === 'rgb-colors'
+    ? ['client/src/styles/design-system.css', 'client/src/index.css', 'client/src/lib/charts/palette.ts']
+    : scan.id === 'raw-radii' || scan.id === 'font-family'
+      ? ['client/src/styles/design-system.css']
+      : [],
+}));
 
 // ---------------------------------------------------------------------------
 // Detector canaries — fail loudly if any classifier stops classifying.
@@ -319,11 +235,12 @@ function runCanaries() {
   eq(radii('/* DS-OK: forced-colors block — widths must be literal */\na\nb\nc\nd\nborder: 2px solid ButtonText;', 5), [], '5-line DS-OK lookback (radii)');
   eq(radii('/* DS-OK: forced-colors block — widths must be literal */\na\nb\nc\nd\ne\nborder: 2px solid ButtonText;', 6), ['border: 2px'], 'DS-OK lookback capped at 5 lines (radii)');
 
-  eq(font("font-family: 'Inter', sans-serif"), ["font-family: '"], 'raw font-family');
+  eq(font("font-family: 'Inter', sans-serif"), ["font-family: 'inter', sans-serif"], 'raw font-family stack');
+  eq(font("font-family: 'Inter', sans-serif; font-family: 'Georgia', serif"), ["font-family: 'inter', sans-serif", "font-family: 'georgia', serif"], 'distinct font-family identities');
   eq(font('font-family: var(--font-body)'), [], 'tokenized font-family');
   eq(font("font-family: 'Courier New', monospace; /* DS-OK: literal fallback stack for the code sample */"), [], 'same-line DS-OK exempts a raw font-family');
   eq(font("/* DS-OK: standalone export document, no DS vars available */\na\nb\nc\nd\nfont-family: 'Georgia', serif;", 5), [], '5-line DS-OK lookback (font)');
-  eq(font("/* DS-OK: standalone export document, no DS vars available */\na\nb\nc\nd\ne\nfont-family: 'Georgia', serif;", 6), ["font-family: '"], 'DS-OK lookback capped at 5 lines (font)');
+  eq(font("/* DS-OK: standalone export document, no DS vars available */\na\nb\nc\nd\ne\nfont-family: 'Georgia', serif;", 6), ["font-family: 'georgia', serif"], 'DS-OK lookback capped at 5 lines (font)');
 
   // The tag is a shared helper (hasDsOkTag) — assert the classifier itself so
   // a detector wired to a private copy of the lookback shows up here.

@@ -36,7 +36,7 @@ jobs:
       env:
         VITE_STATIC_BUILD: 'true'
 
-    - name: Validate standalone design-system exceptions
+    - name: Validate standalone design-system drift
       run: npm run validate:standalone-palette-drift
         
     - name: Build React application
