@@ -1,6 +1,8 @@
 // Repeatable URL-parameter edge-case validation (guards the run27/task246 fixes).
 // Sweeps the edge URLs so a future page edit can't silently regress them:
-//   1. XSS-shaped query params are scrubbed pre-boot + a visible notice appears
+//   1. XSS-shaped query params are scrubbed pre-boot + a visible notice appears,
+//      including double-/triple-encoded payloads, while benign markup-shaped
+//      prose ("a < b > c", "javascript: the good parts") still searches normally
 //   2. /search ?page=99 clamps to the last page AND rewrites the URL
 //   3. /category ?page=999 clamps to the last page with a visible notice (strict rule)
 //   4. "Go to page" jump input clamps 0 -> 1 and 999 -> last page
@@ -104,6 +106,42 @@ const visible = (page, sel) => page.locator(sel).first().isVisible().catch(() =>
   const search = await page.evaluate(() => window.location.search);
   log('scrub:param-removed', !/onerror|%3C|</i.test(search), `location.search after boot: "${search}"`);
   await page.screenshot({ path: `${OUT}/scrub.png` }).catch(() => {});
+  await page.close();
+}
+
+// ---- 1b. False-positive guard: prose that merely LOOKS markup-shaped must
+// survive the pre-boot scrubber and run a real search (index.html scrubs only a
+// tag-open sequence, so "a < b > c" and bare "javascript:" are plain text).
+for (const [label, query] of [
+  ['colon-scheme-prose', 'javascript: the good parts'],
+  ['angle-bracket-prose', 'a < b > c'],
+]) {
+  const page = await openPage(
+    `/search?q=${encodeURIComponent(query)}`,
+    '[data-testid="text-result-count"], [data-testid="text-no-results"]',
+  );
+  const bannerVis = await visible(page, '[data-testid="banner-scrubbed-params"]');
+  const promptVis = await visible(page, '[data-testid="text-search-prompt"]');
+  const inputVal = await page.getByTestId('input-search-page').inputValue().catch(() => '');
+  const kept = new URLSearchParams(await page.evaluate(() => window.location.search)).get('q');
+  log(`scrub-benign:${label}`,
+    !bannerVis && !promptVis && kept === query && inputVal === query,
+    `banner=${bannerVis}, emptyPrompt=${promptVis}, q="${kept}", input="${inputVal}"`);
+  await page.close();
+}
+
+// ---- 1c. Recursive-decode guard: double-/triple-encoded payloads decode to a
+// tag-open sequence, so they must be scrubbed exactly like the single-encoded one.
+for (const [label, encoded] of [
+  ['double-encoded', '%253Cscript%253Ealert(1)%253C%252Fscript%253E'],
+  ['triple-encoded', '%25253Cscript%25253Ealert(1)%25253C%25252Fscript%25253E'],
+]) {
+  const page = await openPage(`/search?q=${encoded}`);
+  const bannerVis = await visible(page, '[data-testid="banner-scrubbed-params"]');
+  const search = await page.evaluate(() => window.location.search);
+  log(`scrub-encoded:${label}`,
+    bannerVis && !new URLSearchParams(search).has('q'),
+    `banner=${bannerVis}; location.search after boot: "${search}"`);
   await page.close();
 }
 
