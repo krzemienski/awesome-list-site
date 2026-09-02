@@ -95,7 +95,9 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
           <BookOpen className="h-8 w-8 shrink-0 text-primary" aria-hidden="true" />
           <div className="min-w-0">
             <h1 className="display-h break-words text-3xl sm:text-4xl">{data.name}</h1>
-            <p className="mt-2 text-muted-foreground">{description}</p>
+            {/* Task #379 (uxv1-06): unbounded prose ran the full page width on wide
+                desktop screens; max-w-prose holds it to a readable measure. */}
+            <p className="mt-2 max-w-prose text-muted-foreground">{description}</p>
           </div>
         </div>
       </header>

@@ -138,40 +138,22 @@ export default function TagLanding() {
       <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]">
         <Link href="/"><ArrowLeft className="h-4 w-4" />Back to Home</Link>
       </Button>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="display-h text-2xl sm:text-3xl">{name}</h1>
-          <p className="text-sm text-muted-foreground">{data.total} {resourceNoun(data.total)} available</p>
-        </div>
-        <Badge variant="secondary" data-testid="badge-count">{data.total}</Badge>
-      </div>
+      {/* Task #379 (uxv2-14): the tag total was stated three times — subtitle,
+          badge, and the results heading. It is now stated once, in the results
+          heading below. */}
+      <h1 className="display-h text-2xl sm:text-3xl">{name}</h1>
       <section aria-labelledby="tag-scope-heading" data-seo-section="tag-intro">
         <h2 id="tag-scope-heading" className="text-base font-semibold">About this collection</h2>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">{intro}</p>
+        {/* Task #379 (uxv1-06): max-w-prose (65ch) instead of max-w-3xl (~105ch
+            at this size) keeps the measure readable on wide desktop screens. */}
+        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{intro}</p>
       </section>
-      {(categories.length > 0 || relatedTags.length > 0) && (
-        <section className="space-y-3" aria-labelledby="related-topics-heading" data-seo-section="related-topics">
-          <h2 id="related-topics-heading" className="text-base font-semibold">Explore related topics</h2>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="inline-flex min-h-10 items-center">
-                <Badge variant="secondary" className="min-h-10 px-3">{category.value} ({category.count})</Badge>
-              </Link>
-            ))}
-            {relatedTags.map(([related, count]) => (
-              <Link key={related} href={tagLandingPath(related)} className="inline-flex min-h-10 items-center">
-                <Badge variant="outline" className="min-h-10 px-3">#{tagDisplayName(related)} ({count})</Badge>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
       {pageNoticeFor(parsedPage) && (
         <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">
           {pageNoticeFor(parsedPage)}
         </div>
       )}
-      <p className="text-sm text-muted-foreground" data-testid="text-results-count">
+      <p className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>
         Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total} {resourceNoun(data.total)}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -198,6 +180,28 @@ export default function TagLanding() {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
+      {/* Task #379 (uxv2-13): this chip wall used to sit between the intro and
+          the results, so on a 375px viewport the first screen was topics rather
+          than resources. Related topics are a "where next" affordance, so they
+          belong after the list the visitor came for. The crawler HTML in
+          server/seo-content.ts emits the same section in the same position. */}
+      {(categories.length > 0 || relatedTags.length > 0) && (
+        <section className="space-y-3" aria-labelledby="related-topics-heading" data-seo-section="related-topics">
+          <h2 id="related-topics-heading" className="text-base font-semibold">Explore related topics</h2>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <Link key={category.value} href={`/category/${slugify(category.value)}`} className="inline-flex min-h-10 items-center">
+                <Badge variant="secondary" className="min-h-10 px-3">{category.value} ({category.count})</Badge>
+              </Link>
+            ))}
+            {relatedTags.map(([related, count]) => (
+              <Link key={related} href={tagLandingPath(related)} className="inline-flex min-h-10 items-center">
+                <Badge variant="outline" className="min-h-10 px-3">#{tagDisplayName(related)} ({count})</Badge>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

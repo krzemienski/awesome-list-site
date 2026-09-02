@@ -145,7 +145,9 @@ const routes = [
   `/journey/${jid}`,
   '/journeys',
   '/submit',
-  '/theme-settings',
+  // The theme page moved to /settings/theme; the old path 404s, so sweeping it
+  // scanned a Not Found page and passed on an empty route.
+  '/settings/theme',
   '/advanced',
   `/resource/${rid}`,
 ];

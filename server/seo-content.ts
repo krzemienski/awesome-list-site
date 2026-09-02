@@ -384,8 +384,12 @@ export function renderTaxonomyContent(opts: {
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
       `<section data-seo-section="${opts.introKind ?? "taxonomy-intro"}"><h2>About this collection</h2><p>${escapeHtml(opts.intro)}</p></section>` +
       (childLinks.length ? `<h2>${childHeading}</h2>${linkList(childLinks)}` : "") +
-      (relatedLinks.length ? `<section data-seo-section="related-topics"><h2>Explore related topics</h2>${linkList(relatedLinks)}</section>` : "") +
-      (resLinks.length ? `<section data-seo-section="listing-resources"><h2>${resHeading}</h2>${linkList(resLinks)}${pager}</section>` : ""),
+      (resLinks.length ? `<section data-seo-section="listing-resources"><h2>${resHeading}</h2>${linkList(resLinks)}${pager}</section>` : "") +
+      // Task #379 (uxv2-13): related topics follow the resource list here for
+      // the same reason they do in client/src/pages/TagLanding.tsx — the chip
+      // wall used to push the actual results off the first mobile screen. Keep
+      // the two orders in lockstep so crawl and render passes agree.
+      (relatedLinks.length ? `<section data-seo-section="related-topics"><h2>Explore related topics</h2>${linkList(relatedLinks)}</section>` : ""),
   );
 }
 

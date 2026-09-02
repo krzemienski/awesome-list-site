@@ -166,7 +166,10 @@ try {
     return query.get("sortBy") === "name-asc" && !query.has("sort");
   });
   const partialTitles = await page.locator('[data-testid^="link-resource-title-"]').allTextContents();
-  const partialCount = Number(await page.locator('[data-testid="badge-count"]').textContent());
+  // Task #379: the header count badge was removed — a listing states its count
+  // once, in the results heading. `data-total` is that heading's machine-readable
+  // total, so this parity check still compares the rendered total to the API.
+  const partialCount = Number(await page.locator('[data-testid="text-results-count"]').getAttribute("data-total"));
   const partialNotice = await page.locator('[data-testid="notice-unknown-subcategory"]').textContent();
   if (
     partialCount !== invalidNestedListing.total ||

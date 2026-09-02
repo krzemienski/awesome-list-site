@@ -652,8 +652,19 @@ export default function JourneyDetail() {
                                     <ExternalLink className="h-4 w-4" />
                                   </a>
                                 </div>
+                                {/* Task #379 (uxv4-07): full descriptions turned the
+                                    mobile syllabus into a wall of prose, so a step's
+                                    resource list could not be scanned. Clamp to two
+                                    lines on small screens (the element that directly
+                                    holds the text node, or -webkit-line-clamp is a
+                                    no-op) and show the rest from ~640px up. Print is
+                                    unaffected: index.css un-clamps line-clamp-* in
+                                    the print stylesheet. */}
                                 {resource.description && (
-                                  <p className="text-xs text-muted-foreground mt-1 ml-6">
+                                  <p
+                                    className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-2 sm:line-clamp-none"
+                                    title={resource.description}
+                                  >
                                     {resource.description}
                                   </p>
                                 )}

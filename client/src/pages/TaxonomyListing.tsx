@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link, useLocation, useSearch } from "wouter";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Search } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paginator } from "@/components/ui/paginator";
@@ -428,10 +427,17 @@ export default function TaxonomyListing({ level }: Props) {
   return <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
     <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} />
     <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]"><Link href={back}><ArrowLeft className="h-4 w-4" />Back to {level === "category" ? "Home" : parentCategory?.name ?? "Category"}</Link></Button>
-    <div className="flex items-start justify-between gap-3"><div><h1 className="display-h text-2xl sm:text-3xl">{name}</h1><p className="text-sm text-muted-foreground">{total === listingData.totalAll ? `${total} ${resourceNoun(total)} available` : `${total} of ${listingData.totalAll} ${resourceNoun(listingData.totalAll)} shown`}</p></div><Badge variant="secondary" className="no-print" data-testid="badge-count">{total}</Badge></div>
+    {/* Task #379 (uxv1-07): the count used to be stated three times in a row —
+        header subtitle, header badge, and the results heading. A listing states
+        its count ONCE, in the results heading below, where the visible range and
+        the total belong together and stay correct as filters change. */}
+    <h1 className="display-h text-2xl sm:text-3xl">{name}</h1>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
       <h2 id="taxonomy-scope-heading" className="text-base font-semibold">About this collection</h2>
-      <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">{listingData.scopeIntro}</p>
+      {/* Task #379 (uxv1-06): max-w-3xl at 14px runs ~105 characters per line.
+          max-w-prose (65ch) keeps long-form prose at a readable measure on wide
+          desktop screens. */}
+      <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{listingData.scopeIntro}</p>
     </section>
     <div className="flex flex-col gap-4"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="min-h-11 rounded-md border bg-background px-3" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
@@ -442,7 +448,10 @@ export default function TaxonomyListing({ level }: Props) {
       <SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets />
       <main className="min-w-0 flex-1">
         <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
-          <div className="flex items-center justify-between gap-2"><h2 id="taxonomy-results-heading" className="text-sm font-medium text-muted-foreground" data-testid="text-results-count">Showing {total === 0 ? "0" : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, total)}`} of {total} {resourceNoun(total)}</h2><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div>
+          {/* The listing's single count statement: visible range, matching total,
+              and — only while a filter narrows the collection — what it was
+              narrowed from. */}
+          <div className="flex items-center justify-between gap-2"><h2 id="taxonomy-results-heading" className="text-sm font-medium text-muted-foreground" data-testid="text-results-count" data-total={total}>Showing {total === 0 ? "0" : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, total)}`} of {total} {resourceNoun(total)}{total !== listingData.totalAll ? ` (filtered from ${listingData.totalAll})` : ""}</h2><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div>
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 min-h-8 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 min-h-8 underline" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}

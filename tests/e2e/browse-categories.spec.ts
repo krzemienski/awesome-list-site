@@ -27,19 +27,21 @@ test.describe('Browse Categories Flow', () => {
       await expect(page.getByRole('button', { name: /Back to all categories/i })).toBeVisible();
     });
 
-    test('should display resource count badge', async ({ page }) => {
+    // Task #379: the header count badge was removed — the listing states its
+    // count once, in the results heading. Assert that single statement instead.
+    test('should state the resource count exactly once', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
       await page.waitForLoadState('domcontentloaded');
 
-      // Check for resource count badge
-      const badge = page.locator('[data-testid="badge-count"]');
-      await expect(badge).toBeVisible();
+      const heading = page.locator('[data-testid="text-results-count"]');
+      await expect(heading).toBeVisible();
+      await expect(heading).toHaveText(/of \d+ resources?/);
+      expect(Number(await heading.getAttribute('data-total'))).toBeGreaterThan(0);
 
-      // Verify badge contains a number
-      const badgeText = await badge.textContent();
-      expect(badgeText).toMatch(/\d+/);
+      // The old duplicate statements must not come back.
+      await expect(page.locator('[data-testid="badge-count"]')).toHaveCount(0);
     });
 
     test('should navigate back to home from category page', async ({ page }) => {
@@ -345,13 +347,11 @@ test.describe('Browse Categories Flow', () => {
         await subcategoryLinks.first().click();
         await page.waitForLoadState('domcontentloaded');
 
-        // Check for resource count badge
-        const badge = page.locator('[data-testid="badge-count"]');
-        await expect(badge).toBeVisible();
-
-        // Verify badge contains a number
-        const badgeText = await badge.textContent();
-        expect(badgeText).toMatch(/\d+/);
+        // Task #379: single count statement, in the results heading.
+        const heading = page.locator('[data-testid="text-results-count"]');
+        await expect(heading).toBeVisible();
+        await expect(heading).toHaveText(/of \d+ resources?/);
+        await expect(page.locator('[data-testid="badge-count"]')).toHaveCount(0);
       }
     });
   });

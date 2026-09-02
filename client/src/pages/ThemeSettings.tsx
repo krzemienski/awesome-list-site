@@ -136,6 +136,49 @@ export default function ThemeSettings() {
         </Link>
       </div>
 
+      {/* Task #379 (uxv5-03): comparing themes on a phone meant tapping a card
+          near the top and scrolling ~4,000px to the Live Preview at the bottom,
+          then scrolling back for the next one. This strip pins a miniature of
+          the same live tokens to the top of the viewport below `lg`, so the
+          effect of every tap is visible without leaving the pickers. Desktop
+          keeps the full-size preview only — it does not have the scroll problem.
+          Deliberately non-interactive: the full preview below is already
+          captioned display-only, and a sticky bar of fake controls would be a
+          second false affordance. */}
+      <div
+        // Pinned BELOW the app header, which is itself sticky at top-0 with a
+        // higher z-index and is 56px tall (60px from md). At top-0 this strip
+        // would sit underneath it and never be seen.
+        className="no-print sticky top-14 z-20 -mx-4 border-b border-[color:var(--border)] bg-[var(--surface)] px-4 py-2 sm:-mx-6 sm:px-6 md:top-[60px] lg:hidden"
+        data-testid="theme-sticky-preview"
+      >
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden
+            className="flex h-8 w-8 shrink-0 overflow-hidden rounded-[var(--radius-sm)] border border-[color:var(--border)]"
+          >
+            <span className="block h-full w-2/3 bg-[var(--accent)]" />
+            <span className="block h-full w-1/3 bg-[var(--accent-2)]" />
+          </span>
+          {/* Both lines are `font-sans` on purpose. It resolves to
+              `--font-body`, the one family BOTH pickers move: a design system
+              sets --font-body/--font-display/--font-mono, but the font
+              override sets only --font-body/--font-sans. A specimen in
+              `font-display` or `font-mono` would therefore sit unchanged while
+              the visitor taps through Inter, DM Sans, Source Sans, IBM Plex and
+              JetBrains — the exact comparison problem this strip exists to
+              solve. Do not "restore" a display face here. */}
+          <span className="min-w-0 flex-1 font-sans">
+            <span className="block truncate text-sm font-bold tracking-tight">
+              The quick brown fox <em className="text-[var(--accent)]">jumps</em>
+            </span>
+            <span className="block truncate text-[11px] uppercase tracking-wider text-[color:var(--text-3)]">
+              {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
+            </span>
+          </span>
+        </div>
+      </div>
+
       {/* System Picker — 5 cards */}
       {/* R5-027 (run24): pickers are pure interactive chrome — their option
           cards are buttons (hidden in print), which left orphan headings. */}

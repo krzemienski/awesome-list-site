@@ -164,7 +164,12 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
           // programmatically focusable, so "Skip to content" actually moves
           // keyboard focus instead of only scrolling.
           tabIndex={-1}
-          className="flex-1 min-w-0 overflow-x-hidden mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-8 focus:outline-none"
+          // Task #379: `overflow-x-hidden` computes overflow-y to `auto`, which
+          // makes <main> a scroll container that never scrolls — and that silently
+          // disables `position: sticky` for every descendant. `overflow-x-clip`
+          // clips the same content without creating a scroll container (a `clip`
+          // axis leaves the other axis `visible`), so sticky works inside routes.
+          className="flex-1 min-w-0 overflow-x-clip mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-8 focus:outline-none"
         >
           {children}
         </main>

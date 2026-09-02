@@ -52,7 +52,9 @@ export default function About() {
             About
           </h1>
         </div>
-        <p className="text-base sm:text-lg text-[color:var(--text-2)] max-w-3xl leading-relaxed">
+        {/* Task #379 (uxv1-06): max-w-prose to match every other paragraph on
+            this page and hold the lead to a readable measure on wide screens. */}
+        <p className="text-base sm:text-lg text-[color:var(--text-2)] max-w-prose leading-relaxed">
           awesome.video is the web home of{" "}
           <span className="font-semibold text-foreground">awesome-video</span> — a community-curated
           list of the best streaming and video-development tools, frameworks, libraries, and learning

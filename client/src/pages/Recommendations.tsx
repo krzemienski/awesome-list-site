@@ -48,15 +48,21 @@ export default function Recommendations() {
         noindex
       />
 
+      {/* Task #379 (uxv2-11): the page used to promise personalization to
+          everyone and only admit further down that guests get popular picks.
+          The heading and lead now describe what the visitor is actually about
+          to see. */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 sm:gap-3">
           <Sparkles className="h-6 w-6 text-[var(--accent)] shrink-0" />
           <h1 className="display-h text-2xl sm:text-3xl">
-            Personalized Recommendations
+            {isAuthenticated ? "Personalized Recommendations" : "Recommended Resources"}
           </h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)]">
-          Get personalized resource recommendations based on your interests and learning goals.
+          {isAuthenticated
+            ? "Get personalized resource recommendations based on your interests and learning goals."
+            : "Popular picks from across the catalog. Sign in to tailor them to your interests and learning goals."}
         </p>
       </div>
 
@@ -64,30 +70,13 @@ export default function Recommendations() {
         <AIRecommendationsPanel showHeader={false} />
       ) : (
         <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <LogIn className="h-5 w-5" />
-                Login to See Personalized Recommendations
-              </CardTitle>
-              <CardDescription>
-                Sign in to unlock AI-powered recommendations tailored to your skill level and interests
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
-              <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
-                <Link href="/sign-in">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Login to Get Started
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-
+          {/* Task #379 (uxv2-11): the sign-in gate used to occupy the first
+              screen, so a guest scrolled past an offer they could not take up
+              before reaching a single resource. The picks come first; the
+              sign-in card follows them as the next step. */}
           <div className="space-y-4">
             <h2 className="font-sans font-semibold text-lg sm:text-xl tracking-tight">
-              Popular picks to get you started
+              Start here
             </h2>
 
             {anonLoading ? (
@@ -131,6 +120,28 @@ export default function Recommendations() {
               </div>
             )}
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LogIn className="h-5 w-5" />
+                Sign in to personalize these picks
+              </CardTitle>
+              <CardDescription>
+                Signed-in recommendations use your skill level, topics, goals, and the
+                feedback you leave on resources.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
+              <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
+                <Link href="/sign-in">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign in
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </>
       )}
     </div>

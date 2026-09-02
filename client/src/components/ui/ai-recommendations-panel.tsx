@@ -210,6 +210,93 @@ export default function AIRecommendationsPanel({
     ? `/sign-in?redirect_url=${encodeURIComponent(currentPath)}`
     : "/sign-in";
 
+  const refreshButton = (
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={retry}
+      disabled={isLoading}
+      data-testid="button-generate-recommendations"
+    >
+      <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+      {isLoading ? "Refreshing…" : "Refresh recommendations"}
+    </Button>
+  );
+
+  /**
+   * Task #379 (uxv2-11): guests used to meet two stacked explanations of what
+   * they could not do — the header card and this one — before a single
+   * recommendation. Signed-in visitors keep it above the list, because it
+   * summarises the profile driving the results and is where they change it.
+   * Guests get a compact version after the list instead, so the useful part
+   * comes first.
+   */
+  const preferenceCard = (
+    <Card className="no-print">
+      <CardHeader>
+        <CardTitle className="text-lg">
+          {hasSavedPreferences
+            ? "Using your saved learning profile"
+            : "Using your account activity"}
+        </CardTitle>
+        <CardDescription>
+          {hasSavedPreferences
+            ? "These results use your saved topics, goals, formats, skill level, and available time."
+            : "Add learning preferences for more precise matches. Existing activity and feedback still shape your results."}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {hasSavedPreferences ? (
+          <div className="flex flex-wrap gap-2" data-testid="active-preference-summary">
+            <Badge variant="secondary">{effectiveProfile.skillLevel}</Badge>
+            {effectiveProfile.preferredCategories.map((category) => (
+              <Badge key={category} variant="outline">{category}</Badge>
+            ))}
+            {effectiveProfile.learningGoals.map((goal) => (
+              <Badge key={goal} variant="outline">
+                {goalLabels.get(goal) ?? goal}
+              </Badge>
+            ))}
+            {effectiveProfile.preferredResourceTypes.map((format) => (
+              <Badge key={format} variant="outline">
+                {formatLabels.get(format) ?? format}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Button asChild variant="outline">
+            <Link href="/settings#learning-preferences">
+              {hasSavedPreferences
+                ? "Edit learning preferences"
+                : "Choose learning preferences"}
+            </Link>
+          </Button>
+          {refreshButton}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const guestFooterCard = (
+    <Card className="no-print">
+      <CardContent className="flex flex-col gap-3 p-6 sm:flex-row sm:flex-wrap sm:items-center">
+        <p className="min-w-0 flex-1 text-sm text-muted-foreground">
+          These picks are popularity-based. Sign in to tailor them to your topics,
+          goals, and activity.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button asChild variant="outline">
+            <Link href={signInHref} data-testid="link-sign-in-personalize">
+              Sign in to personalize
+            </Link>
+          </Button>
+          {refreshButton}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
       {showHeader ? (
@@ -228,71 +315,7 @@ export default function AIRecommendationsPanel({
         </Card>
       ) : null}
 
-      <Card className="no-print">
-        <CardHeader>
-          <CardTitle className="text-lg">
-            {!isAuthenticated
-              ? "Popular across the catalog"
-              : hasSavedPreferences
-                ? "Using your saved learning profile"
-                : "Using your account activity"}
-          </CardTitle>
-          <CardDescription>
-            {!isAuthenticated
-              ? "These are popularity-based picks — not personalized. Sign in to tailor them to your topics, goals, and activity."
-              : hasSavedPreferences
-                ? "These results use your saved topics, goals, formats, skill level, and available time."
-                : "Add learning preferences for more precise matches. Existing activity and feedback still shape your results."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {hasSavedPreferences ? (
-            <div className="flex flex-wrap gap-2" data-testid="active-preference-summary">
-              <Badge variant="secondary">{effectiveProfile.skillLevel}</Badge>
-              {effectiveProfile.preferredCategories.map((category) => (
-                <Badge key={category} variant="outline">{category}</Badge>
-              ))}
-              {effectiveProfile.learningGoals.map((goal) => (
-                <Badge key={goal} variant="outline">
-                  {goalLabels.get(goal) ?? goal}
-                </Badge>
-              ))}
-              {effectiveProfile.preferredResourceTypes.map((format) => (
-                <Badge key={format} variant="outline">
-                  {formatLabels.get(format) ?? format}
-                </Badge>
-              ))}
-            </div>
-          ) : null}
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            {isAuthenticated ? (
-              <Button asChild variant="outline">
-                <Link href="/settings#learning-preferences">
-                  {hasSavedPreferences
-                    ? "Edit learning preferences"
-                    : "Choose learning preferences"}
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild variant="outline">
-                <Link href={signInHref} data-testid="link-sign-in-personalize">
-                  Sign in to personalize
-                </Link>
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={retry}
-              disabled={isLoading}
-              data-testid="button-generate-recommendations"
-            >
-              <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-              {isLoading ? "Refreshing…" : "Refresh recommendations"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {isAuthenticated ? preferenceCard : null}
 
       {hiddenStates.length > 0 ? (
         <details className="no-print rounded-lg border bg-card p-4">
@@ -461,6 +484,8 @@ export default function AIRecommendationsPanel({
           </div>
         </section>
       ) : null}
+
+      {!isAuthenticated && visibleRecommendations.length > 0 ? guestFooterCard : null}
 
       {!isLoading && !isError && recommendations.length === 0 ? (
         <Alert data-testid="no-recommendations">

@@ -246,7 +246,14 @@ const cardChecks = [
       return { pass: vis.length > 0, detail: els.length + ' card titles, ' + vis.length + ' visible in print' };`) },
   { id: 'viewdetails-hidden', fn: hiddenInPrint('[data-testid^="link-view-details-"]') },
   { id: 'favrow-hidden', fn: hiddenInPrint('.no-print.relative.z-10.flex.items-center') },
-  { id: 'badgecount-hidden', fn: hiddenInPrint('[data-testid="badge-count"]') },
+  // Task #379: the duplicate header count badge is gone, so `hiddenInPrint` on it
+  // would pass vacuously (it passes when the selector matches nothing). Assert the
+  // surviving invariant instead: exactly one count statement, and it prints.
+  { id: 'count-stated-once', fn: new Function(`
+      const els = [...document.querySelectorAll('[data-testid="text-results-count"], [data-testid="text-result-count"], [data-testid="badge-count"]')];
+      const vis = els.filter(e => { let n = e; while (n && n !== document.body) { if (getComputedStyle(n).display === 'none') return false; n = n.parentElement; } return true; });
+      const withDigits = vis.filter(e => /\\d/.test(e.textContent || ''));
+      return { pass: withDigits.length === 1, detail: els.length + ' count elements, ' + withDigits.length + ' printed: ' + withDigits.map(e => (e.textContent||'').trim().slice(0, 60)).join(' | ') };`) },
   { id: 'url-printed', fn: new Function(`
       const els = [...document.querySelectorAll('.print-only')].filter(e => getComputedStyle(e).display !== 'none' && /https?:\\/\\//.test(e.textContent));
       return { pass: els.length > 0, detail: els.length + ' visible print-only URLs, sample: ' + (els[0]?.textContent||'').slice(0,60) };`) },

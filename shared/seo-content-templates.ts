@@ -65,7 +65,20 @@ export function taxonomyScopeIntro(input: TaxonomyIntroInput): string {
   } else if (input.level === "subcategory") {
     lead = `${input.name} is a focused collection within ${parents || "video technology"}, with ${resourceCount}.`;
   } else {
-    lead = `${input.name} covers a specific part of ${parents || "video technology"} and includes ${resourceCount}.`;
+    // Task #379 (uxv1-07): a sub-subcategory has two ancestors, and joining them
+    // with `list()` produced "part of Encoding & Codecs and Codecs and includes
+    // …" — two conjunctions in a row, reading as one odd compound name. Nest the
+    // ancestors instead: the immediate parent leads, the top-level category is
+    // set off in its own clause.
+    const ancestors = [...new Set((input.parentNames ?? []).map((name) => name.trim()).filter(Boolean))];
+    const immediate = ancestors.at(-1);
+    const root = ancestors.length > 1 ? ancestors[0] : "";
+    const place = immediate
+      ? root
+        ? `${immediate}, part of ${root},`
+        : `${immediate}`
+      : "video technology";
+    lead = `${input.name} is a specific area of ${place} and includes ${resourceCount}.`;
   }
 
   const details = [

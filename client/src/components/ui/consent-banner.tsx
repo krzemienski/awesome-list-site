@@ -133,15 +133,21 @@ export default function ConsentBanner() {
     window.addEventListener("resize", applyPadding);
     return () => {
       window.removeEventListener("resize", applyPadding);
-      document.body.style.paddingBottom = "";
-      document.documentElement.style.removeProperty("--consent-banner-h");
-      const root = document.getElementById("root");
-      if (root) {
-        root.style.display = "";
-        root.style.flexDirection = "";
+      // Restore the snapshot rather than blanking: another layout feature may
+      // own one of these inline values, and "" would silently erase it.
+      document.body.style.paddingBottom = prev.bodyPaddingBottom;
+      if (prev.bannerH) {
+        document.documentElement.style.setProperty("--consent-banner-h", prev.bannerH);
+      } else {
+        document.documentElement.style.removeProperty("--consent-banner-h");
+      }
+      const rootEl = document.getElementById("root");
+      if (rootEl) {
+        rootEl.style.display = prev.rootDisplay;
+        rootEl.style.flexDirection = prev.rootFlexDirection;
       }
       const inset = document.querySelector("footer")?.parentElement;
-      if (inset instanceof HTMLElement) inset.style.paddingBottom = "";
+      if (inset instanceof HTMLElement) inset.style.paddingBottom = prev.insetPaddingBottom;
     };
   }, [choiceMade]);
 
