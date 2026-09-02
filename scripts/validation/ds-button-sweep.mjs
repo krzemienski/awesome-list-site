@@ -551,6 +551,11 @@ try {
           label: 'edit-email control',
           elements: [...root.querySelectorAll('.cl-identityPreviewEditButton')],
         },
+        {
+          expectedKey: 'formResendCodeLink',
+          label: 'resend-code control',
+          elements: [...root.querySelectorAll('.cl-formResendCodeLink')],
+        },
       ];
 
       return {
@@ -573,7 +578,9 @@ try {
           }),
           passes: elements.length > 0 && elements.every((element) => {
             const rect = element.getBoundingClientRect();
-            return rect.width >= MIN_TOUCH_TARGET && rect.height >= MIN_TOUCH_TARGET;
+            return elementKey(element) === expectedKey
+              && rect.width >= MIN_TOUCH_TARGET
+              && rect.height >= MIN_TOUCH_TARGET;
           }),
         })),
       };

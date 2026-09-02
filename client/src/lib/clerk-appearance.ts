@@ -297,6 +297,13 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
         minHeight: "40px",
         minWidth: "40px",
       },
+      formResendCodeLink: {
+        // The email-code verification link is rendered as a 16px-tall button
+        // by default; keep the full interactive surface easy to tap on phones.
+        display: "inline-flex",
+        alignItems: "center",
+        minHeight: "40px",
+      },
     },
   };
 }
