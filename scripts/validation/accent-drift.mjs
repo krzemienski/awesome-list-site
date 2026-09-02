@@ -29,6 +29,14 @@
 //        itself the source of truth)  ↔  the boot script's FONT_STACKS map +
 //        the id it falls back to, which must be the option applyFontOverride()
 //        falls back to at runtime (FONT_OPTIONS[0])
+//   7 · design-system.ts   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS.
+//        A third hand-maintained list keyed by system id: it is the accent a
+//        system is meant to arrive with. applyDesignSystem() and the theme
+//        provider both read it as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`,
+//        so a system with no entry quietly keeps whatever accent happens to be
+//        active (or falls back to the global default) instead of its own look,
+//        and an entry naming an accent that is not in ACCENTS sets a
+//        data-accent no :root[data-accent="…"] block paints
 //
 // Checks (each FAILs with the id and both sides' literal values):
 //   · id-parity      — an accent id present in only one of the accent sources
@@ -40,6 +48,10 @@
 //     SYSTEMS allowlist
 //   · system-fallback— the boot fallback system id ≠ DEFAULT_SYSTEM, or
 //     DEFAULT_SYSTEM is not one of DESIGN_SYSTEMS
+//   · system-accent-parity — a DESIGN_SYSTEMS id with no SYSTEM_DEFAULT_ACCENT
+//     entry, or an entry keyed by a system that no longer exists
+//   · system-accent-value  — a SYSTEM_DEFAULT_ACCENT entry naming an accent id
+//     that is not in ACCENTS
 //   · font-parity    — a font id in only one of FONT_OPTIONS / FONT_STACKS
 //   · font-stack     — a boot FONT_STACKS stack ≠ the FONT_OPTIONS stack, so
 //     the face applied before paint is not the one applied after it
@@ -294,6 +306,18 @@ function parseTsDefaultSystem(tsSrc) {
   return m ? m[1] : null;
 }
 
+// SYSTEM_DEFAULT_ACCENT: Record<string, string> in design-system.ts — a flat
+// `systemId: 'accentId'` map, read with the shared object walker so quoted
+// keys, bare keys, and a reformat all parse the same. A non-string value (a
+// computed default, a nested object) is reported malformed rather than
+// skipped: it is exactly the shape whose accent id cannot be verified.
+function parseTsSystemDefaultAccents(tsSrc) {
+  const m = /export\s+const\s+SYSTEM_DEFAULT_ACCENT\s*(?::[^=]*)?=\s*\{([\s\S]*?)\n\};/.exec(tsSrc);
+  if (!m) return { accents: new Map(), malformed: [], found: false };
+  const { entries, malformed } = parseObjectStringEntries(m[1]);
+  return { accents: entries, malformed, found: true };
+}
+
 // FONT_OPTIONS: FontOption[] in font-options.ts. Order is kept because
 // applyFontOverride() falls back to FONT_OPTIONS[0] for an unknown id, which
 // is the value the boot script's own fallback has to agree with. `stack` is
@@ -401,6 +425,45 @@ function compareIdSets(kind, a, b, describeOnlyInA, describeOnlyInB) {
   for (const id of [...new Set([...setA, ...setB])].sort()) {
     if (!setB.has(id)) failures.push({ kind, id, message: describeOnlyInA(id) });
     else if (!setA.has(id)) failures.push({ kind, id, message: describeOnlyInB(id) });
+  }
+  return failures;
+}
+
+// Every design system must name the accent it is meant to arrive with, and
+// that accent must exist. Both directions matter and mean different things: a
+// system with no entry silently keeps the previously active accent (or the
+// global default), while an entry keyed by a system that no longer exists is a
+// default nothing can ever apply — the next system added is the one that
+// inherits the wrong look.
+function compareSystemDefaultAccents(systemIds, defaults, accentIds) {
+  const systems = new Set(systemIds);
+  const accents = new Set(accentIds);
+  const failures = [];
+  for (const id of [...new Set([...systems, ...defaults.keys()])].sort()) {
+    const accentId = defaults.get(id);
+    if (accentId === undefined) {
+      failures.push({
+        kind: 'system-accent-parity',
+        id,
+        message: `design system "${id}" is in DESIGN_SYSTEMS in ${TS_REL} but has no SYSTEM_DEFAULT_ACCENT entry — switching to it keeps whatever accent is already active (or falls back to DEFAULT_ACCENT), so a first-time visitor never sees the accent the system was designed around`,
+      });
+      continue;
+    }
+    if (!systems.has(id)) {
+      failures.push({
+        kind: 'system-accent-parity',
+        id,
+        message: `SYSTEM_DEFAULT_ACCENT in ${TS_REL} maps design system "${id}" to accent "${accentId}", but "${id}" is not in DESIGN_SYSTEMS — a default no system can ever pick up`,
+      });
+      continue;
+    }
+    if (!accents.has(accentId)) {
+      failures.push({
+        kind: 'system-accent-value',
+        id,
+        message: `SYSTEM_DEFAULT_ACCENT in ${TS_REL} defaults design system "${id}" to accent "${accentId}", which is not one of the ACCENTS entries — it would be written to data-accent with no :root[data-accent="${accentId}"] block to paint it`,
+      });
+    }
   }
   return failures;
 }
@@ -537,6 +600,29 @@ function runCanaries() {
   eq(parseTsDesignSystems('const OTHER = {\n};').found, false, 'renamed/absent record is detectable, not an empty pass');
   eq(parseTsDefaultSystem(tsSystemSample), 'editorial', 'DEFAULT_SYSTEM parsed');
 
+  // TS SYSTEM_DEFAULT_ACCENT parser (a flat systemId → accentId map).
+  const tsSystemAccentSample = [
+    'export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {',
+    "  editorial: 'crimson',",
+    '  \'terminal\': "matrix",',
+    "  // ghost:     'violet',",
+    '  brutalist: PICKED_LATER,',
+    '};',
+  ].join('\n');
+  const parsedSystemAccents = parseTsSystemDefaultAccents(tsSystemAccentSample);
+  eq(parsedSystemAccents.found, true, 'SYSTEM_DEFAULT_ACCENT map located');
+  eq(
+    [...parsedSystemAccents.accents],
+    [['editorial', 'crimson'], ['terminal', 'matrix']],
+    'bare and quoted keys parsed, comment ignored',
+  );
+  eq(parsedSystemAccents.malformed.length, 1, 'non-string default is reported, never silently dropped');
+  eq(
+    parseTsSystemDefaultAccents('const OTHER = {\n};').found,
+    false,
+    'renamed/absent SYSTEM_DEFAULT_ACCENT map is detectable, not an empty pass',
+  );
+
   // TS FONT_OPTIONS parser.
   const tsFontSample = [
     'export const FONT_OPTIONS: FontOption[] = [',
@@ -631,6 +717,31 @@ function runCanaries() {
     compareIdSets('system-parity', ['editorial'], ['editorial', 'ghost'], onlyBoot, onlyTs).map((f) => [f.kind, f.id, f.message]),
     [['system-parity', 'ghost', 'only-ts ghost']],
     'app-only system caught, with the app-side consequence',
+  );
+
+  // Comparator — per-system default accents.
+  const someSystems = ['editorial', 'terminal'];
+  const someAccents = ['crimson', 'matrix'];
+  const goodDefaults = new Map([
+    ['editorial', 'crimson'],
+    ['terminal', 'matrix'],
+  ]);
+  eq(compareSystemDefaultAccents(someSystems, goodDefaults, someAccents), [], 'every system defaulting to a real accent passes');
+  const unmappedSystem = compareSystemDefaultAccents([...someSystems, 'swiss'], goodDefaults, someAccents);
+  eq(unmappedSystem.map((f) => [f.kind, f.id]), [['system-accent-parity', 'swiss']], 'system with no per-system default accent caught');
+  eq(/no SYSTEM_DEFAULT_ACCENT entry/.test(unmappedSystem[0].message), true, 'the unmapped-system message names the missing entry');
+  const orphanDefault = compareSystemDefaultAccents(someSystems, new Map([...goodDefaults, ['ghost', 'crimson']]), someAccents);
+  eq(orphanDefault.map((f) => [f.kind, f.id]), [['system-accent-parity', 'ghost']], 'default keyed by a system that no longer exists caught');
+  eq(/not in DESIGN_SYSTEMS/.test(orphanDefault[0].message), true, 'the orphan-entry message names the other side of the drift');
+  eq(
+    compareSystemDefaultAccents(someSystems, new Map([...goodDefaults, ['terminal', 'ghostgreen']]), someAccents).map((f) => [f.kind, f.id]),
+    [['system-accent-value', 'terminal']],
+    'default naming an accent that is not in ACCENTS caught',
+  );
+  eq(
+    compareSystemDefaultAccents(someSystems, new Map([...goodDefaults, ['terminal', '']]), someAccents).map((f) => [f.kind, f.id]),
+    [['system-accent-value', 'terminal']],
+    'an emptied default is an unknown accent, not a skip',
   );
 
   // Comparator — fonts.
@@ -780,6 +891,24 @@ if (!bootSystems.fallback) {
 }
 
 // ---------------------------------------------------------------------------
+// Per-system default accents: SYSTEM_DEFAULT_ACCENT must name every design
+// system exactly once, and every accent it names must be a real ACCENTS id.
+// ---------------------------------------------------------------------------
+const tsSystemDefaultAccents = parseTsSystemDefaultAccents(tsSrc);
+
+if (!tsSystemDefaultAccents.found) {
+  fail('parser-rot', `could not locate "export const SYSTEM_DEFAULT_ACCENT … = { … };" in ${TS_REL}`);
+} else if (!tsSystemDefaultAccents.accents.size) {
+  fail('parser-rot', `parsed ZERO entries out of SYSTEM_DEFAULT_ACCENT in ${TS_REL}`);
+}
+for (const part of tsSystemDefaultAccents.malformed) {
+  fail('parser-rot', `SYSTEM_DEFAULT_ACCENT entry in ${TS_REL} is not a "systemId: 'accentId'" pair: ${part}`);
+}
+if (tsSystems.ids.length && tsAccents.size && tsSystemDefaultAccents.accents.size) {
+  failures.push(...compareSystemDefaultAccents(tsSystems.ids, tsSystemDefaultAccents.accents, [...tsAccents.keys()]));
+}
+
+// ---------------------------------------------------------------------------
 // Fonts: FONT_OPTIONS (the declared source of truth) vs the pre-paint
 // FONT_STACKS map, ids AND stacks, plus the two fallbacks.
 // ---------------------------------------------------------------------------
@@ -826,6 +955,11 @@ for (const [id, v] of tsAccents) console.log(`       ${id.padEnd(8)} ${v.primary
 console.log(`PASS root-default :: :root paints DEFAULT_ACCENT "${defaultAccentId}" (${rootDefault.primary} / ${rootDefault.secondary})`);
 console.log(
   `PASS system-parity :: ${tsSystems.ids.length} system(s) present in DESIGN_SYSTEMS and the pre-paint SYSTEMS allowlist — ${tsSystems.ids.join(', ')} (fallback "${defaultSystemId}")`,
+);
+console.log(
+  `PASS system-accent :: every design system names a default accent that exists — ${[...tsSystemDefaultAccents.accents]
+    .map(([system, accent]) => `${system}→${accent}`)
+    .join(', ')}`,
 );
 console.log(`PASS font-parity :: ${tsFonts.fonts.size} font option(s) present in FONT_OPTIONS and the pre-paint FONT_STACKS map with identical stacks (fallback "${runtimeFontFallback}")`);
 for (const [id, stack] of tsFonts.fonts) console.log(`       ${id.padEnd(12)} ${stack === '' ? '(system default — no override)' : stack}`);

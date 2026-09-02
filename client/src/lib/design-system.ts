@@ -86,6 +86,15 @@ export const ACCENTS: Accent[] = [
   { id: 'rose',    name: 'Rose',    primary: '#ff7a8a', secondary: '#ffb3c1' },
 ];
 
+// The accent each system is meant to arrive with. Read as
+// `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT` by applyDesignSystem() below
+// and by the theme provider, so a system with no entry here quietly keeps
+// whatever accent is already active instead of its own intended look. That is
+// enforced, not trusted: the `accent-drift` validation gate
+// (scripts/validation/accent-drift.mjs) fails when a DESIGN_SYSTEMS id has no
+// entry, when an entry names a system that no longer exists, or when an entry
+// names an accent id that is not in ACCENTS. Adding a system means adding a
+// row here too.
 export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {
   editorial: 'crimson',
   terminal:  'matrix',

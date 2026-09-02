@@ -252,6 +252,15 @@ or within the 5 lines above the value):
   Stack identity is normalized only for the cosmetics CSS itself ignores
   (quote character, whitespace, comma spacing, case); a reordered or dropped
   family FAILs. Adding a system or a font means editing both files.
+- The per-system default accent map `SYSTEM_DEFAULT_ACCENT` in
+  `client/src/lib/design-system.ts` — the accent each system is meant to
+  arrive with, read as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`.
+  **Enforced, not trusted:** the same `accent-drift` gate fails when a
+  `DESIGN_SYSTEMS` id has no entry (the system then keeps whatever accent is
+  already active, so its intended look never reaches a first-time visitor),
+  when an entry is keyed by a system that no longer exists, or when an entry
+  names an accent id that is not in `ACCENTS`. Adding a system means adding
+  its default accent row too.
 - The ten accent swatches in the `ACCENTS` array of
   `client/src/lib/design-system.ts` — only the ACTIVE accent's
   `--accent`/`--accent-2` are readable at runtime, so the `/settings/theme`
