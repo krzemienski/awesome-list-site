@@ -48,16 +48,17 @@
 // so --init cannot launder regressions in the established detectors.
 //
 // DS-OK escape hatch (hex + rgb + radii + font scans, per the skill's
-// "Acceptable hardcoded values"): a line is exempt when "DS-OK" appears on
-// the SAME line or within the previous 5 lines (block-level tags like the
-// JourneyDetail celebration surface or the showcase status-constant
-// table). Task #378 extended it from the two color detectors to raw radii
-// and font-family: a value that genuinely cannot ride the token ladder (a
-// webkit scrollbar thumb, a forced-colors border) previously had no honest
-// middle option between converting it — sometimes changing how it looks —
-// and excluding the whole file, which also hides every FUTURE violation in
-// that file. A tagged line still owes a written reason next to the tag; the
-// gate does not parse the prose, the reviewer reads it.
+// "Acceptable hardcoded values"): a line is exempt when a reasoned "DS-OK"
+// tag appears on the SAME line or within the previous 5 lines (block-level
+// tags like the JourneyDetail celebration surface or the showcase
+// status-constant table). Task #378 extended it from the two color
+// detectors to raw radii and font-family: a value that genuinely cannot ride
+// the token ladder (a webkit scrollbar thumb, a forced-colors border)
+// previously had no honest middle option between converting it — sometimes
+// changing how it looks — and excluding the whole file, which also hides
+// every FUTURE violation in that file. A tagged line still owes a written
+// reason next to the tag; a bare or punctuation-only tag is reported as a
+// violation rather than silently exempting the value.
 // Only the palette-class detector has no escape hatch: a raw Tailwind
 // palette class is never the right answer, so there is nothing to justify.
 //
@@ -81,7 +82,7 @@ const BASELINE_PATH = path.join(ROOT, 'scripts/validation/palette-drift-baseline
 const UPDATE = process.argv.includes('--update-baseline');
 
 const SCAN_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.scss', '.html', '.svg', '.md']);
-const DS_OK_LOOKBACK = 5; // lines above a hex hit that a /* DS-OK: … */ tag may sit
+const DS_OK_LOOKBACK = 5; // lines above a hit that a /* DS-OK: reason */ tag may sit
 
 // ---------------------------------------------------------------------------
 // The stage-5 scans (regex literals mirror SKILL.md "How to run" verbatim).
@@ -113,14 +114,48 @@ function hexTokenIsColor(token) {
 
 // The DS-OK escape hatch, shared by EVERY value detector (hex, rgb, radii,
 // font) so the exemption rules can never drift apart between them: a hit is
-// exempt when the literal "DS-OK" appears on the same line or within the
-// previous DS_OK_LOOKBACK lines. Plain substring search — the written reason
-// travels with the tag for the reviewer, not for the gate. The lookback is a
-// hard cap: a tag N>5 lines above a hit does not reach it (so a long
-// justified block needs a tag every 5 entries).
+// exempt when a DS-OK tag with at least one non-punctuation character after
+// the marker appears on the same line or within the previous
+// DS_OK_LOOKBACK lines. The lookback is a hard cap: a tag N>5 lines above a
+// hit does not reach it (so a long justified block needs a tag every 5
+// entries). A bare or punctuation-only marker is deliberately not an
+// exemption.
+const DS_OK_RE = /DS-OK\b/g;
+
+function dsOkReasonText(line, markerStart, markerEnd) {
+  const blockStart = line.lastIndexOf('/*', markerStart);
+  const blockEndBefore = line.lastIndexOf('*/', markerStart);
+  if (blockStart > blockEndBefore) {
+    const blockEnd = line.indexOf('*/', markerEnd);
+    return line.slice(markerEnd, blockEnd === -1 ? line.length : blockEnd);
+  }
+  return line.slice(markerEnd);
+}
+
+function dsOkTagHasReason(line, markerStart, markerEnd) {
+  return /[^\p{P}\s]/u.test(dsOkReasonText(line, markerStart, markerEnd));
+}
+
+function lineHasReasonedDsOkTag(line) {
+  return [...line.matchAll(DS_OK_RE)].some((match) =>
+    dsOkTagHasReason(line, match.index, match.index + match[0].length));
+}
+
+function lineHasBareDsOkTag(line) {
+  return [...line.matchAll(DS_OK_RE)].some((match) =>
+    !dsOkTagHasReason(line, match.index, match.index + match[0].length));
+}
+
 function hasDsOkTag(lines, i) {
   for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
-    if (lines[j].includes('DS-OK')) return true;
+    if (lineHasReasonedDsOkTag(lines[j])) return true;
+  }
+  return false;
+}
+
+function hasBareDsOkTag(lines, i) {
+  for (let j = Math.max(0, i - DS_OK_LOOKBACK); j <= i; j++) {
+    if (lineHasBareDsOkTag(lines[j])) return true;
   }
   return false;
 }
@@ -171,7 +206,7 @@ const SCANS = [
   },
   {
     id: 'hex-colors',
-    label: 'hex color literals (untagged — no DS-OK within 5 lines)',
+    label: 'hex color literals (untagged — no reasoned DS-OK within 5 lines)',
     excludes: [
       'client/src/styles/design-system.css',
       'client/src/index.css',
@@ -181,7 +216,7 @@ const SCANS = [
   },
   {
     id: 'rgb-colors',
-    label: 'rgb()/rgba() literals (untagged, not var(--…)-composed)',
+    label: 'rgb()/rgba() literals (untagged, not var(--…)-composed, no reasoned DS-OK)',
     excludes: [
       'client/src/styles/design-system.css',
       'client/src/index.css',
@@ -191,13 +226,13 @@ const SCANS = [
   },
   {
     id: 'raw-radii',
-    label: 'raw border-radius / border px values (untagged — no DS-OK within 5 lines)',
+    label: 'raw border-radius / border px values (untagged — no reasoned DS-OK within 5 lines)',
     excludes: ['client/src/styles/design-system.css'],
     lineTokens: radiiLineTokens,
   },
   {
     id: 'font-family',
-    label: 'raw font-family strings (untagged — no DS-OK within 5 lines)',
+    label: 'raw font-family strings (untagged — no reasoned DS-OK within 5 lines)',
     excludes: ['client/src/styles/design-system.css'],
     lineTokens: fontLineTokens,
   },
@@ -235,8 +270,12 @@ function runCanaries() {
   eq(hex('color: "#E50914"'), ['#e50914'], '6-digit hex literal (lowercased identity)');
   eq(hex('from-[#34d08c]/10 to-[#34d08c]/5 border-[#34d08c]/30'), ['#34d08c', '#34d08c', '#34d08c'], 'three hex tokens on one line');
   eq(hex('// Task #307 — Clerk auth wiring'), [], 'issue reference is not a color');
+  eq(hex('text-[#34d08c] // DS-OK'), ['#34d08c'], 'bare same-line DS-OK does not exempt');
+  eq(hex('text-[#34d08c] // DS-OK: !!!'), ['#34d08c'], 'punctuation-only DS-OK does not exempt');
+  eq(hex('/* DS-OK */ color: #34d08c'), ['#34d08c'], 'closed bare block tag does not borrow following code as a reason');
   eq(hex('text-[#34d08c] // DS-OK: status ok'), [], 'same-line DS-OK');
   eq(hex('/* DS-OK: status constants */\na\nb\nc\nd\ncolor: #34d08c', 5), [], '5-line DS-OK lookback');
+  eq(hex('/* DS-OK */\na\nb\nc\nd\ncolor: #34d08c', 5), ['#34d08c'], 'bare 5-line DS-OK does not exempt');
   eq(hex('/* DS-OK: status constants */\na\nb\nc\nd\ne\ncolor: #34d08c', 6), ['#34d08c'], 'DS-OK lookback capped at 5 lines');
 
   eq(rgb('background: rgba(20,20,26,0.8)'), ['rgba(20,20,26,0.8)'], 'rgba literal');
@@ -271,6 +310,9 @@ function runCanaries() {
   eq(hasDsOkTag(['/* DS-OK: reason */'], 0), true, 'DS-OK helper: same line');
   eq(hasDsOkTag('/* DS-OK: reason */\na\nb\nc\nd\ne'.split('\n'), 5), true, 'DS-OK helper: 5 lines below the tag');
   eq(hasDsOkTag('/* DS-OK: reason */\na\nb\nc\nd\ne\nf'.split('\n'), 6), false, 'DS-OK helper: 6 lines below is out of reach');
+  eq(hasDsOkTag(['/* DS-OK */'], 0), false, 'DS-OK helper: bare tag has no reason');
+  eq(hasDsOkTag(['/* DS-OK: !!!'], 0), false, 'DS-OK helper: punctuation-only tag has no reason');
+  eq(hasBareDsOkTag(['/* DS-OK */'], 0), true, 'DS-OK helper: bare tag is reported');
   eq(hasDsOkTag(['plain line'], 0), false, 'DS-OK helper: untagged line');
 
   // Ratchet classifier — the same diff drives gate mode AND the shrink-only
@@ -359,7 +401,12 @@ function collect() {
       if (scan.excludes.includes(rel)) continue;
       for (let i = 0; i < lines.length; i++) {
         for (const token of scan.lineTokens(lines, i)) {
-          (hits[scan.id][rel] ??= []).push({ line: i + 1, token, text: lines[i].trim().slice(0, 160) });
+          (hits[scan.id][rel] ??= []).push({
+            line: i + 1,
+            token,
+            text: lines[i].trim().slice(0, 160),
+            missingDsOkReason: hasBareDsOkTag(lines, i),
+          });
           const perFile = (counts[scan.id][rel] ??= {});
           perFile[token] = (perFile[token] ?? 0) + 1;
         }
@@ -482,6 +529,9 @@ for (const v of increases) {
   console.error(`FAIL ${v.scanId} :: ${v.rel} — "${v.token}" ×${v.cur}, baseline allows ×${v.base} (${SCANS.find((s) => s.id === v.scanId).label})`);
   for (const hit of (hits[v.scanId]?.[v.rel] ?? []).filter((h) => h.token === v.token)) {
     console.error(`       ${v.rel}:${hit.line}: ${hit.text}`);
+    if (hit.missingDsOkReason) {
+      console.error('       DS-OK tag is missing a written reason; add text after DS-OK or remove the tag.');
+    }
   }
 }
 if (increases.length) {

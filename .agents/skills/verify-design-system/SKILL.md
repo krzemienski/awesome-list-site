@@ -200,10 +200,12 @@ rg -i '\brgba?\(' client/src \
 > demand `node scripts/validation/palette-drift.mjs --update-baseline`
 > (commit the shrunken baseline alongside), and that command itself refuses
 > to write while any count sits above the baseline, so it cannot launder new
-> violations in. Lines tagged `/* DS-OK: reason */` on the same line or
-> within the previous 5 lines are exempt, matching the "Acceptable hardcoded
-> values" list below; 3–4-digit all-numeric `#307`-style issue references
-> are ignored. All four value scans — hex, rgb/rgba, raw radii/borders and
+> violations in. Lines tagged `/* DS-OK: reason */` — with a written reason
+> after `DS-OK` — on the same line or within the previous 5 lines are exempt,
+> matching the "Acceptable hardcoded values" list below. A bare `DS-OK` tag,
+> or one followed only by punctuation/whitespace, is not an exemption and is
+> reported as a hit missing its written reason. 3–4-digit all-numeric
+> `#307`-style issue references are ignored. All four value scans — hex, rgb/rgba, raw radii/borders and
 > font-family — honor the same tag, so a value that genuinely cannot ride
 > the token ladder (a webkit scrollbar thumb, a forced-colors border, a
 > literal stack in a standalone export document) can stay put with a written
@@ -293,7 +295,9 @@ or within the 5 lines above the value):
   where converting would change how it looks.
 
 An untagged literal is a finding even if it happens to match a token value.
-If you find a `/* DS-OK: … */` comment, skip it.
+If you find a `/* DS-OK: reason */` comment with a written reason, skip the
+tagged value. A bare or punctuation-only `DS-OK` tag is still a finding and
+must be given a reason or removed.
 
 ### Suggest fixes per occurrence
 
