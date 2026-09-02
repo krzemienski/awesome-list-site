@@ -9,9 +9,8 @@
  *
  * - BUG-007: every category-tree chevron button must be ≥24×24 CSS px and
  *   the surrounding row must keep a 44-px hit area (Apple HIG). The
- *   AppSidebar.tsx source must declare `min-h-[44px]` and `min-w-[24px]`
- *   on the top-level toggle button, and inline `minHeight: 44, width: 24`
- *   on the subcategory toggle button. The design-system.css source must
+ *   AppSidebar.tsx source must declare `min-h-[44px]`, `w-10`, and `min-w-10`
+ *   on both category toggle buttons. The design-system.css source must
  *   declare `min-height: 44px` on `.accordion-header` so the row itself
  *   also meets the Apple HIG floor.
  *
@@ -43,24 +42,26 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
   const css = readFileSync(DESIGN_SYSTEM_CSS, 'utf-8');
 
   describe('BUG-007 — chevron hit area (≥24 wide × ≥44 tall)', () => {
-    it('AppSidebar top-level chevron declares min-h-[44px] and min-w-[24px]', () => {
+    it('AppSidebar top-level chevron declares a 40×44px minimum hit area', () => {
       // The top-level chevron is the toggle-cat-<slug> button.
       const toggleButtonBlock = tsx.match(
         /data-testid=\{`toggle-cat-\$\{catSlug\}`\}[\s\S]{0,400}?<\/button>/,
       );
       expect(toggleButtonBlock, 'toggle-cat button block must exist').toBeTruthy();
       expect(toggleButtonBlock![0]).toMatch(/min-h-\[44px\]/);
-      expect(toggleButtonBlock![0]).toMatch(/min-w-\[24px\]/);
+      expect(toggleButtonBlock![0]).toMatch(/\bw-10\b/);
+      expect(toggleButtonBlock![0]).toMatch(/\bmin-w-10\b/);
     });
 
-    it('AppSidebar subcategory chevron declares minHeight: 44 and width: 24', () => {
+    it('AppSidebar subcategory chevron declares a 40×44px minimum hit area', () => {
       // The subcategory chevron is the expand-sub-<slug> button.
       const expandButtonBlock = tsx.match(
         /data-testid=\{`expand-sub-\$\{subSlug\}`\}[\s\S]{0,400}?<\/button>/,
       );
       expect(expandButtonBlock, 'expand-sub button block must exist').toBeTruthy();
-      expect(expandButtonBlock![0]).toMatch(/width:\s*24/);
-      expect(expandButtonBlock![0]).toMatch(/minHeight:\s*44/);
+      expect(expandButtonBlock![0]).toMatch(/\bw-10\b/);
+      expect(expandButtonBlock![0]).toMatch(/\bmin-w-10\b/);
+      expect(expandButtonBlock![0]).toMatch(/min-h-\[44px\]/);
     });
 
     it('design-system.css declares min-height: 44px on .accordion-header', () => {

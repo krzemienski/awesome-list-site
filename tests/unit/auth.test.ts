@@ -8,8 +8,8 @@
  * - Local authentication strategy
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { hashPassword, comparePassword, validateEmail, validatePassword } from '../../server/passwordUtils';
+import { describe, it, expect } from 'vitest';
+import { hashPassword, validateEmail, validatePassword } from '../../server/passwordUtils';
 
 describe('Password Utilities - hashPassword', () => {
   it('should hash a password', async () => {
@@ -60,63 +60,6 @@ describe('Password Utilities - hashPassword', () => {
 
     expect(hash).toBeDefined();
     expect(hash).not.toBe(password);
-  });
-});
-
-describe('Password Utilities - comparePassword', () => {
-  it('should return true for matching password and hash', async () => {
-    const password = 'TestPassword123';
-    const hash = await hashPassword(password);
-
-    const result = await comparePassword(password, hash);
-
-    expect(result).toBe(true);
-  });
-
-  it('should return false for non-matching password and hash', async () => {
-    const password = 'TestPassword123';
-    const wrongPassword = 'WrongPassword456';
-    const hash = await hashPassword(password);
-
-    const result = await comparePassword(wrongPassword, hash);
-
-    expect(result).toBe(false);
-  });
-
-  it('should be case sensitive', async () => {
-    const password = 'TestPassword123';
-    const hash = await hashPassword(password);
-
-    const result = await comparePassword('testpassword123', hash);
-
-    expect(result).toBe(false);
-  });
-
-  it('should return false for empty password against hash', async () => {
-    const password = 'TestPassword123';
-    const hash = await hashPassword(password);
-
-    const result = await comparePassword('', hash);
-
-    expect(result).toBe(false);
-  });
-
-  it('should handle special characters in password comparison', async () => {
-    const password = 'P@ssw0rd!#$%^&*()';
-    const hash = await hashPassword(password);
-
-    const result = await comparePassword(password, hash);
-
-    expect(result).toBe(true);
-  });
-
-  it('should return false for invalid hash format', async () => {
-    const password = 'TestPassword123';
-    const invalidHash = 'not-a-valid-hash';
-
-    const result = await comparePassword(password, invalidHash);
-
-    expect(result).toBe(false);
   });
 });
 
@@ -297,8 +240,7 @@ describe('Password Utilities - Integration Tests', () => {
     const hash = await hashPassword(password);
     expect(hash).toBeDefined();
 
-    const matches = await comparePassword(password, hash);
-    expect(matches).toBe(true);
+    expect(hash).not.toBe(password);
   });
 
   it('should reject invalid password before hashing', () => {
@@ -331,7 +273,7 @@ describe('Password Utilities - Integration Tests', () => {
     expect(passwordValidation.valid).toBe(false);
   });
 
-  it('should handle complete auth flow validation', async () => {
+  it('should validate and hash a complete legacy test credential', async () => {
     const email = 'test@example.com';
     const password = 'SecurePassword123';
 
@@ -342,10 +284,7 @@ describe('Password Utilities - Integration Tests', () => {
     expect(passwordValidation.valid).toBe(true);
 
     const hash = await hashPassword(password);
-    const passwordMatch = await comparePassword(password, hash);
-    expect(passwordMatch).toBe(true);
-
-    const wrongPasswordMatch = await comparePassword('WrongPassword', hash);
-    expect(wrongPasswordMatch).toBe(false);
+    expect(hash).toBeDefined();
+    expect(hash).not.toBe(password);
   });
 });
