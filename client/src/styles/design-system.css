@@ -4,10 +4,11 @@
    (project/styles.css, 678 lines + project/design-systems.jsx tokens).
 
    The :root block carries Editorial+Crimson values by default so the
-   site paints pixel-perfectly with no JS. Per-system skins remain for
-   any future data-system flip — they are dead code while locked to
-   Editorial but cheap to keep, and the HANDOFF explicitly says don't
-   strip them.
+   site paints pixel-perfectly with no JS. The per-system blocks below
+   are live, not spare parts: the /settings/theme picker flips
+   data-system at runtime, so a system's block is the only thing that
+   makes it look like itself (see the PER-SYSTEM TOKEN OVERRIDES header
+   for the gate that enforces one block per offered system).
 
    Replit additions (skip-link, disabled util, lucide stroke, motion
    tokens, prefers-reduced-motion, no-anim toggle) live at the bottom.
@@ -618,6 +619,16 @@ button { font-family: inherit; }
    switch is CSS-only: the boot script in index.html sets data-system +
    data-accent before paint, so zero JS is needed to swap personalities.
    Ported verbatim from project/design-system.js (handoff bundle).
+
+   These blocks ARE the look, so every system the picker offers needs one:
+   the `accent-drift` validation gate (scripts/validation/accent-drift.mjs)
+   fails when a DESIGN_SYSTEMS id in client/src/lib/design-system.ts has no
+   block here (it would stick on <html> and paint exactly like the default),
+   and when a block here names a system the picker never offers. Editorial is
+   the one exception — the bare :root above already carries its tokens — and
+   the gate carries that as an explicit, reason-carrying entry rather than a
+   silent gap. Add a system in ALL THREE places: here, DESIGN_SYSTEMS, and
+   the pre-paint SYSTEMS allowlist in client/index.html.
    ===================================================================== */
 
 :root[data-system="terminal"] {

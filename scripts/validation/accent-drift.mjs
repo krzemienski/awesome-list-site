@@ -27,11 +27,17 @@
 //        that silently resets to the fallback on the next reload
 //   5 · design-system.ts   DESIGN_SYSTEMS + DEFAULT_SYSTEM  ↔  the boot
 //        script's SYSTEMS allowlist + its hard-coded fallback system id
-//   6 · font-options.ts    FONT_OPTIONS (id + stack; its own header calls
+//   6 · design-system.css  :root[data-system="…"] token blocks  ↔
+//        DESIGN_SYSTEMS — agreeing on an id is not the same as having a
+//        LOOK. The block IS the treatment, so a system the picker offers
+//        and the boot script accepts but the stylesheet never paints sticks
+//        on <html> and renders exactly like the default: a theme that "does
+//        nothing" rather than one that "won't stick"
+//   7 · font-options.ts    FONT_OPTIONS (id + stack; its own header calls
 //        itself the source of truth)  ↔  the boot script's FONT_STACKS map +
 //        the id it falls back to, which must be the option applyFontOverride()
 //        falls back to at runtime (FONT_OPTIONS[0])
-//   7 · design-system.ts   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS.
+//   8 · design-system.ts   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS.
 //        A third hand-maintained list keyed by system id: it is the accent a
 //        system is meant to arrive with. applyDesignSystem() and the theme
 //        provider both read it as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`,
@@ -39,13 +45,13 @@
 //        active (or falls back to the global default) instead of its own look,
 //        and an entry naming an accent that is not in ACCENTS sets a
 //        data-accent no :root[data-accent="…"] block paints
-//   8 · font-options.ts    FONT_STYLESHEETS — the map that actually DOWNLOADS
+//   9 · font-options.ts    FONT_STYLESHEETS — the map that actually DOWNLOADS
 //        the picker's webfonts  ↔  FONT_OPTIONS. A stack is only half of a
 //        webfont: an option whose stack is right but whose stylesheet entry
 //        is missing (or which downloads a family the stack never names)
 //        renders in the fallback face — the setting looks applied and the
 //        page looks unchanged, which is harder to spot than an outright reset
-//   9 · font-options.ts    SYSTEM_STYLESHEETS  ↔  design-system.ts
+//  10 · font-options.ts    SYSTEM_STYLESHEETS  ↔  design-system.ts
 //        DESIGN_SYSTEMS — the per-system display face, same failure mode: the
 //        system's CSS still NAMES its family, nothing downloads it
 //
@@ -59,6 +65,14 @@
 //     SYSTEMS allowlist
 //   · system-fallback— the boot fallback system id ≠ DEFAULT_SYSTEM, or
 //     DEFAULT_SYSTEM is not one of DESIGN_SYSTEMS
+//   · system-paint   — a DESIGN_SYSTEMS id with no :root[data-system="…"]
+//     token block, a block whose id the picker never offers (dead paint),
+//     or a block that declares no custom property at all (an empty block
+//     paints like the default just as surely as a missing one)
+//   · base-root-exemption — the "painted by the bare :root" escape hatch
+//     below went stale: an entry carrying no written reason, an entry whose
+//     system has since grown its own token block, or one naming a system
+//     DESIGN_SYSTEMS no longer offers
 //   · system-accent-parity — a DESIGN_SYSTEMS id with no SYSTEM_DEFAULT_ACCENT
 //     entry, or an entry keyed by a system that no longer exists
 //   · system-accent-value  — a SYSTEM_DEFAULT_ACCENT entry naming an accent id
@@ -126,6 +140,25 @@ const TS_REL = 'client/src/lib/design-system.ts';
 const CSS_REL = 'client/src/styles/design-system.css';
 const HTML_REL = 'client/index.html';
 const FONTS_REL = 'client/src/lib/font-options.ts';
+
+// ---------------------------------------------------------------------------
+// Escape hatch: systems intentionally painted by the BASE :root block
+// ---------------------------------------------------------------------------
+// Every offered design system owes a :root[data-system="…"] token block —
+// that block IS the look. The one honest exception is a system whose tokens
+// the bare :root block already carries, which would gain nothing from a block
+// that restates them. Such a system must be named HERE, with a written
+// reason, so the exemption is a decision on the record rather than a silent
+// gap. The table is honest in every direction: an entry with no written
+// reason is not an exemption at all, and an entry whose system has since
+// grown its own block, or that names a system DESIGN_SYSTEMS no longer
+// offers, FAILs as a stale pin so it can never outlive its reason.
+const BASE_ROOT_PAINTED_SYSTEMS = new Map([
+  [
+    'editorial',
+    `Editorial is the baseline, not an override: the bare ":root" block in ${CSS_REL} carries the Editorial token values verbatim (its own header says so), and both DEFAULT_SYSTEM and the pre-paint fallback resolve to it — a ":root[data-system=editorial]" block could only restate what already paints. Editorial's per-system COMPONENT skins do exist in that file, written as [data-system="editorial"] descendant rules.`,
+  ],
+]);
 
 // ---------------------------------------------------------------------------
 // Color identity
@@ -378,6 +411,28 @@ function parseTsDefaultSystem(tsSrc) {
   return m ? m[1] : null;
 }
 
+// :root[data-system="id"] { … } token blocks — the ~30 overrides that make a
+// system look like itself. Anchored exactly like the accent parser, so only a
+// bare attribute rule counts: the PER-SYSTEM COMPONENT SKINS further down the
+// same stylesheet are written as `[data-system="…"] .card` descendant rules,
+// which reshape individual components rather than carrying the system's
+// tokens, and a `:root[data-system="…"] .card` rule is a skin too.
+const SYSTEM_BLOCK_RE = /^[ \t]*:root\[data-system=["']([A-Za-z0-9_-]+)["']\]\s*\{([^}]*)\}/gm;
+
+function parseCssSystems(cssSrc) {
+  const src = stripComments(cssSrc);
+  const out = new Map();
+  for (const m of src.matchAll(SYSTEM_BLOCK_RE)) out.set(m[1], m[2]);
+  return out;
+}
+
+// A token block earns its keep by DECLARING something. An empty block is a
+// system that paints exactly like the default — the same defect as a missing
+// block, wearing a selector.
+function declaresCustomProperty(body) {
+  return /(?:^|[\s;{])--[\w-]+\s*:/.test(String(body ?? ''));
+}
+
 // SYSTEM_DEFAULT_ACCENT: Record<string, string> in design-system.ts — a flat
 // `systemId: 'accentId'` map, read with the shared object walker so quoted
 // keys, bare keys, and a reformat all parse the same. A non-string value (a
@@ -509,6 +564,74 @@ function compareIdSets(kind, a, b, describeOnlyInA, describeOnlyInB) {
     if (!setB.has(id)) failures.push({ kind, id, message: describeOnlyInA(id) });
     else if (!setA.has(id)) failures.push({ kind, id, message: describeOnlyInB(id) });
   }
+  return failures;
+}
+
+// DESIGN_SYSTEMS vs the :root[data-system="…"] token blocks that paint them,
+// with the documented "the bare :root already paints this one" escape hatch.
+// Separate from compareIdSets() because this parity has an exemption table,
+// and because the table itself has to be held to account.
+function compareSystemPaint(systemIds, cssBlocks, baseRootPainted) {
+  const offered = new Set(systemIds);
+  const failures = [];
+
+  // The escape hatch first: an entry only excuses a missing block while it is
+  // honest about WHY, and about still being needed.
+  for (const [id, reason] of baseRootPainted) {
+    const written = String(reason ?? '').trim();
+    if (!written) {
+      failures.push({
+        kind: 'base-root-exemption',
+        id,
+        message: `design system "${id}" is pinned in BASE_ROOT_PAINTED_SYSTEMS with no written reason — an exemption without a reason is silence with extra steps; write why the bare :root paints it or delete the entry`,
+      });
+    }
+    if (cssBlocks.has(id)) {
+      failures.push({
+        kind: 'base-root-exemption',
+        id,
+        message: `design system "${id}" is pinned in BASE_ROOT_PAINTED_SYSTEMS as painted by the bare ":root" but now HAS its own :root[data-system="${id}"] block in ${CSS_REL} — drop the stale entry (reason was: ${written || '(none)'})`,
+      });
+    } else if (!offered.has(id)) {
+      failures.push({
+        kind: 'base-root-exemption',
+        id,
+        message: `design system "${id}" is pinned in BASE_ROOT_PAINTED_SYSTEMS but DESIGN_SYSTEMS in ${TS_REL} no longer offers it — drop the stale entry (reason was: ${written || '(none)'})`,
+      });
+    }
+  }
+
+  const exempt = new Set(
+    [...baseRootPainted].filter(([, reason]) => String(reason ?? '').trim()).map(([id]) => id),
+  );
+
+  for (const id of [...new Set([...offered, ...cssBlocks.keys()])].sort()) {
+    if (!cssBlocks.has(id)) {
+      if (exempt.has(id)) continue; // documented above: the bare :root paints it
+      failures.push({
+        kind: 'system-paint',
+        id,
+        message: `design system "${id}" is offered by DESIGN_SYSTEMS in ${TS_REL} but has no :root[data-system="${id}"] block in ${CSS_REL} — the picker offers it and the attribute sticks, but the page paints exactly like the default. Add the token block, or — if the bare ":root" already paints it — add a reason-carrying entry to BASE_ROOT_PAINTED_SYSTEMS in this gate`,
+      });
+      continue;
+    }
+    if (!offered.has(id)) {
+      failures.push({
+        kind: 'system-paint',
+        id,
+        message: `${CSS_REL} has a :root[data-system="${id}"] token block but DESIGN_SYSTEMS in ${TS_REL} does not offer "${id}" — dead paint no picker choice can ever reach`,
+      });
+      continue;
+    }
+    if (!declaresCustomProperty(cssBlocks.get(id))) {
+      failures.push({
+        kind: 'system-paint',
+        id,
+        message: `design system "${id}" has a :root[data-system="${id}"] block in ${CSS_REL} that declares no custom property — an empty block paints exactly like the default`,
+      });
+    }
+  }
+
   return failures;
 }
 
@@ -779,6 +902,28 @@ function runCanaries() {
   eq(parseTsDesignSystems('const OTHER = {\n};').found, false, 'renamed/absent record is detectable, not an empty pass');
   eq(parseTsDefaultSystem(tsSystemSample), 'editorial', 'DEFAULT_SYSTEM parsed');
 
+  // CSS per-system token-block parser.
+  const cssSystemSample = [
+    ':root { --bg: #000000; --accent: #ff3d52; }',
+    ':root[data-system="terminal"] {',
+    '  --bg: #000000; --radius: 0px;',
+    '}',
+    ":root[data-system='swiss'] { --bg: #000000; --radius: 4px; }",
+    ':root[data-system="hollow"] {   }',
+    '[data-system="editorial"] .display-h em { color: var(--accent); }',
+    ':root[data-system="terminal"] .card { border-radius: 0; }',
+    '/* :root[data-system="ghost"] { --bg: #111111; } */',
+  ].join('\n');
+  const parsedCssSystems = parseCssSystems(cssSystemSample);
+  eq([...parsedCssSystems.keys()].sort(), ['hollow', 'swiss', 'terminal'], 'system token blocks parsed; component skins ignored');
+  eq(parsedCssSystems.has('editorial'), false, 'a bare [data-system="…"] descendant skin is not a token block');
+  eq(parsedCssSystems.has('ghost'), false, 'commented-out block is not live config');
+  eq(declaresCustomProperty(parsedCssSystems.get('terminal')), true, 'multi-line block declares tokens');
+  eq(declaresCustomProperty(parsedCssSystems.get('swiss')), true, 'minified single-quoted block declares tokens');
+  eq(declaresCustomProperty(parsedCssSystems.get('hollow')), false, 'an empty block declares nothing');
+  eq(declaresCustomProperty('color: var(--accent);'), false, 'a var() READ is not a token declaration');
+  eq(parseCssSystems(':root { --bg: #000000; }').size, 0, 'a stylesheet with no system blocks is detectable, not an empty pass');
+
   // TS SYSTEM_DEFAULT_ACCENT parser (a flat systemId → accentId map).
   const tsSystemAccentSample = [
     'export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {',
@@ -916,6 +1061,53 @@ function runCanaries() {
     compareIdSets('system-parity', ['editorial'], ['editorial', 'ghost'], onlyBoot, onlyTs).map((f) => [f.kind, f.id, f.message]),
     [['system-parity', 'ghost', 'only-ts ghost']],
     'app-only system caught, with the app-side consequence',
+  );
+
+  // Comparator — per-system paint, and the escape hatch that excuses one.
+  const paintedIds = ['editorial', 'terminal', 'swiss'];
+  const paintBlocks = new Map([
+    ['terminal', '--bg: #000000; --radius: 0px;'],
+    ['swiss', '--bg: #000000; --radius: 4px;'],
+  ]);
+  const baseRootExempt = new Map([['editorial', 'the bare :root carries the Editorial tokens verbatim']]);
+  eq(compareSystemPaint(paintedIds, paintBlocks, baseRootExempt), [], 'a documented base-:root system passes without its own block');
+  eq(
+    compareSystemPaint(paintedIds, paintBlocks, new Map()).map((f) => [f.kind, f.id]),
+    [['system-paint', 'editorial']],
+    'an undocumented system with no token block is caught — silence is not an exemption',
+  );
+  eq(
+    compareSystemPaint([...paintedIds, 'ghost'], paintBlocks, baseRootExempt).map((f) => [f.kind, f.id]),
+    [['system-paint', 'ghost']],
+    'a system added to DESIGN_SYSTEMS without a token block is caught',
+  );
+  eq(
+    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['ghost', '--bg: #111111;']]), baseRootExempt).map((f) => [f.kind, f.id]),
+    [['system-paint', 'ghost']],
+    'a token block for a system the picker never offers is caught',
+  );
+  eq(
+    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['swiss', '  ']]), baseRootExempt).map((f) => [f.kind, f.id]),
+    [['system-paint', 'swiss']],
+    'a block that declares nothing is caught, not counted as paint',
+  );
+  eq(
+    compareSystemPaint(paintedIds, new Map([...paintBlocks, ['editorial', '--bg: #000000;']]), baseRootExempt).map((f) => [f.kind, f.id]),
+    [['base-root-exemption', 'editorial']],
+    'an exemption whose system grew its own block is a stale pin',
+  );
+  eq(
+    compareSystemPaint(['terminal', 'swiss'], paintBlocks, baseRootExempt).map((f) => [f.kind, f.id]),
+    [['base-root-exemption', 'editorial']],
+    'an exemption naming a system DESIGN_SYSTEMS dropped is a stale pin',
+  );
+  eq(
+    compareSystemPaint(paintedIds, paintBlocks, new Map([['editorial', '   ']])).map((f) => [f.kind, f.id]),
+    [
+      ['base-root-exemption', 'editorial'],
+      ['system-paint', 'editorial'],
+    ],
+    'a reason-less entry is reported AND excuses nothing',
   );
 
   // Comparator — per-system default accents.
@@ -1116,6 +1308,7 @@ if (!boot.fallback) {
 const tsSystems = parseTsDesignSystems(tsSrc);
 const bootSystems = parseBootSystems(htmlSrc);
 const defaultSystemId = parseTsDefaultSystem(tsSrc);
+const cssSystems = parseCssSystems(cssSrc);
 
 if (!tsSystems.found) fail('parser-rot', `could not locate "export const DESIGN_SYSTEMS … = { … };" in ${TS_REL}`);
 if (!tsSystems.ids.length) fail('parser-rot', `parsed ZERO systems out of DESIGN_SYSTEMS in ${TS_REL}`);
@@ -1147,6 +1340,15 @@ if (!bootSystems.fallback) {
     'system-fallback',
     `${HTML_REL} falls back to design system "${bootSystems.fallback}" pre-paint but DEFAULT_SYSTEM in ${TS_REL} is "${defaultSystemId}"`,
   );
+}
+
+// …and the paint itself: an id both lists agree on still has no LOOK until
+// the stylesheet carries its token block (or the bare :root demonstrably
+// already paints it, which BASE_ROOT_PAINTED_SYSTEMS must say out loud).
+if (!cssSystems.size) {
+  fail('parser-rot', `parsed ZERO :root[data-system="…"] token blocks out of ${CSS_REL}`);
+} else if (tsSystems.ids.length) {
+  failures.push(...compareSystemPaint(tsSystems.ids, cssSystems, BASE_ROOT_PAINTED_SYSTEMS));
 }
 
 // ---------------------------------------------------------------------------
@@ -1255,6 +1457,9 @@ for (const [id, v] of tsAccents) console.log(`       ${id.padEnd(8)} ${v.primary
 console.log(`PASS root-default :: :root paints DEFAULT_ACCENT "${defaultAccentId}" (${rootDefault.primary} / ${rootDefault.secondary})`);
 console.log(
   `PASS system-parity :: ${tsSystems.ids.length} system(s) present in DESIGN_SYSTEMS and the pre-paint SYSTEMS allowlist — ${tsSystems.ids.join(', ')} (fallback "${defaultSystemId}")`,
+);
+console.log(
+  `PASS system-paint :: ${cssSystems.size} :root[data-system="…"] token block(s) — ${[...cssSystems.keys()].join(', ')}; painted by the bare :root instead: ${[...BASE_ROOT_PAINTED_SYSTEMS.keys()].join(', ') || '(none)'}`,
 );
 console.log(
   `PASS system-accent :: every design system names a default accent that exists — ${[...tsSystemDefaultAccents.accents]

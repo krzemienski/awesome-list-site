@@ -35,6 +35,12 @@ export interface Accent {
 // next reload. The mirror is enforced: the `accent-drift` validation gate
 // (scripts/validation/accent-drift.mjs) fails when a system id or the boot
 // fallback here and there disagree.
+// The id is only half of it: each system's LOOK is a :root[data-system="…"]
+// token block in client/src/styles/design-system.css, and the same gate fails
+// when one is missing — an id both lists agree on but nothing paints is a
+// theme that sticks and does nothing. Editorial is the documented exception:
+// the bare :root block carries its tokens, so the gate exempts it by name,
+// with a written reason.
 export const DESIGN_SYSTEMS: Record<string, DesignSystem> = {
   editorial: {
     name: 'Editorial',
