@@ -97,6 +97,10 @@
 //   · parser rot     — ANY parser finding ZERO entries is itself a failure,
 //     so a refactor that renames an array, a map, or a selector can never
 //     make this gate pass vacuously
+//   · webfont-http / webfont-empty / webfont-served-family  — OPT-IN, only
+//     under --network: a stylesheet URL that does not answer 200, answers
+//     200 with no @font-face at all, or answers 200 without declaring one of
+//     the families its own URL asks for (see the probe section below)
 //
 // The family cross-check stops at the picker fonts on purpose. A picker
 // option carries its own stack, so the URL and the families it must serve sit
@@ -106,6 +110,29 @@
 // is picker copy, not a family list ("Modern · Geist Sans" for the Geist
 // family, and Brutalist names one of its two faces) — checking ids is a claim
 // this gate can make honestly; checking families off that copy is not.
+//
+// ---------------------------------------------------------------------------
+// The live webfont probe (task #412) — OPT-IN, network, NOT part of the gate
+// ---------------------------------------------------------------------------
+// Every check above compares one file in this repo against another, so a
+// family misspelled on BOTH sides agrees with itself and passes: stack
+// "'Gesit', sans-serif" + family=Gesit is internally consistent, and Google
+// Fonts answers 400 to it while the face never arrives. Only the live
+// response can settle whether a URL serves the typeface it claims:
+//
+//   node scripts/validation/accent-drift.mjs --network   (npm run validate:webfont-fetch)
+//
+// fetches every FONT_STYLESHEETS entry, every SYSTEM_STYLESHEETS entry, and
+// every <link rel="stylesheet"> in client/index.html, and requires each to
+// answer HTTP 200 *and* declare an @font-face font-family for EVERY family
+// its own URL asks for. A 200 that quietly serves nothing (an error page, an
+// empty body, the wrong family) is a failure, not a pass.
+//
+// It is deliberately NOT registered as a validation command and NOT reached
+// by the default run: the `accent-drift` gate runs this file with no
+// arguments and stays offline, so a Google Fonts outage, an egress proxy, or
+// an air-gapped checkout can never fail an unrelated change. Run it by hand
+// after editing any font URL — the offline run prints a reminder saying so.
 //
 // Color identity is normalized before comparison: lowercased, whitespace
 // stripped, and #rgb/#rgba shorthand expanded to #rrggbb/#rrggbbaa (so #0f8
@@ -130,7 +157,12 @@
 // known-bad samples first, so a parser regression can never pass vacuously
 // either.
 //
-// Usage: node scripts/validation/accent-drift.mjs
+// Usage: node scripts/validation/accent-drift.mjs             — offline gate (what the
+//                                                               registered `accent-drift`
+//                                                               validation command runs)
+//        node scripts/validation/accent-drift.mjs --network    — offline gate + the live
+//                                                               webfont probe (opt-in;
+//                                                               reaches fonts.googleapis.com)
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -491,6 +523,26 @@ function parseBootSystems(htmlSrc) {
   return { ids, fallback: fb ? fb[1] : null };
 }
 
+// Every <link rel="stylesheet"> in the HTML shell. Only the live probe reads
+// these: the pre-paint body face is fetched by the shell itself, by neither
+// stylesheet map, so no other check in this file knows that URL exists.
+// HTML comments are stripped first (this file records its own history in
+// them, markup included), attributes are read BY NAME so order and the line
+// break between rel and href do not matter, and `&amp;` is decoded so a
+// properly escaped href still splits into its family= parameters.
+function parseHtmlStylesheetLinks(htmlSrc) {
+  const src = String(htmlSrc).replace(/<!--[\s\S]*?-->/g, '');
+  const hrefs = [];
+  for (const tag of src.matchAll(/<link\b([^>]*)>/gi)) {
+    const rel = /\brel\s*=\s*["']([^"']*)["']/i.exec(tag[1]);
+    if (!rel || rel[1].trim().toLowerCase() !== 'stylesheet') continue; // preconnect/icon/manifest
+    const href = /\bhref\s*=\s*["']([^"']*)["']/i.exec(tag[1]);
+    if (!href) continue;
+    hrefs.push(href[1].trim().replace(/&amp;/gi, '&'));
+  }
+  return hrefs;
+}
+
 // The pre-paint boot script's FONT_STACKS map (id → stack applied to
 // --font-body/--font-sans before React) + the id an unknown saved font is
 // silently rewritten to.
@@ -767,6 +819,130 @@ function compareFontStylesheets(fontStacks, sheets) {
     }
   }
   return failures;
+}
+
+// ---------------------------------------------------------------------------
+// Live webfont probe (opt-in — only reached under --network)
+// ---------------------------------------------------------------------------
+// Everything above is a repo-vs-repo comparison, so it can only catch a
+// disagreement. It cannot catch agreement on something false: a family
+// misspelled in both a stack and its URL matches itself, and the 400 that
+// comes back is invisible to an offline gate. These three helpers close that
+// hole by reading what the server actually sends.
+
+// Only /* … */ comments are stripped from a CSS response: "//" is not a
+// comment in CSS, and treating it as one would eat every src: url(https://…).
+function stripCssComments(css) {
+  return String(css).replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+// The families a stylesheet RESPONSE declares — the font-family of every
+// @font-face block in the body. `blocks` is reported separately so "served a
+// face we did not ask for" and "served no face at all" stay distinguishable:
+// an HTML error page and an empty 200 both parse to zero families, and both
+// are failures.
+function parseServedFamilies(cssBody) {
+  const src = stripCssComments(cssBody);
+  const families = new Set();
+  let blocks = 0;
+  for (const block of src.matchAll(/@font-face\s*\{([^}]*)\}/gi)) {
+    blocks++;
+    const decl = /(?:^|[\s;{])font-family\s*:\s*([^;}]+)/i.exec(block[1]);
+    if (!decl) continue;
+    const name = normalizeFamilyName(decl[1]);
+    if (name) families.add(name);
+  }
+  return { families, blocks };
+}
+
+// One probed URL vs the response it got. Split out from the fetch so the
+// canaries can drive it with the synthetic responses a live run must never
+// wave through: the 400 error page a misspelled family= earns, an empty 200,
+// and a 200 that declares a different family than the one requested.
+function compareServedFamilies(target, response) {
+  const failures = [];
+  const where = `${target.label} → ${target.href}`;
+  if (response.error || response.status !== 200) {
+    const what = response.error ? `no usable response (${response.error})` : `HTTP ${response.status}`;
+    return [
+      {
+        kind: 'webfont-http',
+        id: target.id,
+        message: `${where} answered ${what} — the file never arrives, so ${target.consequence}`,
+      },
+    ];
+  }
+  const { families: served, blocks } = parseServedFamilies(response.body);
+  if (!blocks || !served.size) {
+    const what = blocks ? `${blocks} @font-face block(s) but not one font-family` : 'no @font-face at all';
+    return [
+      {
+        kind: 'webfont-empty',
+        id: target.id,
+        message: `${where} answered HTTP 200 with ${what} (${String(response.body).length}-byte body) — a 200 that serves no face is the same silent bug as no stylesheet at all: ${target.consequence}`,
+      },
+    ];
+  }
+  const servedList = [...served].map((f) => `"${f}"`).join(', ');
+  for (const family of target.families) {
+    if (!served.has(normalizeFamilyName(family))) {
+      failures.push({
+        kind: 'webfont-served-family',
+        id: target.id,
+        message: `${where} asks for "${family}" but the response declares @font-face for ${servedList} — the requested family never arrives, so ${target.consequence}`,
+      });
+    }
+  }
+  return failures;
+}
+
+const PROBE_TIMEOUT_MS = 15000;
+const PROBE_ATTEMPTS = 3;
+const PROBE_CONCURRENCY = 4;
+// Google's css2 endpoint tailors both the file format and the @font-face
+// blocks it serves to the User-Agent, and Node's default agent gets a legacy
+// response. Ask the way a current browser asks, so what the probe verifies is
+// what a visitor is actually sent.
+const PROBE_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function fetchStylesheet(href) {
+  let error = null;
+  for (let attempt = 1; attempt <= PROBE_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(href, {
+        redirect: 'follow',
+        headers: { 'User-Agent': PROBE_UA, Accept: 'text/css,*/*;q=0.1' },
+        signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
+      });
+      const body = await res.text();
+      // A 4xx is the answer, not a hiccup — a misspelled family IS a 400, and
+      // retrying only makes the failure slower. Transport errors, 429 and 5xx
+      // are the ones worth another try, so a blip never fails the run.
+      if (res.status < 500 && res.status !== 429) return { status: res.status, body, attempts: attempt };
+      error = `HTTP ${res.status}`;
+    } catch (err) {
+      error = err?.message ?? String(err);
+    }
+    if (attempt < PROBE_ATTEMPTS) await sleep(400 * attempt);
+  }
+  return { status: null, body: '', attempts: PROBE_ATTEMPTS, error };
+}
+
+// Fetch every target, a few at a time, keeping results in target order so the
+// report reads the same on every run.
+async function fetchAllStylesheets(targets) {
+  const responses = new Array(targets.length);
+  let next = 0;
+  const worker = async () => {
+    for (let i = next++; i < targets.length; i = next++) {
+      responses[i] = await fetchStylesheet(targets[i].href);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(PROBE_CONCURRENCY, targets.length) }, worker));
+  return responses;
 }
 
 // ---------------------------------------------------------------------------
@@ -1214,11 +1390,109 @@ function runCanaries() {
     [['font-stylesheet-family', 'inter']],
     'a stylesheet whose family cannot be read fails loudly instead of being waved through',
   );
+
+  // HTML shell stylesheet links — the pre-paint face nothing else here sees.
+  const htmlLinkSample = [
+    '<link rel="preconnect" href="https://fonts.googleapis.com" />',
+    '<!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ghost&display=swap" /> -->',
+    '    <link rel="stylesheet"',
+    '           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" />',
+    '<link rel="icon" type="image/svg+xml" href="/favicon.svg" />',
+  ].join('\n');
+  const parsedLinks = parseHtmlStylesheetLinks(htmlLinkSample);
+  eq(
+    parsedLinks,
+    ['https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'],
+    'stylesheet link read across a line break; preconnect/icon skipped, commented-out link is not live markup',
+  );
+  eq(parseStylesheetFamilies(parsedLinks[0]), ['Inter'], 'an &amp;-escaped href still splits into its family= parameters');
+  eq(parseHtmlStylesheetLinks('<html><head></head></html>'), [], 'a shell with no stylesheet link is detectable, not an empty pass');
+
+  // Served-response parser — what the offline checks structurally cannot see.
+  const cssResponseSample = [
+    '/* cyrillic */',
+    "@font-face { font-family: 'Inter'; font-style: normal; src: url(https://fonts.gstatic.com/s/inter/v20/a.woff2) format('woff2'); }",
+    '@font-face {',
+    "  font-family: 'Inter';",
+    '  font-weight: 700;',
+    '}',
+    '@font-face { font-family: Instrument Serif; font-weight: 400; }',
+  ].join('\n');
+  const servedSample = parseServedFamilies(cssResponseSample);
+  eq([...servedSample.families].sort(), ['instrument serif', 'inter'], 'every @font-face family read — quoted or bare — and deduped');
+  eq(servedSample.blocks, 3, 'every @font-face block counted, multi-line included');
+  eq(
+    parseServedFamilies("@font-face { src: url(https://fonts.gstatic.com/a.woff2); }").families.size,
+    0,
+    'the "//" in a src: url() is never mistaken for a comment, and a block with no font-family names nothing',
+  );
+  eq(parseServedFamilies('/* @font-face { font-family: Ghost; } */').blocks, 0, 'a commented-out @font-face serves nothing');
+  eq(parseServedFamilies('<!DOCTYPE html><html lang=en><head><title>Error 400</title>').blocks, 0, 'an HTML error page declares no face');
+
+  // Probe comparator — every shape a live response can fail in.
+  const probeTarget = {
+    id: 'font:inter',
+    label: 'FONT_STYLESHEETS["inter"]',
+    href: 'https://fonts.googleapis.com/css2?family=Inter&display=swap',
+    families: ['Inter'],
+    consequence: 'the option paints in its fallback face',
+  };
+  eq(compareServedFamilies(probeTarget, { status: 200, body: cssResponseSample }), [], 'a 200 declaring the requested family passes');
+  eq(
+    compareServedFamilies(probeTarget, { status: 400, body: '<!DOCTYPE html><html lang=en>' }).map((f) => f.kind),
+    ['webfont-http'],
+    'the 400 a family Google does not have earns is caught — the misspelled-on-both-sides bug this probe exists for',
+  );
+  eq(
+    compareServedFamilies(probeTarget, { status: null, body: '', error: 'fetch failed' }).map((f) => f.kind),
+    ['webfont-http'],
+    'a transport failure is a failure, never a silent skip',
+  );
+  eq(
+    compareServedFamilies(probeTarget, { status: 200, body: '/* nothing at all */' }).map((f) => f.kind),
+    ['webfont-empty'],
+    'a 200 that serves no @font-face is caught',
+  );
+  eq(
+    compareServedFamilies(probeTarget, { status: 200, body: '@font-face { src: url(a.woff2); }' }).map((f) => f.kind),
+    ['webfont-empty'],
+    'a 200 whose @font-face blocks declare no family is caught',
+  );
+  eq(
+    compareServedFamilies(probeTarget, { status: 200, body: "@font-face { font-family: 'Inter Tight'; }" }).map((f) => f.kind),
+    ['webfont-served-family'],
+    'a 200 serving a DIFFERENT family is caught',
+  );
+  eq(
+    compareServedFamilies(
+      { ...probeTarget, families: ['Space Grotesk', 'Instrument Serif'] },
+      { status: 200, body: cssResponseSample },
+    ).map((f) => f.kind),
+    ['webfont-served-family'],
+    'ONE undelivered family in a multi-family URL is enough to fail',
+  );
+  eq(
+    compareServedFamilies({ ...probeTarget, families: ['inter'] }, { status: 200, body: '@font-face{font-family:INTER;}' }),
+    [],
+    'served-family matching is case- and quote-insensitive, as CSS is',
+  );
 }
 
 // ---------------------------------------------------------------------------
 // Run
 // ---------------------------------------------------------------------------
+// Argument handling is strict on purpose: a typo'd flag must never quietly
+// downgrade the run to "offline only", which reads exactly like a pass.
+const argv = process.argv.slice(2);
+const NETWORK = argv.includes('--network');
+const unknownArgs = argv.filter((a) => a !== '--network');
+if (unknownArgs.length) {
+  console.error(`FAIL usage :: unknown argument(s): ${unknownArgs.join(' ')}`);
+  console.error('       usage: node scripts/validation/accent-drift.mjs [--network]');
+  console.error('       --network adds the opt-in live webfont probe (npm run validate:webfont-fetch).');
+  process.exit(2);
+}
+
 runCanaries();
 console.log('PASS canaries :: every parser, every normalizer, and every comparator verified against known-good/known-bad samples');
 
@@ -1449,6 +1723,10 @@ if (failures.length) {
   console.error('       A stack is only half of a webfont: the FONT_STYLESHEETS /');
   console.error(`       SYSTEM_STYLESHEETS maps in ${FONTS_REL} are what fetch the face,`);
   console.error('       so a stylesheet fix has to land with every stack fix.');
+  if (NETWORK) {
+    console.error('\n       --network probe SKIPPED: there is no point asking the network about');
+    console.error('       URLs this repo already disagrees with itself about. Fix the above, rerun.');
+  }
   process.exit(1);
 }
 
@@ -1480,3 +1758,107 @@ console.log(
   `PASS system-stylesheet :: ${systemSheets.entries.size} display font(s) fetched, one per DESIGN_SYSTEMS id — ${[...systemSheets.entries.keys()].join(', ')}`,
 );
 console.log('\nPASS accent-drift :: picker swatches, painted accent tokens, the pre-paint system/font lists, and the stylesheets that fetch those faces all agree');
+
+// ---------------------------------------------------------------------------
+// Live webfont probe — opt-in, and never from the registered gate
+// ---------------------------------------------------------------------------
+// The registered `accent-drift` validation command runs this file with no
+// arguments and stops here: the validation suite stays offline, so no Google
+// Fonts outage or egress proxy can fail an unrelated change.
+if (!NETWORK) {
+  console.log('\nNOTE  the live webfont probe did NOT run (offline by default, and not registered as a gate).');
+  console.log('       Every check above compares one file in this repo against another, so a family');
+  console.log('       misspelled in BOTH a stack and its URL agrees with itself and passes here while');
+  console.log('       fonts.googleapis.com answers 400 and the face never arrives.');
+  console.log('       After editing any font URL, run:  npm run validate:webfont-fetch');
+  process.exit(0);
+}
+
+const probeFailures = [];
+const targets = [];
+
+// 1 · the pre-paint <link> in the HTML shell — fetched by the shell itself,
+//     so neither stylesheet map (nor any check above) covers it.
+const shellLinks = parseHtmlStylesheetLinks(htmlSrc);
+const shellHttpLinks = shellLinks.filter((href) => /^https?:\/\//i.test(href));
+if (!shellHttpLinks.length) {
+  probeFailures.push({
+    kind: 'parser-rot',
+    message: `found ZERO absolute <link rel="stylesheet"> hrefs in ${HTML_REL} (${shellLinks.length} stylesheet link(s) total) — either the pre-paint body face is no longer fetched before first paint, or parseHtmlStylesheetLinks() needs teaching about the new markup`,
+  });
+}
+for (const href of shellHttpLinks) {
+  targets.push({
+    id: 'html:pre-paint',
+    label: `the pre-paint <link rel="stylesheet"> in ${HTML_REL}`,
+    href,
+    families: parseStylesheetFamilies(href),
+    consequence: 'every page paints its body text in the next family of the stack instead of the primary face',
+  });
+}
+
+// 2 · the picker's per-option faces, 3 · each design system's display face.
+for (const [id, href] of fontSheets.entries) {
+  targets.push({
+    id: `font:${id}`,
+    label: `FONT_STYLESHEETS["${id}"] in ${FONTS_REL}`,
+    href,
+    families: parseStylesheetFamilies(href),
+    consequence: `choosing font option "${id}" reports the new setting and keeps rendering in the fallback face — the page just looks unchanged`,
+  });
+}
+for (const [id, href] of systemSheets.entries) {
+  targets.push({
+    id: `system:${id}`,
+    label: `SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL}`,
+    href,
+    families: parseStylesheetFamilies(href),
+    consequence: `design system "${id}" paints in the fallback of its --font-display declaration instead of its own face`,
+  });
+}
+
+// A URL naming no family is unverifiable, not agreement: there is nothing to
+// hold the response to. (FONT_STYLESHEETS already fails that offline; the
+// shell link and SYSTEM_STYLESHEETS have no such check.)
+const verifiable = [];
+for (const target of targets) {
+  if (!target.families.length) {
+    probeFailures.push({
+      kind: 'webfont-unverifiable',
+      id: target.id,
+      message: `${target.label} → ${target.href} names no family= parameter, so what it is supposed to serve cannot be checked against what it does serve — teach parseStylesheetFamilies() the new URL shape rather than leaving the entry unprobed`,
+    });
+    continue;
+  }
+  verifiable.push(target);
+}
+
+console.log(`\nPROBE webfont-fetch :: requesting ${verifiable.length} stylesheet URL(s) live (opt-in --network)`);
+const responses = await fetchAllStylesheets(verifiable);
+for (let i = 0; i < verifiable.length; i++) {
+  const target = verifiable[i];
+  const response = responses[i];
+  probeFailures.push(...compareServedFamilies(target, response));
+  const served = response.status === 200 ? parseServedFamilies(response.body) : { families: new Set(), blocks: 0 };
+  const status = response.error ? `ERR(${response.error})` : String(response.status);
+  console.log(
+    `       ${target.id.padEnd(18)} ${status.padEnd(4)} asks ${target.families.join(' + ')} · serves ${
+      served.families.size ? [...served.families].join(' + ') : '(nothing)'
+    } (${served.blocks} @font-face)`,
+  );
+}
+
+if (probeFailures.length) {
+  for (const f of probeFailures) console.error(`FAIL ${f.kind} :: ${f.message}`);
+  console.error(`\n${probeFailures.length} live webfont failure(s).`);
+  console.error(`       These URLs are what actually download the faces ${FONTS_REL} and`);
+  console.error(`       ${HTML_REL} promise. A URL that 400s, or answers 200 without the`);
+  console.error('       family it was asked for, leaves the page rendering in a fallback face with');
+  console.error('       nothing in the UI to notice — check the family spelling against');
+  console.error('       fonts.google.com before assuming the network is at fault.');
+  process.exit(1);
+}
+
+console.log(
+  `\nPASS webfont-fetch :: ${verifiable.length} stylesheet URL(s) each answered HTTP 200 and declared an @font-face for every family they request`,
+);

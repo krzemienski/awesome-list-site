@@ -20,6 +20,15 @@
  * an option whose stack is right but whose stylesheet is missing (or which
  * fetches a family the stack never names) reports the new setting and keeps
  * rendering in the fallback face, so the page just looks unchanged.
+ *
+ * That gate is offline: it can only catch the two sides DISAGREEING. A family
+ * misspelled in BOTH the stack and its URL agrees with itself and passes,
+ * while Google Fonts answers 400 and the face never arrives. After editing
+ * any URL below, run the opt-in live probe — `npm run validate:webfont-fetch`
+ * — which fetches every URL here (plus the pre-paint <link> in
+ * `client/index.html`) and requires HTTP 200 AND an @font-face declaring
+ * every family the URL asks for. It hits the network, so it is deliberately
+ * not part of the validation suite; nothing runs it for you.
  */
 export type FontOption = { id: string; name: string; stack: string };
 

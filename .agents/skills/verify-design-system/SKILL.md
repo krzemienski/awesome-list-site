@@ -252,6 +252,14 @@ or within the 5 lines above the value):
   Stack identity is normalized only for the cosmetics CSS itself ignores
   (quote character, whitespace, comma spacing, case); a reordered or dropped
   family FAILs. Adding a system or a font means editing both files.
+  That gate is **offline** — it only catches the two sides *disagreeing*, so
+  a family misspelled in both a stack and its URL passes while Google Fonts
+  answers 400. Editing a font URL? Also run the opt-in live probe
+  `npm run validate:webfont-fetch` (`accent-drift.mjs --network`): it fetches
+  every `FONT_STYLESHEETS` / `SYSTEM_STYLESHEETS` URL and the pre-paint
+  `<link>` in `client/index.html` and requires HTTP 200 **plus** an
+  `@font-face` for every family the URL asks for. It is not part of the
+  validation suite (network), so nothing runs it for you.
 - The per-system default accent map `SYSTEM_DEFAULT_ACCENT` in
   `client/src/lib/design-system.ts` — the accent each system is meant to
   arrive with, read as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`.

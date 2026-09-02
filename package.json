@@ -30,7 +30,8 @@
     "audit:sidebar": "bash scripts/audit-sidebar.sh",
     "check:awesome-bot": "bash scripts/check-awesome-bot.sh",
     "validate:cache-headers": "node scripts/validation/http-cache-headers.mjs",
-    "validate:pool": "node scripts/validation/db-pool-probe.mjs"
+    "validate:pool": "node scripts/validation/db-pool-probe.mjs",
+    "validate:webfont-fetch": "node scripts/validation/accent-drift.mjs --network"
   },
   "dependencies": {
     "@amplitude/unified": "^1.1.28",
