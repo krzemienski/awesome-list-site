@@ -90,35 +90,34 @@
 // asserted against synthetic samples first, so a detector regression can never
 // pass vacuously.
 //
+// A sibling gate, scripts/validation/dead-exports.mjs (task #374), asks the
+// same question one level down — which exported SYMBOLS inside these
+// (reachable) files nothing imports. Specifier resolution, the file walk, and
+// the checked-scope predicate are shared by both through ./module-graph.mjs so
+// the two can never disagree about where an import points.
+//
 // Usage:
 //   node scripts/validation/dead-components.mjs           # gate mode
 //   node scripts/validation/dead-components.mjs --list    # dump full graph stats
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {
+  ROOT,
+  CLIENT,
+  CLIENT_SRC,
+  SERVER,
+  SHARED,
+  CODE_EXTS,
+  SCAN_EXTS,
+  SCOPE_RELS,
+  inScope,
+  resolveCandidates,
+  resolveSpecifier,
+  walk,
+} from './module-graph.mjs';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const CLIENT = path.join(ROOT, 'client');
-const CLIENT_SRC = path.join(CLIENT, 'src');
-const SERVER = path.join(ROOT, 'server');
-const SHARED = path.join(ROOT, 'shared');
-// Checked scope (task #370): every front-end and shared module, not just
-// components/. server/ is excluded because each of its files is a root.
-const SCOPE_RELS = ['client/src/', 'shared/'];
 const ALLOWLIST_PATH = path.join(ROOT, 'scripts/validation/dead-components-allowlist.json');
 const LIST = process.argv.includes('--list');
-
-const CODE_EXTS = ['.tsx', '.ts', '.jsx', '.js', '.mjs', '.cjs'];
-const SCAN_EXTS = new Set([...CODE_EXTS, '.html']);
-
-// Is this repo-relative path (posix separators) part of the checked scope?
-// *.d.ts is exempt everywhere: ambient declarations are loaded by tsc through
-// tsconfig "include" and legitimately have no importer, so flagging them would
-// be a permanent false positive.
-function inScope(rel) {
-  if (rel.endsWith('.d.ts')) return false;
-  return SCOPE_RELS.some((prefix) => rel.startsWith(prefix));
-}
 
 // ---------------------------------------------------------------------------
 // Trusted frozen exception manifest — the 22 pre-existing dead files found at
@@ -205,57 +204,9 @@ function extractSpecifiers(content) {
 }
 
 // ---------------------------------------------------------------------------
-// Specifier resolution.
+// Graph build (specifier resolution + the file walk live in module-graph.mjs,
+// shared with the symbol-level gate).
 // ---------------------------------------------------------------------------
-function resolveCandidates(base) {
-  const out = [base];
-  // NodeNext-style specifiers point at the EMITTED .js name of a .ts source.
-  const m = base.match(/^(.*)\.(js|jsx|mjs|cjs)$/);
-  if (m) out.push(`${m[1]}.ts`, `${m[1]}.tsx`);
-  for (const ext of CODE_EXTS) out.push(base + ext);
-  for (const ext of CODE_EXTS) out.push(path.join(base, 'index' + ext));
-  return out;
-}
-
-// Returns { kind: 'file', abs } | { kind: 'external' } | { kind: 'unresolved' }
-function resolveSpecifier(spec, importerAbs, fileSet) {
-  let base = null;
-  if (spec.startsWith('./') || spec.startsWith('../')) {
-    base = path.resolve(path.dirname(importerAbs), spec);
-  } else if (spec.startsWith('@/')) {
-    base = path.join(CLIENT_SRC, spec.slice(2));
-  } else if (spec.startsWith('@shared/')) {
-    base = path.join(SHARED, spec.slice(8));
-  } else if (spec.startsWith('/src/')) {
-    base = path.join(CLIENT, spec.slice(1)); // root-relative to the vite root
-  } else {
-    return { kind: 'external' }; // bare package specifier
-  }
-  const candidates = resolveCandidates(base);
-  for (const cand of candidates) {
-    if (fileSet.has(cand)) return { kind: 'file', abs: cand };
-  }
-  // Anything that exists on disk but outside the walked graph (non-code
-  // assets like css/svg/json, or root-level files like vite.config.ts) is
-  // external — real, just not part of the component reachability question.
-  for (const cand of candidates) {
-    if (fs.existsSync(cand)) return { kind: 'external' };
-  }
-  return { kind: 'unresolved' };
-}
-
-// ---------------------------------------------------------------------------
-// Walk + graph build.
-// ---------------------------------------------------------------------------
-function* walk(dir) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) yield* walk(full);
-    else if (SCAN_EXTS.has(path.extname(entry.name))) yield full;
-  }
-}
-
 function buildGraph() {
   const files = new Set();
   for (const dir of [CLIENT, SERVER, SHARED]) {

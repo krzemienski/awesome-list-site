@@ -81,7 +81,7 @@ function toHex(channels: Channels, backdrop: Channels): string {
 /** Reads the active DS tokens off <html>. Returns only the roles that
  *  resolved, so a missing token never overwrites a Clerk default with
  *  `undefined`. */
-export function resolveDesignSystemPalette(): DesignSystemPalette {
+function resolveDesignSystemPalette(): DesignSystemPalette {
   if (typeof document === "undefined" || typeof window === "undefined") return {};
 
   const root = document.documentElement;
@@ -118,7 +118,7 @@ function samePalette(a: DesignSystemPalette, b: DesignSystemPalette): boolean {
  *  `dark` base theme supplies everything not listed here (including the
  *  on-accent ink, which it already keeps at black — the same choice the DS
  *  makes for accent CTAs). */
-export function buildClerkAppearance(palette: DesignSystemPalette, basePath: string) {
+function buildClerkAppearance(palette: DesignSystemPalette, basePath: string) {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   // The card's mark is an IMAGE URL to Clerk, not a node, so it cannot follow

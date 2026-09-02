@@ -152,9 +152,11 @@ const baseContext = (): Record<string, unknown> => {
 /**
  * Central event dispatcher. Enriches every event with standard GA4 context and
  * strips undefined/null params so payloads stay clean. All other helpers in this
- * module funnel through here.
+ * module funnel through here. Module-private on purpose: callers use the named
+ * helpers below, so exporting the raw dispatcher would be an unused surface the
+ * dead-exports gate correctly flags.
  */
-export const sendEvent = (name: string, params: Record<string, unknown> = {}) => {
+const sendEvent = (name: string, params: Record<string, unknown> = {}) => {
   if (typeof window === 'undefined') return;
   if (getAnalyticsConsent() !== 'granted') return;
   if (!window.gtag) {
@@ -408,11 +410,6 @@ export const trackResourceFavorite = (
   });
 };
 
-// Track performance metrics.
-export const trackPerformance = (metric: string, value: number) => {
-  sendEvent('performance', { metric_name: metric, value: Math.round(value) });
-};
-
 // Track API response times.
 export const trackApiPerformance = (
   endpoint: string,
@@ -426,22 +423,9 @@ export const trackApiPerformance = (
   });
 };
 
-// Track copy actions — privacy: never send the raw copied text, only type+length.
-export const trackCopyAction = (content: string, type: string) => {
-  sendEvent('copy_action', { content_type: type, content_length: content.length });
-};
-
 // Track error events.
 export const trackError = (errorType: string, errorMessage: string) => {
   sendEvent('error', { error_type: errorType, error_message: errorMessage });
-};
-
-export const trackListSwitch = (fromList: string, toList: string) => {
-  trackEvent('list_switch', 'navigation', `${fromList} -> ${toList}`);
-};
-
-export const trackLayoutChange = (layout: string) => {
-  trackEvent('layout_change', 'ui_interaction', layout);
 };
 
 export const trackFilterUsage = (
@@ -472,37 +456,6 @@ export const trackSortChange = (sortType: string, surface = 'unknown', resultCou
   mpTrack('sort_changed', properties);
 };
 
-export const trackPopoverView = (resourceTitle: string, category: string) => {
-  trackEvent('resource_preview', 'engagement', `${category}: ${resourceTitle}`);
-};
-
-export const trackMobileInteraction = (action: string, element: string) => {
-  trackEvent('mobile_interaction', 'touch', `${action}: ${element}`);
-};
-
-export const trackEngagementTime = (timeSpent: number, page: string) => {
-  sendEvent('engagement_time', {
-    page_path: page,
-    engagement_time_msec: Math.round(timeSpent),
-  });
-};
-
-export const trackScrollDepth = (percentage: number, page: string) => {
-  sendEvent('scroll_depth', { page_path: page, percent_scrolled: percentage });
-};
-
-export const trackShareAction = (method: string, resource: string) => {
-  trackEvent('share_action', 'engagement', `${method}: ${resource}`);
-};
-
-export const trackKeyboardShortcut = (shortcut: string, action: string) => {
-  trackEvent('keyboard_shortcut', 'power_user', `${shortcut}: ${action}`);
-};
-
-export const trackExportAction = (format: string, itemCount: number) => {
-  trackEvent('export_action', 'data_export', format, itemCount);
-};
-
 export const trackTagInteraction = (tag: string, action: string, surface = 'unknown', resultCount?: number) => {
   const properties = {
     tag,
@@ -513,20 +466,6 @@ export const trackTagInteraction = (tag: string, action: string, surface = 'unkn
   };
   sendEvent('tag_interaction', properties);
   mpTrack('tag_interaction', properties);
-};
-
-export const trackSessionQuality = (metrics: {
-  resourcesViewed: number;
-  searchesPerformed: number;
-  timeSpent: number;
-  categoriesExplored: number;
-}) => {
-  sendEvent('session_quality', {
-    resources_viewed: metrics.resourcesViewed,
-    searches_performed: metrics.searchesPerformed,
-    time_spent_sec: Math.round(metrics.timeSpent / 1000),
-    categories_explored: metrics.categoriesExplored,
-  });
 };
 
 export const trackAuthPromptShown = (

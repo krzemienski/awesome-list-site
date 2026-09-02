@@ -1,0 +1,555 @@
+{
+  "_comment": "Pinned exceptions for scripts/validation/dead-exports.mjs (task #374). Every entry is an exported symbol under client/src/ or shared/ that NO other module imports — pre-existing findings from when the symbol-level gate was introduced. This list is MECHANICALLY shrink-only: the gate carries a frozen manifest of exactly these file#symbol keys and fails on any entry outside it, so adding or substituting entries here does nothing but fail the gate (allowlist-growth). The only allowed edit is REMOVING an entry together with resolving its export (delete it, drop the `export` keyword, or wire it up); stale pins (symbol imported again, or gone with the entry left behind) also fail. The analytics helpers this gate was filed over are NOT pinned — they were deleted, which is what every new finding must do.",
+  "exceptions": [
+    {
+      "file": "client/src/components/ui/alert-dialog.tsx",
+      "symbol": "AlertDialogOverlay",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/alert-dialog.tsx",
+      "symbol": "AlertDialogPortal",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/badge.tsx",
+      "symbol": "badgeVariants",
+      "reason": "vendored shadcn/ui variant factory — exported by the generated component"
+    },
+    {
+      "file": "client/src/components/ui/breadcrumb.tsx",
+      "symbol": "BreadcrumbEllipsis",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/command.tsx",
+      "symbol": "CommandDialog",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/command.tsx",
+      "symbol": "CommandEmpty",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/command.tsx",
+      "symbol": "CommandSeparator",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/command.tsx",
+      "symbol": "CommandShortcut",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/consent-banner.tsx",
+      "symbol": "OPEN_COOKIE_SETTINGS_EVENT",
+      "reason": "pre-existing: event name constant used only inside its own module; consumers dispatch the literal"
+    },
+    {
+      "file": "client/src/components/ui/dialog.tsx",
+      "symbol": "DialogClose",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dialog.tsx",
+      "symbol": "DialogOverlay",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dialog.tsx",
+      "symbol": "DialogPortal",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dialog.tsx",
+      "symbol": "DialogTrigger",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuCheckboxItem",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuGroup",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuPortal",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuRadioGroup",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuRadioItem",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuShortcut",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuSub",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuSubContent",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/dropdown-menu.tsx",
+      "symbol": "DropdownMenuSubTrigger",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/form.tsx",
+      "symbol": "useFormField",
+      "reason": "vendored shadcn/ui form primitive — hook is part of the generated surface"
+    },
+    {
+      "file": "client/src/components/ui/paginator.tsx",
+      "symbol": "pageWindow",
+      "reason": "pre-existing: page-window helper used only inside its own component"
+    },
+    {
+      "file": "client/src/components/ui/scroll-area.tsx",
+      "symbol": "ScrollBar",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/select.tsx",
+      "symbol": "SelectGroup",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/select.tsx",
+      "symbol": "SelectLabel",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/select.tsx",
+      "symbol": "SelectScrollDownButton",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/select.tsx",
+      "symbol": "SelectScrollUpButton",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/select.tsx",
+      "symbol": "SelectSeparator",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sheet.tsx",
+      "symbol": "SheetClose",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sheet.tsx",
+      "symbol": "SheetFooter",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sheet.tsx",
+      "symbol": "SheetOverlay",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sheet.tsx",
+      "symbol": "SheetPortal",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarGroup",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarGroupAction",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarGroupContent",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarGroupLabel",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarInput",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarMenuAction",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarMenuBadge",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarMenuSkeleton",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarMenuSub",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarMenuSubButton",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarMenuSubItem",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarRail",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/sidebar.tsx",
+      "symbol": "SidebarSeparator",
+      "reason": "vendored shadcn/ui sidebar block — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/table.tsx",
+      "symbol": "TableCaption",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/table.tsx",
+      "symbol": "TableFooter",
+      "reason": "vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict"
+    },
+    {
+      "file": "client/src/components/ui/toggle.tsx",
+      "symbol": "Toggle",
+      "reason": "vendored shadcn/ui primitive — toggle-group imports only toggleVariants today"
+    },
+    {
+      "file": "client/src/config/navigation-icons.ts",
+      "symbol": "getSubSubcategoryIcon",
+      "reason": "pre-existing: taxonomy icon lookup lost its caller before this gate existed"
+    },
+    {
+      "file": "client/src/config/navigation-icons.ts",
+      "symbol": "getSubcategoryIcon",
+      "reason": "pre-existing: taxonomy icon lookup lost its caller before this gate existed"
+    },
+    {
+      "file": "client/src/config/navigation-icons.ts",
+      "symbol": "navigationIcons",
+      "reason": "pre-existing: icon map read only by the lookups in its own module"
+    },
+    {
+      "file": "client/src/hooks/use-mobile.tsx",
+      "symbol": "useIsDesktop",
+      "reason": "pre-existing: breakpoint hook with no caller; use-mobile's useIsMobile is the one in use"
+    },
+    {
+      "file": "client/src/hooks/use-mobile.tsx",
+      "symbol": "useIsTablet",
+      "reason": "pre-existing: breakpoint hook with no caller; use-mobile's useIsMobile is the one in use"
+    },
+    {
+      "file": "client/src/hooks/use-toast.ts",
+      "symbol": "reducer",
+      "reason": "vendored shadcn/ui toast store — reducer is exported by the generated hook and used only inside it"
+    },
+    {
+      "file": "client/src/hooks/use-toast.ts",
+      "symbol": "toast",
+      "reason": "vendored shadcn/ui toast store — every caller goes through useToast()"
+    },
+    {
+      "file": "client/src/hooks/useAIRecommendations.ts",
+      "symbol": "useLearningPaths",
+      "reason": "pre-existing: recommendation hook lost its caller (routes pass includeLearningPaths=false)"
+    },
+    {
+      "file": "client/src/hooks/useAIRecommendations.ts",
+      "symbol": "useQuickRecommendations",
+      "reason": "pre-existing: recommendation hook lost its caller before this gate existed"
+    },
+    {
+      "file": "client/src/lib/analytics.ts",
+      "symbol": "trackCategoryView",
+      "reason": "pre-existing: GA4 category_view sender lost its caller; re-wiring it is instrumentation work, not dead-code cleanup"
+    },
+    {
+      "file": "client/src/lib/analytics.ts",
+      "symbol": "trackLogin",
+      "reason": "pre-existing: GA4 login conversion sender lost its caller in the Clerk auth migration; re-wiring it is instrumentation work"
+    },
+    {
+      "file": "client/src/lib/analytics.ts",
+      "symbol": "trackSignUp",
+      "reason": "pre-existing: GA4 sign_up conversion sender lost its caller in the Clerk auth migration (the Mixpanel half moved server-side); re-wiring it is instrumentation work"
+    },
+    {
+      "file": "client/src/lib/authUtils.ts",
+      "symbol": "getReturnPath",
+      "reason": "pre-existing: auth helper with no caller since the Clerk migration"
+    },
+    {
+      "file": "client/src/lib/authUtils.ts",
+      "symbol": "isUnauthorizedError",
+      "reason": "pre-existing: 401 predicate superseded by the central ApiError handling"
+    },
+    {
+      "file": "client/src/lib/guestBookmarks.ts",
+      "symbol": "getGuestBookmarkIdSet",
+      "reason": "pre-existing: guest-bookmark accessor with no caller"
+    },
+    {
+      "file": "client/src/lib/guestBookmarks.ts",
+      "symbol": "guestBookmarkCount",
+      "reason": "pre-existing: guest-bookmark accessor with no caller"
+    },
+    {
+      "file": "client/src/lib/page-param.ts",
+      "symbol": "MAX_PAGE",
+      "reason": "pre-existing: bound used only inside its own module (the shared/page-param copy is the imported one)"
+    },
+    {
+      "file": "client/src/lib/page-param.ts",
+      "symbol": "parsePageFromSearchStrict",
+      "reason": "pre-existing: strict parser variant with no caller"
+    },
+    {
+      "file": "client/src/lib/posthog.ts",
+      "symbol": "phGetFeatureFlag",
+      "reason": "pre-existing: PostHog feature-flag wrapper with no caller (no flags are read yet)"
+    },
+    {
+      "file": "client/src/lib/posthog.ts",
+      "symbol": "phIsFeatureEnabled",
+      "reason": "pre-existing: PostHog feature-flag wrapper with no caller (no flags are read yet)"
+    },
+    {
+      "file": "client/src/lib/posthog.ts",
+      "symbol": "phOnFeatureFlags",
+      "reason": "pre-existing: PostHog feature-flag wrapper with no caller (no flags are read yet)"
+    },
+    {
+      "file": "client/src/lib/queryClient.ts",
+      "symbol": "getQueryFn",
+      "reason": "pre-existing: default query fn used only inside its own module"
+    },
+    {
+      "file": "client/src/lib/static-data.ts",
+      "symbol": "fetchSitemapData",
+      "reason": "pre-existing: static-data fetcher with no caller (the sitemap is served by the server)"
+    },
+    {
+      "file": "client/src/lib/utils.ts",
+      "symbol": "countResourcesByCategory",
+      "reason": "pre-existing: utility with no caller (counts come from the taxonomy tree)"
+    },
+    {
+      "file": "client/src/lib/utils.ts",
+      "symbol": "extractRepoInfoFromUrl",
+      "reason": "pre-existing: utility with no caller"
+    },
+    {
+      "file": "client/src/lib/utils.ts",
+      "symbol": "getAbsoluteUrl",
+      "reason": "pre-existing: utility with no caller"
+    },
+    {
+      "file": "client/src/lib/utils.ts",
+      "symbol": "getSubcategorySlug",
+      "reason": "pre-existing: utility with no caller (slugs come from the shared slug helpers)"
+    },
+    {
+      "file": "client/src/lib/utils.ts",
+      "symbol": "truncate",
+      "reason": "pre-existing: utility with no caller (CSS line-clamp replaced it)"
+    },
+    {
+      "file": "shared/bookmarkCollections.ts",
+      "symbol": "COLLECTION_NAME_MAX",
+      "reason": "pre-existing: bound used only inside its own schema module"
+    },
+    {
+      "file": "shared/bookmarkCollections.ts",
+      "symbol": "PERSONAL_TAG_LIMIT",
+      "reason": "pre-existing: bound used only inside its own schema module"
+    },
+    {
+      "file": "shared/bookmarkCollections.ts",
+      "symbol": "PERSONAL_TAG_MAX",
+      "reason": "pre-existing: bound used only inside its own schema module"
+    },
+    {
+      "file": "shared/bookmarkCollections.ts",
+      "symbol": "collectionPositionSchema",
+      "reason": "pre-existing: zod schema with no importer"
+    },
+    {
+      "file": "shared/journeyProgress.ts",
+      "symbol": "getCompletionRelevantRows",
+      "reason": "pre-existing: helper used only inside its own module"
+    },
+    {
+      "file": "shared/notifications.ts",
+      "symbol": "DIGEST_ATTEMPT_OUTCOMES",
+      "reason": "pre-existing: enum tuple used only inside its own module (its inferred type is the imported surface)"
+    },
+    {
+      "file": "shared/notifications.ts",
+      "symbol": "DIGEST_CHANNELS",
+      "reason": "pre-existing: enum tuple used only inside its own module (its inferred type is the imported surface)"
+    },
+    {
+      "file": "shared/notifications.ts",
+      "symbol": "DIGEST_JOB_STATUSES",
+      "reason": "pre-existing: enum tuple used only inside its own module (its inferred type is the imported surface)"
+    },
+    {
+      "file": "shared/notifications.ts",
+      "symbol": "NOTIFICATION_KINDS",
+      "reason": "pre-existing: enum tuple used only inside its own module (its inferred type is the imported surface)"
+    },
+    {
+      "file": "shared/onboarding.ts",
+      "symbol": "learningPreferencesValuesSchema",
+      "reason": "pre-existing: zod schema used only inside its own module"
+    },
+    {
+      "file": "shared/recommendations.ts",
+      "symbol": "RECOMMENDATION_SIGNAL_CODES",
+      "reason": "pre-existing: signal-code tuple used only inside its own module"
+    },
+    {
+      "file": "shared/resourceFacets.ts",
+      "symbol": "normalizeResourceFormat",
+      "reason": "pre-existing: facet normalizer used only inside its own module"
+    },
+    {
+      "file": "shared/resourceFacets.ts",
+      "symbol": "normalizeResourceProvider",
+      "reason": "pre-existing: facet normalizer used only inside its own module"
+    },
+    {
+      "file": "shared/resourceFacets.ts",
+      "symbol": "normalizeResourceSkillLevel",
+      "reason": "pre-existing: facet normalizer used only inside its own module"
+    },
+    {
+      "file": "shared/resourceFacets.ts",
+      "symbol": "resourceSearchSortSchema",
+      "reason": "pre-existing: zod schema used only inside its own module"
+    },
+    {
+      "file": "shared/seo-templates.ts",
+      "symbol": "SEO_DESCRIPTION_MAX",
+      "reason": "pre-existing: bound used only inside its own module"
+    },
+    {
+      "file": "shared/seo-templates.ts",
+      "symbol": "SEO_TITLE_MAX",
+      "reason": "pre-existing: bound used only inside its own module"
+    },
+    {
+      "file": "shared/seo-templates.ts",
+      "symbol": "tagSeoTitleCore",
+      "reason": "pre-existing: title fragment builder used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "CONTROL_CHARS_MESSAGE",
+      "reason": "pre-existing: validation constant used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "DESCRIPTION_MAX",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "DESCRIPTION_MIN",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "PASSWORD_MAX",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "PASSWORD_MAX_BYTES",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "PASSWORD_MIN_VISIBLE",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "RESOURCE_TITLE_MAX",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "SLUG_MAX",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "SLUG_RE",
+      "reason": "pre-existing: validation pattern used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "TAXONOMY_NAME_MAX",
+      "reason": "pre-existing: validation bound used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "ZERO_WIDTH_RE",
+      "reason": "pre-existing: validation pattern used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "normalizeCatalogUrl",
+      "reason": "pre-existing: URL normalizer used only inside its own module"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "optionalDescriptionSchema",
+      "reason": "pre-existing: zod schema with no importer"
+    },
+    {
+      "file": "shared/validation.ts",
+      "symbol": "utf8ByteLength",
+      "reason": "pre-existing: byte-length helper used only inside its own module"
+    }
+  ]
+}
