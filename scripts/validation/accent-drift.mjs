@@ -35,11 +35,15 @@
 //        nothing" rather than one that "won't stick". The custom properties
 //        the established peer blocks agree on are also a contract: a block
 //        that declares only a small subset is still a half-finished look.
-//   7 · font-options.ts    FONT_OPTIONS (id + stack; its own header calls
+//   7 · design-system.css  component skin selectors containing
+//        [data-system="…"]  ↔  DESIGN_SYSTEMS — a skin for a retired system
+//        is dead CSS that can never match, and would otherwise survive after
+//        the system's token block is removed
+//   8 · font-options.ts    FONT_OPTIONS (id + stack; its own header calls
 //        itself the source of truth)  ↔  the boot script's FONT_STACKS map +
 //        the id it falls back to, which must be the option applyFontOverride()
 //        falls back to at runtime (FONT_OPTIONS[0])
-//   8 · design-system.ts   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS.
+//   9 · design-system.ts   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS.
 //        A third hand-maintained list keyed by system id: it is the accent a
 //        system is meant to arrive with. applyDesignSystem() and the theme
 //        provider both read it as `SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT`,
@@ -47,16 +51,16 @@
 //        active (or falls back to the global default) instead of its own look,
 //        and an entry naming an accent that is not in ACCENTS sets a
 //        data-accent no :root[data-accent="…"] block paints
-//   9 · font-options.ts    FONT_STYLESHEETS — the map that actually DOWNLOADS
+//  10 · font-options.ts    FONT_STYLESHEETS — the map that actually DOWNLOADS
 //        the picker's webfonts  ↔  FONT_OPTIONS. A stack is only half of a
 //        webfont: an option whose stack is right but whose stylesheet entry
 //        is missing (or which downloads a family the stack never names)
 //        renders in the fallback face — the setting looks applied and the
 //        page looks unchanged, which is harder to spot than an outright reset
-//  10 · font-options.ts    SYSTEM_STYLESHEETS  ↔  design-system.ts
+//  11 · font-options.ts    SYSTEM_STYLESHEETS  ↔  design-system.ts
 //        DESIGN_SYSTEMS — the per-system display face, same failure mode: the
 //        system's CSS still NAMES its family, nothing downloads it
-//  10 · design-system.css  the --font-display / --font-body / --font-mono a
+//  12 · design-system.css  the --font-display / --font-body / --font-mono a
 //        system declares (:root[data-system="…"], falling back to :root for
 //        the default system)  ↔  the loaders that actually run for that
 //        system: the always-on <link rel="stylesheet"> tags in the HTML shell
@@ -68,11 +72,11 @@
 //        FONT_STYLESHEETS is deliberately NOT counted as a loader here — it
 //        fires only when a visitor picks that option in the picker, so it can
 //        never be what makes a system's own face arrive
-//  11 · client/index.html  the always-on stylesheet <link>s  ↔  the DEFAULT
+//  13 · client/index.html  the always-on stylesheet <link>s  ↔  the DEFAULT
 //        system's families. Those requests are pre-paint and unconditional —
 //        every visitor pays for them whatever system is active — so they may
 //        carry the default system's faces and nothing else
-//  12 · server/index.ts    both Content-Security-Policy header blocks. Every
+//  14 · server/index.ts    both Content-Security-Policy header blocks. Every
 //        font stylesheet host above must be allowed by style-src, both CSP
 //        copies must agree, and the live response's font-file hosts must be
 //        allowed by font-src or the browser blocks a download this gate just
@@ -92,6 +96,8 @@
 //     token block, a block whose id the picker never offers (dead paint),
 //     or a block that declares no custom property at all (an empty block
 //     paints like the default just as surely as a missing one)
+//   · system-skin    — a component skin selector in design-system.css names a
+//     system DESIGN_SYSTEMS does not offer
 //   · base-root-exemption — the "painted by the bare :root" escape hatch
 //     below went stale: an entry carrying no written reason, an entry whose
 //     system has since grown its own token block, or one naming a system
@@ -421,6 +427,15 @@ function stripComments(src) {
   return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
 }
 
+// Like stripComments(), but retain line breaks so diagnostics can point to the
+// source line of a component skin. CSS comments are replaced with spaces rather
+// than deleted; a commented-out selector can never become a live match.
+function stripCommentsPreservingLines(src) {
+  return String(src)
+    .replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:])\/\/[^\n]*/g, (comment, prefix) => prefix + ' '.repeat(comment.length - prefix.length));
+}
+
 // Object-literal walkers, shared by the DESIGN_SYSTEMS record and the boot
 // script's FONT_STACKS map. Both are read structurally rather than by
 // indentation so a reformat cannot change the parse, and so a nested object
@@ -645,6 +660,34 @@ function parseCssSystems(cssSrc) {
   const out = new Map();
   for (const m of src.matchAll(SYSTEM_BLOCK_RE)) out.set(m[1], m[2]);
   return out;
+}
+
+// Component skins use descendant selectors rather than the bare
+// :root[data-system="…"] token-block form. Keep every live occurrence with its
+// source line so a retired system can be removed from the stylesheet directly.
+// A selector containing :root[data-system="…"] plus a descendant is a skin too;
+// only a rule whose entire selector is the bare token-block form is excluded.
+const SYSTEM_SKIN_SELECTOR_RE = /\[data-system\s*=\s*(["'])([A-Za-z0-9_-]+)\1\s*\]/g;
+
+function parseCssSystemSkins(cssSrc) {
+  const src = stripCommentsPreservingLines(cssSrc);
+  const skins = [];
+  for (const rule of src.matchAll(/([^{}]+)\{/g)) {
+    const selectorText = rule[1];
+    const selector = selectorText.trim();
+    if (!selector) continue;
+    const isBareTokenBlock = /^\s*:root\s*\[data-system\s*=\s*(["'])[A-Za-z0-9_-]+\1\s*\]\s*$/.test(selectorText);
+    for (const match of selectorText.matchAll(SYSTEM_SKIN_SELECTOR_RE)) {
+      if (isBareTokenBlock) continue;
+      const offset = rule.index + match.index;
+      skins.push({
+        id: match[2],
+        line: src.slice(0, offset).split('\n').length,
+        selector: selector.replace(/\s+/g, ' '),
+      });
+    }
+  }
+  return skins;
 }
 
 // The same blocks, read as the font tokens each system declares — one
@@ -1182,6 +1225,17 @@ function compareSystemPaint(systemIds, cssBlocks, baseRootPainted, minimalTokenS
   }
 
   return failures;
+}
+
+function compareSystemSkins(systemIds, skins) {
+  const offered = new Set(systemIds);
+  return skins
+    .filter(({ id }) => !offered.has(id))
+    .map(({ id, line, selector }) => ({
+      kind: 'system-skin',
+      id,
+      message: `${CSS_REL} has a component skin for unknown design system "${id}" on line ${line}: ${selector} — remove or rename the skin because DESIGN_SYSTEMS in ${TS_REL} does not offer "${id}"`,
+    }));
 }
 
 // Every design system must name the accent it is meant to arrive with, and
@@ -2104,6 +2158,35 @@ function runCanaries() {
   eq(declaresCustomProperty('color: var(--accent);'), false, 'a var() READ is not a token declaration');
   eq(parseCssSystems(':root { --bg: #000000; }').size, 0, 'a stylesheet with no system blocks is detectable, not an empty pass');
 
+  // CSS component-skin parser: live descendant rules only, with source lines.
+  const cssSkinSample = [
+    ':root[data-system="terminal"] { --bg: #000000; }',
+    '[data-system="terminal"] .btn { border-radius: 0; }',
+    '[data-system="swiss"] [data-ds="chip"] { border-width: 0.5px; }',
+    ':root[data-system="geist"] .card { box-shadow: none; }',
+    '[data-system="ghost"] .card { color: pink; }',
+    '/* [data-system="commented"] .card { color: red; } */',
+  ].join('\n');
+  const parsedCssSkins = parseCssSystemSkins(cssSkinSample);
+  eq(
+    parsedCssSkins.map(({ id }) => id),
+    ['terminal', 'swiss', 'geist', 'ghost'],
+    'component skins parsed, bare token block and comment ignored',
+  );
+  eq(
+    parsedCssSkins.map(({ line }) => line),
+    [2, 3, 4, 5],
+    'component skin source lines are preserved for diagnostics',
+  );
+  const unknownSkinFailures = compareSystemSkins(['terminal', 'swiss', 'geist'], parsedCssSkins);
+  eq(unknownSkinFailures.map(({ id }) => id), ['ghost'], 'unknown component skin system is reported');
+  eq(
+    unknownSkinFailures[0].message.includes('"ghost"') && unknownSkinFailures[0].message.includes('line 5'),
+    true,
+    'unknown component skin reports its id and source line',
+  );
+  eq(parseCssSystemSkins(':root[data-system="terminal"] { --bg: #000000; }').length, 0, 'zero component skins is detectable, not an empty pass');
+
   // TS SYSTEM_DEFAULT_ACCENT parser (a flat systemId → accentId map).
   const tsSystemAccentSample = [
     'export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {',
@@ -2995,6 +3078,7 @@ const tsSystems = parseTsDesignSystems(tsSrc);
 const bootSystems = parseBootSystems(htmlSrc);
 const defaultSystemId = parseTsDefaultSystem(tsSrc);
 const cssSystems = parseCssSystems(cssSrc);
+const cssSystemSkins = parseCssSystemSkins(cssSrc);
 
 if (!tsSystems.found) fail('parser-rot', `could not locate "export const DESIGN_SYSTEMS … = { … };" in ${TS_REL}`);
 if (!tsSystems.ids.length) fail('parser-rot', `parsed ZERO systems out of DESIGN_SYSTEMS in ${TS_REL}`);
@@ -3035,6 +3119,11 @@ if (!cssSystems.size) {
   fail('parser-rot', `parsed ZERO :root[data-system="…"] token blocks out of ${CSS_REL}`);
 } else if (tsSystems.ids.length) {
   failures.push(...compareSystemPaint(tsSystems.ids, cssSystems, BASE_ROOT_PAINTED_SYSTEMS));
+}
+if (!cssSystemSkins.length) {
+  fail('parser-rot', `parsed ZERO component skin rules containing [data-system="…"] out of ${CSS_REL}`);
+} else if (tsSystems.ids.length) {
+  failures.push(...compareSystemSkins(tsSystems.ids, cssSystemSkins));
 }
 
 // ---------------------------------------------------------------------------
@@ -3260,6 +3349,9 @@ const sharedTokenPeers = tsSystems.ids.filter(
 const sharedTokenContract = sharedSystemTokens(sharedTokenPeers, cssSystems).tokens;
 console.log(
   `PASS system-tokens :: ${sharedTokenContract.size} shared token(s) agreed by ${sharedTokenPeers.length} peer block(s); every non-exempt system declares them`,
+);
+console.log(
+  `PASS system-skin :: ${cssSystemSkins.length} component skin rule(s) name only offered systems — ${[...new Set(cssSystemSkins.map(({ id }) => id))].join(', ')}`,
 );
 console.log(
   `PASS system-accent :: every design system names a default accent that exists — ${[...tsSystemDefaultAccents.accents]
