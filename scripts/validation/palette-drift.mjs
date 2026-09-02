@@ -79,6 +79,8 @@ import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SRC = path.join(ROOT, 'client/src');
 const BASELINE_PATH = path.join(ROOT, 'scripts/validation/palette-drift-baseline.json');
+const SCRIPT_PATH = fileURLToPath(import.meta.url);
+const SKILL_PATH = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md');
 const UPDATE = process.argv.includes('--update-baseline');
 
 const SCAN_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.scss', '.html', '.svg', '.md']);
@@ -101,6 +103,66 @@ const RADII_RE = /border(-radius)?:\s*\d+px|rounded-\[\d+px\]/g;
 const FONT_RE = /font-family:\s*['"]/g;
 
 const normalizeWs = (s) => s.replace(/\s+/g, ' ');
+
+// The Stage 5 instructions intentionally show the palette scan as an `rg`
+// command, while this gate uses a JavaScript RegExp. Compare their pattern
+// sources at runtime so changing one copy cannot silently leave the other
+// stale. The executable flag (`g`) is implementation detail, not part of the
+// documented grep pattern.
+function lineNumberAt(text, index) {
+  return text.slice(0, index).split('\n').length;
+}
+
+function extractDocumentedPaletteRegex(skillText) {
+  const marker = '# Tailwind palette classes';
+  const markerIndex = skillText.indexOf(marker);
+  if (markerIndex === -1) {
+    throw new Error(`could not find the Stage 5 palette section in ${path.relative(ROOT, SKILL_PATH)}`);
+  }
+
+  const fenceEnd = skillText.indexOf('\n```', markerIndex);
+  if (fenceEnd === -1) {
+    throw new Error(`could not find the end of the Stage 5 command block in ${path.relative(ROOT, SKILL_PATH)}`);
+  }
+
+  const section = skillText.slice(markerIndex, fenceEnd);
+  const matches = [...section.matchAll(/\brg -n '([^']+)' client\/src/g)];
+  if (matches.length !== 1) {
+    throw new Error(
+      `expected exactly one Stage 5 palette rg command in ${path.relative(ROOT, SKILL_PATH)}, found ${matches.length}`,
+    );
+  }
+
+  return {
+    source: matches[0][1],
+    line: lineNumberAt(skillText, markerIndex + matches[0].index),
+  };
+}
+
+function checkPaletteRegexParity() {
+  const skillText = fs.readFileSync(SKILL_PATH, 'utf8');
+  const scriptText = fs.readFileSync(SCRIPT_PATH, 'utf8');
+  const documented = extractDocumentedPaletteRegex(skillText);
+  const executableLine = scriptText.split('\n').findIndex((line) => line.includes('const PALETTE_RE =')) + 1;
+  if (executableLine === 0) {
+    throw new Error(`could not locate PALETTE_RE in ${path.relative(ROOT, SCRIPT_PATH)}`);
+  }
+
+  if (documented.source !== PALETTE_RE.source) {
+    console.error('FAIL palette-regex-parity :: documented and executable Stage 5 palette regexes differ');
+    console.error(`  documented ${path.relative(ROOT, SKILL_PATH)}:${documented.line}`);
+    console.error(`    ${documented.source}`);
+    console.error(`  executable ${path.relative(ROOT, SCRIPT_PATH)}:${executableLine}`);
+    console.error(`    ${PALETTE_RE.source}`);
+    console.error('  Update both copies together so manual and automated palette audits agree.');
+    process.exit(1);
+  }
+
+  console.log(
+    `PASS palette-regex-parity :: ${path.relative(ROOT, SKILL_PATH)}:${documented.line} matches ` +
+      `${path.relative(ROOT, SCRIPT_PATH)}:${executableLine}`,
+  );
+}
 
 // A raw #… token is a COLOR candidate (vs a "Task #307" issue reference)
 // when it has 6 or 8 hex digits, or 3–4 digits containing a hex letter.
@@ -470,6 +532,7 @@ function classifyUpdate(prior, counts, init) {
   return { increases, decreases, initSections, shouldWrite: !increases.length && (decreases.length > 0 || initSections.length > 0) };
 }
 
+checkPaletteRegexParity();
 runCanaries();
 console.log('PASS canaries :: all stage-5 detectors + ratchet classifier verified against known-bad/known-good samples');
 
