@@ -528,17 +528,38 @@ try {
   // Drive the real Clerk sign-in UI (post-Clerk there is no local login
   // API). Headless/new-device sessions land on the client-trust OTP step
   // (+clerk_test emails accept the fixed OTP 424242 on the dev instance).
-  const measureClerkVerificationControls = async (pageToAuth) => {
+  const CLERK_VERIFICATION_VARIANTS = {
+    'client-trust': {
+      label: 'client-trust verification',
+      requiredKeys: ['otpCodeFieldInput', 'formResendCodeLink'],
+      evidenceFile: 'clerk-verification-client-trust.png',
+    },
+    'email-code-recovery': {
+      label: 'email-code recovery verification',
+      requiredKeys: [
+        'otpCodeFieldInput',
+        'identityPreviewEditButton',
+        'formResendCodeLink',
+      ],
+      evidenceFile: 'clerk-verification-email-code-recovery.png',
+    },
+  };
+
+  const measureClerkVerificationControls = async (pageToAuth, variantName) => {
+    const variant = CLERK_VERIFICATION_VARIANTS[variantName];
+    if (!variant) throw new Error(`unknown Clerk verification variant: ${variantName}`);
+
     // Keep the pointer away from Clerk controls: its hover ring changes the
     // computed box while the code step is being inspected.
     await pageToAuth.mouse.move(0, 0);
-    const measurements = await pageToAuth.evaluate(() => {
+    const measurements = await pageToAuth.evaluate(({ variantName }) => {
       const MIN_TOUCH_TARGET = 40;
       const elementKey = (element) => {
         const classes = [...element.classList];
         const clerkClass = classes.find((name) => name.startsWith('cl-'));
         return clerkClass?.replace(/^cl-/, '').split('__')[0] ?? null;
       };
+      const isRendered = (element) => element.getClientRects().length > 0;
       const root = document.querySelector('.cl-rootBox') ?? document;
       const controls = [
         {
@@ -559,11 +580,12 @@ try {
       ];
 
       return {
+        variant: variantName,
         controls: controls.map(({ expectedKey, label, elements }) => ({
           expectedKey,
           label,
-          count: elements.length,
-          rendered: elements.map((element) => {
+          count: elements.filter(isRendered).length,
+          rendered: elements.filter(isRendered).map((element) => {
             const rect = element.getBoundingClientRect();
             const styles = window.getComputedStyle(element);
             return {
@@ -576,7 +598,7 @@ try {
               minHeight: styles.minHeight,
             };
           }),
-          passes: elements.length > 0 && elements.every((element) => {
+          passes: elements.filter(isRendered).every((element) => {
             const rect = element.getBoundingClientRect();
             return elementKey(element) === expectedKey
               && rect.width >= MIN_TOUCH_TARGET
@@ -584,9 +606,18 @@ try {
           }),
         })),
       };
-    });
+    }, { variantName });
 
-    const missing = measurements.controls.filter((control) => control.count === 0);
+    const missing = variant.requiredKeys.filter((expectedKey) =>
+      !measurements.controls.some((control) =>
+        control.expectedKey === expectedKey && control.count > 0,
+      ),
+    );
+    const mismatched = measurements.controls.flatMap((control) =>
+      control.rendered
+        .filter((element) => element.elementKey !== control.expectedKey)
+        .map((element) => `${control.label} expected ${control.expectedKey}, got ${element.elementKey ?? 'unknown-key'}`),
+    );
     const undersized = measurements.controls.flatMap((control) =>
       control.rendered
         .filter((element) => element.width < 40 || element.height < 40)
@@ -597,31 +628,31 @@ try {
         ? control.rendered.map((element) => `${element.elementKey ?? 'unknown-key'}=${element.width}x${element.height}px`).join(', ')
         : 'not rendered'}`)
       .join('; ');
-    log('clerk-verification-controls', missing.length === 0 && undersized.length === 0,
+    const passed = missing.length === 0 && mismatched.length === 0 && undersized.length === 0;
+    log(`clerk-verification-${variantName}`, passed,
       missing.length > 0
-        ? `LIVE DOM missing ${missing.map((control) => control.label).join(', ')}; ${detail}`
+        ? `${variant.label} LIVE DOM missing required ${missing.join(', ')}; ${detail}`
+        : mismatched.length > 0
+          ? `${variant.label} LIVE DOM appearance key mismatch: ${mismatched.join(', ')}; ${detail}`
         : undersized.length > 0
-          ? `LIVE DOM touch target below 40px: ${undersized.join(', ')}; ${detail}`
-          : `LIVE DOM measured at or above 40px: ${detail}`);
+          ? `${variant.label} LIVE DOM touch target below 40px: ${undersized.join(', ')}; ${detail}`
+          : `${variant.label} LIVE DOM measured at or above 40px: ${detail}`);
 
     // Keep the complete measurements in results.json as durable evidence, not
     // just the compact console line above.
     results.push({
-      k: 'clerk-verification-controls-evidence',
-      pass: missing.length === 0 && undersized.length === 0,
+      k: `clerk-verification-${variantName}-evidence`,
+      pass: passed,
       detail: measurements,
     });
     await pageToAuth.screenshot({
-      path: path.join(OUT, 'clerk-verification-code-step.png'),
+      path: path.join(OUT, variant.evidenceFile),
       fullPage: true,
     });
   };
 
-  // Reach the EMAIL-CODE variant specifically: the password-first
-  // client-trust OTP screen renders the code cells but intentionally has no
-  // edit-email affordance. Clerk's recovery flow exposes the real code step
-  // that carries both live appearance keys, so this is the only non-vacuous
-  // place to verify identityPreviewEditButton.
+  // Reach the EMAIL-CODE recovery variant specifically: it exposes the real
+  // code step that carries both the edit-email and resend-code appearance keys.
   const openClerkVerificationCodeStep = async (pageToAuth, email) => {
     await pageToAuth.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     const identifier = pageToAuth.locator('input[name="identifier"]');
@@ -637,7 +668,41 @@ try {
       state: 'visible',
       timeout: 30000,
     });
-    await measureClerkVerificationControls(pageToAuth);
+    await measureClerkVerificationControls(pageToAuth, 'email-code-recovery');
+  };
+
+  // Reach the PASSWORD-FIRST client-trust variant in a fresh browser context.
+  // This screen intentionally differs from recovery: it renders the OTP
+  // controls and a resend control, but it does not render the edit-email
+  // affordance. Requiring this direct OTP state prevents the
+  // recovery measurement above from becoming the only exercised variant.
+  const openClerkClientTrustVerificationStep = async (pageToAuth, email, password) => {
+    await pageToAuth.goto(`${BASE}/sign-in`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const identifier = pageToAuth.locator('input[name="identifier"]');
+    await identifier.waitFor({ timeout: 30000 });
+    await identifier.fill(email);
+    await pageToAuth.keyboard.press('Enter');
+    const passwordField = pageToAuth.locator('input[name="password"]');
+    await passwordField.waitFor({ timeout: 30000 });
+    await passwordField.fill(password);
+    await pageToAuth.keyboard.press('Enter');
+
+    const otp = pageToAuth.locator('input[aria-label="Enter verification code"]');
+    await otp.waitFor({ state: 'visible', timeout: 30000 });
+    await measureClerkVerificationControls(pageToAuth, 'client-trust');
+    await otp.click();
+    await pageToAuth.keyboard.type('424242', { delay: 120 });
+
+    const deadline = Date.now() + 60000;
+    while (Date.now() < deadline) {
+      const authenticated = await pageToAuth.evaluate(async () => {
+        const r = await fetch('/api/auth/user', { credentials: 'include' });
+        return (await r.json().catch(() => null))?.isAuthenticated === true;
+      });
+      if (authenticated) return;
+      await pageToAuth.waitForTimeout(1500);
+    }
+    throw new Error('Clerk client-trust verification did not produce an authenticated session');
   };
 
   const signInWithClerk = async (pageToAuth, email, password) => {
@@ -686,10 +751,17 @@ try {
   };
 
   let authedContext = null;
+  let verificationContext = null;
   try {
     await purgeClerkQaUsers(PREFIX);
     await purgeLocalQaUsers();
     await clerkApi('POST', '/users', { email_address: [email], password, skip_password_checks: true });
+
+    verificationContext = await browser.newContext({ viewport: DESKTOP });
+    const verificationPage = await verificationContext.newPage();
+    await openClerkClientTrustVerificationStep(verificationPage, email, password);
+    await verificationContext.close();
+    verificationContext = null;
 
     authedContext = await browser.newContext({ viewport: DESKTOP });
     const authedPage = await authedContext.newPage();
@@ -1002,6 +1074,7 @@ try {
   } catch (e) {
     log('authed-scenario', false, `authed sweep failed: ${e.message.split('\n')[0]}`);
   } finally {
+    await verificationContext?.close().catch(() => {});
     await authedContext?.close().catch(() => {});
     try {
       await purgeClerkQaUsers(PREFIX).catch((e) => log('authed-teardown-clerk', false, e.message));
