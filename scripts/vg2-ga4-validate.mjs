@@ -10,7 +10,35 @@ const EXEC = [
   '/home/runner/workspace/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome',
   '/home/runner/workspace/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome',
 ].filter(Boolean).find((candidate) => fs.existsSync(candidate));
-const BASE = 'http://localhost:5000';
+const ARGS = process.argv.slice(2);
+const SMOKE = ARGS.includes('--smoke');
+const BASE_FLAG_INDEX = ARGS.findIndex((arg) => arg === '--base-url' || arg.startsWith('--base-url='));
+const BASE_FLAG_VALUE =
+  BASE_FLAG_INDEX < 0
+    ? undefined
+    : ARGS[BASE_FLAG_INDEX].startsWith('--base-url=')
+      ? ARGS[BASE_FLAG_INDEX].slice('--base-url='.length)
+      : ARGS[BASE_FLAG_INDEX + 1];
+if (BASE_FLAG_INDEX >= 0 && !BASE_FLAG_VALUE) {
+  throw new Error('--base-url requires an http(s) URL');
+}
+const BASE_INPUT = BASE_FLAG_VALUE || process.env.BASE_URL || 'http://localhost:5000';
+let BASE;
+try {
+  const parsedBase = new URL(BASE_INPUT);
+  if (!['http:', 'https:'].includes(parsedBase.protocol)) {
+    throw new Error('only http(s) URLs are supported');
+  }
+  if (parsedBase.search || parsedBase.hash) {
+    throw new Error('the base URL must not include a query string or hash');
+  }
+  BASE = parsedBase.toString().replace(/\/$/, '');
+} catch (error) {
+  throw new Error(`Invalid base URL "${BASE_INPUT}": ${error.message}`);
+}
+if (SMOKE && !BASE_FLAG_VALUE && !process.env.BASE_URL) {
+  throw new Error('production smoke mode requires an explicit --base-url <http(s) URL>');
+}
 const OUT = '/home/runner/workspace/evidence';
 const TS = Date.now();
 const EXPECTED_BROWSER_ERROR = 'VG2 deliberate browser error';
@@ -196,6 +224,118 @@ async function waitForPerformanceMetric(metricName, sinceSeq, timeout = 14000) {
   return false;
 }
 
+function piiMatchesInCapturedPayloads() {
+  const payload = JSON.stringify(raw);
+  let decoded = payload;
+  try {
+    decoded = decodeURIComponent(payload);
+  } catch {
+    // Keep the raw scan useful even if a third-party payload contains a bad escape.
+  }
+  const patterns = [
+    /(?:^|[?&\n])(?:email|e_mail|password|token|auth(?:entication)?|session(?:_id)?|user(?:_id|name)?|phone|address)=/i,
+    /[A-Z0-9._%+-]+%40[A-Z0-9.-]+\.[A-Z]{2,}/i,
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
+  ];
+  return patterns.flatMap((pattern) =>
+    [payload, decoded].filter((value, index, values) => values.indexOf(value) === index && pattern.test(value)).map(() => pattern.source),
+  );
+}
+
+function writeEvidence() {
+  fs.writeFileSync(`${OUT}/vg2-collect-raw.json`, JSON.stringify(raw, null, 2));
+  fs.writeFileSync(`${OUT}/vg2-events.json`, JSON.stringify(events, null, 2));
+
+  const counts = {};
+  for (const e of events) counts[e.en] = (counts[e.en] || 0) + 1;
+  const skipCount = results.filter((r) => r.skipped).length;
+  const passCount = results.filter((r) => r.pass && !r.skipped).length;
+  const assertedCount = results.length - skipCount;
+  const mode = SMOKE ? 'Production smoke' : 'Full validation';
+
+  const md = [];
+  md.push(`# VG-2 — Real-Browser GA4 Validation Evidence (${mode})`);
+  md.push('');
+  md.push(`Run: ${new Date(TS).toISOString()} · Browser: pinned Chromium · Target: ${BASE}`);
+  md.push('');
+  md.push(`**Result: ${passCount}/${assertedCount} checks passed${skipCount ? ` · ${skipCount} skipped` : ''}.**`);
+  md.push('');
+  md.push('## Event volume captured off the wire (`/g/collect`)');
+  md.push('');
+  md.push('| Event | Count |');
+  md.push('|---|---|');
+  for (const [k, v] of Object.entries(counts).sort()) md.push(`| \`${k}\` | ${v} |`);
+  md.push('');
+  md.push('## Assertions');
+  md.push('');
+  md.push('| Check | Result | Detail |');
+  md.push('|---|---|---|');
+  for (const r of results) {
+    const verdict = r.skipped ? '⏭️ SKIP' : r.pass ? '✅ PASS' : '❌ FAIL';
+    md.push(`| ${r.name} | ${verdict} | ${String(r.detail).replace(/\|/g, '\\|').slice(0, 160)} |`);
+  }
+  md.push('');
+  md.push('## Sample decoded events');
+  md.push('');
+  md.push('```');
+  for (const en of ['page_view', 'page_engaged', 'performance', 'error', 'search', 'select_content', 'theme_change', 'category_view', 'sign_up', 'login']) {
+    const e = events.find((x) => x.en === en);
+    if (e) {
+      const shown = {};
+      for (const [k, v] of Object.entries(e.params)) {
+        if (k.startsWith('ep.') || k.startsWith('epn.') || ['en', 'dl', 'dt', 'dr', '_et', 'method'].includes(k)) shown[k] = v;
+      }
+      md.push(`${en}: ${JSON.stringify(shown)}`);
+    }
+  }
+  md.push('```');
+  md.push('');
+  md.push(`Raw payloads: \`vg2-collect-raw.json\` (${raw.length} requests) · Parsed: \`vg2-events.json\` (${events.length} events)`);
+  if (!SMOKE) md.push('Screenshots: `vg2-01-landing.jpg` … `vg2-06-signed-in.jpg`');
+  fs.writeFileSync(`${OUT}/vg2-report.md`, md.join('\n'));
+
+  log(`\n=== ${passCount}/${assertedCount} checks passed${skipCount ? ` (${skipCount} skipped)` : ''}. Evidence written to ${OUT}/vg2-* ===`);
+  return { passCount, assertedCount, skipCount };
+}
+
+async function runProductionSmoke(page) {
+  // Deliberately do not load the catalog or set up Clerk here: this mode is
+  // safe to run against a published site and must not create or modify data.
+  await page.goto(`${BASE}/?utm_source=vg2_smoke`, { waitUntil: 'load', timeout: 30000 });
+  await sleep(2000);
+  check('no GA request before analytics consent', raw.length === 0, `${raw.length} pre-consent request(s)`);
+
+  const accept = page.getByTestId('consent-accept');
+  await accept.waitFor({ state: 'visible' });
+  await accept.click();
+  const consentGranted = await page.evaluate(
+    () => localStorage.getItem('analytics-consent') === 'granted',
+  );
+  check('analytics consent grant completed', consentGranted, String(consentGranted));
+
+  const warm = await waitForCollect(1, 20000);
+  check('GA4 gtag.js loaded and sent a /collect hit', warm, `${raw.length} request(s) after consent`);
+
+  // INP is finalized after a real interaction and when the page becomes hidden.
+  // The slash shortcut opens the app's real search dialog without submitting
+  // anything or changing server-side state.
+  const beforeInp = seq - 1;
+  await page.keyboard.press('/');
+  const inpReached = await waitForPerformanceMetric('inp', beforeInp, 14000);
+  const inpEvents = evByName('performance', beforeInp).filter(
+    (event) => event.params['ep.metric_name'] === 'inp',
+  );
+  check('INP reached GA4 after a real interaction', inpReached && inpEvents.length >= 1, `${inpEvents.length} inp event(s)`);
+
+  await flushGA();
+  const piiMatches = piiMatchesInCapturedPayloads();
+  check(
+    'captured GA payloads contain no PII',
+    piiMatches.length === 0,
+    piiMatches.length ? `matched ${[...new Set(piiMatches)].join(', ')}` : `scanned ${raw.length} /collect request(s)`,
+  );
+}
+
 // Clerk's OTP field is a row of single-character inputs that auto-advance, so
 // the code has to be typed key by key into the focused control (a bulk fill()
 // lands entirely in the first box). Returns false when no code step appeared —
@@ -226,15 +366,19 @@ async function clerkSignOut(page) {
 }
 
 async function main() {
-  const catalogResponse = await fetch(`${BASE}/api/awesome-list`);
-  if (!catalogResponse.ok) {
-    throw new Error(`Could not load a resource for GA validation (${catalogResponse.status})`);
+  let RESOURCE_ID;
+  let CATEGORY;
+  if (!SMOKE) {
+    const catalogResponse = await fetch(`${BASE}/api/awesome-list`);
+    if (!catalogResponse.ok) {
+      throw new Error(`Could not load a resource for GA validation (${catalogResponse.status})`);
+    }
+    const catalog = await catalogResponse.json();
+    RESOURCE_ID = catalog.resources?.[0]?.id;
+    if (!RESOURCE_ID) throw new Error('Catalog returned no resource for GA validation');
+    CATEGORY = catalog.categories?.find((c) => c.slug && c.name);
+    if (!CATEGORY) throw new Error('Catalog returned no category for GA validation');
   }
-  const catalog = await catalogResponse.json();
-  const RESOURCE_ID = catalog.resources?.[0]?.id;
-  if (!RESOURCE_ID) throw new Error('Catalog returned no resource for GA validation');
-  const CATEGORY = catalog.categories?.find((c) => c.slug && c.name);
-  if (!CATEGORY) throw new Error('Catalog returned no category for GA validation');
 
   const browser = await chromium.launch({
     ...(EXEC ? { executablePath: EXEC } : {}),
@@ -248,7 +392,7 @@ async function main() {
   // testing token goes on every Frontend API call, and the bypass flag is
   // re-asserted on an interval because clerk-js resets it from every /v1/client
   // payload it receives.
-  if (AUTH_FLOWS_READY) {
+  if (!SMOKE && AUTH_FLOWS_READY) {
     const fapiHost = fapiHostFromPublishableKey(CLERK_PUBLISHABLE_KEY);
     const testingToken = (await clerkApi('POST', '/testing_tokens')).token;
     if (!fapiHost || !testingToken) throw new Error('Could not prepare a Clerk testing token');
@@ -285,6 +429,14 @@ async function main() {
     }
   });
   page.on('request', record);
+
+  if (SMOKE) {
+    await runProductionSmoke(page);
+    await browser.close();
+    writeEvidence();
+    const smokePass = results.every((result) => result.pass);
+    process.exit(smokePass ? 0 : 1);
+  }
 
   // ---- FLOW 1: landing with first-touch UTM acquisition ----------------
   await page.goto(`${BASE}/?utm_source=newsletter&utm_medium=email&utm_campaign=vg_test`, { waitUntil: 'load', timeout: 30000 });
@@ -599,59 +751,7 @@ async function main() {
   }
 
   // ---- write evidence -------------------------------------------------
-  fs.writeFileSync(`${OUT}/vg2-collect-raw.json`, JSON.stringify(raw, null, 2));
-  fs.writeFileSync(`${OUT}/vg2-events.json`, JSON.stringify(events, null, 2));
-
-  const counts = {};
-  for (const e of events) counts[e.en] = (counts[e.en] || 0) + 1;
-  const skipCount = results.filter((r) => r.skipped).length;
-  const passCount = results.filter((r) => r.pass && !r.skipped).length;
-  const assertedCount = results.length - skipCount;
-
-  const md = [];
-  md.push('# VG-2 — Real-Browser GA4 Validation Evidence');
-  md.push('');
-  md.push(`Run: ${new Date(TS).toISOString()} · Browser: pinned Chromium 1208 · Target: ${BASE}`);
-  md.push('');
-  md.push(`**Result: ${passCount}/${assertedCount} checks passed${skipCount ? ` · ${skipCount} skipped` : ''}.**`);
-  md.push('');
-  md.push('## Event volume captured off the wire (`/g/collect`)');
-  md.push('');
-  md.push('| Event | Count |');
-  md.push('|---|---|');
-  for (const [k, v] of Object.entries(counts).sort()) md.push(`| \`${k}\` | ${v} |`);
-  md.push('');
-  md.push('## Assertions');
-  md.push('');
-  md.push('| Check | Result | Detail |');
-  md.push('|---|---|---|');
-  for (const r of results) {
-    const verdict = r.skipped ? '⏭️ SKIP' : r.pass ? '✅ PASS' : '❌ FAIL';
-    md.push(`| ${r.name} | ${verdict} | ${String(r.detail).replace(/\|/g, '\\|').slice(0, 160)} |`);
-  }
-  md.push('');
-  md.push('## Sample decoded events');
-  md.push('');
-  md.push('```');
-  for (const en of ['page_view', 'page_engaged', 'performance', 'error', 'search', 'select_content', 'theme_change', 'category_view', 'sign_up', 'login']) {
-    const e = events.find((x) => x.en === en);
-    if (e) {
-      const shown = {};
-      for (const [k, v] of Object.entries(e.params)) {
-        if (k.startsWith('ep.') || k.startsWith('epn.') || ['en', 'dl', 'dt', 'dr', '_et', 'method'].includes(k)) shown[k] = v;
-      }
-      md.push(`${en}: ${JSON.stringify(shown)}`);
-    }
-  }
-  md.push('```');
-  md.push('');
-  md.push(`Raw payloads: \`vg2-collect-raw.json\` (${raw.length} requests) · Parsed: \`vg2-events.json\` (${events.length} events)`);
-  md.push('Screenshots: `vg2-01-landing.jpg` … `vg2-06-signed-in.jpg`');
-  fs.writeFileSync(`${OUT}/vg2-report.md`, md.join('\n'));
-
-  console.log(
-    `\n=== ${passCount}/${assertedCount} checks passed${skipCount ? ` (${skipCount} skipped)` : ''}. Evidence written to ${OUT}/vg2-* ===`,
-  );
+  writeEvidence();
   process.exit(results.every((r) => r.pass) ? 0 : 1);
 }
 

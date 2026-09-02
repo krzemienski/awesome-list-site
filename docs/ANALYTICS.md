@@ -207,9 +207,31 @@ and `qa-test-*` resource submissions) are purged afterward via
 ### Running it
 
 ```bash
-node scripts/vg2-ga4-validate.mjs   # drives Chromium through real flows, asserts events
-npx tsx scripts/vg2-teardown.ts     # purge throwaway QA rows
+node scripts/vg2-ga4-validate.mjs   # drives Chromium through the full local flow
+npx tsx scripts/vg2-teardown.ts     # purge throwaway QA rows after the full flow
 ```
+
+### Post-publish smoke check
+
+Run the production-safe smoke mode immediately after every publish, using the
+published site's exact URL:
+
+```bash
+node scripts/vg2-ga4-validate.mjs --smoke --base-url https://published.example
+```
+
+Smoke mode uses a fresh browser context and only loads the landing page, checks
+that no GA4 collection request occurs before consent, grants consent through the
+real banner, performs the real `/` keyboard interaction, and waits for an
+`INP` performance event on the wire. It does not load the catalog, call Clerk,
+create accounts, submit resources, or exercise any other mutating flow. It also
+scans every captured payload in raw and percent-decoded form for common PII
+fields and email-shaped values.
+
+The smoke command requires an explicit `--base-url` (or `BASE_URL`) when
+targeting a non-local site. It exits non-zero if consent gating, GA4 delivery,
+INP delivery, or the PII scan fails. The full validator remains the development
+check for the broader event taxonomy and auth flows.
 
 The validator prints event counts, per-assertion results, and sample decoded
 payloads to stdout (and any output paths it is configured with at run time).
