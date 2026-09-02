@@ -26,13 +26,6 @@ import { z } from "zod";
 // Unicode-aware invisibility core (R5-001/038)
 // ---------------------------------------------------------------------------
 
-/**
- * Legacy zero-width class — kept for backward compatibility with older call
- * sites; new code should use stripInvisible/visibleLength which cover the
- * full Cf/Cs categories.
- */
-export const ZERO_WIDTH_RE = /[\u200B-\u200F\u2060\uFEFF\u00AD]/g;
-
 /** ALL format (Cf) + surrogate (Cs) code points — used for the length check. */
 const FORMAT_ALL_RE = /[\p{Cf}\p{Cs}]/gu;
 
@@ -67,7 +60,7 @@ export const SINGLE_LINE_CONTROL_RE = /[\u0000-\u001F\u007F]/;
  */
 export const MULTILINE_CONTROL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/;
 
-export const CONTROL_CHARS_MESSAGE = "must not contain control characters";
+const CONTROL_CHARS_MESSAGE = "must not contain control characters";
 
 /**
  * Bidirectional control characters (R5-038). Unlike the zero-widths that
@@ -117,7 +110,7 @@ export function hasVisibleChars(value: string): boolean {
 }
 
 /** UTF-8 byte length (browser + Node safe) — bcrypt truncates at 72 BYTES. */
-export function utf8ByteLength(value: string): number {
+function utf8ByteLength(value: string): number {
   return new TextEncoder().encode(value).length;
 }
 
@@ -233,7 +226,7 @@ const TRACKING_PARAM_EXACT = new Set([
   "gclid",
 ]);
 
-export function normalizeCatalogUrl(raw: string): string {
+function normalizeCatalogUrl(raw: string): string {
   try {
     const u = new URL(raw);
     const toDelete: string[] = [];
@@ -284,9 +277,9 @@ export const webUrlSchema = urlCoreChecks(z.string())
 // R4-047 description bounds, R4-069 trim-on-write, R5-019 control chars)
 // ---------------------------------------------------------------------------
 
-export const RESOURCE_TITLE_MAX = 200;
-export const DESCRIPTION_MIN = 10;
-export const DESCRIPTION_MAX = 1000;
+const RESOURCE_TITLE_MAX = 200;
+const DESCRIPTION_MIN = 10;
+const DESCRIPTION_MAX = 1000;
 export const TAG_MAX_LENGTH = 50;
 
 /** Title: trimmed on write, must contain visible characters, ≤200, no markup, single-line. */
@@ -312,9 +305,6 @@ export const resourceDescriptionSchema = z
   )
   .transform((v) => stripInvisible(v).replace(/\s+/g, " "));
 
-/** Optional variant for edit paths: when present it must meet the same bounds. */
-export const optionalDescriptionSchema = resourceDescriptionSchema.optional();
-
 export const tagSchema = z
   .string()
   .max(TAG_MAX_LENGTH, `Tags must be at most ${TAG_MAX_LENGTH} characters`)
@@ -327,9 +317,9 @@ export const tagSchema = z
 // Taxonomy + journeys (R5-002: names/slugs/step content had ZERO validation)
 // ---------------------------------------------------------------------------
 
-export const TAXONOMY_NAME_MAX = 100;
-export const SLUG_MAX = 100;
-export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const TAXONOMY_NAME_MAX = 100;
+const SLUG_MAX = 100;
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** Category/subcategory/sub-subcategory display name. */
 export const taxonomyNameSchema = z
@@ -373,11 +363,9 @@ export const journeyDescriptionSchema = z
 // ---------------------------------------------------------------------------
 
 export const DISPLAY_NAME_MAX = 50;
-export const PASSWORD_MIN_VISIBLE = 8;
+const PASSWORD_MIN_VISIBLE = 8;
 /** bcrypt silently truncates at 72 BYTES — the real ceiling (R5-046). */
-export const PASSWORD_MAX_BYTES = 72;
-/** @deprecated superseded by PASSWORD_MAX_BYTES; kept for older imports. */
-export const PASSWORD_MAX = 128;
+const PASSWORD_MAX_BYTES = 72;
 
 /**
  * Display-name field (firstName / lastName). Empty string is allowed (clears

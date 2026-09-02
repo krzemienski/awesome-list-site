@@ -198,16 +198,3 @@ export async function fetchAwesomeListNav(): Promise<AwesomeListNav> {
   }
   return await response.json();
 }
-
-export async function fetchSitemapData(): Promise<any> {
-  try {
-    const response = await fetch('/data/sitemap.json');
-    if (!response.ok) {
-      return null;
-    }
-    return await response.json();
-  } catch (error) {
-    console.warn('Sitemap data not available:', error);
-    return null;
-  }
-}

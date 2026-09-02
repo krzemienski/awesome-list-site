@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
 import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
@@ -317,79 +317,4 @@ export function useAIRecommendations(
     // Utils
     reset: recommendationsMutation.reset,
   };
-}
-
-// Hook for learning path generation
-export function useLearningPaths() {
-  // Generate custom learning path
-  const generatePathMutation = useMutation({
-    mutationFn: async ({ 
-      userProfile, 
-      category, 
-      customGoals 
-    }: { 
-      userProfile: UserProfile;
-      category?: string;
-      customGoals?: string[];
-    }): Promise<unknown> => {
-      const result: unknown = await apiRequest('/api/learning-paths/generate', {
-        method: 'POST',
-        body: JSON.stringify({ userProfile, category, customGoals })
-      });
-      return result;
-    }
-  });
-
-  // Get suggested paths query
-  const useSuggestedPaths = (params?: {
-    userId?: string;
-    categories?: string[];
-    skillLevel?: string;
-    goals?: string[];
-    limit?: number;
-  }) => {
-    const queryString = new URLSearchParams();
-    if (params?.userId) queryString.append('userId', params.userId);
-    if (params?.categories) queryString.append('categories', params.categories.join(','));
-    if (params?.skillLevel) queryString.append('skillLevel', params.skillLevel);
-    if (params?.goals) queryString.append('goals', params.goals.join(','));
-    if (params?.limit) queryString.append('limit', params.limit.toString());
-
-    return useQuery({
-      queryKey: ['/api/learning-paths/suggested', params],
-      queryFn: async (): Promise<unknown> => {
-        const url = `/api/learning-paths/suggested${queryString.toString() ? '?' + queryString.toString() : ''}`;
-        const result: unknown = await apiRequest(url, { method: 'GET' });
-        return result;
-      },
-      enabled: !!params
-    });
-  };
-
-  return {
-    generatePath: generatePathMutation.mutate,
-    generatePathAsync: generatePathMutation.mutateAsync,
-    isGenerating: generatePathMutation.isPending,
-    generationError: generatePathMutation.error,
-    useSuggestedPaths
-  };
-}
-
-// Hook for quick recommendations without full profile
-export function useQuickRecommendations(categories?: string[], skillLevel?: string) {
-  return useQuery({
-    queryKey: ['/api/recommendations', 'quick', categories, skillLevel],
-    queryFn: async (): Promise<unknown> => {
-      const params = new URLSearchParams();
-      if (categories?.length) params.append('categories', categories.join(','));
-      if (skillLevel) params.append('skillLevel', skillLevel);
-      params.append('limit', '5');
-
-      const url = `/api/recommendations${params.toString() ? '?' + params.toString() : ''}`;
-      const result: unknown = await apiRequest(url, { method: 'GET' });
-      return result;
-    },
-    enabled: !!categories || !!skillLevel,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
 }

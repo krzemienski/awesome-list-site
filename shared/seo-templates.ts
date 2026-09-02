@@ -19,8 +19,8 @@ const SITE_NAME = "Awesome Video";
 // Both the server (buildMetaTags) and the client (SEOHead) clamp through these
 // SAME functions at emission time, so the crawl-pass HTML and the hydrated DOM
 // always show the identical, budget-fitting string (two-pass parity).
-export const SEO_TITLE_MAX = 60;
-export const SEO_DESCRIPTION_MAX = 160;
+const SEO_TITLE_MAX = 60;
+const SEO_DESCRIPTION_MAX = 160;
 
 // Word-boundary truncation: cut at the budget, back up to the last full word,
 // and append a single ellipsis. Strings already inside the budget pass through
@@ -259,7 +259,7 @@ export function categorySeoDescription(
 }
 
 // Tag landing pages ----------------------------------------------------------
-export function tagSeoTitleCore(name: string): string {
+function tagSeoTitleCore(name: string): string {
   return `${name} Video Resources & Tools`;
 }
 

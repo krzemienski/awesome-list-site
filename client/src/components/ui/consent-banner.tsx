@@ -16,7 +16,7 @@ import { initAmplitude, optOutAmplitude } from "@/lib/amplitude";
 // R5-025 (run24): custom event that re-opens the consent banner. Dispatched
 // by the "Cookie settings" links in Footer and /privacy via
 // openCookieSettings() so users can change a persisted consent choice.
-export const OPEN_COOKIE_SETTINGS_EVENT = "open-cookie-settings";
+const OPEN_COOKIE_SETTINGS_EVENT = "open-cookie-settings";
 export function openCookieSettings() {
   window.dispatchEvent(new CustomEvent(OPEN_COOKIE_SETTINGS_EVENT));
 }

@@ -16,9 +16,9 @@ export const BOOKMARK_QUEUE_STATUSES = [
 export const bookmarkQueueStatusSchema = z.enum(BOOKMARK_QUEUE_STATUSES);
 export type BookmarkQueueStatus = z.infer<typeof bookmarkQueueStatusSchema>;
 
-export const COLLECTION_NAME_MAX = 80;
-export const PERSONAL_TAG_MAX = 40;
-export const PERSONAL_TAG_LIMIT = 20;
+const COLLECTION_NAME_MAX = 80;
+const PERSONAL_TAG_MAX = 40;
+const PERSONAL_TAG_LIMIT = 20;
 
 const safeVisibleText = (value: string) =>
   hasVisibleChars(value) &&
@@ -57,8 +57,6 @@ export const personalTagsSchema = z
 export const collectionShareIdSchema = z
   .string()
   .regex(/^[A-Za-z0-9_-]{24}$/, "Invalid collection link");
-
-export const collectionPositionSchema = z.number().int().min(0).max(1_000_000);
 
 export const BOOKMARK_QUEUE_LABELS: Record<BookmarkQueueStatus, string> = {
   saved: "Saved",

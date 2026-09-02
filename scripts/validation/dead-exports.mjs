@@ -141,15 +141,22 @@ const USAGE_FILES = [
 // new pin / substitution and FAILS. This list must only ever SHRINK (remove a
 // line when the export is deleted, un-exported, or wired up).
 //
-// Categories, for the reader:
+// Task #392 swept the resolvable ones (110 → 53): every helper, constant and
+// schema that was only used inside its own module lost the `export` keyword,
+// and everything with no reference anywhere was deleted. What is left is two
+// categories, both deliberate:
 //   · vendored shadcn/ui primitive families — generated files where the whole
-//     upstream primitive set ships together (deleting members fights the next
-//     `shadcn add` and the components are re-added by hand otherwise);
-//   · app helpers/constants whose last caller disappeared before this gate
-//     existed;
-//   · exports only used inside their own module (the `export` keyword is the
-//     dead part).
-// The analytics helpers this task was filed over are NOT here: they were
+//     upstream primitive set ships together. These are pinned PERMANENTLY, not
+//     pending: trimming them fights the next `shadcn add`, and Rollup
+//     tree-shakes them out of the bundle anyway. That decision is written down
+//     once in docs/COMPONENT-LIBRARY.md ("Vendored surface: keep it whole") —
+//     a sweep should leave them alone rather than re-deciding. The exemption
+//     covers CLI-generated files only, NOT the app composites that share the
+//     ui/ folder;
+//   · the three GA4 conversion senders in client/src/lib/analytics.ts, whose
+//     callers disappeared in the Clerk auth migration. Re-wiring them is
+//     instrumentation work (task #393), not dead-code cleanup.
+// The analytics helpers this GATE was filed over are NOT here: they were
 // deleted (see docs/ANALYTICS.md), which is what every new finding must do.
 // ---------------------------------------------------------------------------
 const FROZEN_EXCEPTIONS = new Set([
@@ -161,7 +168,6 @@ const FROZEN_EXCEPTIONS = new Set([
   'client/src/components/ui/command.tsx#CommandEmpty',
   'client/src/components/ui/command.tsx#CommandSeparator',
   'client/src/components/ui/command.tsx#CommandShortcut',
-  'client/src/components/ui/consent-banner.tsx#OPEN_COOKIE_SETTINGS_EVENT',
   'client/src/components/ui/dialog.tsx#DialogClose',
   'client/src/components/ui/dialog.tsx#DialogOverlay',
   'client/src/components/ui/dialog.tsx#DialogPortal',
@@ -176,7 +182,6 @@ const FROZEN_EXCEPTIONS = new Set([
   'client/src/components/ui/dropdown-menu.tsx#DropdownMenuSubContent',
   'client/src/components/ui/dropdown-menu.tsx#DropdownMenuSubTrigger',
   'client/src/components/ui/form.tsx#useFormField',
-  'client/src/components/ui/paginator.tsx#pageWindow',
   'client/src/components/ui/scroll-area.tsx#ScrollBar',
   'client/src/components/ui/select.tsx#SelectGroup',
   'client/src/components/ui/select.tsx#SelectLabel',
@@ -203,66 +208,11 @@ const FROZEN_EXCEPTIONS = new Set([
   'client/src/components/ui/table.tsx#TableCaption',
   'client/src/components/ui/table.tsx#TableFooter',
   'client/src/components/ui/toggle.tsx#Toggle',
-  'client/src/config/navigation-icons.ts#getSubSubcategoryIcon',
-  'client/src/config/navigation-icons.ts#getSubcategoryIcon',
-  'client/src/config/navigation-icons.ts#navigationIcons',
-  'client/src/hooks/use-mobile.tsx#useIsDesktop',
-  'client/src/hooks/use-mobile.tsx#useIsTablet',
   'client/src/hooks/use-toast.ts#reducer',
   'client/src/hooks/use-toast.ts#toast',
-  'client/src/hooks/useAIRecommendations.ts#useLearningPaths',
-  'client/src/hooks/useAIRecommendations.ts#useQuickRecommendations',
   'client/src/lib/analytics.ts#trackCategoryView',
   'client/src/lib/analytics.ts#trackLogin',
   'client/src/lib/analytics.ts#trackSignUp',
-  'client/src/lib/authUtils.ts#getReturnPath',
-  'client/src/lib/authUtils.ts#isUnauthorizedError',
-  'client/src/lib/guestBookmarks.ts#getGuestBookmarkIdSet',
-  'client/src/lib/guestBookmarks.ts#guestBookmarkCount',
-  'client/src/lib/page-param.ts#MAX_PAGE',
-  'client/src/lib/page-param.ts#parsePageFromSearchStrict',
-  'client/src/lib/posthog.ts#phGetFeatureFlag',
-  'client/src/lib/posthog.ts#phIsFeatureEnabled',
-  'client/src/lib/posthog.ts#phOnFeatureFlags',
-  'client/src/lib/queryClient.ts#getQueryFn',
-  'client/src/lib/static-data.ts#fetchSitemapData',
-  'client/src/lib/utils.ts#countResourcesByCategory',
-  'client/src/lib/utils.ts#extractRepoInfoFromUrl',
-  'client/src/lib/utils.ts#getAbsoluteUrl',
-  'client/src/lib/utils.ts#getSubcategorySlug',
-  'client/src/lib/utils.ts#truncate',
-  'shared/bookmarkCollections.ts#COLLECTION_NAME_MAX',
-  'shared/bookmarkCollections.ts#PERSONAL_TAG_LIMIT',
-  'shared/bookmarkCollections.ts#PERSONAL_TAG_MAX',
-  'shared/bookmarkCollections.ts#collectionPositionSchema',
-  'shared/journeyProgress.ts#getCompletionRelevantRows',
-  'shared/notifications.ts#DIGEST_ATTEMPT_OUTCOMES',
-  'shared/notifications.ts#DIGEST_CHANNELS',
-  'shared/notifications.ts#DIGEST_JOB_STATUSES',
-  'shared/notifications.ts#NOTIFICATION_KINDS',
-  'shared/onboarding.ts#learningPreferencesValuesSchema',
-  'shared/recommendations.ts#RECOMMENDATION_SIGNAL_CODES',
-  'shared/resourceFacets.ts#normalizeResourceFormat',
-  'shared/resourceFacets.ts#normalizeResourceProvider',
-  'shared/resourceFacets.ts#normalizeResourceSkillLevel',
-  'shared/resourceFacets.ts#resourceSearchSortSchema',
-  'shared/seo-templates.ts#SEO_DESCRIPTION_MAX',
-  'shared/seo-templates.ts#SEO_TITLE_MAX',
-  'shared/seo-templates.ts#tagSeoTitleCore',
-  'shared/validation.ts#CONTROL_CHARS_MESSAGE',
-  'shared/validation.ts#DESCRIPTION_MAX',
-  'shared/validation.ts#DESCRIPTION_MIN',
-  'shared/validation.ts#PASSWORD_MAX',
-  'shared/validation.ts#PASSWORD_MAX_BYTES',
-  'shared/validation.ts#PASSWORD_MIN_VISIBLE',
-  'shared/validation.ts#RESOURCE_TITLE_MAX',
-  'shared/validation.ts#SLUG_MAX',
-  'shared/validation.ts#SLUG_RE',
-  'shared/validation.ts#TAXONOMY_NAME_MAX',
-  'shared/validation.ts#ZERO_WIDTH_RE',
-  'shared/validation.ts#normalizeCatalogUrl',
-  'shared/validation.ts#optionalDescriptionSchema',
-  'shared/validation.ts#utf8ByteLength',
 ]);
 
 // Entries in the JSON allowlist that are NOT part of the frozen manifest —

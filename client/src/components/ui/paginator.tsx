@@ -58,7 +58,7 @@ interface PaginatorProps {
  * "…" for gaps (a gap of exactly one page renders that page instead of an
  * ellipsis that would hide a single number).
  */
-export function pageWindow(current: number, total: number): Array<number | "ellipsis"> {
+function pageWindow(current: number, total: number): Array<number | "ellipsis"> {
   if (total <= JUMP_INPUT_THRESHOLD) {
     return Array.from({ length: total }, (_, i) => i + 1);
   }

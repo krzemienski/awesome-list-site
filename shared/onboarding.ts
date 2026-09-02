@@ -22,7 +22,7 @@ const categorySchema = z
   .min(1)
   .max(100);
 
-export const learningPreferencesValuesSchema = z
+const learningPreferencesValuesSchema = z
   .object({
     preferredCategories: z.array(categorySchema).max(12),
     skillLevel: z.enum(SKILL_LEVEL_VALUES),

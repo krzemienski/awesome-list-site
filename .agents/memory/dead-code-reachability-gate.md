@@ -31,3 +31,13 @@ Directory prefixes must keep their trailing slash or a sibling like `src-legacy/
 **Mutation-testing a NEW gate:** snapshot files with `cp`, never `git checkout --`. A brand-new allowlist is untracked, so checkout fails on it — and when given several pathspecs it then restores NONE of them, silently leaving both the probe edit and a dropped pin behind. The gate goes green on a corrupted allowlist and the "verification" proves nothing.
 
 **Allowlist contract:** a repo-mutable JSON allowlist alone fails code review — a newly dead file could be pinned in the same change that killed it. Freeze the exception universe as a manifest inside the gate script (allowlist must be a subset; new paths AND substitutions fail), so growing it requires a visible out-of-band edit to the gate itself, and canary the new-pin/substitution/removal cases.
+
+## Sweeping the symbol-level pins (the resolution side)
+
+Un-exporting is not free. A const whose only remaining reference sits in a TYPE position — export type T = (typeof X)[number], or z.infer<typeof schema> — trades a dead-export finding for an eslint no-unused-vars "assigned a value but only used as a type" error the moment the export keyword comes off. tsc stays green and the gate goes green, so the resolution looks clean while lint quietly regresses. The honest fix is to delete the runtime value and write the union (or derive the type from a tuple something actually reads at runtime); a disable comment is the wrong answer when nothing executes the value.
+
+Vendored/generated families (shadcn CLI output and its use-toast hook) are a PERMANENT pin, not backlog. The whole upstream surface ships per file, trimming members fights the next add of that primitive, and the bundler tree-shakes whatever is unrendered — so the entries cost nothing and resolving them is a net loss. Decide it once, write the decision in the doc the gate header points at, and let the sweep skip them; otherwise every sweep re-triages the same ~50 entries to the same answer.
+
+Shrink-only manifests want a mechanical unpin step, never hand edits. Run the gate, parse ITS OWN stale-allowlist findings, abort if any non-stale failure is present, then remove exactly those keys from both the JSON allowlist and the frozen manifest in the script, asserting the two counts still match afterwards. Two parallel lists of ~100 keys desync silently when edited by hand, and the desync only shows up as a confusing gate failure much later.
+
+Leave a pin in place when another in-flight task owns the symbol (instrumentation waiting to be re-wired is not dead code) — but say so in the gate header, or the next sweep deletes the thing that task is about to call.

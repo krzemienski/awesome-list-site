@@ -62,12 +62,13 @@ export const RESOURCE_SEARCH_SORT_VALUES = [
 export const resourceFormatSchema = z.enum(RESOURCE_FORMAT_VALUES);
 export const resourceProviderSchema = z.enum(RESOURCE_PROVIDER_VALUES);
 export const resourceSkillLevelSchema = z.enum(RESOURCE_SKILL_LEVEL_VALUES);
-export const resourceSearchSortSchema = z.enum(RESOURCE_SEARCH_SORT_VALUES);
 
 export type ResourceFormat = z.infer<typeof resourceFormatSchema>;
 export type ResourceProvider = z.infer<typeof resourceProviderSchema>;
 export type ResourceSkillLevel = z.infer<typeof resourceSkillLevelSchema>;
-export type ResourceSearchSort = z.infer<typeof resourceSearchSortSchema>;
+// No z.enum() counterpart: the sort is never parsed with zod, so the type is
+// derived straight from the value tuple instead of an unused schema object.
+export type ResourceSearchSort = (typeof RESOURCE_SEARCH_SORT_VALUES)[number];
 
 export interface ResourceFacetCount {
   value: string;
@@ -135,69 +136,3 @@ export const RESOURCE_SEARCH_SORT_LABELS: Record<ResourceSearchSort, string> = {
   newest: "Newest",
   oldest: "Oldest",
 };
-
-function normalizeFacetInput(value: unknown): string {
-  return typeof value === "string"
-    ? value.trim().toLowerCase().replace(/[\s_]+/g, "-")
-    : "";
-}
-
-const FORMAT_ALIASES: Record<string, ResourceFormat> = {
-  api: "api-service",
-  service: "api-service",
-  "api-service": "api-service",
-  spec: "specification",
-  standard: "specification",
-  docs: "article",
-  documentation: "article",
-  tutorial: "course",
-};
-
-const PROVIDER_ALIASES: Record<string, ResourceProvider> = {
-  amazon: "aws",
-  "amazon-web-services": "aws",
-  gcp: "google-cloud",
-  google: "google-cloud",
-  "microsoft-azure": "azure",
-  "git-hub": "github",
-  "you-tube": "youtube",
-  selfhosted: "self-hosted",
-};
-
-const SKILL_ALIASES: Record<string, ResourceSkillLevel> = {
-  novice: "beginner",
-  introductory: "beginner",
-  intro: "beginner",
-  expert: "advanced",
-  "all": "all-levels",
-  "all-level": "all-levels",
-  "any-level": "all-levels",
-};
-
-/**
- * Strict normalizers for trusted write paths. Unsupported values become
- * `unknown` rather than being persisted as ad-hoc classifications.
- */
-export function normalizeResourceFormat(value: unknown): ResourceFormat {
-  const normalized = normalizeFacetInput(value);
-  const aliased = FORMAT_ALIASES[normalized] ?? normalized;
-  return resourceFormatSchema.safeParse(aliased).success
-    ? (aliased as ResourceFormat)
-    : "unknown";
-}
-
-export function normalizeResourceProvider(value: unknown): ResourceProvider {
-  const normalized = normalizeFacetInput(value);
-  const aliased = PROVIDER_ALIASES[normalized] ?? normalized;
-  return resourceProviderSchema.safeParse(aliased).success
-    ? (aliased as ResourceProvider)
-    : "unknown";
-}
-
-export function normalizeResourceSkillLevel(value: unknown): ResourceSkillLevel {
-  const normalized = normalizeFacetInput(value);
-  const aliased = SKILL_ALIASES[normalized] ?? normalized;
-  return resourceSkillLevelSchema.safeParse(aliased).success
-    ? (aliased as ResourceSkillLevel)
-    : "unknown";
-}

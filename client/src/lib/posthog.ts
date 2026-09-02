@@ -230,35 +230,3 @@ export const phReset = () => {
     // ignore
   }
 };
-
-// ---------------------------------------------------------------------------
-// Feature flags — safe wrappers (no-op defaults pre-consent / pre-load)
-// ---------------------------------------------------------------------------
-
-export const phIsFeatureEnabled = (flag: string): boolean => {
-  if (!ph || disabled) return false;
-  try {
-    return ph.isFeatureEnabled(flag) === true;
-  } catch {
-    return false;
-  }
-};
-
-export const phGetFeatureFlag = (flag: string): string | boolean | undefined => {
-  if (!ph || disabled) return undefined;
-  try {
-    return ph.getFeatureFlag(flag);
-  } catch {
-    return undefined;
-  }
-};
-
-/** Run a callback once feature flags are loaded (or immediately if already). */
-export const phOnFeatureFlags = (cb: () => void) => {
-  if (!ph || disabled) return;
-  try {
-    ph.onFeatureFlags(cb);
-  } catch {
-    // ignore
-  }
-};

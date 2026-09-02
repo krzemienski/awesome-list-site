@@ -138,15 +138,11 @@ export function getGuestBookmarks(): GuestBookmarkEntry[] {
   return entriesCache;
 }
 
-export function getGuestBookmarkIdSet(): Set<number> {
+function getGuestBookmarkIdSet(): Set<number> {
   if (idSetCache === null) {
     idSetCache = new Set(getGuestBookmarks().map((entry) => entry.id));
   }
   return idSetCache;
-}
-
-export function guestBookmarkCount(): number {
-  return getGuestBookmarks().length;
 }
 
 export function isGuestBookmarked(resourceId: string | number): boolean {

@@ -8,19 +8,17 @@ export const RECOMMENDATION_FEEDBACK_VALUES = [
 export type RecommendationFeedbackValue =
   (typeof RECOMMENDATION_FEEDBACK_VALUES)[number];
 
-export const RECOMMENDATION_SIGNAL_CODES = [
-  "goal_match",
-  "format_match",
-  "time_fit",
-  "topic_match",
-  "skill_match",
-  "journey_context",
-  "positive_feedback",
-  "popular",
-] as const;
-
+// Type contract only — nothing iterates the codes at runtime (unlike
+// RECOMMENDATION_FEEDBACK_VALUES above, which callers validate against).
 export type RecommendationSignalCode =
-  (typeof RECOMMENDATION_SIGNAL_CODES)[number];
+  | "goal_match"
+  | "format_match"
+  | "time_fit"
+  | "topic_match"
+  | "skill_match"
+  | "journey_context"
+  | "positive_feedback"
+  | "popular";
 
 /**
  * Only server-derived, named evidence is exposed to recommendation clients.

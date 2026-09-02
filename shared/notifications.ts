@@ -3,33 +3,26 @@ import { z } from "zod";
 export const DIGEST_CADENCES = ["weekly", "biweekly", "monthly"] as const;
 export type DigestCadence = (typeof DIGEST_CADENCES)[number];
 
-export const DIGEST_CHANNELS = ["email", "in_app"] as const;
-export type DigestChannel = (typeof DIGEST_CHANNELS)[number];
+// These four are TYPE contracts only — nothing reads a runtime tuple for them
+// (DIGEST_CADENCES above is different: z.enum() consumes it below), so they are
+// plain unions rather than `as const` arrays nothing iterates.
+export type DigestChannel = "email" | "in_app";
 
-export const DIGEST_JOB_STATUSES = [
-  "queued",
-  "processing",
-  "sent",
-  "failed",
-  "skipped",
-] as const;
-export type DigestJobStatus = (typeof DIGEST_JOB_STATUSES)[number];
+export type DigestJobStatus =
+  | "queued"
+  | "processing"
+  | "sent"
+  | "failed"
+  | "skipped";
 
-export const DIGEST_ATTEMPT_OUTCOMES = [
-  "started",
-  "sent",
-  "failed",
-  "skipped",
-  "delivery_unknown",
-] as const;
-export type DigestAttemptOutcome = (typeof DIGEST_ATTEMPT_OUTCOMES)[number];
+export type DigestAttemptOutcome =
+  | "started"
+  | "sent"
+  | "failed"
+  | "skipped"
+  | "delivery_unknown";
 
-export const NOTIFICATION_KINDS = [
-  "new_resource",
-  "watch_next",
-  "journey_step",
-] as const;
-export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
+export type NotificationKind = "new_resource" | "watch_next" | "journey_step";
 
 export const notificationPreferencesUpdateSchema = z
   .object({

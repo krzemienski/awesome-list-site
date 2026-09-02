@@ -13,10 +13,7 @@
  *     and never content the crawler pass would deny.
  */
 
-import { MAX_PAGE, parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
-
-/** Re-exported from the shared rule (R5-043 int32 cap) for existing callers. */
-export { MAX_PAGE };
+import { parsePageNumber, parseUrlPageStrict } from "@shared/page-param";
 
 export type PageParamKind =
   /** No ?page= present — page 1, nothing to report. */
@@ -68,11 +65,6 @@ export function parsePageParamStrict(raw: string | null): ParsedPageParam {
       // copy handles the empty raw specially.
       return { page: 1, kind: "invalid", raw };
   }
-}
-
-/** Strict convenience: parse ?page= out of a query string (taxonomy pages). */
-export function parsePageFromSearchStrict(search: string): ParsedPageParam {
-  return parsePageParamStrict(new URLSearchParams(search).get("page"));
 }
 
 /**

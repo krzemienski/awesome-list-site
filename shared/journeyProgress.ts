@@ -34,7 +34,7 @@ export function groupLogicalJourneySteps<T extends LogicalJourneyStepRow>(
     .map(([stepNumber, rows]) => ({ stepNumber, rows }));
 }
 
-export function getCompletionRelevantRows<T extends LogicalJourneyStepRow>(
+function getCompletionRelevantRows<T extends LogicalJourneyStepRow>(
   rows: T[],
 ): T[] {
   const required = rows.filter((row) => !row.isOptional);
