@@ -10,8 +10,8 @@
 // showing up in the first `ls` of the project and in security-scan output,
 // reading as supported tooling.
 //
-// This gate closes that blind spot. Every JS/TS-family file sitting directly
-// in the repository root must be reachable by something MACHINE-READABLE:
+// This gate closes that blind spot. Every executable/script file sitting
+// directly in the repository root must be reachable by something MACHINE-READABLE:
 //   · npm-script       — named in a package.json "scripts" command
 //   · package-manifest — named in another package.json field (main/bin/…)
 //   · workflow         — named in .replit (workflow task, run, deploy build)
@@ -87,9 +87,10 @@
 // exemption universe is a visible, out-of-band edit to the gate itself — the
 // same trust boundary dead-components.mjs uses for its frozen exceptions.
 //
-// Scope is the JS/TS family (.js/.mjs/.cjs/.jsx/.ts/.mts/.cts/.tsx) directly
-// in the root — not recursive: scripts/ is where one-off tooling belongs, and
-// files git already ignores are skipped (they never enter the repository).
+// Scope is executable/script files directly in the root — the JS/TS family
+// (.js/.mjs/.cjs/.jsx/.ts/.mts/.cts/.tsx), shell (.sh), and Python (.py) —
+// not recursive: scripts/ is where one-off tooling belongs, and files git
+// already ignores are skipped (they never enter the repository).
 // *.d.ts is exempt: ambient declarations are pulled in through tsconfig
 // "include", never by a reference.
 //
@@ -144,9 +145,9 @@ const ROOT = path.resolve(path.dirname(SELF), '..', '..');
 const LIST = process.argv.includes('--list');
 
 const CODE_EXTS = ['.js', '.mjs', '.cjs', '.jsx', '.ts', '.mts', '.cts', '.tsx'];
-// Extending the checked family (say to .py or .sh) is a one-line change here;
-// the JS/TS family is what the root has ever accumulated.
-const CHECKED_EXTS = new Set(CODE_EXTS);
+// Keep root-only executable/script detection broader than the source-tree
+// scanner: a one-off .sh or .py is just as stray as a one-off JS/TS file.
+const CHECKED_EXTS = new Set([...CODE_EXTS, '.sh', '.py']);
 
 // ---------------------------------------------------------------------------
 // Trusted manifest of auto-discovered root tool configs. Each entry is honored
@@ -385,6 +386,8 @@ function schemaFor(rel) {
 }
 // Heads that RUN a file argument rather than merely printing or moving it.
 const JS_RUNTIMES = new Set(['node', 'nodejs', 'npx', 'tsx', 'ts-node', 'bun', 'deno', 'nodemon', 'pm2', 'vite-node']);
+const PYTHON_RUNTIMES = new Set(['python', 'python3', 'python3.11']);
+const FILE_ARG_RUNTIMES = new Set([...JS_RUNTIMES, ...PYTHON_RUNTIMES]);
 const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'ksh']);
 // Wrappers run ANOTHER command and say nothing themselves, so they are peeled
 // off and the real head is judged: `env echo probe.mjs` is still just an echo.
@@ -482,7 +485,7 @@ function referencesInvocation(command, name, depth = 0) {
     if (head >= tokens.length) continue;
     const exe = path.basename(tokens[head]);
     const isShell = SHELLS.has(exe);
-    const runsFileArgs = JS_RUNTIMES.has(exe) || isShell;
+    const runsFileArgs = FILE_ARG_RUNTIMES.has(exe) || isShell;
     const honorsFileFlags = FILE_FLAG_HOSTS.has(exe);
     for (let j = head; j < tokens.length; j++) {
       const token = tokens[j];
@@ -691,7 +694,8 @@ function resolveRootTarget(spec, importerAbs, rootFileNames) {
   const base = path.resolve(path.dirname(importerAbs), spec);
   if (path.dirname(base) !== ROOT) return null;
   const stem = path.basename(base);
-  const candidates = [stem];
+  const stemExt = path.extname(stem);
+  const candidates = !stemExt || CODE_EXTS.includes(stemExt) ? [stem] : [];
   const swap = stem.match(/^(.*)\.(js|jsx|mjs|cjs)$/);
   if (swap) candidates.push(`${swap[1]}.ts`, `${swap[1]}.tsx`);
   for (const ext of CODE_EXTS) candidates.push(stem + ext);
@@ -912,7 +916,7 @@ function runCanaries() {
   eq(referencesName('cp probe.mjs /tmp; node probe.mjs', 'probe.mjs'), true, 'name followed by punctuation');
 
   // Invocation matching: naming a file is not running it.
-  const runs = (command) => referencesInvocation(command, 'probe.mjs');
+  const runs = (command, name = 'probe.mjs') => referencesInvocation(command, name);
   eq(runs('node probe.mjs'), true, 'node probe.mjs runs it');
   eq(runs('node --experimental-strip-types ./probe.mjs --check'), true, 'runtime flags do not hide the file');
   eq(runs('NODE_ENV=production npx tsx probe.mjs'), true, 'env prefixes and npx are handled');
@@ -941,6 +945,8 @@ function runCanaries() {
   eq(runs('bash -c "echo probe.mjs"'), false, 'so an echo inside -c is still an echo');
   eq(runs('bash -lc "cd app && node probe.mjs"'), true, 'including combined shell flags');
   eq(runs('bash probe.mjs'), true, 'a shell handed the file runs it');
+  eq(runs('python probe.py', 'probe.py'), true, 'python runs a Python script');
+  eq(runs('python3 ./probe.py', 'probe.py'), true, 'python3 runs a Python script');
 
   // Hash comments — whole-line AND inline — must not keep a file alive, on
   // every surface that has them (shell, TOML/.replit, Dockerfile).
@@ -1060,6 +1066,9 @@ function runCanaries() {
   eq(resolveRootTarget('../probe.mjs', importer, rootNames), 'probe.mjs', 'exact root import resolves');
   eq(resolveRootTarget('./storage', importer, rootNames), null, 'sibling import is not a root import');
   eq(resolveRootTarget('../shared/schema', importer, rootNames), null, 'import into another dir is not a root import');
+  const nonCodeRootNames = new Set(['probe.py', 'probe.sh']);
+  eq(resolveRootTarget('../probe', importer, nonCodeRootNames), null, 'an extensionless JS import cannot resolve a Python or shell script');
+  eq(resolveRootTarget('../probe.py', importer, nonCodeRootNames), null, 'an explicit non-JS import cannot resolve a Python script');
 
   // End-to-end classification against synthetic surfaces.
   const ctx = (over = {}) => ({
@@ -1073,8 +1082,14 @@ function runCanaries() {
   const kindOf = (name, over) => classifyAll([name], ctx(over)).get(name).kind;
   eq(kindOf('probe.mjs'), 'stray', 'unreferenced root script is stray');
   eq(kindOf('probe.mjs', { npmScripts: [['probe', 'node probe.mjs']] }), 'npm-script', 'npm-script reference keeps it');
+  eq(kindOf('probe.sh'), 'stray', 'unreferenced root shell script is stray');
+  eq(kindOf('probe.py'), 'stray', 'unreferenced root Python script is stray');
   const surfaceOf = (rel, text) => ({ surfaces: [{ rel, kind: surfaceKind(rel), ...extractSurfaceRefs(rel, text) }] });
   eq(kindOf('probe.mjs', surfaceOf('.replit', '[[workflows.workflow.tasks]]\ntask = "shell.exec"\nargs = "node probe.mjs"\n')), 'workflow', 'workflow reference keeps it');
+  eq(kindOf('probe.sh', surfaceOf('.replit', '[[workflows.workflow.tasks]]\ntask = "shell.exec"\nargs = "bash probe.sh"\n')), 'workflow', 'workflow reference keeps a root shell script');
+  eq(kindOf('probe.py', { npmScripts: [['probe', 'python probe.py']] }), 'npm-script', 'a Python npm script keeps it');
+  eq(kindOf('probe.py', surfaceOf('.replit', '[[workflows.workflow.tasks]]\ntask = "shell.exec"\nargs = "python3 probe.py"\n')), 'workflow', 'a Python workflow keeps it');
+  eq(kindOf('probe.py', surfaceOf('Dockerfile', 'COPY probe.py ./')), 'tooling', 'Dockerfile reference keeps a root Python script');
   eq(kindOf('probe.mjs', surfaceOf('.replit', 'name = "probe.mjs"')), 'stray', 'a workflow display name does not keep it');
   eq(kindOf('probe.mjs', surfaceOf('.replit', 'this is not toml\nargs = "node probe.mjs"\n')), 'stray', 'a corrupt .replit cannot keep a root script alive');
   eq(kindOf('probe.mjs', { importedBy: new Map([['probe.mjs', 'server/index.ts']]) }), 'import', 'import edge from an execution tree keeps it');
@@ -1145,7 +1160,7 @@ const checked = allRootFiles.filter((n) => !ignored.has(n));
 // The gate must never pass vacuously: the root has always held tool configs,
 // so an empty checked set means the scan itself broke (wrong cwd, bad walk).
 if (!checked.length) {
-  console.error('FAIL scan-empty :: no root JS/TS files found at all — the scan is broken, not the repo clean.');
+  console.error('FAIL scan-empty :: no root executable/script files found at all — the scan is broken, not the repo clean.');
   process.exit(1);
 }
 
@@ -1169,7 +1184,7 @@ const stray = results.filter((r) => r.kind === 'stray');
 if (LIST) {
   console.log(`command surfaces: ${surfaces.length} file(s) (root configs, ${COMMAND_SURFACE_DIRS.join(', ')}, ${SHELL_ONLY_DIRS.join(', ')}/**/*.sh)`);
   console.log(`import edges parsed from: ${codeCount} source file(s) across ${IMPORT_TREE_DIRS.join(', ')}`);
-  console.log(`root JS/TS files: ${allRootFiles.length} (${ignored.size} git-ignored, ${checked.length} checked)`);
+  console.log(`root executable/script files: ${allRootFiles.length} (${ignored.size} git-ignored, ${checked.length} checked)`);
   const manifestAbsent = ROOT_CONFIG_MANIFEST.filter((e) => !checked.includes(e.file)).map((e) => e.file);
   if (manifestAbsent.length) console.log(`manifest entries with no file present: ${manifestAbsent.join(', ')}`);
 }
@@ -1198,5 +1213,5 @@ if (stray.length) {
   process.exit(1);
 }
 
-console.log(`PASS root-script-drift :: ${checked.length} root JS/TS file(s) checked, 0 stray${ignored.size ? `, ${ignored.size} git-ignored` : ''}`);
+console.log(`PASS root-script-drift :: ${checked.length} root executable/script file(s) checked, 0 stray${ignored.size ? `, ${ignored.size} git-ignored` : ''}`);
 for (const r of results) console.log(`       ${r.name} — ${r.kind}: ${r.where}`);
