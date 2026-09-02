@@ -233,5 +233,11 @@ targeting a non-local site. It exits non-zero if consent gating, GA4 delivery,
 INP delivery, or the PII scan fails. The full validator remains the development
 check for the broader event taxonomy and auth flows.
 
+The GitHub Pages release workflow runs this smoke automatically after
+`deploy-pages` succeeds, passing the deployment action's exact `page_url`.
+The workflow uploads `ga4-smoke-evidence-<run id>` even when an assertion fails,
+then marks the workflow failed without rolling back or mutating the published
+site. The report records both the published URL and the workflow run URL.
+
 The validator prints event counts, per-assertion results, and sample decoded
 payloads to stdout (and any output paths it is configured with at run time).

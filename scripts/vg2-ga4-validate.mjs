@@ -46,9 +46,12 @@ try {
 if (SMOKE && !BASE_FLAG_VALUE && !process.env.BASE_URL) {
   throw new Error('production smoke mode requires an explicit --base-url <http(s) URL>');
 }
-const OUT = '/home/runner/workspace/evidence';
+const OUT = process.env.VG2_EVIDENCE_DIR || '/home/runner/workspace/evidence';
+const RELEASE_URL = process.env.VG2_RELEASE_URL || BASE;
+const EVIDENCE_URL = process.env.VG2_EVIDENCE_URL || '';
 const TS = Date.now();
 const EXPECTED_BROWSER_ERROR = 'VG2 deliberate browser error';
+try { fs.mkdirSync(OUT, { recursive: true }); } catch {}
 
 // ---------------------------------------------------------------------------
 // Clerk test-account plumbing (task #393 — real `login` / `sign_up` conversions)
@@ -264,6 +267,10 @@ function writeEvidence() {
   md.push(`# VG-2 — Real-Browser GA4 Validation Evidence (${mode})`);
   md.push('');
   md.push(`Run: ${new Date(TS).toISOString()} · Browser: pinned Chromium · Target: ${BASE}`);
+  if (SMOKE) {
+    md.push(`Published release: ${RELEASE_URL}`);
+    if (EVIDENCE_URL) md.push(`Evidence record: ${EVIDENCE_URL}`);
+  }
   md.push('');
   md.push(`**Result: ${passCount}/${assertedCount} checks passed${skipCount ? ` · ${skipCount} skipped` : ''}.**`);
   md.push('');
@@ -308,16 +315,30 @@ function writeEvidence() {
 async function runProductionSmoke(page) {
   // Deliberately do not load the catalog or set up Clerk here: this mode is
   // safe to run against a published site and must not create or modify data.
-  await page.goto(`${BASE}/?utm_source=vg2_smoke`, { waitUntil: 'load', timeout: 30000 });
+  try {
+    await page.goto(`${BASE}/?utm_source=vg2_smoke`, { waitUntil: 'load', timeout: 30000 });
+    check('published landing page loaded', true, BASE);
+  } catch (error) {
+    check('published landing page loaded', false, String(error).slice(0, 200));
+    return;
+  }
   await sleep(2000);
   check('no GA request before analytics consent', raw.length === 0, `${raw.length} pre-consent request(s)`);
 
   const accept = page.getByTestId('consent-accept');
-  await accept.waitFor({ state: 'visible' });
-  await accept.click();
-  const consentGranted = await page.evaluate(
-    () => localStorage.getItem('analytics-consent') === 'granted',
-  );
+  const consentVisible = await accept.isVisible().catch(() => false);
+  check('analytics consent banner available', consentVisible, String(consentVisible));
+  if (!consentVisible) return;
+
+  try {
+    await accept.click();
+  } catch (error) {
+    check('analytics consent grant completed', false, `could not click consent control: ${String(error).slice(0, 160)}`);
+    return;
+  }
+  const consentGranted = await page
+    .evaluate(() => localStorage.getItem('analytics-consent') === 'granted')
+    .catch(() => false);
   check('analytics consent grant completed', consentGranted, String(consentGranted));
 
   const warm = await waitForCollect(1, 20000);
@@ -438,10 +459,14 @@ async function main() {
   page.on('request', record);
 
   if (SMOKE) {
-    await runProductionSmoke(page);
-    await browser.close();
+    try {
+      await runProductionSmoke(page);
+    } catch (error) {
+      check('production analytics smoke completed', false, String(error).slice(0, 200));
+    }
+    await browser.close().catch(() => {});
     writeEvidence();
-    const smokePass = results.every((result) => result.pass);
+    const smokePass = results.length > 0 && results.every((result) => result.pass);
     process.exit(smokePass ? 0 : 1);
   }
 
@@ -762,4 +787,11 @@ async function main() {
   process.exit(results.every((r) => r.pass) ? 0 : 1);
 }
 
-main().catch((e) => { console.error('FATAL', e); process.exit(2); });
+main().catch((e) => {
+  console.error('FATAL', e);
+  if (SMOKE) {
+    check('production analytics smoke completed', false, String(e).slice(0, 200));
+    writeEvidence();
+  }
+  process.exit(2);
+});

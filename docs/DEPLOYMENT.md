@@ -76,6 +76,12 @@ Steps:
 Replit provides managed PostgreSQL with separate development and production
 databases. An external PostgreSQL provider also works.
 
+For the GitHub Pages release path, `.github/workflows/deploy.yml` runs the
+production-safe GA4/INP smoke after `deploy-pages` reports success. It keeps the
+release published if the smoke fails, uploads the raw payloads and report as
+the `ga4-smoke-evidence-<run id>` workflow artifact, and fails the workflow with
+a direct link to the evidence run.
+
 ## Docker / Self-Hosting
 
 The repo ships a production `Dockerfile` and a `docker-compose.yml` (app +
