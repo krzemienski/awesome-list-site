@@ -368,6 +368,89 @@ for (const w of [768, 375, 320]) {
         consent.bottom.hitTestable === consent.bottom.footerLinks,
       `footerLinks=${consent.bottom.footerLinks} hitTestable=${consent.bottom.hitTestable} bannerBottom=${consent.bottom.bannerBottom}`,
     );
+
+    // ---- persisted consent: Cookie settings must reopen cleanly @375 ----
+    // Start with a real persisted choice so this exercises the later footer
+    // path rather than dispatching the event while the first-visit banner is
+    // already visible. The banner's focus move is user-initiated and should
+    // bring the newly inserted, in-flow row back to the top of the document.
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    const decline = page.locator('[data-testid="consent-decline"]');
+    const declineReady = await decline.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false);
+    if (!declineReady) {
+      log('consent-reopen@375', false, 'initial consent decline control not reachable');
+    } else {
+      await decline.click();
+      const dismissed = await page.waitForSelector('[data-testid="consent-banner"]', { state: 'hidden', timeout: 5000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!dismissed) {
+        log('consent-reopen@375', false, 'initial consent choice did not dismiss the banner');
+      } else {
+        await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+        const settings = page.locator('[data-testid="footer-cookie-settings"]');
+        const settingsReady = await settings.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false);
+        if (!settingsReady) {
+          log('consent-reopen@375', false, 'footer Cookie settings control not reachable after scrolling');
+        } else {
+          await settings.click();
+          await page.waitForFunction(
+            () => document.activeElement?.matches('[data-testid="consent-banner"]') === true,
+            undefined,
+            { timeout: 5000 },
+          ).catch(() => {});
+          const reopened = await page.evaluate(() => {
+            const banner = document.querySelector('[data-testid="consent-banner"]');
+            const footer = document.querySelector('footer');
+            if (!banner || !footer) return { banner: false, footer: !!footer };
+
+            const bannerRect = banner.getBoundingClientRect();
+            const footerContainer = footer.parentElement;
+            const bodyPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+            const footerPad = footerContainer
+              ? parseFloat(getComputedStyle(footerContainer).paddingBottom) || 0
+              : -1;
+            const insetRaw = getComputedStyle(document.documentElement)
+              .getPropertyValue('--app-bottom-inset')
+              .trim();
+            const center = document.elementFromPoint(
+              bannerRect.left + bannerRect.width / 2,
+              bannerRect.top + bannerRect.height / 2,
+            );
+            const onBanner = !!center && (center === banner || banner.contains(center) || center.contains(banner));
+
+            return {
+              banner: true,
+              active: document.activeElement === banner,
+              position: getComputedStyle(banner).position,
+              documentTop: Math.round(bannerRect.top + window.scrollY),
+              viewportTop: Math.round(bannerRect.top),
+              height: Math.round(bannerRect.height),
+              reachable: bannerRect.width > 0 && bannerRect.height > 0 &&
+                bannerRect.top >= -1 && bannerRect.bottom <= window.innerHeight + 1 && onBanner,
+              bodyPad,
+              footerPad,
+              insetRaw,
+            };
+          });
+          const atDocumentTop = reopened.banner &&
+            reopened.documentTop === 0 &&
+            reopened.viewportTop >= -1 &&
+            reopened.viewportTop <= 1;
+          const reachable = reopened.banner && reopened.reachable && reopened.active;
+          const noExternalPadding = reopened.banner &&
+            reopened.bodyPad === 0 &&
+            reopened.footerPad === 0 &&
+            reopened.insetRaw === '0px';
+          log(
+            'consent-reopen@375',
+            atDocumentTop && reachable && noExternalPadding &&
+              reopened.position === 'relative' && reopened.height > 0,
+            JSON.stringify(reopened),
+          );
+        }
+      }
+    }
   }
 
   // ---- home CTA reachable (hit-test) with the banner still visible ----

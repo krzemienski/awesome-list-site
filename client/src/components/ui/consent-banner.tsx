@@ -88,8 +88,17 @@ export default function ConsentBanner() {
   useEffect(() => {
     const onOpen = () => {
       setChoiceMade(false);
-      // Re-focus after the banner re-renders.
-      setTimeout(() => bannerRef.current?.focus(), 0);
+      // Re-focus after the banner re-renders. On phones the banner is an
+      // in-flow row at the top of the document; prevent focus from preserving
+      // the footer's old scroll anchor, then explicitly bring that row back
+      // into view so the reopened settings are reachable.
+      setTimeout(() => {
+        const banner = bannerRef.current;
+        if (!banner) return;
+        const phone = window.innerWidth < 640;
+        banner.focus({ preventScroll: phone });
+        if (phone) window.scrollTo({ top: 0, behavior: "instant" });
+      }, 0);
     };
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, onOpen);
