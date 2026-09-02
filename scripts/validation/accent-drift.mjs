@@ -137,6 +137,10 @@
 //   · static-font-scope — an always-on pre-paint <link> in the HTML shell
 //     fetches a family the DEFAULT system does not name, i.e. every visitor
 //     blocks on a face only some systems use
+//   · font-source-coverage — a Google Fonts stylesheet URL in a client CSS
+//     @import or an HTML entry point's stylesheet link is not one of the
+//     FONT_STYLESHEETS / SYSTEM_STYLESHEETS / client/index.html sources the
+//     offline and live probes read
 //   · csp-parity / stylesheet-csp — the two server CSP blocks disagree, or a
 //     FONT_STYLESHEETS / SYSTEM_STYLESHEETS / pre-paint stylesheet URL is not
 //     allowed by style-src and therefore cannot reach the browser
@@ -230,6 +234,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as cheerio from 'cheerio';
 import esbuild from 'esbuild';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -314,6 +319,25 @@ function stackFamilies(stack) {
   const normalized = normalizeFontStack(stack);
   if (!normalized) return [];
   return normalized.split(',').map(normalizeFamilyName).filter(Boolean);
+}
+
+// The source scan is intentionally limited to stylesheet URLs served by the
+// provider whose responses this gate can understand. Font files from
+// fonts.gstatic.com are response URLs, not source stylesheet URLs, and are
+// checked by the opt-in probe's font-src validation instead.
+const FONT_PROVIDER_HOSTS = new Set(['fonts.googleapis.com']);
+
+function normalizeSourceUrl(raw) {
+  return String(raw).trim().replace(/&amp;/gi, '&');
+}
+
+function isFontProviderUrl(raw) {
+  const value = normalizeSourceUrl(raw);
+  try {
+    return FONT_PROVIDER_HOSTS.has(new URL(value, 'https://font-source-self.invalid').hostname.toLowerCase());
+  } catch {
+    return false;
+  }
 }
 
 // The families a Google Fonts css2 URL DOWNLOADS: every `family=` parameter,
@@ -736,24 +760,54 @@ function parseBootSystems(htmlSrc) {
   return { ids, fallback: fb ? fb[1] : null };
 }
 
-// Every <link rel="stylesheet"> in the HTML shell. Only the live probe reads
-// these: the pre-paint body face is fetched by the shell itself, by neither
-// stylesheet map, so no other check in this file knows that URL exists.
-// HTML comments are stripped first (this file records its own history in
-// them, markup included), attributes are read BY NAME so order and the line
-// break between rel and href do not matter, and `&amp;` is decoded so a
-// properly escaped href still splits into its family= parameters.
+// Every <link> carrying the `stylesheet` rel token in an HTML source. HTML
+// is parsed as HTML rather than matched as text: quoted `>` characters,
+// character references, unquoted attributes, attribute order/line breaks,
+// and space-separated rel tokens therefore resolve exactly as they do in the
+// browser. This parser is shared by the offline coverage lock and live probe.
 function parseHtmlStylesheetLinks(htmlSrc) {
-  const src = String(htmlSrc).replace(/<!--[\s\S]*?-->/g, '');
+  const $ = cheerio.load(String(htmlSrc));
   const hrefs = [];
-  for (const tag of src.matchAll(/<link\b([^>]*)>/gi)) {
-    const rel = /\brel\s*=\s*["']([^"']*)["']/i.exec(tag[1]);
-    if (!rel || rel[1].trim().toLowerCase() !== 'stylesheet') continue; // preconnect/icon/manifest
-    const href = /\bhref\s*=\s*["']([^"']*)["']/i.exec(tag[1]);
-    if (!href) continue;
-    hrefs.push(href[1].trim().replace(/&amp;/gi, '&'));
+  $('link').each((_, element) => {
+    const relTokens = String($(element).attr('rel') ?? '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const href = $(element).attr('href');
+    if (!relTokens.includes('stylesheet') || href === undefined) return; // preconnect/icon/manifest
+    hrefs.push(normalizeSourceUrl(href));
+  });
+  return hrefs;
+}
+
+// CSS @import rules and HTML stylesheet links are both browser fetch points.
+// Keep the source scan focused on provider stylesheets, not preconnect hints or
+// font-file URLs, because only stylesheet URLs are targets of this gate/probe.
+function parseCssFontProviderImports(cssSrc) {
+  const src = stripCssComments(cssSrc);
+  const hrefs = [];
+  const importRe = /@import\s+(?:url\(\s*)?(?:"([^"]+)"|'([^']+)'|([^'"\s)]+))\s*\)?/gi;
+  for (const match of src.matchAll(importRe)) {
+    const href = normalizeSourceUrl(match[1] ?? match[2] ?? match[3] ?? '');
+    if (isFontProviderUrl(href)) hrefs.push(href);
   }
   return hrefs;
+}
+
+function parseHtmlFontProviderLinks(htmlSrc) {
+  return parseHtmlStylesheetLinks(htmlSrc).filter(isFontProviderUrl).map(normalizeSourceUrl);
+}
+
+// Every provider stylesheet the browser can fetch from client source must be a
+// URL this gate/probe already knows how to verify. A new fetch point must be
+// added to one of the stylesheet maps, or the scanner would report a false
+// green while the browser downloads an unchecked face.
+function compareFontSourceCoverage(sources, probedHrefs) {
+  const probed = new Set(probedHrefs.map(normalizeSourceUrl));
+  return sources
+    .filter(({ href }) => !probed.has(normalizeSourceUrl(href)))
+    .map(({ kind, rel, href }) => ({
+      kind: 'font-source-coverage',
+      id: `${kind}:${rel}`,
+      message: `${kind} in ${rel} references font-provider stylesheet ${href}, but that URL is not among the sources probed from ${FONTS_REL} (FONT_STYLESHEETS / SYSTEM_STYLESHEETS) or ${HTML_REL} — move it into a stylesheet map or teach the scanner about this source before adding it`,
+    }));
 }
 
 // The CSP is written twice in server/index.ts: once for the first middleware
@@ -1628,7 +1682,7 @@ function unsafeMembershipTests(src) {
   return UNSAFE_MEMBERSHIP_TESTS.filter(([re]) => re.test(stripped)).map(([, why]) => why);
 }
 
-function walkSourceFiles(relDir) {
+function walkFiles(relDir, filePattern) {
   const out = [];
   const stack = [relDir];
   while (stack.length) {
@@ -1636,10 +1690,18 @@ function walkSourceFiles(relDir) {
     for (const entry of fs.readdirSync(path.join(ROOT, rel), { withFileTypes: true })) {
       const childRel = `${rel}/${entry.name}`;
       if (entry.isDirectory()) stack.push(childRel);
-      else if (/\.tsx?$/.test(entry.name)) out.push(childRel);
+      else if (filePattern.test(entry.name)) out.push(childRel);
     }
   }
   return out.sort();
+}
+
+function walkSourceFiles(relDir) {
+  return walkFiles(relDir, /\.tsx?$/);
+}
+
+function walkClientMarkupFiles() {
+  return walkFiles('client', /\.(?:css|html)$/);
 }
 
 // Run a self-contained TS module and hand back its exports. design-system.ts
@@ -1863,6 +1925,62 @@ function runCanaries() {
   );
   eq(parseStylesheetFamilies('/fonts/self-hosted.css'), [], 'a URL naming no family is reported as unverifiable, not as a match');
   eq(parseStylesheetFamilies('https://example.test/css2?family=Bad%ZZ'), ['Bad%ZZ'], 'a malformed % escape stays literal instead of throwing');
+  eq(
+    parseCssFontProviderImports(`
+      @import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+      @import 'https://example.test/fonts.css';
+      /* @import url("https://fonts.googleapis.com/css2?family=Ghost"); */
+    `),
+    ['https://fonts.googleapis.com/css2?family=Inter&display=swap'],
+    'CSS provider @imports are found while comments and other hosts are ignored',
+  );
+  eq(
+    parseHtmlFontProviderLinks(`
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter&amp;display=swap">
+      <link rel="alternate stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader&display=swap">
+      <link href=https://fonts.googleapis.com/css2 rel=STYLESHEET>
+      <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="preload STYLESHEET">
+      <link rel="style&#115;heet" data-note="a > b" href="https://fonts.googleapis.com/css2?family=Roboto&amp;display=swap">
+      <link rel="stylesheet" href="/local.css">
+    `),
+    [
+      'https://fonts.googleapis.com/css2?family=Inter&display=swap',
+      'https://fonts.googleapis.com/css2?family=Newsreader&display=swap',
+      'https://fonts.googleapis.com/css2',
+      'https://fonts.googleapis.com/css2?family=Manrope&display=swap',
+      'https://fonts.googleapis.com/css2?family=Roboto&display=swap',
+    ],
+    'HTML provider stylesheet links support multi-token rels, unquoted attributes, encoded tokens, and quoted > characters while ignoring non-stylesheets',
+  );
+  const coveredFontUrl = 'https://fonts.googleapis.com/css2?family=Inter&display=swap';
+  eq(
+    compareFontSourceCoverage(
+      [
+        { kind: 'CSS @import', rel: 'client/src/index.css', href: coveredFontUrl },
+        { kind: 'HTML stylesheet link', rel: 'client/index.html', href: coveredFontUrl },
+      ],
+      [coveredFontUrl],
+    ),
+    [],
+    'provider URLs already in the probed source set pass coverage',
+  );
+  eq(
+    compareFontSourceCoverage(
+      [{ kind: 'CSS @import', rel: 'client/src/index.css', href: 'https://fonts.googleapis.com/css2?family=Ghost' }],
+      [coveredFontUrl],
+    ).map((failure) => failure.kind),
+    ['font-source-coverage'],
+    'a stray CSS provider @import cannot pass without a probed source',
+  );
+  eq(
+    compareFontSourceCoverage(
+      [{ kind: 'HTML stylesheet link', rel: 'client/alternate.html', href: 'https://fonts.googleapis.com/css2?family=Ghost' }],
+      [coveredFontUrl],
+    ).map((failure) => failure.kind),
+    ['font-source-coverage'],
+    'an unregistered provider link in another HTML entry point cannot pass coverage',
+  );
 
   // CSS accent-block parser.
   const cssSample = [
@@ -3037,6 +3155,26 @@ if (tsSystems.ids.length && defaultSystemId) {
 const cssRootFonts = parseCssRootFonts(cssSrc);
 const cssSystemFonts = parseCssSystemFonts(cssSrc);
 const staticFontHrefs = parseHtmlStylesheetLinks(htmlSrc);
+const clientMarkupRels = walkClientMarkupFiles();
+const clientCssRels = clientMarkupRels.filter((rel) => rel.endsWith('.css'));
+const clientHtmlRels = clientMarkupRels.filter((rel) => rel.endsWith('.html'));
+const discoveredFontSources = [];
+for (const rel of clientCssRels) {
+  for (const href of parseCssFontProviderImports(read(rel))) {
+    discoveredFontSources.push({ kind: 'CSS @import', rel, href });
+  }
+}
+for (const rel of clientHtmlRels) {
+  for (const href of parseHtmlFontProviderLinks(read(rel))) {
+    discoveredFontSources.push({ kind: 'HTML stylesheet link', rel, href });
+  }
+}
+if (!clientCssRels.length) {
+  fail('parser-rot', 'walked ZERO .css files under client/ — the font-source coverage scan went vacuous');
+}
+if (!clientHtmlRels.length) {
+  fail('parser-rot', 'walked ZERO .html entry points under client/ — the font-source coverage scan went vacuous');
+}
 const stylesheetCspTargets = [
   ...[...fontSheets.entries].map(([id, href]) => ({
     id: `font:${id}`,
@@ -3057,6 +3195,13 @@ const stylesheetCspTargets = [
     consequence: 'the first paint uses the next family in the stack',
   })),
 ];
+failures.push(
+  ...compareFontSourceCoverage(discoveredFontSources, [
+    ...fontSheets.entries.values(),
+    ...systemSheets.entries.values(),
+    ...staticFontHrefs,
+  ]),
+);
 failures.push(...compareStylesheetCsp(stylesheetCspTargets, csp.styleSrc));
 
 if (!cssRootFonts) {
@@ -3139,6 +3284,9 @@ console.log(
 );
 console.log(
   `PASS font-csp :: ${stylesheetCspTargets.length} stylesheet URL(s) are allowed by style-src; ${csp.styleSrc.length} style-src and ${csp.fontSrc.length} font-src directive(s) agree across ${csp.headerCount} CSP block(s) in ${SERVER_REL}`,
+);
+console.log(
+  `PASS font-source-coverage :: ${discoveredFontSources.length} provider stylesheet reference(s) across ${clientCssRels.length} CSS file(s) and ${clientHtmlRels.length} HTML entry point(s) are already represented by a probed source`,
 );
 const alwaysOnFamilies = staticFontHrefs.flatMap(parseStylesheetFamilies);
 console.log(
