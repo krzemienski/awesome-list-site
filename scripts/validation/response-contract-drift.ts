@@ -34,6 +34,7 @@ import { registerRoutes } from "../../server/routes";
 import { installApiContractRegistration } from "../../server/contracts/install";
 import { registerCoreEndpointSchemas } from "../../server/contracts/endpointSchemas";
 import { clerkUserContext, hasValidAuditKey } from "../../server/clerkAuth";
+import { RecommendationEngine } from "../../server/ai/recommendationEngine";
 
 const PROBE_PATH = "/api/__contract-drift-probe";
 const MISMATCH_MARKER = "[contract] response mismatch";
@@ -44,6 +45,8 @@ interface CheckResult {
   ok: boolean;
   detail?: string;
 }
+
+const RETIRED_LEARNING_PATH_METHOD = "generateLearningPathRecommendations";
 
 function fail(messages: string[]): never {
   console.error("Response-contract drift detected:");
@@ -135,6 +138,26 @@ async function main() {
 
   const auditHeaders = { "X-Admin-Audit-Key": adminPassword };
   const checks: CheckResult[] = [];
+  const retiredLearningPathInvocations: string[] = [];
+
+  // The learning-path branch was removed from RecommendationEngine because
+  // these endpoints never returned its result. Keep a runtime tripwire here:
+  // if that private method is reintroduced and either route calls it again,
+  // the request fails loudly instead of silently adding another AI call.
+  const recommendationPrototype = RecommendationEngine.prototype as unknown as Record<
+    string,
+    (...args: unknown[]) => unknown
+  >;
+  const retiredLearningPathGenerator =
+    recommendationPrototype[RETIRED_LEARNING_PATH_METHOD];
+  if (typeof retiredLearningPathGenerator === "function") {
+    recommendationPrototype[RETIRED_LEARNING_PATH_METHOD] = function () {
+      retiredLearningPathInvocations.push(RETIRED_LEARNING_PATH_METHOD);
+      throw new Error(
+        `${RETIRED_LEARNING_PATH_METHOD} must not be called by recommendation routes`,
+      );
+    };
+  }
 
   async function check(
     label: string,
@@ -154,6 +177,65 @@ async function main() {
           res.status === expectStatus
             ? undefined
             : `expected ${expectStatus}, got ${res.status}`,
+      });
+    } catch (error) {
+      checks.push({
+        label,
+        status: 0,
+        ok: false,
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  async function checkRecommendationResponse(
+    label: string,
+    path: string,
+    headers: Record<string, string> = {},
+    init: RequestInit = {},
+  ): Promise<void> {
+    try {
+      const res = await fetch(`${base}${path}`, {
+        ...init,
+        headers: {
+          ...headers,
+          ...(init.body ? { "Content-Type": "application/json" } : {}),
+        },
+      });
+      const rawBody = await res.text();
+      let payload: unknown;
+      try {
+        payload = JSON.parse(rawBody);
+      } catch {
+        throw new Error(`response was not valid JSON: ${rawBody.slice(0, 160)}`);
+      }
+
+      const learningPathFields: string[] = [];
+      const visit = (value: unknown, path: string): void => {
+        if (!value || typeof value !== "object") return;
+        for (const [key, child] of Object.entries(value)) {
+          if (key === "learningPaths" || key === "learningPath") {
+            learningPathFields.push(`${path}.${key}`);
+          }
+          visit(child, `${path}.${key}`);
+        }
+      };
+      visit(payload, "$");
+
+      const detail =
+        res.status !== 200
+          ? `expected 200, got ${res.status}`
+          : !Array.isArray(payload)
+            ? "expected a recommendation array"
+            : learningPathFields.length > 0
+              ? `retired learning-path field(s) present: ${learningPathFields.join(", ")}`
+              : undefined;
+
+      checks.push({
+        label,
+        status: res.status,
+        ok: detail === undefined,
+        detail,
       });
     } catch (error) {
       checks.push({
@@ -193,7 +275,13 @@ async function main() {
       detail: error instanceof Error ? error.message : String(error),
     });
   }
-  await check("GET /api/recommendations", "/api/recommendations", 200);
+  await checkRecommendationResponse("GET /api/recommendations", "/api/recommendations");
+  await checkRecommendationResponse(
+    "POST /api/recommendations (audit-key admin)",
+    "/api/recommendations",
+    auditHeaders,
+    { method: "POST", body: JSON.stringify({}) },
+  );
   await check(
     "GET /api/admin/pending-resources (audit-key)",
     "/api/admin/pending-resources",
@@ -267,6 +355,11 @@ async function main() {
     (line) => !line.includes(PROBE_PATH),
   );
 
+  if (retiredLearningPathInvocations.length > 0) {
+    errors.push(
+      `retired learning-path generator invoked ${retiredLearningPathInvocations.length} time(s): ${RETIRED_LEARNING_PATH_METHOD}`,
+    );
+  }
   if (probeMismatches.length !== 1) {
     errors.push(
       `observer liveness FAILED: expected exactly 1 probe mismatch for ${PROBE_PATH}, saw ${probeMismatches.length} — response observation is not active, so a green run would be meaningless`,
