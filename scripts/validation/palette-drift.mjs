@@ -89,7 +89,7 @@ const DS_OK_LOOKBACK = 5; // lines above a hex hit that a /* DS-OK: … */ tag m
 // Each detector returns the array of matched TOKENS on a line (one entry per
 // individual match — a line with three palette classes yields three tokens).
 // ---------------------------------------------------------------------------
-const PALETTE_RE = /\b(bg|text|border|ring|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b/g;
+const PALETTE_RE = /\b(bg|text|border(?:-[xytrblse])?|ring|fill|stroke|from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset|inset-ring|inset-shadow)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b/g;
 const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
 // rgb()/rgba() literals. One level of nested parens is tolerated so that a
 // truncated match of rgba(var(--x), 0.4) can never smuggle the var() ref out
@@ -221,6 +221,14 @@ function runCanaries() {
   eq(palette('hover:text-zinc-400'), ['text-zinc-400'], 'variant-prefixed palette class');
   // Per-match counting: several tokens on ONE line each count individually.
   eq(palette('bg-red-500 text-blue-300 border-emerald-950'), ['bg-red-500', 'text-blue-300', 'border-emerald-950'], 'multi-token line');
+  eq(palette('from-yellow-400'), ['from-yellow-400'], 'gradient stop palette class');
+  eq(palette('from-[var(--accent)]'), [], 'tokenized gradient stop');
+  eq(
+    palette('border-x-red-500 border-y-orange-500 border-t-amber-500 border-r-yellow-500 border-b-lime-500 border-l-green-500 border-s-emerald-500 border-e-teal-500'),
+    ['border-x-red-500', 'border-y-orange-500', 'border-t-amber-500', 'border-r-yellow-500', 'border-b-lime-500', 'border-l-green-500', 'border-s-emerald-500', 'border-e-teal-500'],
+    'directional and logical border palette classes',
+  );
+  eq(palette('inset-ring-blue-400 inset-shadow-gray-900'), ['inset-ring-blue-400', 'inset-shadow-gray-900'], 'inset ring and shadow palette classes');
   eq(palette('bg-card text-muted-foreground bg-[var(--surface-3)] ring-ring'), [], 'bridge utilities');
   eq(palette('text-red-foreground bg-orange'), [], 'no numeric step → not a palette class');
 

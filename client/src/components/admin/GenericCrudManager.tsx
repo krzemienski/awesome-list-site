@@ -3397,9 +3397,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   <div
                     key={entry.id}
                     className={`border rounded-lg p-3 ${
-                      entry.operationType === 'create' ? 'border-l-4 border-l-green-500' :
-                      entry.operationType === 'update' ? 'border-l-4 border-l-blue-500' :
-                      'border-l-4 border-l-red-500'
+                      entry.operationType === 'create' ? 'border-l-4 border-l-chart-2' :
+                      entry.operationType === 'update' ? 'border-l-4 border-l-chart-3' :
+                      'border-l-4 border-l-destructive'
                     }`}
                     data-testid={`audit-entry-${entry.id}`}
                   >

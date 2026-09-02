@@ -166,7 +166,7 @@ rg '#[0-9a-fA-F]{3,8}\b' client/src \
   --glob '!client/src/lib/charts/palette.ts'
 
 # Tailwind palette classes (bg-zinc-900, text-red-500, …) — forbidden
-rg -n '\b(bg|text|border|ring|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b' client/src
+rg -n '\b(bg|text|border(?:-[xytrblse])?|ring|fill|stroke|from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset|inset-ring|inset-shadow)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b' client/src
 
 # Raw radii / borders that bypass the ladders
 rg 'border(-radius)?:\s*\d+px|rounded-\[\d+px\]' client/src \
