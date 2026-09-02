@@ -33,6 +33,67 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+const buildContentSecurityPolicy = (nonce: string): string =>
+  [
+    "default-src 'self'",
+    // BUG-014: nonce-based scripts — no 'unsafe-inline'.
+    // July 2026 audit BUG-003: Replit's deployment platform injects
+    // <script src="https://replit-cdn.com/feedback-widget/widget.global.js">
+    // into the served HTML (it is NOT in our source, so we cannot nonce or
+    // remove it) — allowlist the origin so the widget loads cleanly.
+    // Task #232: cdn.mxpnl.com — mixpanel-browser is bundled from npm, but
+    // the SDK can lazy-load auxiliary scripts from its CDN.
+    // PostHog: posthog-js is bundled from npm but lazy-loads extra bundles
+    // (session recorder, surveys, toolbar) from its assets CDN.
+    // Aug 2026 prod sign-in outage: Clerk uses Cloudflare Turnstile for bot
+    // protection on sign-up and OAuth-transfer sign-in flows. Its loader
+    // (challenges.cloudflare.com/turnstile/v0/api.js) was blocked by this
+    // CSP, so Clerk's FAPI rejected those flows with "Error loading
+    // CAPTCHA" — allowlist it in script-src, connect-src, and frame-src
+    // (per the Clerk skill's canonical directive list).
+    `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com`,
+    // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
+    // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
+    // present in the same directive, so there is no "nonce + fallback"
+    // option — and the platform-injected Replit feedback widget (plus other
+    // third-party snippets we don't render) sets inline style="" attributes
+    // that can never carry our nonce, producing a CSP violation on every
+    // page load and an unstyled widget. Inline STYLE injection is a far
+    // weaker vector than script injection; script-src keeps its strict
+    // nonce policy.
+    // Task #238 prod verification: PostHog's session recorder and
+    // Amplitude's replay plugin spawn compression Web Workers from blob:
+    // URLs. Without an explicit worker-src, workers fall back to
+    // script-src (which rightly has no blob:) and every page load logs
+    // "Creating a worker from 'blob:…' violates CSP" — replay then runs
+    // on its slower non-worker fallback. blob: workers only execute code
+    // the page itself constructed, so this does not weaken script-src.
+    `worker-src 'self' blob:`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    "font-src 'self' https://fonts.gstatic.com",
+    // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
+    // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,
+    // so a fixed allowlist would break resource preview images in production.
+    // Keeping the blanket https: for img-src (it covers the allowlist hosts too).
+    "img-src 'self' data: https:",
+    // M1 audit fix: allow www.google.com in connect-src (prod console CSP report).
+    // BUG-003: replit.com + replit-cdn.com so the platform feedback widget
+    // can phone home without spawning new CSP violations once its script loads.
+    // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
+    // host; api.mixpanel.com covers config fallbacks.
+    // PostHog ingest + assets (feature flags, replay, surveys).
+    "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com",
+    // Turnstile renders inside an iframe from challenges.cloudflare.com;
+    // without an explicit frame-src it falls back to default-src 'self'
+    // and the widget is blocked silently (Turnstile error 300030).
+    "frame-src 'self' https://challenges.cloudflare.com",
+    "frame-ancestors 'none'",
+    // BUG-014: add the missing hardening directives.
+    "form-action 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+  ].join("; ");
+
 // Replit terminates TLS at the edge; trust the first proxy hop so req.protocol
 // and secure-cookie handling are correct (previously set inside setupAuth).
 app.set("trust proxy", 1);
@@ -107,65 +168,7 @@ app.use((_req, res, next) => {
     // owns TLS termination, so it owns HSTS; the app copy is dropped.
     res.setHeader(
       "Content-Security-Policy",
-      [
-        "default-src 'self'",
-        // BUG-014: nonce-based scripts — no 'unsafe-inline'.
-        // July 2026 audit BUG-003: Replit's deployment platform injects
-        // <script src="https://replit-cdn.com/feedback-widget/widget.global.js">
-        // into the served HTML (it is NOT in our source, so we cannot nonce or
-        // remove it) — allowlist the origin so the widget loads cleanly.
-        // Task #232: cdn.mxpnl.com — mixpanel-browser is bundled from npm, but
-        // the SDK can lazy-load auxiliary scripts from its CDN.
-        // PostHog: posthog-js is bundled from npm but lazy-loads extra bundles
-        // (session recorder, surveys, toolbar) from its assets CDN.
-        // Aug 2026 prod sign-in outage: Clerk uses Cloudflare Turnstile for bot
-        // protection on sign-up and OAuth-transfer sign-in flows. Its loader
-        // (challenges.cloudflare.com/turnstile/v0/api.js) was blocked by this
-        // CSP, so Clerk's FAPI rejected those flows with "Error loading
-        // CAPTCHA" — allowlist it in script-src, connect-src, and frame-src
-        // (per the Clerk skill's canonical directive list).
-        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com`,
-        // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
-        // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
-        // present in the same directive, so there is no "nonce + fallback"
-        // option — and the platform-injected Replit feedback widget (plus other
-        // third-party snippets we don't render) sets inline style="" attributes
-        // that can never carry our nonce, producing a CSP violation on every
-        // page load and an unstyled widget. Inline STYLE injection is a far
-        // weaker vector than script injection; script-src keeps its strict
-        // nonce policy.
-        // Task #238 prod verification: PostHog's session recorder and
-        // Amplitude's replay plugin spawn compression Web Workers from blob:
-        // URLs. Without an explicit worker-src, workers fall back to
-        // script-src (which rightly has no blob:) and every page load logs
-        // "Creating a worker from 'blob:…' violates CSP" — replay then runs
-        // on its slower non-worker fallback. blob: workers only execute code
-        // the page itself constructed, so this does not weaken script-src.
-        `worker-src 'self' blob:`,
-        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-        "font-src 'self' https://fonts.gstatic.com",
-        // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
-        // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,
-        // so a fixed allowlist would break resource preview images in production.
-        // Keeping the blanket https: for img-src (it covers the allowlist hosts too).
-        "img-src 'self' data: https:",
-        // M1 audit fix: allow www.google.com in connect-src (prod console CSP report).
-        // BUG-003: replit.com + replit-cdn.com so the platform feedback widget
-        // can phone home without spawning new CSP violations once its script loads.
-        // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
-        // host; api.mixpanel.com covers config fallbacks.
-        // PostHog ingest + assets (feature flags, replay, surveys).
-        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com",
-        // Turnstile renders inside an iframe from challenges.cloudflare.com;
-        // without an explicit frame-src it falls back to default-src 'self'
-        // and the widget is blocked silently (Turnstile error 300030).
-        "frame-src 'self' https://challenges.cloudflare.com",
-        "frame-ancestors 'none'",
-        // BUG-014: add the missing hardening directives.
-        "form-action 'self'",
-        "base-uri 'self'",
-        "object-src 'none'",
-      ].join("; "),
+      buildContentSecurityPolicy(nonce),
     );
   }
   next();
@@ -223,65 +226,7 @@ app.use((_req, res, next) => {
     // owns TLS termination, so it owns HSTS; the app copy is dropped.
     res.setHeader(
       "Content-Security-Policy",
-      [
-        "default-src 'self'",
-        // BUG-014: nonce-based scripts — no 'unsafe-inline'.
-        // July 2026 audit BUG-003: Replit's deployment platform injects
-        // <script src="https://replit-cdn.com/feedback-widget/widget.global.js">
-        // into the served HTML (it is NOT in our source, so we cannot nonce or
-        // remove it) — allowlist the origin so the widget loads cleanly.
-        // Task #232: cdn.mxpnl.com — mixpanel-browser is bundled from npm, but
-        // the SDK can lazy-load auxiliary scripts from its CDN.
-        // PostHog: posthog-js is bundled from npm but lazy-loads extra bundles
-        // (session recorder, surveys, toolbar) from its assets CDN.
-        // Aug 2026 prod sign-in outage: Clerk uses Cloudflare Turnstile for bot
-        // protection on sign-up and OAuth-transfer sign-in flows. Its loader
-        // (challenges.cloudflare.com/turnstile/v0/api.js) was blocked by this
-        // CSP, so Clerk's FAPI rejected those flows with "Error loading
-        // CAPTCHA" — allowlist it in script-src, connect-src, and frame-src
-        // (per the Clerk skill's canonical directive list).
-        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com`,
-        // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
-        // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
-        // present in the same directive, so there is no "nonce + fallback"
-        // option — and the platform-injected Replit feedback widget (plus other
-        // third-party snippets we don't render) sets inline style="" attributes
-        // that can never carry our nonce, producing a CSP violation on every
-        // page load and an unstyled widget. Inline STYLE injection is a far
-        // weaker vector than script injection; script-src keeps its strict
-        // nonce policy.
-        // Task #238 prod verification: PostHog's session recorder and
-        // Amplitude's replay plugin spawn compression Web Workers from blob:
-        // URLs. Without an explicit worker-src, workers fall back to
-        // script-src (which rightly has no blob:) and every page load logs
-        // "Creating a worker from 'blob:…' violates CSP" — replay then runs
-        // on its slower non-worker fallback. blob: workers only execute code
-        // the page itself constructed, so this does not weaken script-src.
-        `worker-src 'self' blob:`,
-        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-        "font-src 'self' https://fonts.gstatic.com",
-        // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
-        // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,
-        // so a fixed allowlist would break resource preview images in production.
-        // Keeping the blanket https: for img-src (it covers the allowlist hosts too).
-        "img-src 'self' data: https:",
-        // M1 audit fix: allow www.google.com in connect-src (prod console CSP report).
-        // BUG-003: replit.com + replit-cdn.com so the platform feedback widget
-        // can phone home without spawning new CSP violations once its script loads.
-        // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
-        // host; api.mixpanel.com covers config fallbacks.
-        // PostHog ingest + assets (feature flags, replay, surveys).
-        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com",
-        // Turnstile renders inside an iframe from challenges.cloudflare.com;
-        // without an explicit frame-src it falls back to default-src 'self'
-        // and the widget is blocked silently (Turnstile error 300030).
-        "frame-src 'self' https://challenges.cloudflare.com",
-        "frame-ancestors 'none'",
-        // BUG-014: add the missing hardening directives.
-        "form-action 'self'",
-        "base-uri 'self'",
-        "object-src 'none'",
-      ].join("; "),
+      buildContentSecurityPolicy(nonce),
     );
   }
   next();

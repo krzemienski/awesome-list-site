@@ -648,12 +648,16 @@ function parseCspHostAllowlists(serverSrc) {
   const headers = [...src.matchAll(/setHeader\s*\(\s*["']Content-Security-Policy["']/g)];
   const directives = { styleSrc: [], fontSrc: [] };
   const literalRe = /(["'`])((?:\\.|(?!\1)[\s\S])*)\1/g;
+  const sharedBuilder = src.match(
+    /const\s+buildContentSecurityPolicy\s*=\s*\([^)]*\)(?:\s*:\s*[^=]+)?\s*=>\s*\[/,
+  );
+  const sharedArrayStart = sharedBuilder
+    ? sharedBuilder.index + sharedBuilder[0].lastIndexOf("[")
+    : -1;
 
-  for (const header of headers) {
-    const arrayStart = src.indexOf('[', header.index + header[0].length);
-    if (arrayStart < 0) continue;
+  function findArrayEnd(arrayStart) {
+    if (arrayStart < 0) return -1;
     let depth = 0;
-    let arrayEnd = -1;
     for (let i = arrayStart; i < src.length; i++) {
       if (src[i] === '"' || src[i] === "'" || src[i] === '`') {
         i = endOfString(src, i);
@@ -661,12 +665,15 @@ function parseCspHostAllowlists(serverSrc) {
       }
       if (src[i] === '[') depth++;
       else if (src[i] === ']' && --depth === 0) {
-        arrayEnd = i;
-        break;
+        return i;
       }
     }
-    if (arrayEnd < 0) continue;
+    return -1;
+  }
 
+  function parseDirectiveArray(arrayStart) {
+    const arrayEnd = findArrayEnd(arrayStart);
+    if (arrayEnd < 0) return;
     for (const match of src.slice(arrayStart + 1, arrayEnd).matchAll(literalRe)) {
       const value = match[2].trim();
       const directive = /^(style-src|font-src)\s+([^;]+)/i.exec(value);
@@ -684,6 +691,17 @@ function parseCspHostAllowlists(serverSrc) {
         });
       directives[key].push({ sources, hosts });
     }
+  }
+
+  for (const header of headers) {
+    // Accept the original inline array form for synthetic canaries and older
+    // source layouts, but prefer the single shared builder used by production.
+    const headerTail = src.slice(header.index + header[0].length);
+    const inlineArray = /^\s*,\s*\[/.exec(headerTail);
+    const arrayStart = inlineArray
+      ? header.index + header[0].length + inlineArray[0].lastIndexOf("[")
+      : sharedArrayStart;
+    parseDirectiveArray(arrayStart);
   }
 
   return { headerCount: headers.length, ...directives };
@@ -1997,8 +2015,8 @@ function runCanaries() {
   eq(parseStylesheetFamilies(parsedLinks[0]), ['Inter'], 'an &amp;-escaped href still splits into its family= parameters');
   eq(parseHtmlStylesheetLinks('<html><head></head></html>'), [], 'a shell with no stylesheet link is detectable, not an empty pass');
 
-  // CSP parser + stylesheet source comparator. The real server has one CSP
-  // block in each middleware stack, so both copies are represented here.
+  // CSP parser + stylesheet source comparator. Cover both the legacy inline
+  // array form and the shared builder used by the real server.
   const cspSample = [
     'res.setHeader("Content-Security-Policy", [',
     `  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",`,
@@ -2022,6 +2040,27 @@ function runCanaries() {
     'font-src hosts parsed from both blocks',
   );
   eq(compareCspHostAllowlists(parsedCsp), [], 'matching CSP blocks pass');
+  const sharedCspSample = [
+    'const buildContentSecurityPolicy = (nonce: string): string => [',
+    `  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",`,
+    `  "font-src 'self' https://fonts.gstatic.com",`,
+    '].join("; ");',
+    'res.setHeader("Content-Security-Policy", buildContentSecurityPolicy(nonce));',
+    'res.setHeader("Content-Security-Policy", buildContentSecurityPolicy(nonce));',
+  ].join('\n');
+  const parsedSharedCsp = parseCspHostAllowlists(sharedCspSample);
+  eq(parsedSharedCsp.headerCount, 2, 'shared CSP builder still covers both header paths');
+  eq(
+    parsedSharedCsp.styleSrc.map((entry) => entry.hosts),
+    [['https://fonts.googleapis.com'], ['https://fonts.googleapis.com']],
+    'shared builder style-src hosts parsed for both paths',
+  );
+  eq(
+    parsedSharedCsp.fontSrc.map((entry) => entry.hosts),
+    [['https://fonts.gstatic.com'], ['https://fonts.gstatic.com']],
+    'shared builder font-src hosts parsed for both paths',
+  );
+  eq(compareCspHostAllowlists(parsedSharedCsp), [], 'shared CSP builder passes parity checks');
   eq(
     compareCspHostAllowlists(
       parseCspHostAllowlists(
