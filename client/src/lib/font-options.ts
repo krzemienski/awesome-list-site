@@ -1,18 +1,10 @@
 /**
  * Single source of truth for the I1 Font override picker.
  *
- * IMPORTANT: the same FONT_STACKS map is duplicated inline in
- * `client/index.html` boot script for pre-paint application (the boot script
- * cannot import TS modules because it runs before bundle resolution).
- *
- * When editing FONT_OPTIONS, keep the inline map in `client/index.html` in
- * sync by hand — there is no build step to catch drift between the two, but
- * there IS a gate: the `accent-drift` validation gate
- * (`scripts/validation/accent-drift.mjs`) parses both and fails when a font
- * id exists in only one of them, when a stack disagrees, or when the boot
- * script's fallback id stops being FONT_OPTIONS[0] (the option
- * `applyFontOverride` falls back to). A font missing from the boot map is
- * silently reset to the fallback on the next reload.
+ * The pre-paint boot data is generated from FONT_OPTIONS below and injected
+ * into `client/index.html` by Vite. The boot script cannot import TS modules
+ * because it runs before bundle resolution, so the generated object keeps the
+ * no-flash behavior without introducing a second hand-maintained font list.
  *
  * A stack is only half of a webfont: the two maps below are what actually
  * download the files, and the same gate holds each of them to its registry —
@@ -42,6 +34,12 @@ export const FONT_OPTIONS: FontOption[] = [
 ];
 
 export const FONT_LS_KEY = "ds-font-override";
+
+/** Data injected by Vite into client/index.html before the first paint. */
+export const FONT_BOOT_DATA = {
+  stacks: Object.fromEntries(FONT_OPTIONS.map(({ id, stack }) => [id, stack])),
+  fallback: FONT_OPTIONS[0].id,
+} as const;
 
 // RULE (enforced by the `accent-drift` gate): a FONT_OPTIONS entry has an
 // entry here IF AND ONLY IF it declares a non-empty stack, and every family

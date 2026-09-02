@@ -5,6 +5,7 @@ import {
   THEME_BOOT_DATA,
   THEME_FALLBACK_REGISTRY,
 } from "./client/src/lib/design-system";
+import { FONT_BOOT_DATA, FONT_OPTIONS } from "./client/src/lib/font-options";
 
 const workspaceRoot = path.resolve(import.meta.dirname);
 
@@ -71,10 +72,33 @@ function themeBootRegistry(): Plugin {
   };
 }
 
+function fontBootRegistry(): Plugin {
+  const marker = "__AWESOME_VIDEO_FONT_BOOT__";
+  const registryFontData = {
+    stacks: Object.fromEntries(FONT_OPTIONS.map(({ id, stack }) => [id, stack])),
+    fallback: FONT_OPTIONS[0]?.id,
+  };
+  if (JSON.stringify(FONT_BOOT_DATA) !== JSON.stringify(registryFontData)) {
+    throw new Error("FONT_BOOT_DATA is stale relative to FONT_OPTIONS");
+  }
+  const bootData = JSON.stringify(FONT_BOOT_DATA);
+
+  return {
+    name: "font-boot-registry",
+    transformIndexHtml(html) {
+      if (!html.includes(marker)) {
+        throw new Error(`font-boot-registry marker ${marker} is missing from client/index.html`);
+      }
+      return html.replaceAll(marker, bootData);
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     react(),
     themeBootRegistry(),
+    fontBootRegistry(),
     bundleModuleManifest(),
     ...(process.env.REPL_ID !== undefined
       ? [

@@ -2,11 +2,10 @@
 // Theme drift gate (tasks #377, #388, #399, #429).
 //
 // The inline boot script in client/index.html paints the theme BEFORE React
-// loads. Vite now replaces one marker with THEME_BOOT_DATA derived from
-// THEME_FALLBACK_REGISTRY, so system/accent ids and fallbacks are generated
-// from the runtime source instead of copied into HTML. Font overrides still
-// use an inline FONT_STACKS map. This gate verifies the generated-theme source
-// contract plus the remaining stylesheet/font mirrors.
+// loads. Vite replaces markers with boot data derived from the runtime sources,
+// so system/accent/font ids and fallbacks are generated instead of copied into
+// HTML. This gate verifies those generation contracts plus the remaining
+// stylesheet/font mirrors.
 //
 // Sources compared (every one is a hand-maintained copy of ONE registry, and
 // every pair below has silently drifted-by-omission before):
@@ -34,9 +33,9 @@
 //        is dead CSS that can never match, and would otherwise survive after
 //        the system's token block is removed
 //   8 · font-options.ts    FONT_OPTIONS (id + stack; its own header calls
-//        itself the source of truth)  ↔  the boot script's FONT_STACKS map +
-//        the id it falls back to, which must be the option applyFontOverride()
-//        falls back to at runtime (FONT_OPTIONS[0])
+//        itself the source of truth)  ↔  FONT_BOOT_DATA generated from it +
+//        the id it falls back to, which must be the option
+//        applyFontOverride() falls back to at runtime (FONT_OPTIONS[0])
 //   9 · design-system.ts   SYSTEM_DEFAULT_ACCENT  ↔  DESIGN_SYSTEMS + ACCENTS.
 //        A third hand-maintained list keyed by system id: it is the accent a
 //        system is meant to arrive with. applyDesignSystem() and the theme
@@ -82,7 +81,7 @@
 //   · root-default   — :root's --accent/--accent-2 ≠ DEFAULT_ACCENT's pair
 //   · boot-registry  — a derived runtime export or THEME_BOOT_DATA disagrees
 //     with THEME_FALLBACK_REGISTRY
-//   · boot-generation — client/index.html lost the Vite marker, regained a
+//   · boot-generation — client/index.html lost either Vite marker, regained a
 //     hand-copied list/fallback, or no longer consumes injected fields
 //   · system-fallback— DEFAULT_SYSTEM is not one of DESIGN_SYSTEMS
 //   · system-paint   — a DESIGN_SYSTEMS id with no :root[data-system="…"]
@@ -107,11 +106,8 @@
 //   · system-default-accent — SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM] ≠
 //     DEFAULT_ACCENT, so the default system's intended accent never reaches a
 //     first-time visitor
-//   · font-parity    — a font id in only one of FONT_OPTIONS / FONT_STACKS
-//   · font-stack     — a boot FONT_STACKS stack ≠ the FONT_OPTIONS stack, so
-//     the face applied before paint is not the one applied after it
-//   · font-fallback  — the boot fallback font id ≠ FONT_OPTIONS[0].id, the
-//     option applyFontOverride() falls back to
+//   · font-boot-registry — FONT_BOOT_DATA is missing or does not exactly
+//     derive its ids/stacks/fallback from FONT_OPTIONS
 //   · font-stylesheet— an option with a non-empty stack has no
 //     FONT_STYLESHEETS entry, an entry exists for an id FONT_OPTIONS does not
 //     offer, or an entry exists for an option with NO stack. "System default"
@@ -433,11 +429,10 @@ function stripCommentsPreservingLines(src) {
     .replace(/(^|[^:])\/\/[^\n]*/g, (comment, prefix) => prefix + ' '.repeat(comment.length - prefix.length));
 }
 
-// Object-literal walkers, shared by the DESIGN_SYSTEMS record and the boot
-// script's FONT_STACKS map. Both are read structurally rather than by
-// indentation so a reformat cannot change the parse, and so a nested object
-// (a DesignSystem record) or a comma inside a quoted font stack is never
-// mistaken for an entry boundary.
+// Object-literal walkers used by the remaining source maps. Entries are read
+// structurally rather than by indentation so a reformat cannot change the
+// parse, and so nested objects or commas inside quoted strings are never
+// mistaken for entry boundaries.
 function endOfString(src, i) {
   const quote = src[i];
   for (let j = i + 1; j < src.length; j++) {
@@ -725,6 +720,30 @@ function parseTsFontOptions(fontsSrc) {
   return { fonts, order, malformed, found: true };
 }
 
+function parseFontRegistry(fontsSrc, parsedFonts = parseTsFontOptions(fontsSrc)) {
+  let exports_;
+  try {
+    exports_ = loadTsExports(FONTS_REL, fontsSrc);
+  } catch (err) {
+    return { found: false, issues: [`could not execute ${FONTS_REL}: ${err.message}`], bootData: null };
+  }
+
+  const expectedBootData = {
+    stacks: Object.fromEntries(parsedFonts.fonts),
+    fallback: parsedFonts.order[0] ?? null,
+  };
+  const actualBootData = exports_.FONT_BOOT_DATA;
+  const issues = [];
+  if (JSON.stringify(actualBootData) !== JSON.stringify(expectedBootData)) {
+    issues.push(`FONT_BOOT_DATA is stale: expected ${JSON.stringify(expectedBootData)}, received ${JSON.stringify(actualBootData)}`);
+  }
+  return {
+    found: actualBootData !== undefined,
+    issues,
+    bootData: actualBootData ?? null,
+  };
+}
+
 // A `Record<string, string>` map declared in a TS module, read by NAME:
 // FONT_STYLESHEETS / SYSTEM_STYLESHEETS. Neither is exported (both are
 // module-private, reached only through loadFontOverride() /
@@ -746,6 +765,7 @@ function parseBootSystems(htmlSrc) {
 }
 
 const THEME_BOOT_MARKER = '__AWESOME_VIDEO_THEME_BOOT__';
+const FONT_BOOT_MARKER = '__AWESOME_VIDEO_FONT_BOOT__';
 
 function parseThemeRegistry(tsSrc) {
   let exports_;
@@ -853,26 +873,42 @@ function parseThemeRegistry(tsSrc) {
 
 function checkThemeBootGeneration(htmlSrc, viteSrc) {
   const issues = [];
-  const markerCount = htmlSrc.split(THEME_BOOT_MARKER).length - 1;
-  if (markerCount !== 1) {
-    issues.push(`${HTML_REL} must contain exactly one ${THEME_BOOT_MARKER} marker; found ${markerCount}`);
+  for (const marker of [THEME_BOOT_MARKER, FONT_BOOT_MARKER]) {
+    const markerCount = htmlSrc.split(marker).length - 1;
+    if (markerCount !== 1) {
+      issues.push(`${HTML_REL} must contain exactly one ${marker} marker; found ${markerCount}`);
+    }
   }
-  if (/\bvar\s+(?:SYSTEMS|ACCENTS)\s*=\s*\[/.test(htmlSrc)) {
-    issues.push(`${HTML_REL} contains a hand-maintained SYSTEMS/ACCENTS allowlist instead of generated THEME_BOOT data`);
+  if (/\bvar\s+(?:SYSTEMS|ACCENTS)\s*=\s*\[|\bvar\s+FONT_STACKS\s*=\s*\{/.test(htmlSrc)) {
+    issues.push(`${HTML_REL} contains a hand-maintained theme/font allowlist instead of generated boot data`);
   }
   for (const field of ['systems', 'accents', 'defaultSystem', 'defaultAccent']) {
     if (!new RegExp(`\\bTHEME_BOOT\\.${field}\\b`).test(htmlSrc)) {
       issues.push(`${HTML_REL} does not consume generated THEME_BOOT.${field}`);
     }
   }
+  for (const field of ['stacks', 'fallback']) {
+    if (!new RegExp(`\\bFONT_BOOT\\.${field}\\b`).test(htmlSrc)) {
+      issues.push(`${HTML_REL} does not consume generated FONT_BOOT.${field}`);
+    }
+  }
   if (!/\bimport\s*\{[^}]*\bTHEME_BOOT_DATA\b[^}]*\}\s*from\s*["']\.\/client\/src\/lib\/design-system["']/.test(viteSrc)) {
     issues.push(`${VITE_REL} does not import THEME_BOOT_DATA from ${TS_REL}`);
+  }
+  if (!/\bimport\s*\{[^}]*\bFONT_BOOT_DATA\b[^}]*\}\s*from\s*["']\.\/client\/src\/lib\/font-options["']/.test(viteSrc)) {
+    issues.push(`${VITE_REL} does not import FONT_BOOT_DATA from ${FONTS_REL}`);
   }
   if (!viteSrc.includes(`const marker = "${THEME_BOOT_MARKER}"`) || !viteSrc.includes('JSON.stringify(THEME_BOOT_DATA)')) {
     issues.push(`${VITE_REL} does not serialize THEME_BOOT_DATA for the ${THEME_BOOT_MARKER} marker`);
   }
+  if (!viteSrc.includes(`const marker = "${FONT_BOOT_MARKER}"`) || !viteSrc.includes('JSON.stringify(FONT_BOOT_DATA)')) {
+    issues.push(`${VITE_REL} does not serialize FONT_BOOT_DATA for the ${FONT_BOOT_MARKER} marker`);
+  }
   if (!/\bplugins\s*:\s*\[[\s\S]*?\bthemeBootRegistry\(\)/.test(viteSrc)) {
     issues.push(`${VITE_REL} does not register themeBootRegistry() in the Vite plugin pipeline`);
+  }
+  if (!/\bplugins\s*:\s*\[[\s\S]*?\bfontBootRegistry\(\)/.test(viteSrc)) {
+    issues.push(`${VITE_REL} does not register fontBootRegistry() in the Vite plugin pipeline`);
   }
   return issues;
 }
@@ -996,15 +1032,14 @@ function parseCspHostAllowlists(serverSrc) {
   return { headerCount: headers.length, ...directives };
 }
 
-// The pre-paint boot script's FONT_STACKS map (id → stack applied to
-// --font-body/--font-sans before React) + the id an unknown saved font is
-// silently rewritten to.
+// The pre-paint boot script must consume the generated FONT_BOOT marker rather
+// than carry a second id/stack/fallback registry in HTML.
 function parseBootFonts(htmlSrc) {
-  const m = /var\s+FONT_STACKS\s*=\s*\{([\s\S]*?)\n\s*\};/.exec(htmlSrc);
-  const fb = /hasOwnProperty\.call\(\s*FONT_STACKS\s*,\s*fnt\s*\)\s*\)\s*fnt\s*=\s*['"]([^'"]+)['"]/.exec(htmlSrc);
-  if (!m) return { stacks: new Map(), malformed: [], found: false, fallback: fb ? fb[1] : null };
-  const { entries, malformed } = parseObjectStringEntries(m[1]);
-  return { stacks: entries, malformed, found: true, fallback: fb ? fb[1] : null };
+  return {
+    found: new RegExp(`\\bvar\\s+FONT_BOOT\\s*=\\s*${FONT_BOOT_MARKER}\\b`).test(htmlSrc),
+    consumesStacks: /\bFONT_BOOT\.stacks\b/.test(htmlSrc),
+    consumesFallback: /\bFONT_BOOT\.fallback\b/.test(htmlSrc),
+  };
 }
 
 function cspSourceAllowsUrl(href, directives) {
@@ -1351,39 +1386,6 @@ function compareDefaultSystemAccent(defaultSystemId, defaultAccentId, defaults) 
     id: defaultSystemId,
     message: `SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM] in ${TS_REL} maps "${defaultSystemId}" to "${mappedAccentId ?? '(missing)'}", but DEFAULT_ACCENT is "${defaultAccentId}" — the default system's intended accent never reaches a first-time visitor because readInitial() in theme-provider.tsx and the pre-paint fallback in ${HTML_REL} use DEFAULT_ACCENT`,
   }];
-}
-
-// The boot script's FONT_STACKS map vs FONT_OPTIONS: same ids, same stacks.
-function compareFonts(bootStacks, tsStacks) {
-  const failures = [];
-  for (const id of [...new Set([...bootStacks.keys(), ...tsStacks.keys()])].sort()) {
-    const boot = bootStacks.get(id);
-    const ts = tsStacks.get(id);
-    if (ts === undefined) {
-      failures.push({
-        kind: 'font-parity',
-        id,
-        message: `font "${id}" is in the pre-paint FONT_STACKS map in ${HTML_REL} but not in FONT_OPTIONS in ${FONTS_REL} — the picker can never offer it`,
-      });
-      continue;
-    }
-    if (boot === undefined) {
-      failures.push({
-        kind: 'font-parity',
-        id,
-        message: `font "${id}" is offered by FONT_OPTIONS in ${FONTS_REL} but missing from the pre-paint FONT_STACKS map in ${HTML_REL} — choosing it would silently reset to the fallback font on the next reload`,
-      });
-      continue;
-    }
-    if (normalizeFontStack(boot) !== normalizeFontStack(ts)) {
-      failures.push({
-        kind: 'font-stack',
-        id,
-        message: `font "${id}" stack drifted — ${FONTS_REL} says ${JSON.stringify(ts)}, the pre-paint map in ${HTML_REL} says ${JSON.stringify(boot)} — the face painted before React is not the face the picker applies after it`,
-      });
-    }
-  }
-  return failures;
 }
 
 // FONT_OPTIONS vs FONT_STYLESHEETS: an option has a webfont to download if
@@ -2319,16 +2321,12 @@ function runCanaries() {
   eq(parsedSheets.malformed.length, 1, 'a non-string value is reported, never silently dropped');
   eq(parseTsStringMap(tsSheetSample, 'SYSTEM_STYLESHEETS').found, false, 'renamed/absent stylesheet map is detectable, not an empty pass');
 
-  // Boot-script system + font parsers.
+  // Boot-script system + generated-font consumers.
   const htmlThemeSample = [
     "          var SYSTEMS = ['editorial', 'terminal', 'geist'];",
     "          if (SYSTEMS.indexOf(sys) === -1) sys = 'editorial';",
-    '          var FONT_STACKS = {',
-    "            'system':       '',",
-    `            'inter':        "'Inter', system-ui, sans-serif",`,
-    `            'jetbrains':    "'JetBrains Mono', ui-monospace, monospace"`,
-    '          };',
-    "          if (!Object.prototype.hasOwnProperty.call(FONT_STACKS, fnt)) fnt = 'system';",
+    `          var FONT_BOOT = ${FONT_BOOT_MARKER};`,
+    '          if (!Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt)) fnt = FONT_BOOT.fallback;',
   ].join('\n');
   eq(
     parseBootSystems(htmlThemeSample),
@@ -2337,12 +2335,29 @@ function runCanaries() {
   );
   eq(parseBootSystems('<html></html>'), { ids: null, fallback: null }, 'absent boot SYSTEMS list is detectable');
   const parsedBootFonts = parseBootFonts(htmlThemeSample);
-  eq(parsedBootFonts.found, true, 'boot FONT_STACKS map located');
-  eq([...parsedBootFonts.stacks.keys()], ['system', 'inter', 'jetbrains'], 'boot font ids parsed');
-  eq(parsedBootFonts.stacks.get('inter'), "'Inter', system-ui, sans-serif", 'commas inside a quoted stack do not split the entry');
-  eq(parsedBootFonts.stacks.get('system'), '', 'empty boot stack parsed as "", not skipped');
-  eq(parsedBootFonts.fallback, 'system', 'boot font fallback parsed');
-  eq(parseBootFonts('<html></html>'), { stacks: new Map(), malformed: [], found: false, fallback: null }, 'absent FONT_STACKS map is detectable');
+  eq(parsedBootFonts, { found: true, consumesStacks: true, consumesFallback: true }, 'boot FONT_BOOT marker and both generated fields located');
+  eq(
+    parseBootFonts('<html></html>'),
+    { found: false, consumesStacks: false, consumesFallback: false },
+    'absent generated FONT_BOOT consumer is detectable',
+  );
+
+  const fontRegistryModule = (fallbackExpression = 'FONT_OPTIONS[0].id') => [
+    'export const FONT_OPTIONS = [',
+    "  { id: 'system', name: 'System default', stack: '' },",
+    `  { id: 'inter', name: 'Inter', stack: "'Inter', system-ui, sans-serif" },`,
+    '];',
+    'export const FONT_BOOT_DATA = {',
+    '  stacks: Object.fromEntries(FONT_OPTIONS.map(({ id, stack }) => [id, stack])),',
+    `  fallback: ${fallbackExpression},`,
+    '};',
+  ].join('\n');
+  eq(parseFontRegistry(fontRegistryModule()).issues, [], 'font boot data derives ids, stacks, and fallback from FONT_OPTIONS');
+  eq(
+    parseFontRegistry(fontRegistryModule("'inter'")).issues.some((issue) => issue.includes('FONT_BOOT_DATA is stale')),
+    true,
+    'stale generated font fallback is caught with an explicit failure',
+  );
 
   // Generated theme boot contract.
   const registryModule = (bootDefaultAccent = 'crimson') => [
@@ -2369,14 +2384,21 @@ function runCanaries() {
     `var THEME_BOOT = ${THEME_BOOT_MARKER};`,
     'THEME_BOOT.systems; THEME_BOOT.accents;',
     'THEME_BOOT.defaultSystem; THEME_BOOT.defaultAccent;',
+    `var FONT_BOOT = ${FONT_BOOT_MARKER};`,
+    'FONT_BOOT.stacks; FONT_BOOT.fallback;',
   ].join('\n');
   const generatedVite = [
     'import { THEME_BOOT_DATA } from "./client/src/lib/design-system";',
+    'import { FONT_BOOT_DATA } from "./client/src/lib/font-options";',
     'function themeBootRegistry() {',
     `  const marker = "${THEME_BOOT_MARKER}";`,
     '  const bootData = JSON.stringify(THEME_BOOT_DATA);',
     '}',
-    'const config = { plugins: [themeBootRegistry()] };',
+    'function fontBootRegistry() {',
+    `  const marker = "${FONT_BOOT_MARKER}";`,
+    '  const bootData = JSON.stringify(FONT_BOOT_DATA);',
+    '}',
+    'const config = { plugins: [themeBootRegistry(), fontBootRegistry()] };',
   ].join('\n');
   eq(checkThemeBootGeneration(generatedHtml, generatedVite), [], 'Vite theme marker generation contract passes');
   eq(
@@ -2579,26 +2601,6 @@ function runCanaries() {
     [['system-default-accent', 'editorial']],
     'a missing default-system row is also drift',
   );
-
-  // Comparator — fonts.
-  const goodFonts = new Map([
-    ['system', ''],
-    ['inter', "'Inter', system-ui, sans-serif"],
-  ]);
-  eq(compareFonts(goodFonts, new Map(goodFonts)), [], 'identical font maps pass');
-  eq(
-    compareFonts(new Map([...goodFonts, ['inter', '"Inter",system-ui,sans-serif']]), goodFonts),
-    [],
-    'quote/whitespace differences are the same stack',
-  );
-  const stackDrift = compareFonts(new Map([...goodFonts, ['inter', "'Inter', sans-serif"]]), goodFonts);
-  eq(stackDrift.map((f) => [f.kind, f.id]), [['font-stack', 'inter']], 'stack drift caught');
-  const bootOnlyFont = compareFonts(goodFonts, new Map([['system', '']]));
-  eq(bootOnlyFont.map((f) => [f.kind, f.id]), [['font-parity', 'inter']], 'boot-only font caught');
-  const pickerOnlyFont = compareFonts(new Map([['system', '']]), goodFonts);
-  eq(pickerOnlyFont.map((f) => [f.kind, f.id]), [['font-parity', 'inter']], 'picker-only font caught');
-  const emptiedStack = compareFonts(new Map([...goodFonts, ['inter', '']]), goodFonts);
-  eq(emptiedStack.map((f) => [f.kind, f.id]), [['font-stack', 'inter']], 'a stack emptied on one side is drift, not a skip');
 
   // Comparator — font stylesheets (the map that downloads the faces).
   const stackedFonts = new Map([
@@ -3209,10 +3211,11 @@ if (defaultSystemId && defaultAccentId && tsSystemDefaultAccents.found) {
 }
 
 // ---------------------------------------------------------------------------
-// Fonts: FONT_OPTIONS (the declared source of truth) vs the pre-paint
-// FONT_STACKS map, ids AND stacks, plus the two fallbacks.
+// Fonts: FONT_OPTIONS is the source of truth for generated pre-paint ids,
+// stacks, and fallback.
 // ---------------------------------------------------------------------------
 const tsFonts = parseTsFontOptions(fontsSrc);
+const fontRegistry = parseFontRegistry(fontsSrc, tsFonts);
 const bootFonts = parseBootFonts(htmlSrc);
 const runtimeFontFallback = tsFonts.order[0] ?? null;
 
@@ -3221,24 +3224,11 @@ if (!tsFonts.fonts.size) fail('parser-rot', `parsed ZERO options out of FONT_OPT
 for (const obj of tsFonts.malformed) {
   fail('parser-rot', `FONT_OPTIONS entry in ${FONTS_REL} is missing id/stack: ${obj}`);
 }
-if (!bootFonts.found) fail('parser-rot', `could not locate the pre-paint "var FONT_STACKS = { … };" map in ${HTML_REL}`);
-if (bootFonts.found && !bootFonts.stacks.size) {
-  fail('parser-rot', `parsed ZERO entries out of the pre-paint FONT_STACKS map in ${HTML_REL}`);
-}
-for (const part of bootFonts.malformed) {
-  fail('parser-rot', `pre-paint FONT_STACKS entry in ${HTML_REL} is not an "id: 'stack'" pair: ${part}`);
-}
-if (tsFonts.fonts.size && bootFonts.stacks.size) {
-  failures.push(...compareFonts(bootFonts.stacks, tsFonts.fonts));
-}
-if (!bootFonts.fallback) {
-  fail('parser-rot', `could not locate the pre-paint font fallback assignment in ${HTML_REL}`);
-} else if (runtimeFontFallback && bootFonts.fallback !== runtimeFontFallback) {
-  fail(
-    'font-fallback',
-    `${HTML_REL} falls back to font "${bootFonts.fallback}" pre-paint but applyFontOverride() in ${FONTS_REL} falls back to FONT_OPTIONS[0] ("${runtimeFontFallback}") — an unknown saved font would paint one face before React and another after it`,
-  );
-}
+if (!fontRegistry.found) fail('parser-rot', `${FONTS_REL} does not export FONT_BOOT_DATA`);
+for (const issue of fontRegistry.issues) fail('font-boot-registry', issue);
+if (!bootFonts.found) fail('parser-rot', `could not locate "var FONT_BOOT = ${FONT_BOOT_MARKER}" in ${HTML_REL}`);
+if (!bootFonts.consumesStacks) fail('boot-generation', `${HTML_REL} does not consume generated FONT_BOOT.stacks`);
+if (!bootFonts.consumesFallback) fail('boot-generation', `${HTML_REL} does not consume generated FONT_BOOT.fallback`);
 
 // ---------------------------------------------------------------------------
 // Stylesheets: the maps that actually FETCH the faces the stacks above name.
@@ -3383,8 +3373,8 @@ if (failures.length) {
   console.error(`\n${failures.length} theme-drift failure(s).`);
   console.error(`       Theme ids/defaults come from THEME_FALLBACK_REGISTRY in ${TS_REL};`);
   console.error(`       ${VITE_REL} must inject its derived THEME_BOOT_DATA into ${HTML_REL}.`);
-  console.error(`       Picker swatches still mirror the paint in ${CSS_REL}, and font stacks`);
-  console.error(`       in ${FONTS_REL} still mirror the pre-paint FONT_STACKS map.`);
+  console.error(`       ${VITE_REL} must also inject FONT_OPTIONS-derived FONT_BOOT_DATA from`);
+  console.error(`       ${FONTS_REL}; picker swatches still mirror the paint in ${CSS_REL}.`);
   console.error('       A stack is only half of a webfont: the FONT_STYLESHEETS /');
   console.error(`       SYSTEM_STYLESHEETS maps in ${FONTS_REL} are what fetch the face,`);
   console.error('       so a stylesheet fix has to land with every stack fix.');
@@ -3423,7 +3413,7 @@ console.log(
 console.log(
   `PASS system-default-accent :: DEFAULT_SYSTEM "${defaultSystemId}" and DEFAULT_ACCENT "${defaultAccentId}" agree with SYSTEM_DEFAULT_ACCENT`,
 );
-console.log(`PASS font-parity :: ${tsFonts.fonts.size} font option(s) present in FONT_OPTIONS and the pre-paint FONT_STACKS map with identical stacks (fallback "${runtimeFontFallback}")`);
+console.log(`PASS font-boot-registry :: ${tsFonts.fonts.size} font option id(s), stacks, and fallback "${runtimeFontFallback}" are generated from FONT_OPTIONS into the inline pre-paint script`);
 for (const [id, stack] of tsFonts.fonts) console.log(`       ${id.padEnd(12)} ${stack === '' ? '(system default — no override)' : stack}`);
 const webfontOptions = [...tsFonts.fonts].filter(([, stack]) => stack !== '');
 console.log(
@@ -3459,7 +3449,7 @@ for (const id of [...tsSystems.ids].sort()) {
   const href = systemSheets.entries.get(id);
   console.log(`       ${id.padEnd(10)} ${asked.padEnd(52)} → ${href ? parseStylesheetFamilies(href).join(' + ') : '(no stylesheet)'}`);
 }
-console.log('\nPASS accent-drift :: the generated pre-paint theme registry, picker swatches, painted tokens, font map, and stylesheets all agree');
+console.log('\nPASS accent-drift :: the generated pre-paint theme/font registries, picker swatches, painted tokens, and stylesheets all agree');
 
 // ---------------------------------------------------------------------------
 // Live webfont probe — opt-in, and never from the registered gate

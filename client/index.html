@@ -117,29 +117,20 @@
           // I1 — font override: read ds-font-override from localStorage and
           // apply --font-sans pre-paint on EVERY route, so the override
           // persists across hard reloads regardless of which page boots.
-          // Must match FONT_OPTIONS in client/src/lib/font-options.ts (source of truth).
-          // Enforced, not trusted (task #388): the `accent-drift` validation
-          // gate (scripts/validation/accent-drift.mjs) fails when an id or a
-          // stack here disagrees with FONT_OPTIONS — as it does for SYSTEMS
-          // vs DESIGN_SYSTEMS and ACCENTS vs the accent registry above.
-
-          var FONT_STACKS = {
-            'system':       '',
-            'inter':        "'Inter', system-ui, sans-serif",
-            'dm-sans':      "'DM Sans', system-ui, sans-serif",
-            'source-sans':  "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif",
-            'ibm-plex':     "'IBM Plex Sans', system-ui, sans-serif",
-            'jetbrains':    "'JetBrains Mono', ui-monospace, monospace"
-          };
+          // Vite replaces this marker from FONT_OPTIONS-derived data before
+          // serving/building the HTML. Keeping it inline preserves the
+          // current no-flash behavior without a second network request or a
+          // hand-maintained list of font ids and stacks.
+          var FONT_BOOT = __AWESOME_VIDEO_FONT_BOOT__;
           var fnt = null;
           try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
-          if (!Object.prototype.hasOwnProperty.call(FONT_STACKS, fnt)) fnt = 'system';
+          if (!Object.prototype.hasOwnProperty.call(FONT_BOOT.stacks, fnt)) fnt = FONT_BOOT.fallback;
           root.setAttribute('data-font', fnt);
-          if (fnt && FONT_STACKS[fnt]) {
+          if (fnt && FONT_BOOT.stacks[fnt]) {
             // Run22 BUG-015: body text uses --font-body (not --font-sans);
             // set both, matching applyFontOverride in font-options.ts.
-            root.style.setProperty('--font-body', FONT_STACKS[fnt]);
-            root.style.setProperty('--font-sans', FONT_STACKS[fnt]);
+            root.style.setProperty('--font-body', FONT_BOOT.stacks[fnt]);
+            root.style.setProperty('--font-sans', FONT_BOOT.stacks[fnt]);
           }
            // Font assets remain optional until after the first paint. The app
            // applies a selected picker font and system display font on idle.
