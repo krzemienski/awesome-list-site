@@ -7,7 +7,7 @@ The documented stage-5 palette scan (`(bg|text|border|ring|fill|stroke)-<hue>-<s
 
 **Why:** A full palette migration verified "clean" by the documented regex was rejected in completion review because tier-badge gradients (`from-yellow-400 to-yellow-600`, …) survived untouched.
 
-**How to apply:** Any raw-palette sweep or regression gate must extend the prefix alternation to at least `from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset`. Also remember comments count: a code comment naming a palette class (e.g. "the old bg-blue-500 override") matches line-based scans — reword it.
+**How to apply:** Any raw-palette sweep or regression gate must extend the prefix alternation to at least `from|via|to|divide|outline|decoration|shadow|accent|caret|placeholder|ring-offset`. Also remember comments count: a code comment naming a palette class (e.g. "the old bg-blue-500 override") — or quoting a hex literal it is explaining away (e.g. "the vendor theme's #26262b grey") — matches the line-based scans. Describe such values in words ("a mid-grey around 15% lightness"), never by literal.
 
 ## DS-OK tagging quirks (same gate)
 

@@ -40,8 +40,19 @@ const TOKENS = {
   ink: "--text",
   mutedInk: "--text-3",
   border: "--border-strong",
+  fieldSurface: "--surface",
 } as const;
 
+/** Roles Clerk re-tints with an alpha ramp of its OWN before painting.
+ *
+ *  Every hairline in the widget (card, divider, social buttons, and the field
+ *  itself) is drawn as `colorBorder` at 3–11% — 28% on hover/focus. Handing
+ *  that role a pre-composited value would dilute an already-dim near-black
+ *  twice over and erase the border completely, so it is resolved at full
+ *  opacity instead and Clerk's ramp lands it where the DS hairline sits. The
+ *  token's own alpha is therefore intentionally dropped for this role — it is
+ *  Clerk's ramp, not ours, that decides the weight. */
+const RAMPED_ROLES = new Set<keyof typeof TOKENS>(["border"]);
 export type DesignSystemPalette = Partial<Record<keyof typeof TOKENS, string>>;
 
 /** Parses any CSS color notation by handing it to the browser: the CSSOM
@@ -102,7 +113,10 @@ function resolveDesignSystemPalette(): DesignSystemPalette {
     const palette: DesignSystemPalette = {};
     for (const [role, token] of Object.entries(TOKENS) as [keyof typeof TOKENS, string][]) {
       const channels = read(token);
-      if (channels) palette[role] = toHex(channels, backdrop);
+      if (!channels) continue;
+      palette[role] = RAMPED_ROLES.has(role)
+        ? toHex([channels[0], channels[1], channels[2], 1], backdrop)
+        : toHex(channels, backdrop);
     }
     return palette;
   } finally {
@@ -143,15 +157,27 @@ function buildClerkAppearance(palette: DesignSystemPalette, basePath: string) {
       ...(palette.background ? { colorBackground: palette.background } : {}),
       ...(palette.ink ? { colorForeground: palette.ink } : {}),
       ...(palette.mutedInk ? { colorMutedForeground: palette.mutedInk } : {}),
+      // Task #390: the dark base theme fills every input with a mid-grey of its
+      // own (~15% lightness), which reads as a lighter patch stuck onto the
+      // true-black card. The DS paints text fields as the surface token over
+      // the page background with a hairline border — hand Clerk those instead.
+      // The placeholder is colorMutedForeground (already the --text-3 ink) and
+      // keyboard focus is the global 2px accent outline in design-system.css,
+      // so both stay on-system for free once the field itself is.
+      ...(palette.fieldSurface ? { colorInput: palette.fieldSurface } : {}),
+      ...(palette.ink ? { colorInputForeground: palette.ink } : {}),
+      ...(palette.border ? { colorBorder: palette.border } : {}),
       borderRadius: "0px",
     },
     elements: {
       // OAuth provider marks default to dark ink. Keep the dark card
       // treatment, but invert those marks so Apple, GitHub, and other
       // monochrome providers remain visible against their near-black buttons.
+      // (No borderColor here: Clerk draws these buttons at border-width 0 and
+      // rings them from `colorBorder`, which task #390 now maps, so a
+      // per-element override would only be a dormant second source of truth.)
       socialButtonsBlockButton: {
         ...(palette.ink ? { color: palette.ink } : {}),
-        ...(palette.border ? { borderColor: palette.border } : {}),
         minHeight: "40px",
       },
       socialButtonsBlockButtonText: {
