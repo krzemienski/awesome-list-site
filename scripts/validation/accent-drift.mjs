@@ -98,6 +98,9 @@
 //     entry, or an entry keyed by a system that no longer exists
 //   · system-accent-value  — a SYSTEM_DEFAULT_ACCENT entry naming an accent id
 //     that is not in ACCENTS
+//   · system-default-accent — SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM] ≠
+//     DEFAULT_ACCENT, so the default system's intended accent never reaches a
+//     first-time visitor
 //   · font-parity    — a font id in only one of FONT_OPTIONS / FONT_STACKS
 //   · font-stack     — a boot FONT_STACKS stack ≠ the FONT_OPTIONS stack, so
 //     the face applied before paint is not the one applied after it
@@ -983,6 +986,21 @@ function compareSystemDefaultAccents(systemIds, defaults, accentIds) {
     }
   }
   return failures;
+}
+
+// The default system is the one case where a first-time visitor does not pass
+// through SYSTEM_DEFAULT_ACCENT: readInitial() and the pre-paint boot script
+// both start with DEFAULT_ACCENT. Keep that fallback aligned with the
+// default system's intended accent, or the site's initial look is wrong even
+// though every map entry is otherwise valid.
+function compareDefaultSystemAccent(defaultSystemId, defaultAccentId, defaults) {
+  const mappedAccentId = defaults.get(defaultSystemId);
+  if (mappedAccentId === defaultAccentId) return [];
+  return [{
+    kind: 'system-default-accent',
+    id: defaultSystemId,
+    message: `SYSTEM_DEFAULT_ACCENT[DEFAULT_SYSTEM] in ${TS_REL} maps "${defaultSystemId}" to "${mappedAccentId ?? '(missing)'}", but DEFAULT_ACCENT is "${defaultAccentId}" — the default system's intended accent never reaches a first-time visitor because readInitial() in theme-provider.tsx and the pre-paint fallback in ${HTML_REL} use DEFAULT_ACCENT`,
+  }];
 }
 
 // The boot script's FONT_STACKS map vs FONT_OPTIONS: same ids, same stacks.
@@ -1916,6 +1934,28 @@ function runCanaries() {
     [['system-accent-value', 'terminal']],
     'an emptied default is an unknown accent, not a skip',
   );
+  eq(
+    compareDefaultSystemAccent('editorial', 'crimson', goodDefaults),
+    [],
+    'the default system and first-visit accent agree',
+  );
+  const defaultSystemAccentDrift = compareDefaultSystemAccent(
+    'editorial',
+    'crimson',
+    new Map([...goodDefaults, ['editorial', 'matrix']]),
+  );
+  eq(
+    defaultSystemAccentDrift.map((f) => [f.kind, f.id]),
+    [['system-default-accent', 'editorial']],
+    'the default system accent drift is caught',
+  );
+  eq(/"matrix".*"crimson"/.test(defaultSystemAccentDrift[0].message), true, 'the default-system message names both accent values');
+  eq(/first-time visitor/.test(defaultSystemAccentDrift[0].message), true, 'the default-system message names the first-visit consequence');
+  eq(
+    compareDefaultSystemAccent('editorial', 'crimson', new Map([['terminal', 'matrix']])).map((f) => [f.kind, f.id]),
+    [['system-default-accent', 'editorial']],
+    'a missing default-system row is also drift',
+  );
 
   // Comparator — fonts.
   const goodFonts = new Map([
@@ -2550,6 +2590,9 @@ for (const part of tsSystemDefaultAccents.malformed) {
 if (tsSystems.ids.length && tsAccents.size && tsSystemDefaultAccents.accents.size) {
   failures.push(...compareSystemDefaultAccents(tsSystems.ids, tsSystemDefaultAccents.accents, [...tsAccents.keys()]));
 }
+if (defaultSystemId && defaultAccentId && tsSystemDefaultAccents.found) {
+  failures.push(...compareDefaultSystemAccent(defaultSystemId, defaultAccentId, tsSystemDefaultAccents.accents));
+}
 
 // ---------------------------------------------------------------------------
 // Fonts: FONT_OPTIONS (the declared source of truth) vs the pre-paint
@@ -2724,6 +2767,9 @@ console.log(
   `PASS system-accent :: every design system names a default accent that exists — ${[...tsSystemDefaultAccents.accents]
     .map(([system, accent]) => `${system}→${accent}`)
     .join(', ')}`,
+);
+console.log(
+  `PASS system-default-accent :: DEFAULT_SYSTEM "${defaultSystemId}" and DEFAULT_ACCENT "${defaultAccentId}" agree with SYSTEM_DEFAULT_ACCENT`,
 );
 console.log(`PASS font-parity :: ${tsFonts.fonts.size} font option(s) present in FONT_OPTIONS and the pre-paint FONT_STACKS map with identical stacks (fallback "${runtimeFontFallback}")`);
 for (const [id, stack] of tsFonts.fonts) console.log(`       ${id.padEnd(12)} ${stack === '' ? '(system default — no override)' : stack}`);
