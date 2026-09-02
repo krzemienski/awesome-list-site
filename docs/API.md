@@ -204,7 +204,6 @@ email/password login endpoint was removed.
 | POST | `/api/claude/analyze` | AI URL analysis (rate-limited) |
 | GET/POST | `/api/recommendations` | Recommendations |
 | GET/PUT/POST | `/api/recommendations/feedback`, `/api/recommendations/:resourceId/feedback` | Recommendation feedback |
-| GET/POST | `/api/learning-paths/suggested`, `/api/learning-paths/generate` | Learning paths |
 | POST | `/api/interactions` | Record a user interaction |
 
 Edit suggestions accept a whitelisted set of fields: `title`, `description`,
@@ -347,6 +346,6 @@ interface Tag { id: number; name: string; slug: string; createdAt: string }
 ## Rate limiting
 
 - Public API: free tier ≈ 60 requests/hour; API keys can raise the limit.
-- AI endpoints (`/api/claude/*`, `/api/learning-paths/generate`): additionally
+- AI endpoints (`/api/claude/*`): additionally
   gated by an AI rate limiter and by upstream Anthropic/OpenAI limits.
 - GitHub endpoints: subject to GitHub API limits.

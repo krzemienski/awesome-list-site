@@ -30,14 +30,14 @@ import {
 // longer branches on REPL_ID, so both environments share one baseline.
 const BASELINES = {
   replit: {
-    apiCount: 174,
-    apiHash: "acde34b78e4bd2d5f6bc9a06f2ca0fe6caf679aef14872257065d523dd44bb7f",
+    apiCount: 171,
+    apiHash: "834349f3386fa99cd9e12c04ee467f44ab568beb1dfae1f6bedbaf63a3f132f3",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
   portable: {
-    apiCount: 174,
-    apiHash: "acde34b78e4bd2d5f6bc9a06f2ca0fe6caf679aef14872257065d523dd44bb7f",
+    apiCount: 171,
+    apiHash: "834349f3386fa99cd9e12c04ee467f44ab568beb1dfae1f6bedbaf63a3f132f3",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },

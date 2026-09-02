@@ -106,7 +106,6 @@ Registered in `client/src/App.tsx` (Wouter). Admin and most non-browse pages are
 | `researchService.ts` | Claude Agent SDK research runs |
 | `agentRuntime.ts`, `agentEvents.ts`, `runAgentQuery.ts` | Agent execution + event logging |
 | `recommendationEngine.ts`, `recommendations.ts` | Personalized recommendations |
-| `learningPathGenerator.ts` | AI learning-path generation |
 | `embeddingService.ts` | OpenAI embeddings |
 | `tagging.ts` | AI-powered tagging |
 | `configCrypto.ts` | Encrypt/decrypt per-run agent auth tokens |

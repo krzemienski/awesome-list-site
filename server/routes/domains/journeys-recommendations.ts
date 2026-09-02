@@ -8,7 +8,7 @@
  *
  *   1. Learning journey routes — public listing/detail/start/progress plus the
  *      admin journey & step CRUD (former lines ~3866-4365).
- *   2. AI recommendation, learning-path and interaction routes (former lines
+ *   2. AI recommendation and interaction routes (former lines
  *      ~7459-8014).
  *
  * The two blocks are registered by separate exported registrars so the
@@ -36,7 +36,6 @@ import {
 } from "@shared/validation";
 import type { RecommendationEngine } from "../../ai/recommendationEngine";
 import type { UserProfile as AIUserProfile } from "../../ai/recommendationEngine";
-import type { LearningPathGenerator } from "../../ai/learningPathGenerator";
 import {
   RECOMMENDATION_FEEDBACK_VALUES,
   type RecommendationFeedbackValue,
@@ -590,15 +589,13 @@ export function registerJourneyRoutes(
 }
 
 // ---------------------------------------------------------------------------
-// Recommendations / learning-paths / interactions registrar
+// Recommendations / interactions registrar
 // ---------------------------------------------------------------------------
 
 export interface RecommendationRoutesContext {
   isAuthenticated: any;
   aiLimiter: RequestHandler;
-  suggestedReadLimiter: RequestHandler;
   recommendationEngine: RecommendationEngine;
-  learningPathGenerator: LearningPathGenerator;
   userFeatureRepo: UserFeatureRepository;
   resourceRepo: ResourceRepository;
   categoryRepo: CategoryRepository;
@@ -613,9 +610,7 @@ export function registerRecommendationRoutes(
   const {
     isAuthenticated,
     aiLimiter,
-    suggestedReadLimiter,
     recommendationEngine,
-    learningPathGenerator,
     userFeatureRepo,
     resourceRepo,
     categoryRepo,
@@ -643,24 +638,6 @@ export function registerRecommendationRoutes(
         ? { ...r, resource: stripInternalResourceFields(r.resource) }
         : r
     );
-
-  // Learning-path payloads carry resources at the top level and inside
-  // milestones — strip both.
-  const stripPathInternals = (p: any): any => {
-    if (!p || typeof p !== 'object') return p;
-    const out: any = { ...p };
-    if (Array.isArray(out.resources)) {
-      out.resources = out.resources.map(stripInternalResourceFields);
-    }
-    if (Array.isArray(out.milestones)) {
-      out.milestones = out.milestones.map((m: any) =>
-        m && typeof m === 'object' && Array.isArray(m.resources)
-          ? { ...m, resources: m.resources.map(stripInternalResourceFields) }
-          : m
-      );
-    }
-    return out;
-  };
 
   // NB-007 (run23): limit must be validated — ?limit=500 returned 500 rows and
   // ?limit=-5 fell through to the entire corpus. 400 on invalid, cap at 50.
@@ -931,184 +908,6 @@ export function registerRecommendationRoutes(
     } catch (error) {
       console.error('Error recording recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to record feedback' });
-    }
-  });
-
-  // GET /api/learning-paths/suggested - Get suggested learning paths
-  // NB-002 (run23): every distinct sanitized param combo is a generation cache
-  // key, and a miss runs ~15-45s of paid Claude calls. Anonymous requests are
-  // therefore PINNED to the boot-warmed default profile — no unauthenticated
-  // input can mint a new cache key or trigger generation. Signed-in users get
-  // personalization (bounded params) behind the strict aiLimiter.
-  // Task-178: split the limiter by auth — anonymous requests only ever read
-  // the warmed cache, so they get the generous suggestedReadLimiter; signed-in
-  // requests (which can trigger paid generation) stay behind the strict
-  // aiLimiter.
-  app.get("/api/learning-paths/suggested", (req: any, res, next) => {
-    const isAuthed = Boolean(req.dbUser);
-    return (isAuthed ? aiLimiter : suggestedReadLimiter)(req, res, next);
-  }, async (req: any, res) => {
-    try {
-      const rawLimit = parseInt(req.query.limit as string);
-      const requestedLimit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
-
-      const isAuthed = Boolean(req.dbUser);
-
-      if (!isAuthed) {
-        // Must mirror warmDefaultSuggestedPaths() exactly so this always hits
-        // the warmed cache entry (key: default profile + limit 5).
-        const anonProfile: AIUserProfile = {
-          userId: 'anonymous',
-          preferredCategories: [],
-          skillLevel: 'intermediate',
-          learningGoals: [],
-          preferredResourceTypes: [],
-          timeCommitment: 'flexible',
-          viewHistory: [],
-          bookmarks: [],
-          completedResources: [],
-          completedJourneys: [],
-          journeyProgress: [],
-          ratings: {}
-        };
-        const paths = await learningPathGenerator.getSuggestedPaths(anonProfile, 5);
-        // NB-015 (run23): strip internal resource fields before sending.
-        return res.json(paths.slice(0, requestedLimit).map(stripPathInternals));
-      }
-
-      const skillLevels = ['beginner', 'intermediate', 'advanced'];
-      const skillLevel = (skillLevels.includes(req.query.skillLevel as string)
-        ? req.query.skillLevel : 'intermediate') as 'beginner' | 'intermediate' | 'advanced';
-
-      const timeCommitments = ['daily', 'weekly', 'flexible'];
-      const timeCommitment = (timeCommitments.includes(req.query.timeCommitment as string)
-        ? req.query.timeCommitment : 'flexible') as 'daily' | 'weekly' | 'flexible';
-
-      // Only accept categories that actually exist in the taxonomy.
-      const requestedCategories = ((req.query.categories as string)?.split(',') || [])
-        .map((c) => c.trim())
-        .filter(Boolean)
-        .slice(0, 10);
-      let preferredCategories: string[] = [];
-      if (requestedCategories.length > 0) {
-        const known = new Set((await categoryRepo.listCategories()).map((c) => c.name));
-        preferredCategories = requestedCategories.filter((c) => known.has(c));
-      }
-
-      const learningGoals = ((req.query.goals as string)?.split(',') || [])
-        .map((g) => g.trim())
-        .filter(Boolean)
-        .slice(0, 5)
-        .map((g) => g.slice(0, 100));
-
-      // Identity comes from the session, never from the query string.
-      const userProfile: AIUserProfile = {
-        userId: req.dbUser?.id || 'anonymous',
-        preferredCategories,
-        skillLevel,
-        learningGoals,
-        preferredResourceTypes: [],
-        timeCommitment,
-        viewHistory: [],
-        bookmarks: [],
-        completedResources: [],
-        completedJourneys: [],
-        journeyProgress: [],
-        ratings: {}
-      };
-
-      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, requestedLimit);
-
-      // NB-015 (run23): strip internal resource fields before sending.
-      res.json(paths.map(stripPathInternals));
-    } catch (error) {
-      console.error('Error generating suggested learning paths:', error);
-      res.status(500).json({ message: 'Failed to generate suggested learning paths' });
-    }
-  });
-
-  // NB-002 (run23): shared sanitizer for body-supplied profiles on the paid
-  // generation POSTs — whitelists fields, clamps enums/arrays/lengths, and
-  // forces the identity to the session user. Raw client bodies must never
-  // reach the generator (unbounded prompt/cache-key material).
-  const sanitizeBodyProfile = (body: any, sessionUserId: string): AIUserProfile => {
-    const skillLevels = ['beginner', 'intermediate', 'advanced'];
-    const timeCommitments = ['daily', 'weekly', 'flexible'];
-    const strArr = (v: unknown, maxItems: number, maxLen: number): string[] =>
-      Array.isArray(v)
-        ? v.filter((x): x is string => typeof x === 'string')
-            .map((x) => x.trim())
-            .filter(Boolean)
-            .slice(0, maxItems)
-            .map((x) => x.slice(0, maxLen))
-        : [];
-    return {
-      userId: sessionUserId,
-      preferredCategories: strArr(body?.preferredCategories, 10, 100),
-      skillLevel: (skillLevels.includes(body?.skillLevel) ? body.skillLevel : 'intermediate'),
-      learningGoals: strArr(body?.learningGoals, 5, 100),
-      preferredResourceTypes: strArr(body?.preferredResourceTypes, 10, 50),
-      timeCommitment: (timeCommitments.includes(body?.timeCommitment) ? body.timeCommitment : 'flexible'),
-      viewHistory: [],
-      bookmarks: [],
-      completedResources: [],
-      completedJourneys: [],
-      journeyProgress: [],
-      ratings: {}
-    } as AIUserProfile;
-  };
-
-  // POST /api/learning-paths/generate - Generate custom learning path
-  // NB-002 (run23): was fully anonymous — any visitor could trigger a paid
-  // ~25s Claude generation with arbitrary prompt material. Now requires a
-  // signed-in session and rides the strict AI limiter.
-  app.post("/api/learning-paths/generate", isAuthenticated, aiLimiter, async (req: any, res) => {
-    try {
-      const { userProfile, category, customGoals } = req.body ?? {};
-
-      if (!userProfile) {
-        return res.status(400).json({ message: 'User profile is required' });
-      }
-
-      const sessionUserId = req.dbUser?.id;
-      const safeProfile = sanitizeBodyProfile(userProfile, sessionUserId);
-      const safeCategory = typeof category === 'string' ? category.trim().slice(0, 100) : undefined;
-      const safeGoals = Array.isArray(customGoals)
-        ? customGoals.filter((g): g is string => typeof g === 'string')
-            .map((g) => g.trim()).filter(Boolean).slice(0, 5).map((g) => g.slice(0, 100))
-        : undefined;
-
-      const path = await learningPathGenerator.generateLearningPath(
-        safeProfile,
-        safeCategory,
-        safeGoals
-      );
-
-      // NB-015 (run23): strip internal resource fields before sending.
-      res.json(stripPathInternals(path));
-    } catch (error) {
-      console.error('Error generating custom learning path:', error);
-      res.status(500).json({ message: 'Failed to generate custom learning path' });
-    }
-  });
-
-  // POST /api/learning-paths - Legacy route for compatibility
-  // NB-002 (run23): auth-gated + sanitized like /generate (was: raw body
-  // straight into the generator with no auth and no limiter).
-  app.post("/api/learning-paths", isAuthenticated, aiLimiter, async (req: any, res) => {
-    try {
-      const sessionUserId = req.dbUser?.id;
-      const userProfile = sanitizeBodyProfile(req.body, sessionUserId);
-      const rawLimit = parseInt(req.query.limit as string);
-      const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
-
-      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-
-      // NB-015 (run23): strip internal resource fields before sending.
-      res.json(paths.map(stripPathInternals));
-    } catch (error) {
-      console.error('Error generating AI learning paths:', error);
-      res.status(500).json({ message: 'Failed to generate learning paths' });
     }
   });
 

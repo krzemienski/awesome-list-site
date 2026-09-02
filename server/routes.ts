@@ -34,7 +34,6 @@ import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
 import { registerNotificationRoutes } from "./api/notifications";
 import { recommendationEngine } from "./ai/recommendationEngine";
-import { learningPathGenerator } from "./ai/learningPathGenerator";
 import { SITE_URL } from "./og-middleware";
 import { stripInternalResourceFields } from "./lib/publicResource";
 import { parseBoundedInt } from "./validation/inputs";
@@ -263,16 +262,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       "Too many AI requests. Please try again in a few minutes.",
     ),
   });
-  const suggestedReadLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    limit: 60,
-    standardHeaders: true,
-    legacyHeaders: false,
-    store: new PgRateLimitStore("suggested-read"),
-    handler: negotiated429Handler(
-      "Too many requests. Please slow down and try again shortly.",
-    ),
-  });
   const apiBackstopLimiter = rateLimit({
     windowMs: 60 * 1000,
     limit: 600,
@@ -369,9 +358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerRecommendationRoutes(app, {
     isAuthenticated,
     aiLimiter,
-    suggestedReadLimiter,
     recommendationEngine,
-    learningPathGenerator,
     userFeatureRepo,
     resourceRepo,
     categoryRepo,
@@ -465,11 +452,5 @@ export async function runBackgroundInitialization(): Promise<void> {
     );
   }
 
-  learningPathGenerator.warmDefaultSuggestedPaths().catch((error) => {
-    console.error(
-      "Suggested-paths cache warm-up failed (non-fatal):",
-      error,
-    );
-  });
   console.log("✅ Background initialization complete");
 }

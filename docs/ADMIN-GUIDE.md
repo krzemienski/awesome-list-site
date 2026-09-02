@@ -277,8 +277,7 @@ The **Journeys** tab manages curated learning journeys and their ordered steps.
 2. Create/edit/delete journeys (title, description, difficulty, published state)
 3. Add, reorder, or remove steps that reference resources
 
-Only **published** journeys are visible to end users on `/journeys`. Journeys can
-also be AI-generated (see `server/ai/learningPathGenerator.ts`).
+Only **published** journeys are visible to end users on `/journeys`.
 
 ## Export & Backup
 

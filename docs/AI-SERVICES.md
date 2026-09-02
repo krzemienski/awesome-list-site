@@ -40,7 +40,6 @@ Models (as configured in code):
 | `embeddingService.ts` | OpenAI embeddings + cache (singleton `embeddingService`) |
 | `recommendationEngine.ts` | Personalized recommendations, hybrid AI + rule-based scoring (singleton `recommendationEngine`) |
 | `recommendations.ts` | Recommendation scoring helpers + `generateAIRecommendations()` / `generateAILearningPaths()` |
-| `learningPathGenerator.ts` | Learning-journey generation (templates + AI) (singleton `learningPathGenerator`) |
 | `researchService.ts` | AI research agent that discovers new candidate resources (singleton `researchService`) |
 | `webResearch.ts` | `WebResearchService` helper used during research |
 | `agentRuntime.ts` | Agent config parsing, model resolution, base-URL validation/preflight |
@@ -109,13 +108,6 @@ fallbacks. When AI is unavailable the engine falls back to rule-based scoring.
 candidate resources and records them as **discoveries** for admin review.
 Per-run model/base-URL/credentials come from `agentRuntime.ts` and are stored
 encrypted (`configCrypto.ts`). Progress is emitted to `agentEvents.ts`.
-
-## Learning path generator
-
-`server/ai/learningPathGenerator.ts` (singleton `learningPathGenerator`) builds
-structured learning journeys from category templates, optionally enhanced by
-Claude, and falls back to template-only generation without a key. See the
-**Journeys** admin tab and `/journeys` for the user-facing surface.
 
 ## HTTP API surface
 
