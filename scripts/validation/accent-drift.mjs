@@ -211,8 +211,10 @@
 //
 // A stylesheet's families are read out of its `family=` parameters ("+" is a
 // space, the axis spec after ":" is not part of the name) and matched against
-// the families its stack NAMES, by that same identity. A URL that names no
-// family at all is reported as unverifiable rather than waved through.
+// the families its stack NAMES, by that same identity. The same parameters
+// carry the requested `wght` values: discrete values are individual faces and
+// `min..max` values are variable ranges. A URL that names no family at all is
+// reported as unverifiable rather than waved through.
 //
 // Detector canaries run on every invocation: every parser, every normalizer,
 // and every comparator are asserted against synthetic known-good and
@@ -320,19 +322,70 @@ function stackFamilies(stack) {
 // href names no family at all — the caller treats that as unverifiable rather
 // than as agreement.
 function parseStylesheetFamilies(href) {
-  const families = [];
-  for (const m of String(href).matchAll(/[?&]family=([^&:]+)/g)) {
-    const raw = m[1].replace(/\+/g, ' ');
-    let decoded = raw;
-    try {
-      decoded = decodeURIComponent(raw);
-    } catch {
-      /* a malformed % escape stays literal — it will simply fail to match */
-    }
-    const family = decoded.trim();
-    if (family) families.push(family);
+  return [...parseStylesheetFontEntries(href).values()].map((entry) => entry.family);
+}
+
+function decodeStylesheetPart(raw) {
+  const value = String(raw).replace(/\+/g, ' ');
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    /* a malformed % escape stays literal — it will simply fail to match */
+    return value;
   }
-  return families;
+}
+
+// Google Fonts css2 `family=` parameters, preserving the weight coverage
+// needed by the runtime paint gate. A family with no `wght` axis is a static
+// 400 face (for example Instrument Serif's `ital@0;1` request). Ranges are
+// inclusive, so variable `400..700` covers every meaningful integer weight
+// between those bounds without pretending it is a finite static list.
+function parseStylesheetFontEntries(href) {
+  const entries = new Map();
+  for (const m of String(href).matchAll(/[?&]family=([^&]+)/g)) {
+    const parameter = decodeStylesheetPart(m[1]);
+    const separator = parameter.indexOf(':');
+    const family = (separator < 0 ? parameter : parameter.slice(0, separator)).trim();
+    if (!family) continue;
+
+    const ranges = [];
+    const axisSpec = separator < 0 ? '' : parameter.slice(separator + 1);
+    const at = axisSpec.indexOf('@');
+    const axes = at < 0 ? [] : axisSpec.slice(0, at).split(',').map((axis) => axis.trim());
+    const weightAxis = axes.indexOf('wght');
+    const values = at < 0 ? [] : axisSpec.slice(at + 1).split(';');
+    if (weightAxis < 0 || !values.length) {
+      ranges.push({ min: 400, max: 400 });
+    } else {
+      for (const value of values) {
+        const weight = value.split(',')[weightAxis]?.trim();
+        const range = /^(\d+(?:\.\d+)?)\.\.(\d+(?:\.\d+)?)$/.exec(weight ?? '');
+        const single = /^(\d+(?:\.\d+)?)$/.exec(weight ?? '');
+        if (range) {
+          const min = Number(range[1]);
+          const max = Number(range[2]);
+          if (Number.isFinite(min) && Number.isFinite(max) && min <= max) ranges.push({ min, max });
+        } else if (single) {
+          const number = Number(single[1]);
+          if (Number.isFinite(number)) ranges.push({ min: number, max: number });
+        }
+      }
+      if (!ranges.length) ranges.push({ min: 400, max: 400 });
+    }
+
+    const key = normalizeFamilyName(family);
+    const previous = entries.get(key);
+    entries.set(key, {
+      family,
+      ranges: [...(previous?.ranges ?? []), ...ranges],
+    });
+  }
+  return entries;
+}
+
+function stylesheetFamilyCoversWeight(entries, family, weight) {
+  const entry = entries.get(normalizeFamilyName(family));
+  return Boolean(entry?.ranges.some(({ min, max }) => weight >= min && weight <= max));
 }
 
 // ---------------------------------------------------------------------------
@@ -1406,7 +1459,15 @@ function effectiveSystemFonts(systemId, rootFonts, systemFonts) {
   return out;
 }
 
-function compareSystemFontCoverage({ systemIds, defaultSystemId, rootFonts, systemFonts, systemSheets, staticHrefs }) {
+function compareSystemFontCoverage({
+  systemIds,
+  defaultSystemId,
+  rootFonts,
+  systemFonts,
+  systemSheets,
+  staticHrefs,
+  requiredWeights,
+}) {
   const failures = [];
   const alwaysLoaded = new Set();
   for (const href of staticHrefs) {
@@ -1417,6 +1478,17 @@ function compareSystemFontCoverage({ systemIds, defaultSystemId, rootFonts, syst
     const sheetHref = systemSheets.get(id);
     const sheetFamilies =
       sheetHref === undefined ? [] : parseStylesheetFamilies(sheetHref).map(normalizeFamilyName);
+    const sheetEntries = sheetHref === undefined ? new Map() : parseStylesheetFontEntries(sheetHref);
+    const staticEntries = new Map();
+    for (const href of staticHrefs) {
+      for (const [family, entry] of parseStylesheetFontEntries(href)) {
+        const previous = staticEntries.get(family);
+        staticEntries.set(family, {
+          family: entry.family,
+          ranges: [...(previous?.ranges ?? []), ...entry.ranges],
+        });
+      }
+    }
     if (sheetHref !== undefined && !sheetFamilies.length) {
       failures.push({
         kind: 'system-stylesheet-family',
@@ -1454,6 +1526,36 @@ function compareSystemFontCoverage({ systemIds, defaultSystemId, rootFonts, syst
         id,
         message: `design system "${id}" asks for "${primary}" (${token} in ${source}: ${JSON.stringify(value)}) but no loader that runs for "${id}" downloads it — not the always-on links in ${HTML_REL} (${[...alwaysLoaded].join(', ') || 'none'}) and not SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL} (${sheetFamilies.join(', ') || 'no entry'}) — so every surface reading ${token} silently paints in the next family of that stack instead`,
       });
+    }
+
+    // The browser gate supplies this optional inventory after measuring the
+    // actual display/body/mono surfaces. Keep the structural comparator useful
+    // on its own as well: its canaries use the same path to prove a dropped
+    // static weight and a variable range are not waved through.
+    const requiredByToken = requiredWeights?.get?.(id);
+    if (requiredByToken) {
+      const loadedEntries = new Map();
+      for (const [family, entry] of staticEntries) loadedEntries.set(family, entry);
+      for (const [family, entry] of sheetEntries) {
+        const previous = loadedEntries.get(family);
+        loadedEntries.set(family, {
+          family: entry.family,
+          ranges: [...(previous?.ranges ?? []), ...entry.ranges],
+        });
+      }
+      for (const [token, weights] of requiredByToken) {
+        const value = effectiveSystemFonts(id, rootFonts, systemFonts).get(token)?.value;
+        const primary = stackFamilies(value ?? '')[0];
+        if (!primary || GENERIC_FAMILIES.has(primary)) continue;
+        for (const weight of weights) {
+          if (stylesheetFamilyCoversWeight(loadedEntries, primary, weight)) continue;
+          failures.push({
+            kind: 'system-font-weight',
+            id,
+            message: `design system "${id}" requires weight ${weight} for ${token} (${primary}), but no loader URL for "${id}" requests that weight — a browser may synthesize faux bold even though the family itself is present`,
+          });
+        }
+      }
     }
 
     for (const family of sheetFamilies) {
@@ -1726,6 +1828,38 @@ function runCanaries() {
     parseStylesheetFamilies('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&display=swap'),
     ['Fraunces'],
     'commas inside a variable-axis spec do not leak into the family name',
+  );
+  eq(
+    [...parseStylesheetFontEntries('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap').get('inter').ranges],
+    [{ min: 400, max: 400 }, { min: 500, max: 500 }, { min: 700, max: 700 }],
+    'discrete wght values are read as individual static faces',
+  );
+  eq(
+    stylesheetFamilyCoversWeight(
+      parseStylesheetFontEntries('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&display=swap'),
+      'Fraunces',
+      650,
+    ),
+    true,
+    'a variable wght range covers an interior weight',
+  );
+  eq(
+    stylesheetFamilyCoversWeight(
+      parseStylesheetFontEntries('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&display=swap'),
+      'Fraunces',
+      850,
+    ),
+    false,
+    'a weight outside a variable range is missing',
+  );
+  eq(
+    stylesheetFamilyCoversWeight(
+      parseStylesheetFontEntries('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap'),
+      'Instrument Serif',
+      400,
+    ),
+    true,
+    'a face with no wght axis is treated as its default 400 face',
   );
   eq(parseStylesheetFamilies('/fonts/self-hosted.css'), [], 'a URL naming no family is reported as unverifiable, not as a match');
   eq(parseStylesheetFamilies('https://example.test/css2?family=Bad%ZZ'), ['Bad%ZZ'], 'a malformed % escape stays literal instead of throwing');
@@ -2413,8 +2547,8 @@ function runCanaries() {
     ],
   ]);
   const coverageSheets = new Map([
-    ['editorial', 'https://fonts.googleapis.com/css2?family=Fraunces:wght@400&family=JetBrains+Mono:wght@400&display=swap'],
-    ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400&family=IBM+Plex+Mono:wght@400&display=swap'],
+    ['editorial', 'https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap'],
+    ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap'],
   ]);
   const coverageStatic = ['https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'];
   const coverageArgs = {
@@ -2506,6 +2640,39 @@ function runCanaries() {
     compareSystemFontCoverage({ ...coverageArgs, staticHrefs: [] }).map((f) => [f.kind, f.id]),
     [['system-font-coverage', 'editorial']],
     'dropping the always-on link leaves the body face it carried uncovered',
+  );
+  const requiredWeights = new Map([
+    ['editorial', new Map([
+      ['--font-display', new Set([400, 500])],
+      ['--font-body', new Set([400])],
+      ['--font-mono', new Set([400, 600])],
+    ])],
+    ['swiss', new Map([
+      ['--font-display', new Set([400, 700])],
+      ['--font-body', new Set([400, 600])],
+      ['--font-mono', new Set([400, 500])],
+    ])],
+  ]);
+  eq(
+    compareSystemFontCoverage({ ...coverageArgs, requiredWeights }).filter((f) => f.kind === 'system-font-weight'),
+    [],
+    'all inventoried weights pass when static loader URLs request them',
+  );
+  const missingWeight = compareSystemFontCoverage({
+    ...coverageArgs,
+    requiredWeights,
+    systemSheets: new Map([...coverageSheets, ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap']]),
+  }).filter((f) => f.kind === 'system-font-weight');
+  eq(missingWeight.map((f) => [f.kind, f.id]), [['system-font-weight', 'swiss']], 'a single removed static weight is caught');
+  eq(/--font-display/.test(missingWeight[0].message) && /weight 700/.test(missingWeight[0].message), true, 'the missing-weight message names token and weight');
+  eq(
+    compareSystemFontCoverage({
+      ...coverageArgs,
+      requiredWeights: new Map([['editorial', new Map([['--font-display', new Set([650])]])]]),
+      systemSheets: new Map([...coverageSheets, ['editorial', 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&family=JetBrains+Mono:wght@400&display=swap']]),
+    }).filter((f) => f.kind === 'system-font-weight'),
+    [],
+    'a variable range satisfies an inventoried interior weight',
   );
 
   // Stored-id resolution. The detector EXECUTES the resolver, so its canaries

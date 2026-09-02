@@ -11,9 +11,13 @@
 // 3. Spot-check divergence: --radius / --font-display actually differ across
 //    systems (proves we're not reading one frozen snapshot).
 // 4. --font-display / --font-body / --font-mono actually paint in their
-//    declared primary face. This uses rendered widths, not document.fonts.check:
-//    the same sample must measure identically with the declared stack and the
-//    primary family alone, but differently with the stack's generic fallback.
+//    declared primary face at every meaningful weight the showcase paints.
+//    This uses rendered widths, not document.fonts.check: the same sample must
+//    measure identically with the declared stack and the primary family alone,
+//    but differently with the stack's generic fallback.
+// 5. The active system's Google Fonts loader requests every inventoried weight;
+//    a temporary URL mutation proves a missing weight names its system, token,
+//    and weight instead of passing because the family itself is present.
 //
 // Requires the dev server on :5000 (public route, no login). Exits 1 on any
 // failure. Evidence: /tmp/validation/ds-showcase.
@@ -90,11 +94,11 @@ try {
 
   const SYSTEMS = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];
   const perSystem = {};
-  const paintFonts = async (targetPage = page) => {
-    const deadline = Date.now() + 15000;
+  const paintFonts = async (targetPage = page, systemId, retry = true) => {
+    const deadline = Date.now() + (retry ? 15000 : 1);
     let last = [];
     while (Date.now() < deadline) {
-      last = await targetPage.evaluate(async () => {
+      last = await targetPage.evaluate(async (activeSystemId) => {
         const GENERIC_FAMILIES = new Set([
           'serif',
           'sans-serif',
@@ -111,9 +115,9 @@ try {
           'fangsong',
         ]);
         const FONT_TOKENS = [
-          { token: '--font-display', weight: getComputedStyle(document.documentElement).getPropertyValue('--display-weight').trim() || '400' },
-          { token: '--font-body', weight: '400' },
-          { token: '--font-mono', weight: '400' },
+          { token: '--font-display', surface: 'display' },
+          { token: '--font-body', surface: 'body' },
+          { token: '--font-mono', surface: 'mono' },
         ];
         const SAMPLE = 'Aa Bb Cc Dd Ee Ff Gg Hh 0123456789 — @#$%';
 
@@ -150,6 +154,70 @@ try {
           return trimmed;
         };
         const cssFamily = (family) => `"${family.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`;
+        const normalizeFamily = (family) =>
+          String(family).replace(/["']/g, '').replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').trim().toLowerCase();
+        const decodeFontPart = (raw) => {
+          const value = String(raw).replaceAll('+', ' ');
+          try {
+            return decodeURIComponent(value);
+          } catch {
+            return value;
+          }
+        };
+        const loaderEntries = new Map();
+        const addLoaderEntry = (family, ranges) => {
+          const key = normalizeFamily(family);
+          const previous = loaderEntries.get(key) || [];
+          loaderEntries.set(key, [...previous, ...ranges]);
+        };
+        const parseLoaderHref = (href) => {
+          let url;
+          try {
+            url = new URL(href, location.href);
+          } catch {
+            return;
+          }
+          for (const parameter of url.searchParams.getAll('family')) {
+            const decoded = decodeFontPart(parameter);
+            const separator = decoded.indexOf(':');
+            const family = (separator < 0 ? decoded : decoded.slice(0, separator)).trim();
+            if (!family) continue;
+            const axisSpec = separator < 0 ? '' : decoded.slice(separator + 1);
+            const at = axisSpec.indexOf('@');
+            const axes = at < 0 ? [] : axisSpec.slice(0, at).split(',').map((axis) => axis.trim());
+            const weightAxis = axes.indexOf('wght');
+            const values = at < 0 ? [] : axisSpec.slice(at + 1).split(';');
+            const ranges = [];
+            if (weightAxis < 0 || !values.length) {
+              ranges.push({ min: 400, max: 400 });
+            } else {
+              for (const value of values) {
+                const part = value.split(',')[weightAxis]?.trim() || '';
+                const range = /^(\d+(?:\.\d+)?)\.\.(\d+(?:\.\d+)?)$/.exec(part);
+                const single = /^(\d+(?:\.\d+)?)$/.exec(part);
+                if (range) ranges.push({ min: Number(range[1]), max: Number(range[2]) });
+                else if (single) ranges.push({ min: Number(single[1]), max: Number(single[1]) });
+              }
+            }
+            addLoaderEntry(family, ranges.length ? ranges : [{ min: 400, max: 400 }]);
+          }
+        };
+        const loaderHrefs = [...document.querySelectorAll('link[rel="stylesheet"]')]
+          .map((link) => link.href || link.getAttribute('href') || '')
+          .filter(Boolean);
+        for (const href of loaderHrefs) parseLoaderHref(href);
+        const covers = (family, weight) =>
+          (loaderEntries.get(normalizeFamily(family)) || []).some(({ min, max }) => weight >= min && weight <= max);
+        const meaningfulElements = [...document.querySelectorAll('body, body *')].filter((element) => {
+          const style = getComputedStyle(element);
+          return (
+            element.textContent.trim() &&
+            element.getClientRects().length > 0 &&
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            style.opacity !== '0'
+          );
+        });
 
         const probe = document.createElement('span');
         probe.textContent = SAMPLE;
@@ -171,7 +239,7 @@ try {
         const results = [];
         try {
           const rootStyle = getComputedStyle(document.documentElement);
-          for (const { token, weight } of FONT_TOKENS) {
+          for (const { token, surface } of FONT_TOKENS) {
             const stack = rootStyle.getPropertyValue(token).trim();
             const families = splitStack(stack);
             const primary = families[0] ? unquote(families[0]) : '';
@@ -181,13 +249,16 @@ try {
               .find((family) => GENERIC_FAMILIES.has(family.toLowerCase())) || '';
             const result = {
               token,
-              weight,
               stack,
               primary,
               generic,
               declaredWidth: null,
               forcedWidth: null,
               fallbackWidth: null,
+              surface,
+              weights: [],
+              missingWeights: [],
+              loaderHrefs,
               pass: false,
               error: '',
             };
@@ -208,11 +279,32 @@ try {
               continue;
             }
 
+            // Inventory the weights that the live page really paints for this
+            // token. Matching the resolved family stack keeps inherited body
+            // text and token-backed utility classes in scope, while filtering
+            // empty/hidden nodes avoids synthetic or decorative DOM noise.
+            const tokenFamily = normalizeFamily(stack);
+            const paintedWeights = new Set();
+            for (const element of meaningfulElements) {
+              const style = getComputedStyle(element);
+              if (normalizeFamily(style.fontFamily) !== tokenFamily) continue;
+              const numericWeight = Number(style.fontWeight);
+              if (Number.isFinite(numericWeight) && numericWeight >= 1) paintedWeights.add(numericWeight);
+            }
+            result.weights = [...paintedWeights].sort((a, b) => a - b);
+            if (!result.weights.length) {
+              result.error = `system "${activeSystemId}" token ${token} (${surface}) paints no meaningful text`;
+              results.push(result);
+              continue;
+            }
+
             // A FontFaceSet check is intentionally not used here. Loading the
-            // exact weight first is important for static per-weight Google
+            // exact weights first is important for static per-weight Google
             // Fonts faces: a weight nothing paints can otherwise measure like
             // the fallback even while the requested face is correctly loaded.
-            await document.fonts.load(`${weight} 64px ${cssFamily(primary)}`, SAMPLE);
+            for (const weight of result.weights) {
+              await document.fonts.load(`${weight} 64px ${cssFamily(primary)}`, SAMPLE);
+            }
             const measure = (fontFamily) => {
               probe.style.fontFamily = fontFamily;
               return probe.getBoundingClientRect().width;
@@ -223,9 +315,14 @@ try {
             result.pass =
               result.declaredWidth === result.forcedWidth &&
               result.declaredWidth !== result.fallbackWidth;
-            if (!result.pass) {
+            result.missingWeights = result.weights.filter((weight) => !covers(primary, weight));
+            if (result.missingWeights.length) {
+              result.pass = false;
               result.error =
-                `declared=${result.declaredWidth} forced=${result.forcedWidth} fallback=${result.fallbackWidth}`;
+                `system "${activeSystemId}" token ${token} (${surface}) loader for "${primary}" is missing weight(s) ${result.missingWeights.join(', ')}`;
+            }
+            if (!result.pass) {
+              result.error ||= `declared=${result.declaredWidth} forced=${result.forcedWidth} fallback=${result.fallbackWidth}`;
             }
             results.push(result);
           }
@@ -233,8 +330,8 @@ try {
           probe.remove();
         }
         return results;
-      });
-      if (last.length === 3 && last.every((result) => result.pass)) return last;
+      }, systemId);
+      if (!retry || (last.length === 3 && last.every((result) => result.pass))) return last;
       await new Promise((resolve) => setTimeout(resolve, 250));
     }
     return last;
@@ -265,11 +362,11 @@ try {
       id,
       { timeout: 5000 },
     );
-    const fontResults = await paintFonts(fontPage);
+    const fontResults = await paintFonts(fontPage, id);
     await fontContext.close();
     log(`font-paint-${id}`, fontResults.length === 3 && fontResults.every((result) => result.pass),
       fontResults.map((result) =>
-        `${result.token}=${result.pass ? 'painted' : `FAILED (${result.error})`}`).join('; '));
+        `${result.token}=${result.pass ? `painted [${result.weights.join(', ')}]` : `FAILED (${result.error})`}`).join('; '));
     perSystem[id] = await page.evaluate(() => {
       const cs = getComputedStyle(document.documentElement);
       return { radius: cs.getPropertyValue('--radius').trim(), display: cs.getPropertyValue('--font-display').trim() };
@@ -293,33 +390,42 @@ try {
       ? `--accent row shows ${accentShown.trim()} for violet`
       : `${afterAccent.mismatches.length} stale rows after accent flip`);
 
-  // Mutation proof: a system stylesheet that drops a designed family and
-  // leaves only its generic fallback must fail this gate. This is deliberately
-  // done in the browser against a temporary inline override, so the real
-  // checkout and the running app remain untouched while the failure path is
-  // exercised on every validation run.
-  const mutation = await page.evaluate(() => {
-    const root = document.documentElement;
-    const previous = root.style.getPropertyValue('--font-mono');
-    const priority = root.style.getPropertyPriority('--font-mono');
-    root.style.setProperty('--font-mono', 'ui-monospace, monospace', 'important');
-    return {
-      previous,
-      priority,
-      computed: getComputedStyle(root).getPropertyValue('--font-mono').trim(),
-    };
+  // Mutation proof: remove one requested weight from the active system's
+  // loader URL. Existing @font-face rules may remain registered in this
+  // document, so this deliberately tests the URL-vs-inventory comparator
+  // rather than relying on a browser unload. The href is restored immediately.
+  const mutationTarget = await page.evaluate(() => {
+    const links = [...document.querySelectorAll('link[data-font-href]')];
+    const link = links.at(-1);
+    if (!link) return null;
+    const systemHref = link.getAttribute('href') || link.href;
+    const href = new URL(systemHref, location.href);
+    const families = href.searchParams.getAll('family');
+    const first = families.find((family) => /(?:^|[:,])wght@/.test(family));
+    if (!first) return null;
+    const weightMatch = first.match(/wght@[^;,&]*;(\d+(?:\.\d+)?)/);
+    const weight = weightMatch ? Number(weightMatch[1]) : 700;
+    const mutatedFamily = first.replace(new RegExp(`;${weight}(?=;|&)`), '');
+    if (mutatedFamily === first) return null;
+    href.searchParams.delete('family');
+    for (const family of families) href.searchParams.append('family', family === first ? mutatedFamily : family);
+    const original = link.getAttribute('href') || link.href;
+    link.setAttribute('href', href.toString());
+    return { original, mutated: href.toString(), weight };
   });
-  const mutationResult = await paintFonts();
-  await page.evaluate(({ previous, priority }) => {
-    const root = document.documentElement;
-    root.style.removeProperty('--font-mono');
-    if (previous) root.style.setProperty('--font-mono', previous, priority);
-  }, mutation);
-  const mutatedMono = mutationResult.find((result) => result.token === '--font-mono');
-  log('font-paint-mutation-detection', Boolean(mutatedMono && !mutatedMono.pass),
-    mutatedMono
-      ? `dropping the named mono face to "${mutation.computed}" was ${mutatedMono.pass ? 'not detected' : 'detected'}`
-      : 'mono probe did not return a result');
+  const mutationResult = mutationTarget ? await paintFonts(page, 'swiss', false) : [];
+  if (mutationTarget) {
+    await page.evaluate(({ original, mutated }) => {
+      const link = [...document.querySelectorAll('link[rel="stylesheet"]')]
+        .find((candidate) => candidate.href === new URL(mutated, location.href).href);
+      if (link) link.setAttribute('href', original);
+    }, mutationTarget);
+  }
+  const mutated = mutationResult.find((result) => result.missingWeights?.includes(mutationTarget?.weight));
+  log('font-paint-mutation-detection', Boolean(mutationTarget && mutated && !mutated.pass),
+    mutationTarget && mutated
+      ? `system=swiss token=${mutated.token} weight=${mutationTarget.weight} was ${mutated.pass ? 'not detected' : 'detected'} after removing it from the loader URL`
+      : 'could not remove a requested static weight from the active system loader URL');
 } finally {
   await browser.close();
 }

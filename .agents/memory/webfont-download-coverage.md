@@ -46,3 +46,13 @@ Comparing a stack against its stylesheet URL only catches the two sides *disagre
 **Why:** the offline gate is registered in the validation suite, so it must stay off the network — a font-host outage cannot be allowed to fail unrelated changes. The live check is therefore opt-in and nothing runs it for you.
 
 **How to apply:** run the opt-in webfont probe by hand in the same change that edits a font URL; treat "the gate is green" as saying nothing about whether the URL resolves.
+
+## Weight coverage is a URL contract, not a paint measurement
+
+A loaded family can still synthesize a requested weight. Inventory meaningful rendered text by its resolved token stack and computed numeric `fontWeight`, then compare those weights with the active loader URL. Normalize optional quotes away when comparing computed `font-family` with custom-property stacks: browsers may serialize the same family once quoted and once unquoted.
+
+Google Fonts css2 weight parsing has three cases: discrete `wght@400;600`, inclusive variable ranges such as `wght@400..800`, and no `wght` axis (a default static 400 face, including requests that only specify `ital`). A mutation must remove the weight from the URL contract; registered faces remain document-scoped after a link changes and can otherwise make a missing-weight paint probe pass.
+
+**Why:** rendered-width checks prove the primary family paints, but synthesized bold has the same family metrics and slips through. Browser serialization and cumulative `FontFaceSet` state make naive comparisons and post-load mutations falsely reassuring.
+
+**How to apply:** report failures with system, token, and numeric weight. Interpret ranges inclusively, treat axis tuples by the `wght` column rather than position, and validate the mutated URL inventory instead of expecting the browser to unload a previously registered face.
