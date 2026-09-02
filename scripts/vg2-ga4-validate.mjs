@@ -14,6 +14,67 @@ const BASE = 'http://localhost:5000';
 const OUT = '/home/runner/workspace/evidence';
 const TS = Date.now();
 
+// ---------------------------------------------------------------------------
+// Clerk test-account plumbing (task #393 — real `login` / `sign_up` conversions)
+// ---------------------------------------------------------------------------
+// The auth conversions can only be observed by completing a REAL Clerk attempt
+// through the prebuilt <SignIn>/<SignUp> UI, so the harness registers and signs
+// in a throwaway account on the development instance and deletes it afterwards.
+// Three Clerk testing affordances make that possible headlessly:
+//   · a `+clerk_test` email subaddress, whose email code is the fixed, publicly
+//     documented value below (it only ever unlocks these fake addresses on a
+//     development instance — override with CLERK_TEST_VERIFICATION_CODE);
+//   · a testing token (Backend API POST /testing_tokens) appended to every FAPI
+//     request, so Clerk accepts the scripted attempt instead of answering
+//     "Bot traffic detected";
+//   · `Clerk.client.captchaBypass`, forced on so clerk-js skips the Cloudflare
+//     Turnstile widget it would otherwise render before POSTing a sign-up.
+//     Turnstile serves an interactive challenge to headless Chromium that no
+//     script can honestly clear, and it guards ONLY registration — sign-in
+//     never invokes it. Nothing about the measurement under test is faked: the
+//     registration, the session, the app code and the GA4 network path are all
+//     real; only the third-party bot gate in front of them is stepped around.
+// Without Clerk keys, or on a production instance, the auth flows are SKIPPED
+// loudly rather than silently passing.
+const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY || '';
+const CLERK_PUBLISHABLE_KEY =
+  process.env.VITE_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
+const CLERK_TEST_CODE = process.env.CLERK_TEST_VERIFICATION_CODE || '424242';
+const AUTH_FLOWS_READY = Boolean(CLERK_SECRET_KEY) && CLERK_PUBLISHABLE_KEY.startsWith('pk_test_');
+
+/** Clerk's Frontend API host is base64-encoded into the publishable key. */
+function fapiHostFromPublishableKey(pk) {
+  try {
+    return Buffer.from(pk.replace(/^pk_(test|live)_/, ''), 'base64').toString('utf8').replace(/\$$/, '');
+  } catch {
+    return '';
+  }
+}
+
+/** Returns the throwaway Clerk account, or undefined when it does not exist. */
+async function findClerkUser() {
+  const found = await clerkApi('GET', `/users?email_address=${encodeURIComponent(QA_EMAIL)}`);
+  return (Array.isArray(found) ? found : found.data ?? [])[0];
+}
+
+async function clerkApi(method, apiPath, body) {
+  const res = await fetch(`https://api.clerk.com/v1${apiPath}`, {
+    method,
+    headers: { Authorization: `Bearer ${CLERK_SECRET_KEY}`, 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(`Clerk ${method} ${apiPath} → ${res.status}: ${JSON.stringify(json)}`);
+  return json;
+}
+
+// Throwaway identity. The local-part carries the `__qa_test_` prefix the
+// project's teardown sweeps, and the address ends in `+clerk_test@example.com`
+// so Clerk treats it as a test email. The password is generated per run and
+// never written to evidence.
+const QA_EMAIL = `__qa_test_ga4_${TS}+clerk_test@example.com`;
+const QA_PASSWORD = `Qa!${TS}${Math.random().toString(36).slice(2, 10)}`;
+
 const raw = [];   // full request records
 const events = [];// flattened parsed events with a monotonic seq
 let seq = 0;
@@ -68,6 +129,12 @@ function check(name, pass, detail) {
   results.push({ name, pass: !!pass, detail: detail || '' });
   log(`${pass ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`);
 }
+// A skipped flow never counts as verified: it is reported in its own row so a
+// run that could not exercise something says so out loud instead of looking green.
+function skip(name, detail) {
+  results.push({ name, pass: true, skipped: true, detail: detail || '' });
+  log(`SKIP  ${name}${detail ? '  — ' + detail : ''}`);
+}
 
 function evByName(en, sinceSeq = -1) {
   return events.filter((e) => e.en === en && e.seq > sinceSeq);
@@ -116,6 +183,35 @@ async function waitForEvent(name, sinceSeq, timeout = 14000) {
   return false;
 }
 
+// Clerk's OTP field is a row of single-character inputs that auto-advance, so
+// the code has to be typed key by key into the focused control (a bulk fill()
+// lands entirely in the first box). Returns false when no code step appeared —
+// a password sign-in on a trusted device skips it.
+async function enterClerkCode(page) {
+  const otp = page
+    .locator('input[autocomplete="one-time-code"], input[name^="codeInput"], input[inputmode="numeric"]')
+    .first();
+  if (!(await otp.waitFor({ state: 'visible', timeout: 12000 }).then(() => true).catch(() => false))) {
+    return false;
+  }
+  await otp.click();
+  await page.keyboard.type(CLERK_TEST_CODE, { delay: 120 });
+  return true;
+}
+
+/**
+ * Ends the session through Clerk itself rather than the app's /logout route:
+ * that route is a full document load, and the harness only needs the signed-out
+ * state, not another page transition to measure.
+ */
+async function clerkSignOut(page) {
+  await page.evaluate(async () => {
+    await window.Clerk?.signOut?.();
+  });
+  await page.waitForFunction(() => !window.Clerk?.user, null, { timeout: 15000 }).catch(() => {});
+  await sleep(1500);
+}
+
 async function main() {
   const catalogResponse = await fetch(`${BASE}/api/awesome-list`);
   if (!catalogResponse.ok) {
@@ -124,6 +220,8 @@ async function main() {
   const catalog = await catalogResponse.json();
   const RESOURCE_ID = catalog.resources?.[0]?.id;
   if (!RESOURCE_ID) throw new Error('Catalog returned no resource for GA validation');
+  const CATEGORY = catalog.categories?.find((c) => c.slug && c.name);
+  if (!CATEGORY) throw new Error('Catalog returned no category for GA validation');
 
   const browser = await chromium.launch({
     ...(EXEC ? { executablePath: EXEC } : {}),
@@ -132,6 +230,31 @@ async function main() {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   context.setDefaultTimeout(8000);
   context.setDefaultNavigationTimeout(30000);
+
+  // Bot-gate plumbing for the auth flows only (see the header note): the
+  // testing token goes on every Frontend API call, and the bypass flag is
+  // re-asserted on an interval because clerk-js resets it from every /v1/client
+  // payload it receives.
+  if (AUTH_FLOWS_READY) {
+    const fapiHost = fapiHostFromPublishableKey(CLERK_PUBLISHABLE_KEY);
+    const testingToken = (await clerkApi('POST', '/testing_tokens')).token;
+    if (!fapiHost || !testingToken) throw new Error('Could not prepare a Clerk testing token');
+    await context.route(`https://${fapiHost}/**`, async (route) => {
+      const url = new URL(route.request().url());
+      url.searchParams.set('__clerk_testing_token', testingToken);
+      await route.continue({ url: url.toString() });
+    });
+    await context.addInitScript(() => {
+      setInterval(() => {
+        try {
+          if (window.Clerk?.client) window.Clerk.client.captchaBypass = true;
+        } catch {
+          /* Clerk not loaded on this page */
+        }
+      }, 200);
+    });
+  }
+
   const page = await context.newPage();
   PAGE = page;
 
@@ -240,7 +363,117 @@ async function main() {
   const theme = evByName('theme_change', beforeTheme);
   check('theme_change fired', theme.length >= 1, `${theme.length} theme_change`);
 
-  // ---- FLOW 6: in-session revoke and re-grant ---------------------------
+  // ---- FLOW 6: taxonomy page -> category_view ---------------------------
+  // trackCategoryView is keyed on the resolved node, so this also proves the
+  // event does NOT re-fire when only filters/pagination change.
+  const beforeCategory = seq - 1;
+  await page.goto(`${BASE}/category/${CATEGORY.slug}`, { waitUntil: 'load', timeout: 30000 });
+  await sleep(1200);
+  await waitForEvent('category_view', beforeCategory, 16000);
+  await page.screenshot({ path: `${OUT}/vg2-04-category.jpg`, quality: 70 });
+  const categoryEvents = evByName('category_view', beforeCategory);
+  check('category_view fired on a taxonomy page', categoryEvents.length >= 1, `${categoryEvents.length} event(s)`);
+  check('category_view fired exactly once per page view', categoryEvents.length === 1, `expected 1, got ${categoryEvents.length}`);
+  const cv = categoryEvents[0];
+  if (cv) {
+    check(
+      'category_view content_category is the resolved node name',
+      cv.params['ep.content_category'] === CATEGORY.name,
+      `${cv.params['ep.content_category']} (expected ${CATEGORY.name})`,
+    );
+  }
+  // Narrowing the same page must NOT look like a second category view: the
+  // in-page search re-queries and re-renders the listing without remounting it.
+  const beforeCategoryFilter = seq - 1;
+  await page.locator('[data-testid="input-search-resources"]').first().fill('a');
+  await sleep(2000);
+  await flushGA();
+  const reFired = evByName('category_view', beforeCategoryFilter).length;
+  check('category_view does not re-fire while filtering the same node', reFired === 0, `${reFired} extra event(s)`);
+
+  // ---- FLOW 7-9: real Clerk sign-up / sign-in conversions ---------------
+  if (!AUTH_FLOWS_READY) {
+    skip(
+      'auth conversions (sign_up / login) exercised against Clerk',
+      'set CLERK_TEST_VERIFICATION_CODE (+ pk_test Clerk keys) to run the auth flows',
+    );
+  } else {
+    // FLOW 7: sign up through the prebuilt <SignUp> card.
+    const beforeSignUp = seq - 1;
+    await page.goto(`${BASE}/sign-up`, { waitUntil: 'load', timeout: 30000 });
+    await page.getByLabel(/email address/i).first().fill(QA_EMAIL);
+    await page.getByLabel(/^password$/i).first().fill(QA_PASSWORD);
+    await page.getByRole('button', { name: /^continue$/i }).first().click();
+    await enterClerkCode(page);
+    await page.waitForURL((url) => !url.pathname.startsWith('/sign-up'), { timeout: 30000 }).catch(() => {});
+    await waitForEvent('sign_up', beforeSignUp, 20000);
+    await page.screenshot({ path: `${OUT}/vg2-05-signed-up.jpg`, quality: 70 });
+    const signUpEvents = evByName('sign_up', beforeSignUp);
+    check('sign_up fired on a completed registration', signUpEvents.length >= 1, `${signUpEvents.length} event(s)`);
+    check('sign_up fired exactly once', signUpEvents.length === 1, `expected 1, got ${signUpEvents.length}`);
+    if (signUpEvents[0]) {
+      check('sign_up carries a method', !!signUpEvents[0].params['ep.method'], `method=${signUpEvents[0].params['ep.method']}`);
+    }
+    check(
+      'sign_up did not also count as a login',
+      evByName('login', beforeSignUp).length === 0,
+      `${evByName('login', beforeSignUp).length} login event(s) during registration`,
+    );
+
+    // FLOW 8: a signed-in reload is a session RESTORE, not a conversion.
+    const beforeRestore = seq - 1;
+    await page.goto(`${BASE}/`, { waitUntil: 'load', timeout: 30000 });
+    await sleep(2500);
+    await flushGA();
+    await flushGA();
+    check(
+      'session restore fires neither login nor sign_up',
+      evByName('login', beforeRestore).length === 0 && evByName('sign_up', beforeRestore).length === 0,
+      `login=${evByName('login', beforeRestore).length} sign_up=${evByName('sign_up', beforeRestore).length}`,
+    );
+
+    // FLOW 9: sign out, then sign back in with the same credentials.
+    await clerkSignOut(page);
+    // Sign-in is never bot-gated, so `login` stays verifiable even if the
+    // registration above did not land: fall back to provisioning the same
+    // account through the Backend API so this flow always runs for real.
+    if (!(await findClerkUser())) {
+      await clerkApi('POST', '/users', {
+        email_address: [QA_EMAIL],
+        password: QA_PASSWORD,
+        skip_password_checks: true,
+      });
+    }
+    const beforeLogin = seq - 1;
+    await page.goto(`${BASE}/sign-in`, { waitUntil: 'load', timeout: 30000 });
+    await page.getByLabel(/email address/i).first().fill(QA_EMAIL);
+    await page.getByRole('button', { name: /^continue$/i }).first().click();
+    await page.getByLabel(/^password$/i).first().fill(QA_PASSWORD, { timeout: 20000 });
+    await page.getByRole('button', { name: /^continue$/i }).first().click();
+    await enterClerkCode(page); // device verification, if the instance asks
+    await page.waitForURL((url) => !url.pathname.startsWith('/sign-in'), { timeout: 30000 }).catch(() => {});
+    await waitForEvent('login', beforeLogin, 20000);
+    await page.screenshot({ path: `${OUT}/vg2-06-signed-in.jpg`, quality: 70 });
+    const loginEvents = evByName('login', beforeLogin);
+    check('login fired on a completed sign-in', loginEvents.length >= 1, `${loginEvents.length} event(s)`);
+    check('login fired exactly once', loginEvents.length === 1, `expected 1, got ${loginEvents.length}`);
+    if (loginEvents[0]) {
+      check('login carries a method', !!loginEvents[0].params['ep.method'], `method=${loginEvents[0].params['ep.method']}`);
+    }
+    check(
+      'returning sign-in is not counted as a registration',
+      evByName('sign_up', beforeLogin).length === 0,
+      `${evByName('sign_up', beforeLogin).length} sign_up event(s) during sign-in`,
+    );
+
+    await clerkSignOut(page);
+  }
+
+  // ---- FLOW 10: in-session revoke and re-grant --------------------------
+  // Back to the theme page: the revoke flow needs both the footer consent
+  // control and an in-app link to click once analytics is switched off.
+  await page.goto(`${BASE}/settings/theme`, { waitUntil: 'load', timeout: 30000 });
+  await sleep(1200);
   await page.locator('[data-testid="footer-cookie-settings"]').click();
   await page.getByRole('button', { name: /^decline$/i }).click();
   const beforeRevokedNavigation = seq - 1;
@@ -260,6 +493,16 @@ async function main() {
   // ---- PII guard: URL query values do not leak beyond expected UTM data --
   const blob = JSON.stringify(raw);
   check('no password/token-shaped values in GA payloads', !/(password|token)=/i.test(blob), 'scanned all /collect requests');
+  if (AUTH_FLOWS_READY) {
+    // The auth conversions only ever report a verification STRATEGY. Prove the
+    // credentials typed into the Clerk card never reached GA4 — checked against
+    // both the raw and the percent-decoded payloads. Detail names no value.
+    const decoded = decodeURIComponent(blob);
+    const leaked = [blob, decoded].some(
+      (haystack) => haystack.includes(QA_EMAIL) || haystack.includes('__qa_test_ga4_') || haystack.includes(QA_PASSWORD),
+    );
+    check('no sign-up email or password in GA payloads', !leaked, 'scanned raw + decoded /collect payloads');
+  }
 
   check(
     'no console errors during flows',
@@ -269,20 +512,39 @@ async function main() {
 
   await browser.close();
 
+  // ---- teardown: delete the throwaway Clerk account ---------------------
+  // Its application-DB row is swept by scripts/vg2-teardown.ts (the local-part
+  // carries the `__qa_test_` prefix that sweep matches).
+  if (AUTH_FLOWS_READY) {
+    let removed = 0;
+    try {
+      const found = await clerkApi('GET', `/users?email_address=${encodeURIComponent(QA_EMAIL)}`);
+      for (const user of Array.isArray(found) ? found : found.data ?? []) {
+        await clerkApi('DELETE', `/users/${user.id}`);
+        removed += 1;
+      }
+    } catch (error) {
+      check('throwaway Clerk account deleted', false, String(error).slice(0, 160));
+    }
+    if (removed) check('throwaway Clerk account deleted', true, `${removed} account(s) removed`);
+  }
+
   // ---- write evidence -------------------------------------------------
   fs.writeFileSync(`${OUT}/vg2-collect-raw.json`, JSON.stringify(raw, null, 2));
   fs.writeFileSync(`${OUT}/vg2-events.json`, JSON.stringify(events, null, 2));
 
   const counts = {};
   for (const e of events) counts[e.en] = (counts[e.en] || 0) + 1;
-  const passCount = results.filter((r) => r.pass).length;
+  const skipCount = results.filter((r) => r.skipped).length;
+  const passCount = results.filter((r) => r.pass && !r.skipped).length;
+  const assertedCount = results.length - skipCount;
 
   const md = [];
   md.push('# VG-2 — Real-Browser GA4 Validation Evidence');
   md.push('');
   md.push(`Run: ${new Date(TS).toISOString()} · Browser: pinned Chromium 1208 · Target: ${BASE}`);
   md.push('');
-  md.push(`**Result: ${passCount}/${results.length} checks passed.**`);
+  md.push(`**Result: ${passCount}/${assertedCount} checks passed${skipCount ? ` · ${skipCount} skipped` : ''}.**`);
   md.push('');
   md.push('## Event volume captured off the wire (`/g/collect`)');
   md.push('');
@@ -294,12 +556,15 @@ async function main() {
   md.push('');
   md.push('| Check | Result | Detail |');
   md.push('|---|---|---|');
-  for (const r of results) md.push(`| ${r.name} | ${r.pass ? '✅ PASS' : '❌ FAIL'} | ${String(r.detail).replace(/\|/g, '\\|').slice(0, 160)} |`);
+  for (const r of results) {
+    const verdict = r.skipped ? '⏭️ SKIP' : r.pass ? '✅ PASS' : '❌ FAIL';
+    md.push(`| ${r.name} | ${verdict} | ${String(r.detail).replace(/\|/g, '\\|').slice(0, 160)} |`);
+  }
   md.push('');
   md.push('## Sample decoded events');
   md.push('');
   md.push('```');
-  for (const en of ['page_view', 'page_engaged', 'search', 'select_content', 'theme_change']) {
+  for (const en of ['page_view', 'page_engaged', 'search', 'select_content', 'theme_change', 'category_view', 'sign_up', 'login']) {
     const e = events.find((x) => x.en === en);
     if (e) {
       const shown = {};
@@ -312,10 +577,12 @@ async function main() {
   md.push('```');
   md.push('');
   md.push(`Raw payloads: \`vg2-collect-raw.json\` (${raw.length} requests) · Parsed: \`vg2-events.json\` (${events.length} events)`);
-  md.push('Screenshots: `vg2-01-landing.jpg` … `vg2-03-resource.jpg`');
+  md.push('Screenshots: `vg2-01-landing.jpg` … `vg2-06-signed-in.jpg`');
   fs.writeFileSync(`${OUT}/vg2-report.md`, md.join('\n'));
 
-  console.log(`\n=== ${passCount}/${results.length} checks passed. Evidence written to ${OUT}/vg2-* ===`);
+  console.log(
+    `\n=== ${passCount}/${assertedCount} checks passed${skipCount ? ` (${skipCount} skipped)` : ''}. Evidence written to ${OUT}/vg2-* ===`,
+  );
   process.exit(results.every((r) => r.pass) ? 0 : 1);
 }
 

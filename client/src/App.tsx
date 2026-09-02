@@ -16,6 +16,7 @@ import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
+import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
 import NotFound from "@/pages/not-found";
 import ConsentBanner from "@/components/ui/consent-banner";
@@ -798,6 +799,10 @@ function App() {
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
       <ClerkQueryClientCacheInvalidator />
+      {/* Task #393: fires the GA4 login / sign_up conversions once per
+          completed Clerk auth attempt (never on a session restore or token
+          refresh) — see the component for how the two are told apart. */}
+      <AuthConversionTracker />
       {/* Task #329: pushes on-device guest saves into the account after
           sign-in (SPA transition or full-reload) — see the component for the
           dedupe/cleanup rules. */}

@@ -27,11 +27,11 @@ import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { apiRequest } from "@/lib/queryClient";
-import { trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
 import { fetchListingPage, type ListingLevel } from "@/lib/static-data";
 import type { ResourceSearchFacets } from "@shared/resourceFacets";
+import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trackTagInteraction } from "@/lib/analytics";
 
 const PAGE_SIZE = 24;
 type Props = { level: ListingLevel };
@@ -202,6 +202,7 @@ export default function TaxonomyListing({ level }: Props) {
     ? Boolean(taxonomySearch.data && !taxonomySearch.isPlaceholderData)
     : Boolean(listingData && !listing.isPlaceholderData);
   const lastTrackedSearchIntentRef = useRef("");
+  const trackedCategoryViewRef = useRef("");
   const resultsRef = useRef<HTMLDivElement>(null);
   const pendingResultsFocusRef = useRef(false);
   const pendingAnalyticsRef = useRef<{
@@ -216,6 +217,19 @@ export default function TaxonomyListing({ level }: Props) {
   const requestResultsFocus = () => {
     pendingResultsFocusRef.current = true;
   };
+
+  // Task #393: GA4 `category_view` / Mixpanel `category_viewed`. Keyed on the
+  // node being viewed, so paging, filtering and re-renders never re-fire it,
+  // and a sibling navigation (same component, new slug) does. `name` comes
+  // from a keepPreviousData query, so wait for the placeholder to clear —
+  // otherwise the first event after a sibling nav reports the PREVIOUS node.
+  useEffect(() => {
+    if (!name || listing.isPlaceholderData) return;
+    const key = `${level}:${slug}`;
+    if (trackedCategoryViewRef.current === key) return;
+    trackedCategoryViewRef.current = key;
+    trackCategoryView(name);
+  }, [level, listing.isPlaceholderData, name, slug]);
 
   useEffect(() => {
     if (serverSearchActive && taxonomySearch.data && !taxonomySearch.isPlaceholderData) {

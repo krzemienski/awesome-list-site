@@ -143,8 +143,11 @@ const USAGE_FILES = [
 //
 // Task #392 swept the resolvable ones (110 → 53): every helper, constant and
 // schema that was only used inside its own module lost the `export` keyword,
-// and everything with no reference anywhere was deleted. What is left is two
-// categories, both deliberate:
+// and everything with no reference anywhere was deleted. Task #393 then wired
+// the last three — the GA4 `login` / `sign_up` / `category_view` conversion
+// senders, pinned rather than deleted because deleting an uncalled CONVERSION
+// sender ratifies a measurement gap instead of removing dead code — leaving 50,
+// all of one deliberate category:
 //   · vendored shadcn/ui primitive families — generated files where the whole
 //     upstream primitive set ships together. These are pinned PERMANENTLY, not
 //     pending: trimming them fights the next `shadcn add`, and Rollup
@@ -152,10 +155,7 @@ const USAGE_FILES = [
 //     once in docs/COMPONENT-LIBRARY.md ("Vendored surface: keep it whole") —
 //     a sweep should leave them alone rather than re-deciding. The exemption
 //     covers CLI-generated files only, NOT the app composites that share the
-//     ui/ folder;
-//   · the three GA4 conversion senders in client/src/lib/analytics.ts, whose
-//     callers disappeared in the Clerk auth migration. Re-wiring them is
-//     instrumentation work (task #393), not dead-code cleanup.
+//     ui/ folder.
 // The analytics helpers this GATE was filed over are NOT here: they were
 // deleted (see docs/ANALYTICS.md), which is what every new finding must do.
 // ---------------------------------------------------------------------------
@@ -210,9 +210,6 @@ const FROZEN_EXCEPTIONS = new Set([
   'client/src/components/ui/toggle.tsx#Toggle',
   'client/src/hooks/use-toast.ts#reducer',
   'client/src/hooks/use-toast.ts#toast',
-  'client/src/lib/analytics.ts#trackCategoryView',
-  'client/src/lib/analytics.ts#trackLogin',
-  'client/src/lib/analytics.ts#trackSignUp',
 ]);
 
 // Entries in the JSON allowlist that are NOT part of the frozen manifest —

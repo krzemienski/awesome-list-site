@@ -1,5 +1,5 @@
 {
-  "_comment": "Pinned exceptions for scripts/validation/dead-exports.mjs (task #374). Every entry is an exported symbol under client/src/ or shared/ that NO other module imports — pre-existing findings from when the symbol-level gate was introduced. This list is MECHANICALLY shrink-only: the gate carries a frozen manifest of exactly these file#symbol keys and fails on any entry outside it, so adding or substituting entries here does nothing but fail the gate (allowlist-growth). The only allowed edit is REMOVING an entry together with resolving its export (delete it, drop the `export` keyword, or wire it up); stale pins (symbol imported again, or gone with the entry left behind) also fail. The analytics helpers this gate was filed over are NOT pinned — they were deleted, which is what every new finding must do. Task #392 swept this list from 110 to 53: everything used only inside its own module lost the `export` keyword and everything with no reference anywhere was deleted. The 50 remaining vendored shadcn/ui entries are pinned PERMANENTLY by a settled decision (docs/COMPONENT-LIBRARY.md, \"Vendored surface: keep it whole\") — do not re-triage them per sweep; the 3 analytics entries are owned by the sign-in/sign-up tracking task, not by dead-code cleanup.",
+  "_comment": "Pinned exceptions for scripts/validation/dead-exports.mjs (task #374). Every entry is an exported symbol under client/src/ or shared/ that NO other module imports — pre-existing findings from when the symbol-level gate was introduced. This list is MECHANICALLY shrink-only: the gate carries a frozen manifest of exactly these file#symbol keys and fails on any entry outside it, so adding or substituting entries here does nothing but fail the gate (allowlist-growth). The only allowed edit is REMOVING an entry together with resolving its export (delete it, drop the `export` keyword, or wire it up); stale pins (symbol imported again, or gone with the entry left behind) also fail. The analytics helpers this gate was filed over are NOT pinned — they were deleted, which is what every new finding must do. Task #392 swept this list from 110 to 53: everything used only inside its own module lost the `export` keyword and everything with no reference anywhere was deleted. The 50 remaining vendored shadcn/ui entries are pinned PERMANENTLY by a settled decision (docs/COMPONENT-LIBRARY.md, \"Vendored surface: keep it whole\") — do not re-triage them per sweep. The 3 GA4 conversion senders that sat here instead of being deleted — an uncalled CONVERSION sender is a measurement gap, and deleting it ratifies the gap — are gone: task #393 wired `login` / `sign_up` / `category_view` to real call sites, so every one of the 50 remaining entries is vendored.",
   "exceptions": [
     {
       "file": "client/src/components/ui/alert-dialog.tsx",
@@ -250,21 +250,6 @@
       "file": "client/src/hooks/use-toast.ts",
       "symbol": "toast",
       "reason": "vendored shadcn/ui toast store — every caller goes through useToast()"
-    },
-    {
-      "file": "client/src/lib/analytics.ts",
-      "symbol": "trackCategoryView",
-      "reason": "pre-existing: GA4 category_view sender lost its caller; re-wiring it is instrumentation work, not dead-code cleanup"
-    },
-    {
-      "file": "client/src/lib/analytics.ts",
-      "symbol": "trackLogin",
-      "reason": "pre-existing: GA4 login conversion sender lost its caller in the Clerk auth migration; re-wiring it is instrumentation work"
-    },
-    {
-      "file": "client/src/lib/analytics.ts",
-      "symbol": "trackSignUp",
-      "reason": "pre-existing: GA4 sign_up conversion sender lost its caller in the Clerk auth migration (the Mixpanel half moved server-side); re-wiring it is instrumentation work"
     }
   ]
 }

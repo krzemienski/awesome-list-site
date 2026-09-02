@@ -74,8 +74,8 @@ In DEV, `debug_mode: true` is added so events appear in GA4 DebugView.
 | `page_view` | Every navigation — `use-analytics` on mount + route change | `page_location`, `page_path`, `page_title`, `page_referrer` |
 | `search` | Search dialog, once per debounced query — `search-dialog.tsx` | `search_term`, `result_count` |
 | `select_content` | Resource detail page mount — `ResourceDetail.tsx` | `content_type: "resource"`, `content_id`, `content_name`, `content_category` |
-| `login` | Successful login — `trackLogin()` in `client/src/lib/analytics.ts` (defined; not currently wired to a call site after Clerk migration) | `method` + acquisition |
-| `sign_up` | Successful registration — `trackSignUp()` in `client/src/lib/analytics.ts` (defined; not currently wired to a call site after Clerk migration) | `method` + acquisition |
+| `login` | A Clerk sign-in attempt completes and produces a session — `AuthConversionTracker.tsx`. Session restores, page reloads and token refreshes never fire it. | `method` (verification strategy, e.g. `password`, `google`) + acquisition |
+| `sign_up` | A Clerk sign-up attempt completes and produces a session — `AuthConversionTracker.tsx`. An OAuth sign-in transferred into a registration counts here, not as `login`. | `method` (verification strategy, e.g. `email_code`, `google`) + acquisition |
 | `generate_lead` | Successful resource submission — `SubmitResource.tsx` | `content_type: "resource_submission"`, `category` + acquisition |
 | `share` | Share button on a resource — `ResourceDetail.tsx` | `method: "web_share" \| "clipboard"`, `content_type`, `content_id` |
 
@@ -95,7 +95,7 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 |---|---|---|
 | `page_engaged` | Leaving a page / tab hide — `use-analytics.tsx` | `page_path`, `engagement_time_msec` |
 | `resource_click` + `outbound_link` | Clicking a search result — `search-dialog.tsx` (documented **pair**, not a duplicate: one engagement signal, one outbound-navigation signal) | `content_*` / `link_url`, `link_domain` |
-| `category_view` | Category / Subcategory / Sub-subcategory pages | `content_category` |
+| `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
@@ -167,7 +167,8 @@ the batched event payloads, and asserts on event names, parameters, de-duplicati
 and the absence of PII.
 
 Flows exercised: landing (with UTM query) → search → resource detail view →
-in-app SPA navigation → sign-up → resource submission → theme change.
+in-app SPA navigation → theme change → taxonomy page → Clerk sign-up → signed-in
+reload → Clerk sign-in → consent revoke and re-grant.
 
 ### Gotchas the harness handles
 
@@ -178,6 +179,16 @@ in-app SPA navigation → sign-up → resource submission → theme change.
 - **A search-result click opens the resource's external URL** in a new tab
   (`window.open`); it does **not** navigate to `/resource/:id`. So the harness
   reaches `select_content` via the real resource route, not via search results.
+- **The auth conversions need a real Clerk attempt.** The harness registers a
+  throwaway `__qa_test_*+clerk_test@example.com` account through the prebuilt
+  `<SignUp>` card, signs out, signs back in through `<SignIn>`, and deletes the
+  Clerk account afterwards. Registration — and only registration — sits behind
+  Cloudflare Turnstile, which serves headless Chromium an interactive challenge,
+  so the harness attaches a Clerk [Testing Token](https://clerk.com/docs/guides/development/testing/overview)
+  to every Frontend API call and forces `Clerk.client.captchaBypass`. The
+  registration, session, app code and GA4 network path all stay real; only the
+  third-party bot gate is stepped around. Without `CLERK_SECRET_KEY` and a
+  `pk_test_` publishable key these flows are reported as **SKIP**, never as pass.
 
 ### Net-zero teardown
 

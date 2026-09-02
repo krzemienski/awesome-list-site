@@ -43,9 +43,9 @@ below.
 | `resource_viewed` | Resource detail opened | `resource_id`, extras from caller | `trackSelectContent('resource', …)` |
 | `resource_link_opened` | Outbound resource link clicked | `resource_title`, `link_url`, `link_domain`, `category` | `trackResourceClick` |
 | `search_performed` | Search executed with results | `search_term`, `result_count` | `trackSearch` |
-| `category_viewed` | Category navigation | `category` | `trackCategoryView` |
+| `category_viewed` | Category / subcategory / sub-subcategory page, once per resolved node | `category` | `TaxonomyListing` via `trackCategoryView` |
 | `sign_up_completed` | Clerk user is first provisioned into the application DB | `sign_up_method: 'clerk'`, acquisition, `tracked_from: 'server'` | **server** — Clerk JIT provisioning (`server/clerkAuth.ts`) |
-| `logged_in` | Reserved helper; not currently wired after the Clerk migration | `login_method`, acquisition | `trackLogin` |
+| `logged_in` | A Clerk sign-in attempt completes and produces a session (never on a session restore or token refresh) | `login_method` (verification strategy), acquisition | `AuthConversionTracker` via `trackLogin` |
 | `resource_bookmarked` / `resource_unbookmarked` | Bookmark toggle server-confirmed | `resource_id` | `useResourceToggle` (choke point, all surfaces) |
 | `resource_favorited` / `resource_unfavorited` | Favorite toggle server-confirmed | `resource_id` | `useResourceToggle` |
 | `resource_submitted` | Resource submission accepted | `content_type`, `category`, acquisition, `tracked_from: 'server'` (no PII) | **server** — `routes/domains/catalog-contributions.ts` |

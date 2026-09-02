@@ -58,7 +58,8 @@
 - [Vite workspace watch reload](vite-workspace-watch-reload.md) — repo file writes (tee/rm) during live Playwright runs trigger SPA reloads → ERR_ABORTED flakes; stage output in /tmp, cp after.
 - [Flex-anchor min-width:auto](flex-anchor-min-width.md) — raw text in a flex container is an anonymous item with min-width:auto that never wraps; wrap it in a min-w-0 span or long URLs blow dialogs.
 - [Full-origin CSRF comparison](origin-check-port-normalization.md) — compare normalized scheme+host+effective port; scripts hitting prod admin API MUST send Origin header or 403.
-- [Clerk headless UI sign-in](clerk-headless-ui-signin.md) — client-trust fields need accessible-label selection and sequential keypresses; keep verification values out of memory.
+- [Clerk headless UI sign-in](clerk-headless-ui-signin.md) — client-trust fields need accessible-label selection and sequential keypresses; only sign-UP has a captcha, and testing tokens alone don't bypass it.
+- [Clerk auth completion signal](clerk-auth-completion-signal.md) — the completed attempt and its session are never in the same update, so `createdSessionId` matching never fires; watch the attempt→session sequence.
 - [Headless E2E gotchas](headless-e2e-gotchas.md) — /submit consent banner eats clicks (dismiss first); toast = li[data-state]; agent-browser daemon dies between calls — prefer one-shot Playwright; verify "blank render" screenshots with a 2nd capture method.
 - [Parallel subagent file clobber](parallel-subagent-file-clobber.md) — subagents silently revert main-agent edits to shared files (README etc.); edit contested files after subagents finish + re-grep before wrap-up.
 - [Gitignore cleanup anchoring](gitignore-cleanup-anchoring.md) — root-anchor bulk-cleanup ignore patterns (`/screenshots/`) or they shadow kept dirs at depth (docs/screenshots); verify with check-ignore + ls-files -i -c.
