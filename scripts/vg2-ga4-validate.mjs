@@ -13,6 +13,7 @@ const EXEC = [
 const BASE = 'http://localhost:5000';
 const OUT = '/home/runner/workspace/evidence';
 const TS = Date.now();
+const EXPECTED_BROWSER_ERROR = 'VG2 deliberate browser error';
 
 // ---------------------------------------------------------------------------
 // Clerk test-account plumbing (task #393 — real `login` / `sign_up` conversions)
@@ -261,7 +262,11 @@ async function main() {
   const consoleErrors = [];
   const failedResponses = [];
   page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
-  page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
+  page.on('pageerror', (e) => {
+    if (!e.message.includes(EXPECTED_BROWSER_ERROR)) {
+      consoleErrors.push('pageerror: ' + e.message);
+    }
+  });
   page.on('response', (response) => {
     if (response.status() >= 400) {
       failedResponses.push(`${response.status()} ${response.url()}`);
@@ -273,8 +278,13 @@ async function main() {
   await page.goto(`${BASE}/?utm_source=newsletter&utm_medium=email&utm_campaign=vg_test`, { waitUntil: 'load', timeout: 30000 });
   await sleep(1200);
   check('no GA request before analytics consent', raw.length === 0, `${raw.length} pre-consent request(s)`);
-  const accept = page.getByRole('button', { name: /allow analytics/i });
-  if (await accept.isVisible().catch(() => false)) await accept.click();
+  const accept = page.getByTestId('consent-accept');
+  await accept.waitFor({ state: 'visible' });
+  await accept.click();
+  const consentGranted = await page.evaluate(
+    () => localStorage.getItem('analytics-consent') === 'granted',
+  );
+  check('initial analytics consent grant completed', consentGranted, String(consentGranted));
   const warm = await waitForCollect(1, 20000); // wait for gtag.js cold-load + first hit
   check('GA4 gtag.js loaded and sent a /collect hit', warm, `${raw.length} request(s) after warmup`);
   await sleep(1500);
@@ -285,6 +295,34 @@ async function main() {
   const pvUtm = pv1.find((e) => e.dl.includes('utm_source=newsletter'));
   check('landing page_view dl carries UTM', !!pvUtm, pvUtm ? decodeURIComponent(pvUtm.dl) : 'no dl with utm_source');
 
+  // ---- FLOW 1b: Core Web Vitals + global JavaScript error ---------------
+  // The page has already granted consent and warmed gtag, so these assertions
+  // prove the mounted capture reaches the real /g/collect endpoint. The thrown
+  // message deliberately contains a query-shaped value; only its safe shape
+  // may appear in the captured payload.
+  await waitForEvent('performance', -1, 12000);
+  const performanceEvents = evByName('performance');
+  check('Core Web Vitals reached GA4 after consent', performanceEvents.length >= 1, `${performanceEvents.length} performance event(s)`);
+  const metricNames = new Set(performanceEvents.map((e) => e.params['ep.metric_name']));
+  check('performance event carries a supported metric name', [...metricNames].some((name) => ['lcp', 'fid', 'cls'].includes(name)), [...metricNames].join(', ') || 'none');
+  const beforeBrowserError = seq - 1;
+  await page.evaluate((message) => {
+    setTimeout(() => {
+      throw new Error(`${message} https://example.com/path?email=not-for-analytics`);
+    }, 0);
+  }, EXPECTED_BROWSER_ERROR);
+  await waitForEvent('error', beforeBrowserError, 12000);
+  const browserErrors = evByName('error', beforeBrowserError).filter(
+    (e) => e.params['ep.error_type'] === 'javascript_error',
+  );
+  check('global JavaScript error reached GA4', browserErrors.length >= 1, `${browserErrors.length} javascript_error event(s)`);
+  const browserError = browserErrors[0];
+  if (browserError) {
+    check('JavaScript error carries its error type', browserError.params['ep.error_type'] === 'javascript_error', browserError.params['ep.error_type']);
+    check('JavaScript error carries only a safe message shape', /^(short|medium|long)-(text|url)(-query)?$/.test(browserError.params['ep.error_message']), browserError.params['ep.error_message']);
+    check('JavaScript error message does not carry the thrown URL/query', !JSON.stringify(browserError).includes('example.com') && !JSON.stringify(browserError).includes('email=not-for-analytics'), 'scanned decoded event');
+  }
+
   // ---- FLOW 2: debounced site search -----------------------------------
   const beforeSearch = seq - 1;
   await page.keyboard.press('/');
@@ -292,6 +330,7 @@ async function main() {
   await page.locator('[cmdk-input]').first().fill('encoding');
   await sleep(1500); // debounce is 600ms; allow one settled search
   await flushGA();
+  await waitForEvent('search', beforeSearch, 12000);
   await page.screenshot({ path: `${OUT}/vg2-02-search.jpg`, quality: 70 });
   const searchEvents = evByName('search', beforeSearch);
   check('search fired after typing', searchEvents.length >= 1, `${searchEvents.length} search event(s)`);
@@ -301,6 +340,14 @@ async function main() {
     check('search has search_term=encoding', se.params['ep.search_term'] === 'encoding', se.params['ep.search_term']);
     check('search has numeric result_count', 'epn.result_count' in se.params, `result_count=${se.params['epn.result_count']}`);
   }
+  const flushedVitalNames = new Set(
+    evByName('performance').map((e) => e.params['ep.metric_name']),
+  );
+  check(
+    'LCP, FID, and CLS all reached GA4',
+    ['lcp', 'fid', 'cls'].every((name) => flushedVitalNames.has(name)),
+    [...flushedVitalNames].join(', ') || 'none',
+  );
 
   // ---- FLOW 3: click a search result -> SPA nav -> select_content -------
   // A search-result click opens the resource's EXTERNAL url in a new tab
@@ -564,7 +611,7 @@ async function main() {
   md.push('## Sample decoded events');
   md.push('');
   md.push('```');
-  for (const en of ['page_view', 'page_engaged', 'search', 'select_content', 'theme_change', 'category_view', 'sign_up', 'login']) {
+  for (const en of ['page_view', 'page_engaged', 'performance', 'error', 'search', 'select_content', 'theme_change', 'category_view', 'sign_up', 'login']) {
     const e = events.find((x) => x.en === en);
     if (e) {
       const shown = {};

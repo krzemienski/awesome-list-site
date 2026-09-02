@@ -50,7 +50,9 @@ the `ae` flag appeared alongside our manual one on the one true SPA navigation).
   and attaches it to conversion events.
 - **`client/src/hooks/use-analytics.tsx`** — fires exactly one `page_view` per
   navigation (mount + every route change) and a `page_engaged` (with dwell time)
-  when leaving a page or hiding the tab. Mounted once in `App.tsx`.
+  when leaving a page or hiding the tab. After consent, the same mounted hook
+  reports Core Web Vitals (LCP/CLS/FID) and global JavaScript errors. Mounted
+  once in `App.tsx`.
 
 ### Initialization order (important)
 
@@ -98,8 +100,9 @@ Funnel: journeys list view (`page_view`) → `journey_start` → `journey_step_c
 | `category_view` | Category / Subcategory / Sub-subcategory pages — `TaxonomyListing.tsx`, once per resolved node (filtering, sorting and paging within the node do not re-fire it) | `content_category` |
 | `theme_change` | Theme settings pickers — `ThemeSettings.tsx` | `theme_name`, `theme_type: "color" \| "font" \| "system"` |
 | `resource_favorite` | Favorite toggle — `ResourceDetail.tsx` | `action: "add" \| "remove"`, `content_name`, `content_category` |
+| `performance` | Core Web Vitals after analytics consent — `use-analytics.tsx` | `metric_name: "lcp" \| "fid" \| "cls"`, `value` (milliseconds for LCP/FID, unitless score for CLS) |
 | `api_performance` | Every API request — `queryClient.ts` | `endpoint`, `status`, `value` (ms) |
-| `error` | Failed API request — `queryClient.ts` | `error_type`, `error_message` |
+| `error` | Failed API request or global JavaScript error — `queryClient.ts` / `use-analytics.tsx` | `error_type`, `error_message` (browser errors use a non-content shape such as `short-text`) |
 | `guest_bookmark_added` / `guest_bookmark_removed` | Signed-out save toggle (on-device store, Task #329) — `useResourceToggle` guest branch | `resource_id`, `guest_saved_count` |
 | `auth_prompt_shown` | Save-intent sign-in prompt shown to a guest — toggle hook / `GuestBookmarks.tsx` | `prompt_context: "guest_save_toast" \| "guest_save_cap" \| "bookmarks_page"`, `guest_saved_count` |
 | `bookmarks_merged` | Guest saves merged into the account after sign-in — `GuestBookmarkMerge.tsx` | `merged_count`, `duplicate_count`, `failed_count` |
@@ -124,6 +127,9 @@ No personally identifiable information is ever sent to GA4:
 - No email, password, auth token, or session id in any event or param.
 - No user-authored or user-copied text in any event: an event that describes
   content sends its **type and length**, never the content itself.
+- Browser-error telemetry sends only the error type and a message shape
+  (`empty`, `short-text`, `medium-url-query`, etc.), never the raw message,
+  URL, query string, or copied/user-authored text.
 - Acquisition stores the referrer **hostname** and landing **pathname** only —
   no full referrer URLs or query strings; UTM values are capped at 100 chars.
 
@@ -140,22 +146,13 @@ zero-result state.
 instrumentation": `trackListSwitch`, `trackLayoutChange`, `trackPopoverView`,
 `trackMobileInteraction`, `trackEngagementTime`, `trackScrollDepth`,
 `trackShareAction`, `trackKeyboardShortcut`, `trackExportAction`,
-`trackSessionQuality`, `trackCopyAction`, and `trackPerformance` (whose last
-caller went away with the unreachable `use-session-analytics.tsx` hook).
-**They have been deleted** (task #374): nothing imported them, so they sent no
-events, while every typecheck, bundle, and styling sweep still paid for them —
-and a helper kept "for later" is indistinguishable from one whose caller was
-lost by accident. Reinstating a signal means writing the helper *and* its call
-site together in the same change; git history has the previous bodies, and
-`sendEvent` / `trackEvent` are the two lines of plumbing they were built on.
-
-The `use-session-analytics.tsx` hook (Core Web Vitals + global JS-error capture)
-that sat alongside them was defined but never mounted; the widened dead-code
-gate (task #370) found it unreachable and it was deleted, so LCP/FID/CLS and
-`javascript_error` events still do not fire today. Mounting that behaviour again
-means writing it into a component that is actually rendered — an unreferenced
-hook file will fail the `dead-components` gate, and an uncalled exported helper
-will now fail its symbol-level sibling, `dead-exports`.
+`trackSessionQuality`, and `trackCopyAction`. **They have been deleted** (task
+#374): nothing imported them, so they sent no events, while every typecheck,
+bundle, and styling sweep still paid for them. `trackPerformance` is the
+exception: it is restored together with its call site in the already-mounted
+`use-analytics.tsx` hook. The hook also owns consent-gated global
+JavaScript-error capture, so no unreferenced session hook can silently recreate
+the same measurement gap.
 
 ## Validation (real GA4 network, no mocks)
 
@@ -166,9 +163,10 @@ Chromium through real user flows, intercepts every `/g/collect` request, decodes
 the batched event payloads, and asserts on event names, parameters, de-duplication,
 and the absence of PII.
 
-Flows exercised: landing (with UTM query) → search → resource detail view →
-in-app SPA navigation → theme change → taxonomy page → Clerk sign-up → signed-in
-reload → Clerk sign-in → consent revoke and re-grant.
+Flows exercised: landing (with UTM query) → consent-gated performance and
+deliberate browser-error capture → search → resource detail view → in-app SPA
+navigation → theme change → taxonomy page → Clerk sign-up → signed-in reload →
+Clerk sign-in → consent revoke and re-grant.
 
 ### Gotchas the harness handles
 

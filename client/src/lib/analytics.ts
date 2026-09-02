@@ -48,6 +48,9 @@ export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
   } catch {
     // Storage unavailable (private mode) — treat as session-only choice.
   }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('analytics-consent-changed'));
+  }
 };
 
 const domainOf = (url: string): string | undefined => {
@@ -420,6 +423,19 @@ export const trackApiPerformance = (
     endpoint,
     status,
     value: Math.round(responseTime),
+  });
+};
+
+// Track Core Web Vitals. LCP/FID are milliseconds; CLS is a unitless score, so
+// retain enough precision for the score to remain useful in GA4.
+export const trackPerformance = (metric: string, value: number) => {
+  if (!Number.isFinite(value)) return;
+  const normalizedMetric = metric.toLowerCase();
+  const reportedValue =
+    normalizedMetric === 'cls' ? Number(value.toFixed(4)) : Math.round(value);
+  sendEvent('performance', {
+    metric_name: normalizedMetric,
+    value: reportedValue,
   });
 };
 
