@@ -51,6 +51,27 @@ configured outcomes: an authenticated session or a visible new-password form.
 The browser global exposes `Clerk.user` reliably here; `Clerk.isLoaded` may be
 undefined and must not gate the completion check.
 
+
+## Repeated sign-in factor escalation
+
+**Rule:** A sequence of real sign-ins for the same disposable account can
+escalate from the password step to an email-code factor chooser at
+`/sign-in/factor-one`. Sign-in automation must handle the chooser as well as a
+direct verification input, and wait for an explicit outcome instead of treating
+a short OTP timeout as “no verification needed.”
+
+**Why:** A multi-route return audit passed several password-only sign-ins, then
+Clerk presented “Email code to …” before the next verification input. The old
+helper silently continued after 20 seconds, producing a cascade of misleading
+route-return failures.
+
+**How to apply:** After password submission, poll within one bounded budget for
+one of three states: an authenticated Clerk user, a visible email-code factor
+button, or the accessible verification input. Select the factor once when
+offered, type the configured test code sequentially, and throw if no explicit
+state arrives. Recovery’s post-code session/new-password transition needs the
+same bounded polling pattern rather than racing equal-duration timeouts.
+
 ## Getting past the bot gate
 
 **Rule:** Only **sign-up** invokes the captcha — `SignIn.create` has no captcha

@@ -25,7 +25,11 @@ import {
   clerkProxyMiddleware,
   getClerkProxyHost,
 } from "./middlewares/clerkProxyMiddleware";
-import { clerkUserContext, hasValidAuditKey } from "./clerkAuth";
+import {
+  clerkUserContext,
+  hasValidAuditKey,
+  hasValidAuthReturnAuditKey,
+} from "./clerkAuth";
 import { HASHED_ASSET_CACHE_CONTROL } from "./http-cache-policy";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -387,8 +391,15 @@ export const PROTECTED_PAGE_PATTERNS = [
 const needsClerkAuth = (req: express.Request) =>
   req.path.startsWith("/api") ||
   PROTECTED_PAGE_PATTERNS.some((pattern) => pattern.test(req.path));
+const isProtectedPage = (req: express.Request) =>
+  PROTECTED_PAGE_PATTERNS.some((pattern) => pattern.test(req.path));
 app.use((req, res, next) => {
   if (!needsClerkAuth(req)) return next();
+  // The auth-return audit must remain anonymous so the protected-page guard
+  // emits its real /sign-in redirect, but it also must not be diverted into
+  // Clerk's cross-origin development handshake. This bypass applies only to
+  // protected document routes; API requests still require a real session.
+  if (isProtectedPage(req) && hasValidAuthReturnAuditKey(req)) return next();
   // Requests carrying a valid X-Admin-Audit-Key (pre-publish audit scripts)
   // skip Clerk verification entirely — clerkUserContext resolves the admin
   // row for them instead. Without this, clerkMiddleware 307-redirects
@@ -404,6 +415,7 @@ app.use((req, res, next) => {
 // middleware never saw.
 app.use((req, res, next) => {
   if (!needsClerkAuth(req)) return next();
+  if (isProtectedPage(req) && hasValidAuthReturnAuditKey(req)) return next();
   return clerkUserContext(req, res, next);
 });
 

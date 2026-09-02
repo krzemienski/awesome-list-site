@@ -74,6 +74,15 @@ export default function AdminGuard({ children }: AdminGuardProps) {
     );
   }
   
-  // Only render children (AdminDashboard) if confirmed admin
-  return <>{children}</>;
+  // Only render children (AdminDashboard) if confirmed admin. The attached
+  // marker lets the auth-return audit prove this authorization branch without
+  // depending on whether the dashboard's separate data queries have finished.
+  return (
+    <>
+      <span className="sr-only" data-testid="admin-authorized">
+        Authorized admin area
+      </span>
+      {children}
+    </>
+  );
 }

@@ -172,6 +172,20 @@ export function hasValidAuditKey(req: Request): boolean {
   return secretsMatch(headerValue, adminPassword);
 }
 
+/**
+ * Anonymous document-navigation bypass for the auth-return browser audit.
+ * Unlike X-Admin-Audit-Key, this never resolves a user or grants access; the
+ * server uses it only to skip Clerk's development handshake so the protected
+ * page guard can issue the real local /sign-in redirect being audited.
+ */
+export function hasValidAuthReturnAuditKey(req: Request): boolean {
+  const headerValue = req.get("x-auth-return-audit-key");
+  if (!headerValue) return false;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword || adminPassword.length < 8) return false;
+  return secretsMatch(headerValue, adminPassword);
+}
+
 async function resolveAuditKeyAdmin(req: Request): Promise<User | undefined> {
   if (!hasValidAuditKey(req)) return undefined;
   const [admin] = await db
