@@ -635,8 +635,10 @@ button { font-family: inherit; }
    and when a block here names a system the picker never offers. Editorial is
    the one exception — the bare :root above already carries its tokens — and
    the gate carries that as an explicit, reason-carrying entry rather than a
-   silent gap. Add a system in ALL THREE places: here, DESIGN_SYSTEMS, and
-   the pre-paint SYSTEMS allowlist in client/index.html.
+   silent gap. The gate also requires each block to declare the token set its
+   established peers agree on; a deliberately smaller look needs a written
+   reason in MINIMAL_TOKEN_SYSTEMS there. Add a system in ALL THREE places:
+   here, DESIGN_SYSTEMS, and the pre-paint SYSTEMS allowlist in client/index.html.
    ===================================================================== */
 
 :root[data-system="terminal"] {
