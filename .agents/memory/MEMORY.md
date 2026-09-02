@@ -99,3 +99,4 @@
 - [Dark-only means color-scheme, not light tokens](dark-only-color-scheme.md) — "light mode broken" findings are by design (0 `.light` selectors); the real defect is an undeclared `color-scheme`.
 - [Drift-gate mutation probing](drift-gate-mutation-probing.md) — prove a gate fails by mutating a /tmp copy of its inputs; parser-rot short-circuits parity checks, and literals need unescaping first.
 - [Sticky killed by overflow-x:hidden](sticky-vs-overflow-hidden.md) — hidden computes the other axis to auto → a scroll container that never scrolls, disabling sticky app-wide; use clip.
+- [Webfont download coverage](webfont-download-coverage.md) — naming a family in a stack or a --font-* var renders nothing by itself; three separate loaders fetch faces and none owns the whole set.

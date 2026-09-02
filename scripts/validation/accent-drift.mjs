@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Pre-paint theme drift gate (tasks #377, #388).
+// Theme drift gate (tasks #377, #388, #399).
 //
 // The inline boot script in client/index.html paints the theme BEFORE React
 // loads: it reads ds-system / ds-accent / ds-font-override out of localStorage
@@ -9,7 +9,9 @@
 // is missing from (or disagrees with) the boot script looks to a visitor like
 // a choice that "won't stick" after a reload. Task #371 tagged the accent
 // literals DS-OK with a "keep the two files in sync" note; a note is not a
-// check. This is the check, for all three lists.
+// check. This is the check, for all three lists — and for the stylesheet maps
+// that fetch the faces those lists name, whose omission is quieter still: the
+// choice sticks, it just never paints in the typeface it promised.
 //
 // Sources compared (every one is a hand-maintained copy of ONE registry, and
 // every pair below has silently drifted-by-omission before):
@@ -37,6 +39,15 @@
 //        active (or falls back to the global default) instead of its own look,
 //        and an entry naming an accent that is not in ACCENTS sets a
 //        data-accent no :root[data-accent="…"] block paints
+//   8 · font-options.ts    FONT_STYLESHEETS — the map that actually DOWNLOADS
+//        the picker's webfonts  ↔  FONT_OPTIONS. A stack is only half of a
+//        webfont: an option whose stack is right but whose stylesheet entry
+//        is missing (or which downloads a family the stack never names)
+//        renders in the fallback face — the setting looks applied and the
+//        page looks unchanged, which is harder to spot than an outright reset
+//   9 · font-options.ts    SYSTEM_STYLESHEETS  ↔  design-system.ts
+//        DESIGN_SYSTEMS — the per-system display face, same failure mode: the
+//        system's CSS still NAMES its family, nothing downloads it
 //
 // Checks (each FAILs with the id and both sides' literal values):
 //   · id-parity      — an accent id present in only one of the accent sources
@@ -57,9 +68,30 @@
 //     the face applied before paint is not the one applied after it
 //   · font-fallback  — the boot fallback font id ≠ FONT_OPTIONS[0].id, the
 //     option applyFontOverride() falls back to
+//   · font-stylesheet— an option with a non-empty stack has no
+//     FONT_STYLESHEETS entry, an entry exists for an id FONT_OPTIONS does not
+//     offer, or an entry exists for an option with NO stack. "System default"
+//     needs no webfont BY RULE — stack "" ⇔ no stylesheet entry, checked in
+//     BOTH directions, so the exemption is the empty stack itself and can
+//     never quietly widen to cover an option that does declare a stack
+//   · font-stylesheet-family — the stylesheet an option downloads names a
+//     family its stack does not, so the file arrives and nothing renders in
+//     it (the same invisible fallback-face bug as a missing entry)
+//   · system-stylesheet — a DESIGN_SYSTEMS id with no SYSTEM_STYLESHEETS
+//     entry (its display face is never fetched), or an entry for a system the
+//     app does not offer
 //   · parser rot     — ANY parser finding ZERO entries is itself a failure,
 //     so a refactor that renames an array, a map, or a selector can never
 //     make this gate pass vacuously
+//
+// The family cross-check stops at the picker fonts on purpose. A picker
+// option carries its own stack, so the URL and the families it must serve sit
+// side by side in one file. A design system's families live in
+// design-system.css (--font-body/--font-display/--font-mono per
+// :root[data-system="…"] block), and the DESIGN_SYSTEMS `tag` beside each id
+// is picker copy, not a family list ("Modern · Geist Sans" for the Geist
+// family, and Brutalist names one of its two faces) — checking ids is a claim
+// this gate can make honestly; checking families off that copy is not.
 //
 // Color identity is normalized before comparison: lowercased, whitespace
 // stripped, and #rgb/#rgba shorthand expanded to #rrggbb/#rrggbbaa (so #0f8
@@ -74,7 +106,12 @@
 // name matching is case-insensitive). Anything else — a reordered fallback
 // chain, a dropped generic family — is drift and FAILs.
 //
-// Detector canaries run on every invocation: every parser, both normalizers,
+// A stylesheet's families are read out of its `family=` parameters ("+" is a
+// space, the axis spec after ":" is not part of the name) and matched against
+// the families its stack NAMES, by that same identity. A URL that names no
+// family at all is reported as unverifiable rather than waved through.
+//
+// Detector canaries run on every invocation: every parser, every normalizer,
 // and every comparator are asserted against synthetic known-good and
 // known-bad samples first, so a parser regression can never pass vacuously
 // either.
@@ -116,6 +153,41 @@ function normalizeFontStack(raw) {
     .replace(/\s*,\s*/g, ',')
     .trim()
     .toLowerCase();
+}
+
+// One family NAME, as CSS matches them: quoting is optional, inner whitespace
+// runs collapse, and case is ignored. 'IBM Plex Sans' ≡ IBM  plex  sans.
+function normalizeFamilyName(raw) {
+  return String(raw).replace(/["']/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+// The families a font-family stack actually NAMES, generics included — the
+// list a downloaded webfont has to appear in to render anything.
+function stackFamilies(stack) {
+  const normalized = normalizeFontStack(stack);
+  if (!normalized) return [];
+  return normalized.split(',').map(normalizeFamilyName).filter(Boolean);
+}
+
+// The families a Google Fonts css2 URL DOWNLOADS: every `family=` parameter,
+// with "+" read as a space and the axis spec after ":" dropped
+// (family=Source+Sans+3:wght@400;700 → "Source Sans 3"). Returns [] when the
+// href names no family at all — the caller treats that as unverifiable rather
+// than as agreement.
+function parseStylesheetFamilies(href) {
+  const families = [];
+  for (const m of String(href).matchAll(/[?&]family=([^&:]+)/g)) {
+    const raw = m[1].replace(/\+/g, ' ');
+    let decoded = raw;
+    try {
+      decoded = decodeURIComponent(raw);
+    } catch {
+      /* a malformed % escape stays literal — it will simply fail to match */
+    }
+    const family = decoded.trim();
+    if (family) families.push(family);
+  }
+  return families;
 }
 
 // ---------------------------------------------------------------------------
@@ -344,6 +416,17 @@ function parseTsFontOptions(fontsSrc) {
   return { fonts, order, malformed, found: true };
 }
 
+// A `Record<string, string>` map declared in a TS module, read by NAME:
+// FONT_STYLESHEETS / SYSTEM_STYLESHEETS. Neither is exported (both are
+// module-private, reached only through loadFontOverride() /
+// loadDesignSystemFont()), so `export` is optional in the match.
+function parseTsStringMap(src, name) {
+  const m = new RegExp(`(?:export\\s+)?const\\s+${name}\\s*(?::[^=]*)?=\\s*\\{([\\s\\S]*?)\\n\\};`).exec(src);
+  if (!m) return { entries: new Map(), malformed: [], found: false };
+  const { entries, malformed } = parseObjectStringEntries(m[1]);
+  return { entries, malformed, found: true };
+}
+
 // The pre-paint boot script's system allowlist + the id an unknown saved
 // system is silently rewritten to.
 function parseBootSystems(htmlSrc) {
@@ -501,6 +584,68 @@ function compareFonts(bootStacks, tsStacks) {
   return failures;
 }
 
+// FONT_OPTIONS vs FONT_STYLESHEETS: an option has a webfont to download if
+// and only if it declares a non-empty stack, and every family the download
+// serves must be one the stack names.
+//
+// The "if and only if" is what makes "System default" exempt BY RULE: the
+// exemption belongs to the empty stack, not to the id "system". Give that
+// option a stack and it must carry a stylesheet; give any option a stylesheet
+// without a stack and the download can never be applied.
+function compareFontStylesheets(fontStacks, sheets) {
+  const failures = [];
+  for (const id of [...new Set([...fontStacks.keys(), ...sheets.keys()])].sort()) {
+    const stack = fontStacks.get(id);
+    const href = sheets.get(id);
+    if (stack === undefined) {
+      failures.push({
+        kind: 'font-stylesheet',
+        id,
+        message: `FONT_STYLESHEETS in ${FONTS_REL} downloads a webfont for "${id}" but FONT_OPTIONS does not offer that id — nothing can ever select it`,
+      });
+      continue;
+    }
+    if (stack === '') {
+      if (href !== undefined) {
+        failures.push({
+          kind: 'font-stylesheet',
+          id,
+          message: `font option "${id}" declares an empty stack (no override — the "System default" rule is stack "" ⇔ no webfont) yet FONT_STYLESHEETS in ${FONTS_REL} downloads ${href} for it — a font file no rule can ever apply`,
+        });
+      }
+      continue; // exempt by rule: no stack to point at a face, so no face to fetch
+    }
+    if (href === undefined) {
+      failures.push({
+        kind: 'font-stylesheet',
+        id,
+        message: `font option "${id}" declares stack ${JSON.stringify(stack)} but has no FONT_STYLESHEETS entry in ${FONTS_REL} — selecting it points --font-body at a family the page never downloads, so the text silently keeps rendering in the fallback face and the setting looks like it did nothing`,
+      });
+      continue;
+    }
+    const families = parseStylesheetFamilies(href);
+    if (!families.length) {
+      failures.push({
+        kind: 'font-stylesheet-family',
+        id,
+        message: `FONT_STYLESHEETS["${id}"] in ${FONTS_REL} names no family= parameter, so which face it downloads cannot be verified against the stack: ${href} — teach parseStylesheetFamilies() the new URL shape rather than leaving the entry unchecked`,
+      });
+      continue;
+    }
+    const named = new Set(stackFamilies(stack));
+    for (const family of families) {
+      if (!named.has(normalizeFamilyName(family))) {
+        failures.push({
+          kind: 'font-stylesheet-family',
+          id,
+          message: `font option "${id}" downloads "${family}" but its stack ${JSON.stringify(stack)} never names that family — the file arrives and nothing renders in it, so the option paints in a face it did not choose`,
+        });
+      }
+    }
+  }
+  return failures;
+}
+
 // ---------------------------------------------------------------------------
 // Detector canaries
 // ---------------------------------------------------------------------------
@@ -533,6 +678,40 @@ function runCanaries() {
     false,
     'a reordered fallback chain is drift',
   );
+
+  // Family identity + the two family readers.
+  eq(normalizeFamilyName("'IBM Plex Sans'"), 'ibm plex sans', 'family name unquoted + lowercased');
+  eq(normalizeFamilyName('IBM  Plex\n Sans'), 'ibm plex sans', 'family name whitespace runs collapsed');
+  eq(
+    stackFamilies("'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif"),
+    ['source sans 3', 'source sans pro', 'system-ui', 'sans-serif'],
+    'stack split into the families it names, generics included',
+  );
+  eq(stackFamilies(''), [], 'the empty "System default" stack names no family');
+  eq(
+    parseStylesheetFamilies('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'),
+    ['Inter'],
+    'family read, axis spec after ":" dropped',
+  );
+  eq(
+    parseStylesheetFamilies('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;700&display=swap'),
+    ['Source Sans 3'],
+    '"+" read as a space',
+  );
+  eq(
+    parseStylesheetFamilies(
+      'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap',
+    ),
+    ['Space Grotesk', 'Instrument Serif'],
+    'every family= parameter of a multi-family URL is read',
+  );
+  eq(
+    parseStylesheetFamilies('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&display=swap'),
+    ['Fraunces'],
+    'commas inside a variable-axis spec do not leak into the family name',
+  );
+  eq(parseStylesheetFamilies('/fonts/self-hosted.css'), [], 'a URL naming no family is reported as unverifiable, not as a match');
+  eq(parseStylesheetFamilies('https://example.test/css2?family=Bad%ZZ'), ['Bad%ZZ'], 'a malformed % escape stays literal instead of throwing');
 
   // CSS accent-block parser.
   const cssSample = [
@@ -651,6 +830,26 @@ function runCanaries() {
     'escaped quotes are unescaped — a stack is compared by value, not by spelling',
   );
 
+  // TS stylesheet-map parser (module-private `const`, quoted + bare keys).
+  const tsSheetSample = [
+    'const FONT_STYLESHEETS: Record<string, string> = {',
+    '  inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap",',
+    '  "dm-sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap",',
+    '  // ghost: "https://fonts.googleapis.com/css2?family=Ghost&display=swap",',
+    '  broken: SOME_CONST,',
+    '};',
+  ].join('\n');
+  const parsedSheets = parseTsStringMap(tsSheetSample, 'FONT_STYLESHEETS');
+  eq(parsedSheets.found, true, 'module-private FONT_STYLESHEETS map located without an `export`');
+  eq([...parsedSheets.entries.keys()], ['inter', 'dm-sans'], 'quoted + bare keys parsed, comment ignored');
+  eq(
+    parsedSheets.entries.get('inter'),
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap',
+    'the "//" in an https URL is never mistaken for a line comment',
+  );
+  eq(parsedSheets.malformed.length, 1, 'a non-string value is reported, never silently dropped');
+  eq(parseTsStringMap(tsSheetSample, 'SYSTEM_STYLESHEETS').found, false, 'renamed/absent stylesheet map is detectable, not an empty pass');
+
   // Boot-script system + font parsers.
   const htmlThemeSample = [
     "          var SYSTEMS = ['editorial', 'terminal', 'geist'];",
@@ -763,13 +962,73 @@ function runCanaries() {
   eq(pickerOnlyFont.map((f) => [f.kind, f.id]), [['font-parity', 'inter']], 'picker-only font caught');
   const emptiedStack = compareFonts(new Map([...goodFonts, ['inter', '']]), goodFonts);
   eq(emptiedStack.map((f) => [f.kind, f.id]), [['font-stack', 'inter']], 'a stack emptied on one side is drift, not a skip');
+
+  // Comparator — font stylesheets (the map that downloads the faces).
+  const stackedFonts = new Map([
+    ['system', ''],
+    ['inter', "'Inter', system-ui, sans-serif"],
+    ['ibm-plex', "'IBM Plex Sans', system-ui, sans-serif"],
+  ]);
+  const goodSheets = new Map([
+    ['inter', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'],
+    ['ibm-plex', 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap'],
+  ]);
+  eq(compareFontStylesheets(stackedFonts, goodSheets), [], 'every stacked option downloads the family it names');
+  eq(
+    compareFontStylesheets(new Map([['system', '']]), new Map()),
+    [],
+    'the empty-stack option needs no webfont — the exemption is the empty stack itself',
+  );
+  const noSheet = compareFontStylesheets(stackedFonts, new Map([['inter', goodSheets.get('inter')]]));
+  eq(noSheet.map((f) => [f.kind, f.id]), [['font-stylesheet', 'ibm-plex']], 'a stacked option with no stylesheet caught');
+  const sheetOnly = compareFontStylesheets(
+    stackedFonts,
+    new Map([...goodSheets, ['ghost', 'https://fonts.googleapis.com/css2?family=Ghost&display=swap']]),
+  );
+  eq(sheetOnly.map((f) => [f.kind, f.id]), [['font-stylesheet', 'ghost']], 'a stylesheet for an id the picker never offers caught');
+  const sheetForSystem = compareFontStylesheets(
+    stackedFonts,
+    new Map([...goodSheets, ['system', 'https://fonts.googleapis.com/css2?family=Inter&display=swap']]),
+  );
+  eq(
+    sheetForSystem.map((f) => [f.kind, f.id]),
+    [['font-stylesheet', 'system']],
+    'the exemption is a rule in BOTH directions — an empty-stack option must not download a face either',
+  );
+  const wrongFamily = compareFontStylesheets(
+    stackedFonts,
+    new Map([...goodSheets, ['ibm-plex', 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap']]),
+  );
+  eq(
+    wrongFamily.map((f) => [f.kind, f.id]),
+    [['font-stylesheet-family', 'ibm-plex']],
+    'a stylesheet downloading a family the stack does not name caught — the silent wrong-typeface bug',
+  );
+  eq(
+    compareFontStylesheets(
+      new Map([['inter', "'Inter', system-ui, sans-serif"]]),
+      new Map([['inter', 'https://fonts.googleapis.com/css2?family=Inter&family=Ghost&display=swap']]),
+    ).map((f) => [f.kind, f.id]),
+    [['font-stylesheet-family', 'inter']],
+    'ONE unnamed family in a multi-family URL is enough to fail',
+  );
+  eq(
+    compareFontStylesheets(new Map([['inter', "'inter', system-ui"]]), new Map([['inter', '?family=INTER']])).length,
+    0,
+    'family matching is case- and quote-insensitive, as CSS is',
+  );
+  eq(
+    compareFontStylesheets(stackedFonts, new Map([...goodSheets, ['inter', '/fonts/inter.css']])).map((f) => [f.kind, f.id]),
+    [['font-stylesheet-family', 'inter']],
+    'a stylesheet whose family cannot be read fails loudly instead of being waved through',
+  );
 }
 
 // ---------------------------------------------------------------------------
 // Run
 // ---------------------------------------------------------------------------
 runCanaries();
-console.log('PASS canaries :: every parser, both normalizers, and every comparator verified against known-good/known-bad samples');
+console.log('PASS canaries :: every parser, every normalizer, and every comparator verified against known-good/known-bad samples');
 
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const tsSrc = read(TS_REL);
@@ -940,6 +1199,44 @@ if (!bootFonts.fallback) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Stylesheets: the maps that actually FETCH the faces the stacks above name.
+// A correct stack with no download is invisible — the picker reports the new
+// setting, the page keeps rendering in the fallback face.
+// ---------------------------------------------------------------------------
+const fontSheets = parseTsStringMap(fontsSrc, 'FONT_STYLESHEETS');
+const systemSheets = parseTsStringMap(fontsSrc, 'SYSTEM_STYLESHEETS');
+
+if (!fontSheets.found) fail('parser-rot', `could not locate "const FONT_STYLESHEETS … = { … };" in ${FONTS_REL}`);
+if (fontSheets.found && !fontSheets.entries.size) {
+  fail('parser-rot', `parsed ZERO entries out of FONT_STYLESHEETS in ${FONTS_REL}`);
+}
+for (const part of fontSheets.malformed) {
+  fail('parser-rot', `FONT_STYLESHEETS entry in ${FONTS_REL} is not an "id: 'href'" pair: ${part}`);
+}
+if (tsFonts.fonts.size && fontSheets.entries.size) {
+  failures.push(...compareFontStylesheets(tsFonts.fonts, fontSheets.entries));
+}
+
+if (!systemSheets.found) fail('parser-rot', `could not locate "const SYSTEM_STYLESHEETS … = { … };" in ${FONTS_REL}`);
+if (systemSheets.found && !systemSheets.entries.size) {
+  fail('parser-rot', `parsed ZERO entries out of SYSTEM_STYLESHEETS in ${FONTS_REL}`);
+}
+for (const part of systemSheets.malformed) {
+  fail('parser-rot', `SYSTEM_STYLESHEETS entry in ${FONTS_REL} is not an "id: 'href'" pair: ${part}`);
+}
+if (tsSystems.ids.length && systemSheets.entries.size) {
+  failures.push(
+    ...compareIdSets(
+      'system-stylesheet',
+      [...systemSheets.entries.keys()],
+      tsSystems.ids,
+      (id) => `SYSTEM_STYLESHEETS in ${FONTS_REL} downloads a display font for "${id}" but DESIGN_SYSTEMS in ${TS_REL} does not offer that system — nothing can ever select it`,
+      (id) => `design system "${id}" is offered by DESIGN_SYSTEMS in ${TS_REL} but has no SYSTEM_STYLESHEETS entry in ${FONTS_REL} — ${CSS_REL} still NAMES its display family, so choosing it downloads nothing and silently paints in that declaration's fallback face`,
+    ),
+  );
+}
+
 if (failures.length) {
   for (const f of failures) console.error(`FAIL ${f.kind} :: ${f.message}`);
   console.error(`\n${failures.length} theme-drift failure(s).`);
@@ -947,6 +1244,9 @@ if (failures.length) {
   console.error(`       and the font stacks (${FONTS_REL}) are hand-copied mirrors of one theme`);
   console.error('       registry — fix ALL affected sides together, and keep the pre-paint');
   console.error(`       SYSTEMS / ACCENTS / FONT_STACKS lists in ${HTML_REL} in step.`);
+  console.error('       A stack is only half of a webfont: the FONT_STYLESHEETS /');
+  console.error(`       SYSTEM_STYLESHEETS maps in ${FONTS_REL} are what fetch the face,`);
+  console.error('       so a stylesheet fix has to land with every stack fix.');
   process.exit(1);
 }
 
@@ -963,4 +1263,15 @@ console.log(
 );
 console.log(`PASS font-parity :: ${tsFonts.fonts.size} font option(s) present in FONT_OPTIONS and the pre-paint FONT_STACKS map with identical stacks (fallback "${runtimeFontFallback}")`);
 for (const [id, stack] of tsFonts.fonts) console.log(`       ${id.padEnd(12)} ${stack === '' ? '(system default — no override)' : stack}`);
-console.log('\nPASS accent-drift :: picker swatches, painted accent tokens, and the pre-paint system/font lists agree');
+const webfontOptions = [...tsFonts.fonts].filter(([, stack]) => stack !== '');
+console.log(
+  `PASS font-stylesheet :: ${webfontOptions.length} option(s) with a stack each download exactly the family they name; ${tsFonts.fonts.size - webfontOptions.length} with no stack download nothing (exempt by rule)`,
+);
+for (const id of tsFonts.fonts.keys()) {
+  const href = fontSheets.entries.get(id);
+  console.log(`       ${id.padEnd(12)} ${href ? parseStylesheetFamilies(href).join(' + ') : '(no webfont — empty stack)'}`);
+}
+console.log(
+  `PASS system-stylesheet :: ${systemSheets.entries.size} display font(s) fetched, one per DESIGN_SYSTEMS id — ${[...systemSheets.entries.keys()].join(', ')}`,
+);
+console.log('\nPASS accent-drift :: picker swatches, painted accent tokens, the pre-paint system/font lists, and the stylesheets that fetch those faces all agree');

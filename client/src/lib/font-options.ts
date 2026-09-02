@@ -13,6 +13,13 @@
  * script's fallback id stops being FONT_OPTIONS[0] (the option
  * `applyFontOverride` falls back to). A font missing from the boot map is
  * silently reset to the fallback on the next reload.
+ *
+ * A stack is only half of a webfont: the two maps below are what actually
+ * download the files, and the same gate holds each of them to its registry —
+ * see the rule stated above each map. That failure is quieter than a reset:
+ * an option whose stack is right but whose stylesheet is missing (or which
+ * fetches a family the stack never names) reports the new setting and keeps
+ * rendering in the fallback face, so the page just looks unchanged.
  */
 export type FontOption = { id: string; name: string; stack: string };
 
@@ -27,6 +34,11 @@ export const FONT_OPTIONS: FontOption[] = [
 
 export const FONT_LS_KEY = "ds-font-override";
 
+// RULE (enforced by the `accent-drift` gate): a FONT_OPTIONS entry has an
+// entry here IF AND ONLY IF it declares a non-empty stack, and every family
+// the URL fetches must be one that entry's stack names. "System default"
+// (stack: "") is the one option with no webfont — that exemption belongs to
+// the empty stack, not to the id, and is checked in both directions.
 const FONT_STYLESHEETS: Record<string, string> = {
   inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
   "dm-sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
@@ -35,6 +47,11 @@ const FONT_STYLESHEETS: Record<string, string> = {
   jetbrains: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap",
 };
 
+// RULE (enforced by the same gate): exactly one entry per DESIGN_SYSTEMS id in
+// `client/src/lib/design-system.ts` — every system's display face is a
+// webfont. A system missing here still has its family named by the
+// :root[data-system="…"] block in client/src/styles/design-system.css, but
+// nothing downloads it, so the system paints in that declaration's fallback.
 const SYSTEM_STYLESHEETS: Record<string, string> = {
   editorial: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&display=swap",
   terminal: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap",
