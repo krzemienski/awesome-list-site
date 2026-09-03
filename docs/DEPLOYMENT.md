@@ -82,7 +82,11 @@ reports success. The recommendation check targets the `PRODUCTION_URL`
 repository variable (defaulting to `https://awesome.video`) in fresh mobile and
 desktop guest contexts. It keeps the release published if a smoke check fails,
 uploads each check's evidence as a workflow artifact, and then fails the
-workflow with a direct pointer to the relevant artifact.
+workflow with a direct pointer to the relevant artifact. Before browser smoke
+checks begin, it waits up to ten minutes for that backend's `/api/version` to
+equal the release's `github.sha`. The production backend must therefore deploy
+from the same GitHub push; a missing, stale, or independently built backend
+revision deliberately fails the release check with both revisions in evidence.
 
 ## Docker / Self-Hosting
 
@@ -125,7 +129,9 @@ Steps:
 3. Set `NODE_ENV=production`, `DATABASE_URL` if it was not injected, and the
    Clerk build/runtime keys.
 4. Deploy — Railway builds the Dockerfile and health-checks
-   `/api/health/ready`.
+   `/api/health/ready`. The Dockerfile consumes Railway's
+   `RAILWAY_GIT_COMMIT_SHA` build variable so `/api/version` identifies the
+   exact source revision running in the container.
 
 ## Vercel
 
@@ -163,6 +169,7 @@ Run, AWS ECS/Fargate, Azure Container Apps, Fly.io, etc.). The general recipe:
 1. Build and push the image:
    ```bash
    docker build \
+     --build-arg BUILD_REVISION="$(git rev-parse HEAD)" \
      --build-arg VITE_CLERK_PUBLISHABLE_KEY="$VITE_CLERK_PUBLISHABLE_KEY" \
      --build-arg VITE_CLERK_PROXY_URL="${VITE_CLERK_PROXY_URL:-/api/__clerk}" \
      -t <registry>/awesome-list-site:latest .

@@ -17,6 +17,11 @@ const BASE = process.env.AUDIT_BASE_URL || process.env.BASE_URL || "http://local
 const OUT =
   process.env.GUEST_RECOMMENDATIONS_EVIDENCE_DIR || "/tmp/validation/guest-recommendations";
 const POPULATED_ONLY = process.argv.includes("--populated-only");
+const EXPECTED_BUILD_REVISION = process.env.EXPECTED_BUILD_REVISION?.trim() || null;
+const REVISION_WAIT_TIMEOUT_MS = Number.parseInt(
+  process.env.REVISION_WAIT_TIMEOUT_MS || "120000",
+  10,
+);
 const RECOMMENDATIONS_PATH = "/api/recommendations";
 const VIEWPORTS = [
   { name: "mobile", width: 375, height: 812 },
@@ -24,6 +29,23 @@ const VIEWPORTS = [
 ];
 
 fs.mkdirSync(OUT, { recursive: true });
+
+const releaseEvidence = {
+  baseUrl: BASE,
+  populatedOnly: POPULATED_ONLY,
+  expectedRevision: EXPECTED_BUILD_REVISION,
+  observedRevision: null,
+  observedRevisionStatus: null,
+  revisionMatched: null,
+  results: [],
+};
+
+function writeReport() {
+  fs.writeFileSync(
+    path.join(OUT, "report.json"),
+    `${JSON.stringify(releaseEvidence, null, 2)}\n`,
+  );
+}
 
 function chromePath() {
   if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE) {
@@ -53,6 +75,51 @@ async function waitForServer() {
     await new Promise((resolve) => setTimeout(resolve, 3_000));
   }
   throw new Error(`App not reachable at ${BASE} after 120s (${lastError})`);
+}
+
+async function assertReleasedRevision() {
+  if (!EXPECTED_BUILD_REVISION) return;
+
+  const timeoutMs =
+    Number.isFinite(REVISION_WAIT_TIMEOUT_MS) && REVISION_WAIT_TIMEOUT_MS >= 0
+      ? REVISION_WAIT_TIMEOUT_MS
+      : 120_000;
+  const deadline = Date.now() + timeoutMs;
+  let lastError = null;
+
+  do {
+    try {
+      const response = await fetch(`${BASE}/api/version`, {
+        headers: { "cache-control": "no-cache" },
+      });
+      releaseEvidence.observedRevisionStatus = response.status;
+      const body = await response.json();
+      releaseEvidence.observedRevision =
+        typeof body?.revision === "string" ? body.revision.trim() : null;
+      releaseEvidence.revisionMatched =
+        response.ok && releaseEvidence.observedRevision === EXPECTED_BUILD_REVISION;
+      lastError = null;
+    } catch (error) {
+      releaseEvidence.observedRevision = null;
+      releaseEvidence.revisionMatched = false;
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    writeReport();
+
+    if (releaseEvidence.revisionMatched) {
+      console.log(
+        `PASS deployed-revision :: expected=${EXPECTED_BUILD_REVISION} observed=${releaseEvidence.observedRevision}`,
+      );
+      return;
+    }
+    if (Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 10_000));
+    }
+  } while (Date.now() < deadline);
+
+  throw new Error(
+    `Deployed revision mismatch after ${timeoutMs}ms: expected=${EXPECTED_BUILD_REVISION} observed=${releaseEvidence.observedRevision || "<missing>"} (HTTP ${releaseEvidence.observedRevisionStatus ?? "unavailable"}${lastError ? `; ${lastError}` : ""})`,
+  );
 }
 
 function isRecommendationGet(response) {
@@ -209,7 +276,7 @@ async function emptyScenario(browser, pathName, surface) {
   }
 }
 
-const results = [];
+const results = releaseEvidence.results;
 const log = (name, passed, detail, evidence = null) => {
   results.push({ name, passed, detail, ...(evidence || {}) });
   const counts = evidence
@@ -219,6 +286,7 @@ const log = (name, passed, detail, evidence = null) => {
 };
 
 await waitForServer();
+await assertReleasedRevision();
 const browser = await launchBrowserWithLease(
   chromium,
   {
@@ -279,10 +347,7 @@ try {
   await browser.close();
 }
 
-fs.writeFileSync(
-  path.join(OUT, "report.json"),
-  `${JSON.stringify({ baseUrl: BASE, populatedOnly: POPULATED_ONLY, results }, null, 2)}\n`,
-);
+writeReport();
 
 const failed = results.filter((result) => !result.passed);
 if (failed.length > 0) {

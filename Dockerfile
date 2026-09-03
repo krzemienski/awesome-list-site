@@ -10,6 +10,8 @@ WORKDIR /app
 # (not secret), but must be supplied when the image is built.
 ARG VITE_CLERK_PUBLISHABLE_KEY
 ARG VITE_CLERK_PROXY_URL=/api/__clerk
+ARG BUILD_REVISION
+ARG RAILWAY_GIT_COMMIT_SHA
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 ENV VITE_CLERK_PROXY_URL=$VITE_CLERK_PROXY_URL
 
@@ -25,7 +27,7 @@ COPY . .
 # Build the application (frontend + backend)
 # This runs: vite build && esbuild server/index.ts
 RUN node -e "if (!process.env.VITE_CLERK_PUBLISHABLE_KEY) { console.error('VITE_CLERK_PUBLISHABLE_KEY build argument is required'); process.exit(1); }"
-RUN npm run build
+RUN BUILD_REVISION="${BUILD_REVISION:-$RAILWAY_GIT_COMMIT_SHA}" npm run build
 
 # Stage 2: Production stage
 FROM node:20-alpine AS production

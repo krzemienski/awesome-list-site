@@ -406,6 +406,7 @@ curl http://localhost:5000/api/health/ready
 
 ```bash
 docker build \
+  --build-arg BUILD_REVISION="$(git rev-parse HEAD)" \
   --build-arg VITE_CLERK_PUBLISHABLE_KEY="$VITE_CLERK_PUBLISHABLE_KEY" \
   --build-arg VITE_CLERK_PROXY_URL="${VITE_CLERK_PROXY_URL:-/api/__clerk}" \
   -t awesome-list-site:latest .

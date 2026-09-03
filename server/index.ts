@@ -37,6 +37,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+const buildRevision =
+  process.env.BUILD_REVISION ||
+  process.env.REPLIT_GIT_COMMIT_SHA ||
+  process.env.GITHUB_SHA ||
+  "unknown";
+
 const buildContentSecurityPolicy = (nonce: string): string =>
   [
     "default-src 'self'",
@@ -356,6 +362,17 @@ app.use((req, res, next) => {
 export const REQUEST_BODY_LIMIT = "256kb";
 app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
 app.use(express.urlencoded({ extended: false, limit: REQUEST_BODY_LIMIT }));
+
+// Public release correlation endpoint. BUILD_REVISION is the explicit
+// deployment contract; the platform/CI variables support environments that
+// already expose their checked-out commit without extra configuration.
+// Never cache this response: post-release checks must observe the active
+// backend process rather than a stale edge response.
+app.get("/api/version", (_req, res) => {
+  res
+    .set("Cache-Control", "no-store")
+    .json({ revision: buildRevision });
+});
 
 // Clerk session verification (Task #307). Resolve the publishable key from the
 // incoming request host so the same server can serve multiple Clerk custom

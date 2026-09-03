@@ -28,6 +28,7 @@ services:
         # Vite compiles this public key into the browser bundle.
         VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY:?Set VITE_CLERK_PUBLISHABLE_KEY in .env}
         VITE_CLERK_PROXY_URL: ${VITE_CLERK_PROXY_URL:-/api/__clerk}
+        BUILD_REVISION: ${BUILD_REVISION:-local}
     container_name: awesome-list-app
     environment:
       NODE_ENV: production

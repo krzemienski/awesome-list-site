@@ -115,6 +115,8 @@ jobs:
         continue-on-error: true
         env:
           AUDIT_BASE_URL: ${{ vars.PRODUCTION_URL || 'https://awesome.video' }}
+          EXPECTED_BUILD_REVISION: ${{ github.sha }}
+          REVISION_WAIT_TIMEOUT_MS: '600000'
           GUEST_RECOMMENDATIONS_EVIDENCE_DIR: ${{ github.workspace }}/evidence/guest-recommendations
           PLAYWRIGHT_CHROMIUM_EXECUTABLE: ${{ runner.tool_cache }}/Playwright/1.60.0/x64/chrome-linux/chrome
         run: |
@@ -154,5 +156,5 @@ jobs:
       - name: Surface guest recommendation failure
         if: steps.guest-recommendations.outcome == 'failure'
         run: |
-          echo "::error::Post-publish guest recommendations failed. The release remains published; download the guest-recommendations-evidence-${{ github.run_id }} artifact for route, viewport, API item count, and rendered card count."
+          echo "::error::Post-publish guest recommendations failed. The release remains published; download the guest-recommendations-evidence-${{ github.run_id }} artifact for expected/observed revisions, route, viewport, API item count, and rendered card count."
           exit 1
