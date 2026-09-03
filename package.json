@@ -22,6 +22,7 @@
     "validate:response-contracts": "tsx scripts/validation/response-contract-drift.ts",
     "validate:search-typos": "node scripts/validation/search-typo-suite.mjs",
     "validate:guest-recommendations": "node scripts/validation/guest-recommendations.mjs",
+    "validate:guest-recommendations:release": "node scripts/validation/guest-recommendations.mjs --populated-only",
     "validate:standalone-palette-drift": "node scripts/validation/standalone-palette-drift.mjs",
     "validate:theme-registry-types": "node scripts/validation/theme-registry-type-safety.mjs",
     "test:unit": "vitest run tests/unit",

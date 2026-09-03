@@ -5,7 +5,7 @@
 // deterministic without modifying catalog data.
 //
 // Requires the development server on :5000 (or AUDIT_BASE_URL/BASE_URL).
-// Evidence is written only to /tmp/validation/guest-recommendations.
+// Pass --populated-only for a production-safe post-release check.
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,7 +14,9 @@ import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
 const BASE = process.env.AUDIT_BASE_URL || process.env.BASE_URL || "http://localhost:5000";
-const OUT = "/tmp/validation/guest-recommendations";
+const OUT =
+  process.env.GUEST_RECOMMENDATIONS_EVIDENCE_DIR || "/tmp/validation/guest-recommendations";
+const POPULATED_ONLY = process.argv.includes("--populated-only");
 const RECOMMENDATIONS_PATH = "/api/recommendations";
 const VIEWPORTS = [
   { name: "mobile", width: 375, height: 812 },
@@ -24,6 +26,9 @@ const VIEWPORTS = [
 fs.mkdirSync(OUT, { recursive: true });
 
 function chromePath() {
+  if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE) {
+    return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
+  }
   const cache = path.join(ROOT, ".cache/ms-playwright");
   const dir = fs
     .readdirSync(cache)
@@ -80,8 +85,17 @@ async function assertHidden(locator, label) {
 async function populatedScenario(browser, viewport, pathName, surface) {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
+  const evidence = {
+    route: pathName,
+    viewport: viewport.name,
+    width: viewport.width,
+    height: viewport.height,
+    apiItemCount: null,
+    renderedCardCount: 0,
+  };
   try {
     const body = await waitForRecommendationResponse(page, pathName);
+    evidence.apiItemCount = body.length;
     if (body.length === 0) {
       throw new Error("Expected populated recommendation response, got []");
     }
@@ -99,6 +113,7 @@ async function populatedScenario(browser, viewport, pathName, surface) {
       });
       const cards = page.locator('[data-testid^="recommendation-explanation-"]');
       const cardCount = await cards.count();
+      evidence.renderedCardCount = cardCount;
       if (cardCount === 0) throw new Error("Advanced panel rendered no recommendation cards");
       await assertHidden(
         page.locator('[data-testid="no-recommendations"]'),
@@ -106,12 +121,13 @@ async function populatedScenario(browser, viewport, pathName, surface) {
       );
       await assertHidden(page.locator('[data-testid="loading-state"]'), "Advanced loading state");
       await assertHidden(page.locator('[data-testid="error-state"]'), "Advanced error state");
-      return `API returned ${body.length}; rendered ${cardCount} recommendation cards`;
+      return evidence;
     }
 
     const cards = page.locator('[data-testid^="card-resource-"]');
     await cards.first().waitFor({ state: "visible", timeout: 60_000 });
     const cardCount = await cards.count();
+    evidence.renderedCardCount = cardCount;
     if (cardCount === 0) throw new Error("Standalone page rendered no recommendation cards");
     await assertHidden(
       page.getByText("No recommendations available yet.", { exact: false }),
@@ -121,7 +137,10 @@ async function populatedScenario(browser, viewport, pathName, surface) {
       page.locator('[data-testid="button-retry-recommendations"]'),
       "Standalone retry/error control",
     );
-    return `API returned ${body.length}; rendered ${cardCount} resource cards`;
+    return evidence;
+  } catch (error) {
+    error.evidence = evidence;
+    throw error;
   } finally {
     await page
       .screenshot({
@@ -191,9 +210,12 @@ async function emptyScenario(browser, pathName, surface) {
 }
 
 const results = [];
-const log = (name, passed, detail) => {
-  results.push({ name, passed, detail });
-  console.log(`${passed ? "PASS" : "FAIL"} ${name} :: ${detail}`);
+const log = (name, passed, detail, evidence = null) => {
+  results.push({ name, passed, detail, ...(evidence || {}) });
+  const counts = evidence
+    ? `route=${evidence.route} viewport=${evidence.viewport} apiItems=${evidence.apiItemCount ?? "unknown"} renderedCards=${evidence.renderedCardCount}`
+    : detail;
+  console.log(`${passed ? "PASS" : "FAIL"} ${name} :: ${counts}`);
 };
 
 await waitForServer();
@@ -215,31 +237,52 @@ try {
     ]) {
       const name = `${scenario.surface}-${viewport.name}-populated`;
       try {
+        const evidence = await populatedScenario(
+          browser,
+          viewport,
+          scenario.pathName,
+          scenario.surface,
+        );
+        log(name, true, "Populated guest recommendations rendered", evidence);
+      } catch (error) {
         log(
           name,
-          true,
-          await populatedScenario(browser, viewport, scenario.pathName, scenario.surface),
+          false,
+          error instanceof Error ? error.message : String(error),
+          error?.evidence || {
+            route: scenario.pathName,
+            viewport: viewport.name,
+            width: viewport.width,
+            height: viewport.height,
+            apiItemCount: null,
+            renderedCardCount: 0,
+          },
         );
+      }
+    }
+  }
+
+  if (!POPULATED_ONLY) {
+    for (const scenario of [
+      { surface: "advanced", pathName: "/advanced?tab=recommendations" },
+      { surface: "standalone", pathName: "/recommendations" },
+    ]) {
+      const name = `${scenario.surface}-mobile-empty`;
+      try {
+        log(name, true, await emptyScenario(browser, scenario.pathName, scenario.surface));
       } catch (error) {
         log(name, false, error instanceof Error ? error.message : String(error));
       }
     }
   }
-
-  for (const scenario of [
-    { surface: "advanced", pathName: "/advanced?tab=recommendations" },
-    { surface: "standalone", pathName: "/recommendations" },
-  ]) {
-    const name = `${scenario.surface}-mobile-empty`;
-    try {
-      log(name, true, await emptyScenario(browser, scenario.pathName, scenario.surface));
-    } catch (error) {
-      log(name, false, error instanceof Error ? error.message : String(error));
-    }
-  }
 } finally {
   await browser.close();
 }
+
+fs.writeFileSync(
+  path.join(OUT, "report.json"),
+  `${JSON.stringify({ baseUrl: BASE, populatedOnly: POPULATED_ONLY, results }, null, 2)}\n`,
+);
 
 const failed = results.filter((result) => !result.passed);
 if (failed.length > 0) {
