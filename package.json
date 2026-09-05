@@ -29,6 +29,7 @@
     "generate:design-system-artifact": "node scripts/generate-design-system-artifact.mjs",
     "validate:design-system-artifact": "node scripts/generate-design-system-artifact.mjs --check",
     "validate:product-profiles": "node scripts/validation/product-profile-drift.mjs",
+    "validate:product-profile-browser": "node scripts/validation/product-profile-drift.mjs --browser",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",

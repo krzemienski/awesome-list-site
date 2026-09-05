@@ -159,6 +159,10 @@ args = "guest-recommendations"
 task = "workflow.run"
 args = "theme-registry-types"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "product-profile-browser"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -536,6 +540,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run validate:theme-registry-types"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "product-profile-browser"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:product-profile-browser"
 
 [workflows.workflow.metadata]
 isValidation = true

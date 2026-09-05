@@ -1,5 +1,13 @@
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const BASE = process.env.AUDIT_BASE_URL || "http://localhost:5000";
+const APP_ORIGIN = new URL(BASE).origin;
+const AUDIT_KEY = process.env.ADMIN_PASSWORD;
 
 const read = (path) => fs.readFileSync(path, "utf8");
 const failures = [];
@@ -164,4 +172,277 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Product profile drift: PASS (${profiles.length} approved profiles)`);
+if (!process.argv.includes("--browser")) {
+  console.log(`Product profile drift: PASS (${profiles.length} approved profiles)`);
+  process.exit(0);
+}
+
+function chromePath() {
+  const cache = path.join(ROOT, ".cache/ms-playwright");
+  const dir = fs.readdirSync(cache).filter((entry) => /^chromium-\d+$/.test(entry)).sort().pop();
+  if (!dir) {
+    throw new Error("No chromium-* dir in .cache/ms-playwright — run npx playwright install chromium");
+  }
+  return path.join(cache, dir, "chrome-linux64/chrome");
+}
+
+async function waitForServer() {
+  const deadline = Date.now() + 120_000;
+  let lastError = "no response";
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`${BASE}/`, { method: "HEAD" });
+      if (response.ok) return;
+      lastError = `status ${response.status}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+  }
+  throw new Error(`App not reachable at ${BASE} after 120s (${lastError})`);
+}
+
+const routeFamilies = [
+  {
+    route: "/",
+    profile: "public-discovery",
+    defaultSystem: "editorial",
+    defaultAccent: "crimson",
+    density: {
+      "--profile-content-gap": "1.5rem",
+      "--profile-control-height": "2.75rem",
+      "--profile-panel-padding": "1.5rem",
+      "--profile-page-measure": "80rem",
+      "--profile-chrome-opacity": "0.88",
+    },
+  },
+  {
+    route: "/settings/theme",
+    profile: "learning-workspace",
+    defaultSystem: "geist",
+    defaultAccent: "cyan",
+    density: {
+      "--profile-content-gap": "1.25rem",
+      "--profile-control-height": "2.75rem",
+      "--profile-panel-padding": "1.25rem",
+      "--profile-page-measure": "72rem",
+      "--profile-chrome-opacity": "0.92",
+    },
+  },
+  {
+    route: "/admin",
+    profile: "admin-operations",
+    defaultSystem: "swiss",
+    defaultAccent: "orange",
+    density: {
+      "--profile-content-gap": "0.75rem",
+      "--profile-control-height": "2.5rem",
+      "--profile-panel-padding": "1rem",
+      "--profile-page-measure": "80rem",
+      "--profile-chrome-opacity": "0.96",
+    },
+  },
+];
+
+async function inspectRoute(browser, family, saved) {
+  const context = await browser.newContext();
+  if (family.profile === "admin-operations") {
+    await context.route("**/*", (route) => {
+      let sameOrigin = false;
+      try {
+        sameOrigin = new URL(route.request().url()).origin === APP_ORIGIN;
+      } catch {
+        // Opaque schemes (data:, about:) never receive the audit credential.
+      }
+      if (sameOrigin) {
+        route.continue({
+          headers: { ...route.request().headers(), "x-admin-audit-key": AUDIT_KEY },
+        });
+      } else {
+        route.continue();
+      }
+    });
+
+    let probeHeaders = null;
+    await context.route("https://audit-key-leak-probe.invalid/**", (route) => {
+      probeHeaders = route.request().headers();
+      route.fulfill({ status: 200, contentType: "text/plain", body: "probe" });
+    });
+    const probePage = await context.newPage();
+    await probePage.goto("https://audit-key-leak-probe.invalid/profile-theme").catch(() => {});
+    await probePage.close();
+    await context.unroute("https://audit-key-leak-probe.invalid/**");
+    if (!probeHeaders) {
+      await context.close();
+      throw new Error("Cross-origin audit-key leak probe never ran");
+    }
+    if (Object.keys(probeHeaders).some((header) => header.toLowerCase() === "x-admin-audit-key")) {
+      await context.close();
+      throw new Error("Admin audit key leaked to a cross-origin request");
+    }
+    console.log(`Audit key scope: PASS (${family.route} ${saved.system ?? "clean"}/${saved.accent ?? "clean"})`);
+  }
+  await context.addInitScript(({ system, accent }) => {
+    if (system === null) localStorage.removeItem("ds-system");
+    else localStorage.setItem("ds-system", system);
+    if (accent === null) localStorage.removeItem("ds-accent");
+    else localStorage.setItem("ds-accent", accent);
+
+    window.__profileAttributeWrites = {
+      "data-product-profile": [],
+      "data-system": [],
+      "data-accent": [],
+    };
+    const original = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (name, value) {
+      if (
+        this === document.documentElement &&
+        Object.prototype.hasOwnProperty.call(window.__profileAttributeWrites, name)
+      ) {
+        window.__profileAttributeWrites[name].push(String(value));
+      }
+      return original.call(this, name, value);
+    };
+  }, saved);
+
+  const page = await context.newPage();
+  try {
+    const response = await page.goto(`${BASE}${family.route}`, {
+      waitUntil: "domcontentloaded",
+      timeout: 45_000,
+    });
+    if (!response?.ok()) {
+      throw new Error(`${family.route} returned ${response?.status() ?? "no status"}`);
+    }
+    await page.waitForFunction(
+      () => Object.values(window.__profileAttributeWrites || {})
+        .every((writes) => writes.length >= 2),
+      undefined,
+      { timeout: 30_000 },
+    );
+    const readState = async () => page.evaluate((densityRoles) => {
+        const root = document.documentElement;
+        const styles = getComputedStyle(root);
+        return {
+          first: Object.fromEntries(
+            Object.entries(window.__profileAttributeWrites)
+              .map(([attribute, writes]) => [attribute, writes[0]]),
+          ),
+          final: {
+            "data-product-profile": root.getAttribute("data-product-profile"),
+            "data-system": root.getAttribute("data-system"),
+            "data-accent": root.getAttribute("data-accent"),
+          },
+          density: Object.fromEntries(densityRoles.map((role) => [role, styles.getPropertyValue(role).trim()])),
+          saved: {
+            system: localStorage.getItem("ds-system"),
+            accent: localStorage.getItem("ds-accent"),
+          },
+        };
+      }, Object.keys(family.density));
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        return await readState();
+      } catch (error) {
+        if (!String(error).includes("Execution context was destroyed") || attempt === 2) throw error;
+        await page.waitForLoadState("domcontentloaded", { timeout: 30_000 });
+      }
+    }
+  } finally {
+    await context.close();
+  }
+}
+
+await waitForServer();
+if (!AUDIT_KEY || AUDIT_KEY.length < 8) {
+  throw new Error("ADMIN_PASSWORD (>=8 chars) is required to inspect the protected admin document");
+}
+const { chromium } = await import(path.join(ROOT, "node_modules/playwright/index.mjs"));
+const browser = await launchBrowserWithLease(
+  chromium,
+  {
+    headless: true,
+    executablePath: chromePath(),
+    args: ["--no-sandbox", "--disable-dev-shm-usage"],
+  },
+  "product-profile-browser",
+);
+
+try {
+  for (const family of routeFamilies) {
+    const scenarios = [
+      {
+        name: "clean",
+        saved: { system: null, accent: null },
+        expectedSystem: family.defaultSystem,
+        expectedAccent: family.defaultAccent,
+      },
+      {
+        name: "saved-valid",
+        saved: { system: "terminal", accent: "violet" },
+        expectedSystem: "terminal",
+        expectedAccent: "violet",
+      },
+      {
+        name: "saved-invalid",
+        saved: { system: "retired-system", accent: "retired-accent" },
+        expectedSystem: family.defaultSystem,
+        expectedAccent: family.defaultAccent,
+      },
+      {
+        name: "saved-invalid-system",
+        saved: { system: "retired-system", accent: "violet" },
+        expectedSystem: family.defaultSystem,
+        expectedAccent: "violet",
+      },
+      {
+        name: "saved-invalid-accent",
+        saved: { system: "terminal", accent: "retired-accent" },
+        expectedSystem: "terminal",
+        expectedAccent: family.defaultAccent,
+      },
+    ];
+
+    for (const scenario of scenarios) {
+      const result = await inspectRoute(browser, family, scenario.saved);
+      const expected = {
+        "data-product-profile": family.profile,
+        "data-system": scenario.expectedSystem,
+        "data-accent": scenario.expectedAccent,
+      };
+      for (const [attribute, value] of Object.entries(expected)) {
+        expect(
+          result.first[attribute] === value,
+          `${family.route} ${scenario.name} pre-paint ${attribute}: expected ${value}, got ${result.first[attribute]}`,
+        );
+        expect(
+          result.final[attribute] === value,
+          `${family.route} ${scenario.name} runtime ${attribute}: expected ${value}, got ${result.final[attribute]}`,
+        );
+      }
+      for (const [role, value] of Object.entries(family.density)) {
+        expect(
+          result.density[role] === value,
+          `${family.route} ${scenario.name} ${role}: expected ${value}, got ${result.density[role]}`,
+        );
+      }
+      expect(
+        result.saved.system === scenario.expectedSystem && result.saved.accent === scenario.expectedAccent,
+        `${family.route} ${scenario.name} did not persist the resolved theme consistently`,
+      );
+    }
+  }
+} finally {
+  await browser.close();
+}
+
+if (failures.length) {
+  console.error(`Product profile browser drift (${failures.length}):`);
+  failures.forEach((failure) => console.error(`- ${failure}`));
+  process.exit(1);
+}
+
+console.log(
+  `Product profile drift: PASS (${profiles.length} approved profiles; ${routeFamilies.length * 5} browser scenarios)`,
+);
