@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { spawnSync } from "node:child_process";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 const failures = [];
@@ -20,7 +21,6 @@ const exportTools = read("client/src/components/ui/export-tools.tsx");
 const awesomeEntry = read("awesome-list-site-ds/index.html");
 const awesomeCss = read("awesome-list-site-ds/styles.css");
 const awesomeRuntime = read("awesome-list-site-ds/design-systems.jsx");
-const standaloneBundle = read("awesome-list-site-ds/index.standalone.html");
 const mockupEntry = read("artifacts/mockup-sandbox/index.html");
 const mockupCss = read("artifacts/mockup-sandbox/src/index.css");
 const mockupApp = read("artifacts/mockup-sandbox/src/App.tsx");
@@ -147,12 +147,15 @@ expect(
   exportTools.includes('data-product-profile="standalone-exports"'),
   "Generated HTML downloads do not declare standalone-exports",
 );
+const standaloneGeneration = spawnSync(
+  process.execPath,
+  ["scripts/generate-standalone-product-profile.mjs", "--check"],
+  { encoding: "utf8" },
+);
 expect(
-  standaloneBundle.includes('data-product-profile="standalone-exports"') &&
-    profileTokens.every((token) => standaloneBundle.includes(token)) &&
-    standaloneBundle.includes("profileContract.textContent") &&
-    standaloneBundle.includes("@media(prefers-reduced-motion:reduce)"),
-  "Self-contained design-system bundle does not carry the compiled profile/accessibility adapter",
+  standaloneGeneration.status === 0,
+  standaloneGeneration.stderr.trim() ||
+    "Self-contained design-system bundle is stale",
 );
 
 if (failures.length) {

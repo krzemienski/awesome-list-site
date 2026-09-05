@@ -25,6 +25,7 @@
     "validate:guest-recommendations:release": "node scripts/validation/guest-recommendations.mjs --populated-only",
     "validate:standalone-palette-drift": "node scripts/validation/standalone-palette-drift.mjs",
     "validate:theme-registry-types": "node scripts/validation/theme-registry-type-safety.mjs",
+    "generate:standalone-product-profile": "node scripts/generate-standalone-product-profile.mjs",
     "validate:product-profiles": "node scripts/validation/product-profile-drift.mjs",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",

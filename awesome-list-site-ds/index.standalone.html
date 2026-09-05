@@ -1,8 +1,123 @@
 <!DOCTYPE html>
-<html data-product-profile="standalone-exports" data-system="editorial" data-accent="crimson" style="--profile-content-gap:1.5rem;--profile-control-height:2.75rem;--profile-panel-padding:1.5rem;--profile-page-measure:50rem;--profile-chrome-opacity:1">
+<html data-product-profile="standalone-exports" data-system="editorial" data-accent="crimson">
 <head>
   <meta charset="utf-8">
   <title>Awesome Video — Editorial</title>
+  <style id="generated-product-profile">
+    /* GENERATED PRODUCT PROFILE: START */
+    /* Generated from shared/styles/product-profiles.css and profile-token consumers in awesome-list-site-ds/styles.css. */
+    /*
+     * Awesome.Video product-profile contract.
+     *
+     * Products keep their own composition and visual personality, but consume
+     * these semantic density roles instead of declaring parallel profile values.
+     */
+    :root {
+      --profile-content-gap: 1.5rem;
+      --profile-control-height: 2.75rem;
+      --profile-panel-padding: 1.5rem;
+      --profile-page-measure: 80rem;
+      --profile-chrome-opacity: 0.88;
+    }
+
+    [data-product-profile="public-discovery"] {
+      --profile-content-gap: 1.5rem;
+      --profile-control-height: 2.75rem;
+      --profile-panel-padding: 1.5rem;
+      --profile-page-measure: 80rem;
+      --profile-chrome-opacity: 0.88;
+    }
+
+    [data-product-profile="learning-workspace"] {
+      --profile-content-gap: 1.25rem;
+      --profile-control-height: 2.75rem;
+      --profile-panel-padding: 1.25rem;
+      --profile-page-measure: 72rem;
+      --profile-chrome-opacity: 0.92;
+    }
+
+    [data-product-profile="admin-operations"] {
+      --profile-content-gap: 0.75rem;
+      --profile-control-height: 2.5rem;
+      --profile-panel-padding: 1rem;
+      --profile-page-measure: 80rem;
+      --profile-chrome-opacity: 0.96;
+    }
+
+    [data-product-profile="standalone-exports"] {
+      --profile-content-gap: 1.5rem;
+      --profile-control-height: 2.75rem;
+      --profile-panel-padding: 1.5rem;
+      --profile-page-measure: 50rem;
+      --profile-chrome-opacity: 1;
+    }
+
+    [data-product-profile="embedded-integrations"] {
+      --profile-content-gap: 0.75rem;
+      --profile-control-height: 2.5rem;
+      --profile-panel-padding: 0.75rem;
+      --profile-page-measure: 100%;
+      --profile-chrome-opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    .search-input {
+    width: 100%;
+      min-height: var(--profile-control-height);
+      background: var(--surface);
+      border: var(--border-w) solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px 9px 36px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color 160ms ease, background 160ms ease;
+    }
+
+    /* ============== BUTTONS ============== */
+    .btn {
+    display: inline-flex;
+      min-height: var(--profile-control-height);
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      border: var(--border-w) solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 160ms ease;
+      white-space: nowrap;
+    }
+
+    .btn.icon {
+    width: var(--profile-control-height);
+      min-width: var(--profile-control-height);
+      height: var(--profile-control-height);
+      padding: 0;
+    }
+
+    /* ============== SHOWCASE-PAGE-ONLY (design-system.html) ============== */
+    .ds-shell {
+    max-width: var(--profile-page-measure);
+      margin: 0 auto;
+      padding: 56px 40px 120px;
+    }
+    /* GENERATED PRODUCT PROFILE: END */
+  </style>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #faf9f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -33,7 +148,7 @@
   <div id="__bundler_loading">Unpacking...</div>
 
   <script>
-    
+
 document.addEventListener('DOMContentLoaded', async function() {
   const loading = document.getElementById('__bundler_loading');
   function setStatus(msg) { if (loading) loading.textContent = msg; }
@@ -136,25 +251,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     // DOMParser/replaceWith are inert per spec — re-create each with
     // createElement so they execute, awaiting onload for src scripts to
     // preserve ordering (React before ReactDOM before Babel before text/babel).
-    const profileRoot = getComputedStyle(document.documentElement);
-    const profileTokens = [
-      '--profile-content-gap',
-      '--profile-control-height',
-      '--profile-panel-padding',
-      '--profile-page-measure',
-      '--profile-chrome-opacity',
-    ];
     const doc = new DOMParser().parseFromString(template, 'text/html');
-    doc.documentElement.setAttribute('data-product-profile', 'standalone-exports');
-    for (const token of profileTokens) {
-      doc.documentElement.style.setProperty(token, profileRoot.getPropertyValue(token));
-    }
+    doc.documentElement.setAttribute('data-product-profile', "standalone-exports");
     const profileContract = doc.createElement('style');
-    profileContract.textContent =
-      '.btn,.search-input{min-height:var(--profile-control-height)}' +
-      '.btn.icon{width:var(--profile-control-height);min-width:var(--profile-control-height);height:var(--profile-control-height)}' +
-      '.ds-shell{max-width:var(--profile-page-measure)}' +
-      '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}';
+    profileContract.id = 'generated-product-profile';
+    profileContract.textContent = "/* GENERATED PRODUCT PROFILE: START */\n/* Generated from shared/styles/product-profiles.css and profile-token consumers in awesome-list-site-ds/styles.css. */\n/*\n * Awesome.Video product-profile contract.\n *\n * Products keep their own composition and visual personality, but consume\n * these semantic density roles instead of declaring parallel profile values.\n */\n:root {\n  --profile-content-gap: 1.5rem;\n  --profile-control-height: 2.75rem;\n  --profile-panel-padding: 1.5rem;\n  --profile-page-measure: 80rem;\n  --profile-chrome-opacity: 0.88;\n}\n\n[data-product-profile=\"public-discovery\"] {\n  --profile-content-gap: 1.5rem;\n  --profile-control-height: 2.75rem;\n  --profile-panel-padding: 1.5rem;\n  --profile-page-measure: 80rem;\n  --profile-chrome-opacity: 0.88;\n}\n\n[data-product-profile=\"learning-workspace\"] {\n  --profile-content-gap: 1.25rem;\n  --profile-control-height: 2.75rem;\n  --profile-panel-padding: 1.25rem;\n  --profile-page-measure: 72rem;\n  --profile-chrome-opacity: 0.92;\n}\n\n[data-product-profile=\"admin-operations\"] {\n  --profile-content-gap: 0.75rem;\n  --profile-control-height: 2.5rem;\n  --profile-panel-padding: 1rem;\n  --profile-page-measure: 80rem;\n  --profile-chrome-opacity: 0.96;\n}\n\n[data-product-profile=\"standalone-exports\"] {\n  --profile-content-gap: 1.5rem;\n  --profile-control-height: 2.75rem;\n  --profile-panel-padding: 1.5rem;\n  --profile-page-measure: 50rem;\n  --profile-chrome-opacity: 1;\n}\n\n[data-product-profile=\"embedded-integrations\"] {\n  --profile-content-gap: 0.75rem;\n  --profile-control-height: 2.5rem;\n  --profile-panel-padding: 0.75rem;\n  --profile-page-measure: 100%;\n  --profile-chrome-opacity: 1;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  *,\n  *::before,\n  *::after {\n    animation-duration: 0.01ms !important;\n    animation-iteration-count: 1 !important;\n    transition-duration: 0.01ms !important;\n    scroll-behavior: auto !important;\n  }\n}\n.search-input {\nwidth: 100%;\n  min-height: var(--profile-control-height);\n  background: var(--surface);\n  border: var(--border-w) solid var(--border);\n  border-radius: var(--radius-sm);\n  padding: 9px 14px 9px 36px;\n  color: var(--text);\n  font-family: inherit;\n  font-size: 13px;\n  transition: border-color 160ms ease, background 160ms ease;\n}\n\n/* ============== BUTTONS ============== */\n.btn {\ndisplay: inline-flex;\n  min-height: var(--profile-control-height);\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  padding: 9px 16px;\n  border-radius: var(--radius-sm);\n  border: var(--border-w) solid var(--border-strong);\n  background: var(--surface);\n  color: var(--text);\n  font-family: inherit;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: all 160ms ease;\n  white-space: nowrap;\n}\n\n.btn.icon {\nwidth: var(--profile-control-height);\n  min-width: var(--profile-control-height);\n  height: var(--profile-control-height);\n  padding: 0;\n}\n\n/* ============== SHOWCASE-PAGE-ONLY (design-system.html) ============== */\n.ds-shell {\nmax-width: var(--profile-page-measure);\n  margin: 0 auto;\n  padding: 56px 40px 120px;\n}\n/* GENERATED PRODUCT PROFILE: END */";
     doc.head.appendChild(profileContract);
     document.documentElement.replaceWith(doc.documentElement);
     const dead = Array.from(document.scripts);
