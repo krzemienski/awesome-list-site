@@ -5,7 +5,9 @@ import {
   SYSTEM_DEFAULT_ACCENT,
   DEFAULT_SYSTEM,
   DEFAULT_ACCENT,
+  PRODUCT_PROFILES,
   applyDesignSystem,
+  resolveProductProfile,
   isSystemId,
   type DesignSystemId,
   type AccentId,
@@ -50,12 +52,16 @@ function isAccentId(id: string): id is AccentId {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const initialProfile =
+    PRODUCT_PROFILES[
+      resolveProductProfile(typeof window === "undefined" ? "/" : window.location.pathname)
+    ];
   const [systemId, setSystemId] = useState<DesignSystemId>(() =>
-    readInitial("ds-system", DEFAULT_SYSTEM, isSystemId)
+    readInitial("ds-system", initialProfile.defaultSystem ?? DEFAULT_SYSTEM, isSystemId)
   );
 
   const [accentId, setAccentId] = useState<AccentId>(() =>
-    readInitial("ds-accent", DEFAULT_ACCENT, isAccentId)
+    readInitial("ds-accent", initialProfile.defaultAccent ?? DEFAULT_ACCENT, isAccentId)
   );
 
   useEffect(() => {

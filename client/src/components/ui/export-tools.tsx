@@ -276,7 +276,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
        the site-default system+accent as hex literals is intentional. A
        @media print block flips to a light ink-saving palette. */
     let content = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-product-profile="standalone-exports" data-system="editorial" data-accent="crimson">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -286,6 +286,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
          no runtime switching. -->
     <style>
         :root {
+            color-scheme: dark;
             --bg: #000000; /* DS-OK: standalone export DS background */
             --text: #f4f3ee; /* DS-OK: standalone export DS text */
             --text-2: rgba(244, 243, 238, 0.66);

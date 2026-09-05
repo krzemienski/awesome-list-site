@@ -7,6 +7,7 @@ import AppHeader from "./AppHeader";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { openCookieSettings } from "@/components/ui/consent-banner";
+import type { ProductProfileId } from "@/lib/design-system";
 
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
 function BackToTop() {
@@ -48,6 +49,7 @@ interface User {
 }
 
 interface MainLayoutProps {
+  productProfile: ProductProfileId;
   // Run22 BUG-008: chrome (sidebar/header) renders from the lightweight nav
   // tree, not the 2.7MB corpus — non-listing pages never download the corpus.
   nav?: AwesomeListNav;
@@ -68,7 +70,7 @@ interface MainLayoutProps {
   }) => React.ReactNode;
 }
 
-export default function MainLayout({ nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, renderSearchDialog }: MainLayoutProps) {
+export default function MainLayout({ productProfile, nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, renderSearchDialog }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Keep the lightweight global trigger in the eager shell. The palette code
@@ -145,7 +147,7 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
           contract (page-level structural class required by Editorial DS). */}
       <div className="grain" aria-hidden="true" />
 
-      <div className="page contents">
+      <div className="page contents" data-product-profile={productProfile}>
         <AppHeader
           onSearchOpen={() => setSearchOpen(true)}
           user={user}
@@ -169,6 +171,7 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
         */}
         <main
           id="main"
+          data-product-profile={productProfile}
           // BUG-043 (run13): tabIndex={-1} makes the skip-link target
           // programmatically focusable, so "Skip to content" actually moves
           // keyboard focus instead of only scrolling.
@@ -178,7 +181,7 @@ export default function MainLayout({ nav, isLoading, navError, onRetryNav, child
           // disables `position: sticky` for every descendant. `overflow-x-clip`
           // clips the same content without creating a scroll container (a `clip`
           // axis leaves the other axis `visible`), so sticky works inside routes.
-          className="flex-1 min-w-0 overflow-x-clip mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-8 focus:outline-none"
+          className="flex-1 min-w-0 overflow-x-clip mx-auto w-full max-w-[var(--profile-page-measure)] px-4 sm:px-6 md:px-12 py-8 focus:outline-none"
         >
           {children}
         </main>

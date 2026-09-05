@@ -54,10 +54,12 @@ function afterFirstPaint(callback: () => void): void {
   fallback();
 }
 
-let selectedSystemAtBoot: string | null = null;
+// The inline pre-paint boot has already resolved saved-theme precedence and
+// product-profile defaults. Read its painted result so first-time learning and
+// admin visits load Geist/Swiss fonts rather than the global Editorial fallback.
+const selectedSystemAtBoot = document.documentElement.getAttribute("data-system");
 let fontOverrideAtBoot: string | null = null;
 try {
-  selectedSystemAtBoot = localStorage.getItem("ds-system");
   fontOverrideAtBoot = localStorage.getItem("ds-font-override");
 } catch {
   // Storage can be unavailable in hardened/private browsing contexts.
@@ -70,11 +72,9 @@ afterFirstPaint(() => {
   initMixpanel();
   initPosthog();
   initAmplitude();
-  // #411: resolve the saved system the same way the pre-paint boot script and
-  // ThemeProvider do. A first visit (no ds-system yet), a saved id the app no
-  // longer offers, and junk in localStorage all PAINT as DEFAULT_SYSTEM, so
-  // passing the raw value through skipped that system's webfonts entirely —
-  // its display and mono faces were named by the CSS and never downloaded.
+  // #411: validate the pre-paint result before selecting a stylesheet. The
+  // profile-aware boot script owns saved/default resolution; this loader owns
+  // fetching the faces for exactly the system the document already paints.
   loadDesignSystemFont(resolveSystemId(selectedSystemAtBoot));
   if (fontOverrideAtBoot) loadFontOverride(fontOverrideAtBoot);
 });

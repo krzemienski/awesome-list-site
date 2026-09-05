@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
@@ -9,6 +9,10 @@ import { useAuth } from "./hooks/useAuth";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { useClerkAppearance } from "./lib/clerk-appearance";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import {
+  applyProductProfile,
+  resolveProductProfile,
+} from "@/lib/design-system";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
@@ -506,6 +510,10 @@ function Router() {
     logoutError,
   } = useAuth();
   const [location] = useLocation();
+  const productProfile = resolveProductProfile(location);
+  useLayoutEffect(() => {
+    applyProductProfile(productProfile);
+  }, [productProfile]);
   const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((re) => re.test(location));
   const renderSearchDialog = ({
     isOpen,
@@ -584,14 +592,14 @@ function Router() {
   // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
+      <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
         <NotFound />
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
+    <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
       {/* NB-028 (run18): when the auth check itself fails (429/500/network),
           the app keeps working logged-out — surface it once with a manual
           retry instead of silently looping refetches behind a skeleton. */}

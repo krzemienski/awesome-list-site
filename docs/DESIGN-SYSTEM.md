@@ -9,9 +9,10 @@ the code ever disagree, **the code wins** — fix the doc.
 
 | Source of truth | What it owns |
 |---|---|
-| `client/src/styles/design-system.css` | All tokens (`:root` + per-system/per-accent overrides), DS component classes, per-system skins, shadcn bridge skins |
+| `shared/styles/product-profiles.css` | Cross-product profile density roles and reduced-motion contract |
+| `client/src/styles/design-system.css` | Personality/accent tokens, DS component classes, per-system skins, shadcn bridge skins |
 | `client/src/index.css` | Tailwind v4 `@theme inline` shadcn↔DS token bridge |
-| `client/src/lib/design-system.ts` | System/accent metadata, `applyDesignSystem()`, defaults |
+| `client/src/lib/design-system.ts` | System/accent metadata, product profiles, runtime appliers, defaults |
 | `client/index.html` | FOUC-free pre-paint boot script (`ds-system` / `ds-accent` / `ds-font-override`) |
 | `client/src/lib/font-options.ts` | Font override list + on-demand font loading |
 | `client/src/lib/charts/palette.ts` | The single chart color palette (`CHART_PALETTE`) |
@@ -44,6 +45,13 @@ The switch is **CSS-attribute-driven** — zero JS is needed to swap personaliti
   brutalist→amber, swiss→orange. If the user is on a system's natural default and
   switches systems, the accent nudges to the new system's natural default; an explicit
   accent choice carries across.
+- **Product profiles:** every route resolves to public discovery, learning
+  workspace, or admin operations; standalone exports and embedded integrations
+  declare their profile at their own entry boundary. Public, learning, admin,
+  and standalone profiles supply first-visit system/accent defaults plus shared
+  density/composition roles. Embedded integrations are host-neutral and inherit
+  their accent. A saved visitor choice always wins, so every personality remains
+  available on every selectable surface.
 - **Font override (I1):** a sixth control at `/settings/theme` can override
   `--font-body` at runtime (localStorage key `ds-font-override`); "System default"
   falls back to the active system's bundled face. Only Inter is loaded pre-paint;

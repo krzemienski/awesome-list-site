@@ -2,6 +2,7 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import {
+  PRODUCT_PROFILE_BOOT_DATA,
   THEME_BOOT_DATA,
   THEME_FALLBACK_REGISTRY,
 } from "./client/src/lib/design-system";
@@ -72,6 +73,21 @@ function themeBootRegistry(): Plugin {
   };
 }
 
+function productProfileBootRegistry(): Plugin {
+  const marker = "__AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__";
+  const bootData = JSON.stringify(PRODUCT_PROFILE_BOOT_DATA);
+
+  return {
+    name: "product-profile-boot-registry",
+    transformIndexHtml(html) {
+      if (!html.includes(marker)) {
+        throw new Error(`product-profile-boot-registry marker ${marker} is missing from client/index.html`);
+      }
+      return html.replaceAll(marker, bootData);
+    },
+  };
+}
+
 function fontBootRegistry(): Plugin {
   const marker = "__AWESOME_VIDEO_FONT_BOOT__";
   const registryFontData = {
@@ -98,6 +114,7 @@ export default defineConfig({
   plugins: [
     react(),
     themeBootRegistry(),
+    productProfileBootRegistry(),
     fontBootRegistry(),
     bundleModuleManifest(),
     ...(process.env.REPL_ID !== undefined

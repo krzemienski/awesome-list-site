@@ -1,13 +1,5 @@
 {
   "palette-classes": {
-    "artifacts/mockup-sandbox/src/App.tsx": {
-      "bg-gray-100": 1,
-      "bg-gray-50": 1,
-      "text-gray-400": 1,
-      "text-gray-500": 1,
-      "text-gray-600": 1,
-      "text-gray-900": 1
-    },
     "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
       "border-blue-500": 1
     },

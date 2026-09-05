@@ -70,6 +70,7 @@ export default defineConfig({
     allowedHosts,
     fs: {
       strict: true,
+      allow: [path.resolve(import.meta.dirname, "../..")],
     },
   },
   preview: {

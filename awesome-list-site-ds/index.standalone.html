@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-product-profile="standalone-exports" data-system="editorial" data-accent="crimson" style="--profile-content-gap:1.5rem;--profile-control-height:2.75rem;--profile-panel-padding:1.5rem;--profile-page-measure:50rem;--profile-chrome-opacity:1">
 <head>
   <meta charset="utf-8">
   <title>Awesome Video — Editorial</title>
@@ -136,7 +136,26 @@ document.addEventListener('DOMContentLoaded', async function() {
     // DOMParser/replaceWith are inert per spec — re-create each with
     // createElement so they execute, awaiting onload for src scripts to
     // preserve ordering (React before ReactDOM before Babel before text/babel).
+    const profileRoot = getComputedStyle(document.documentElement);
+    const profileTokens = [
+      '--profile-content-gap',
+      '--profile-control-height',
+      '--profile-panel-padding',
+      '--profile-page-measure',
+      '--profile-chrome-opacity',
+    ];
     const doc = new DOMParser().parseFromString(template, 'text/html');
+    doc.documentElement.setAttribute('data-product-profile', 'standalone-exports');
+    for (const token of profileTokens) {
+      doc.documentElement.style.setProperty(token, profileRoot.getPropertyValue(token));
+    }
+    const profileContract = doc.createElement('style');
+    profileContract.textContent =
+      '.btn,.search-input{min-height:var(--profile-control-height)}' +
+      '.btn.icon{width:var(--profile-control-height);min-width:var(--profile-control-height);height:var(--profile-control-height)}' +
+      '.ds-shell{max-width:var(--profile-page-measure)}' +
+      '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}';
+    doc.head.appendChild(profileContract);
     document.documentElement.replaceWith(doc.documentElement);
     const dead = Array.from(document.scripts);
     for (const old of dead) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark" data-product-profile="public-discovery">
   <head>
     <meta charset="UTF-8" />
     <meta name="color-scheme" content="dark" />
@@ -103,12 +103,24 @@
           // preserves the current no-flash behavior without a second network
           // request or a hand-maintained list of theme ids.
           var THEME_BOOT = __AWESOME_VIDEO_THEME_BOOT__;
+          var PRODUCT_PROFILE_BOOT = __AWESOME_VIDEO_PRODUCT_PROFILE_BOOT__;
           var sys = null, acc = null;
           try { sys = localStorage.getItem('ds-system'); } catch (_) {}
           try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
-          if (THEME_BOOT.systems.indexOf(sys) === -1) sys = THEME_BOOT.defaultSystem;
-          if (THEME_BOOT.accents.indexOf(acc)  === -1) acc = THEME_BOOT.defaultAccent;
           var root = document.documentElement;
+          var profile = new RegExp(PRODUCT_PROFILE_BOOT.routePatterns.admin).test(location.pathname)
+            ? 'admin-operations'
+            : new RegExp(PRODUCT_PROFILE_BOOT.routePatterns.learning).test(location.pathname)
+              ? 'learning-workspace'
+              : 'public-discovery';
+          var profileDefaults = PRODUCT_PROFILE_BOOT.profiles[profile];
+          if (THEME_BOOT.systems.indexOf(sys) === -1) {
+            sys = profileDefaults ? profileDefaults.defaultSystem : THEME_BOOT.defaultSystem;
+          }
+          if (THEME_BOOT.accents.indexOf(acc)  === -1) {
+            acc = profileDefaults ? profileDefaults.defaultAccent : THEME_BOOT.defaultAccent;
+          }
+          root.setAttribute('data-product-profile', profile);
           root.setAttribute('data-system', sys);
           root.setAttribute('data-accent', acc);
           root.classList.add('dark');

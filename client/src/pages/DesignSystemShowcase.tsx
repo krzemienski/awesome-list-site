@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import SEOHead from "@/components/layout/SEOHead";
+import { PRODUCT_PROFILES } from "@/lib/design-system";
 
 /**
  * Design-system showcase (Task #346) — the living anatomy of the runtime
@@ -285,6 +286,30 @@ export default function DesignSystemShowcase() {
         <p className="text-xs text-[color:var(--text-2)] max-w-3xl">
           Accent discipline: one accent moment per surface — primary action, active nav, eyebrows,
           live indicators, selection. Ink on accent fills is always near-black, in every system and accent.
+        </p>
+      </section>
+
+      {/* ── Token catalog ── */}
+      <section aria-label="Product profiles" className="space-y-4" data-testid="ds-product-profiles">
+        <div className="flex items-center gap-2">
+          <Layers className="h-5 w-5 text-[var(--accent)]" />
+          <h2 className={SECTION_HEADING}>Product profiles</h2>
+          <span className="text-xs text-[color:var(--text-3)]">one contract, surface-specific defaults</span>
+        </div>
+        <div className="grid gap-[var(--profile-content-gap)] sm:grid-cols-2">
+          {Object.entries(PRODUCT_PROFILES).map(([id, profile]) => (
+            <Card key={id} className="p-[var(--profile-panel-padding)] bg-[var(--surface)] border-[color:var(--border)]">
+              <code className="font-mono text-xs text-[var(--accent)]">{id}</code>
+              <h3 className="mt-2 font-semibold">{profile.name}</h3>
+              <p className="mt-1 text-xs text-[color:var(--text-2)]">
+                {profile.defaultSystem ?? "host-neutral"} + {profile.defaultAccent ?? "inherited accent"} default · {profile.density} density
+              </p>
+            </Card>
+          ))}
+        </div>
+        <p className="text-xs text-[color:var(--text-2)] max-w-3xl">
+          Profiles set semantic density and composition defaults. The active system and accent remain
+          visitor-selectable, so Editorial, Terminal, Geist, Brutalist, and Swiss stay available everywhere.
         </p>
       </section>
 

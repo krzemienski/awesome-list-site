@@ -100,14 +100,18 @@ else
   echo "[pre-publish] SKIP print-audit + responsive-audit — no app on :5000 (publish build container; these run as dev workflows instead)"
 fi
 
-# 5. Standalone design-system drift. This is source-only and safe in the
+# 5. Product-profile adoption. This is source-only and safe in the publish
+# container: it opens no network or database connection.
+run_step product-profile-drift npm run validate:product-profiles
+
+# 6. Standalone design-system drift. This is source-only and safe in the
 # publish container: it opens no network or database connection.
 run_step standalone-palette-drift npm run validate:standalone-palette-drift
 
-# 6. Production build
+# 7. Production build
 run_step build npm run build
 
-# 7. The report consumes Vite's logical manifest and module inventory emitted
+# 8. The report consumes Vite's logical manifest and module inventory emitted
 # by the production build above. It must run after (never before) that build.
 run_step bundle-budget npm run bundle:budget
 

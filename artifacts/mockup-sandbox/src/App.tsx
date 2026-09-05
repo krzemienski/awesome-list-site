@@ -98,17 +98,17 @@ function getPreviewExamplePath(): string {
 
 function Gallery() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-      <div className="text-center max-w-md">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-3">
+    <div className="profile-gallery-shell bg-background text-foreground">
+      <div className="profile-gallery-panel text-center">
+        <h1 className="text-2xl font-semibold">
           Component Preview Server
         </h1>
-        <p className="text-gray-500 mb-4">
+        <p className="text-muted-foreground">
           This server renders individual components for the workspace canvas.
         </p>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted-foreground">
           Access component previews at{" "}
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+          <code className="bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
             {getPreviewExamplePath()}
           </code>
         </p>

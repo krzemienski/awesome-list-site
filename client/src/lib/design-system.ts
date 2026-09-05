@@ -113,6 +113,71 @@ export const THEME_FALLBACK_REGISTRY = defineThemeFallbackRegistry({
 export type DesignSystemId = (typeof THEME_FALLBACK_REGISTRY.systems)[number]['id'];
 export type AccentId = (typeof THEME_FALLBACK_REGISTRY.accents)[number]['id'];
 
+export interface ProductProfile {
+  name: string;
+  defaultSystem: DesignSystemId | null;
+  defaultAccent: AccentId | null;
+  density: "comfortable" | "balanced" | "dense" | "document" | "compact";
+}
+
+export const PRODUCT_PROFILES = {
+  "public-discovery": {
+    name: "Public discovery",
+    defaultSystem: "editorial",
+    defaultAccent: "crimson",
+    density: "comfortable",
+  },
+  "learning-workspace": {
+    name: "Learning workspace",
+    defaultSystem: "geist",
+    defaultAccent: "cyan",
+    density: "balanced",
+  },
+  "admin-operations": {
+    name: "Admin operations",
+    defaultSystem: "swiss",
+    defaultAccent: "orange",
+    density: "dense",
+  },
+  "standalone-exports": {
+    name: "Standalone exports",
+    defaultSystem: "editorial",
+    defaultAccent: "crimson",
+    density: "document",
+  },
+  "embedded-integrations": {
+    name: "Embedded integrations",
+    defaultSystem: null,
+    defaultAccent: null,
+    density: "compact",
+  },
+} as const satisfies Record<string, ProductProfile>;
+
+export type ProductProfileId = keyof typeof PRODUCT_PROFILES;
+
+const PRODUCT_PROFILE_ROUTE_PATTERNS = {
+  admin: "^/admin(?:/|$)",
+  learning:
+    "^/(?:journeys|journey(?:/|$)|continue-learning|recommendations|bookmarks|favorites|profile|contributions|notifications|onboarding|settings(?:/|$)|account(?:/|$))",
+} as const;
+
+const ADMIN_PROFILE_PATH = new RegExp(PRODUCT_PROFILE_ROUTE_PATTERNS.admin);
+const LEARNING_PROFILE_PATH = new RegExp(PRODUCT_PROFILE_ROUTE_PATTERNS.learning);
+
+/** Classify every SPA route without changing the visitor's selected personality. */
+export function resolveProductProfile(pathname: string): ProductProfileId {
+  if (ADMIN_PROFILE_PATH.test(pathname)) return "admin-operations";
+  if (LEARNING_PROFILE_PATH.test(pathname)) return "learning-workspace";
+  return "public-discovery";
+}
+
+export function applyProductProfile(profileId: ProductProfileId): ProductProfileId {
+  if (typeof document !== "undefined") {
+    document.documentElement.setAttribute("data-product-profile", profileId);
+  }
+  return profileId;
+}
+
 export const DESIGN_SYSTEMS: Record<DesignSystemId, DesignSystem> = Object.fromEntries(
   THEME_FALLBACK_REGISTRY.systems.map(({ id, name, tag, desc }) => [id, { name, tag, desc }]),
 ) as Record<DesignSystemId, DesignSystem>;
@@ -132,6 +197,11 @@ export const THEME_BOOT_DATA = {
   accents: ACCENTS.map(({ id }) => id),
   defaultSystem: DEFAULT_SYSTEM,
   defaultAccent: DEFAULT_ACCENT,
+} as const;
+
+export const PRODUCT_PROFILE_BOOT_DATA = {
+  profiles: PRODUCT_PROFILES,
+  routePatterns: PRODUCT_PROFILE_ROUTE_PATTERNS,
 } as const;
 
 /**

@@ -1,3 +1,5 @@
+@import "../shared/styles/product-profiles.css";
+
 /* =====================================================================
    AWESOME.VIDEO — STYLES
    Tokens come from design-systems.jsx via `applyDesignSystem()`.
@@ -172,6 +174,7 @@ a { color: inherit; }
 
 .search-input {
   width: 100%;
+  min-height: var(--profile-control-height);
   background: var(--surface);
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);
@@ -190,6 +193,7 @@ a { color: inherit; }
 /* ============== BUTTONS ============== */
 .btn {
   display: inline-flex;
+  min-height: var(--profile-control-height);
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -215,7 +219,12 @@ a { color: inherit; }
 .btn.primary:hover { box-shadow: var(--shadow-accent); }
 .btn.ghost { background: transparent; border-color: var(--border); }
 .btn.ghost:hover { background: var(--surface); }
-.btn.icon { width: 36px; height: 36px; padding: 0; }
+.btn.icon {
+  width: var(--profile-control-height);
+  min-width: var(--profile-control-height);
+  height: var(--profile-control-height);
+  padding: 0;
+}
 .btn.danger {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
@@ -621,7 +630,7 @@ a { color: inherit; }
 
 /* ============== SHOWCASE-PAGE-ONLY (design-system.html) ============== */
 .ds-shell {
-  max-width: 1240px;
+  max-width: var(--profile-page-measure);
   margin: 0 auto;
   padding: 56px 40px 120px;
 }

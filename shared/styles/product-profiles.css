@@ -1,0 +1,64 @@
+/*
+ * Awesome.Video product-profile contract.
+ *
+ * Products keep their own composition and visual personality, but consume
+ * these semantic density roles instead of declaring parallel profile values.
+ */
+:root {
+  --profile-content-gap: 1.5rem;
+  --profile-control-height: 2.75rem;
+  --profile-panel-padding: 1.5rem;
+  --profile-page-measure: 80rem;
+  --profile-chrome-opacity: 0.88;
+}
+
+[data-product-profile="public-discovery"] {
+  --profile-content-gap: 1.5rem;
+  --profile-control-height: 2.75rem;
+  --profile-panel-padding: 1.5rem;
+  --profile-page-measure: 80rem;
+  --profile-chrome-opacity: 0.88;
+}
+
+[data-product-profile="learning-workspace"] {
+  --profile-content-gap: 1.25rem;
+  --profile-control-height: 2.75rem;
+  --profile-panel-padding: 1.25rem;
+  --profile-page-measure: 72rem;
+  --profile-chrome-opacity: 0.92;
+}
+
+[data-product-profile="admin-operations"] {
+  --profile-content-gap: 0.75rem;
+  --profile-control-height: 2.5rem;
+  --profile-panel-padding: 1rem;
+  --profile-page-measure: 80rem;
+  --profile-chrome-opacity: 0.96;
+}
+
+[data-product-profile="standalone-exports"] {
+  --profile-content-gap: 1.5rem;
+  --profile-control-height: 2.75rem;
+  --profile-panel-padding: 1.5rem;
+  --profile-page-measure: 50rem;
+  --profile-chrome-opacity: 1;
+}
+
+[data-product-profile="embedded-integrations"] {
+  --profile-content-gap: 0.75rem;
+  --profile-control-height: 2.5rem;
+  --profile-panel-padding: 0.75rem;
+  --profile-page-measure: 100%;
+  --profile-chrome-opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

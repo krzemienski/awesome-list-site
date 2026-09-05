@@ -1,3 +1,5 @@
+@import "../../../shared/styles/product-profiles.css";
+
 /* =====================================================================
    AWESOME.VIDEO DESIGN SYSTEM
    Ported 1:1 from Claude Design's awesome-list-site handoff
@@ -11,7 +13,8 @@
    for the gate that enforces one block per offered system).
 
    Replit additions (skip-link, disabled util, lucide stroke, motion
-   tokens, prefers-reduced-motion, no-anim toggle) live at the bottom.
+   tokens and no-anim toggle live here; the shared profile foundation owns
+   cross-product density roles and prefers-reduced-motion behavior.
    ===================================================================== */
 
 :root {
@@ -1071,16 +1074,4 @@ button:active:not([disabled]):not([aria-disabled="true"]),
 .btn:active:not([disabled]):not([aria-disabled="true"]),
 [role="button"]:active:not([disabled]):not([aria-disabled="true"]) {
   transform: translateY(1px);
-}
-
-/* REDUCED MOTION (CC-05, CC-11) */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }
