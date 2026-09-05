@@ -1,0 +1,33 @@
+{
+  "name": "@workspace/awesome-video-design-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/consumer.ts",
+    "./tokens": "./tokens.json",
+    "./styles.css": "./src/index.css"
+  },
+  "scripts": {
+    "predev": "node ../../scripts/generate-design-system-artifact.mjs --check",
+    "dev": "vite --config vite.config.ts --host 0.0.0.0",
+    "prebuild": "node ../../scripts/generate-design-system-artifact.mjs --check",
+    "build": "tsc -p tsconfig.json --noEmit && vite build --config vite.config.ts",
+    "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.11",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "5.6.3",
+    "vite": "^5.4.21"
+  }
+}

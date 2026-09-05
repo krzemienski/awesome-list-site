@@ -1,0 +1,15 @@
+kind = "design-system"
+previewPath = "/"
+title = "Awesome.Video Design System"
+description = "The canonical federated design system for Awesome.Video: five personalities, ten accents, shared semantic tokens, accessible component contracts, and product profiles."
+version = "1.0.0"
+id = "artifacts/awesome-video-design-system"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20928
+
+[services.development]
+run = "pnpm --filter @workspace/awesome-video-design-system run dev"

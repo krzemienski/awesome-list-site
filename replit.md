@@ -132,6 +132,14 @@ The Editorial + Crimson identity is formalized as the official awesome.video bra
 
 ## Design-System scope (MR-DS-13)
 
+The first-class Replit design-system artifact is
+`artifacts/awesome-video-design-system`. Replit discovery starts at its `DESIGN.md` and
+`tokens.json`; the living artifact imports `client/src/styles/design-system.css` and
+`client/src/lib/design-system.ts` directly. `tokens.json` is generated with
+`npm run generate:design-system-artifact` and must never be hand-edited. Treat the
+runtime sources, artifact, and saved workspace template as one release—never create a
+parallel “reference” or “retro” token implementation.
+
 The Awesome.Video DS contract documented in `docs/` + `HANDOFF.md` is implemented with five intentional, in-repo divergences from the canonical handoff. Every future Stage-5/Stage-6 DS sweep should treat these as architectural decisions, not per-occurrence violations:
 
 1. **shadcn/ui primitives replace raw `.btn / .card / .chip / .input`.** The runtime surfaces use `Button`, `Card`, `Badge`, `Input` (and other shadcn primitives) styled through the `client/src/index.css @theme inline` bridge that maps `--color-*` shadcn tokens onto DS tokens (`--accent`, `--bg`, `--surface`, etc.). Searching the DOM for stray `<button>` outside `.btn/.tab/.icon-btn` is expected to return many — that is shadcn working as designed. Class-compliance audits (DS Stage 6) should compare against the shadcn-bridge surface, not the raw handoff classes.

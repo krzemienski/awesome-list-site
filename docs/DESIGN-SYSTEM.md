@@ -1,14 +1,18 @@
 # Design System
 
-The authoritative, code-derived catalog of the awesome.video runtime design system:
+The authoritative catalog of the unified Awesome.Video design system:
 **5 systems × 10 accents**, switchable live at [`/settings/theme`](/settings/theme) and
 presented at the living showcase [`/design-system`](/design-system).
 
-Every value in this document is transcribed from the shipping code. If this document and
-the code ever disagree, **the code wins** — fix the doc.
+Replit recognizes the same system through the first-class
+`artifacts/awesome-video-design-system` artifact. That artifact imports the shipping CSS
+and runtime registry directly; its `tokens.json` is generated from the sources below and
+is never edited independently.
 
 | Source of truth | What it owns |
 |---|---|
+| `artifacts/awesome-video-design-system/DESIGN.md` | Replit artifact identity, contribution contract, and workspace consumption guidance |
+| `artifacts/awesome-video-design-system/tokens.json` | Generated machine-readable projection; never hand-edit |
 | `shared/styles/product-profiles.css` | Cross-product profile density roles and reduced-motion contract |
 | `client/src/styles/design-system.css` | Personality/accent tokens, DS component classes, per-system skins, shadcn bridge skins |
 | `client/src/index.css` | Tailwind v4 `@theme inline` shadcn↔DS token bridge |
@@ -16,6 +20,11 @@ the code ever disagree, **the code wins** — fix the doc.
 | `client/index.html` | FOUC-free pre-paint boot script (`ds-system` / `ds-accent` / `ds-font-override`) |
 | `client/src/lib/font-options.ts` | Font override list + on-demand font loading |
 | `client/src/lib/charts/palette.ts` | The single chart color palette (`CHART_PALETTE`) |
+
+This is one logical design system with multiple responsible source files—not a code
+system plus a separate reference system. Run `npm run generate:design-system-artifact`
+after changing tokens, themes, accents, or product profiles. The artifact refuses to
+start or build when its generated token projection is stale.
 
 Consumption rules for new UI live in [`docs/AGENTS.md`](AGENTS.md). The component
 inventory lives in [`docs/COMPONENT-LIBRARY.md`](COMPONENT-LIBRARY.md). The structural

@@ -6,282 +6,329 @@ id = "PlSr7uRJCrJ3teRZoQAgH"
 uri = "file://screenshots/production/INDEX.md"
 type = "text"
 title = "Production Screenshots Index"
+logical_id = "6fb8217c-4a04-4258-be64-43328b05daf7"
 
 [[outputs]]
 id = "WTKqVioaNwKymgCJ9Pskn"
 uri = "file://screenshots/production/01_home.png"
 type = "image"
 title = "01 — Home"
+logical_id = "a780305e-edb4-4900-a719-ad94e4b7ab75"
 
 [[outputs]]
 id = "cZVKyJFi7QekXUTboQCNr"
 uri = "file://screenshots/production/02_about.png"
 type = "image"
 title = "02 — About"
+logical_id = "582e4233-05b7-4e1f-af20-103d5c961411"
 
 [[outputs]]
 id = "g0Y2wsPrOfo7-Z7GiXqr3"
 uri = "file://screenshots/production/03_advanced.png"
 type = "image"
 title = "03 — Advanced Features"
+logical_id = "25a2fba3-9a4c-485e-b776-4bf6e155e0a8"
 
 [[outputs]]
 id = "uIkY0bVCHbJed1e-HAEBa"
 uri = "file://screenshots/production/04_learning_journeys.png"
 type = "image"
 title = "04 — Learning Journeys"
+logical_id = "4615eb6f-64c4-414a-9fa8-965adad27c24"
 
 [[outputs]]
 id = "yp0kyDd5Jcy7otFfUlrsy"
 uri = "file://screenshots/production/05_journey_detail.png"
 type = "image"
 title = "05 — Journey Detail"
+logical_id = "b833c70a-c970-4d37-9817-c3b766a3d426"
 
 [[outputs]]
 id = "KfX5NF4f_f_XRi0P7rBxM"
 uri = "file://screenshots/production/06_login.png"
 type = "image"
 title = "06 — Login"
+logical_id = "d78b411b-a867-4b17-9487-154481f5f5ed"
 
 [[outputs]]
 id = "HP35xAQY_sQsCfuLUcwFx"
 uri = "file://screenshots/production/07_submit_resource_authgate.png"
 type = "image"
 title = "07 — Submit Resource"
+logical_id = "de996236-666a-49d2-af4b-08ffc557c802"
 
 [[outputs]]
 id = "-4MkcNZ9jcSRgauRt4Zt7"
 uri = "file://screenshots/production/08_theme_settings.png"
 type = "image"
 title = "08 — Theme Settings"
+logical_id = "5fd3ac62-1a09-49db-897b-c21312cf031a"
 
 [[outputs]]
 id = "Q4QuPoVBhU2YUnXakXOfv"
 uri = "file://screenshots/production/09_category_community-events.png"
 type = "image"
 title = "09 — Community & Events"
+logical_id = "3370de5c-791e-4925-a5bd-abd884f37144"
 
 [[outputs]]
 id = "2iTAQsMpC2YmtYQpW6etY"
 uri = "file://screenshots/production/10_category_encoding-codecs.png"
 type = "image"
 title = "10 — Encoding & Codecs"
+logical_id = "731fd84d-b8dd-476b-a61f-f989e14732e5"
 
 [[outputs]]
 id = "uj_qLv3u3-iXF4dyMX9km"
 uri = "file://screenshots/production/11_category_general-tools.png"
 type = "image"
 title = "11 — General Tools"
+logical_id = "5d96fe48-8c13-4adb-83a8-9efc97f071bb"
 
 [[outputs]]
 id = "lBE-aoUkBEibqE9S4yw1K"
 uri = "file://screenshots/production/12_category_infrastructure-delivery.png"
 type = "image"
 title = "12 — Infrastructure & Delivery"
+logical_id = "14961a70-d361-4ae2-a578-8bce6922ea7f"
 
 [[outputs]]
 id = "4WjAVqaMJ7fJWC-9B3nIv"
 uri = "file://screenshots/production/13_category_intro-learning.png"
 type = "image"
 title = "13 — Intro & Learning"
+logical_id = "7d8ab2ea-b3f3-469e-a81c-e55eaa0864c6"
 
 [[outputs]]
 id = "VXO3dwB26h5g2c2bHOe2a"
 uri = "file://screenshots/production/14_category_media-tools.png"
 type = "image"
 title = "14 — Media Tools"
+logical_id = "75d63020-d139-42fd-9d08-9077ff510ec7"
 
 [[outputs]]
 id = "TE9apsSzua5C6NiQVvLeR"
 uri = "file://screenshots/production/15_category_players-clients.png"
 type = "image"
 title = "15 — Players & Clients"
+logical_id = "11d77c2e-416a-4714-83c2-19b7e4c7fc67"
 
 [[outputs]]
 id = "is0ugO0m1wjDG89ZUKeA_"
 uri = "file://screenshots/production/16_category_protocols-transport.png"
 type = "image"
 title = "16 — Protocols & Transport"
+logical_id = "8943f1e2-024b-45a2-a879-0a9d01ebbe80"
 
 [[outputs]]
 id = "Np3PcvlRjT4cqDfpzKY-E"
 uri = "file://screenshots/production/17_category_standards-industry.png"
 type = "image"
 title = "17 — Standards & Industry"
+logical_id = "f025fbb1-b12b-490b-8135-45c90dbb4275"
 
 [[outputs]]
 id = "S66bM1Cdv4ijtK9BDRI7d"
 uri = "file://screenshots/production/18_subcategory_ai-ml-tools.png"
 type = "image"
 title = "18 — AI/ML Subcategory"
+logical_id = "4b307f05-b62c-485d-8965-6d6172f1de6b"
 
 [[outputs]]
 id = "mESthzXJixu01c5ele61h"
 uri = "file://screenshots/production/19_sub-subcategory_hls.png"
 type = "image"
 title = "19 — HLS Sub-subcategory"
+logical_id = "968d7f96-b209-4a85-89b2-fa680ab6db0b"
 
 [[outputs]]
 id = "WrJNNuibssEUhXoPjudo0"
 uri = "file://screenshots/production/20_sub-subcategory_dash.png"
 type = "image"
 title = "20 — DASH Sub-subcategory"
+logical_id = "513d0d8e-a613-481a-853e-65d7abdc728f"
 
 [[outputs]]
 id = "hMzFvpxfmCVwIMbQucy0U"
 uri = "file://screenshots/production/21_resource_detail.png"
 type = "image"
 title = "21 — Resource Detail"
+logical_id = "cb63a5c4-e82a-475a-a6f8-d8032009da0f"
 
 [[outputs]]
 id = "uZQbSP1Fjy0Ewm88AMfj3"
 uri = "file://screenshots/production/22_404_not_found.png"
 type = "image"
 title = "22 — 404 Not Found"
+logical_id = "9f935d0d-19ec-4207-ba87-6ac18606131a"
 
 [[outputs]]
 id = "2BtfAQKx2oYkZox5Becpw"
 uri = "file://screenshots/production/DESIGN-BRIEF.md"
 type = "text"
 title = "Claude Design Redesign Brief"
+logical_id = "730ef65f-e39a-4283-aedb-03e6952f0474"
 
 [[outputs]]
 id = "Pn0ipKaKkkJgGSdlDad4J"
 uri = "file://screenshots/og/og-category-encoding.png"
 type = "image"
 title = "OG image — Category page (Editorial + Crimson)"
+logical_id = "56cbe749-d912-446d-9614-fa1b6f0ec87f"
 
 [[outputs]]
 id = "LHNpXwtjp3EXFna1Oktw5"
 uri = "file://screenshots/og/og-home.png"
 type = "image"
 title = "OG image — Home"
+logical_id = "d7ebb5a8-7f01-4b58-ad93-8cc201e801aa"
 
 [[outputs]]
 id = "s0ozuTAC-jT7C0xRjDK2Q"
 uri = "file://screenshots/og/og-journey-streaming.png"
 type = "image"
 title = "OG image — Learning Journey"
+logical_id = "962c3a9d-0691-4d19-a78a-6374cd49accb"
 
 [[outputs]]
 id = "xIy3ikP019pb5H91CZZTX"
 uri = "file://evidence/design-system-proof/contact-sheets/cross_01_home.jpg"
 type = "image"
 title = "Home — all 5 systems side-by-side (Editorial · Terminal · Geist · Brutalist · Swiss)"
+logical_id = "97ebf6ef-f25a-4bbc-8590-a02d1739910f"
 
 [[outputs]]
 id = "odXqlLmQ1UOVcHQmorVF2"
 uri = "file://evidence/design-system-proof/contact-sheets/cross_04_theme_picker.jpg"
 type = "image"
 title = "Theme Picker — all 5 systems side-by-side"
+logical_id = "ef6d08a4-6336-4376-ae0e-c2006e667bef"
 
 [[outputs]]
 id = "2Hqr49mKMUvRzPBG8jhlX"
 uri = "file://evidence/design-system-proof/contact-sheets/cross_07_category.jpg"
 type = "image"
 title = "Category page — all 5 systems side-by-side"
+logical_id = "7a074950-eea9-4ea8-9c17-96031f2654e5"
 
 [[outputs]]
 id = "4e6livuvO5hxFJL98d03L"
 uri = "file://evidence/design-system-proof/contact-sheets/editorial_contact.jpg"
 type = "image"
 title = "Editorial (Crimson) — 8 pages: Home / About / Login / Theme / Advanced / Journeys / Category / Submit"
+logical_id = "77e647dd-d68d-4117-8a3e-3489c4d697bf"
 
 [[outputs]]
 id = "Brn-Bta3kDtnDC5g-hdBa"
 uri = "file://evidence/design-system-proof/contact-sheets/terminal_contact.jpg"
 type = "image"
 title = "Terminal (Matrix) — 8 pages"
+logical_id = "d7a49cd4-9c65-4c8e-95bb-5c0551bad2f8"
 
 [[outputs]]
 id = "mfIhUdSjKZ2Ep6IbufTFu"
 uri = "file://evidence/design-system-proof/contact-sheets/geist_contact.jpg"
 type = "image"
 title = "Geist (Cyan) — 8 pages"
+logical_id = "4b987c5b-4b6d-459d-8b45-dea1b58d322d"
 
 [[outputs]]
 id = "iSSzRaqfT40eR6p8flnA_"
 uri = "file://evidence/design-system-proof/contact-sheets/brutalist_contact.jpg"
 type = "image"
 title = "Brutalist (Amber) — 8 pages"
+logical_id = "bfc3eafa-4cf8-4596-935a-75c9c9adf855"
 
 [[outputs]]
 id = "18efSoyjptsXlTfGb6dDX"
 uri = "file://evidence/design-system-proof/contact-sheets/swiss_contact.jpg"
 type = "image"
 title = "Swiss (Orange) — 8 pages"
+logical_id = "b558316c-9c09-4a64-946f-70e8f64f1c8b"
 
 [[outputs]]
 id = "eDOjnpkoKE0Q5gb6c_7Zt"
 uri = "file://evidence/design-system-proof/manifest.json"
 type = "unspecified"
 title = "Capture manifest — 40 screenshots, applied tokens per capture, 0 console/page errors"
+logical_id = "100e4460-ef7e-4fca-b03c-943633cd13e2"
 
 [[outputs]]
 id = "4BZ_aSilwE9dSKqbkStna"
 uri = "file://evidence/design-system-proof/contact-sheets/cross_picker_with_preview.jpg"
 type = "image"
 title = "/settings/theme full page — all 5 systems side-by-side with new Live Preview section"
+logical_id = "312f6a2a-c7c0-4e86-a786-42fdcf5c6ac6"
 
 [[outputs]]
 id = "iUMywZqfx6UO6UPjG8hAn"
 uri = "file://evidence/design-system-proof/editorial/04b_theme_picker_full.jpg"
 type = "image"
 title = "Editorial — full picker page with Live Preview"
+logical_id = "3f334cb6-acb3-47d1-b83b-aa1faf2a9c05"
 
 [[outputs]]
 id = "kx4gAf8HTf0YJoJKcf9ZY"
 uri = "file://evidence/design-system-proof/terminal/04b_theme_picker_full.jpg"
 type = "image"
 title = "Terminal — full picker page with Live Preview"
+logical_id = "e6812ad1-f2ee-4202-87d5-26b11c18f2fd"
 
 [[outputs]]
 id = "OGbBOTIw52qRe9ZHVXe6P"
 uri = "file://evidence/design-system-proof/geist/04b_theme_picker_full.jpg"
 type = "image"
 title = "Geist — full picker page with Live Preview"
+logical_id = "61ceede0-954a-4fdf-94bd-c1d778ed1043"
 
 [[outputs]]
 id = "qE-eog9iuJpjiJy9hVmZb"
 uri = "file://evidence/design-system-proof/brutalist/04b_theme_picker_full.jpg"
 type = "image"
 title = "Brutalist — full picker page with Live Preview"
+logical_id = "af31abee-88a6-4bab-a660-943bf0a242b2"
 
 [[outputs]]
 id = "OqZuMIWozp5jIui-QvBxY"
 uri = "file://evidence/design-system-proof/swiss/04b_theme_picker_full.jpg"
 type = "image"
 title = "Swiss — full picker page with Live Preview"
+logical_id = "c14293aa-3ddf-4781-bf24-84d5373685d1"
 
 [[outputs]]
 id = "UFRY6r5EFCbRI6R8rUbST"
 uri = "file://.local/brand-directions/dirA.png"
 type = "image"
 title = "Direction A — Editorial Monogram"
+logical_id = "fbadf89f-2f56-49b2-8eb9-e76f3397aa1c"
 
 [[outputs]]
 id = "eaMShyoqpfvXHz1sWjuEQ"
 uri = "file://.local/brand-directions/dirB.png"
 type = "image"
 title = "Direction B — Play Glyph"
+logical_id = "5ac6b768-c922-41ee-a323-81830879b52c"
 
 [[outputs]]
 id = "ftqt7u2mW5N4VQrfKMYn3"
 uri = "file://.local/brand-directions/dirC.png"
 type = "image"
 title = "Direction C — Terminal Prompt"
+logical_id = "96f24897-32f1-41cc-a275-25dff48313e2"
 
 [[outputs]]
 id = "uSK-SyjlT6TOw9EaJWsrX"
 uri = "file://.local/brand-directions/logo-choices.png"
 type = "image"
 title = "Logo Mark Choices — 6 options, editorial voice locked"
+logical_id = "ee6c748a-048a-4683-b563-13c9c2071527"
 
 [[outputs]]
 id = "Om_mfWHGBimKqe9l72TDh"
 uri = "file://exports/production-readiness-audit-skill.zip"
 type = "unspecified"
 title = "Production Readiness Audit skill (zip)"
+logical_id = "6000fc5d-944b-495e-bb17-1e0d58829724"
 
 [[outputs]]
 id = "kZhE399yQM73H8KzCP4Nt"
@@ -289,3 +336,18 @@ uri = "file://audit-evidence/VERDICT.md"
 type = "text"
 title = "Full UI/UX Audit — Final Verdict"
 description = "PASS: zero open CRITICAL, HIGH, or MEDIUM findings after a clean confirmation pass."
+logical_id = "a7e5de5d-26a1-4dac-b300-fb1bf021e1ff"
+
+[[outputs]]
+id = "wwfF3DuyJAWbLOgeb1sHA"
+uri = "file://screenshots/awesome-video-design-system-final.jpg"
+type = "image"
+title = "Awesome.Video Design System"
+description = "Final live preview of the canonical federated design-system artifact, rendered from the shipping Awesome.Video tokens and runtime registry."
+logical_id = "4248deaf-e447-4457-8745-16741a734847"
+content_hash = "sha256:6e002d51794b9ec0509c9694bc8a74587f693658278c9c1b35493bd768c54096"
+size = 101570
+mtime_ms = 1788641642570
+storage_uri = "gcs://replit-rams-assets-picard/rams/assets/repl:71ccccc7-37f7-4f07-a880-5973ae4aa911/4248deaf-e447-4457-8745-16741a734847/0e3bb82d-6a8a-4e5a-a84d-ed1c22475887"
+storage_version_token = "1788641647108186"
+content_type = "image/jpeg"

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-product-profile="standalone-exports" data-system="editorial" data-accent="crimson">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="The canonical federated design system for Awesome.Video." />
+    <title>Awesome.Video Design System</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    />
+    <script>
+      (() => {
+        const registry = __AWESOME_VIDEO_DS_BOOT__;
+        try {
+          const system = localStorage.getItem("ds-system");
+          const accent = localStorage.getItem("ds-accent");
+          document.documentElement.dataset.system = registry.systems.includes(system)
+            ? system
+            : registry.defaultSystem;
+          document.documentElement.dataset.accent = registry.accents.includes(accent)
+            ? accent
+            : registry.defaultAccent;
+        } catch {
+          document.documentElement.dataset.system = registry.defaultSystem;
+          document.documentElement.dataset.accent = registry.defaultAccent;
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
