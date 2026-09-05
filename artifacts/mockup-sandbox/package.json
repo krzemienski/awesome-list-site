@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "vite build --config vite.config.ts",
-    "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
+    "dev": "PORT=${PORT:-4173} BASE_PATH=${BASE_PATH:-/__mockup/} vite --config vite.config.ts --host 0.0.0.0",
+    "build": "PORT=${PORT:-4173} BASE_PATH=${BASE_PATH:-/__mockup/} vite build --config vite.config.ts",
+    "serve": "PORT=${PORT:-4173} BASE_PATH=${BASE_PATH:-/__mockup/} vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
