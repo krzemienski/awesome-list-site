@@ -282,11 +282,38 @@ async function inspectRoute(browser, family, saved) {
     }
     console.log(`Audit key scope: PASS (${family.route} ${saved.system ?? "clean"}/${saved.accent ?? "clean"})`);
   }
-  await context.addInitScript(({ system, accent }) => {
-    if (system === null) localStorage.removeItem("ds-system");
-    else localStorage.setItem("ds-system", system);
-    if (accent === null) localStorage.removeItem("ds-accent");
-    else localStorage.setItem("ds-accent", accent);
+  await context.addInitScript(({ system, accent, blocked }) => {
+    window.__profileStorageCalls = { getItem: 0, setItem: 0, removeItem: 0 };
+    if (blocked) {
+      const nativeStorage = window.localStorage;
+      // Deny the app-owned theme keys without turning this focused profile gate
+      // into a compatibility test for Clerk's separately managed session keys.
+      const themeKeys = new Set(["ds-system", "ds-accent"]);
+      const deniedStorage = new Proxy(nativeStorage, {
+        get(target, property) {
+          if (property === "getItem" || property === "setItem" || property === "removeItem") {
+            return function (key, ...args) {
+              if (themeKeys.has(String(key))) {
+                window.__profileStorageCalls[property] += 1;
+                throw new DOMException("Theme storage access denied by profile audit", "SecurityError");
+              }
+              return target[property](key, ...args);
+            };
+          }
+          const value = Reflect.get(target, property, target);
+          return typeof value === "function" ? value.bind(target) : value;
+        },
+      });
+      Object.defineProperty(window, "localStorage", {
+        configurable: true,
+        value: deniedStorage,
+      });
+    } else {
+      if (system === null) localStorage.removeItem("ds-system");
+      else localStorage.setItem("ds-system", system);
+      if (accent === null) localStorage.removeItem("ds-accent");
+      else localStorage.setItem("ds-accent", accent);
+    }
 
     window.__profileAttributeWrites = {
       "data-product-profile": [],
@@ -306,6 +333,8 @@ async function inspectRoute(browser, family, saved) {
   }, saved);
 
   const page = await context.newPage();
+  const pageErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
   try {
     const response = await page.goto(`${BASE}${family.route}`, {
       waitUntil: "domcontentloaded",
@@ -314,12 +343,21 @@ async function inspectRoute(browser, family, saved) {
     if (!response?.ok()) {
       throw new Error(`${family.route} returned ${response?.status() ?? "no status"}`);
     }
-    await page.waitForFunction(
-      () => Object.values(window.__profileAttributeWrites || {})
-        .every((writes) => writes.length >= 2),
-      undefined,
-      { timeout: 30_000 },
-    );
+    try {
+      await page.waitForFunction(
+        () => Object.values(window.__profileAttributeWrites || {})
+          .every((writes) => writes.length >= 2),
+        undefined,
+        { timeout: 30_000 },
+      );
+    } catch (error) {
+      const writes = await page.evaluate(() => window.__profileAttributeWrites);
+      throw new Error(
+        `${family.route} theme mount did not complete; writes=${JSON.stringify(writes)}; ` +
+        `pageErrors=${JSON.stringify(pageErrors)}`,
+        { cause: error },
+      );
+    }
     const readState = async () => page.evaluate((densityRoles) => {
         const root = document.documentElement;
         const styles = getComputedStyle(root);
@@ -334,10 +372,17 @@ async function inspectRoute(browser, family, saved) {
             "data-accent": root.getAttribute("data-accent"),
           },
           density: Object.fromEntries(densityRoles.map((role) => [role, styles.getPropertyValue(role).trim()])),
-          saved: {
-            system: localStorage.getItem("ds-system"),
-            accent: localStorage.getItem("ds-accent"),
-          },
+          saved: (() => {
+            try {
+              return {
+                system: localStorage.getItem("ds-system"),
+                accent: localStorage.getItem("ds-accent"),
+              };
+            } catch {
+              return null;
+            }
+          })(),
+          storageCalls: { ...window.__profileStorageCalls },
         };
       }, Object.keys(family.density));
 
@@ -372,6 +417,13 @@ const browser = await launchBrowserWithLease(
 try {
   for (const family of routeFamilies) {
     const scenarios = [
+      {
+        name: "storage-blocked",
+        saved: { system: null, accent: null, blocked: true },
+        expectedSystem: family.defaultSystem,
+        expectedAccent: family.defaultAccent,
+        storageBlocked: true,
+      },
       {
         name: "clean",
         saved: { system: null, accent: null },
@@ -427,10 +479,21 @@ try {
           `${family.route} ${scenario.name} ${role}: expected ${value}, got ${result.density[role]}`,
         );
       }
-      expect(
-        result.saved.system === scenario.expectedSystem && result.saved.accent === scenario.expectedAccent,
-        `${family.route} ${scenario.name} did not persist the resolved theme consistently`,
-      );
+      if (scenario.storageBlocked) {
+        expect(
+          result.saved === null,
+          `${family.route} ${scenario.name} unexpectedly regained localStorage access`,
+        );
+        expect(
+          result.storageCalls.getItem >= 2 && result.storageCalls.setItem >= 2,
+          `${family.route} ${scenario.name} did not deny both theme reads and writes`,
+        );
+      } else {
+        expect(
+          result.saved.system === scenario.expectedSystem && result.saved.accent === scenario.expectedAccent,
+          `${family.route} ${scenario.name} did not persist the resolved theme consistently`,
+        );
+      }
     }
   }
 } finally {
@@ -444,5 +507,5 @@ if (failures.length) {
 }
 
 console.log(
-  `Product profile drift: PASS (${profiles.length} approved profiles; ${routeFamilies.length * 5} browser scenarios)`,
+  `Product profile drift: PASS (${profiles.length} approved profiles; ${routeFamilies.length * 6} browser scenarios)`,
 );

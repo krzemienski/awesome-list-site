@@ -105,3 +105,4 @@
 - [Vite SPA curl smoke checks](vite-spa-curl-smoke-checks.md) — curl sees only the static HTML shell; assert shell markers and route status, not copy rendered later by React.
 - [Browser response state assertions](browser-response-state-assertions.md) — shared response helpers validate transport/shape; scenarios own populated-vs-empty cardinality assertions.
 - [Artifact registry registration](artifact-registry-registration.md) — verify with listArtifacts; create/register APIs can report success or scaffold files while the platform registry still rolls back.
+- [Theme storage denial gates](theme-storage-denial-gates.md) — isolate app-owned theme keys from Clerk session storage unless Clerk compatibility is the test itself.
