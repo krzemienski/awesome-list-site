@@ -21,6 +21,21 @@ const TSC_PATH = join(ROOT, 'node_modules/typescript/bin/tsc');
 
 const mutations = [
   {
+    name: 'duplicate system id',
+    apply(source) {
+      return source.replace("id: 'terminal',", "id: 'editorial',");
+    },
+  },
+  {
+    name: 'duplicate accent id',
+    apply(source) {
+      return source.replace(
+        "{ id: 'magenta', name: 'Magenta'",
+        "{ id: 'crimson', name: 'Magenta'",
+      );
+    },
+  },
+  {
     name: 'missing SYSTEM_DEFAULT_ACCENT row',
     apply(source) {
       const needle = "defaultAccent: 'matrix',";

@@ -48,8 +48,24 @@ type ThemeRegistryWithKnownReferences<T extends ThemeRegistryShape> =
       : never
     : never;
 
+type ThemeRegistryIdsAreUnique<
+  Entries extends readonly { id: string }[],
+  Seen extends string = never,
+> = Entries extends readonly [
+  infer Head extends { id: string },
+  ...infer Tail extends readonly { id: string }[],
+]
+  ? Head['id'] extends Seen
+    ? never
+    : ThemeRegistryIdsAreUnique<Tail, Seen | Head['id']>
+  : unknown;
+
+type ThemeRegistryWithUniqueIds<T extends ThemeRegistryShape> =
+  ThemeRegistryIdsAreUnique<T['systems']> &
+  ThemeRegistryIdsAreUnique<T['accents']>;
+
 function defineThemeFallbackRegistry<const T extends ThemeRegistryShape>(
-  registry: T & ThemeRegistryWithKnownReferences<T>,
+  registry: T & ThemeRegistryWithKnownReferences<T> & ThemeRegistryWithUniqueIds<T>,
 ): T {
   return registry;
 }
