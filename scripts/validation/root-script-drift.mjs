@@ -91,10 +91,12 @@
 //
 // Scope is executable/script files directly in the root or directly under
 // scripts/ — the JS/TS family (.js/.mjs/.cjs/.jsx/.ts/.mts/.cts/.tsx), shell
-// (.sh), and Python (.py) — not recursive. scripts/validation/ and other
-// nested directories are execution trees, while scripts/archive/ is excluded
-// from both candidate discovery and import reachability. Files git already
-// ignores are skipped (they never enter the repository).
+// (.sh), and Python (.py) — not recursive. Tracked extensionless root files are
+// also candidates when their first line has a recognized interpreter shebang;
+// ordinary extensionless data files remain outside the scan. scripts/validation/
+// and other nested directories are execution trees, while scripts/archive/ is
+// excluded from both candidate discovery and import reachability. Files git
+// already ignores are skipped (they never enter the repository).
 // *.d.ts is exempt: ambient declarations are pulled in through tsconfig
 // "include", never by a reference.
 //
@@ -183,6 +185,26 @@ const CHECKED_EXTS = new Set([
   ...REPLIT_MODULE_POLICIES.flatMap((policy) => policy.extensions),
   '.sh',
 ]);
+const RECOGNIZED_SHEBANG_INTERPRETERS = new Set([
+  ...REPLIT_MODULE_POLICIES.flatMap((policy) => policy.runtimes),
+  'sh', 'bash', 'zsh', 'dash', 'ksh',
+]);
+
+function recognizedShebangInterpreter(content) {
+  const firstLine = content.split(/\r?\n/, 1)[0];
+  const match = /^#!\s*(\S+)(?:\s+(.*))?$/.exec(firstLine);
+  if (!match) return null;
+  const launcher = path.posix.basename(match[1]);
+  const args = (match[2] ?? '').trim().split(/\s+/).filter(Boolean);
+  let interpreter = launcher;
+  if (launcher === 'env') {
+    let i = 0;
+    if (args[i] === '-S' || args[i] === '--split-string') i++;
+    while (i < args.length && (args[i].startsWith('-') || /^[A-Za-z_]\w*=/.test(args[i]))) i++;
+    interpreter = args[i] ? path.posix.basename(args[i]) : '';
+  }
+  return RECOGNIZED_SHEBANG_INTERPRETERS.has(interpreter) ? interpreter : null;
+}
 
 function policyForReplitModule(moduleName) {
   if (typeof moduleName !== 'string') return null;
@@ -950,6 +972,22 @@ function rootCodeFiles() {
     .sort();
 }
 
+function trackedExtensionlessShebangFiles() {
+  const tracked = spawnSync('git', ['-C', ROOT, 'ls-files', '--cached', '-z'], { encoding: 'utf8' });
+  if (tracked.error || tracked.status !== 0) return [];
+  return tracked.stdout
+    .split('\0')
+    .filter((name) => name && !name.includes('/') && path.extname(name) === '')
+    .filter((name) => {
+      try {
+        return recognizedShebangInterpreter(fs.readFileSync(path.join(ROOT, name), 'utf8')) !== null;
+      } catch {
+        return false;
+      }
+    })
+    .sort();
+}
+
 function activeScriptFiles() {
   const dir = path.join(ROOT, ACTIVE_SCRIPT_DIR);
   let entries;
@@ -1105,6 +1143,14 @@ function runCanaries() {
   eq(runs('python probe.py', 'probe.py'), true, 'python runs a Python script');
   eq(runs('python3 ./probe.py', 'probe.py'), true, 'python3 runs a Python script');
 
+  // Tracked extensionless root files only become candidates when their first
+  // line names an interpreter this gate understands.
+  eq(recognizedShebangInterpreter('#!/usr/bin/env node\nconsole.log("x")'), 'node', 'env node shebang is recognized');
+  eq(recognizedShebangInterpreter('#!/usr/bin/env -S python3 -u\nprint("x")'), 'python3', 'env split-string Python shebang is recognized');
+  eq(recognizedShebangInterpreter('#!/bin/bash\nset -e'), 'bash', 'direct shell shebang is recognized');
+  eq(recognizedShebangInterpreter('#!/usr/bin/ruby\nputs "x"'), null, 'unknown interpreter shebang is not guessed');
+  eq(recognizedShebangInterpreter('extensionless data\n#!/usr/bin/env node'), null, 'a later shebang does not make data executable');
+
   // Hash comments — whole-line AND inline — must not keep a file alive, on
   // every surface that has them (shell, TOML/.replit, Dockerfile).
   const kindsOf = (rel, text) => {
@@ -1253,6 +1299,9 @@ function runCanaries() {
   eq(kindOf('probe.py', { npmScripts: [['probe', 'python probe.py']] }), 'npm-script', 'a Python npm script keeps it');
   eq(kindOf('probe.py', surfaceOf('.replit', '[[workflows.workflow.tasks]]\ntask = "shell.exec"\nargs = "python3 probe.py"\n')), 'workflow', 'a Python workflow keeps it');
   eq(kindOf('probe.py', surfaceOf('Dockerfile', 'COPY probe.py ./')), 'tooling', 'Dockerfile reference keeps a root Python script');
+  eq(kindOf('probe'), 'stray', 'unreferenced extensionless shebang candidate is stray');
+  eq(kindOf('probe', { npmScripts: [['probe', './probe']] }), 'npm-script', 'direct command keeps an extensionless shebang candidate');
+  eq(kindOf('probe', { pkgFields: packageFieldRefs({ bin: { probe: './probe' } }) }), 'package-manifest', 'machine-readable path keeps an extensionless shebang candidate');
 
   // Every enabled .replit module family must have an explicit policy. The
   // interpreter policies also carry both sides of the extension contract:
@@ -1383,7 +1432,7 @@ if (moduleCoverage.error) {
   process.exit(1);
 }
 
-const rootFiles = rootCodeFiles();
+const rootFiles = [...new Set([...rootCodeFiles(), ...trackedExtensionlessShebangFiles()])].sort();
 const activeScripts = activeScriptFiles();
 const allCandidates = [...rootFiles, ...activeScripts];
 const ignored = gitIgnoredNames(allCandidates);
