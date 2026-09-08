@@ -290,18 +290,6 @@ const MANUAL_RUNBOOK_MANIFEST = [
     file: 'scripts/test-feedback-loop.ts',
     note: 'retained opt-in database-backed recommendation regression probe with QA-only teardown',
   },
-  {
-    file: 'scripts/dedup-reject.ts',
-    note: 'retained idempotent rollback/audit runbook for the documented duplicate-resource corrections',
-  },
-  {
-    file: 'scripts/fix-dead-links-task286.ts',
-    note: 'retained idempotent audit trail for the documented task-286 URL corrections',
-  },
-  {
-    file: 'scripts/run3-cleanup-dev.ts',
-    note: 'retained dry-run-first development cleanup runbook for repeat QA-residue removal',
-  },
 ];
 
 // Execution trees: walked for CODE files, which contribute IMPORT EDGES ONLY.
