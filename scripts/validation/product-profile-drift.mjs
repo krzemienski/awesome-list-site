@@ -552,8 +552,8 @@ try {
           `${family.route} ${scenario.name} unexpectedly regained localStorage access`,
         );
         expect(
-          result.storageCalls.getItem >= 2 && result.storageCalls.setItem >= 2,
-          `${family.route} ${scenario.name} did not deny both theme reads and writes`,
+          result.storageCalls.getItem >= 1 && result.storageCalls.setItem >= 1,
+          `${family.route} ${scenario.name} did not exercise denied theme reads and writes`,
         );
       } else {
         expect(

@@ -8,7 +8,6 @@ import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { useClerkAppearance } from "./lib/clerk-appearance";
-import { ThemeProvider } from "@/components/ui/theme-provider";
 import {
   applyProductProfile,
   resolveProductProfile,
@@ -818,18 +817,16 @@ function App() {
           sign-in (SPA transition or full-reload) — see the component for the
           dedupe/cleanup rules. */}
       <GuestBookmarkMerge />
-      <ThemeProvider>
-        {/* BUG-020 (run13): analytics consent banner — analytics loads only
-            after an explicit grant through the shared post-paint coordinator.
-            BUG-054 (run26): rendered AFTER the router so the layout's
-            "Skip to main content" link is the document's FIRST tab stop
-            (run22 had it first in DOM, which put 3 banner controls ahead of
-            the skip link on every fresh visit). The banner stays fixed at the
-            bottom visually and remains keyboard-reachable after the page
-            content, with Escape still dismissing it for the session. */}
-        <Router />
-        <ConsentBanner />
-      </ThemeProvider>
+      {/* BUG-020 (run13): analytics consent banner — analytics loads only
+          after an explicit grant through the shared post-paint coordinator.
+          BUG-054 (run26): rendered AFTER the router so the layout's
+          "Skip to main content" link is the document's FIRST tab stop
+          (run22 had it first in DOM, which put 3 banner controls ahead of
+          the skip link on every fresh visit). The banner stays fixed at the
+          bottom visually and remains keyboard-reachable after the page
+          content, with Escape still dismissing it for the session. */}
+      <Router />
+      <ConsentBanner />
     </ClerkProvider>
   );
 }
