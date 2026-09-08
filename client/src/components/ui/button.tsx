@@ -20,10 +20,10 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline active:opacity-80",
       },
       size: {
-        default: "min-h-[max(40px,var(--profile-control-height))] px-4 py-2",
-        sm: "min-h-[max(40px,var(--profile-control-height))] px-3",
+        default: "min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-4 py-2",
+        sm: "min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-3",
         lg: "min-h-[48px] px-8",
-        icon: "min-h-[max(40px,var(--profile-control-height))] min-w-[max(40px,var(--profile-control-height))]",
+        icon: "min-h-[max(44px,var(--profile-control-height))] min-w-[max(44px,var(--profile-control-height))]",
       },
     },
     defaultVariants: {

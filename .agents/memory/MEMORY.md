@@ -107,3 +107,4 @@
 - [Artifact registry registration](artifact-registry-registration.md) — verify with listArtifacts; create/register APIs can report success or scaffold files while the platform registry still rolls back.
 - [Theme storage denial gates](theme-storage-denial-gates.md) — isolate app-owned theme keys from Clerk session storage unless Clerk compatibility is the test itself.
 - [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
+- [Workflow reconciliation double-start](workflow-reconciliation-double-start.md) — after merge reconciliation, a healthy artifact listener can coexist with a false “port already in use” workflow failure; restart once.

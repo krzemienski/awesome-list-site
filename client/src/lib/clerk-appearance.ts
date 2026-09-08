@@ -240,7 +240,7 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       // dormant. This card enables four providers and renders the ICON variant
       // (confirmed against the live DOM: `.cl-socialButtonsIconButton`), which
       // is why a `socialButtonsBlockButton`-only treatment left them at Clerk's
-      // ~32px default while every other control on the card sat at 40px. Both
+      // ~32px default while every other control on the card sat at 44px. Both
       // keys carry the same treatment so it survives a provider being added or
       // removed in the Clerk dashboard.
       // (No borderColor here: Clerk draws these buttons at border-width 0 and
@@ -248,11 +248,12 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       // per-element override would only be a dormant second source of truth.)
       socialButtonsIconButton: {
         ...(palette.ink ? { color: palette.ink } : {}),
-        minHeight: "40px",
+        minHeight: "44px",
+        minWidth: "44px",
       },
       socialButtonsBlockButton: {
         ...(palette.ink ? { color: palette.ink } : {}),
-        minHeight: "40px",
+        minHeight: "44px",
       },
       socialButtonsBlockButtonText: {
         ...(palette.ink ? { color: palette.ink } : {}),
@@ -271,38 +272,38 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       socialButtonsProviderIcon: {
         filter: "none",
       },
-      // Clerk's default control height renders ~32px, below the 40px touch
+      // Clerk's default control height renders ~32px, below the 44px touch
       // minimum the rest of the app holds to. Raise the interactive surfaces
       // (submit, inputs, OTP cells, and the footer sign-up/sign-in switch)
       // without altering the branded look.
       formButtonPrimary: {
-        minHeight: "40px",
+        minHeight: "44px",
       },
       formFieldInput: {
-        minHeight: "40px",
+        minHeight: "44px",
       },
       otpCodeFieldInput: {
-        minHeight: "40px",
-        minWidth: "40px",
+        minHeight: "44px",
+        minWidth: "44px",
       },
       footerActionLink: {
         display: "inline-flex",
         alignItems: "center",
-        minHeight: "40px",
+        minHeight: "44px",
       },
       identityPreviewEditButton: {
         // Confirmed on Clerk's live email-code verification variant: this is
         // the rendered edit-email key (the client-trust OTP variant omits the
         // edit affordance entirely).
-        minHeight: "40px",
-        minWidth: "40px",
+        minHeight: "44px",
+        minWidth: "44px",
       },
       formResendCodeLink: {
         // The email-code verification link is rendered as a 16px-tall button
         // by default; keep the full interactive surface easy to tap on phones.
         display: "inline-flex",
         alignItems: "center",
-        minHeight: "40px",
+        minHeight: "44px",
       },
     },
   };

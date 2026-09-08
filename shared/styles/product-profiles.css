@@ -30,7 +30,7 @@
 
 [data-product-profile="admin-operations"] {
   --profile-content-gap: 0.75rem;
-  --profile-control-height: 2.5rem;
+  --profile-control-height: 2.75rem;
   --profile-panel-padding: 1rem;
   --profile-page-measure: 80rem;
   --profile-chrome-opacity: 0.96;
@@ -46,7 +46,7 @@
 
 [data-product-profile="embedded-integrations"] {
   --profile-content-gap: 0.75rem;
-  --profile-control-height: 2.5rem;
+  --profile-control-height: 2.75rem;
   --profile-panel-padding: 0.75rem;
   --profile-page-measure: 100%;
   --profile-chrome-opacity: 1;

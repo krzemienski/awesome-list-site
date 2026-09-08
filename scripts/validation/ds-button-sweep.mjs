@@ -132,6 +132,66 @@ const BASE = process.env.AUDIT_BASE_URL || process.env.BASE_URL || 'http://local
 const OUT = '/tmp/validation/ds-button-sweep';
 fs.mkdirSync(OUT, { recursive: true });
 
+const results = [];
+const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} ${k} :: ${detail}`); };
+
+{
+  const minimumTarget = 44;
+  const buttonSource = fs.readFileSync(
+    path.join(ROOT, 'client/src/components/ui/button.tsx'),
+    'utf8',
+  );
+  const profileSource = fs.readFileSync(
+    path.join(ROOT, 'shared/styles/product-profiles.css'),
+    'utf8',
+  );
+  const buttonHeightGuardCount = [
+    ...buttonSource.matchAll(
+      /min-h-\[max\(44px,var\(--profile-control-height\)\)\]/g,
+    ),
+  ].length;
+  const fixedWidthGuardCount = [
+    ...buttonSource.matchAll(/min-w-\[44px\]/g),
+  ].length;
+  const profileWidthGuardCount = [
+    ...buttonSource.matchAll(
+      /min-w-\[max\(44px,var\(--profile-control-height\)\)\]/g,
+    ),
+  ].length;
+  const profileHeights = [
+    ...profileSource.matchAll(
+      /--profile-control-height:\s*([0-9.]+)(rem|px);/g,
+    ),
+  ].map((match) => ({
+    raw: match[0],
+    pixels: Number(match[1]) * (match[2] === 'rem' ? 16 : 1),
+  }));
+  const undersizedProfiles = profileHeights.filter(
+    ({ pixels }) => pixels < minimumTarget,
+  );
+  const passed =
+    buttonHeightGuardCount === 3
+    && fixedWidthGuardCount === 2
+    && profileWidthGuardCount === 1
+    && profileHeights.length === 6
+    && undersizedProfiles.length === 0;
+
+  log(
+    'minimum-touch-target-contract',
+    passed,
+    passed
+      ? 'default, small, and icon buttons plus all 5 product profiles preserve the 44x44px minimum'
+      : `expected 3 height guards, 2 fixed-width guards, 1 profile-width guard, and 6 profile heights at or above 44px; found heights=${buttonHeightGuardCount}, fixedWidths=${fixedWidthGuardCount}, profileWidths=${profileWidthGuardCount}, profileHeights=${profileHeights.length}, undersized=${JSON.stringify(undersizedProfiles.map(({ raw }) => raw))}`,
+  );
+}
+
+if (process.argv.includes('--contract-only')) {
+  const failed = results.filter(({ pass }) => !pass);
+  if (failed.length > 0) process.exit(1);
+  console.log('Minimum touch-target contract: PASS');
+  process.exit(0);
+}
+
 // Fail closed: without these the signed-in half of the gate cannot run, and
 // a silently anonymous-only sweep would defeat the point of task #360.
 for (const key of ['CLERK_SECRET_KEY', 'DATABASE_URL']) {
@@ -140,9 +200,6 @@ for (const key of ['CLERK_SECRET_KEY', 'DATABASE_URL']) {
     process.exit(1);
   }
 }
-
-const results = [];
-const log = (k, pass, detail) => { results.push({ k, pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} ${k} :: ${detail}`); };
 
 function chromePath() {
   const cache = path.join(ROOT, '.cache/ms-playwright');
@@ -553,7 +610,7 @@ try {
     // computed box while the code step is being inspected.
     await pageToAuth.mouse.move(0, 0);
     const measurements = await pageToAuth.evaluate(({ variantName }) => {
-      const MIN_TOUCH_TARGET = 40;
+      const MIN_TOUCH_TARGET = 44;
       const elementKey = (element) => {
         const classes = [...element.classList];
         const clerkClass = classes.find((name) => name.startsWith('cl-'));
@@ -620,7 +677,7 @@ try {
     );
     const undersized = measurements.controls.flatMap((control) =>
       control.rendered
-        .filter((element) => element.width < 40 || element.height < 40)
+        .filter((element) => element.width < 44 || element.height < 44)
         .map((element) => `${control.label} ${element.elementKey ?? control.expectedKey}=${element.width}x${element.height}px`),
     );
     const detail = measurements.controls
@@ -635,8 +692,8 @@ try {
         : mismatched.length > 0
           ? `${variant.label} LIVE DOM appearance key mismatch: ${mismatched.join(', ')}; ${detail}`
         : undersized.length > 0
-          ? `${variant.label} LIVE DOM touch target below 40px: ${undersized.join(', ')}; ${detail}`
-          : `${variant.label} LIVE DOM measured at or above 40px: ${detail}`);
+          ? `${variant.label} LIVE DOM touch target below 44px: ${undersized.join(', ')}; ${detail}`
+          : `${variant.label} LIVE DOM measured at or above 44px: ${detail}`);
 
     // Keep the complete measurements in results.json as durable evidence, not
     // just the compact console line above.

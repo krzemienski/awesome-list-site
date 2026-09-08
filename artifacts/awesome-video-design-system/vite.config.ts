@@ -21,6 +21,13 @@ const bootData = JSON.stringify({
 
 const port = Number(process.env.PORT || 20928);
 const base = process.env.BASE_PATH || "/";
+const allowedHosts = [
+  "localhost",
+  "127.0.0.1",
+  "[::1]",
+  ".replit.dev",
+  ".repl.co",
+];
 
 export default defineConfig({
   base,
@@ -38,13 +45,16 @@ export default defineConfig({
     port,
     strictPort: true,
     host: "0.0.0.0",
-    allowedHosts: true,
-    fs: { allow: [path.resolve(root, "../..")] },
+    allowedHosts,
+    fs: {
+      strict: true,
+      allow: [path.resolve(root, "../..")],
+    },
   },
   preview: {
     port,
     host: "0.0.0.0",
-    allowedHosts: true,
+    allowedHosts,
   },
   build: {
     outDir: path.resolve(root, "dist"),
