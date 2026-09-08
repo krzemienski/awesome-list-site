@@ -1,26 +1,22 @@
 import React from 'react';
 
 export function LogoSystem() {
+  // DS-OK: SVG paint and geometry below are fixed logo assets/specimens;
+  // surrounding cards, type, borders, and state UI consume shared tokens.
   return (
-    <div className="min-h-screen bg-black text-[#f4f3ee] font-sans antialiased selection:bg-[#ff3d52] selection:text-white p-12 lg:p-24 pb-32">
+    <div className="brand-kit-page antialiased selection:bg-[var(--accent)] selection:text-[var(--text)] p-12 lg:p-24 pb-32">
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-      <style dangerouslySetInnerHTML={{__html: `
-        .font-sans { font-family: 'Inter', sans-serif; }
-        .font-serif { font-family: 'Fraunces', serif; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-      `}} />
-
       <div className="max-w-[1000px] mx-auto space-y-32">
         <header className="space-y-4">
-          <p className="font-serif italic font-medium uppercase tracking-[3px] text-[#ffb4be] text-sm">Brand Identity · Logo System</p>
+          <p className="brand-kit-display italic font-medium uppercase tracking-[3px] brand-kit-accent-tint text-sm">Brand Identity · Logo System</p>
           <h1 className="font-sans font-extrabold text-5xl md:text-7xl tracking-[-0.03em] leading-[1.1]">The Inverted Monogram</h1>
         </header>
 
         <section className="space-y-12">
-          <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-24 flex items-center justify-center gap-16 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#f4f3ee 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+          <div className="brand-kit-card p-24 flex items-center justify-center gap-16 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(var(--text) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
             <svg viewBox="0 0 76 76" className="w-[220px] h-[220px]">
               <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
@@ -33,8 +29,8 @@ export function LogoSystem() {
                 <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
               </svg>
               <div className="ml-[38.5px] flex items-baseline">
-                <span className="font-sans font-bold text-[#f4f3ee] text-[90px] tracking-[-0.02em] leading-none">awesome</span>
-                <span className="font-serif italic font-semibold text-[#ff3d52] text-[90px] leading-none">.video</span>
+                <span className="font-sans font-bold brand-kit-ink text-[90px] tracking-[-0.02em] leading-none">awesome</span>
+                <span className="brand-kit-display italic font-semibold brand-kit-accent text-[90px] leading-none">.video</span>
               </div>
             </div>
           </div>
@@ -44,10 +40,10 @@ export function LogoSystem() {
           <section className="space-y-8">
             <header>
               <h2 className="font-sans font-bold text-2xl tracking-[-0.01em]">Construction</h2>
-              <div className="h-px w-full bg-[#f4f3ee]/10 mt-6" />
+              <div className="h-px w-full bg-[var(--border-strong)] mt-6" />
             </header>
 
-            <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-12 flex justify-center relative">
+            <div className="brand-kit-card p-12 flex justify-center relative">
               <div className="relative">
                 <div className="absolute -inset-4 border border-[#5eddf2]/30 border-dashed" />
                 <div className="absolute top-0 bottom-0 left-1/2 w-px bg-[#5eddf2]/30" />
@@ -69,10 +65,10 @@ export function LogoSystem() {
           <section className="space-y-8">
             <header>
               <h2 className="font-sans font-bold text-2xl tracking-[-0.01em]">Clearspace</h2>
-              <div className="h-px w-full bg-[#f4f3ee]/10 mt-6" />
+              <div className="h-px w-full bg-[var(--border-strong)] mt-6" />
             </header>
 
-            <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-12 flex justify-center items-center h-[282px]">
+            <div className="brand-kit-card p-12 flex justify-center items-center h-[282px]">
               <div className="relative p-12 border border-[#b84dff]/40 border-dashed">
                 <svg viewBox="0 0 76 76" className="w-[100px] h-[100px]">
                   <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
@@ -90,48 +86,48 @@ export function LogoSystem() {
         <section className="space-y-8">
           <header>
             <h2 className="font-sans font-bold text-2xl tracking-[-0.01em]">Minimum Sizes & Stroke Compensation</h2>
-            <div className="h-px w-full bg-[#f4f3ee]/10 mt-6" />
+            <div className="h-px w-full bg-[var(--border-strong)] mt-6" />
           </header>
 
           <div className="grid grid-cols-4 gap-6">
-            <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-8 flex flex-col items-center gap-6">
+            <div className="brand-kit-card p-8 flex flex-col items-center gap-6">
               <svg viewBox="0 0 76 76" className="w-[76px] h-[76px]">
                 <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
                 <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
               </svg>
-              <div className="text-center font-mono text-sm text-[#a8a4a0]">
+              <div className="text-center font-mono text-sm brand-kit-muted">
                 <div>76px</div>
-                <div className="text-[#f4f3ee]/50 text-xs mt-1">stroke: 4</div>
+                <div className="text-[var(--text-3)] text-xs mt-1">stroke: 4</div>
               </div>
             </div>
-            <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-8 flex flex-col items-center gap-6">
+            <div className="brand-kit-card p-8 flex flex-col items-center gap-6">
               <svg viewBox="0 0 76 76" className="w-[44px] h-[44px]">
                 <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
                 <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
               </svg>
-              <div className="text-center font-mono text-sm text-[#a8a4a0]">
+              <div className="text-center font-mono text-sm brand-kit-muted">
                 <div>44px</div>
-                <div className="text-[#f4f3ee]/50 text-xs mt-1">stroke: 4</div>
+                <div className="text-[var(--text-3)] text-xs mt-1">stroke: 4</div>
               </div>
             </div>
-            <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-8 flex flex-col items-center gap-6">
+            <div className="brand-kit-card p-8 flex flex-col items-center gap-6">
               <svg viewBox="0 0 76 76" className="w-[22px] h-[22px]">
                 <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="5"/>
                 <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
               </svg>
-              <div className="text-center font-mono text-sm text-[#a8a4a0]">
+              <div className="text-center font-mono text-sm brand-kit-muted">
                 <div>22px</div>
-                <div className="text-[#f4f3ee]/50 text-xs mt-1">stroke: 5</div>
+                <div className="text-[var(--text-3)] text-xs mt-1">stroke: 5</div>
               </div>
             </div>
-            <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 p-8 flex flex-col items-center gap-6">
+            <div className="brand-kit-card p-8 flex flex-col items-center gap-6">
               <svg viewBox="0 0 76 76" className="w-[16px] h-[16px]">
                 <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="6"/>
                 <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
               </svg>
-              <div className="text-center font-mono text-sm text-[#a8a4a0]">
+              <div className="text-center font-mono text-sm brand-kit-muted">
                 <div>16px</div>
-                <div className="text-[#f4f3ee]/50 text-xs mt-1">stroke: 6</div>
+                <div className="text-[var(--text-3)] text-xs mt-1">stroke: 6</div>
               </div>
             </div>
           </div>
@@ -140,52 +136,52 @@ export function LogoSystem() {
         <section className="space-y-8">
           <header>
             <h2 className="font-sans font-bold text-2xl tracking-[-0.01em]">Variants & Contexts</h2>
-            <div className="h-px w-full bg-[#f4f3ee]/10 mt-6" />
+            <div className="h-px w-full bg-[var(--border-strong)] mt-6" />
           </header>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            <div className="bg-[#000] h-40 border border-[#f4f3ee]/10 rounded-[14px] flex items-center justify-center">
+            <div className="bg-[var(--bg)] h-40 border brand-kit-hairline rounded-[var(--radius)] flex items-center justify-center">
               <div className="flex items-baseline scale-[0.6]">
                 <svg viewBox="0 0 76 76" className="w-[76px] h-[76px]">
                   <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
                   <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
                 </svg>
                 <div className="ml-[26px] flex items-baseline">
-                  <span className="font-sans font-bold text-[#f4f3ee] text-[62px] tracking-[-0.02em] leading-none">awesome</span>
-                  <span className="font-serif italic font-semibold text-[#ff3d52] text-[62px] leading-none">.video</span>
+                  <span className="font-sans font-bold brand-kit-ink text-[62px] tracking-[-0.02em] leading-none">awesome</span>
+                  <span className="brand-kit-display italic font-semibold brand-kit-accent text-[62px] leading-none">.video</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#0e0d0c] h-40 border border-[#f4f3ee]/10 rounded-[14px] flex items-center justify-center">
+            <div className="brand-kit-card h-40 flex items-center justify-center">
               <div className="flex items-baseline scale-[0.6]">
                 <svg viewBox="0 0 76 76" className="w-[76px] h-[76px]">
                   <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
                   <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
                 </svg>
                 <div className="ml-[26px] flex items-baseline">
-                  <span className="font-sans font-bold text-[#f4f3ee] text-[62px] tracking-[-0.02em] leading-none">awesome</span>
-                  <span className="font-serif italic font-semibold text-[#ff3d52] text-[62px] leading-none">.video</span>
+                  <span className="font-sans font-bold brand-kit-ink text-[62px] tracking-[-0.02em] leading-none">awesome</span>
+                  <span className="brand-kit-display italic font-semibold brand-kit-accent text-[62px] leading-none">.video</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#f4f3ee] h-40 border border-[#f4f3ee]/10 rounded-[14px] flex items-center justify-center relative overflow-hidden">
-              <div className="absolute top-2 left-3 font-mono text-[10px] text-[#a8a4a0]">Tile stays black</div>
+            <div className="bg-[var(--text)] h-40 border brand-kit-hairline rounded-[var(--radius)] flex items-center justify-center relative overflow-hidden">
+              <div className="absolute top-2 left-3 font-mono text-[10px] brand-kit-muted">Tile stays black</div>
               <div className="flex items-baseline scale-[0.6]">
                 <svg viewBox="0 0 76 76" className="w-[76px] h-[76px]">
                   <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
                   <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
                 </svg>
                 <div className="ml-[26px] flex items-baseline">
-                  <span className="font-sans font-bold text-[#000] text-[62px] tracking-[-0.02em] leading-none">awesome</span>
-                  <span className="font-serif italic font-semibold text-[#ff3d52] text-[62px] leading-none">.video</span>
+                  <span className="font-sans font-bold text-[var(--bg)] text-[62px] tracking-[-0.02em] leading-none">awesome</span>
+                  <span className="brand-kit-display italic font-semibold brand-kit-accent text-[62px] leading-none">.video</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#0e0d0c] h-40 border border-[#f4f3ee]/10 rounded-[14px] flex items-center justify-center relative">
-              <div className="absolute top-2 left-3 font-mono text-[10px] text-[#a8a4a0]">Avatar crop</div>
+            <div className="brand-kit-card h-40 flex items-center justify-center relative">
+              <div className="absolute top-2 left-3 font-mono text-[10px] brand-kit-muted">Avatar crop</div>
               <div className="w-16 h-16 rounded-full overflow-hidden bg-[#000] flex items-center justify-center border border-[#ff3d52]/20">
                 <svg viewBox="0 0 76 76" className="w-[64px] h-[64px] scale-[1.2]">
                   <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="4"/>
@@ -195,13 +191,13 @@ export function LogoSystem() {
             </div>
 
             <div className="bg-[#1e1e1e] h-40 border border-[#f4f3ee]/10 rounded-[14px] flex items-start justify-start p-4 relative overflow-hidden">
-               <div className="absolute top-2 left-3 font-mono text-[10px] text-[#a8a4a0]">Browser Tab</div>
+               <div className="absolute top-2 left-3 font-mono text-[10px] brand-kit-muted">Browser Tab</div>
                <div className="mt-6 flex items-center bg-[#2d2d2d] rounded-t-lg px-4 py-2 min-w-[200px] border-b-2 border-blue-500">
                  <svg viewBox="0 0 76 76" className="w-[16px] h-[16px] mr-2">
                     <rect x="2" y="2" width="72" height="72" rx="16" fill="#000" stroke="#ff3d52" strokeWidth="6"/>
                     <text x="38" y="51" textAnchor="middle" fontFamily="Inter" fontWeight="800" fontSize="34" fill="#ff3d52" letterSpacing="-1">AV</text>
                   </svg>
-                  <span className="text-xs text-[#f4f3ee] font-sans">awesome.video</span>
+                  <span className="text-xs brand-kit-ink font-sans">awesome.video</span>
                </div>
             </div>
 
@@ -211,7 +207,7 @@ export function LogoSystem() {
         <section className="space-y-8">
           <header>
             <h2 className="font-sans font-bold text-2xl tracking-[-0.01em]">Do & Don't</h2>
-            <div className="h-px w-full bg-[#f4f3ee]/10 mt-6" />
+            <div className="h-px w-full bg-[var(--border-strong)] mt-6" />
           </header>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
@@ -271,13 +267,13 @@ function DoDont({ type, desc, children }: any) {
   const isDo = type === 'do';
   const color = isDo ? '#34d08c' : '#ff5c7a';
   return (
-    <div className="bg-[#0e0d0c] rounded-[14px] border border-[#f4f3ee]/10 overflow-hidden flex flex-col h-[200px]">
-      <div className="flex-1 flex items-center justify-center relative border-b border-[#f4f3ee]/10">
+    <div className="brand-kit-card overflow-hidden flex flex-col h-[200px]">
+      <div className="flex-1 flex items-center justify-center relative border-b brand-kit-hairline">
         <div className="absolute top-2 left-3 font-mono text-[10px]" style={{ color }}>{isDo ? 'DO' : "DON'T"}</div>
         {children}
       </div>
-      <div className="p-3 bg-[#000] min-h-[48px] flex items-center">
-        <p className="font-sans text-xs text-[#a8a4a0]">{desc}</p>
+      <div className="p-3 bg-[var(--bg)] min-h-[48px] flex items-center">
+        <p className="font-sans text-xs brand-kit-muted">{desc}</p>
       </div>
     </div>
   );

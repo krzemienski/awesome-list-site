@@ -15,60 +15,24 @@
       "#ff3c00": 1
     },
     "artifacts/mockup-sandbox/src/components/mockups/brand-kit/BrandInAction.tsx": {
-      "#000000": 4,
-      "#0e0d0c": 1,
-      "#a8a4a0": 1,
-      "#f4f3ee": 3,
-      "#ff3d52": 17,
-      "#ff5c7a": 1,
-      "#ffb4be": 1
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/ColorType.tsx": {
-      "#000000": 2,
-      "#0e0d0c": 5,
-      "#33070c": 1,
-      "#34d08c": 4,
-      "#5eddf2": 2,
-      "#660f18": 1,
-      "#991724": 1,
-      "#a8a4a0": 12,
-      "#b84dff": 3,
-      "#cc1e30": 1,
-      "#f4f3ee": 13,
-      "#ff3d52": 6,
-      "#ff5c7a": 2,
-      "#ff6675": 1,
-      "#ff8f99": 1,
-      "#ffb4be": 7,
-      "#ffb84d": 2,
-      "#ffe3e7": 1,
-      "#fff": 2
+      "#ff3d52": 10
     },
     "artifacts/mockup-sandbox/src/components/mockups/brand-kit/Guidelines.tsx": {
-      "#000000": 4,
-      "#0e0d0c": 2,
-      "#34d08c": 5,
-      "#5eddf2": 2,
-      "#a8a4a0": 6,
-      "#b84dff": 1,
-      "#f4f3ee": 5,
-      "#ff3d52": 8,
-      "#ff5c7a": 5,
-      "#ffb4be": 5,
-      "#ffb84d": 2
+      "#000000": 1,
+      "#a8a4a0": 3,
+      "#f4f3ee": 2,
+      "#ff3d52": 4,
+      "#ffb4be": 3
     },
     "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
-      "#0e0d0c": 10,
       "#1e1e1e": 1,
       "#2d2d2d": 1,
       "#34d08c": 2,
       "#5eddf2": 8,
-      "#a8a4a0": 8,
       "#b84dff": 6,
-      "#f4f3ee": 30,
-      "#ff3d52": 42,
+      "#f4f3ee": 1,
+      "#ff3d52": 37,
       "#ff5c7a": 1,
-      "#ffb4be": 1,
       "#fff": 2
     },
     "artifacts/mockup-sandbox/src/components/ui/chart.tsx": {
@@ -189,28 +153,6 @@
     }
   },
   "rgb-colors": {
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/BrandInAction.tsx": {
-      "rgba(244,243,238,0.05)": 1,
-      "rgba(244,243,238,0.12)": 1,
-      "rgba(244,243,238,0.24)": 1,
-      "rgba(255,61,82,0.08)": 1
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/ColorType.tsx": {
-      "rgba(244,243,238,0.12)": 3,
-      "rgba(244,243,238,0.2)": 1,
-      "rgba(255,61,82,0.08)": 2
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/Guidelines.tsx": {
-      "rgba(244,243,238,.12)": 1,
-      "rgba(244,243,238,0.12)": 1,
-      "rgba(255,184,77,0.1)": 1,
-      "rgba(255,61,82,0.08)": 1,
-      "rgba(255,92,122,0.1)": 4,
-      "rgba(255,92,122,0.2)": 3,
-      "rgba(52,208,140,0.1)": 4,
-      "rgba(52,208,140,0.2)": 3,
-      "rgba(94,221,242,0.1)": 1
-    },
     "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
       "rgba(0,0,0,0.5)": 1,
       "rgba(255,61,82,0.3)": 1
@@ -375,20 +317,8 @@
     }
   },
   "raw-radii": {
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/BrandInAction.tsx": {
-      "border: 1px": 1,
-      "rounded-[14px]": 7,
-      "rounded-[8px]": 1
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/ColorType.tsx": {
-      "rounded-[14px]": 3
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/Guidelines.tsx": {
-      "border: 1px": 1,
-      "rounded-[14px]": 8
-    },
     "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
-      "rounded-[14px]": 13
+      "rounded-[14px]": 1
     },
     "artifacts/mockup-sandbox/src/components/ui/chart.tsx": {
       "rounded-[2px]": 2
@@ -422,26 +352,6 @@
     }
   },
   "font-family": {
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/BrandInAction.tsx": {
-      "font-family: 'fraunces', serif": 1,
-      "font-family: 'inter', sans-serif": 1,
-      "font-family: 'jetbrains mono', monospace": 1
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/ColorType.tsx": {
-      "font-family: 'fraunces', serif": 1,
-      "font-family: 'inter', sans-serif": 1,
-      "font-family: 'jetbrains mono', monospace": 1
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/Guidelines.tsx": {
-      "font-family: 'fraunces', serif": 1,
-      "font-family: 'inter', sans-serif": 1,
-      "font-family: 'jetbrains mono', monospace": 1
-    },
-    "artifacts/mockup-sandbox/src/components/mockups/brand-kit/LogoSystem.tsx": {
-      "font-family: 'fraunces', serif": 1,
-      "font-family: 'inter', sans-serif": 1,
-      "font-family: 'jetbrains mono', monospace": 1
-    },
     "awesome-list-site-ds/HANDOFF.md": {
       "font-family: 'inter'": 1
     },
