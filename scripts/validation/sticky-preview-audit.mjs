@@ -76,6 +76,68 @@ const log = (name, pass, detail) => {
   console.log(`${pass ? "PASS" : "FAIL"} ${name} :: ${detail}`);
 };
 
+function readClientSource(relativePath) {
+  return fs.readFileSync(path.join(ROOT, relativePath), "utf8");
+}
+
+function openingTagAround(source, anchor, tagName) {
+  const anchorIndex = source.indexOf(anchor);
+  if (anchorIndex < 0) return "";
+  const start = source.lastIndexOf(`<${tagName}`, anchorIndex);
+  const end = source.indexOf(">", anchorIndex);
+  return start >= 0 && end >= 0 ? source.slice(start, end + 1) : "";
+}
+
+function auditSharedHeaderHeightSource() {
+  const mainLayout = readClientSource("client/src/components/layout/new/MainLayout.tsx");
+  const appHeader = readClientSource("client/src/components/layout/new/AppHeader.tsx");
+  const themeSettings = readClientSource("client/src/pages/ThemeSettings.tsx");
+
+  const shellClass = mainLayout.match(
+    /<SidebarProvider\b[\s\S]*?\bclassName="([^"]*)"/,
+  )?.[1] ?? "";
+  const definesPhone = shellClass.split(/\s+/).includes("[--header-height:56px]");
+  const definesTablet = shellClass.split(/\s+/).includes("md:[--header-height:60px]");
+  log(
+    "shared-header-height-shell-source",
+    definesPhone && definesTablet,
+    `phoneVariable=${definesPhone} tabletVariable=${definesTablet}`,
+  );
+
+  const headerClass = appHeader.match(/<header\b\s+className="([^"]*)"/)?.[1] ?? "";
+  const headerConsumesVariable = headerClass
+    .split(/\s+/)
+    .includes("h-[var(--header-height)]");
+  log(
+    "shared-header-height-header-source",
+    headerConsumesVariable,
+    `heightConsumesVariable=${headerConsumesVariable}`,
+  );
+
+  const previewTag = openingTagAround(
+    themeSettings,
+    'data-testid="theme-sticky-preview"',
+    "div",
+  );
+  const previewClass = previewTag.match(/\bclassName="([^"]*)"/)?.[1] ?? "";
+  const previewConsumesVariable = previewClass
+    .split(/\s+/)
+    .includes("top-[var(--header-height)]");
+  log(
+    "shared-header-height-preview-source",
+    previewConsumesVariable,
+    `topConsumesVariable=${previewConsumesVariable}`,
+  );
+}
+
+auditSharedHeaderHeightSource();
+const sourceFailures = results.filter((result) => !result.pass);
+if (sourceFailures.length) {
+  fs.writeFileSync(`${OUT}/sticky-preview-audit.json`, JSON.stringify(results, null, 2));
+  console.log(`\nTOTAL ${results.length}, FAIL ${sourceFailures.length} (evidence: ${OUT})`);
+  process.exit(1);
+}
+
 await waitForServer();
 const browser = await launchBrowserWithLease(
   chromium,
