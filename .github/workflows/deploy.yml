@@ -129,6 +129,25 @@ jobs:
           fi
           npm run validate:guest-recommendations:release
 
+      - name: Run published tag route check
+        id: tag-routes
+        continue-on-error: true
+        env:
+          AUDIT_BASE_URL: ${{ vars.PRODUCTION_URL || 'https://awesome.video' }}
+          EXPECTED_BUILD_REVISION: ${{ github.sha }}
+          REVISION_WAIT_TIMEOUT_MS: '600000'
+          TAG_ROUTE_AUDIT_EVIDENCE_DIR: ${{ github.workspace }}/evidence/tag-routes
+          PLAYWRIGHT_CHROMIUM_EXECUTABLE: ${{ runner.tool_cache }}/Playwright/1.60.0/x64/chrome-linux/chrome
+        run: |
+          if [ ! -x "$PLAYWRIGHT_CHROMIUM_EXECUTABLE" ]; then
+            export PLAYWRIGHT_CHROMIUM_EXECUTABLE="$(find "$HOME/.cache/ms-playwright" -type f \( -path '*/chrome-linux/chrome' -o -path '*/chrome-linux64/chrome' \) -print -quit)"
+          fi
+          if [ -z "$PLAYWRIGHT_CHROMIUM_EXECUTABLE" ] || [ ! -x "$PLAYWRIGHT_CHROMIUM_EXECUTABLE" ]; then
+            echo "::error::Chromium was not installed; tag route evidence cannot be collected."
+            exit 1
+          fi
+          node scripts/validation/tag-route-audit.mjs
+
       - name: Upload post-publish analytics evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -147,6 +166,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Upload post-publish tag route evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tag-route-evidence-${{ github.run_id }}
+          path: evidence/tag-routes
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Surface analytics smoke failure
         if: steps.analytics-smoke.outcome == 'failure'
         run: |
@@ -157,4 +185,10 @@ jobs:
         if: steps.guest-recommendations.outcome == 'failure'
         run: |
           echo "::error::Post-publish guest recommendations failed. The release remains published; download the guest-recommendations-evidence-${{ github.run_id }} artifact for expected/observed revisions, route, viewport, API item count, and rendered card count."
+          exit 1
+
+      - name: Surface tag route failure
+        if: always() && steps.tag-routes.outcome == 'failure'
+        run: |
+          echo "::error::Post-publish tag navigation failed. The release remains published; download the tag-route-evidence-${{ github.run_id }} artifact for direct redirect, client-side redirect, live tag rendering, and history navigation results."
           exit 1
