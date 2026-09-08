@@ -224,9 +224,24 @@ export function isSystemId(id: string | null | undefined): id is DesignSystemId 
   return typeof id === 'string' && Object.prototype.hasOwnProperty.call(DESIGN_SYSTEMS, id);
 }
 
+export function isAccentId(id: string | null | undefined): id is AccentId {
+  return typeof id === 'string' && ACCENTS.some((accent) => accent.id === id);
+}
+
 /** The offered system this stored value means — DEFAULT_SYSTEM if it means none. */
 export function resolveSystemId(id: string | null | undefined): DesignSystemId {
   return isSystemId(id) ? id : DEFAULT_SYSTEM;
+}
+
+/** The offered accent this stored value means, using the resolved system's natural fallback. */
+export function resolveAccentId(
+  id: string | null | undefined,
+  systemId: string | null | undefined,
+): AccentId {
+  const resolvedSystem = resolveSystemId(systemId);
+  return isAccentId(id)
+    ? id
+    : SYSTEM_DEFAULT_ACCENT[resolvedSystem] || DEFAULT_ACCENT;
 }
 
 declare global {
@@ -240,9 +255,7 @@ declare global {
 
 export function applyDesignSystem(systemId: string, accentId: string): { system: string; accent: string } {
   const resolvedSystem = resolveSystemId(systemId);
-  const validAccent = ACCENTS.find((x) => x.id === accentId);
-  const fallbackAccentId = SYSTEM_DEFAULT_ACCENT[resolvedSystem] || DEFAULT_ACCENT;
-  const resolvedAccent = (validAccent && validAccent.id) || fallbackAccentId;
+  const resolvedAccent = resolveAccentId(accentId, resolvedSystem);
 
   if (typeof document !== 'undefined') {
     const root = document.documentElement;

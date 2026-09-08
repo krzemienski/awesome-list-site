@@ -9,6 +9,9 @@ import {
   applyDesignSystem,
   resolveProductProfile,
   isSystemId,
+  isAccentId,
+  resolveSystemId,
+  resolveAccentId,
   type DesignSystemId,
   type AccentId,
 } from "@/lib/design-system";
@@ -47,10 +50,6 @@ function readInitial<T extends string>(
   return saved && valid(saved) ? saved : fallback;
 }
 
-function isAccentId(id: string): id is AccentId {
-  return ACCENTS.some((a) => a.id === id);
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const initialProfile =
     PRODUCT_PROFILES[
@@ -67,6 +66,33 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     applyDesignSystem(systemId, accentId);
   }, [systemId, accentId]);
+
+  useEffect(() => {
+    let syncTimer: number | null = null;
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.storageArea !== localStorage) return;
+      if (event.key !== null && event.key !== "ds-system" && event.key !== "ds-accent") return;
+
+      if (syncTimer !== null) window.clearTimeout(syncTimer);
+      syncTimer = window.setTimeout(() => {
+        // Coalesce the two native events from a paired system/accent change,
+        // then resolve both values from the writer's completed storage state.
+        const nextSystem = resolveSystemId(safeGetItem("ds-system"));
+        const nextAccent = resolveAccentId(safeGetItem("ds-accent"), nextSystem);
+        loadDesignSystemFont(resolveSystemId(nextSystem));
+        setSystemId(nextSystem);
+        setAccentId(nextAccent);
+        syncTimer = null;
+      }, 0);
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      if (syncTimer !== null) window.clearTimeout(syncTimer);
+    };
+  }, []);
 
   const setSystem = useCallback((id: string) => {
     if (!isSystemId(id)) return;

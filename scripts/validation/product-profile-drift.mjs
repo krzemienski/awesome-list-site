@@ -399,6 +399,73 @@ async function inspectRoute(browser, family, saved) {
   }
 }
 
+async function inspectCrossTabThemeSync(browser) {
+  const context = await browser.newContext();
+  const writer = await context.newPage();
+  const receiver = await context.newPage();
+
+  const readTheme = (page) => page.evaluate(() => ({
+    profile: document.documentElement.getAttribute("data-product-profile"),
+    system: document.documentElement.getAttribute("data-system"),
+    accent: document.documentElement.getAttribute("data-accent"),
+  }));
+  const waitForTheme = (page, system, accent) => page.waitForFunction(
+    ({ expectedSystem, expectedAccent }) => {
+      const root = document.documentElement;
+      return root.getAttribute("data-system") === expectedSystem
+        && root.getAttribute("data-accent") === expectedAccent;
+    },
+    { expectedSystem: system, expectedAccent: accent },
+    { timeout: 10_000 },
+  );
+
+  try {
+    await receiver.goto(`${BASE}/settings/theme`, {
+      waitUntil: "domcontentloaded",
+      timeout: 45_000,
+    });
+    await receiver.waitForSelector('[data-testid="system-picker"]', { timeout: 30_000 });
+    await writer.goto(`${BASE}/design-system`, {
+      waitUntil: "domcontentloaded",
+      timeout: 45_000,
+    });
+    await writer.waitForSelector('[data-testid="ds-system-switcher"]', { timeout: 30_000 });
+
+    await writer.click('[data-testid="ds-system-terminal"]');
+    await writer.click('[data-testid="ds-accent-violet"]');
+    await waitForTheme(receiver, "terminal", "violet");
+    let state = await readTheme(receiver);
+    expect(
+      state.profile === "learning-workspace",
+      `Cross-tab valid update reset the receiving profile to ${state.profile}`,
+    );
+
+    await writer.evaluate(() => {
+      localStorage.setItem("ds-system", "retired-system");
+      localStorage.setItem("ds-accent", "retired-accent");
+    });
+    await waitForTheme(receiver, "editorial", "crimson");
+    state = await readTheme(receiver);
+    expect(
+      state.profile === "learning-workspace",
+      `Cross-tab invalid fallback reset the receiving profile to ${state.profile}`,
+    );
+
+    await writer.evaluate(() => {
+      localStorage.removeItem("ds-system");
+      localStorage.removeItem("ds-accent");
+    });
+    await waitForTheme(receiver, "editorial", "crimson");
+    state = await readTheme(receiver);
+    expect(
+      state.profile === "learning-workspace",
+      `Cross-tab removed-value fallback reset the receiving profile to ${state.profile}`,
+    );
+  } finally {
+    await context.close();
+  }
+}
+
 await waitForServer();
 if (!AUDIT_KEY || AUDIT_KEY.length < 8) {
   throw new Error("ADMIN_PASSWORD (>=8 chars) is required to inspect the protected admin document");
@@ -496,6 +563,7 @@ try {
       }
     }
   }
+  await inspectCrossTabThemeSync(browser);
 } finally {
   await browser.close();
 }
@@ -507,5 +575,5 @@ if (failures.length) {
 }
 
 console.log(
-  `Product profile drift: PASS (${profiles.length} approved profiles; ${routeFamilies.length * 6} browser scenarios)`,
+  `Product profile drift: PASS (${profiles.length} approved profiles; ${routeFamilies.length * 6} route scenarios; cross-tab theme sync)`,
 );

@@ -106,3 +106,4 @@
 - [Browser response state assertions](browser-response-state-assertions.md) — shared response helpers validate transport/shape; scenarios own populated-vs-empty cardinality assertions.
 - [Artifact registry registration](artifact-registry-registration.md) — verify with listArtifacts; create/register APIs can report success or scaffold files while the platform registry still rolls back.
 - [Theme storage denial gates](theme-storage-denial-gates.md) — isolate app-owned theme keys from Clerk session storage unless Clerk compatibility is the test itself.
+- [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
