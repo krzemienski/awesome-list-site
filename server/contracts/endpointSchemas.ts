@@ -111,7 +111,7 @@ const resourcesListResponseSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// GET /api/recommendations
+// GET + POST /api/recommendations
 // ---------------------------------------------------------------------------
 
 /**
@@ -293,6 +293,11 @@ export function registerCoreEndpointSchemas(): void {
   setRouteResponseSchema("get", "/api/recommendations", {
     name: "RecommendationsResponse",
     description: "Array of recommendation items, each wrapping a public resource",
+    schema: recommendationsResponseSchema,
+  });
+  setRouteResponseSchema("post", "/api/recommendations", {
+    name: "AuthenticatedRecommendationsResponse",
+    description: "Authenticated array of recommendation items, each wrapping a public resource",
     schema: recommendationsResponseSchema,
   });
 

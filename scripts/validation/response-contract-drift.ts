@@ -78,6 +78,7 @@ async function main() {
   // body parsing → Clerk verification (skipped for valid audit keys) →
   // clerkUserContext (resolves req.dbUser, incl. the audit-key admin row).
   const app = express();
+  app.set("trust proxy", 1);
   app.use(express.json({ limit: "256kb" }));
   app.use(express.urlencoded({ extended: false, limit: "256kb" }));
   const clerkSession = clerkMiddleware(() => ({
@@ -136,7 +137,13 @@ async function main() {
   const { port } = server.address() as AddressInfo;
   const base = `http://127.0.0.1:${port}`;
 
-  const auditHeaders = { "X-Admin-Audit-Key": adminPassword };
+  const auditHeaders = {
+    "X-Admin-Audit-Key": adminPassword,
+    // Keep this in-process contract probe out of sibling validation gates'
+    // shared ai-generation limiter bucket when the completion suite runs in
+    // parallel. The production route still executes its real limiter.
+    "X-Forwarded-For": `2001:db8::${(process.pid % 65535).toString(16)}`,
+  };
   const checks: CheckResult[] = [];
   const retiredLearningPathInvocations: string[] = [];
 

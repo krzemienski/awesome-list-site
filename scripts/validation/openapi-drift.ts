@@ -197,6 +197,44 @@ async function main() {
     }
   }
 
+  const authenticatedRecommendations = contracts
+    .all()
+    .find(
+      (contract) =>
+        contract.method === "post" &&
+        contract.path === "/api/recommendations",
+  );
+  const authenticatedRecommendationsOperation =
+    document.paths?.["/api/recommendations"]?.post;
+  const authenticatedRecommendationsResponse =
+    authenticatedRecommendations?.responses?.["200"];
+  if (
+    authenticatedRecommendationsResponse?.name !==
+    "AuthenticatedRecommendationsResponse"
+  ) {
+    errors.push(
+      "post /api/recommendations must use the explicit AuthenticatedRecommendationsResponse schema",
+    );
+  }
+  if (
+    authenticatedRecommendationsOperation?.responses?.["200"]?.content?.[
+      "application/json"
+    ]?.schema?.$ref !==
+    "#/components/schemas/AuthenticatedRecommendationsResponse"
+  ) {
+    errors.push(
+      "post /api/recommendations OpenAPI 200 response must reference AuthenticatedRecommendationsResponse",
+    );
+  }
+  if (
+    JSON.stringify(authenticatedRecommendationsOperation?.security) !==
+    JSON.stringify([{ SessionCookie: [] }])
+  ) {
+    errors.push(
+      "post /api/recommendations must remain authenticated with SessionCookie security",
+    );
+  }
+
   // Serialize before SwaggerParser.validate(): recursive schemas are valid via
   // $ref, and the parser may dereference them into circular object references.
   const yamlPath = join(process.cwd(), "docs", "api", "openapi.yaml");

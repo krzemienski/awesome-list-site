@@ -7931,6 +7931,31 @@ components:
             items:
               type: string
               maxLength: 512
+    AuthenticatedRecommendationsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          resource:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              status:
+                type: string
+            required:
+              - id
+              - title
+              - url
+              - status
+            additionalProperties: {}
+        required:
+          - resource
+        additionalProperties: {}
     post_3a__2f_api_2f_recommendations_2f_feedback.Query:
       type: object
       properties:
@@ -31592,11 +31617,11 @@ paths:
       operationId: post:/api/recommendations
       responses:
         '200':
-          description: Successful response
+          description: Authenticated array of recommendation items, each wrapping a public resource
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/AuthenticatedRecommendationsResponse'
         '400':
           description: Request validation failed
           content:
