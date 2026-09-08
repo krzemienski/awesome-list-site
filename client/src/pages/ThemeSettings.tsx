@@ -12,7 +12,12 @@ import { Input } from "@/components/ui/input";
 // `client/src/lib/font-options.ts`. The boot script in `client/index.html`
 // duplicates the same map inline for pre-paint application;
 // Keep the two in sync by hand.
-import { FONT_OPTIONS, FONT_LS_KEY, applyFontOverride } from "@/lib/font-options";
+import {
+  FONT_OPTIONS,
+  FONT_LS_KEY,
+  applyFontOverride,
+  resolveFontOverrideId,
+} from "@/lib/font-options";
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { isSystemId } from "@/lib/design-system";
@@ -28,12 +33,21 @@ export default function ThemeSettings() {
   // I1 — Font override state
   const [fontId, setFontId] = useState<string>(() => {
     if (typeof window === "undefined") return "system";
-    return localStorage.getItem(FONT_LS_KEY) || "system";
+    return resolveFontOverrideId(localStorage.getItem(FONT_LS_KEY));
   });
   useEffect(() => {
     applyFontOverride(fontId);
     localStorage.setItem(FONT_LS_KEY, fontId);
   }, [fontId]);
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.storageArea !== localStorage) return;
+      if (event.key !== FONT_LS_KEY && event.key !== null) return;
+      setFontId(resolveFontOverrideId(localStorage.getItem(FONT_LS_KEY)));
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const handlePickFont = (id: string) => {
     setFontId(id);

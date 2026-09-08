@@ -408,6 +408,8 @@ async function inspectCrossTabThemeSync(browser) {
     profile: document.documentElement.getAttribute("data-product-profile"),
     system: document.documentElement.getAttribute("data-system"),
     accent: document.documentElement.getAttribute("data-accent"),
+    font: document.documentElement.getAttribute("data-font"),
+    fontBody: document.documentElement.style.getPropertyValue("--font-body"),
   }));
   const waitForTheme = (page, system, accent) => page.waitForFunction(
     ({ expectedSystem, expectedAccent }) => {
@@ -438,6 +440,64 @@ async function inspectCrossTabThemeSync(browser) {
     expect(
       state.profile === "learning-workspace",
       `Cross-tab valid update reset the receiving profile to ${state.profile}`,
+    );
+
+    await writer.evaluate(() => {
+      localStorage.setItem("ds-font-override", "ibm-plex");
+    });
+    await receiver.waitForFunction(
+      () => document.documentElement.getAttribute("data-font") === "ibm-plex",
+      undefined,
+      { timeout: 10_000 },
+    );
+    state = await readTheme(receiver);
+    expect(
+      state.fontBody.includes("IBM Plex Sans"),
+      `Cross-tab font update did not apply the IBM Plex stack: ${state.fontBody}`,
+    );
+    expect(
+      state.profile === "learning-workspace" && state.system === "terminal" && state.accent === "violet",
+      `Cross-tab font update changed unrelated theme state: ${JSON.stringify(state)}`,
+    );
+    expect(
+      await receiver.locator('[data-testid="font-option-ibm-plex"]').getAttribute("aria-checked") === "true",
+      "Cross-tab font update did not update the receiving picker",
+    );
+    expect(
+      await receiver.locator('link[data-font-option="ibm-plex"]').count() === 1,
+      "Cross-tab font update did not load the selected font stylesheet",
+    );
+
+    await writer.evaluate(() => {
+      localStorage.setItem("ds-font-override", "retired-font");
+    });
+    await receiver.waitForFunction(
+      () => document.documentElement.getAttribute("data-font") === "system",
+      undefined,
+      { timeout: 10_000 },
+    );
+    state = await readTheme(receiver);
+    expect(
+      state.fontBody === "",
+      `Cross-tab invalid font did not clear the override: ${state.fontBody}`,
+    );
+    expect(
+      state.profile === "learning-workspace" && state.system === "terminal" && state.accent === "violet",
+      `Cross-tab invalid font fallback changed unrelated theme state: ${JSON.stringify(state)}`,
+    );
+
+    await writer.evaluate(() => {
+      localStorage.removeItem("ds-font-override");
+    });
+    await receiver.waitForFunction(
+      () => document.documentElement.getAttribute("data-font") === "system",
+      undefined,
+      { timeout: 10_000 },
+    );
+    state = await readTheme(receiver);
+    expect(
+      state.font === "system" && state.fontBody === "",
+      `Cross-tab cleared font did not retain the system fallback: ${JSON.stringify(state)}`,
     );
 
     await writer.evaluate(() => {
@@ -575,5 +635,5 @@ if (failures.length) {
 }
 
 console.log(
-  `Product profile drift: PASS (${profiles.length} approved profiles; ${routeFamilies.length * 6} route scenarios; cross-tab theme sync)`,
+  `Product profile drift: PASS (${profiles.length} approved profiles; ${routeFamilies.length * 6} route scenarios; cross-tab theme and font sync)`,
 );

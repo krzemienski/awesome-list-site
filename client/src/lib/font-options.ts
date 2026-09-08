@@ -35,6 +35,10 @@ export const FONT_OPTIONS: FontOption[] = [
 
 export const FONT_LS_KEY = "ds-font-override";
 
+export function resolveFontOverrideId(id: string | null): string {
+  return FONT_OPTIONS.some((option) => option.id === id) ? id! : FONT_OPTIONS[0].id;
+}
+
 /** Data injected by Vite into client/index.html before the first paint. */
 export const FONT_BOOT_DATA = {
   stacks: Object.fromEntries(FONT_OPTIONS.map(({ id, stack }) => [id, stack])),
@@ -106,7 +110,8 @@ export function loadDesignSystemFont(systemId: string): void {
 }
 
 export function applyFontOverride(id: string): void {
-  const opt = FONT_OPTIONS.find((f) => f.id === id) ?? FONT_OPTIONS[0];
+  const resolvedId = resolveFontOverrideId(id);
+  const opt = FONT_OPTIONS.find((f) => f.id === resolvedId)!;
   document.documentElement.setAttribute("data-font", opt.id);
   // Run22 BUG-015: body text renders with `var(--font-body)` (index.css +
   // design-system.css), NOT `--font-sans` — setting only --font-sans was a

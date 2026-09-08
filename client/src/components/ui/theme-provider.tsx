@@ -16,7 +16,12 @@ import {
   type AccentId,
 } from "@/lib/design-system";
 import { safeGetItem } from "@/lib/safeStorage";
-import { loadDesignSystemFont } from "@/lib/font-options";
+import {
+  FONT_LS_KEY,
+  applyFontOverride,
+  loadDesignSystemFont,
+  resolveFontOverrideId,
+} from "@/lib/font-options";
 
 type ThemeProviderState = {
   systemId: DesignSystemId;
@@ -72,6 +77,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     const onStorage = (event: StorageEvent) => {
       if (event.storageArea !== localStorage) return;
+      if (event.key === FONT_LS_KEY || event.key === null) {
+        applyFontOverride(resolveFontOverrideId(safeGetItem(FONT_LS_KEY)));
+      }
       if (event.key !== null && event.key !== "ds-system" && event.key !== "ds-accent") return;
 
       if (syncTimer !== null) window.clearTimeout(syncTimer);
