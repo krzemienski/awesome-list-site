@@ -11,6 +11,7 @@
 //   node scripts/validation/standalone-palette-drift.mjs --update-baseline --init
 
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
@@ -29,6 +30,12 @@ const STANDALONE_SCOPE = {
   sourceExtensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.scss', '.html', '.svg', '.md'],
   ignoredDirectories: ['.git', 'dist', 'node_modules', 'uploads', 'docs'],
   tokenSourceExclusions: ['**/design-system.css', 'awesome-list-site-ds/styles.css', 'artifacts/*/src/index.css'],
+  unmanifestedArtifactExclusions: [
+    {
+      path: 'artifacts/r6',
+      reason: 'release-audit evidence bundle containing claims Markdown and screenshots, not a runnable UI artifact',
+    },
+  ],
 };
 const LEGACY_ROOT_REL = STANDALONE_SCOPE.roots.find((root) => !root.includes('*'));
 const MANIFEST_ROOT_PATTERN = STANDALONE_SCOPE.roots.find((root) => root.includes('*'));
@@ -108,6 +115,22 @@ function runCanaries() {
   assertEqual(diff.decreases.map(formatDiff), ['hex-colors|surface.tsx|#34d08c|1->0'], 'removed legacy value requires ratchet');
   assertEqual(classifyUpdate(baseline, added, false).shouldWrite, false, 'new value refuses baseline update');
   assertEqual(classifyUpdate(baseline, removed, false).shouldWrite, true, 'cleanup allows baseline ratchet');
+
+  const canaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'standalone-palette-unmanifested-canary-'));
+  try {
+    fs.mkdirSync(path.join(canaryRoot, 'new-mockup', 'src'), { recursive: true });
+    fs.writeFileSync(path.join(canaryRoot, 'new-mockup', 'src', 'App.tsx'), 'export default function App() { return null; }\n');
+    fs.mkdirSync(path.join(canaryRoot, 'manifested', '.replit-artifact'), { recursive: true });
+    fs.writeFileSync(path.join(canaryRoot, 'manifested', '.replit-artifact', 'artifact.toml'), 'kind = "design"\n');
+    fs.writeFileSync(path.join(canaryRoot, 'manifested', 'index.html'), '<main></main>\n');
+    assertEqual(
+      findUnmanifestedSourceDirectories(canaryRoot, []),
+      [path.join(canaryRoot, 'new-mockup')],
+      'unmanifested source-bearing mockup detector',
+    );
+  } finally {
+    fs.rmSync(canaryRoot, { recursive: true, force: true });
+  }
 }
 
 function formatDiff(value) {
@@ -132,7 +155,7 @@ function extractDocumentedScope(skillText) {
 
   const section = skillText.slice(markerIndex + marker.length, endIndex);
   const documented = {};
-  for (const [, key, rawValue] of section.matchAll(/^\s*>?\s*(roots|sourceExtensions|ignoredDirectories|tokenSourceExclusions)\s*=\s*(\[[^\n]+\])\s*$/gm)) {
+  for (const [, key, rawValue] of section.matchAll(/^\s*>?\s*(roots|sourceExtensions|ignoredDirectories|tokenSourceExclusions|unmanifestedArtifactExclusions)\s*=\s*(\[[^\n]+\])\s*$/gm)) {
     documented[key] = JSON.parse(rawValue);
   }
 
@@ -180,6 +203,30 @@ function checkStandaloneScopeParity() {
 
 function hasArtifactManifest(dir) {
   return fs.existsSync(path.join(dir, '.replit-artifact', 'artifact.toml'));
+}
+
+function hasSourceFiles(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory() && IGNORED_DIRS.has(entry.name)) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory() && hasSourceFiles(full)) return true;
+    if (entry.isFile() && SOURCE_EXTS.has(path.extname(entry.name).toLowerCase())) return true;
+  }
+  return false;
+}
+
+function findUnmanifestedSourceDirectories(artifactsRoot, exclusions = STANDALONE_SCOPE.unmanifestedArtifactExclusions) {
+  if (!fs.existsSync(artifactsRoot)) return [];
+  const excludedPaths = new Set(exclusions.map((exclusion) => path.resolve(ROOT, exclusion.path)));
+  return fs.readdirSync(artifactsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(artifactsRoot, entry.name))
+    .filter((artifactRoot) =>
+      !hasArtifactManifest(artifactRoot) &&
+      !excludedPaths.has(path.resolve(artifactRoot)) &&
+      hasSourceFiles(artifactRoot),
+    )
+    .sort();
 }
 
 function discoverRoots() {
@@ -339,7 +386,21 @@ function totalOf(counts) {
 
 checkStandaloneScopeParity();
 runCanaries();
-console.log('PASS canaries :: standalone Stage 5 detectors, DS-OK parser, and shrink-only ratchet verified');
+console.log('PASS canaries :: standalone Stage 5 detectors, unmanifested-artifact discovery, DS-OK parser, and shrink-only ratchet verified');
+
+const unmanifestedSourceDirectories = findUnmanifestedSourceDirectories(ARTIFACTS_ROOT);
+for (const directory of unmanifestedSourceDirectories) {
+  console.error(`FAIL unmanifested-artifact :: ${path.relative(ROOT, directory)} contains source files but has no .replit-artifact/artifact.toml`);
+}
+if (unmanifestedSourceDirectories.length) {
+  console.error(`\n${unmanifestedSourceDirectories.length} source-bearing top-level artifact director${unmanifestedSourceDirectories.length === 1 ? 'y is' : 'ies are'} outside standalone design-system validation.`);
+  console.error('Add an artifact manifest, or add an exact-path exclusion with a written reason to the executable and documented scope contracts.');
+  process.exit(1);
+}
+console.log(
+  `PASS artifact-manifest-coverage :: every source-bearing top-level artifacts/ directory is manifested or one of ` +
+  `${STANDALONE_SCOPE.unmanifestedArtifactExclusions.length} narrow documented exclusion(s)`,
+);
 
 const roots = discoverRoots();
 if (!roots.length) {
