@@ -43,6 +43,7 @@
     "validate:cache-headers": "node scripts/validation/http-cache-headers.mjs",
     "validate:pool": "node scripts/validation/db-pool-probe.mjs",
     "validate:webfont-fetch": "node scripts/validation/accent-drift.mjs --network",
+    "validate:font-prepaint": "tsx scripts/validation/font-prepaint-audit.ts",
     "validate:auth-return": "node scripts/validation/auth-return-audit.mjs"
   },
   "dependencies": {
