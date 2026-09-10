@@ -21,6 +21,8 @@ Official sources reviewed on 2026-09-10:
 
 The Pixelmatch repository's current branch can evolve beyond the installed version. Reproducible comparisons use the pinned package, not whichever algorithm a later README describes.
 
+The installed `node_modules/pixelmatch/README.md` was also checked directly: 7.1.0 documents threshold 0.1, equal-size RGBA inputs, and anti-alias exclusion by default. A real launch verified Chromium sandbox support; `chromiumSandbox: true` must be explicit because omitting a hand-written `--no-sandbox` argument alone does not enable Playwright's sandbox.
+
 ### Security information
 
 The package operation's automatic audit and a subsequent `npm audit --json` reported **28 root-lockfile findings: 13 moderate, 14 high, 1 critical**. Pixelmatch was not listed as an affected package in that report. This is not a security-clean verdict. No blanket `audit fix`, dependency replacement, or unrelated remediation was performed. Review the concrete findings before a release-readiness claim; existing security findings must not be hidden behind a successful install.

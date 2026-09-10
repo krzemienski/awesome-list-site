@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-10T06-15-56-772Z-17978",
+  "algorithm": "sha256",
+  "scope": "Every output present before this manifest; the manifest cannot self-hash.",
+  "files": [
+    {
+      "path": "REPORT.md",
+      "sha256": "ddbbd1e7ad9955c0b7b306100dad075f4fd9a8034b6d6b11c576b11ba738bb23",
+      "bytes": 17727
+    },
+    {
+      "path": "results.json",
+      "sha256": "34574990cb87497b7af8f4dcd9bcac6c743cd239216bca5d97ce494a745b3f4a",
+      "bytes": 98105
+    }
+  ]
+}

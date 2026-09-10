@@ -18,7 +18,7 @@
 - [Anthropic mid-loop steering](anthropic-midloop-steering.md) — inject mid-run guidance as a text block on the tool_result user turn (a separate user msg → 400); research agent "don't give up" tuning lives here too.
 - [SEO title two-pass parity](seo-title-two-pass-parity.md) — client SEOHead titles must exactly mirror og-middleware templates or Googlebot's crawl/render passes see different titles.
 - [Verifying CSS states](verifying-css-states.md) — confirm focus/hover/active with a REAL click/hover+screenshot; getComputedStyle after programmatic .focus() lies (transition mid-value) and CSSOM cssRules is opaque for Vite's injected Tailwind sheet (read style.textContent).
-- [Playwright browser version pin](playwright-browser-version-pin.md) — installed Chromium 1208 ≠ package's expected revision; launch with explicit executablePath from workspace root, don't reinstall.
+- [Playwright browser launch](playwright-browser-version-pin.md) — discover the cached executable instead of reinstalling; enabling the sandbox requires chromiumSandbox:true, not just removing an argument.
 - [Link-scan false positives](link-scan-false-positives.md) — connect timeouts from datacenter IPs are bot-blocks, never "dead"; only DNS/refused/404-410/SSL count; verify timeouts via web search.
 - [Prod status-change paths](prod-status-change-paths.md) — bulk/reject only works on pending resources; approved ones need PUT :id/reject|approve; bulk endpoints hide failures in counts.
 - [Bash long jobs + gotchas](bash-long-jobs.md) — nohup dies with the bash session (use resumable cursor+JSONL, ~88s budget); never capture into `UID` (readonly → silent wrong value).
@@ -108,3 +108,4 @@
 - [Theme storage denial gates](theme-storage-denial-gates.md) — isolate app-owned theme keys from Clerk session storage unless Clerk compatibility is the test itself.
 - [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
 - [Workflow reconciliation double-start](workflow-reconciliation-double-start.md) — after merge reconciliation, a healthy artifact listener can coexist with a false “port already in use” workflow failure; restart once.
+- [Helper evidence provenance](helper-evidence-provenance.md) — reject detailed reports for unrelated routes; verify project scope and local outputs before counting evidence.

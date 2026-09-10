@@ -1,0 +1,2551 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-10T06-15-56-772Z-17978",
+  "executedAt": "2026-09-10T06:16:00.826Z",
+  "claim": "filtered-diagnostic-only",
+  "fullGateEligible": false,
+  "executed": true,
+  "configuration": {
+    "pixelmatchThreshold": 0.1,
+    "maximumDiffPercent": 0.5,
+    "fullPage": true,
+    "deviceScaleFactor": 1,
+    "locale": "en-US",
+    "timezone": "UTC",
+    "colorScheme": "dark",
+    "reducedMotion": "reduce",
+    "widths": [
+      1440
+    ],
+    "viewportHeights": {
+      "375": 812,
+      "768": 1024,
+      "1024": 768,
+      "1440": 900
+    },
+    "browser": "chromium",
+    "browserVersion": "148.0.7778.96",
+    "executablePath": "/home/runner/workspace/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome",
+    "chromiumSandbox": "enabled explicitly with chromiumSandbox: true; launch verified in this workspace"
+  },
+  "provenance": {
+    "appBaseUrl": "http://127.0.0.1:5000",
+    "artifactBaseUrl": "http://127.0.0.1:20928",
+    "referenceBaseUrl": "http://127.0.0.1:46653",
+    "referenceRoot": "awesome-list-site-ds",
+    "referenceAssetHashes": {
+      ".thumbnail": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a",
+      "Awesome.Video - Standalone.html": "f40a5525c72adda5af874f1d475084f8a5ba9714a74a9e95403dc6b056662af5",
+      "HANDOFF.md": "2bcbf1d8e7e19f0e14e4413689e2c7bdfd9b45e1adee6f5416dc4d429fd9228f",
+      "REPLIT-REMEDIATION-PROMPT.md": "a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b",
+      "SKILL-verify-design-system.md": "37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6",
+      "_check/01-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/02-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/03-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/app-hero.png": "39c555adb98a3314c4e8e3d6db19f8a305a1d05911970b18beed2254a645aca5",
+      "_check/app-top.png": "ff61ca5519b51952519ede2abeb1472e83056a36d50010a36ef6d814feb917cf",
+      "_check/docs-overview.png": "87d751cdc133c43fd47ec2cbc30a0eccba14179aa35ed74bca8a7010fdf14e26",
+      "_check/flow-editorial.png": "37481b61470650c167a03a57a10054e96dcffc6075f600b2ec8ec99c7f5749f6",
+      "_check/flow.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/show-top.png": "a9d231c71cf0a3ae8fdb8e3200ca4d12e2de3f3eb009f1f4faefe828758d2dac",
+      "admin.jsx": "c32b6a11b58d54b6704955fd556e2014e9c0617d1720bfbbd9dab10c19d82360",
+      "app.jsx": "9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6",
+      "audit-report.md": "ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70",
+      "data.js": "d8353e769bcb65cd7de33a5b32fe94733228783bd304bca1859615cad44ed035",
+      "design-system-anatomy.jsx": "9cadf8f0a44a535f416e56e3e24d2e005556a0ea270e97dcdab28ebff505810a",
+      "design-system-showcase.jsx": "24c91a564df8e7a50425ab0db86ef61f9d029a809c37571da3c5c6efb1adbe11",
+      "design-system.html": "59a851a95949c36b2877b4bd57f554e84d9be9d662d3f23a895216a26d5f4dc7",
+      "design-systems.jsx": "30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c",
+      "docs/01-overview.md": "7434b385729ad6e1a8592161ae6bb8b0a0898bc8c58fad6152c4fc4ccee2582a",
+      "docs/02-principles.md": "d25feef86fb7ca5d184eaeabd6f5cb32ffc553e7b693329109bf00b6378d7b13",
+      "docs/03-getting-started.md": "99dbdf4ccf793d551985b5eb10bdafb99c8393848bb65af3c07bbe937b2f33b3",
+      "docs/04-tokens.md": "9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87",
+      "docs/05-theming.md": "98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371",
+      "docs/06-typography.md": "50636d27ae58414d3c5e36ab4013b82dfa92ce6d1c0ed0dfaa68887694cc562d",
+      "docs/07-color.md": "e6320c732732573000f3d8ff76d892c4c13fcbe74983aef69955d0071c1e2dd4",
+      "docs/08-spacing-layout.md": "637b852813c4565d534d4b844d8a3729c1f61372f883e6a989d44f72311edada",
+      "docs/09-motion.md": "8f8a4a3f86c154455764580cd43c2da613f150c273ceb5190b9b6e02d5cbac4c",
+      "docs/10-components.md": "083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf",
+      "docs/11-patterns.md": "9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761",
+      "docs/12-integration-html.md": "e9979c4781fda6b85a0539ec03b1c8d405d92e7ce717c1e05509385e7e0476a9",
+      "docs/13-integration-react.md": "4eaff2bbbc7aaf04809d81d5d8babbb02e020496e6f5aaeaebfb2cb8af7cf3b2",
+      "docs/14-integration-nextjs.md": "48a26566d786bc566fb808b016a61652ee542c0ded22ad81a2810d2f888697c7",
+      "docs/15-integration-vue.md": "be4ef659fc307401eb86a9c59434bdd201059120dba4bb11f87d2812608b2f5d",
+      "docs/16-migration.md": "7d5076e486008b51fae6d6a4ad48bcb5289a4b2b87036d561ef3f9cf454cb98a",
+      "docs/17-accessibility.md": "f1b0bdaf0b78fb8bcbea5348ea9dadd757cdbffb218de868009d36ebf3659e9e",
+      "docs/18-launch-checklist.md": "4fefbb090fca7699abbc7f59a274f751bb27c20d3f0510bc7408c8a41f91c707",
+      "docs/README.md": "995c700e5cd839a01627b7a4442f8ae3a98164b9c7fce52cca1e5eddd07ea7ca",
+      "docs-content-1.jsx": "b7b969b4aeb1b6e560b7fb1589626dd8def9145c3709bc31a127454ea5015982",
+      "docs-content-2.jsx": "fbf202ebdba472a6663c43e8a38cc86346ab2d0c9655fe012a66b579f6508f81",
+      "docs.html": "e3072e8e0f4722c0201b444ab270ccb32dacdf571329ac5b4cb4c4b954de45ec",
+      "docs.jsx": "d430fc4a9f5d2f3f95c789eab20ea36ae96eb307d495f07052a720f912f6eee2",
+      "home-layouts.jsx": "c91a2a679670684b4182b3c6015544265373e01cf2ee96efc778975a2257b4f2",
+      "index.html": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7",
+      "index.standalone.html": "7b62e47bf3ab24c6c1268be3a9ce078627d3074519af542bec07d1c40c7ffa47",
+      "layout.jsx": "911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a",
+      "pages-core.jsx": "fd370da82ed465d568a549816e607a4c59e3e764e7342ca176d1b4f65766aad9",
+      "pages-extra.jsx": "d9abd2edaf5df810b5cb2246059c4f4cba461c085771c00a465f107b64413e3a",
+      "pages.jsx": "ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58",
+      "sidebar-variants.jsx": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95",
+      "styles.css": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055",
+      "tweaks-panel.jsx": "ea982af775f053999f1f8841b7078ae20b37bdb3c20432fe293e3b4572c0c454",
+      "uploads/01_home.png": "43c6cb5b4f4ea68a25fff11c4d176709e95248ec80ea7ba47901c49f9d5015c4",
+      "uploads/02_about.png": "9d66e7e3b86841f708e19e74b4933207023a3aea864c18b264717206537dad9a",
+      "uploads/03_advanced.png": "8f004d07f1a2200365992f0ef9ea177df8c756da836332714c2934d3ecb76d38",
+      "uploads/04_learning_journeys.png": "bf0ad1aa3e384c5369a3afe7f57b48f07fa2362aef4b13b6401356404bb41921",
+      "uploads/05_journey_detail.png": "c8d13312128776fb51d8389b2d7bf43e863bb8d43095ed997e9ddec4e69eff10",
+      "uploads/06_login.png": "291baba8571c24f703b41acb3a1bde2731e02fb60ae3cdb94786980de4bbe506",
+      "uploads/07_submit_resource_authgate.png": "616819c0cf65707ed64c82a337deb5d15016bffdebb39ad7a110eca27cdc8cde",
+      "uploads/08_theme_settings.png": "9205753c5fd56106849fb5dc8ccae635084b5aa957641e3313e1fe36263c851e",
+      "uploads/09_category_community-events.png": "4a8b89350c6b0dc18f41ce85edf9d9babcac989419403c5c253e4991bfa81101",
+      "uploads/10_category_encoding-codecs.png": "b966ae38b27df934a18456c50e47c589d4a570d805b11a3580a8ecf6ac51df99",
+      "uploads/11_category_general-tools.png": "755c0115ce7d0726cdba5610f23988ecd368ba2da8c2c6ebb5ccb5b2b8e2d09b",
+      "uploads/12_category_infrastructure-delivery.png": "c72a990a404a3f819e35bf27908c47442e4970c2192cba774ed54b311f1caf1e",
+      "uploads/13_category_intro-learning.png": "6c945f36f389d1c6ea32583b7df1f1bd2551d735748636455833cf86404bf197",
+      "uploads/14_category_media-tools.png": "deadba69a700015bf508cc2dcc7305da44fe45e4a6a83e3448c90e79730667ae",
+      "uploads/15_category_players-clients.png": "91cbe5aba894bd35592598398657ee730162389c2591a423b123d481a0793e40",
+      "uploads/16_category_protocols-transport.png": "4d9cbb4d2d2081169b8af5f78514a0d1ed720e459a6705bed87399509eb765a1",
+      "uploads/17_category_standards-industry.png": "36e0cab03d177077dc6182d0f4ca89a7019a66759ee7e2151731a8b11a099d95",
+      "uploads/18_subcategory_ai-ml-tools.png": "4c91239b46395596cfc00ea91a7636493f55a903dcb075abcc67870ac97a53de",
+      "uploads/19_sub-subcategory_hls.png": "48fd44966fe7d3aa7cfe41be6c0500e957c32963122902c05e36a5a043c68b33",
+      "uploads/20_sub-subcategory_dash.png": "e8c7bb9b685c7ba2a0c31f5cb171a3521590a375743ee9746da29c93f4907241",
+      "uploads/21_resource_detail.png": "27e44c258f0ae9d2f14a865b6e51e893325b6bace8f0832e90b4e442586326ee",
+      "uploads/22_404_not_found.png": "ee9bbafa356eff6653a1a464a4e8f7adb8249d16cdcfff29a100b97ed344c835",
+      "uploads/IMG_3167.jpeg": "74fa937a2d4647d2d863e4afd08aa03c55eab946ece06923c05195785952d405",
+      "uploads/IMG_3169.jpeg": "b897452732a0cd8b639f8420796a9f4b1a713eed218706910dfb84fb090b0d01",
+      "uploads/IMG_3171.jpeg": "02d1130b7e87353010d2678440ecd7ace07c66a34d0631ca02dd60958cc83d9d",
+      "uploads/IMG_3173.jpeg": "791462af1ca505f23381d7b871b5ae4d122a579b83c176550c99b06a0c3a10bc",
+      "uploads/IMG_3175.jpeg": "ac8a23f8ac8133af86fb7ec21f0b9bd59bc8ae997e9bda43c1efb610845ca1f8",
+      "uploads/IMG_3177.jpeg": "28af1816a1987fdc40cb5f7af104e69749597bae7f1420d3259e8b44e953f997",
+      "uploads/IMG_3179.jpeg": "41fe819a15b4bbfe7cfbe2e085b1093b0cbbed8c042a1e8d45db2ab8e1490ac3",
+      "uploads/IMG_3181.jpeg": "a69d28c39b3dd58706a1d10a0238ebacf0ec3f03e14afe8a0c2885734e2a4120",
+      "uploads/IMG_3183.jpeg": "07abd8ffe6b91b03c923c87b521b00aee37637e0b9225ef2b4195799d087b2a0",
+      "uploads/IMG_3185.jpeg": "b645696f282e4fdb862a060c39434bc6c759a5a103afd9c5c66fd07faef540f1",
+      "uploads/IMG_3187.jpeg": "d5118ccbd8ffbb34eba1881b9ed669e83ca6884600eac41c983516ddbaeda912",
+      "uploads/IMG_3189.jpeg": "fea2d4ec82c95166c399214f3ac58300efc4d31d6ad1e6521928c3a6f48b4150",
+      "uploads/IMG_3191.jpeg": "13b7659661965d61ace34112cc07fba2704ae012ae38c9b8c3f3786af478d3af",
+      "uploads/IMG_3193.jpeg": "ce82d6451490b633016caba103131e1ff3ae14494bde60977414264461bc4fa0",
+      "uploads/IMG_3195.jpeg": "23d29bc41b152ef40c4b57d8724656c859704cc26c3f79cccc2ae33dd6e4b630",
+      "uploads/IMG_3197.jpeg": "7f3ae99ef3fdfa508816671fc6d4a50ae3b040ddc8bef1cebf6639e476e11730",
+      "uploads/IMG_3199.jpeg": "56896b8236a364fb0cfa25568d36b4360d3d9a2b60b58b14f48219942c862e2a",
+      "uploads/IMG_3201.jpeg": "b35514757788928eb7068c10fda0d2880ba1ca979397587344ab8cbd853bc65f",
+      "uploads/IMG_3203.jpeg": "39c1098f988a3b196646d62834a813e6b529a3191208cd992416a0a9d26eccf6",
+      "uploads/IMG_3205.jpeg": "3bbe6722397685b9e9c01f1f0cc3394badf259066cfac61da04b4c428adee0b7",
+      "uploads/IMG_3207.jpeg": "4f379c8b36c17eb5e25c2cb4911c81310ebc6d726d5a371e9def03c35041c1d6",
+      "uploads/IMG_3209.jpeg": "9ae400e5fe80693c174bce00ae496973a8f68caddc51d71a7daba85bf610ea4e",
+      "uploads/INDEX.md": "12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2",
+      "uploads/Screenshot 2026-05-22 at 15.26.17.png": "8e3633aded14b8e21dc3c0e06de81b2844d137ddec7fa429ceb59922ce4a2639",
+      "views-1.jsx": "0d772bc0ae8133a5e400a111f79ea04db0944b403eb75584747cdd49c151a40e",
+      "views-2.jsx": "a91dccea691004186155e46677e680e987a7f01651bff895eb5a5c86871ad9e0"
+    },
+    "referenceSourceAssetHashes": {
+      ".thumbnail": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a",
+      "Awesome.Video - Standalone.html": "f40a5525c72adda5af874f1d475084f8a5ba9714a74a9e95403dc6b056662af5",
+      "HANDOFF.md": "2bcbf1d8e7e19f0e14e4413689e2c7bdfd9b45e1adee6f5416dc4d429fd9228f",
+      "REPLIT-REMEDIATION-PROMPT.md": "a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b",
+      "SKILL-verify-design-system.md": "37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6",
+      "_check/01-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/02-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/03-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/app-hero.png": "39c555adb98a3314c4e8e3d6db19f8a305a1d05911970b18beed2254a645aca5",
+      "_check/app-top.png": "ff61ca5519b51952519ede2abeb1472e83056a36d50010a36ef6d814feb917cf",
+      "_check/docs-overview.png": "87d751cdc133c43fd47ec2cbc30a0eccba14179aa35ed74bca8a7010fdf14e26",
+      "_check/flow-editorial.png": "37481b61470650c167a03a57a10054e96dcffc6075f600b2ec8ec99c7f5749f6",
+      "_check/flow.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+      "_check/show-top.png": "a9d231c71cf0a3ae8fdb8e3200ca4d12e2de3f3eb009f1f4faefe828758d2dac",
+      "admin.jsx": "c32b6a11b58d54b6704955fd556e2014e9c0617d1720bfbbd9dab10c19d82360",
+      "app.jsx": "9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6",
+      "audit-report.md": "ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70",
+      "data.js": "5196b2a166673cc3c62a011028573d93e02b9f690b24db2e06b6372700b25a66",
+      "design-system-anatomy.jsx": "9cadf8f0a44a535f416e56e3e24d2e005556a0ea270e97dcdab28ebff505810a",
+      "design-system-showcase.jsx": "24c91a564df8e7a50425ab0db86ef61f9d029a809c37571da3c5c6efb1adbe11",
+      "design-system.html": "59a851a95949c36b2877b4bd57f554e84d9be9d662d3f23a895216a26d5f4dc7",
+      "design-systems.jsx": "30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c",
+      "docs/01-overview.md": "7434b385729ad6e1a8592161ae6bb8b0a0898bc8c58fad6152c4fc4ccee2582a",
+      "docs/02-principles.md": "d25feef86fb7ca5d184eaeabd6f5cb32ffc553e7b693329109bf00b6378d7b13",
+      "docs/03-getting-started.md": "99dbdf4ccf793d551985b5eb10bdafb99c8393848bb65af3c07bbe937b2f33b3",
+      "docs/04-tokens.md": "9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87",
+      "docs/05-theming.md": "98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371",
+      "docs/06-typography.md": "50636d27ae58414d3c5e36ab4013b82dfa92ce6d1c0ed0dfaa68887694cc562d",
+      "docs/07-color.md": "e6320c732732573000f3d8ff76d892c4c13fcbe74983aef69955d0071c1e2dd4",
+      "docs/08-spacing-layout.md": "637b852813c4565d534d4b844d8a3729c1f61372f883e6a989d44f72311edada",
+      "docs/09-motion.md": "8f8a4a3f86c154455764580cd43c2da613f150c273ceb5190b9b6e02d5cbac4c",
+      "docs/10-components.md": "083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf",
+      "docs/11-patterns.md": "9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761",
+      "docs/12-integration-html.md": "e9979c4781fda6b85a0539ec03b1c8d405d92e7ce717c1e05509385e7e0476a9",
+      "docs/13-integration-react.md": "4eaff2bbbc7aaf04809d81d5d8babbb02e020496e6f5aaeaebfb2cb8af7cf3b2",
+      "docs/14-integration-nextjs.md": "48a26566d786bc566fb808b016a61652ee542c0ded22ad81a2810d2f888697c7",
+      "docs/15-integration-vue.md": "be4ef659fc307401eb86a9c59434bdd201059120dba4bb11f87d2812608b2f5d",
+      "docs/16-migration.md": "7d5076e486008b51fae6d6a4ad48bcb5289a4b2b87036d561ef3f9cf454cb98a",
+      "docs/17-accessibility.md": "f1b0bdaf0b78fb8bcbea5348ea9dadd757cdbffb218de868009d36ebf3659e9e",
+      "docs/18-launch-checklist.md": "4fefbb090fca7699abbc7f59a274f751bb27c20d3f0510bc7408c8a41f91c707",
+      "docs/README.md": "995c700e5cd839a01627b7a4442f8ae3a98164b9c7fce52cca1e5eddd07ea7ca",
+      "docs-content-1.jsx": "b7b969b4aeb1b6e560b7fb1589626dd8def9145c3709bc31a127454ea5015982",
+      "docs-content-2.jsx": "fbf202ebdba472a6663c43e8a38cc86346ab2d0c9655fe012a66b579f6508f81",
+      "docs.html": "e3072e8e0f4722c0201b444ab270ccb32dacdf571329ac5b4cb4c4b954de45ec",
+      "docs.jsx": "d430fc4a9f5d2f3f95c789eab20ea36ae96eb307d495f07052a720f912f6eee2",
+      "home-layouts.jsx": "c91a2a679670684b4182b3c6015544265373e01cf2ee96efc778975a2257b4f2",
+      "index.html": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7",
+      "index.standalone.html": "7b62e47bf3ab24c6c1268be3a9ce078627d3074519af542bec07d1c40c7ffa47",
+      "layout.jsx": "911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a",
+      "pages-core.jsx": "fd370da82ed465d568a549816e607a4c59e3e764e7342ca176d1b4f65766aad9",
+      "pages-extra.jsx": "d9abd2edaf5df810b5cb2246059c4f4cba461c085771c00a465f107b64413e3a",
+      "pages.jsx": "ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58",
+      "sidebar-variants.jsx": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95",
+      "styles.css": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055",
+      "tweaks-panel.jsx": "ea982af775f053999f1f8841b7078ae20b37bdb3c20432fe293e3b4572c0c454",
+      "uploads/01_home.png": "43c6cb5b4f4ea68a25fff11c4d176709e95248ec80ea7ba47901c49f9d5015c4",
+      "uploads/02_about.png": "9d66e7e3b86841f708e19e74b4933207023a3aea864c18b264717206537dad9a",
+      "uploads/03_advanced.png": "8f004d07f1a2200365992f0ef9ea177df8c756da836332714c2934d3ecb76d38",
+      "uploads/04_learning_journeys.png": "bf0ad1aa3e384c5369a3afe7f57b48f07fa2362aef4b13b6401356404bb41921",
+      "uploads/05_journey_detail.png": "c8d13312128776fb51d8389b2d7bf43e863bb8d43095ed997e9ddec4e69eff10",
+      "uploads/06_login.png": "291baba8571c24f703b41acb3a1bde2731e02fb60ae3cdb94786980de4bbe506",
+      "uploads/07_submit_resource_authgate.png": "616819c0cf65707ed64c82a337deb5d15016bffdebb39ad7a110eca27cdc8cde",
+      "uploads/08_theme_settings.png": "9205753c5fd56106849fb5dc8ccae635084b5aa957641e3313e1fe36263c851e",
+      "uploads/09_category_community-events.png": "4a8b89350c6b0dc18f41ce85edf9d9babcac989419403c5c253e4991bfa81101",
+      "uploads/10_category_encoding-codecs.png": "b966ae38b27df934a18456c50e47c589d4a570d805b11a3580a8ecf6ac51df99",
+      "uploads/11_category_general-tools.png": "755c0115ce7d0726cdba5610f23988ecd368ba2da8c2c6ebb5ccb5b2b8e2d09b",
+      "uploads/12_category_infrastructure-delivery.png": "c72a990a404a3f819e35bf27908c47442e4970c2192cba774ed54b311f1caf1e",
+      "uploads/13_category_intro-learning.png": "6c945f36f389d1c6ea32583b7df1f1bd2551d735748636455833cf86404bf197",
+      "uploads/14_category_media-tools.png": "deadba69a700015bf508cc2dcc7305da44fe45e4a6a83e3448c90e79730667ae",
+      "uploads/15_category_players-clients.png": "91cbe5aba894bd35592598398657ee730162389c2591a423b123d481a0793e40",
+      "uploads/16_category_protocols-transport.png": "4d9cbb4d2d2081169b8af5f78514a0d1ed720e459a6705bed87399509eb765a1",
+      "uploads/17_category_standards-industry.png": "36e0cab03d177077dc6182d0f4ca89a7019a66759ee7e2151731a8b11a099d95",
+      "uploads/18_subcategory_ai-ml-tools.png": "4c91239b46395596cfc00ea91a7636493f55a903dcb075abcc67870ac97a53de",
+      "uploads/19_sub-subcategory_hls.png": "48fd44966fe7d3aa7cfe41be6c0500e957c32963122902c05e36a5a043c68b33",
+      "uploads/20_sub-subcategory_dash.png": "e8c7bb9b685c7ba2a0c31f5cb171a3521590a375743ee9746da29c93f4907241",
+      "uploads/21_resource_detail.png": "27e44c258f0ae9d2f14a865b6e51e893325b6bace8f0832e90b4e442586326ee",
+      "uploads/22_404_not_found.png": "ee9bbafa356eff6653a1a464a4e8f7adb8249d16cdcfff29a100b97ed344c835",
+      "uploads/IMG_3167.jpeg": "74fa937a2d4647d2d863e4afd08aa03c55eab946ece06923c05195785952d405",
+      "uploads/IMG_3169.jpeg": "b897452732a0cd8b639f8420796a9f4b1a713eed218706910dfb84fb090b0d01",
+      "uploads/IMG_3171.jpeg": "02d1130b7e87353010d2678440ecd7ace07c66a34d0631ca02dd60958cc83d9d",
+      "uploads/IMG_3173.jpeg": "791462af1ca505f23381d7b871b5ae4d122a579b83c176550c99b06a0c3a10bc",
+      "uploads/IMG_3175.jpeg": "ac8a23f8ac8133af86fb7ec21f0b9bd59bc8ae997e9bda43c1efb610845ca1f8",
+      "uploads/IMG_3177.jpeg": "28af1816a1987fdc40cb5f7af104e69749597bae7f1420d3259e8b44e953f997",
+      "uploads/IMG_3179.jpeg": "41fe819a15b4bbfe7cfbe2e085b1093b0cbbed8c042a1e8d45db2ab8e1490ac3",
+      "uploads/IMG_3181.jpeg": "a69d28c39b3dd58706a1d10a0238ebacf0ec3f03e14afe8a0c2885734e2a4120",
+      "uploads/IMG_3183.jpeg": "07abd8ffe6b91b03c923c87b521b00aee37637e0b9225ef2b4195799d087b2a0",
+      "uploads/IMG_3185.jpeg": "b645696f282e4fdb862a060c39434bc6c759a5a103afd9c5c66fd07faef540f1",
+      "uploads/IMG_3187.jpeg": "d5118ccbd8ffbb34eba1881b9ed669e83ca6884600eac41c983516ddbaeda912",
+      "uploads/IMG_3189.jpeg": "fea2d4ec82c95166c399214f3ac58300efc4d31d6ad1e6521928c3a6f48b4150",
+      "uploads/IMG_3191.jpeg": "13b7659661965d61ace34112cc07fba2704ae012ae38c9b8c3f3786af478d3af",
+      "uploads/IMG_3193.jpeg": "ce82d6451490b633016caba103131e1ff3ae14494bde60977414264461bc4fa0",
+      "uploads/IMG_3195.jpeg": "23d29bc41b152ef40c4b57d8724656c859704cc26c3f79cccc2ae33dd6e4b630",
+      "uploads/IMG_3197.jpeg": "7f3ae99ef3fdfa508816671fc6d4a50ae3b040ddc8bef1cebf6639e476e11730",
+      "uploads/IMG_3199.jpeg": "56896b8236a364fb0cfa25568d36b4360d3d9a2b60b58b14f48219942c862e2a",
+      "uploads/IMG_3201.jpeg": "b35514757788928eb7068c10fda0d2880ba1ca979397587344ab8cbd853bc65f",
+      "uploads/IMG_3203.jpeg": "39c1098f988a3b196646d62834a813e6b529a3191208cd992416a0a9d26eccf6",
+      "uploads/IMG_3205.jpeg": "3bbe6722397685b9e9c01f1f0cc3394badf259066cfac61da04b4c428adee0b7",
+      "uploads/IMG_3207.jpeg": "4f379c8b36c17eb5e25c2cb4911c81310ebc6d726d5a371e9def03c35041c1d6",
+      "uploads/IMG_3209.jpeg": "9ae400e5fe80693c174bce00ae496973a8f68caddc51d71a7daba85bf610ea4e",
+      "uploads/INDEX.md": "12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2",
+      "uploads/Screenshot 2026-05-22 at 15.26.17.png": "8e3633aded14b8e21dc3c0e06de81b2844d137ddec7fa429ceb59922ce4a2639",
+      "views-1.jsx": "0d772bc0ae8133a5e400a111f79ea04db0944b403eb75584747cdd49c151a40e",
+      "views-2.jsx": "a91dccea691004186155e46677e680e987a7f01651bff895eb5a5c86871ad9e0"
+    },
+    "workspace": {
+      "gitCommit": "3ed2811868217f33e53758a90f68f1bb4e460259",
+      "gitStatus": [
+        "M .agents/memory/MEMORY.md",
+        " M package-lock.json",
+        " M package.json",
+        "?? .agents/memory/helper-evidence-provenance.md",
+        "?? docs/parity/HARNESS-REVIEW.md",
+        "?? tests/parity/"
+      ],
+      "dirtyFileFingerprints": {},
+      "sourceFingerprints": {
+        "config": "cd55a3021e0138f5afd35085fa2d6777f5d2584a0acc43c0ae224bfbd31f1854",
+        "app": {
+          ".env": "5a237fa819a50655d85fe3448d96cfc6dd2988748c1966160ce99d858ec620c7",
+          "env.d.ts": "ef8c812436f90dc79ffe40a6542394c8c6083619819b16ab443b7b31ce698d67",
+          "index.html": "3906b6080e982a8eb18f7f65fdf497e4d03efba35d750095ebaaa4f551138193",
+          "public/apple-touch-icon.png": "9bfe768a9cee02a593ba9d4458dc2bc7eb9abebac26e924ed81ca551ef88f6aa",
+          "public/data/sitemap.json": "7b1f9fe0fdfc5d3476de758153d67f78bd78fd75fcfb90235da5928ad31f0ecf",
+          "public/favicon.ico": "52f32e0c43113b306bc90bb34a9bec45879915654d8ad99336b6bf5d95cf64cb",
+          "public/favicon.svg": "bc43bc3385574982574c3b33f3cd51be173da613c56971bc0e5d51d606de4aa5",
+          "public/icon-192.png": "69729bc51dcf70cb8d844507ad9eef4fa49f18fcd2eb38ae2a6df82b521e0c82",
+          "public/icon-512.png": "f4c2b72f93dad80f6a4418c372546a4734b0160ae391602b74ccbebd764d4146",
+          "public/llms.txt": "6ca8ec74629580e5c60d90a985648889817a3d81759580c1f68262e4e261339a",
+          "public/robots.txt": "6c20f9d5d3e8b4921688bbc25f7ad9a8d763b2b1c41fdb8b71d599ca4968fe42",
+          "public/site.webmanifest": "8d24775d24921433eff214179be6f898e30889523b6893b41813d76d5d7d3290",
+          "src/App.tsx": "6c41e33307f0a83fbf3dc3c80c2be78d69ad80b2d63b90d2781bc38067d3cc0c",
+          "src/components/BrandMark.tsx": "920505f4d43e08ddfce1d3a0108867cc5e283b206b95334d5a71e9e331600242",
+          "src/components/ErrorBoundary.tsx": "22478f0053fa3ac139bce4a6ef70d9b1f4c163a5250d29820ec478a8e85d67f9",
+          "src/components/admin/AdminStats.tsx": "47067f915e54aaae8cb212089859ceb63d154cd14b53e1b3ad944edf986ed7d6",
+          "src/components/admin/AgentCommsGraph.tsx": "ae4fd3769aeec996af0364be9df290c9bbec5ed94d0098c09040b57e37a70567",
+          "src/components/admin/AgentEventLog.tsx": "86e714281dd93e561b1022644ec475a262d0dc0f3f84b986e309bf51bf52b2cb",
+          "src/components/admin/AuditTab.tsx": "0a8451f19b521a34e55764b4aad71a22f8dbf7d641abed4bc81e14ee3d7b718d",
+          "src/components/admin/BatchEnrichmentPanel.tsx": "877a5d56540fcf9e46323aad58a25394b096c7545a355aafb1cfa70a39b78867",
+          "src/components/admin/CategoryManager.tsx": "d73c697d240abb9f1d93065f812678d180a24e46ee75550f27a8dbec3a0709d3",
+          "src/components/admin/DatabaseTab.tsx": "64ffc754db845d9c349caf543885d5fa062b374d93bdc3e8f9580bacf9fc12b3",
+          "src/components/admin/DigestQueueHealth.tsx": "6cba2c11cf21ac83c351ba28cc0f647db997a28d2daf0def3a17c5d1c795a12f",
+          "src/components/admin/ExportTab.tsx": "f26b42246b153b8d0683e828b798b2cd5d6ff0f6d36ca1633e4598fd26d8a1b4",
+          "src/components/admin/GenericCrudManager.tsx": "789be6093a5711b86fcea97e51dcef9972a5906f8c5d3f5558d650dec004b929",
+          "src/components/admin/GitHubSyncPanel.tsx": "ec332344bd3aa68de435f0a7f45805028186d6181b8f800e541100271280baa2",
+          "src/components/admin/JourneyStepsManager.tsx": "b64bd7aad124a0b301b0e691d25db039ba9a812a91fa6fa5d0d8b5410775228c",
+          "src/components/admin/LinkHealthDashboard.tsx": "5698073c8eb78a25b2190ce065bfcf0e3faae90e8ed63a6aee2798cb45adc9fb",
+          "src/components/admin/PendingEdits.tsx": "c89067b869fb8de3d8908054c7bf0a47d88f37fe7ab5373609bc6e0d9555f7fd",
+          "src/components/admin/PendingResources.tsx": "2670125002c06a17ce13c377917416c390fe49970020a349140955c1d1e42c4b",
+          "src/components/admin/README.md": "93f6e8eef86a147ebab9fa35adac25348b1bf973989321fd6a4ed8c453cf0eaa",
+          "src/components/admin/ResearcherTab.tsx": "93ba0fbaf20b3a8090e12200d289d6037cfa97c3c69f975264cf5bbf1c4f547f",
+          "src/components/admin/ResourceManager.tsx": "18b5543f3eee5aedc4a51a8e074b9934642357322116c5eeef81cd47ebf2bb33",
+          "src/components/admin/SubSubcategoryManager.tsx": "773fd46d9dc75c7ea428e594df39c47e80fa2a326b702296e9a41083da2bac8d",
+          "src/components/admin/SubcategoryManager.tsx": "a5ff9020166accae7a49e7d7e0400e7d990c99db6779d4d6276cd01b7904e664",
+          "src/components/admin/UsersTab.tsx": "3b0076cbececadc7849bc4d3ac82e230dec45050ef97e8b0d5b470c63f2345e2",
+          "src/components/admin/configs/category-config.ts": "5e7daa0a913d4079c2d6f24d26151d52d7986045f812bba4d9d9c532a9181e5a",
+          "src/components/admin/configs/subcategory-config.ts": "0687a705efa9cca326d1d10d876b750c25f36b5039bd5c328b8b3553e6e32c51",
+          "src/components/admin/configs/subsubcategory-config.ts": "445eba8b08bef4441c8b2368097f0b625efaa91a1798a4bd757f6fb408dcd0fd",
+          "src/components/admin/types/validation.ts": "64e0509fb609d43fa6f864c7505e6b30cbfc485478d412f00b53bac8c0e6a10f",
+          "src/components/ai/RecommendationCard.tsx": "5537aba3ae30e0c7ebdd09ff2e9f73f54eb03376842e04fc6f5da64108a3af2f",
+          "src/components/auth/AdminGuard.tsx": "772eb3a191f5aa0ea994838ed87a987cf37542123b9eff9b270070bf2bde4190",
+          "src/components/auth/AuthConversionTracker.tsx": "b63ca28db01c87a7d5a51771dd1295f8be27544defcf9b1277583da35a8c940d",
+          "src/components/auth/AuthGuard.tsx": "f5e57dbf018e1aa83411b4ef130634abf41c9762c04b363375034c5b13116adf",
+          "src/components/auth/GuestBookmarkMerge.tsx": "ee0148e14ac51e3b7ca1f324a9bf875201570a08a4a294333205ee8340d34a98",
+          "src/components/layout/SEOHead.tsx": "d91fa14076d83d2f9680257201d952304e1797be9485fba2d6371a1d4070fca6",
+          "src/components/layout/new/AppHeader.tsx": "518205ed1ed3b0b241c464f206c0b33ca945fbbb1e8b5b19819f9a33a32186ae",
+          "src/components/layout/new/AppSidebar.tsx": "84e9904161b381cbc1f06c186784720f26c5457f13ec651a74fdc3b8c87da8c2",
+          "src/components/layout/new/MainLayout.tsx": "406559241c8f26a50c2df2be5a3a989f5f2c02800b673537e01657d488bc7ed5",
+          "src/components/learning/ContinueLearningPreview.tsx": "f1a9b97aa05471a571f5a6f4f15a2914acd6de2befdc365bd739cc677232d02e",
+          "src/components/notifications/NotificationPreferencesCard.tsx": "720c9cbb46220f1581c7e19245191671a0705c9baa3acef8efb7a97b26c20139",
+          "src/components/onboarding/learning-preferences-form.tsx": "bc7f3729572110aff0aa26844833e210d103461c1ff21f0e3ee0c9c80527f7fb",
+          "src/components/profile/AccountSecurityCard.tsx": "25bd93f581392bcdb9dd72d317e03ca8c5e9ad9b964f2eeb14c42b5bc6688bc8",
+          "src/components/resource/BookmarkButton.tsx": "578e7dd6ac38a225e17716618ee0ba55a2a79dd651d6077054c75bcb20ced97c",
+          "src/components/resource/BookmarkNotesDialog.tsx": "67b6d6cfa76a9fdb149548260e0f0c7f0c729f4130454b5308992cd129f64a1d",
+          "src/components/resource/FavoriteButton.tsx": "bf46aa1d97910e2e581c303ae92e9005d80c339420f78c4daab9018aa182e50e",
+          "src/components/resource/ResourceCard.tsx": "e447ee6cefbfdd71a6695c88bfa7d39726204ee30733dc0a4a2abe043a4dcb87",
+          "src/components/resource/resource-view-modes.tsx": "00f0476fe3573b2e1558cd943fe164ade5fecf8b660ed90965ee85cc9ad6f7c0",
+          "src/components/search/SearchFilters.tsx": "e8b7d4c30f3c8f3c218ac6f835e246b1965b6ca4da9e6387dd62113c770b53c9",
+          "src/components/ui/advanced-filter.tsx": "e51a44fdb2f9cce51a99a6bf7f3636e2c6aa93ee927c8836a59b310301dfc153",
+          "src/components/ui/ai-recommendations-panel.tsx": "d2c26eb369b2bfd8b449f1aeee1de4976a5c83aeb87e765de6b01361a0f5ad0c",
+          "src/components/ui/alert-dialog.tsx": "9ff6580e807a5b0c582d7e8622065e08e2c10d3fe50fad0bb9b0d15294356883",
+          "src/components/ui/alert.tsx": "d49b94e060aa0cdc1f3c7615052bcaea4ad3b8eb0b7395e184c29d53221bf6d0",
+          "src/components/ui/avatar.tsx": "54fa028d6bde8e1506b67daa1f9dda6c8be6c6e31da55850b77c95d7f5631a2f",
+          "src/components/ui/badge.tsx": "9a899dc41bf51fad1bf63b15f060d08a0de7ccf79cc5742fff89316fdc0dfa5e",
+          "src/components/ui/breadcrumb.tsx": "c3d3dcb0d82fc5e91d8830bac7fead905686fe876f1f42c3ed872bb0a6b6584e",
+          "src/components/ui/button.tsx": "de19a26c6b651a249cc163e3c5375361323414dc9740173d1db24bf8f3d0a935",
+          "src/components/ui/card.tsx": "8a8d1ec0dbd99d7f450833b32f2e8ba202048560f257a03763979cb1609e6fd4",
+          "src/components/ui/category-explorer.tsx": "b38a6b844a864fd05fa8814898e3988b3dd988c98f916932cd29543e85ccceb3",
+          "src/components/ui/checkbox.tsx": "d6020011b1472db1f0097e85974660fb7ab797d3bc6330a8f5e8daa37c7a918a",
+          "src/components/ui/collapsible.tsx": "f4cdd104de29928bfcd40b865c7d08eed9157a537fbb8b5e6d0921f02b63cc04",
+          "src/components/ui/command.tsx": "f15af371baaf3092f29b54d791f963c8aa18cb9937f97b289c8b44f8f52a885d",
+          "src/components/ui/community-metrics.tsx": "71587732c68c5026b76adaf1a9483047fea603799656c6763965ab62026d63b8",
+          "src/components/ui/consent-banner.tsx": "0eac2b3123e834467626400dd8b9aa47f18e7d22dc95b231e7e7b7ed63622ecc",
+          "src/components/ui/dialog.tsx": "964773f61818412a3da3e15585aa570ecb467299af57e2d7582c2f1b4821e049",
+          "src/components/ui/dropdown-menu.tsx": "dcccf9d76df9a9e6989b43c2e794d93e1051543dc8872730e0bc2b3e254c2f09",
+          "src/components/ui/export-tools.tsx": "f008e8eb0afc3b0929c3ef3e9515d6058050a8f3d4a67a5d955e2465a654d90c",
+          "src/components/ui/form.tsx": "7bdb2e0ae11685f29171023d8538691a13c93f1a983784ad82ecb7cf0d07906f",
+          "src/components/ui/input.tsx": "a6667fc285d2e1814147dd22be4b03ec1a3890cf913ac1d57e79951a6ae9a959",
+          "src/components/ui/label.tsx": "e69cfc27d78c9ef31b248ab8ea4fa54327c1038843f70efb5cd85d54c0bf1e0e",
+          "src/components/ui/paginator.tsx": "ab4437b397f5e4966c56d5f6f17449773969c6696b3b229c30c632f003bf1083",
+          "src/components/ui/popover.tsx": "c5b068cdd2e111df943d4c10650cd73dd8280fdfeb65e5325054b137f7d3c364",
+          "src/components/ui/progress.tsx": "8c036da4baed076de68d27719929dc98151a81b51456bfa6a2488d835303b1d7",
+          "src/components/ui/radio-group.tsx": "74f87531da1fde8d3c07dbd7b380ee6508a70d5c0af1c22e2d2c33d66cc79f10",
+          "src/components/ui/recommendation-feedback.tsx": "f683f3a0839c55639aee5540300c6d3a5850a3410e8fa7d982009d29514bcd6c",
+          "src/components/ui/scroll-area.tsx": "f1f139db3d18201e08f59466df535fb16a76759b31c3a6d5ba2960cc1103567b",
+          "src/components/ui/scrubbed-params-notice.tsx": "9e3c3b9da1f9c5bab84fa5c13d9e0cfa6503ff37c130ec8f0160b8b007e8388a",
+          "src/components/ui/search-dialog.tsx": "54de857dbf5529635c852059d435cb7c872ece3f97de10f0d7d2d69d0deeeb4b",
+          "src/components/ui/select.tsx": "9596da144dc752c8e4089c33180a3bbce424e51b8f97c482003a24d02435290c",
+          "src/components/ui/separator.tsx": "c956c4cca4b8442fa9314d6079b9f975e1ee39d5804aaf2966990f6258ac342a",
+          "src/components/ui/sheet.tsx": "6cccb7058061fbfce0d0ef1be85e4326d020dbc83dba918aa747b6e45d8db0ac",
+          "src/components/ui/sidebar.tsx": "152f1dafa309fcd2a9e2173df3fc2cc5c593686602db05fedee2d85d370d2860",
+          "src/components/ui/skeleton.tsx": "43a99962619c3ec5311f72af093b643e42cc961e1f32e3cc47a0c893242cc841",
+          "src/components/ui/skeletons.tsx": "a5a5a3d705a56e94b2aed2aa795c85934758c93c4568dff296e11d3a307aea79",
+          "src/components/ui/suggest-edit-dialog.tsx": "f2203097284125608795a38f7e9b7f07f4a2a1f4e9a537e00e66591d924169c1",
+          "src/components/ui/switch.tsx": "bd29ce723e952bc7f8fab367320347ca82fbb933f4da9872c7120d6765662ebe",
+          "src/components/ui/table.tsx": "1da243956282c040db49d5718d2f0093a705fbbdfa3a25f51c1a31a069c45093",
+          "src/components/ui/tabs.tsx": "11e5af088968c8db64c275eda57814e34256ebd3553c07d2df3f530be6a882ab",
+          "src/components/ui/taxonomy-card.tsx": "d326c52039732aeca8f229d5210e71d1c64541a7064ac970256c40064d996c2d",
+          "src/components/ui/textarea.tsx": "e0894b76a5258d0aadba3fcd9d61e44f2070d2e285c57f2fa65a1a8b2e096ed2",
+          "src/components/ui/theme-provider.tsx": "cce816008ddc14c5f283ce7eb6d4caa88255c4a9a7cf14e42db112aa40e86754",
+          "src/components/ui/toast.tsx": "48d029a8b31394e70b4325270b2beb0563650c282c84871979693af9f20f6812",
+          "src/components/ui/toaster.tsx": "4a55d85afc232ba154aa6bffde53efcbc02fe353a18d5acf364f45098bfba13f",
+          "src/components/ui/toggle-group.tsx": "dba95ead40d163af6959198ded9853a2cc9282b2cb534980f99937a65edf4e2d",
+          "src/components/ui/toggle.tsx": "bf19499272d57adbf5ebcc0af4ba1d1d118b78857bb39f3ea1ec0be89cf66269",
+          "src/components/ui/tooltip.tsx": "c036e4d0ccdf2cc9ad74ead0a69dcb50abd259d0173ae4eb4d2d103c4362f227",
+          "src/components/ui/view-mode-toggle.tsx": "83cebe271ed4b01789b03cfeaba4175b8384f441170a527b4391ba71bf53264b",
+          "src/config/navigation-icons.ts": "46416e84454d92444c2ccd74c8e082a90e2ed28151d7b57a67a62eb6531e77a6",
+          "src/entry-server.tsx": "936160347c867d163b33ec8ea8764a859e49d8b3b8d8ef9edb715d4eff8991c4",
+          "src/hooks/use-analytics.tsx": "9ee26a4c197acbafdeecb9a7e5718352f4a350a8b9065208e5809ac3d85237ee",
+          "src/hooks/use-app-bottom-inset.ts": "ea13f473876a41ad1e8d3409064488c681fa7f56ab8b94a578e39915d6597629",
+          "src/hooks/use-learning-preferences.ts": "f0a619a56040d13328383999e1c056834cd2a0f39282b1873db3e9a03a4b185b",
+          "src/hooks/use-mobile.tsx": "ad0936f84f1df79d3697bfbff9c18f8ad58431c1cbaf2359c6a853b0fcc9f28b",
+          "src/hooks/use-theme.ts": "7d89bc9ef8ea996bc0b0eef8620bb9a84aa6f7f6c866530fbe5082d54e856895",
+          "src/hooks/use-toast.ts": "5aab0623ee24bddf9420c259a23a06996292e38ea70eccbac2715516f6d01a0b",
+          "src/hooks/use-user-profile.tsx": "5a9ef4d758b194120ffba2bb2e200ae3db93e2184d8e2fc9a654b897caae0f03",
+          "src/hooks/useAIRecommendations.ts": "63e49ff3421e47e6a4778223e58ccdd3f214725b6cac52ee13c510284c19f18a",
+          "src/hooks/useAdmin.ts": "e7fd33d4b84873f39dbc42ee954265b7aa4dd69e2d979dfcbb9493ecfc5fefac",
+          "src/hooks/useAuth.ts": "29973d0dad161b00c5b7bd6a1ce686ed187e08c3a8fa07949603af6f9125b975",
+          "src/hooks/useContinueLearning.ts": "43a07ee35af3880e926be6d9195248b85be593e603c41a7aceda18e51c2a5d2c",
+          "src/hooks/useDebounce.ts": "3e4352036b8aac1e854c44ea6366398a095d4ee8d2e8c751430606a5e8d5c492",
+          "src/hooks/useRecommendationFeedback.ts": "a5b9c68c6e6d1e4fc3184d2e950c98a361865a28fa83ba45e8db346489e9c4b9",
+          "src/hooks/useResourceToggle.ts": "6258fde5876bdd827a604767d7938a7f9d62f7868f086f2547b638175a257224",
+          "src/index.css": "5369bde2eaef4c0287d3194db200845142b11af16e52e6cff066e3e1cd632f6c",
+          "src/lib/acquisition.ts": "c49d7e4aa3ed1dfbb32c612df46fbc07604ebf822b12245a861a0665ce6f1e35",
+          "src/lib/amplitude.ts": "6fc9e37c65a2f191cab3f5c6f123dd9c2f1a9f6a20beb799fa91d16d429c39fa",
+          "src/lib/analytics.ts": "8902d96d5179a94fa50c6987566fc2fd77adff7755a00e8149eb74b67fd91344",
+          "src/lib/apiError.ts": "a15c79fd5181a29690b80320093f97a6063bbf1425ebd94538c6aefa7bb429b3",
+          "src/lib/authUtils.ts": "e1849c3c5371f5f1cb0f2b7c5e0deaa3bd0f06bf66a777235afae2ab823f12f8",
+          "src/lib/brand-mark.ts": "e4c77b0a9a4624f42e2ebca748fd89ae5f331caec841f5ba32c938d5497a7f19",
+          "src/lib/charts/palette.ts": "8f343c04613a003201e6e92e6bf5aa2cb1e1f6c6456c7e2e11e0035acb301d57",
+          "src/lib/clerk-appearance.ts": "8ead46c56debfe44116d5b3820ad4481ba563365b06c11f7ac1f3a11577a36c1",
+          "src/lib/crossTabSync.ts": "713c10d11f7bf44c1c620ffd8805c084fdc2b77935b02e0ef3aefb8ea7d3dfcf",
+          "src/lib/design-system.ts": "091dbe8917cf1f3a7b91d5c2f07daa3852e07fef04fc732863d7e88158182e53",
+          "src/lib/difficulty.ts": "2897f11faa7700b2fb5ece69c227d4f534e05e9bb68270b172fb01b646ad32a5",
+          "src/lib/font-options.ts": "677cc5a39d153ebed6228b6b722724c418329d79e8dcff0857027c541cadd125",
+          "src/lib/guestBookmarks.ts": "5c0ccc5427071108248521ebd36c3ecfdd2bb32818e81555bd64ccacd561c294",
+          "src/lib/mixpanel.ts": "95f80644ad31b6ad544f22a8a5570435169cc1dcb90cca93276d91b2b0803b5c",
+          "src/lib/nav-history.ts": "0345c41c33264293ac5472c5da5f6923ed652407e3181e21eb01fe09bdba3a34",
+          "src/lib/page-param.ts": "2fa8d5575977d2d70f8171371ea312c08aca8bc887d97130eb44d7e2064eb396",
+          "src/lib/parser.ts": "d98f2965ea86176374178ac8fb71d2ebb09175c25ce8635f3880ba56228ae090",
+          "src/lib/posthog.ts": "d4c3934403a68119ca9eea871333839efd5e4fbbd83a95d666cd2f15d064d5a6",
+          "src/lib/queryClient.ts": "209e386c52fb28b73236cfa623cd03f74492c759aa59870117e23ba88eedc2ae",
+          "src/lib/recommendation-cache.ts": "2f866df01c0947d0ecebe1955c94c18ada447589a7297653b661637d8259b17c",
+          "src/lib/route-monitor.ts": "d0088c307dd26ee5f096c2f945d70321952ab63db1ca14f946a08b0f1ae50e31",
+          "src/lib/safeStorage.ts": "9361837f5398d9d14be6be4df424d7200aaa488169c2a44d6db9e286bd0cdf2f",
+          "src/lib/sanitize-display.ts": "61b4cef42b919bfa1c102dcd1d4aec0b316032db9181448a14d939b1207c7fbe",
+          "src/lib/static-data.ts": "75853fcdf3e7d49fd7f384d9cbfa867ce4015dc08a1f7401cae00fcc195039d2",
+          "src/lib/tags.ts": "cbe51cfde68921ace572facf2297f22acbc351d305f8e52639e3fa13fbd39933",
+          "src/lib/url-filter-state.ts": "5d62beb57e26774f8849aab364884d42dd45e1e1e6b54206953bf8c2b50ec673",
+          "src/lib/utils.ts": "825636959eae2e5b9d968f4cd9e3c23d7ad53c10d0637a5781b353af40841964",
+          "src/main.tsx": "5cc576ce8793e12da3bce4ebe7e802a8d0e07bf77729016a71112e6701abe36e",
+          "src/pages/About.tsx": "c70b71e1378c7c0e1e1581b82b1ca49ca5ae267803335c20a9b1d5499b114f10",
+          "src/pages/AdminDashboard.tsx": "d2a0cf4a2007a276f7e83cf2277ca164bd67335ed730484780de9b4be108bed7",
+          "src/pages/Advanced.tsx": "0ee17ca178f7184d31291387e2618e98bb7b77f363c01ed0705b63d2afe1bfd3",
+          "src/pages/Bookmarks.tsx": "8c847d4a02c32b9db8c2b04427d287dbfd9d99e2a992f0aa1cb4a3112bbcc547",
+          "src/pages/BookmarksGate.tsx": "abd7f544589dc231e66127538ff606b5a68fab050bd8ad7bb80dfd21c304df52",
+          "src/pages/Categories.tsx": "c7e6c504df06fca126649612d0b3eeb5a040dbefda353e58b3ac96732afcfd8f",
+          "src/pages/Category.tsx": "ebc1aaa91ada5ae3889fe6c723e890738fbb27b335627f00db8338c80605a479",
+          "src/pages/CodeOfConduct.tsx": "777c000ab650d52d44949ab2d0cd961f05862466751fee1089e1d42859cbb1de",
+          "src/pages/ContinueLearning.tsx": "fda5b4498b67b2e4c47f83029456939ad449a39da4b034a8666fd69c6680d9ae",
+          "src/pages/Contributions.tsx": "b1a5c07d30a57615bd02c67f5bb3b0a70cf86a5ec60511a1ce92098825ce6298",
+          "src/pages/DesignSystemShowcase.tsx": "187b662eb85c677f937a02a922686ade357f85c8810b4157c2e904f7ecf785f5",
+          "src/pages/ErrorPage.tsx": "6449c6acf88f10c01b8855f08a9d998800ebc1b8cb12cc19915537d91f4605e5",
+          "src/pages/GuestBookmarks.tsx": "027ef55886faca09419d4185ad027e98d160e6036daac03570c328b57f8ff422",
+          "src/pages/Home.tsx": "470d84fb38ac567b3e66b1892224bc172315582beba96b61678af359fb14315b",
+          "src/pages/JourneyDetail.tsx": "cd8e21adad26193cc7c3e179d0914dae7c41d3188b5d01f021db8112e16d4a5a",
+          "src/pages/Journeys.tsx": "abf8c79a1252f18f28761d29b1407eb2aadfd44d4963f2d77c6911806eb084d5",
+          "src/pages/Notifications.tsx": "378ecd7eb0b07fb6b5d9967d28c5ca963a5822fdaf1c5faa1ecd2264daad90c5",
+          "src/pages/Onboarding.tsx": "3ee7394aafe4b4bdda2ed275ab222d9d47ea955fa179a79b9c5ed18a99440872",
+          "src/pages/Privacy.tsx": "1a85c65d152b52a894a5b20a12243f1084cc5cd29c4d813079e090e35800febd",
+          "src/pages/Profile.tsx": "5be71b04f4fe55a0e1c68253c0efc7f03a82b76d540d2fbdf1b24bbada8164e0",
+          "src/pages/PublicCollection.tsx": "176df2a6d061ae437303d793e4ac2dad2cb5568daa0dee039d9dadbe05a43bf5",
+          "src/pages/Recommendations.tsx": "a050d3e81673442bed85ef9654d0e8e7930c907f84448d65c056ac8d4bafa4a5",
+          "src/pages/ResourceDetail.tsx": "abc93435c3b3a5ecef7a79b473dd57efdbca2802925e07977c961143b9cb3bb2",
+          "src/pages/Search.tsx": "37c3693aa88415d53b2c1b586c574bd7fd6bd5c21aff9278949979c0110d72fe",
+          "src/pages/Settings.tsx": "f059a62943410724a128460b0e047b53b1590cfdb788facc738cc7170324ec8a",
+          "src/pages/SubSubcategory.tsx": "f9b6fb69aa8da099934ebd2079b39767a9cd43ac6432aaa09f89b8561ec94ee5",
+          "src/pages/Subcategory.tsx": "7d8893d371b75b888338a0ad229f3d5cec3babcc100dc197d97cdb35c1c405d6",
+          "src/pages/SubmitResource.tsx": "fb7015ebf23447edd5f8549eb5f87b52feed3af6af0fef046309abcbd2f4a015",
+          "src/pages/TagLanding.tsx": "343eabd62373ed7a72c96d2cbcd980c75a23c47ebe725d2cda644727fa789ebf",
+          "src/pages/TaxonomyListing.tsx": "01d3b5c325de42420095af63441067593138512497c7d635916280ea4f9746b6",
+          "src/pages/Terms.tsx": "d329960129daa8e65a6720e0c6a380c9e448a3ed5d3fa0042fc5f56dfa71f6a2",
+          "src/pages/ThemeSettings.tsx": "194adc4762678e76dc6901f29398af6463fc35cf85d577419363318b75c3ad3b",
+          "src/pages/not-found.tsx": "0f1d5d573c5e99b4b041804065c8b17ffd3c47b06f955c9f04bfa50f95374d6e",
+          "src/styles/design-system.css": "f830bc98b10e749f248fc92650684bc590909edd47b634ff49aeb77915baf052",
+          "src/styles/mobile-optimizations.css": "f371b90ce90f9084075834e87742dc409ac971e57ff9fe2bcc1db1b0340f7f07",
+          "src/styles/scrolling-fix.css": "22a07197735fc564227cf8a0557726f948933a14ca830d023cb576cd4834a257",
+          "src/styles/skeleton-animations.css": "d56646921c17193be07ab03743834499138dcaeb73d18599814a57afa74f2438",
+          "src/types/awesome-list.ts": "aec9d736881c4cf04d1b16f805b333afcdd072b04b48ed868b0bc75fa3b4928e",
+          "src/types/bookmarks.ts": "2bc67b571ada92bb047295b9610657a5ed5f60b189a649c06e361c3f10be8573"
+        },
+        "artifact": {
+          ".replit-artifact/artifact.toml": "a0a76b604e3866dfb2699cdf70ec6e73e0aed72b4717f1e0d2b7a47486249e3d",
+          ".tsbuildinfo": "242b7f50ac44dab78d979b0855a935ef5fad7fce35687732b32431ee40698e91",
+          "DESIGN.md": "9d0d7521ea0c0f3a4e1ca7b1a75e21b10bc10ff716c41a2f64987c63674219ab",
+          "dist/assets/index-ByHE3DoD.js": "4d18fc895313d63429101d58d38231e643b01d66e296b04ce31428894655971e",
+          "dist/assets/index-CUhYLBQG.css": "7da9be3a831e40fd5bbdc3f64cb2e8132b48a85f125c79c9b863d6a9a231309b",
+          "dist/index.html": "253bf3c75e9d3aade3f357f846d532bf1aee676991fba4a469a4c58701c88dcb",
+          "index.html": "92e5d37f40e54459078023a354c6afcf27d448df68ec1169d12e6946b05e4da1",
+          "node_modules/.vite/deps/_metadata.json": "562e6dafaf0f771c0a3cad1ed14b93fa46416a8a88a3fe519ddfc61c46a26feb",
+          "node_modules/.vite/deps/chunk-3F3DK5PK.js": "a13a1a81a67f1c49db7888909f68276f572f4d7730e143c08d452adfe3e65f28",
+          "node_modules/.vite/deps/chunk-3F3DK5PK.js.map": "ee77dada9cb4362f383ef3120c8b7fc573f3d8bf80133afbee42d09ecbe84a1a",
+          "node_modules/.vite/deps/chunk-5E45WTG7.js": "7955bbf08079bf353e461996f5440fb46b34e60fd609374b2a02d4342248bbb5",
+          "node_modules/.vite/deps/chunk-5E45WTG7.js.map": "e9d3341fb1ba473570e5491e4fe9d9c77d2dd393348d97bacf8b9257f1dc0418",
+          "node_modules/.vite/deps/package.json": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a",
+          "node_modules/.vite/deps/react-dom.js": "553e7ecddb0bcd23e5843352cf25bbae6f40ea58c61a9bba2b50240776593db2",
+          "node_modules/.vite/deps/react-dom.js.map": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9",
+          "node_modules/.vite/deps/react-dom_client.js": "d82410650524fb4d071a38d2a6345a7509e717eb14ad91ddff7ae83d610c6c02",
+          "node_modules/.vite/deps/react-dom_client.js.map": "f3e395c563a2017d2edf72288e8e480aa199d94405801ec8093e916c069d208a",
+          "node_modules/.vite/deps/react.js": "c741c384364f7ff3b776a3ae1299bd41540d340dd53757f723be90bf3cc0dbef",
+          "node_modules/.vite/deps/react.js.map": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9",
+          "node_modules/.vite/deps/react_jsx-dev-runtime.js": "61861f53e19c42953044f43476e466533b52539dda57c3329f6eafabe0573dc6",
+          "node_modules/.vite/deps/react_jsx-dev-runtime.js.map": "44d2cbb214cedbafc6f25ea065ac2bf3d5982b1b97edf2fe3d1d401771013498",
+          "node_modules/.vite/deps/react_jsx-runtime.js": "4ef00b2368380498b57c2d4479f9144f8ed6491110dcd2539ab21fea8490a01d",
+          "node_modules/.vite/deps/react_jsx-runtime.js.map": "5cb2e4d60a813cce725fac33ae7a41cef9dedeefdb0c149b3cda600807913ac9",
+          "package.json": "62a2cdb54d0f498367791d53f492f588e1775d7c8724930a33f2d24a0ab51775",
+          "src/App.tsx": "36504151bb5abf6e3cba13243357687c31927d3965c0045f29f311b3d1da8753",
+          "src/consumer.ts": "8e42790056f992cdc348d371dc49a7e13eb7370e1b93769c57d13ea3b2093ba1",
+          "src/index.css": "b5378ddbf6246166b7f72543e034f739651256e41b3a8388945467f267bd7a6a",
+          "src/main.tsx": "29946f51942fba11605c7595fd82b50b0d7e50148e0194fd356dacbc958f18ec",
+          "tokens.json": "3c32a05eb0feb31e0466dc024b071284d3a3099bcd18c2ed4154f87a7fa4dd0f",
+          "tsconfig.json": "8cca42fd1f37bdf2739e65ae700c00c274291ac56aaf4d49017885cef537d741",
+          "vite.config.ts": "cec56ae22efb1e55b015e5ed40db69a89e5512b7bab316f37a0ce8f738313121"
+        }
+      },
+      "serviceDocumentHashes": {
+        "app": "910eb9e6cc0692524366b5a5de452ca6a5ffe15c3f1b99ecd6392cc017a5c08d",
+        "artifact": "9094a2a92311db39f66e89aa04e0ab5b66738ac24b5330e5fe566fd9a946468c",
+        "reference": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7"
+      },
+      "validityFingerprint": "83e4e242c6ff6ac583654988d60f3bae5ca5187610f2bbe3bfbfe78e1f7f3079",
+      "endValidityFingerprint": "7b6c22cd2efbf9d652f25013bd0ced2705db8e86073dd9c7b9446382deb0f9a7",
+      "inputsChangedDuringRun": true,
+      "stale": true,
+      "runnerHash": "e7ddfd99585a7ace8061b1f25811c1c1637fd6b89c17c8f022f57f573948ddf6",
+      "inventoryHash": "23af7e29722f5ba37220d9a1260208350feea3ef05fc7831a5c3850a4cfa82dc",
+      "browserBinaryHash": "adc1c21ceed5c2a67184766376fe816ac03e556cc0ca3f782e8212235fe05c6f",
+      "invalidationRule": "Any commit, status entry, source/config fingerprint, or served-document hash change invalidates this run."
+    },
+    "snapshot": {
+      "endpoints": [
+        "http://127.0.0.1:5000/api/awesome-list",
+        "http://127.0.0.1:5000/api/awesome-list/nav"
+      ],
+      "sha256": "6c32eb9da32d81f6a9b856322ea1746d3d8890ed04ff94955551b90a3b5c64ea",
+      "bytes": 2477708,
+      "categories": 9,
+      "resourcesBound": 1816,
+      "totalResources": 1816,
+      "authorization": "public endpoints; no cookies, secrets, fixtures, or privileged data",
+      "mapping": "All corpus resources mapped from their authoritative public-tree placement to exact nav slugs; tags came from metadata.tags; flat catalog order was preserved without slicing.",
+      "reconciledPaths": [
+        {
+          "resourceId": 188006,
+          "raw": [
+            "Players & Clients",
+            "Web Players",
+            "Web Players"
+          ],
+          "publicTree": [
+            "Players & Clients",
+            "Web Players",
+            null
+          ]
+        }
+      ],
+      "referenceIdentityDefaults": {
+        "siteName": "Awesome Video",
+        "siteTag": "A curated list of awesome video tools, frameworks, libraries, and learning resources",
+        "repoUrl": "https://github.com/krzemienski/awesome-video",
+        "mechanism": "Identity defaults are not rewritten. Any demonstrator-versus-visitor shell identity mismatch is explicitly blocked."
+      }
+    }
+  },
+  "rows": [
+    {
+      "screen": "app.about",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.about",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.about",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.about",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.approvals",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.digests",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.digests",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.digests",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.digests",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.edits",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.journeys",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.journeys",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.journeys",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.journeys",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.overview",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.researcher",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.advanced",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.advanced",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.advanced",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.advanced",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-in",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-in",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-in",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-in",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-up",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-up",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-up",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.auth.sign-up",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.bookmarks",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.bookmarks",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.bookmarks",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.bookmarks",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.categories",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.categories",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.categories",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.categories",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.category",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.category",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.category",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.category",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.collection",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.collection",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.collection",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.collection",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.contributions",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.contributions",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.contributions",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.contributions",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.design-system",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.design-system",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.design-system",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.design-system",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.empty",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.empty",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.empty",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.empty",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.loading",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.loading",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.loading",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.loading",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.route",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.route",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.route",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.error.route",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.home.index",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.home.index",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.home.index",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.home.index",
+      "width": 1440,
+      "viewportHeight": 900,
+      "classification": "pixel-gated",
+      "denominator": false,
+      "links": {
+        "expected": "baseline/2026-09-10T06-15-56-772Z-17978/expected/app.home.index-1440.png",
+        "expectedRepeat": "baseline/2026-09-10T06-15-56-772Z-17978/expected/app.home.index-1440.repeat.png",
+        "actual": "baseline/2026-09-10T06-15-56-772Z-17978/actual/app.home.index-1440.png",
+        "actualRepeat": "baseline/2026-09-10T06-15-56-772Z-17978/actual/app.home.index-1440.repeat.png",
+        "diff": "baseline/2026-09-10T06-15-56-772Z-17978/diff/app.home.index-1440.png"
+      },
+      "status": "MISSING_PAIR",
+      "reason": "Diagnostic execution error: page.evaluate: Error: Required concrete font face unavailable: [{\"label\":\"body-400\",\"family\":\"Inter\",\"style\":\"normal\",\"weight\":\"400\",\"check\":true,\"loadedFace\":true},{\"label\":\"body-600\",\"family\":\"Inter\",\"style\":\"normal\",\"weight\":\"600\",\"check\":true,\"loadedFace\":true},{\"label\":\"display-400\",\"family\":\"Fraunces\",\"style\":\"normal\",\"weight\":\"400\",\"check\":true,\"loadedFace\":false},{\"label\":\"display-italic-400\",\"family\":\"Fraunces\",\"style\":\"italic\",\"weight\":\"400\",\"check\":true,\"loadedFace\":false},{\"label\":\"mono-400\",\"family\":\"JetBrains Mono\",\"style\":\"normal\",\"weight\":\"400\",\"check\":true,\"loadedFace\":false}]\n    at eval (eval at evaluate (:303:30), <anonymous>:39:13)\n    at async <anonymous>:329:30"
+    },
+    {
+      "screen": "app.journey-detail",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.journey-detail",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.journey-detail",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.journey-detail",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.journeys",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.journeys",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.journeys",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.journeys",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.legal",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.legal",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.legal",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.legal",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.not-found",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.not-found",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.not-found",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.not-found",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.notifications",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.notifications",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.notifications",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.notifications",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.onboarding",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.onboarding",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.onboarding",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.onboarding",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.profile",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.profile",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.profile",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.profile",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.resource.detail",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.search",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.search",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.search",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.search",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings.theme",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings.theme",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings.theme",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.settings.theme",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.default",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.default",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.default",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.default",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.mobile-drawer",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.shell.palette",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.submit",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.submit",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.submit",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.submit",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.tag",
+      "width": 375,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.tag",
+      "width": 768,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.tag",
+      "width": 1024,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "app.tag",
+      "width": 1440,
+      "classification": "token-only",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.anatomy.flows",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.anatomy.flows",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.anatomy.flows",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.anatomy.flows",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.a11y",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.buttons",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.cards",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.checklist",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.color",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.data-density",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.flows",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.forms",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.getting-started",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.integration",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.lists",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.motion",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.navigation",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.overview",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.pages",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.principles",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.spacing",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.theming-app",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.tokens",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.docs.typography",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 375,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 768,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 1024,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    },
+    {
+      "screen": "artifact.showcase",
+      "width": 1440,
+      "classification": "pixel-gated",
+      "status": "FILTERED",
+      "denominator": false
+    }
+  ],
+  "summary": {
+    "pass": 0,
+    "fail": 0,
+    "denominator": 0,
+    "blocked": 0,
+    "missingCounterpart": 0,
+    "missingPair": 1,
+    "filtered": 284
+  },
+  "gatePassed": false
+}

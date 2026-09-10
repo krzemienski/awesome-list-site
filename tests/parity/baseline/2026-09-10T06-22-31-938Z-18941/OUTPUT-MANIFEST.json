@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-10T06-22-31-938Z-18941",
+  "algorithm": "sha256",
+  "scope": "Every output present before this manifest; the manifest cannot self-hash.",
+  "files": [
+    {
+      "path": "REPORT.md",
+      "sha256": "3f8fd711528a1b9ef87fcdfb1a37fe9ec6ac33df77d1c1b326b11557c84d0c20",
+      "bytes": 18615
+    },
+    {
+      "path": "actual/app.home.index-1024.png",
+      "sha256": "70e5163a373c60c649aa556749aa35576f7a6aac44a7f7c5271aed78a056296b",
+      "bytes": 253107
+    },
+    {
+      "path": "actual/app.home.index-1024.repeat.png",
+      "sha256": "70e5163a373c60c649aa556749aa35576f7a6aac44a7f7c5271aed78a056296b",
+      "bytes": 253107
+    },
+    {
+      "path": "actual/app.home.index-1440.png",
+      "sha256": "9f40619bc1094188154fc879f276abde81479c23d7af51616ce76b6d1a4918b0",
+      "bytes": 313709
+    },
+    {
+      "path": "actual/app.home.index-1440.repeat.png",
+      "sha256": "9f40619bc1094188154fc879f276abde81479c23d7af51616ce76b6d1a4918b0",
+      "bytes": 313709
+    },
+    {
+      "path": "actual/app.home.index-375.png",
+      "sha256": "6ed25a89b17f988a3b704f8350bc9a06ef72a84e194ffb0423e0218301a7ac8d",
+      "bytes": 246069
+    },
+    {
+      "path": "actual/app.home.index-375.repeat.png",
+      "sha256": "6ed25a89b17f988a3b704f8350bc9a06ef72a84e194ffb0423e0218301a7ac8d",
+      "bytes": 246069
+    },
+    {
+      "path": "actual/app.home.index-768.png",
+      "sha256": "e466bea2bf71ed4f1ec852a7f1148a5b8a9a0ad88078fe181372f4df73a070e9",
+      "bytes": 265788
+    },
+    {
+      "path": "actual/app.home.index-768.repeat.png",
+      "sha256": "e466bea2bf71ed4f1ec852a7f1148a5b8a9a0ad88078fe181372f4df73a070e9",
+      "bytes": 265788
+    },
+    {
+      "path": "diff/app.home.index-1024.png",
+      "sha256": "fed9ca7713b3dbe2a181e82e9f9979d42c3ba30a8ad7e9392c9e8f1985c13ead",
+      "bytes": 179502
+    },
+    {
+      "path": "diff/app.home.index-1440.png",
+      "sha256": "cf81a827a1124f804a231bab61a9f7f18d25cd98c3511f6e26d7d78d0980c540",
+      "bytes": 193265
+    },
+    {
+      "path": "diff/app.home.index-768.png",
+      "sha256": "15d7af3da8a8e6e08f9697c4468cd82b2fcea86332c6d55da773669b6e55d512",
+      "bytes": 167932
+    },
+    {
+      "path": "expected/app.home.index-1024.png",
+      "sha256": "64b8db79c7f5df26316a4501faab9f590adb33641ba446066b98e48b20ea6a9f",
+      "bytes": 387649
+    },
+    {
+      "path": "expected/app.home.index-1024.repeat.png",
+      "sha256": "64b8db79c7f5df26316a4501faab9f590adb33641ba446066b98e48b20ea6a9f",
+      "bytes": 387649
+    },
+    {
+      "path": "expected/app.home.index-1440.png",
+      "sha256": "b2de919067d336f14663e322547ef53827a3419edfbbe02829131cde33658c64",
+      "bytes": 416318
+    },
+    {
+      "path": "expected/app.home.index-1440.repeat.png",
+      "sha256": "b2de919067d336f14663e322547ef53827a3419edfbbe02829131cde33658c64",
+      "bytes": 416318
+    },
+    {
+      "path": "expected/app.home.index-375.png",
+      "sha256": "42633517e0d251af31df2bb61827e95020476ab47e236623bd1acc1f11e6ad96",
+      "bytes": 359458
+    },
+    {
+      "path": "expected/app.home.index-375.repeat.png",
+      "sha256": "6067e390517afbf414208468801b26ed73984e626c33f476f2e40e62a3f99ede",
+      "bytes": 359489
+    },
+    {
+      "path": "expected/app.home.index-768.png",
+      "sha256": "f57ae33caf019623d0cd202e6c067a2206f23253a9b114077d978832a52ea4cd",
+      "bytes": 350372
+    },
+    {
+      "path": "expected/app.home.index-768.repeat.png",
+      "sha256": "f57ae33caf019623d0cd202e6c067a2206f23253a9b114077d978832a52ea4cd",
+      "bytes": 350372
+    },
+    {
+      "path": "results.json",
+      "sha256": "ad07d4e6b9e9f859fcfa4b9a9a6feffbf3f0a58a3c2cc8daa7022f880477fad6",
+      "bytes": 140319
+    }
+  ]
+}

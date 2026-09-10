@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-10T06-19-30-646Z-18725",
+  "algorithm": "sha256",
+  "scope": "Every output present before this manifest; the manifest cannot self-hash.",
+  "files": [
+    {
+      "path": "REPORT.md",
+      "sha256": "4bbd581ef4d60412b58c16a061d3e7ea282296c8963ba55ed34ad1a0a9c6cc40",
+      "bytes": 17942
+    },
+    {
+      "path": "actual/app.home.index-1440.png",
+      "sha256": "9f40619bc1094188154fc879f276abde81479c23d7af51616ce76b6d1a4918b0",
+      "bytes": 313709
+    },
+    {
+      "path": "actual/app.home.index-1440.repeat.png",
+      "sha256": "9f40619bc1094188154fc879f276abde81479c23d7af51616ce76b6d1a4918b0",
+      "bytes": 313709
+    },
+    {
+      "path": "diff/app.home.index-1440.png",
+      "sha256": "cf81a827a1124f804a231bab61a9f7f18d25cd98c3511f6e26d7d78d0980c540",
+      "bytes": 193265
+    },
+    {
+      "path": "expected/app.home.index-1440.png",
+      "sha256": "b2de919067d336f14663e322547ef53827a3419edfbbe02829131cde33658c64",
+      "bytes": 416318
+    },
+    {
+      "path": "expected/app.home.index-1440.repeat.png",
+      "sha256": "b2de919067d336f14663e322547ef53827a3419edfbbe02829131cde33658c64",
+      "bytes": 416318
+    },
+    {
+      "path": "results.json",
+      "sha256": "59f0a97822cfc977b1c769ebef302d084176e74fb77d07709f897d0a40295a2a",
+      "bytes": 106434
+    }
+  ]
+}

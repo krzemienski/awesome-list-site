@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "widths": [375, 768, 1024, 1440],
+  "viewportHeights": {
+    "375": 812,
+    "768": 1024,
+    "1024": 768,
+    "1440": 900
+  },
+  "screens": [
+    {
+      "id": "app.home.index",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "referenceAction": "home-index",
+      "actualReadySelector": "[data-testid=list-categories]",
+      "referenceReadySelector": "main",
+      "identityCheck": "home"
+    },
+    {
+      "id": "app.category",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/category/{categorySlug}",
+      "referencePath": "/index.html",
+      "referenceAction": "category",
+      "actualReadySelector": "[data-testid=taxonomy-results-region]",
+      "referenceReadySelector": "main",
+      "identityCheck": "category"
+    },
+    {
+      "id": "app.subcategory",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/subcategory/{subcategorySlug}",
+      "referencePath": "/index.html",
+      "referenceAction": "subcategory",
+      "actualReadySelector": "[data-testid=taxonomy-results-region]",
+      "referenceReadySelector": "main",
+      "identityCheck": "subcategory"
+    },
+    {
+      "id": "app.resource.detail",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/resource/{resourceId}",
+      "referencePath": "/index.html",
+      "referenceAction": "resource",
+      "actualReadySelector": "main h1",
+      "referenceReadySelector": "main",
+      "identityCheck": "resource"
+    },
+    {
+      "id": "app.about",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/about",
+      "referencePath": "/index.html",
+      "referenceAction": "about",
+      "actualReadySelector": "main h1",
+      "referenceReadySelector": "main"
+    },
+    {
+      "id": "app.shell.default",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "aliasOf": "app.home.index"
+    },
+    {
+      "id": "app.shell.palette",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "actualAction": "palette",
+      "referenceAction": "palette",
+      "actualReadySelector": "[role=dialog]",
+      "referenceReadySelector": ".modal-backdrop"
+    },
+    {
+      "id": "app.shell.mobile-drawer",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "widths": [375],
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "actualAction": "mobile-drawer",
+      "referenceAction": "mobile-drawer",
+      "actualReadySelector": "[role=dialog]",
+      "referenceReadySelector": ".mobile-drawer.open"
+    },
+    {
+      "id": "app.search",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/search",
+      "referencePath": null,
+      "blocked": "The current modular reference has no independently routeable search-results state."
+    },
+    {
+      "id": "app.submit",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/submit",
+      "referencePath": "/index.html",
+      "referenceAction": "submit",
+      "blocked": "Authentication is fail-closed; no privileged fixture or test identity is supplied."
+    },
+    {
+      "id": "app.admin.overview",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "referenceAction": "admin",
+      "blocked": "Admin requires a real authorized session, and reference admin statistics are demonstrator data rather than an approved real-data adapter."
+    },
+    {
+      "id": "app.settings.theme",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/settings/theme",
+      "referencePath": null,
+      "blocked": "Counterpart belongs to an older non-active page family and is not routeable in the approved modular target."
+    },
+    {
+      "id": "app.not-found",
+      "kind": "app",
+      "classification": "pixel-gated",
+      "actualPath": "/__parity-not-found__",
+      "referencePath": null,
+      "blocked": "The active modular reference does not expose a 404 state."
+    },
+    {
+      "id": "artifact.showcase",
+      "kind": "artifact",
+      "classification": "pixel-gated",
+      "actualPath": "/",
+      "referencePath": "/design-system.html",
+      "readySelector": "main"
+    },
+    {
+      "id": "artifact.anatomy.flows",
+      "kind": "artifact",
+      "classification": "pixel-gated",
+      "actualPath": "/#anatomy",
+      "referencePath": "/design-system.html",
+      "readySelector": "main",
+      "missingActualNavigationCounterpart": "The registered artifact has no independently routeable anatomy state; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.overview",
+      "kind": "artifact",
+      "classification": "pixel-gated",
+      "actualPath": "/#docs-overview",
+      "referencePath": "/docs.html#overview",
+      "readySelector": "main",
+      "missingActualNavigationCounterpart": "The registered artifact has no docs hash router; both captures are diagnostic only."
+    }
+  ],
+  "tokenOnly": [
+    "app.tag",
+    "app.collection",
+    "app.bookmarks",
+    "app.profile",
+    "app.contributions",
+    "app.notifications",
+    "app.onboarding",
+    "app.legal",
+    "app.error.loading",
+    "app.error.empty"
+  ],
+  "artifactDocs": [
+    ["overview", "Overview"],
+    ["principles", "Principles"],
+    ["getting-started", "Getting started"],
+    ["tokens", "Token contract"],
+    ["theming", "Theming & switching"],
+    ["typography", "Typography"],
+    ["color", "Color & accent"],
+    ["spacing", "Spacing & layout"],
+    ["motion", "Motion"],
+    ["buttons", "Buttons"],
+    ["cards", "Cards"],
+    ["forms", "Forms"],
+    ["navigation", "Navigation"],
+    ["lists", "List patterns"],
+    ["flows", "Flow diagrams"],
+    ["pages", "Page templates"],
+    ["data-density", "Data density"],
+    ["integration", "Integrate the system"],
+    ["theming-app", "Theming an app"],
+    ["a11y", "Accessibility"],
+    ["checklist", "Launch checklist"]
+  ],
+  "unconfiguredScreens": [
+    ["app.auth.sign-in", "pixel-gated", "Real Clerk state is required; no auth fixture is permitted."],
+    ["app.auth.sign-up", "pixel-gated", "Real Clerk state is required; no auth fixture is permitted."],
+    ["app.categories", "pixel-gated", "No independently configured active-reference state yet."],
+    ["app.subsubcategory", "pixel-gated", "No independently configured active-reference state yet."],
+    ["app.advanced", "pixel-gated", "No independently configured active-reference state yet."],
+    ["app.journeys", "pixel-gated", "No independently configured active-reference state yet."],
+    ["app.journey-detail", "pixel-gated", "A real journey identity has not been aligned."],
+    ["app.settings", "pixel-gated", "No independently configured active-reference state yet."],
+    ["app.design-system", "pixel-gated", "Application showcase is distinct from the registered artifact baseline."],
+    ["app.error.route", "token-only", "Error injection is prohibited; no naturally occurring real error state supplied."]
+  ],
+  "adminSections": [
+    "approvals",
+    "edits",
+    "enrichment",
+    "researcher",
+    "export",
+    "database",
+    "resources",
+    "categories",
+    "subcategories",
+    "subsubcategories",
+    "journeys",
+    "users",
+    "github",
+    "linkhealth",
+    "digests",
+    "audit"
+  ],
+  "sourceInventoryProvenance": {
+    "copiedFrom": [
+      "/tmp/parity-inspection/proposed-screens.json",
+      "/tmp/parity-inspection/admin-screens.json"
+    ],
+    "copiedAtImplementationTime": true,
+    "runtimeDependencyOnTmp": false,
+    "adminRoute": "client/src/pages/AdminDashboard.tsx",
+    "routeSource": "client/src/App.tsx"
+  },
+  "sourceInventoryAliases": {
+    "screen.home.default": "app.home.index",
+    "screen.category": "app.category",
+    "screen.subcategory": "app.subcategory",
+    "screen.resource": "app.resource.detail",
+    "screen.about": "app.about",
+    "screen.search": "app.search",
+    "screen.submit": "app.submit",
+    "screen.admin": "app.admin.overview",
+    "screen.theme": "app.settings.theme",
+    "screen.error.not-found": "app.not-found",
+    "screen.auth.sign-in": "app.auth.sign-in",
+    "screen.auth.sign-up": "app.auth.sign-up",
+    "screen.categories": "app.categories",
+    "screen.subsubcategory": "app.subsubcategory",
+    "screen.tag": "app.tag",
+    "screen.advanced": "app.advanced",
+    "screen.journeys": "app.journeys",
+    "screen.journey-detail": "app.journey-detail",
+    "screen.collection": "app.collection",
+    "screen.bookmarks": "app.bookmarks",
+    "screen.profile": "app.profile",
+    "screen.contributions": "app.contributions",
+    "screen.notifications": "app.notifications",
+    "screen.settings": "app.settings",
+    "screen.onboarding": "app.onboarding",
+    "screen.design-system": "app.design-system",
+    "screen.legal": "app.legal",
+    "screen.error.load": "app.error.loading"
+  }
+}
