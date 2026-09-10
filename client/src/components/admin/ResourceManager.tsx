@@ -45,8 +45,17 @@ import {
   type ResourceSkillLevel,
 } from "@shared/resourceFacets";
 
+type ResourceKind = "tools" | "libraries" | "standards" | "events" | "protocols" | "other";
+const RESOURCE_KIND_OPTIONS: Array<{ value: ResourceKind; label: string }> = [
+  { value: "tools", label: "Tools" }, { value: "libraries", label: "Libraries" },
+  { value: "standards", label: "Standards" }, { value: "events", label: "Events" },
+  { value: "protocols", label: "Protocols" }, { value: "other", label: "Other" },
+];
+type AdminResource = Resource & { kind: ResourceKind | null; resolvedKind: ResourceKind; metadata: (Record<string, any> & { featured?: boolean }) | null };
+const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
+
 interface ResourcesResponse {
-  resources: Resource[];
+  resources: AdminResource[];
   total: number;
   page: number;
   limit: number;
@@ -125,7 +134,7 @@ export default function ResourceManager() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const [selectedResource, setSelectedResource] = useState<AdminResource | null>(null);
   const [selectedResourceIds, setSelectedResourceIds] = useState<number[]>([]);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
@@ -149,6 +158,8 @@ export default function ResourceManager() {
     resourceFormat: "unknown" as ResourceFormat,
     provider: "unknown" as ResourceProvider,
     skillLevel: "unknown" as ResourceSkillLevel,
+    kind: "" as ResourceKind | "",
+    featured: false,
     status: "approved"
   });
 
@@ -239,7 +250,7 @@ export default function ResourceManager() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: Partial<Resource> }) => {
+    mutationFn: async ({ id, data }: { id: number, data: Partial<AdminResource> }) => {
       return await apiRequest(`/api/admin/resources/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
@@ -249,6 +260,8 @@ export default function ResourceManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setEditDialogOpen(false);
       setSelectedResource(null);
       toast({
@@ -269,7 +282,7 @@ export default function ResourceManager() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: Partial<Resource>) => {
+    mutationFn: async (data: Partial<AdminResource>) => {
       return await apiRequest('/api/admin/resources', {
         method: 'POST',
         body: JSON.stringify(data)
@@ -279,7 +292,8 @@ export default function ResourceManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setCreateDialogOpen(false);
       resetEditForm();
       toast({
@@ -308,7 +322,8 @@ export default function ResourceManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setDeleteDialogOpen(false);
       setSelectedResource(null);
       toast({
@@ -336,7 +351,8 @@ export default function ResourceManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
       toast({
         title: "Resources Approved",
@@ -363,7 +379,8 @@ export default function ResourceManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
       setRejectDialogOpen(false);
       toast({
@@ -391,7 +408,8 @@ export default function ResourceManager() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       setSelectedResourceIds([]);
       toast({
         title: "Resources Deleted",
@@ -421,6 +439,8 @@ export default function ResourceManager() {
       resourceFormat: "unknown",
       provider: "unknown",
       skillLevel: "unknown",
+      kind: "",
+      featured: false,
       status: "approved"
     });
   };
@@ -430,7 +450,7 @@ export default function ResourceManager() {
   // <body> — keyboard/AT users keep their place in the table row.
   const editTriggerRef = useRef<HTMLElement | null>(null);
 
-  const openEditDialog = (resource: Resource) => {
+  const openEditDialog = (resource: AdminResource) => {
     // Capture the triggering row button (falls back to null for the
     // deep-link path, where there is no in-page trigger to restore to).
     const active = document.activeElement;
@@ -449,6 +469,8 @@ export default function ResourceManager() {
       resourceFormat: resource.resourceFormat || "unknown",
       provider: resource.provider || "unknown",
       skillLevel: resource.skillLevel || "unknown",
+      kind: resource.kind ?? "",
+      featured: featuredValue(resource),
       status: resource.status || "approved"
     });
     setEditDialogOpen(true);
@@ -461,6 +483,18 @@ export default function ResourceManager() {
     setEditForm(prev => ({ ...prev, status: "pending" }));
     setCreateDialogOpen(true);
   };
+
+  // Canonical masthead deep-link: open the existing create workflow, then strip
+  // the one-shot flag so refresh and Back do not reopen the modal.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") !== "1") return;
+    openCreateDialog();
+    const url = new URL(window.location.href);
+    url.searchParams.delete("create");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // NEW-013: /admin/resources?resourceId=N (ResourceDetail's "Edit in Admin"
   // deep-link) opens that resource's edit dialog directly instead of dumping
@@ -483,7 +517,7 @@ export default function ResourceManager() {
     };
     fetch(`/api/resources/${rid}`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((resource: Resource) => openEditDialog(resource))
+      .then((resource: AdminResource) => openEditDialog(resource))
       .catch(() => {
         toast({
           title: "Resource not found",
@@ -495,7 +529,7 @@ export default function ResourceManager() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const openDeleteDialog = (resource: Resource) => {
+  const openDeleteDialog = (resource: AdminResource) => {
     setSelectedResource(resource);
     setDeleteDialogOpen(true);
   };
@@ -534,9 +568,14 @@ export default function ResourceManager() {
   const handleSaveEdit = () => {
     if (!selectedResource) return;
     if (!validateEditForm('edit')) return;
+    const { featured, kind, ...fields } = editForm;
     updateMutation.mutate({
       id: selectedResource.id,
-      data: editForm
+      data: {
+        ...fields,
+        kind: kind || null,
+        metadata: { ...(selectedResource.metadata ?? {}), featured },
+      } as Partial<AdminResource>,
     });
   };
 
@@ -552,7 +591,12 @@ export default function ResourceManager() {
       });
       return;
     }
-    createMutation.mutate(editForm);
+    const { featured, kind, ...fields } = editForm;
+    createMutation.mutate({
+      ...fields,
+      kind: kind || null,
+      metadata: { featured },
+    } as Partial<AdminResource>);
   };
 
   const handleDelete = () => {
@@ -960,6 +1004,8 @@ export default function ResourceManager() {
                   <TableHead>Title</TableHead>
                   <TableHead className="hidden md:table-cell">Category</TableHead>
                   <TableHead className="hidden lg:table-cell">Status</TableHead>
+                  <TableHead className="hidden xl:table-cell">Kind</TableHead>
+                  <TableHead className="hidden xl:table-cell">Featured</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -967,7 +1013,7 @@ export default function ResourceManager() {
                 {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
                 {!isLoading && (data?.resources.length || 0) === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+                    <TableCell colSpan={8} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
                       {(search || categoryFilter || statusFilter)
                         ? <>No resources match the current search or filters.{' '}
                             <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
@@ -1028,6 +1074,13 @@ export default function ResourceManager() {
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
                       {getStatusBadge(resource.status || 'approved')}
+                    </TableCell>
+                    <TableCell className="hidden xl:table-cell">
+                      <div className="text-xs font-medium text-[var(--text)]">{resource.kind ? RESOURCE_KIND_OPTIONS.find((option) => option.value === resource.kind)?.label : "No override"}</div>
+                      <div className="text-xs text-[var(--text-2)]">{resource.kind ? "Stored" : `Inferred: ${resource.resolvedKind}`}</div>
+                    </TableCell>
+                    <TableCell className="hidden xl:table-cell">
+                      {featuredValue(resource) ? <Badge variant="accent">Featured</Badge> : <span className="text-xs text-[var(--text-2)]">—</span>}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
@@ -1268,6 +1321,24 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-kind">Kind override</Label>
+                <Select value={editForm.kind || "inferred"} onValueChange={(value) => setEditForm((form) => ({ ...form, kind: value === "inferred" ? "" : value as ResourceKind }))}>
+                  <SelectTrigger id="edit-kind" className="min-h-11" data-testid="select-edit-kind"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="inferred">Use inferred ({selectedResource?.resolvedKind ?? "other"})</SelectItem>{RESOURCE_KIND_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+                </Select>
+                <p className="text-xs text-[var(--text-2)]" data-testid="text-kind-storage-state">{editForm.kind ? `Stored override: ${editForm.kind}` : `Stored: null · resolved: ${selectedResource?.resolvedKind ?? "other"}`}</p>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-featured">Curated placement</Label>
+                <label htmlFor="edit-featured" className="flex min-h-11 cursor-pointer items-center gap-3 border border-[var(--border)] px-3 focus-within:ring-2 focus-within:ring-[var(--accent)]">
+                  <Checkbox id="edit-featured" checked={editForm.featured} onCheckedChange={(checked) => setEditForm((form) => ({ ...form, featured: checked === true }))} data-testid="checkbox-edit-featured" />
+                  <span className="text-sm">Feature this resource</span>
+                </label>
+                <p className="text-xs text-[var(--text-2)]">Drives Curated cards and the Index rail.</p>
+              </div>
+            </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="grid gap-2">
                 <Label htmlFor="edit-resource-format">Format</Label>
@@ -1486,6 +1557,24 @@ export default function ResourceManager() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="create-kind">Kind override</Label>
+                <Select value={editForm.kind || "inferred"} onValueChange={(value) => setEditForm((form) => ({ ...form, kind: value === "inferred" ? "" : value as ResourceKind }))}>
+                  <SelectTrigger id="create-kind" className="min-h-11" data-testid="select-create-kind"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="inferred">No override (infer from tags)</SelectItem>{RESOURCE_KIND_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+                </Select>
+                <p className="text-xs text-[var(--text-2)]" data-testid="text-create-kind-storage-state">{editForm.kind ? `Stored override: ${editForm.kind}` : "Stored: null · resolved after creation"}</p>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-featured">Curated placement</Label>
+                <label htmlFor="create-featured" className="flex min-h-11 cursor-pointer items-center gap-3 border border-[var(--border)] px-3 focus-within:ring-2 focus-within:ring-[var(--accent)]">
+                  <Checkbox id="create-featured" checked={editForm.featured} onCheckedChange={(checked) => setEditForm((form) => ({ ...form, featured: checked === true }))} data-testid="checkbox-create-featured" />
+                  <span className="text-sm">Feature this resource</span>
+                </label>
+                <p className="text-xs text-[var(--text-2)]">Persists as metadata.featured.</p>
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">

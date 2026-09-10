@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "wouter";
 import { ArrowUp } from "lucide-react";
+import { BrandMark } from "@/components/BrandMark";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
@@ -8,6 +9,11 @@ import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { openCookieSettings } from "@/components/ui/consent-banner";
 import type { ProductProfileId } from "@/lib/design-system";
+import { getCategorySlug } from "@/lib/utils";
+import { contactVariant } from "@/lib/contact";
+
+const ContactFooter = lazy(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })));
+const ContactDialogHost = lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })));
 
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
 function BackToTop() {
@@ -48,6 +54,12 @@ interface User {
   createdAt?: string;
 }
 
+export interface ShellSiteConfig {
+  title?: string;
+  description?: string;
+  repositoryUrl?: string;
+}
+
 interface MainLayoutProps {
   productProfile: ProductProfileId;
   // Run22 BUG-008: chrome (sidebar/header) renders from the lightweight nav
@@ -64,14 +76,20 @@ interface MainLayoutProps {
   user?: User;
   onLogout?: () => void;
   logoutError?: string | null;
+  /** Map GET /api/config as: site.title → title, site.description → description,
+   * and source.repositoryUrl → repositoryUrl. */
+  siteConfig?: ShellSiteConfig;
   renderSearchDialog?: (controls: {
     isOpen: boolean;
     setIsOpen: (open: boolean) => void;
   }) => React.ReactNode;
 }
 
-export default function MainLayout({ productProfile, nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, renderSearchDialog }: MainLayoutProps) {
+export default function MainLayout({ productProfile, nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, siteConfig, renderSearchDialog }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const siteName = siteConfig?.title?.trim() || nav?.title?.trim() || "Awesome List";
+  const siteTagline = siteConfig?.description?.trim();
+  const repositoryUrl = siteConfig?.repositoryUrl?.trim();
 
   // Keep the lightweight global trigger in the eager shell. The palette code
   // itself is loaded only after one of these controls opens it.
@@ -117,13 +135,9 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
 
   return (
     <SidebarProvider
-      // Audit2 BUG-004/005/017/018: default the sidebar CLOSED below 1024px.
-      // At tablet widths (768–1023) the expanded 17.5rem panel squeezed main
-      // content to ~390px — /advanced chips and tabs clipped past the
-      // viewport, the home CTA row overflowed, and /search columns collapsed
-      // to 188px. ui/sidebar.tsx additionally force-collapses when a viewport
-      // ENTERS that range carrying a stale expanded preference.
-      defaultOpen={typeof window !== "undefined" && window.innerWidth >= 1024}
+      // Canonical breakpoint contract: keep a persistent 240px sidebar at 768–1023px,
+      // use the 280px width at desktop, and switch to the drawer only below 768px.
+      defaultOpen={typeof window !== "undefined" && window.innerWidth >= 768}
       // DS shell parity: column layout — the full-width header owns the brand
       // (reference layout.jsx Header), and the sidebar/icon-rail starts BELOW
       // it. Keep the responsive header height in one shell variable so the
@@ -136,7 +150,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
       // bottom row past the fold, and on a short page a first paint would show
       // that row over the end of this one. Growing past the column on long
       // pages still works: a flex item never shrinks below its content.
-      className="flex-col flex-1 min-h-[auto] [--header-height:56px] md:[--header-height:60px]"
+      className="flex-col flex-1 min-h-[auto] [--header-height:60px]"
     >
       {/* CC-17 — Skip-link is the first focusable element on every page. */}
       <a href="#main" className="skip-link">Skip to main content</a>
@@ -154,6 +168,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           onLogout={onLogout}
           logoutError={logoutError}
           categories={nav?.categories || []}
+          siteName={siteName}
         />
         <div className="flex flex-1 w-full min-h-0">
         <AppSidebar
@@ -163,6 +178,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           navError={navError}
           onRetryNav={onRetryNav}
           user={user}
+          siteName={siteName}
         />
         <SidebarInset>
         {/*
@@ -185,66 +201,63 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
         >
           {children}
         </main>
-        {/* R1 — minimal app footer; R2-M19 — navigation links + copyright. */}
-        <footer className="border-t border-[var(--border)] mt-auto">
-          <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[color:var(--text-3)]">
-            <span data-testid="footer-copyright">
-              © {new Date().getFullYear()} Awesome Video · Built with React &amp; shadcn/ui
-            </span>
-            {/* BUG-013 (run9): footer links get 44px-tall hit areas (WCAG 2.5.5)
-                — text stays small, the tap target grows. BUG-030: GitHub source
-                link added alongside internal nav. */}
-            <nav aria-label="Footer" className="flex items-center gap-4 flex-wrap justify-center">
-              <Link href="/" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-home">
-                Home
-              </Link>
-              <Link href="/categories" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-categories">
-                Categories
-              </Link>
-              <Link href="/journeys" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-journeys">
-                Journeys
-              </Link>
-              <Link href="/submit" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-submit">
-                Submit
-              </Link>
-              <Link href="/about" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-about">
-                About
-              </Link>
-              {/* BUG-019 (run13): real legal pages instead of dead promises. */}
-              <Link href="/terms" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-terms">
-                Terms
-              </Link>
-              <Link href="/privacy" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-privacy">
-                Privacy
-              </Link>
-              <Link href="/code-of-conduct" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-code-of-conduct">
-                Code of Conduct
-              </Link>
-              {/* R5-025 (run24): in-product consent-reset path — re-opens the
-                  analytics consent banner so a persisted choice can be changed. */}
-              <button
-                type="button"
-                onClick={openCookieSettings}
-                className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors"
-                data-testid="footer-cookie-settings"
-              >
-                Cookie settings
-              </button>
-              <a
-                href="https://github.com/krzemienski/awesome-video"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors"
-                data-testid="footer-github"
-              >
-                GitHub
-              </a>
-            </nav>
+        <footer className="site-footer mt-auto" data-testid="site-footer">
+          <div className="site-footer-inner">
+            <div className="footer-grid">
+              <div className="footer-brand">
+                <Link href="/" className="footer-brand-link" data-testid="footer-home" aria-label={`${siteName} — home`}>
+                  <BrandMark className="size-7 shrink-0" />
+                  <span className="font-mono footer-wordmark">{siteName.toUpperCase()}</span>
+                </Link>
+                {siteTagline ? <p className="footer-tagline">{siteTagline}</p> : null}
+                <p className="font-mono footer-stats">
+                  {(nav?.totalResources ?? 0).toLocaleString()} resources · {(nav?.categories.length ?? 0).toLocaleString()} categories
+                  <span className="footer-live"><span className="live-dot" aria-hidden="true" />indexed live</span>
+                </p>
+              </div>
+              <nav aria-label="Browse" className="footer-column">
+                <h2>BROWSE</h2>
+                {(nav?.categories ?? []).slice(0, 6).map((category) => (
+                  <Link key={category.slug ?? category.name} href={`/category/${category.slug ?? getCategorySlug(category.name)}`}>{category.name}</Link>
+                ))}
+                <Link href="/categories" data-testid="footer-categories">All categories →</Link>
+              </nav>
+              <nav aria-label="Project" className="footer-column">
+                <h2>PROJECT</h2>
+                <Link href="/about" data-testid="footer-about">About</Link>
+                <Link href="/submit" data-testid="footer-submit">Submit a resource</Link>
+                <Link href="/journeys" data-testid="footer-journeys">Learning journeys</Link>
+                <Link href="/design-system">Design system</Link>
+              </nav>
+              <nav aria-label="Source and policies" className="footer-column">
+                <h2>SOURCE</h2>
+                {repositoryUrl ? (
+                  <>
+                    <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" data-testid="footer-github">Source repository ↗</a>
+                    <a href={`${repositoryUrl.replace(/\/$/, "")}/issues`} target="_blank" rel="noopener noreferrer">Report an issue ↗</a>
+                  </>
+                ) : null}
+                <Link href="/terms" data-testid="footer-terms">Terms</Link>
+                <Link href="/privacy" data-testid="footer-privacy">Privacy</Link>
+                <Link href="/code-of-conduct" data-testid="footer-code-of-conduct">Code of Conduct</Link>
+                <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings">Cookie settings</button>
+                {contactVariant === "a" || contactVariant === "b" || contactVariant === "c" ? (
+                  <Suspense fallback={null}><ContactFooter /></Suspense>
+                ) : null}
+              </nav>
+            </div>
+            <div className="footer-bottom font-mono">
+              <span data-testid="footer-copyright">© {new Date().getFullYear()} {siteName}</span>
+              <span>built on the awesome-list design system · v1.0</span>
+            </div>
           </div>
         </footer>
         </SidebarInset>
         </div>
       </div>
+      {contactVariant === "b" || contactVariant === "e" ? (
+        <Suspense fallback={null}><ContactDialogHost /></Suspense>
+      ) : null}
       {renderSearchDialog?.({
         isOpen: searchOpen,
         setIsOpen: setSearchOpen,

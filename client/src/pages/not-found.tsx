@@ -1,3 +1,4 @@
+import "@/components/parity/parity-styles";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +35,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
   // leaves (see index.css), so filling main centers this card without claiming
   // a viewport height the shell may not have to give.
   return (
-    <div className="flex items-center justify-center min-h-full">
+    <div className="parity-page parity-not-found flex items-center justify-center min-h-full">
       {/* R5-050: ONE 404 head shared by every not-found surface (unknown path,
           unknown taxonomy slug, unknown resource) — mirrors the server's
           notFoundMeta: same title/description/noindex, og tags kept, og:url

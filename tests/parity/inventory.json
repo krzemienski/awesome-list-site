@@ -170,7 +170,10 @@
     "app.onboarding",
     "app.legal",
     "app.error.loading",
-    "app.error.empty"
+    "app.error.empty",
+    "app.admin.subsubcategories",
+    "app.admin.journeys",
+    "app.admin.digests"
   ],
   "artifactDocs": [
     ["overview", "Overview"],
@@ -217,12 +220,9 @@
     "resources",
     "categories",
     "subcategories",
-    "subsubcategories",
-    "journeys",
     "users",
     "github",
     "linkhealth",
-    "digests",
     "audit"
   ],
   "sourceInventoryProvenance": {

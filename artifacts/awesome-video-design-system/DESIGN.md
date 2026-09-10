@@ -63,3 +63,36 @@ Saved user theme choices always win over first-visit profile defaults.
 
 See `docs/AGENTS.md` for the enforceable contract and
 `.agents/skills/verify-design-system/SKILL.md` for the compliance gate.
+## Living manual routes
+
+The registered artifact is a single, hash-routed modular manual. Its routes are stable
+capture and deep-link targets rather than duplicate applications:
+
+- `#showcase` (or `/`) — canonical systems, accents, foundations, components, and ownership.
+- `#anatomy` — a genuine section route composed from the canonical switcher, exact flow-diagram anatomy section, and canonical footer. It does not count the full showcase twice or invent replacement content.
+- `#docs-<chapter>` — 21 genuine chapters grouped under Start, Foundations,
+  Components, Patterns, and Apply. Chapter ids match `tests/parity/inventory.json`.
+
+Examples in component and pattern chapters are explicitly labeled documentation.
+They demonstrate component structure and state, not operational catalog data. Product
+surface comparisons must continue to use real application data.
+
+## Reference reconciliation hooks
+
+The artifact preserves canonical content and composition while correcting prototype
+accessibility defects. The reference capture must apply the same non-content adapter:
+
+- Render accent circles inside `.ds-accent-target` 44×44 buttons; keep the painted
+  circle at 18×18 and preserve non-overlapping spacing.
+- Give `.btn`, `.tab`, `.ds-system-pill`, `.docs-nav-item`, `.input`, `.select`, and
+  navigation links a 44px minimum target.
+- Preserve the shipping runtime's higher-contrast `--text-3` value (`0.52` alpha).
+  Do not restore the prototype's failing `0.4` value to manufacture a pixel pass.
+- `data-canonical-section="anatomy"` is the stable, nonvisual reference-adapter hook.
+  The `#anatomy` route composes the actual canonical `SystemSwitcher`,
+  `FlowDiagramsSection`, and `Footer`; it does not duplicate the full showcase or
+  introduce substitute flow content.
+
+These changes intentionally require the same adapter on expected captures. Any baseline
+change must be independently reviewed as accessibility reconciliation, not accepted as
+an arbitrary visual update.

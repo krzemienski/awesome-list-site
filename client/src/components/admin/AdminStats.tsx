@@ -32,7 +32,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
   const pendingCount = stats?.totalPending ?? 0;
   const rejectedCount = stats?.totalRejected ?? 0;
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="admin-stat-strip">
       {[
         { icon: Users, label: "Total Users", value: stats?.users, tab: "users" },
         {
@@ -110,11 +110,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
                   }
                 : undefined
             }
-            className={
-              clickable
-                ? "cursor-pointer transition-colors hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                : undefined
-            }
+            className={clickable ? "admin-stat cursor-pointer focus-ring" : "admin-stat"}
             // Stage-6 card sweep (task #363): every clickable/hoverable
             // bg-card surface must carry the card-hover hook so per-system
             // hover skins apply — this also marks the nested deep-link
@@ -145,7 +141,7 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
             </CardHeader>
             <CardContent>
               <div
-                className="font-display font-medium text-3xl tracking-tight tabular-nums text-[var(--text)]"
+                className="admin-stat__value"
                 data-testid={testId}
               >
                 {isLoading ? "—" : (value ?? 0).toLocaleString()}

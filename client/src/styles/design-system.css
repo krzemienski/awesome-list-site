@@ -1075,3 +1075,53 @@ button:active:not([disabled]):not([aria-disabled="true"]),
 [role="button"]:active:not([disabled]):not([aria-disabled="true"]) {
   transform: translateY(1px);
 }
+
+/* ============== CANONICAL SHARED SHELL ============== */
+:root {
+  --shell-sidebar-width: 280px;
+  --shell-header-height: 60px;
+  --shell-footer-measure: 1240px;
+}
+
+.site-footer {
+  position: relative;
+  z-index: 2;
+  border-top: var(--hairline-w) solid var(--border);
+  background: var(--bg-2);
+}
+.site-footer-inner {
+  width: min(100%, var(--shell-footer-measure));
+  margin-inline: auto;
+  padding: 48px 40px 32px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+.footer-brand-link { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; }
+.footer-wordmark { font-size: 11px; font-weight: 700; letter-spacing: 1.8px; }
+.footer-tagline { max-width: 360px; margin: 8px 0 14px; color: var(--text-2); font-size: 13.5px; line-height: 1.55; }
+.footer-stats { margin: 8px 0 0; color: var(--text-3); font-size: 11px; line-height: 1.7; }
+.footer-live { display: flex; align-items: center; gap: 6px; color: var(--accent); }
+.footer-column { display: flex; min-width: 0; flex-direction: column; gap: 0; }
+.footer-column h2 { margin: 0 0 12px; color: var(--text-3); font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em; }
+.footer-column a, .footer-column button {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: transparent;
+  color: var(--text-2); font: inherit; font-size: 13px; text-align: left; text-decoration: none; cursor: pointer; overflow-wrap: anywhere;
+}
+.footer-column a:hover, .footer-column button:hover { color: var(--text); }
+.footer-bottom {
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 40px; padding-top: 20px;
+  border-top: var(--hairline-w) solid var(--hairline); color: var(--text-3); font-size: 10.5px; letter-spacing: 0.04em;
+}
+@media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-width: 240px; } }
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .footer-grid { grid-template-columns: minmax(0, 1fr); }
+  .footer-brand { grid-column: auto; }
+  .site-footer-inner { padding: 36px 20px 24px; }
+}

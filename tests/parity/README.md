@@ -1,8 +1,9 @@
 # Independent visual baseline harness
 
-**Current status:** Phase 1 is not passed. Only filtered home diagnostics have
-run; see `docs/parity/STATUS.md`. Diagnostic PNGs with missing native fonts,
-identity mismatches, or unstable repeats never enter the passing denominator.
+**Current status:** The complete pre-product-change Phase 1 inventory baseline
+has run; see `tests/parity/REPORT.md` and `docs/parity/REPORT.md`. Visual
+failures are expected baseline results. Missing counterparts, unavailable roles,
+and unverified token-only states remain explicit and keep the parity gate open.
 
 This directory contains the real-browser comparator only. It does not start the
 application or artifact, alter product/reference source, bypass authentication,
@@ -51,8 +52,8 @@ Every declared inventory row is emitted. Missing counterparts, blockers, and
 unverified token-only rows remain visible outside the pixel denominator and
 keep the full gate unpassed. Missing pairs also produce a non-zero exit.
 Exact duplicate full-page capture identities are represented as aliases and
-never double the denominator. Every raw full-page capture is taken twice and
-must be byte-identical after image decoding and bounded layout stabilization.
+never double the denominator. The runner retains up to eight bounded raw
+attempts and admits only two consecutive byte-identical full-page frames.
 `OUTPUT-MANIFEST.json` hashes every evidence output, and copied run directories
 are made read-only; end-of-run input rehashing marks changed evidence stale.
 Expected and actual captures use Chromium, DPR 1, fixed viewport heights,
@@ -88,4 +89,3 @@ than emitted as duplicate rows.
 
 `pixelmatch` 7.1.0 is the only additional direct root dependency used by this
 harness; `sharp` was already present. The coordinator owns the root npm script.
-No baseline has been executed or claimed by this implementation.

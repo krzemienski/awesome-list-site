@@ -8,6 +8,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
+import { ContactPaletteItem } from "@/components/contact/contact-palette-item";
+import { contactVariant } from "@/lib/contact";
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -328,6 +330,11 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                 <p className="mt-2 text-xs text-muted-foreground">Type at least 2 characters</p>
               </div>
             )}
+            {contactVariant === "e" ? (
+              <CommandGroup aria-label="Actions">
+                <ContactPaletteItem closePalette={() => setIsOpen(false)} />
+              </CommandGroup>
+            ) : null}
           </CommandList>
         </Command>
         

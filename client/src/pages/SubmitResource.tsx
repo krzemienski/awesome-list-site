@@ -1,3 +1,4 @@
+import "@/components/parity/parity-styles";
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -527,7 +528,7 @@ export default function SubmitResource() {
     <>
       <SEOHead title={submitSeoTitle} description={submitSeoDescription} />
 
-      <div className="container max-w-2xl mx-auto px-4 py-12">
+      <div className="parity-page parity-submit-page container max-w-2xl mx-auto px-4 py-12">
         <h1 className="sr-only">Submit a Resource</h1>
         {/* Success Message */}
         {showSuccess && (

@@ -1,6 +1,7 @@
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { HeartHandshake } from "lucide-react";
+import ParityPageHeader from "@/components/parity-settings/ParityPageHeader";
 
 // Companion to Terms and Privacy — see Terms.tsx for the routing notes. This is
 // a real static route (registered in App.tsx KNOWN_ROUTE_PATTERNS + <Route>,
@@ -8,20 +9,20 @@ import { HeartHandshake } from "lucide-react";
 // mirrors the server og-middleware title EXACTLY (two-pass SEO parity).
 export default function CodeOfConduct() {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="parity-page parity-page--narrow space-y-6">
       <SEOHead
         title="Code of Conduct"
+        titleTestId="heading-code-of-conduct"
         description="The standards of behavior we expect from everyone who participates in Awesome Video — a free, community-curated directory of video development resources."
       />
-      <div className="space-y-2">
-        <h1 className="display-h text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-code-of-conduct">
-          <HeartHandshake className="h-6 w-6 text-[var(--accent)]" />
-          Code of Conduct
-        </h1>
-        <p className="text-sm text-[color:var(--text-3)]">Last updated: July 16, 2026</p>
-      </div>
+      <ParityPageHeader
+        title="Code of Conduct"
+        icon={<HeartHandshake className="h-5 w-5" />}
+        meta="Last updated: July 16, 2026"
+        backHref="/"
+      />
 
-      <Card>
+      <Card className="parity-content-card">
         <CardContent className="pt-6 space-y-6 text-sm leading-relaxed text-[color:var(--text-2)]">
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">1. Our pledge</h2>

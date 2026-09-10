@@ -1,3 +1,4 @@
+import "@/components/parity/parity-styles";
 import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
 import { resourceSeoDescription } from "@shared/seo-templates";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
+import { ContactResourceAction } from "@/components/contact";
 import {
   ArrowLeft,
   ExternalLink,
@@ -554,7 +556,7 @@ export default function ResourceDetail() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
+    <div className="parity-page parity-resource-page space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
       <SEOHead 
         title={`${resource.title}`}
         description={resourceSeoDescription(resource.title, resource.description)}
@@ -629,17 +631,22 @@ export default function ResourceDetail() {
             <Share2 className="h-4 w-4 mr-2" />
             <span>Share</span>
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleSuggestEditClick} 
-            data-testid="button-suggest-edit"
-            className="min-h-[44px] px-4"
-            aria-label="Suggest an edit"
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            <span>Suggest Edit</span>
-          </Button>
+          <ContactResourceAction
+            onSuggestEdit={handleSuggestEditClick}
+            fallback={(
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSuggestEditClick} 
+                data-testid="button-suggest-edit"
+                className="min-h-[44px] px-4"
+                aria-label="Suggest an edit"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                <span>Suggest Edit</span>
+              </Button>
+            )}
+          />
         </div>
       </div>
 

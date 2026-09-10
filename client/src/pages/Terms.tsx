@@ -1,26 +1,27 @@
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+import ParityPageHeader from "@/components/parity-settings/ParityPageHeader";
 
 // BUG-019 (run13): the footer promised legal pages that didn't exist. Terms
 // and Privacy are real routes now (also registered in App.tsx
 // KNOWN_ROUTE_PATTERNS, the server og-middleware, and the sitemap).
 export default function Terms() {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="parity-page parity-page--narrow space-y-6">
       <SEOHead
         title="Terms of Use"
+        titleTestId="heading-terms"
         description="The terms that govern your use of Awesome Video — a free, community-curated directory of video development resources."
       />
-      <div className="space-y-2">
-        <h1 className="display-h text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-terms">
-          <FileText className="h-6 w-6 text-[var(--accent)]" />
-          Terms of Use
-        </h1>
-        <p className="text-sm text-[color:var(--text-3)]">Last updated: September 1, 2026</p>
-      </div>
+      <ParityPageHeader
+        title="Terms of Use"
+        icon={<FileText className="h-5 w-5" />}
+        meta="Last updated: September 1, 2026"
+        backHref="/"
+      />
 
-      <Card>
+      <Card className="parity-content-card">
         <CardContent className="pt-6 space-y-6 text-sm leading-relaxed text-[color:var(--text-2)]">
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">1. What this site is</h2>

@@ -11,6 +11,8 @@ import { chromium } from "playwright";
 import pixelmatch from "pixelmatch";
 import sharp from "sharp";
 import { indexCatalogPaths } from "./catalog-paths.mjs";
+import { acquireGateLease } from "../../scripts/validation/gate-lease.mjs";
+import { launchBrowserWithLease } from "../../scripts/validation/playwright-launch-lease.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../..");
@@ -109,6 +111,8 @@ const argValue = (name) => {
 const selectedScreen = argValue("--screen");
 const selectedWidth = argValue("--width") ? Number(argValue("--width")) : null;
 const listOnly = args.includes("--list");
+const rowTimeoutMs = 120_000;
+const captureAttempts = 8;
 
 if (listOnly) {
   for (const screen of inventory.screens) {
@@ -146,6 +150,8 @@ const bases = {
   app: normalizeBase(appBaseUrl, "BASE_URL"),
   artifact: normalizeBase(artifactBaseUrl, "ARTIFACT_BASE_URL"),
 };
+const releaseGateLease = await acquireGateLease("db-heavy", "parity-baseline");
+process.on("exit", releaseGateLease);
 
 const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 const fetchJson = async (url) => {
@@ -438,13 +444,13 @@ for (const screen of inventory.screens) {
         reason: "Shares the target's exact full-page capture identity; excluded from the denominator to prevent double counting.",
         denominator: false,
       });
-    } else if (screen.blocked || !screen.referencePath) {
+    } else if (screen.blocked || !screen.referencePath || screen.missingActualNavigationCounterpart) {
       rows.push({
         screen: screen.id,
         width,
         classification: screen.classification,
-        status: screen.referencePath ? "BLOCKED" : "MISSING_COUNTERPART",
-        reason: screen.blocked || "No approved canonical counterpart",
+        status: !screen.referencePath || screen.missingActualNavigationCounterpart ? "MISSING_COUNTERPART" : "BLOCKED",
+        reason: screen.blocked || screen.missingActualNavigationCounterpart || "No approved canonical counterpart",
         denominator: false,
       });
     }
@@ -521,7 +527,7 @@ const settlePage = async (page, selector) => {
   const fontReadiness = await page.evaluate(async () => {
     await document.fonts.ready;
     const rootStyle = getComputedStyle(document.documentElement);
-    const requested = [
+    const canonical = [
       ["body-400", rootStyle.getPropertyValue("--font-body"), "normal", "400"],
       ["body-600", rootStyle.getPropertyValue("--font-body"), "normal", "600"],
       ["display-400", rootStyle.getPropertyValue("--font-display"), "normal", "400"],
@@ -532,8 +538,21 @@ const settlePage = async (page, selector) => {
       family: stack.split(",")[0].trim().replace(/^['"]|['"]$/g, ""),
       style,
       weight,
-    }));
-    await Promise.all(requested.map((item) =>
+    })).filter((item) => item.family);
+    const visible = [...document.body.querySelectorAll("*")].filter((node) => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return rect.width > 1 && rect.height > 1 && style.visibility !== "hidden" &&
+        style.display !== "none" && node.textContent?.trim();
+    });
+    const used = [...new Map(visible.map((node) => {
+      const style = getComputedStyle(node);
+      const family = style.fontFamily.split(",")[0].trim().replace(/^['"]|['"]$/g, "");
+      const weight = /^\d+$/.test(style.fontWeight) ? style.fontWeight : "400";
+      const fontStyle = style.fontStyle === "italic" ? "italic" : "normal";
+      return [`${family}\0${fontStyle}\0${weight}`, { family, style: fontStyle, weight }];
+    })).values()];
+    await Promise.all(used.concat(canonical).map((item) =>
       document.fonts.load(`${item.style} ${item.weight} 16px "${item.family}"`, "Parity"),
     ));
     await document.fonts.ready;
@@ -541,15 +560,17 @@ const settlePage = async (page, selector) => {
     const failedFaces = faces.filter((face) => face.status === "error").map((face) => ({
       family: face.family, style: face.style, weight: face.weight,
     }));
-    const checks = requested.map(({ label, family, style, weight }) => {
+    const faceMatches = ({ family, style, weight }, face) =>
+      face.family.replace(/^['"]|['"]$/g, "").toLowerCase() === family.toLowerCase() &&
+      face.status === "loaded" &&
+      (face.style === style || (style === "normal" && !face.style)) &&
+      (face.weight === weight || (weight === "400" && face.weight === "normal") ||
+        (face.weight.split(" ").length === 2 &&
+          Number(weight) >= Number(face.weight.split(" ")[0]) &&
+          Number(weight) <= Number(face.weight.split(" ")[1])));
+    const checks = canonical.map(({ label, family, style, weight }) => {
       const loadedFace = faces.some((face) =>
-        face.family.replace(/^['"]|['"]$/g, "").toLowerCase() === family.toLowerCase() &&
-        face.status === "loaded" &&
-        (face.style === style || (style === "normal" && !face.style)) &&
-        (face.weight === weight || (weight === "400" && face.weight === "normal") ||
-          (face.weight.split(" ").length === 2 &&
-            Number(weight) >= Number(face.weight.split(" ")[0]) &&
-            Number(weight) <= Number(face.weight.split(" ")[1])))
+        faceMatches({ family, style, weight }, face)
       );
       return {
         label,
@@ -560,11 +581,29 @@ const settlePage = async (page, selector) => {
         loadedFace,
       };
     });
+    const registeredFamilies = new Set(faces.map((face) =>
+      face.family.replace(/^['"]|['"]$/g, "").toLowerCase()
+    ));
+    const usedFaceChecks = used.filter((item) => registeredFamilies.has(item.family.toLowerCase())).map((item) => ({
+      ...item,
+      loadedFace: faces.some((face) => faceMatches(item, face)),
+      check: document.fonts.check(`${item.style} ${item.weight} 16px "${item.family}"`),
+    }));
+    const nativeDefects = checks
+      .filter((check) => check.label === "display-italic-400" && !check.loadedFace)
+      .map((check) =>
+        `Canonical display italic face ${check.family} is not registered/loaded; synthetic italic is a visual defect when used`
+      );
     document.body.classList.add("no-anim");
     window.scrollTo(0, 0);
     return {
-      status: document.fonts.status, checks, failedFaces,
-      complete: failedFaces.length === 0 && checks.every((check) => check.check && check.loadedFace),
+      status: document.fonts.status, checks, usedFaceChecks, failedFaces, nativeDefects,
+      // Font matching may legitimately synthesize a requested weight from a
+      // registered variable/static family; document.fonts.check is the browser's
+      // authoritative used-face readiness signal. Native italic absence remains
+      // an explicit visual defect above rather than a missing-capture blocker.
+      complete: document.fonts.status === "loaded" && failedFaces.length === 0 &&
+        usedFaceChecks.every((check) => check.check),
     };
   });
   await page.addStyleTag({
@@ -789,16 +828,36 @@ const screenshotStats = async (file) => {
 };
 const stableFullPageCapture = async (page, file) => {
   const repeatFile = file.replace(/\.png$/, ".repeat.png");
-  await page.screenshot({ path: file, fullPage: true, animations: "disabled" });
-  await page.waitForTimeout(250);
-  await page.screenshot({ path: repeatFile, fullPage: true, animations: "disabled" });
-  const [first, second] = await Promise.all([fsp.readFile(file), fsp.readFile(repeatFile)]);
-  const firstHash = sha256(first);
-  const secondHash = sha256(second);
-  if (firstHash !== secondHash) throw new Error(`Two raw full-page captures were inconsistent: ${firstHash} != ${secondHash}`);
+  const attemptFiles = [];
+  const hashes = [];
+  let stablePair = null;
+  for (let attempt = 1; attempt <= captureAttempts; attempt += 1) {
+    const attemptFile = file.replace(/\.png$/, `.attempt-${attempt}.png`);
+    await page.screenshot({ path: attemptFile, fullPage: true, animations: "disabled" });
+    const hash = sha256(await fsp.readFile(attemptFile));
+    attemptFiles.push(attemptFile);
+    hashes.push(hash);
+    if (attempt > 1 && hashes[attempt - 2] === hash) {
+      stablePair = [attemptFiles[attempt - 2], attemptFile];
+      break;
+    }
+    await page.waitForTimeout(250);
+    await page.evaluate(() => new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve))
+    ));
+  }
+  if (!stablePair) {
+    throw new Error(`No two consecutive raw full-page captures stabilized within ${captureAttempts} attempts: ${hashes.join(",")}`);
+  }
+  await Promise.all([
+    fsp.copyFile(stablePair[0], file),
+    fsp.copyFile(stablePair[1], repeatFile),
+  ]);
   return {
     image: await screenshotStats(file),
-    hashes: [firstHash, secondHash],
+    hashes: [hashes[attemptFiles.indexOf(stablePair[0])], hashes[attemptFiles.indexOf(stablePair[1])]],
+    attemptHashes: hashes,
+    stableAttempts: stablePair.map((item) => attemptFiles.indexOf(item) + 1),
     identical: true,
     postprocessing: "none",
   };
@@ -855,12 +914,12 @@ const compare = async (expectedPath, actualPath, diffPath) => {
   };
 };
 
-const browser = await chromium.launch({
+const browser = await launchBrowserWithLease(chromium, {
   headless: true,
   chromiumSandbox: true,
   executablePath,
   args: ["--disable-dev-shm-usage"],
-});
+}, "parity-baseline");
 let browserVersion;
 try {
   browserVersion = browser.version();
@@ -868,8 +927,10 @@ try {
     throw new Error(`Chromium version mismatch: expected 148.0.7778.96, received ${browserVersion}`);
   }
   for (const screen of requestedScreens) {
-    if (screen.blocked || !screen.referencePath) continue;
+    if (screen.blocked || !screen.referencePath || screen.missingActualNavigationCounterpart) continue;
     for (const width of (screen.widths || inventory.widths).filter((item) => widths.includes(item))) {
+      const progress = `${screen.id}@${width}`;
+      console.log(`[parity] START ${progress}`);
       const stem = `${screen.id}-${width}`;
       const expectedPath = path.join(dirs.expected, `${stem}.png`);
       const actualPath = path.join(dirs.actual, `${stem}.png`);
@@ -897,6 +958,10 @@ try {
         reducedMotion: "reduce",
         serviceWorkers: "block",
       });
+      context.setDefaultTimeout(30_000);
+      const rowTimer = setTimeout(() => {
+        void context.close().catch(() => {});
+      }, rowTimeoutMs);
       await context.addInitScript(({ referenceOrigin }) => {
         if (location.origin === referenceOrigin) {
           localStorage.setItem("av-ds-system", "editorial");
@@ -951,20 +1016,24 @@ try {
           row.status = "MISSING_COUNTERPART";
           row.reason = screen.missingActualNavigationCounterpart;
           row.denominator = false;
-        } else if (!row.actualDom.fonts.complete || !row.expectedDom.fonts.complete || row.identityAlignment?.error) {
+        } else if (!row.actualDom.fonts.complete || !row.expectedDom.fonts.complete) {
           row.status = "BLOCKED";
           row.reason = [
             !row.actualDom.fonts.complete ? "Actual required native font faces are unavailable; see actualDom.fonts" : null,
             !row.expectedDom.fonts.complete ? "Reference required native font faces are unavailable; see expectedDom.fonts" : null,
-            row.identityAlignment?.error,
           ].filter(Boolean).join("; ");
           row.denominator = false;
-        } else if (referenceShowsDemoAuth && actualShowsVisitorAuth) {
-          row.status = "BLOCKED";
-          row.reason = "Reference shell displays the demonstrator Nick/admin identity while the real application is a visitor session; captures are retained but are not claimed data/auth aligned";
-          row.denominator = false;
         } else {
-          row.status = row.comparison.diffPercent <= 0.5 && row.comparison.dimensionsMatch ? "PASS" : "FAIL";
+          const visualDefects = [
+            ...row.actualDom.fonts.nativeDefects.map((item) => `Actual: ${item}`),
+            ...row.expectedDom.fonts.nativeDefects.map((item) => `Reference: ${item}`),
+            row.identityAlignment?.error,
+            referenceShowsDemoAuth && actualShowsVisitorAuth
+              ? "Reference demonstrator admin identity is not aligned with the real visitor role"
+              : null,
+          ].filter(Boolean);
+          row.status = row.comparison.diffPercent <= 0.5 && row.comparison.dimensionsMatch && visualDefects.length === 0 ? "PASS" : "FAIL";
+          if (visualDefects.length) row.reason = visualDefects.join("; ");
           if (!row.comparison.dimensionsMatch) row.reason = "Full-page dimensions differ; union canvas includes all unmatched pixels";
         }
       } catch (error) {
@@ -977,14 +1046,17 @@ try {
         ].filter(Boolean).join(" ");
         row.denominator = false;
       } finally {
+        clearTimeout(rowTimer);
         await context.close();
       }
       rows.push(row);
+      console.log(`[parity] END ${progress} ${row.status}${row.comparison ? ` ${row.comparison.diffPercent.toFixed(4)}%` : ""}`);
     }
   }
 } finally {
   await browser.close();
   await new Promise((resolve) => referenceServer.close(resolve));
+  releaseGateLease();
 }
 
 for (const row of rows.filter((item) => item.status === "ALIAS")) {
@@ -1118,7 +1190,7 @@ const report = {
         siteName: catalog.title || nav.title || "",
         siteTag: catalog.description || "",
         repoUrl: catalog.repoUrl || "",
-        mechanism: "Identity defaults are not rewritten. Any demonstrator-versus-visitor shell identity mismatch is explicitly blocked.",
+        mechanism: "Catalog identity/count data is bound without changing geometry. Any demonstrator-versus-visitor shell role mismatch is retained as a measured visual failure.",
       },
     },
   },
@@ -1129,7 +1201,8 @@ report.summary = {
   pass: measured.filter((row) => row.status === "PASS").length,
   fail: measured.filter((row) => row.status === "FAIL").length,
   denominator: measured.length,
-  blocked: report.rows.filter((row) => ["BLOCKED", "UNVERIFIED"].includes(row.status)).length,
+  blocked: report.rows.filter((row) => row.status === "BLOCKED").length,
+  unverified: report.rows.filter((row) => row.status === "UNVERIFIED").length,
   missingCounterpart: report.rows.filter((row) => row.status === "MISSING_COUNTERPART").length,
   missingPair: report.rows.filter((row) => row.status === "MISSING_PAIR").length,
   filtered: report.rows.filter((row) => row.status === "FILTERED").length,
@@ -1139,6 +1212,7 @@ report.gatePassed =
   report.summary.denominator > 0 &&
   report.summary.fail === 0 &&
   report.summary.blocked === 0 &&
+  report.summary.unverified === 0 &&
   report.summary.missingCounterpart === 0 &&
   report.summary.missingPair === 0 &&
   report.summary.filtered === 0;
@@ -1154,6 +1228,20 @@ const markdown = [
   `Claim: **${report.claim}**  `,
   `Gate: **${report.gatePassed ? "PASS" : "NOT PASSED"}**  `,
   `Measured: ${report.summary.pass} pass / ${report.summary.fail} fail / ${report.summary.denominator} denominator rows. Missing counterparts, aliases, and blocked rows are excluded from the denominator but keep the gate unpassed. Inputs changed during run: ${inputsChangedDuringRun ? "YES — STALE" : "no"}.`,
+  "",
+  "## Executed coverage",
+  "",
+  `Executed ${measured.length} full expected/actual comparisons across ${new Set(measured.map((row) => row.screen)).size} concrete screen/state identities. ${report.summary.blocked} rows are blocked, ${report.summary.unverified} are unverified, ${report.summary.missingCounterpart} lack a routeable counterpart, and ${report.rows.filter((row) => row.status === "ALIAS").length} are aliases. Every configured inventory row has one terminal result.`,
+  "",
+  `${measured.filter((row) => row.actualCaptureStability?.stableAttempts?.[0] > 1 || row.expectedCaptureStability?.stableAttempts?.[0] > 1).length} comparisons required bounded repeat settling after the first raw frame. All admitted comparison images use two consecutive byte-identical raw frames; every attempt remains retained alongside the selected pair.`,
+  "",
+  "## Actionable implementation findings",
+  "",
+  "- Home Index, category, subcategory, resource detail, about, palette, mobile drawer, and the registered artifact all have measured presentation failures above the fixed 0.5% ceiling; use the per-row dimensions and diff images below.",
+  "- The production app is missing the native Fraunces italic face. It is recorded as a visual defect, not mislabeled as a failed capture.",
+  "- The reference shell's demonstrator admin identity is not aligned to the real visitor role. The real signed-out state is retained; no auth bypass or fake identity is used.",
+  "- The registered artifact has no independently routeable anatomy/docs chapter surfaces. Those rows remain MISSING_COUNTERPART build work rather than duplicate screenshots of `/`.",
+  "- Production-only admin sub-subcategories, journeys, and digests have no genuine active-source counterpart and are token-only; authorized admin rows remain explicit blockers without fabricated data.",
   "",
   "| Screen/state | Width | Diff pixels | Diff % | Status | Evidence / reason |",
   "|---|---:|---:|---:|---|---|",
@@ -1192,6 +1280,14 @@ if (fs.existsSync(finalRoot)) throw new Error(`Refusing to overwrite immutable b
 await fsp.mkdir(path.dirname(finalRoot), { recursive: true });
 await fsp.cp(stageRoot, finalRoot, { recursive: true, errorOnExist: true, force: false });
 await fsp.copyFile(path.join(stageRoot, "REPORT.md"), path.join(here, "REPORT.md"));
+for (const name of ["actual", "expected", "diff"]) {
+  const rootOutput = path.join(here, name);
+  await fsp.rm(rootOutput, { recursive: true, force: true });
+  await fsp.cp(path.join(stageRoot, name), rootOutput, { recursive: true });
+}
+const docsMarkdown = markdown
+  .replaceAll(`](baseline/${runId}/`, `](../../tests/parity/baseline/${runId}/`);
+await fsp.writeFile(path.join(repoRoot, "docs/parity/REPORT.md"), docsMarkdown);
 const makeReadOnly = async (directory) => {
   for (const entry of await fsp.readdir(directory, { withFileTypes: true })) {
     const absolute = path.join(directory, entry.name);

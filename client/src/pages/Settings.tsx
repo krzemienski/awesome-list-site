@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Palette, User, ShieldCheck, Bookmark, Sparkles, ChevronRight, LogIn, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { Settings as SettingsIcon, Palette, User, ShieldCheck, Bookmark, Sparkles, ChevronRight, LogIn, RotateCcw, SlidersHorizontal } from "lucide-react";
 import {
   DEFAULT_LEARNING_PREFERENCES,
   type LearningPreferencesValues,
@@ -26,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import NotificationPreferencesCard from "@/components/notifications/NotificationPreferencesCard";
+import ParityPageHeader from "@/components/parity-settings/ParityPageHeader";
 
 interface CategoryOption {
   name: string;
@@ -195,36 +196,26 @@ export default function Settings() {
     }
   };
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="parity-page parity-page--narrow space-y-8">
       <SEOHead
         title="Settings"
         description="Manage your Awesome Video preferences — appearance, account, security, and saved resources."
         noindex
       />
 
-      <div>
-        <Link
-          href="/"
-          // BUG-042 (audit2): the bare text link measured 55×20px — below the
-          // 24px WCAG 2.5.8 floor; give it a 44px-tall hit area.
-          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]"
-          data-testid="link-back-home"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
-        <h1 className="display-h text-2xl">Settings</h1>
-        <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
-          Manage your preferences and account. Pick a section below.
-        </p>
-      </div>
+      <ParityPageHeader
+        title="Settings"
+        description="Manage your preferences and account. Pick a section below."
+        icon={<SettingsIcon className="h-5 w-5" />}
+        backHref="/"
+      />
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="parity-settings-grid">
         {links.map(({ href, icon: Icon, title, description, testid }) => (
           <Link key={testid} href={href} data-testid={testid}>
             <Card
               data-ds="card-hover"
-              className="h-full p-4 flex items-start gap-3 hover:border-[var(--accent)] transition-colors cursor-pointer"
+              className="parity-settings-card h-full p-5 flex items-start gap-3 cursor-pointer"
             >
               <Icon className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />
               <div className="min-w-0 flex-1">

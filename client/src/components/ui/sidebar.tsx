@@ -26,7 +26,7 @@ import {
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 // DS parity: reference .sidebar is 280px wide (awesome-list-site-ds/styles.css).
-const SIDEBAR_WIDTH = "17.5rem"
+const SIDEBAR_WIDTH = "var(--shell-sidebar-width, 17.5rem)"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -120,28 +120,8 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
-    // Audit2 BUG-004/005/017/018: at tablet widths (768–1023px) an expanded
-    // 17.5rem sidebar squeezes the content column to ~390px — /advanced
-    // subcategory chips and tabs clipped past the viewport, the home CTA row
-    // overflowed, and /search columns collapsed to 188px. Collapse to the
-    // icon rail whenever the viewport IS (or becomes) tablet-sized, which
-    // also overrides a stale expanded preference persisted from a desktop
-    // session. One-way: never auto-expands, and an explicit user expand at
-    // tablet sticks for the session (uses _setOpen so the user's stored
-    // preference isn't clobbered by an environmental adjustment).
-    React.useEffect(() => {
-      if (openProp !== undefined) return // controlled — the owner decides
-      const mql = window.matchMedia("(min-width: 768px) and (max-width: 1023px)")
-      const collapseIfTablet = () => {
-        if (mql.matches) _setOpen(false)
-      }
-      collapseIfTablet()
-      mql.addEventListener("change", collapseIfTablet)
-      return () => mql.removeEventListener("change", collapseIfTablet)
-      // mount-only by design; switching controlled/uncontrolled mid-session
-      // isn't a supported case.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    // Canonical shell contract: the persistent sidebar remains available at
+    // exactly 768px; only viewports below 768px switch to the drawer.
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.

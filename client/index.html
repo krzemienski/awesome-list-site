@@ -269,8 +269,13 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Load only the primary body face before first paint. Optional display,
-         mono, and theme/picker faces are loaded on demand by the app. -->
+    <!-- Editorial is the canonical first-paint system. Load its native display
+         faces here so Fraunces italic 400 is never browser-synthesized during
+         baseline capture; runtime loading still supplies every alternate system. -->
+    <link rel="stylesheet"
+           href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" />
+    <!-- Load the primary body face before first paint. Optional picker faces
+         and non-default system faces are loaded on demand by the app. -->
     <!-- BUG-014: load the primary font stylesheet directly. The previous
          rel="preload" + inline onload="..." swap relied on an inline event
          handler, which a nonce-based CSP (no 'unsafe-inline') blocks — nonces

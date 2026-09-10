@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Link, Sparkles, Brain, ListOrdered, MailCheck } from "lucide-react";
+import { Shield, Link, Sparkles, Brain, ListOrdered, MailCheck, LayoutDashboard, Plus, Settings } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink, useRoute } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
+import AdminOverview from "@/components/admin/AdminOverview";
+import { Button } from "@/components/ui/button";
+import "@/components/admin/admin-canonical.css";
 import SEOHead from "@/components/layout/SEOHead";
 import ExportTab from "@/components/admin/ExportTab";
 import DatabaseTab from "@/components/admin/DatabaseTab";
@@ -29,7 +32,7 @@ import NotFound from "@/pages/not-found";
 // deep-links (unknown sections fall back to the default tab).
 import { ApiError } from "@/lib/queryClient";
 const ADMIN_TAB_IDS = [
-  "approvals", "edits", "enrichment", "researcher", "export", "database",
+  "overview", "approvals", "edits", "enrichment", "researcher", "export", "database",
   "resources", "categories", "subcategories", "subsubcategories", "journeys",
   "users", "github", "linkhealth", "digests", "audit",
 ] as const;
@@ -75,7 +78,7 @@ export default function AdminDashboard() {
 
   const [activeTab, setActiveTab] = useState(() => {
     if (sectionTab) return sectionTab;
-    return tabFromWindow() ?? "approvals";
+    return tabFromWindow() ?? "overview";
   });
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
@@ -95,7 +98,7 @@ export default function AdminDashboard() {
         // BUG-008 (run18): Back/Forward that strips the #hash must return to
         // the default tab so the URL (/admin) and the visible tab stay in sync
         // instead of leaving a stale active tab (e.g. Resources) on bare /admin.
-        setActiveTab("approvals");
+        setActiveTab("overview");
       }
     };
     window.addEventListener("hashchange", syncFromUrl);
@@ -105,6 +108,13 @@ export default function AdminDashboard() {
       window.removeEventListener("popstate", syncFromUrl);
     };
   }, []);
+
+  const handleNewEntry = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("create", "1");
+    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    handleTabChange("resources");
+  };
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -209,28 +219,34 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
+    <div className="admin-dashboard overflow-x-hidden">
       <SEOHead
         title="Admin"
         description="Awesome Video admin panel."
         noindex
       />
-      <div className="mb-8 space-y-3">
+      <div className="admin-dashboard__masthead">
+        <div className="space-y-3">
         <div className="eyebrow flex items-center gap-3">
           <span aria-hidden="true" className="text-[var(--accent)]">──</span>
           <span>Admin</span>
           <span aria-hidden="true" className="text-[var(--text-2)]">·</span>
-          <span>Control Surface</span>
+          <span>Operations</span>
         </div>
         <h1 className="display-h text-3xl sm:text-4xl text-[var(--text)] flex items-center gap-3">
           <Shield className="h-7 w-7 text-[var(--accent)]" />
-          <span><em className="not-italic font-display italic text-[var(--accent)]">Admin</em> Dashboard</span>
+          <span>Operations <em className="not-italic italic">dashboard</em></span>
         </h1>
-        <p className="text-sm sm:text-base text-[var(--text-2)]">Manage resources, users, and system configuration.</p>
+        <p className="text-sm sm:text-base text-[var(--text-2)]">Manage the live catalog, review queues, and operational jobs.</p>
+        </div>
+        <div className="admin-dashboard__actions">
+          <Button asChild variant="outline" className="min-h-11"><WLink href="/settings/theme"><Settings className="h-4 w-4" /> Settings</WLink></Button>
+          <Button className="min-h-11" onClick={handleNewEntry}><Plus className="h-4 w-4" /> New entry</Button>
+        </div>
       </div>
 
       {/* R4-L17: stat cards jump straight to their admin tab. */}
-      <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} />
+      {activeTab === "overview" ? <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} /> : null}
 
       {/* NB-020 (run18): `activeTab` is always one of the TabsTrigger values
           (normalizeTab yields a valid id or the "approvals" default), so Radix's
@@ -244,7 +260,8 @@ export default function AdminDashboard() {
         <div className="w-full pb-2 admin-tab-scroller">
           {/* F017: keep every trigger a comfortable ≥40px touch target at the
               usage site (the global ui/tabs default is h-9/36px). */}
-          <TabsList className="flex flex-wrap h-auto w-full justify-start gap-1 [&>[role=tab]]:min-h-10">
+          <TabsList className="admin-dashboard__tabs flex flex-wrap h-auto w-full justify-start gap-1">
+            <TabsTrigger value="overview" className="whitespace-nowrap" data-testid="tab-overview"><LayoutDashboard className="h-4 w-4 mr-1" />Overview</TabsTrigger>
             <TabsTrigger value="approvals" className="whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>
@@ -285,6 +302,10 @@ export default function AdminDashboard() {
 
         {/* R2-L13: each tab body sits in its own ErrorBoundary so a render
             crash in one panel can't blank the entire admin dashboard. */}
+        <TabsContent value="overview" data-testid="content-overview">
+          <ErrorBoundary label="Overview tab"><AdminOverview stats={stats} onNavigate={handleTabChange} /></ErrorBoundary>
+        </TabsContent>
+
         <TabsContent value="approvals" data-testid="content-approvals">
           <ErrorBoundary label="Approvals tab"><PendingResources /></ErrorBoundary>
         </TabsContent>
