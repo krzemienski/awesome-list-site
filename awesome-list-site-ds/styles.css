@@ -1,5 +1,3 @@
-@import "../shared/styles/product-profiles.css";
-
 /* =====================================================================
    AWESOME.VIDEO — STYLES
    Tokens come from design-systems.jsx via `applyDesignSystem()`.
@@ -90,7 +88,7 @@ a { color: inherit; }
   position: fixed; inset: 0; pointer-events: none; z-index: 1;
   opacity: var(--grain-opacity, 0.32);
   mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScgb3BhY2l0eT0nMC41Jy8+PC9zdmc+");
 }
 
 /* ============== ANIMATIONS ============== */
@@ -174,7 +172,6 @@ a { color: inherit; }
 
 .search-input {
   width: 100%;
-  min-height: var(--profile-control-height);
   background: var(--surface);
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);
@@ -193,7 +190,6 @@ a { color: inherit; }
 /* ============== BUTTONS ============== */
 .btn {
   display: inline-flex;
-  min-height: var(--profile-control-height);
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -219,12 +215,7 @@ a { color: inherit; }
 .btn.primary:hover { box-shadow: var(--shadow-accent); }
 .btn.ghost { background: transparent; border-color: var(--border); }
 .btn.ghost:hover { background: var(--surface); }
-.btn.icon {
-  width: var(--profile-control-height);
-  min-width: var(--profile-control-height);
-  height: var(--profile-control-height);
-  padding: 0;
-}
+.btn.icon { width: 36px; height: 36px; padding: 0; }
 .btn.danger {
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
@@ -452,17 +443,92 @@ a { color: inherit; }
 .dot.bad { background: #ff5c7a; }
 
 /* ============== RESPONSIVE ============== */
-@media (max-width: 1024px) { .sidebar { width: 240px; } }
+@media (max-width: 1024px) {
+  .sidebar { width: 240px; }
+  .hide-tablet { display: none !important; }
+  /* Primary nav is hidden at tablet — the drawer must be reachable here too. */
+  .mobile-menu-btn { display: flex !important; }
+}
+@media (min-width: 1025px) {
+  .show-tablet { display: none !important; }
+  .mobile-menu-btn { display: none !important; }
+}
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .icon-rail.desktop-only { display: none; }
   .header { padding: 0 14px; gap: 10px; height: 56px; }
   .hide-mobile { display: none !important; }
   .mobile-menu-btn { display: flex !important; }
+  .header-search-trigger { display: none !important; }
 }
 @media (min-width: 769px) {
-  .mobile-menu-btn { display: none !important; }
   .show-mobile { display: none !important; }
+}
+
+/* ============== HEADER SEARCH TRIGGER ============== */
+/* Compact "Search…" button, not an always-open input. Click opens
+   the command palette modal. Width adapts to viewport. */
+.header-search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 10px 0 12px;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  min-width: 240px;
+  max-width: 360px;
+  transition: all 160ms ease;
+  flex-shrink: 1;
+}
+.header-search-trigger:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text);
+}
+.header-search-label {
+  flex: 1; text-align: left;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+/* Tighten for tablet */
+@media (max-width: 1180px) {
+  .header-search-trigger { min-width: 180px; }
+}
+@media (max-width: 1024px) {
+  .header-search-trigger { min-width: 0; width: 180px; }
+  .header-search-trigger .header-search-label { display: none; }
+  .header-search-trigger { gap: 6px; padding: 0 10px; }
+}
+
+/* ============== USER PILL ============== */
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px 0 4px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 160ms ease;
+  flex-shrink: 0;
+}
+.user-pill:hover {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+@media (max-width: 768px) {
+  .user-pill { padding: 0 4px; gap: 0; }
 }
 
 /* ============== MOBILE DRAWER ============== */
@@ -480,6 +546,7 @@ a { color: inherit; }
   display: flex; flex-direction: column;
 }
 .mobile-drawer.open { transform: translateX(0); }
+.mobile-drawer > * { flex-shrink: 0; }
 .mobile-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.6);
@@ -630,7 +697,7 @@ a { color: inherit; }
 
 /* ============== SHOWCASE-PAGE-ONLY (design-system.html) ============== */
 .ds-shell {
-  max-width: var(--profile-page-measure);
+  max-width: 1240px;
   margin: 0 auto;
   padding: 56px 40px 120px;
 }

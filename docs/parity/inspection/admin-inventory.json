@@ -1,0 +1,645 @@
+{
+  "generated": "phase-0 read-only inspection",
+  "route": "client/src/pages/AdminDashboard.tsx",
+  "tabs": [
+    "approvals",
+    "edits",
+    "enrichment",
+    "researcher",
+    "export",
+    "database",
+    "resources",
+    "categories",
+    "subcategories",
+    "subsubcategories",
+    "journeys",
+    "users",
+    "github",
+    "linkhealth",
+    "digests",
+    "audit"
+  ],
+  "counterpart_tabs": [
+    "overview",
+    "approvals",
+    "edits",
+    "enrichment",
+    "researcher",
+    "export",
+    "database",
+    "resources",
+    "categories",
+    "subcategories",
+    "users",
+    "github",
+    "linkhealth",
+    "audit",
+    "research"
+  ],
+  "components": [
+    {
+      "path": "client/src/components/admin/AdminStats.tsx",
+      "endpoints": [],
+      "testids": [
+        "link-stat-pending",
+        "link-stat-rejected",
+        "stat-title-${tab"
+      ],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/AgentCommsGraph.tsx",
+      "endpoints": [
+        "/api/researcher",
+        "/api/enrichment"
+      ],
+      "testids": [
+        "agent-comms-graph",
+        "graph-node-${n.id"
+      ],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/AgentEventLog.tsx",
+      "endpoints": [
+        "/api/researcher",
+        "/api/enrichment"
+      ],
+      "testids": [
+        "text-event-count",
+        "row-event-${ev.seq",
+        "button-toggle-detail-${ev.seq"
+      ],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/AuditTab.tsx",
+      "endpoints": [
+        "/api/admin/audit-logs"
+      ],
+      "testids": [
+        "input-audit-resource-id",
+        "error-audit-resource-id",
+        "alert-audit-error",
+        "button-audit-retry",
+        "row-audit-log-${log.id",
+        "text-audit-range",
+        "button-audit-prev",
+        "button-audit-next",
+        "text-audit-detail-notes",
+        "text-audit-detail-changes"
+      ],
+      "dialog_token_occurrences": 15,
+      "forms": 1
+    },
+    {
+      "path": "client/src/components/admin/BatchEnrichmentPanel.tsx",
+      "endpoints": [
+        "/api/enrichment/jobs",
+        "/api/admin/enrichment/coverage",
+        "/api/enrichment/jobs/${selectedJobId}",
+        "/api/enrichment/start",
+        "/api/enrichment/jobs/${jobId}"
+      ],
+      "testids": [
+        "text-tag-coverage",
+        "select-filter",
+        "input-batch-size",
+        "error-batch-size",
+        "button-toggle-advanced-enrichment",
+        "input-enrich-model",
+        "input-enrich-baseurl",
+        "input-enrich-token",
+        "button-start-enrichment",
+        "progress-bar",
+        "button-cancel-job-${activeJob.id",
+        "scroller-enrichment-jobs-table",
+        "status-badge-${job.id",
+        "skipped-rate-${job.id",
+        "button-view-details-${job.id",
+        "text-enrichment-legend",
+        "dialog-cancel-job",
+        "button-cancel-job-dismiss",
+        "button-cancel-job-confirm",
+        "dialog-confirm-enrichment",
+        "button-cancel-enrichment-start",
+        "button-confirm-enrichment-start"
+      ],
+      "dialog_token_occurrences": 53,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/CategoryManager.tsx",
+      "endpoints": [],
+      "testids": [],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/configs/category-config.ts",
+      "endpoints": [
+        "/api/admin/categories",
+        "/api/admin/categories/${id}",
+        "/api/categories"
+      ],
+      "testids": [],
+      "dialog_token_occurrences": 4,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/configs/subcategory-config.ts",
+      "endpoints": [
+        "/api/admin/subcategories",
+        "/api/admin/subcategories/${id}",
+        "/api/subcategories",
+        "/api/admin/categories"
+      ],
+      "testids": [],
+      "dialog_token_occurrences": 4,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/configs/subsubcategory-config.ts",
+      "endpoints": [
+        "/api/admin/sub-subcategories",
+        "/api/admin/sub-subcategories/${id}",
+        "/api/sub-subcategories",
+        "/api/admin/categories",
+        "/api/admin/subcategories"
+      ],
+      "testids": [],
+      "dialog_token_occurrences": 4,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/DatabaseTab.tsx",
+      "endpoints": [
+        "/api/admin/seed-database",
+        "/api/admin/stats"
+      ],
+      "testids": [
+        "button-seed-database",
+        "button-clear-reseed",
+        "stat-db-live-resources",
+        "dialog-seed-database",
+        "button-seed-cancel",
+        "button-seed-confirm",
+        "dialog-clear-reseed",
+        "input-reseed-confirm",
+        "button-reseed-cancel",
+        "button-reseed-confirm"
+      ],
+      "dialog_token_occurrences": 53,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/DigestQueueHealth.tsx",
+      "endpoints": [
+        "/api/admin/digests/health"
+      ],
+      "testids": [
+        "card-digest-queue-health"
+      ],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/ExportTab.tsx",
+      "endpoints": [
+        "/api/admin/validation-status",
+        "/api/admin/export",
+        "/api/admin/validate",
+        "/api/admin/check-links"
+      ],
+      "testids": [
+        "error-group-${rule",
+        "warning-group-${rule",
+        "dialog-confirm-export-job",
+        "button-cancel-export-job",
+        "button-confirm-export-job"
+      ],
+      "dialog_token_occurrences": 24,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/GenericCrudManager.tsx",
+      "endpoints": [
+        "/api/admin/platforms",
+        "/api/admin/categories",
+        "/api/tags",
+        "/api/admin/categories/${id}",
+        "/api/admin/platforms/${id}",
+        "/api/admin/subcategories",
+        "/api/admin/subcategories/${id}"
+      ],
+      "testids": [
+        "bulk-actions-toolbar",
+        "text-selected-count",
+        "button-bulk-delete",
+        "button-export-selected",
+        "menu-export-csv",
+        "menu-export-json",
+        "button-clear-selection",
+        "button-export-all",
+        "menu-export-all-csv",
+        "menu-export-all-json",
+        "input-search-${testIdEntityPlural",
+        "button-clear-search",
+        "button-undo",
+        "button-redo",
+        "button-audit-trail",
+        "button-create-${testIdEntity",
+        "text-search-results",
+        "alert-parent-load-failed",
+        "button-retry-parents",
+        "table-${testIdEntityPlural",
+        "checkbox-select-all",
+        "empty-${testIdEntityPlural",
+        "row-${testIdEntity",
+        "checkbox-select-${item.id",
+        "badge-count-${item.id",
+        "button-edit-${item.id",
+        "button-delete-${item.id",
+        "pagination-${testIdEntityPlural",
+        "select-page-size",
+        "dialog-create-${testIdEntity",
+        "error-create-form",
+        "select-create-${parent.fieldName.replace(/([A-Z])/g, ",
+        "input-create-name",
+        "input-create-slug",
+        "button-clear-file-create-${field.name",
+        "input-create-${field.name",
+        "error-create-${field.name",
+        "button-cancel-create",
+        "button-confirm-create",
+        "dialog-edit-${testIdEntity",
+        "error-edit-form",
+        "select-edit-${parent.fieldName.replace(/([A-Z])/g, ",
+        "input-edit-name",
+        "input-edit-slug",
+        "button-clear-file-edit-${field.name",
+        "input-edit-${field.name",
+        "error-edit-${field.name",
+        "button-cancel-edit",
+        "button-confirm-edit",
+        "dialog-delete-${testIdEntity",
+        "button-cancel-delete",
+        "button-confirm-delete",
+        "dialog-bulk-delete-${testIdEntity",
+        "button-cancel-bulk-delete",
+        "button-confirm-bulk-delete",
+        "dialog-audit-trail",
+        "audit-entry-${entry.id",
+        "button-clear-audit-trail",
+        "button-close-audit-trail"
+      ],
+      "dialog_token_occurrences": 156,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/GitHubSyncPanel.tsx",
+      "endpoints": [
+        "/api/github/sync-history",
+        "/api/github/sync-status",
+        "/api/github/import",
+        "/api/github/export"
+      ],
+      "testids": [
+        "input-repo-url",
+        "button-reset-repo",
+        "text-repo-url-error",
+        "button-import-github",
+        "button-export-github",
+        "badge-failed-jobs",
+        "alert-sync-failures",
+        "alert-last-sync",
+        "badge-last-sync-failed",
+        "button-view-commit",
+        "badge-repeat-${item.id",
+        "sync-history-row-${sync.id",
+        "badge-sync-history-status-${sync.id",
+        "button-cancel-sync-action",
+        "button-confirm-sync-action"
+      ],
+      "dialog_token_occurrences": 24,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/JourneyStepsManager.tsx",
+      "endpoints": [
+        "/api/resources",
+        "/api/resources/picker",
+        "/api/resources/${value}",
+        "/api/admin/journeys",
+        "/api/admin/journeys/${journeyId}/steps",
+        "/api/journeys/${journeyId}",
+        "/api/journeys",
+        "/api/admin/journeys/${journeyId}/steps/${row.id}",
+        "/api/admin/journeys/${journeyId}/steps/${id}",
+        "/api/admin/journeys/${journeyId}/steps/reorder"
+      ],
+      "testids": [
+        "step-resource-selected",
+        "step-resource-clear",
+        "step-resource-toggle",
+        "step-resource-search",
+        "step-resource-option-${r.id",
+        "step-editor-dialog",
+        "step-title-input",
+        "step-description-input",
+        "step-optional-checkbox",
+        "step-editor-submit",
+        "steps-dialog",
+        "add-step-button",
+        "step-group-${primary.id",
+        "step-up-${primary.id",
+        "step-down-${primary.id",
+        "step-remove-resource-${row.id",
+        "step-edit-${primary.id",
+        "step-delete-${primary.id",
+        "confirm-delete-step",
+        "confirm-remove-resource",
+        "journey-steps-manager",
+        "journey-row-${j.id",
+        "edit-steps-${j.id"
+      ],
+      "dialog_token_occurrences": 70,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/LinkHealthDashboard.tsx",
+      "endpoints": [
+        "/api/admin/link-health/status",
+        "/api/admin/link-health/history",
+        "/api/admin/link-health/broken-links",
+        "/api/admin/enrichment/coverage",
+        "/api/admin/link-health/run"
+      ],
+      "testids": [
+        "text-summary-last-completed",
+        "text-linkhealth-scope",
+        "counter-total-links",
+        "counter-healthy-links",
+        "counter-broken-links",
+        "counter-redirect-links",
+        "counter-timeout-links",
+        "counter-suspect-links",
+        "scroller-link-health-table",
+        "dialog-confirm-link-check",
+        "button-cancel-link-check",
+        "button-confirm-link-check"
+      ],
+      "dialog_token_occurrences": 24,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/PendingEdits.tsx",
+      "endpoints": [
+        "/api/admin/resource-edits",
+        "/api/admin/resource-edits/${editId}/approve",
+        "/api/admin/stats",
+        "/api/resources",
+        "/api/admin/resource-edits/${editId}/reject"
+      ],
+      "testids": [
+        "button-refresh-pending-edits",
+        "gradient-scroll-cue-edits",
+        "row-pending-edit-${edit.id",
+        "link-edit-resource-${edit.id",
+        "button-view-edit-${edit.id",
+        "button-approve-edit-${edit.id",
+        "button-reject-edit-${edit.id",
+        "text-swipe-hint-edits",
+        "button-confirm-approve-edit",
+        "input-rejection-reason",
+        "button-confirm-reject-edit"
+      ],
+      "dialog_token_occurrences": 70,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/PendingResources.tsx",
+      "endpoints": [
+        "/api/admin/pending-resources",
+        "/api/admin/resources/${resourceId}/approve",
+        "/api/admin/stats",
+        "/api/admin/resources/${resourceId}/reject"
+      ],
+      "testids": [
+        "button-refresh-pending-resources",
+        "gradient-scroll-cue",
+        "row-pending-resource-${resource.id",
+        "link-resource-url-${resource.id",
+        "tags-pending-${resource.id",
+        "button-view-details-${resource.id",
+        "button-approve-${resource.id",
+        "button-reject-${resource.id",
+        "hint-swipe-pending-table",
+        "link-detail-url",
+        "text-detail-url-invalid",
+        "tags-detail-modal",
+        "button-close-details",
+        "button-cancel-approve",
+        "button-confirm-approve",
+        "textarea-rejection-reason",
+        "button-cancel-reject",
+        "button-confirm-reject"
+      ],
+      "dialog_token_occurrences": 73,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/README.md",
+      "endpoints": [
+        "/api/admin/your-entities",
+        "/api/admin/your-entities/${id}",
+        "/api/your-entities",
+        "/api/admin/categories",
+        "/api/admin/subcategories",
+        "/api/admin/categories/${id}",
+        "/api/categories",
+        "/api/admin/subcategories/${id}",
+        "/api/subcategories",
+        "/api/admin/sub-subcategories",
+        "/api/admin/sub-subcategories/${id}",
+        "/api/sub-subcategories",
+        "/api/admin/{entities}",
+        "/api/admin/{entities}/{id}",
+        "/api/resources",
+        "/api/admin/resources/bulk-delete",
+        "/api/check-email"
+      ],
+      "testids": [],
+      "dialog_token_occurrences": 24,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/ResearcherTab.tsx",
+      "endpoints": [
+        "/api/researcher/jobs",
+        "/api/researcher/jobs/${selectedJobId}",
+        "/api/researcher/discoveries",
+        "/api/researcher/start",
+        "/api/researcher/brief",
+        "/api/researcher/jobs/${jobId}",
+        "/api/researcher/discoveries/approve-all",
+        "/api/researcher/discoveries/${discoveryId}/approve",
+        "/api/researcher/discoveries/${id}/reject"
+      ],
+      "testids": [
+        "badge-verification-dead-${d.id",
+        "badge-verification-ok-${d.id",
+        "button-generate-brief",
+        "text-prompt-hint",
+        "text-discovery-cap",
+        "text-turns-hint",
+        "input-target-discoveries",
+        "text-target-hint",
+        "button-toggle-advanced-researcher",
+        "input-research-model",
+        "input-research-scout-model",
+        "input-research-baseurl",
+        "input-research-token",
+        "button-cancel-launch",
+        "button-confirm-launch",
+        "button-research-details-${job.id",
+        "button-approve-all",
+        "button-cancel-approve-all",
+        "button-confirm-approve-all",
+        "text-job-history-range",
+        "button-load-more-jobs"
+      ],
+      "dialog_token_occurrences": 76,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/ResourceManager.tsx",
+      "endpoints": [
+        "/api/categories",
+        "/api/subcategories",
+        "/api/sub-subcategories",
+        "/api/admin/resources",
+        "/api/admin/resources/${id}",
+        "/api/resources",
+        "/api/admin/stats",
+        "/api/admin/resources/bulk/approve",
+        "/api/admin/resources/bulk/reject",
+        "/api/admin/resources/bulk/delete",
+        "/api/resources/${rid}"
+      ],
+      "testids": [
+        "button-add-resource",
+        "input-search-resources",
+        "select-category-filter",
+        "select-status-filter",
+        "select-sort",
+        "button-search",
+        "button-clear-filters",
+        "button-bulk-approve",
+        "button-bulk-reject",
+        "button-bulk-delete",
+        "button-clear-selection",
+        "dialog-bulk-approve",
+        "button-bulk-approve-cancel",
+        "button-bulk-approve-confirm",
+        "dialog-bulk-delete",
+        "button-bulk-delete-cancel",
+        "button-bulk-delete-confirm",
+        "banner-resources-error",
+        "button-resources-retry",
+        "row-empty-state",
+        "button-empty-clear-filters",
+        "row-resource-${resource.id",
+        "button-edit-${resource.id",
+        "button-delete-${resource.id",
+        "select-page-size",
+        "error-edit-form",
+        "input-edit-title",
+        "error-edit-title",
+        "input-edit-url",
+        "error-edit-url",
+        "input-edit-description",
+        "error-edit-description",
+        "select-edit-category",
+        "select-edit-status",
+        "select-edit-subcategory",
+        "select-edit-subsubcategory",
+        "select-edit-resource-format",
+        "select-edit-provider",
+        "select-edit-skill-level",
+        "button-save-edit",
+        "error-create-form",
+        "input-create-title",
+        "error-create-title",
+        "input-create-url",
+        "error-create-url",
+        "input-create-description",
+        "error-create-description",
+        "select-create-category",
+        "select-create-status",
+        "select-create-subcategory",
+        "select-create-subsubcategory",
+        "select-create-resource-format",
+        "select-create-provider",
+        "select-create-skill-level",
+        "button-create-resource",
+        "button-confirm-delete"
+      ],
+      "dialog_token_occurrences": 146,
+      "forms": 1
+    },
+    {
+      "path": "client/src/components/admin/SubcategoryManager.tsx",
+      "endpoints": [],
+      "testids": [],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/SubSubcategoryManager.tsx",
+      "endpoints": [],
+      "testids": [],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/types/validation.ts",
+      "endpoints": [],
+      "testids": [],
+      "dialog_token_occurrences": 0,
+      "forms": 0
+    },
+    {
+      "path": "client/src/components/admin/UsersTab.tsx",
+      "endpoints": [
+        "/api/admin/users",
+        "/api/admin/users/${userId}/role",
+        "/api/admin/users/${userId}",
+        "/api/admin/users/export"
+      ],
+      "testids": [
+        "input-user-search",
+        "button-export-users",
+        "button-sort-${col.key",
+        "text-name-${user.id",
+        "text-email-${user.id",
+        "button-toggle-email-${user.id",
+        "button-delete-user-${user.id",
+        "button-users-prev-page",
+        "button-users-next-page",
+        "button-cancel-role-change",
+        "button-confirm-role-change",
+        "button-confirm-delete-user"
+      ],
+      "dialog_token_occurrences": 40,
+      "forms": 0
+    }
+  ],
+  "limitations": [
+    "Static source inventory only; endpoint strings can be dynamic and token counts are not runtime behavior.",
+    "No credentials, env files, tests, browser, server, or workspace writes."
+  ]
+}

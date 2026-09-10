@@ -73,7 +73,7 @@ function CategoryPage({ cat, go, t }) {
 window.CategoryPage = CategoryPage;
 
 /* ============== SUBCATEGORY PAGE ============== */
-function SubcategoryPage({ cat, sub, go, t }) {
+function SubcategoryPage({ cat, sub, subSub, go, t }) {
   const resources = AV_RESOURCES.filter(r => r.cat === cat.id && r.sub === sub.id);
   const fallback = AV_RESOURCES.filter(r => r.cat === cat.id).slice(0, 6);
   const list = resources.length ? resources : fallback;
@@ -91,7 +91,9 @@ function SubcategoryPage({ cat, sub, go, t }) {
           {cat.name.toUpperCase()}
         </a>
         <span>/</span>
-        <span style={{ color: 'var(--accent)' }}>{sub.name.toUpperCase()}</span>
+        <span style={{ color: subSub ? 'inherit' : 'var(--accent)', cursor: subSub ? 'pointer' : 'default' }}
+          onClick={() => subSub && go('subcategory', { cat, sub })}>{sub.name.toUpperCase()}</span>
+        {subSub && (<><span>/</span><span style={{ color: 'var(--accent)' }}>{subSub.name.toUpperCase()}</span></>)}
       </div>
 
       <div>

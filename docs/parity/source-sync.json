@@ -1,0 +1,68 @@
+{
+  "archive": {
+    "path": "attached_assets/awesome_list_site_2_1789019068732.zip",
+    "sha256": "19f0240c46caf790bfc384e21f123525699e1ff386fe892f8084bf73337302c9",
+    "originalEntries": 103
+  },
+  "sourceRoot": "/tmp/design-parity-bundle-7zbnza_9",
+  "authority": "modular index.html load graph; standalone exports retained as historical older snapshots",
+  "comparison": {
+    "unchanged": 77,
+    "overwrite": 10,
+    "add": 16
+  },
+  "changedOrAdded": [
+    {"path": ".thumbnail", "status": "add", "sha256": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a"},
+    {"path": "Awesome.Video - Standalone.html", "status": "add", "sha256": "f40a5525c72adda5af874f1d475084f8a5ba9714a74a9e95403dc6b056662af5"},
+    {"path": "REPLIT-REMEDIATION-PROMPT.md", "status": "add", "sha256": "a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b"},
+    {"path": "SKILL-verify-design-system.md", "status": "add", "sha256": "37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6"},
+    {"path": "_check/01-flow2.png", "status": "add", "sha256": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0"},
+    {"path": "_check/02-flow2.png", "status": "add", "sha256": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0"},
+    {"path": "_check/03-flow2.png", "status": "add", "sha256": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0"},
+    {"path": "_check/app-hero.png", "status": "add", "sha256": "39c555adb98a3314c4e8e3d6db19f8a305a1d05911970b18beed2254a645aca5"},
+    {"path": "_check/app-top.png", "status": "add", "sha256": "ff61ca5519b51952519ede2abeb1472e83056a36d50010a36ef6d814feb917cf"},
+    {"path": "_check/docs-overview.png", "status": "add", "sha256": "87d751cdc133c43fd47ec2cbc30a0eccba14179aa35ed74bca8a7010fdf14e26"},
+    {"path": "_check/flow-editorial.png", "status": "add", "sha256": "37481b61470650c167a03a57a10054e96dcffc6075f600b2ec8ec99c7f5749f6"},
+    {"path": "_check/flow.png", "status": "add", "sha256": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0"},
+    {"path": "_check/show-top.png", "status": "add", "sha256": "a9d231c71cf0a3ae8fdb8e3200ca4d12e2de3f3eb009f1f4faefe828758d2dac"},
+    {"path": "app.jsx", "status": "overwrite", "sha256": "9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6"},
+    {"path": "audit-report.md", "status": "add", "sha256": "ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70"},
+    {"path": "data.js", "status": "overwrite", "sha256": "5196b2a166673cc3c62a011028573d93e02b9f690b24db2e06b6372700b25a66"},
+    {"path": "design-systems.jsx", "status": "overwrite", "sha256": "30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c"},
+    {"path": "home-layouts.jsx", "status": "overwrite", "sha256": "c91a2a679670684b4182b3c6015544265373e01cf2ee96efc778975a2257b4f2"},
+    {"path": "index.html", "status": "overwrite", "sha256": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7"},
+    {"path": "index.standalone.html", "status": "overwrite", "sha256": "7b62e47bf3ab24c6c1268be3a9ce078627d3074519af542bec07d1c40c7ffa47"},
+    {"path": "layout.jsx", "status": "overwrite", "sha256": "911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a"},
+    {"path": "pages.jsx", "status": "overwrite", "sha256": "ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58"},
+    {"path": "sidebar-variants.jsx", "status": "add", "sha256": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95"},
+    {"path": "styles.css", "status": "overwrite", "sha256": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055"},
+    {"path": "uploads/INDEX.md", "status": "overwrite", "sha256": "12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2"},
+    {"path": "uploads/Screenshot 2026-05-22 at 15.26.17.png", "status": "add", "sha256": "8e3633aded14b8e21dc3c0e06de81b2844d137ddec7fa429ceb59922ce4a2639"}
+  ],
+  "readManifest": {
+    "requiredOrder": [
+      "HANDOFF.md",
+      "docs/04-tokens.md",
+      "docs/05-theming.md",
+      "docs/10-components.md",
+      "docs/11-patterns.md",
+      "SKILL-verify-design-system.md",
+      "styles.css",
+      "design-systems.jsx"
+    ],
+    "fullyReadChangedAuthored": [
+      "app.jsx",
+      "data.js",
+      "design-systems.jsx",
+      "home-layouts.jsx",
+      "index.html",
+      "layout.jsx",
+      "pages.jsx",
+      "sidebar-variants.jsx",
+      "styles.css",
+      "REPLIT-REMEDIATION-PROMPT.md",
+      "audit-report.md",
+      "uploads/INDEX.md"
+    ]
+  }
+}

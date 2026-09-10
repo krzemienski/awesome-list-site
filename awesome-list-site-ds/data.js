@@ -24,6 +24,56 @@ window.AV_TOTAL = 1953;
 window.AV_TOTAL_SUBCATS = 102;
 window.AV_TOTAL_USERS = 3;
 
+// Sub-subcategories — demonstrates L3 hierarchy. Only populated where it
+// makes semantic sense (geographic meetups, regional conferences, etc.).
+window.AV_SUBSUBCATEGORIES = {
+  // encoding-codecs (deeper demonstrations of arbitrary nesting)
+  'av1': [
+    { id: 'av1-encoders',  name: 'Encoders',       count: 14 },
+    { id: 'av1-decoders',  name: 'Decoders',       count: 8 },
+    { id: 'av1-hw',        name: 'Hardware Accel', count: 6 },
+    { id: 'av1-research',  name: 'Research',       count: 4 },
+  ],
+  'ffmpeg-tools': [
+    { id: 'ffmpeg-core',     name: 'FFmpeg Core',         count: 20 },
+    { id: 'ffmpeg-wrappers', name: 'Wrappers & Bindings', count: 18 },
+    { id: 'ffmpeg-plugins',  name: 'Plugins & Filters',   count: 10 },
+  ],
+  'web-players': [
+    { id: 'wp-react',  name: 'React',         count: 14 },
+    { id: 'wp-vue',    name: 'Vue',           count: 8 },
+    { id: 'wp-vanilla',name: 'Vanilla JS',    count: 22 },
+    { id: 'wp-mse',    name: 'MSE Libraries', count: 12 },
+  ],
+  // community-events
+  'meetups': [
+    { id: 'meetups-nyc',     name: 'NYC',           count: 4 },
+    { id: 'meetups-sf',      name: 'San Francisco', count: 3 },
+    { id: 'meetups-london',  name: 'London',        count: 3 },
+    { id: 'meetups-berlin',  name: 'Berlin',        count: 2 },
+    { id: 'meetups-tokyo',   name: 'Tokyo',         count: 2 },
+    { id: 'meetups-online',  name: 'Online / Global', count: 4 },
+  ],
+  'conferences': [
+    { id: 'conf-americas', name: 'Americas',     count: 10 },
+    { id: 'conf-europe',   name: 'Europe',       count: 8 },
+    { id: 'conf-apac',     name: 'APAC',         count: 4 },
+    { id: 'conf-virtual',  name: 'Virtual-only', count: 2 },
+  ],
+  // protocols-transport
+  'webrtc': [
+    { id: 'webrtc-clients',  name: 'Clients',     count: 11 },
+    { id: 'webrtc-servers',  name: 'Servers',     count: 9 },
+    { id: 'webrtc-tooling',  name: 'Tooling',     count: 8 },
+  ],
+  // standards-industry
+  'mpeg': [
+    { id: 'mpeg-video',  name: 'Video',  count: 16 },
+    { id: 'mpeg-audio',  name: 'Audio',  count: 10 },
+    { id: 'mpeg-systems',name: 'Systems & Containers', count: 12 },
+  ],
+};
+
 window.AV_SUBCATEGORIES = {
   'community-events': [
     { id: 'conferences', name: 'Conferences', count: 24 },

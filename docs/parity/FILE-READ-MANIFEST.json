@@ -1,0 +1,1812 @@
+{
+  "scope": "client/src",
+  "semantics": "completeRead is the reporting helper assertion, not a claim of exhaustive semantic audit or functional verification",
+  "files": [
+    {
+      "path": "client/src/App.tsx",
+      "sha256": "6c41e33307f0a83fbf3dc3c80c2be78d69ad80b2d63b90d2781bc38067d3cc0c",
+      "bytes": 34673,
+      "lines": 834,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "6c41e33307f0a83fbf3dc3c80c2be78d69ad80b2d63b90d2781bc38067d3cc0c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/BrandMark.tsx",
+      "sha256": "920505f4d43e08ddfce1d3a0108867cc5e283b206b95334d5a71e9e331600242",
+      "bytes": 1383,
+      "lines": 44,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "920505f4d43e08ddfce1d3a0108867cc5e283b206b95334d5a71e9e331600242",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ErrorBoundary.tsx",
+      "sha256": "22478f0053fa3ac139bce4a6ef70d9b1f4c163a5250d29820ec478a8e85d67f9",
+      "bytes": 1993,
+      "lines": 61,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "22478f0053fa3ac139bce4a6ef70d9b1f4c163a5250d29820ec478a8e85d67f9",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/AdminStats.tsx",
+      "sha256": "47067f915e54aaae8cb212089859ceb63d154cd14b53e1b3ad944edf986ed7d6",
+      "bytes": 7280,
+      "lines": 162,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "47067f915e54aaae8cb212089859ceb63d154cd14b53e1b3ad944edf986ed7d6",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/AgentCommsGraph.tsx",
+      "sha256": "ae4fd3769aeec996af0364be9df290c9bbec5ed94d0098c09040b57e37a70567",
+      "bytes": 11712,
+      "lines": 291,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "ae4fd3769aeec996af0364be9df290c9bbec5ed94d0098c09040b57e37a70567",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/AgentEventLog.tsx",
+      "sha256": "86e714281dd93e561b1022644ec475a262d0dc0f3f84b986e309bf51bf52b2cb",
+      "bytes": 9768,
+      "lines": 196,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "86e714281dd93e561b1022644ec475a262d0dc0f3f84b986e309bf51bf52b2cb",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/AuditTab.tsx",
+      "sha256": "0a8451f19b521a34e55764b4aad71a22f8dbf7d641abed4bc81e14ee3d7b718d",
+      "bytes": 16977,
+      "lines": 397,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "0a8451f19b521a34e55764b4aad71a22f8dbf7d641abed4bc81e14ee3d7b718d",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/BatchEnrichmentPanel.tsx",
+      "sha256": "877a5d56540fcf9e46323aad58a25394b096c7545a355aafb1cfa70a39b78867",
+      "bytes": 43453,
+      "lines": 986,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "877a5d56540fcf9e46323aad58a25394b096c7545a355aafb1cfa70a39b78867",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/CategoryManager.tsx",
+      "sha256": "d73c697d240abb9f1d93065f812678d180a24e46ee75550f27a8dbec3a0709d3",
+      "bytes": 508,
+      "lines": 15,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d73c697d240abb9f1d93065f812678d180a24e46ee75550f27a8dbec3a0709d3",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/DatabaseTab.tsx",
+      "sha256": "64ffc754db845d9c349caf543885d5fa062b374d93bdc3e8f9580bacf9fc12b3",
+      "bytes": 13871,
+      "lines": 339,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "64ffc754db845d9c349caf543885d5fa062b374d93bdc3e8f9580bacf9fc12b3",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/DigestQueueHealth.tsx",
+      "sha256": "6cba2c11cf21ac83c351ba28cc0f647db997a28d2daf0def3a17c5d1c795a12f",
+      "bytes": 4114,
+      "lines": 12,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "6cba2c11cf21ac83c351ba28cc0f647db997a28d2daf0def3a17c5d1c795a12f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/ExportTab.tsx",
+      "sha256": "f26b42246b153b8d0683e828b798b2cd5d6ff0f6d36ca1633e4598fd26d8a1b4",
+      "bytes": 20368,
+      "lines": 476,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f26b42246b153b8d0683e828b798b2cd5d6ff0f6d36ca1633e4598fd26d8a1b4",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/GenericCrudManager.tsx",
+      "sha256": "789be6093a5711b86fcea97e51dcef9972a5906f8c5d3f5558d650dec004b929",
+      "bytes": 139684,
+      "lines": 3518,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "789be6093a5711b86fcea97e51dcef9972a5906f8c5d3f5558d650dec004b929",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/GitHubSyncPanel.tsx",
+      "sha256": "ec332344bd3aa68de435f0a7f45805028186d6181b8f800e541100271280baa2",
+      "bytes": 24514,
+      "lines": 565,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "ec332344bd3aa68de435f0a7f45805028186d6181b8f800e541100271280baa2",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/JourneyStepsManager.tsx",
+      "sha256": "b64bd7aad124a0b301b0e691d25db039ba9a812a91fa6fa5d0d8b5410775228c",
+      "bytes": 26936,
+      "lines": 770,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "b64bd7aad124a0b301b0e691d25db039ba9a812a91fa6fa5d0d8b5410775228c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/LinkHealthDashboard.tsx",
+      "sha256": "5698073c8eb78a25b2190ce065bfcf0e3faae90e8ed63a6aee2798cb45adc9fb",
+      "bytes": 29085,
+      "lines": 663,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5698073c8eb78a25b2190ce065bfcf0e3faae90e8ed63a6aee2798cb45adc9fb",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/PendingEdits.tsx",
+      "sha256": "c89067b869fb8de3d8908054c7bf0a47d88f37fe7ab5373609bc6e0d9555f7fd",
+      "bytes": 26773,
+      "lines": 608,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c89067b869fb8de3d8908054c7bf0a47d88f37fe7ab5373609bc6e0d9555f7fd",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/PendingResources.tsx",
+      "sha256": "2670125002c06a17ce13c377917416c390fe49970020a349140955c1d1e42c4b",
+      "bytes": 30180,
+      "lines": 656,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "2670125002c06a17ce13c377917416c390fe49970020a349140955c1d1e42c4b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/README.md",
+      "sha256": "93f6e8eef86a147ebab9fa35adac25348b1bf973989321fd6a4ed8c453cf0eaa",
+      "bytes": 55230,
+      "lines": 1870,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "93f6e8eef86a147ebab9fa35adac25348b1bf973989321fd6a4ed8c453cf0eaa",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/ResearcherTab.tsx",
+      "sha256": "93ba0fbaf20b3a8090e12200d289d6037cfa97c3c69f975264cf5bbf1c4f547f",
+      "bytes": 71259,
+      "lines": 1392,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "93ba0fbaf20b3a8090e12200d289d6037cfa97c3c69f975264cf5bbf1c4f547f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/ResourceManager.tsx",
+      "sha256": "18b5543f3eee5aedc4a51a8e074b9934642357322116c5eeef81cd47ebf2bb33",
+      "bytes": 71390,
+      "lines": 1588,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "18b5543f3eee5aedc4a51a8e074b9934642357322116c5eeef81cd47ebf2bb33",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/SubSubcategoryManager.tsx",
+      "sha256": "773fd46d9dc75c7ea428e594df39c47e80fa2a326b702296e9a41083da2bac8d",
+      "bytes": 569,
+      "lines": 16,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "773fd46d9dc75c7ea428e594df39c47e80fa2a326b702296e9a41083da2bac8d",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/SubcategoryManager.tsx",
+      "sha256": "a5ff9020166accae7a49e7d7e0400e7d990c99db6779d4d6276cd01b7904e664",
+      "bytes": 548,
+      "lines": 16,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "a5ff9020166accae7a49e7d7e0400e7d990c99db6779d4d6276cd01b7904e664",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/UsersTab.tsx",
+      "sha256": "3b0076cbececadc7849bc4d3ac82e230dec45050ef97e8b0d5b470c63f2345e2",
+      "bytes": 22281,
+      "lines": 476,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "3b0076cbececadc7849bc4d3ac82e230dec45050ef97e8b0d5b470c63f2345e2",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/configs/category-config.ts",
+      "sha256": "5e7daa0a913d4079c2d6f24d26151d52d7986045f812bba4d9d9c532a9181e5a",
+      "bytes": 1745,
+      "lines": 68,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5e7daa0a913d4079c2d6f24d26151d52d7986045f812bba4d9d9c532a9181e5a",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/configs/subcategory-config.ts",
+      "sha256": "0687a705efa9cca326d1d10d876b750c25f36b5039bd5c328b8b3553e6e32c51",
+      "bytes": 2283,
+      "lines": 84,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "0687a705efa9cca326d1d10d876b750c25f36b5039bd5c328b8b3553e6e32c51",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/configs/subsubcategory-config.ts",
+      "sha256": "445eba8b08bef4441c8b2368097f0b625efaa91a1798a4bd757f6fb408dcd0fd",
+      "bytes": 3524,
+      "lines": 108,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "445eba8b08bef4441c8b2368097f0b625efaa91a1798a4bd757f6fb408dcd0fd",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/admin/types/validation.ts",
+      "sha256": "64e0509fb609d43fa6f864c7505e6b30cbfc485478d412f00b53bac8c0e6a10f",
+      "bytes": 1002,
+      "lines": 51,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "64e0509fb609d43fa6f864c7505e6b30cbfc485478d412f00b53bac8c0e6a10f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ai/RecommendationCard.tsx",
+      "sha256": "5537aba3ae30e0c7ebdd09ff2e9f73f54eb03376842e04fc6f5da64108a3af2f",
+      "bytes": 5680,
+      "lines": 152,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5537aba3ae30e0c7ebdd09ff2e9f73f54eb03376842e04fc6f5da64108a3af2f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/auth/AdminGuard.tsx",
+      "sha256": "772eb3a191f5aa0ea994838ed87a987cf37542123b9eff9b270070bf2bde4190",
+      "bytes": 3576,
+      "lines": 87,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "772eb3a191f5aa0ea994838ed87a987cf37542123b9eff9b270070bf2bde4190",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/auth/AuthConversionTracker.tsx",
+      "sha256": "b63ca28db01c87a7d5a51771dd1295f8be27544defcf9b1277583da35a8c940d",
+      "bytes": 4937,
+      "lines": 106,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "b63ca28db01c87a7d5a51771dd1295f8be27544defcf9b1277583da35a8c940d",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/auth/AuthGuard.tsx",
+      "sha256": "f5e57dbf018e1aa83411b4ef130634abf41c9762c04b363375034c5b13116adf",
+      "bytes": 1757,
+      "lines": 50,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f5e57dbf018e1aa83411b4ef130634abf41c9762c04b363375034c5b13116adf",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/auth/GuestBookmarkMerge.tsx",
+      "sha256": "ee0148e14ac51e3b7ca1f324a9bf875201570a08a4a294333205ee8340d34a98",
+      "bytes": 5999,
+      "lines": 167,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "ee0148e14ac51e3b7ca1f324a9bf875201570a08a4a294333205ee8340d34a98",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/layout/SEOHead.tsx",
+      "sha256": "d91fa14076d83d2f9680257201d952304e1797be9485fba2d6371a1d4070fca6",
+      "bytes": 11119,
+      "lines": 261,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d91fa14076d83d2f9680257201d952304e1797be9485fba2d6371a1d4070fca6",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/layout/new/AppHeader.tsx",
+      "sha256": "518205ed1ed3b0b241c464f206c0b33ca945fbbb1e8b5b19819f9a33a32186ae",
+      "bytes": 29375,
+      "lines": 641,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "518205ed1ed3b0b241c464f206c0b33ca945fbbb1e8b5b19819f9a33a32186ae",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/layout/new/AppSidebar.tsx",
+      "sha256": "84e9904161b381cbc1f06c186784720f26c5457f13ec651a74fdc3b8c87da8c2",
+      "bytes": 34333,
+      "lines": 914,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "84e9904161b381cbc1f06c186784720f26c5457f13ec651a74fdc3b8c87da8c2",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/layout/new/MainLayout.tsx",
+      "sha256": "406559241c8f26a50c2df2be5a3a989f5f2c02800b673537e01657d488bc7ed5",
+      "bytes": 11522,
+      "lines": 255,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "406559241c8f26a50c2df2be5a3a989f5f2c02800b673537e01657d488bc7ed5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/learning/ContinueLearningPreview.tsx",
+      "sha256": "f1a9b97aa05471a571f5a6f4f15a2914acd6de2befdc365bd739cc677232d02e",
+      "bytes": 6704,
+      "lines": 185,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f1a9b97aa05471a571f5a6f4f15a2914acd6de2befdc365bd739cc677232d02e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/notifications/NotificationPreferencesCard.tsx",
+      "sha256": "720c9cbb46220f1581c7e19245191671a0705c9baa3acef8efb7a97b26c20139",
+      "bytes": 12214,
+      "lines": 184,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "720c9cbb46220f1581c7e19245191671a0705c9baa3acef8efb7a97b26c20139",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/onboarding/learning-preferences-form.tsx",
+      "sha256": "bc7f3729572110aff0aa26844833e210d103461c1ff21f0e3ee0c9c80527f7fb",
+      "bytes": 11512,
+      "lines": 307,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "bc7f3729572110aff0aa26844833e210d103461c1ff21f0e3ee0c9c80527f7fb",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/profile/AccountSecurityCard.tsx",
+      "sha256": "25bd93f581392bcdb9dd72d317e03ca8c5e9ad9b964f2eeb14c42b5bc6688bc8",
+      "bytes": 1302,
+      "lines": 42,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "25bd93f581392bcdb9dd72d317e03ca8c5e9ad9b964f2eeb14c42b5bc6688bc8",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/resource/BookmarkButton.tsx",
+      "sha256": "578e7dd6ac38a225e17716618ee0ba55a2a79dd651d6077054c75bcb20ced97c",
+      "bytes": 12469,
+      "lines": 329,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "578e7dd6ac38a225e17716618ee0ba55a2a79dd651d6077054c75bcb20ced97c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/resource/BookmarkNotesDialog.tsx",
+      "sha256": "67b6d6cfa76a9fdb149548260e0f0c7f0c729f4130454b5308992cd129f64a1d",
+      "bytes": 6169,
+      "lines": 166,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "67b6d6cfa76a9fdb149548260e0f0c7f0c729f4130454b5308992cd129f64a1d",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/resource/FavoriteButton.tsx",
+      "sha256": "bf46aa1d97910e2e581c303ae92e9005d80c339420f78c4daab9018aa182e50e",
+      "bytes": 3662,
+      "lines": 115,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "bf46aa1d97910e2e581c303ae92e9005d80c339420f78c4daab9018aa182e50e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/resource/ResourceCard.tsx",
+      "sha256": "e447ee6cefbfdd71a6695c88bfa7d39726204ee30733dc0a4a2abe043a4dcb87",
+      "bytes": 16394,
+      "lines": 397,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e447ee6cefbfdd71a6695c88bfa7d39726204ee30733dc0a4a2abe043a4dcb87",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/resource/resource-view-modes.tsx",
+      "sha256": "00f0476fe3573b2e1558cd943fe164ade5fecf8b660ed90965ee85cc9ad6f7c0",
+      "bytes": 6244,
+      "lines": 150,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "00f0476fe3573b2e1558cd943fe164ade5fecf8b660ed90965ee85cc9ad6f7c0",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/search/SearchFilters.tsx",
+      "sha256": "e8b7d4c30f3c8f3c218ac6f835e246b1965b6ca4da9e6387dd62113c770b53c9",
+      "bytes": 13533,
+      "lines": 148,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e8b7d4c30f3c8f3c218ac6f835e246b1965b6ca4da9e6387dd62113c770b53c9",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/advanced-filter.tsx",
+      "sha256": "e51a44fdb2f9cce51a99a6bf7f3636e2c6aa93ee927c8836a59b310301dfc153",
+      "bytes": 10777,
+      "lines": 245,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e51a44fdb2f9cce51a99a6bf7f3636e2c6aa93ee927c8836a59b310301dfc153",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/ai-recommendations-panel.tsx",
+      "sha256": "d2c26eb369b2bfd8b449f1aeee1de4976a5c83aeb87e765de6b01361a0f5ad0c",
+      "bytes": 19547,
+      "lines": 521,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d2c26eb369b2bfd8b449f1aeee1de4976a5c83aeb87e765de6b01361a0f5ad0c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/alert-dialog.tsx",
+      "sha256": "9ff6580e807a5b0c582d7e8622065e08e2c10d3fe50fad0bb9b0d15294356883",
+      "bytes": 5251,
+      "lines": 148,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "9ff6580e807a5b0c582d7e8622065e08e2c10d3fe50fad0bb9b0d15294356883",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/alert.tsx",
+      "sha256": "d49b94e060aa0cdc1f3c7615052bcaea4ad3b8eb0b7395e184c29d53221bf6d0",
+      "bytes": 1573,
+      "lines": 59,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d49b94e060aa0cdc1f3c7615052bcaea4ad3b8eb0b7395e184c29d53221bf6d0",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/avatar.tsx",
+      "sha256": "54fa028d6bde8e1506b67daa1f9dda6c8be6c6e31da55850b77c95d7f5631a2f",
+      "bytes": 1404,
+      "lines": 47,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "54fa028d6bde8e1506b67daa1f9dda6c8be6c6e31da55850b77c95d7f5631a2f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/badge.tsx",
+      "sha256": "9a899dc41bf51fad1bf63b15f060d08a0de7ccf79cc5742fff89316fdc0dfa5e",
+      "bytes": 1666,
+      "lines": 44,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "9a899dc41bf51fad1bf63b15f060d08a0de7ccf79cc5742fff89316fdc0dfa5e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/breadcrumb.tsx",
+      "sha256": "c3d3dcb0d82fc5e91d8830bac7fead905686fe876f1f42c3ed872bb0a6b6584e",
+      "bytes": 2712,
+      "lines": 115,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c3d3dcb0d82fc5e91d8830bac7fead905686fe876f1f42c3ed872bb0a6b6584e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/button.tsx",
+      "sha256": "de19a26c6b651a249cc163e3c5375361323414dc9740173d1db24bf8f3d0a935",
+      "bytes": 2414,
+      "lines": 57,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "de19a26c6b651a249cc163e3c5375361323414dc9740173d1db24bf8f3d0a935",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/card.tsx",
+      "sha256": "8a8d1ec0dbd99d7f450833b32f2e8ba202048560f257a03763979cb1609e6fd4",
+      "bytes": 2115,
+      "lines": 79,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "8a8d1ec0dbd99d7f450833b32f2e8ba202048560f257a03763979cb1609e6fd4",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/category-explorer.tsx",
+      "sha256": "b38a6b844a864fd05fa8814898e3988b3dd988c98f916932cd29543e85ccceb3",
+      "bytes": 22990,
+      "lines": 531,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "b38a6b844a864fd05fa8814898e3988b3dd988c98f916932cd29543e85ccceb3",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/checkbox.tsx",
+      "sha256": "d6020011b1472db1f0097e85974660fb7ab797d3bc6330a8f5e8daa37c7a918a",
+      "bytes": 1045,
+      "lines": 28,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d6020011b1472db1f0097e85974660fb7ab797d3bc6330a8f5e8daa37c7a918a",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/collapsible.tsx",
+      "sha256": "f4cdd104de29928bfcd40b865c7d08eed9157a537fbb8b5e6d0921f02b63cc04",
+      "bytes": 329,
+      "lines": 11,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f4cdd104de29928bfcd40b865c7d08eed9157a537fbb8b5e6d0921f02b63cc04",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/command.tsx",
+      "sha256": "f15af371baaf3092f29b54d791f963c8aa18cb9937f97b289c8b44f8f52a885d",
+      "bytes": 4980,
+      "lines": 151,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f15af371baaf3092f29b54d791f963c8aa18cb9937f97b289c8b44f8f52a885d",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/community-metrics.tsx",
+      "sha256": "71587732c68c5026b76adaf1a9483047fea603799656c6763965ab62026d63b8",
+      "bytes": 26752,
+      "lines": 564,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "71587732c68c5026b76adaf1a9483047fea603799656c6763965ab62026d63b8",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/consent-banner.tsx",
+      "sha256": "0eac2b3123e834467626400dd8b9aa47f18e7d22dc95b231e7e7b7ed63622ecc",
+      "bytes": 9986,
+      "lines": 233,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "0eac2b3123e834467626400dd8b9aa47f18e7d22dc95b231e7e7b7ed63622ecc",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/dialog.tsx",
+      "sha256": "964773f61818412a3da3e15585aa570ecb467299af57e2d7582c2f1b4821e049",
+      "bytes": 4482,
+      "lines": 126,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "964773f61818412a3da3e15585aa570ecb467299af57e2d7582c2f1b4821e049",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/dropdown-menu.tsx",
+      "sha256": "dcccf9d76df9a9e6989b43c2e794d93e1051543dc8872730e0bc2b3e254c2f09",
+      "bytes": 7543,
+      "lines": 198,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "dcccf9d76df9a9e6989b43c2e794d93e1051543dc8872730e0bc2b3e254c2f09",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/export-tools.tsx",
+      "sha256": "f008e8eb0afc3b0929c3ef3e9515d6058050a8f3d4a67a5d955e2465a654d90c",
+      "bytes": 37123,
+      "lines": 918,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f008e8eb0afc3b0929c3ef3e9515d6058050a8f3d4a67a5d955e2465a654d90c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/form.tsx",
+      "sha256": "7bdb2e0ae11685f29171023d8538691a13c93f1a983784ad82ecb7cf0d07906f",
+      "bytes": 4327,
+      "lines": 185,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "7bdb2e0ae11685f29171023d8538691a13c93f1a983784ad82ecb7cf0d07906f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/input.tsx",
+      "sha256": "a6667fc285d2e1814147dd22be4b03ec1a3890cf913ac1d57e79951a6ae9a959",
+      "bytes": 1293,
+      "lines": 25,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "a6667fc285d2e1814147dd22be4b03ec1a3890cf913ac1d57e79951a6ae9a959",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/label.tsx",
+      "sha256": "e69cfc27d78c9ef31b248ab8ea4fa54327c1038843f70efb5cd85d54c0bf1e0e",
+      "bytes": 710,
+      "lines": 24,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e69cfc27d78c9ef31b248ab8ea4fa54327c1038843f70efb5cd85d54c0bf1e0e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/paginator.tsx",
+      "sha256": "ab4437b397f5e4966c56d5f6f17449773969c6696b3b229c30c632f003bf1083",
+      "bytes": 8591,
+      "lines": 258,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "ab4437b397f5e4966c56d5f6f17449773969c6696b3b229c30c632f003bf1083",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/popover.tsx",
+      "sha256": "c5b068cdd2e111df943d4c10650cd73dd8280fdfeb65e5325054b137f7d3c364",
+      "bytes": 1309,
+      "lines": 29,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c5b068cdd2e111df943d4c10650cd73dd8280fdfeb65e5325054b137f7d3c364",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/progress.tsx",
+      "sha256": "8c036da4baed076de68d27719929dc98151a81b51456bfa6a2488d835303b1d7",
+      "bytes": 791,
+      "lines": 28,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "8c036da4baed076de68d27719929dc98151a81b51456bfa6a2488d835303b1d7",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/radio-group.tsx",
+      "sha256": "74f87531da1fde8d3c07dbd7b380ee6508a70d5c0af1c22e2d2c33d66cc79f10",
+      "bytes": 1467,
+      "lines": 42,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "74f87531da1fde8d3c07dbd7b380ee6508a70d5c0af1c22e2d2c33d66cc79f10",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/recommendation-feedback.tsx",
+      "sha256": "f683f3a0839c55639aee5540300c6d3a5850a3410e8fa7d982009d29514bcd6c",
+      "bytes": 5582,
+      "lines": 191,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f683f3a0839c55639aee5540300c6d3a5850a3410e8fa7d982009d29514bcd6c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/scroll-area.tsx",
+      "sha256": "f1f139db3d18201e08f59466df535fb16a76759b31c3a6d5ba2960cc1103567b",
+      "bytes": 2243,
+      "lines": 55,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f1f139db3d18201e08f59466df535fb16a76759b31c3a6d5ba2960cc1103567b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/scrubbed-params-notice.tsx",
+      "sha256": "9e3c3b9da1f9c5bab84fa5c13d9e0cfa6503ff37c130ec8f0160b8b007e8388a",
+      "bytes": 1986,
+      "lines": 54,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "9e3c3b9da1f9c5bab84fa5c13d9e0cfa6503ff37c130ec8f0160b8b007e8388a",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/search-dialog.tsx",
+      "sha256": "54de857dbf5529635c852059d435cb7c872ece3f97de10f0d7d2d69d0deeeb4b",
+      "bytes": 16708,
+      "lines": 354,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "54de857dbf5529635c852059d435cb7c872ece3f97de10f0d7d2d69d0deeeb4b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/select.tsx",
+      "sha256": "9596da144dc752c8e4089c33180a3bbce424e51b8f97c482003a24d02435290c",
+      "bytes": 8427,
+      "lines": 212,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "9596da144dc752c8e4089c33180a3bbce424e51b8f97c482003a24d02435290c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/separator.tsx",
+      "sha256": "c956c4cca4b8442fa9314d6079b9f975e1ee39d5804aaf2966990f6258ac342a",
+      "bytes": 756,
+      "lines": 29,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c956c4cca4b8442fa9314d6079b9f975e1ee39d5804aaf2966990f6258ac342a",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/sheet.tsx",
+      "sha256": "6cccb7058061fbfce0d0ef1be85e4326d020dbc83dba918aa747b6e45d8db0ac",
+      "bytes": 4434,
+      "lines": 140,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "6cccb7058061fbfce0d0ef1be85e4326d020dbc83dba918aa747b6e45d8db0ac",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/sidebar.tsx",
+      "sha256": "152f1dafa309fcd2a9e2173df3fc2cc5c593686602db05fedee2d85d370d2860",
+      "bytes": 31207,
+      "lines": 914,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "152f1dafa309fcd2a9e2173df3fc2cc5c593686602db05fedee2d85d370d2860",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/skeleton.tsx",
+      "sha256": "43a99962619c3ec5311f72af093b643e42cc961e1f32e3cc47a0c893242cc841",
+      "bytes": 640,
+      "lines": 23,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "43a99962619c3ec5311f72af093b643e42cc961e1f32e3cc47a0c893242cc841",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/skeletons.tsx",
+      "sha256": "a5a5a3d705a56e94b2aed2aa795c85934758c93c4568dff296e11d3a307aea79",
+      "bytes": 2859,
+      "lines": 84,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "a5a5a3d705a56e94b2aed2aa795c85934758c93c4568dff296e11d3a307aea79",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/suggest-edit-dialog.tsx",
+      "sha256": "f2203097284125608795a38f7e9b7f07f4a2a1f4e9a537e00e66591d924169c1",
+      "bytes": 26063,
+      "lines": 697,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f2203097284125608795a38f7e9b7f07f4a2a1f4e9a537e00e66591d924169c1",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/switch.tsx",
+      "sha256": "bd29ce723e952bc7f8fab367320347ca82fbb933f4da9872c7120d6765662ebe",
+      "bytes": 1139,
+      "lines": 27,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "bd29ce723e952bc7f8fab367320347ca82fbb933f4da9872c7120d6765662ebe",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/table.tsx",
+      "sha256": "1da243956282c040db49d5718d2f0093a705fbbdfa3a25f51c1a31a069c45093",
+      "bytes": 2765,
+      "lines": 117,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "1da243956282c040db49d5718d2f0093a705fbbdfa3a25f51c1a31a069c45093",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/tabs.tsx",
+      "sha256": "11e5af088968c8db64c275eda57814e34256ebd3553c07d2df3f530be6a882ab",
+      "bytes": 2374,
+      "lines": 58,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "11e5af088968c8db64c275eda57814e34256ebd3553c07d2df3f530be6a882ab",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/taxonomy-card.tsx",
+      "sha256": "d326c52039732aeca8f229d5210e71d1c64541a7064ac970256c40064d996c2d",
+      "bytes": 3097,
+      "lines": 80,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d326c52039732aeca8f229d5210e71d1c64541a7064ac970256c40064d996c2d",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/textarea.tsx",
+      "sha256": "e0894b76a5258d0aadba3fcd9d61e44f2070d2e285c57f2fa65a1a8b2e096ed2",
+      "bytes": 1019,
+      "lines": 25,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e0894b76a5258d0aadba3fcd9d61e44f2070d2e285c57f2fa65a1a8b2e096ed2",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/theme-provider.tsx",
+      "sha256": "cce816008ddc14c5f283ce7eb6d4caa88255c4a9a7cf14e42db112aa40e86754",
+      "bytes": 4281,
+      "lines": 139,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "cce816008ddc14c5f283ce7eb6d4caa88255c4a9a7cf14e42db112aa40e86754",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/toast.tsx",
+      "sha256": "48d029a8b31394e70b4325270b2beb0563650c282c84871979693af9f20f6812",
+      "bytes": 5537,
+      "lines": 134,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "48d029a8b31394e70b4325270b2beb0563650c282c84871979693af9f20f6812",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/toaster.tsx",
+      "sha256": "4a55d85afc232ba154aa6bffde53efcbc02fe353a18d5acf364f45098bfba13f",
+      "bytes": 1425,
+      "lines": 45,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "4a55d85afc232ba154aa6bffde53efcbc02fe353a18d5acf364f45098bfba13f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/toggle-group.tsx",
+      "sha256": "dba95ead40d163af6959198ded9853a2cc9282b2cb534980f99937a65edf4e2d",
+      "bytes": 1753,
+      "lines": 61,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "dba95ead40d163af6959198ded9853a2cc9282b2cb534980f99937a65edf4e2d",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/toggle.tsx",
+      "sha256": "bf19499272d57adbf5ebcc0af4ba1d1d118b78857bb39f3ea1ec0be89cf66269",
+      "bytes": 1516,
+      "lines": 43,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "bf19499272d57adbf5ebcc0af4ba1d1d118b78857bb39f3ea1ec0be89cf66269",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/tooltip.tsx",
+      "sha256": "c036e4d0ccdf2cc9ad74ead0a69dcb50abd259d0173ae4eb4d2d103c4362f227",
+      "bytes": 1147,
+      "lines": 29,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c036e4d0ccdf2cc9ad74ead0a69dcb50abd259d0173ae4eb4d2d103c4362f227",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/components/ui/view-mode-toggle.tsx",
+      "sha256": "83cebe271ed4b01789b03cfeaba4175b8384f441170a527b4391ba71bf53264b",
+      "bytes": 1933,
+      "lines": 58,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "83cebe271ed4b01789b03cfeaba4175b8384f441170a527b4391ba71bf53264b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/config/navigation-icons.ts",
+      "sha256": "46416e84454d92444c2ccd74c8e082a90e2ed28151d7b57a67a62eb6531e77a6",
+      "bytes": 1167,
+      "lines": 44,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "46416e84454d92444c2ccd74c8e082a90e2ed28151d7b57a67a62eb6531e77a6",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/entry-server.tsx",
+      "sha256": "936160347c867d163b33ec8ea8764a859e49d8b3b8d8ef9edb715d4eff8991c4",
+      "bytes": 2010,
+      "lines": 73,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "936160347c867d163b33ec8ea8764a859e49d8b3b8d8ef9edb715d4eff8991c4",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/use-analytics.tsx",
+      "sha256": "9ee26a4c197acbafdeecb9a7e5718352f4a350a8b9065208e5809ac3d85237ee",
+      "bytes": 5261,
+      "lines": 136,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "9ee26a4c197acbafdeecb9a7e5718352f4a350a8b9065208e5809ac3d85237ee",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/use-app-bottom-inset.ts",
+      "sha256": "ea13f473876a41ad1e8d3409064488c681fa7f56ab8b94a578e39915d6597629",
+      "bytes": 2713,
+      "lines": 60,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "ea13f473876a41ad1e8d3409064488c681fa7f56ab8b94a578e39915d6597629",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/use-learning-preferences.ts",
+      "sha256": "f0a619a56040d13328383999e1c056834cd2a0f39282b1873db3e9a03a4b185b",
+      "bytes": 4672,
+      "lines": 138,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f0a619a56040d13328383999e1c056834cd2a0f39282b1873db3e9a03a4b185b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/use-mobile.tsx",
+      "sha256": "ad0936f84f1df79d3697bfbff9c18f8ad58431c1cbaf2359c6a853b0fcc9f28b",
+      "bytes": 565,
+      "lines": 19,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "ad0936f84f1df79d3697bfbff9c18f8ad58431c1cbaf2359c6a853b0fcc9f28b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/use-theme.ts",
+      "sha256": "7d89bc9ef8ea996bc0b0eef8620bb9a84aa6f7f6c866530fbe5082d54e856895",
+      "bytes": 734,
+      "lines": 19,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "7d89bc9ef8ea996bc0b0eef8620bb9a84aa6f7f6c866530fbe5082d54e856895",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/use-toast.ts",
+      "sha256": "5aab0623ee24bddf9420c259a23a06996292e38ea70eccbac2715516f6d01a0b",
+      "bytes": 3895,
+      "lines": 191,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5aab0623ee24bddf9420c259a23a06996292e38ea70eccbac2715516f6d01a0b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/use-user-profile.tsx",
+      "sha256": "5a9ef4d758b194120ffba2bb2e200ae3db93e2184d8e2fc9a654b897caae0f03",
+      "bytes": 3346,
+      "lines": 118,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5a9ef4d758b194120ffba2bb2e200ae3db93e2184d8e2fc9a654b897caae0f03",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/useAIRecommendations.ts",
+      "sha256": "63e49ff3421e47e6a4778223e58ccdd3f214725b6cac52ee13c510284c19f18a",
+      "bytes": 8899,
+      "lines": 285,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "63e49ff3421e47e6a4778223e58ccdd3f214725b6cac52ee13c510284c19f18a",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/useAdmin.ts",
+      "sha256": "e7fd33d4b84873f39dbc42ee954265b7aa4dd69e2d979dfcbb9493ecfc5fefac",
+      "bytes": 1494,
+      "lines": 43,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e7fd33d4b84873f39dbc42ee954265b7aa4dd69e2d979dfcbb9493ecfc5fefac",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/useAuth.ts",
+      "sha256": "29973d0dad161b00c5b7bd6a1ce686ed187e08c3a8fa07949603af6f9125b975",
+      "bytes": 5685,
+      "lines": 165,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "29973d0dad161b00c5b7bd6a1ce686ed187e08c3a8fa07949603af6f9125b975",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/useContinueLearning.ts",
+      "sha256": "43a07ee35af3880e926be6d9195248b85be593e603c41a7aceda18e51c2a5d2c",
+      "bytes": 1146,
+      "lines": 40,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "43a07ee35af3880e926be6d9195248b85be593e603c41a7aceda18e51c2a5d2c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/useDebounce.ts",
+      "sha256": "3e4352036b8aac1e854c44ea6366398a095d4ee8d2e8c751430606a5e8d5c492",
+      "bytes": 377,
+      "lines": 17,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "3e4352036b8aac1e854c44ea6366398a095d4ee8d2e8c751430606a5e8d5c492",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/useRecommendationFeedback.ts",
+      "sha256": "a5b9c68c6e6d1e4fc3184d2e950c98a361865a28fa83ba45e8db346489e9c4b9",
+      "bytes": 4241,
+      "lines": 143,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "a5b9c68c6e6d1e4fc3184d2e950c98a361865a28fa83ba45e8db346489e9c4b9",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/hooks/useResourceToggle.ts",
+      "sha256": "6258fde5876bdd827a604767d7938a7f9d62f7868f086f2547b638175a257224",
+      "bytes": 13589,
+      "lines": 362,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "6258fde5876bdd827a604767d7938a7f9d62f7868f086f2547b638175a257224",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/index.css",
+      "sha256": "5369bde2eaef4c0287d3194db200845142b11af16e52e6cff066e3e1cd632f6c",
+      "bytes": 15769,
+      "lines": 429,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5369bde2eaef4c0287d3194db200845142b11af16e52e6cff066e3e1cd632f6c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/acquisition.ts",
+      "sha256": "c49d7e4aa3ed1dfbb32c612df46fbc07604ebf822b12245a861a0665ce6f1e35",
+      "bytes": 2951,
+      "lines": 98,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c49d7e4aa3ed1dfbb32c612df46fbc07604ebf822b12245a861a0665ce6f1e35",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/amplitude.ts",
+      "sha256": "6fc9e37c65a2f191cab3f5c6f123dd9c2f1a9f6a20beb799fa91d16d429c39fa",
+      "bytes": 10738,
+      "lines": 300,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "6fc9e37c65a2f191cab3f5c6f123dd9c2f1a9f6a20beb799fa91d16d429c39fa",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/analytics.ts",
+      "sha256": "8902d96d5179a94fa50c6987566fc2fd77adff7755a00e8149eb74b67fd91344",
+      "bytes": 18730,
+      "lines": 532,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "8902d96d5179a94fa50c6987566fc2fd77adff7755a00e8149eb74b67fd91344",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/apiError.ts",
+      "sha256": "a15c79fd5181a29690b80320093f97a6063bbf1425ebd94538c6aefa7bb429b3",
+      "bytes": 5732,
+      "lines": 129,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "a15c79fd5181a29690b80320093f97a6063bbf1425ebd94538c6aefa7bb429b3",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/authUtils.ts",
+      "sha256": "e1849c3c5371f5f1cb0f2b7c5e0deaa3bd0f06bf66a777235afae2ab823f12f8",
+      "bytes": 331,
+      "lines": 7,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e1849c3c5371f5f1cb0f2b7c5e0deaa3bd0f06bf66a777235afae2ab823f12f8",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/brand-mark.ts",
+      "sha256": "e4c77b0a9a4624f42e2ebca748fd89ae5f331caec841f5ba32c938d5497a7f19",
+      "bytes": 4100,
+      "lines": 89,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "e4c77b0a9a4624f42e2ebca748fd89ae5f331caec841f5ba32c938d5497a7f19",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/charts/palette.ts",
+      "sha256": "8f343c04613a003201e6e92e6bf5aa2cb1e1f6c6456c7e2e11e0035acb301d57",
+      "bytes": 832,
+      "lines": 19,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "8f343c04613a003201e6e92e6bf5aa2cb1e1f6c6456c7e2e11e0035acb301d57",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/clerk-appearance.ts",
+      "sha256": "8ead46c56debfe44116d5b3820ad4481ba563365b06c11f7ac1f3a11577a36c1",
+      "bytes": 16356,
+      "lines": 342,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "8ead46c56debfe44116d5b3820ad4481ba563365b06c11f7ac1f3a11577a36c1",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/crossTabSync.ts",
+      "sha256": "713c10d11f7bf44c1c620ffd8805c084fdc2b77935b02e0ef3aefb8ea7d3dfcf",
+      "bytes": 1593,
+      "lines": 41,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "713c10d11f7bf44c1c620ffd8805c084fdc2b77935b02e0ef3aefb8ea7d3dfcf",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/design-system.ts",
+      "sha256": "091dbe8917cf1f3a7b91d5c2f07daa3852e07fef04fc732863d7e88158182e53",
+      "bytes": 11016,
+      "lines": 299,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "091dbe8917cf1f3a7b91d5c2f07daa3852e07fef04fc732863d7e88158182e53",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/difficulty.ts",
+      "sha256": "2897f11faa7700b2fb5ece69c227d4f534e05e9bb68270b172fb01b646ad32a5",
+      "bytes": 957,
+      "lines": 20,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "2897f11faa7700b2fb5ece69c227d4f534e05e9bb68270b172fb01b646ad32a5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/font-options.ts",
+      "sha256": "677cc5a39d153ebed6228b6b722724c418329d79e8dcff0857027c541cadd125",
+      "bytes": 7220,
+      "lines": 128,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "677cc5a39d153ebed6228b6b722724c418329d79e8dcff0857027c541cadd125",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/guestBookmarks.ts",
+      "sha256": "5c0ccc5427071108248521ebd36c3ecfdd2bb32818e81555bd64ccacd561c294",
+      "bytes": 7827,
+      "lines": 225,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5c0ccc5427071108248521ebd36c3ecfdd2bb32818e81555bd64ccacd561c294",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/mixpanel.ts",
+      "sha256": "95f80644ad31b6ad544f22a8a5570435169cc1dcb90cca93276d91b2b0803b5c",
+      "bytes": 11093,
+      "lines": 278,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "95f80644ad31b6ad544f22a8a5570435169cc1dcb90cca93276d91b2b0803b5c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/nav-history.ts",
+      "sha256": "0345c41c33264293ac5472c5da5f6923ed652407e3181e21eb01fe09bdba3a34",
+      "bytes": 3826,
+      "lines": 115,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "0345c41c33264293ac5472c5da5f6923ed652407e3181e21eb01fe09bdba3a34",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/page-param.ts",
+      "sha256": "2fa8d5575977d2d70f8171371ea312c08aca8bc887d97130eb44d7e2064eb396",
+      "bytes": 4104,
+      "lines": 101,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "2fa8d5575977d2d70f8171371ea312c08aca8bc887d97130eb44d7e2064eb396",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/parser.ts",
+      "sha256": "d98f2965ea86176374178ac8fb71d2ebb09175c25ce8635f3880ba56228ae090",
+      "bytes": 9671,
+      "lines": 283,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d98f2965ea86176374178ac8fb71d2ebb09175c25ce8635f3880ba56228ae090",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/posthog.ts",
+      "sha256": "d4c3934403a68119ca9eea871333839efd5e4fbbd83a95d666cd2f15d064d5a6",
+      "bytes": 8200,
+      "lines": 232,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d4c3934403a68119ca9eea871333839efd5e4fbbd83a95d666cd2f15d064d5a6",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/queryClient.ts",
+      "sha256": "209e386c52fb28b73236cfa623cd03f74492c759aa59870117e23ba88eedc2ae",
+      "bytes": 6841,
+      "lines": 196,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "209e386c52fb28b73236cfa623cd03f74492c759aa59870117e23ba88eedc2ae",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/recommendation-cache.ts",
+      "sha256": "2f866df01c0947d0ecebe1955c94c18ada447589a7297653b661637d8259b17c",
+      "bytes": 1949,
+      "lines": 58,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "2f866df01c0947d0ecebe1955c94c18ada447589a7297653b661637d8259b17c",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/route-monitor.ts",
+      "sha256": "d0088c307dd26ee5f096c2f945d70321952ab63db1ca14f946a08b0f1ae50e31",
+      "bytes": 1084,
+      "lines": 36,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d0088c307dd26ee5f096c2f945d70321952ab63db1ca14f946a08b0f1ae50e31",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/safeStorage.ts",
+      "sha256": "9361837f5398d9d14be6be4df424d7200aaa488169c2a44d6db9e286bd0cdf2f",
+      "bytes": 375,
+      "lines": 19,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "9361837f5398d9d14be6be4df424d7200aaa488169c2a44d6db9e286bd0cdf2f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/sanitize-display.ts",
+      "sha256": "61b4cef42b919bfa1c102dcd1d4aec0b316032db9181448a14d939b1207c7fbe",
+      "bytes": 928,
+      "lines": 18,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "61b4cef42b919bfa1c102dcd1d4aec0b316032db9181448a14d939b1207c7fbe",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/static-data.ts",
+      "sha256": "75853fcdf3e7d49fd7f384d9cbfa867ce4015dc08a1f7401cae00fcc195039d2",
+      "bytes": 7125,
+      "lines": 200,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "75853fcdf3e7d49fd7f384d9cbfa867ce4015dc08a1f7401cae00fcc195039d2",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/tags.ts",
+      "sha256": "cbe51cfde68921ace572facf2297f22acbc351d305f8e52639e3fa13fbd39933",
+      "bytes": 1199,
+      "lines": 26,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "cbe51cfde68921ace572facf2297f22acbc351d305f8e52639e3fa13fbd39933",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/url-filter-state.ts",
+      "sha256": "5d62beb57e26774f8849aab364884d42dd45e1e1e6b54206953bf8c2b50ec673",
+      "bytes": 2313,
+      "lines": 54,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5d62beb57e26774f8849aab364884d42dd45e1e1e6b54206953bf8c2b50ec673",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/lib/utils.ts",
+      "sha256": "825636959eae2e5b9d968f4cd9e3c23d7ad53c10d0637a5781b353af40841964",
+      "bytes": 1796,
+      "lines": 55,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "825636959eae2e5b9d968f4cd9e3c23d7ad53c10d0637a5781b353af40841964",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/main.tsx",
+      "sha256": "5cc576ce8793e12da3bce4ebe7e802a8d0e07bf77729016a71112e6701abe36e",
+      "bytes": 8088,
+      "lines": 217,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5cc576ce8793e12da3bce4ebe7e802a8d0e07bf77729016a71112e6701abe36e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/About.tsx",
+      "sha256": "c70b71e1378c7c0e1e1581b82b1ca49ca5ae267803335c20a9b1d5499b114f10",
+      "bytes": 19007,
+      "lines": 414,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c70b71e1378c7c0e1e1581b82b1ca49ca5ae267803335c20a9b1d5499b114f10",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/AdminDashboard.tsx",
+      "sha256": "d2a0cf4a2007a276f7e83cf2277ca164bd67335ed730484780de9b4be108bed7",
+      "bytes": 17452,
+      "lines": 354,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d2a0cf4a2007a276f7e83cf2277ca164bd67335ed730484780de9b4be108bed7",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Advanced.tsx",
+      "sha256": "0ee17ca178f7184d31291387e2618e98bb7b77f363c01ed0705b63d2afe1bfd3",
+      "bytes": 17530,
+      "lines": 374,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "0ee17ca178f7184d31291387e2618e98bb7b77f363c01ed0705b63d2afe1bfd3",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Bookmarks.tsx",
+      "sha256": "8c847d4a02c32b9db8c2b04427d287dbfd9d99e2a992f0aa1cb4a3112bbcc547",
+      "bytes": 41430,
+      "lines": 1009,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "8c847d4a02c32b9db8c2b04427d287dbfd9d99e2a992f0aa1cb4a3112bbcc547",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/BookmarksGate.tsx",
+      "sha256": "abd7f544589dc231e66127538ff606b5a68fab050bd8ad7bb80dfd21c304df52",
+      "bytes": 923,
+      "lines": 25,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "abd7f544589dc231e66127538ff606b5a68fab050bd8ad7bb80dfd21c304df52",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Categories.tsx",
+      "sha256": "c7e6c504df06fca126649612d0b3eeb5a040dbefda353e58b3ac96732afcfd8f",
+      "bytes": 8915,
+      "lines": 244,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "c7e6c504df06fca126649612d0b3eeb5a040dbefda353e58b3ac96732afcfd8f",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Category.tsx",
+      "sha256": "ebc1aaa91ada5ae3889fe6c723e890738fbb27b335627f00db8338c80605a479",
+      "bytes": 135,
+      "lines": 4,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "ebc1aaa91ada5ae3889fe6c723e890738fbb27b335627f00db8338c80605a479",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/CodeOfConduct.tsx",
+      "sha256": "777c000ab650d52d44949ab2d0cd961f05862466751fee1089e1d42859cbb1de",
+      "bytes": 4784,
+      "lines": 100,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "777c000ab650d52d44949ab2d0cd961f05862466751fee1089e1d42859cbb1de",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/ContinueLearning.tsx",
+      "sha256": "fda5b4498b67b2e4c47f83029456939ad449a39da4b034a8666fd69c6680d9ae",
+      "bytes": 16942,
+      "lines": 444,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "fda5b4498b67b2e4c47f83029456939ad449a39da4b034a8666fd69c6680d9ae",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Contributions.tsx",
+      "sha256": "b1a5c07d30a57615bd02c67f5bb3b0a70cf86a5ec60511a1ce92098825ce6298",
+      "bytes": 32019,
+      "lines": 920,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "b1a5c07d30a57615bd02c67f5bb3b0a70cf86a5ec60511a1ce92098825ce6298",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/DesignSystemShowcase.tsx",
+      "sha256": "187b662eb85c677f937a02a922686ade357f85c8810b4157c2e904f7ecf785f5",
+      "bytes": 25205,
+      "lines": 519,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "187b662eb85c677f937a02a922686ade357f85c8810b4157c2e904f7ecf785f5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/ErrorPage.tsx",
+      "sha256": "6449c6acf88f10c01b8855f08a9d998800ebc1b8cb12cc19915537d91f4605e5",
+      "bytes": 2156,
+      "lines": 62,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "6449c6acf88f10c01b8855f08a9d998800ebc1b8cb12cc19915537d91f4605e5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/GuestBookmarks.tsx",
+      "sha256": "027ef55886faca09419d4185ad027e98d160e6036daac03570c328b57f8ff422",
+      "bytes": 9844,
+      "lines": 263,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "027ef55886faca09419d4185ad027e98d160e6036daac03570c328b57f8ff422",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Home.tsx",
+      "sha256": "470d84fb38ac567b3e66b1892224bc172315582beba96b61678af359fb14315b",
+      "bytes": 25995,
+      "lines": 646,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "470d84fb38ac567b3e66b1892224bc172315582beba96b61678af359fb14315b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/JourneyDetail.tsx",
+      "sha256": "cd8e21adad26193cc7c3e179d0914dae7c41d3188b5d01f021db8112e16d4a5a",
+      "bytes": 32100,
+      "lines": 746,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "cd8e21adad26193cc7c3e179d0914dae7c41d3188b5d01f021db8112e16d4a5a",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Journeys.tsx",
+      "sha256": "abf8c79a1252f18f28761d29b1407eb2aadfd44d4963f2d77c6911806eb084d5",
+      "bytes": 19679,
+      "lines": 432,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "abf8c79a1252f18f28761d29b1407eb2aadfd44d4963f2d77c6911806eb084d5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Notifications.tsx",
+      "sha256": "378ecd7eb0b07fb6b5d9967d28c5ca963a5822fdaf1c5faa1ecd2264daad90c5",
+      "bytes": 6326,
+      "lines": 39,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "378ecd7eb0b07fb6b5d9967d28c5ca963a5822fdaf1c5faa1ecd2264daad90c5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Onboarding.tsx",
+      "sha256": "3ee7394aafe4b4bdda2ed275ab222d9d47ea955fa179a79b9c5ed18a99440872",
+      "bytes": 14555,
+      "lines": 459,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "3ee7394aafe4b4bdda2ed275ab222d9d47ea955fa179a79b9c5ed18a99440872",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Privacy.tsx",
+      "sha256": "1a85c65d152b52a894a5b20a12243f1084cc5cd29c4d813079e090e35800febd",
+      "bytes": 13571,
+      "lines": 244,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "1a85c65d152b52a894a5b20a12243f1084cc5cd29c4d813079e090e35800febd",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Profile.tsx",
+      "sha256": "5be71b04f4fe55a0e1c68253c0efc7f03a82b76d540d2fbdf1b24bbada8164e0",
+      "bytes": 39009,
+      "lines": 968,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "5be71b04f4fe55a0e1c68253c0efc7f03a82b76d540d2fbdf1b24bbada8164e0",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/PublicCollection.tsx",
+      "sha256": "176df2a6d061ae437303d793e4ac2dad2cb5568daa0dee039d9dadbe05a43bf5",
+      "bytes": 5138,
+      "lines": 133,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "176df2a6d061ae437303d793e4ac2dad2cb5568daa0dee039d9dadbe05a43bf5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Recommendations.tsx",
+      "sha256": "a050d3e81673442bed85ef9654d0e8e7930c907f84448d65c056ac8d4bafa4a5",
+      "bytes": 6160,
+      "lines": 149,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "a050d3e81673442bed85ef9654d0e8e7930c907f84448d65c056ac8d4bafa4a5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/ResourceDetail.tsx",
+      "sha256": "abc93435c3b3a5ecef7a79b473dd57efdbca2802925e07977c961143b9cb3bb2",
+      "bytes": 46547,
+      "lines": 1130,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "abc93435c3b3a5ecef7a79b473dd57efdbca2802925e07977c961143b9cb3bb2",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Search.tsx",
+      "sha256": "37c3693aa88415d53b2c1b586c574bd7fd6bd5c21aff9278949979c0110d72fe",
+      "bytes": 19006,
+      "lines": 248,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "37c3693aa88415d53b2c1b586c574bd7fd6bd5c21aff9278949979c0110d72fe",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Settings.tsx",
+      "sha256": "f059a62943410724a128460b0e047b53b1590cfdb788facc738cc7170324ec8a",
+      "bytes": 15306,
+      "lines": 398,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f059a62943410724a128460b0e047b53b1590cfdb788facc738cc7170324ec8a",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/SubSubcategory.tsx",
+      "sha256": "f9b6fb69aa8da099934ebd2079b39767a9cd43ac6432aaa09f89b8561ec94ee5",
+      "bytes": 148,
+      "lines": 4,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f9b6fb69aa8da099934ebd2079b39767a9cd43ac6432aaa09f89b8561ec94ee5",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Subcategory.tsx",
+      "sha256": "7d8893d371b75b888338a0ad229f3d5cec3babcc100dc197d97cdb35c1c405d6",
+      "bytes": 141,
+      "lines": 4,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "7d8893d371b75b888338a0ad229f3d5cec3babcc100dc197d97cdb35c1c405d6",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/SubmitResource.tsx",
+      "sha256": "fb7015ebf23447edd5f8549eb5f87b52feed3af6af0fef046309abcbd2f4a015",
+      "bytes": 39237,
+      "lines": 933,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "fb7015ebf23447edd5f8549eb5f87b52feed3af6af0fef046309abcbd2f4a015",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/TagLanding.tsx",
+      "sha256": "343eabd62373ed7a72c96d2cbcd980c75a23c47ebe725d2cda644727fa789ebf",
+      "bytes": 8797,
+      "lines": 206,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "343eabd62373ed7a72c96d2cbcd980c75a23c47ebe725d2cda644727fa789ebf",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/TaxonomyListing.tsx",
+      "sha256": "01d3b5c325de42420095af63441067593138512497c7d635916280ea4f9746b6",
+      "bytes": 28733,
+      "lines": 485,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "01d3b5c325de42420095af63441067593138512497c7d635916280ea4f9746b6",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/Terms.tsx",
+      "sha256": "d329960129daa8e65a6720e0c6a380c9e448a3ed5d3fa0042fc5f56dfa71f6a2",
+      "bytes": 5340,
+      "lines": 116,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d329960129daa8e65a6720e0c6a380c9e448a3ed5d3fa0042fc5f56dfa71f6a2",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/ThemeSettings.tsx",
+      "sha256": "194adc4762678e76dc6901f29398af6463fc35cf85d577419363318b75c3ad3b",
+      "bytes": 23006,
+      "lines": 479,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "194adc4762678e76dc6901f29398af6463fc35cf85d577419363318b75c3ad3b",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/pages/not-found.tsx",
+      "sha256": "0f1d5d573c5e99b4b041804065c8b17ffd3c47b06f955c9f04bfa50f95374d6e",
+      "bytes": 4319,
+      "lines": 98,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "0f1d5d573c5e99b4b041804065c8b17ffd3c47b06f955c9f04bfa50f95374d6e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/styles/design-system.css",
+      "sha256": "f830bc98b10e749f248fc92650684bc590909edd47b634ff49aeb77915baf052",
+      "bytes": 41366,
+      "lines": 1077,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f830bc98b10e749f248fc92650684bc590909edd47b634ff49aeb77915baf052",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/styles/mobile-optimizations.css",
+      "sha256": "f371b90ce90f9084075834e87742dc409ac971e57ff9fe2bcc1db1b0340f7f07",
+      "bytes": 1000,
+      "lines": 42,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "f371b90ce90f9084075834e87742dc409ac971e57ff9fe2bcc1db1b0340f7f07",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/styles/scrolling-fix.css",
+      "sha256": "22a07197735fc564227cf8a0557726f948933a14ca830d023cb576cd4834a257",
+      "bytes": 774,
+      "lines": 50,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "22a07197735fc564227cf8a0557726f948933a14ca830d023cb576cd4834a257",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/styles/skeleton-animations.css",
+      "sha256": "d56646921c17193be07ab03743834499138dcaeb73d18599814a57afa74f2438",
+      "bytes": 2900,
+      "lines": 141,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "d56646921c17193be07ab03743834499138dcaeb73d18599814a57afa74f2438",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/types/awesome-list.ts",
+      "sha256": "aec9d736881c4cf04d1b16f805b333afcdd072b04b48ed868b0bc75fa3b4928e",
+      "bytes": 1088,
+      "lines": 55,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "aec9d736881c4cf04d1b16f805b333afcdd072b04b48ed868b0bc75fa3b4928e",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    },
+    {
+      "path": "client/src/types/bookmarks.ts",
+      "sha256": "2bc67b571ada92bb047295b9610657a5ed5f60b189a649c06e361c3f10be8573",
+      "bytes": 1031,
+      "lines": 44,
+      "completeRead": true,
+      "readMode": "contiguous full file via fs.readFileSync",
+      "currentSha256": "2bc67b571ada92bb047295b9610657a5ed5f60b189a649c06e361c3f10be8573",
+      "reviewAttribution": "infrastructure full-byte ledger; semantic coverage in focused page/admin/shell/foundations reports"
+    }
+  ],
+  "totalFiles": 179,
+  "totalLines": 49610,
+  "totalBytes": 2011824,
+  "changed": [],
+  "unlisted": [],
+  "catalog": {
+    "endpoint": "/api/awesome-list",
+    "originPort": 5000,
+    "status": 200,
+    "approvedResources": 1816,
+    "categories": 9,
+    "statuses": [
+      "approved"
+    ],
+    "sha256": "6b28219d0e154cc2d5440f265200a132ec5b055d928ced9e1287937452bcf397"
+  }
+}

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-product-profile="standalone-exports" data-system="editorial" data-accent="crimson">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Awesome Video — Editorial</title>
+<title>Awesome.Video — Indexed Atlas of Video Tooling</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,15 +16,27 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<template id="__bundler_thumbnail">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-    <rect width="200" height="200" fill="#000"/>
-    <g transform="translate(60 60)" fill="none" stroke="#ff3d52" stroke-width="3" stroke-linecap="round">
-      <rect x="0" y="0" width="80" height="20" rx="3"/>
-      <rect x="0" y="30" width="60" height="20" rx="3"/>
-      <rect x="0" y="60" width="70" height="20" rx="3"/>
+<template id="__bundler_thumbnail" data-bg-color="#000000">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+    <rect width="1200" height="800" fill="#000"/>
+    <!-- mono eyebrow -->
+    <text x="160" y="220" fill="#ff3d52" font-family="ui-monospace, monospace" font-size="20" letter-spacing="6">── INDEXED · ATLAS</text>
+    <!-- big italic display -->
+    <text x="156" y="380" fill="#f4f3ee" font-family="Georgia, serif" font-style="italic" font-size="120" font-weight="500">awesome</text>
+    <text x="156" y="510" fill="#f4f3ee" font-family="Georgia, serif" font-style="italic" font-size="120" font-weight="500">.video</text>
+    <!-- list rows -->
+    <g stroke="rgba(244,243,238,0.18)" stroke-width="1">
+      <line x1="160" y1="620" x2="1040" y2="620"/>
+      <line x1="160" y1="680" x2="1040" y2="680"/>
+      <line x1="160" y1="740" x2="1040" y2="740"/>
     </g>
-    <text x="100" y="170" text-anchor="middle" fill="#f4f3ee" font-family="monospace" font-size="14" letter-spacing="2">AV</text>
+    <g fill="rgba(244,243,238,0.4)" font-family="ui-monospace, monospace" font-size="18">
+      <text x="172" y="612">01</text>
+      <text x="172" y="672">02</text>
+      <text x="172" y="732">03</text>
+    </g>
+    <!-- accent dot -->
+    <circle cx="1020" cy="608" r="6" fill="#ff3d52"/>
   </svg>
 </template>
 <div id="root"></div>
@@ -33,6 +45,7 @@
 <script type="text/babel" src="tweaks-panel.jsx"></script>
 <script type="text/babel" src="design-systems.jsx"></script>
 <script type="text/babel" src="layout.jsx"></script>
+<script type="text/babel" src="sidebar-variants.jsx"></script>
 <script type="text/babel" src="home-layouts.jsx"></script>
 <script type="text/babel" src="pages.jsx"></script>
 <script type="text/babel" src="admin.jsx"></script>

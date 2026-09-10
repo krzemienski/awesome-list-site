@@ -1,0 +1,50 @@
+{
+  "lockfileVersion": 3,
+  "packages": {
+    "@clerk/react": {
+      "declared": "^6.14.1",
+      "installed": "6.14.1",
+      "license": "MIT"
+    },
+    "@clerk/express": {
+      "declared": "^2.1.55",
+      "installed": "2.1.55",
+      "license": "MIT"
+    },
+    "react": {
+      "declared": "^18.3.1",
+      "installed": "18.3.1",
+      "license": "MIT"
+    },
+    "vite": {
+      "declared": null,
+      "installed": "5.4.21",
+      "license": "MIT"
+    },
+    "typescript": {
+      "declared": null,
+      "installed": "5.6.3",
+      "license": "Apache-2.0"
+    },
+    "express": {
+      "declared": "^4.21.2",
+      "installed": "4.22.2",
+      "license": "MIT"
+    },
+    "drizzle-orm": {
+      "declared": "^0.39.1",
+      "installed": "0.39.3",
+      "license": "Apache-2.0"
+    },
+    "zod": {
+      "declared": "^4.4.3",
+      "installed": "4.4.3",
+      "license": "MIT"
+    },
+    "@tanstack/react-query": {
+      "declared": "^5.60.5",
+      "installed": "5.101.2",
+      "license": "MIT"
+    }
+  }
+}

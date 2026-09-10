@@ -290,21 +290,6 @@ window.SYSTEM_DEFAULT_ACCENT = {
   swiss:     'orange',
 };
 
-window.applyProductProfile = function(profileId) {
-  const allowed = [
-    'public-discovery',
-    'learning-workspace',
-    'admin-operations',
-    'standalone-exports',
-    'embedded-integrations',
-  ];
-  const profile = allowed.includes(profileId) ? profileId : 'standalone-exports';
-  document.documentElement.setAttribute('data-product-profile', profile);
-  return profile;
-};
-
-window.applyProductProfile('standalone-exports');
-
 /* Type scale — semantic sizes the showcase + components can use. */
 window.TYPE_SCALE = [
   { name: 'display-xl', px: 72, label: 'Display XL', use: 'Hero, single-line' },

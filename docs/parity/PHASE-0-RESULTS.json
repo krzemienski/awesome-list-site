@@ -1,0 +1,56 @@
+{
+  "phase": 0,
+  "scope": "source synchronization, inventoried scope, real home readiness only",
+  "checks": [
+    {
+      "name": "canonical-source",
+      "passed": true,
+      "entries": 103,
+      "mismatches": []
+    },
+    {
+      "name": "client-coverage-hashes",
+      "passed": true,
+      "files": 179,
+      "semanticLimit": "completeRead is the reporting helper assertion, not a claim of exhaustive semantic audit or functional verification"
+    },
+    {
+      "name": "discovered-screens",
+      "passed": true,
+      "routeFamilies": 28,
+      "adminTabs": 16,
+      "inventory": "docs/parity/SCREENS.md"
+    },
+    {
+      "name": "real-public-catalog",
+      "passed": true,
+      "endpoint": "/api/awesome-list",
+      "originPort": 5000,
+      "status": 200,
+      "approvedResources": 1816,
+      "categories": 9,
+      "statuses": [
+        "approved"
+      ],
+      "sha256": "6b28219d0e154cc2d5440f265200a132ec5b055d928ced9e1287937452bcf397"
+    },
+    {
+      "name": "client-home-readiness",
+      "passed": true,
+      "evidence": "docs/parity/evidence/phase-0-app-ready.png",
+      "evidenceSha256": "14d55c84497b215cc4cd7c15d6012fde51caffc75e222226add0b34cd7ab45f8",
+      "observed": "Main agent browser awaited visible list-categories; nine category cards with real resource teasers, header/sidebar/footer rendered; pageerror list empty",
+      "browser": "Google Chrome for Testing 148.0.7778.96",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "limits": "Not a pixel comparison, four-width check, auth verification, axe or performance audit"
+    }
+  ],
+  "excludedEvidence": [
+    "Early prerender-only phase-0-app-smoke.jpg",
+    "Unrelated film/TV route claims from documentation helper follow-up"
+  ],
+  "nextPhase": "Baseline harness under integrity correction; no comparison gate passed"
+}
