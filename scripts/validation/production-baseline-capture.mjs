@@ -27,9 +27,11 @@
 // run it in the background. A dated directory belongs to one origin: resuming
 // it with a different --base fails. All browser traffic is read-only by
 // construction: a browser-wide interceptor fails every non-GET request from
-// every target (pages, popups, workers, Lighthouse's page), and every window
-// gets WebSocket, Worker, SharedWorker, window.open and service-worker
-// registration sealed shut; the manifest records what was refused.
+// every target (pages, popups, workers, Lighthouse's page), every page —
+// Lighthouse's included — is a page of a read-only Playwright context whose
+// init script seals WebSocket, Worker, SharedWorker, window.open and
+// service-worker registration in every document and popup, and Chromium's
+// popup blocker stays on; the manifest records what was refused.
 //
 //   npm run baseline:capture                       # everything, today's dir
 //   npm run baseline:capture -- --max-navigations 8
@@ -212,6 +214,7 @@ async function main() {
           const result = await captureLighthouseSet({
             base: args.base,
             outDir,
+            browser,
             port,
             routes: LIGHTHOUSE_ROUTES,
             force: args.force,

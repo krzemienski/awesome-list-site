@@ -600,3 +600,157 @@ product renders during capture.
 
 Static gates after this pass: `node --check` ×3 ok; JS-only eslint 0
 problems; `root-script-drift` PASS; `dead-exports` PASS.
+
+
+## 7. Fourth review round → two more residuals, closed
+
+The reviewer re-checked §6 and failed both findings again, for reasons the
+§6 construction did not cover:
+
+- **Popups without `window.open`.** The Lighthouse page only had the window
+  seal through `page.evaluateOnNewDocument`, a *page-scoped* hook. A document
+  can create and programmatically click `<a target="_blank" href="about:blank">`
+  (or a `javascript:` href); that creates a new target with no `window.open`
+  call, the new target gets no init script, and its `WebSocket` stays native.
+  The browser-level `Fetch` guard cannot stop a WebSocket handshake, so a
+  socket from such a popup would have reached the origin.
+- **Password redaction collapsed identities.** `normalizeUrl` mapped every
+  non-empty password to the literal `<password>`, so
+  `https://user:first@host/p` and `https://user:second@host/p` normalised to
+  the same string and compared equal.
+
+### 7.1 Probes that decided the fix
+
+- `--block-new-web-contents` is **not honoured** by Playwright's Chromium
+  build (popups were still created) — abandoned.
+- Playwright's own auto-attach installs a context's init scripts, `route`
+  and `routeWebSocket` in a popup *before* the popup runs script, for every
+  popup vector — verified: popups opened by `window.open`, by clicks on
+  `target=_blank` anchors to a document, to `about:blank` and to a
+  `javascript:` URL all reported the init marker and a sealed `WebSocket`
+  (`pb-popup-probe2`, mode `default`: 135 pages, every one `init-ran` /
+  `wsSealed: true`). Playwright ignores pages of the default browser context
+  (where puppeteer's `newPage()` lands), which is exactly why the previous
+  Lighthouse page was outside that contract.
+- Leaving Chromium's popup blocker on (`ignoreDefaultArgs:
+  ["--disable-popup-blocking"]`) stops page scripts from opening any window
+  without user activation: the same probe in mode `blocker-on` created no
+  popup from the page's own `window.open("/popup")` or its anchor clicks
+  (only the two opened from the probe's `page.evaluate`, which Playwright
+  runs with a user gesture, and nothing from the third click because the
+  activation was consumed), and the origin logged **0** popup navigations
+  and **0** upgrades.
+
+### 7.2 What changed
+
+- **One read-only context factory for every page.** `openReadOnlyContext`
+  (`serviceWorkers: "block"`, `context.route` failing non-safe methods,
+  `routeWebSocket`, `addInitScript(READ_ONLY_WINDOW_SOURCE)`) now opens every
+  screenshot/DOM/axe load *and* the page Lighthouse audits. Its `refusals()`
+  reads the window guard from **every attached frame** (a cross-origin iframe's
+  refused socket and worker are now attributed, not just enforced) and lists
+  any other page of the context still open at read-back as
+  `blockedPopups: "contained <url>"`.
+- **Lighthouse drives a Playwright page.** `openLighthousePage` creates the
+  page in a read-only context with no Playwright viewport emulation
+  (Lighthouse applies its own mobile metrics), navigates it to a one-off
+  `about:blank#production-baseline-lighthouse-<uuid>` marker, finds the same
+  target through the puppeteer browser connected to the remote-debugging port
+  (`waitForTarget(url === marker)` → `target.page()`), and hands that handle to
+  `lighthouse(url, flags, undefined, puppeteerPage)`. Two CDP clients on one
+  target: Lighthouse's navigation runner, the `bf-cache` gatherer and the
+  scores all still work; the puppeteer-side request interception and the
+  `evaluateOnNewDocument` seal are gone (the context provides both).
+- **Popup blocker on** in `launchBrowser`; the seal on `window.open` stays as a
+  second layer and for attribution.
+- **Compare:** the password in a URL is fingerprinted with
+  `HMAC-SHA256(key = crypto.randomBytes(32) per run)` truncated to 16 hex
+  (`user:<pw#1a2b…>@`). Same secret → same fingerprint within a run, different
+  secret → different fingerprint, never reversible without the key (which is
+  never stored), never printed.
+
+### 7.3 Live smoke (third run of `pb-smoke3.sh`, exit 0, 9/9 steps)
+
+The probe origin page now additionally embeds a cross-origin iframe
+(`http://localhost:<port>/frame`, which POSTs, opens a socket and spawns a
+blob worker that POSTs) and, on `DOMContentLoaded`, programmatically clicks
+`target=_blank` anchors to `/popup`, `about:blank` and a `javascript:` URL that
+opens a socket, and submits a `target=_blank` POST form.
+
+```
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+   pngs: home@1024.png,home@1440.png,home@375.png,home@768.png | dom viewports: 375,768,1024,1440 | axe viewports: 375,1440
+   @375 attempts=1 unit=198ff456 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon,POST /frame-mutate ws=/socket,/frame-socket workers=Worker:blob:,Worker:blob: popups=/popup
+   @768 attempts=1 unit=a9655af7 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon,POST /frame-mutate ws=/socket,/frame-socket workers=Worker:blob:,Worker:blob: popups=/popup
+   @1024 attempts=1 unit=03fa1b6d pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon,POST /frame-mutate ws=/socket,/frame-socket workers=Worker:blob:,Worker:blob: popups=/popup
+   @1440 attempts=1 unit=a2be8c08 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon,POST /frame-mutate ws=/socket,/frame-socket workers=Worker:blob:,Worker:blob: popups=/popup
+== 6 Lighthouse audits a page inside a read-only Playwright context (expect exit 0, nav 3, refusals recorded, nothing at the origin)
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+  base http://127.0.0.1:33429 · commit 5970774affddd951cf0c4d558900f3b8b04453e1 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+Phase: lighthouse
+  lighthouse /
+  lighthouse http://127.0.0.1:33429/: refused 8 non-safe request(s)
+  lighthouse /category/encoding-codecs
+  lighthouse http://127.0.0.1:33429/category/encoding-codecs: refused 8 non-safe request(s)
+  lighthouse /resource/185020
+  lighthouse http://127.0.0.1:33429/resource/185020: refused 8 non-safe request(s)
+Playwright lease released (production-baseline-capture)
+Done in 29s · 3 navigations · 0 throttle retries · 0 failures
+  routes complete 3/26 · api 0/12 · lighthouse 3/3
+exit 0
+   manifest: nav 3 budget null stopped false fail 0 throttled 0 guard continued 15 blocked 0
+   / scores {"performance":1,"accessibility":0.89,"best-practices":0.93,"seo":1} requests 7 blocked POST /mutate,PUT /put,POST /beacon,POST /frame-mutate,POST /mutate,PUT /put,POST /beacon,POST /frame-mutate ws /socket,/frame-socket workers 2 popups 1
+   /category/encoding-codecs scores {"performance":1,"accessibility":0.89,"best-practices":0.93,"seo":0.92} requests 7 blocked POST /mutate,PUT /put,POST /beacon,POST /frame-mutate,POST /mutate,PUT /put,POST /beacon,POST /frame-mutate ws /socket,/frame-socket workers 2 popups 1
+   /resource/185020 scores {"performance":1,"accessibility":0.89,"best-practices":0.93,"seo":0.92} requests 7 blocked POST /mutate,PUT /put,POST /beacon,POST /frame-mutate,POST /mutate,PUT /put,POST /beacon,POST /frame-mutate ws /socket,/frame-socket workers 2 popups 1
+== 6b Lighthouse --force with budget 1 (expect exit 2, nav 1)
+  lighthouse http://127.0.0.1:33429/: refused 8 non-safe request(s)
+  base http://127.0.0.1:33429 · commit 5970774affddd951cf0c4d558900f3b8b04453e1 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Phase: lighthouse
+  lighthouse /
+Done in 8s · 1 navigations · 0 throttle retries · 0 failures
+  routes complete 3/26 · api 0/12 · lighthouse 3/3
+  stopped by --max-navigations; re-run the same command to resume
+exit 2
+   manifest: nav 1 budget 1 stopped true fail 0 throttled 0 guard continued 5 blocked 0
+== 7 origin log: every non-safe method / upgrade that reached the origin (expect none)
+   requests logged: 54
+   none reached the origin
+   only GET/HEAD/OPTIONS in the origin log
+```
+
+Origin log tally for the whole run (every request the origin ever saw):
+
+```
+     19 GET /frame browser:navigate
+     14 GET /about browser:navigate
+      8 GET / browser:navigate
+      4 GET /robots.txt browser:no-cors
+      3 GET /robots.txt browser:cors
+      2 GET /resource/185020 browser:navigate
+      2 GET /category/encoding-codecs browser:navigate
+      1 GET / browser:cors
+      1 GET /about browser:cors
+```
+
+No `/popup`, `/popup-plain`, `/form-popup`, no `/js-popup-socket` or
+`/frame-socket` upgrade, no non-safe method: the iframe's `POST /frame-mutate`
+and `ws://…/frame-socket` are refused *and* attributed in every record.
+
+### 7.4 Compare mutation probe
+
+| probe | expected | observed |
+| --- | --- | --- |
+| mutant A vs mutant B (`/categories` final URL `qa:hunter2@` → `qa:swordfish9@`, nothing else) | 1 delta, no secret in the report | **1** tracked delta (`final-url`), rendered as `` qa:<pw#42be2580e17d29b3>@{origin}/categories → qa:<pw#c95ef21ae2e88e7b>@{origin}/categories ``; `grep -c hunter2` 0, `grep -c swordfish9` 0 |
+| mutant A vs byte-identical copy | 0 deltas | **0** |
+| committed baseline vs mutant A (7 planted changes) | 7 deltas | **7**, `grep -c hunter2` 0 |
+
+### 7.5 Static gates and known limits
+
+`node --check` ×3 ok; JS-only eslint 0 problems; `root-script-drift` PASS;
+`dead-exports` PASS. Limits that remain, stated plainly: a popup blocked by
+Chromium's popup blocker leaves no trace in the record (only its absence at
+the origin); a refusal inside a frame that is detached before read-back is
+enforced but not attributed (the origin-side evidence is the route layer); the
+browser layer still sees HTTP only, sockets remain the sealed realm's job —
+now in every document of every page and popup of every context.

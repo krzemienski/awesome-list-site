@@ -27,6 +27,7 @@
 // delta, 1 = deltas found (like diff), 3 = capture or tooling failure.
 // Lighthouse is capture-only and is not compared here (its scores vary run to
 // run by design; read lighthouse/scores.json directly).
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
@@ -84,15 +85,19 @@ const setDiff = (before = [], after = []) => {
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // Own-origin URLs collapse to "{origin}/path?query#hash"; anything else keeps
 // its host, so a hop to another site can never read as "same". URL.origin
-// drops userinfo, so credentials are re-attached (user visible, password
-// redacted — the report must not echo a secret): a URL that carries
-// credentials never normalises to one that does not.
+// drops userinfo, so credentials are re-attached: the user name as is, the
+// password as a fingerprint keyed with a random per-run secret — two URLs
+// normalise equal only if their passwords are equal, the report never carries
+// the password, and the fingerprint cannot be brute-forced offline because the
+// key is never written anywhere.
+const PASSWORD_FINGERPRINT_KEY = crypto.randomBytes(32);
+const fingerprintPassword = (password) => `<pw#${crypto.createHmac("sha256", PASSWORD_FINGERPRINT_KEY).update(password).digest("hex").slice(0, 16)}>`;
 const normalizeUrl = (url, ownOrigin) => {
   if (!url) return null;
   try {
     const parsed = new URL(url, ownOrigin);
     const prefix = parsed.origin === new URL(ownOrigin).origin ? "{origin}" : parsed.origin;
-    const userinfo = parsed.username || parsed.password ? `${parsed.username}${parsed.password ? ":<password>" : ""}@` : "";
+    const userinfo = parsed.username || parsed.password ? `${parsed.username}${parsed.password ? `:${fingerprintPassword(parsed.password)}` : ""}@` : "";
     return `${userinfo}${prefix}${parsed.pathname}${parsed.search}${parsed.hash}`;
   } catch {
     return url;

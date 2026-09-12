@@ -135,8 +135,26 @@ all are fixed and re-verified
    A probe page that tries POST/PUT/beacon/socket, spawns a blob worker that
    does the same, and opens a popup: only `GET`s reached the origin. Compare
    also reports a missing document body file as missing (exit 3) instead of
-   trusting the recorded digest, and keeps URL credentials (password
-   redacted) so a credential-bearing redirect is always a delta.
+   trusting the recorded digest, and keeps URL credentials so a
+   credential-bearing redirect is always a delta.
+   The fourth review round found two gaps in that: a page-scoped init
+   script does not reach a popup opened by a programmatic click on a
+   `target=_blank` anchor (no `window.open` involved, so its `WebSocket` stayed
+   native), and redacting every password to the same literal made two URLs
+   that differ only in the password compare equal. Now the page Lighthouse
+   audits is created in a read-only Playwright context (routes,
+   `routeWebSocket`, init script — the same `openReadOnlyContext` every
+   screenshot load uses) and Lighthouse drives it through the puppeteer handle
+   to that same target, found by a one-off `about:blank#…` marker; Playwright
+   holds every popup of a context paused until the context's scripts and
+   routes are installed, so anchors, `javascript:` URLs and form targets are
+   covered too; Chromium's popup blocker is left on (`ignoreDefaultArgs:
+   ["--disable-popup-blocking"]`) so a page script without user activation
+   cannot open a window at all; refusals are read from every attached frame,
+   and a popup still open at read-back is recorded as `contained <url>`.
+   Compare fingerprints the password with an HMAC under a random per-run key
+   (`user:<pw#…>@`): same secret → equal, different secret → delta, never
+   reversible, never in the report.
 
 Residual, documented: the browser layer sees HTTP requests only (sockets are
 layer 2's job); Lighthouse's `bf-cache` gatherer re-executes the page once from
@@ -155,6 +173,7 @@ cache, so each refused attempt appears twice in its list.
 | hardened compare re-run on the stored candidates (offline) | prod 0 deltas · local 37 deltas | `docs/parity/evidence/prod-baseline/compare-{prod,local}-2026-09-12-recheck.md` |
 | hardening smoke + mutation probe | 5/5 planted changes caught · live resume/budget/blocking checks pass · 0 deltas on re-captured routes | `docs/parity/evidence/prod-baseline/review-hardening-2026-09-12.md` |
 | second-round smoke + mutation probe | 7/7 planted changes caught incl. fragment + URL credentials (+ missing body → exit 3) · per-attempt budget, unit binding ×3 tamperings, two-layer read-only guard (browser-target Fetch + sealed window realm) against a local probe origin with page/worker/popup mutation attempts · backfilled baseline resumes 26/26 with 0 loads | `docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md` |
+| fourth-round smoke + mutation probe | Lighthouse page inside a read-only Playwright context (scores 3/3, refusals from the cross-origin iframe attributed) · popup blocker on: five popup vectors (window.open, target=_blank anchors to a document / about:blank / javascript:, POST form target) left only `GET`s at the origin · password-only URL change = 1 delta, same password = 0, no secret in the report · committed baseline resumes 26/26 with 0 loads | `docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md` §7 |
 
 ### Reading the local compare
 

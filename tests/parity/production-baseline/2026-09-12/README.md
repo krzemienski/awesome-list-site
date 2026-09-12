@@ -79,20 +79,30 @@ is `false` everywhere). Nothing was signed in, no admin key was sent, nothing
 was POSTed. Since the post-review hardening every browser the tool launches is
 read-only by construction, in two layers: a `Fetch` interceptor on the
 **browser target** fails every non-`GET`/`HEAD`/`OPTIONS` request from every
-target (pages, popups, iframes, workers, and the page Lighthouse drives over
-the remote-debugging port), and an init script in every document seals
-`WebSocket`, `Worker`, `SharedWorker`, `window.open` and service-worker
-registration (non-configurable, recording, throwing) so a socket can only be
+target (pages, popups, iframes, workers, and the page Lighthouse audits), and
+every page — the Lighthouse page included, which is created in a Playwright
+context and only *driven* through Lighthouse's puppeteer handle to the same
+target — lives in a context whose init script seals `WebSocket`, `Worker`,
+`SharedWorker`, `window.open` and service-worker registration in every
+document (non-configurable, recording, throwing) so a socket can only be
 attempted from a realm that refuses it and no realm outside the script can be
-created. Page-level routing stays for attribution: refusals land in
+created. Chromium's popup blocker is left on (Playwright disables it by
+default): a capture never clicks, so no page script has the user activation a
+`target=_blank` anchor, form target or `window.open` needs, and a popup that
+existed anyway would be a page of the same context, under the same script and
+routes. Context routing stays for attribution: refusals land in
 `dom.json.byViewport[w].blockedRequests` / `blockedWebSockets` /
-`blockedWorkers` / `blockedPopups` / `blockedServiceWorkers`, Lighthouse's
-`scores.json` entries record `requestCount` plus the same fields, and the
-manifest records `browserGuard` per invocation. This capture predates those
-fields; the same-day re-captures used to verify them recorded zero refusals on
-`/`, `/sign-in`, `/submit` and `/recommendations`, and a local probe origin
-whose page tries to POST/PUT/beacon, open a socket, spawn a blob worker that
-does the same, and open a popup saw nothing but `GET`s arrive
+`blockedWorkers` / `blockedPopups` / `blockedServiceWorkers` (collected from
+every attached frame; a popup still open when the load is read back is listed
+as `contained <url>`), Lighthouse's `scores.json` entries record
+`requestCount` plus the same fields, and the manifest records `browserGuard`
+per invocation. This capture predates those fields; the same-day re-captures
+used to verify them recorded zero refusals on `/`, `/sign-in`, `/submit` and
+`/recommendations`, and a local probe origin whose page tries to
+POST/PUT/beacon, open a socket, spawn a blob worker that does the same, embeds
+a cross-origin iframe that does the same, and tries to open popups five ways
+(`window.open`, `target=_blank` anchors to a document, `about:blank` and a
+`javascript:` URL, a `target=_blank` POST form) saw nothing but `GET`s arrive
 (`docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md`).
 Lighthouse's `bf-cache` gatherer restores the audited page a second time, so
 one attempt shows up twice in its list.
@@ -188,8 +198,11 @@ viewport, title, h1, axe serious+critical **rules and node counts** at 375/1440,
 document counts **and body**, API status, key paths, item/total counts. URLs and
 document bodies count as equal when byte-identical or when they only differ by
 each side's own origin (`{origin}` placeholder) — a hop to a foreign host, a
-different fragment or credentials in the URL is always a delta (the password
-is redacted in the report), and a document body file missing on either side
+different fragment or credentials in the URL is always a delta — the user
+name is compared as is and the password as an HMAC fingerprint under a random
+key generated per compare run (`user:<pw#…>@`), so two different passwords
+never compare equal, the report never carries a password, and the fingerprint
+cannot be reversed offline — and a document body file missing on either side
 is reported as missing (exit 3), never assumed. `--against` must be a bare
 origin. Canonical, robots meta, JSON-LD types, nav labels and
 `cache-control` are notes.

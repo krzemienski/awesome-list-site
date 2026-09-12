@@ -101,17 +101,19 @@ const RETRYABLE_STATUSES = new Set([429, 503]);
 const MAX_ATTEMPTS = 6;
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 // Read-only guard, layer 2 of 2 (layer 1 is the browser-wide Fetch guard in
-// launchBrowser). Runs before any page script in EVERY document of a page —
-// main frame, iframes, popups (Playwright addInitScript / Puppeteer
-// evaluateOnNewDocument). WebSocket handshakes never pass through request
-// interception, so sockets are refused at the only place they can be created:
-// a window realm. Realms this script cannot reach are prevented from existing
-// instead — Worker/SharedWorker constructors and service-worker registration
-// are sealed (blob/data URLs never touch the network, so aborting worker
-// script loads would not be enough) — and window.open is sealed so no page
-// can spawn a window outside the hooks of a page-scoped driver (Lighthouse).
-// Every property is non-configurable: a page cannot delete or reassign it to
-// recover the native constructor. Attempts are recorded on
+// launchBrowser). Installed as a context init script, so Chromium runs it
+// before any page script in EVERY document of every page of the context —
+// main frame, iframes, and popups, which Playwright holds paused until the
+// context's scripts and routes are in place. WebSocket handshakes never pass
+// through request interception, so sockets are refused at the only place they
+// can be created: a window realm. Realms this script cannot reach are
+// prevented from existing instead — Worker/SharedWorker constructors and
+// service-worker registration are sealed (blob/data URLs never touch the
+// network, so aborting worker script loads would not be enough) — and
+// window.open is sealed as well (popups are additionally blocked by the
+// browser's popup blocker, see launchBrowser, and contained by the context if
+// one ever appears). Every property is non-configurable: a page cannot delete
+// or reassign it to recover the native constructor. Attempts are recorded on
 // window.__baselineRefused for the capture record.
 const READ_ONLY_WINDOW_SOURCE = `(() => {
   const refused = { webSockets: [], workers: [], popups: [], serviceWorkers: [] };
@@ -384,7 +386,17 @@ export async function launchBrowser(label, { remoteDebuggingPort } = {}) {
   if (remoteDebuggingPort) args.push(`--remote-debugging-port=${remoteDebuggingPort}`);
   const browser = await launchBrowserWithLease(
     chromium,
-    { headless: true, executablePath: chromiumExecutable(), chromiumSandbox: true, args },
+    {
+      headless: true,
+      executablePath: chromiumExecutable(),
+      chromiumSandbox: true,
+      args,
+      // Playwright disables Chromium's popup blocker by default; a capture
+      // never clicks, so leaving it on means no page script can open a window
+      // (window.open, <a target=_blank>, form targets) without a user
+      // activation it can never obtain.
+      ignoreDefaultArgs: ["--disable-popup-blocking"],
+    },
     label,
   );
   try {
@@ -575,39 +587,73 @@ async function fullPageScreenshot(page, viewport) {
 // One route × one viewport in a fresh context. Returns the DOM summary, the
 // PNG (already max-compressed), the axe result when requested, and the
 // browser-side navigation record (final URL + client-side redirect hops).
+// Every page the capture drives — screenshot/DOM/axe loads and the page
+// Lighthouse audits — lives in a context opened here. Read-only by
+// construction, not by hope: the page may only GET/HEAD (and send CORS
+// preflights); anything else — a beacon, a form post, a client that decides
+// to create state — is aborted and recorded so the capture can never mutate
+// the origin it is measuring (the browser-wide guard fails it independently).
+// WebSocket frames bypass request routing, so sockets are never connected to
+// the server (a routed socket sees a silent mock); the window guard refuses
+// the constructor before that can even fire. Context-level routes and init
+// scripts cover every page of the context, popups included: Playwright holds
+// a new target paused until they are installed, and the browser's popup
+// blocker (see launchBrowser) keeps page scripts from opening one at all;
+// a page that exists anyway when the load is read back is recorded as a
+// contained popup and closed with the context. Refusals are collected per
+// context so a capture record can attribute them to one page load.
+async function openReadOnlyContext(browser, contextOptions) {
+  const context = await browser.newContext({ serviceWorkers: "block", ...contextOptions });
+  const refused = { requests: [], webSockets: [] };
+  await context.route("**/*", (route) => {
+    const request = route.request();
+    if (SAFE_METHODS.has(request.method())) return route.continue();
+    refused.requests.push({ method: request.method(), url: request.url() });
+    return route.abort("blockedbyclient");
+  });
+  await context.routeWebSocket("**", (ws) => {
+    refused.webSockets.push(ws.url());
+  });
+  await context.addInitScript(READ_ONLY_WINDOW_SOURCE);
+  const page = await context.newPage();
+  // What this page load refused, from every layer that can attribute it to
+  // the page: context routes, the routed sockets, and the window guard of
+  // every frame still attached (a frame gone by now can only have been
+  // refused, never served — the origin-side evidence is the routes above).
+  // Any other page of the context at this point is a popup the page managed
+  // to open; it ran under the same guard and is reported as contained.
+  // (Tooling pages, e.g. the blank page axe uses to finish a run, are closed
+  // by their owner before this is read.)
+  const refusals = async () => {
+    const windowRefused = EMPTY_REFUSALS();
+    for (const frame of page.frames()) {
+      const frameRefused = await frame.evaluate(readRefusals).catch(() => EMPTY_REFUSALS());
+      for (const key of Object.keys(windowRefused)) windowRefused[key].push(...frameRefused[key]);
+    }
+    const contained = context.pages().filter((other) => other !== page).map((other) => `contained ${other.url()}`);
+    return {
+      blockedRequests: [...refused.requests],
+      blockedWebSockets: [...new Set([...refused.webSockets, ...windowRefused.webSockets])],
+      blockedWorkers: windowRefused.workers,
+      blockedPopups: [...windowRefused.popups, ...contained],
+      blockedServiceWorkers: windowRefused.serviceWorkers,
+    };
+  };
+  return { context, page, refusals };
+}
+
 async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry, log = console, budget = createNavigationBudget() }) {
   let lastReason = "no response";
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     budget.take(`${url}@${viewport.width} attempt ${attempt}`);
-    const context = await browser.newContext({
+    const { context, page, refusals } = await openReadOnlyContext(browser, {
       viewport,
       deviceScaleFactor: 1,
       locale: "en-US",
       timezoneId: "UTC",
       colorScheme: "dark",
       reducedMotion: "reduce",
-      serviceWorkers: "block",
     });
-    // Read-only by construction, not by hope: the page may only GET/HEAD (and
-    // send CORS preflights). Anything else — a beacon, a form post, a client
-    // that decides to create state — is aborted and recorded so the capture
-    // can never mutate the origin it is measuring.
-    const blockedRequests = [];
-    await context.route("**/*", (route) => {
-      const request = route.request();
-      if (SAFE_METHODS.has(request.method())) return route.continue();
-      blockedRequests.push({ method: request.method(), url: request.url() });
-      return route.abort("blockedbyclient");
-    });
-    // WebSocket frames bypass request routing, so sockets are never connected
-    // to the server (the page sees a mocked, silent socket); the window guard
-    // below refuses the constructor before this can even fire.
-    const blockedWebSockets = [];
-    await context.routeWebSocket("**", (ws) => {
-      blockedWebSockets.push(ws.url());
-    });
-    await context.addInitScript(READ_ONLY_WINDOW_SOURCE);
-    const page = await context.newPage();
     const clientNavigations = [];
     page.on("framenavigated", (frame) => {
       if (frame === page.mainFrame()) clientNavigations.push(frame.url());
@@ -638,7 +684,6 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
       await settleFrames(page);
 
       const dom = await page.evaluate(extractDom);
-      const refused = await page.evaluate(readRefusals);
       const capture = {
         capturedAt: new Date().toISOString(),
         requestedUrl: url,
@@ -647,11 +692,7 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
         xRobotsTag: response.headers()["x-robots-tag"] ?? null,
         httpRedirects,
         clientNavigations: [...new Set(clientNavigations)],
-        blockedRequests,
-        blockedWebSockets: [...new Set([...blockedWebSockets, ...refused.webSockets])],
-        blockedWorkers: refused.workers,
-        blockedPopups: refused.popups,
-        blockedServiceWorkers: refused.serviceWorkers,
+        ...(await refusals()),
         consentBanner,
         attempts: attempt,
         viewport: { ...viewport },
@@ -841,13 +882,16 @@ async function captureApi(base, endpoint, { telemetry, log } = {}) {
 // Lighthouse (mobile preset) through the Playwright-launched Chromium
 // ---------------------------------------------------------------------------
 //
-// Lighthouse drives its own page over the remote-debugging port, outside the
-// Playwright contexts. The browser-wide Fetch guard from launchBrowser already
-// covers that page's HTTP traffic; the page is still created here, through the
-// puppeteer-core that Lighthouse itself resolves (the only version its
-// navigation runner is built against), so the read-only window script can be
-// installed in it and its refusals attributed per audit, then handed to
-// Lighthouse's page-mode API.
+// Lighthouse's page-mode API wants a puppeteer Page, and puppeteer attaches
+// over the remote-debugging port outside the Playwright contexts whose routes
+// and init scripts make a page read-only. So the page Lighthouse audits is
+// created in a read-only Playwright context first, and the puppeteer handle
+// to that same target (found by a one-off marker URL) is what Lighthouse
+// drives — puppeteer-core is the copy Lighthouse itself resolves, the only
+// version its navigation runner is built against. The audited page, its
+// frames and any popup are then Playwright pages of that context, with the
+// same guarantees as every screenshot load, and the refusals are read back
+// through the Playwright side.
 
 async function importLighthousePuppeteer() {
   const requireFromLighthouse = createRequire(createRequire(import.meta.url).resolve("lighthouse/package.json"));
@@ -859,35 +903,36 @@ async function connectLighthouseBrowser(port) {
   return puppeteer.connect({ browserURL: `http://127.0.0.1:${port}`, defaultViewport: null });
 }
 
-async function openReadOnlyPage(puppeteerBrowser) {
-  const page = await puppeteerBrowser.newPage();
-  const blockedRequests = [];
-  await page.setRequestInterception(true);
-  page.on("request", (request) => {
-    if (SAFE_METHODS.has(request.method())) {
-      request.continue().catch(() => {});
-      return;
-    }
-    blockedRequests.push({ method: request.method(), url: request.url() });
-    request.abort("blockedbyclient").catch(() => {});
-  });
-  await page.evaluateOnNewDocument(READ_ONLY_WINDOW_SOURCE);
-  return { page, blockedRequests };
+async function openLighthousePage(browser, puppeteerBrowser) {
+  // No Playwright viewport emulation: Lighthouse applies its own mobile
+  // device metrics on the page and must not compete with a second override.
+  const readOnly = await openReadOnlyContext(browser, { viewport: null });
+  const marker = `about:blank#production-baseline-lighthouse-${randomUUID()}`;
+  try {
+    await readOnly.page.goto(marker);
+    const target = await puppeteerBrowser.waitForTarget((candidate) => candidate.url() === marker, { timeout: 15_000 });
+    const puppeteerPage = await target.page();
+    if (!puppeteerPage) throw new Error("puppeteer could not attach to the Lighthouse page");
+    return { ...readOnly, puppeteerPage };
+  } catch (error) {
+    await readOnly.context.close().catch(() => {});
+    throw error;
+  }
 }
 
-async function runLighthouse({ url, puppeteerBrowser, log = console, telemetry, budget = createNavigationBudget() }) {
+async function runLighthouse({ url, browser, puppeteerBrowser, log = console, telemetry, budget = createNavigationBudget() }) {
   const { default: lighthouse } = await import("lighthouse");
   let lastReason = "no result";
   for (let attempt = 1; attempt <= 4; attempt++) {
     budget.take(`lighthouse ${url} attempt ${attempt}`);
-    const { page, blockedRequests } = await openReadOnlyPage(puppeteerBrowser);
+    const { context, puppeteerPage, refusals } = await openLighthousePage(browser, puppeteerBrowser);
     let result;
-    let refused = EMPTY_REFUSALS();
+    let refused;
     try {
-      result = await lighthouse(url, { output: "json", logLevel: "error", onlyCategories: LIGHTHOUSE_CATEGORIES }, undefined, page);
-      refused = await page.evaluate(readRefusals).catch(() => EMPTY_REFUSALS());
+      result = await lighthouse(url, { output: "json", logLevel: "error", onlyCategories: LIGHTHOUSE_CATEGORIES }, undefined, puppeteerPage);
+      refused = await refusals();
     } finally {
-      await page.close().catch(() => {});
+      await context.close().catch(() => {});
     }
     const lhr = result?.lhr;
     if (!lhr) throw new Error(`Lighthouse returned no result for ${url}`);
@@ -900,7 +945,7 @@ async function runLighthouse({ url, puppeteerBrowser, log = console, telemetry, 
       await sleep(backoffMs(attempt));
       continue;
     }
-    if (blockedRequests.length) log.warn(`  lighthouse ${url}: refused ${blockedRequests.length} non-safe request(s)`);
+    if (refused.blockedRequests.length) log.warn(`  lighthouse ${url}: refused ${refused.blockedRequests.length} non-safe request(s)`);
     // The full-page screenshot and filmstrip are base64 PNGs (megabytes per
     // run) that add nothing a stored PNG capture does not already hold; the
     // treemap, internal timings and i18n lookup tables are tooling internals.
@@ -929,11 +974,7 @@ async function runLighthouse({ url, puppeteerBrowser, log = console, telemetry, 
       finalDisplayedUrl: lhr.finalDisplayedUrl,
       formFactor: lhr.configSettings?.formFactor ?? null,
       requestCount: lhr.audits?.["network-requests"]?.details?.items?.length ?? null,
-      blockedRequests,
-      blockedWebSockets: refused.webSockets,
-      blockedWorkers: refused.workers,
-      blockedPopups: refused.popups,
-      blockedServiceWorkers: refused.serviceWorkers,
+      ...refused,
     };
   }
   throw new Error(`Lighthouse for ${url}: still failing after 4 attempts (${lastReason})`);
@@ -1123,7 +1164,7 @@ export async function captureApiSet({ base, outDir, endpoints = API_ENDPOINTS, f
 // it), so it spends the same navigation budget as a screenshot; `complete` is
 // false when the budget ran out before every route had a report. The report
 // file is written before its scores entry, which is the completion marker.
-export async function captureLighthouseSet({ base, outDir, port, routes = LIGHTHOUSE_ROUTES, force = false, telemetry, log = console, budget = createNavigationBudget() }) {
+export async function captureLighthouseSet({ base, outDir, browser, port, routes = LIGHTHOUSE_ROUTES, force = false, telemetry, log = console, budget = createNavigationBudget() }) {
   const lhDir = path.join(outDir, "lighthouse");
   fs.mkdirSync(lhDir, { recursive: true });
   const scoresPath = path.join(lhDir, "scores.json");
@@ -1149,7 +1190,7 @@ export async function captureLighthouseSet({ base, outDir, port, routes = LIGHTH
       puppeteerBrowser ??= await connectLighthouseBrowser(port);
       let outcome;
       try {
-        outcome = await runLighthouse({ url, puppeteerBrowser, log, telemetry, budget });
+        outcome = await runLighthouse({ url, browser, puppeteerBrowser, log, telemetry, budget });
       } catch (error) {
         if (error instanceof NavigationBudgetExhausted) {
           complete = false;
