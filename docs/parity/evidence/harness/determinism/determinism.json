@@ -1,44 +1,24 @@
 {
-  "runId": "2026-09-12T12-18-59-778Z-25390",
-  "frozenAt": "2026-09-12T12:18:00.000Z",
+  "runId": "2026-09-12T23-21-07-982Z-38222",
+  "frozenAt": "2026-09-12T23:21:00.000Z",
   "captures": 3,
   "browserVersion": "148.0.7778.96",
   "referenceAdapter": {
-    "snapshot": "fa76147cd881b1356d52f4f440014fba72d0674bd722c6db08952f99a846fffa"
+    "snapshot": "97b794cb99d8e4cc434397da7626f7879080393de0a2f529efd191fb2df94b33",
+    "live": {
+      "catalogStart": "97b794cb99d8e4cc434397da7626f7879080393de0a2f529efd191fb2df94b33",
+      "catalogEnd": "97b794cb99d8e4cc434397da7626f7879080393de0a2f529efd191fb2df94b33",
+      "adminStart": "4a40c7fb96db148d45731c32d3fcc07da7e659c2ee747222557b43f8568cd88f",
+      "adminEnd": "4a40c7fb96db148d45731c32d3fcc07da7e659c2ee747222557b43f8568cd88f",
+      "error": null
+    }
+  },
+  "workspace": {
+    "startFingerprints": "96300b378b6b026883d9d5b7335243ee71c89f7f5fb6ceb211a2e05b21e5d7b5",
+    "endFingerprints": "96300b378b6b026883d9d5b7335243ee71c89f7f5fb6ceb211a2e05b21e5d7b5",
+    "inputsChangedDuringRun": false
   },
   "rows": [
-    {
-      "screen": "app.about",
-      "width": 375,
-      "hashes": [
-        "6edf4773dd41b6615f2316cf7e0a6d30510adc77750fce3155bf8169e2db6227",
-        "6edf4773dd41b6615f2316cf7e0a6d30510adc77750fce3155bf8169e2db6227",
-        "6edf4773dd41b6615f2316cf7e0a6d30510adc77750fce3155bf8169e2db6227"
-      ],
-      "identical": true,
-      "failure": null,
-      "files": [
-        "determinism/app.about-375.capture-1.png",
-        "determinism/app.about-375.capture-2.png",
-        "determinism/app.about-375.capture-3.png"
-      ]
-    },
-    {
-      "screen": "app.about",
-      "width": 768,
-      "hashes": [
-        "2e3144c240e477ea3634b4623c181126bf6773fb51e38bfd7441770fb01d2bf0",
-        "2e3144c240e477ea3634b4623c181126bf6773fb51e38bfd7441770fb01d2bf0",
-        "2e3144c240e477ea3634b4623c181126bf6773fb51e38bfd7441770fb01d2bf0"
-      ],
-      "identical": true,
-      "failure": null,
-      "files": [
-        "determinism/app.about-768.capture-1.png",
-        "determinism/app.about-768.capture-2.png",
-        "determinism/app.about-768.capture-3.png"
-      ]
-    },
     {
       "screen": "app.category",
       "width": 375,
@@ -53,22 +33,6 @@
         "determinism/app.category-375.capture-1.png",
         "determinism/app.category-375.capture-2.png",
         "determinism/app.category-375.capture-3.png"
-      ]
-    },
-    {
-      "screen": "app.category",
-      "width": 768,
-      "hashes": [
-        "909159ce58f74e741415b34a0f6e07c13bb58dc789a708a0258e08023804a015",
-        "909159ce58f74e741415b34a0f6e07c13bb58dc789a708a0258e08023804a015",
-        "909159ce58f74e741415b34a0f6e07c13bb58dc789a708a0258e08023804a015"
-      ],
-      "identical": true,
-      "failure": null,
-      "files": [
-        "determinism/app.category-768.capture-1.png",
-        "determinism/app.category-768.capture-2.png",
-        "determinism/app.category-768.capture-3.png"
       ]
     },
     {
@@ -88,26 +52,26 @@
       ]
     },
     {
-      "screen": "app.home.index",
-      "width": 768,
+      "screen": "app.shell.mobile-drawer",
+      "width": 375,
       "hashes": [
-        "8dc03057eaf5a8213c2fd5838bcff38bf053d469136b87d71744c13ff18959ab",
-        "8dc03057eaf5a8213c2fd5838bcff38bf053d469136b87d71744c13ff18959ab",
-        "8dc03057eaf5a8213c2fd5838bcff38bf053d469136b87d71744c13ff18959ab"
+        "16166011aaacab6b3559c1067fc82ba0be7344c891765a7dafa3c7efdea5fa83",
+        "16166011aaacab6b3559c1067fc82ba0be7344c891765a7dafa3c7efdea5fa83",
+        "16166011aaacab6b3559c1067fc82ba0be7344c891765a7dafa3c7efdea5fa83"
       ],
       "identical": true,
       "failure": null,
       "files": [
-        "determinism/app.home.index-768.capture-1.png",
-        "determinism/app.home.index-768.capture-2.png",
-        "determinism/app.home.index-768.capture-3.png"
+        "determinism/app.shell.mobile-drawer-375.capture-1.png",
+        "determinism/app.shell.mobile-drawer-375.capture-2.png",
+        "determinism/app.shell.mobile-drawer-375.capture-3.png"
       ]
     }
   ],
   "identityTeardown": {
     "keepUser": false,
-    "bridgeId": "2066104468",
-    "email": "__qa_test_parity_mtycqic1a1e0d1+clerk_test@example.com",
+    "bridgeId": "2082824710",
+    "email": "__qa_test_parity_mtz0e0vna9639b+clerk_test@example.com",
     "localDeleted": true,
     "clerkDeleted": true,
     "errors": [],
