@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Theme drift gate (tasks #377, #388, #399, #429).
+// Theme drift gate (tasks #377, #388, #399, #429, parity W1 fonts).
 //
 // The inline boot script in client/index.html paints the theme BEFORE React
 // loads. Vite replaces markers with boot data derived from the runtime sources,
@@ -50,25 +50,35 @@
 //        is missing (or which downloads a family the stack never names)
 //        renders in the fallback face — the setting looks applied and the
 //        page looks unchanged, which is harder to spot than an outright reset
-//  11 · font-options.ts    SYSTEM_STYLESHEETS  ↔  design-system.ts
-//        DESIGN_SYSTEMS — the per-system display face, same failure mode: the
-//        system's CSS still NAMES its family, nothing downloads it
+//  11 · client/index.html  the ONE always-on font <link rel="stylesheet">  ↔
+//        awesome-list-site-ds/index.html, the frozen design source's single
+//        Google Fonts css2 request (parity W1). Pixel parity needs both
+//        documents to declare the same @font-face set — same families,
+//        weights, styles and AXES — because a different axis subset (Fraunces
+//        requested with `opsz`, Inter without 800) shapes different glyph
+//        outlines and metrics, so headings drift by pixels everywhere. The
+//        shell href must be byte-identical to the design's after entity
+//        decoding, and there must be exactly one: a second request is a
+//        second owner of the font set. That one request carries every family
+//        all five systems name, so there is no per-system stylesheet map any
+//        more — switching systems is attribute-only
 //  12 · design-system.css  the --font-display / --font-body / --font-mono a
 //        system declares (:root[data-system="…"], falling back to :root for
-//        the default system)  ↔  the loaders that actually run for that
-//        system: the always-on <link rel="stylesheet"> tags in the HTML shell
-//        plus SYSTEM_STYLESHEETS[id]. This is #9 one level deeper and it is
-//        how the mono face went missing (#411): every system NAMED a mono
-//        family, the per-system stylesheets fetched only each system's
-//        display/body face, and .mono/.kbd/.textarea/eyebrows in four of the
-//        five systems quietly rendered in the browser's ui-monospace.
-//        FONT_STYLESHEETS is deliberately NOT counted as a loader here — it
-//        fires only when a visitor picks that option in the picker, so it can
-//        never be what makes a system's own face arrive
-//  13 · client/index.html  the always-on stylesheet <link>s  ↔  the DEFAULT
-//        system's families. Those requests are pre-paint and unconditional —
-//        every visitor pays for them whatever system is active — so they may
-//        carry the default system's faces and nothing else
+//        the default system)  ↔  the only loader that runs for that system:
+//        the always-on <link rel="stylesheet"> in the HTML shell. This is #9
+//        one level deeper and it is how the mono face went missing (#411):
+//        every system NAMED a mono family, the (then per-system) stylesheets
+//        fetched only each system's display/body face, and .mono/.kbd/
+//        .textarea/eyebrows in four of the five systems quietly rendered in
+//        the browser's ui-monospace. FONT_STYLESHEETS is deliberately NOT
+//        counted as a loader here — it fires only when a visitor picks that
+//        option in the picker, so it can never be what makes a system's own
+//        face arrive. Because the shell request is the design's, a family a
+//        system names that the shell lacks is a TOKEN drifting from the
+//        design, never a reason to widen the URL
+//  13 · client/src/**      no TS/TSX file other than font-options.ts may carry
+//        a Google Fonts css2 request — the shell owns the base set and the
+//        picker map owns overrides; anything else is a request nothing probes
 //  14 · server/index.ts    both Content-Security-Policy header blocks. Every
 //        font stylesheet host above must be allowed by style-src, both CSP
 //        copies must agree, and the live response's font-file hosts must be
@@ -117,35 +127,31 @@
 //   · font-stylesheet-family — the stylesheet an option downloads names a
 //     family its stack does not, so the file arrives and nothing renders in
 //     it (the same invisible fallback-face bug as a missing entry)
-//   · system-stylesheet — a DESIGN_SYSTEMS id with no SYSTEM_STYLESHEETS
-//     entry (its display face is never fetched), or an entry for a system the
-//     app does not offer
+//   · canonical-font-request — the HTML shell carries more or fewer than one
+//     always-on font-provider <link>, or its href is not byte-identical to
+//     the design source's (the message names the family whose axes differ,
+//     the family one side lacks, or the non-family parameter that changed)
 //   · system-font-coverage — a family a system's --font-display/--font-body/
-//     --font-mono NAMES that no loader running for that system downloads, so
-//     that surface paints in the declaration's fallback face
-//   · system-stylesheet-family — a system's stylesheet downloads a family
-//     none of its --font-* tokens name (a file nothing can render in), or
-//     names no family at all so its coverage cannot be read
+//     --font-mono NAMES that the always-on request does not carry, so that
+//     surface paints in the declaration's fallback face
+//   · system-font-weight — (optional inventory from the browser gate) a weight
+//     a system's surfaces use that the always-on request does not ask for
 //   · system-font-token — a system resolves a --font-* token to nothing, or
 //     to a value naming no family: `font-family: var(--font-mono)` then
 //     computes to nothing at all
-//   · static-font-scope — an always-on pre-paint <link> in the HTML shell
-//     fetches a family the DEFAULT system does not name, i.e. every visitor
-//     blocks on a face only some systems use
 //   · font-source-coverage — a Google Fonts stylesheet URL in a client CSS
 //     @import or an HTML entry point's stylesheet link is not one of the
-//     FONT_STYLESHEETS / SYSTEM_STYLESHEETS / client/index.html sources the
-//     offline and live probes read
+//     FONT_STYLESHEETS / client/index.html sources the offline and live
+//     probes read, or a TS/TSX file other than font-options.ts carries one
 //   · csp-parity / stylesheet-csp — the two server CSP blocks disagree, or a
-//     FONT_STYLESHEETS / SYSTEM_STYLESHEETS / pre-paint stylesheet URL is not
-//     allowed by style-src and therefore cannot reach the browser
+//     FONT_STYLESHEETS / pre-paint stylesheet URL is not allowed by style-src
+//     and therefore cannot reach the browser
 //   · system-id-resolution — a stored `ds-system` value is validated with a
 //     prototype-chain test ("toString" in DESIGN_SYSTEMS, DESIGN_SYSTEMS[id]
 //     ? …) instead of the shared own-property resolver, so junk resolves as
-//     itself while the page paints the default: the loader then asks for a
-//     stylesheet that cannot exist and the painted system's faces never
-//     download. The real resolver is EXECUTED against inherited keys here,
-//     not just pattern-matched
+//     itself while the page paints the default: the app then believes a
+//     system is selected that nothing paints. The real resolver is EXECUTED
+//     against inherited keys here, not just pattern-matched
 //   · parser rot     — ANY parser finding ZERO entries is itself a failure,
 //     so a refactor that renames an array, a map, or a selector can never
 //     make this gate pass vacuously
@@ -181,8 +187,8 @@
 //
 //   node scripts/validation/accent-drift.mjs --network   (npm run validate:webfont-fetch)
 //
-// fetches every FONT_STYLESHEETS entry, every SYSTEM_STYLESHEETS entry, and
-// every <link rel="stylesheet"> in client/index.html, and requires each to
+// fetches every FONT_STYLESHEETS entry and every <link rel="stylesheet"> in
+// client/index.html (the canonical request), and requires each to
 // answer HTTP 200 *and* declare an @font-face font-family for EVERY family
 // its own URL asks for. Every font file URL in those @font-face blocks must
 // also be allowed by the font-src parsed from both server CSP blocks. A 200
@@ -745,9 +751,8 @@ function parseFontRegistry(fontsSrc, parsedFonts = parseTsFontOptions(fontsSrc))
 }
 
 // A `Record<string, string>` map declared in a TS module, read by NAME:
-// FONT_STYLESHEETS / SYSTEM_STYLESHEETS. Neither is exported (both are
-// module-private, reached only through loadFontOverride() /
-// loadDesignSystemFont()), so `export` is optional in the match.
+// FONT_STYLESHEETS. It is not exported (module-private, reached only through
+// loadFontOverride()), so `export` is optional in the match.
 function parseTsStringMap(src, name) {
   const m = new RegExp(`(?:export\\s+)?const\\s+${name}\\s*(?::[^=]*)?=\\s*\\{([\\s\\S]*?)\\n\\};`).exec(src);
   if (!m) return { entries: new Map(), malformed: [], found: false };
@@ -959,7 +964,7 @@ function compareFontSourceCoverage(sources, probedHrefs) {
     .map(({ kind, rel, href }) => ({
       kind: 'font-source-coverage',
       id: `${kind}:${rel}`,
-      message: `${kind} in ${rel} references font-provider stylesheet ${href}, but that URL is not among the sources probed from ${FONTS_REL} (FONT_STYLESHEETS / SYSTEM_STYLESHEETS) or ${HTML_REL} — move it into a stylesheet map or teach the scanner about this source before adding it`,
+      message: `${kind} in ${rel} references font-provider stylesheet ${href}, but that URL is not among the sources probed from ${FONTS_REL} (FONT_STYLESHEETS) or ${HTML_REL} (the canonical always-on request) — move it into the picker map or teach the scanner about this source before adding it`,
     }));
 }
 
@@ -1603,20 +1608,26 @@ async function fetchAllStylesheets(targets) {
 }
 
 // ---------------------------------------------------------------------------
-// Comparator — the loaders behind a system's OWN font tokens (#411).
+// Comparator — the loader behind a system's OWN font tokens (#411).
 // ---------------------------------------------------------------------------
-// Two loaders run for a given design system, and only two: the always-on
-// stylesheet links in the HTML shell (every visitor, pre-paint) and
-// SYSTEM_STYLESHEETS[id] (post-paint, only while that system is selected).
-// Every family the system's --font-display / --font-body / --font-mono names
-// FIRST has to come from one of them. FONT_STYLESHEETS is not a loader here:
-// it fires only when a visitor picks that option in the picker.
+// Exactly one loader runs for a design system: the always-on stylesheet
+// link(s) in the HTML shell (every visitor, pre-paint). That link is the
+// design source's canonical request and carries every family all five
+// systems name, so switching systems fetches nothing and there is no
+// per-system stylesheet map to keep in step. Every family a system's
+// --font-display / --font-body / --font-mono names FIRST has to come from
+// those links. FONT_STYLESHEETS is not a loader here: it fires only when a
+// visitor picks that option in the picker.
 //
-// Checked in both directions, so neither side can drift quietly:
-//   · a named family nothing fetches  → the surface paints in the fallback
-//   · a fetched family nothing names  → a font file that renders nothing
-//   · a family in the ALWAYS-ON links that the default system does not name
-//     → a pre-paint request every visitor pays for a face only some use
+//   · a named family nothing fetches            → the surface paints in the
+//     declaration's fallback face
+//   · a named weight nothing fetches (optional
+//     inventory from the browser gate)          → faux bold / faux weight
+//
+// The other direction — a fetched family no system names — is deliberately
+// NOT judged here: the shell request is held byte-identical to the design's
+// by compareCanonicalFontRequest() below, and it legitimately carries the
+// faces of every system, not just the active one.
 function effectiveSystemFonts(systemId, rootFonts, systemFonts) {
   const own = systemFonts.get(systemId);
   const out = new Map();
@@ -1630,47 +1641,31 @@ function effectiveSystemFonts(systemId, rootFonts, systemFonts) {
   return out;
 }
 
-function compareSystemFontCoverage({
-  systemIds,
-  defaultSystemId,
-  rootFonts,
-  systemFonts,
-  systemSheets,
-  staticHrefs,
-  requiredWeights,
-}) {
+function mergeStylesheetFontEntries(hrefs) {
+  const entries = new Map();
+  for (const href of hrefs) {
+    for (const [family, entry] of parseStylesheetFontEntries(href)) {
+      const previous = entries.get(family);
+      entries.set(family, {
+        family: entry.family,
+        ranges: [...(previous?.ranges ?? []), ...entry.ranges],
+      });
+    }
+  }
+  return entries;
+}
+
+function compareSystemFontCoverage({ systemIds, rootFonts, systemFonts, staticHrefs, requiredWeights }) {
   const failures = [];
   const alwaysLoaded = new Set();
   for (const href of staticHrefs) {
     for (const family of parseStylesheetFamilies(href)) alwaysLoaded.add(normalizeFamilyName(family));
   }
+  const loadedEntries = mergeStylesheetFontEntries(staticHrefs);
 
   for (const id of [...systemIds].sort()) {
-    const sheetHref = systemSheets.get(id);
-    const sheetFamilies =
-      sheetHref === undefined ? [] : parseStylesheetFamilies(sheetHref).map(normalizeFamilyName);
-    const sheetEntries = sheetHref === undefined ? new Map() : parseStylesheetFontEntries(sheetHref);
-    const staticEntries = new Map();
-    for (const href of staticHrefs) {
-      for (const [family, entry] of parseStylesheetFontEntries(href)) {
-        const previous = staticEntries.get(family);
-        staticEntries.set(family, {
-          family: entry.family,
-          ranges: [...(previous?.ranges ?? []), ...entry.ranges],
-        });
-      }
-    }
-    if (sheetHref !== undefined && !sheetFamilies.length) {
-      failures.push({
-        kind: 'system-stylesheet-family',
-        id,
-        message: `SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL} names no family= parameter, so which faces it downloads cannot be checked against the --font-* tokens "${id}" declares in ${CSS_REL}: ${sheetHref} — teach parseStylesheetFamilies() the new URL shape rather than leaving the entry unchecked`,
-      });
-    }
-    const loaded = new Set([...alwaysLoaded, ...sheetFamilies]);
-    const namedByTokens = new Set();
-
-    for (const [token, { value, source }] of effectiveSystemFonts(id, rootFonts, systemFonts)) {
+    const effective = effectiveSystemFonts(id, rootFonts, systemFonts);
+    for (const [token, { value, source }] of effective) {
       if (value === undefined || value === null) {
         failures.push({
           kind: 'system-font-token',
@@ -1688,14 +1683,13 @@ function compareSystemFontCoverage({
         });
         continue;
       }
-      for (const family of families) namedByTokens.add(family);
       const primary = families[0];
       if (GENERIC_FAMILIES.has(primary)) continue; // a face the browser already has
-      if (loaded.has(primary)) continue;
+      if (alwaysLoaded.has(primary)) continue;
       failures.push({
         kind: 'system-font-coverage',
         id,
-        message: `design system "${id}" asks for "${primary}" (${token} in ${source}: ${JSON.stringify(value)}) but no loader that runs for "${id}" downloads it — not the always-on links in ${HTML_REL} (${[...alwaysLoaded].join(', ') || 'none'}) and not SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL} (${sheetFamilies.join(', ') || 'no entry'}) — so every surface reading ${token} silently paints in the next family of that stack instead`,
+        message: `design system "${id}" asks for "${primary}" (${token} in ${source}: ${JSON.stringify(value)}) but the always-on <link rel="stylesheet"> in ${HTML_REL} — the only loader that runs for a system — does not download it (it carries: ${[...alwaysLoaded].join(', ') || 'nothing'}), so every surface reading ${token} silently paints in the next family of that stack instead. The shell request is the design source's; a family it lacks is a token drifting from the design, not a URL to widen`,
       });
     }
 
@@ -1704,57 +1698,18 @@ function compareSystemFontCoverage({
     // on its own as well: its canaries use the same path to prove a dropped
     // static weight and a variable range are not waved through.
     const requiredByToken = requiredWeights?.get?.(id);
-    if (requiredByToken) {
-      const loadedEntries = new Map();
-      for (const [family, entry] of staticEntries) loadedEntries.set(family, entry);
-      for (const [family, entry] of sheetEntries) {
-        const previous = loadedEntries.get(family);
-        loadedEntries.set(family, {
-          family: entry.family,
-          ranges: [...(previous?.ranges ?? []), ...entry.ranges],
+    if (!requiredByToken) continue;
+    for (const [token, weights] of requiredByToken) {
+      const primary = stackFamilies(effective.get(token)?.value ?? '')[0];
+      if (!primary || GENERIC_FAMILIES.has(primary)) continue;
+      for (const weight of weights) {
+        if (stylesheetFamilyCoversWeight(loadedEntries, primary, weight)) continue;
+        failures.push({
+          kind: 'system-font-weight',
+          id,
+          message: `design system "${id}" requires weight ${weight} for ${token} (${primary}), but the always-on font request in ${HTML_REL} does not request that weight — a browser may synthesize faux bold even though the family itself is present`,
         });
       }
-      for (const [token, weights] of requiredByToken) {
-        const value = effectiveSystemFonts(id, rootFonts, systemFonts).get(token)?.value;
-        const primary = stackFamilies(value ?? '')[0];
-        if (!primary || GENERIC_FAMILIES.has(primary)) continue;
-        for (const weight of weights) {
-          if (stylesheetFamilyCoversWeight(loadedEntries, primary, weight)) continue;
-          failures.push({
-            kind: 'system-font-weight',
-            id,
-            message: `design system "${id}" requires weight ${weight} for ${token} (${primary}), but no loader URL for "${id}" requests that weight — a browser may synthesize faux bold even though the family itself is present`,
-          });
-        }
-      }
-    }
-
-    for (const family of sheetFamilies) {
-      if (namedByTokens.has(family)) continue;
-      failures.push({
-        kind: 'system-stylesheet-family',
-        id,
-        message: `SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL} downloads "${family}" but none of "${id}"'s --font-display/--font-body/--font-mono in ${CSS_REL} names it — a font file every visitor on that system fetches and nothing can render in`,
-      });
-    }
-  }
-
-  // The always-on links are unconditional and pre-paint: they cost every
-  // visitor on every system, so they may carry the default system's faces and
-  // nothing else. Anything else belongs in that system's own stylesheet.
-  if (defaultSystemId && alwaysLoaded.size) {
-    const defaultNamed = new Set();
-    for (const [, { value }] of effectiveSystemFonts(defaultSystemId, rootFonts, systemFonts)) {
-      if (value === undefined || value === null) continue;
-      for (const family of stackFamilies(value)) defaultNamed.add(family);
-    }
-    for (const family of [...alwaysLoaded].sort()) {
-      if (defaultNamed.has(family)) continue;
-      failures.push({
-        kind: 'static-font-scope',
-        id: defaultSystemId,
-        message: `an always-on <link rel="stylesheet"> in ${HTML_REL} downloads "${family}" before the first paint, but the default system "${defaultSystemId}" never names it in ${CSS_REL} — every visitor pays that request for a face only some systems use; load it from SYSTEM_STYLESHEETS instead`,
-      });
     }
   }
 
@@ -1762,23 +1717,105 @@ function compareSystemFontCoverage({
 }
 
 // ---------------------------------------------------------------------------
+// Comparator — the shell's font request vs the design source's (parity W1)
+// ---------------------------------------------------------------------------
+// awesome-list-site-ds/index.html is the frozen design source. It makes ONE
+// Google Fonts css2 request, and the app's shell must make the SAME one, byte
+// for byte once HTML entities are decoded: same families, weights, styles and
+// axes. A different axis subset (Fraunces requested with `opsz`, Inter
+// without 800) produces different glyph outlines and metrics, so headings
+// drift by pixels on every page and the parity budget can never be met.
+// Exactly one always-on font-provider link is allowed: a second request is a
+// second owner, and two owners have to be kept in lockstep by hand.
+const DESIGN_HTML_REL = 'awesome-list-site-ds/index.html';
+
+// The `family=` parameters of a css2 href as family → axis spec (the text
+// after ":", "" when there is none), plus every other query parameter, so a
+// mismatch can be described by what differs rather than by two long strings.
+function describeCss2Href(href) {
+  const families = new Map();
+  const others = [];
+  const query = String(href).split('?')[1] ?? '';
+  for (const part of query.split('&')) {
+    if (!part) continue;
+    const [key, ...rest] = part.split('=');
+    const value = rest.join('=');
+    if (key === 'family') {
+      const [family, ...spec] = value.split(':');
+      families.set(decodeStylesheetPart(family), spec.join(':'));
+    } else {
+      others.push(part);
+    }
+  }
+  return { families, others };
+}
+
+function describeHrefDifference(appHref, designHref) {
+  const app = describeCss2Href(appHref);
+  const design = describeCss2Href(designHref);
+  const notes = [];
+  for (const [family, spec] of design.families) {
+    if (!app.families.has(family)) notes.push(`app never requests "${family}"`);
+    else if (app.families.get(family) !== spec) notes.push(`"${family}" axes differ — app "${app.families.get(family)}" vs design "${spec}"`);
+  }
+  for (const family of app.families.keys()) {
+    if (!design.families.has(family)) notes.push(`app requests "${family}", which the design does not`);
+  }
+  if (app.others.join('&') !== design.others.join('&')) notes.push(`other parameters differ — app "${app.others.join('&')}" vs design "${design.others.join('&')}"`);
+  if (!notes.length) notes.push('the two differ only in parameter order or spelling — copy the design href verbatim');
+  return notes;
+}
+
+function compareCanonicalFontRequest(shellHrefs, designHrefs) {
+  const design = designHrefs.map(normalizeSourceUrl);
+  if (design.length !== 1) {
+    return [
+      {
+        kind: 'parser-rot',
+        id: DESIGN_HTML_REL,
+        message: `expected exactly one font-provider <link rel="stylesheet"> in ${DESIGN_HTML_REL} but found ${design.length}${design.length ? `: ${design.join(' | ')}` : ''} — the design source is frozen; this gate cannot say what the canonical request is without it`,
+      },
+    ];
+  }
+  const shell = shellHrefs.map(normalizeSourceUrl);
+  if (shell.length !== 1) {
+    return [
+      {
+        kind: 'canonical-font-request',
+        id: HTML_REL,
+        message: `${HTML_REL} must carry exactly ONE always-on font-provider <link rel="stylesheet"> — the design source's request, byte for byte — but carries ${shell.length}${shell.length ? `: ${shell.join(' | ')}` : ''}. A second request is a second owner of the font set; a missing one leaves every system painting in fallback faces`,
+      },
+    ];
+  }
+  if (shell[0] === design[0]) return [];
+  return [
+    {
+      kind: 'canonical-font-request',
+      id: HTML_REL,
+      message: `the always-on font request in ${HTML_REL} is not byte-identical to the design source's in ${DESIGN_HTML_REL}:\n         app:    ${shell[0]}\n         design: ${design[0]}\n         ${describeHrefDifference(shell[0], design[0]).join('; ')}`,
+    },
+  ];
+}
+
+// ---------------------------------------------------------------------------
 // Stored-id resolution: junk must resolve to the DEFAULT system in BOTH halves
 // ---------------------------------------------------------------------------
 // `ds-system` in localStorage is arbitrary text: it outlives a retired system
 // id and anyone can type one in by hand. TWO halves read it — the pre-paint
-// boot script in the HTML shell, which PAINTS the page, and the app, which
-// DOWNLOADS the painted system's faces. The boot script resolves against a
-// literal id list, so it always lands on a real system. The moment the app's
-// half calls a value valid that the boot script rejected, the two disagree:
-// the page paints the default system while the loader asks for a stylesheet
-// that cannot exist, and every face the painted system names goes unfetched
-// (#411) — the same invisible fallback the coverage check above exists for.
+// boot script in the HTML shell, which PAINTS the page, and the app (the
+// theme provider, the storage-sync path, the picker), which holds the
+// selected system as STATE. The boot script resolves against a literal id
+// list, so it always lands on a real system. The moment the app's half calls
+// a value valid that the boot script rejected, the two disagree: the page
+// paints the default system while the provider believes "toString" is
+// selected — no picker card lights up, and the next storage write persists
+// the junk for every tab.
 //
 // `id in DESIGN_SYSTEMS` and `DESIGN_SYSTEMS[id] ? …` both answer YES for keys
 // nobody declared — toString, constructor, valueOf, __proto__ — so the test
 // has to be an OWN-property test. This check does not take the source's word
 // for it: it EXECUTES the real resolver out of the real file and hands it
-// those keys, then asserts the id it returns has a stylesheet behind it.
+// those keys, then asserts the id it returns is the default.
 const CLIENT_SRC_REL = 'client/src';
 const INHERITED_KEYS = ['toString', 'constructor', 'valueOf', 'hasOwnProperty', '__proto__'];
 // Everything a stored `ds-system` can be that is NOT a system we offer: keys
@@ -1790,6 +1827,10 @@ const UNSAFE_MEMBERSHIP_TESTS = [
   [/DESIGN_SYSTEMS\s*\[[^\]\n]*\]\s*(?:\?|&&|\|\|)/, '`DESIGN_SYSTEMS[…] ? …` — a truthy lookup answers yes for inherited keys'],
   [/\bif\s*\(\s*!?\s*DESIGN_SYSTEMS\s*\[/, '`if (DESIGN_SYSTEMS[…])` — a truthy lookup answers yes for inherited keys'],
 ];
+// A Google Fonts css2 request written into TS/TSX. Only font-options.ts may
+// hold one (the picker map); anywhere else is a second owner of a webfont
+// request that neither the canonical-request check nor the live probe reads.
+const FONT_PROVIDER_REQUEST_RE = /https?:\/\/fonts\.googleapis\.com\/css2?\?[^\s'"`]*/gi;
 
 // The unsafe patterns a source file must not use to decide "is this a system
 // we offer?". Comments are stripped first: prose ABOUT the trap (including the
@@ -1797,6 +1838,11 @@ const UNSAFE_MEMBERSHIP_TESTS = [
 function unsafeMembershipTests(src) {
   const stripped = stripComments(String(src));
   return UNSAFE_MEMBERSHIP_TESTS.filter(([re]) => re.test(stripped)).map(([, why]) => why);
+}
+
+// Font-provider stylesheet requests a TS/TSX source carries outside comments.
+function tsFontProviderRequests(src) {
+  return [...stripComments(String(src)).matchAll(FONT_PROVIDER_REQUEST_RE)].map((m) => normalizeSourceUrl(m[0]));
 }
 
 function walkFiles(relDir, filePattern) {
@@ -1836,7 +1882,7 @@ function loadTsExports(rel, tsSrc) {
   return mod.exports;
 }
 
-function checkSystemIdResolution(tsSrc, { systemIds, defaultSystemId, sheetIds }) {
+function checkSystemIdResolution(tsSrc, { systemIds, defaultSystemId }) {
   const out = [];
   const bad = (message) => out.push({ kind: 'system-id-resolution', id: 'ds-system', message });
 
@@ -1866,82 +1912,43 @@ function checkSystemIdResolution(tsSrc, { systemIds, defaultSystemId, sheetIds }
     }
     const resolved = resolveSystemId(key);
     if (resolved !== defaultSystemId) {
-      bad(`resolveSystemId(${shown}) returns "${resolved}" instead of DEFAULT_SYSTEM "${defaultSystemId}" — the pre-paint boot script PAINTS such a value as the default, so anything else splits the painted system from the loaded one`);
-    } else if (sheetIds.size && !sheetIds.has(resolved)) {
-      bad(`resolveSystemId(${shown}) returns "${resolved}", which has no SYSTEM_STYLESHEETS entry in ${FONTS_REL} — a stored value would paint that system with none of its faces downloaded`);
+      bad(`resolveSystemId(${shown}) returns "${resolved}" instead of DEFAULT_SYSTEM "${defaultSystemId}" — the pre-paint boot script PAINTS such a value as the default, so anything else splits the painted system from the one the app believes is selected`);
     }
   }
 
   return out;
 }
 
-// The argument text of every loadDesignSystemFont(…) call in a file. Read by
-// balancing parentheses rather than by regex, so a wrapped call reports the
-// whole expression instead of stopping at the inner ")".
-function loaderCallArguments(src) {
-  const stripped = stripComments(String(src));
+// Every client source: no hand-rolled membership test against DESIGN_SYSTEMS
+// (see above), and no Google Fonts request outside the picker map — the shell
+// <link> is the one owner of the base font set, and the picker map the one
+// owner of overrides, so a URL anywhere else is a request nothing verifies.
+function checkSystemIdSources(sourceRels, readSource = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8')) {
   const out = [];
-  const re = /\bloadDesignSystemFont\s*\(/g;
-  let m;
-  while ((m = re.exec(stripped))) {
-    let depth = 1;
-    let i = m.index + m[0].length;
-    const start = i;
-    for (; i < stripped.length && depth; i++) {
-      if (stripped[i] === '(') depth++;
-      else if (stripped[i] === ')') depth--;
-    }
-    out.push(stripped.slice(start, i - 1).trim());
-  }
-  return out;
-}
-
-// An argument is safe when the value cannot be an id we do not offer: it is
-// wrapped in resolveSystemId(), it is a literal id from DESIGN_SYSTEMS, or the
-// same file has already refused to continue unless isSystemId() said yes.
-// Anything else — the raw stored value, a ternary that re-derives the test —
-// is how the painted system and the downloaded faces drift apart.
-function loaderArgumentIsResolved(arg, src, systemIds) {
-  if (/^resolveSystemId\s*\(/.test(arg)) return true;
-  const literal = /^['"`]([^'"`]*)['"`]$/.exec(arg);
-  if (literal) return systemIds.includes(literal[1]);
-  if (/^[A-Za-z_$][\w$]*$/.test(arg)) {
-    return new RegExp(`\\bisSystemId\\s*\\(\\s*${arg}\\s*\\)`).test(stripComments(String(src)));
-  }
-  return false;
-}
-
-function checkSystemIdCallSites(sourceRels, systemIds, readSource = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8')) {
-  const out = [];
-  const consumers = [];
-
+  let scanned = 0;
   for (const rel of sourceRels) {
     const src = readSource(rel);
+    scanned++;
     for (const why of unsafeMembershipTests(src)) {
       out.push({
         kind: 'system-id-resolution',
         id: rel,
-        message: `${rel} decides whether a system id is real with ${why}. Use isSystemId()/resolveSystemId() from ${TS_REL}: a stored "ds-system" is arbitrary text, and this test calls "toString" a valid system — which paints as the default while its faces are never fetched`,
+        message: `${rel} decides whether a system id is real with ${why}. Use isSystemId()/resolveSystemId() from ${TS_REL}: a stored "ds-system" is arbitrary text, and this test calls "toString" a valid system — which paints as the default while the app believes junk is selected`,
       });
     }
     if (rel === FONTS_REL) continue;
-    const args = loaderCallArguments(src);
-    if (!args.length) continue;
-    consumers.push({ rel, args });
-    for (const arg of args) {
-      if (loaderArgumentIsResolved(arg, src, systemIds)) continue;
+    for (const href of tsFontProviderRequests(src)) {
       out.push({
-        kind: 'system-id-resolution',
+        kind: 'font-source-coverage',
         id: rel,
-        message: `${rel} calls loadDesignSystemFont(${arg}) with a value nothing put through isSystemId()/resolveSystemId() from ${TS_REL} — a first visit, an id we retired, or junk in localStorage paints the default system while this asks for a stylesheet that does not exist, so none of the painted system's faces download`,
+        message: `${rel} carries a font-provider stylesheet request (${href}) — only the always-on <link> in ${HTML_REL} (the design source's canonical set) and FONT_STYLESHEETS in ${FONTS_REL} (picker overrides) may request webfonts; anything else is a second owner nothing probes`,
       });
     }
   }
-
-  if (!consumers.length) {
-    out.push({ kind: 'parser-rot', id: CLIENT_SRC_REL, message: `found ZERO callers of loadDesignSystemFont() under ${CLIENT_SRC_REL} — the loader was renamed and this check went vacuous` });
+  if (!scanned) {
+    out.push({ kind: 'parser-rot', id: CLIENT_SRC_REL, message: `scanned ZERO source files under ${CLIENT_SRC_REL} — the walker went vacuous` });
   }
-  return { failures: out, consumers };
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -2319,7 +2326,7 @@ function runCanaries() {
     'the "//" in an https URL is never mistaken for a line comment',
   );
   eq(parsedSheets.malformed.length, 1, 'a non-string value is reported, never silently dropped');
-  eq(parseTsStringMap(tsSheetSample, 'SYSTEM_STYLESHEETS').found, false, 'renamed/absent stylesheet map is detectable, not an empty pass');
+  eq(parseTsStringMap(tsSheetSample, 'GHOST_STYLESHEETS').found, false, 'renamed/absent stylesheet map is detectable, not an empty pass');
 
   // Boot-script system + generated-font consumers.
   const htmlThemeSample = [
@@ -2841,8 +2848,9 @@ function runCanaries() {
     'served-family matching is case- and quote-insensitive, as CSS is',
   );
 
-  // Comparator — a design system's own --font-* tokens vs the loaders that
-  // run for it (the #411 bug: a family named everywhere, downloaded nowhere).
+  // Comparator — a design system's own --font-* tokens vs the ONE loader that
+  // runs for it, the always-on shell links (the #411 bug: a family named
+  // everywhere, downloaded nowhere).
   const coverageRoot = new Map([
     ['--font-display', "'Fraunces', Georgia, serif"],
     ['--font-body', "'Inter', system-ui, sans-serif"],
@@ -2858,42 +2866,34 @@ function runCanaries() {
       ]),
     ],
   ]);
-  const coverageSheets = new Map([
-    ['editorial', 'https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap'],
-    ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap'],
-  ]);
-  const coverageStatic = ['https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'];
+  const coverageStatic = [
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fraunces:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap',
+  ];
   const coverageArgs = {
     systemIds: ['editorial', 'swiss'],
-    defaultSystemId: 'editorial',
     rootFonts: coverageRoot,
     systemFonts: coverageSystemFonts,
-    systemSheets: coverageSheets,
     staticHrefs: coverageStatic,
   };
-  eq(compareSystemFontCoverage(coverageArgs), [], 'every family a system names is downloaded by a loader that runs for it');
+  const withoutFamily = (family) => coverageStatic.map((href) => href.replace(new RegExp(`family=${family}[^&]*&`), ''));
+  eq(compareSystemFontCoverage(coverageArgs), [], 'every family a system names is downloaded by the always-on links');
   eq(
-    compareSystemFontCoverage({
-      ...coverageArgs,
-      systemSheets: new Map([...coverageSheets, ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400&display=swap']]),
-    }).map((f) => [f.kind, f.id]),
+    compareSystemFontCoverage({ ...coverageArgs, staticHrefs: withoutFamily('IBM\\+Plex\\+Mono') }).map((f) => [f.kind, f.id]),
     [['system-font-coverage', 'swiss']],
-    'the #411 bug: a system whose stylesheet fetches its body face but not the mono face it names',
+    'the #411 bug: the shell fetches a system\'s body face but not the mono face it names',
   );
   eq(
-    /IBM Plex Mono/.test(
-      compareSystemFontCoverage({
-        ...coverageArgs,
-        systemSheets: new Map([...coverageSheets, ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400&display=swap']]),
-      })[0].message,
-    ),
+    /IBM Plex Mono/.test(compareSystemFontCoverage({ ...coverageArgs, staticHrefs: withoutFamily('IBM\\+Plex\\+Mono') })[0].message),
     true,
     'the coverage message names the family that never downloads',
   );
   eq(
-    compareSystemFontCoverage({ ...coverageArgs, systemSheets: new Map([['swiss', coverageSheets.get('swiss')]]) }).map((f) => [f.kind, f.id]),
-    [['system-font-coverage', 'editorial'], ['system-font-coverage', 'editorial']],
-    'a system with no stylesheet at all is uncovered for every non-generic family it names',
+    compareSystemFontCoverage({ ...coverageArgs, staticHrefs: [] }).map((f) => [f.kind, f.id]),
+    [
+      ['system-font-coverage', 'editorial'], ['system-font-coverage', 'editorial'], ['system-font-coverage', 'editorial'],
+      ['system-font-coverage', 'swiss'], ['system-font-coverage', 'swiss'], ['system-font-coverage', 'swiss'],
+    ],
+    'dropping the always-on link leaves every non-generic family of every system uncovered',
   );
   eq(
     compareSystemFontCoverage({
@@ -2902,7 +2902,7 @@ function runCanaries() {
         ...coverageSystemFonts,
         ['swiss', new Map([...coverageSystemFonts.get('swiss'), ['--font-mono', 'ui-monospace, monospace']])],
       ]),
-      systemSheets: new Map([...coverageSheets, ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400&display=swap']]),
+      staticHrefs: withoutFamily('IBM\\+Plex\\+Mono'),
     }),
     [],
     'a token whose FIRST family is a generic keyword needs no loader — the exemption is the keyword, not the token',
@@ -2911,47 +2911,26 @@ function runCanaries() {
     compareSystemFontCoverage({
       ...coverageArgs,
       systemFonts: new Map([...coverageSystemFonts, ['swiss', new Map([['--font-mono', "'IBM Plex Mono', ui-monospace"]])]]),
-      systemSheets: new Map([...coverageSheets, ['swiss', 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap']]),
+      staticHrefs: withoutFamily('Fraunces'),
     }).map((f) => [f.kind, f.id]),
-    [['system-font-coverage', 'swiss']],
-    'a token a system does NOT override inherits :root and still needs a loader for that system',
+    [['system-font-coverage', 'editorial'], ['system-font-coverage', 'swiss']],
+    'a token a system does NOT override inherits :root and still needs the loader to carry it for that system',
   );
   eq(
     compareSystemFontCoverage({ ...coverageArgs, rootFonts: new Map([...coverageRoot].filter(([t]) => t !== '--font-mono')) }).map((f) => [
       f.kind,
       f.id,
     ]),
-    [['system-font-token', 'editorial'], ['system-stylesheet-family', 'editorial']],
-    'a token no block declares fails as unresolvable — and its now-orphaned download is reported too',
+    [['system-font-token', 'editorial']],
+    'a token no block declares fails as unresolvable',
   );
   eq(
     compareSystemFontCoverage({
       ...coverageArgs,
-      systemSheets: new Map([...coverageSheets, ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400&family=IBM+Plex+Mono:wght@400&family=Ghost&display=swap']]),
-    }).map((f) => [f.kind, f.id]),
-    [['system-stylesheet-family', 'swiss']],
-    'a system stylesheet downloading a family none of its tokens name caught',
-  );
-  eq(
-    compareSystemFontCoverage({ ...coverageArgs, systemSheets: new Map([...coverageSheets, ['swiss', '/fonts/swiss.css']]) }).map((f) => [
-      f.kind,
-      f.id,
-    ]),
-    [['system-stylesheet-family', 'swiss'], ['system-font-coverage', 'swiss'], ['system-font-coverage', 'swiss'], ['system-font-coverage', 'swiss']],
-    'a system stylesheet whose families cannot be read fails loudly instead of being waved through',
-  );
-  eq(
-    compareSystemFontCoverage({
-      ...coverageArgs,
-      staticHrefs: [...coverageStatic, 'https://fonts.googleapis.com/css2?family=Manrope:wght@400&display=swap'],
-    }).map((f) => [f.kind, f.id]),
-    [['static-font-scope', 'editorial']],
-    'a pre-paint link carrying a face only some systems use caught — that request is paid by every visitor',
-  );
-  eq(
-    compareSystemFontCoverage({ ...coverageArgs, staticHrefs: [] }).map((f) => [f.kind, f.id]),
-    [['system-font-coverage', 'editorial']],
-    'dropping the always-on link leaves the body face it carried uncovered',
+      staticHrefs: [...coverageStatic, 'https://fonts.googleapis.com/css2?family=Geist:wght@400&display=swap'],
+    }),
+    [],
+    'a family the shell carries that no system names is not a coverage failure — the canonical-request check owns the shell\'s contents',
   );
   const requiredWeights = new Map([
     ['editorial', new Map([
@@ -2968,12 +2947,12 @@ function runCanaries() {
   eq(
     compareSystemFontCoverage({ ...coverageArgs, requiredWeights }).filter((f) => f.kind === 'system-font-weight'),
     [],
-    'all inventoried weights pass when static loader URLs request them',
+    'all inventoried weights pass when the always-on URL requests them',
   );
   const missingWeight = compareSystemFontCoverage({
     ...coverageArgs,
     requiredWeights,
-    systemSheets: new Map([...coverageSheets, ['swiss', 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap']]),
+    staticHrefs: coverageStatic.map((href) => href.replace('Manrope:wght@400;600;700', 'Manrope:wght@400;600')),
   }).filter((f) => f.kind === 'system-font-weight');
   eq(missingWeight.map((f) => [f.kind, f.id]), [['system-font-weight', 'swiss']], 'a single removed static weight is caught');
   eq(/--font-display/.test(missingWeight[0].message) && /weight 700/.test(missingWeight[0].message), true, 'the missing-weight message names token and weight');
@@ -2981,10 +2960,79 @@ function runCanaries() {
     compareSystemFontCoverage({
       ...coverageArgs,
       requiredWeights: new Map([['editorial', new Map([['--font-display', new Set([650])]])]]),
-      systemSheets: new Map([...coverageSheets, ['editorial', 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..800&family=JetBrains+Mono:wght@400&display=swap']]),
+      staticHrefs: coverageStatic.map((href) => href.replace('Fraunces:ital,wght@0,400;0,500;1,400', 'Fraunces:opsz,wght@9..144,400..800')),
     }).filter((f) => f.kind === 'system-font-weight'),
     [],
     'a variable range satisfies an inventoried interior weight',
+  );
+  eq(
+    compareSystemFontCoverage({
+      ...coverageArgs,
+      requiredWeights,
+      staticHrefs: [
+        'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Fraunces:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;600&display=swap',
+        'https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap',
+      ],
+    }),
+    [],
+    'weights and families are merged across every always-on link, not read from the first one only',
+  );
+
+  // Comparator — the shell's font request vs the design source's. Byte
+  // identity after entity decoding, exactly one link on each side.
+  const designHref =
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap';
+  eq(compareCanonicalFontRequest([designHref], [designHref]), [], 'an identical request passes');
+  eq(compareCanonicalFontRequest([designHref.replace(/&/g, '&amp;')], [designHref]), [], 'HTML entity encoding of & is not a difference');
+  eq(
+    compareCanonicalFontRequest([designHref.replace('Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600', 'Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400')], [designHref]).map((f) => f.kind),
+    ['canonical-font-request'],
+    'a different axis subset for one family fails',
+  );
+  eq(
+    /"Fraunces" axes differ/.test(
+      compareCanonicalFontRequest([designHref.replace('Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600', 'Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400')], [designHref])[0].message,
+    ),
+    true,
+    'the mismatch message names the family whose axes differ',
+  );
+  eq(
+    /never requests "JetBrains Mono"/.test(compareCanonicalFontRequest([designHref.replace('&family=JetBrains+Mono:wght@400;500;600;700', '')], [designHref])[0].message),
+    true,
+    'a family the app drops is named',
+  );
+  eq(
+    /requests "Geist", which the design does not/.test(compareCanonicalFontRequest([designHref.replace('&display=swap', '&family=Geist:wght@400&display=swap')], [designHref])[0].message),
+    true,
+    'a family the app adds is named',
+  );
+  eq(
+    /other parameters differ/.test(compareCanonicalFontRequest([designHref.replace('display=swap', 'display=optional')], [designHref])[0].message),
+    true,
+    'a non-family parameter difference (display=) is named',
+  );
+  eq(
+    compareCanonicalFontRequest(
+      [designHref.replace('family=Inter:wght@400;500;600;700;800&', '').replace('&display=swap', '&family=Inter:wght@400;500;600;700;800&display=swap')],
+      [designHref],
+    ).map((f) => f.kind),
+    ['canonical-font-request'],
+    'the same parameters in a different order still fail — byte identity, not set identity',
+  );
+  eq(
+    compareCanonicalFontRequest([designHref, 'https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap'], [designHref]).map((f) => f.kind),
+    ['canonical-font-request'],
+    'a second always-on request is a second owner and fails',
+  );
+  eq(compareCanonicalFontRequest([], [designHref]).map((f) => f.kind), ['canonical-font-request'], 'no always-on request at all fails');
+  eq(compareCanonicalFontRequest([designHref], []).map((f) => f.kind), ['parser-rot'], 'losing the design source href is parser rot, never an empty pass');
+  eq(compareCanonicalFontRequest([designHref], [designHref, designHref]).map((f) => f.kind), ['parser-rot'], 'two design hrefs are ambiguous and fail loudly');
+  eq(
+    parseHtmlFontProviderLinks(
+      '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="./styles.css">',
+    ),
+    ['https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap'],
+    'the design source shape (href before rel, unclosed tags) yields exactly its provider href',
   );
 
   // Stored-id resolution. The detector EXECUTES the resolver, so its canaries
@@ -2998,7 +3046,7 @@ function runCanaries() {
       'export function resolveSystemId(id: string | null | undefined): string { return isSystemId(id) ? (id as string) : DEFAULT_SYSTEM; }',
       "if (typeof window !== 'undefined') { (window as any).DESIGN_SYSTEMS = DESIGN_SYSTEMS; }",
     ].join('\n');
-  const resolverArgs = { systemIds: ['editorial', 'swiss'], defaultSystemId: 'editorial', sheetIds: new Set(['editorial', 'swiss']) };
+  const resolverArgs = { systemIds: ['editorial', 'swiss'], defaultSystemId: 'editorial' };
   const resolverKinds = (test, args = resolverArgs) => checkSystemIdResolution(resolverModule(test), args).map((f) => f.kind);
 
   eq(resolverKinds("typeof id === 'string' && Object.prototype.hasOwnProperty.call(DESIGN_SYSTEMS, id)"), [], 'an own-property resolver passes');
@@ -3025,11 +3073,6 @@ function runCanaries() {
     'a resolver that rejects the systems we DO offer fails too — both offered ids, plus the non-default one no longer resolving to itself',
   );
   eq(
-    resolverKinds("typeof id === 'string' && Object.prototype.hasOwnProperty.call(DESIGN_SYSTEMS, id)", { ...resolverArgs, sheetIds: new Set(['swiss']) }),
-    Array(REJECTED_SAMPLE_IDS.length).fill('system-id-resolution'),
-    'resolving to a system with no stylesheet is a failure even when the resolver itself is right',
-  );
-  eq(
     checkSystemIdResolution("export const DESIGN_SYSTEMS = { editorial: 1 };\nexport const DEFAULT_SYSTEM = 'editorial';", resolverArgs).map((f) => f.kind),
     ['system-id-resolution'],
     'deleting the shared resolver is detectable, not an empty pass',
@@ -3048,37 +3091,30 @@ function runCanaries() {
   eq(unsafeMembershipTests('// `id in DESIGN_SYSTEMS` accepts inherited keys').length, 0, 'prose about the trap is documentation, not a live test');
   eq(unsafeMembershipTests('Object.prototype.hasOwnProperty.call(DESIGN_SYSTEMS, id)').length, 0, 'the safe test is not mistaken for the unsafe one');
 
-  // What each loadDesignSystemFont() call is actually handed.
-  const callSiteSrc = [
-    'import { resolveSystemId, isSystemId } from "@/lib/design-system";',
-    'loadDesignSystemFont(resolveSystemId(saved));',
-    'if (!isSystemId(id)) return;',
-    'loadDesignSystemFont(id);',
-    '// loadDesignSystemFont(saved) — the old shape, quoted in prose',
-  ].join('\n');
-  eq(loaderCallArguments(callSiteSrc), ['resolveSystemId(saved)', 'id'], 'every call argument read, a wrapped call not truncated at its inner ")", comment ignored');
-  eq(loaderCallArguments('const x = 1;'), [], 'a file that never calls the loader reports no call sites');
-  eq(loaderArgumentIsResolved('resolveSystemId(saved)', callSiteSrc, ['editorial']), true, 'a wrapped argument is resolved');
-  eq(loaderArgumentIsResolved('id', callSiteSrc, ['editorial']), true, 'an identifier the same file already refused to pass unguarded is resolved');
-  eq(loaderArgumentIsResolved('saved', callSiteSrc, ['editorial']), false, 'the raw stored value is NOT resolved — importing the helper is not using it (#411)');
-  eq(loaderArgumentIsResolved("'editorial'", callSiteSrc, ['editorial']), true, 'a literal id we offer needs no resolver');
-  eq(loaderArgumentIsResolved("'ghost'", callSiteSrc, ['editorial']), false, 'a literal id we do not offer fails');
-  eq(loaderArgumentIsResolved('saved && saved in DESIGN_SYSTEMS ? saved : DEFAULT_SYSTEM', callSiteSrc, ['editorial']), false, 'a hand-rolled ternary is not a resolver');
+  // Source scan for a second owner of a webfont request.
+  eq(
+    tsFontProviderRequests('const href = "https://fonts.googleapis.com/css2?family=Geist:wght@400&display=swap";'),
+    ['https://fonts.googleapis.com/css2?family=Geist:wght@400&display=swap'],
+    'a css2 request in a string literal is read — the "//" in https is not a comment',
+  );
+  eq(tsFontProviderRequests('// https://fonts.googleapis.com/css2?family=Geist:wght@400 — prose'), [], 'a URL quoted in a comment is documentation');
+  eq(tsFontProviderRequests('<link rel="preconnect" href="https://fonts.googleapis.com" />'), [], 'a preconnect to the host is a hint, not a stylesheet request');
   const fakeSources = new Map([
-    ['ok-wrapped.tsx', 'loadDesignSystemFont(resolveSystemId(v));'],
-    ['ok-guarded.tsx', 'if (!isSystemId(id)) return;\nloadDesignSystemFont(id);'],
+    ['ok.tsx', 'const name = DESIGN_SYSTEMS[systemId].name;'],
+    [FONTS_REL, 'const FONT_STYLESHEETS = { inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" };'],
   ]);
-  eq(checkSystemIdCallSites([...fakeSources.keys()], ['editorial'], (rel) => fakeSources.get(rel)).failures, [], 'resolved call sites pass');
+  eq(checkSystemIdSources([...fakeSources.keys()], (rel) => fakeSources.get(rel)), [], 'clean sources pass, and the picker map may hold requests');
   eq(
-    checkSystemIdCallSites(['raw.tsx'], ['editorial'], () => 'import { resolveSystemId } from "x";\nloadDesignSystemFont(saved);').failures.map((f) => f.kind),
+    checkSystemIdSources(['second-owner.tsx'], () => 'link.href = "https://fonts.googleapis.com/css2?family=Geist:wght@400&display=swap";').map((f) => f.kind),
+    ['font-source-coverage'],
+    'a webfont request outside the picker map is a second owner and fails',
+  );
+  eq(
+    checkSystemIdSources(['raw.tsx'], () => 'if (saved in DESIGN_SYSTEMS) apply(saved);').map((f) => f.kind),
     ['system-id-resolution'],
-    'a raw call site fails even while the file still imports the resolver',
+    'a hand-rolled membership test in any source fails',
   );
-  eq(
-    checkSystemIdCallSites(['none.tsx'], ['editorial'], () => 'const x = 1;').failures.map((f) => f.kind),
-    ['parser-rot'],
-    'a codebase with no caller at all is parser rot, not a pass',
-  );
+  eq(checkSystemIdSources([], () => '').map((f) => f.kind), ['parser-rot'], 'scanning no files at all is parser rot, not a pass');
 }
 
 // ---------------------------------------------------------------------------
@@ -3236,7 +3272,6 @@ if (!bootFonts.consumesFallback) fail('boot-generation', `${HTML_REL} does not c
 // setting, the page keeps rendering in the fallback face.
 // ---------------------------------------------------------------------------
 const fontSheets = parseTsStringMap(fontsSrc, 'FONT_STYLESHEETS');
-const systemSheets = parseTsStringMap(fontsSrc, 'SYSTEM_STYLESHEETS');
 
 if (!fontSheets.found) fail('parser-rot', `could not locate "const FONT_STYLESHEETS … = { … };" in ${FONTS_REL}`);
 if (fontSheets.found && !fontSheets.entries.size) {
@@ -3249,52 +3284,41 @@ if (tsFonts.fonts.size && fontSheets.entries.size) {
   failures.push(...compareFontStylesheets(tsFonts.fonts, fontSheets.entries));
 }
 
-if (!systemSheets.found) fail('parser-rot', `could not locate "const SYSTEM_STYLESHEETS … = { … };" in ${FONTS_REL}`);
-if (systemSheets.found && !systemSheets.entries.size) {
-  fail('parser-rot', `parsed ZERO entries out of SYSTEM_STYLESHEETS in ${FONTS_REL}`);
-}
-for (const part of systemSheets.malformed) {
-  fail('parser-rot', `SYSTEM_STYLESHEETS entry in ${FONTS_REL} is not an "id: 'href'" pair: ${part}`);
-}
-if (tsSystems.ids.length && systemSheets.entries.size) {
-  failures.push(
-    ...compareIdSets(
-      'system-stylesheet',
-      [...systemSheets.entries.keys()],
-      tsSystems.ids,
-      (id) => `SYSTEM_STYLESHEETS in ${FONTS_REL} downloads a display font for "${id}" but DESIGN_SYSTEMS in ${TS_REL} does not offer that system — nothing can ever select it`,
-      (id) => `design system "${id}" is offered by DESIGN_SYSTEMS in ${TS_REL} but has no SYSTEM_STYLESHEETS entry in ${FONTS_REL} — ${CSS_REL} still NAMES its display family, so choosing it downloads nothing and silently paints in that declaration's fallback face`,
-    ),
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Stored-id resolution: junk resolves to the DEFAULT system, in both halves.
+// The same walk also catches a second owner of a webfont request in TS/TSX.
 // ---------------------------------------------------------------------------
 const clientSourceRels = walkSourceFiles(CLIENT_SRC_REL);
 if (!clientSourceRels.length) {
   fail('parser-rot', `walked ZERO .ts/.tsx files under ${CLIENT_SRC_REL} — the source scan went vacuous`);
 }
-const systemIdCallSites = checkSystemIdCallSites(clientSourceRels, tsSystems.ids);
-failures.push(...systemIdCallSites.failures);
+failures.push(...checkSystemIdSources(clientSourceRels));
 if (tsSystems.ids.length && defaultSystemId) {
-  failures.push(
-    ...checkSystemIdResolution(tsSrc, {
-      systemIds: tsSystems.ids,
-      defaultSystemId,
-      sheetIds: new Set(systemSheets.entries.keys()),
-    }),
-  );
+  failures.push(...checkSystemIdResolution(tsSrc, { systemIds: tsSystems.ids, defaultSystemId }));
 }
 
 // ---------------------------------------------------------------------------
+// The canonical font request: the ONE always-on <link> in the HTML shell must
+// be the design source's request, byte for byte (parity W1).
+// ---------------------------------------------------------------------------
+const staticFontHrefs = parseHtmlStylesheetLinks(htmlSrc);
+const staticProviderHrefs = parseHtmlFontProviderLinks(htmlSrc);
+let designHtmlSrc = null;
+try {
+  designHtmlSrc = read(DESIGN_HTML_REL);
+} catch (err) {
+  fail('parser-rot', `could not read the design source ${DESIGN_HTML_REL} (${err.message}) — the canonical font request cannot be verified without it`);
+}
+const designFontHrefs = designHtmlSrc === null ? [] : parseHtmlFontProviderLinks(designHtmlSrc);
+if (designHtmlSrc !== null) failures.push(...compareCanonicalFontRequest(staticProviderHrefs, designFontHrefs));
+
+// ---------------------------------------------------------------------------
 // Font coverage: a --font-* token is a declaration, not a download (#411).
-// Every family a design system NAMES has to be fetched by a loader that runs
-// for that system, and every face those loaders fetch has to be named back.
+// Every family a design system NAMES has to be fetched by the always-on
+// request above — the only loader that runs for a system.
 // ---------------------------------------------------------------------------
 const cssRootFonts = parseCssRootFonts(cssSrc);
 const cssSystemFonts = parseCssSystemFonts(cssSrc);
-const staticFontHrefs = parseHtmlStylesheetLinks(htmlSrc);
 const clientMarkupRels = walkClientMarkupFiles();
 const clientCssRels = clientMarkupRels.filter((rel) => rel.endsWith('.css'));
 const clientHtmlRels = clientMarkupRels.filter((rel) => rel.endsWith('.html'));
@@ -3322,26 +3346,14 @@ const stylesheetCspTargets = [
     href,
     consequence: `choosing font option "${id}" keeps rendering in the fallback face`,
   })),
-  ...[...systemSheets.entries].map(([id, href]) => ({
-    id: `system:${id}`,
-    label: `SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL}`,
-    href,
-    consequence: `design system "${id}" paints in its fallback face`,
-  })),
   ...staticFontHrefs.map((href, index) => ({
     id: `html:pre-paint:${index + 1}`,
     label: `pre-paint <link rel="stylesheet"> #${index + 1} in ${HTML_REL}`,
     href,
-    consequence: 'the first paint uses the next family in the stack',
+    consequence: 'the first paint uses the next family in the stack, for every system',
   })),
 ];
-failures.push(
-  ...compareFontSourceCoverage(discoveredFontSources, [
-    ...fontSheets.entries.values(),
-    ...systemSheets.entries.values(),
-    ...staticFontHrefs,
-  ]),
-);
+failures.push(...compareFontSourceCoverage(discoveredFontSources, [...fontSheets.entries.values(), ...staticFontHrefs]));
 failures.push(...compareStylesheetCsp(stylesheetCspTargets, csp.styleSrc));
 
 if (!cssRootFonts) {
@@ -3359,10 +3371,8 @@ if (cssRootFonts?.size && tsSystems.ids.length) {
   failures.push(
     ...compareSystemFontCoverage({
       systemIds: tsSystems.ids,
-      defaultSystemId,
       rootFonts: cssRootFonts,
       systemFonts: cssSystemFonts,
-      systemSheets: systemSheets.entries,
       staticHrefs: staticFontHrefs,
     }),
   );
@@ -3375,9 +3385,10 @@ if (failures.length) {
   console.error(`       ${VITE_REL} must inject its derived THEME_BOOT_DATA into ${HTML_REL}.`);
   console.error(`       ${VITE_REL} must also inject FONT_OPTIONS-derived FONT_BOOT_DATA from`);
   console.error(`       ${FONTS_REL}; picker swatches still mirror the paint in ${CSS_REL}.`);
-  console.error('       A stack is only half of a webfont: the FONT_STYLESHEETS /');
-  console.error(`       SYSTEM_STYLESHEETS maps in ${FONTS_REL} are what fetch the face,`);
-  console.error('       so a stylesheet fix has to land with every stack fix.');
+  console.error('       A stack is only half of a webfont: the always-on <link> in');
+  console.error(`       ${HTML_REL} (the design source's canonical request, byte for byte)`);
+  console.error(`       and FONT_STYLESHEETS in ${FONTS_REL} are what fetch the face, so a`);
+  console.error('       stylesheet fix has to land with every stack fix.');
   if (NETWORK) {
     console.error('\n       --network probe SKIPPED: there is no point asking the network about');
     console.error('       URLs this repo already disagrees with itself about. Fix the above, rerun.');
@@ -3424,30 +3435,28 @@ for (const id of tsFonts.fonts.keys()) {
   console.log(`       ${id.padEnd(12)} ${href ? parseStylesheetFamilies(href).join(' + ') : '(no webfont — empty stack)'}`);
 }
 console.log(
-  `PASS system-stylesheet :: ${systemSheets.entries.size} stylesheet(s) fetched, one per DESIGN_SYSTEMS id — ${[...systemSheets.entries.keys()].join(', ')}`,
+  `PASS canonical-font-request :: the one always-on <link rel="stylesheet"> in ${HTML_REL} is byte-identical to the design source's request in ${DESIGN_HTML_REL} — ${describeCss2Href(staticProviderHrefs[0])
+    .families.size} families: ${[...describeCss2Href(staticProviderHrefs[0]).families].map(([family, spec]) => `${family}${spec ? `:${spec}` : ''}`).join(', ')}`,
 );
 console.log(
   `PASS font-csp :: ${stylesheetCspTargets.length} stylesheet URL(s) are allowed by style-src; ${csp.styleSrc.length} style-src and ${csp.fontSrc.length} font-src directive(s) agree across ${csp.headerCount} CSP block(s) in ${SERVER_REL}`,
 );
 console.log(
-  `PASS font-source-coverage :: ${discoveredFontSources.length} provider stylesheet reference(s) across ${clientCssRels.length} CSS file(s) and ${clientHtmlRels.length} HTML entry point(s) are already represented by a probed source`,
+  `PASS font-source-coverage :: ${discoveredFontSources.length} provider stylesheet reference(s) across ${clientCssRels.length} CSS file(s) and ${clientHtmlRels.length} HTML entry point(s) are already represented by a probed source; ${clientSourceRels.length} TS/TSX file(s) carry no webfont request outside FONT_STYLESHEETS`,
 );
 const alwaysOnFamilies = staticFontHrefs.flatMap(parseStylesheetFamilies);
 console.log(
-  `PASS system-id-resolution :: the shipped resolver was executed — every offered id resolves to itself, and ${INHERITED_KEYS.map((k) => `"${k}"`).join(', ')}, a retired id, "" and null all resolve to "${defaultSystemId}" (which has a stylesheet); ${systemIdCallSites.consumers.length} loadDesignSystemFont() caller(s) hand it a resolved id: ${systemIdCallSites.consumers
-    .map((c) => `${c.rel} (${c.args.join(', ')})`)
-    .join('; ')}`,
+  `PASS system-id-resolution :: the shipped resolver was executed — every offered id resolves to itself, and ${INHERITED_KEYS.map((k) => `"${k}"`).join(', ')}, a retired id, "" and null all resolve to "${defaultSystemId}"; ${clientSourceRels.length} client source file(s) use no prototype-chain membership test`,
 );
 console.log(
-  `PASS system-font-coverage :: every family named by ${FONT_TOKENS.join(' / ')} downloads for the system that names it`,
+  `PASS system-font-coverage :: every family named by ${FONT_TOKENS.join(' / ')} is carried by the always-on request, for every system`,
 );
 console.log(`       always-on (${HTML_REL}, pre-paint, every visitor) ${alwaysOnFamilies.join(' + ') || '(none)'}`);
 for (const id of [...tsSystems.ids].sort()) {
   const asked = [...effectiveSystemFonts(id, cssRootFonts, cssSystemFonts)]
     .map(([token, { value }]) => `${token.replace('--font-', '')}=${stackFamilies(value ?? '')[0] ?? '?'}`)
     .join(' ');
-  const href = systemSheets.entries.get(id);
-  console.log(`       ${id.padEnd(10)} ${asked.padEnd(52)} → ${href ? parseStylesheetFamilies(href).join(' + ') : '(no stylesheet)'}`);
+  console.log(`       ${id.padEnd(10)} ${asked}`);
 }
 console.log('\nPASS accent-drift :: the generated pre-paint theme/font registries, picker swatches, painted tokens, and stylesheets all agree');
 
@@ -3485,11 +3494,12 @@ for (const href of shellHttpLinks) {
     label: `the pre-paint <link rel="stylesheet"> in ${HTML_REL}`,
     href,
     families: parseStylesheetFamilies(href),
-    consequence: 'every page paints its body text in the next family of the stack instead of the primary face',
+    consequence: 'every page, on every system, paints in the next family of the stack instead of the primary face',
   });
 }
 
-// 2 · the picker's per-option faces, 3 · each design system's display face.
+// 2 · the picker's per-option faces. (Design systems have no stylesheet of
+//     their own: the shell link above carries every family they name.)
 for (const [id, href] of fontSheets.entries) {
   targets.push({
     id: `font:${id}`,
@@ -3499,19 +3509,9 @@ for (const [id, href] of fontSheets.entries) {
     consequence: `choosing font option "${id}" reports the new setting and keeps rendering in the fallback face — the page just looks unchanged`,
   });
 }
-for (const [id, href] of systemSheets.entries) {
-  targets.push({
-    id: `system:${id}`,
-    label: `SYSTEM_STYLESHEETS["${id}"] in ${FONTS_REL}`,
-    href,
-    families: parseStylesheetFamilies(href),
-    consequence: `design system "${id}" paints in the fallback of its --font-display declaration instead of its own face`,
-  });
-}
-
 // A URL naming no family is unverifiable, not agreement: there is nothing to
 // hold the response to. (FONT_STYLESHEETS already fails that offline; the
-// shell link and SYSTEM_STYLESHEETS have no such check.)
+// shell link has no such check.)
 const verifiable = [];
 for (const target of targets) {
   if (!target.families.length) {

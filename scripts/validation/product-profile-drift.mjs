@@ -88,10 +88,10 @@ expect(
   "Runtime and pre-paint route classification do not share one generated source",
 );
 expect(
-  main.includes('document.documentElement.getAttribute("data-system")') &&
-    main.includes("loadDesignSystemFont(resolveSystemId(selectedSystemAtBoot))") &&
-    !main.includes('selectedSystemAtBoot = localStorage.getItem("ds-system")'),
-  "Initial font loading does not consume the profile/saved system resolved before paint",
+  !main.includes('localStorage.getItem("ds-system")') &&
+    !main.includes("loadDesignSystemFont") &&
+    main.includes("loadFontOverride(fontOverrideAtBoot)"),
+  "Boot font work must be limited to the saved picker override — the canonical <link> in client/index.html carries every system's families, and the pre-paint boot owns saved-system/profile precedence",
 );
 expect(
   vite.includes("PRODUCT_PROFILE_BOOT_DATA") &&

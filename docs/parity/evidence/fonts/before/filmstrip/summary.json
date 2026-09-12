@@ -1,0 +1,88 @@
+{
+  "phase": "before",
+  "app": "http://127.0.0.1:5000",
+  "runs": {
+    "cold": {
+      "framesTotal": 12,
+      "framesUnique": 7,
+      "framesKept": [
+        "301ms",
+        "498ms",
+        "918ms",
+        "1013ms",
+        "1065ms",
+        "1112ms",
+        "1164ms"
+      ],
+      "h1FirstSample": {
+        "t": 70,
+        "text": "Awesome Video",
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+        "width": 319,
+        "height": 48,
+        "fontsReadyAt": 0.7999999998137355
+      },
+      "h1LastSample": {
+        "t": 4003,
+        "text": "Awesome Video Resources",
+        "family": "Fraunces, Georgia, serif",
+        "width": 343,
+        "height": 62.38,
+        "fontsReadyAt": 0.7999999998137355
+      },
+      "widthChanges": [
+        {
+          "t": 866,
+          "from": 319,
+          "to": 343,
+          "fromText": "Awesome Video",
+          "toText": "Awesome Video Resources",
+          "toFamily": "Fraunces, Georgia, serif"
+        }
+      ],
+      "fontsReadyAt": 0.7999999998137355,
+      "sampleCount": 228
+    },
+    "warm": {
+      "framesTotal": 12,
+      "framesUnique": 7,
+      "framesKept": [
+        "26ms",
+        "82ms",
+        "327ms",
+        "429ms",
+        "476ms",
+        "490ms",
+        "566ms"
+      ],
+      "h1FirstSample": {
+        "t": 31,
+        "text": "Awesome Video",
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif",
+        "width": 319,
+        "height": 48,
+        "fontsReadyAt": 1.6999999999534339
+      },
+      "h1LastSample": {
+        "t": 4014,
+        "text": "Awesome Video Resources",
+        "family": "Fraunces, Georgia, serif",
+        "width": 343,
+        "height": 62.38,
+        "fontsReadyAt": 1.6999999999534339
+      },
+      "widthChanges": [
+        {
+          "t": 413,
+          "from": 319,
+          "to": 343,
+          "fromText": "Awesome Video",
+          "toText": "Awesome Video Resources",
+          "toFamily": "Fraunces, Georgia, serif"
+        }
+      ],
+      "fontsReadyAt": 1.6999999999534339,
+      "sampleCount": 233
+    }
+  }
+}

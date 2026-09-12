@@ -63,3 +63,11 @@ live probe origin before the fix. **How to apply:** any headless capture,
 crawler, or audit that touches production must be assembled from all three
 layers and smoke-tested against a probe origin that tries POST/PUT/beacon,
 WS, blob workers, a cross-origin iframe and the five popup vectors.
+
+**Local Lighthouse through the same harness:** pointing the baseline capture
+at the dev server with `--only lighthouse --max-navigations 1` audits just `/`
+in ~30 s. Read only per-audit rows (`font-display`, `uses-rel-preconnect`,
+CLS…) against the production baseline, never category scores: the sealed
+realm makes Vite's HMR client log a refused WebSocket, which alone costs
+`errors-in-console` (best-practices 1 → 0.96), and unbundled HTTP/1.1 modules
+make every performance number incomparable.

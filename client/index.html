@@ -269,22 +269,22 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Editorial is the canonical first-paint system. Load its native display
-         faces here so Fraunces italic 400 is never browser-synthesized during
-         baseline capture; runtime loading still supplies every alternate system. -->
+    <!-- The ONE webfont request, copied byte-for-byte from the design source
+         (awesome-list-site-ds/index.html). Pixel parity with the design needs
+         both documents to declare the same @font-face set — same families,
+         weights, styles and axes — because a different axis subset (Fraunces
+         with `opsz`, Inter without 800) shapes different glyph outlines and
+         metrics. All nine families every design system names ride on this
+         single pre-paint link, so switching systems never fetches another
+         stylesheet; only picker overrides not in this set load on demand
+         (client/src/lib/font-options.ts). The accent-drift gate holds this
+         href equal to the design's. Unused families cost only CSS bytes: the
+         font files themselves download when a face is first used.
+         BUG-014: a plain stylesheet link (no preload + inline onload) so a
+         nonce-based CSP needs no inline event handler; display=swap keeps
+         FOUT control. -->
     <link rel="stylesheet"
-           href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" />
-    <!-- Load the primary body face before first paint. Optional picker faces
-         and non-default system faces are loaded on demand by the app. -->
-    <!-- BUG-014: load the primary font stylesheet directly. The previous
-         rel="preload" + inline onload="..." swap relied on an inline event
-         handler, which a nonce-based CSP (no 'unsafe-inline') blocks — nonces
-         do not cover inline event handlers. A plain stylesheet link needs no
-         inline JS, works under strict CSP, and keeps display=swap for FOUT
-         control. Same URL for all clients, so the old <noscript> duplicate is
-         no longer needed. -->
-    <link rel="stylesheet"
-           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" />
   </head>
   <body>
     <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.

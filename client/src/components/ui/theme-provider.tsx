@@ -19,7 +19,6 @@ import { safeGetItem } from "@/lib/safeStorage";
 import {
   FONT_LS_KEY,
   applyFontOverride,
-  loadDesignSystemFont,
   resolveFontOverrideId,
 } from "@/lib/font-options";
 
@@ -88,7 +87,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // then resolve both values from the writer's completed storage state.
         const nextSystem = resolveSystemId(safeGetItem("ds-system"));
         const nextAccent = resolveAccentId(safeGetItem("ds-accent"), nextSystem);
-        loadDesignSystemFont(resolveSystemId(nextSystem));
         setSystemId(nextSystem);
         setAccentId(nextAccent);
         syncTimer = null;
@@ -104,7 +102,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setSystem = useCallback((id: string) => {
     if (!isSystemId(id)) return;
-    loadDesignSystemFont(id);
     setSystemId(id);
     /* On system change, nudge the accent to the system's natural default
        only if the user is still on the previous system's natural default.

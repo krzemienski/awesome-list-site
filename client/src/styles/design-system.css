@@ -37,13 +37,13 @@
   --accent-2: #b84dff;
 
   /* Naming a family here does not download it. Every FIRST family in these
-     three stacks must also be fetched by a loader that runs for the active
-     system — the always-on <link> in client/index.html (Inter) or that
-     system's SYSTEM_STYLESHEETS entry in client/src/lib/font-options.ts.
-     #411: every system named a mono family and no loader carried one, so
-     .mono/.kbd/.textarea/.eyebrow quietly painted in ui-monospace. The
-     accent-drift gate now fails on a --font-* family with no loader behind
-     it, here and in every :root[data-system="…"] block below. */
+     three stacks must also be fetched by the one always-on <link> in
+     client/index.html — the design source's canonical nine-family request,
+     which carries every family all five systems name. #411: every system
+     named a mono family and no loader carried one, so .mono/.kbd/.textarea/
+     .eyebrow quietly painted in ui-monospace. The accent-drift gate now
+     fails on a --font-* family that link does not fetch, here and in every
+     :root[data-system="…"] block below. */
   --font-body:    'Inter', system-ui, sans-serif;
   --font-display: 'Fraunces', Georgia, serif;
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;

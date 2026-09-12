@@ -67,6 +67,19 @@ Machine-readable additions and hashes are in `source-sync.json`.
 - Touch guidance conflicts: component visuals include 26–36px controls while the governing accessibility contract requires 44px targets. Preserve the 44px production contract; do not treat undersized reference hit boxes as required behavior.
 - Breakpoint guidance conflicts: source CSS hides the sidebar at `max-width: 768px` and opens tablet drawer access through 1024px, while the governing brief requires a 240px sidebar at exactly 768px and drawer only below 768px. Future implementation must follow the explicit 375/768/1024/1440 contract and record the reconciliation; this source sync does not rewrite upstream bytes.
 
+## Fonts
+
+The app declares the same web-font set as the design source. Since parity wave 1 (September 12, 2026) `client/index.html` carries exactly one always-on font stylesheet, and its `href` is the design's request (`awesome-list-site-ds/index.html` line 10) byte for byte:
+
+```
+https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap
+```
+
+- Nine families, one request, preceded by `preconnect` to `fonts.googleapis.com` and `fonts.gstatic.com`, exactly as the design loads them. Every `--font-display` / `--font-body` / `--font-mono` family of all five design systems is in this set, so switching systems requests no further stylesheet; only picker overrides outside the set (DM Sans, Source Sans 3) load on demand from `client/src/lib/font-options.ts`.
+- **Why Fraunces lost the `opsz` axis.** The app used to request `Fraunces:ital,opsz,wght@0,9..144,400…` while the design requests `Fraunces:ital,wght@0,400…` — no optical-size axis. Google Fonts serves a different variable-font subset for each axis list, and a different subset means different glyph outlines and different advance widths/vertical metrics, so a heading set in "Fraunces 600" on both pages still rasterised differently and could never meet a 0.5 % pixel gate. The face set must be identical on both sides — same families, weights, styles *and axes* — and the design is the source of truth, so the `opsz` axis (and the app-only weight 800) were dropped rather than the gate loosened. Inter gained weight 800 and Fraunces italic 500/600 for the same reason: the design declares them.
+- Verified by `docs/parity/evidence/fonts/font-set.mjs`: `[...document.fonts]` after `document.fonts.ready` lists 39 identical (family, weight, style) faces on the app's `/` and the design page, with 0 faces on either side only (`docs/parity/evidence/fonts/after/font-set.md`; the pre-change gap was 1 app-only / 26 design-only).
+- Held by `scripts/validation/accent-drift.mjs` (`canonical-font-request`): it reads the design's `href` live and fails if the app's differs by a single byte, if a second always-on font link appears, or if any other module under `client/src` requests Google Fonts. A family a system token names that this link does not fetch is token drift and fails the gate; it is never a reason to widen the URL beyond the design's.
+
 ## Verification boundary
 
 Synchronization verifies provenance, hashes, load references, and static syntax only. No browser was run and no server/workflow was started. This is not evidence of visual or behavioral parity.

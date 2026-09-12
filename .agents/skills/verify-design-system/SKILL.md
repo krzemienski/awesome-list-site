@@ -282,8 +282,10 @@ or within the 5 lines above the value):
   a family misspelled in both a stack and its URL passes while Google Fonts
   answers 400. Editing a font URL? Also run the opt-in live probe
   `npm run validate:webfont-fetch` (`accent-drift.mjs --network`): it fetches
-  every `FONT_STYLESHEETS` / `SYSTEM_STYLESHEETS` URL and the pre-paint
-  `<link>` in `client/index.html` and requires HTTP 200 **plus** an
+  every `FONT_STYLESHEETS` URL and the canonical always-on `<link>` in
+  `client/index.html` (the design source's nine-family request, which the
+  same gate requires to be byte-identical to `awesome-list-site-ds/index.html`
+  — no per-system stylesheets exist) and requires HTTP 200 **plus** an
   `@font-face` for every family the URL asks for. It is not part of the
   validation suite (network), so nothing runs it for you.
 - The per-system default accent map `SYSTEM_DEFAULT_ACCENT` in

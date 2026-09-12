@@ -1,0 +1,2329 @@
+{
+  "phase": "after",
+  "capturedAt": "2026-09-12T18:54:02.023Z",
+  "app": "http://127.0.0.1:5000",
+  "pages": {
+    "design": {
+      "url": "http://127.0.0.1:38907/",
+      "links": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      ],
+      "fonts": [
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 1
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "700",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "400",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "500",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "600",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "700",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "400",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "500",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "600",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "700",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Instrument Serif",
+          "style": "italic",
+          "weight": "400",
+          "faces": 2,
+          "loaded": 0
+        },
+        {
+          "family": "Instrument Serif",
+          "style": "normal",
+          "weight": "400",
+          "faces": 2,
+          "loaded": 0
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "400",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "500",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "600",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "700",
+          "faces": 7,
+          "loaded": 0
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "800",
+          "faces": 7,
+          "loaded": 0
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "800",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "700",
+          "faces": 3,
+          "loaded": 0
+        }
+      ]
+    },
+    "app/": {
+      "url": "http://127.0.0.1:5000/",
+      "links": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      ],
+      "fonts": [
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 1
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "700",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "400",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "500",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "600",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "700",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "400",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "500",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "600",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "700",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Instrument Serif",
+          "style": "italic",
+          "weight": "400",
+          "faces": 2,
+          "loaded": 0
+        },
+        {
+          "family": "Instrument Serif",
+          "style": "normal",
+          "weight": "400",
+          "faces": 2,
+          "loaded": 0
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "400",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "500",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "600",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "700",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "800",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "800",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "700",
+          "faces": 3,
+          "loaded": 0
+        }
+      ]
+    },
+    "app/settings/theme": {
+      "url": "http://127.0.0.1:5000/settings/theme",
+      "links": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      ],
+      "fonts": [
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "italic",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 1
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 1
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Fraunces",
+          "style": "normal",
+          "weight": "700",
+          "faces": 3,
+          "loaded": 1
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "400",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "500",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "600",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "Geist",
+          "style": "normal",
+          "weight": "700",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "400",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "500",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "600",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Mono",
+          "style": "normal",
+          "weight": "700",
+          "faces": 5,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "IBM Plex Sans",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Instrument Serif",
+          "style": "italic",
+          "weight": "400",
+          "faces": 2,
+          "loaded": 0
+        },
+        {
+          "family": "Instrument Serif",
+          "style": "normal",
+          "weight": "400",
+          "faces": 2,
+          "loaded": 0
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "400",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "500",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "600",
+          "faces": 7,
+          "loaded": 1
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "700",
+          "faces": 7,
+          "loaded": 0
+        },
+        {
+          "family": "Inter",
+          "style": "normal",
+          "weight": "800",
+          "faces": 7,
+          "loaded": 0
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "JetBrains Mono",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 1
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "400",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "500",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "600",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "700",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Manrope",
+          "style": "normal",
+          "weight": "800",
+          "faces": 6,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "400",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "500",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "600",
+          "faces": 3,
+          "loaded": 0
+        },
+        {
+          "family": "Space Grotesk",
+          "style": "normal",
+          "weight": "700",
+          "faces": 3,
+          "loaded": 0
+        }
+      ],
+      "perSystem": {
+        "editorial": {
+          "tokens": {
+            "--font-display": "'Fraunces', Georgia, serif",
+            "--font-body": "'Inter', system-ui, sans-serif",
+            "--font-mono": "'JetBrains Mono', ui-monospace, monospace"
+          },
+          "heading": {
+            "text": "Theme Settings",
+            "fontFamily": "Fraunces, Georgia, serif",
+            "width": 171.0625
+          },
+          "links": [
+            "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "italic",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "normal",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 0
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "400",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "500",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "600",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "700",
+              "faces": 7,
+              "loaded": 0
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "800",
+              "faces": 7,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "800",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 0
+            }
+          ]
+        },
+        "terminal": {
+          "tokens": {
+            "--font-display": "'IBM Plex Mono', ui-monospace, monospace",
+            "--font-body": "'IBM Plex Mono', ui-monospace, monospace",
+            "--font-mono": "'IBM Plex Mono', ui-monospace, monospace"
+          },
+          "heading": {
+            "text": "Theme Settings",
+            "fontFamily": "\"IBM Plex Mono\", ui-monospace, monospace",
+            "width": 198.25
+          },
+          "links": [
+            "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "italic",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "normal",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 0
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "400",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "500",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "600",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "700",
+              "faces": 7,
+              "loaded": 0
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "800",
+              "faces": 7,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "800",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 0
+            }
+          ]
+        },
+        "geist": {
+          "tokens": {
+            "--font-display": "'Geist', 'Inter', system-ui, sans-serif",
+            "--font-body": "'Geist', 'Inter', system-ui, sans-serif",
+            "--font-mono": "'JetBrains Mono', ui-monospace, monospace"
+          },
+          "heading": {
+            "text": "Theme Settings",
+            "fontFamily": "Geist, Inter, system-ui, sans-serif",
+            "width": 166.921875
+          },
+          "links": [
+            "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "italic",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "normal",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 0
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "400",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "500",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "600",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "700",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "800",
+              "faces": 7,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "800",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 0
+            }
+          ]
+        },
+        "brutalist": {
+          "tokens": {
+            "--font-display": "'Instrument Serif', 'Times New Roman', serif",
+            "--font-body": "'Space Grotesk', system-ui, sans-serif",
+            "--font-mono": "'JetBrains Mono', ui-monospace, monospace"
+          },
+          "heading": {
+            "text": "Theme Settings",
+            "fontFamily": "\"Instrument Serif\", \"Times New Roman\", serif",
+            "width": 110.890625
+          },
+          "links": [
+            "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "italic",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 1
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "normal",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "400",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "500",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "600",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "700",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "800",
+              "faces": 7,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "800",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 0
+            }
+          ]
+        },
+        "swiss": {
+          "tokens": {
+            "--font-display": "'Manrope', system-ui, sans-serif",
+            "--font-body": "'Manrope', system-ui, sans-serif",
+            "--font-mono": "'IBM Plex Mono', ui-monospace, monospace"
+          },
+          "heading": {
+            "text": "Theme Settings",
+            "fontFamily": "Manrope, system-ui, sans-serif",
+            "width": 169.703125
+          },
+          "links": [
+            "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+          ],
+          "fonts": [
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "italic",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 0
+            },
+            {
+              "family": "Fraunces",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "Geist",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 5,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "IBM Plex Sans",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "italic",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 1
+            },
+            {
+              "family": "Instrument Serif",
+              "style": "normal",
+              "weight": "400",
+              "faces": 2,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "400",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "500",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "600",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "700",
+              "faces": 7,
+              "loaded": 1
+            },
+            {
+              "family": "Inter",
+              "style": "normal",
+              "weight": "800",
+              "faces": 7,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "JetBrains Mono",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "400",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "500",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "600",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "700",
+              "faces": 6,
+              "loaded": 1
+            },
+            {
+              "family": "Manrope",
+              "style": "normal",
+              "weight": "800",
+              "faces": 6,
+              "loaded": 0
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "400",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "500",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "600",
+              "faces": 3,
+              "loaded": 1
+            },
+            {
+              "family": "Space Grotesk",
+              "style": "normal",
+              "weight": "700",
+              "faces": 3,
+              "loaded": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "log": [
+    {
+      "page": "design",
+      "kind": "console.warning",
+      "text": "You are using the in-browser Babel transformer. Be sure to precompile your scripts for production - https://babeljs.io/docs/setup/"
+    },
+    {
+      "page": "design",
+      "kind": "console.error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "page": "app/",
+      "kind": "console.warning",
+      "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    },
+    {
+      "page": "app/settings/theme",
+      "kind": "console.warning",
+      "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    }
+  ],
+  "diff": {
+    "shared": 39,
+    "appOnly": [],
+    "designOnly": []
+  }
+}

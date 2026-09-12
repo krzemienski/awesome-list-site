@@ -1,7 +1,6 @@
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { resolveSystemId } from "./lib/design-system";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,7 +11,7 @@ import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
 import { needsCorpusRoute } from "./lib/static-data";
-import { loadDesignSystemFont, loadFontOverride } from "./lib/font-options";
+import { loadFontOverride } from "./lib/font-options";
 
 function afterFirstPaint(callback: () => void): void {
   const scheduleIdle = () => {
@@ -55,9 +54,9 @@ function afterFirstPaint(callback: () => void): void {
 }
 
 // The inline pre-paint boot has already resolved saved-theme precedence and
-// product-profile defaults. Read its painted result so first-time learning and
-// admin visits load Geist/Swiss fonts rather than the global Editorial fallback.
-const selectedSystemAtBoot = document.documentElement.getAttribute("data-system");
+// product-profile defaults, and the canonical <link> in index.html carries
+// every family the five systems name, so no per-system font work happens
+// here; only a saved picker override may still need its stylesheet.
 let fontOverrideAtBoot: string | null = null;
 try {
   fontOverrideAtBoot = localStorage.getItem("ds-font-override");
@@ -72,10 +71,6 @@ afterFirstPaint(() => {
   initMixpanel();
   initPosthog();
   initAmplitude();
-  // #411: validate the pre-paint result before selecting a stylesheet. The
-  // profile-aware boot script owns saved/default resolution; this loader owns
-  // fetching the faces for exactly the system the document already paints.
-  loadDesignSystemFont(resolveSystemId(selectedSystemAtBoot));
   if (fontOverrideAtBoot) loadFontOverride(fontOverrideAtBoot);
 });
 

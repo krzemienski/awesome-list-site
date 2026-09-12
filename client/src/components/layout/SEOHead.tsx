@@ -213,9 +213,9 @@ export default function SEOHead({
         </>
       )}
 
-      {/* Performance and Preconnect Hints */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      {/* Performance hints. The webfont preconnects and the single canonical
+          font request live in the static <head> of client/index.html (the one
+          owner of the base font set); nothing font-related is injected here. */}
       <link rel="dns-prefetch" href="//github.com" />
       <link rel="dns-prefetch" href="//api.github.com" />
     </Helmet>

@@ -15,12 +15,14 @@
 //    This uses rendered widths, not document.fonts.check: the same sample must
 //    measure identically with the declared stack and the primary family alone,
 //    but differently with the stack's generic fallback.
-// 5. The active system's Google Fonts loader requests every inventoried weight;
-//    a temporary URL mutation proves a missing weight names its system, token,
-//    and weight instead of passing because the family itself is present.
+// 5. The canonical always-on Google Fonts request in client/index.html (the
+//    design source's, carrying every family all five systems name) requests
+//    every inventoried weight of the active system; a temporary URL mutation
+//    proves a missing weight names its system, token, and weight instead of
+//    passing because the family itself is present.
 // 6. Every non-system font override selected in the picker paints its intended
 //    body family at every meaningful body weight. Its own loader is scoped
-//    separately from the always-on/system loaders, and a temporary URL mutation
+//    separately from the always-on request, and a temporary URL mutation
 //    proves a missing weight names the option id and weight.
 //
 // Requires the dev server on :5000 (public route, no login). Exits 1 on any
@@ -370,10 +372,9 @@ try {
       mismatches.length === 0
         ? `${total} rendered token values match getComputedStyle`
         : `${mismatches.length}/${total} stale rows, e.g. ${JSON.stringify(mismatches.slice(0, 3))}`);
-    // Font availability is document-scoped. Do not measure in the showcase
-    // page after several switches: previously loaded system stylesheets stay
-    // registered there and can mask a missing family in a later system that
-    // happens to share the face (Terminal and Swiss both use IBM Plex Mono).
+    // Measure each system in a fresh document booted INTO that system, so the
+    // weights inventoried are the ones its own surfaces paint from first
+    // paint, not leftovers of whichever system the showcase switched through.
     const fontContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
     await fontContext.addInitScript((systemId) => {
       localStorage.setItem('ds-system', systemId);
@@ -571,18 +572,24 @@ try {
       ? `--accent row shows ${accentShown.trim()} for violet`
       : `${afterAccent.mismatches.length} stale rows after accent flip`);
 
-  // Mutation proof: remove one requested weight from the active system's
-  // loader URL. Existing @font-face rules may remain registered in this
-  // document, so this deliberately tests the URL-vs-inventory comparator
-  // rather than relying on a browser unload. The href is restored immediately.
+  // Mutation proof: remove one requested weight of the active system's display
+  // family from the canonical always-on request (the one font-provider link
+  // without data-font-option — there is no per-system stylesheet any more).
+  // Existing @font-face rules may remain registered in this document, so this
+  // deliberately tests the URL-vs-inventory comparator rather than relying on
+  // a browser unload. The href is restored immediately.
   const mutationTarget = await page.evaluate(() => {
-    const links = [...document.querySelectorAll('link[data-font-href]')];
-    const link = links.at(-1);
+    const link = [...document.querySelectorAll('link[rel="stylesheet"]')]
+      .find((candidate) => /fonts\.googleapis\.com\/css2/.test(candidate.href) && !candidate.dataset.fontOption);
     if (!link) return null;
-    const systemHref = link.getAttribute('href') || link.href;
-    const href = new URL(systemHref, location.href);
+    const displayStack = getComputedStyle(document.documentElement).getPropertyValue('--font-display').trim();
+    const displayFamily = (displayStack.split(',')[0] || '').trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+    const shellHref = link.getAttribute('href') || link.href;
+    const href = new URL(shellHref, location.href);
     const families = href.searchParams.getAll('family');
-    const first = families.find((family) => /(?:^|[:,])wght@/.test(family));
+    const first = families.find(
+      (family) => family.split(':')[0].trim().toLowerCase() === displayFamily && /(?:^|[:,])wght@/.test(family),
+    );
     if (!first) return null;
     const weightMatch = first.match(/wght@[^;,&]*;(\d+(?:\.\d+)?)/);
     const weight = weightMatch ? Number(weightMatch[1]) : 700;
@@ -605,8 +612,8 @@ try {
   const mutated = mutationResult.find((result) => result.missingWeights?.includes(mutationTarget?.weight));
   log('font-paint-mutation-detection', Boolean(mutationTarget && mutated && !mutated.pass),
     mutationTarget && mutated
-      ? `system=swiss token=${mutated.token} weight=${mutationTarget.weight} was ${mutated.pass ? 'not detected' : 'detected'} after removing it from the loader URL`
-      : 'could not remove a requested static weight from the active system loader URL');
+      ? `system=swiss token=${mutated.token} weight=${mutationTarget.weight} was ${mutated.pass ? 'not detected' : 'detected'} after removing it from the canonical always-on request`
+      : "could not remove a requested static weight of the active system's display family from the canonical always-on request");
 } finally {
   await browser.close();
 }

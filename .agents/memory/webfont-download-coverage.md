@@ -5,17 +5,19 @@ description: Why a font family named in a stack or a --font-* var can still rend
 
 # Webfont download coverage
 
-Declaring a family — in a picker stack, in a `--font-*` custom property, in the pre-paint boot map — is only half of a webfont. The face renders only if some loader actually fetches the file, and the fetchers are separate from the declarations and from each other:
+Declaring a family — in a picker stack, in a `--font-*` custom property, in the pre-paint boot map — is only half of a webfont. The face renders only if some loader actually fetches the file, and the fetchers are separate from the declarations. Historically there were three of them (shell link with the body face only, a per-design-system stylesheet map fetched after first paint, a per-picker-option map) and no single one owned the whole set, so a family could be named by every declaration that matters and still never be downloaded.
 
-- the static `<link rel="stylesheet">` in the HTML shell (pre-paint, carries the primary body face only),
-- the per-design-system stylesheet map (fetched after first paint, for the selected system),
-- the per-picker-option stylesheet map (fetched only when a visitor selects that option).
+**Why:** this failure is invisible in the way that matters. The setting sticks, the attribute flips, the computed `font-family` reads back correct — and the text quietly renders in the next family in the chain (`system-ui`, `ui-monospace`). Unlike a rejected choice that resets on reload, there is nothing in the UI to notice. Mono faces were the usual casualty: `--font-mono` declared per system while the per-system maps fetched only each system's display/body face.
 
-No single map owns the whole set, so a family can be named by every declaration that matters and still never be downloaded.
+**How to apply:** when a font "doesn't apply", check the fetcher before the declaration — grep the loader for the family, not the CSS for the token. When adding a family to any declaration, confirm the loader that downloads it in the same change.
 
-**Why:** this failure is invisible in the way that matters. The setting sticks, the attribute flips, the computed `font-family` reads back correct — and the text quietly renders in the next family in the chain (`system-ui`, `ui-monospace`). Unlike a rejected choice that resets on reload, there is nothing in the UI to notice. Mono faces are the usual casualty: `--font-mono` is declared per system while the per-system maps fetch only each system's display/body face.
+## The shell owns ONE request, copied from the design source (parity W1, September 2026)
 
-**How to apply:** when a font "doesn't apply", check the fetcher before the declaration — grep the loader maps for the family, not the CSS for the token. When adding a family to any declaration, add or confirm the loader that downloads it in the same change. Merging families into an existing per-system Google Fonts URL (`&family=…`) closes the gap for free: same single request, so no new pre-paint cost.
+The always-on `<link rel="stylesheet">` in the HTML shell now IS the whole set: the design source's single Google Fonts css2 request (nine families — Inter, Fraunces, JetBrains Mono, Geist, Instrument Serif, Space Grotesk, IBM Plex Mono, IBM Plex Sans, Manrope), byte-identical. The per-design-system stylesheet map and its loader were deleted, not kept "lazy": every family any system's `--font-*` names is already in that link, so a lazy path would be dead code. Only picker overrides outside the set (DM Sans, Source Sans 3) still load on demand.
+
+**Why:** pixel parity needs both documents to declare the same `@font-face` set — same families, weights, styles AND axes. Google Fonts serves a different variable subset per axis list: the app's `Fraunces:ital,opsz,wght@…9..144…` and the design's `Fraunces:ital,wght@…` both "have Fraunces 600", but from different font files with different outlines and advance widths, so headings drifted by pixels while every family/weight/style check passed. `[...document.fonts]` triples cannot see this; only the request URL can.
+
+**How to apply:** never edit the shell font URL by hand — it must stay equal to the design's (`accent-drift` reads the design html live and fails on one byte, on a second always-on font link, or on any other `client/src` module requesting Google Fonts). If a system's token names a family the link lacks, that is token drift: fix the token, never widen the URL past the design. Unused declared families cost only CSS bytes — browsers fetch font files on first use, so the nine-family link still downloads exactly two files on `/`. Compare face sets with a probe that lists `document.fonts` on both pages after `fonts.ready` (`docs/parity/evidence/fonts/font-set.mjs`), and diff the *hrefs* too.
 
 
 ## One stored id, two halves

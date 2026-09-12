@@ -6,12 +6,17 @@
  * because it runs before bundle resolution, so the generated object keeps the
  * no-flash behavior without introducing a second hand-maintained font list.
  *
- * A stack is only half of a webfont: the two maps below are what actually
- * download the files, and the same gate holds each of them to its registry —
- * see the rule stated above each map. That failure is quieter than a reset:
- * an option whose stack is right but whose stylesheet is missing (or which
- * fetches a family the stack never names) reports the new setting and keeps
- * rendering in the fallback face, so the page just looks unchanged.
+ * A stack is only half of a webfont: something has to download the files.
+ * The always-on <link rel="stylesheet"> in `client/index.html` is the ONE
+ * request for every family the five design systems name — it is copied
+ * byte-for-byte from the design source (awesome-list-site-ds/index.html) so
+ * both documents declare the same @font-face set, which pixel parity
+ * requires. Switching systems therefore fetches nothing; the map below only
+ * covers picker overrides, and the same gate holds it to FONT_OPTIONS — see
+ * the rule stated above it. That failure is quieter than a reset: an option
+ * whose stack is right but whose stylesheet is missing (or which fetches a
+ * family the stack never names) reports the new setting and keeps rendering
+ * in the fallback face, so the page just looks unchanged.
  *
  * That gate is offline: it can only catch the two sides DISAGREEING. A family
  * misspelled in BOTH the stack and its URL agrees with itself and passes,
@@ -50,35 +55,19 @@ export const FONT_BOOT_DATA = {
 // the URL fetches must be one that entry's stack names. "System default"
 // (stack: "") is the one option with no webfont — that exemption belongs to
 // the empty stack, not to the id, and is checked in both directions.
+//
+// Families the canonical shell request already carries (Inter, IBM Plex
+// Sans, JetBrains Mono) keep an entry so the picker contract stays uniform;
+// their weights mirror the shell's so the two declarations agree. The
+// per-system faces need no map at all: the shell <link> in client/index.html
+// fetches every family the five systems name (see the header above), so
+// switching systems is attribute-only.
 const FONT_STYLESHEETS: Record<string, string> = {
-  inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+  inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
   "dm-sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
   "source-sans": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap",
   "ibm-plex": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
   jetbrains: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap",
-};
-
-// RULE (enforced by the same gate): exactly one entry per DESIGN_SYSTEMS id in
-// `client/src/lib/design-system.ts`, and that ONE stylesheet fetches EVERY
-// family the system names — --font-display, --font-body AND --font-mono in
-// its :root[data-system="…"] block in client/src/styles/design-system.css
-// (:root itself for the default system) — minus whatever the always-on
-// pre-paint <link> in client/index.html already carries (Inter). A system
-// missing here, or an entry that skips one of the three tokens, still has
-// that family NAMED by the CSS while nothing downloads it, so those surfaces
-// paint in the declaration's fallback: mono text falls through to the
-// browser's ui-monospace with nothing in the UI to notice. #411: --font-mono
-// was exactly that gap in four of the five systems.
-//
-// One multi-`family=` URL per system keeps the fix free: still a single
-// request, made after the first paint, only for the system in use — no new
-// pre-paint blocking request for a face only some systems need.
-const SYSTEM_STYLESHEETS: Record<string, string> = {
-  editorial: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap",
-  terminal: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap",
-  geist: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap",
-  brutalist: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&display=swap",
-  swiss: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap",
 };
 
 function loadStylesheet(href: string, fontOptionId?: string): void {
@@ -101,12 +90,6 @@ function loadStylesheet(href: string, fontOptionId?: string): void {
 export function loadFontOverride(id: string): void {
   const href = FONT_STYLESHEETS[id];
   if (href) loadStylesheet(href, id);
-}
-
-/** Load every webfont the selected design system names, after the first paint. */
-export function loadDesignSystemFont(systemId: string): void {
-  const href = SYSTEM_STYLESHEETS[systemId];
-  if (href) loadStylesheet(href);
 }
 
 export function applyFontOverride(id: string): void {
