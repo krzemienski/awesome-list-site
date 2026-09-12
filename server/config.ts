@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
+import type { ResourceKindTagMappings } from '@shared/resourceKinds';
 
 interface SiteConfig {
   title: string;
@@ -54,6 +55,36 @@ interface FeaturesConfig {
   ai_descriptions: boolean;
 }
 
+/**
+ * Design-parity resource kinds. The stored `resources.kind` always wins; when
+ * it is null, shared/resourceKinds.ts resolves a kind at read time from these
+ * tag mappings (merged with its generic defaults), falling back to "other".
+ */
+interface ResourceKindsConfig {
+  tag_mappings: ResourceKindTagMappings;
+}
+
+/**
+ * Contact destinations for the five default-off contact variants.
+ *
+ * `enabled` is the master switch for the in-app form endpoint
+ * (POST /api/contact). It is intentionally NOT read from the YAML file: the
+ * only way to turn it on is the CONTACT_ENABLED=true environment variable, so
+ * a checked-in config can never enable it by accident.
+ */
+interface ContactConfig {
+  enabled: boolean;
+  /** mailto: destination; empty means "no email destination". */
+  email: string;
+  /** https: issue tracker; empty means derive from source.url when possible. */
+  issues_url: string;
+  /** https: discussions destination; only used when discussions_verified is true. */
+  discussions_url: string;
+  discussions_verified: boolean;
+  /** Days a contact submission is kept before the retention purge deletes it. */
+  retention_days: number;
+}
+
 interface AwesomeListConfig {
   site: SiteConfig;
   source: SourceConfig;
@@ -64,7 +95,11 @@ interface AwesomeListConfig {
   deploy: Record<string, unknown>;
   seo: Record<string, unknown>;
   performance: Record<string, unknown>;
+  resource_kinds: ResourceKindsConfig;
+  contact: ContactConfig;
 }
+
+const CONTACT_ENABLED = process.env.CONTACT_ENABLED === "true";
 
 // Default configuration
 const defaultConfig: AwesomeListConfig = {
@@ -108,7 +143,18 @@ const defaultConfig: AwesomeListConfig = {
   build: {},
   deploy: {},
   seo: {},
-  performance: {}
+  performance: {},
+  resource_kinds: {
+    tag_mappings: {}
+  },
+  contact: {
+    enabled: CONTACT_ENABLED,
+    email: process.env.CONTACT_EMAIL ?? "",
+    issues_url: process.env.CONTACT_ISSUES_URL ?? "",
+    discussions_url: process.env.CONTACT_DISCUSSIONS_URL ?? "",
+    discussions_verified: process.env.CONTACT_DISCUSSIONS_VERIFIED === "true",
+    retention_days: 180
+  }
 };
 
 function loadConfig(): AwesomeListConfig {
@@ -127,7 +173,21 @@ function loadConfig(): AwesomeListConfig {
         source: { ...defaultConfig.source, ...yamlConfig.source },
         theme: { ...defaultConfig.theme, ...yamlConfig.theme },
         analytics: { ...defaultConfig.analytics, ...yamlConfig.analytics },
-        features: { ...defaultConfig.features, ...yamlConfig.features }
+        features: { ...defaultConfig.features, ...yamlConfig.features },
+        resource_kinds: {
+          ...defaultConfig.resource_kinds,
+          ...yamlConfig.resource_kinds,
+          tag_mappings: {
+            ...defaultConfig.resource_kinds.tag_mappings,
+            ...yamlConfig.resource_kinds?.tag_mappings
+          }
+        },
+        contact: {
+          ...defaultConfig.contact,
+          ...yamlConfig.contact,
+          // The form switch is environment-only; see ContactConfig.
+          enabled: CONTACT_ENABLED
+        }
       };
     }
   } catch (error) {
@@ -138,4 +198,4 @@ function loadConfig(): AwesomeListConfig {
 }
 
 export const config = loadConfig();
-export type { AwesomeListConfig, SiteConfig, SourceConfig, ThemeConfig, AnalyticsConfig, FeaturesConfig };
+export type { AwesomeListConfig, SiteConfig, SourceConfig, ThemeConfig, AnalyticsConfig, FeaturesConfig, ResourceKindsConfig, ContactConfig };

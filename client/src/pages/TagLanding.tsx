@@ -1,4 +1,3 @@
-import "@/components/parity/parity-styles";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { Link, Redirect, useLocation, useParams, useSearch } from "wouter";
@@ -126,7 +125,7 @@ export default function TagLanding() {
     nextPage > 1 ? `${canonicalPath}?page=${nextPage}` : canonicalPath;
 
   return (
-    <div className="parity-page parity-page-shell parity-tag-page space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
+    <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       <SEOHead
         title={pagedSeoTitleCore(titleCore, page)}
         description={pagedSeoDescription(description, page, totalPages)}

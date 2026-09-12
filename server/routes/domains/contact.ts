@@ -1,6 +1,6 @@
 import rateLimit from "express-rate-limit";
 import type { Express, RequestHandler } from "express";
-import { contactSubmissionSchema } from "@shared/contact";
+import { contactSubmissionSchema, type ContactSubmissionInput } from "@shared/contact";
 import type { ContactRepository } from "../../repositories";
 import { config } from "../../config";
 import { validateBody } from "../../validation/inputs";
@@ -12,11 +12,11 @@ export interface ContactRoutesContext {
   contactRepo: ContactRepository;
 }
 
-type ContactLinkEntry = {
+interface ContactLinkEntry {
   available: boolean;
   href?: string;
   unavailableReason?: string;
-};
+}
 
 function unavailable(reason: string): ContactLinkEntry {
   return { available: false, unavailableReason: reason };
@@ -66,7 +66,7 @@ function configuredDiscussions(): ContactLinkEntry {
 }
 
 const contactEnabled: RequestHandler = (_req, res, next) => {
-  if (!config.contact.form_enabled) {
+  if (!config.contact.enabled) {
     return res.status(404).json({ message: "Not found" });
   }
   next();
@@ -130,7 +130,7 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
         email: configuredEmail(),
         issues: configuredIssues(),
         discussions: configuredDiscussions(),
-        form: config.contact.form_enabled
+        form: config.contact.enabled
           ? { available: true, persistence: "database" as const }
           : { available: false, unavailableReason: "The contact form is disabled" },
       },
@@ -146,11 +146,13 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
     validateBody(contactSubmissionSchema),
     async (req, res) => {
       try {
+        // validateBody(contactSubmissionSchema) already parsed + replaced req.body.
+        const input = req.body as ContactSubmissionInput;
         const created = await ctx.contactRepo.createSubmission({
-          name: req.body.name,
-          replyTo: req.body.replyTo,
-          subject: req.body.subject,
-          message: req.body.message,
+          name: input.name,
+          replyTo: input.replyTo,
+          subject: input.subject,
+          message: input.message,
         });
         return res.json({ id: created.id, status: "received" });
       } catch (error) {

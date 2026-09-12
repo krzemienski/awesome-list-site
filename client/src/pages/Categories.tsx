@@ -1,4 +1,3 @@
-import "@/components/parity/parity-styles";
 import { TaxonomyCardSkeleton } from "@/components/ui/skeletons";
 import { useMemo, useState } from "react";
 import { TaxonomyCard } from "@/components/ui/taxonomy-card";
@@ -139,7 +138,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
   }, [baseCategories, sort]);
 
   return (
-    <div className="parity-page parity-page-shell parity-categories-page max-w-6xl mx-auto px-0 sm:px-4 space-y-6">
+    <div className="max-w-6xl mx-auto px-0 sm:px-4 space-y-6">
       <SEOHead
         title="All Categories"
         description="Browse all categories of curated video development resources on Awesome Video — players, encoders, codecs, streaming, AI, tools, and more."

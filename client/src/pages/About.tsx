@@ -1,4 +1,3 @@
-import "@/components/parity/parity-styles";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
@@ -35,7 +34,7 @@ export default function About() {
   });
   const aboutFaqs = getAboutFaqs(treeData?.resources?.length);
   return (
-    <div className="parity-page parity-page-shell parity-about-page container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
       {/* R5-005 (run24): use the shared SEOHead (canonical + robots + full
           OG/Twitter set) — the bare Helmet block here declared only
           title+description, so the single-head-set reconciliation stripped

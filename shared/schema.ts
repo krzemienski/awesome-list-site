@@ -24,6 +24,7 @@ import {
   type ResourceSkillLevel,
 } from "./resourceFacets";
 import type { BookmarkQueueStatus } from "./bookmarkCollections";
+import type { ResourceKind } from "./resourceKinds";
 import type {
   DigestAttemptOutcome,
   DigestCadence,
@@ -258,6 +259,11 @@ export const resources = pgTable(
     resourceFormat: text("resource_format").$type<ResourceFormat>().notNull().default("unknown"),
     provider: text("provider").$type<ResourceProvider>().notNull().default("unknown"),
     skillLevel: text("skill_level").$type<ResourceSkillLevel>().notNull().default("unknown"),
+    // Design-parity kind override (migrations/0047_resource_kind_and_contact.sql).
+    // Nullable and additive: existing imports omit it and the read-time resolver
+    // in shared/resourceKinds.ts infers a kind from tags when it is null. Never
+    // backfilled; a stored value always wins over inference.
+    kind: text("kind").$type<ResourceKind>(),
     status: text("status").default("approved"), // pending, approved, rejected, withdrawn, archived
     submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "cascade" }),
     approvedBy: varchar("approved_by").references(() => users.id),
@@ -299,6 +305,8 @@ export const resources = pgTable(
     check("resources_resource_format_check", sql`${table.resourceFormat} IN ('unknown','tool','library','player','sdk','api-service','platform','course','article','video','book','specification','dataset','community','other')`),
     check("resources_provider_check", sql`${table.provider} IN ('unknown','self-hosted','github','youtube','vimeo','aws','google-cloud','azure','cloudflare','mux','akamai','wowza','brightcove','bitmovin','other')`),
     check("resources_skill_level_check", sql`${table.skillLevel} IN ('unknown','beginner','intermediate','advanced','all-levels')`),
+    // Keep in lockstep with RESOURCE_KIND_VALUES in shared/resourceKinds.ts and migration 0047.
+    check("resources_kind_check", sql`${table.kind} IS NULL OR ${table.kind} IN ('tools','libraries','standards','events','protocols','other')`),
   ]
 );
 
@@ -323,6 +331,44 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
 
 export type InsertResource = z.infer<typeof insertResourceSchema>;
 export type Resource = typeof resources.$inferSelect;
+
+/**
+ * Contact submissions - private inbox for the default-off in-app contact form
+ * (migrations/0047_resource_kind_and_contact.sql).
+ *
+ * Rows are never exposed publicly. Retention is enforced by
+ * purgeExpiredContactSubmissions (server/repositories/ContactRepository.ts)
+ * using config.contact.retention_days. Length checks mirror
+ * shared/contact.ts so the database rejects anything validation let through.
+ */
+export const contactSubmissions = pgTable(
+  "contact_submissions",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: varchar("name", { length: 100 }).notNull(),
+    replyTo: varchar("reply_to", { length: 320 }).notNull(),
+    subject: varchar("subject", { length: 200 }).notNull(),
+    message: text("message").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_contact_submissions_created_at").on(table.createdAt),
+    check("contact_submissions_name_length_check", sql`char_length(trim(${table.name})) BETWEEN 1 AND 100`),
+    check("contact_submissions_reply_to_length_check", sql`char_length(${table.replyTo}) BETWEEN 3 AND 320`),
+    check("contact_submissions_subject_length_check", sql`char_length(trim(${table.subject})) BETWEEN 1 AND 200`),
+    check("contact_submissions_message_length_check", sql`char_length(${table.message}) BETWEEN 20 AND 4000`),
+  ]
+);
+
+const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).pick({
+  name: true,
+  replyTo: true,
+  subject: true,
+  message: true,
+});
+
+export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;
+export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 
 /**
  * Resource Edits table - Crowdsourced edit suggestions

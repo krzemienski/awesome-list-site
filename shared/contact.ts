@@ -2,7 +2,8 @@ import { z } from "zod";
 
 const singleLine = (max: number) =>
   z.string().trim().min(1).max(max)
-    .refine((value) => !/[\u0000-\u001f\u007f]/.test(value), "must be a single line");
+    // \p{Cc} = Unicode control characters (C0, DEL, C1) — newlines included.
+    .refine((value) => !/\p{Cc}/u.test(value), "must be a single line");
 
 export const contactSubmissionSchema = z.object({
   name: singleLine(100),
@@ -15,27 +16,4 @@ export const contactSubmissionSchema = z.object({
   website: z.string().max(0).optional(),
 }).strict();
 
-export const contactSubmissionResponseSchema = z.object({
-  id: z.string().uuid(),
-  status: z.literal("received"),
-});
-
 export type ContactSubmissionInput = z.infer<typeof contactSubmissionSchema>;
-export type ContactSubmissionResponse = z.infer<typeof contactSubmissionResponseSchema>;
-
-export const contactLinkEntrySchema = z.object({
-  available: z.boolean(),
-  href: z.string().optional(),
-  unavailableReason: z.string().optional(),
-});
-
-export const publicContactConfigSchema = z.object({
-  email: contactLinkEntrySchema,
-  issues: contactLinkEntrySchema,
-  discussions: contactLinkEntrySchema,
-  form: z.object({
-    available: z.boolean(),
-    persistence: z.literal("database").optional(),
-    unavailableReason: z.string().optional(),
-  }),
-});

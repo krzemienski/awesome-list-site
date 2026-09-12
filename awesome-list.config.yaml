@@ -122,3 +122,30 @@ performance:
   cache_duration: 3600
   # Lazy load images
   lazy_loading: true
+
+# Resource Kinds Configuration
+# A stored resource kind always wins. When a resource has no stored kind, the
+# read-time resolver infers one from its tags using these mappings (merged with
+# the generic defaults in shared/resourceKinds.ts) and falls back to "other".
+resource_kinds:
+  tag_mappings:
+    tools: []
+    libraries: []
+    standards: []
+    events: []
+    protocols: []
+
+# Contact Configuration
+# Destinations for the contact variants. Every destination is unavailable until
+# configured. The in-app form endpoint is enabled ONLY by the CONTACT_ENABLED=true
+# environment variable; it cannot be switched on from this file.
+contact:
+  # mailto: address, e.g. "mailto:hello@example.com" (empty = unavailable)
+  email: ""
+  # https: issue tracker (empty = derived from source.url when it is a GitHub raw URL)
+  issues_url: ""
+  # https: discussions destination; only offered when discussions_verified is true
+  discussions_url: ""
+  discussions_verified: false
+  # Days to keep contact submissions before the retention purge removes them
+  retention_days: 180

@@ -1,4 +1,3 @@
-import "@/components/parity/parity-styles";
 import { useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -94,7 +93,7 @@ export default function Advanced() {
 
   if (isLoading && tab !== "recommendations") {
     return (
-      <div className="parity-page parity-page-shell parity-advanced-page container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <Skeleton className="h-12 w-3/4 mb-4" />
         <Skeleton className="h-6 w-full mb-8" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -111,7 +110,7 @@ export default function Advanced() {
   // instead of the ambiguous "Unable to load" dead-end that offered no recovery.
   if (isError && tab !== "recommendations") {
     return (
-      <div className="parity-page parity-page-shell parity-advanced-page container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
         <div
           className="max-w-md mx-auto flex flex-col items-center gap-3 py-16 text-center"
@@ -148,7 +147,7 @@ export default function Advanced() {
   }
 
   return (
-    <div className="parity-page parity-page-shell parity-advanced-page container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
       <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
 
       {/* Header */}

@@ -1,23 +1,43 @@
+import { TaxonomyCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { HomePresentation, HomePresentationSkeleton, RESOURCE_KINDS, type HomeLayout, type ResourceKind } from "@/components/parity/HomePresentation";
-import { adaptCanonicalHomePayload, type CanonicalHomePayload } from "@/components/parity/canonicalDataAdapter";
+import { TaxonomyCard } from "@/components/ui/taxonomy-card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
-import { type AwesomeListNav } from "@/lib/static-data";
-import { apiRequest } from "@/lib/queryClient";
+import { Category, Resource } from "@/types/awesome-list";
+import { processAwesomeListData } from "@/lib/parser";
+import {
+  fetchStaticAwesomeList,
+  type AwesomeListNav,
+  type AwesomeListNavNode,
+} from "@/lib/static-data";
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import { useAuth } from "@/hooks/useAuth";
-import { parseTagsParam } from "@/lib/tags";
+import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
-import { Sparkles, LogIn } from "lucide-react";
+import {
+  FileText,
+  Video,
+  Code,
+  Play,
+  Settings,
+  Package,
+  Server,
+  Layers,
+  Users,
+  Sparkles,
+  LogIn,
+  Clapperboard,
+} from "lucide-react";
 
-// Home joins the lightweight nav tree to bounded summary/preview rows from the
-// dedicated read-only home endpoint. It never downloads the full corpus.
+// Run23 R-06: Home renders from the ~few-KB nav tree (+ /api/tags for the
+// filter panel). The 3.1MB corpus is fetched lazily ONLY when a tag filter is
+// active (per-category match counts need per-resource tags).
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding-values";
 
@@ -60,6 +80,70 @@ function FilterControlsFallback() {
 interface HomeProps {
   nav?: AwesomeListNav;
   navLoading: boolean;
+}
+
+// Unified card shape whether the grid renders from the nav tree (default) or
+// the corpus (tag-filter mode).
+interface DisplayCategory {
+  name: string;
+  slug: string;
+  displayCount: number;
+  teaser?: { title: string; description: string };
+}
+
+const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
+
+function isRealCategory(name: string): boolean {
+  return (
+    name !== "Table of contents" &&
+    !name.startsWith("List of") &&
+    !EXCLUDED_CATEGORY_NAMES.includes(name)
+  );
+}
+
+function navTotalCount(node: AwesomeListNavNode): number {
+  let total = node.resourceCount || 0;
+  for (const sub of node.subcategories || []) total += navTotalCount(sub);
+  for (const ss of node.subSubcategories || []) total += navTotalCount(ss);
+  return total;
+}
+
+const categoryIcons: { [key: string]: any } = {
+  "Intro & Learning": FileText,
+  "Protocols & Transport": Server,
+  "Encoding & Codecs": Code,
+  "Players & Clients": Play,
+  "Media Tools": Clapperboard,
+  "Standards & Industry": Package,
+  "Infrastructure & Delivery": Layers,
+  "General Tools": Settings,
+  "Community & Events": Users,
+};
+
+function getTotalResourceCount(item: any): number {
+  let total = item.resources?.length || 0;
+  if (item.subcategories) {
+    total += item.subcategories.reduce((sum: number, sub: any) => sum + getTotalResourceCount(sub), 0);
+  }
+  if (item.subSubcategories) {
+    total += item.subSubcategories.reduce((sum: number, subSub: any) => sum + getTotalResourceCount(subSub), 0);
+  }
+  return total;
+}
+
+function getAllResources(category: Category): Resource[] {
+  let all = [...(category.resources || [])];
+  if (category.subcategories) {
+    for (const sub of category.subcategories) {
+      all = all.concat(sub.resources || []);
+      if (sub.subSubcategories) {
+        for (const ss of sub.subSubcategories) {
+          all = all.concat(ss.resources || []);
+        }
+      }
+    }
+  }
+  return all;
 }
 
 export default function Home({ nav, navLoading }: HomeProps) {
@@ -136,28 +220,6 @@ export default function Home({ nav, navLoading }: HomeProps) {
     return fromUrl && VALID_SORTS.includes(fromUrl) ? fromUrl : "default";
   });
 
-  const [homeLayout, setHomeLayoutState] = useState<HomeLayout>(() => {
-    const value = new URLSearchParams(window.location.search).get("layout");
-    return value === "curated" ? "curated" : "index";
-  });
-  const [selectedKind, setSelectedKindState] = useState<ResourceKind | null>(() => {
-    const value = new URLSearchParams(window.location.search).get("kind") as ResourceKind | null;
-    return RESOURCE_KINDS.some((kind) => kind.id === value) ? value : null;
-  });
-  const setHomeLayout = (layout: HomeLayout) => {
-    setHomeLayoutState(layout);
-    writeFilterParams({ layout: layout === "index" ? null : layout });
-  };
-  const setSelectedKind = (kind: ResourceKind | null) => {
-    setSelectedKindState(kind);
-    writeFilterParams({ kind });
-  };
-  const clearHomeFilters = () => {
-    setSelectedTagsState([]);
-    setSelectedKindState(null);
-    writeFilterParams({ tags: null, kind: null });
-  };
-
   const handleSortChange = (next: string) => {
     setSortBy(next);
     // Run22 BUG-016: push (not replace) so Back steps through sort changes.
@@ -171,9 +233,6 @@ export default function Home({ nav, navLoading }: HomeProps) {
     setSelectedTagsState(parseTagsParam(params));
     const s = params.get("sort");
     setSortBy(s && VALID_SORTS.includes(s) ? s : "default");
-    setHomeLayoutState(params.get("layout") === "curated" ? "curated" : "index");
-    const kind = params.get("kind") as ResourceKind | null;
-    setSelectedKindState(RESOURCE_KINDS.some((item) => item.id === kind) ? kind : null);
   });
 
   // Run23 R-06: corpus is a lazy dependency — only fetched once a tag filter

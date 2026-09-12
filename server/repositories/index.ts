@@ -20,6 +20,7 @@
  * - GithubSyncRepository: GitHub sync queue and history
  * - EnrichmentRepository: AI enrichment jobs and queue
  * - AdminRepository: Administrative statistics and operations
+ * - ContactRepository: Private contact-form inbox and retention purge
  *
  * BENEFITS:
  * - Single Responsibility: Each repository handles one domain
@@ -68,6 +69,7 @@ export { AuditRepository } from './AuditRepository';
 export { GithubSyncRepository } from './GithubSyncRepository';
 export { EnrichmentRepository } from './EnrichmentRepository';
 export { AdminRepository, type AdminStats } from './AdminRepository';
+export { ContactRepository, purgeExpiredContactSubmissions } from './ContactRepository';
 export {
   LegacyRepository,
   type AwesomeListData,

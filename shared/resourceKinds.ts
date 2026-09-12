@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export const RESOURCE_KIND_VALUES = [
+// Exports stay minimal on purpose: the dead-exports gate rejects symbols with
+// no importer, so helpers are exported only once a consumer exists.
+const RESOURCE_KIND_VALUES = [
   "tools",
   "libraries",
   "standards",
@@ -9,11 +11,9 @@ export const RESOURCE_KIND_VALUES = [
   "other",
 ] as const;
 
-export const resourceKindSchema = z.enum(RESOURCE_KIND_VALUES);
-export const nullableResourceKindSchema = resourceKindSchema.nullable();
+const resourceKindSchema = z.enum(RESOURCE_KIND_VALUES);
 
 export type ResourceKind = z.infer<typeof resourceKindSchema>;
-export type ResourceKindCounts = Record<ResourceKind, number>;
 export type ResourceKindTagMappings = Partial<Record<ResourceKind, readonly string[]>>;
 
 const GENERIC_KIND_TAG_MAPPINGS: Record<ResourceKind, readonly string[]> = {
@@ -25,7 +25,7 @@ const GENERIC_KIND_TAG_MAPPINGS: Record<ResourceKind, readonly string[]> = {
   other: [],
 };
 
-export function normalizeResourceKindTag(value: string): string {
+function normalizeResourceKindTag(value: string): string {
   return value
     .normalize("NFKC")
     .trim()
@@ -34,7 +34,7 @@ export function normalizeResourceKindTag(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export function buildResourceKindTagMappings(
+function buildResourceKindTagMappings(
   configured: ResourceKindTagMappings = {},
 ): Record<ResourceKind, readonly string[]> {
   return Object.fromEntries(
@@ -69,15 +69,4 @@ export function resolveResourceKind(
     if (mappings[kind].some((tag) => normalizedTags.has(tag))) return kind;
   }
   return "other";
-}
-
-export function emptyResourceKindCounts(): ResourceKindCounts {
-  return {
-    tools: 0,
-    libraries: 0,
-    standards: 0,
-    events: 0,
-    protocols: 0,
-    other: 0,
-  };
 }
