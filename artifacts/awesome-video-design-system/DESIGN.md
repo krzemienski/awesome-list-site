@@ -4,6 +4,23 @@ This is the first-class Replit design-system artifact for Awesome.Video. It is t
 workspace-recognized home of the same federated design system that ships in the app.
 There is no separate “Replit theme” and no copied retro/reference implementation.
 
+## Reference authority and implementation
+
+The approved visual reference is the newer modular Index/Curated generation of
+the supplied design archive (SHA-256
+`19f0240c46caf790bfc384e21f123525699e1ff386fe892f8084bf73337302c9`), held
+byte-exact in `awesome-list-site-ds/` by the design-source sync recorded in
+`docs/parity/DESIGN-SYNC.md`. Its application, showcase, flow anatomy, and
+21-page documentation govern the intended presentation; the archive itself is
+gitignored, so that directory and its recorded hashes are the durable authority.
+
+The sources below remain the **shipping implementation authority**, not proof
+of visual parity. Translate approved reference changes into those sources and
+regenerate projections; do not hand-edit generated tokens, import historical
+standalone applications into production, or create a second foundation.
+Independent captures of this artifact's own running pages must prove its
+parity; captures of the main application's `/design-system` cannot.
+
 ## Canonical ownership
 
 | Resource | Responsibility |

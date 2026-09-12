@@ -12,6 +12,8 @@
 - [Dedup cascade safety](resource-dedup-cascade-safety.md) — bulk hard-delete of duplicate resources silently cascades dependent rows; journal row contents and repoint them before deleting.
 - [Empty taxonomy cleanup](empty-taxonomy-cleanup.md) — empty nodes hard-delete-safe; pre-check full-chain 0 across ALL statuses + 0 orphans; prod=no direct write, rename-then-delete via admin API (guard is name-global).
 - [Dev server no hot-reload](dev-server-no-watch.md) — tsx runs without --watch; restart the workflow after every server edit before API-testing.
+- [Reference sync gate history](design-reference-independence.md) — why the archive root is frozen out of palette/profile gates (125 findings + hard fail when raw-copied); the frozen check reads a gitignored zip by upload name → ENOENT in other workspaces.
+- [Dev listener selection](dev-listener-selection.md) — the proxied dev hostname can serve the artifact's HTML for /api/*; address 127.0.0.1:5000 vs the artifact port explicitly; `eslint .` is pre-existing red on all .mjs.
 - [Pre-boot param scrubber honesty](scrubbed-params-honesty.md) — index.html deletes XSS-shaped query params before React boots; "silent full-catalog fallback" on q/tags = the scrubber, surface via window.__scrubbedParams notice.
 - [SPA crawler/SEO prerender](spa-crawler-prerender.md) — crawler visibility = og-middleware injecting content into `<!--app-html-->`, NOT React SSR (no prod server bundle; never set __INITIAL_DATA__ → createRoot replaces).
 - [SEO soft-404 + sitemap](seo-soft-404-architecture.md) — SPA hard-codes 200, so set 404 in og-middleware's buffered res.end; indexable set must equal sitemap; malformed %-URLs crash vite dev via decodeURI — guard before next().
