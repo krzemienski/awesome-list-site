@@ -1,0 +1,18 @@
+{
+  "screen": "app.home.curated",
+  "width": 1440,
+  "side": "actual",
+  "error": "app exposes no curated home layout control ([data-testid=home-layout-curated] or a control named /curated/i)",
+  "url": "http://127.0.0.1:5000/",
+  "title": "Awesome Video — 1816+ Curated Video & Streaming Resources",
+  "bodyTextHead": "Skip to main content\nToggle sidebar\nAWESOME.VIDEO\nHome\nSearch resources...\n/\nN\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nAdmin\nBROWSE\nCategories · 9\n1,816 resources\nCommunity & Events\n80\nCommunity Groups\n40\nOnline Forums\n1\nEvents & Conferences\n40\nPodcasts & Webinars\n1\nEncoding & Codecs\n333\nBenchmarking & Performance Tools for Codecs\n2\nCloud-Based Encoding Solutions\n9\nCodecs\n23\nAV1\n5\nHEVC\n10\nVP9\n1\nComparative Analysis of Codecs\n1\nContainerization & Packaging Tools\n19\nOrigin Servers\n1\nEncoding Tools\n120\nFFmpeg\n50\nFFmpeg-Based Tools\n14\nHardware Accelerated Transcoding\n4\nHar",
+  "console": [
+    {
+      "type": "warning",
+      "text": "Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    }
+  ],
+  "pageErrors": [],
+  "failedRequests": [],
+  "apiFailures": []
+}
