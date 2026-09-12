@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "dbf112bb-0eb2-4f87-8949-abd0f956a074",
       "capturedAt": "2026-09-12T06:24:37.323Z",
       "requestedUrl": "https://awesome.video/privacy",
       "finalUrl": "https://awesome.video/privacy",
@@ -80,10 +81,12 @@
         "height": 3426,
         "bytes": 383643,
         "truncated": false,
-        "documentHeight": 3426
+        "documentHeight": 3426,
+        "sha256": "dc36a30baae22bcddcd95d49be479e592efba64edf5934606dc675f5bbd945b4"
       }
     },
     "768": {
+      "unitId": "ff7451ce-65d5-41cd-b6ef-8c2e5222c531",
       "capturedAt": "2026-09-12T06:24:40.422Z",
       "requestedUrl": "https://awesome.video/privacy",
       "finalUrl": "https://awesome.video/privacy",
@@ -168,10 +171,12 @@
         "height": 2358,
         "bytes": 497742,
         "truncated": false,
-        "documentHeight": 2358
+        "documentHeight": 2358,
+        "sha256": "798d3575ac92ed8cd2557a0f2eeee436fed1b5ebc745d8d9c5ad8a5bfb3c8ff8"
       }
     },
     "1024": {
+      "unitId": "2e434ced-8670-4f6e-8362-5f8913a0a18b",
       "capturedAt": "2026-09-12T06:24:43.077Z",
       "requestedUrl": "https://awesome.video/privacy",
       "finalUrl": "https://awesome.video/privacy",
@@ -618,10 +623,12 @@
         "height": 2247,
         "bytes": 500052,
         "truncated": false,
-        "documentHeight": 2247
+        "documentHeight": 2247,
+        "sha256": "34bafe17f77322104f94907331fd064351afb55f60ece7d57f9b1535d55246bc"
       }
     },
     "1440": {
+      "unitId": "006f3656-9f0f-4ad8-b0d2-27fd891a1c79",
       "capturedAt": "2026-09-12T06:24:45.725Z",
       "requestedUrl": "https://awesome.video/privacy",
       "finalUrl": "https://awesome.video/privacy",
@@ -1068,7 +1075,8 @@
         "height": 1954,
         "bytes": 521181,
         "truncated": false,
-        "documentHeight": 1954
+        "documentHeight": 1954,
+        "sha256": "7de9569f135c49f8cd55f78ed719fe8168ffc2c9aeeb431ade5d491c27fbfdae"
       }
     }
   },

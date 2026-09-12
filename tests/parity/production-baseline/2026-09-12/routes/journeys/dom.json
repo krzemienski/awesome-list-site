@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "ff676fa6-1ff1-497d-baf7-16928f3632a9",
       "capturedAt": "2026-09-12T06:22:58.028Z",
       "requestedUrl": "https://awesome.video/journeys",
       "finalUrl": "https://awesome.video/journeys",
@@ -106,10 +107,12 @@
         "height": 2723,
         "bytes": 182357,
         "truncated": false,
-        "documentHeight": 2723
+        "documentHeight": 2723,
+        "sha256": "fe7d140026db43fd77c8698050ed8a0a5cdc271d47e077a5d468d99e985e5ef0"
       }
     },
     "768": {
+      "unitId": "1ba1258e-2089-4a99-a1db-be4942273473",
       "capturedAt": "2026-09-12T06:23:01.110Z",
       "requestedUrl": "https://awesome.video/journeys",
       "finalUrl": "https://awesome.video/journeys",
@@ -220,10 +223,12 @@
         "height": 1821,
         "bytes": 190819,
         "truncated": false,
-        "documentHeight": 1821
+        "documentHeight": 1821,
+        "sha256": "dd1c4a0950e2af6f136b63bdb120c4a87913de6f6267eab7505c967bdf7cfeb0"
       }
     },
     "1024": {
+      "unitId": "76cf5947-7908-4529-8fee-7ae6a971b502",
       "capturedAt": "2026-09-12T06:23:03.612Z",
       "requestedUrl": "https://awesome.video/journeys",
       "finalUrl": "https://awesome.video/journeys",
@@ -696,10 +701,12 @@
         "height": 1811,
         "bytes": 223445,
         "truncated": false,
-        "documentHeight": 1811
+        "documentHeight": 1811,
+        "sha256": "ea021fd8d3bb8cac9c21c7f7767db3762e9cc9369fbc9917880abbc31dd7c0ba"
       }
     },
     "1440": {
+      "unitId": "a1232858-afc3-4276-8c5f-6b93ed85f766",
       "capturedAt": "2026-09-12T06:23:06.163Z",
       "requestedUrl": "https://awesome.video/journeys",
       "finalUrl": "https://awesome.video/journeys",
@@ -1172,7 +1179,8 @@
         "height": 1279,
         "bytes": 223822,
         "truncated": false,
-        "documentHeight": 1279
+        "documentHeight": 1279,
+        "sha256": "08883a82f338f3fa58525df1a285fdeb8bb5bb256439baf82e8cd0aef28bf78c"
       }
     }
   },

@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "2020befb-dee1-42af-9a36-853af6bf2843",
       "capturedAt": "2026-09-12T06:24:10.224Z",
       "requestedUrl": "https://awesome.video/design-system",
       "finalUrl": "https://awesome.video/design-system",
@@ -141,10 +142,12 @@
         "height": 7097,
         "bytes": 488591,
         "truncated": false,
-        "documentHeight": 7097
+        "documentHeight": 7097,
+        "sha256": "556d856d11e390c16157c5a0b6469eaf9c2c8b4dc329e6a5608ea7373d4932bc"
       }
     },
     "768": {
+      "unitId": "43fc4279-f5e6-410d-b422-369268da7715",
       "capturedAt": "2026-09-12T06:24:14.175Z",
       "requestedUrl": "https://awesome.video/design-system",
       "finalUrl": "https://awesome.video/design-system",
@@ -290,10 +293,12 @@
         "height": 5832,
         "bytes": 562967,
         "truncated": false,
-        "documentHeight": 5832
+        "documentHeight": 5832,
+        "sha256": "291bab7f25dedbd7742bf3799097d75eb30a3f3ae323121f381e2b1768f16475"
       }
     },
     "1024": {
+      "unitId": "7994888e-a9fa-47bc-8485-04076c10a8dc",
       "capturedAt": "2026-09-12T06:24:17.430Z",
       "requestedUrl": "https://awesome.video/design-system",
       "finalUrl": "https://awesome.video/design-system",
@@ -801,10 +806,12 @@
         "height": 5752,
         "bytes": 579059,
         "truncated": false,
-        "documentHeight": 5752
+        "documentHeight": 5752,
+        "sha256": "1b3e3542aec5bc9a81270846371469901eceddc5e099e88c0c4c6c67aeaf32ec"
       }
     },
     "1440": {
+      "unitId": "825fc37f-44bb-4425-8534-68bd0feb4744",
       "capturedAt": "2026-09-12T06:24:20.795Z",
       "requestedUrl": "https://awesome.video/design-system",
       "finalUrl": "https://awesome.video/design-system",
@@ -1312,7 +1319,8 @@
         "height": 5500,
         "bytes": 633924,
         "truncated": false,
-        "documentHeight": 5500
+        "documentHeight": 5500,
+        "sha256": "2c0f783d8e0d2519035e55fdc0cac4f6a3ebf1ee5edcb1b8f3450a0eb3e972d4"
       }
     }
   },

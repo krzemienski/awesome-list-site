@@ -24,8 +24,9 @@ import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
-import { fileURLToPath } from "node:url";
+import { createHash, randomUUID } from "node:crypto";
+import { createRequire } from "node:module";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 import sharp from "sharp";
 import { AxeBuilder } from "@axe-core/playwright";
@@ -99,6 +100,23 @@ const LIGHTHOUSE_CATEGORIES = ["performance", "accessibility", "best-practices",
 const RETRYABLE_STATUSES = new Set([429, 503]);
 const MAX_ATTEMPTS = 6;
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+// Runs before any page script (Playwright addInitScript / Puppeteer
+// evaluateOnNewDocument): every WebSocket construction is recorded and refused,
+// because socket frames never pass through request routing. Dedicated workers
+// have their own global and are outside this stub; the product opens no
+// sockets at all (nothing in client/src references WebSocket).
+const WEBSOCKET_STUB_SOURCE = `(() => {
+  const attempted = [];
+  Object.defineProperty(window, "__baselineBlockedWebSockets", { value: attempted });
+  class BlockedWebSocket {
+    constructor(url) {
+      attempted.push(String(url));
+      throw new DOMException("WebSocket refused: production-baseline capture is read-only", "SecurityError");
+    }
+  }
+  Object.assign(BlockedWebSocket, { CONNECTING: 0, OPEN: 1, CLOSING: 2, CLOSED: 3 });
+  window.WebSocket = BlockedWebSocket;
+})();`;
 const MAX_REDIRECT_HOPS = 10;
 const CHROMIUM_MAX_CAPTURE_HEIGHT = 16384;
 const USER_AGENT =
@@ -157,7 +175,48 @@ export function parseOriginUrl(value, flag) {
   }
   if (!/^https?:$/.test(url.protocol)) throw new Error(`${flag} must use http or https, got ${url.protocol}`);
   if (url.username || url.password) throw new Error(`${flag} must not carry credentials (userinfo is written to manifests and reports)`);
-  return url.href.replace(/\/$/, "");
+  // Routes are absolute paths resolved against the origin, so a base with its
+  // own path/query/hash would silently capture something else.
+  if (url.pathname !== "/" || url.search || url.hash) throw new Error(`${flag} must be a bare origin without path, query or fragment, got ${JSON.stringify(value)}`);
+  return url.origin;
+}
+
+function sha256File(file) {
+  try {
+    return sha256(fs.readFileSync(file));
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Navigation budget
+// ---------------------------------------------------------------------------
+//
+// One budget object is shared by every page load of an invocation — screenshot
+// captures, their throttle/timeout retries, and Lighthouse audits alike — and
+// is charged BEFORE the load is attempted, so `used` can never understate what
+// the origin actually served, even when the attempt throws.
+class NavigationBudgetExhausted extends Error {
+  constructor(label) {
+    super(`navigation budget exhausted before ${label}`);
+    this.name = "NavigationBudgetExhausted";
+  }
+}
+
+export function createNavigationBudget(max = Infinity) {
+  return {
+    max: Number.isFinite(max) ? max : Infinity,
+    used: 0,
+    get remaining() {
+      return this.max - this.used;
+    },
+    take(label) {
+      if (this.used >= this.max) throw new NavigationBudgetExhausted(label);
+      this.used += 1;
+    },
+  };
 }
 
 function sha256(value) {
@@ -378,6 +437,7 @@ function extractDom() {
     navLabels,
     visibleTestIds: testIds,
     documentHeight: document.documentElement.scrollHeight,
+    attemptedWebSockets: [...(window.__baselineBlockedWebSockets ?? [])],
   };
 }
 
@@ -430,9 +490,10 @@ async function fullPageScreenshot(page, viewport) {
 // One route × one viewport in a fresh context. Returns the DOM summary, the
 // PNG (already max-compressed), the axe result when requested, and the
 // browser-side navigation record (final URL + client-side redirect hops).
-async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry, log = console }) {
+async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry, log = console, budget = createNavigationBudget() }) {
   let lastReason = "no response";
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    budget.take(`${url}@${viewport.width} attempt ${attempt}`);
     const context = await browser.newContext({
       viewport,
       deviceScaleFactor: 1,
@@ -453,6 +514,14 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
       blockedRequests.push({ method: request.method(), url: request.url() });
       return route.abort("blockedbyclient");
     });
+    // WebSocket frames bypass request routing, so sockets are never connected
+    // to the server (the page sees a mocked, silent socket) and the
+    // constructor is stubbed as a second line for code that checks the class.
+    const blockedWebSockets = [];
+    await context.routeWebSocket("**", (ws) => {
+      blockedWebSockets.push(ws.url());
+    });
+    await context.addInitScript(WEBSOCKET_STUB_SOURCE);
     const page = await context.newPage();
     const clientNavigations = [];
     page.on("framenavigated", (frame) => {
@@ -483,7 +552,7 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
       await page.waitForTimeout(250);
       await settleFrames(page);
 
-      const dom = await page.evaluate(extractDom);
+      const { attemptedWebSockets, ...dom } = await page.evaluate(extractDom);
       const capture = {
         capturedAt: new Date().toISOString(),
         requestedUrl: url,
@@ -493,6 +562,7 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
         httpRedirects,
         clientNavigations: [...new Set(clientNavigations)],
         blockedRequests,
+        blockedWebSockets: [...new Set([...blockedWebSockets, ...attemptedWebSockets])],
         consentBanner,
         attempts: attempt,
         viewport: { ...viewport },
@@ -681,17 +751,54 @@ async function captureApi(base, endpoint, { telemetry, log } = {}) {
 // ---------------------------------------------------------------------------
 // Lighthouse (mobile preset) through the Playwright-launched Chromium
 // ---------------------------------------------------------------------------
+//
+// Lighthouse drives its own page over the remote-debugging port, outside the
+// Playwright contexts whose request routing enforces read-only traffic. So the
+// page is created here, through the puppeteer-core that Lighthouse itself
+// resolves (the only version its navigation runner is built against), with
+// request interception refusing every non-safe method and the WebSocket stub
+// installed, and handed to Lighthouse's page-mode API.
 
-async function runLighthouse({ url, port, log = console, telemetry }) {
+async function importLighthousePuppeteer() {
+  const requireFromLighthouse = createRequire(createRequire(import.meta.url).resolve("lighthouse/package.json"));
+  return (await import(pathToFileURL(requireFromLighthouse.resolve("puppeteer-core")).href)).default;
+}
+
+async function connectLighthouseBrowser(port) {
+  const puppeteer = await importLighthousePuppeteer();
+  return puppeteer.connect({ browserURL: `http://127.0.0.1:${port}`, defaultViewport: null });
+}
+
+async function openReadOnlyPage(puppeteerBrowser) {
+  const page = await puppeteerBrowser.newPage();
+  const blockedRequests = [];
+  await page.setRequestInterception(true);
+  page.on("request", (request) => {
+    if (SAFE_METHODS.has(request.method())) {
+      request.continue().catch(() => {});
+      return;
+    }
+    blockedRequests.push({ method: request.method(), url: request.url() });
+    request.abort("blockedbyclient").catch(() => {});
+  });
+  await page.evaluateOnNewDocument(WEBSOCKET_STUB_SOURCE);
+  return { page, blockedRequests };
+}
+
+async function runLighthouse({ url, puppeteerBrowser, log = console, telemetry, budget = createNavigationBudget() }) {
   const { default: lighthouse } = await import("lighthouse");
   let lastReason = "no result";
   for (let attempt = 1; attempt <= 4; attempt++) {
-    const result = await lighthouse(url, {
-      port,
-      output: "json",
-      logLevel: "error",
-      onlyCategories: LIGHTHOUSE_CATEGORIES,
-    });
+    budget.take(`lighthouse ${url} attempt ${attempt}`);
+    const { page, blockedRequests } = await openReadOnlyPage(puppeteerBrowser);
+    let result;
+    let blockedWebSockets = [];
+    try {
+      result = await lighthouse(url, { output: "json", logLevel: "error", onlyCategories: LIGHTHOUSE_CATEGORIES }, undefined, page);
+      blockedWebSockets = await page.evaluate(() => [...(window.__baselineBlockedWebSockets ?? [])]).catch(() => []);
+    } finally {
+      await page.close().catch(() => {});
+    }
     const lhr = result?.lhr;
     if (!lhr) throw new Error(`Lighthouse returned no result for ${url}`);
     const statusCode = lhr.audits?.["network-requests"]?.details?.items?.find((item) => item.resourceType === "Document")?.statusCode;
@@ -703,6 +810,7 @@ async function runLighthouse({ url, port, log = console, telemetry }) {
       await sleep(backoffMs(attempt));
       continue;
     }
+    if (blockedRequests.length) log.warn(`  lighthouse ${url}: refused ${blockedRequests.length} non-safe request(s)`);
     // The full-page screenshot and filmstrip are base64 PNGs (megabytes per
     // run) that add nothing a stored PNG capture does not already hold; the
     // treemap, internal timings and i18n lookup tables are tooling internals.
@@ -730,6 +838,9 @@ async function runLighthouse({ url, port, log = console, telemetry }) {
       fetchTime: lhr.fetchTime,
       finalDisplayedUrl: lhr.finalDisplayedUrl,
       formFactor: lhr.configSettings?.formFactor ?? null,
+      requestCount: lhr.audits?.["network-requests"]?.details?.items?.length ?? null,
+      blockedRequests,
+      blockedWebSockets,
     };
   }
   throw new Error(`Lighthouse for ${url}: still failing after 4 attempts (${lastReason})`);
@@ -743,14 +854,26 @@ export function routeDir(outDir, slug) {
   return path.join(outDir, "routes", slug);
 }
 
-// Captures one visitor route into <outDir>/routes/<slug>/. Resumable: a
-// viewport whose PNG, DOM record and (where required) axe record are all on
-// disk is kept unless `force`, so an interrupted run continues where it
-// stopped. A viewport is ONE unit — if any constituent is missing, all of them
-// are recaptured from a single fresh page load, so the PNG can never describe a
-// different load than the DOM/axe record next to it. Returns the number of
-// browser navigations performed.
-export async function captureRoute({ browser, base, route, outDir, viewports = VIEWPORTS, axeWidths = AXE_WIDTHS, force = false, telemetry, log = console, navigationBudget = Infinity }) {
+// Captures one visitor route into <outDir>/routes/<slug>/. Resumable, with a
+// route × viewport as the unit of work. A unit is complete only when its
+// three artefacts provably came from one page load:
+//
+//   dom.json  byViewport[w].unitId + screenshot.sha256   (written LAST)
+//   axe.json  byViewport[w].unitId                       (same id, axe widths)
+//   <slug>@<w>.png                                        (sha256 as recorded)
+//
+// The DOM record is the completion marker: before a viewport is (re)captured
+// its previous DOM/axe records are removed and persisted and its PNG deleted;
+// afterwards the PNG lands first, then the axe record, then the DOM record
+// naming both. A crash at any point leaves a unit that fails the binding
+// check and is recaptured whole — a PNG from one load can never sit beside a
+// DOM/axe record from another. Documents (robots, sitemap) bind the same way:
+// body file first, DOM record with the body's sha256 last.
+//
+// Every page load, including throttle/timeout retries, is charged to `budget`
+// before it starts; an exhausted budget ends the route with complete=false and
+// no partial unit left behind. Returns the loads this call performed.
+export async function captureRoute({ browser, base, route, outDir, viewports = VIEWPORTS, axeWidths = AXE_WIDTHS, force = false, telemetry, log = console, budget = createNavigationBudget() }) {
   const slug = routeSlug(route.path);
   const dir = routeDir(outDir, slug);
   fs.mkdirSync(dir, { recursive: true });
@@ -758,7 +881,7 @@ export async function captureRoute({ browser, base, route, outDir, viewports = V
   const statusPath = path.join(dir, "status.json");
   const domPath = path.join(dir, "dom.json");
   const axePath = path.join(dir, "axe.json");
-  let navigations = 0;
+  const usedBefore = budget.used;
 
   if (force || !fs.existsSync(statusPath)) {
     log.log(`  status probe ${route.path}`);
@@ -766,7 +889,8 @@ export async function captureRoute({ browser, base, route, outDir, viewports = V
   }
 
   if (route.kind === "document") {
-    if (!force && fs.existsSync(domPath)) return { slug, navigations, complete: true };
+    if (!force && documentUnitComplete(dir, readJson(domPath))) return { slug, navigations: 0, complete: true };
+    fs.rmSync(domPath, { force: true });
     const { response } = await fetchWithRetry(url, {}, { telemetry, log, label: route.path });
     const body = await response.text();
     const extension = documentExtension(route.path);
@@ -781,55 +905,80 @@ export async function captureRoute({ browser, base, route, outDir, viewports = V
       bodyFile: `body.${extension}`,
       ...describeDocument(route.path, response.headers.get("content-type"), body),
     });
-    return { slug, navigations, complete: true };
+    return { slug, navigations: 0, complete: true };
   }
 
   const dom = readJson(domPath) ?? { route: route.path, slug, kind: route.kind, note: route.note ?? null, byViewport: {} };
   const axe = readJson(axePath) ?? { route: route.path, slug, axeWidths, byViewport: {} };
+  const persist = () => {
+    finalizeDom(dom, viewports);
+    if (axeWidths.length) writeJson(axePath, axe);
+    writeJson(domPath, dom);
+  };
   let complete = true;
   for (const viewport of viewports) {
     const key = String(viewport.width);
     const pngPath = path.join(dir, `${slug}@${viewport.width}.png`);
     const wantAxe = axeWidths.includes(viewport.width);
-    const haveAll = fs.existsSync(pngPath) && Boolean(dom.byViewport[key]) && (!wantAxe || Boolean(axe.byViewport[key]));
-    if (haveAll && !force) continue;
-    if (navigations >= navigationBudget) {
+    if (!force && viewportUnitComplete({ pngPath, dom, axe, key, wantAxe })) continue;
+    if (budget.remaining <= 0) {
       complete = false;
       break;
     }
+    // Invalidate the old generation before loading the new one.
+    if (dom.byViewport[key] || axe.byViewport[key]) {
+      delete dom.byViewport[key];
+      delete axe.byViewport[key];
+      persist();
+    }
+    fs.rmSync(pngPath, { force: true });
     log.log(`  capture ${route.path} @${viewport.width}${wantAxe ? " +axe" : ""}`);
-    const result = await capturePage({ browser, url, viewport, wantAxe, wantPng: true, telemetry, log });
-    navigations += 1;
-    // PNG first, records last: a crash in between leaves the DOM record
-    // missing, which makes the next run redo the whole viewport.
+    let result;
+    try {
+      result = await capturePage({ browser, url, viewport, wantAxe, wantPng: true, telemetry, log, budget });
+    } catch (error) {
+      if (error instanceof NavigationBudgetExhausted) {
+        complete = false;
+        break;
+      }
+      throw error;
+    }
+    const unitId = randomUUID();
     writeFileAtomic(pngPath, result.png);
-    dom.byViewport[key] = result.capture;
-    if (wantAxe) axe.byViewport[key] = result.axe;
+    if (wantAxe) axe.byViewport[key] = { unitId, ...result.axe };
     else delete axe.byViewport[key];
-    finalizeDom(dom, viewports);
-    writeJson(domPath, dom);
-    if (axeWidths.length) writeJson(axePath, axe);
+    dom.byViewport[key] = { unitId, ...result.capture, screenshot: { ...result.capture.screenshot, sha256: sha256(result.png), bytes: result.png.length } };
+    persist();
   }
-  return { slug, navigations, complete };
+  return { slug, navigations: budget.used - usedBefore, complete };
 }
 
-// True when every artefact captureRoute would produce for this route exists.
-// Shares the per-viewport unit rule above so callers never declare a route
-// complete from file existence alone.
+function viewportUnitComplete({ pngPath, dom, axe, key, wantAxe }) {
+  const record = dom.byViewport?.[key];
+  if (!record?.unitId || !record.screenshot?.sha256) return false;
+  if (sha256File(pngPath) !== record.screenshot.sha256) return false;
+  return !wantAxe || axe.byViewport?.[key]?.unitId === record.unitId;
+}
+
+function documentUnitComplete(dir, dom) {
+  if (!dom?.bodyFile || !dom.sha256) return false;
+  return sha256File(path.join(dir, dom.bodyFile)) === dom.sha256;
+}
+
+// True when every unit captureRoute would produce for this route is complete
+// under the binding rule above, so callers never declare a route complete
+// from file existence alone.
 export function routeIsComplete({ outDir, route, viewports = VIEWPORTS, axeWidths = AXE_WIDTHS }) {
   const slug = routeSlug(route.path);
   const dir = routeDir(outDir, slug);
   if (!fs.existsSync(path.join(dir, "status.json"))) return false;
   const dom = readJson(path.join(dir, "dom.json"));
   if (!dom) return false;
-  if (route.kind === "document") return Boolean(dom.bodyFile) && fs.existsSync(path.join(dir, dom.bodyFile));
+  if (route.kind === "document") return documentUnitComplete(dir, dom);
   const axe = readJson(path.join(dir, "axe.json")) ?? { byViewport: {} };
-  return viewports.every((viewport) => {
-    const key = String(viewport.width);
-    if (!fs.existsSync(path.join(dir, `${slug}@${viewport.width}.png`))) return false;
-    if (!dom.byViewport?.[key]) return false;
-    return !axeWidths.includes(viewport.width) || Boolean(axe.byViewport?.[key]);
-  });
+  return viewports.every((viewport) =>
+    viewportUnitComplete({ pngPath: path.join(dir, `${slug}@${viewport.width}.png`), dom, axe, key: String(viewport.width), wantAxe: axeWidths.includes(viewport.width) }),
+  );
 }
 
 // Head-level facts are viewport independent; promote the widest capture to the
@@ -877,35 +1026,55 @@ export async function captureApiSet({ base, outDir, endpoints = API_ENDPOINTS, f
   return shapes;
 }
 
-// Each Lighthouse audit is a page load against the origin, so it spends the
-// same navigation budget as a screenshot; `complete` is false when the budget
-// ran out before every route had a report.
-export async function captureLighthouseSet({ base, outDir, port, routes = LIGHTHOUSE_ROUTES, force = false, telemetry, log = console, navigationBudget = Infinity }) {
+// Each Lighthouse audit is a page load against the origin (every attempt of
+// it), so it spends the same navigation budget as a screenshot; `complete` is
+// false when the budget ran out before every route had a report. The report
+// file is written before its scores entry, which is the completion marker.
+export async function captureLighthouseSet({ base, outDir, port, routes = LIGHTHOUSE_ROUTES, force = false, telemetry, log = console, budget = createNavigationBudget() }) {
   const lhDir = path.join(outDir, "lighthouse");
   fs.mkdirSync(lhDir, { recursive: true });
   const scoresPath = path.join(lhDir, "scores.json");
   const scores = readJson(scoresPath) ?? { base, preset: "mobile", categories: LIGHTHOUSE_CATEGORIES, routes: {} };
-  let navigations = 0;
+  const usedBefore = budget.used;
   let complete = true;
-  for (const route of routes) {
-    const slug = routeSlug(route);
-    const reportPath = path.join(lhDir, `${slug}.json`);
-    if (!force && scores.routes[route] && fs.existsSync(reportPath)) continue;
-    if (navigations >= navigationBudget) {
-      complete = false;
-      break;
+  let puppeteerBrowser = null;
+  try {
+    for (const route of routes) {
+      const slug = routeSlug(route);
+      const reportPath = path.join(lhDir, `${slug}.json`);
+      if (!force && scores.routes[route] && fs.existsSync(reportPath)) continue;
+      if (budget.remaining <= 0) {
+        complete = false;
+        break;
+      }
+      if (scores.routes[route]) {
+        delete scores.routes[route];
+        writeJson(scoresPath, scores);
+      }
+      const url = new URL(route, base).href;
+      log.log(`  lighthouse ${route}`);
+      puppeteerBrowser ??= await connectLighthouseBrowser(port);
+      let outcome;
+      try {
+        outcome = await runLighthouse({ url, puppeteerBrowser, log, telemetry, budget });
+      } catch (error) {
+        if (error instanceof NavigationBudgetExhausted) {
+          complete = false;
+          break;
+        }
+        throw error;
+      }
+      const { lhr, ...summary } = outcome;
+      // Compact JSON: a Lighthouse report is read by tools, and pretty-printing
+      // doubles what the repository has to carry per route.
+      writeFileAtomic(reportPath, `${JSON.stringify(lhr)}\n`);
+      scores.routes[route] = { ...summary, reportFile: `${slug}.json` };
+      writeJson(scoresPath, scores);
     }
-    const url = new URL(route, base).href;
-    log.log(`  lighthouse ${route}`);
-    const { lhr, ...summary } = await runLighthouse({ url, port, log, telemetry });
-    navigations += 1;
-    // Compact JSON: a Lighthouse report is read by tools, and pretty-printing
-    // doubles what the repository has to carry per route.
-    writeFileAtomic(reportPath, `${JSON.stringify(lhr)}\n`);
-    scores.routes[route] = { ...summary, reportFile: `${slug}.json` };
-    writeJson(scoresPath, scores);
+  } finally {
+    await puppeteerBrowser?.disconnect().catch(() => {});
   }
-  return { scores, navigations, complete };
+  return { scores, navigations: budget.used - usedBefore, complete };
 }
 
 export function inventory({ base, routes = VISITOR_ROUTES, endpoints = API_ENDPOINTS, lighthouseRoutes = LIGHTHOUSE_ROUTES }) {

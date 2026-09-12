@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "6c47e24a-86d5-45d7-9ad7-71a9d524e6d2",
       "capturedAt": "2026-09-12T06:23:26.578Z",
       "requestedUrl": "https://awesome.video/tag/open-source",
       "finalUrl": "https://awesome.video/tag/open-source",
@@ -314,10 +315,12 @@
         "height": 9340,
         "bytes": 627277,
         "truncated": false,
-        "documentHeight": 9340
+        "documentHeight": 9340,
+        "sha256": "b9eaab4f32c22ec6199296ce64ab0646737b67f85495a16caaec2ecba5c1e9f8"
       }
     },
     "768": {
+      "unitId": "96200790-dd33-45fc-95f1-d2efd36714bf",
       "capturedAt": "2026-09-12T06:23:31.978Z",
       "requestedUrl": "https://awesome.video/tag/open-source",
       "finalUrl": "https://awesome.video/tag/open-source",
@@ -636,10 +639,12 @@
         "height": 7952,
         "bytes": 785778,
         "truncated": false,
-        "documentHeight": 7952
+        "documentHeight": 7952,
+        "sha256": "3014178b7f4d6fe86d1f70705de8c68654a2b94ef0373b7b50bb62d6e2931a01"
       }
     },
     "1024": {
+      "unitId": "fd9a1d76-9d60-494d-96e8-2ae295f1ec98",
       "capturedAt": "2026-09-12T06:23:35.566Z",
       "requestedUrl": "https://awesome.video/tag/open-source",
       "finalUrl": "https://awesome.video/tag/open-source",
@@ -1320,10 +1325,12 @@
         "height": 5088,
         "bytes": 585147,
         "truncated": false,
-        "documentHeight": 5088
+        "documentHeight": 5088,
+        "sha256": "195a7662b8e237b780281ba0a65516acc67187d0d73194332b51e39633c1766b"
       }
     },
     "1440": {
+      "unitId": "9d06b116-fad4-4c58-a081-8b76d1cea402",
       "capturedAt": "2026-09-12T06:23:38.813Z",
       "requestedUrl": "https://awesome.video/tag/open-source",
       "finalUrl": "https://awesome.video/tag/open-source",
@@ -2004,7 +2011,8 @@
         "height": 3495,
         "bytes": 557209,
         "truncated": false,
-        "documentHeight": 3495
+        "documentHeight": 3495,
+        "sha256": "3c090c99ab570224faeb2a1948e8a192f308462c31e45a80d7f8633db8f7558e"
       }
     }
   },

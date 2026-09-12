@@ -5,6 +5,7 @@
   "note": "guest → client-side redirect to sign-in; both chains are recorded",
   "byViewport": {
     "375": {
+      "unitId": "0fa6d0f1-6621-4cf2-a58b-7a3bfcf89f9f",
       "capturedAt": "2026-09-12T06:21:55.545Z",
       "requestedUrl": "https://awesome.video/submit",
       "finalUrl": "https://awesome.video/submit",
@@ -83,10 +84,12 @@
         "height": 1933,
         "bytes": 172371,
         "truncated": false,
-        "documentHeight": 1933
+        "documentHeight": 1933,
+        "sha256": "3f6dcc11e0d59f5ef6157a04dded5dbe7b552936a79ac5bab90de324d7093e3f"
       }
     },
     "768": {
+      "unitId": "256a629d-579f-4383-91d8-2457e7ef9ff3",
       "capturedAt": "2026-09-12T06:21:58.613Z",
       "requestedUrl": "https://awesome.video/submit",
       "finalUrl": "https://awesome.video/submit",
@@ -174,10 +177,12 @@
         "height": 1577,
         "bytes": 207183,
         "truncated": false,
-        "documentHeight": 1577
+        "documentHeight": 1577,
+        "sha256": "b8e823fecf62e51cdc784245456ff2c99f66fbe3d0a21f65e087e84adc1b558d"
       }
     },
     "1024": {
+      "unitId": "9d2db487-fb69-4c77-ab01-008c57fc86b7",
       "capturedAt": "2026-09-12T06:22:01.181Z",
       "requestedUrl": "https://awesome.video/submit",
       "finalUrl": "https://awesome.video/submit",
@@ -627,10 +632,12 @@
         "height": 1577,
         "bytes": 221167,
         "truncated": false,
-        "documentHeight": 1577
+        "documentHeight": 1577,
+        "sha256": "df71f2b3072e091733ee9c75a811f2433e6636bd2c43078df895debb8d962602"
       }
     },
     "1440": {
+      "unitId": "b6ce5d72-8ece-47b2-8346-70ba0b20d450",
       "capturedAt": "2026-09-12T06:22:03.664Z",
       "requestedUrl": "https://awesome.video/submit",
       "finalUrl": "https://awesome.video/submit",
@@ -1080,7 +1087,8 @@
         "height": 1497,
         "bytes": 235049,
         "truncated": false,
-        "documentHeight": 1497
+        "documentHeight": 1497,
+        "sha256": "1736fb1862752d5d8ec24344821fc17bd64cd58b855aa50429d7e98de68e18e4"
       }
     }
   },

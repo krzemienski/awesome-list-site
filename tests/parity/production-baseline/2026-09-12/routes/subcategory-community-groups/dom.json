@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "a874e78c-8476-4015-8f63-aa167394b931",
       "capturedAt": "2026-09-12T06:20:38.917Z",
       "requestedUrl": "https://awesome.video/subcategory/community-groups",
       "finalUrl": "https://awesome.video/subcategory/community-groups",
@@ -309,10 +310,12 @@
         "height": 8509,
         "bytes": 606065,
         "truncated": false,
-        "documentHeight": 8509
+        "documentHeight": 8509,
+        "sha256": "b57ebb6bdf7214023d8b8642f5a5ee34dfd797bb02a6fb4e429b9e04554c1cac"
       }
     },
     "768": {
+      "unitId": "4ffd4398-6e05-457c-9fb4-59e4931e20dd",
       "capturedAt": "2026-09-12T06:20:44.268Z",
       "requestedUrl": "https://awesome.video/subcategory/community-groups",
       "finalUrl": "https://awesome.video/subcategory/community-groups",
@@ -628,10 +631,12 @@
         "height": 7268,
         "bytes": 763892,
         "truncated": false,
-        "documentHeight": 7268
+        "documentHeight": 7268,
+        "sha256": "8254d127407589942b4c0b94e3592de0690758e82c3f23a4382d82f1b8b1efb6"
       }
     },
     "1024": {
+      "unitId": "1853335e-1de3-4332-a733-e0795af64af0",
       "capturedAt": "2026-09-12T06:20:47.873Z",
       "requestedUrl": "https://awesome.video/subcategory/community-groups",
       "finalUrl": "https://awesome.video/subcategory/community-groups",
@@ -1308,10 +1313,12 @@
         "height": 6010,
         "bytes": 478174,
         "truncated": false,
-        "documentHeight": 6010
+        "documentHeight": 6010,
+        "sha256": "8080330e3848c90e34d79aa3815999630dba7f7b4620d6aaa846527e1bce0091"
       }
     },
     "1440": {
+      "unitId": "27659c33-c7cb-4e2f-badf-2c0babc6e9a1",
       "capturedAt": "2026-09-12T06:20:51.221Z",
       "requestedUrl": "https://awesome.video/subcategory/community-groups",
       "finalUrl": "https://awesome.video/subcategory/community-groups",
@@ -1986,7 +1993,8 @@
         "height": 3812,
         "bytes": 546878,
         "truncated": false,
-        "documentHeight": 3812
+        "documentHeight": 3812,
+        "sha256": "700a2621916e4cd0b9280ceb20c4acc993f9f3421a763a194b08e525eaee174a"
       }
     }
   },

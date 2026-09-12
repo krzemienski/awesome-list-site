@@ -5,6 +5,7 @@
   "note": "expected 404",
   "byViewport": {
     "375": {
+      "unitId": "8fc003bf-b546-408b-b43d-0f81fb466065",
       "capturedAt": "2026-09-12T06:25:12.487Z",
       "requestedUrl": "https://awesome.video/this-route-does-not-exist",
       "finalUrl": "https://awesome.video/this-route-does-not-exist",
@@ -71,10 +72,12 @@
         "height": 812,
         "bytes": 78434,
         "truncated": false,
-        "documentHeight": 812
+        "documentHeight": 812,
+        "sha256": "e4638531f2059f2a490ce537ce1d0cbacfbb293b705b8075dad4f5fcaac49fd2"
       }
     },
     "768": {
+      "unitId": "c3441ae2-f751-41b9-b984-953dc2c66940",
       "capturedAt": "2026-09-12T06:25:15.254Z",
       "requestedUrl": "https://awesome.video/this-route-does-not-exist",
       "finalUrl": "https://awesome.video/this-route-does-not-exist",
@@ -150,10 +153,12 @@
         "height": 1024,
         "bytes": 84128,
         "truncated": false,
-        "documentHeight": 1024
+        "documentHeight": 1024,
+        "sha256": "f7f67255c4e9a91272fec54a4e7d8f8da78dd19e3b89e43affb38b6b3632ebef"
       }
     },
     "1024": {
+      "unitId": "4f313c3a-5990-4235-a963-a852dd6961f4",
       "capturedAt": "2026-09-12T06:25:17.573Z",
       "requestedUrl": "https://awesome.video/this-route-does-not-exist",
       "finalUrl": "https://awesome.video/this-route-does-not-exist",
@@ -591,10 +596,12 @@
         "height": 768,
         "bytes": 114151,
         "truncated": false,
-        "documentHeight": 768
+        "documentHeight": 768,
+        "sha256": "436477f4b223121fde58fd496228021b1df5ba164527900e393925fced39878c"
       }
     },
     "1440": {
+      "unitId": "0d75697b-b11f-4174-8472-e62d307c26f4",
       "capturedAt": "2026-09-12T06:25:19.824Z",
       "requestedUrl": "https://awesome.video/this-route-does-not-exist",
       "finalUrl": "https://awesome.video/this-route-does-not-exist",
@@ -1032,7 +1039,8 @@
         "height": 900,
         "bytes": 119611,
         "truncated": false,
-        "documentHeight": 900
+        "documentHeight": 900,
+        "sha256": "69dbbc31439de299334c28030c8ffca3211ef11a46e57e944ed365c94ada0133"
       }
     }
   },

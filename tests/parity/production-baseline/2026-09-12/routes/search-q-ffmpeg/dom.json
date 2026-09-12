@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "b119d12b-796e-446c-a60b-54a4268ebee3",
       "capturedAt": "2026-09-12T06:22:07.647Z",
       "requestedUrl": "https://awesome.video/search?q=ffmpeg",
       "finalUrl": "https://awesome.video/search?q=ffmpeg",
@@ -209,10 +210,12 @@
         "height": 7034,
         "bytes": 492077,
         "truncated": false,
-        "documentHeight": 7034
+        "documentHeight": 7034,
+        "sha256": "fd18ced87b488c0d3e533097f19c551ad90a36020d238198c922fbaa607af4a8"
       }
     },
     "768": {
+      "unitId": "c9ae7a21-6f35-43dc-9261-803e3ab57b57",
       "capturedAt": "2026-09-12T06:22:12.465Z",
       "requestedUrl": "https://awesome.video/search?q=ffmpeg",
       "finalUrl": "https://awesome.video/search?q=ffmpeg",
@@ -426,10 +429,12 @@
         "height": 3964,
         "bytes": 443887,
         "truncated": false,
-        "documentHeight": 3964
+        "documentHeight": 3964,
+        "sha256": "d790e410b4a2f96a34d648df9dac356ef6cde635b85b31e26d84f58489891b9b"
       }
     },
     "1024": {
+      "unitId": "05ac30ff-adb1-44a1-a2ad-157dac80f4c3",
       "capturedAt": "2026-09-12T06:22:15.900Z",
       "requestedUrl": "https://awesome.video/search?q=ffmpeg",
       "finalUrl": "https://awesome.video/search?q=ffmpeg",
@@ -1022,10 +1027,12 @@
         "height": 6881,
         "bytes": 648405,
         "truncated": false,
-        "documentHeight": 6881
+        "documentHeight": 6881,
+        "sha256": "aa049bde4223021c099194643870edeeaf946fda718244df19d5632318fd6e65"
       }
     },
     "1440": {
+      "unitId": "6a1f2ab4-339c-404d-bc6c-33f620e05d9d",
       "capturedAt": "2026-09-12T06:22:19.383Z",
       "requestedUrl": "https://awesome.video/search?q=ffmpeg",
       "finalUrl": "https://awesome.video/search?q=ffmpeg",
@@ -1618,7 +1625,8 @@
         "height": 3630,
         "bytes": 568303,
         "truncated": false,
-        "documentHeight": 3630
+        "documentHeight": 3630,
+        "sha256": "deb21a8eb06b75d537297a813fa9902631f99d4dd5b359eba6df995d5fddc05c"
       }
     }
   },

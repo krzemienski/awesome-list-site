@@ -28,19 +28,22 @@ can be diffed against a dated snapshot of production instead of memory.
 
 ```
 inventory.json          routes / endpoints / viewports / axe widths this run covers
-manifest.json           one entry per invocation (this baseline: exactly one)
+manifest.json           one entry per invocation (this baseline: exactly one) and a
+                        `maintenance` record of the same-day unit-binding backfill
 routes/<slug>/
   <slug>@375.png  <slug>@768.png  <slug>@1024.png  <slug>@1440.png   full page, DPR 1
-  dom.json              per viewport: title, lang, h1[], canonical, robots meta,
-                        description, JSON-LD @types (incl. @graph), <a href> count,
-                        visible nav labels, visible data-testids, document height,
-                        final URL, client-side navigations, consent-banner record;
+  dom.json              per viewport: unitId, title, lang, h1[], canonical, robots
+                        meta, description, JSON-LD @types (incl. @graph), <a href>
+                        count, visible nav labels, visible data-testids, document
+                        height, final URL, client-side navigations, consent-banner
+                        record, screenshot {width, height, bytes, sha256, truncated};
                         the widest viewport is promoted to the top level and
                         `viewportDisagreements` lists any width that differs
   status.json           HTTP status, manual redirect chain, x-robots-tag,
                         content-type, cache-control (Node fetch, no cookies)
   axe.json              violations by impact at 375 and 1440 (rule + node counts,
-                        top 5 selectors per rule)
+                        top 5 selectors per rule), each under the unitId of the
+                        page load it was measured on
 routes/sitemap-xml/, routes/robots-txt/
                         status.json + body.<ext> (raw bytes) + dom.json summary
                         (URL count, hosts, lastmod range / directives); machine
@@ -75,20 +78,42 @@ Chromium caps a capture at 16 384 px; no route reached it (`screenshot.truncated
 is `false` everywhere). Nothing was signed in, no admin key was sent, nothing
 was POSTed. Since the post-review hardening the browser context aborts every
 non-`GET`/`HEAD`/`OPTIONS` request outright and lists them in
-`dom.json.byViewport[w].blockedRequests` (this capture predates the field; the
-same-day re-capture used to verify it recorded zero blocked requests on `/`,
-`/sign-in`, `/submit` and `/recommendations`).
+`dom.json.byViewport[w].blockedRequests`, refuses every WebSocket (a routed
+socket that never connects plus a `window.WebSocket` stub that throws; attempts
+land in `blockedWebSockets`), and Lighthouse audits run on a page with the
+same interception and stub (`scores.json` entries record `requestCount`,
+`blockedRequests`, `blockedWebSockets`). This capture predates those fields;
+the same-day re-captures used to verify them recorded zero blocked requests
+and zero socket attempts on `/`, `/sign-in`, `/submit` and `/recommendations`,
+and a local probe origin whose page tries to POST/PUT/beacon/open a socket
+saw none of it arrive (`docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md`).
+Lighthouse's `bf-cache` gatherer restores the audited page a second time, so
+one attempt shows up twice in its list.
 
 Edge throttling (bare 429/503) is retried with exponential backoff (respecting
 `retry-after`, max 6 attempts) and is **never** recorded as a route status; a
 route that stays throttled is left incomplete and the next resumable run picks
 it up. This run saw zero throttle events.
 
-Resume unit: one route × viewport is PNG + DOM record + axe record together. If
-any of the three is missing the whole viewport is recaptured from one fresh
-page load (so a PNG can never describe a different load than the record beside
-it), every file lands via temp + rename, and a dated directory refuses to
-resume against a different `--base`.
+Resume unit: one route × viewport is PNG + DOM record + axe record from **one**
+page load, bound together — the DOM record carries a `unitId` and the PNG's
+`screenshot.sha256`, the axe record (at 375/1440) carries the same `unitId`,
+and the DOM record is written last (PNG → axe → DOM) so it is the commit
+marker. A viewport counts as captured only when the id is present, the PNG on
+disk hashes to the recorded digest and the axe id matches; anything else
+(missing file, foreign PNG, record from another load, crash between writes)
+recaptures that viewport from a fresh load after removing the stale pieces.
+Documents bind the same way (body file, then a DOM record with its sha256).
+Every file lands via temp + rename, and a dated directory refuses to resume
+against a different `--base`.
+
+This baseline was captured before the ids existed and was **backfilled** the
+same day rather than recaptured: its manifest shows one uninterrupted
+invocation (96 navigations, 0 failures, 0 throttle events), so each PNG is the
+one written beside its record; a fresh `unitId` per route × viewport and the
+PNG digests were written in place (96 units, `screenshot.bytes` re-verified
+against the files, both document bodies re-hashed) and a copy of the result
+resumed as `26/26 · 12/12 · 3/3` with zero page loads.
 
 ## Production quirks observed on this date
 
@@ -140,7 +165,8 @@ resume against a different `--base`.
 # resume / extend today's baseline (skips whatever is already on disk)
 npm run baseline:capture
 # stay under a short shell budget (exit 2 = stopped early, re-run to resume;
-# screenshots AND Lighthouse audits count; exit 1 wins when anything failed)
+# every page load counts — screenshots, throttle retries AND Lighthouse
+# attempts — and is charged before it happens; exit 1 wins when anything failed)
 npm run baseline:capture -- --max-navigations 8
 # a new dated baseline
 npm run baseline:capture -- --date 2026-10-01
@@ -154,8 +180,10 @@ Tracked deltas: status, redirect chain, final URL, visible `data-testid`s per
 viewport, title, h1, axe serious+critical **rules and node counts** at 375/1440,
 document counts **and body**, API status, key paths, item/total counts. URLs and
 document bodies count as equal when byte-identical or when they only differ by
-each side's own origin (`{origin}` placeholder) — a hop to a foreign host is
-always a delta. Canonical, robots meta, JSON-LD types, nav labels and
+each side's own origin (`{origin}` placeholder) — a hop to a foreign host or a
+different fragment is always a delta, and a document body file missing on
+either side is reported as missing (exit 3), never assumed. `--against` must
+be a bare origin. Canonical, robots meta, JSON-LD types, nav labels and
 `cache-control` are notes.
 
 `compare` re-captures the candidate with the same library (routes + API, no

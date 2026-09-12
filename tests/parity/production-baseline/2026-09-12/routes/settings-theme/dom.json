@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "2e703974-00b7-4483-a788-00ff4174a723",
       "capturedAt": "2026-09-12T06:23:44.574Z",
       "requestedUrl": "https://awesome.video/settings/theme",
       "finalUrl": "https://awesome.video/settings/theme",
@@ -112,10 +113,12 @@
         "height": 4022,
         "bytes": 230465,
         "truncated": false,
-        "documentHeight": 4022
+        "documentHeight": 4022,
+        "sha256": "35ad190071b35d1691be90338872a2c7da22bbb3dab1fa564571d7c64624fffa"
       }
     },
     "768": {
+      "unitId": "82617b5b-1d54-4b1a-8ce8-7433c68a61a1",
       "capturedAt": "2026-09-12T06:23:47.942Z",
       "requestedUrl": "https://awesome.video/settings/theme",
       "finalUrl": "https://awesome.video/settings/theme",
@@ -234,10 +237,12 @@
         "height": 2832,
         "bytes": 233073,
         "truncated": false,
-        "documentHeight": 2832
+        "documentHeight": 2832,
+        "sha256": "b0fb044d419b8186b3439e46d74a4a4e15b997b75c20dc2c0c7dbb5f51a40cbb"
       }
     },
     "1024": {
+      "unitId": "fb31543e-a4d7-485b-a3cf-75531705c0fa",
       "capturedAt": "2026-09-12T06:23:50.544Z",
       "requestedUrl": "https://awesome.video/settings/theme",
       "finalUrl": "https://awesome.video/settings/theme",
@@ -717,10 +722,12 @@
         "height": 2318,
         "bytes": 253961,
         "truncated": false,
-        "documentHeight": 2318
+        "documentHeight": 2318,
+        "sha256": "7d914dc3271d6f148fd30804cd904fde1ce45584060dec288e6b0bb39c637e8b"
       }
     },
     "1440": {
+      "unitId": "54c478f0-a5ed-4f34-8318-6360471e4d74",
       "capturedAt": "2026-09-12T06:23:53.177Z",
       "requestedUrl": "https://awesome.video/settings/theme",
       "finalUrl": "https://awesome.video/settings/theme",
@@ -1199,7 +1206,8 @@
         "height": 2078,
         "bytes": 259395,
         "truncated": false,
-        "documentHeight": 2078
+        "documentHeight": 2078,
+        "sha256": "08ceb286692c6438dde10f3fe65af91fc15b2b0e022c71b65431e006d3f7ac7f"
       }
     }
   },

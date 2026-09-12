@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "d43e76b3-8bb3-4294-9580-e36a0bbce0df",
       "capturedAt": "2026-09-12T06:25:01.004Z",
       "requestedUrl": "https://awesome.video/sign-in",
       "finalUrl": "https://awesome.video/sign-in",
@@ -70,10 +71,12 @@
         "height": 898,
         "bytes": 63047,
         "truncated": false,
-        "documentHeight": 898
+        "documentHeight": 898,
+        "sha256": "e0dac0971f35bc808a8be7bf7b6f5f3121c725c40f90d002c735b8b7c8a94a77"
       }
     },
     "768": {
+      "unitId": "e4e222a6-4528-42fd-98c7-e48e34e43dc9",
       "capturedAt": "2026-09-12T06:25:04.188Z",
       "requestedUrl": "https://awesome.video/sign-in",
       "finalUrl": "https://awesome.video/sign-in",
@@ -148,10 +151,12 @@
         "height": 1024,
         "bytes": 75131,
         "truncated": false,
-        "documentHeight": 1024
+        "documentHeight": 1024,
+        "sha256": "8a7dcf6e509cb66fed49e402669f61f8cda86481c9397d2f5795e3c1feaf855e"
       }
     },
     "1024": {
+      "unitId": "dcefb35b-39d9-4554-aab1-bf22b0149a0f",
       "capturedAt": "2026-09-12T06:25:06.660Z",
       "requestedUrl": "https://awesome.video/sign-in",
       "finalUrl": "https://awesome.video/sign-in",
@@ -588,10 +593,12 @@
         "height": 878,
         "bytes": 100855,
         "truncated": false,
-        "documentHeight": 878
+        "documentHeight": 878,
+        "sha256": "eff2b02f128c0dc7b53f3b315627479dbb712bfbf5484b59424eae1f75d90abd"
       }
     },
     "1440": {
+      "unitId": "8c6b435f-d8c4-4a3c-b8cc-afdbc9e29482",
       "capturedAt": "2026-09-12T06:25:09.292Z",
       "requestedUrl": "https://awesome.video/sign-in",
       "finalUrl": "https://awesome.video/sign-in",
@@ -1028,7 +1035,8 @@
         "height": 900,
         "bytes": 110176,
         "truncated": false,
-        "documentHeight": 900
+        "documentHeight": 900,
+        "sha256": "eae78dca4d8f7cdf7136a3119fae1776868b6f15714c40c442e02b9834992f77"
       }
     }
   },

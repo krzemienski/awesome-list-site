@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "cad4929f-accd-4803-bb88-70a23480dea2",
       "capturedAt": "2026-09-12T06:20:20.136Z",
       "requestedUrl": "https://awesome.video/category/community-events?page=2",
       "finalUrl": "https://awesome.video/category/community-events?page=2",
@@ -308,10 +309,12 @@
         "height": 8358,
         "bytes": 590298,
         "truncated": false,
-        "documentHeight": 8358
+        "documentHeight": 8358,
+        "sha256": "9e7630e439780291e91b7426e03c0b9cdb59ced5903c11834f6ba936fdec4481"
       }
     },
     "768": {
+      "unitId": "6b204614-4aa8-4c30-9638-da92b1fedf95",
       "capturedAt": "2026-09-12T06:20:25.785Z",
       "requestedUrl": "https://awesome.video/category/community-events?page=2",
       "finalUrl": "https://awesome.video/category/community-events?page=2",
@@ -624,10 +627,12 @@
         "height": 7251,
         "bytes": 744138,
         "truncated": false,
-        "documentHeight": 7251
+        "documentHeight": 7251,
+        "sha256": "140477c0acaeed47e8d03a27cd7234e04f6fab9bf8112de3c0b7d593926d2a70"
       }
     },
     "1024": {
+      "unitId": "31ab4602-e71d-44f9-8d88-a55f130933f8",
       "capturedAt": "2026-09-12T06:20:29.322Z",
       "requestedUrl": "https://awesome.video/category/community-events?page=2",
       "finalUrl": "https://awesome.video/category/community-events?page=2",
@@ -1301,10 +1306,12 @@
         "height": 6070,
         "bytes": 464135,
         "truncated": false,
-        "documentHeight": 6070
+        "documentHeight": 6070,
+        "sha256": "1bd2653112c20f57edd2a60d2781f2cc2ca22903406d55c3936ef10cec8cb63f"
       }
     },
     "1440": {
+      "unitId": "d40c117e-5fd8-4faf-a609-989ad2f26bd7",
       "capturedAt": "2026-09-12T06:20:32.704Z",
       "requestedUrl": "https://awesome.video/category/community-events?page=2",
       "finalUrl": "https://awesome.video/category/community-events?page=2",
@@ -1978,7 +1985,8 @@
         "height": 3834,
         "bytes": 541081,
         "truncated": false,
-        "documentHeight": 3834
+        "documentHeight": 3834,
+        "sha256": "c4271128cf49774c1b0da33af770e0166a8e7a4c7e7ee8e9042b7736510c717b"
       }
     }
   },

@@ -89,7 +89,7 @@ const normalizeUrl = (url, ownOrigin) => {
   try {
     const parsed = new URL(url, ownOrigin);
     const prefix = parsed.origin === new URL(ownOrigin).origin ? "{origin}" : parsed.origin;
-    return `${prefix}${parsed.pathname}${parsed.search}`;
+    return `${prefix}${parsed.pathname}${parsed.search}${parsed.hash}`;
   } catch {
     return url;
   }
@@ -168,14 +168,16 @@ function compareRoute(route, baselineDir, candidateDir, viewports, axeWidths, or
     };
     const bBody = bodyOf(b.dom, baselineDir);
     const cBody = bodyOf(c.dom, candidateDir);
-    // Read the stored bodies themselves (not the sha recorded next to them) so
-    // the verdict is about the files a reviewer can open and diff.
-    result.document.bodyMatch = bBody !== null && cBody !== null
-      ? equivalent(bBody, cBody, normalizeBody(bBody, origins.baseline), normalizeBody(cBody, origins.candidate))
-      : result.document.sha256Match;
+    // The verdict is about the stored bodies a reviewer can open and diff, so
+    // a side without its body file is a missing capture (exit 3), never a
+    // sha-only comparison that looks like a result.
+    if (bBody === null) result.missing.push("baseline body");
+    if (cBody === null) result.missing.push("candidate body");
+    if (result.missing.length) return result;
+    result.document.bodyMatch = equivalent(bBody, cBody, normalizeBody(bBody, origins.baseline), normalizeBody(cBody, origins.candidate));
     if (!result.document.bodyMatch) {
       result.deltas.push("body");
-      result.notes.push(bBody === null || cBody === null ? "body differs (recorded sha256; a body file is missing)" : "body differs beyond its own origin");
+      result.notes.push("body differs beyond its own origin");
     }
     return result;
   }

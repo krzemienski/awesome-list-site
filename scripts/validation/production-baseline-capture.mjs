@@ -17,12 +17,16 @@
 //
 // Resumable by design: every finished unit on disk is skipped, so a run that
 // was interrupted (shell budget, edge throttling) just continues on the next
-// invocation. A unit is one route × viewport (PNG + DOM + axe together — a
-// partial unit is recaptured whole), one API body, or one Lighthouse report,
-// and every file lands via temp + rename. `--max-navigations N` stops after N
-// page loads (screenshots AND Lighthouse audits) for callers that must stay
-// under a short shell timeout; otherwise run it in the background. A dated
-// directory belongs to one origin: resuming it with a different --base fails.
+// invocation. A unit is one route × viewport (PNG + DOM + axe bound to one
+// page load by a shared unit id and the PNG's sha256 in the DOM record, which
+// is written last — a unit that fails that check is recaptured whole), one
+// API body, or one Lighthouse report, and every file lands via temp + rename.
+// `--max-navigations N` caps the page loads of this invocation (screenshot
+// loads, their retries, and Lighthouse attempts are all charged before they
+// start) for callers that must stay under a short shell timeout; otherwise
+// run it in the background. A dated directory belongs to one origin: resuming
+// it with a different --base fails. All browser traffic is read-only: non-GET
+// requests are aborted and WebSockets refused, in Lighthouse's page too.
 //
 //   npm run baseline:capture                       # everything, today's dir
 //   npm run baseline:capture -- --max-navigations 8
@@ -45,6 +49,7 @@ import {
   VISITOR_ROUTES,
   captureApiSet,
   captureLighthouseSet,
+  createNavigationBudget,
   captureRoute,
   createTelemetry,
   freePort,
@@ -145,7 +150,9 @@ async function main() {
   console.log(`Production baseline capture → ${invocation.outDir}`);
   console.log(`  base ${args.base} · commit ${invocation.toolCommit ?? "unknown"} · chromium ${invocation.tools.chromium} · lighthouse ${invocation.tools.lighthouse} · axe ${invocation.tools.axeCore}`);
 
-  let navigations = 0;
+  // One budget for the whole invocation: screenshot loads, their retries and
+  // Lighthouse attempts all draw from it before they start.
+  const budget = createNavigationBudget(args.maxNavigations);
   let stoppedByBudget = false;
   const routeResults = [];
 
@@ -168,7 +175,7 @@ async function main() {
       if (args.only.has("routes")) {
         console.log("Phase: routes");
         for (const route of routes) {
-          if (navigations >= args.maxNavigations) {
+          if (budget.remaining <= 0) {
             stoppedByBudget = true;
             break;
           }
@@ -180,9 +187,8 @@ async function main() {
               outDir,
               force: args.force,
               telemetry,
-              navigationBudget: args.maxNavigations - navigations,
+              budget,
             });
-            navigations += result.navigations;
             routeResults.push({ route: route.path, navigations: result.navigations, complete: result.complete });
             if (!result.complete) {
               stoppedByBudget = true;
@@ -206,9 +212,8 @@ async function main() {
             routes: LIGHTHOUSE_ROUTES,
             force: args.force,
             telemetry,
-            navigationBudget: args.maxNavigations - navigations,
+            budget,
           });
-          navigations += result.navigations;
           if (!result.complete) stoppedByBudget = true;
         } catch (error) {
           telemetry.failures.push({ phase: "lighthouse", error: error instanceof Error ? error.message : String(error) });
@@ -222,6 +227,7 @@ async function main() {
 
   invocation.finishedAt = new Date().toISOString();
   invocation.durationSeconds = Math.round((Date.parse(invocation.finishedAt) - Date.parse(invocation.startedAt)) / 1000);
+  const navigations = budget.used;
   invocation.navigations = navigations;
   invocation.stoppedByBudget = stoppedByBudget;
   invocation.routes = routeResults;

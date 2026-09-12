@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "50a7b0c3-cd08-4379-830a-069ce06e08e4",
       "capturedAt": "2026-09-12T06:21:28.680Z",
       "requestedUrl": "https://awesome.video/resource/186190",
       "finalUrl": "https://awesome.video/resource/186190",
@@ -94,10 +95,12 @@
         "height": 2309,
         "bytes": 196756,
         "truncated": false,
-        "documentHeight": 2309
+        "documentHeight": 2309,
+        "sha256": "a90d72f03f8ac2a0235afe79d5c4200e7345f453bc5ac6d00b38c79f219e2ce8"
       }
     },
     "768": {
+      "unitId": "ead917a8-170a-4512-8a32-c7ecd0f9e229",
       "capturedAt": "2026-09-12T06:21:31.880Z",
       "requestedUrl": "https://awesome.video/resource/186190",
       "finalUrl": "https://awesome.video/resource/186190",
@@ -198,10 +201,12 @@
         "height": 2061,
         "bytes": 266455,
         "truncated": false,
-        "documentHeight": 2061
+        "documentHeight": 2061,
+        "sha256": "70eb36e9da8f6b9943aec1e91602a3774eae922c44f74a48a09870730eba496b"
       }
     },
     "1024": {
+      "unitId": "2f9795fc-7832-47b0-b898-82dfd53aa54f",
       "capturedAt": "2026-09-12T06:21:34.469Z",
       "requestedUrl": "https://awesome.video/resource/186190",
       "finalUrl": "https://awesome.video/resource/186190",
@@ -664,10 +669,12 @@
         "height": 1607,
         "bytes": 260236,
         "truncated": false,
-        "documentHeight": 1607
+        "documentHeight": 1607,
+        "sha256": "147ec64edb536b8123ebbca2ca006c6776bbdcca7472e153ff3e3deb4a8fc8ff"
       }
     },
     "1440": {
+      "unitId": "cd5667f5-94fa-40f2-a8c7-321790a73244",
       "capturedAt": "2026-09-12T06:21:37.099Z",
       "requestedUrl": "https://awesome.video/resource/186190",
       "finalUrl": "https://awesome.video/resource/186190",
@@ -1129,7 +1136,8 @@
         "height": 1297,
         "bytes": 314851,
         "truncated": false,
-        "documentHeight": 1297
+        "documentHeight": 1297,
+        "sha256": "a9ddeaf8ced400c32dd6b22283b70503e341540ef66b625bc8621b0162fabbcc"
       }
     }
   },

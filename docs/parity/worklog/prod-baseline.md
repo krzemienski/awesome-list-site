@@ -11,7 +11,7 @@ documents layout, protocol and quirks). Evidence:
 | file | role |
 |---|---|
 | `scripts/validation/production-baseline-lib.mjs` | shared capture library: route/endpoint inventory, throttle-aware fetch, sandboxed Chromium launch through the shared Playwright lease, per-viewport capture (fresh context, `networkidle` + `fonts.ready` + 2 rAF, consent dismissed via `consent-decline`, lazy-image warm scroll, full-page PNG, DOM extraction, axe), API shape description, Lighthouse over the browser's debug port |
-| `scripts/validation/production-baseline-capture.mjs` | `npm run baseline:capture` — resumable per route × viewport (PNG + DOM + axe as one unit), per endpoint and per Lighthouse route, every file via temp + rename; `--max-navigations N` (screenshots and Lighthouse audits alike) stops early with exit 2 so a short shell budget can run it in slices, exit 1 wins when anything failed; a dated dir refuses a different `--base`; `manifest.json` records every invocation |
+| `scripts/validation/production-baseline-capture.mjs` | `npm run baseline:capture` — resumable per route × viewport (PNG + DOM + axe as one unit bound by `unitId` + PNG sha256, DOM record written last), per endpoint and per Lighthouse route, every file via temp + rename; `--max-navigations N` (charged before every page load: screenshots, throttle retries and Lighthouse attempts alike) stops early with exit 2 so a short shell budget can run it in slices, exit 1 wins when anything failed; a dated dir refuses a different `--base`; `manifest.json` records every invocation |
 | `scripts/validation/production-baseline-compare.mjs` | `npm run baseline:compare -- --baseline <dir> --against <url> [--routes …]` — re-captures the candidate (routes + API, no Lighthouse), prints a per-route / per-endpoint table, writes `compare-report.md` + `.json` and side-by-side `strips/<slug>@<w>.png` on a union canvas; exit 1 on tracked deltas |
 | `package.json` | `baseline:capture`, `baseline:compare`; `@axe-core/playwright`, `lighthouse` added to `devDependencies` |
 
@@ -60,9 +60,11 @@ Full list in the baseline `README.md`; the ones that changed the plan:
 - The edge rewrites `cache-control` to `private` on read-only catalog endpoints
   (origin says `public`), and adds `private` where the origin sends nothing;
   compare treats cache-control as a note for that reason.
-- No 429/503 was seen in any of the three sequential runs; the retry path is
-  exercised only by unit-level reasoning (backoff on 429/503 with
-  `retry-after`, max 6 attempts, never recorded as a status).
+- No 429/503 was seen in any of the three sequential runs; the retry path was
+  later exercised against a local origin that 503s every other navigation
+  (second hardening round below): backoff honours `retry-after`, max 6
+  attempts, never recorded as a status, and each attempt is charged to the
+  navigation budget.
 
 ## Post-review hardening (same day)
 
@@ -92,6 +94,45 @@ Also added: non-GET requests are aborted in the capture context (zero were
 observed on the four routes re-captured to verify it), and `--base`/`--against`
 reject credentials in the URL.
 
+## Second hardening round (same day)
+
+A second architect pass on the hardened scripts found four residual defects;
+all are fixed and re-verified
+(`docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md`):
+
+1. **Unit binding** — "all three files present" could not tell a PNG from one
+   page load apart from DOM/axe records of another (crash between writes,
+   interrupted resume). Each route × viewport now carries a `unitId` in its
+   DOM and axe records plus the PNG's sha256, the DOM record is written last
+   as the commit marker, and completeness means id present + digest matches +
+   axe id equal. The committed baseline was **backfilled** in place (one
+   uninterrupted invocation, 0 failures — every PNG is the one written beside
+   its record; 96 units, both document bodies re-hashed) and a copy resumed
+   as complete with zero page loads.
+2. **Budget charged per attempt** — one budget object per invocation is spent
+   *before* every page load, including 429/503 retries and every Lighthouse
+   attempt; exhaustion mid-route leaves the route incomplete for the next run.
+   Proven against a local origin that 503s every other navigation: with
+   `--max-navigations 1` the throttled attempt is charged and the retry
+   refused.
+3. **URLs** — fragments are kept when comparing (a `#frag`-only change is a
+   `final-url` delta) and `--base`/`--against` must be a bare origin (a path
+   or query is an error, not silently prefixed onto every URL).
+4. **Lighthouse and WebSockets read-only** — Lighthouse attaches over the
+   remote-debugging port, outside `context.route`, so it now audits a
+   puppeteer page (Lighthouse's own `puppeteer-core`, no new dependency) with
+   request interception aborting non-safe methods and the same
+   `window.WebSocket` stub the capture contexts install alongside
+   `context.routeWebSocket`. A probe page that tries POST/PUT/beacon/socket on
+   load: nothing reached the origin from either path; a control run without
+   the stub showed socket upgrades *do* get through interception alone.
+   Compare also reports a missing document body file as missing (exit 3)
+   instead of trusting the recorded digest.
+
+Residual, documented: dedicated workers get neither WebSocket hook (`client/src`
+opens no sockets); Lighthouse's `bf-cache` gatherer re-executes the page once
+from cache, so each refused attempt appears twice in its list.
+
 ## Gates run
 
 | gate | result | evidence |
@@ -104,6 +145,7 @@ reject credentials in the URL.
 | lint + root-script-drift transcript | see above | `docs/parity/evidence/prod-baseline/gates-2026-09-12.md` |
 | hardened compare re-run on the stored candidates (offline) | prod 0 deltas · local 37 deltas | `docs/parity/evidence/prod-baseline/compare-{prod,local}-2026-09-12-recheck.md` |
 | hardening smoke + mutation probe | 5/5 planted changes caught · live resume/budget/blocking checks pass · 0 deltas on re-captured routes | `docs/parity/evidence/prod-baseline/review-hardening-2026-09-12.md` |
+| second-round smoke + mutation probe | 6/6 planted changes caught (+ missing body → exit 3) · per-attempt budget, unit binding ×3 tamperings, read-only Lighthouse/WebSockets against a local probe origin · backfilled baseline resumes 26/26 with 0 loads | `docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md` |
 
 ### Reading the local compare
 

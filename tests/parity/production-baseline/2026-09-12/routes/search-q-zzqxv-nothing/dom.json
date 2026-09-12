@@ -5,6 +5,7 @@
   "note": "empty search state",
   "byViewport": {
     "375": {
+      "unitId": "9c4f2a87-2d25-42ad-a039-327cef9c6329",
       "capturedAt": "2026-09-12T06:22:27.894Z",
       "requestedUrl": "https://awesome.video/search?q=zzqxv-nothing",
       "finalUrl": "https://awesome.video/search?q=zzqxv-nothing",
@@ -76,10 +77,12 @@
         "height": 844,
         "bytes": 77047,
         "truncated": false,
-        "documentHeight": 844
+        "documentHeight": 844,
+        "sha256": "829d135846223c2cc54cf8c14a95e35c8e0719f9670b8b24f4bff09a1fb4e1bc"
       }
     },
     "768": {
+      "unitId": "26f157b4-c5fb-4102-a1b5-43f6eeade670",
       "capturedAt": "2026-09-12T06:22:31.228Z",
       "requestedUrl": "https://awesome.video/search?q=zzqxv-nothing",
       "finalUrl": "https://awesome.video/search?q=zzqxv-nothing",
@@ -160,10 +163,12 @@
         "height": 1024,
         "bytes": 86609,
         "truncated": false,
-        "documentHeight": 1024
+        "documentHeight": 1024,
+        "sha256": "d896bdf9c2aa3eafaf5509f3553e9e0f9b2a2828a166bcbca02b1ee368b331dc"
       }
     },
     "1024": {
+      "unitId": "939aa531-a981-4c0f-8abf-78f11dbe33e7",
       "capturedAt": "2026-09-12T06:22:34.084Z",
       "requestedUrl": "https://awesome.video/search?q=zzqxv-nothing",
       "finalUrl": "https://awesome.video/search?q=zzqxv-nothing",
@@ -605,10 +610,12 @@
         "height": 768,
         "bytes": 125925,
         "truncated": false,
-        "documentHeight": 768
+        "documentHeight": 768,
+        "sha256": "936f38bced90b17f958f1266710886913f2f686ecbd8a14b219a4a28ad4ee7e3"
       }
     },
     "1440": {
+      "unitId": "6f415505-21d8-4afb-ac22-4c50f160336a",
       "capturedAt": "2026-09-12T06:22:37.064Z",
       "requestedUrl": "https://awesome.video/search?q=zzqxv-nothing",
       "finalUrl": "https://awesome.video/search?q=zzqxv-nothing",
@@ -1050,7 +1057,8 @@
         "height": 900,
         "bytes": 129502,
         "truncated": false,
-        "documentHeight": 900
+        "documentHeight": 900,
+        "sha256": "f07d3bc1182d8f08bbfae79660e5c7b4023b1084fdbd17bb8332023c4a5fba9b"
       }
     }
   },

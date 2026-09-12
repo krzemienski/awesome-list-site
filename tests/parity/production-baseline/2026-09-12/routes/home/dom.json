@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "69f4d4a2-dce3-4217-ac52-0ec328815551",
       "capturedAt": "2026-09-12T06:19:33.303Z",
       "requestedUrl": "https://awesome.video/",
       "finalUrl": "https://awesome.video/",
@@ -105,10 +106,12 @@
         "height": 2683,
         "bytes": 218556,
         "truncated": false,
-        "documentHeight": 2683
+        "documentHeight": 2683,
+        "sha256": "464ac40cae3a46076e5c40c94b354d8e184332eb3ba8ed74b2076b3acf0f33a8"
       }
     },
     "768": {
+      "unitId": "6e9d5d8c-93ad-46df-a3cf-ac813247eb3c",
       "capturedAt": "2026-09-12T06:19:36.586Z",
       "requestedUrl": "https://awesome.video/",
       "finalUrl": "https://awesome.video/",
@@ -219,10 +222,12 @@
         "height": 1782,
         "bytes": 257733,
         "truncated": false,
-        "documentHeight": 1782
+        "documentHeight": 1782,
+        "sha256": "8fa08422a236c6c3094f6d703318c4676fb6153d53d4a1b85779bb52f278080d"
       }
     },
     "1024": {
+      "unitId": "ae1399fa-78aa-4bfb-8e66-be1b9ca62706",
       "capturedAt": "2026-09-12T06:19:39.054Z",
       "requestedUrl": "https://awesome.video/",
       "finalUrl": "https://awesome.video/",
@@ -695,10 +700,12 @@
         "height": 1382,
         "bytes": 246636,
         "truncated": false,
-        "documentHeight": 1382
+        "documentHeight": 1382,
+        "sha256": "5b95e323136744bfcea4e78da11ee3413a0b7f09ce03e5f0f69861cceed0f409"
       }
     },
     "1440": {
+      "unitId": "53f8337e-b25f-46d9-a45d-35e7dbcd2a34",
       "capturedAt": "2026-09-12T06:19:41.538Z",
       "requestedUrl": "https://awesome.video/",
       "finalUrl": "https://awesome.video/",
@@ -1171,7 +1178,8 @@
         "height": 1278,
         "bytes": 310639,
         "truncated": false,
-        "documentHeight": 1278
+        "documentHeight": 1278,
+        "sha256": "82a6b5e1dfd43e97314d27de83648242dbe44dda884ec196c57cdbdc88cf8713"
       }
     }
   },

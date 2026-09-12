@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "cd44d0e6-7da3-46be-80b4-35ffea2c7314",
       "capturedAt": "2026-09-12T06:24:49.321Z",
       "requestedUrl": "https://awesome.video/code-of-conduct",
       "finalUrl": "https://awesome.video/code-of-conduct",
@@ -76,10 +77,12 @@
         "height": 1584,
         "bytes": 210065,
         "truncated": false,
-        "documentHeight": 1584
+        "documentHeight": 1584,
+        "sha256": "a4c9e0926d1bd62711e39ad2b6646a3829ab3987da6bc4f5df46bea8d7de747d"
       }
     },
     "768": {
+      "unitId": "7f24c8b8-4ae1-45c8-8649-3f84d6d4b549",
       "capturedAt": "2026-09-12T06:24:52.256Z",
       "requestedUrl": "https://awesome.video/code-of-conduct",
       "finalUrl": "https://awesome.video/code-of-conduct",
@@ -160,10 +163,12 @@
         "height": 1185,
         "bytes": 275518,
         "truncated": false,
-        "documentHeight": 1185
+        "documentHeight": 1185,
+        "sha256": "3123e864f0f6455618716eebcf14a8bf918839bef29e9eb04ad158988b5be188"
       }
     },
     "1024": {
+      "unitId": "a39db015-6387-4676-848b-7cf459ae26ed",
       "capturedAt": "2026-09-12T06:24:54.760Z",
       "requestedUrl": "https://awesome.video/code-of-conduct",
       "finalUrl": "https://awesome.video/code-of-conduct",
@@ -606,10 +611,12 @@
         "height": 1163,
         "bytes": 276611,
         "truncated": false,
-        "documentHeight": 1163
+        "documentHeight": 1163,
+        "sha256": "3d4c6cf181aebe8b45650fe31c108864f5df75cccd11a21b3e2d8302648494c8"
       }
     },
     "1440": {
+      "unitId": "cf166c01-33b9-47ef-8413-535d0197c78e",
       "capturedAt": "2026-09-12T06:24:57.274Z",
       "requestedUrl": "https://awesome.video/code-of-conduct",
       "finalUrl": "https://awesome.video/code-of-conduct",
@@ -1052,7 +1059,8 @@
         "height": 1034,
         "bytes": 310056,
         "truncated": false,
-        "documentHeight": 1034
+        "documentHeight": 1034,
+        "sha256": "aca48dd7211e89cc058b6e480aa09fcffe427d260ce1b868ac2ff03b08112881"
       }
     }
   },

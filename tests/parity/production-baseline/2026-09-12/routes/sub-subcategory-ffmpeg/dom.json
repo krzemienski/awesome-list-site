@@ -5,6 +5,7 @@
   "note": null,
   "byViewport": {
     "375": {
+      "unitId": "10952747-655b-47b9-8a23-9ba778cca025",
       "capturedAt": "2026-09-12T06:20:57.399Z",
       "requestedUrl": "https://awesome.video/sub-subcategory/ffmpeg",
       "finalUrl": "https://awesome.video/sub-subcategory/ffmpeg",
@@ -248,10 +249,12 @@
         "height": 7397,
         "bytes": 457953,
         "truncated": false,
-        "documentHeight": 7397
+        "documentHeight": 7397,
+        "sha256": "808326b4b11da00cf6cb7dd9fc4474f4ab7caedf3ee06fc162346da7aea9c57f"
       }
     },
     "768": {
+      "unitId": "6b600e58-986a-4c8b-8aaa-c70e80ed40e9",
       "capturedAt": "2026-09-12T06:21:02.334Z",
       "requestedUrl": "https://awesome.video/sub-subcategory/ffmpeg",
       "finalUrl": "https://awesome.video/sub-subcategory/ffmpeg",
@@ -506,10 +509,12 @@
         "height": 6909,
         "bytes": 537802,
         "truncated": false,
-        "documentHeight": 6909
+        "documentHeight": 6909,
+        "sha256": "0b08ed00699ebcd60f705bbd08ade22318c3bc3a65952a161cffb5c08d0ae644"
       }
     },
     "1024": {
+      "unitId": "b3ccd2d7-e044-4981-b070-f727179e728c",
       "capturedAt": "2026-09-12T06:21:05.719Z",
       "requestedUrl": "https://awesome.video/sub-subcategory/ffmpeg",
       "finalUrl": "https://awesome.video/sub-subcategory/ffmpeg",
@@ -1125,10 +1130,12 @@
         "height": 5084,
         "bytes": 366424,
         "truncated": false,
-        "documentHeight": 5084
+        "documentHeight": 5084,
+        "sha256": "96adf17bdc5359b46bf4ee6f3293587a1b49dad79e3a494bfebf5595107a6895"
       }
     },
     "1440": {
+      "unitId": "7ab02b30-9e0f-47ff-915f-25b91f739aed",
       "capturedAt": "2026-09-12T06:21:08.836Z",
       "requestedUrl": "https://awesome.video/sub-subcategory/ffmpeg",
       "finalUrl": "https://awesome.video/sub-subcategory/ffmpeg",
@@ -1743,7 +1750,8 @@
         "height": 3272,
         "bytes": 457014,
         "truncated": false,
-        "documentHeight": 3272
+        "documentHeight": 3272,
+        "sha256": "b1b52ce98546299407f1a02b365f538f560c7496c522934541013704eff2ba1a"
       }
     }
   },
