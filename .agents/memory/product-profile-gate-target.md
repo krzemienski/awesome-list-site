@@ -1,24 +1,24 @@
 ---
 name: Product-profile gate targets the design-system artifact
-description: Why the product-profile drift/browser gate reads the registered design-system artifact instead of the canonical awesome-list-site-ds source, and what that forbids.
+description: Why the product-profile gate validates the repo-owned design-system artifact instead of the canonical awesome-list-site-ds source, and how consumer checks must be written.
 ---
 
-**Rule:** `product-profile-drift.mjs` (and the `product-profile-browser`
-workflow) validate `artifacts/awesome-video-design-system/` (its `index.html`
-markers + `src/index.css` consuming `--profile-control-height`) and re-run the
-artifact generator in `--check` mode. Never point the gate back at
-`awesome-list-site-ds/`, and never write `data-product-profile` markers into
-that directory.
+**Rule:** the product-profile drift/browser gate validates the registered
+design-system artifact, never `awesome-list-site-ds/`. Never write
+`data-product-profile` markers or token consumers into the canonical
+directory; it must stay byte-identical to the uploaded archive.
 
-**Why:** `awesome-list-site-ds/` is contractually byte-identical to the
-uploaded archive (`docs/parity/source-sync.json` hashes; `diff -rq` against the
-extracted zip must be empty). A generator that patched markers into it made
-the canonical source drift and left the gate permanently red once the source
-was re-synced. The artifact is the repo-owned surface that may carry app
-specific instrumentation.
+**Why:** a generator once patched markers into the canonical source to make
+the gate pass; re-syncing the source to the archive (a contract of the parity
+work) then left the gate permanently red. The artifact is the repo-owned
+surface that may carry app-specific instrumentation.
 
-**How to apply:** any parity task touching the artifact's CSS must keep the
-two control-height rules on `var(--profile-control-height)`;
-`--profile-page-measure` is intentionally unconsumed there until the docs
-pages gain a measure-bounded prose column (decision left to the design-system
-docs tasks).
+**How to apply:**
+- Consumer assertions must be per-selector against the owning rule's
+  declarations, not a stylesheet-wide substring: with two rules consuming the
+  same token, a substring check stays green when one regresses to a literal.
+  Prove it with mutation probes (literal swap, selector dropped, declaration
+  deleted) before trusting the gate.
+- When a shared profile value changes (e.g. the accessible-target floor), the
+  browser gate's per-route expectations must move in the same commit or the
+  gate goes red silently for weeks.

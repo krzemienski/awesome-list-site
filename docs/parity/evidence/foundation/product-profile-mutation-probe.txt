@@ -1,0 +1,31 @@
+# product-profile-drift mutation probe — each mutation must FAIL, restored tree must PASS
+
+== M1 second consumer block -> 44px
+- standalone design-system artifact: .docs-nav > div:first-child > a does not take min-height from var(--profile-control-height)
+- standalone design-system artifact: .docs-nav .chip does not take min-height from var(--profile-control-height)
+- standalone design-system artifact: .ds-shell footer a does not take min-height from var(--profile-control-height)
+- standalone design-system artifact restates the control-height floor as a literal (1×) instead of consuming the token
+exit=1
+
+== M2 first consumer block -> 2.75rem
+- standalone design-system artifact: .ds-system-pill does not take min-height from var(--profile-control-height)
+- standalone design-system artifact: .input does not take min-height from var(--profile-control-height)
+- standalone design-system artifact: .select does not take min-height from var(--profile-control-height)
+- standalone design-system artifact restates the control-height floor as a literal (1×) instead of consuming the token
+exit=1
+
+== M3 .tab dropped from the consumer block
+Product profile drift (1):
+- standalone design-system artifact: .tab does not take min-height from var(--profile-control-height)
+exit=1
+
+== M4 second block min-height declaration deleted
+- standalone design-system artifact: .ds-switcher > a does not take min-height from var(--profile-control-height)
+- standalone design-system artifact: .docs-nav > div:first-child > a does not take min-height from var(--profile-control-height)
+- standalone design-system artifact: .docs-nav .chip does not take min-height from var(--profile-control-height)
+- standalone design-system artifact: .ds-shell footer a does not take min-height from var(--profile-control-height)
+exit=1
+
+== restored tree
+Product profile drift: PASS (5 approved profiles)
+exit=0

@@ -109,7 +109,7 @@
 - [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
 - [Workflow reconciliation double-start](workflow-reconciliation-double-start.md) — after merge reconciliation, a healthy artifact listener can coexist with a false “port already in use” workflow failure; restart once.
 - [Helper evidence provenance](helper-evidence-provenance.md) — reject detailed reports for unrelated routes; verify project scope and local outputs before counting evidence.
-- [Last-green gate baselines](last-green-baselines.md) — lint (~5.2k), test:integration (171 red) and e2e (stale admin/browse specs) were never green; extract the last green sha to /tmp and compare per file/test before calling anything a regression.
-- [Product-profile gate target](product-profile-gate-target.md) — the gate validates the design-system artifact, never `awesome-list-site-ds/` (must stay archive-identical; no markers there).
+- [Last-green gate baselines](last-green-baselines.md) — lint, test:integration and parts of e2e were never green; extract the last green sha to /tmp and compare per file/test before calling anything a regression.
+- [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the archive-identical canonical source; assert token consumers per selector, not by substring.
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [standalone-palette-drift scope](standalone-palette-gate-scope.md) — structurally red (canonical root + artifact canonical ports); informational until the artifact tasks decide scope.

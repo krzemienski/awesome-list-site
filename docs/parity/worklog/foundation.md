@@ -93,7 +93,7 @@ Required list from the task plan; ✔ = exit 0 on the final tree.
 | `root-script-drift` | ✔ | |
 | `palette-drift` | ✔ | |
 | `accent-drift` | ✔ | |
-| `product-profile-browser` | ✔ | retargeted at the artifact (static part). Browser part had been red since `86d0b996` (2026-09-08, before the last green commit) because that commit raised every profile's `--profile-control-height` to `2.75rem` for the 44px target floor without updating the gate's `/admin` expectation (`2.5rem`); the expectation now matches `shared/styles/product-profiles.css`. |
+| `product-profile-browser` | ✔ | retargeted at the artifact (static part); the review round found that a single stylesheet-wide substring check would stay green if one of the artifact's two consumer rules regressed to a literal, so the gate now asserts each of the ten interactive selectors takes `min-height` from `var(--profile-control-height)` and that the stylesheet never restates the 44px floor. Mutation probe (literal swap ×2, selector dropped, declaration deleted → all FAIL; restored → PASS): `evidence/foundation/product-profile-mutation-probe.txt`. Browser part had been red since `86d0b996` (2026-09-08, before the last green commit) because that commit raised every profile's `--profile-control-height` to `2.75rem` for the 44px target floor without updating the gate's `/admin` expectation (`2.5rem`); the expectation now matches `shared/styles/product-profiles.css`. |
 | `font-prepaint` | ✔ | |
 | `ds-showcase` | ✔ | |
 | `ds-button-sweep` | ✔ | |

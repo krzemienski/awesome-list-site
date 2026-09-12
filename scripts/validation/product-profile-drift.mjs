@@ -127,6 +127,23 @@ const surfaces = [
       // docs/parity/assumptions/foundation.md.
       [artifactCss, "--profile-control-height"],
     ],
+    // Every interactive selector in the artifact's accessibility
+    // reconciliation must take its 44px floor from the token. A single
+    // substring check would stay green if one rule regressed to a literal
+    // while another still used the variable, so each selector is asserted
+    // against the declarations of the rule that owns it.
+    controlHeightSelectors: [
+      ".docs-nav-item",
+      ".btn",
+      ".tab",
+      ".ds-system-pill",
+      ".input",
+      ".select",
+      ".ds-switcher > a",
+      ".docs-nav > div:first-child > a",
+      ".docs-nav .chip",
+      ".ds-shell footer a",
+    ],
   },
   {
     name: "mockup sandbox",
@@ -155,6 +172,42 @@ for (const surface of surfaces) {
   for (const [source, role] of surface.consumers) {
     expect(source.includes(role), `${surface.name} does not consume ${role}`);
   }
+  for (const selector of surface.controlHeightSelectors ?? []) {
+    expect(
+      ruleDeclaresTokenMinHeight(surface.adapter, selector),
+      `${surface.name}: ${selector} does not take min-height from var(--profile-control-height)`,
+    );
+  }
+  if (surface.controlHeightSelectors) {
+    const literalFloor = surface.adapter.match(/min-height:\s*(44px|2\.75rem)\b/g);
+    expect(
+      !literalFloor,
+      `${surface.name} restates the control-height floor as a literal (${literalFloor?.length ?? 0}×) instead of consuming the token`,
+    );
+  }
+}
+
+/**
+ * True when some flat CSS rule whose selector list contains `selector`
+ * declares `min-height: var(--profile-control-height)`. Flat rules only
+ * (the artifact's reconciliation block has no nesting); a selector that only
+ * appears inside an at-rule still resolves because the regex matches the
+ * innermost `selector { declarations }` pair.
+ */
+function ruleDeclaresTokenMinHeight(css, selector) {
+  const stripped = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const rulePattern = /([^{}]+)\{([^{}]*)\}/g;
+  for (const match of stripped.matchAll(rulePattern)) {
+    const selectors = match[1]
+      .split(",")
+      .map((entry) => entry.trim().replace(/\s+/g, " "));
+    if (!selectors.includes(selector)) continue;
+    const declarations = match[2];
+    if (/min-height:\s*var\(--profile-control-height\)\s*(!important)?\s*;/.test(declarations)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 expect(
