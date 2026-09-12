@@ -78,7 +78,7 @@ export function ContactDialogHost() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-lg" data-testid="contact-dialog">
         <DialogHeader>
-          <div className="eyebrow" aria-hidden>// Contact</div>
+          <div className="eyebrow" aria-hidden>{"// Contact"}</div>
           <DialogTitle className="font-display text-2xl font-medium tracking-tight">
             Contact <em className="not-italic text-[var(--accent)]">maintainers</em>
           </DialogTitle>
@@ -111,7 +111,7 @@ export function ContactDialogHost() {
           <Form {...form}>
             <form
               className="space-y-4"
-              onSubmit={form.handleSubmit((data) => mutation.mutate(data))}
+              onSubmit={(event) => { void form.handleSubmit((data) => mutation.mutate(data))(event); }}
               noValidate
             >
               <FormField

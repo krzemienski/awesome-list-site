@@ -26,9 +26,11 @@ const main = read("client/src/main.tsx");
 const button = read("client/src/components/ui/button.tsx");
 const card = read("client/src/components/ui/card.tsx");
 const exportTools = read("client/src/components/ui/export-tools.tsx");
-const awesomeEntry = read("awesome-list-site-ds/index.html");
-const awesomeCss = read("awesome-list-site-ds/styles.css");
-const awesomeRuntime = read("awesome-list-site-ds/design-systems.jsx");
+// The standalone design-system surface is the registered artifact. The
+// canonical reference under awesome-list-site-ds/ is an archive-identical
+// source (docs/parity/source-sync.json) and is intentionally never edited.
+const artifactEntry = read("artifacts/awesome-video-design-system/index.html");
+const artifactCss = read("artifacts/awesome-video-design-system/src/index.css");
 const mockupEntry = read("artifacts/mockup-sandbox/index.html");
 const mockupCss = read("artifacts/mockup-sandbox/src/index.css");
 const mockupApp = read("artifacts/mockup-sandbox/src/App.tsx");
@@ -111,15 +113,19 @@ const surfaces = [
     ],
   },
   {
-    name: "standalone design-system site",
-    entry: awesomeEntry,
+    name: "standalone design-system artifact",
+    entry: artifactEntry,
     profile: "standalone-exports",
-    adapter: awesomeCss,
-    importPath: "../shared/styles/product-profiles.css",
+    // The artifact reaches the shared foundation through the app stylesheet
+    // (design-system.css imports product-profiles.css; the SPA surface above
+    // asserts that hop), so both hops of the chain are covered.
+    adapter: artifactCss,
+    importPath: "../../../client/src/styles/design-system.css",
     consumers: [
-      [awesomeCss, "--profile-control-height"],
-      [awesomeCss, "--profile-page-measure"],
-      [awesomeRuntime, "applyProductProfile('standalone-exports')"],
+      // The docs measure (920px) is canonical docs.html chrome, so the
+      // artifact deliberately does not consume --profile-page-measure; see
+      // docs/parity/assumptions/foundation.md.
+      [artifactCss, "--profile-control-height"],
     ],
   },
   {
@@ -155,15 +161,15 @@ expect(
   exportTools.includes('data-product-profile="standalone-exports"'),
   "Generated HTML downloads do not declare standalone-exports",
 );
-const standaloneGeneration = spawnSync(
+const artifactGeneration = spawnSync(
   process.execPath,
-  ["scripts/generate-standalone-product-profile.mjs", "--check"],
+  ["scripts/generate-design-system-artifact.mjs", "--check"],
   { encoding: "utf8" },
 );
 expect(
-  standaloneGeneration.status === 0,
-  standaloneGeneration.stderr.trim() ||
-    "Self-contained design-system bundle is stale",
+  artifactGeneration.status === 0,
+  artifactGeneration.stderr.trim() ||
+    "Design-system artifact tokens (incl. productProfiles) are stale",
 );
 
 if (failures.length) {
@@ -236,7 +242,9 @@ const routeFamilies = [
     defaultAccent: "orange",
     density: {
       "--profile-content-gap": "0.75rem",
-      "--profile-control-height": "2.5rem",
+      // Every profile shares the 44px accessible-target floor (see
+      // shared/styles/product-profiles.css); admin no longer runs denser.
+      "--profile-control-height": "2.75rem",
       "--profile-panel-padding": "1rem",
       "--profile-page-measure": "80rem",
       "--profile-chrome-opacity": "0.96",

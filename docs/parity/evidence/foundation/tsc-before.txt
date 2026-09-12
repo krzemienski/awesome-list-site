@@ -1,0 +1,40 @@
+client/src/pages/CodeOfConduct.tsx(15,9): error TS2322: Type '{ title: string; titleTestId: string; description: string; }' is not assignable to type 'IntrinsicAttributes & SEOHeadProps'.
+  Property 'titleTestId' does not exist on type 'IntrinsicAttributes & SEOHeadProps'.
+client/src/pages/Home.tsx(189,14): error TS2304: Cannot find name 'fetchStaticAwesomeList'.
+client/src/pages/Home.tsx(193,35): error TS2304: Cannot find name 'processAwesomeListData'.
+client/src/pages/Home.tsx(206,33): error TS2304: Cannot find name 'DisplayCategory'.
+client/src/pages/Home.tsx(209,24): error TS2304: Cannot find name 'isRealCategory'.
+client/src/pages/Home.tsx(209,52): error TS2304: Cannot find name 'navTotalCount'.
+client/src/pages/Home.tsx(213,23): error TS2304: Cannot find name 'navTotalCount'.
+client/src/pages/Home.tsx(220,48): error TS2304: Cannot find name 'Category'.
+client/src/pages/Home.tsx(222,8): error TS7006: Parameter 'cat' implicitly has an 'any' type.
+client/src/pages/Home.tsx(222,16): error TS2552: Cannot find name 'getTotalResourceCount'. Did you mean 'totalResourceCount'?
+client/src/pages/Home.tsx(222,50): error TS2304: Cannot find name 'isRealCategory'.
+client/src/pages/Home.tsx(226,38): error TS2304: Cannot find name 'DisplayCategory'.
+client/src/pages/Home.tsx(227,15): error TS2304: Cannot find name 'DisplayCategory'.
+client/src/pages/Home.tsx(232,15): error TS7006: Parameter 'cat' implicitly has an 'any' type.
+client/src/pages/Home.tsx(233,26): error TS2304: Cannot find name 'getAllResources'.
+client/src/pages/Home.tsx(235,65): error TS2304: Cannot find name 'normalizeTag'.
+client/src/pages/Home.tsx(236,59): error TS2304: Cannot find name 'normalizeTag'.
+client/src/pages/Home.tsx(248,18): error TS7006: Parameter 'c' implicitly has an 'any' type.
+client/src/pages/Home.tsx(287,12): error TS2304: Cannot find name 'PageHeaderSkeleton'.
+client/src/pages/Home.tsx(290,16): error TS2304: Cannot find name 'TaxonomyCardSkeleton'.
+client/src/pages/Home.tsx(471,24): error TS2304: Cannot find name 'categoryIcons'.
+client/src/pages/Home.tsx(471,56): error TS2304: Cannot find name 'FileText'.
+client/src/pages/Home.tsx(489,14): error TS2304: Cannot find name 'TaxonomyCard'.
+client/src/pages/Privacy.tsx(14,9): error TS2322: Type '{ title: string; titleTestId: string; description: string; }' is not assignable to type 'IntrinsicAttributes & SEOHeadProps'.
+  Property 'titleTestId' does not exist on type 'IntrinsicAttributes & SEOHeadProps'.
+client/src/pages/Terms.tsx(14,9): error TS2322: Type '{ title: string; titleTestId: string; description: string; }' is not assignable to type 'IntrinsicAttributes & SEOHeadProps'.
+  Property 'titleTestId' does not exist on type 'IntrinsicAttributes & SEOHeadProps'.
+server/lib/resourceKindPresentation.ts(43,16): error TS2339: Property 'resource_kinds' does not exist on type 'AwesomeListConfig'.
+server/repositories/ContactRepository.ts(2,3): error TS2305: Module '"@shared/schema"' has no exported member 'contactSubmissions'.
+server/repositories/ContactRepository.ts(3,8): error TS2305: Module '"@shared/schema"' has no exported member 'ContactSubmission'.
+server/repositories/ContactRepository.ts(4,8): error TS2305: Module '"@shared/schema"' has no exported member 'InsertContactSubmission'.
+server/repositories/ContactRepository.ts(11,49): error TS2339: Property 'contact' does not exist on type 'AwesomeListConfig'.
+server/routes/domains/contact.ts(4,15): error TS2724: '"../../repositories"' has no exported member named 'ContactRepository'. Did you mean 'TagRepository'?
+server/routes/domains/contact.ts(36,37): error TS2339: Property 'contact' does not exist on type 'AwesomeListConfig'.
+server/routes/domains/contact.ts(41,41): error TS2339: Property 'contact' does not exist on type 'AwesomeListConfig'.
+server/routes/domains/contact.ts(60,23): error TS2339: Property 'contact' does not exist on type 'AwesomeListConfig'.
+server/routes/domains/contact.ts(61,28): error TS2339: Property 'contact' does not exist on type 'AwesomeListConfig'.
+server/routes/domains/contact.ts(69,15): error TS2339: Property 'contact' does not exist on type 'AwesomeListConfig'.
+server/routes/domains/contact.ts(133,22): error TS2339: Property 'contact' does not exist on type 'AwesomeListConfig'.

@@ -80,6 +80,7 @@ function ResourceCard({
     resourceFormat: "unknown",
     provider: "unknown",
     skillLevel: "unknown",
+    kind: null,
     status: "approved",
     submittedBy: null,
     approvedBy: null,

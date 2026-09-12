@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { Check, Palette, Layers, Eye, Sparkles, Zap, Type } from "lucide-react";
+import { ArrowLeft, Check, Palette, Layers, Eye, Sparkles, Zap, Type } from "lucide-react";
 import { ThemeProviderContext } from "@/components/ui/theme-provider";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import {
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { isSystemId } from "@/lib/design-system";
-import ParityPageHeader from "@/components/parity-settings/ParityPageHeader";
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
@@ -112,22 +111,36 @@ export default function ThemeSettings() {
     };
 
   return (
-    <div className="parity-page space-y-10">
+    <div className="max-w-5xl space-y-10">
       <SEOHead
         title="Theme Settings"
         description="Customize the look and feel of Awesome Video — switch fonts and color themes."
         noindex
       />
-      <ParityPageHeader
-        title="Theme Settings"
-        icon={<Sparkles className="h-5 w-5" />}
-        backHref="/settings"
-        backLabel="Back to Settings"
-        description={<>Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
+      <div>
+        <Link
+          href="/"
+          // BUG-042 (audit2): the bare text link measured 55×20px — below the
+          // 24px WCAG 2.5.8 floor; give it a 44px-tall hit area.
+          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4 min-h-[44px]"
+          data-testid="link-back-home"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Link>
+        <div className="flex items-center gap-3">
+          {/* P5 — sparkle icon to match ref 08 */}
+          <Sparkles className="h-6 w-6 text-[var(--accent)]" />
+          <h1 className="display-h text-2xl">
+            Theme Settings
+          </h1>
+        </div>
+        <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
+          Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
           <span className="text-[color:var(--text-3)]" data-testid="text-active-preset">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
-          </span></>}
-      >
+          </span>
+        </p>
         {/* Task #346: living showcase — full token catalog + component anatomy. */}
         <Link
           href="/design-system"
@@ -136,7 +149,7 @@ export default function ThemeSettings() {
         >
           Explore the full design-system showcase →
         </Link>
-      </ParityPageHeader>
+      </div>
 
       {/* Task #379 (uxv5-03): comparing themes on a phone meant tapping a card
           near the top and scrolling ~4,000px to the Live Preview at the bottom,
@@ -184,7 +197,7 @@ export default function ThemeSettings() {
       {/* System Picker — 5 cards */}
       {/* R5-027 (run24): pickers are pure interactive chrome — their option
           cards are buttons (hidden in print), which left orphan headings. */}
-      <section aria-label="Design system picker" data-testid="system-picker" className="parity-picker-section no-print">
+      <section aria-label="Design system picker" data-testid="system-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
           <Layers className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Design System</h2>
@@ -230,7 +243,7 @@ export default function ThemeSettings() {
       </section>
 
       {/* Accent Picker — 10 swatches */}
-      <section aria-label="Accent picker" data-testid="accent-picker" className="parity-picker-section no-print">
+      <section aria-label="Accent picker" data-testid="accent-picker" className="no-print">
         <div className="flex items-center gap-2 mb-4">
           <Palette className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Accent</h2>
@@ -283,7 +296,7 @@ export default function ThemeSettings() {
       </section>
 
       {/* I1 — Font override picker (hybrid: keeps 5×10 picker above, adds per-system font override) */}
-      <section aria-label="Font override picker" data-testid="font-picker" className="parity-picker-section no-print">
+      <section aria-label="Font override picker" data-testid="font-picker" className="no-print">
         <div className="flex items-center gap-2 mb-2">
           <Type className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
@@ -337,7 +350,7 @@ export default function ThemeSettings() {
       {/* R5-027 (run24): no-print — in print the preview's buttons/inputs are
           hidden and the token swatches lose their background fills, leaving
           empty headings and blank bordered boxes; hide the whole preview. */}
-      <section aria-label="Live preview" data-testid="theme-preview" className="parity-picker-section no-print">
+      <section aria-label="Live preview" data-testid="theme-preview" className="no-print">
         <div className="flex items-center gap-2 mb-4">
           <Eye className="h-5 w-5 text-[var(--accent)]" />
           <h2 className="font-sans font-semibold text-xl tracking-tight">Live Preview</h2>

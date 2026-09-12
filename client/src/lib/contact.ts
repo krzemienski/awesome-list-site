@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
-export const CONTACT_VARIANTS = ["a", "b", "c", "d", "e"] as const;
+const CONTACT_VARIANTS = ["a", "b", "c", "d", "e"] as const;
 export type ContactVariant = (typeof CONTACT_VARIANTS)[number];
 
-export type ContactDestination = {
+export interface ContactDestination {
   available: boolean;
   href?: string;
   unavailableReason?: string;
-};
+}
 
-export type ContactFormConfig = {
+export interface ContactFormConfig {
   available: boolean;
   persistence?: "database";
   unavailableReason?: string;
-};
+}
 
 export interface ContactPublicConfig {
   contact: {
@@ -38,7 +38,7 @@ export interface ContactSubmissionReceipt {
   status: "received";
 }
 
-const configuredVariant = import.meta.env.VITE_CONTACT_VARIANT;
+const configuredVariant: unknown = import.meta.env.VITE_CONTACT_VARIANT;
 
 export const contactVariant: ContactVariant | null = CONTACT_VARIANTS.includes(
   configuredVariant as ContactVariant,

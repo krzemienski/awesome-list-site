@@ -1,4 +1,3 @@
-import "@/components/parity/parity-styles";
 import { useParams, Link, useLocation } from "wouter";
 import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
 import { resourceSeoDescription } from "@shared/seo-templates";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { ContactResourceAction } from "@/components/contact";
+import { ContactResourceAction } from "@/components/contact/contact-resource-action";
 import {
   ArrowLeft,
   ExternalLink,
@@ -556,7 +555,7 @@ export default function ResourceDetail() {
   }
 
   return (
-    <div className="parity-page parity-resource-page space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
+    <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
       <SEOHead 
         title={`${resource.title}`}
         description={resourceSeoDescription(resource.title, resource.description)}

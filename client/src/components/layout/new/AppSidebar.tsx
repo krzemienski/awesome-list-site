@@ -53,7 +53,6 @@ interface AppSidebarProps {
   // an empty "No categories." list.
   onRetryNav?: () => void;
   user?: any;
-  siteName?: string;
 }
 
 /* -------- helpers -------- */
@@ -125,7 +124,6 @@ function SubItem({
   testId,
   italic = false,
   size = "sm",
-  connector,
 }: {
   label: string;
   count?: number;
@@ -135,7 +133,6 @@ function SubItem({
   testId?: string;
   italic?: boolean;
   size?: "sm" | "xs";
-  connector?: "├" | "└";
 }) {
   return (
     <a
@@ -147,7 +144,7 @@ function SubItem({
       data-testid={testId}
       data-active={active || undefined}
       className={cn(
-        "sub-item touch-manipulation min-h-[44px] no-underline w-full",
+        "sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full",
         size === "xs" && "text-[12px]",
         italic && "italic",
       )}
@@ -165,9 +162,6 @@ function SubItem({
       }
       title={count === 0 ? `${label} (no resources yet)` : label}
     >
-      {connector ? (
-        <span className="font-mono shrink-0 text-center text-[11px] text-[var(--text-4)]" aria-hidden="true">{connector}</span>
-      ) : null}
       <span className="flex-1 min-w-0 break-words" title={label}>{label}</span>
       {typeof count === "number" && (
         <span
@@ -292,7 +286,7 @@ function CategoryAccordion({
           href={catPath}
           data-testid={`row-cat-${catSlug}`}
           aria-label={`Open ${cat.name} category page`}
-          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm min-h-[44px]"
+          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm min-h-[44px] md:min-h-[36px]"
         >
           <span
             className="flex items-center justify-center shrink-0"
@@ -401,13 +395,12 @@ function CategoryAccordion({
                       <button
                         type="button"
                         onClick={() => toggleSub(subKey(sub.name))}
-                        aria-label={`${subOpen ? "Collapse" : "Expand"} ${subSubs.length} nested groups in ${sub.name}`}
+                        aria-label={`Toggle ${sub.name}`}
                         aria-expanded={subOpen}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
                         className="shrink-0 inline-flex items-center justify-center w-10 min-w-10 min-h-[44px] -mx-2 rounded-md hover:bg-[var(--surface)] text-[var(--text-3)] hover:text-[var(--text)]"
                       >
-                        <span className="font-mono rounded-[3px] border border-[var(--border)] px-1 text-[9px] tracking-[0.06em]">+{subSubs.length}</span>
                         <ChevronRight className={cn("size-3 chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                       <SubItem
@@ -437,7 +430,7 @@ function CategoryAccordion({
                           marginLeft: 10,
                         }}
                       >
-                        {subSubs.map((ss, ssIndex) => {
+                        {subSubs.map((ss) => {
                           const ssSlug = ss.slug || slugify(ss.name);
                           const ssPath = `/sub-subcategory/${ssSlug}`;
                           return (
@@ -450,7 +443,6 @@ function CategoryAccordion({
                               onClick={() => navigate(ssPath)}
                               testId={`subsub-${ssSlug}`}
                               size="xs"
-                              connector={ssIndex === subSubs.length - 1 ? "└" : "├"}
                             />
                           );
                         })}
@@ -490,35 +482,12 @@ export default function AppSidebar({
   navError,
   onRetryNav,
   user,
-  siteName = "Awesome List",
 }: AppSidebarProps) {
   const [location, setLocation] = useLocation();
   const activeSearch = useSearch();
-  const [openCategories, setOpenCategories] = useState<string[]>(() => {
-    try {
-      const value = JSON.parse(localStorage.getItem("av-sb-open-categories") || "[]");
-      return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
-    } catch {
-      return [];
-    }
-  });
-  const [openSubcategories, setOpenSubcategories] = useState<string[]>(() => {
-    try {
-      const value = JSON.parse(localStorage.getItem("av-sb-open-subcategories") || "[]");
-      return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
-    } catch {
-      return [];
-    }
-  });
+  const [openCategories, setOpenCategories] = useState<string[]>([]);
+  const [openSubcategories, setOpenSubcategories] = useState<string[]>([]);
   const { setOpenMobile, isMobile, openMobile } = useSidebar();
-
-  useEffect(() => {
-    try { localStorage.setItem("av-sb-open-categories", JSON.stringify(openCategories)); } catch {}
-  }, [openCategories]);
-
-  useEffect(() => {
-    try { localStorage.setItem("av-sb-open-subcategories", JSON.stringify(openSubcategories)); } catch {}
-  }, [openSubcategories]);
 
   const filtered = useMemo(() => filterCategories(categories), [categories]);
 
@@ -622,7 +591,7 @@ export default function AppSidebar({
               size="lg"
               onClick={() => navigate("/")}
               className="cursor-pointer h-14 px-3"
-              tooltip={siteName}
+              tooltip="Awesome Video"
             >
               <BrandMark className="size-8 shrink-0" />
               <div className="flex flex-col gap-0.5 leading-none min-w-0">
@@ -630,7 +599,7 @@ export default function AppSidebar({
                   className="font-sans text-sm font-semibold tracking-tight truncate"
                   style={{ color: "var(--text)" }}
                 >
-                  {siteName}
+                  Awesome Video
                 </span>
                 <span
                   className="font-mono"
@@ -719,7 +688,7 @@ export default function AppSidebar({
                 }}
                 data-testid={`nav-${slugify(item.label)}`}
                 data-active={isActive(item.href) || undefined}
-                className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
+                className="sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full"
                 style={
                   isActive(item.href)
                     ? {
@@ -748,7 +717,7 @@ export default function AppSidebar({
               }}
               data-testid="nav-admin"
               data-active={isActive("/admin") || undefined}
-              className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
+              className="sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full"
               style={
                 isActive("/admin")
                   ? {
@@ -900,7 +869,7 @@ export default function AppSidebar({
                 <button
                   type="button"
                   onClick={() => onRetryNav()}
-                  className="underline underline-offset-2 font-medium min-h-[44px]"
+                  className="underline underline-offset-2 font-medium min-h-[44px] md:min-h-[36px]"
                   style={{ color: "var(--text-2)" }}
                   data-testid="sidebar-nav-retry"
                 >
@@ -931,7 +900,7 @@ export default function AppSidebar({
             navigate("/about");
           }}
           data-testid="footer-about"
-          className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
+          className="sub-item touch-manipulation min-h-[44px] md:min-h-[36px] no-underline w-full"
         >
           <span className="flex items-center gap-[10px] min-w-0">
             <BookOpen className="size-[14px] shrink-0" />

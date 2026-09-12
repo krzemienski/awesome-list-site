@@ -33,7 +33,6 @@ interface AppHeaderProps {
   onLogout?: () => void;
   logoutError?: string | null;
   categories?: any[];
-  siteName?: string;
 }
 
 // Resolve the true taxonomy parent chain for a category/subcategory/
@@ -192,7 +191,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
   return crumbs;
 }
 
-export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories, siteName = "Awesome List" }: AppHeaderProps) {
+export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories }: AppHeaderProps) {
   // Task #329: signed-out visitors with on-device saves get a header entry
   // point to /bookmarks (their guest library).
   const guestSavedCount = useGuestBookmarkIds().size;
@@ -311,7 +310,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
       <Link
         href="/"
         className="hidden min-[360px]:flex items-center justify-center gap-2.5 shrink-0 no-underline min-h-[44px] min-w-10"
-        aria-label={`${siteName} — home`}
+        aria-label="Awesome Video — home"
         data-testid="header-brand"
       >
         <BrandMark className="size-7 shrink-0" />
@@ -324,7 +323,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
             color: "var(--text)",
           }}
         >
-          {siteName.toUpperCase()}
+          AWESOME.VIDEO
         </span>
       </Link>
       <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />

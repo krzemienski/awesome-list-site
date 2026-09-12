@@ -105,14 +105,17 @@ button { color: inherit; }
 
 
 /* Artifact accessibility reconciliation. Visual swatches/icons stay at their
-   canonical sizes inside non-overlapping 44px interactive boxes. */
+   canonical sizes inside non-overlapping 44px interactive boxes. The floor is
+   the standalone-exports control height from shared/styles/product-profiles.css
+   (2.75rem = 44px), so the artifact consumes the profile contract instead of
+   restating the number. */
 .docs-nav-item,
 .btn,
 .tab,
 .ds-system-pill,
 .input,
 .select {
-  min-height: 44px;
+  min-height: var(--profile-control-height);
 }
 
 .btn.icon {
@@ -139,7 +142,7 @@ button { color: inherit; }
 .docs-nav .chip,
 .ds-shell footer a {
   display: inline-flex !important;
-  min-height: 44px;
+  min-height: var(--profile-control-height);
   align-items: center;
 }
 
