@@ -10,10 +10,12 @@
 //   node scripts/validation/standalone-palette-drift.mjs --update-baseline
 //   node scripts/validation/standalone-palette-drift.mjs --update-baseline --init
 
+import { createHash } from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { inflateRawSync } from 'zlib';
 import {
   DS_OK_LOOKBACK,
   STAGE5_SCANS,
@@ -26,18 +28,26 @@ import {
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SKILL_PATH = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md');
 const STANDALONE_SCOPE = {
-  roots: ['awesome-list-site-ds', 'artifacts/*/.replit-artifact/artifact.toml'],
+  roots: ['artifacts/*/.replit-artifact/artifact.toml'],
   sourceExtensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.css', '.scss', '.html', '.svg', '.md'],
   ignoredDirectories: ['.git', 'dist', 'node_modules', 'uploads', 'docs'],
-  tokenSourceExclusions: ['**/design-system.css', 'awesome-list-site-ds/styles.css', 'artifacts/*/src/index.css'],
+  tokenSourceExclusions: ['**/design-system.css', 'artifacts/*/src/index.css'],
   unmanifestedArtifactExclusions: [
     {
       path: 'artifacts/r6',
       reason: 'release-audit evidence bundle containing claims Markdown and screenshots, not a runnable UI artifact',
     },
   ],
+  // Reference material that is contractually kept byte-identical to an
+  // external upload. It is never served, cannot take tokens or DS-OK tags,
+  // and its UI is validated through the registered artifact that ports it.
+  frozenReferenceRoots: [
+    {
+      path: 'awesome-list-site-ds',
+      reason: 'canonical design archive kept byte-identical to the upload; validated through its registered artifact port',
+    },
+  ],
 };
-const LEGACY_ROOT_REL = STANDALONE_SCOPE.roots.find((root) => !root.includes('*'));
 const MANIFEST_ROOT_PATTERN = STANDALONE_SCOPE.roots.find((root) => root.includes('*'));
 const ARTIFACTS_ROOT = path.join(ROOT, MANIFEST_ROOT_PATTERN.split('/*/')[0]);
 const BASELINE_PATH = path.join(ROOT, 'scripts/validation/standalone-palette-drift-baseline.json');
@@ -155,7 +165,7 @@ function extractDocumentedScope(skillText) {
 
   const section = skillText.slice(markerIndex + marker.length, endIndex);
   const documented = {};
-  for (const [, key, rawValue] of section.matchAll(/^\s*>?\s*(roots|sourceExtensions|ignoredDirectories|tokenSourceExclusions|unmanifestedArtifactExclusions)\s*=\s*(\[[^\n]+\])\s*$/gm)) {
+  for (const [, key, rawValue] of section.matchAll(/^\s*>?\s*(roots|sourceExtensions|ignoredDirectories|tokenSourceExclusions|unmanifestedArtifactExclusions|frozenReferenceRoots)\s*=\s*(\[[^\n]+\])\s*$/gm)) {
     documented[key] = JSON.parse(rawValue);
   }
 
@@ -231,9 +241,6 @@ function findUnmanifestedSourceDirectories(artifactsRoot, exclusions = STANDALON
 
 function discoverRoots() {
   const roots = [];
-  const legacyStandalone = path.join(ROOT, LEGACY_ROOT_REL);
-  if (fs.existsSync(legacyStandalone)) roots.push(legacyStandalone);
-
   if (fs.existsSync(ARTIFACTS_ROOT)) {
     for (const entry of fs.readdirSync(ARTIFACTS_ROOT, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
@@ -384,9 +391,110 @@ function totalOf(counts) {
   );
 }
 
+// ─── Frozen reference roots ────────────────────────────────────────────────
+// A root may only be excluded from the scan while it is provably still the
+// external upload it mirrors. The archive path and digest come from the
+// sync record; entries are hashed straight out of the zip (stored or
+// deflated members; the archive is far below zip64 sizes) and compared with
+// the working tree, so an edited, missing or extra file fails the gate and
+// the directory has to be either restored or treated as a scanned surface.
+const SYNC_RECORD_PATH = path.join(ROOT, 'docs/parity/source-sync.json');
+
+function sha256(buffer) {
+  return createHash('sha256').update(buffer).digest('hex');
+}
+
+function readZipEntries(zipBuffer) {
+  const EOCD_SIG = 0x06054b50;
+  const CENTRAL_SIG = 0x02014b50;
+  const LOCAL_SIG = 0x04034b50;
+  let eocd = -1;
+  for (let i = zipBuffer.length - 22; i >= Math.max(0, zipBuffer.length - 22 - 0xffff); i--) {
+    if (zipBuffer.readUInt32LE(i) === EOCD_SIG) { eocd = i; break; }
+  }
+  if (eocd === -1) throw new Error('zip: end-of-central-directory record not found');
+  const entryCount = zipBuffer.readUInt16LE(eocd + 10);
+  let offset = zipBuffer.readUInt32LE(eocd + 16);
+  if (entryCount === 0xffff || offset === 0xffffffff) throw new Error('zip: zip64 archives are not supported');
+  const entries = new Map();
+  for (let index = 0; index < entryCount; index++) {
+    if (zipBuffer.readUInt32LE(offset) !== CENTRAL_SIG) throw new Error(`zip: bad central directory entry at ${offset}`);
+    const method = zipBuffer.readUInt16LE(offset + 10);
+    const compressedSize = zipBuffer.readUInt32LE(offset + 20);
+    const nameLength = zipBuffer.readUInt16LE(offset + 28);
+    const extraLength = zipBuffer.readUInt16LE(offset + 30);
+    const commentLength = zipBuffer.readUInt16LE(offset + 32);
+    const localOffset = zipBuffer.readUInt32LE(offset + 42);
+    const name = zipBuffer.toString('utf8', offset + 46, offset + 46 + nameLength);
+    offset += 46 + nameLength + extraLength + commentLength;
+    if (name.endsWith('/')) continue;
+    if (zipBuffer.readUInt32LE(localOffset) !== LOCAL_SIG) throw new Error(`zip: bad local header for ${name}`);
+    const dataStart = localOffset + 30 + zipBuffer.readUInt16LE(localOffset + 26) + zipBuffer.readUInt16LE(localOffset + 28);
+    const raw = zipBuffer.subarray(dataStart, dataStart + compressedSize);
+    let content;
+    if (method === 0) content = raw;
+    else if (method === 8) content = inflateRawSync(raw);
+    else throw new Error(`zip: unsupported compression method ${method} for ${name}`);
+    entries.set(name, sha256(content));
+  }
+  return entries;
+}
+
+function listFilesRecursively(dir, base = dir) {
+  const files = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) files.push(...listFilesRecursively(full, base));
+    else files.push(path.relative(base, full).split(path.sep).join('/'));
+  }
+  return files;
+}
+
+function checkFrozenReferenceRoots() {
+  const syncRecord = JSON.parse(fs.readFileSync(SYNC_RECORD_PATH, 'utf8'));
+  const archivePath = path.join(ROOT, syncRecord.archive.path);
+  const zipBuffer = fs.readFileSync(archivePath);
+  const zipDigest = sha256(zipBuffer);
+  if (zipDigest !== syncRecord.archive.sha256) {
+    console.error(`FAIL frozen-reference :: ${syncRecord.archive.path} sha256 ${zipDigest} does not match ${path.relative(ROOT, SYNC_RECORD_PATH)} (${syncRecord.archive.sha256})`);
+    process.exit(1);
+  }
+  const archiveEntries = readZipEntries(zipBuffer);
+
+  const problems = [];
+  for (const frozen of STANDALONE_SCOPE.frozenReferenceRoots) {
+    const dir = path.join(ROOT, frozen.path);
+    if (!fs.existsSync(dir)) {
+      problems.push(`${frozen.path}: directory missing`);
+      continue;
+    }
+    const onDisk = new Set(listFilesRecursively(dir));
+    for (const [name, digest] of archiveEntries) {
+      if (!onDisk.has(name)) { problems.push(`${frozen.path}/${name}: missing (present in archive)`); continue; }
+      if (sha256(fs.readFileSync(path.join(dir, name))) !== digest) problems.push(`${frozen.path}/${name}: content differs from archive`);
+    }
+    for (const name of onDisk) {
+      if (!archiveEntries.has(name)) problems.push(`${frozen.path}/${name}: not in archive (extra file)`);
+    }
+  }
+
+  for (const problem of problems) console.error(`FAIL frozen-reference :: ${problem}`);
+  if (problems.length) {
+    console.error(`\n${problems.length} frozen reference file(s) drifted from ${syncRecord.archive.path}.`);
+    console.error('A frozen reference root is excluded from the Stage 5 scan only while it is byte-identical to its archive:');
+    console.error('restore the files, or move the change into the registered artifact that ports this source.');
+    process.exit(1);
+  }
+  console.log(
+    `PASS frozen-reference :: ${STANDALONE_SCOPE.frozenReferenceRoots.map((frozen) => frozen.path).join(', ')} ` +
+      `byte-identical to ${syncRecord.archive.path} (${archiveEntries.size} files)`,
+  );
+}
+
 checkStandaloneScopeParity();
 runCanaries();
 console.log('PASS canaries :: standalone Stage 5 detectors, unmanifested-artifact discovery, DS-OK parser, and shrink-only ratchet verified');
+checkFrozenReferenceRoots();
 
 const unmanifestedSourceDirectories = findUnmanifestedSourceDirectories(ARTIFACTS_ROOT);
 for (const directory of unmanifestedSourceDirectories) {
@@ -405,7 +513,7 @@ console.log(
 const roots = discoverRoots();
 if (!roots.length) {
   console.error('FAIL standalone-palette-drift :: no standalone artifact roots discovered');
-  console.error('       Expected awesome-list-site-ds or an artifacts/*/.replit-artifact/artifact.toml root.');
+  console.error('       Expected at least one artifacts/*/.replit-artifact/artifact.toml root.');
   process.exit(1);
 }
 

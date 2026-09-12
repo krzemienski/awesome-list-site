@@ -224,21 +224,29 @@ rg -i '\brgba?\(' client/src \
 > against known-bad/known-good canary samples on every run, so a regex
 > regression cannot pass vacuously. A manual stage-5 audit still adds value
 > for standalone artifacts, run
-> `npm run validate:standalone-palette-drift`. That check discovers the
-> `awesome-list-site-ds` standalone root and every manifest-backed root under
-> `artifacts/`, excludes only the token source stylesheet, and fails on bare
-> or punctuation-only `DS-OK` markers with the same written-reason rule.
-> It also fails when a source-bearing top-level `artifacts/` directory has no
-> artifact manifest. Exact-path exclusions are reserved for non-UI evidence
-> bundles and must include a written reason in the executable scope contract.
-> Its executable scope contract is checked against this guidance on every run:
+> `npm run validate:standalone-palette-drift`. That check discovers every
+> manifest-backed root under `artifacts/`, excludes only the token source
+> stylesheets, and fails on bare or punctuation-only `DS-OK` markers with the
+> same written-reason rule. It also fails when a source-bearing top-level
+> `artifacts/` directory has no artifact manifest. Exact-path exclusions are
+> reserved for non-UI evidence bundles and must include a written reason in
+> the executable scope contract. The canonical design archive
+> `awesome-list-site-ds/` is a *frozen reference root*: it is never served,
+> is contractually byte-identical to the upload recorded in
+> `docs/parity/source-sync.json`, and is validated through the registered
+> artifact that ports it — so the gate does not scan it, but it does verify
+> on every run that the directory still matches the archive file for file;
+> any edit there fails the gate until it is restored or moved into the
+> artifact. Its executable scope contract is checked against this guidance on
+> every run:
 >
 > <!-- standalone-palette-drift-scope
-> roots = ["awesome-list-site-ds", "artifacts/*/.replit-artifact/artifact.toml"]
+> roots = ["artifacts/*/.replit-artifact/artifact.toml"]
 > sourceExtensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".css", ".scss", ".html", ".svg", ".md"]
 > ignoredDirectories = [".git", "dist", "node_modules", "uploads", "docs"]
-> tokenSourceExclusions = ["**/design-system.css", "awesome-list-site-ds/styles.css", "artifacts/*/src/index.css"]
+> tokenSourceExclusions = ["**/design-system.css", "artifacts/*/src/index.css"]
 > unmanifestedArtifactExclusions = [{"path":"artifacts/r6","reason":"release-audit evidence bundle containing claims Markdown and screenshots, not a runnable UI artifact"}]
+> frozenReferenceRoots = [{"path":"awesome-list-site-ds","reason":"canonical design archive kept byte-identical to the upload; validated through its registered artifact port"}]
 > -->
 
 For standalone artifacts, run the same scans over the artifact's files,

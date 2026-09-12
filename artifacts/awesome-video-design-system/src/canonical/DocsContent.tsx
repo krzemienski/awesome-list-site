@@ -77,6 +77,7 @@ function Overview() {
         </div>
         <div className="card" style={{ padding: 22 }}>
           <div className="mono" style={{ fontSize: 10, color: 'var(--accent)', letterSpacing: '0.18em', marginBottom: 8 }}>FLAT BLACK</div>
+          {/* DS-OK: documentation prose quoting a token value, not a style */}
           <P>Every system uses pure #000000. Atmosphere is layered above, never colored backgrounds.</P>
         </div>
       </Grid2>
@@ -358,10 +359,12 @@ function ColorDoc() {
         'Live-dot pulse.',
       ]} />
       <Callout kind="ANTI-PATTERN">
+        {/* DS-OK: documentation prose quoting a token value, not a style */}
         Never set a chip, badge, or chart bar to a free color. Use accent, the four ink tiers, or one of the semantic tokens (#34d08c ok, #ffb84d warn, #ff5c7a bad).
       </Callout>
       <H2>Status colors</H2>
       <Spec rows={[
+        // DS-OK: documentation prose quoting a token value, not a style
         ['#34d08c', 'OK — healthy, indexed, up.'],
         ['#ffb84d', 'WARN — stale, deprecated, archived.'],
         ['#ff5c7a', 'BAD — broken, down, error.'],
@@ -649,6 +652,7 @@ function NavDoc() {
       <ULb items={[
         '86% width (max 340px) sliding from left.',
         '280ms cubic-bezier slide.',
+        // DS-OK: documentation prose quoting a token value, not a style
         'Backdrop is rgba(0,0,0,0.6) + 2px blur, click-to-dismiss.',
       ]} />
     </>

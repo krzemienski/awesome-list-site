@@ -82,15 +82,44 @@ palette gate accepts tagged literals and there are no `--status-*` tokens in
 the design system to point at. Hairlines use `var(--hairline-w)` and pills use
 `var(--radius-pill)`.
 
-## 7. `standalone-palette-drift` is out of the required-green set and stays red
+## 7. `standalone-palette-drift`: the canonical archive is a frozen reference root, not a scanned surface
 
-The gate scans `awesome-list-site-ds/` (89 literals at `e519de14`, untouchable
-by contract) and, since the snapshot, the artifact's canonical ports
-(`artifacts/awesome-video-design-system/src/canonical/CanonicalShowcase.tsx`,
-`DocsContent.tsx`; +36). It cannot be green without a scope decision (exclude
-the canonical root, or port the literals to tokens inside the artifact). It is
-not in the foundation task's required list; `parity-20/21` own the artifact
-files, and the scope decision is raised as a follow-up.
+The gate was red at `e519de14` (89 findings) because the 2026-09-10 design
+resync (`3ed28118`) refilled `awesome-list-site-ds/` with archive files the
+shrink-only baseline had never pinned, and the snapshot added 36 more in the
+artifact's canonical ports. The gate is a registered validation command, so
+it blocks completion of this and every later parity task; the scope decision
+could not wait for `parity-20/21/28`.
+
+Decision, applied in both the executable contract
+(`scripts/validation/standalone-palette-drift.mjs`) and its documented twin
+in `.agents/skills/verify-design-system/SKILL.md` (the gate verifies they
+match on every run):
+
+- `awesome-list-site-ds/` is removed from `roots` and declared under a new
+  `frozenReferenceRoots` key with a written reason. It is never served, it
+  is contractually byte-identical to
+  `attached_assets/awesome_list_site_2_1789019068732.zip`, and its UI is
+  validated through the registered artifact that ports it. A frozen root
+  can carry neither tokens nor `DS-OK` tags, so scanning it could only ever
+  produce findings nobody is allowed to fix.
+- The exclusion is enforced, not trusted: on every run the gate hashes the
+  archive (digest pinned in `docs/parity/source-sync.json`), reads its 103
+  members straight out of the zip, and compares them with the working tree.
+  An edited, missing or extra file fails the gate until the directory is
+  restored or the change moves into the artifact
+  (`docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt`).
+- The artifact's 36 findings are tagged at their definition sites with
+  reasoned `DS-OK` comments, the mechanism the audit skill prescribes:
+  `CanonicalShowcase.tsx` holds the per-system flow-diagram skin and anatomy
+  renderer values ported verbatim from `design-system-anatomy.jsx` (the same
+  "intentional per-system skin" category the skill already accepts, and the
+  view `parity-20` pixel-gates against that source); `DocsContent.tsx` only
+  quotes token values in documentation prose. `parity-20/21` may replace the
+  tags with tokens where pixel parity allows, and the ratchet will record it.
+- The 249 baseline entries that belonged to the canonical root were retired
+  with `--update-baseline` (98 legacy matches remain pinned, all in
+  `artifacts/mockup-sandbox`).
 
 ## 8. `lint` and `test:integration` were already red at the last green commit
 

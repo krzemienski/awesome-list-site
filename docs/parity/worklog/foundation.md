@@ -110,8 +110,11 @@ Also green (not in the required list): `theme-registry-types`,
 `cache-headers`, `guest-recommendations`, `search-typos`, `auth-return-audit`
 (see the note under "Flakes" below).
 
-Known red, not required: `standalone-palette-drift` (89 at `e519de14`, 125
-now; assumptions §7).
+`standalone-palette-drift`: red at `e519de14` (89) and 125 at the start of
+this task; now **PASS** (3 roots, 82 files) after the frozen-reference scope
+decision in assumptions §7. Mutation probe (edited / extra / missing archive
+file, untagged artifact literal, bare `DS-OK`): all five fail, restored tree
+passes — `docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt`.
 
 ### Flakes seen during the run (each green on a single rerun)
 
@@ -143,8 +146,13 @@ now; assumptions §7).
 
 ## Open items for the orchestrator (not proposed as follow-ups: W1 tasks already depend on this one)
 
-1. `standalone-palette-drift` scope decision (assumptions §7) — belongs with
-   the artifact tasks (`parity-20/21`) or the cleanup task (`parity-28`).
+1. `standalone-palette-drift` is green again, but the artifact's canonical
+   ports carry reasoned `DS-OK` tags rather than tokens (assumptions §7);
+   `parity-20/21` decide per value whether a token keeps pixel parity and
+   drop the tag when it does. `artifacts/awesome-video-ds/` is an untracked,
+   git-ignored scaffold (manifest + empty dirs, 2026-09-05) that the gate
+   scans as an empty third root — delete it once the registry is confirmed
+   to hold only the two registered artifacts.
 2. Legacy `tests/integration/api/*` suite (171 red, mock-era) and the six
    stale e2e specs listed above — quarantine or rewrite; natural home is the
    regression task (`parity-29`), which otherwise inherits a red baseline it

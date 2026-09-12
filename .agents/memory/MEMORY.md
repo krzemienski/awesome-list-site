@@ -109,7 +109,7 @@
 - [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
 - [Workflow reconciliation double-start](workflow-reconciliation-double-start.md) — after merge reconciliation, a healthy artifact listener can coexist with a false “port already in use” workflow failure; restart once.
 - [Helper evidence provenance](helper-evidence-provenance.md) — reject detailed reports for unrelated routes; verify project scope and local outputs before counting evidence.
-- [Last-green gate baselines](last-green-baselines.md) — lint, test:integration and parts of e2e were never green; extract the last green sha to /tmp and compare per file/test before calling anything a regression.
-- [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the archive-identical canonical source; assert token consumers per selector, not by substring.
+- [Last-green gate baselines](last-green-baselines.md) — lint/test:integration/parts of e2e were never green; diff per file+test against the last green sha before calling a regression.
+- [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
-- [standalone-palette-drift scope](standalone-palette-gate-scope.md) — structurally red (canonical root + artifact canonical ports); informational until the artifact tasks decide scope.
+- [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.

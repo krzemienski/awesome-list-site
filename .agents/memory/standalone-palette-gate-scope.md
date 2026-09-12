@@ -1,19 +1,30 @@
 ---
-name: standalone-palette-drift is structurally red
-description: The standalone palette gate scans the untouchable canonical source plus verbatim canonical ports; it cannot pass without a scope decision, so treat it as informational.
+name: Frozen reference roots in drift gates
+description: How to keep a hardcoded-value drift gate green when its scope includes a directory that is contractually byte-identical to an external archive.
 ---
 
-**Rule:** treat `standalone-palette-drift` as informational until its scope is
-decided. Do not "fix" it by editing the canonical `awesome-list-site-ds/`
-(contract: archive-identical) and do not pin exceptions to force green.
+**Rule:** a directory that must stay byte-identical to an upload (the
+canonical design archive) is never a scanned surface of a Stage 5 / palette
+drift gate. Exclude it under an explicit, reasoned "frozen reference" entry
+in BOTH the executable and the documented scope contract, and make the gate
+prove the exclusion on every run by hashing the archive members (read
+straight out of the zip; digest pinned in the sync record) against the
+working tree. Verbatim ports of that archive inside a real surface (the
+registered artifact) are scanned normally and take reasoned `DS-OK` tags at
+the definition site — the same "per-system skin" category the audit skill
+already accepts — until the owning task can tokenize them under a pixel gate.
 
-**Why:** the canonical source is a reference corpus full of raw colour
-literals by design, and verbatim ports of it inside the design-system
-artifact inherit them. Two legitimate resolutions exist — exclude the
-canonical root and port the artifact literals to tokens, or accept the
-canonical root as a reference corpus — and only the artifact-owning task can
-make that call.
+**Why:** a frozen directory can carry neither tokens nor `DS-OK` tags, so a
+gate that scans it can only ever report findings nobody is allowed to fix.
+That is exactly what happened when the archive was resynced: the shrink-only
+ratchet went red one commit before the last green build and stayed red, and
+because the gate is a registered validation command it silently blocked
+completion of every later task. "Treat it as informational" is not an option
+the platform offers.
 
-**How to apply:** report baseline vs current count in the worklog and attribute
-new literals to their owning files; the palette gates that matter for app
-code are `palette-drift` and `accent-drift`.
+**How to apply:** when a drift gate turns red on files you may not edit, ask
+first whether the files are a reference corpus. If yes: exclusion + archive
+verification + mutation probe (edited / extra / missing file must each fail),
+then `--update-baseline` retires the orphaned entries (a shrink-only ratchet
+refuses growth even with `--init`, so fix regressions before ratcheting). If
+no: tokenize or tag; never pin exceptions to force green.
