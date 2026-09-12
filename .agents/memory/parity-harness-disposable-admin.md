@@ -1,50 +1,24 @@
 ---
 name: Parity harness disposable Clerk admin
-description: Constraints discovered while automating a create → sign-in → promote → delete Clerk admin for the visual parity harness (numeric bridge id, admin reads via page fetch, frozen clock vs token refresh).
+description: Rules for an automated create → sign-in → promote → delete Clerk admin in a capture harness (numeric bridge id, admin reads via page fetch, frozen clock vs token refresh, fail-closed sweep, main-scoped identity checks).
 ---
 
-## Bridge id must be numeric for API-managed test users
-
-The admin user routes (`/api/admin/users/:id/name|role`, `DELETE :id`) go
-through the contract guard that types every `id` param as a bounded int4
-string. A prefixed string bridge id (`__qa_test_…`) is happily JIT-provisioned
-on sign-in but can never be renamed, promoted or deleted through the API — it
-becomes residue only direct SQL can remove.
-
-**Rule:** bridge id / Clerk `external_id` = random integer in
-2 000 000 000–2 147 483 647; put the `__qa_test_` prefix on the **email**
-instead and sweep by `email LIKE '__qa_test_%'` (admin users search `q=`
-matches email; Clerk list `?query=` matches too).
-
-**Why:** the first harness attempt left an undeletable row behind.
-
-## Admin reads: use the signed-in page's fetch, not context.request
-
-Playwright's `context.request` shares the cookie jar but `/api/admin/*`
-answered 401 for the disposable admin; a same-origin `fetch(..., {credentials:
-"include"})` evaluated in the signed-in page works (same path the app uses).
-
-## Frozen clock vs ClerkJS
-
-`context.clock.setFixedTime()` freezes `Date`, so ClerkJS believes its ~60 s
-session token never ages and stops refreshing. Mitigate with a fresh
-`storageState()` per row (after `Clerk.session.getToken({skipCache:true})`) and
-an immediate `/api/auth/user` check after navigation; a page must settle within
-about a minute. `clock.install()` is worse: it pauses timers and stalls the
-handshake.
-
-## Sweep must fail closed on BOTH sides
-
-A cleanup sweep that computes "remaining" from the local users table alone
-can exit 0 while a Clerk user is still there (Clerk deletion failed but was
-only appended to a `failed` list). Re-list Clerk after deleting, and treat any
-deletion failure or any leftover on either side as a non-zero exit.
-
-## Identity guard: scope label checks to the main content
-
-"Both sides show the same entity" checks must not search `body` text — the
-sidebar tree names every taxonomy label on every page, so a wrong-but-similar
-page (both sides fell back to home) passes. Compare the page heading with the
-catalogue label where the design's heading is the entity, and search only the
-main content (navigation removed, breadcrumb kept) elsewhere; admin tab checks
-must compare the ACTIVE tab against the requested slug, not "some tab".
+- **Bridge id / Clerk `external_id` must be a random integer** (2 000 000 000–
+  2 147 483 647): the admin user routes type `:id` as a bounded int4, so a
+  prefixed string id is JIT-provisioned on sign-in but can never be renamed,
+  promoted or deleted through the API (residue only SQL removes). Put the
+  `__qa_test_` prefix on the **email** and sweep by `email LIKE '__qa_test_%'`
+  (the admin users `q=` search and Clerk `?query=` both match it).
+- **Admin reads use the signed-in page's `fetch(..., {credentials:"include"})`**,
+  not `context.request` (shares the jar yet gets 401 on `/api/admin/*`).
+- **Frozen clock stops ClerkJS refreshing its ~60 s token.** Snapshot a fresh
+  `storageState()` per row after `getToken({skipCache:true})`, check
+  `/api/auth/user` right after navigation, and settle within about a minute.
+- **The sweep fails closed on BOTH sides:** re-list Clerk after deleting and
+  exit non-zero on any deletion failure or leftover — "remaining" computed
+  from the local table alone exited 0 with a Clerk user still there.
+- **Identity checks scope to the main content** (navigation removed, breadcrumb
+  kept): the sidebar names every taxonomy label on every page, so body-wide
+  matching passes two pages that both fell back to home. Compare the heading
+  with the catalogue label where the design's heading is the entity; admin
+  tab checks compare the ACTIVE tab to the requested slug, not "some tab".

@@ -114,5 +114,5 @@
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
 - [Read-only browser capture](read-only-browser-capture.md) — three layers (browser Fetch / context guards / sealed realm); page-scoped hooks miss anchor popups; LH needs a Playwright-context page via puppeteer handle; keep popup blocker ON.
-- [Parity harness disposable admin](parity-harness-disposable-admin.md) — int4-guarded admin routes need a NUMERIC bridge id (prefix the email); sweep fails closed on Clerk leftovers too; identity checks scope to main.
-- [Headless capture determinism](headless-capture-determinism.md) — neutralise backdrop-filter both sides; `--disable-partial-raster` for stable fullPage; stamp+reopen on reload; wait, THEN snapshot.
+- [Parity harness disposable admin](parity-harness-disposable-admin.md) — NUMERIC bridge id (int4 admin routes; prefix the email); sweep fails closed on Clerk leftovers; identity checks scope to main.
+- [Headless capture determinism](headless-capture-determinism.md) — backdrop-filter off both sides; `--disable-partial-raster`; stamp + API-quiet + font checks around every frame; wait, THEN snapshot.

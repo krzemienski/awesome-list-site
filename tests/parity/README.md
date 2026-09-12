@@ -118,8 +118,17 @@ identities behind, and `--keep-user` to keep one for manual inspection.
   transparent, `backdrop-filter: none` (headless Chromium rasterises blur
   non-deterministically). Each page's non-`none` `backdrop-filter` set is
   collected *before* normalisation; a mismatch fails the row.
-- Fonts: the nine parity families are forced to load on both pages and their
-  declared `@font-face` sets diffed; any gap fails the row (`fontGap`).
+- Fonts: every declared `@font-face` of the nine parity families (each
+  family|style|weight, latin subset) is forced to load on both pages, plus the
+  faces the page uses and the canonical body/display/mono faces. A side whose
+  fonts do not finish (`document.fonts.status` not `loaded`, a face in
+  `error`, a declared parity face still unloaded after the forced load, or a
+  used face unavailable) fails its capture — a fallback-font render is not a
+  capture of either side; the side is reopened once in a fresh context before
+  the failure is final. The declared sets are then diffed; any gap fails the
+  row (`fontGap`). A canonical display italic that is used but not registered
+  (synthetic italic) is a deterministic page defect and fails the row
+  (`fontDefects`) while the pixels are still measured.
 - Identity checks per family prove both sides show the same entity before
   pixels are compared: category, subcategory and resource rows need the
   `main h1` on BOTH sides to equal the catalogue label; the leaf row needs the
@@ -132,6 +141,12 @@ identities behind, and `--keep-user` to keep one for manual inspection.
   and the reason names the side).
 - A capture is accepted only when two consecutive raw full-page frames are
   byte-identical (up to eight attempts); blank or loading DOM is rejected.
+  Every frame is bracketed by the same-origin API guard: before it, `/api/`
+  traffic must be idle again and no `429`/`5xx` may have landed since the
+  settle; a frame during which a request started or finished is discarded
+  (`discardedFrames`) and can never form the identical pair. Each side is
+  captured straight after its own settle, so the window in which the other
+  side opens is not left open on a live page.
 - The app side is not trusted until React has mounted on `#root` and the
   crawler prerender (`#ssr-seo-content`) and its hold overlay (`#ssr-seo-hold`)
   are gone. Both satisfy plain ready selectors such as `main h1`; during a
@@ -160,9 +175,12 @@ identities behind, and `--keep-user` to keep one for manual inspection.
   for 750 ms, repeated until a settle round sees no new completions) before a
   frame counts, so the signed-in home is captured after its ~10 s
   recommendation call lands, not at a timing-dependent loading state. Any
-  `429` or `5xx` from the app during a row makes the side untrustworthy: the
-  row fails with `capture failed: app API failed during capture (...)`, and
-  every 4xx/5xx is listed in the row's `apiFailures`.
+  `429` or `5xx` from the app during a row — at the settle or around any frame —
+  makes the side untrustworthy: the row fails with
+  `capture failed: app API failed during capture (...)`, and every 4xx/5xx is
+  listed in the row's `apiFailures`, read from the live tracker after the last
+  frame and the identity reads (never a settle-time snapshot; the reference
+  side's list is `referenceApiFailures`).
 
 ### Rate-limit budget
 

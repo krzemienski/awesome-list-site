@@ -41,7 +41,7 @@ const describeRecoveries = (configuration) => {
   const parts = [
     waits.length ? `${waits.length} rate-limit wait${waits.length === 1 ? "" : "s"} (${Math.round(waitedMs / 1000)} s in total, excluded from row budgets)` : "no rate-limit waits",
     deferrals.length ? `${deferrals.length} row deferral${deferrals.length === 1 ? "" : "s"} to the end of the queue` : "no deferrals",
-    reloads.length ? `${reloads.length} document reload${reloads.length === 1 ? "" : "s"} detected and recovered by reopening the side (${reloads.map((event) => `${event.screen}@${event.width} ${event.side}/${event.phase}`).join(", ")})` : "no document reloads detected",
+    reloads.length ? `${reloads.length} side reopen${reloads.length === 1 ? "" : "s"} (document reload or fonts not ready) recovered by reopening the side (${reloads.map((event) => `${event.screen}@${event.width} ${event.side}/${event.phase}${event.kind === "fonts-not-ready" ? "/fonts" : ""}`).join(", ")})` : "no document reloads or font-readiness reopens",
   ];
   return `Recoveries: ${parts.join("; ")}. Every event is listed in results.json under \`configuration\`.`;
 };

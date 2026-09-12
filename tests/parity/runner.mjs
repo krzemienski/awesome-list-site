@@ -29,7 +29,9 @@ import {
   settlePage,
   stableFullPageCapture,
   DocumentReloadedError,
+  FontsNotReadyError,
   attachNetworkTracker,
+  currentApiFailures,
 } from "./readiness.mjs";
 import { ActionUnavailableError, applyAction } from "./actions.mjs";
 import {
@@ -492,16 +494,24 @@ const main = async () => {
       }
       const row = { ...base, ...outcome };
       const fontGap = !row.fontParity.ok;
+      // A canonical face that is declared but not registered (synthetic italic)
+      // is a deterministic property of the page, so it is a row defect rather
+      // than a capture failure: the capture faithfully shows it.
+      const fontDefects = [
+        ...row.fontsSettled.actual.nativeDefects.map((defect) => `app: ${defect}`),
+        ...row.fontsSettled.expected.nativeDefects.map((defect) => `reference: ${defect}`),
+      ];
       const visualOk = row.comparison.withinCeiling && row.backdropFilters.match && row.identity.ok !== false;
       const reasons = [];
       if (!row.comparison.withinCeiling) reasons.push(`${row.comparison.diffPercent.toFixed(3)}% differing pixels exceeds the ${MAXIMUM_DIFF_PERCENT}% ceiling`);
       if (!row.backdropFilters.match) reasons.push(`backdrop-filter sets differ (app ${JSON.stringify(row.backdropFilters.actual)} vs reference ${JSON.stringify(row.backdropFilters.expected)})`);
       if (row.identity.ok === false) reasons.push(row.identity.reason);
       if (fontGap) reasons.push(`@font-face parity gap: ${row.fontParity.gaps.length} face(s) declared on one side only`);
+      if (fontDefects.length) reasons.push(`font defect — ${fontDefects.join("; ")}`);
       if (evidenceKind) {
-        pushRow({ ...row, status: "EVIDENCE", evidenceKind, reason: reasons.join("; ") || undefined });
+        pushRow({ ...row, status: "EVIDENCE", evidenceKind, fontDefects, reason: reasons.join("; ") || undefined });
       } else {
-        pushRow({ ...row, status: visualOk && !fontGap ? "PASS" : "FAIL", denominator: true, fontGap, reason: reasons.join("; ") || undefined });
+        pushRow({ ...row, status: visualOk && !fontGap && !fontDefects.length ? "PASS" : "FAIL", denominator: true, fontGap, fontDefects, reason: reasons.join("; ") || undefined });
       }
       log(`  ${rows.at(-1).status} ${row.comparison.diffPercent.toFixed(4)}% (${row.comparison.differingPixels}px)`);
     }
@@ -913,11 +923,14 @@ const captureRow = async (ctx, screen, width) => {
   // frame is reopened from scratch (fresh context, same action, full settle)
   // instead of being captured mid-boot, at most MAX_DOCUMENT_RELOADS times per
   // row; discarded frames go to diagnostics/ and every event is recorded.
+  // A side whose web fonts did not finish loading is reopened the same way (a
+  // fresh context re-fetches them); the second failure is final.
   const noteReload = async (sideName, phase, error) => {
-    if (!looksLikeReload(error) || reloads[sideName] >= MAX_DOCUMENT_RELOADS) throw error;
+    const fontsNotReady = error instanceof FontsNotReadyError;
+    if ((!looksLikeReload(error) && !fontsNotReady) || reloads[sideName] >= MAX_DOCUMENT_RELOADS) throw error;
     reloads[sideName] += 1;
     const frames = await stashReloadFrames(ctx, stem, sideName, reloads[sideName]);
-    ctx.documentReloads?.push({ screen: screen.id, width, side: sideName, phase, round: reloads[sideName], reason: error.message.split("\n")[0], frames, at: new Date().toISOString() });
+    ctx.documentReloads?.push({ screen: screen.id, width, side: sideName, phase, kind: fontsNotReady ? "fonts-not-ready" : "document-reloaded", round: reloads[sideName], reason: error.message.split("\n")[0], frames, at: new Date().toISOString() });
     log(`  … ${sideName} ${phase}: ${error.message.split("\n")[0]}; reopening the side (${reloads[sideName]}/${MAX_DOCUMENT_RELOADS})`);
   };
   const openSideOrReopen = async (sideName) => {
@@ -945,9 +958,12 @@ const captureRow = async (ctx, screen, width) => {
     }
   };
   try {
+    // Each side is captured straight after its own settle (the gap in which
+    // the other side opens is not left open); every frame re-checks the
+    // document stamp and same-origin API quiet/poisoning anyway.
     sides.actual = await openSideOrReopen("actual");
-    sides.expected = await openSideOrReopen("expected");
     const actualCapture = await captureSide("actual", actualFile);
+    sides.expected = await openSideOrReopen("expected");
     const expectedCapture = await captureSide("expected", expectedFile);
     const slug = screen.actualAction?.startsWith("admin-tab:") ? screen.actualAction.slice("admin-tab:".length) : null;
     const identityCheck = screen.identityCheck || (slug ? "admin-tab" : null);
@@ -977,13 +993,16 @@ const captureRow = async (ctx, screen, width) => {
       identity,
       fontParity,
       backdropFilters: { actual: actualFilters, expected: expectedFilters, match: JSON.stringify(actualFilters) === JSON.stringify(expectedFilters) },
-      apiFailures: sides.actual.settled.apiFailures || [],
-      actualCaptureStability: { stableAttempts: actualCapture.stableAttempts, attemptHashes: actualCapture.attemptHashes, reopenedAfterReload: reloads.actual },
-      expectedCaptureStability: { stableAttempts: expectedCapture.stableAttempts, attemptHashes: expectedCapture.attemptHashes, reopenedAfterReload: reloads.expected },
+      // Read from the live tracker after both captures and the identity reads —
+      // never the settle-time snapshot.
+      apiFailures: currentApiFailures(sides.actual.page),
+      referenceApiFailures: currentApiFailures(sides.expected.page),
+      actualCaptureStability: { stableAttempts: actualCapture.stableAttempts, attemptHashes: actualCapture.attemptHashes, discardedFrames: actualCapture.discardedFrames, apiTraffic: actualCapture.apiTraffic, reopenedAfterReload: reloads.actual },
+      expectedCaptureStability: { stableAttempts: expectedCapture.stableAttempts, attemptHashes: expectedCapture.attemptHashes, discardedFrames: expectedCapture.discardedFrames, apiTraffic: expectedCapture.apiTraffic, reopenedAfterReload: reloads.expected },
       captureHashes: { actual: actualCapture.sha256, expected: expectedCapture.sha256 },
       fontsSettled: {
-        actual: { complete: sides.actual.settled.fonts.complete, failedFaces: sides.actual.settled.fonts.failedFaces, nativeDefects: sides.actual.settled.fonts.nativeDefects },
-        expected: { complete: sides.expected.settled.fonts.complete, failedFaces: sides.expected.settled.fonts.failedFaces, nativeDefects: sides.expected.settled.fonts.nativeDefects },
+        actual: { complete: sides.actual.settled.fonts.complete, forcedParityFaces: sides.actual.settled.fonts.forcedParityFaces, failedFaces: sides.actual.settled.fonts.failedFaces, nativeDefects: sides.actual.settled.fonts.nativeDefects },
+        expected: { complete: sides.expected.settled.fonts.complete, forcedParityFaces: sides.expected.settled.fonts.forcedParityFaces, failedFaces: sides.expected.settled.fonts.failedFaces, nativeDefects: sides.expected.settled.fonts.nativeDefects },
       },
       links: { actual: `actual/${stem}.png`, expected: `expected/${stem}.png`, diff: `diff/${stem}.png` },
     };

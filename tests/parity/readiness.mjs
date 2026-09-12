@@ -124,6 +124,44 @@ const throwIfPoisoned = (tracker) => {
   throw error;
 };
 
+/**
+ * The moment-of-frame API guard. A page stays live between its settle and each
+ * frame (the other side opens and settles in between), so every frame is
+ * bracketed: before it, same-origin API traffic must be idle again and no
+ * 429/5xx may have landed since the settle; after it, no request may have
+ * started or finished while the frame was taken (a frame that straddles a
+ * refetch is discarded, whatever its pixels look like).
+ * @returns {number|null} the tracker's completed-request count at the check (null when the page has no tracker)
+ */
+export async function assertApiQuiet(page, when, { quietMs = 500, timeout = 15_000 } = {}) {
+  const tracker = page.__parityNetwork;
+  if (!tracker) return null;
+  const idle = await waitForApiIdle(page, { quietMs, timeout });
+  if (!idle.idle) throw new Error(`same-origin API requests still in flight ${when} (${Math.round(idle.waitedMs / 1000)}s): ${idle.pending.join(", ")}`);
+  throwIfPoisoned(tracker);
+  return tracker.completed;
+}
+
+/** Describes API traffic that overlapped a frame, or null when the frame was quiet. */
+export function apiTrafficDuringFrame(page, completedBefore) {
+  const tracker = page.__parityNetwork;
+  if (!tracker || completedBefore === null) return null;
+  throwIfPoisoned(tracker);
+  const started = [...tracker.inflight.keys()].map((request) => `${request.method()} ${apiPath(request)}`);
+  const completed = tracker.completed - completedBefore;
+  if (!started.length && completed === 0) return null;
+  return `${completed} request(s) completed and ${started.length} started during the frame${started.length ? ` (${started.join(", ")})` : ""}`;
+}
+
+/** Thrown when a page's web fonts did not finish loading (a fallback-font render is not a capture of either side). */
+export class FontsNotReadyError extends Error {
+  constructor(message, readiness = null) {
+    super(message);
+    this.name = "FontsNotReadyError";
+    this.readiness = readiness;
+  }
+}
+
 const SPA_ENTRY_PATHS = new Set(["/", "/index.html"]);
 
 /** Distinct computed backdrop-filter values in use, sampled before normalisation. */
@@ -240,8 +278,9 @@ export async function settlePage(page, selector, { side } = {}) {
     const root = document.documentElement;
     return root.dataset.system === "editorial" && root.dataset.accent === "crimson";
   }, null, { timeout: 15_000 });
-  const fontReadiness = await page.evaluate(async () => {
+  const fontReadiness = await page.evaluate(async (parityFamilies) => {
     await document.fonts.ready;
+    const stripQuotes = (value) => String(value).replace(/^['"]|['"]$/g, "");
     const rootStyle = getComputedStyle(document.documentElement);
     const canonical = [
       ["body-400", rootStyle.getPropertyValue("--font-body"), "normal", "400"],
@@ -268,7 +307,22 @@ export async function settlePage(page, selector, { side } = {}) {
       const fontStyle = style.fontStyle === "italic" ? "italic" : "normal";
       return [`${family}\0${fontStyle}\0${weight}`, { family, style: fontStyle, weight }];
     })).values()];
-    await Promise.all(used.concat(canonical).map((item) =>
+    // Every declared family|style|weight of the nine parity families is forced
+    // to load (its latin subset — the one every capture renders), not only the
+    // faces the page happens to use: a declared-but-broken face must fail here,
+    // and two sides that both fell back would otherwise compare equal.
+    const wantedFamilies = new Set(parityFamilies.map((family) => family.toLowerCase()));
+    const declaredParity = new Map();
+    for (const face of document.fonts) {
+      const family = stripQuotes(face.family);
+      if (!wantedFamilies.has(family.toLowerCase())) continue;
+      const key = `${family}|${face.style}|${face.weight}`;
+      if (!declaredParity.has(key)) {
+        declaredParity.set(key, { key, family, style: face.style.split(" ")[0] || "normal", weight: face.weight.split(" ")[0] || "400" });
+      }
+    }
+    const forced = [...declaredParity.values()];
+    await Promise.allSettled(used.concat(canonical, forced).map((item) =>
       document.fonts.load(`${item.style} ${item.weight} 16px "${item.family}"`, "Parity"),
     ));
     await document.fonts.ready;
@@ -276,6 +330,20 @@ export async function settlePage(page, selector, { side } = {}) {
     const failedFaces = faces.filter((face) => face.status === "error").map((face) => ({
       family: face.family, style: face.style, weight: face.weight,
     }));
+    // Best status per declared parity key (unicode-range subsets share a key;
+    // the latin subset is the one the forced load fetches).
+    const parityKeyStatus = new Map();
+    for (const face of faces) {
+      const family = stripQuotes(face.family);
+      if (!wantedFamilies.has(family.toLowerCase())) continue;
+      const key = `${family}|${face.style}|${face.weight}`;
+      const rank = { loaded: 3, loading: 2, unloaded: 1, error: 0 }[face.status] ?? 0;
+      const previous = parityKeyStatus.get(key);
+      if (!previous || rank > previous.rank) parityKeyStatus.set(key, { status: face.status, rank });
+    }
+    const unloadedParityFaces = [...parityKeyStatus.entries()]
+      .filter(([, value]) => value.status !== "loaded")
+      .map(([key, value]) => `${key} (${value.status})`);
     const faceMatches = ({ family, style, weight }, face) =>
       face.family.replace(/^['"]|['"]$/g, "").toLowerCase() === family.toLowerCase() &&
       face.status === "loaded" &&
@@ -305,10 +373,21 @@ export async function settlePage(page, selector, { side } = {}) {
     window.scrollTo(0, 0);
     return {
       status: document.fonts.status, checks, usedFaceChecks, failedFaces, nativeDefects,
+      forcedParityFaces: forced.length,
+      unloadedParityFaces,
       complete: document.fonts.status === "loaded" && failedFaces.length === 0 &&
-        usedFaceChecks.every((check) => check.check),
+        unloadedParityFaces.length === 0 && usedFaceChecks.every((check) => check.check),
     };
-  });
+  }, PARITY_FONT_FAMILIES);
+  if (!fontReadiness.complete) {
+    const problems = [
+      fontReadiness.status !== "loaded" ? `document.fonts.status is ${fontReadiness.status}` : null,
+      fontReadiness.failedFaces.length ? `${fontReadiness.failedFaces.length} face(s) failed to load: ${fontReadiness.failedFaces.slice(0, 4).map((face) => `${face.family} ${face.style} ${face.weight}`).join(", ")}` : null,
+      fontReadiness.unloadedParityFaces.length ? `${fontReadiness.unloadedParityFaces.length} declared parity face(s) not loaded after a forced load: ${fontReadiness.unloadedParityFaces.slice(0, 4).join(", ")}` : null,
+      fontReadiness.usedFaceChecks.some((check) => !check.check) ? `used faces unavailable: ${fontReadiness.usedFaceChecks.filter((check) => !check.check).slice(0, 4).map((check) => `${check.family} ${check.style} ${check.weight}`).join(", ")}` : null,
+    ].filter(Boolean);
+    throw new FontsNotReadyError(`${side || "page"} fonts not ready (${problems.join("; ")}); a fallback-font render is not a capture`, fontReadiness);
+  }
   const backdropFilters = await collectBackdropFilters(page);
   await page.addStyleTag({ content: RENDER_NORMALISATION_CSS });
   await page.evaluate(async () => {
@@ -413,9 +492,14 @@ export async function settlePage(page, selector, { side } = {}) {
     backdropFilters,
     stability,
     apiIdle,
+    apiCompleted: network ? network.completed : null,
     apiFailures: network ? network.failures.map(({ method, path, status, error }) => ({ method, path, status, ...(error ? { error } : {}) })) : [],
   };
 }
+
+/** The tracker's failures as they stand now (read at the end of a row, never a settle-time snapshot). */
+export const currentApiFailures = (page) =>
+  (page.__parityNetwork?.failures || []).map(({ method, path, status, error }) => ({ method, path, status, ...(error ? { error } : {}) }));
 
 export async function screenshotStats(file) {
   const image = sharp(file).ensureAlpha();
@@ -471,35 +555,50 @@ export async function assertSettledDocument(page, { documentToken, side }, when)
 
 export async function stableFullPageCapture(page, file, { attempts = 8, documentToken = null, side = null } = {}) {
   const repeatFile = file.replace(/\.png$/, ".repeat.png");
-  const attemptFiles = [];
-  const hashes = [];
+  const frames = [];
+  const discardedFrames = [];
+  let previous = null;
   let stablePair = null;
   const identity = documentToken ? { documentToken, side } : null;
+  const completedAtStart = page.__parityNetwork?.completed ?? null;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const attemptFile = file.replace(/\.png$/, `.attempt-${attempt}.png`);
     if (identity) await assertSettledDocument(page, identity, `before frame ${attempt}`);
+    // Idle again + nothing poisoned since the settle (the other side opened and
+    // settled in between; a refetch or a late 429 in that gap must not be captured).
+    const completedBefore = await assertApiQuiet(page, `before frame ${attempt}`);
     await page.screenshot({ path: attemptFile, fullPage: true, animations: "disabled" });
     if (identity) await assertSettledDocument(page, identity, `while taking frame ${attempt}`);
+    const overlap = apiTrafficDuringFrame(page, completedBefore);
     const hash = sha256(await fsp.readFile(attemptFile));
-    attemptFiles.push(attemptFile);
-    hashes.push(hash);
-    if (attempt > 1 && hashes[attempt - 2] === hash) {
-      stablePair = [attemptFiles[attempt - 2], attemptFile];
+    const frame = { attempt, file: attemptFile, hash };
+    frames.push(frame);
+    if (overlap) {
+      // The frame straddled API traffic: whatever it shows is timing-dependent.
+      discardedFrames.push({ attempt, reason: overlap });
+      previous = null;
+    } else if (previous && previous.hash === hash) {
+      stablePair = [previous, frame];
       break;
+    } else {
+      previous = frame;
     }
     await page.waitForTimeout(250);
     await waitTwoFrames(page);
   }
   if (!stablePair) {
-    throw new Error(`No two consecutive raw full-page captures stabilized within ${attempts} attempts: ${hashes.join(",")}`);
+    const discarded = discardedFrames.length ? ` (${discardedFrames.length} frame(s) discarded for overlapping API traffic)` : "";
+    throw new Error(`No two consecutive raw full-page captures stabilized within ${attempts} attempts${discarded}: ${frames.map((frame) => frame.hash).join(",")}`);
   }
-  await Promise.all([fsp.copyFile(stablePair[0], file), fsp.copyFile(stablePair[1], repeatFile)]);
+  await Promise.all([fsp.copyFile(stablePair[0].file, file), fsp.copyFile(stablePair[1].file, repeatFile)]);
   return {
     image: await screenshotStats(file),
-    sha256: hashes[attemptFiles.indexOf(stablePair[0])],
-    hashes: [hashes[attemptFiles.indexOf(stablePair[0])], hashes[attemptFiles.indexOf(stablePair[1])]],
-    attemptHashes: hashes,
-    stableAttempts: stablePair.map((item) => attemptFiles.indexOf(item) + 1),
+    sha256: stablePair[0].hash,
+    hashes: [stablePair[0].hash, stablePair[1].hash],
+    attemptHashes: frames.map((frame) => frame.hash),
+    stableAttempts: stablePair.map((frame) => frame.attempt),
+    discardedFrames,
+    apiTraffic: completedAtStart === null ? null : { completedAtCaptureStart: completedAtStart, completedAtCaptureEnd: page.__parityNetwork.completed, failures: capturePoisoningFailures(page.__parityNetwork).length },
     identical: true,
     postprocessing: "none",
   };
