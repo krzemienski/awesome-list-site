@@ -113,3 +113,4 @@
 - [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
+- [Read-only browser capture](read-only-browser-capture.md) — three layers (browser Fetch / context guards / sealed realm); page-scoped hooks miss anchor popups; LH needs a Playwright-context page via puppeteer handle; keep popup blocker ON.
