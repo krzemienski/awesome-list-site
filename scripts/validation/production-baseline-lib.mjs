@@ -98,6 +98,7 @@ const LIGHTHOUSE_CATEGORIES = ["performance", "accessibility", "best-practices",
 
 const RETRYABLE_STATUSES = new Set([429, 503]);
 const MAX_ATTEMPTS = 6;
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 const MAX_REDIRECT_HOPS = 10;
 const CHROMIUM_MAX_CAPTURE_HEIGHT = 16384;
 const USER_AGENT =
@@ -131,11 +132,32 @@ export function readJson(file) {
   }
 }
 
-export function writeJson(file, value) {
+// Every artefact lands through a temp file + rename so a run killed mid-write
+// (shell budget, OOM) never leaves a half-written PNG or JSON that the next
+// resumable run would mistake for a finished one.
+function writeFileAtomic(file, data) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const tmp = `${file}.${process.pid}.tmp`;
-  fs.writeFileSync(tmp, `${JSON.stringify(value, null, 2)}\n`);
+  fs.writeFileSync(tmp, data);
   fs.renameSync(tmp, file);
+}
+
+export function writeJson(file, value) {
+  writeFileAtomic(file, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+// `--base` / `--against` are recorded verbatim in manifests and reports, so a
+// URL carrying credentials would persist them in the repository.
+export function parseOriginUrl(value, flag) {
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error(`${flag} must be an absolute http(s) URL, got ${JSON.stringify(value)}`);
+  }
+  if (!/^https?:$/.test(url.protocol)) throw new Error(`${flag} must use http or https, got ${url.protocol}`);
+  if (url.username || url.password) throw new Error(`${flag} must not carry credentials (userinfo is written to manifests and reports)`);
+  return url.href.replace(/\/$/, "");
 }
 
 function sha256(value) {
@@ -420,6 +442,17 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
       reducedMotion: "reduce",
       serviceWorkers: "block",
     });
+    // Read-only by construction, not by hope: the page may only GET/HEAD (and
+    // send CORS preflights). Anything else — a beacon, a form post, a client
+    // that decides to create state — is aborted and recorded so the capture
+    // can never mutate the origin it is measuring.
+    const blockedRequests = [];
+    await context.route("**/*", (route) => {
+      const request = route.request();
+      if (SAFE_METHODS.has(request.method())) return route.continue();
+      blockedRequests.push({ method: request.method(), url: request.url() });
+      return route.abort("blockedbyclient");
+    });
     const page = await context.newPage();
     const clientNavigations = [];
     page.on("framenavigated", (frame) => {
@@ -459,6 +492,7 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
         xRobotsTag: response.headers()["x-robots-tag"] ?? null,
         httpRedirects,
         clientNavigations: [...new Set(clientNavigations)],
+        blockedRequests,
         consentBanner,
         attempts: attempt,
         viewport: { ...viewport },
@@ -709,9 +743,13 @@ export function routeDir(outDir, slug) {
   return path.join(outDir, "routes", slug);
 }
 
-// Captures one visitor route into <outDir>/routes/<slug>/. Resumable: anything
-// already on disk is kept unless `force`, so an interrupted run continues where
-// it stopped. Returns the number of browser navigations performed.
+// Captures one visitor route into <outDir>/routes/<slug>/. Resumable: a
+// viewport whose PNG, DOM record and (where required) axe record are all on
+// disk is kept unless `force`, so an interrupted run continues where it
+// stopped. A viewport is ONE unit — if any constituent is missing, all of them
+// are recaptured from a single fresh page load, so the PNG can never describe a
+// different load than the DOM/axe record next to it. Returns the number of
+// browser navigations performed.
 export async function captureRoute({ browser, base, route, outDir, viewports = VIEWPORTS, axeWidths = AXE_WIDTHS, force = false, telemetry, log = console, navigationBudget = Infinity }) {
   const slug = routeSlug(route.path);
   const dir = routeDir(outDir, slug);
@@ -732,7 +770,7 @@ export async function captureRoute({ browser, base, route, outDir, viewports = V
     const { response } = await fetchWithRetry(url, {}, { telemetry, log, label: route.path });
     const body = await response.text();
     const extension = documentExtension(route.path);
-    fs.writeFileSync(path.join(dir, `body.${extension}`), body);
+    writeFileAtomic(path.join(dir, `body.${extension}`), body);
     writeJson(domPath, {
       route: route.path,
       slug,
@@ -752,25 +790,46 @@ export async function captureRoute({ browser, base, route, outDir, viewports = V
   for (const viewport of viewports) {
     const key = String(viewport.width);
     const pngPath = path.join(dir, `${slug}@${viewport.width}.png`);
-    const needPng = force || !fs.existsSync(pngPath);
-    const needDom = force || !dom.byViewport[key];
-    const needAxe = axeWidths.includes(viewport.width) && (force || !axe.byViewport[key]);
-    if (!needPng && !needDom && !needAxe) continue;
+    const wantAxe = axeWidths.includes(viewport.width);
+    const haveAll = fs.existsSync(pngPath) && Boolean(dom.byViewport[key]) && (!wantAxe || Boolean(axe.byViewport[key]));
+    if (haveAll && !force) continue;
     if (navigations >= navigationBudget) {
       complete = false;
       break;
     }
-    log.log(`  capture ${route.path} @${viewport.width}${needAxe ? " +axe" : ""}`);
-    const result = await capturePage({ browser, url, viewport, wantAxe: needAxe, wantPng: needPng, telemetry, log });
+    log.log(`  capture ${route.path} @${viewport.width}${wantAxe ? " +axe" : ""}`);
+    const result = await capturePage({ browser, url, viewport, wantAxe, wantPng: true, telemetry, log });
     navigations += 1;
-    if (needPng) fs.writeFileSync(pngPath, result.png);
+    // PNG first, records last: a crash in between leaves the DOM record
+    // missing, which makes the next run redo the whole viewport.
+    writeFileAtomic(pngPath, result.png);
     dom.byViewport[key] = result.capture;
-    if (needAxe) axe.byViewport[key] = result.axe;
+    if (wantAxe) axe.byViewport[key] = result.axe;
+    else delete axe.byViewport[key];
     finalizeDom(dom, viewports);
     writeJson(domPath, dom);
     if (axeWidths.length) writeJson(axePath, axe);
   }
   return { slug, navigations, complete };
+}
+
+// True when every artefact captureRoute would produce for this route exists.
+// Shares the per-viewport unit rule above so callers never declare a route
+// complete from file existence alone.
+export function routeIsComplete({ outDir, route, viewports = VIEWPORTS, axeWidths = AXE_WIDTHS }) {
+  const slug = routeSlug(route.path);
+  const dir = routeDir(outDir, slug);
+  if (!fs.existsSync(path.join(dir, "status.json"))) return false;
+  const dom = readJson(path.join(dir, "dom.json"));
+  if (!dom) return false;
+  if (route.kind === "document") return Boolean(dom.bodyFile) && fs.existsSync(path.join(dir, dom.bodyFile));
+  const axe = readJson(path.join(dir, "axe.json")) ?? { byViewport: {} };
+  return viewports.every((viewport) => {
+    const key = String(viewport.width);
+    if (!fs.existsSync(path.join(dir, `${slug}@${viewport.width}.png`))) return false;
+    if (!dom.byViewport?.[key]) return false;
+    return !axeWidths.includes(viewport.width) || Boolean(axe.byViewport?.[key]);
+  });
 }
 
 // Head-level facts are viewport independent; promote the widest capture to the
@@ -809,32 +868,44 @@ export async function captureApiSet({ base, outDir, endpoints = API_ENDPOINTS, f
     if (!force && shapes.endpoints[endpoint] && fs.existsSync(bodyPath)) continue;
     log.log(`  api ${endpoint}`);
     const { body, ...summary } = await captureApi(base, endpoint, { telemetry, log });
-    fs.writeFileSync(bodyPath, body.endsWith("\n") ? body : `${body}\n`);
+    // Byte-faithful: the file IS the response body, so its sha256 equals the
+    // one recorded in shapes.json and a `cmp` against a fresh fetch is honest.
+    writeFileAtomic(bodyPath, body);
     shapes.endpoints[endpoint] = { ...summary, bodyFile: `${slug}.json` };
     writeJson(shapesPath, shapes);
   }
   return shapes;
 }
 
-export async function captureLighthouseSet({ base, outDir, port, routes = LIGHTHOUSE_ROUTES, force = false, telemetry, log = console }) {
+// Each Lighthouse audit is a page load against the origin, so it spends the
+// same navigation budget as a screenshot; `complete` is false when the budget
+// ran out before every route had a report.
+export async function captureLighthouseSet({ base, outDir, port, routes = LIGHTHOUSE_ROUTES, force = false, telemetry, log = console, navigationBudget = Infinity }) {
   const lhDir = path.join(outDir, "lighthouse");
   fs.mkdirSync(lhDir, { recursive: true });
   const scoresPath = path.join(lhDir, "scores.json");
   const scores = readJson(scoresPath) ?? { base, preset: "mobile", categories: LIGHTHOUSE_CATEGORIES, routes: {} };
+  let navigations = 0;
+  let complete = true;
   for (const route of routes) {
     const slug = routeSlug(route);
     const reportPath = path.join(lhDir, `${slug}.json`);
     if (!force && scores.routes[route] && fs.existsSync(reportPath)) continue;
+    if (navigations >= navigationBudget) {
+      complete = false;
+      break;
+    }
     const url = new URL(route, base).href;
     log.log(`  lighthouse ${route}`);
     const { lhr, ...summary } = await runLighthouse({ url, port, log, telemetry });
+    navigations += 1;
     // Compact JSON: a Lighthouse report is read by tools, and pretty-printing
     // doubles what the repository has to carry per route.
-    fs.writeFileSync(reportPath, `${JSON.stringify(lhr)}\n`);
+    writeFileAtomic(reportPath, `${JSON.stringify(lhr)}\n`);
     scores.routes[route] = { ...summary, reportFile: `${slug}.json` };
     writeJson(scoresPath, scores);
   }
-  return scores;
+  return { scores, navigations, complete };
 }
 
 export function inventory({ base, routes = VISITOR_ROUTES, endpoints = API_ENDPOINTS, lighthouseRoutes = LIGHTHOUSE_ROUTES }) {

@@ -15,10 +15,14 @@
 //     api/<slug>.json + shapes.json
 //     lighthouse/<slug>.json + scores.json   (mobile preset, 3 routes)
 //
-// Resumable by design: anything already on disk is skipped, so a run that was
-// interrupted (shell budget, edge throttling) just continues on the next
-// invocation. `--max-navigations N` stops after N page loads for callers that
-// must stay under a short shell timeout; otherwise run it in the background.
+// Resumable by design: every finished unit on disk is skipped, so a run that
+// was interrupted (shell budget, edge throttling) just continues on the next
+// invocation. A unit is one route × viewport (PNG + DOM + axe together — a
+// partial unit is recaptured whole), one API body, or one Lighthouse report,
+// and every file lands via temp + rename. `--max-navigations N` stops after N
+// page loads (screenshots AND Lighthouse audits) for callers that must stay
+// under a short shell timeout; otherwise run it in the background. A dated
+// directory belongs to one origin: resuming it with a different --base fails.
 //
 //   npm run baseline:capture                       # everything, today's dir
 //   npm run baseline:capture -- --max-navigations 8
@@ -27,14 +31,17 @@
 //   npm run baseline:capture -- --base http://127.0.0.1:5000 --out /tmp/x
 //
 // Exit codes: 0 complete · 2 stopped by --max-navigations (re-run to resume)
-//             1 at least one route/endpoint failed (details in manifest.json).
+//             1 at least one route/endpoint failed (details in manifest.json;
+//               takes precedence over 2 when both apply).
 import fs from "node:fs";
 import path from "node:path";
 import {
   API_ENDPOINTS,
+  AXE_WIDTHS,
   BASELINE_ROOT,
   DEFAULT_BASE,
   LIGHTHOUSE_ROUTES,
+  VIEWPORTS,
   VISITOR_ROUTES,
   captureApiSet,
   captureLighthouseSet,
@@ -44,7 +51,9 @@ import {
   gitCommit,
   inventory,
   launchBrowser,
+  parseOriginUrl,
   readJson,
+  routeIsComplete,
   toolVersions,
   todayStamp,
   writeJson,
@@ -84,8 +93,7 @@ function parseArgs(argv) {
   for (const phase of args.only) {
     if (!["routes", "api", "lighthouse"].includes(phase)) throw new Error(`--only accepts routes, api, lighthouse (got ${phase})`);
   }
-  if (!/^https?:\/\//.test(args.base)) throw new Error(`--base must be an absolute http(s) origin (got ${args.base})`);
-  args.base = args.base.replace(/\/+$/, "");
+  args.base = parseOriginUrl(args.base, "--base");
   if (args.date && !/^\d{4}-\d{2}-\d{2}$/.test(args.date)) throw new Error("--date must be YYYY-MM-DD");
   return args;
 }
@@ -113,7 +121,13 @@ async function main() {
 
   fs.mkdirSync(outDir, { recursive: true });
   const inventoryPath = path.join(outDir, "inventory.json");
-  if (args.force || !fs.existsSync(inventoryPath)) writeJson(inventoryPath, inventory({ base: args.base }));
+  const existingInventory = readJson(inventoryPath);
+  if (existingInventory && existingInventory.base !== args.base) {
+    // A dated baseline describes ONE origin. Resuming it against another would
+    // silently interleave two sites' artefacts under one date.
+    throw new Error(`${path.relative(process.cwd(), inventoryPath)} was captured from ${existingInventory.base}, not ${args.base}; use --out/--date for a separate baseline`);
+  }
+  if (args.force || !existingInventory) writeJson(inventoryPath, inventory({ base: args.base }));
 
   const telemetry = createTelemetry();
   const invocation = {
@@ -185,7 +199,17 @@ async function main() {
       if (args.only.has("lighthouse") && !stoppedByBudget) {
         console.log("Phase: lighthouse");
         try {
-          await captureLighthouseSet({ base: args.base, outDir, port, routes: LIGHTHOUSE_ROUTES, force: args.force, telemetry });
+          const result = await captureLighthouseSet({
+            base: args.base,
+            outDir,
+            port,
+            routes: LIGHTHOUSE_ROUTES,
+            force: args.force,
+            telemetry,
+            navigationBudget: args.maxNavigations - navigations,
+          });
+          navigations += result.navigations;
+          if (!result.complete) stoppedByBudget = true;
         } catch (error) {
           telemetry.failures.push({ phase: "lighthouse", error: error instanceof Error ? error.message : String(error) });
           console.error(`  lighthouse phase failed: ${error instanceof Error ? error.message : error}`);
@@ -211,41 +235,26 @@ async function main() {
   const completeness = summarizeCompleteness(outDir, routes);
   console.log(`Done in ${invocation.durationSeconds}s · ${navigations} navigations · ${telemetry.throttled.length} throttle retries · ${telemetry.failures.length} failures`);
   console.log(`  routes complete ${completeness.routesComplete}/${completeness.routesTotal} · api ${completeness.apiComplete}/${API_ENDPOINTS.length} · lighthouse ${completeness.lighthouseComplete}/${LIGHTHOUSE_ROUTES.length}`);
-  if (stoppedByBudget) {
-    console.log("  stopped by --max-navigations; re-run the same command to resume");
-    return 2;
-  }
+  // Failures outrank a budget stop: exit 2 promises "just re-run to finish",
+  // which is not true while a route or phase is erroring.
+  if (stoppedByBudget) console.log("  stopped by --max-navigations; re-run the same command to resume");
   if (telemetry.failures.length) return 1;
+  if (stoppedByBudget) return 2;
   return 0;
 }
 
 function summarizeCompleteness(outDir, routes) {
   const inv = readJson(path.join(outDir, "inventory.json"));
-  const viewports = inv?.viewports ?? [];
-  const axeWidths = inv?.axeWidths ?? [];
-  let routesComplete = 0;
-  for (const route of routes) {
-    const dir = path.join(outDir, "routes", inv?.routes.find((entry) => entry.path === route.path)?.slug ?? "");
-    const dom = readJson(path.join(dir, "dom.json"));
-    const status = readJson(path.join(dir, "status.json"));
-    if (!dom || !status) continue;
-    if (route.kind === "document") {
-      routesComplete += 1;
-      continue;
-    }
-    const axe = readJson(path.join(dir, "axe.json"));
-    const allViewports = viewports.every((viewport) => dom.byViewport?.[viewport.width] && fs.existsSync(path.join(dir, `${dom.slug}@${viewport.width}.png`)));
-    const allAxe = axeWidths.every((width) => axe?.byViewport?.[width]);
-    if (allViewports && allAxe) routesComplete += 1;
-  }
+  const viewports = inv?.viewports ?? VIEWPORTS;
+  const axeWidths = inv?.axeWidths ?? AXE_WIDTHS;
+  const routesComplete = routes.filter((route) => routeIsComplete({ outDir, route, viewports, axeWidths })).length;
   const shapes = readJson(path.join(outDir, "api/shapes.json"));
+  const apiDir = path.join(outDir, "api");
+  const apiComplete = Object.values(shapes?.endpoints ?? {}).filter((entry) => entry?.bodyFile && fs.existsSync(path.join(apiDir, entry.bodyFile))).length;
   const scores = readJson(path.join(outDir, "lighthouse/scores.json"));
-  return {
-    routesTotal: routes.length,
-    routesComplete,
-    apiComplete: Object.keys(shapes?.endpoints ?? {}).length,
-    lighthouseComplete: Object.keys(scores?.routes ?? {}).length,
-  };
+  const lhDir = path.join(outDir, "lighthouse");
+  const lighthouseComplete = Object.values(scores?.routes ?? {}).filter((entry) => entry?.reportFile && fs.existsSync(path.join(lhDir, entry.reportFile))).length;
+  return { routesTotal: routes.length, routesComplete, apiComplete, lighthouseComplete };
 }
 
 main().then(

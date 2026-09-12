@@ -4,12 +4,20 @@
 // Re-captures a candidate origin with exactly the code that produced a stored
 // baseline (production-baseline-lib.mjs) and reports what moved:
 //
-//   per route     status + redirect chain, visible data-testid add/remove (per
-//                 viewport), title / h1 change, canonical / robots / JSON-LD
-//                 notes, axe serious+critical delta at 375 and 1440
+//   per route     status + redirect chain, final URL, visible data-testid
+//                 add/remove (per viewport), title / h1 change, axe
+//                 serious+critical rule set AND node count at 375 and 1440;
+//                 canonical / robots / JSON-LD / nav changes land in notes
+//   per document  (sitemap.xml, robots.txt) status, counts, and the body
+//                 itself once each side's own origin is normalised away
 //   per endpoint  status, key-path add/remove, item / total count deltas
 //   strips        <out>/strips/<slug>@<w>.png = baseline | candidate side by
 //                 side on a union canvas — VISUAL ONLY, never a pixel gate
+//
+// URLs and document bodies match when they are byte-identical OR equal once
+// each side's OWN origin is replaced by "{origin}": a local candidate is not
+// penalised for not being awesome.video, an unchanged response is never a
+// delta, and a redirect or canonical that newly points at a foreign host is.
 //
 //   npm run baseline:compare -- --baseline tests/parity/production-baseline/2026-09-12 \
 //       --against http://127.0.0.1:5000 [--routes /,/about] [--out /tmp/dir]
@@ -32,6 +40,7 @@ import {
   createTelemetry,
   gitCommit,
   launchBrowser,
+  parseOriginUrl,
   readJson,
   routeDir,
   toolVersions,
@@ -49,7 +58,7 @@ function parseArgs(argv) {
     };
     switch (arg) {
       case "--baseline": args.baseline = next(); break;
-      case "--against": args.against = next().replace(/\/+$/, ""); break;
+      case "--against": args.against = parseOriginUrl(next(), "--against"); break;
       case "--candidate": args.candidate = next(); break;
       case "--routes": args.routes = next().split(",").map((route) => route.trim()).filter(Boolean); break;
       case "--out": args.out = next(); break;
@@ -64,7 +73,6 @@ function parseArgs(argv) {
   }
   if (!args.baseline) throw new Error("--baseline <dir> is required");
   if (!args.against && !args.candidate) throw new Error("--against <url> (or --candidate <dir>) is required");
-  if (args.against && !/^https?:\/\//.test(args.against)) throw new Error(`--against must be an absolute http(s) origin (got ${args.against})`);
   return args;
 }
 
@@ -74,16 +82,37 @@ const setDiff = (before = [], after = []) => {
   return { added: [...b].filter((x) => !a.has(x)).sort(), removed: [...a].filter((x) => !b.has(x)).sort() };
 };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const pathOf = (url) => {
+// Own-origin URLs collapse to "{origin}/path?query"; anything else keeps its
+// host, so a hop to another site can never read as "same".
+const normalizeUrl = (url, ownOrigin) => {
   if (!url) return null;
   try {
-    const parsed = new URL(url);
-    return parsed.pathname + parsed.search;
+    const parsed = new URL(url, ownOrigin);
+    const prefix = parsed.origin === new URL(ownOrigin).origin ? "{origin}" : parsed.origin;
+    return `${prefix}${parsed.pathname}${parsed.search}`;
   } catch {
     return url;
   }
 };
-const seriousCritical = (axeViewport) => (axeViewport ? (axeViewport.byImpact?.serious ?? 0) + (axeViewport.byImpact?.critical ?? 0) : null);
+const normalizeBody = (body, ownOrigin) => body.split(ownOrigin.replace(/\/$/, "")).join("{origin}");
+// Identical wins outright; otherwise the origin-normalised forms must agree.
+const equivalent = (rawB, rawC, normB, normC) => same(rawB, rawC) || same(normB, normC);
+const S_C = new Set(["serious", "critical"]);
+const seriousCritical = (axeViewport) => {
+  if (!axeViewport) return { rules: null, nodes: null, ruleIds: [] };
+  const violations = (axeViewport.violations ?? []).filter((v) => S_C.has(v.impact));
+  return {
+    rules: violations.length,
+    nodes: violations.reduce((sum, v) => sum + (v.nodes ?? 0), 0),
+    ruleIds: violations.map((v) => `${v.id}×${v.nodes ?? 0}`).sort(),
+  };
+};
+const fmtAxe = (before, after) => {
+  if (!before || before.rules === null) return "–";
+  const b = `${before.rules}/${before.nodes}`;
+  const a = after && after.rules !== null ? `${after.rules}/${after.nodes}` : "–";
+  return b === a ? b : `${b} → ${a}`;
+};
 const fmtDelta = (before, after) => {
   if (before === after) return `${before ?? "–"}`;
   if (before === null || before === undefined || after === null || after === undefined) return `${before ?? "–"} → ${after ?? "–"}`;
@@ -92,8 +121,10 @@ const fmtDelta = (before, after) => {
 };
 const cell = (value) => String(value ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
 
-function compareRoute(route, baselineDir, candidateDir, viewports, axeWidths) {
+function compareRoute(route, baselineDir, candidateDir, viewports, axeWidths, origins) {
   const slug = route.slug;
+  const bUrl = (url) => normalizeUrl(url, origins.baseline);
+  const cUrl = (url) => normalizeUrl(url, origins.candidate);
   const b = {
     status: readJson(path.join(routeDir(baselineDir, slug), "status.json")),
     dom: readJson(path.join(routeDir(baselineDir, slug), "dom.json")),
@@ -111,22 +142,41 @@ function compareRoute(route, baselineDir, candidateDir, viewports, axeWidths) {
 
   result.status = { baseline: b.status.status, candidate: c.status.status, match: b.status.status === c.status.status };
   if (!result.status.match) result.deltas.push("status");
-  const chain = (status) => (status.redirectChain ?? []).map((hop) => `${hop.status}→${pathOf(hop.location)}`);
-  result.redirects = { baseline: chain(b.status), candidate: chain(c.status), match: same(chain(b.status), chain(c.status)) };
+  const chain = (status, norm = (location) => location) => (status.redirectChain ?? []).map((hop) => `${hop.status}→${norm(hop.location)}`);
+  result.redirects = { baseline: chain(b.status, bUrl), candidate: chain(c.status, cUrl) };
+  result.redirects.match = equivalent(chain(b.status), chain(c.status), result.redirects.baseline, result.redirects.candidate);
   if (!result.redirects.match) result.deltas.push("redirects");
   if ((b.status.xRobotsTag ?? null) !== (c.status.xRobotsTag ?? null)) result.notes.push(`x-robots-tag ${b.status.xRobotsTag ?? "–"} → ${c.status.xRobotsTag ?? "–"}`);
 
   if (route.kind === "document") {
-    result.document = {
-      sha256Match: b.dom.sha256 === c.dom.sha256,
-      counts: {},
-    };
+    result.document = { sha256Match: b.dom.sha256 === c.dom.sha256, counts: {} };
     for (const field of ["urlCount", "lineCount", "bytes"]) {
       if (b.dom[field] !== undefined || c.dom[field] !== undefined) result.document.counts[field] = { baseline: b.dom[field] ?? null, candidate: c.dom[field] ?? null };
     }
     if (b.dom.urlCount !== undefined && b.dom.urlCount !== c.dom.urlCount) result.deltas.push("counts");
     if (b.dom.lineCount !== c.dom.lineCount && b.dom.urlCount === undefined) result.deltas.push("counts");
-    if (!result.document.sha256Match) result.notes.push("body differs");
+    // The body is the contract: equal counts with different URLs or
+    // directives is still a change. Compare with own origins normalised so the
+    // only thing that can differ is content.
+    const bodyOf = (dom, dir) => {
+      if (!dom.bodyFile) return null;
+      try {
+        return fs.readFileSync(path.join(routeDir(dir, slug), dom.bodyFile), "utf8");
+      } catch {
+        return null;
+      }
+    };
+    const bBody = bodyOf(b.dom, baselineDir);
+    const cBody = bodyOf(c.dom, candidateDir);
+    // Read the stored bodies themselves (not the sha recorded next to them) so
+    // the verdict is about the files a reviewer can open and diff.
+    result.document.bodyMatch = bBody !== null && cBody !== null
+      ? equivalent(bBody, cBody, normalizeBody(bBody, origins.baseline), normalizeBody(cBody, origins.candidate))
+      : result.document.sha256Match;
+    if (!result.document.bodyMatch) {
+      result.deltas.push("body");
+      result.notes.push(bBody === null || cBody === null ? "body differs (recorded sha256; a body file is missing)" : "body differs beyond its own origin");
+    }
     return result;
   }
 
@@ -134,12 +184,14 @@ function compareRoute(route, baselineDir, candidateDir, viewports, axeWidths) {
   if (!result.title.match) result.deltas.push("title");
   result.h1 = { baseline: b.dom.h1, candidate: c.dom.h1, match: same(b.dom.h1, c.dom.h1) };
   if (!result.h1.match) result.deltas.push("h1");
-  result.finalPath = { baseline: pathOf(b.dom.finalUrl), candidate: pathOf(c.dom.finalUrl) };
-  if (result.finalPath.baseline !== result.finalPath.candidate) result.deltas.push("final-url");
-  const clientChain = (dom) => (dom.clientNavigations ?? []).map(pathOf);
-  if (!same(clientChain(b.dom), clientChain(c.dom))) result.notes.push(`client navigations ${clientChain(b.dom).join(" → ")} ⇒ ${clientChain(c.dom).join(" → ")}`);
+  result.finalPath = { baseline: bUrl(b.dom.finalUrl), candidate: cUrl(c.dom.finalUrl) };
+  result.finalPath.match = equivalent(b.dom.finalUrl ?? null, c.dom.finalUrl ?? null, result.finalPath.baseline, result.finalPath.candidate);
+  if (!result.finalPath.match) result.deltas.push("final-url");
+  const bChain = (b.dom.clientNavigations ?? []).map(bUrl);
+  const cChain = (c.dom.clientNavigations ?? []).map(cUrl);
+  if (!equivalent(b.dom.clientNavigations ?? [], c.dom.clientNavigations ?? [], bChain, cChain)) result.notes.push(`client navigations ${bChain.join(" → ")} ⇒ ${cChain.join(" → ")}`);
 
-  if (pathOf(b.dom.canonical) !== pathOf(c.dom.canonical)) result.notes.push(`canonical ${pathOf(b.dom.canonical) ?? "–"} → ${pathOf(c.dom.canonical) ?? "–"}`);
+  if (!equivalent(b.dom.canonical ?? null, c.dom.canonical ?? null, bUrl(b.dom.canonical), cUrl(c.dom.canonical))) result.notes.push(`canonical ${bUrl(b.dom.canonical) ?? "–"} → ${cUrl(c.dom.canonical) ?? "–"}`);
   if ((b.dom.robotsMeta ?? null) !== (c.dom.robotsMeta ?? null)) result.notes.push(`robots meta "${b.dom.robotsMeta ?? "–"}" → "${c.dom.robotsMeta ?? "–"}"`);
   const jsonLd = setDiff(b.dom.jsonLdTypes, c.dom.jsonLdTypes);
   if (jsonLd.added.length || jsonLd.removed.length) result.notes.push(`JSON-LD types +${jsonLd.added.join(",") || "∅"} −${jsonLd.removed.join(",") || "∅"}`);
@@ -168,12 +220,11 @@ function compareRoute(route, baselineDir, candidateDir, viewports, axeWidths) {
     const key = String(width);
     const before = seriousCritical(b.axe?.byViewport?.[key]);
     const after = seriousCritical(c.axe?.byViewport?.[key]);
-    const rules = setDiff(
-      (b.axe?.byViewport?.[key]?.violations ?? []).filter((v) => ["serious", "critical"].includes(v.impact)).map((v) => v.id),
-      (c.axe?.byViewport?.[key]?.violations ?? []).filter((v) => ["serious", "critical"].includes(v.impact)).map((v) => v.id),
-    );
+    // Rule ids carry their node count, so an existing violation spreading to
+    // more elements is a delta even when the rule set is unchanged.
+    const rules = setDiff(before.ruleIds, after.ruleIds);
     result.axe[key] = { baseline: before, candidate: after, rules };
-    if (before !== after || rules.added.length || rules.removed.length) result.deltas.push(`axe@${key}`);
+    if (before.rules !== after.rules || before.nodes !== after.nodes || rules.added.length || rules.removed.length) result.deltas.push(`axe@${key}`);
   }
   return result;
 }
@@ -242,16 +293,16 @@ function renderMarkdown({ meta, routes, api, strips }) {
   lines.push(`# Production baseline compare — ${meta.baselineDate}`);
   lines.push("");
   lines.push(`- baseline: \`${meta.baseline}\` (captured from ${meta.baselineBase})`);
-  lines.push(`- candidate: ${meta.candidateBase ? `\`${meta.candidateBase}\`` : "pre-captured"} → \`${meta.candidate}\``);
+  lines.push(`- candidate: \`${meta.candidateBase}\`${meta.candidatePrecaptured ? " (pre-captured)" : ""} → \`${meta.candidate}\``);
   lines.push(`- compared at ${meta.comparedAt} · tool commit ${meta.toolCommit ?? "unknown"} · chromium ${meta.tools.chromium} · axe-core ${meta.tools.axeCore}`);
   lines.push(`- routes: ${meta.routeCount} · endpoints: ${meta.apiCount} · strips: ${strips.length} (visual only, never a pixel gate)`);
   lines.push(`- tracked deltas: **${meta.deltaCount}** (${meta.routesWithDeltas} routes, ${meta.apiWithDeltas} endpoints)${meta.missing ? ` · ${meta.missing} entries missing on one side` : ""}`);
   lines.push("");
-  lines.push("Tracked delta columns: status, redirect chain, final URL, visible data-testids (any viewport), title, h1, axe serious+critical (375/1440), API status, key paths, item/total counts. Everything else lands in *notes*.");
+  lines.push("Tracked delta columns: status, redirect chain, final URL, visible data-testids (any viewport), title, h1, axe serious+critical rules/nodes (375/1440), document counts + body (own origin normalised), API status, key paths, item/total counts. Everything else lands in *notes*.");
   lines.push("");
   lines.push("## Routes");
   lines.push("");
-  lines.push("| route | status | redirects | testids (+/−) | title | h1 | axe S+C 375 | axe S+C 1440 | deltas | notes |");
+  lines.push("| route | status | redirects | testids (+/−) | title | h1 | axe S+C rules/nodes 375 | axe S+C rules/nodes 1440 | deltas | notes |");
   lines.push("|---|---|---|---|---|---|---|---|---|---|");
   for (const r of routes) {
     if (r.missing.length) {
@@ -268,7 +319,7 @@ function renderMarkdown({ meta, routes, api, strips }) {
     }
     const testIds = `+${r.testIdSummary.added.length} / −${r.testIdSummary.removed.length}`;
     lines.push(
-      `| \`${cell(r.route)}\` | ${fmtDelta(r.status.baseline, r.status.candidate)} | ${r.redirects.match ? "same" : cell(`${r.redirects.baseline.join(",") || "∅"} → ${r.redirects.candidate.join(",") || "∅"}`)} | ${testIds} | ${r.title.match ? "same" : "changed"} | ${r.h1.match ? "same" : "changed"} | ${fmtDelta(r.axe["375"]?.baseline ?? null, r.axe["375"]?.candidate ?? null)} | ${fmtDelta(r.axe["1440"]?.baseline ?? null, r.axe["1440"]?.candidate ?? null)} | ${r.deltas.join(", ") || "—"} | ${cell(r.notes.join("; "))} |`,
+      `| \`${cell(r.route)}\` | ${fmtDelta(r.status.baseline, r.status.candidate)} | ${r.redirects.match ? "same" : cell(`${r.redirects.baseline.join(",") || "∅"} → ${r.redirects.candidate.join(",") || "∅"}`)} | ${testIds} | ${r.title.match ? "same" : "changed"} | ${r.h1.match ? "same" : "changed"} | ${fmtAxe(r.axe["375"]?.baseline, r.axe["375"]?.candidate)} | ${fmtAxe(r.axe["1440"]?.baseline, r.axe["1440"]?.candidate)} | ${r.deltas.join(", ") || "—"} | ${cell(r.notes.join("; "))} |`,
     );
   }
   lines.push("");
@@ -281,7 +332,7 @@ function renderMarkdown({ meta, routes, api, strips }) {
       lines.push("");
       if (!r.title.match) lines.push(`- title: \`${cell(r.title.baseline)}\` → \`${cell(r.title.candidate)}\``);
       if (!r.h1.match) lines.push(`- h1: \`${cell(JSON.stringify(r.h1.baseline))}\` → \`${cell(JSON.stringify(r.h1.candidate))}\``);
-      if (r.finalPath.baseline !== r.finalPath.candidate) lines.push(`- final URL: \`${r.finalPath.baseline}\` → \`${r.finalPath.candidate}\``);
+      if (!r.finalPath.match) lines.push(`- final URL: \`${r.finalPath.baseline}\` → \`${r.finalPath.candidate}\``);
       for (const [width, diff] of Object.entries(r.testIds)) {
         if (diff.added.length || diff.removed.length) {
           lines.push(`- testids @${width}: +[${diff.added.slice(0, 25).join(", ")}${diff.added.length > 25 ? ", …" : ""}] −[${diff.removed.slice(0, 25).join(", ")}${diff.removed.length > 25 ? ", …" : ""}]`);
@@ -371,7 +422,15 @@ async function main() {
 
   const baselineShapes = readJson(path.join(baselineDir, "api/shapes.json"));
   const candidateShapes = readJson(path.join(candidateDir, "api/shapes.json"));
-  const routeResults = routes.map((route) => compareRoute(route, baselineDir, candidateDir, viewports, axeWidths));
+  const candidateInventory = readJson(path.join(candidateDir, "inventory.json"));
+  const origins = {
+    baseline: inventory.base ?? manifest?.base,
+    candidate: args.against ?? candidateInventory?.base ?? candidateShapes?.base,
+  };
+  for (const [side, origin] of Object.entries(origins)) {
+    if (!origin) throw new Error(`Cannot determine the ${side} origin (no inventory.json base); URLs cannot be normalised`);
+  }
+  const routeResults = routes.map((route) => compareRoute(route, baselineDir, candidateDir, viewports, axeWidths, origins));
   const apiResults = endpoints.map((endpoint) => compareApi(endpoint, baselineShapes, candidateShapes));
 
   const strips = [];
@@ -397,9 +456,10 @@ async function main() {
   const meta = {
     baseline: path.relative(process.cwd(), baselineDir),
     baselineDate: path.basename(baselineDir),
-    baselineBase: inventory.base ?? manifest?.base ?? "unknown",
+    baselineBase: origins.baseline,
     candidate: path.relative(process.cwd(), candidateDir),
-    candidateBase: args.against ?? null,
+    candidateBase: origins.candidate,
+    candidatePrecaptured: Boolean(args.candidate),
     comparedAt: new Date().toISOString(),
     toolCommit: gitCommit(),
     tools: toolVersions(),

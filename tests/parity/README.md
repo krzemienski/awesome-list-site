@@ -95,10 +95,14 @@ A separate, dated record of what `https://awesome.video` served an anonymous
 visitor — full-page PNGs at 375/768/1024/1440, DOM summaries, HTTP status and
 redirect chains, axe results, raw API bodies with shape descriptions, and
 mobile Lighthouse reports. It is captured with `npm run baseline:capture`
-(`scripts/validation/production-baseline-capture.mjs`, resumable, sandboxed
-Chromium, read-only) and diffed with `npm run baseline:compare -- --baseline
-<dir> --against <url>` (`production-baseline-compare.mjs`, exit 1 on tracked
-deltas, side-by-side strips for eyes only). It is **not** the pixel gate above:
+(`scripts/validation/production-baseline-capture.mjs`, resumable per route ×
+viewport as one atomic unit, sandboxed Chromium that aborts every non-GET
+request, exit 2 when `--max-navigations` stops it early) and diffed with
+`npm run baseline:compare -- --baseline <dir> --against <url>`
+(`production-baseline-compare.mjs`, exit 1 on tracked deltas — status,
+redirects, final URL, testids, title, h1, axe serious+critical rules and nodes,
+document counts and bodies, API status/key paths/counts — with each side's own
+origin normalised away; side-by-side strips for eyes only). It is **not** the pixel gate above:
 its reference is production, not the design-system artifact. Each baseline's
 `README.md` records the date, tool commit, exact command and the production
 quirks seen that day.

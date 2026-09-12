@@ -73,12 +73,22 @@ thumbnails below the fold are fetched → back to top → full-page PNG with
 animations disabled and caret hidden → DOM extraction → axe at 375 and 1440.
 Chromium caps a capture at 16 384 px; no route reached it (`screenshot.truncated`
 is `false` everywhere). Nothing was signed in, no admin key was sent, nothing
-was POSTed.
+was POSTed. Since the post-review hardening the browser context aborts every
+non-`GET`/`HEAD`/`OPTIONS` request outright and lists them in
+`dom.json.byViewport[w].blockedRequests` (this capture predates the field; the
+same-day re-capture used to verify it recorded zero blocked requests on `/`,
+`/sign-in`, `/submit` and `/recommendations`).
 
 Edge throttling (bare 429/503) is retried with exponential backoff (respecting
 `retry-after`, max 6 attempts) and is **never** recorded as a route status; a
 route that stays throttled is left incomplete and the next resumable run picks
 it up. This run saw zero throttle events.
+
+Resume unit: one route × viewport is PNG + DOM record + axe record together. If
+any of the three is missing the whole viewport is recaptured from one fresh
+page load (so a PNG can never describe a different load than the record beside
+it), every file lands via temp + rename, and a dated directory refuses to
+resume against a different `--base`.
 
 ## Production quirks observed on this date
 
@@ -129,7 +139,8 @@ it up. This run saw zero throttle events.
 ```sh
 # resume / extend today's baseline (skips whatever is already on disk)
 npm run baseline:capture
-# stay under a short shell budget (exit 2 = stopped early, re-run to resume)
+# stay under a short shell budget (exit 2 = stopped early, re-run to resume;
+# screenshots AND Lighthouse audits count; exit 1 wins when anything failed)
 npm run baseline:capture -- --max-navigations 8
 # a new dated baseline
 npm run baseline:capture -- --date 2026-10-01
@@ -138,6 +149,14 @@ npm run baseline:capture -- --date 2026-10-01
 npm run baseline:compare -- --baseline tests/parity/production-baseline/2026-09-12 \
   --against http://127.0.0.1:5000 [--routes /,/about] [--out /tmp/dir]
 ```
+
+Tracked deltas: status, redirect chain, final URL, visible `data-testid`s per
+viewport, title, h1, axe serious+critical **rules and node counts** at 375/1440,
+document counts **and body**, API status, key paths, item/total counts. URLs and
+document bodies count as equal when byte-identical or when they only differ by
+each side's own origin (`{origin}` placeholder) — a hop to a foreign host is
+always a delta. Canonical, robots meta, JSON-LD types, nav labels and
+`cache-control` are notes.
 
 `compare` re-captures the candidate with the same library (routes + API, no
 Lighthouse), writes `compare-report.md` / `compare-report.json` and one
