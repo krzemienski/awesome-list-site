@@ -99,7 +99,58 @@ interface AwesomeListConfig {
   contact: ContactConfig;
 }
 
-const CONTACT_ENABLED = process.env.CONTACT_ENABLED === "true";
+/**
+ * process.env (or a test double with the same shape). The contact block reads
+ * CONTACT_ENABLED, CONTACT_EMAIL, CONTACT_ISSUES_URL, CONTACT_DISCUSSIONS_URL
+ * and CONTACT_DISCUSSIONS_VERIFIED.
+ */
+type ContactEnv = Readonly<Record<string, string | undefined>>;
+
+const CONTACT_DEFAULTS: Omit<ContactConfig, "enabled"> = {
+  email: "",
+  issues_url: "",
+  discussions_url: "",
+  discussions_verified: false,
+  retention_days: 180
+};
+
+/** An env var counts as set only when it carries a non-blank value, so a blank `.env` line cannot erase a YAML value. */
+function envValue(value: string | undefined): string | undefined {
+  return value !== undefined && value.trim() !== "" ? value.trim() : undefined;
+}
+
+/**
+ * Resolve the contact block. Precedence for every destination field is
+ * environment variable, then the YAML block, then the built-in default —
+ * env must win even though the YAML file is merged last, because the
+ * checked-in YAML ships blank values. `enabled` is environment-only (see
+ * ContactConfig) and never falls back to YAML.
+ */
+export function resolveContactConfig(
+  yamlContact: Partial<ContactConfig> | null | undefined,
+  env: ContactEnv
+): ContactConfig {
+  const yamlString = (value: unknown, fallback: string): string =>
+    typeof value === "string" ? value : fallback;
+  const email = envValue(env.CONTACT_EMAIL);
+  const issuesUrl = envValue(env.CONTACT_ISSUES_URL);
+  const discussionsUrl = envValue(env.CONTACT_DISCUSSIONS_URL);
+  const discussionsVerified = envValue(env.CONTACT_DISCUSSIONS_VERIFIED);
+  const retentionDays = yamlContact?.retention_days;
+
+  return {
+    enabled: env.CONTACT_ENABLED === "true",
+    email: email ?? yamlString(yamlContact?.email, CONTACT_DEFAULTS.email),
+    issues_url: issuesUrl ?? yamlString(yamlContact?.issues_url, CONTACT_DEFAULTS.issues_url),
+    discussions_url: discussionsUrl ?? yamlString(yamlContact?.discussions_url, CONTACT_DEFAULTS.discussions_url),
+    discussions_verified: discussionsVerified !== undefined
+      ? discussionsVerified === "true"
+      : yamlContact?.discussions_verified === true,
+    retention_days: typeof retentionDays === "number" && Number.isFinite(retentionDays) && retentionDays > 0
+      ? retentionDays
+      : CONTACT_DEFAULTS.retention_days
+  };
+}
 
 // Default configuration
 const defaultConfig: AwesomeListConfig = {
@@ -147,14 +198,7 @@ const defaultConfig: AwesomeListConfig = {
   resource_kinds: {
     tag_mappings: {}
   },
-  contact: {
-    enabled: CONTACT_ENABLED,
-    email: process.env.CONTACT_EMAIL ?? "",
-    issues_url: process.env.CONTACT_ISSUES_URL ?? "",
-    discussions_url: process.env.CONTACT_DISCUSSIONS_URL ?? "",
-    discussions_verified: process.env.CONTACT_DISCUSSIONS_VERIFIED === "true",
-    retention_days: 180
-  }
+  contact: resolveContactConfig(undefined, process.env)
 };
 
 function loadConfig(): AwesomeListConfig {
@@ -182,12 +226,8 @@ function loadConfig(): AwesomeListConfig {
             ...yamlConfig.resource_kinds?.tag_mappings
           }
         },
-        contact: {
-          ...defaultConfig.contact,
-          ...yamlConfig.contact,
-          // The form switch is environment-only; see ContactConfig.
-          enabled: CONTACT_ENABLED
-        }
+        // Env overrides are applied AFTER the YAML block; see resolveContactConfig.
+        contact: resolveContactConfig(yamlConfig.contact, process.env)
       };
     }
   } catch (error) {

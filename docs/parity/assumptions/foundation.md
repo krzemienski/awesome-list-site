@@ -24,8 +24,10 @@ component, not from the `22be4659` draft.
 `config.contact.enabled` is `process.env.CONTACT_ENABLED === "true"`, forced
 after the YAML merge so a YAML `contact.enabled: true` can never switch the
 endpoint on by itself. The other contact fields (`email`, `issues_url`,
-`discussions_url`, `discussions_verified`) come from `CONTACT_*` env vars with
-YAML fallbacks. `retention_days` defaults to 180. The contact router is not
+`discussions_url`, `discussions_verified`) resolve per field as env var, then
+YAML, then built-in default (`resolveContactConfig()`), and a blank env var
+counts as absent so an empty `.env` line cannot erase a YAML value.
+`retention_days` is YAML/default only (180). The contact router is not
 mounted yet (`parity-06` mounts it).
 
 **Revisit when:** an operator needs YAML-driven enablement; then add an
