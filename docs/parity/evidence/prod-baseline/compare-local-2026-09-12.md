@@ -1,0 +1,312 @@
+<!-- Evidence for docs/parity/worklog/prod-baseline.md. Verbatim copy of
+     /tmp/validation/pb-compare-local-2026-09-12/compare-report.md produced by
+     `node scripts/validation/production-baseline-compare.mjs --baseline tests/parity/production-baseline/2026-09-12 --against http://127.0.0.1:5000 --out /tmp/validation/pb-compare-local-2026-09-12`
+     on 2026-09-12 (exit 1 = tracked deltas; 96 strips stayed in /tmp). Deltas are
+     data-volume (dev DB 1816 vs prod 3824 resources) plus the W1 `kind` field that
+     local already serialises. -->
+
+# Production baseline compare — 2026-09-12
+
+- baseline: `tests/parity/production-baseline/2026-09-12` (captured from https://awesome.video)
+- candidate: `http://127.0.0.1:5000` → `../../../tmp/validation/pb-compare-local-2026-09-12/candidate`
+- compared at 2026-09-12T06:33:38.594Z · tool commit 98f1b0cc4806c65b423f09a68650ee50a3c78c40 · chromium chromium-1223 · axe-core 4.13.0
+- routes: 26 · endpoints: 12 · strips: 96 (visual only, never a pixel gate)
+- tracked deltas: **36** (25 routes, 7 endpoints)
+
+Tracked delta columns: status, redirect chain, final URL, visible data-testids (any viewport), title, h1, axe serious+critical (375/1440), API status, key paths, item/total counts. Everything else lands in *notes*.
+
+## Routes
+
+| route | status | redirects | testids (+/−) | title | h1 | axe S+C 375 | axe S+C 1440 | deltas | notes |
+|---|---|---|---|---|---|---|---|---|---|
+| `/` | 200 | same | +1 / −14 | changed | same | 0 | 0 | title, testids | nav labels +125 −137 |
+| `/categories` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/category/encoding-codecs` | 200 | same | +11 / −20 | same | same | 0 | 0 | testids | nav labels +126 −138 |
+| `/category/community-events?page=2` | 200 | same | +91 / −94 | same | same | 0 | 0 | testids | nav labels +125 −139 |
+| `/subcategory/community-groups` | 200 | same | +10 / −20 | same | same | 0 | 0 | testids | nav labels +125 −138 |
+| `/sub-subcategory/ffmpeg` | 200 | same | +11 / −24 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/resource/185020` | 200 | same | +6 / −19 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/resource/186190` | 200 | same | +6 / −19 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/about` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/submit` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/search?q=ffmpeg` | 200 | same | +37 / −51 | same | same | 0 | 0 | testids | nav labels +126 −138 |
+| `/search?q=zzqxv-nothing` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/advanced` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/journeys` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/journey/7` | 200 | same | +5 / −18 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/tag/open-source` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/settings/theme` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/recommendations` | 200 | same | +61 / −74 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/design-system` | 200 | same | +1 / −14 | same | same | 1 | 1 | testids | nav labels +125 −137 |
+| `/terms` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/privacy` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/code-of-conduct` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/sign-in` | 200 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/this-route-does-not-exist` | 404 | same | +1 / −14 | same | same | 0 | 0 | testids | nav labels +125 −137 |
+| `/sitemap.xml` | 200 | same | n/a | n/a | n/a | n/a | n/a | counts | urlCount 4487 → 2325 (-2162); lineCount 26641 → 13671 (-12970); bytes 759491 → 389141 (-370350); body differs |
+| `/robots.txt` | 200 | same | n/a | n/a | n/a | n/a | n/a | — |  |
+
+### Route details
+
+#### `/`
+
+- title: `Awesome Video — 3824+ Curated Video & Streaming Resources` → `Awesome Video — 1816+ Curated Video & Streaming Resources`
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/categories`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/category/encoding-codecs`
+
+- testids @375: +[button-more-tags-185016, button-suggest-edit-185016, button-visit-185016, card-resource-185016, link-page-14, link-resource-title-185016, link-view-details-185016, tag-pill-185016-HandBrake, tag-pill-185016-transcoding, tag-pill-185016-web] −[button-suggest-edit-189535, button-visit-189535, card-resource-189535, link-page-25, link-resource-title-189535, link-view-details-189535]
+- testids @768: +[button-more-tags-185016, button-suggest-edit-185016, button-visit-185016, card-resource-185016, link-page-14, link-resource-title-185016, link-view-details-185016, tag-pill-185016-HandBrake, tag-pill-185016-transcoding, tag-pill-185016-web] −[button-suggest-edit-189535, button-visit-189535, card-resource-189535, link-page-25, link-resource-title-189535, link-view-details-189535]
+- testids @1024: +[button-more-tags-185016, button-suggest-edit-185016, button-visit-185016, card-resource-185016, expand-sub-industry-forums-standards-bodies, link-page-14, link-resource-title-185016, link-view-details-185016, tag-pill-185016-HandBrake, tag-pill-185016-transcoding, tag-pill-185016-web] −[button-suggest-edit-189535, button-visit-189535, card-resource-189535, expand-sub-vendors-hdr, link-page-25, link-resource-title-189535, link-view-details-189535, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[button-more-tags-185016, button-suggest-edit-185016, button-visit-185016, card-resource-185016, expand-sub-industry-forums-standards-bodies, link-page-14, link-resource-title-185016, link-view-details-185016, tag-pill-185016-HandBrake, tag-pill-185016-transcoding, tag-pill-185016-web] −[button-suggest-edit-189535, button-visit-189535, card-resource-189535, expand-sub-vendors-hdr, link-page-25, link-resource-title-189535, link-view-details-189535, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/category/community-events?page=2`
+
+- testids @375: +[button-more-tags-184751, button-more-tags-184974, button-more-tags-185199, button-more-tags-185233, button-more-tags-185644, button-more-tags-185645, button-more-tags-185647, button-more-tags-185648, button-more-tags-185649, button-more-tags-186390, button-suggest-edit-184751, button-suggest-edit-184974, button-suggest-edit-185199, button-suggest-edit-185233, button-suggest-edit-185644, button-suggest-edit-185645, button-suggest-edit-185647, button-suggest-edit-185648, button-suggest-edit-185649, button-suggest-edit-186390, button-visit-184751, button-visit-184974, button-visit-185199, button-visit-185233, button-visit-185644, …] −[button-more-tags-184856, button-more-tags-184976, button-more-tags-185237, button-more-tags-185308, button-more-tags-185328, button-more-tags-185335, button-more-tags-185432, button-suggest-edit-184856, button-suggest-edit-184976, button-suggest-edit-185237, button-suggest-edit-185308, button-suggest-edit-185328, button-suggest-edit-185335, button-suggest-edit-185432, button-suggest-edit-187995, button-suggest-edit-187996, button-suggest-edit-188153, button-visit-184856, button-visit-184976, button-visit-185237, button-visit-185308, button-visit-185328, button-visit-185335, button-visit-185432, button-visit-187995, …]
+- testids @768: +[button-more-tags-184751, button-more-tags-184974, button-more-tags-185199, button-more-tags-185233, button-more-tags-185644, button-more-tags-185645, button-more-tags-185647, button-more-tags-185648, button-more-tags-185649, button-more-tags-186390, button-suggest-edit-184751, button-suggest-edit-184974, button-suggest-edit-185199, button-suggest-edit-185233, button-suggest-edit-185644, button-suggest-edit-185645, button-suggest-edit-185647, button-suggest-edit-185648, button-suggest-edit-185649, button-suggest-edit-186390, button-visit-184751, button-visit-184974, button-visit-185199, button-visit-185233, button-visit-185644, …] −[button-more-tags-184856, button-more-tags-184976, button-more-tags-185237, button-more-tags-185308, button-more-tags-185328, button-more-tags-185335, button-more-tags-185432, button-suggest-edit-184856, button-suggest-edit-184976, button-suggest-edit-185237, button-suggest-edit-185308, button-suggest-edit-185328, button-suggest-edit-185335, button-suggest-edit-185432, button-suggest-edit-187995, button-suggest-edit-187996, button-suggest-edit-188153, button-visit-184856, button-visit-184976, button-visit-185237, button-visit-185308, button-visit-185328, button-visit-185335, button-visit-185432, button-visit-187995, …]
+- testids @1024: +[button-more-tags-184751, button-more-tags-184974, button-more-tags-185199, button-more-tags-185233, button-more-tags-185644, button-more-tags-185645, button-more-tags-185647, button-more-tags-185648, button-more-tags-185649, button-more-tags-186390, button-suggest-edit-184751, button-suggest-edit-184974, button-suggest-edit-185199, button-suggest-edit-185233, button-suggest-edit-185644, button-suggest-edit-185645, button-suggest-edit-185647, button-suggest-edit-185648, button-suggest-edit-185649, button-suggest-edit-186390, button-visit-184751, button-visit-184974, button-visit-185199, button-visit-185233, button-visit-185644, …] −[button-more-tags-184856, button-more-tags-184976, button-more-tags-185237, button-more-tags-185308, button-more-tags-185328, button-more-tags-185335, button-more-tags-185432, button-suggest-edit-184856, button-suggest-edit-184976, button-suggest-edit-185237, button-suggest-edit-185308, button-suggest-edit-185328, button-suggest-edit-185335, button-suggest-edit-185432, button-suggest-edit-187995, button-suggest-edit-187996, button-suggest-edit-188153, button-visit-184856, button-visit-184976, button-visit-185237, button-visit-185308, button-visit-185328, button-visit-185335, button-visit-185432, button-visit-187995, …]
+- testids @1440: +[button-more-tags-184751, button-more-tags-184974, button-more-tags-185199, button-more-tags-185233, button-more-tags-185644, button-more-tags-185645, button-more-tags-185647, button-more-tags-185648, button-more-tags-185649, button-more-tags-186390, button-suggest-edit-184751, button-suggest-edit-184974, button-suggest-edit-185199, button-suggest-edit-185233, button-suggest-edit-185644, button-suggest-edit-185645, button-suggest-edit-185647, button-suggest-edit-185648, button-suggest-edit-185649, button-suggest-edit-186390, button-visit-184751, button-visit-184974, button-visit-185199, button-visit-185233, button-visit-185644, …] −[button-more-tags-184856, button-more-tags-184976, button-more-tags-185237, button-more-tags-185308, button-more-tags-185328, button-more-tags-185335, button-more-tags-185432, button-suggest-edit-184856, button-suggest-edit-184976, button-suggest-edit-185237, button-suggest-edit-185308, button-suggest-edit-185328, button-suggest-edit-185335, button-suggest-edit-185432, button-suggest-edit-187995, button-suggest-edit-187996, button-suggest-edit-188153, button-visit-184856, button-visit-184976, button-visit-185237, button-visit-185308, button-visit-185328, button-visit-185335, button-visit-185432, button-visit-187995, …]
+
+#### `/subcategory/community-groups`
+
+- testids @375: +[button-more-tags-185432, button-suggest-edit-185432, button-visit-185432, card-resource-185432, link-resource-title-185432, link-view-details-185432, tag-pill-185432-audio encoding, tag-pill-185432-compression, tag-pill-185432-video encoding] −[button-suggest-edit-187996, button-visit-187996, card-resource-187996, link-page-3, link-resource-title-187996, link-view-details-187996]
+- testids @768: +[button-more-tags-185432, button-suggest-edit-185432, button-visit-185432, card-resource-185432, link-resource-title-185432, link-view-details-185432, tag-pill-185432-audio encoding, tag-pill-185432-compression, tag-pill-185432-video encoding] −[button-suggest-edit-187996, button-visit-187996, card-resource-187996, link-page-3, link-resource-title-187996, link-view-details-187996]
+- testids @1024: +[button-more-tags-185432, button-suggest-edit-185432, button-visit-185432, card-resource-185432, expand-sub-industry-forums-standards-bodies, link-resource-title-185432, link-view-details-185432, tag-pill-185432-audio encoding, tag-pill-185432-compression, tag-pill-185432-video encoding] −[button-suggest-edit-187996, button-visit-187996, card-resource-187996, expand-sub-vendors-hdr, link-page-3, link-resource-title-187996, link-view-details-187996, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[button-more-tags-185432, button-suggest-edit-185432, button-visit-185432, card-resource-185432, expand-sub-industry-forums-standards-bodies, link-resource-title-185432, link-view-details-185432, tag-pill-185432-audio encoding, tag-pill-185432-compression, tag-pill-185432-video encoding] −[button-suggest-edit-187996, button-visit-187996, card-resource-187996, expand-sub-vendors-hdr, link-page-3, link-resource-title-187996, link-view-details-187996, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/sub-subcategory/ffmpeg`
+
+- testids @375: +[button-suggest-edit-186172, button-suggest-edit-186459, button-visit-186172, button-visit-186459, card-resource-186172, card-resource-186459, link-resource-title-186172, link-resource-title-186459, link-view-details-186172, link-view-details-186459] −[button-suggest-edit-186113, button-suggest-edit-186158, button-visit-186113, button-visit-186158, card-resource-186113, card-resource-186158, link-resource-title-186113, link-resource-title-186158, link-view-details-186113, link-view-details-186158]
+- testids @768: +[button-suggest-edit-186172, button-suggest-edit-186459, button-visit-186172, button-visit-186459, card-resource-186172, card-resource-186459, link-resource-title-186172, link-resource-title-186459, link-view-details-186172, link-view-details-186459] −[button-suggest-edit-186113, button-suggest-edit-186158, button-visit-186113, button-visit-186158, card-resource-186113, card-resource-186158, link-resource-title-186113, link-resource-title-186158, link-view-details-186113, link-view-details-186158]
+- testids @1024: +[button-suggest-edit-186172, button-suggest-edit-186459, button-visit-186172, button-visit-186459, card-resource-186172, card-resource-186459, expand-sub-industry-forums-standards-bodies, link-resource-title-186172, link-resource-title-186459, link-view-details-186172, link-view-details-186459] −[button-suggest-edit-186113, button-suggest-edit-186158, button-visit-186113, button-visit-186158, card-resource-186113, card-resource-186158, expand-sub-vendors-hdr, link-resource-title-186113, link-resource-title-186158, link-view-details-186113, link-view-details-186158, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[button-suggest-edit-186172, button-suggest-edit-186459, button-visit-186172, button-visit-186459, card-resource-186172, card-resource-186459, expand-sub-industry-forums-standards-bodies, link-resource-title-186172, link-resource-title-186459, link-view-details-186172, link-view-details-186459] −[button-suggest-edit-186113, button-suggest-edit-186158, button-visit-186113, button-visit-186158, card-resource-186113, card-resource-186158, expand-sub-vendors-hdr, link-resource-title-186113, link-resource-title-186158, link-view-details-186113, link-view-details-186158, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/resource/185020`
+
+- testids @375: +[related-resource-186418, related-resource-186419, related-resource-186458, related-resource-186495, related-resource-186610] −[related-resource-189664, related-resource-189808, related-resource-189809, related-resource-190062, related-resource-190065]
+- testids @768: +[related-resource-186418, related-resource-186419, related-resource-186458, related-resource-186495, related-resource-186610] −[related-resource-189664, related-resource-189808, related-resource-189809, related-resource-190062, related-resource-190065]
+- testids @1024: +[expand-sub-industry-forums-standards-bodies, related-resource-186418, related-resource-186419, related-resource-186458, related-resource-186495, related-resource-186610] −[expand-sub-vendors-hdr, related-resource-189664, related-resource-189808, related-resource-189809, related-resource-190062, related-resource-190065, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies, related-resource-186418, related-resource-186419, related-resource-186458, related-resource-186495, related-resource-186610] −[expand-sub-vendors-hdr, related-resource-189664, related-resource-189808, related-resource-189809, related-resource-190062, related-resource-190065, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/resource/186190`
+
+- testids @375: +[related-resource-186515, related-resource-186537, related-resource-186557, related-resource-186564, related-resource-186567] −[related-resource-189729, related-resource-189795, related-resource-190128, related-resource-190135, related-resource-190152]
+- testids @768: +[related-resource-186515, related-resource-186537, related-resource-186557, related-resource-186564, related-resource-186567] −[related-resource-189729, related-resource-189795, related-resource-190128, related-resource-190135, related-resource-190152]
+- testids @1024: +[expand-sub-industry-forums-standards-bodies, related-resource-186515, related-resource-186537, related-resource-186557, related-resource-186564, related-resource-186567] −[expand-sub-vendors-hdr, related-resource-189729, related-resource-189795, related-resource-190128, related-resource-190135, related-resource-190152, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies, related-resource-186515, related-resource-186537, related-resource-186557, related-resource-186564, related-resource-186567] −[expand-sub-vendors-hdr, related-resource-189729, related-resource-189795, related-resource-190128, related-resource-190135, related-resource-190152, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/about`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/submit`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/search?q=ffmpeg`
+
+- testids @375: +[button-suggest-edit-185101, button-suggest-edit-185298, button-suggest-edit-185767, button-suggest-edit-186063, button-suggest-edit-186113, button-suggest-edit-186482, button-suggest-edit-186677, button-visit-185101, button-visit-185298, button-visit-185767, button-visit-186063, button-visit-186113, button-visit-186482, button-visit-186677, card-resource-185101, card-resource-185298, card-resource-185767, card-resource-186063, card-resource-186113, card-resource-186482, card-resource-186677, link-page-9, link-resource-title-185101, link-resource-title-185298, link-resource-title-185767, …] −[button-suggest-edit-187996, button-suggest-edit-188024, button-suggest-edit-188325, button-suggest-edit-188365, button-suggest-edit-188601, button-suggest-edit-188932, button-suggest-edit-188951, button-visit-187996, button-visit-188024, button-visit-188325, button-visit-188365, button-visit-188601, button-visit-188932, button-visit-188951, card-resource-187996, card-resource-188024, card-resource-188325, card-resource-188365, card-resource-188601, card-resource-188932, card-resource-188951, link-page-19, link-resource-title-187996, link-resource-title-188024, link-resource-title-188325, …]
+- testids @768: +[button-suggest-edit-185101, button-suggest-edit-185298, button-suggest-edit-185767, button-suggest-edit-186063, button-suggest-edit-186113, button-suggest-edit-186482, button-suggest-edit-186677, button-visit-185101, button-visit-185298, button-visit-185767, button-visit-186063, button-visit-186113, button-visit-186482, button-visit-186677, card-resource-185101, card-resource-185298, card-resource-185767, card-resource-186063, card-resource-186113, card-resource-186482, card-resource-186677, link-page-9, link-resource-title-185101, link-resource-title-185298, link-resource-title-185767, …] −[button-suggest-edit-187996, button-suggest-edit-188024, button-suggest-edit-188325, button-suggest-edit-188365, button-suggest-edit-188601, button-suggest-edit-188932, button-suggest-edit-188951, button-visit-187996, button-visit-188024, button-visit-188325, button-visit-188365, button-visit-188601, button-visit-188932, button-visit-188951, card-resource-187996, card-resource-188024, card-resource-188325, card-resource-188365, card-resource-188601, card-resource-188932, card-resource-188951, link-page-19, link-resource-title-187996, link-resource-title-188024, link-resource-title-188325, …]
+- testids @1024: +[button-suggest-edit-185101, button-suggest-edit-185298, button-suggest-edit-185767, button-suggest-edit-186063, button-suggest-edit-186113, button-suggest-edit-186482, button-suggest-edit-186677, button-visit-185101, button-visit-185298, button-visit-185767, button-visit-186063, button-visit-186113, button-visit-186482, button-visit-186677, card-resource-185101, card-resource-185298, card-resource-185767, card-resource-186063, card-resource-186113, card-resource-186482, card-resource-186677, expand-sub-industry-forums-standards-bodies, link-page-9, link-resource-title-185101, link-resource-title-185298, …] −[button-suggest-edit-187996, button-suggest-edit-188024, button-suggest-edit-188325, button-suggest-edit-188365, button-suggest-edit-188601, button-suggest-edit-188932, button-suggest-edit-188951, button-visit-187996, button-visit-188024, button-visit-188325, button-visit-188365, button-visit-188601, button-visit-188932, button-visit-188951, card-resource-187996, card-resource-188024, card-resource-188325, card-resource-188365, card-resource-188601, card-resource-188932, card-resource-188951, expand-sub-vendors-hdr, facet-category-Community & Events, link-page-19, link-resource-title-187996, …]
+- testids @1440: +[button-suggest-edit-185101, button-suggest-edit-185298, button-suggest-edit-185767, button-suggest-edit-186063, button-suggest-edit-186113, button-suggest-edit-186482, button-suggest-edit-186677, button-visit-185101, button-visit-185298, button-visit-185767, button-visit-186063, button-visit-186113, button-visit-186482, button-visit-186677, card-resource-185101, card-resource-185298, card-resource-185767, card-resource-186063, card-resource-186113, card-resource-186482, card-resource-186677, expand-sub-industry-forums-standards-bodies, link-page-9, link-resource-title-185101, link-resource-title-185298, …] −[button-suggest-edit-187996, button-suggest-edit-188024, button-suggest-edit-188325, button-suggest-edit-188365, button-suggest-edit-188601, button-suggest-edit-188932, button-suggest-edit-188951, button-visit-187996, button-visit-188024, button-visit-188325, button-visit-188365, button-visit-188601, button-visit-188932, button-visit-188951, card-resource-187996, card-resource-188024, card-resource-188325, card-resource-188365, card-resource-188601, card-resource-188932, card-resource-188951, expand-sub-vendors-hdr, facet-category-Community & Events, link-page-19, link-resource-title-187996, …]
+
+#### `/search?q=zzqxv-nothing`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/advanced`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/journeys`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/journey/7`
+
+- testids @375: +[link-resource-185441, link-resource-185472, link-resource-external-185441, link-resource-external-185472] −[link-resource-186813, link-resource-188016, link-resource-external-186813, link-resource-external-188016]
+- testids @768: +[link-resource-185441, link-resource-185472, link-resource-external-185441, link-resource-external-185472] −[link-resource-186813, link-resource-188016, link-resource-external-186813, link-resource-external-188016]
+- testids @1024: +[expand-sub-industry-forums-standards-bodies, link-resource-185441, link-resource-185472, link-resource-external-185441, link-resource-external-185472] −[expand-sub-vendors-hdr, link-resource-186813, link-resource-188016, link-resource-external-186813, link-resource-external-188016, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies, link-resource-185441, link-resource-185472, link-resource-external-185441, link-resource-external-185472] −[expand-sub-vendors-hdr, link-resource-186813, link-resource-188016, link-resource-external-186813, link-resource-external-188016, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/tag/open-source`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/settings/theme`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/recommendations`
+
+- testids @375: +[button-suggest-edit-186817, button-suggest-edit-186818, button-suggest-edit-186821, button-suggest-edit-187178, button-suggest-edit-188007, button-suggest-edit-188008, button-suggest-edit-188009, button-suggest-edit-188010, button-suggest-edit-188011, button-suggest-edit-188012, button-suggest-edit-188014, button-suggest-edit-188015, button-visit-186817, button-visit-186818, button-visit-186821, button-visit-187178, button-visit-188007, button-visit-188008, button-visit-188009, button-visit-188010, button-visit-188011, button-visit-188012, button-visit-188014, button-visit-188015, card-resource-186817, …] −[button-suggest-edit-190120, button-suggest-edit-190121, button-suggest-edit-190122, button-suggest-edit-190123, button-suggest-edit-190125, button-suggest-edit-190127, button-suggest-edit-190128, button-suggest-edit-190130, button-suggest-edit-190131, button-suggest-edit-190133, button-suggest-edit-190134, button-suggest-edit-190135, button-visit-190120, button-visit-190121, button-visit-190122, button-visit-190123, button-visit-190125, button-visit-190127, button-visit-190128, button-visit-190130, button-visit-190131, button-visit-190133, button-visit-190134, button-visit-190135, card-resource-190120, …]
+- testids @768: +[button-suggest-edit-186817, button-suggest-edit-186818, button-suggest-edit-186821, button-suggest-edit-187178, button-suggest-edit-188007, button-suggest-edit-188008, button-suggest-edit-188009, button-suggest-edit-188010, button-suggest-edit-188011, button-suggest-edit-188012, button-suggest-edit-188014, button-suggest-edit-188015, button-visit-186817, button-visit-186818, button-visit-186821, button-visit-187178, button-visit-188007, button-visit-188008, button-visit-188009, button-visit-188010, button-visit-188011, button-visit-188012, button-visit-188014, button-visit-188015, card-resource-186817, …] −[button-suggest-edit-190120, button-suggest-edit-190121, button-suggest-edit-190122, button-suggest-edit-190123, button-suggest-edit-190125, button-suggest-edit-190127, button-suggest-edit-190128, button-suggest-edit-190130, button-suggest-edit-190131, button-suggest-edit-190133, button-suggest-edit-190134, button-suggest-edit-190135, button-visit-190120, button-visit-190121, button-visit-190122, button-visit-190123, button-visit-190125, button-visit-190127, button-visit-190128, button-visit-190130, button-visit-190131, button-visit-190133, button-visit-190134, button-visit-190135, card-resource-190120, …]
+- testids @1024: +[button-suggest-edit-186817, button-suggest-edit-186818, button-suggest-edit-186821, button-suggest-edit-187178, button-suggest-edit-188007, button-suggest-edit-188008, button-suggest-edit-188009, button-suggest-edit-188010, button-suggest-edit-188011, button-suggest-edit-188012, button-suggest-edit-188014, button-suggest-edit-188015, button-visit-186817, button-visit-186818, button-visit-186821, button-visit-187178, button-visit-188007, button-visit-188008, button-visit-188009, button-visit-188010, button-visit-188011, button-visit-188012, button-visit-188014, button-visit-188015, card-resource-186817, …] −[button-suggest-edit-190120, button-suggest-edit-190121, button-suggest-edit-190122, button-suggest-edit-190123, button-suggest-edit-190125, button-suggest-edit-190127, button-suggest-edit-190128, button-suggest-edit-190130, button-suggest-edit-190131, button-suggest-edit-190133, button-suggest-edit-190134, button-suggest-edit-190135, button-visit-190120, button-visit-190121, button-visit-190122, button-visit-190123, button-visit-190125, button-visit-190127, button-visit-190128, button-visit-190130, button-visit-190131, button-visit-190133, button-visit-190134, button-visit-190135, card-resource-190120, …]
+- testids @1440: +[button-suggest-edit-186817, button-suggest-edit-186818, button-suggest-edit-186821, button-suggest-edit-187178, button-suggest-edit-188007, button-suggest-edit-188008, button-suggest-edit-188009, button-suggest-edit-188010, button-suggest-edit-188011, button-suggest-edit-188012, button-suggest-edit-188014, button-suggest-edit-188015, button-visit-186817, button-visit-186818, button-visit-186821, button-visit-187178, button-visit-188007, button-visit-188008, button-visit-188009, button-visit-188010, button-visit-188011, button-visit-188012, button-visit-188014, button-visit-188015, card-resource-186817, …] −[button-suggest-edit-190120, button-suggest-edit-190121, button-suggest-edit-190122, button-suggest-edit-190123, button-suggest-edit-190125, button-suggest-edit-190127, button-suggest-edit-190128, button-suggest-edit-190130, button-suggest-edit-190131, button-suggest-edit-190133, button-suggest-edit-190134, button-suggest-edit-190135, button-visit-190120, button-visit-190121, button-visit-190122, button-visit-190123, button-visit-190125, button-visit-190127, button-visit-190128, button-visit-190130, button-visit-190131, button-visit-190133, button-visit-190134, button-visit-190135, card-resource-190120, …]
+
+#### `/design-system`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/terms`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/privacy`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/code-of-conduct`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/sign-in`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+#### `/this-route-does-not-exist`
+
+- testids @1024: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+- testids @1440: +[expand-sub-industry-forums-standards-bodies] −[expand-sub-vendors-hdr, sub-browser-extensions, sub-closed-captioning-subtitling-standards, sub-dash-manifest-tools, sub-ffmpeg-tools, sub-non-linear-editing-suites, sub-performance-monitoring-tools, sub-uncategorized-community-events, sub-vendors-hdr, subsub-advertising, subsub-conferences, subsub-rtmp, subsub-slack-meetups, subsub-vendor-docs]
+
+## API
+
+| endpoint | status | key paths (+/−) | items | counts | deltas | notes |
+|---|---|---|---|---|---|---|
+| `/api/resources?limit=24` | 200 | +1 / −0 | 24 | total 3824 → 1816 (-2008); pagination.total 3824 → 1816 (-2008); pagination.totalPages 160 → 76 (-84) | key-paths, counts | first/last id 190152…190114 → 188015…186687; cache-control "private" → "–" |
+| `/api/resources/185020` | 200 | +1 / −0 | – | same | key-paths | cache-control "private" → "–" |
+| `/api/categories` | 200 | +0 / −0 | 9 | same | — | cache-control "private, max-age=60, must-revalidate" → "public, max-age=60, must-revalidate" |
+| `/api/subcategories` | 200 | +0 / −0 | 99 → 92 (-7) | $[] 99 → 92 (-7) | item-count | cache-control "private, max-age=60, must-revalidate" → "public, max-age=60, must-revalidate" |
+| `/api/sub-subcategories` | 200 | +0 / −0 | 32 → 27 (-5) | $[] 32 → 27 (-5) | item-count | cache-control "private, max-age=60, must-revalidate" → "public, max-age=60, must-revalidate" |
+| `/api/tags` | 200 | +0 / −0 | 1541 → 1535 (-6) | tags[] 1541 → 1535 (-6); total 1541 → 1535 (-6) | item-count, counts | cache-control "private, max-age=60, must-revalidate" → "public, max-age=60, must-revalidate" |
+| `/api/awesome-list/listing?level=category&slug=encoding-codecs` | 200 | +1 / −0 | 24 | tags[] 275 → 271 (-4); total 579 → 333 (-246); totalPages 25 → 14 (-11); totalAll 579 → 333 (-246); generalCount 96 → 92 (-4) | key-paths, counts | first/last id 184847…186240 → 184847…185016; cache-control "private, max-age=0, must-revalidate" → "public, max-age=0, must-revalidate" |
+| `/api/journeys` | 200 | +0 / −0 | 5 | same | — | cache-control "private" → "–" |
+| `/api/journeys/7` | 200 | +0 / −0 | 18 | same | — | cache-control "private" → "–" |
+| `/api/recommendations` | 200 | +1 / −2 | 10 | same | key-paths | first/last id 190135…190122 → 188015…186821; cache-control "private" → "–" |
+| `/api/health` | 200 | +0 / −0 | – | same | — | byte-identical body |
+| `/api/health/ready` | 200 | +0 / −0 | – | same | — | byte-identical body |
+
+### Key-path details
+
+- `/api/resources?limit=24`: +[resources[].kind] −[]
+- `/api/resources/185020`: +[kind] −[]
+- `/api/awesome-list/listing?level=category&slug=encoding-codecs`: +[resources[].kind] −[]
+- `/api/recommendations`: +[[].resource.kind] −[[].resource.metadata.tags, [].resource.metadata.tags[]]
+
+## Strips
+
+- `strips/home@375.png` 
+- `strips/home@768.png` 
+- `strips/home@1024.png` 
+- `strips/home@1440.png` 
+- `strips/categories@375.png` 
+- `strips/categories@768.png` 
+- `strips/categories@1024.png` 
+- `strips/categories@1440.png` 
+- `strips/category-encoding-codecs@375.png` (dimensions differ)
+- `strips/category-encoding-codecs@768.png` 
+- `strips/category-encoding-codecs@1024.png` (dimensions differ)
+- `strips/category-encoding-codecs@1440.png` (dimensions differ)
+- `strips/category-community-events-page-2@375.png` (dimensions differ)
+- `strips/category-community-events-page-2@768.png` (dimensions differ)
+- `strips/category-community-events-page-2@1024.png` (dimensions differ)
+- `strips/category-community-events-page-2@1440.png` (dimensions differ)
+- `strips/subcategory-community-groups@375.png` (dimensions differ)
+- `strips/subcategory-community-groups@768.png` (dimensions differ)
+- `strips/subcategory-community-groups@1024.png` (dimensions differ)
+- `strips/subcategory-community-groups@1440.png` (dimensions differ)
+- `strips/sub-subcategory-ffmpeg@375.png` (dimensions differ)
+- `strips/sub-subcategory-ffmpeg@768.png` (dimensions differ)
+- `strips/sub-subcategory-ffmpeg@1024.png` (dimensions differ)
+- `strips/sub-subcategory-ffmpeg@1440.png` (dimensions differ)
+- `strips/resource-185020@375.png` 
+- `strips/resource-185020@768.png` (dimensions differ)
+- `strips/resource-185020@1024.png` 
+- `strips/resource-185020@1440.png` 
+- `strips/resource-186190@375.png` 
+- `strips/resource-186190@768.png` 
+- `strips/resource-186190@1024.png` 
+- `strips/resource-186190@1440.png` 
+- `strips/about@375.png` 
+- `strips/about@768.png` 
+- `strips/about@1024.png` 
+- `strips/about@1440.png` 
+- `strips/submit@375.png` 
+- `strips/submit@768.png` 
+- `strips/submit@1024.png` 
+- `strips/submit@1440.png` 
+- `strips/search-q-ffmpeg@375.png` (dimensions differ)
+- `strips/search-q-ffmpeg@768.png` (dimensions differ)
+- `strips/search-q-ffmpeg@1024.png` (dimensions differ)
+- `strips/search-q-ffmpeg@1440.png` (dimensions differ)
+- `strips/search-q-zzqxv-nothing@375.png` 
+- `strips/search-q-zzqxv-nothing@768.png` 
+- `strips/search-q-zzqxv-nothing@1024.png` 
+- `strips/search-q-zzqxv-nothing@1440.png` 
+- `strips/advanced@375.png` (dimensions differ)
+- `strips/advanced@768.png` (dimensions differ)
+- `strips/advanced@1024.png` (dimensions differ)
+- `strips/advanced@1440.png` (dimensions differ)
+- `strips/journeys@375.png` 
+- `strips/journeys@768.png` 
+- `strips/journeys@1024.png` 
+- `strips/journeys@1440.png` 
+- `strips/journey-7@375.png` 
+- `strips/journey-7@768.png` (dimensions differ)
+- `strips/journey-7@1024.png` (dimensions differ)
+- `strips/journey-7@1440.png` (dimensions differ)
+- `strips/tag-open-source@375.png` 
+- `strips/tag-open-source@768.png` 
+- `strips/tag-open-source@1024.png` 
+- `strips/tag-open-source@1440.png` 
+- `strips/settings-theme@375.png` 
+- `strips/settings-theme@768.png` 
+- `strips/settings-theme@1024.png` 
+- `strips/settings-theme@1440.png` 
+- `strips/recommendations@375.png` (dimensions differ)
+- `strips/recommendations@768.png` (dimensions differ)
+- `strips/recommendations@1024.png` 
+- `strips/recommendations@1440.png` 
+- `strips/design-system@375.png` (dimensions differ)
+- `strips/design-system@768.png` 
+- `strips/design-system@1024.png` 
+- `strips/design-system@1440.png` 
+- `strips/terms@375.png` 
+- `strips/terms@768.png` 
+- `strips/terms@1024.png` 
+- `strips/terms@1440.png` 
+- `strips/privacy@375.png` 
+- `strips/privacy@768.png` 
+- `strips/privacy@1024.png` 
+- `strips/privacy@1440.png` 
+- `strips/code-of-conduct@375.png` 
+- `strips/code-of-conduct@768.png` 
+- `strips/code-of-conduct@1024.png` 
+- `strips/code-of-conduct@1440.png` 
+- `strips/sign-in@375.png` (dimensions differ)
+- `strips/sign-in@768.png` 
+- `strips/sign-in@1024.png` (dimensions differ)
+- `strips/sign-in@1440.png` 
+- `strips/this-route-does-not-exist@375.png` 
+- `strips/this-route-does-not-exist@768.png` 
+- `strips/this-route-does-not-exist@1024.png` 
+- `strips/this-route-does-not-exist@1440.png` 
+

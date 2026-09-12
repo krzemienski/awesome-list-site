@@ -1,0 +1,15 @@
+{
+  "route": "/submit",
+  "slug": "submit",
+  "kind": "html",
+  "note": "guest → client-side redirect to sign-in; both chains are recorded",
+  "requestedUrl": "https://awesome.video/submit",
+  "finalUrl": "https://awesome.video/submit",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:21:53.332Z"
+}

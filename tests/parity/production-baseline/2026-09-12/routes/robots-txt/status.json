@@ -1,0 +1,15 @@
+{
+  "route": "/robots.txt",
+  "slug": "robots-txt",
+  "kind": "document",
+  "note": null,
+  "requestedUrl": "https://awesome.video/robots.txt",
+  "finalUrl": "https://awesome.video/robots.txt",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/plain; charset=UTF-8",
+  "cacheControl": "private, max-age=0",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:25:21.916Z"
+}

@@ -1,0 +1,15 @@
+{
+  "route": "/recommendations",
+  "slug": "recommendations",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/recommendations",
+  "finalUrl": "https://awesome.video/recommendations",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:23:54.705Z"
+}

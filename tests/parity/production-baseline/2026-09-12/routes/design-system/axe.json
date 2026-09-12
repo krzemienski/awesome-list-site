@@ -1,0 +1,70 @@
+{
+  "route": "/design-system",
+  "slug": "design-system",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "https://awesome.video/design-system",
+      "byImpact": {
+        "critical": 0,
+        "serious": 1,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 1,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+          "nodes": 1,
+          "targets": [
+            ".text-\\[color\\:var\\(--text-4\\)\\]"
+          ]
+        }
+      ],
+      "incompleteRules": 1,
+      "passedRules": 38
+    },
+    "1440": {
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "https://awesome.video/design-system",
+      "byImpact": {
+        "critical": 0,
+        "serious": 1,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 1,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+          "nodes": 1,
+          "targets": [
+            ".text-\\[color\\:var\\(--text-4\\)\\]"
+          ]
+        }
+      ],
+      "incompleteRules": 2,
+      "passedRules": 41
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "route": "/sitemap.xml",
+  "slug": "sitemap-xml",
+  "kind": "document",
+  "note": null,
+  "requestedUrl": "https://awesome.video/sitemap.xml",
+  "finalUrl": "https://awesome.video/sitemap.xml",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "application/xml; charset=utf-8",
+  "cacheControl": "private",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:25:21.439Z"
+}

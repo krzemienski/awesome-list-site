@@ -1,0 +1,15 @@
+{
+  "route": "/advanced",
+  "slug": "advanced",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/advanced",
+  "finalUrl": "https://awesome.video/advanced",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:22:38.160Z"
+}

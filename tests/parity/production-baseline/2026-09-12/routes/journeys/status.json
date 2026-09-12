@@ -1,0 +1,15 @@
+{
+  "route": "/journeys",
+  "slug": "journeys",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/journeys",
+  "finalUrl": "https://awesome.video/journeys",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:22:55.675Z"
+}

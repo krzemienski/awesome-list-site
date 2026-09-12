@@ -1,0 +1,15 @@
+{
+  "route": "/category/community-events?page=2",
+  "slug": "category-community-events-page-2",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/category/community-events?page=2",
+  "finalUrl": "https://awesome.video/category/community-events?page=2",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:20:17.408Z"
+}

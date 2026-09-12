@@ -1,0 +1,75 @@
+{
+  "base": "https://awesome.video",
+  "preset": "mobile",
+  "categories": [
+    "performance",
+    "accessibility",
+    "best-practices",
+    "seo"
+  ],
+  "routes": {
+    "/": {
+      "scores": {
+        "performance": 0.85,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 3191,
+        "largestContentfulPaintMs": 3269,
+        "totalBlockingTimeMs": 130,
+        "cumulativeLayoutShift": 0.051799,
+        "speedIndexMs": 3191,
+        "interactiveMs": 5082
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-12T06:25:30.372Z",
+      "finalDisplayedUrl": "https://awesome.video/",
+      "formFactor": "mobile",
+      "reportFile": "home.json"
+    },
+    "/category/encoding-codecs": {
+      "scores": {
+        "performance": 0.78,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 3224,
+        "largestContentfulPaintMs": 3224,
+        "totalBlockingTimeMs": 363,
+        "cumulativeLayoutShift": 0.000214,
+        "speedIndexMs": 3224,
+        "interactiveMs": 5432
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-12T06:25:39.514Z",
+      "finalDisplayedUrl": "https://awesome.video/category/encoding-codecs",
+      "formFactor": "mobile",
+      "reportFile": "category-encoding-codecs.json"
+    },
+    "/resource/185020": {
+      "scores": {
+        "performance": 0.74,
+        "accessibility": 1,
+        "best-practices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 3239,
+        "largestContentfulPaintMs": 4578,
+        "totalBlockingTimeMs": 190,
+        "cumulativeLayoutShift": 0.054711,
+        "speedIndexMs": 3239,
+        "interactiveMs": 5464
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-12T06:25:50.615Z",
+      "finalDisplayedUrl": "https://awesome.video/resource/185020",
+      "formFactor": "mobile",
+      "reportFile": "resource-185020.json"
+    }
+  }
+}

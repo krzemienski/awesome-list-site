@@ -1,0 +1,15 @@
+{
+  "route": "/design-system",
+  "slug": "design-system",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/design-system",
+  "finalUrl": "https://awesome.video/design-system",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:24:07.684Z"
+}

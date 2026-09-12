@@ -1,0 +1,197 @@
+{
+  "base": "https://awesome.video",
+  "createdAt": "2026-09-12T06:19:28.157Z",
+  "invocations": [
+    {
+      "startedAt": "2026-09-12T06:19:28.157Z",
+      "command": "node scripts/validation/production-baseline-capture.mjs --base https://awesome.video",
+      "base": "https://awesome.video",
+      "outDir": "tests/parity/production-baseline/2026-09-12",
+      "toolCommit": "98f1b0cc4806c65b423f09a68650ee50a3c78c40",
+      "tools": {
+        "node": "v20.20.0",
+        "playwright": "1.61.1",
+        "axeCore": "4.13.0",
+        "axePlaywright": "4.13.0",
+        "lighthouse": "12.8.2",
+        "sharp": "0.33.5",
+        "pixelmatch": "7.1.0",
+        "chromium": "chromium-1223",
+        "chromiumVersion": "148.0.7778.96"
+      },
+      "phases": [
+        "routes",
+        "api",
+        "lighthouse"
+      ],
+      "routesRequested": [
+        "/",
+        "/categories",
+        "/category/encoding-codecs",
+        "/category/community-events?page=2",
+        "/subcategory/community-groups",
+        "/sub-subcategory/ffmpeg",
+        "/resource/185020",
+        "/resource/186190",
+        "/about",
+        "/submit",
+        "/search?q=ffmpeg",
+        "/search?q=zzqxv-nothing",
+        "/advanced",
+        "/journeys",
+        "/journey/7",
+        "/tag/open-source",
+        "/settings/theme",
+        "/recommendations",
+        "/design-system",
+        "/terms",
+        "/privacy",
+        "/code-of-conduct",
+        "/sign-in",
+        "/this-route-does-not-exist",
+        "/sitemap.xml",
+        "/robots.txt"
+      ],
+      "maxNavigations": null,
+      "force": false,
+      "finishedAt": "2026-09-12T06:25:58.500Z",
+      "durationSeconds": 390,
+      "navigations": 96,
+      "stoppedByBudget": false,
+      "routes": [
+        {
+          "route": "/",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/categories",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/category/encoding-codecs",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/category/community-events?page=2",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/subcategory/community-groups",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/sub-subcategory/ffmpeg",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/resource/185020",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/resource/186190",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/about",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/submit",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/search?q=ffmpeg",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/search?q=zzqxv-nothing",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/advanced",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/journeys",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/journey/7",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/tag/open-source",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/settings/theme",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/recommendations",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/design-system",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/terms",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/privacy",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/code-of-conduct",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/sign-in",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/this-route-does-not-exist",
+          "navigations": 4,
+          "complete": true
+        },
+        {
+          "route": "/sitemap.xml",
+          "navigations": 0,
+          "complete": true
+        },
+        {
+          "route": "/robots.txt",
+          "navigations": 0,
+          "complete": true
+        }
+      ],
+      "throttled": [],
+      "failures": []
+    }
+  ]
+}

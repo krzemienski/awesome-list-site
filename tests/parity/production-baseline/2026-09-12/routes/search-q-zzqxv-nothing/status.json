@@ -1,0 +1,15 @@
+{
+  "route": "/search?q=zzqxv-nothing",
+  "slug": "search-q-zzqxv-nothing",
+  "kind": "html",
+  "note": "empty search state",
+  "requestedUrl": "https://awesome.video/search?q=zzqxv-nothing",
+  "finalUrl": "https://awesome.video/search?q=zzqxv-nothing",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:22:25.248Z"
+}

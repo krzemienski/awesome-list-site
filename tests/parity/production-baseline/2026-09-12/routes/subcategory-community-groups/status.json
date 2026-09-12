@@ -1,0 +1,15 @@
+{
+  "route": "/subcategory/community-groups",
+  "slug": "subcategory-community-groups",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/subcategory/community-groups",
+  "finalUrl": "https://awesome.video/subcategory/community-groups",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:20:36.256Z"
+}

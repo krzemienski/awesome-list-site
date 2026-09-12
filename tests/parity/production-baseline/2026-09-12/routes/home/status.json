@@ -1,0 +1,15 @@
+{
+  "route": "/",
+  "slug": "home",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/",
+  "finalUrl": "https://awesome.video/",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:19:30.750Z"
+}

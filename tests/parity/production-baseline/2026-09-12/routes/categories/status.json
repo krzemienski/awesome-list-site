@@ -1,0 +1,15 @@
+{
+  "route": "/categories",
+  "slug": "categories",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/categories",
+  "finalUrl": "https://awesome.video/categories",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:19:43.086Z"
+}

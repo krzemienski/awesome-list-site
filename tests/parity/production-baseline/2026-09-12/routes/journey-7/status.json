@@ -1,0 +1,15 @@
+{
+  "route": "/journey/7",
+  "slug": "journey-7",
+  "kind": "html",
+  "note": null,
+  "requestedUrl": "https://awesome.video/journey/7",
+  "finalUrl": "https://awesome.video/journey/7",
+  "status": 200,
+  "xRobotsTag": null,
+  "contentType": "text/html; charset=UTF-8",
+  "cacheControl": "no-store",
+  "redirectChain": [],
+  "attempts": 1,
+  "probedAt": "2026-09-12T06:23:07.486Z"
+}

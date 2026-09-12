@@ -89,3 +89,16 @@ than emitted as duplicate rows.
 
 `pixelmatch` 7.1.0 is the only additional direct root dependency used by this
 harness; `sharp` was already present. The coordinator owns the root npm script.
+## Production baseline (`production-baseline/<YYYY-MM-DD>/`)
+
+A separate, dated record of what `https://awesome.video` served an anonymous
+visitor — full-page PNGs at 375/768/1024/1440, DOM summaries, HTTP status and
+redirect chains, axe results, raw API bodies with shape descriptions, and
+mobile Lighthouse reports. It is captured with `npm run baseline:capture`
+(`scripts/validation/production-baseline-capture.mjs`, resumable, sandboxed
+Chromium, read-only) and diffed with `npm run baseline:compare -- --baseline
+<dir> --against <url>` (`production-baseline-compare.mjs`, exit 1 on tracked
+deltas, side-by-side strips for eyes only). It is **not** the pixel gate above:
+its reference is production, not the design-system artifact. Each baseline's
+`README.md` records the date, tool commit, exact command and the production
+quirks seen that day.
