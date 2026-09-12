@@ -1,6 +1,42 @@
 # Evidence — disposable admin identity is created and removed by the run
 
-Run `2026-09-12T16-03-20-100Z-278` (the committed baseline).
+## Latest clean full baseline
+
+Run `2026-09-12T21-32-31-677Z-10218` (started 2026-09-12 21:32:31 UTC,
+finished 2026-09-12 22:46:23 UTC). The run used admin identity mode and
+recorded equal workspace fingerprints with `inputsChangedDuringRun: false`.
+
+```json
+{
+  "mode": "admin",
+  "reason": null,
+  "bridgeId": "2019696328",
+  "displayName": "Nick",
+  "clerkUserId": "user_3JFF9bgeEVrlY84XQh9IsOizCgL",
+  "teardown": {
+    "keepUser": false,
+    "bridgeId": "2019696328",
+    "email": "__qa_test_parity_mtywihjlcc325a+clerk_test@example.com",
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "errors": [],
+    "verification": {
+      "localQaUsersRemaining": []
+    }
+  },
+  "teardownError": null,
+  "prefix": "__qa_test_parity_"
+}
+```
+
+This is runner-level cleanup evidence: the local row and Clerk user were
+deleted, no teardown errors were recorded, and the final local QA-user
+verification was empty. The run still exits 1 because parity rows fail; that
+exit is unrelated to identity teardown.
+
+## Historical seventh baseline
+
+Run `2026-09-12T16-03-20-100Z-278` (the earlier committed baseline).
 
 ## `users` table before and after
 

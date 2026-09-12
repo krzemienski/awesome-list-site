@@ -84,7 +84,7 @@ export function renderReport(results, { linkPrefix, stageRoot, determinismEviden
     `Identity: ${results.identity.mode === "admin" ? `disposable Clerk admin \`${results.identity.bridgeId}\` "${results.identity.displayName || "Nick"}" (torn down: ${describeTeardown(results.identity)})` : `visitor (\`--as visitor\`, ${results.identity.reason || "no admin session"})`}  `,
     `Frozen clock: \`${results.configuration.frozenAt}\` on both sides.  `,
     `Denominator: ${results.summary.pass} pass / ${results.summary.fail} fail / **${results.summary.denominator}** pixel rows executed. ` +
-      `${byStatus("BLOCKED")} blocked, ${byStatus("EVIDENCE")} evidence-only, ${byStatus("UNVERIFIED")} token-only, ${byStatus("ALIAS")} aliases, ${byStatus("SKIPPED")} not selected.`,
+      `${results.summary.incomplete || byStatus("INCOMPLETE")} row-incomplete${results.summary.incompleteEvidence && !results.summary.incomplete ? " plus run-level incomplete evidence" : ""}, ${byStatus("BLOCKED")} blocked, ${byStatus("EVIDENCE")} evidence-only, ${byStatus("UNVERIFIED")} token-only, ${byStatus("ALIAS")} aliases, ${byStatus("SKIPPED")} not selected.`,
     "",
     results.selection.full
       ? `Full inventory run: every one of the ${rows.length} screen/width rows below has exactly one terminal status.`
@@ -139,7 +139,7 @@ export function renderReport(results, { linkPrefix, stageRoot, determinismEviden
     "",
     `Machine-readable result: ${link("results.json", "results.json")}; output hashes: ${link("OUTPUT-MANIFEST.json", "OUTPUT-MANIFEST.json")}. The reference was served from an in-memory snapshot on an ephemeral loopback port; awesome-list-site-ds/ was not modified (raw and served hashes are both recorded).`,
     "",
-    `Inputs changed during run: ${results.provenance.workspace.inputsChangedDuringRun ? "YES — stale" : "no"}. ${measured.length ? `${measured.filter((row) => row.actualCaptureStability?.stableAttempts?.[0] > 1 || row.expectedCaptureStability?.stableAttempts?.[0] > 1).length} comparisons needed more than one raw frame before two consecutive frames were byte-identical; every attempt is retained.` : ""}`,
+    `Inputs changed during run: ${results.provenance.workspace.inputsChangedDuringRun ? "YES — stale" : "no"}. Live catalog/admin adapter hashes were re-read after the final row${results.provenance.referenceAdapter?.live?.error ? `, but the re-read was incomplete: ${results.provenance.referenceAdapter.live.error}` : ""}; ${measured.length ? `${measured.filter((row) => row.actualCaptureStability?.stableAttempts?.[0] > 1 || row.expectedCaptureStability?.stableAttempts?.[0] > 1).length} comparisons needed more than one raw frame before two consecutive frames were byte-identical; every attempt is retained.` : ""}`,
     "",
   ];
   return lines.filter((line) => line !== null).join("\n");
@@ -150,6 +150,7 @@ export function renderStatus(results) {
   const pixelRows = rows.filter((row) => row.eligibility === "pixel");
   const passing = pixelRows.filter((row) => row.status === "PASS");
   const failing = pixelRows.filter((row) => row.status === "FAIL");
+  const incomplete = pixelRows.filter((row) => row.status === "INCOMPLETE");
   const blocked = pixelRows.filter((row) => row.status === "BLOCKED");
   const worst = [...failing].sort((a, b) => (b.comparison?.diffPercent ?? 0) - (a.comparison?.diffPercent ?? 0)).slice(0, 10);
   return [
@@ -157,7 +158,7 @@ export function renderStatus(results) {
     "",
     `Latest baseline run: \`${results.runId}\` (${results.executedAt}) — gate **${results.gatePassed ? "PASS" : "NOT PASSED"}**.`,
     "",
-    `Pixel rows: ${passing.length} pass, ${failing.length} fail, ${blocked.length} blocked of ${pixelRows.length}. Eligibility: ${JSON.stringify(results.inventory.eligibility)}.`,
+    `Pixel rows: ${passing.length} pass, ${failing.length} fail, ${incomplete.length} incomplete, ${blocked.length} blocked of ${pixelRows.length}. Eligibility: ${JSON.stringify(results.inventory.eligibility)}.`,
     "",
     "## Largest measured gaps",
     "",
@@ -168,6 +169,10 @@ export function renderStatus(results) {
     "## Blocked rows",
     "",
     ...(blocked.length ? blocked.map((row) => `- ${row.screen}@${row.width}: ${row.reason}`) : ["- none"]),
+    "",
+    "## Incomplete rows",
+    "",
+    ...(incomplete.length ? incomplete.map((row) => `- ${row.screen}@${row.width}: ${row.reason}`) : ["- none"]),
     "",
     "See [REPORT.md](REPORT.md) for every row and the evidence links.",
     "",

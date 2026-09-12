@@ -38,9 +38,12 @@ npm run test:parity -- --keep-user ...                # keep the disposable admi
 (design-system docs chapter; evidence only) or `blocked:<reason>`.
 
 Exit codes: **0** every executed pixel row passed (a full admin run also needs
-the gate: no FAIL, no BLOCKED, inputs unchanged); **1** a pixel row failed or was
-blocked; **2** precondition, CLI or infrastructure failure (including an
-incomplete identity teardown — the results are still written). `--sweep` exits
+the gate: no FAIL, no BLOCKED, no INCOMPLETE, inputs unchanged); **1** a visual
+pixel row failed or was blocked; **2** precondition or infrastructure failure
+(including a row timeout, browser/context crash, filesystem failure, or
+incomplete identity teardown — the results are still written). Infrastructure
+rows are recorded as `INCOMPLETE`, excluded from the visual denominator, and
+never misreported as visual `FAIL`. `--sweep` exits
 **0** only when nothing is left on either side: any deletion failure or any
 remaining `__qa_test_parity_` user, local or Clerk, exits 2 with the JSON
 summary (`failed`, `remaining`, `clerkRemaining`) on stdout.
@@ -50,7 +53,7 @@ summary (`failed`, `remaining`, `clerkRemaining`) on stdout.
 `tests/parity/baseline/<run-id>/` (read-only once copied from `/tmp`):
 
 - `results.json` — every row with status `PASS | FAIL | BLOCKED | EVIDENCE |
-  UNVERIFIED | ALIAS`, the diff numbers, both capture hashes and stability
+  INCOMPLETE | UNVERIFIED | ALIAS`, the diff numbers, both capture hashes and stability
   attempts, the identity check, the `backdrop-filter` sets, font parity, and the
   run-level `identity`, `configuration`, `provenance` and `selection` blocks.
 - `actual/`, `expected/`, `diff/` PNGs per row (`<id>-<width>.png`, plus the
@@ -181,6 +184,13 @@ identities behind, and `--keep-user` to keep one for manual inspection.
   listed in the row's `apiFailures`, read from the live tracker after the last
   frame and the identity reads (never a settle-time snapshot; the reference
   side's list is `referenceApiFailures`).
+- A row budget timeout aborts the row, closes every context it owns, and waits
+  for `captureRow` to settle before the next row starts. No timed-out row may
+  continue writing captures or logging in the background.
+- Workspace fingerprints include the `server/` runtime sources. The catalog and
+  disposable-admin adapter snapshots are fetched and hashed again after the
+  final row (while the admin session is still alive); a failed end re-read is
+  incomplete evidence rather than silently reusing the start data.
 
 ### Rate-limit budget
 

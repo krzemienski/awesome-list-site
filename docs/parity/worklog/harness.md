@@ -400,3 +400,111 @@ would have replaced the whole-inventory table with a six-row subset; the copy
 is now inside the full-run branch and the file was restored from the baseline
 run. The diagnostic run directory was removed (selected runs are diagnostics,
 not baselines).
+
+## 7. Eighth full run — input-stale evidence
+
+The next full admin run,
+`tests/parity/baseline/2026-09-12T18-03-48-670Z-22711`, started at
+`2026-09-12T18:03:48.670Z` and finished at `19:17:34.932Z`. It was not a
+clean final baseline: the runner recorded
+`provenance.workspace.inputsChangedDuringRun: true` (start fingerprint
+`6500e4df…`, end fingerprint `1dfa66c1…`). It remains measured evidence only;
+it must not be described as gate-passing or input-clean.
+
+The exact hashed inputs that changed while that browser was running were:
+
+| Hashed input | Change | Commit/time |
+|---|---|---|
+| `tests/parity/readiness.mjs` | Frame-level API guard and declared-face font readiness | `c429efcf`, 18:34 UTC |
+| `tests/parity/report.mjs` | Live recoveries and stale-input reporting | `c429efcf`, 18:34 UTC |
+| `tests/parity/runner.mjs` | Capture ordering and live API/font evidence | `c429efcf`, 18:34 UTC |
+| `artifacts/awesome-video-design-system/DESIGN.md` | Reference-authority note | `8b4fbe3d` / `8964fdcd`, 18:35–36 UTC |
+| `awesome-list.config.yaml` | Contact configuration | `d38861f9`, 19:05 UTC |
+| `shared/contact.ts` | Contact types/configuration | `d38861f9`, 19:05 UTC |
+| `shared/schema.ts` | Contact schema/provenance | `d38861f9`, 19:05 UTC |
+| `client/index.html` | Canonical web-font set | `19dfa90c`, 19:09 UTC |
+| `client/src/components/layout/SEOHead.tsx` | Font preload/metadata | `19dfa90c`, 19:09 UTC |
+| `client/src/components/ui/theme-provider.tsx` | Font theme wiring | `19dfa90c`, 19:09 UTC |
+| `client/src/lib/font-options.ts` | Font option declarations | `19dfa90c`, 19:09 UTC |
+| `client/src/main.tsx` | Font loading setup | `19dfa90c`, 19:09 UTC |
+| `client/src/styles/design-system.css` | Font-face/style declarations | `19dfa90c`, 19:09 UTC |
+
+The canonical `awesome-list-site-ds/` hashes and hashed inventory JSON did
+not change. `c429efcf` also edited `tests/parity/README.md` and removed old
+raw baseline frames; those paths are outside the input fingerprint, but they
+were still watched workspace writes. The corrected staged narrative is kept
+in `.cache/parity-task/worklog-s7.md`.
+
+## 8. Final clean full baseline and harness acceptance
+
+The latest full admin run is
+`tests/parity/baseline/2026-09-12T21-32-31-677Z-10218/results.json`
+(started `2026-09-12T21:32:31.677Z`, finished `2026-09-12T22:46:23.313Z`,
+exit 1, claim `pre-parity-baseline`). It is the first clean full run after
+the post-review harness changes:
+
+- Workspace fingerprints are equal (`c9781473…` at start and end) and
+  `inputsChangedDuringRun: false`; `gitCommit` was
+  `38831ea5bd43de6d6fb904b2bac4b5a629636870` with no dirty input paths.
+- The run executed the full 293-row inventory: 93 denominator rows, 0 pass,
+  93 fail, 52 blocked, 88 evidence-only, 56 token-only and 4 aliases.
+  This is a clean harness run, not a parity-gate pass: the app's 89 pixel
+  rows fail their measured visual/backdrop comparison, and the four
+  `artifact.showcase` rows also retain their artifact font gap/synthetic
+  italic defect.
+- All 181 captured rows had complete font readiness on both sides, with zero
+  forced-face load failures and zero unloaded faces. The 89 app pixel rows
+  have no declared-face gap after the font wave. The remaining 92 rows with
+  declared-face gaps are artifact evidence rows (88 excluded
+  `artifact-docs`) plus the four counted `artifact.showcase` rows; they are
+  reported in `font-gaps.md`, not silently ignored.
+- There were no capture-failure rows, same-origin API failure rows, discarded
+  frames, or document reloads. Every actual side stabilized on attempts
+  `[1,2]`; 180 reference sides stabilized on `[1,2]` and one on `[2,3]`.
+  The run recorded one real rate-limit wait of 554677 ms (excluded from row
+  budgets) and eight queue deferrals. The standalone determinism proof
+  remains 6/6 cells byte-identical across three fresh captures; see
+  `docs/parity/evidence/harness/determinism/determinism.json`.
+- Identity teardown was clean: disposable admin "Nick" (`2019696328`) had
+  both local and Clerk rows deleted, no teardown errors, and
+  `localQaUsersRemaining: []`; see
+  `docs/parity/evidence/harness/identity-cleanup.md`.
+
+### Final-run gates
+
+| Gate | Result |
+|---|---|
+| Full baseline input integrity | **PASS** — equal fingerprints; `inputsChangedDuringRun: false` |
+| Identity teardown | **PASS** — local and Clerk deleted; no QA users remaining |
+| Capture readiness | **PASS** — no capture/API failures, no reloads, all captured sides font-complete |
+| Harness module syntax | **PASS** — `node --check` over `tests/parity/*.mjs` |
+| Inventory/list checks | **PASS** — 74 screens; generated inventory in sync; `--list` exit 0 |
+| Pixel parity gate | **NOT PASSED** — 0/93 pixel rows pass; page-wave differences remain |
+
+The clean run closes the harness acceptance requirement without claiming
+visual parity. Task #504 is still merging; any later source change requires a
+new run if it affects the runner's hashed inputs or captured surfaces.
+
+## 9. Focused post-repair failure-path verification
+
+The full baseline in §8 is historical. It predates the row-timeout
+cancellation, `server/` fingerprint, and end-of-run live catalog/admin
+adapter-hash repairs, so its equal fingerprints do **not** prove current
+server or live-data integrity. No full run was repeated for this correction.
+
+Against the live local app (`BASE_URL=http://127.0.0.1:5000`), two temporary
+runner roots were used so no shared baseline, report, or capture mirror could
+be overwritten:
+
+| Probe | Result |
+|---|---|
+| `/tmp/parity-failure-probe-30790`, `ROW_TIMEOUT_MS=1000`, visitor `app.about,app.category@375` | Exit 2; both rows were `INCOMPLETE`, denominator 0, and the timeout terminal output for each row preceded the next row start. No capture files or lingering Chromium process remained. |
+| `/tmp/parity-normal-probe-31077`, visitor `app.about@375` | Exit 0 evidence-only capture; actual/reference stability `[1,2]`, font-complete, API failures empty, catalog start/end hashes equal, workspace unchanged. |
+| Same temporary root, admin `app.about@375` | Exit 1 for the expected visual diff, not infrastructure; actual/reference stability `[1,2]`, font-complete, API failures empty, catalog and admin start/end hashes equal, workspace unchanged, and local/Clerk teardown clean. |
+
+The complete command/output and hash evidence is recorded in
+`docs/parity/evidence/harness/failure-paths.md`. These selected captures
+verify failure cleanup and live adapter re-reads only; they are not a new
+parity baseline. The final classifier review also covers nested infrastructure
+causes and common filesystem errors so an unexpected filesystem rejection
+cannot be mislabeled as visual drift.

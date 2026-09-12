@@ -24,7 +24,8 @@ Modes
   --help
 
 Exit codes: 0 every executed pixel row passed (full runs also need the gate);
-1 a pixel row failed or was blocked; 2 precondition or infrastructure failure.`;
+1 a visual pixel row failed or was blocked; 2 precondition or infrastructure
+failure (including incomplete capture evidence).`;
 
 export class CliError extends Error {}
 

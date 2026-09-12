@@ -73,6 +73,14 @@ const MAX_DOCUMENT_RELOADS = 2;
 const CHROMIUM_ARGS = ["--disable-partial-raster"];
 
 class PreconditionError extends Error {}
+class CaptureTimeoutError extends Error {
+  constructor(label, ms) {
+    super(`${label} exceeded the ${ms / 1000}s row budget`);
+    this.name = "CaptureTimeoutError";
+    this.infrastructure = true;
+    this.category = "timeout";
+  }
+}
 
 const log = (message) => process.stderr.write(`${message}\n`);
 const rel = (from, to) => path.relative(from, to).split(path.sep).join("/");
@@ -392,25 +400,81 @@ const main = async () => {
     const referenceBase = `http://127.0.0.1:${referenceServer.address().port}`;
 
     // ---- workspace fingerprints ---------------------------------------------
-    const fingerprintInputs = async () => ({
+    const fingerprintInputs = async ({ catalog = catalogBinding, admin: adminBinding = admin, liveError = null } = {}) => ({
       config: sha256(await fsp.readFile(path.join(repoRoot, "awesome-list.config.yaml"))),
       app: await walkHashes(path.join(repoRoot, "client")),
+      server: await walkHashes(path.join(repoRoot, "server")),
       shared: await walkHashes(path.join(repoRoot, "shared")),
       artifact: needsArtifact ? await walkHashes(path.join(repoRoot, "artifacts/awesome-video-design-system")) : null,
       reference: adapted.provenance.rawHashes,
       harness: await walkHashes(here, { include: (relative) => /\.(mjs|json)$/.test(relative) && !relative.startsWith("baseline/") }),
+      liveAdapters: {
+        catalog: catalog ? {
+          sha256: sha256(catalog.snapshotBytes),
+          categories: catalog.adapter.AV_CATEGORIES.length,
+          totalResources: catalog.adapter.AV_TOTAL,
+        } : null,
+        admin: adminBinding ? {
+          sha256: sha256(adminBinding.snapshotBytes),
+          counts: adminBinding.counts,
+        } : null,
+        error: liveError,
+      },
     });
+    const rehashLiveAdapters = async (phase) => {
+      const [catalogResult, adminResult] = await Promise.allSettled([
+        buildCatalogAdapter(appBase),
+        identity ? buildAdminAdapter(identity.fetchJson, frozenAt.getTime()) : Promise.resolve(null),
+      ]);
+      const errors = [catalogResult, adminResult]
+        .filter((result) => result.status === "rejected")
+        .map((result) => String(result.reason?.message || result.reason));
+      if (errors.length) log(`[parity] live adapter rehash failed at ${phase}: ${errors.join(" | ")}`);
+      return {
+        catalog: catalogResult.status === "fulfilled" ? catalogResult.value : null,
+        admin: adminResult.status === "fulfilled" ? adminResult.value : null,
+        error: errors.length ? errors.join(" | ") : null,
+      };
+    };
     const startFingerprints = await fingerprintInputs();
     const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repoRoot, encoding: "utf8" }).trim();
-    const gitDirty = execFileSync("git", ["status", "--porcelain=v1", "--", "client", "shared", "awesome-list-site-ds", "artifacts/awesome-video-design-system", "tests/parity/inventory", "awesome-list.config.yaml"], { cwd: repoRoot, encoding: "utf8" }).trim().split("\n").filter(Boolean);
+    const gitDirty = execFileSync("git", ["status", "--porcelain=v1", "--", "client", "server", "shared", "awesome-list-site-ds", "artifacts/awesome-video-design-system", "tests/parity/inventory", "awesome-list.config.yaml"], { cwd: repoRoot, encoding: "utf8" }).trim().split("\n").filter(Boolean);
 
     // ---- determinism mode ---------------------------------------------------
     if (cli.determinism) {
       const determinism = await runDeterminism({ browser, plan, byId, cli, tokens, referenceBase, frozenAt, dirs, catalogBinding });
+      const endAdapters = await rehashLiveAdapters("determinism end");
+      const endCatalogBinding = endAdapters.catalog;
+      const endAdmin = endAdapters.admin;
+      const liveAdapterError = endAdapters.error;
+      const endFingerprints = await fingerprintInputs({ catalog: endCatalogBinding, admin: endAdmin, liveError: liveAdapterError });
+      const inputsChangedDuringRun = JSON.stringify(startFingerprints) !== JSON.stringify(endFingerprints) || Boolean(liveAdapterError);
       await cleanup();
       if (identity) teardownOutcome = await identity.teardown({ keepUser: cli.keepUser });
       const outFile = path.join(stageRoot, "determinism.json");
-      const payload = { runId, frozenAt: frozenAt.toISOString(), captures: cli.determinism, browserVersion, referenceAdapter: { snapshot: sha256(catalogBinding.snapshotBytes) }, rows: determinism, identityTeardown: teardownOutcome };
+      const payload = {
+        runId,
+        frozenAt: frozenAt.toISOString(),
+        captures: cli.determinism,
+        browserVersion,
+        referenceAdapter: {
+          snapshot: sha256(catalogBinding.snapshotBytes),
+          live: {
+            catalogStart: sha256(catalogBinding.snapshotBytes),
+            catalogEnd: endCatalogBinding ? sha256(endCatalogBinding.snapshotBytes) : null,
+            adminStart: admin ? sha256(admin.snapshotBytes) : null,
+            adminEnd: endAdmin ? sha256(endAdmin.snapshotBytes) : null,
+            error: liveAdapterError,
+          },
+        },
+        workspace: {
+          startFingerprints: sha256(Buffer.from(JSON.stringify(startFingerprints))),
+          endFingerprints: sha256(Buffer.from(JSON.stringify(endFingerprints))),
+          inputsChangedDuringRun,
+        },
+        rows: determinism,
+        identityTeardown: teardownOutcome,
+      };
       await fsp.writeFile(outFile, JSON.stringify(payload, null, 2));
       const evidenceDir = path.join(harnessEvidenceDir, "determinism");
       await fsp.rm(evidenceDir, { recursive: true, force: true });
@@ -419,9 +483,10 @@ const main = async () => {
       await fsp.cp(dirs.determinism, evidenceDir, { recursive: true, filter: (source) => !STABILITY_FRAME_RE.test(source) });
       await fsp.copyFile(outFile, path.join(evidenceDir, "determinism.json"));
       const failing = determinism.filter((cell) => !cell.identical);
+      const incomplete = failing.some((cell) => cell.failure && isInfrastructureFailure(new Error(cell.failure.error)));
       log(`[parity] determinism: ${determinism.length - failing.length}/${determinism.length} cells byte-identical across ${cli.determinism} captures → ${rel(repoRoot, evidenceDir)}`);
       for (const cell of failing) log(`  ✗ ${cell.screen}@${cell.width}: ${cell.hashes.join(" ")}`);
-      return failing.length ? 1 : 0;
+      return inputsChangedDuringRun || incomplete ? 2 : failing.length ? 1 : 0;
     }
 
     // ---- rows ------------------------------------------------------------------
@@ -475,14 +540,26 @@ const main = async () => {
         ? "artifact-docs"
         : (identityMode === "visitor" && screen.kind === "app" ? "visitor-identity" : null);
       log(`[parity] ${screen.id} @ ${width}`);
-      const outcome = await withTimeout(() => captureRow(captureContext, screen, width), ROW_TIMEOUT_MS, `${screen.id}@${width}`, throttleGuard)
+      const rowContext = { ...captureContext, activeContexts: new Set() };
+      const outcome = await withTimeout(
+        (signal) => {
+          rowContext.signal = signal;
+          return captureRow(rowContext, screen, width);
+        },
+        ROW_TIMEOUT_MS,
+        `${screen.id}@${width}`,
+        throttleGuard,
+        { cancel: () => closeCaptureContexts(rowContext) },
+      )
         .catch((error) => ({ failure: error }));
       if (outcome.failure) {
         const error = outcome.failure;
         const diagnostics = error?.diagnostics || undefined;
         // Failed sides keep their same-origin API failures on the row as well as in the diagnostics record.
         const apiFailures = error?.apiFailures || [];
-        if (error instanceof ActionUnavailableError) {
+        if (isInfrastructureFailure(error)) {
+          pushRow({ ...base, status: "INCOMPLETE", reason: `infrastructure failure: ${error.message}`, diagnostics, apiFailures });
+        } else if (error instanceof ActionUnavailableError) {
           pushRow({ ...base, status: "BLOCKED", reason: error.message, diagnostics, apiFailures });
         } else if (evidenceKind) {
           pushRow({ ...base, status: "EVIDENCE", evidenceKind, reason: `capture failed: ${error.message}`, diagnostics, apiFailures });
@@ -525,8 +602,20 @@ const main = async () => {
     }
 
     // ---- teardown + provenance ------------------------------------------------
-    const endFingerprints = await fingerprintInputs();
-    const inputsChangedDuringRun = JSON.stringify(startFingerprints) !== JSON.stringify(endFingerprints);
+    // Re-read the live adapters while the disposable admin session is still
+    // alive. A static workspace hash cannot detect a catalog or admin response
+    // changing underneath the run, and silently reusing the start snapshot
+    // would overstate what the captures prove.
+    const endAdapters = await rehashLiveAdapters("run end");
+    const endCatalogBinding = endAdapters.catalog;
+    const endAdmin = endAdapters.admin;
+    const liveAdapterError = endAdapters.error;
+    const endFingerprints = await fingerprintInputs({
+      catalog: endCatalogBinding,
+      admin: endAdmin,
+      liveError: liveAdapterError,
+    });
+    const inputsChangedDuringRun = JSON.stringify(startFingerprints) !== JSON.stringify(endFingerprints) || Boolean(liveAdapterError);
     await cleanup();
     let teardownError = null;
     if (identity) {
@@ -543,14 +632,19 @@ const main = async () => {
     const pass = measured.filter((row) => row.status === "PASS").length;
     const fail = measured.length - pass;
     const blocked = rows.filter((row) => row.status === "BLOCKED").length;
-    const gatePassed = full && identityMode === "admin" && fail === 0 && blocked === 0 && !inputsChangedDuringRun && measured.length > 0;
+    const incomplete = rows.filter((row) => row.status === "INCOMPLETE").length;
+    const incompleteEvidence = incomplete > 0 || Boolean(liveAdapterError);
+    const gatePassed = full && identityMode === "admin" && fail === 0 && blocked === 0 && !incompleteEvidence && !inputsChangedDuringRun && measured.length > 0;
     let exitCode;
-    if (fail > 0 || rows.some((row) => row.status === "BLOCKED" && row.eligibility === "pixel" && !(row.reason || "").startsWith("Requires a real admin session") && identityMode === "admin")) exitCode = 1;
+    if (incompleteEvidence) exitCode = 2;
+    else if (fail > 0 || rows.some((row) => row.status === "BLOCKED" && row.eligibility === "pixel" && !(row.reason || "").startsWith("Requires a real admin session") && identityMode === "admin")) exitCode = 1;
     else if (full && identityMode === "admin" && !gatePassed) exitCode = 1;
     else exitCode = 0;
-    if (identityMode === "admin" && rows.some((row) => row.status === "BLOCKED" && row.eligibility === "pixel")) exitCode = 1;
+    if (exitCode !== 2 && identityMode === "admin" && rows.some((row) => row.status === "BLOCKED" && row.eligibility === "pixel")) exitCode = 1;
     if (teardownError) exitCode = 2;
-    const claim = identityMode !== "admin"
+    const claim = incompleteEvidence
+      ? "incomplete-evidence"
+      : identityMode !== "admin"
       ? "visitor-evidence-only"
       : full
         ? (gatePassed ? "parity-gate-pass" : "pre-parity-baseline")
@@ -610,10 +704,23 @@ const main = async () => {
         gitCommit,
         gitDirtyPaths: gitDirty,
         snapshot: { sha256: sha256(catalogBinding.snapshotBytes), categories: catalogBinding.adapter.AV_CATEGORIES.length, totalResources: catalogBinding.adapter.AV_TOTAL, reconciledPaths: catalogBinding.reconciledPaths },
-        referenceAdapter: { adminGlobals: admin ? Object.keys(admin.globals) : [], adminCounts: admin?.counts || null, placeholders: { applied: adapted.provenance.applied, unadapted: adapted.provenance.unadapted, rule: adapted.provenance.rule }, rawHashes: adapted.provenance.rawHashes, servedHashes: adapted.provenance.servedHashes },
+        referenceAdapter: {
+          adminGlobals: admin ? Object.keys(admin.globals) : [],
+          adminCounts: admin?.counts || null,
+          placeholders: { applied: adapted.provenance.applied, unadapted: adapted.provenance.unadapted, rule: adapted.provenance.rule },
+          rawHashes: adapted.provenance.rawHashes,
+          servedHashes: adapted.provenance.servedHashes,
+          live: {
+            catalogStart: sha256(catalogBinding.snapshotBytes),
+            catalogEnd: endCatalogBinding ? sha256(endCatalogBinding.snapshotBytes) : null,
+            adminStart: admin ? sha256(admin.snapshotBytes) : null,
+            adminEnd: endAdmin ? sha256(endAdmin.snapshotBytes) : null,
+            error: liveAdapterError,
+          },
+        },
         workspace: { startFingerprints: sha256(Buffer.from(JSON.stringify(startFingerprints))), endFingerprints: sha256(Buffer.from(JSON.stringify(endFingerprints))), inputsChangedDuringRun },
       },
-      summary: { denominator: measured.length, pass, fail, fontGapOnlyFails: measured.filter((row) => row.status === "FAIL" && row.fontGap && row.comparison?.withinCeiling && row.backdropFilters?.match && row.identity?.ok !== false).length, blocked, evidence: rows.filter((row) => row.status === "EVIDENCE").length, unverified: rows.filter((row) => row.status === "UNVERIFIED").length, aliases: rows.filter((row) => row.status === "ALIAS").length },
+      summary: { denominator: measured.length, pass, fail, incomplete, incompleteEvidence, fontGapOnlyFails: measured.filter((row) => row.status === "FAIL" && row.fontGap && row.comparison?.withinCeiling && row.backdropFilters?.match && row.identity?.ok !== false).length, blocked, evidence: rows.filter((row) => row.status === "EVIDENCE").length, unverified: rows.filter((row) => row.status === "UNVERIFIED").length, aliases: rows.filter((row) => row.status === "ALIAS").length },
       rows,
     };
     await fsp.writeFile(path.join(stageRoot, "results.json"), JSON.stringify(results, null, 2));
@@ -650,7 +757,7 @@ const main = async () => {
     await makeReadOnly(finalRoot);
     // The /tmp stage is fully published; leaving it would only pile up ~100 MB per run.
     await fsp.rm(stageRoot, { recursive: true, force: true });
-    log(`[parity] ${claim}: ${pass}/${measured.length} pixel rows pass, ${fail} fail, ${blocked} blocked → ${rel(repoRoot, finalRoot)} (exit ${exitCode})`);
+    log(`[parity] ${claim}: ${pass}/${measured.length} pixel rows pass, ${fail} fail, ${incomplete} incomplete${liveAdapterError ? " (live adapter rehash incomplete)" : ""}, ${blocked} blocked → ${rel(repoRoot, finalRoot)} (exit ${exitCode})`);
     return exitCode;
   } catch (error) {
     await cleanup();
@@ -679,6 +786,41 @@ const stateInitScript = (isReference) => `(() => {
   const entries = ${JSON.stringify(Object.entries(isReference ? CAPTURE_STATE.reference.localStorage : CAPTURE_STATE.app.localStorage))};
   try { for (const [key, value] of entries) localStorage.setItem(key, value); } catch {}
 })();`;
+
+const throwIfCaptureAborted = (signal) => {
+  if (signal?.aborted) throw signal.reason || new CaptureTimeoutError("capture", ROW_TIMEOUT_MS);
+};
+
+const registerCaptureContext = (ctx, context) => {
+  ctx.activeContexts?.add(context);
+  const signal = ctx.signal;
+  if (!signal) return;
+  const closeOnAbort = () => { context.close().catch(() => {}); };
+  signal.addEventListener("abort", closeOnAbort, { once: true });
+  if (!ctx.contextAbortHandlers) ctx.contextAbortHandlers = new Map();
+  ctx.contextAbortHandlers.set(context, closeOnAbort);
+  if (signal.aborted) closeOnAbort();
+};
+
+const unregisterCaptureContext = (ctx, context) => {
+  const handler = ctx.contextAbortHandlers?.get(context);
+  if (handler) {
+    ctx.signal?.removeEventListener("abort", handler);
+    ctx.contextAbortHandlers.delete(context);
+  }
+  ctx.activeContexts?.delete(context);
+};
+
+const closeCaptureContext = async (ctx, context) => {
+  if (!context) return;
+  unregisterCaptureContext(ctx, context);
+  await context.close().catch(() => {});
+};
+
+const closeCaptureContexts = async (ctx) => {
+  const contexts = [...(ctx.activeContexts || [])];
+  await Promise.all(contexts.map((context) => closeCaptureContext(ctx, context)));
+};
 
 const newCaptureContext = async ({ browser, frozenAt }, width, { reference, storageState }) => {
   const context = await browser.newContext({
@@ -753,7 +895,14 @@ const dumpDiagnostics = async (ctx, page, screen, width, side, error) => {
   } catch {
     // the page may be wedged; the JSON record is still written
   }
-  await fsp.writeFile(path.join(ctx.dirs.diagnostics, `${stem}.json`), JSON.stringify(record, null, 2)).catch(() => {});
+  try {
+    await fsp.writeFile(path.join(ctx.dirs.diagnostics, `${stem}.json`), JSON.stringify(record, null, 2));
+  } catch (writeError) {
+    if (error && typeof error === "object") {
+      error.infrastructure = true;
+      error.diagnosticsWriteError = String(writeError?.message || writeError);
+    }
+  }
   if (error && typeof error === "object") error.apiFailures = record.apiFailures;
   return `diagnostics/${stem}.json`;
 };
@@ -793,10 +942,11 @@ const noteRateLimits = (guard, page, screen) => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const recordThrottleWait = async (guard, { screen, width, key, waitMs, why }) => {
+const recordThrottleWait = async (guard, { screen, width, key, waitMs, why }, signal) => {
   console.log(`  … waiting ${Math.ceil(waitMs / 1000)}s for the app limiter behind ${key} to reset before ${screen.id}@${width} (${why})`);
   guard.waits.push({ screen: screen.id, width, limiter: key, waitedMs: waitMs, why, at: new Date().toISOString() });
   await sleep(waitMs);
+  if (signal?.aborted) throw signal.reason;
 };
 
 /** The limiter (if any) that would reject another load of `screen` right now. */
@@ -809,10 +959,10 @@ const throttleWaitNeeded = (guard, screen) => {
   return null;
 };
 
-const awaitThrottleBudget = async (guard, screen, width) => {
+const awaitThrottleBudget = async (guard, screen, width, signal) => {
   for (let pending = throttleWaitNeeded(guard, screen); pending; pending = throttleWaitNeeded(guard, screen)) {
     const { key, info, waitMs } = pending;
-    await recordThrottleWait(guard, { screen, width, key, waitMs, why: `${info.remaining} of ${info.limit} left, a load consumes ${info.perOpen}` });
+    await recordThrottleWait(guard, { screen, width, key, waitMs, why: `${info.remaining} of ${info.limit} left, a load consumes ${info.perOpen}` }, signal);
     info.remaining = info.limit;
   }
 };
@@ -830,6 +980,7 @@ const throttleRetryDelay = (error) => {
 };
 
 const openSide = async (ctx, screen, width, side, { retriedAfterThrottle = false } = {}) => {
+  throwIfCaptureAborted(ctx.signal);
   const isReference = side === "expected";
   const kind = screen.kind;
   const base = isReference ? ctx.referenceBase : (kind === "artifact" ? ctx.artifactBase : ctx.appBase);
@@ -837,9 +988,15 @@ const openSide = async (ctx, screen, width, side, { retriedAfterThrottle = false
   // short-lived Clerk session token that the frozen-clock capture context never
   // refreshes, so a snapshot taken before a multi-minute wait arrives expired
   // (both earlier full runs lost app.shell.palette@768 this way).
-  if (!isReference && kind === "app") await awaitThrottleBudget(ctx.throttleGuard, screen, width);
+  if (!isReference && kind === "app") await awaitThrottleBudget(ctx.throttleGuard, screen, width, ctx.signal);
+  throwIfCaptureAborted(ctx.signal);
   const storageState = !isReference && kind === "app" && ctx.identity ? await ctx.identity.storageState() : null;
   const context = await newCaptureContext(ctx, width, { reference: isReference, storageState });
+  registerCaptureContext(ctx, context);
+  if (ctx.signal?.aborted) {
+    await closeCaptureContext(ctx, context);
+    throw ctx.signal.reason;
+  }
   let page;
   try {
     page = await context.newPage();
@@ -847,30 +1004,36 @@ const openSide = async (ctx, screen, width, side, { retriedAfterThrottle = false
     attachNetworkTracker(page);
     guardOrigin(page, base, side);
   } catch (error) {
-    await context.close().catch(() => {});
+    await closeCaptureContext(ctx, context);
     throw error;
   }
   try {
     return await openSideOn(ctx, screen, width, side, { context, page, base, isReference, kind });
   } catch (error) {
+    if (ctx.signal?.aborted) {
+      await closeCaptureContext(ctx, context);
+      throw ctx.signal.reason;
+    }
     if (!isReference && kind === "app") noteRateLimits(ctx.throttleGuard, page, screen);
     const retry = !isReference && kind === "app" && !retriedAfterThrottle ? throttleRetryDelay(error) : null;
     if (retry) {
-      await context.close().catch(() => {});
-      await recordThrottleWait(ctx.throttleGuard, { screen, width, key: retry.key, waitMs: retry.waitMs, why: "429 received (window filled before this run); reopening once" });
+      await closeCaptureContext(ctx, context);
+      await recordThrottleWait(ctx.throttleGuard, { screen, width, key: retry.key, waitMs: retry.waitMs, why: "429 received (window filled before this run); reopening once" }, ctx.signal);
       return openSide(ctx, screen, width, side, { retriedAfterThrottle: true });
     }
     const diagnostics = await dumpDiagnostics(ctx, page, screen, width, side, error);
     if (diagnostics && error && typeof error === "object") error.diagnostics = diagnostics;
-    await context.close().catch(() => {});
+    await closeCaptureContext(ctx, context);
     throw error;
   }
 };
 
 const openSideOn = async (ctx, screen, width, side, { context, page, base, isReference, kind }) => {
+  throwIfCaptureAborted(ctx.signal);
   const template = isReference ? screen.referencePath : screen.actualPath;
   const url = `${base}${resolvePathTemplate(template, ctx.tokens.values)}`;
   const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  throwIfCaptureAborted(ctx.signal);
   const status = response?.status() ?? 0;
   if (status >= 400) throw new Error(`${side} ${url} returned HTTP ${status}`);
   let session = null;
@@ -883,12 +1046,14 @@ const openSideOn = async (ctx, screen, width, side, { context, page, base, isRef
     const role = session.user?.role;
     if ((screen.requires || []).includes("admin-session") && role !== "admin") throw new Error(`app row context is authenticated as role ${role}, not admin`);
   }
+  throwIfCaptureAborted(ctx.signal);
   const action = isReference ? screen.referenceAction : screen.actualAction;
   // Actions receive the structured catalog tokens (category/subcategory/leaf/
   // resource objects); path templates and identity checks use the flat `values`.
   if (action) await applyAction(page, action, isReference ? "reference" : "actual", { tokens: ctx.tokens });
   const selector = isReference ? screen.referenceReadySelector : screen.actualReadySelector;
   const settled = await settlePage(page, selector, { side: isReference ? "reference" : "actual" });
+  throwIfCaptureAborted(ctx.signal);
   if (!isReference && kind === "app") noteRateLimits(ctx.throttleGuard, page, screen);
   const faces = await collectFontFaces(page);
   if (page.__originViolation) throw new Error(page.__originViolation);
@@ -912,6 +1077,16 @@ const stashReloadFrames = async (ctx, stem, side, round) => {
 const looksLikeReload = (error) => error instanceof DocumentReloadedError ||
   /Execution context was destroyed|because of a navigation|[Ff]rame was detached/.test(String(error?.message || ""));
 
+const isInfrastructureFailure = (error) => {
+  if (!error) return false;
+  if (error.cause && error.cause !== error && isInfrastructureFailure(error.cause)) return true;
+  if (error.infrastructure || error.name === "TimeoutError") return true;
+  const filesystemCodes = ["EACCES", "EBUSY", "EEXIST", "EIO", "EISDIR", "EMFILE", "ENAMETOOLONG", "ENFILE", "ENOENT", "ENOSPC", "ENOTDIR", "ENOTEMPTY", "EPERM", "EROFS", "ELOOP", "ETXTBSY"];
+  if (filesystemCodes.includes(error.code) || String(error.code || "").startsWith("ERR_FS_")) return true;
+  const message = String(error.message || error);
+  return /\b(?:EACCES|EBUSY|EEXIST|EIO|EISDIR|EMFILE|ENAMETOOLONG|ENFILE|ENOENT|ENOSPC|ENOTDIR|ENOTEMPTY|EPERM|EROFS|ELOOP|ETXTBSY)\b|(?:browser|context|page|target) (?:has been )?closed|browser disconnected|browser crash(?:ed)?|target closed|no space left on device|read-only file system|timed? ?out|timeout/i.test(message);
+};
+
 const captureRow = async (ctx, screen, width) => {
   const stem = `${screen.id}-${width}`;
   const actualFile = path.join(ctx.dirs.actual, `${stem}.png`);
@@ -926,24 +1101,29 @@ const captureRow = async (ctx, screen, width) => {
   // A side whose web fonts did not finish loading is reopened the same way (a
   // fresh context re-fetches them); the second failure is final.
   const noteReload = async (sideName, phase, error) => {
+    throwIfCaptureAborted(ctx.signal);
     const fontsNotReady = error instanceof FontsNotReadyError;
     if ((!looksLikeReload(error) && !fontsNotReady) || reloads[sideName] >= MAX_DOCUMENT_RELOADS) throw error;
     reloads[sideName] += 1;
     const frames = await stashReloadFrames(ctx, stem, sideName, reloads[sideName]);
+    throwIfCaptureAborted(ctx.signal);
     ctx.documentReloads?.push({ screen: screen.id, width, side: sideName, phase, kind: fontsNotReady ? "fonts-not-ready" : "document-reloaded", round: reloads[sideName], reason: error.message.split("\n")[0], frames, at: new Date().toISOString() });
     log(`  … ${sideName} ${phase}: ${error.message.split("\n")[0]}; reopening the side (${reloads[sideName]}/${MAX_DOCUMENT_RELOADS})`);
   };
   const openSideOrReopen = async (sideName) => {
     for (;;) {
+      throwIfCaptureAborted(ctx.signal);
       try {
         return await openSide(ctx, screen, width, sideName);
       } catch (error) {
+        throwIfCaptureAborted(ctx.signal);
         await noteReload(sideName, "settle", error);
       }
     }
   };
   const captureSide = async (sideName, file) => {
     for (;;) {
+      throwIfCaptureAborted(ctx.signal);
       const side = sides[sideName];
       try {
         return await stableFullPageCapture(side.page, file, {
@@ -951,8 +1131,9 @@ const captureRow = async (ctx, screen, width) => {
           side: sideName === "expected" ? "reference" : "actual",
         });
       } catch (error) {
+        throwIfCaptureAborted(ctx.signal);
         await noteReload(sideName, "capture", error);
-        await side.context.close().catch(() => {});
+        await closeCaptureContext(ctx, side.context);
         sides[sideName] = await openSideOrReopen(sideName);
       }
     }
@@ -1007,7 +1188,7 @@ const captureRow = async (ctx, screen, width) => {
       links: { actual: `actual/${stem}.png`, expected: `expected/${stem}.png`, diff: `diff/${stem}.png` },
     };
   } finally {
-    for (const side of Object.values(sides)) await side.context.close().catch(() => {});
+    for (const side of Object.values(sides)) await closeCaptureContext(ctx, side.context);
   }
 };
 
@@ -1057,27 +1238,50 @@ const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase,
  * wait records that wait synchronously (no await precedes the push) and a
  * baseline taken afterwards would count the wait against the row.
  */
-const withTimeout = (run, ms, label, guard) => new Promise((resolve, reject) => {
+const withTimeout = async (run, ms, label, guard, { cancel } = {}) => {
   const sumWaits = () => (guard ? guard.waits.reduce((total, wait) => total + wait.waitedMs, 0) : 0);
   const waitedBefore = sumWaits();
   const startedAt = Date.now();
+  const controller = new AbortController();
   let timer = null;
-  const check = () => {
-    const elapsed = Date.now() - startedAt - (sumWaits() - waitedBefore);
-    if (elapsed >= ms) reject(new Error(`${label} exceeded the ${ms / 1000}s row budget`));
-    else timer = setTimeout(check, Math.min(ms - elapsed, 5_000));
-  };
-  timer = setTimeout(check, Math.min(ms, 5_000));
-  let promise;
+  let timedOut = false;
+  let timeoutError = null;
+  const timeout = new Promise((_, reject) => {
+    const check = () => {
+      const elapsed = Date.now() - startedAt - (sumWaits() - waitedBefore);
+      if (elapsed >= ms) {
+        timedOut = true;
+        timeoutError = new CaptureTimeoutError(label, ms);
+        reject(timeoutError);
+      } else {
+        timer = setTimeout(check, Math.min(ms - elapsed, 5_000));
+      }
+    };
+    timer = setTimeout(check, Math.min(ms, 5_000));
+  });
+  let runPromise;
   try {
-    promise = Promise.resolve(run());
+    runPromise = Promise.resolve().then(() => run(controller.signal));
+    return await Promise.race([runPromise, timeout]);
   } catch (error) {
+    if (!timedOut) throw error;
+    controller.abort(timeoutError);
+    let cancelError = null;
+    try {
+      await cancel?.(timeoutError);
+    } catch (cleanupError) {
+      cancelError = cleanupError;
+    }
+    // A timeout is not allowed to return control to the row queue while the
+    // capture still owns a page/context. Playwright operations may reject only
+    // after the context is closed, so always await the row's final settlement.
+    await runPromise.catch(() => {});
+    if (cancelError) timeoutError.cleanupError = String(cancelError?.message || cancelError);
+    throw timeoutError;
+  } finally {
     clearTimeout(timer);
-    reject(error);
-    return;
   }
-  promise.then((value) => { clearTimeout(timer); resolve(value); }, (error) => { clearTimeout(timer); reject(error); });
-});
+};
 
 const snapshotDirectory = async (directory, prefix = "") => {
   const files = new Map();

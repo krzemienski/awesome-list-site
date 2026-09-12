@@ -228,6 +228,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     stats,
     counts: { users: users.length, admins, contributors, pending: Number(stats.pendingApprovals ?? pendingResources.length), oldestPendingMs: oldestPending ?? null },
     endpoints: ["/api/admin/stats", "/api/admin/users?limit=100", "/api/admin/pending-resources", "/api/admin/audit-logs?limit=12"],
+    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, pending, audit })),
   };
 }
 
