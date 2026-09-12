@@ -50,10 +50,11 @@
  * explicit `AdminContentContext` so this module never depends on module-scoped
  * state inside routes.ts.
  */
-import type { Express, Response } from "express";
+import type { Express, Request, Response } from "express";
 import type { RequestHandler } from "express";
 import { z } from "zod";
-import { insertResourceSchema } from "@shared/schema";
+import { adminResourceWriteSchema } from "@shared/schema";
+import { resourceKindSchema } from "@shared/resourceKinds";
 import {
   httpsUrlSchema,
   resourceTitleSchema,
@@ -62,7 +63,7 @@ import {
   stripInvisible,
   parseIntInRange,
 } from "@shared/validation";
-import { sanitizeUser, parseBoundedInt, PG_INT_MAX } from "../../validation/inputs";
+import { sanitizeUser, parseBoundedInt, PG_INT_MAX, validateBody } from "../../validation/inputs";
 import { ensureMinDescription, decodeResourceTextFields } from "../../github/importHygiene";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { isDatabaseUnavailableError } from "../../db/errors";
@@ -543,7 +544,10 @@ export function registerAdminContentRoutes(
       if (typeof bodyForValidation.url === 'string' && bodyForValidation.url === resource.url) {
         delete bodyForValidation.url;
       }
-      const updateSchema = insertResourceSchema.partial().extend({
+      // adminResourceWriteSchema (not the contributor insertResourceSchema):
+      // this is the only write path, with the PATCH routes below, that may
+      // set the admin-owned stored kind.
+      const updateSchema = adminResourceWriteSchema.partial().extend({
         title: resourceTitleSchema.optional(),
         description: resourceDescriptionSchema.optional(),
         url: httpsUrlSchema.optional(),
@@ -587,6 +591,9 @@ export function registerAdminContentRoutes(
       if (validatedData.provider !== undefined) updateData.provider = validatedData.provider;
       if (validatedData.skillLevel !== undefined) updateData.skillLevel = validatedData.skillLevel;
       if (validatedData.status !== undefined) updateData.status = validatedData.status;
+      // Design parity: the admin editor may set or clear the stored kind here
+      // too (null = back to read-time resolution).
+      if (validatedData.kind !== undefined) updateData.kind = validatedData.kind;
 
       // Auto-create the implied sub_subcategories row so the resource never
       // disappears from the category drilldown (task #57). Uses the post-update
@@ -627,6 +634,91 @@ export function registerAdminContentRoutes(
       res.status(500).json({ message: 'Failed to update resource' });
     }
   });
+
+  // Design parity (resource kinds): two narrow admin edits used by the catalog
+  // table's kind select and featured toggle. Both are admin-only, Zod-checked
+  // by validateBody (so OpenAPI documents the exact body), audit-logged with
+  // the acting admin, and answer with the updated raw row like the PUT above.
+  // :id is digits-only so the literal /resources/bulk/* routes stay reachable.
+  const kindBodySchema = z.object({ kind: resourceKindSchema.nullable() }).strict();
+  const featuredBodySchema = z.object({ featured: z.boolean() }).strict();
+
+  // PATCH /api/admin/resources/:id/kind - Set or clear the stored kind
+  app.patch(
+    '/api/admin/resources/:id(\\d+)/kind',
+    isAuthenticated,
+    isAdmin,
+    validateBody(kindBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const resourceId = parseBoundedInt(req.params.id);
+        if (resourceId === null) {
+          return res.status(400).json({ message: 'Invalid resource ID' });
+        }
+        const { kind } = req.body as z.infer<typeof kindBodySchema>;
+        const existing = await resourceRepo.getResource(resourceId);
+        if (!existing) {
+          return res.status(404).json({ message: 'Resource not found' });
+        }
+        const updated = await resourceRepo.setResourceKind(resourceId, kind);
+        if (!updated) {
+          return res.status(404).json({ message: 'Resource not found' });
+        }
+        await auditRepo.logResourceAudit(
+          resourceId,
+          'updated',
+          req.dbUser?.id,
+          { kind, previousKind: existing.kind ?? null },
+          kind === null ? 'Resource kind cleared by admin' : 'Resource kind set by admin',
+        );
+        res.json(updated);
+      } catch (error) {
+        console.error('Error updating resource kind:', error);
+        sendOperationalFailure(res, error, 'Failed to update resource kind');
+      }
+    },
+  );
+
+  // PATCH /api/admin/resources/:id/featured - Toggle the featured flag
+  // (persisted as metadata.featured; there is no column).
+  app.patch(
+    '/api/admin/resources/:id(\\d+)/featured',
+    isAuthenticated,
+    isAdmin,
+    validateBody(featuredBodySchema),
+    async (req: Request, res: Response) => {
+      try {
+        const resourceId = parseBoundedInt(req.params.id);
+        if (resourceId === null) {
+          return res.status(400).json({ message: 'Invalid resource ID' });
+        }
+        const { featured } = req.body as z.infer<typeof featuredBodySchema>;
+        const existing = await resourceRepo.getResource(resourceId);
+        if (!existing) {
+          return res.status(404).json({ message: 'Resource not found' });
+        }
+        const updated = await resourceRepo.setResourceFeatured(resourceId, featured);
+        if (!updated) {
+          return res.status(404).json({ message: 'Resource not found' });
+        }
+        const previousFeatured =
+          existing.metadata && typeof existing.metadata === 'object' && !Array.isArray(existing.metadata)
+            ? (existing.metadata as Record<string, unknown>).featured === true
+            : false;
+        await auditRepo.logResourceAudit(
+          resourceId,
+          'updated',
+          req.dbUser?.id,
+          { featured, previousFeatured },
+          featured ? 'Resource featured by admin' : 'Resource unfeatured by admin',
+        );
+        res.json(updated);
+      } catch (error) {
+        console.error('Error updating resource featured flag:', error);
+        sendOperationalFailure(res, error, 'Failed to update resource featured flag');
+      }
+    },
+  );
 
   // DELETE /api/admin/resources/:id - Delete a resource (admin only)
   app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
@@ -843,7 +935,7 @@ export function registerAdminContentRoutes(
       // Run16 BUG-001/BUG-031 + Run21 R4-016: admin-created resources go live
       // immediately — full shared validation (https-only bounded URL, visible
       // title, bounded description when provided).
-      const createSchema = insertResourceSchema.extend({
+      const createSchema = adminResourceWriteSchema.extend({
         title: resourceTitleSchema,
         url: httpsUrlSchema,
         description: resourceDescriptionSchema.optional(),
@@ -899,7 +991,8 @@ export function registerAdminContentRoutes(
         provider: validatedData.provider,
         skillLevel: validatedData.skillLevel,
         status: validatedData.status || 'approved',
-        submittedBy: userId
+        submittedBy: userId,
+        kind: validatedData.kind ?? null,
       });
       
       await auditRepo.logResourceAudit(

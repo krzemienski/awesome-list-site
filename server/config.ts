@@ -58,10 +58,13 @@ interface FeaturesConfig {
 /**
  * Design-parity resource kinds. The stored `resources.kind` always wins; when
  * it is null, shared/resourceKinds.ts resolves a kind at read time from these
- * tag mappings (merged with its generic defaults), falling back to "other".
+ * tag mappings (merged with its generic defaults), then from these category
+ * mappings (taxonomy names → kind, no generic defaults), falling back to
+ * "other".
  */
 interface ResourceKindsConfig {
   tag_mappings: ResourceKindTagMappings;
+  category_mappings: ResourceKindTagMappings;
 }
 
 /**
@@ -208,7 +211,8 @@ const defaultConfig: AwesomeListConfig = {
   seo: {},
   performance: {},
   resource_kinds: {
-    tag_mappings: {}
+    tag_mappings: {},
+    category_mappings: {}
   },
   contact: resolveContactConfig(undefined, process.env)
 };
@@ -236,6 +240,10 @@ function loadConfig(): AwesomeListConfig {
           tag_mappings: {
             ...defaultConfig.resource_kinds.tag_mappings,
             ...yamlConfig.resource_kinds?.tag_mappings
+          },
+          category_mappings: {
+            ...defaultConfig.resource_kinds.category_mappings,
+            ...yamlConfig.resource_kinds?.category_mappings
           }
         },
         // Env overrides are applied AFTER the YAML block; see resolveContactConfig.

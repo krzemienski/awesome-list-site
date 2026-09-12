@@ -1,0 +1,28 @@
+# Integration suite — measured against the last commit (HEAD 6ee20a60 extracted to /tmp, node_modules symlinked), both runs with `npx vitest run tests/integration --no-file-parallelism`
+
+Why sequential: every tests/integration/api file calls cleanupDatabase() in beforeEach against the one shared test DB, so vitest's default parallel workers wipe each other's rows mid-test (the default parallel run reports 182 failures, 12 of them in resource-kinds.test.ts — its seeded rows and users deleted from under it by sibling files). Sequentially the pre-existing failing set is stable and exactly 162 (all in the mock-era files: admin, auth, categories, favorites, resources).
+
+## totals
+HEAD (before): {"files":59,"tests":207,"passed":44,"failed":162,"pending":1}
+this tree (after): {"files":66,"tests":225,"passed":62,"failed":162,"pending":1}
+
+## per-file
+tests/integration/api/admin.test.ts                  before 0 pass / 52 fail | after 0 pass / 52 fail
+tests/integration/api/auth.test.ts                   before 1 pass / 27 fail | after 1 pass / 27 fail
+tests/integration/api/categories.test.ts             before 10 pass / 21 fail | after 10 pass / 21 fail
+tests/integration/api/collections.test.ts            before 0 pass / 0 fail | after 0 pass / 0 fail
+tests/integration/api/favorites.test.ts              before 6 pass / 28 fail | after 6 pass / 28 fail
+tests/integration/api/not-found.test.ts              before 3 pass / 0 fail | after 3 pass / 0 fail
+tests/integration/api/resource-kinds.test.ts         before (new file)    | after 18 pass / 0 fail
+tests/integration/api/resources.test.ts              before 17 pass / 34 fail | after 17 pass / 34 fail
+tests/integration/security-headers.test.ts           before 7 pass / 0 fail | after 7 pass / 0 fail
+
+## failing-name set diff (before vs after)
+failed before=162 after=162 onlyAfter=0 onlyBefore=0
+
+## isolated run of the new file
+$ npx vitest run tests/integration/api/resource-kinds.test.ts → Tests 18 passed (18)
+
+## default (parallel) full run of this tree, for the record
+ Test Files  7 failed | 2 passed (9)
+      Tests  182 failed | 42 passed | 1 skipped (225)

@@ -51,6 +51,13 @@ import {
   type ResourceSkillLevel,
 } from "@shared/resourceFacets";
 import { normalizeTagFilter, TAG_PLURAL_KEEP } from "@shared/tagNormalize";
+import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
+import {
+  emptyResourceKindCounts,
+  resolvedResourceKindSql,
+  type ResourceKind,
+  type ResourceKindCounts,
+} from "../lib/resourceKinds";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -74,6 +81,11 @@ export interface ListResourceOptions {
   includeFacets?: boolean;
   /** R3-H08: whitelisted sort order; unknown/absent falls back to newest-first. */
   sort?: "relevance" | "name-asc" | "name-desc" | "newest" | "oldest";
+  /**
+   * Design parity: filter by RESOLVED kind (stored value, else the read-time
+   * inference) so the list agrees with /api/resources/kinds/counts.
+   */
+  kind?: ResourceKind;
 }
 
 export type ResourceSearchMetadata = {
@@ -373,6 +385,7 @@ export class ResourceRepository {
       skillLevel,
       generalScope,
       sort,
+      kind,
       includeFacets = false,
     } = options;
     const offset = options.offset ?? ((page - 1) * limit);
@@ -449,6 +462,10 @@ export class ResourceRepository {
       if (skillLevel && omit !== "skillLevel") conditions.push(eq(resources.skillLevel, skillLevel));
       if (generalScope === "category") conditions.push(isNull(resources.subcategory));
       if (generalScope === "subcategory") conditions.push(isNull(resources.subSubcategory));
+      // Resolved-kind predicate: one correlated CASE per row over metadata.tags
+      // (server/lib/resourceKinds.ts) — the same expression the counts
+      // endpoint groups by, so totals and pages can never disagree.
+      if (kind) conditions.push(sql`${resolvedResourceKindSql()} = ${kind}`);
       if (tags.length > 0 && omit !== "tags") {
         const canonicalTags = Array.from(new Set(tags.map(normalizeTagFilter)));
         conditions.push(tagExists(sql`${canonicalTagSql} IN (${sql.join(canonicalTags.map((v) => sql`${v}`), sql`, `)})`));
@@ -797,6 +814,65 @@ export class ResourceRepository {
     await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
 
     return newResource;
+  }
+
+  /**
+   * Full-set counts of APPROVED resources per resolved kind, in ONE grouped
+   * statement (no per-resource work). Optional scoping to a category name.
+   * Every kind key is always present (zero when absent) plus `total`.
+   */
+  async getResourceKindCounts(options: { category?: string } = {}): Promise<ResourceKindCounts> {
+    const conditions = [eq(resources.status, "approved")];
+    if (options.category) conditions.push(eq(resources.category, options.category));
+    // GROUP BY position: Drizzle re-parameterises a repeated fragment, so the
+    // expression must appear exactly once in the statement.
+    const rows = await db
+      .select({ kind: resolvedResourceKindSql(), count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(and(...conditions))
+      .groupBy(sql`1`);
+    const counts = emptyResourceKindCounts();
+    for (const row of rows) {
+      const kindKey = String(row.kind);
+      if (!RESOURCE_KIND_VALUES.includes(kindKey as ResourceKind)) continue;
+      counts[kindKey as ResourceKind] += Number(row.count);
+      counts.total += Number(row.count);
+    }
+    return counts;
+  }
+
+  /**
+   * Admin: set or clear the stored kind. null returns the resource to
+   * read-time resolution. Returns undefined when the resource does not exist.
+   * Audit logging is the caller's job (it knows the acting admin).
+   */
+  async setResourceKind(id: number, kind: ResourceKind | null): Promise<Resource | undefined> {
+    const [updated] = await db
+      .update(resources)
+      .set({ kind, updatedAt: new Date() })
+      .where(eq(resources.id, id))
+      .returning();
+    if (updated) invalidatePublicCache("resource-mutation");
+    return updated;
+  }
+
+  /**
+   * Admin: set the featured flag. Featured has no column — it lives at
+   * metadata.featured (the admin UI already reads it there) — so this is a
+   * targeted jsonb merge that leaves every other metadata key untouched.
+   * Returns undefined when the resource does not exist.
+   */
+  async setResourceFeatured(id: number, featured: boolean): Promise<Resource | undefined> {
+    const [updated] = await db
+      .update(resources)
+      .set({
+        metadata: sql`COALESCE(${resources.metadata}, '{}'::jsonb) || jsonb_build_object('featured', ${featured}::boolean)`,
+        updatedAt: new Date(),
+      })
+      .where(eq(resources.id, id))
+      .returning();
+    if (updated) invalidatePublicCache("resource-mutation");
+    return updated;
   }
 
   /**

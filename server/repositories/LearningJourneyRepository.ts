@@ -38,6 +38,17 @@ import {
 } from "@shared/journeyProgress";
 import { db } from "../db";
 import { eq, and, asc, desc, inArray, getTableColumns, sql } from "drizzle-orm";
+import { resolveResourceKind, type ResourceKind } from "../lib/resourceKinds";
+
+/** Public projection of a step's linked resource (never the raw row). */
+export interface JourneyStepResource {
+  id: number;
+  title: string;
+  url: string;
+  description: string | null;
+  kind: ResourceKind | null;
+  resolvedKind: ResourceKind;
+}
 
 export type JourneyStartResult = {
   progress: UserJourneyProgress;
@@ -285,9 +296,11 @@ export class LearningJourneyRepository {
    */
   async listJourneySteps(
     journeyId: number
-  ): Promise<(JourneyStep & { resource?: { id: number; title: string; url: string; description: string | null } })[]> {
+  ): Promise<(JourneyStep & { resource?: JourneyStepResource })[]> {
     // Hydrate each step with its linked resource so the journey detail UI can
     // render real, clickable resource links (the frontend reads step.resource).
+    // kind/metadata/taxonomy are selected only to resolve the public kind
+    // fields (design parity) and are not sent as-is.
     const rows = await db
       .select({
         step: journeySteps,
@@ -296,6 +309,11 @@ export class LearningJourneyRepository {
           title: resources.title,
           url: resources.url,
           description: resources.description,
+          kind: resources.kind,
+          metadata: resources.metadata,
+          category: resources.category,
+          subcategory: resources.subcategory,
+          subSubcategory: resources.subSubcategory,
         },
       })
       .from(journeySteps)
@@ -308,7 +326,17 @@ export class LearningJourneyRepository {
 
     return rows.map((r) => ({
       ...r.step,
-      resource: r.resource && r.resource.id != null ? r.resource : undefined,
+      resource:
+        r.resource && r.resource.id != null
+          ? {
+              id: r.resource.id,
+              title: r.resource.title,
+              url: r.resource.url,
+              description: r.resource.description,
+              kind: r.resource.kind ?? null,
+              resolvedKind: resolveResourceKind(r.resource).kind,
+            }
+          : undefined,
     }));
   }
 

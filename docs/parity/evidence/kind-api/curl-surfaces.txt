@@ -1,0 +1,24 @@
+# Every public resource surface carries kind + resolvedKind (2026-09-12T19:13:03Z)
+
+GET /api/resources?limit=24 (list)                         {"n":24,"with_both":24}
+GET /api/resources?tags=ffmpeg (tag landing)               {"n":24,"with_both":24}
+GET /api/resources/185020 (detail)                         {"id":185020,"kind":null,"resolvedKind":"other"}
+jq: error (at <stdin>:0): Cannot index array with string "resource"
+GET /api/resources/185020/related                          
+GET /api/search?q=ffmpeg (search)                          {"n":10,"with_both":10}
+GET /api/awesome-list (listing tree)                       {"n":1816,"with_both":1816}
+GET /api/awesome-list/listing?level=category&slug=encoding-codecs {"n":24,"with_both":24}
+GET /api/public/resources?limit=10 (public API list)       {"n":10,"with_both":10}
+GET /api/public/resources/185020 (public API detail)       {"id":185020,"kind":null,"resolvedKind":"other"}
+GET /api/journeys/7 (journey step resources)               {"n":0,"with_both":0}
+jq: error (at <stdin>:0): Cannot index array with string "recommendations"
+GET /api/recommendations?limit=5 (anonymous)               
+
+# sample resolvedKind distribution on the first list page
+{"other":24}
+
+# re-run of the three surfaces whose envelope differed from the first guess (2026-09-12T19:13:17Z)
+GET /api/resources/185020/related                          {"n":0,"with_both":0}
+GET /api/journeys/7 (journey step resources)               {"n":18,"with_both":18,"sample":{"id":185440,"kind":null,"resolvedKind":"other"}}
+GET /api/recommendations?limit=5 (anonymous, array envelope) {"n":5,"with_both":5}
+GET /api/resources/185020/related {similar,prerequisites,nextSteps} {"n":9,"with_both":9,"sample":{"id":186458,"kind":null,"resolvedKind":"other"}}

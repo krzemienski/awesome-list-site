@@ -76,9 +76,10 @@ import {
   resourceSkillLevelSchema,
 } from "@shared/resourceFacets";
 import { parseTagFilterValues } from "@shared/tagNormalize";
+import { RESOURCE_KIND_VALUES, resourceKindSchema } from "@shared/resourceKinds";
 import { parseBoundedInt, PG_INT_MAX } from "../../validation/inputs";
 import { trackServerEvent } from "../../lib/mixpanelServer";
-import { CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
+import { CATALOG_CACHE_CONTROL, UNCACHED_CATALOG_CACHE_CONTROL } from "../../http-cache-policy";
 import { ensureSubSubcategoryExists } from "../../repositories/ensureSubSubcategory";
 import { ensureMinDescription, decodeResourceTextFields } from "../../github/importHygiene";
 import { buildRelatedResources } from "../../services/relatedResources";
@@ -264,6 +265,10 @@ export function registerCatalogContributionsRoutes(
       if (resourceFormat === false) return;
       const skillLevel = parseControlledFacet('skillLevel', resourceSkillLevelSchema, RESOURCE_SKILL_LEVEL_VALUES);
       if (skillLevel === false) return;
+      // Design parity: ?kind= filters by RESOLVED kind (stored or inferred) so
+      // the page total matches /api/resources/kinds/counts for the same kind.
+      const kind = parseControlledFacet('kind', resourceKindSchema, RESOURCE_KIND_VALUES);
+      if (kind === false) return;
 
       const rawTagValues = [
         ...(Array.isArray(req.query.tags) ? req.query.tags : [req.query.tags]),
@@ -372,6 +377,7 @@ export function registerCatalogContributionsRoutes(
         generalScope: rawGeneralScope as "category" | "subcategory" | undefined,
         includeFacets,
         sort,
+        kind: kind || undefined,
       });
 
       // R3-06: explicit paging metadata. nextOffset is null on the last page.
@@ -386,6 +392,9 @@ export function registerCatalogContributionsRoutes(
       // offset/nextOffset fields, so API consumers get page/totalPages/hasMore.
       const currentPage = Math.floor(offset / limit) + 1;
       const totalPages = Math.max(Math.ceil(result.total / limit), 1);
+      // Full-set total as a header too, so paged consumers (and the kind
+      // strip) can read it without parsing the body.
+      res.set('X-Total-Count', String(result.total));
       res.json({
         ...result,
         resources: publicResources,
@@ -404,6 +413,64 @@ export function registerCatalogContributionsRoutes(
     } catch (error) {
       console.error('Error fetching resources:', error);
       sendOperationalFailure(res, error, 'Failed to fetch resources');
+    }
+  });
+
+  // GET /api/resources/kinds/counts - Full-set counts of approved resources per
+  // resolved kind { tools, libraries, standards, events, protocols, other,
+  // total }. ONE grouped SQL statement over the same resolved-kind expression
+  // the ?kind= list filter uses (server/lib/resourceKinds.ts), so the strip
+  // counts and the filtered page totals can never disagree. Optional
+  // ?category= (name or slug) scopes the counts to one category. Cached and
+  // cache-controlled like the sibling aggregate endpoints (/api/tags).
+  app.get('/api/resources/kinds/counts', async (req, res) => {
+    try {
+      const rawCategory = firstQueryValue(req.query.category);
+      if (req.query.category !== undefined && rawCategory === undefined) {
+        return res.status(400).json({
+          error: 'invalid_category',
+          message: 'category must be a single category name or slug',
+        });
+      }
+      const requestedCategory = rawCategory?.trim();
+      if (requestedCategory !== undefined && (requestedCategory === '' || requestedCategory.length > 200)) {
+        return res.status(400).json({
+          error: 'invalid_category',
+          message: 'category must be a non-empty category name or slug of at most 200 characters',
+        });
+      }
+
+      // Resolve the scope to a KNOWN category name (slug or exact name); the
+      // unbounded space of unknown values is answered honestly (all zeros)
+      // but never server-cached, mirroring the listing endpoints.
+      let category: string | undefined;
+      let knownScope = true;
+      if (requestedCategory !== undefined) {
+        const match = /^[a-z0-9-]+$/.test(requestedCategory)
+          ? await categoryRepo.getCategoryBySlug(requestedCategory)
+          : await categoryRepo.getCategoryByName(requestedCategory);
+        if (match) {
+          category = match.name;
+        } else {
+          category = requestedCategory;
+          knownScope = false;
+        }
+      }
+
+      const load = () => resourceRepo.getResourceKindCounts({ category });
+      const counts = knownScope
+        ? await getPublicCacheValue({
+            namespace: 'catalog-taxonomy',
+            key: `kind-counts:${category ?? ''}`,
+            ttlMs: 60_000,
+            load,
+          })
+        : await load();
+      res.set('Cache-Control', knownScope ? CATALOG_CACHE_CONTROL : UNCACHED_CATALOG_CACHE_CONTROL);
+      res.json(counts);
+    } catch (error) {
+      console.error('Error counting resources by kind:', error);
+      sendOperationalFailure(res, error, 'Failed to count resources by kind');
     }
   });
 
@@ -726,6 +793,10 @@ export function registerCatalogContributionsRoutes(
       // Task #248: decode HTML entities ("&amp;" pasted from web pages /
       // LLM output) at EVERY resource write path so literal entity text
       // never reaches the DB (shared with admin create/edit + AI imports).
+      // insertResourceSchema is the CONTRIBUTOR schema: it does not declare
+      // admin-owned columns (the stored kind override), so a `kind` in a
+      // contributor body is stripped here — and pinned to null again at the
+      // insert below — never persisted. Only the admin routes write kind.
       const resourceData = decodeResourceTextFields({
         ...insertResourceSchema.parse(req.body),
         title: submitValidation.data.title,
@@ -749,7 +820,10 @@ export function registerCatalogContributionsRoutes(
         const resource = await resourceRepo.createResource({
           ...resourceData,
           submittedBy: userId,
-          status: 'pending'
+          status: 'pending',
+          // Contributor submissions never carry a stored kind; the public
+          // classification resolves at read time until an admin sets one.
+          kind: null,
         });
 
         // Task #233: server-side conversion event — survives ad blockers.

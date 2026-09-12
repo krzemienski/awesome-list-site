@@ -24,7 +24,7 @@ import {
   type ResourceSkillLevel,
 } from "./resourceFacets";
 import type { BookmarkQueueStatus } from "./bookmarkCollections";
-import type { ResourceKind } from "./resourceKinds";
+import { resourceKindSchema, type ResourceKind } from "./resourceKinds";
 import type {
   DigestAttemptOutcome,
   DigestCadence,
@@ -310,6 +310,13 @@ export const resources = pgTable(
   ]
 );
 
+/**
+ * Contributor-facing resource write schema: the columns a signed-in user may
+ * supply on POST /api/resources (/api/submit). Admin-owned columns are
+ * deliberately NOT in this pick — the public submit handler parses the raw
+ * body with this schema, and zod strips whatever it does not declare, so an
+ * admin-only field can only be persisted through adminResourceWriteSchema.
+ */
 export const insertResourceSchema = createInsertSchema(resources).pick({
   title: true,
   url: true,
@@ -329,7 +336,19 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
   skillLevel: resourceSkillLevelSchema.optional(),
 });
 
-export type InsertResource = z.infer<typeof insertResourceSchema>;
+/**
+ * Admin-only resource columns. The stored `kind` override beats read-time
+ * inference (shared/resourceKinds.ts) on every public surface, so only the
+ * admin create/update routes (server/routes/domains/admin-content.ts) accept
+ * it; a contributor value is stripped by insertResourceSchema and the row is
+ * created with kind = NULL.
+ */
+const adminOnlyResourceFieldsSchema = z.object({
+  // Nullable on purpose: null means "no stored kind, resolve at read time".
+  kind: resourceKindSchema.nullable().optional(),
+});
+/** Repository-level write shape (superset: admin-only columns are optional). */
+export type InsertResource = z.infer<typeof adminResourceWriteSchema>;
 export type Resource = typeof resources.$inferSelect;
 
 /**
@@ -1986,3 +2005,8 @@ export type EditableResourceField = typeof EDITABLE_RESOURCE_FIELDS[number];
 
 export type UserRecommendationFeedback =
   typeof userRecommendationFeedback.$inferSelect;
+
+/** What the admin editor may write: contributor columns + admin-only ones. */
+export const adminResourceWriteSchema = insertResourceSchema.extend(
+  adminOnlyResourceFieldsSchema.shape,
+);

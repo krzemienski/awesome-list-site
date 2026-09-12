@@ -1,0 +1,23 @@
+# Functional check 1 — counts total vs SQL approved count (2026-09-12T19:11:09Z)
+
+$ curl -s -D - localhost:5000/api/resources/kinds/counts
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=60, must-revalidate
+Content-Type: application/json; charset=utf-8
+{"tools":23,"libraries":61,"standards":47,"events":18,"protocols":11,"other":1656,"total":1816}
+
+$ psql "$DATABASE_URL" -Atc "SELECT count(*) FROM resources WHERE status='approved'"
+1816
+
+$ curl -s "localhost:5000/api/resources/kinds/counts?category=encoding-codecs"
+{"tools":5,"libraries":9,"standards":0,"events":0,"protocols":0,"other":319,"total":333}
+$ psql ... scoped
+333
+
+$ curl -s -D - "localhost:5000/api/resources/kinds/counts?category=does-not-exist" (unknown scope → zeros, uncached)
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=0, must-revalidate
+{"tools":0,"libraries":0,"standards":0,"events":0,"protocols":0,"other":0,"total":0}
+
+$ curl -s -w " [%{http_code}]" "localhost:5000/api/resources/kinds/counts?category="
+{"error":"validation_failed","message":"Invalid query parameters","fieldErrors":{"category":"Too small: expected string to have >=1 characters"},"errors":[{"origin":"string","code":"too_small","minimum":1,"inclusive":true,"path":["category"],"message":"Too small: expected string to have >=1 characters"}]} [400]

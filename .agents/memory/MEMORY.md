@@ -49,7 +49,7 @@
 - [Publish build gate isolation](publish-build-gate-isolation.md) — deploy-build gates run with PROD env before the schema diff applies; never boot the app or open a DB there (chicken-and-egg block + scratch-DB DDL hit prod).
 - [CSP vs platform/inline scripts](csp-platform-injection.md) — Replit injects replit-cdn.com widget into prod HTML (must allowlist); runtime-created inline scripts get no nonce → bootstrap gtag as module code.
 - [PII masking must cover every DOM path](pii-mask-full-dom.md) — masks leak via fallback columns and aria-label/title attributes; leak checks must scan outerHTML, not textContent.
-- [Public serializer choke point](public-serializer-choke-point.md) — per-route field stripping misses sibling surfaces (related/tree/public API); strip via ONE shared util + probe ALL send sites.
+- [Public serializer choke point](public-serializer-choke-point.md) — per-route field stripping misses sibling surfaces; strip via ONE shared util + probe ALL send sites; custom `select({...})` projections (collections, journey steps) bypass it for NEW fields too.
 - [Fix at the audited surface](fix-at-audited-surface.md) — an endpoint fix can verify green while the UI never reads that endpoint (filter tags are built client-side); reproduce at the rendered UI.
 - [Nonce'd HTML must never 304](nonce-html-no-304.md) — static ETag + rotating CSP nonce → 304 pairs cached stale-nonce body with fresh-nonce header, blocking ALL inline scripts on repeat visits.
 - [Safe ?next= redirect validation](next-redirect-validation.md) — startsWith("/") && !startsWith("//") is bypassable via /\evil.com (backslash→slash normalization); require /^\/(?![/\\])/.
@@ -111,7 +111,7 @@
 - [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
 - [Workflow reconciliation double-start](workflow-reconciliation-double-start.md) — after merge reconciliation, a healthy artifact listener can coexist with a false “port already in use” workflow failure; restart once.
 - [Helper evidence provenance](helper-evidence-provenance.md) — reject detailed reports for unrelated routes; verify project scope and local outputs before counting evidence.
-- [Last-green gate baselines](last-green-baselines.md) — lint/test:integration/parts of e2e were never green; diff per file+test against the last green sha before calling a regression.
+- [Last-green gate baselines](last-green-baselines.md) — lint/integration/e2e were never green; diff per file+test vs last green sha; integration only with --no-file-parallelism (shared test DB).
 - [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
@@ -119,3 +119,4 @@
 - [Parity harness disposable admin](parity-harness-disposable-admin.md) — NUMERIC bridge id (int4 admin routes; prefix the email); sweep fails closed on Clerk leftovers; identity checks scope to main.
 - [Headless capture determinism](headless-capture-determinism.md) — backdrop-filter off both sides; `--disable-partial-raster`; stamp + API-quiet + font checks around every frame; wait, THEN snapshot.
 - [Shared test DB vs vitest file parallelism](vitest-shared-db-file-parallelism.md) — per-file cleanupDatabase() on ONE DB: parallel files wipe each other (500/401/never-429); run serially.
+- [Vitest spy calls vanish on mockRestore](vitest-spy-mockrestore.md) — `mockRestore()` also clears `mock.calls`; collect observed lines inside the mockImplementation or a live warning looks like "the observer never ran".

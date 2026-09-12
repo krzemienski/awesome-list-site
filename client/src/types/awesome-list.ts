@@ -1,3 +1,5 @@
+import type { ResourceKind } from "@shared/resourceKinds";
+
 export interface Resource {
   id: string;
   title: string;
@@ -11,6 +13,14 @@ export interface Resource {
   skillLevel?: string;
   tags?: string[];
   status?: string;
+  /** Stored kind column (admin-editable); null when the admin never set one. */
+  kind?: ResourceKind | null;
+  /**
+   * Read-time resolution the server applies to every public resource:
+   * stored kind → tag/category inference → "other". This is the value UI
+   * surfaces (kind strip, badges) must render; `kind` alone is incomplete.
+   */
+  resolvedKind?: ResourceKind;
   submittedBy?: string | null;
   approvedBy?: string | null;
   approvedAt?: string | null;

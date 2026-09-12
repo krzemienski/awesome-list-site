@@ -126,9 +126,18 @@ performance:
 # Resource Kinds Configuration
 # A stored resource kind always wins. When a resource has no stored kind, the
 # read-time resolver infers one from its tags using these mappings (merged with
-# the generic defaults in shared/resourceKinds.ts) and falls back to "other".
+# the generic defaults in shared/resourceKinds.ts), then from its category /
+# subcategory / sub-subcategory name using category_mappings (no generic
+# defaults), and finally falls back to "other". Words are matched after
+# normalisation (NFKC, lowercase, whitespace/underscores → "-").
 resource_kinds:
   tag_mappings:
+    tools: []
+    libraries: []
+    standards: []
+    events: []
+    protocols: []
+  category_mappings:
     tools: []
     libraries: []
     standards: []

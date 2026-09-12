@@ -41,6 +41,9 @@ the default.
 resource payload, but `insertResourceSchema` still omits it. Accepting it is
 `parity-05`'s job together with the API and admin editing.
 
+**Closed by `kind-api.md` §7:** the insert schema accepts `kind`, every public
+payload carries `kind` + `resolvedKind`, and the admin PATCH endpoints exist.
+
 ## 4. Shared helpers stay un-exported until a consumer exists
 
 The `dead-exports` gate fails on any export without an importer, so
@@ -52,6 +55,10 @@ barrel `client/src/components/contact/index.ts` was deleted. Label maps, the
 Zod kind enum, tag-normalisation helpers and the empty-count factory are still
 in the files as module-local values — re-export them in the task that first
 imports them instead of pinning gate exceptions.
+
+**Partly closed by `kind-api.md` §7:** the `shared/resourceKinds.ts` helpers
+are exported now that the server resolver and its tests import them (the
+label-only `resourceKindPresentation.ts` was deleted instead).
 
 ## 5. The product-profile gate targets the design-system artifact
 

@@ -1,0 +1,22 @@
+# Functional check 2 — ?kind= filter returns only that resolvedKind and totals match the counts endpoint (2026-09-12T19:11:46Z)
+
+$ curl -s "localhost:5000/api/resources?kind=events&limit=5" | jq "{total, page_len: (.resources|length), kinds: [.resources[].resolvedKind], stored: [.resources[].kind]}"
+{"total":18,"page_len":5,"kinds":["events","events","events","events","events"],"stored":[null,null,null,null,null]}
+
+$ X-Total-Count header
+HTTP/1.1 200 OK
+X-Total-Count: 18
+
+# every kind: filter total (walked through all pages, limit=100) vs counts bucket
+kind=tools counts.bucket=23 filter.total=23 walked=23 mismatches=0
+kind=libraries counts.bucket=61 filter.total=61 walked=61 mismatches=0
+kind=standards counts.bucket=47 filter.total=47 walked=47 mismatches=0
+kind=events counts.bucket=18 filter.total=18 walked=18 mismatches=0
+kind=protocols counts.bucket=11 filter.total=11 walked=11 mismatches=0
+kind=other counts.bucket=1656 filter.total=1656 walked=400 mismatches=0 (other: first 400 rows sampled)
+
+$ curl -s -w " [%{http_code}]" "localhost:5000/api/resources?kind=gadgets"
+{"error":"invalid_kind","message":"kind must be one of: tools, libraries, standards, events, protocols, other","allowed":["tools","libraries","standards","events","protocols","other"],"fieldErrors":{},"errors":[]} [400]
+
+$ case-insensitive: ?kind=EVENTS&limit=2
+{"total":18,"kinds":["events","events"]}

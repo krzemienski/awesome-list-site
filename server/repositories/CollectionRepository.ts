@@ -20,6 +20,7 @@ import {
   isNull,
   sql,
 } from "drizzle-orm";
+import { withResourceKindFields, type ResourceKind } from "../lib/resourceKinds";
 
 export interface CollectionWithCount extends BookmarkCollection {
   itemCount: number;
@@ -46,6 +47,14 @@ export interface BookmarkBulkResult {
   failed: BookmarkBulkFailure[];
 }
 
+/**
+ * Public projection of a shared collection's resource. It is a hand-picked
+ * column list (never the raw row, never `metadata`), so the resource kind
+ * fields every other public resource surface carries are attached here
+ * explicitly: `kind` is the stored, admin-owned value (null until set) and
+ * `resolvedKind` is the read-time resolution (stored → tag/category mapping
+ * → "other"), identical to what `/api/resources/:id` reports for the same row.
+ */
 export interface PublicCollectionResource {
   id: number;
   title: string;
@@ -57,6 +66,8 @@ export interface PublicCollectionResource {
   resourceFormat: string;
   provider: string;
   skillLevel: string;
+  kind: ResourceKind | null;
+  resolvedKind: ResourceKind;
 }
 
 export interface PublicCollection {
@@ -533,7 +544,10 @@ export class CollectionRepository {
       .limit(1);
     if (!collection?.shareId || !collection.publishedAt) return null;
 
-    const publicResources = await db
+    // `kind` and `metadata` are selected only to resolve the public kind
+    // fields; `metadata` is dropped again below so the private/internal
+    // metadata keys never leave the server on this surface.
+    const publicRows = await db
       .select({
         id: resources.id,
         title: resources.title,
@@ -545,6 +559,8 @@ export class CollectionRepository {
         resourceFormat: resources.resourceFormat,
         provider: resources.provider,
         skillLevel: resources.skillLevel,
+        kind: resources.kind,
+        metadata: resources.metadata,
       })
       .from(bookmarkCollectionItems)
       .innerJoin(
@@ -568,6 +584,27 @@ export class CollectionRepository {
         asc(bookmarkCollectionItems.createdAt),
         asc(bookmarkCollectionItems.resourceId),
       );
+
+    // Rebuilt field by field (not spread) so the wire projection is exactly
+    // the PublicCollectionResource interface: `metadata` cannot leak and a
+    // dropped kind field is a compile error here, not a contract mismatch.
+    const publicResources: PublicCollectionResource[] = publicRows.map((row) => {
+      const { kind, resolvedKind } = withResourceKindFields(row);
+      return {
+        id: row.id,
+        title: row.title,
+        url: row.url,
+        description: row.description,
+        category: row.category,
+        subcategory: row.subcategory,
+        subSubcategory: row.subSubcategory,
+        resourceFormat: row.resourceFormat,
+        provider: row.provider,
+        skillLevel: row.skillLevel,
+        kind,
+        resolvedKind,
+      };
+    });
 
     return {
       shareId: collection.shareId,

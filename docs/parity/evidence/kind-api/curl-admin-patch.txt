@@ -1,0 +1,51 @@
+# Functional check 3 — admin PATCH kind/featured, audit rows, auth paths (2026-09-12T19:12:40Z)
+# target resource id=188015 (dev DB); admin identity = X-Admin-Audit-Key (ADMIN_PASSWORD) + Origin matching the request host; the key value is never printed
+
+$ before:
+188015|NULL|NULL
+$ audit rows before:
+0
+
+$ PATCH /api/admin/resources/188015/kind {"kind":"tools"}
+{"id":188015,"kind":"tools","featured":null}
+$ public detail now:
+{"id":188015,"kind":"tools","resolvedKind":"tools"}
+$ counts now (tools bucket +1 → 24):
+{"tools":24,"libraries":61,"standards":47,"events":18,"protocols":11,"other":1655,"total":1816}
+$ PATCH .../featured {"featured":true}
+{"id":188015,"kind":"tools","featured":true}
+db: kind=tools featured=true
+$ PATCH .../kind {"kind":null} (clear)
+{"id":188015,"kind":null}
+$ public detail after clear (falls back to inference):
+{"id":188015,"kind":null,"resolvedKind":"other"}
+$ PATCH .../featured {"featured":false}
+{"id":188015,"featured":false}
+$ after:
+188015|NULL|false
+$ audit rows written (newest 4):
+updated | Resource unfeatured by admin | {"featured": false, "previousFeatured": true} | by=d460f5e7-a085-4083-96a2-2f20dc9315c4
+updated | Resource kind cleared by admin | {"kind": null, "previousKind": "tools"} | by=d460f5e7-a085-4083-96a2-2f20dc9315c4
+updated | Resource featured by admin | {"featured": true, "previousFeatured": false} | by=d460f5e7-a085-4083-96a2-2f20dc9315c4
+updated | Resource kind set by admin | {"kind": "tools", "previousKind": null} | by=d460f5e7-a085-4083-96a2-2f20dc9315c4
+
+$ 400 bad body {"kind":"gadgets"}
+{"error":"validation_failed","message":"Validation failed","fieldErrors":{"kind":"Invalid option: expected one of \"tools\"|\"libraries\"|\"standards\"|\"events
+$ 400 bad body {"featured":"yes"}
+{"error":"validation_failed","message":"Validation failed","fieldErrors":{"featured":"Invalid input: expected boolean, received string"},"errors":[{"expected":"
+$ 400 unknown key {"kind":"tools","extra":1} (strict body)
+{"error":"validation_failed","message":"Validation failed","fieldErrors":{"form":"Unrecognized key: \"extra\""},"errors":[{"code":"unrecognized_keys","keys":["e
+$ 404 unknown id
+{"message":"Resource not found"} [404]
+$ 401 anonymous (no key, no session)
+{"message":"Unauthorized"} [401]
+$ 403 cross-origin (Origin host != request host), even with the admin key
+{"message":"Cross-origin request rejected"} [403]
+$ 403 non-admin: proven in tests/integration/api/resource-kinds.test.ts ("requires an admin (401 anonymous, 403 signed-in user)") against a real non-admin users row; the live server has no non-admin header identity.
+
+$ cleanup: delete the 4 audit rows this transcript created
+DELETE 4
+audit rows for 188015 now: 0
+$ counts restored:
+{"tools":23,"libraries":61,"standards":47,"events":18,"protocols":11,"other":1656,"total":1816}
+$ restore: UPDATE resources SET metadata = metadata - 'featured' WHERE id=188015 → featured key removed again (row back to its pre-check metadata)

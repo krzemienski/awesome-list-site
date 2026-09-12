@@ -1,0 +1,27 @@
+# npm run validate:openapi
+OpenAPI drift PASS: 174 API routes, 174 named contracts, 146 paths
+exit=0
+
+# npm run validate:response-contracts (summary lines; full log in /tmp during the run)
+  ok  GET /api/auth/user (anonymous) -> 200
+  ok  GET /api/auth/user (audit-key admin) -> 200
+  ok  GET /api/resources -> 200
+  ok  GET /api/awesome-list/listing (first category) -> 200
+  ok  GET /api/recommendations -> 200
+  ok  POST /api/recommendations (audit-key admin) -> 200
+  ok  GET /api/admin/pending-resources (audit-key) -> 200
+  ok  GET /api/resources/:id (id=188015) -> 200
+  ok  GET /api/auth/me (audit-key admin) -> 200
+  ok  GET /api/admin/stats (audit-key) -> 200
+  ok  GET /api/journeys (anonymous) -> 200
+  ok  GET /api/resources/kinds/counts -> 200
+  ok  GET /api/resources/kinds/counts (first category) -> 200
+  ok  GET /api/resources?kind=tools -> 200
+  ok  GET /api/__contract-drift-probe (observer liveness) -> 401
+Response-contract drift PASS: 15 endpoint checks, 0 real mismatches, observer liveness verified
+exit=0
+
+# node scripts/validation/dead-exports.mjs
+PASS canaries :: export/import extraction + re-export & star following + namespace/dynamic whole-module uses + allowlist contract verified against synthetic modules
+PASS dead-exports :: 795 export(s) across 200 module(s) in client/src/ + shared/ checked, 745 imported elsewhere, 50 pinned exception(s)
+exit=0

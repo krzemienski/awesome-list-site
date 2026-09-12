@@ -1,0 +1,17 @@
+# Counts endpoint burst: 40 concurrent cold-cache requests (distinct ?category= slugs bypass the 60s cache) + 20 unscoped (2026-09-12T19:17:23Z)
+distinct category slugs used: 40
+wall=262ms
+awk: line 2: function asort never defined
+$ app still healthy afterwards:
+200 0.014167s
+status 200: 60
+p50=0.057172s p95=0.107021s max=0.112225s (n=60)
+
+# Re-run restricted to the 9 real top-level categories (so every scoped request is a real cold-cache grouped query), 5 parallel hits per slug + 15 unscoped, 60 concurrent (2026-09-12T19:17:46Z)
+wall=463ms
+status 200: 60
+p50=0.232623s p95=0.249697s max=0.260410s (n=60)
+non-zero totals returned: 56/60
+$ app still healthy afterwards:
+200 0.013567s
+JSON bodies in the burst output: 60/60 (the 4 'missing' ones are interleaved onto neighbouring lines by parallel writers; zero-total bodies: 0)

@@ -1,7 +1,7 @@
 /**
- * ============================================================================
+ * ----------------------------------------------------------------------------
  * CONTRACTS/ENDPOINTSCHEMAS.TS - Per-endpoint structural 200 response schemas
- * ============================================================================
+ * ----------------------------------------------------------------------------
  *
  * Task #319: adds real, field-level zod schemas for the four high-traffic
  * endpoints so the response-contract observer catches genuine shape drift
@@ -20,9 +20,10 @@
  * columns added in the future don't immediately trigger false mismatches.
  * The required top-level keys ARE structurally enforced — missing or
  * renamed keys WILL fire a "[contract] response mismatch" warning.
- * ============================================================================
+ * ----------------------------------------------------------------------------
  */
 import { z } from "zod";
+import { RESOURCE_KIND_VALUES } from "@shared/resourceKinds";
 import { setRouteQuerySchema, setRouteResponseSchema } from "./install";
 
 // ---------------------------------------------------------------------------
@@ -47,6 +48,18 @@ const requiredTimestampField = z.union([z.date(), z.string(), z.null()]);
 const requiredTimestampNonNull = z.union([z.date(), z.string()]);
 
 /**
+ * Resource kind fields (design parity W1). `kind` is the nullable stored
+ * column; `resolvedKind` is what the read-time resolver decided
+ * (stored → tag/category inference → "other"). Both are REQUIRED on every
+ * public resource surface — dropping either is shape drift.
+ */
+const resourceKindSchema = z.enum(RESOURCE_KIND_VALUES);
+const resourceKindFields = {
+  kind: resourceKindSchema.nullable(),
+  resolvedKind: resourceKindSchema,
+} as const;
+
+/**
  * A public resource row after `stripInternalResourceFields`. We only assert
  * the stable, client-critical keys; extra columns are allowed via passthrough.
  */
@@ -56,6 +69,83 @@ const publicResourceSchema = z
     title: z.string(),
     url: z.string(),
     status: z.string(),
+    ...resourceKindFields,
+  })
+  .passthrough();
+
+// ---------------------------------------------------------------------------
+// GET /api/resources/kinds/counts
+// ---------------------------------------------------------------------------
+
+/** Full-set counts per resolved kind over approved resources (one SQL statement). */
+const resourceKindCountsResponseSchema = z.object({
+  tools: z.number().int().nonnegative(),
+  libraries: z.number().int().nonnegative(),
+  standards: z.number().int().nonnegative(),
+  events: z.number().int().nonnegative(),
+  protocols: z.number().int().nonnegative(),
+  other: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+});
+
+const resourceKindCountsQuerySchema = z.object({
+  /** Optional taxonomy scope: a category slug or exact category name. */
+  category: z.string().min(1).max(200).optional(),
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/public/collections/:shareId
+// ---------------------------------------------------------------------------
+
+/**
+ * A published bookmark collection. Its resources are a hand-picked projection
+ * (CollectionRepository.getPublicCollection), not the serializer output, so
+ * the kind fields are asserted here explicitly: dropping either from that
+ * projection is shape drift. `metadata` must never appear (the projection
+ * selects it only to resolve the kind and drops it again).
+ */
+const publicCollectionResourceSchema = z
+  .object({
+    id: z.number(),
+    title: z.string(),
+    url: z.string(),
+    description: z.string(),
+    category: z.string(),
+    subcategory: z.string().nullable(),
+    subSubcategory: z.string().nullable(),
+    resourceFormat: z.string(),
+    provider: z.string(),
+    skillLevel: z.string(),
+    ...resourceKindFields,
+  })
+  .strict();
+
+const publicCollectionResponseSchema = z
+  .object({
+    shareId: z.string(),
+    name: z.string(),
+    publishedAt: requiredTimestampNonNull,
+    resources: z.array(publicCollectionResourceSchema),
+  })
+  .strict();
+
+// ---------------------------------------------------------------------------
+// PATCH /api/admin/resources/:id/kind + /featured
+// ---------------------------------------------------------------------------
+
+/**
+ * Admin editing routes answer with the updated raw resource row (the admin
+ * surface, not the public serializer — no `resolvedKind`, `searchTsv` may be
+ * present). Only the edited columns are asserted structurally.
+ */
+const adminResourceRowSchema = z
+  .object({
+    id: z.number(),
+    title: z.string(),
+    url: z.string(),
+    status: z.string(),
+    kind: resourceKindSchema.nullable(),
+    metadata: z.union([z.record(z.string(), z.unknown()), z.null()]).optional(),
   })
   .passthrough();
 
@@ -166,6 +256,7 @@ const singleResourceResponseSchema = z
     status: z.string(),
     category: z.string().nullable().optional(),
     subcategory: z.string().nullable().optional(),
+    ...resourceKindFields,
   })
   .passthrough();
 
@@ -266,7 +357,6 @@ const awesomeListListingQuerySchema = z.object({
   subSubcategory: z.string().min(1).max(512).optional(),
   general: z.literal("1").optional(),
 });
-
 // ---------------------------------------------------------------------------
 // Contact (docs/CONTACT-VARIANTS.md "Backend"; client type ContactPublicConfig)
 // ---------------------------------------------------------------------------
@@ -426,5 +516,36 @@ export function registerCoreEndpointSchemas(): void {
   setRouteQuerySchema("get", "/api/admin/contact-submissions", {
     name: "AdminContactSubmissionsQuery",
     schema: adminContactSubmissionsQuerySchema,
+  });
+
+  // --- Resource kinds (design parity W1) ---
+
+  setRouteResponseSchema("get", "/api/resources/kinds/counts", {
+    name: "ResourceKindCountsResponse",
+    description:
+      "Full-set counts of approved resources per resolved kind (stored kind, else tag/category inference, else other) plus total",
+    schema: resourceKindCountsResponseSchema,
+  });
+  setRouteQuerySchema("get", "/api/resources/kinds/counts", {
+    name: "ResourceKindCountsQuery",
+    schema: resourceKindCountsQuerySchema,
+  });
+
+  setRouteResponseSchema("get", "/api/public/collections/:shareId", {
+    name: "PublicCollectionResponse",
+    description:
+      "A published bookmark collection; each resource is the public projection plus the kind fields (stored kind or null, resolved kind), never metadata",
+    schema: publicCollectionResponseSchema,
+  });
+
+  setRouteResponseSchema("patch", "/api/admin/resources/:id(\\d+)/kind", {
+    name: "AdminResourceKindResponse",
+    description: "Updated resource row after the stored kind was set or cleared",
+    schema: adminResourceRowSchema,
+  });
+  setRouteResponseSchema("patch", "/api/admin/resources/:id(\\d+)/featured", {
+    name: "AdminResourceFeaturedResponse",
+    description: "Updated resource row after metadata.featured was toggled",
+    schema: adminResourceRowSchema,
   });
 }

@@ -24,6 +24,11 @@ import "dotenv/config";
  *   - GET /api/config                   (anonymous; contact destinations)
  *   - POST /api/contact                 (default-off → 404 before any work)
  *   - GET /api/admin/contact-submissions (via X-Admin-Audit-Key header)
+ *   - GET /api/resources/kinds/counts   (anonymous; unscoped + first category)
+ *   - GET /api/resources?kind=tools     (kind filter through ResourcesListResponse)
+ *   - GET /api/public/collections/:shareId (a live published collection when
+ *     this database has one, else the 404 envelope; the 200 shape is also
+ *     pinned by the resource-kinds integration test through the same observer)
  *
  * Harness self-verification: a throwaway probe route deliberately returns a
  * 401 body violating the shared ErrorResponse schema. The run FAILS unless
@@ -33,6 +38,9 @@ import "dotenv/config";
 import express from "express";
 import type { AddressInfo } from "node:net";
 import { clerkMiddleware } from "@clerk/express";
+import { and, isNotNull, isNull } from "drizzle-orm";
+import { bookmarkCollections } from "@shared/schema";
+import { db } from "../../server/db";
 import { registerRoutes } from "../../server/routes";
 import { installApiContractRegistration } from "../../server/contracts/install";
 import { registerCoreEndpointSchemas } from "../../server/contracts/endpointSchemas";
@@ -364,6 +372,68 @@ async function main() {
     200,
     auditHeaders,
   );
+
+  // --- Resource kinds (design parity W1) ---
+  // Counts are one grouped SQL statement over approved resources; the named
+  // ResourceKindCountsResponse schema must match both the unscoped payload and
+  // a category-scoped one. The kind filter reuses ResourcesListResponse, whose
+  // resource items now REQUIRE kind + resolvedKind.
+  await check("GET /api/resources/kinds/counts", "/api/resources/kinds/counts", 200);
+  try {
+    const navRes = await fetch(`${base}/api/awesome-list/nav`);
+    const nav = (await navRes.json()) as { categories?: Array<{ slug?: string }> };
+    const slug = nav.categories?.[0]?.slug;
+    if (!slug) throw new Error("nav response had no category slug");
+    await check(
+      "GET /api/resources/kinds/counts (first category)",
+      `/api/resources/kinds/counts?category=${encodeURIComponent(slug)}`,
+      200,
+    );
+  } catch (error) {
+    checks.push({
+      label: "GET /api/resources/kinds/counts (first category)",
+      status: 0,
+      ok: false,
+      detail: error instanceof Error ? error.message : String(error),
+    });
+  }
+  await check("GET /api/resources?kind=tools", "/api/resources?kind=tools&limit=5", 200);
+
+  // Published bookmark collections are the one public resource surface that
+  // does NOT go through the public serializer (a hand-picked projection), so
+  // the named PublicCollectionResponse schema requires kind + resolvedKind
+  // per item and forbids metadata. This gate never writes to the database, so
+  // it exercises a real 200 only when a published collection already exists;
+  // otherwise it pins the 404 envelope and says so in the label. The 200
+  // shape is additionally proven by tests/integration/api/resource-kinds.test.ts,
+  // which publishes a collection and asserts zero observer mismatches.
+  try {
+    const [live] = await db
+      .select({ shareId: bookmarkCollections.shareId })
+      .from(bookmarkCollections)
+      .where(and(isNotNull(bookmarkCollections.publishedAt), isNull(bookmarkCollections.archivedAt)))
+      .limit(1);
+    if (live?.shareId) {
+      await check(
+        "GET /api/public/collections/:shareId (published)",
+        `/api/public/collections/${encodeURIComponent(live.shareId)}`,
+        200,
+      );
+    } else {
+      await check(
+        "GET /api/public/collections/:shareId (no published collection in this database; 404 envelope)",
+        "/api/public/collections/contract-drift-gate-unpublished",
+        404,
+      );
+    }
+  } catch (error) {
+    checks.push({
+      label: "GET /api/public/collections/:shareId",
+      status: 0,
+      ok: false,
+      detail: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   await check(`GET ${PROBE_PATH} (observer liveness)`, PROBE_PATH, 401);
 

@@ -5,6 +5,9 @@
  * Static JSON files have been deprecated in favor of database-driven content
  */
 
+import type { ResourceKind } from "@shared/resourceKinds";
+import { apiRequest } from "@/lib/queryClient";
+
 /**
  * Fetch the awesome-list payload with a per-attempt timeout and one retry.
  * Surfaces the real failure cause (timeout, HTTP status, parse error) so the
@@ -197,4 +200,44 @@ export async function fetchAwesomeListNav(): Promise<AwesomeListNav> {
     throw new Error(`HTTP ${response.status} ${response.statusText || ''} from /api/awesome-list/nav`.trim());
   }
   return await response.json();
+}
+
+// ---------------------------------------------------------------------------
+// Resource kind counts (design parity W1)
+//
+// The kind strip on the canonical home page needs FULL-SET counts (every
+// approved resource, independent of pagination), so it must never tally the
+// page it happens to have loaded. `GET /api/resources/kinds/counts` answers
+// with one grouped SQL statement over the same read-time resolver every
+// public resource payload uses for `resolvedKind`.
+//
+// `other` is deliberately part of the payload (it keeps `total` honest) but
+// is not a strip chip — see docs/parity/assumptions/kind-api.md.
+// ---------------------------------------------------------------------------
+
+export const KIND_COUNTS_ENDPOINT = "/api/resources/kinds/counts";
+
+/** Response shape of GET /api/resources/kinds/counts. */
+export type ResourceKindCounts = Record<ResourceKind, number> & { total: number };
+
+/** Kinds that render as strip chips (enum order = display order). */
+export const STRIP_KINDS = ["tools", "libraries", "standards", "events", "protocols"] as const satisfies readonly ResourceKind[];
+
+/**
+ * Build the counts URL. `category` accepts a taxonomy slug or an exact
+ * category name; blank values are ignored rather than sent as `?category=`,
+ * which the server rejects with a 400.
+ */
+export function kindCountsUrl(category?: string | null): string {
+  const scope = category?.trim();
+  return scope ? `${KIND_COUNTS_ENDPOINT}?category=${encodeURIComponent(scope)}` : KIND_COUNTS_ENDPOINT;
+}
+
+/**
+ * Fetch full-set kind counts (optionally scoped to one category). Throws the
+ * shared `ApiError` on non-2xx so callers get the same humanized handling as
+ * every other API read.
+ */
+export async function fetchKindCounts(category?: string | null): Promise<ResourceKindCounts> {
+  return apiRequest(kindCountsUrl(category), { method: "GET" }) as Promise<ResourceKindCounts>;
 }

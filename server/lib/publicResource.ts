@@ -25,7 +25,22 @@
  * as the "Metadata fetched" / "Page Title" verification UI).
  * Admin surfaces read raw rows via the authed /api/admin/* endpoints, which
  * do NOT pass through this serializer.
+ *
+ * Added (design parity, resource kinds): `kind` (stored value or null) and
+ * `resolvedKind` (read-time resolution, see server/lib/resourceKinds.ts).
+ * Because this is the single choke point, every public surface — list,
+ * search, detail, related, the awesome-list tree + listing pages, the
+ * `/api/public/*` surface and recommendations — gains both fields at once;
+ * journey step embeds (a 4-column projection) attach them separately in
+ * LearningJourneyRepository.listJourneySteps.
  */
+import { withResourceKindFields, type ResourceKind } from "./resourceKinds";
+
+export interface PublicResourceFields {
+  kind: ResourceKind | null;
+  resolvedKind: ResourceKind;
+}
+
 const INTERNAL_METADATA_KEYS = [
   "source",
   "confidence",
@@ -53,7 +68,7 @@ const INTERNAL_METADATA_KEYS = [
   "urlScrapedAt",
 ] as const;
 
-export function stripInternalResourceFields<T extends Record<string, any>>(r: T): T {
+export function stripInternalResourceFields<T extends Record<string, any>>(r: T): T & PublicResourceFields {
   if (!r || typeof r !== "object") return r;
   const { searchTsv, submittedBy, approvedBy, githubSynced, lastSyncedAt, updatedAt, approvedAt, ...rest } = r as any;
   if (rest.metadata && typeof rest.metadata === "object" && !Array.isArray(rest.metadata)) {
@@ -67,5 +82,5 @@ export function stripInternalResourceFields<T extends Record<string, any>>(r: T)
     }
     if (changed) rest.metadata = meta;
   }
-  return rest as T;
+  return withResourceKindFields(rest as T);
 }

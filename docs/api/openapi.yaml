@@ -698,11 +698,32 @@ components:
                 type: string
               status:
                 type: string
+              kind:
+                nullable: true
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+              resolvedKind:
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
             required:
               - id
               - title
               - url
               - status
+              - kind
+              - resolvedKind
             additionalProperties: {}
         total:
           type: number
@@ -765,6 +786,53 @@ components:
         - nextOffset
         - nextCursor
         - pagination
+      additionalProperties: false
+    ResourceKindCountsQuery:
+      type: object
+      properties:
+        category:
+          type: string
+          minLength: 1
+          maxLength: 200
+    ResourceKindCountsResponse:
+      type: object
+      properties:
+        tools:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        libraries:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        standards:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        events:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        protocols:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        other:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+        - tools
+        - libraries
+        - standards
+        - events
+        - protocols
+        - other
+        - total
       additionalProperties: false
     get_3a__2f_api_2f_search.Query:
       type: object
@@ -972,11 +1040,32 @@ components:
         subcategory:
           nullable: true
           type: string
+        kind:
+          nullable: true
+          type: string
+          enum:
+            - tools
+            - libraries
+            - standards
+            - events
+            - protocols
+            - other
+        resolvedKind:
+          type: string
+          enum:
+            - tools
+            - libraries
+            - standards
+            - events
+            - protocols
+            - other
       required:
         - id
         - title
         - url
         - status
+        - kind
+        - resolvedKind
       additionalProperties: {}
     get_3a__2f_api_2f_resource_2f__7b_id_7d_.Params:
       type: object
@@ -2494,6 +2583,83 @@ components:
             items:
               type: string
               maxLength: 512
+    PublicCollectionResponse:
+      type: object
+      properties:
+        shareId:
+          type: string
+        name:
+          type: string
+        publishedAt:
+          anyOf:
+            - {}
+            - type: string
+        resources:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              description:
+                type: string
+              category:
+                type: string
+              subcategory:
+                nullable: true
+                type: string
+              subSubcategory:
+                nullable: true
+                type: string
+              resourceFormat:
+                type: string
+              provider:
+                type: string
+              skillLevel:
+                type: string
+              kind:
+                nullable: true
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+              resolvedKind:
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+            required:
+              - id
+              - title
+              - url
+              - description
+              - category
+              - subcategory
+              - subSubcategory
+              - resourceFormat
+              - provider
+              - skillLevel
+              - kind
+              - resolvedKind
+            additionalProperties: false
+      required:
+        - shareId
+        - name
+        - publishedAt
+        - resources
+      additionalProperties: false
     post_3a__2f_api_2f_user_2f_api-keys.Query:
       type: object
       properties:
@@ -4573,6 +4739,210 @@ components:
             items:
               type: string
               maxLength: 512
+    patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_kind.Params:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: ^\d+$
+      required:
+        - id
+      additionalProperties: {}
+    patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_kind.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 512
+          - type: string
+            maxLength: 0
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_kind.Body:
+      type: object
+      properties:
+        kind:
+          nullable: true
+          type: string
+          enum:
+            - tools
+            - libraries
+            - standards
+            - events
+            - protocols
+            - other
+      required:
+        - kind
+      additionalProperties: false
+    AdminResourceKindResponse:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+        kind:
+          nullable: true
+          type: string
+          enum:
+            - tools
+            - libraries
+            - standards
+            - events
+            - protocols
+            - other
+        metadata:
+          anyOf:
+            - type: object
+              additionalProperties: {}
+            - type: string
+              nullable: true
+              enum:
+                - null
+      required:
+        - id
+        - title
+        - url
+        - status
+        - kind
+      additionalProperties: {}
+    patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_featured.Params:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: ^\d+$
+      required:
+        - id
+      additionalProperties: {}
+    patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_featured.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 512
+          - type: string
+            maxLength: 0
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_featured.Body:
+      type: object
+      properties:
+        featured:
+          type: boolean
+      required:
+        - featured
+      additionalProperties: false
+    AdminResourceFeaturedResponse:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+        kind:
+          nullable: true
+          type: string
+          enum:
+            - tools
+            - libraries
+            - standards
+            - events
+            - protocols
+            - other
+        metadata:
+          anyOf:
+            - type: object
+              additionalProperties: {}
+            - type: string
+              nullable: true
+              enum:
+                - null
+      required:
+        - id
+        - title
+        - url
+        - status
+        - kind
+      additionalProperties: {}
     delete_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d_.Params:
       type: object
       properties:
@@ -7615,11 +7985,32 @@ components:
                 type: string
               status:
                 type: string
+              kind:
+                nullable: true
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+              resolvedKind:
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
             required:
               - id
               - title
               - url
               - status
+              - kind
+              - resolvedKind
             additionalProperties: {}
       required:
         - level
@@ -7877,11 +8268,32 @@ components:
                 type: string
               status:
                 type: string
+              kind:
+                nullable: true
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+              resolvedKind:
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
             required:
               - id
               - title
               - url
               - status
+              - kind
+              - resolvedKind
             additionalProperties: {}
         required:
           - resource
@@ -7947,11 +8359,32 @@ components:
                 type: string
               status:
                 type: string
+              kind:
+                nullable: true
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+              resolvedKind:
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
             required:
               - id
               - title
               - url
               - status
+              - kind
+              - resolvedKind
             additionalProperties: {}
         required:
           - resource
@@ -10930,6 +11363,92 @@ paths:
       x-contract-schemas:
         query: post_3a__2f_api_2f_resources.Query
         body: JsonObjectBody
+  /api/resources/kinds/counts:
+    get:
+      operationId: get:/api/resources/kinds/counts
+      responses:
+        '200':
+          description: >-
+            Full-set counts of approved resources per resolved kind (stored kind, else tag/category inference, else
+            other) plus total
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceKindCountsResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - resources
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+      x-domain: resources
+      x-middleware: []
+      x-contract-schemas:
+        query: ResourceKindCountsQuery
   /api/search:
     get:
       operationId: get:/api/search
@@ -15730,11 +16249,13 @@ paths:
       operationId: get:/api/public/collections/{shareId}
       responses:
         '200':
-          description: Successful response
+          description: >-
+            A published bookmark collection; each resource is the public projection plus the kind fields (stored kind or
+            null, resolved kind), never metadata
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonResponse'
+                $ref: '#/components/schemas/PublicCollectionResponse'
         '400':
           description: Request validation failed
           content:
@@ -22063,6 +22584,324 @@ paths:
         params: delete_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d_.Params
         query: delete_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d_.Query
         body: JsonObjectBody
+  /api/admin/resources/{id}/kind:
+    patch:
+      operationId: patch:/api/admin/resources/{id}/kind
+      responses:
+        '200':
+          description: Updated resource row after the stored kind was set or cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResourceKindResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_kind.Body'
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+        - middleware
+      x-contract-schemas:
+        params: patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_kind.Params
+        query: patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_kind.Query
+        body: patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_kind.Body
+  /api/admin/resources/{id}/featured:
+    patch:
+      operationId: patch:/api/admin/resources/{id}/featured
+      responses:
+        '200':
+          description: Updated resource row after metadata.featured was toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResourceFeaturedResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_featured.Body'
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+        - middleware
+      x-contract-schemas:
+        params: patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_featured.Params
+        query: patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_featured.Query
+        body: patch_3a__2f_api_2f_admin_2f_resources_2f__7b_id_7d__2f_featured.Body
   /api/admin/resources/bulk/approve:
     post:
       operationId: post:/api/admin/resources/bulk/approve

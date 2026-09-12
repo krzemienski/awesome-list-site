@@ -127,7 +127,8 @@ email/password login endpoint was removed.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/resources` | List resources (in-app catalog) |
+| GET | `/api/resources` | List resources (in-app catalog); `?kind=` filters by **resolved** kind (see below); the response also carries `X-Total-Count` |
+| GET | `/api/resources/kinds/counts` | Full-set counts per resolved kind over approved resources (see below) |
 | GET | `/api/resources/:id` | Single resource (numeric ID) |
 | GET | `/api/resources/:id/related` | Related resources |
 | GET | `/api/awesome-list` | Hierarchical list (categories → resources); filters: `category`, `subcategory`, `subSubcategory` |
@@ -138,7 +139,42 @@ email/password login endpoint was removed.
 | GET | `/api/journeys` | List learning journeys (`?category=`) |
 | GET | `/api/journeys/:id` | Journey with steps |
 | GET | `/api/github/awesome-lists` | Browse awesome lists (discovery) |
-| GET | `/api/public/collections/:shareId` | Read a published bookmark collection |
+| GET | `/api/public/collections/:shareId` | Read a published bookmark collection (each resource carries `kind` + `resolvedKind`; never `metadata`) |
+
+### Resource kinds
+
+Every public resource payload (list, detail, related, search, tag landing, the
+`/api/awesome-list` tree and `/listing` pages, `/api/public/resources`, journey
+step resources, recommendations, published bookmark collections) carries two
+additive fields:
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `kind` | `"tools" \| "libraries" \| "standards" \| "events" \| "protocols" \| "other" \| null` | The stored, admin-editable column. `null` until an admin sets one. |
+| `resolvedKind` | same enum, never null | What the read-time resolver decided: the stored value if present, else a tag mapping from `metadata.tags`, else a category mapping, else `"other"`. UI must render this one. |
+
+Resolution is deterministic and configured in `awesome-list.config.yaml`
+(`resource_kinds.tag_mappings`, `resource_kinds.category_mappings`); the
+precedence rules are recorded in
+[`docs/parity/assumptions/kind-api.md`](parity/assumptions/kind-api.md).
+
+`GET /api/resources/kinds/counts` answers in one grouped SQL statement (no
+per-resource work) and is cached for 60 s like the other catalog aggregates:
+
+```json
+{ "tools": 23, "libraries": 61, "standards": 47, "events": 18, "protocols": 11, "other": 1656, "total": 1816 }
+```
+
+`total` always equals `SELECT count(*) FROM resources WHERE status = 'approved'`
+(scoped by `?category=<slug or exact name>` when given). An unknown category
+returns all zeros with `Cache-Control: max-age=0`; an empty, repeated or
+over-long `category` is rejected with `400` (`validation_failed` from the query
+contract, `invalid_category` for a blank or >200-character value).
+
+`GET /api/resources?kind=events` applies the same resolver server-side (stored
+**or** inferred), keeps every other filter, the sort and the pagination, and its
+`total` / `X-Total-Count` equal the matching bucket of the counts endpoint. An
+unknown kind is `400 invalid_kind` with the allowed values.
 
 ### SEO / crawler endpoints (non-`/api`)
 
@@ -234,6 +270,8 @@ and `server/routes/domains/` for the complete set):
 | GET | `/api/admin/resources`, `/api/admin/pending-resources` |
 | POST | `/api/admin/resources` |
 | PUT/DELETE | `/api/admin/resources/:id` |
+| PATCH | `/api/admin/resources/:id/kind` — body `{ "kind": ResourceKind \| null }`, sets or clears the stored kind (audit-logged) |
+| PATCH | `/api/admin/resources/:id/featured` — body `{ "featured": boolean }`, toggles `metadata.featured` (audit-logged) |
 | POST | `/api/admin/resources/:id/approve` \| `/reject` \| `/unapprove` |
 | POST | `/api/admin/resources/bulk/approve` \| `/reject` \| `/delete` |
 | GET | `/api/admin/resource-edits` |
@@ -332,10 +370,14 @@ interface Resource {
   subcategory: string | null;
   subSubcategory: string | null;
   status: 'pending' | 'approved' | 'rejected' | 'archived';
+  kind: ResourceKind | null;      // stored, admin-editable
+  resolvedKind: ResourceKind;     // stored → inferred → 'other'
   metadata: Record<string, unknown> | null;
   createdAt: string;
   updatedAt: string;
 }
+
+type ResourceKind = 'tools' | 'libraries' | 'standards' | 'events' | 'protocols' | 'other';
 
 interface Category { id: number; name: string; slug: string }
 interface Tag { id: number; name: string; slug: string; createdAt: string }

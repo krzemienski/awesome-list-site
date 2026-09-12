@@ -9,6 +9,4 @@ description: Origin checks must compare normalized scheme, host, and effective p
 
 **How to apply:** Whenever touching Origin/Referer middleware, verify same-origin, wrong scheme, wrong port, explicit correct default port, nondefault port, canonical fallback, no-Origin, cross-site Fetch Metadata, and `Origin: null`. A 403 versus route-level 200/400/401 distinguishes gate rejection.
 
-**Scripts:** server-to-server clients (Node fetch) send no Origin header, so cookie-authed mutations 403 under the CSRF check — non-browser scripts must set an Origin matching the target base.
-
-**Script note (Aug 2026):** prod `/api/auth/local/login` (and all admin writes) 403 "A same-origin request is required" unless the request sends `Origin: https://awesome.video` — server-side fetch/curl must set the Origin header explicitly.
+**Scripts:** server-to-server clients (Node fetch, curl) send no Origin header, so cookie- or audit-key-authed mutations 403 under the CSRF check ("A same-origin request is required" / "Cross-origin request rejected") in every environment. Non-browser scripts must send an Origin whose scheme + host + port match the URL they actually hit — hostname aliases do not count (`localhost` vs `127.0.0.1` is a rejection), and the gate runs before auth, so the 403 looks like a permissions bug rather than a CSRF one.

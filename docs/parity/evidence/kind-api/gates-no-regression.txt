@@ -1,0 +1,38 @@
+# No-regression workflows (run sequentially against the restarted dev server, 2026-09-12)
+
+## taxonomy-no-corpus-fetch
+exit=0
+
+## taxonomy-listing-parity
+Taxonomy listing SSR/API parity PASS
+exit=0
+
+## guest-recommendations
+PASS advanced-mobile-populated :: route=/advanced?tab=recommendations viewport=mobile apiItems=10 renderedCards=10
+PASS standalone-mobile-populated :: route=/recommendations viewport=mobile apiItems=12 renderedCards=12
+PASS advanced-desktop-populated :: route=/advanced?tab=recommendations viewport=desktop apiItems=10 renderedCards=10
+PASS standalone-desktop-populated :: route=/recommendations viewport=desktop apiItems=12 renderedCards=12
+PASS advanced-mobile-empty :: Rendered data-testid=no-recommendations for an empty API response
+PASS standalone-mobile-empty :: Rendered the standalone empty copy for an empty API response
+All 6 guest recommendation scenarios passed.
+exit=0
+
+## seo-snapshot
+  PASS parity /journey/10
+Mode: GATE + parity · Base: http://127.0.0.1:5000 · Origin: https://awesome.video
+| schema validation pass rate | **100.00%** (2325/2325) |
+| hydration parity | 20/20 PASS |
+## Failures by code (0)
+GATE PASSED ✅
+Gate lease released (db-heavy: seo-snapshot)
+exit=0
+
+## pool-probe
+Gate lease acquired (db-heavy: db-pool-probe)
+  round 1: 20/20 OK  wall=1177ms  p50=923ms  p95=1160ms
+  round 2: 20/20 OK  wall=1030ms  p50=766ms  p95=1019ms
+  round 3: 20/20 OK  wall=921ms  p50=582ms  p95=909ms
+Total: 60/60 OK  p50=750ms  p75=927ms  p95=1119ms  max=1168ms
+PASS: zero pool-timeout/5xx errors under burst.
+Gate lease released (db-heavy: db-pool-probe)
+exit=0

@@ -1,0 +1,17 @@
+# eslint per-file error counts, HEAD version vs this tree (same config, files swapped in place then restored byte-identical)
+client/src/lib/resourceKinds.ts                            before n/a (new/unchanged-by-task) after 0
+client/src/types/awesome-list.ts                           before n/a (new/unchanged-by-task) after 0
+scripts/validation/openapi-drift.ts                        before n/a (new/unchanged-by-task) after 1
+scripts/validation/response-contract-drift.ts              before n/a (new/unchanged-by-task) after 1
+server/config.ts                                           before 8      after 8
+server/contracts/endpointSchemas.ts                        before n/a (new/unchanged-by-task) after 0
+server/lib/publicResource.ts                               before 18     after 19
+server/lib/resourceKinds.ts                                before n/a (new/unchanged-by-task) after 0
+server/repositories/LearningJourneyRepository.ts           before 9      after 9
+server/repositories/ResourceRepository.ts                  before 27     after 27
+server/routes/domains/admin-content.ts                     before 248    after 250
+server/routes/domains/catalog-contributions.ts             before 164    after 166
+shared/resourceKinds.ts                                    before n/a (new/unchanged-by-task) after 0
+shared/schema.ts                                           before 14     after 14
+
+Remaining +1 per new route (admin-content +2, catalog-contributions +2): @typescript-eslint/no-misused-promises on `app.<verb>(path, async (req,res)=>…)` — the pattern every existing route in these files uses (asyncHandler has zero importers); no new any/unsafe-* errors. publicResource.ts back to its HEAD count after the interface + assertion cleanup. scripts/validation/*.ts report only the pre-existing project-service parsing error; tests/ are eslint-ignored.
