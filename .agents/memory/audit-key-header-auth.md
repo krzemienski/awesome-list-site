@@ -52,3 +52,8 @@ guard); anonymous visitors and prod-without-the-secret can never exercise it.
   its email/password live in the gitignored `.env` as TEST_ADMIN_EMAIL /
   TEST_ADMIN_PASSWORD. In prod the same sign-in JIT-provisions a plain `user`
   row — elevation there still needs an existing prod admin.
+- Full-page `/admin` captures need the header on the **document** request too,
+  not only on `/api/*`: the page-level admin gate redirects an unauthenticated
+  navigation before React mounts. Route-intercept every same-origin resource
+  type (still gated on the app origin) or the "admin" screenshot is the sign-in
+  page.

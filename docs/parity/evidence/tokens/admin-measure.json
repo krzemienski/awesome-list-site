@@ -1,0 +1,50 @@
+[
+  {
+    "viewport": 1920,
+    "state": "round-2 live: max-width var(--content-max-admin, 80rem)",
+    "maxWidth": "1400px",
+    "width": 1184,
+    "rootContentMax": "1240px",
+    "rootContentMaxAdmin": "1400px"
+  },
+  {
+    "viewport": 1920,
+    "state": "round-1: max-width var(--content-max, 80rem)",
+    "maxWidth": "1240px",
+    "width": 1184,
+    "rootContentMax": "1240px",
+    "rootContentMaxAdmin": "1400px"
+  },
+  {
+    "viewport": 1920,
+    "state": "pre-task: max-width 80rem (token undefined → fallback)",
+    "maxWidth": "1280px",
+    "width": 1184,
+    "rootContentMax": "1240px",
+    "rootContentMaxAdmin": "1400px"
+  },
+  {
+    "viewport": 1440,
+    "state": "round-2 live: max-width var(--content-max-admin, 80rem)",
+    "maxWidth": "1400px",
+    "width": 1064,
+    "rootContentMax": "1240px",
+    "rootContentMaxAdmin": "1400px"
+  },
+  {
+    "viewport": 1440,
+    "state": "round-1: max-width var(--content-max, 80rem)",
+    "maxWidth": "1240px",
+    "width": 1064,
+    "rootContentMax": "1240px",
+    "rootContentMaxAdmin": "1400px"
+  },
+  {
+    "viewport": 1440,
+    "state": "pre-task: max-width 80rem (token undefined → fallback)",
+    "maxWidth": "1280px",
+    "width": 1064,
+    "rootContentMax": "1240px",
+    "rootContentMaxAdmin": "1400px"
+  }
+]

@@ -58,6 +58,38 @@ The artifact refuses to start or build when this projection is stale.
 Products may select a personality, accent, and approved product profile. They may not
 fork foundational values, accessible behavior, status semantics, or motion preferences.
 
+
+## Canonical parity
+
+The frozen design source (`awesome-list-site-ds/styles.css` for the bare `:root`,
+`design-systems.jsx` for per-system overrides, accents and default accents) is the
+authority for every painted token. `npm run validate:canonical-token-parity` resolves the
+effective cascade for each of the five systems and compares it, plus the ten accent pairs
+and the registry defaults, against the design (165 shared values, zero drift allowed). It
+also checks the shell geometry tokens below against the numbers the design hard-codes and
+holds the canonical utility rules (`.page`, `.grain`, `.card…`, `.chip…`, `.dot…`,
+`.eyebrow`, `.kbd`, `.mono`, `.display…`, `.hide-…`, `.show-…`) verbatim, including the
+byte-identical base64 grain asset. It reads the stylesheet the way a browser does — every
+occurrence of a selector merged last-wins with `!important` precedence, inside any
+`@media`/`@supports`/`@layer` — and enforces a single source: a painted token may be
+declared only by `:root`, `:root[data-system]` or `:root[data-accent]` in
+`design-system.css`, the tablet/mobile geometry overrides must equal the design's own
+media values, rules that shadow a utility's properties must match the design's, and an in-memory
+canary suite (one mutation per bypass class, PASS controls included) proves each rule on
+every run.
+
+Two deviations are deliberate and self-expiring (each carries a reason and a machine check
+in the gate's `DOCUMENTED_DEVIATIONS`; see `docs/parity/assumptions/tokens.md`):
+
+- `--text-3` keeps `0.52` alpha in all five systems (design: `0.36`–`0.4`). The design
+  documents 4.6:1 AA contrast for this role, but its literal alpha resolves to ~3.4:1; the
+  runtime value is the one that delivers the documented contract.
+- `.kbd` renders at `12px` (design: `10.5px`) — the 12px microtext legibility floor the
+  tablet/mobile audits enforce.
+
+Tokens the runtime adds beyond the design (`--radius-xs`, `--motion-*`) are reported by
+the gate, never failed.
+
 ## Product profiles
 
 - `public-discovery`: editorial hierarchy and comfortable browsing.
@@ -113,3 +145,26 @@ accessibility defects. The reference capture must apply the same non-content ada
 These changes intentionally require the same adapter on expected captures. Any baseline
 change must be independently reviewed as accessibility reconciliation, not accepted as
 an arbitrary visual update.
+
+## Shell geometry
+
+Layout measurements live as tokens in the first `:root` of `design-system.css` so shell
+and page work can consume them instead of restating numbers:
+
+| Token | Value | Design source |
+|---|---|---|
+| `--shell-sidebar-w` | `280px` (resolves to the tablet value at 768–1023) | `styles.css .sidebar` |
+| `--shell-sidebar-w-tablet` | `240px` | `styles.css @media (max-width: 1024px) .sidebar` |
+| `--shell-rail-w` | `56px` | `styles.css .icon-rail` |
+| `--shell-header-h` | `60px` (`56px` below 768) | `styles.css .header` |
+| `--page-pad-y` / `--page-pad-x` | `48px` / `40px` | `app.jsx` comfortable page padding |
+| `--content-max` | `1240px` | `app.jsx` page measure |
+| `--content-max-admin` | `1400px` | `app.jsx` admin measure |
+| `--footer-pad` | `48px 40px 32px` | `layout.jsx` footer |
+
+Breakpoints: mobile `<768`, tablet `768–1023`, desktop `>=1024`. The canonical
+`.hide-tablet` / `.show-tablet` utilities keep the design's own 1024/1025 edge.
+`--shell-footer-measure` is a compatibility alias of `--content-max` (it is declared in a
+second `:root` block beside the footer rules, which is why it appears in `tokens.json`
+foundations). `--content-max-admin` is consumed by the admin dashboard measure; the other
+geometry tokens are consumed by the shell components as they move onto them.

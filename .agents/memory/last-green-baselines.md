@@ -35,3 +35,8 @@ checkable statement.
   mid-run), then rerun. Cold-boot flakes that pass on one rerun include the
   url-params scrub banner and Clerk's hosted recovery step, alongside the
   responsive/print audits.
+- CSS-only or single-file changes: measure the e2e baseline without extracting
+  a tree — write `git show HEAD:<file>` over the working copy (Vite HMR picks it
+  up), rerun the failing spec, restore from a `/tmp` copy and re-check the
+  SHA-256. An identical failing set with the old file is the proof; keep a copy
+  of your version first, the swap is the only moment the tree isn't yours.

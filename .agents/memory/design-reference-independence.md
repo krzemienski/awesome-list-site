@@ -11,21 +11,19 @@ byte-identical to the pinned archive, and no longer the product-profile gate's
 target (see the companion notes `standalone-palette-gate-scope.md` and
 `product-profile-gate-target.md`).
 
-**Why:** raw-copying the archive's modular files into `awesome-list-site-ds/`
-produced 30 palette regressions (10-file copy) → 125 findings once the
-`Awesome.Video - Standalone.html`, `SKILL-verify-design-system.md` and
-`REPLIT-REMEDIATION-PROMPT.md` extras came too, and a product-profile hard
-fail (`index.html` declares no `data-product-profile`). The parity harness
-serves the reference from that same directory, so "fixing" the findings in
-place would have silently rewritten the reference. Freezing + verifying was the
+**Why:** raw-copying the archive's files into `awesome-list-site-ds/` made the
+palette scan report the reference's own literals as regressions (more with
+every extra file copied) and hard-failed the product-profile gate (the
+reference's HTML declares no profile attribute). The parity harness serves the
+reference from that same directory, so "fixing" the findings in place would
+have silently rewritten the reference. Freezing + verifying was the
 resolution; do not re-open it by editing files under a frozen root.
 
-**Gitignored-archive trap:** the frozen-reference check reads the zip by the
-upload filename recorded in `docs/parity/source-sync.json` (`archive.path`).
-`attached_assets/` is gitignored, so a task workspace that received the same
-bytes under a different upload name (uploads get per-upload prefixes/suffixes)
+**Gitignored-archive trap:** the frozen-reference check reads the zip at the
+path recorded in the sync record. Uploads are gitignored and get per-upload
+names, so another workspace holding the same bytes under a different name
 crashes the gate with `ENOENT` — not a drift verdict. Copy the zip to the
-recorded path (same SHA-256) before reading the result. Likewise, anything
+recorded path (same hash) before reading the result. Likewise, anything
 written under `.local/` does not survive a task merge; commit ledgers into
 `docs/` before closing.
 

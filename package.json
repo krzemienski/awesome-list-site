@@ -25,6 +25,7 @@
     "validate:guest-recommendations:release": "node scripts/validation/guest-recommendations.mjs --populated-only",
     "validate:standalone-palette-drift": "node scripts/validation/standalone-palette-drift.mjs",
     "validate:theme-registry-types": "node scripts/validation/theme-registry-type-safety.mjs",
+    "validate:canonical-token-parity": "node scripts/validation/canonical-token-parity.mjs",
     "generate:design-system-artifact": "node scripts/generate-design-system-artifact.mjs",
     "validate:design-system-artifact": "node scripts/generate-design-system-artifact.mjs --check",
     "validate:product-profiles": "node scripts/validation/product-profile-drift.mjs",

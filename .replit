@@ -171,6 +171,10 @@ args = "product-profile-browser"
 task = "workflow.run"
 args = "font-prepaint"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "canonical-token-parity"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -570,6 +574,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run validate:font-prepaint"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "canonical-token-parity"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run validate:canonical-token-parity"
 
 [workflows.workflow.metadata]
 isValidation = true

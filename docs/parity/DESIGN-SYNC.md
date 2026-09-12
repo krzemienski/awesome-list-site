@@ -83,3 +83,114 @@ https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=F
 ## Verification boundary
 
 Synchronization verifies provenance, hashes, load references, and static syntax only. No browser was run and no server/workflow was started. This is not evidence of visual or behavioral parity.
+
+## Tokens
+
+Synchronized by the tokens task (`docs/parity/worklog/tokens.md`,
+`docs/parity/assumptions/tokens.md`, evidence in
+`docs/parity/evidence/tokens/`). Runtime file: `client/src/styles/design-system.css`.
+Gate: `npm run validate:canonical-token-parity`
+(`scripts/validation/canonical-token-parity.mjs`, registered as a validation
+step) — compares the effective cascade of all five systems and ten accents
+against `styles.css` + `design-systems.jsx`, the nine shell geometry tokens
+against the numbers parsed from `styles.css`/`app.jsx`/`layout.jsx`, and 26
+utility rules declaration-for-declaration. The comparison is a cascade
+resolution, not a block diff: every html-level custom-property declaration in
+the document (all sheets, `client/index.html` first, then `index.css`'s
+`@import` graph; the design's `:root` plus the inline writes of
+`applyDesignSystem()`) is ranked by importance, then inline style, then the
+document's cascade-layer ORDER (named layers by first appearance across every
+sheet — `@layer` statements, `@import … layer()` and blocks, the bare
+`tailwindcss` import followed into `node_modules` — anonymous layers each
+their own, sublayers before their parent, unlayered last; later layer wins for
+normal declarations, earlier layer wins under `!important`), then specificity,
+then document order, so `:root { … !important }` outranks a later system
+block exactly as in the browser, an earlier layer's `:where(.hide-tablet) {
+display: block !important }` beats a later layer's `.hide-tablet.hide-tablet {
+display: none !important }`, all 50 system × accent combinations must
+resolve `--accent`/`--accent-2` to the design's pair, and geometry must hold
+under every system. The tablet/mobile geometry overrides must equal the
+design's own media values; a tracked token may be declared only by the three
+canonical html-level forms in `design-system.css` (sibling stylesheets and
+`client/index.html` styles are scanned and fail on a tracked token). Shadow
+detection runs a selector engine (jsdom `Element.matches`) over a modelled
+utility element — unknown type, exactly the utility's classes, no other
+attribute, unknown position — so `[class~="chip"]`, `:is(.chip)`,
+`.chip:not(.accent)`, `span.chip`, `.page .chip`, `:where(.chip){…!important}`,
+a later sibling sheet and `[data-system="geist"] .chip` are all cascaded
+against the canonical rule, while `:where(.chip)` at zero specificity, a
+normal-importance `@layer` copy and a print-only `@media` list are not; the
+parser flattens CSS Nesting and decodes hex escapes first, so `.page { .chip
+{} }` and `.\63 hip` are seen as the browser sees them; the resolved values
+must agree with the design wherever a non-canonical rule wins on either side.
+The document itself is modelled: each imported sheet is spliced in at its
+`@import`'s position (an importer's `@layer` statement written above its
+imports ranks before them; the layer order is built from every declaration
+across the graph), the main sheet must be reached unconditionally, every
+`@import` must be well-placed and single (the Tailwind compiler inlines a
+misplaced or doubled one where it sits — that is what ships and what is
+modelled — while css-syntax, postcss-import and a browser given the raw sheet
+drop it), and a layer whose first declaration sits inside a conditional group
+cannot order the cascade (Chromium does not register it while the condition is
+false). 91 in-memory canaries (including PASS controls) run on every
+invocation; the eleven cascade-layer cases and the twelve document cases (the
+latter rewriting `index.css` through an in-memory overlay, served both
+compiled by the Tailwind compiler and raw) were rendered in Chromium
+(`docs/parity/evidence/tokens/layer-order-browser.json`) so each expectation
+is the browser's. The modelled layer order of the app document is `base <
+theme < components < utilities < unlayered` (Tailwind's statement comes after
+`design-system.css`'s own `@layer base`); the summary line prints it. Result
+at sync:
+165 shared values, 0 mismatches, 0 missing; every colour, radius, shadow,
+spacing and font token already matched the design, so no colour value changed.
+
+### Added
+
+| token / rule | value | design source |
+|---|---|---|
+| `--shell-sidebar-w` | 280px; 240px at 768–1023px | `styles.css` `.sidebar` + tablet override |
+| `--shell-sidebar-w-tablet` | 240px | `styles.css` `@media (max-width:1024px) .sidebar` |
+| `--shell-rail-w` | 56px | `styles.css` `.icon-rail` |
+| `--shell-header-h` | 60px; 56px below 768px | `styles.css` `.header` + mobile override |
+| `--page-pad-y` / `--page-pad-x` | 48px / 40px | `app.jsx` page padding |
+| `--content-max` / `--content-max-admin` | 1240px / 1400px | `app.jsx` page `maxWidth` |
+| `--footer-pad` | 48px 40px 32px | `layout.jsx` footer padding |
+| `.hide-tablet` / `.show-tablet` | verbatim (`max-width:1024px` / `min-width:1025px`) | `styles.css` |
+
+Breakpoints for the shell tokens follow the governing contract: mobile <768px,
+tablet 768–1023px, desktop ≥1024px (the verbatim utilities keep upstream's
+1024/1025 edge; see assumptions §7). The only consumer of a new geometry token
+is the admin measure (`.admin-dashboard` → `--content-max-admin`); the shell
+tasks move their components onto the rest.
+
+### Changed (old → new)
+
+| token / rule | old | new |
+|---|---|---|
+| `.chip` `font-size` | 12px | 10.5px (canonical) |
+| `.grain` `background-image` | utf8-encoded SVG data URL | canonical base64 data URL (same SVG bytes) |
+| `--shell-footer-measure` | 1240px | `var(--content-max)` (resolves to 1240px) |
+| `.admin-dashboard` `max-width` (`client/src/components/admin/admin-canonical.css`) | `var(--content-max, 80rem)` → 1280px fallback | `var(--content-max-admin, 80rem)` → 1400px; rendered width unchanged at 1440/1920 (page column caps first) |
+
+### Kept different from the design (gate deviations, self-expiring)
+
+| token / rule | design | runtime | reason |
+|---|---|---|---|
+| `--text-3` (all five systems) | alpha 0.4 / 0.36 / 0.38 / 0.4 / 0.38 | alpha 0.52 | design's literal alphas measure 3.3–3.7:1 on `#000`; 0.52 keeps AA (≥4.5:1) and the production axe baseline (assumptions §1) |
+| `.kbd` `font-size` | 10.5px | 12px | tablet-audit 12px floor on the theme preview card rendered by `ThemeSettings.tsx` (assumptions §2) |
+| `.no-anim *` `transition` (cascade shadow over `.card*`) | card transitions survive `.no-anim` | `none !important` | the runtime's motion toggle freezes every animation/transition; the design's `.no-anim` only stops caret/shimmer/live-dot (assumptions §8) |
+
+Runtime-only tokens (reported, never failed): `--radius-xs`,
+`--motion-fast/base/slow/ease`, `--shell-footer-measure`, and — now that the
+resolver reads every sheet — the sibling-owned `--skeleton-base/shine`
+(`skeleton-animations.css`) and `--profile-*` (`shared/styles/product-profiles.css`). `.stat` and
+`.section-title` exist on neither side (assumptions §3). The artifact
+`artifacts/awesome-video-design-system/tokens.json` was regenerated from the
+same file (`npm run generate:design-system-artifact`, whose reader now merges
+every top-level occurrence of a selector like the gate does) and `DESIGN.md`
+documents the parity contract and the geometry table; there is no second
+source of truth.
+### Removed
+
+`--shell-sidebar-width` (280px) and `--shell-header-height` (60px): zero
+consumers, superseded by `--shell-sidebar-w` / `--shell-header-h`.

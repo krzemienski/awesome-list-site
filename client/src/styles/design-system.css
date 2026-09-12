@@ -15,6 +15,15 @@
    Replit additions (skip-link, disabled util, lucide stroke, motion
    tokens and no-anim toggle live here; the shared profile foundation owns
    cross-product density roles and prefers-reduced-motion behavior.
+
+   Parity contract: scripts/validation/canonical-token-parity.mjs diffs the
+   first :root, every :root[data-system] / :root[data-accent] block and the
+   registry defaults against awesome-list-site-ds/styles.css +
+   design-systems.jsx (effective per-system cascades, all five systems, all
+   ten accents). Any deviation must be a reason-carrying entry in that
+   gate's DOCUMENTED_DEVIATIONS and in docs/parity/assumptions/tokens.md.
+   Shell geometry tokens (sidebar/rail/header/page/content/footer) also live
+   in the first :root so the artifact generator publishes them.
    ===================================================================== */
 
 :root {
@@ -78,6 +87,26 @@
   --motion-base: 240ms;
   --motion-slow: 400ms;
   --motion-ease: cubic-bezier(0.2, 0.65, 0.3, 1);
+
+  /* ----- Shell geometry (canonical awesome-list-site-ds measurements) -----
+     Single source for the numbers app.jsx / styles.css hard-code: sidebar
+     280 (240 on tablet), icon rail 56, header 60 (56 on mobile, see the
+     media override at the end of this file), page padding 48/40, content
+     measure 1240 (1400 on admin), footer padding 48 40 32.
+     Breakpoints: mobile <768px, tablet 768–1023px, desktop >=1024px.
+     Consumers: none beyond the pre-existing shell aliases in the CANONICAL
+     SHARED SHELL block (--shell-footer-measure -> .site-footer-inner) and
+     .admin-dashboard, which already read --content-max. The canonical
+     header/sidebar/footer tasks move their components onto these names. */
+  --shell-sidebar-w:        280px;
+  --shell-sidebar-w-tablet: 240px;
+  --shell-rail-w:           56px;
+  --shell-header-h:         60px;
+  --page-pad-y:             48px;
+  --page-pad-x:             40px;
+  --content-max:            1240px;
+  --content-max-admin:      1400px;
+  --footer-pad:             48px 40px 32px;
 }
 
 /* ============== BASE ==============
@@ -141,7 +170,11 @@ button { font-family: inherit; }
   position: fixed; inset: 0; pointer-events: none; z-index: 1;
   opacity: var(--grain-opacity, 0.32);
   mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  /* Byte-identical to awesome-list-site-ds/styles.css .grain (base64 of the same
+     200x200 fractalNoise SVG, seed 0) so the parity harness can suppress the
+     layer on both sides by matching one background-image value. Guarded by
+     scripts/validation/canonical-token-parity.mjs. */
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScgb3BhY2l0eT0nMC41Jy8+PC9zdmc+");
 }
 
 /* ============== ANIMATIONS ============== */
@@ -292,7 +325,7 @@ button { font-family: inherit; }
   background: var(--surface);
   border: var(--hairline-w) solid var(--border);
   font-family: var(--font-mono);
-  font-size: 12px; /* BUG-041 (audit2): 10.5px chip microtext fell below the 12px floor on mobile */
+  font-size: 10.5px; /* canonical; BUG-041's 12px mobile floor belongs to the component (Badge data-ds="chip"), see docs/parity/assumptions/tokens.md */
   letter-spacing: 0.6px;
   color: var(--text-2);
   text-transform: uppercase;
@@ -482,7 +515,11 @@ button { font-family: inherit; }
 }
 .kbd {
   font-family: var(--font-mono);
-  font-size: 12px; /* BUG-041 (audit2): 10.5px kbd chips fell below the 12px floor on mobile */
+  /* Canonical is 10.5px. Kept at BUG-041's 12px floor: ThemeSettings renders
+     .kbd inside the theme preview card and tablet-audit's theme-preview-text
+     check fails any text under 12px there. Documented deviation, see
+     docs/parity/assumptions/tokens.md section 2. */
+  font-size: 12px;
   color: var(--text-3);
   padding: 2px 6px;
   border: var(--hairline-w) solid var(--border);
@@ -573,6 +610,19 @@ button { font-family: inherit; }
 @media (min-width: 769px) {
   .mobile-menu-btn { display: none !important; }
   .show-mobile { display: none !important; }
+}
+/* ============== CANONICAL UTILITIES (tablet visibility) ==============
+   Verbatim from awesome-list-site-ds/styles.css lines 445-455: the design's
+   tablet cut is 1024px inclusive (.hide-tablet) / 1025px (.show-tablet),
+   one pixel off the shell's documented 768–1023 tablet range. Kept verbatim
+   so components ported from the design JSX behave identically; the shell
+   tasks own any re-basing. The canonical .mobile-menu-btn rules at the same
+   breakpoints belong to the canonical header task. */
+@media (max-width: 1024px) {
+  .hide-tablet { display: none !important; }
+}
+@media (min-width: 1025px) {
+  .show-tablet { display: none !important; }
 }
 
 /* ============== MOBILE DRAWER ============== */
@@ -1077,10 +1127,11 @@ button:active:not([disabled]):not([aria-disabled="true"]),
 }
 
 /* ============== CANONICAL SHARED SHELL ============== */
+/* Geometry values live in the first :root (Shell geometry). This block only
+   keeps the pre-existing alias that the footer already consumes, resolved
+   from the canonical token so there is one number to change. */
 :root {
-  --shell-sidebar-width: 280px;
-  --shell-header-height: 60px;
-  --shell-footer-measure: 1240px;
+  --shell-footer-measure: var(--content-max);
 }
 
 .site-footer {
@@ -1115,7 +1166,11 @@ button:active:not([disabled]):not([aria-disabled="true"]),
   display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 40px; padding-top: 20px;
   border-top: var(--hairline-w) solid var(--hairline); color: var(--text-3); font-size: 10.5px; letter-spacing: 0.04em;
 }
-@media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-width: 240px; } }
+/* Shell geometry breakpoints — mobile <768, tablet 768–1023, desktop >=1024.
+   The sidebar narrows to its tablet width and the header drops to 56px on
+   mobile (canonical styles.css .header @768 / MainLayout --header-height). */
+@media (min-width: 768px) and (max-width: 1023px) { :root { --shell-sidebar-w: var(--shell-sidebar-w-tablet); } }
+@media (max-width: 767px) { :root { --shell-header-h: 56px; } }
 @media (max-width: 900px) {
   .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer-brand { grid-column: 1 / -1; }

@@ -1,0 +1,255 @@
+{
+  "generated": "2026-09-12T22:29:48.655Z",
+  "viewport": {
+    "width": 900,
+    "height": 600
+  },
+  "chromium": "ms-playwright chromium-1223",
+  "canaries": [
+    {
+      "id": "two-layer-important-earlier-wins",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true
+    },
+    {
+      "id": "two-layer-important-canonical-earlier",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "none",
+      "expectedBrowser": "none",
+      "gateExpect": "PASS",
+      "agrees": true
+    },
+    {
+      "id": "layer-statement-sets-order-pass",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "none",
+      "expectedBrowser": "none",
+      "gateExpect": "PASS",
+      "agrees": true
+    },
+    {
+      "id": "layer-statement-sets-order-fail",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true
+    },
+    {
+      "id": "anonymous-layers-first-wins",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true
+    },
+    {
+      "id": "nested-sublayer-precedes-parent",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true
+    },
+    {
+      "id": "nested-sublayer-canonical",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "none",
+      "expectedBrowser": "none",
+      "gateExpect": "PASS",
+      "agrees": true
+    },
+    {
+      "id": "layered-important-beats-unlayered-important",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true
+    },
+    {
+      "id": "two-layer-normal-later-wins",
+      "element": ".chip",
+      "property": "outline-offset",
+      "browser": "2px",
+      "expectedBrowser": "2px",
+      "gateExpect": "FAIL",
+      "agrees": true
+    },
+    {
+      "id": "vendor-statement-orders-named-layers",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "none",
+      "expectedBrowser": "none",
+      "gateExpect": "PASS",
+      "agrees": true
+    },
+    {
+      "id": "import-layer-statement-above-imports",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "block",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "import-layer-statement-control",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "none",
+      "expectedBrowser": "none",
+      "gateExpect": "PASS",
+      "agrees": true,
+      "rawBrowser": "none",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "import-layers-without-statement",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "none",
+      "expectedBrowser": "none",
+      "gateExpect": "PASS",
+      "agrees": true,
+      "rawBrowser": "none",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "misplaced-import-after-rule",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "none",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "misplaced-import-nested-in-media",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "none",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "duplicate-import",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "block",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "conditional-import-media-matches",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "block",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "conditional-import-print-only",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "none",
+      "expectedBrowser": "none",
+      "gateExpect": "PASS",
+      "agrees": true,
+      "rawBrowser": "none",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "main-sheet-import-after-rule",
+      "element": ".chip",
+      "property": "display",
+      "browser": "inline-flex",
+      "expectedBrowser": "inline-flex",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "inline-flex",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "main-sheet-import-removed",
+      "element": ".chip",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "block",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "main-sheet-import-conditional",
+      "element": ".chip",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "block",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "layer-order-conditional-first-declaration",
+      "element": ".hide-tablet",
+      "property": "display",
+      "browser": "block",
+      "expectedBrowser": "block",
+      "gateExpect": "FAIL",
+      "agrees": true,
+      "rawBrowser": "block",
+      "document": "tailwind-compiled index.css (rawBrowser: the browser following the raw @imports)"
+    },
+    {
+      "id": "import-layer-main-sheet",
+      "element": "html",
+      "property": "--bg",
+      "browser": "#000001",
+      "expectedBrowser": "#000001",
+      "gateExpect": "FAIL",
+      "agrees": true
+    }
+  ],
+  "liveDocument": {
+    "url": "http://127.0.0.1:5000/",
+    "layerOrder": [
+      "properties",
+      "base",
+      "theme",
+      "components",
+      "utilities"
+    ],
+    "sheets": [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+      "/home/runner/workspace/client/src/index.css"
+    ]
+  }
+}

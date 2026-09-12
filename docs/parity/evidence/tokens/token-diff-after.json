@@ -1,0 +1,4301 @@
+{
+  "ok": true,
+  "failures": [],
+  "mismatches": [],
+  "missing": [],
+  "honoured": [
+    {
+      "system": "editorial",
+      "token": "--text-3",
+      "canonical": "rgba(244,243,238,0.4)",
+      "app": "rgba(244,243,238,0.52)",
+      "reason": "WCAG 1.4.3: the design documents --text-3 as \"4.6:1, passes AA for normal text\" (awesome-list-site-ds/docs/07-color.md), but its literal alpha resolves to ~3.4:1 on the black --bg; the runtime keeps the alpha that actually delivers the documented AA contract. See docs/parity/assumptions/tokens.md §1. This entry expires the moment the design value itself passes 4.5:1 or the runtime value stops passing it."
+    },
+    {
+      "system": "terminal",
+      "token": "--text-3",
+      "canonical": "rgba(232,232,224,0.36)",
+      "app": "rgba(232,232,224,0.52)",
+      "reason": "WCAG 1.4.3: the design documents --text-3 as \"4.6:1, passes AA for normal text\" (awesome-list-site-ds/docs/07-color.md), but its literal alpha resolves to ~3.4:1 on the black --bg; the runtime keeps the alpha that actually delivers the documented AA contract. See docs/parity/assumptions/tokens.md §1. This entry expires the moment the design value itself passes 4.5:1 or the runtime value stops passing it."
+    },
+    {
+      "system": "geist",
+      "token": "--text-3",
+      "canonical": "rgba(250,250,250,0.38)",
+      "app": "rgba(250,250,250,0.52)",
+      "reason": "WCAG 1.4.3: the design documents --text-3 as \"4.6:1, passes AA for normal text\" (awesome-list-site-ds/docs/07-color.md), but its literal alpha resolves to ~3.4:1 on the black --bg; the runtime keeps the alpha that actually delivers the documented AA contract. See docs/parity/assumptions/tokens.md §1. This entry expires the moment the design value itself passes 4.5:1 or the runtime value stops passing it."
+    },
+    {
+      "system": "brutalist",
+      "token": "--text-3",
+      "canonical": "rgba(245,245,240,0.4)",
+      "app": "rgba(245,245,240,0.52)",
+      "reason": "WCAG 1.4.3: the design documents --text-3 as \"4.6:1, passes AA for normal text\" (awesome-list-site-ds/docs/07-color.md), but its literal alpha resolves to ~3.4:1 on the black --bg; the runtime keeps the alpha that actually delivers the documented AA contract. See docs/parity/assumptions/tokens.md §1. This entry expires the moment the design value itself passes 4.5:1 or the runtime value stops passing it."
+    },
+    {
+      "system": "swiss",
+      "token": "--text-3",
+      "canonical": "rgba(250,250,248,0.38)",
+      "app": "rgba(250,250,248,0.52)",
+      "reason": "WCAG 1.4.3: the design documents --text-3 as \"4.6:1, passes AA for normal text\" (awesome-list-site-ds/docs/07-color.md), but its literal alpha resolves to ~3.4:1 on the black --bg; the runtime keeps the alpha that actually delivers the documented AA contract. See docs/parity/assumptions/tokens.md §1. This entry expires the moment the design value itself passes 4.5:1 or the runtime value stops passing it."
+    },
+    {
+      "system": "shadow:.no-anim *",
+      "token": "transition",
+      "canonical": "transform 220ms cubic-bezier(0.2,0.65,0.3,1),background 220ms ease,border-color 220ms ease,box-shadow 220ms ease",
+      "app": "none !important",
+      "reason": "Reduced motion: the runtime's motion toggle puts .no-anim on the root and freezes EVERY animation/transition (!important), so a user who turned motion off also loses card hover transitions; the design's .no-anim only stops caret, shimmer and live-dot (styles.css). Kept on the WCAG 2.3.3 side. See docs/parity/assumptions/tokens.md §8. Expires when the design freezes transitions under .no-anim too or the runtime narrows its rule."
+    },
+    {
+      "system": "rule:.kbd",
+      "token": "font-size",
+      "canonical": "10.5px",
+      "app": "12px",
+      "reason": "Legibility floor: the design sets .kbd at 10.5px; the runtime renders .kbd inside the /settings/theme preview card, where tablet-audit (theme-preview-text) fails any text under 12px, and BUG-041 (audit 2) set the same 12px floor for mobile microtext. See docs/parity/assumptions/tokens.md §2. Expires when the design raises .kbd to 12px or the runtime drops below the floor."
+    }
+  ],
+  "appOnly": [
+    {
+      "token": "--radius-xs",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--motion-fast",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--motion-base",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--motion-slow",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--motion-ease",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--shell-footer-measure",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--skeleton-base",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--skeleton-shine",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--profile-content-gap",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--profile-control-height",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--profile-panel-padding",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--profile-page-measure",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    },
+    {
+      "token": "--profile-chrome-opacity",
+      "systems": [
+        "editorial",
+        "terminal",
+        "geist",
+        "brutalist",
+        "swiss"
+      ]
+    }
+  ],
+  "perSystem": {
+    "editorial": [
+      {
+        "token": "--bg",
+        "canonical": "#000000",
+        "app": "#000000",
+        "status": "match"
+      },
+      {
+        "token": "--bg-2",
+        "canonical": "#070706",
+        "app": "#070706",
+        "status": "match"
+      },
+      {
+        "token": "--surface",
+        "canonical": "rgba(244,243,238,0.025)",
+        "app": "rgba(244,243,238,0.025)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-2",
+        "canonical": "rgba(244,243,238,0.05)",
+        "app": "rgba(244,243,238,0.05)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-3",
+        "canonical": "rgba(244,243,238,0.08)",
+        "app": "rgba(244,243,238,0.08)",
+        "status": "match"
+      },
+      {
+        "token": "--border",
+        "canonical": "rgba(244,243,238,0.08)",
+        "app": "rgba(244,243,238,0.08)",
+        "status": "match"
+      },
+      {
+        "token": "--border-strong",
+        "canonical": "rgba(244,243,238,0.16)",
+        "app": "rgba(244,243,238,0.16)",
+        "status": "match"
+      },
+      {
+        "token": "--hairline",
+        "canonical": "rgba(244,243,238,0.06)",
+        "app": "rgba(244,243,238,0.06)",
+        "status": "match"
+      },
+      {
+        "token": "--text",
+        "canonical": "#f4f3ee",
+        "app": "#f4f3ee",
+        "status": "match"
+      },
+      {
+        "token": "--text-2",
+        "canonical": "rgba(244,243,238,0.66)",
+        "app": "rgba(244,243,238,0.66)",
+        "status": "match"
+      },
+      {
+        "token": "--text-3",
+        "canonical": "rgba(244,243,238,0.4)",
+        "app": "rgba(244,243,238,0.52)",
+        "status": "documented-deviation"
+      },
+      {
+        "token": "--text-4",
+        "canonical": "rgba(244,243,238,0.22)",
+        "app": "rgba(244,243,238,0.22)",
+        "status": "match"
+      },
+      {
+        "token": "--font-body",
+        "canonical": "'Inter',system-ui,sans-serif",
+        "app": "'Inter',system-ui,sans-serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-display",
+        "canonical": "'Fraunces',Georgia,serif",
+        "app": "'Fraunces',Georgia,serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-mono",
+        "canonical": "'JetBrains Mono',ui-monospace,monospace",
+        "app": "'JetBrains Mono',ui-monospace,monospace",
+        "status": "match"
+      },
+      {
+        "token": "--display-weight",
+        "canonical": "500",
+        "app": "500",
+        "status": "match"
+      },
+      {
+        "token": "--display-tracking",
+        "canonical": "-0.02em",
+        "app": "-0.02em",
+        "status": "match"
+      },
+      {
+        "token": "--display-leading",
+        "canonical": "1.04",
+        "app": "1.04",
+        "status": "match"
+      },
+      {
+        "token": "--body-leading",
+        "canonical": "1.6",
+        "app": "1.6",
+        "status": "match"
+      },
+      {
+        "token": "--eyebrow-tracking",
+        "canonical": "0.18em",
+        "app": "0.18em",
+        "status": "match"
+      },
+      {
+        "token": "--mono-size-step",
+        "canonical": "11px",
+        "app": "11px",
+        "status": "match"
+      },
+      {
+        "token": "--radius",
+        "canonical": "12px",
+        "app": "12px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-sm",
+        "canonical": "8px",
+        "app": "8px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-pill",
+        "canonical": "999px",
+        "app": "999px",
+        "status": "match"
+      },
+      {
+        "token": "--border-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--hairline-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-sm",
+        "canonical": "0 1px 2px rgba(0,0,0,0.3)",
+        "app": "0 1px 2px rgba(0,0,0,0.3)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow",
+        "canonical": "0 6px 24px -8px rgba(0,0,0,0.5)",
+        "app": "0 6px 24px -8px rgba(0,0,0,0.5)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-lg",
+        "canonical": "0 24px 60px -20px rgba(0,0,0,0.7)",
+        "app": "0 24px 60px -20px rgba(0,0,0,0.7)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-accent",
+        "canonical": "0 0 0 1px color-mix(in srgb,var(--accent)25%,transparent),0 12px 36px -12px color-mix(in srgb,var(--accent)40%,transparent)",
+        "app": "0 0 0 1px color-mix(in srgb,var(--accent)25%,transparent),0 12px 36px -12px color-mix(in srgb,var(--accent)40%,transparent)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere",
+        "canonical": "radial-gradient(ellipse 1100px 700px at 88% -8%,color-mix(in srgb,var(--accent)7%,transparent),transparent 60%),radial-gradient(ellipse 900px 500px at -8% 110%,color-mix(in srgb,var(--accent-2)6%,transparent),transparent 60%)",
+        "app": "radial-gradient(ellipse 1100px 700px at 88% -8%,color-mix(in srgb,var(--accent)7%,transparent),transparent 60%),radial-gradient(ellipse 900px 500px at -8% 110%,color-mix(in srgb,var(--accent-2)6%,transparent),transparent 60%)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere-size",
+        "canonical": "auto",
+        "app": "auto",
+        "status": "match"
+      },
+      {
+        "token": "--grain-opacity",
+        "canonical": "0.32",
+        "app": "0.32",
+        "status": "match"
+      },
+      {
+        "token": "--radius-xs",
+        "canonical": null,
+        "app": "3px",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-fast",
+        "canonical": null,
+        "app": "160ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-base",
+        "canonical": null,
+        "app": "240ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-slow",
+        "canonical": null,
+        "app": "400ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-ease",
+        "canonical": null,
+        "app": "cubic-bezier(0.2,0.65,0.3,1)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--shell-footer-measure",
+        "canonical": null,
+        "app": "var(--content-max)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-base",
+        "canonical": null,
+        "app": "hsl(var(--muted))",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-shine",
+        "canonical": null,
+        "app": "hsl(var(--muted)/ 0.5)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-content-gap",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-control-height",
+        "canonical": null,
+        "app": "2.75rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-panel-padding",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-page-measure",
+        "canonical": null,
+        "app": "80rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-chrome-opacity",
+        "canonical": null,
+        "app": "0.88",
+        "status": "runtime-only"
+      }
+    ],
+    "terminal": [
+      {
+        "token": "--bg",
+        "canonical": "#000000",
+        "app": "#000000",
+        "status": "match"
+      },
+      {
+        "token": "--bg-2",
+        "canonical": "#040404",
+        "app": "#040404",
+        "status": "match"
+      },
+      {
+        "token": "--surface",
+        "canonical": "rgba(0,255,136,0.012)",
+        "app": "rgba(0,255,136,0.012)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-2",
+        "canonical": "rgba(0,255,136,0.025)",
+        "app": "rgba(0,255,136,0.025)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-3",
+        "canonical": "rgba(0,255,136,0.05)",
+        "app": "rgba(0,255,136,0.05)",
+        "status": "match"
+      },
+      {
+        "token": "--border",
+        "canonical": "rgba(232,232,224,0.14)",
+        "app": "rgba(232,232,224,0.14)",
+        "status": "match"
+      },
+      {
+        "token": "--border-strong",
+        "canonical": "rgba(232,232,224,0.32)",
+        "app": "rgba(232,232,224,0.32)",
+        "status": "match"
+      },
+      {
+        "token": "--hairline",
+        "canonical": "rgba(232,232,224,0.08)",
+        "app": "rgba(232,232,224,0.08)",
+        "status": "match"
+      },
+      {
+        "token": "--text",
+        "canonical": "#e8e8e0",
+        "app": "#e8e8e0",
+        "status": "match"
+      },
+      {
+        "token": "--text-2",
+        "canonical": "rgba(232,232,224,0.62)",
+        "app": "rgba(232,232,224,0.62)",
+        "status": "match"
+      },
+      {
+        "token": "--text-3",
+        "canonical": "rgba(232,232,224,0.36)",
+        "app": "rgba(232,232,224,0.52)",
+        "status": "documented-deviation"
+      },
+      {
+        "token": "--text-4",
+        "canonical": "rgba(232,232,224,0.2)",
+        "app": "rgba(232,232,224,0.2)",
+        "status": "match"
+      },
+      {
+        "token": "--font-body",
+        "canonical": "'IBM Plex Mono',ui-monospace,monospace",
+        "app": "'IBM Plex Mono',ui-monospace,monospace",
+        "status": "match"
+      },
+      {
+        "token": "--font-display",
+        "canonical": "'IBM Plex Mono',ui-monospace,monospace",
+        "app": "'IBM Plex Mono',ui-monospace,monospace",
+        "status": "match"
+      },
+      {
+        "token": "--font-mono",
+        "canonical": "'IBM Plex Mono',ui-monospace,monospace",
+        "app": "'IBM Plex Mono',ui-monospace,monospace",
+        "status": "match"
+      },
+      {
+        "token": "--display-weight",
+        "canonical": "600",
+        "app": "600",
+        "status": "match"
+      },
+      {
+        "token": "--display-tracking",
+        "canonical": "-0.01em",
+        "app": "-0.01em",
+        "status": "match"
+      },
+      {
+        "token": "--display-leading",
+        "canonical": "1.1",
+        "app": "1.1",
+        "status": "match"
+      },
+      {
+        "token": "--body-leading",
+        "canonical": "1.55",
+        "app": "1.55",
+        "status": "match"
+      },
+      {
+        "token": "--eyebrow-tracking",
+        "canonical": "0.2em",
+        "app": "0.2em",
+        "status": "match"
+      },
+      {
+        "token": "--mono-size-step",
+        "canonical": "12px",
+        "app": "12px",
+        "status": "match"
+      },
+      {
+        "token": "--radius",
+        "canonical": "0px",
+        "app": "0px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-sm",
+        "canonical": "0px",
+        "app": "0px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-pill",
+        "canonical": "0px",
+        "app": "0px",
+        "status": "match"
+      },
+      {
+        "token": "--border-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--hairline-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-sm",
+        "canonical": "none",
+        "app": "none",
+        "status": "match"
+      },
+      {
+        "token": "--shadow",
+        "canonical": "none",
+        "app": "none",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-lg",
+        "canonical": "0 0 0 1px var(--accent),inset 0 0 60px color-mix(in srgb,var(--accent)8%,transparent)",
+        "app": "0 0 0 1px var(--accent),inset 0 0 60px color-mix(in srgb,var(--accent)8%,transparent)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-accent",
+        "canonical": "0 0 0 1px var(--accent),0 0 24px color-mix(in srgb,var(--accent)30%,transparent)",
+        "app": "0 0 0 1px var(--accent),0 0 24px color-mix(in srgb,var(--accent)30%,transparent)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere",
+        "canonical": "repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,0.018)2px,rgba(255,255,255,0.018)3px),radial-gradient(ellipse 800px 600px at 50% 50%,color-mix(in srgb,var(--accent)4%,transparent),transparent 70%)",
+        "app": "repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,0.018)2px,rgba(255,255,255,0.018)3px),radial-gradient(ellipse 800px 600px at 50% 50%,color-mix(in srgb,var(--accent)4%,transparent),transparent 70%)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere-size",
+        "canonical": "auto",
+        "app": "auto",
+        "status": "match"
+      },
+      {
+        "token": "--grain-opacity",
+        "canonical": "0.5",
+        "app": "0.5",
+        "status": "match"
+      },
+      {
+        "token": "--radius-xs",
+        "canonical": null,
+        "app": "3px",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-fast",
+        "canonical": null,
+        "app": "160ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-base",
+        "canonical": null,
+        "app": "240ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-slow",
+        "canonical": null,
+        "app": "400ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-ease",
+        "canonical": null,
+        "app": "cubic-bezier(0.2,0.65,0.3,1)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--shell-footer-measure",
+        "canonical": null,
+        "app": "var(--content-max)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-base",
+        "canonical": null,
+        "app": "hsl(var(--muted))",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-shine",
+        "canonical": null,
+        "app": "hsl(var(--muted)/ 0.5)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-content-gap",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-control-height",
+        "canonical": null,
+        "app": "2.75rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-panel-padding",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-page-measure",
+        "canonical": null,
+        "app": "80rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-chrome-opacity",
+        "canonical": null,
+        "app": "0.88",
+        "status": "runtime-only"
+      }
+    ],
+    "geist": [
+      {
+        "token": "--bg",
+        "canonical": "#000000",
+        "app": "#000000",
+        "status": "match"
+      },
+      {
+        "token": "--bg-2",
+        "canonical": "#0a0a0a",
+        "app": "#0a0a0a",
+        "status": "match"
+      },
+      {
+        "token": "--surface",
+        "canonical": "rgba(255,255,255,0.04)",
+        "app": "rgba(255,255,255,0.04)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-2",
+        "canonical": "rgba(255,255,255,0.07)",
+        "app": "rgba(255,255,255,0.07)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-3",
+        "canonical": "rgba(255,255,255,0.1)",
+        "app": "rgba(255,255,255,0.1)",
+        "status": "match"
+      },
+      {
+        "token": "--border",
+        "canonical": "rgba(255,255,255,0.1)",
+        "app": "rgba(255,255,255,0.1)",
+        "status": "match"
+      },
+      {
+        "token": "--border-strong",
+        "canonical": "rgba(255,255,255,0.18)",
+        "app": "rgba(255,255,255,0.18)",
+        "status": "match"
+      },
+      {
+        "token": "--hairline",
+        "canonical": "rgba(255,255,255,0.07)",
+        "app": "rgba(255,255,255,0.07)",
+        "status": "match"
+      },
+      {
+        "token": "--text",
+        "canonical": "#fafafa",
+        "app": "#fafafa",
+        "status": "match"
+      },
+      {
+        "token": "--text-2",
+        "canonical": "rgba(250,250,250,0.62)",
+        "app": "rgba(250,250,250,0.62)",
+        "status": "match"
+      },
+      {
+        "token": "--text-3",
+        "canonical": "rgba(250,250,250,0.38)",
+        "app": "rgba(250,250,250,0.52)",
+        "status": "documented-deviation"
+      },
+      {
+        "token": "--text-4",
+        "canonical": "rgba(250,250,250,0.2)",
+        "app": "rgba(250,250,250,0.2)",
+        "status": "match"
+      },
+      {
+        "token": "--font-body",
+        "canonical": "'Geist','Inter',system-ui,sans-serif",
+        "app": "'Geist','Inter',system-ui,sans-serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-display",
+        "canonical": "'Geist','Inter',system-ui,sans-serif",
+        "app": "'Geist','Inter',system-ui,sans-serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-mono",
+        "canonical": "'JetBrains Mono',ui-monospace,monospace",
+        "app": "'JetBrains Mono',ui-monospace,monospace",
+        "status": "match"
+      },
+      {
+        "token": "--display-weight",
+        "canonical": "600",
+        "app": "600",
+        "status": "match"
+      },
+      {
+        "token": "--display-tracking",
+        "canonical": "-0.035em",
+        "app": "-0.035em",
+        "status": "match"
+      },
+      {
+        "token": "--display-leading",
+        "canonical": "1.05",
+        "app": "1.05",
+        "status": "match"
+      },
+      {
+        "token": "--body-leading",
+        "canonical": "1.55",
+        "app": "1.55",
+        "status": "match"
+      },
+      {
+        "token": "--eyebrow-tracking",
+        "canonical": "0.06em",
+        "app": "0.06em",
+        "status": "match"
+      },
+      {
+        "token": "--mono-size-step",
+        "canonical": "11px",
+        "app": "11px",
+        "status": "match"
+      },
+      {
+        "token": "--radius",
+        "canonical": "10px",
+        "app": "10px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-sm",
+        "canonical": "6px",
+        "app": "6px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-pill",
+        "canonical": "999px",
+        "app": "999px",
+        "status": "match"
+      },
+      {
+        "token": "--border-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--hairline-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-sm",
+        "canonical": "0 1px 2px rgba(0,0,0,0.4)",
+        "app": "0 1px 2px rgba(0,0,0,0.4)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow",
+        "canonical": "0 0 0 1px rgba(255,255,255,0.04),0 8px 24px rgba(0,0,0,0.4)",
+        "app": "0 0 0 1px rgba(255,255,255,0.04),0 8px 24px rgba(0,0,0,0.4)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-lg",
+        "canonical": "0 0 0 1px rgba(255,255,255,0.06),0 24px 56px rgba(0,0,0,0.55)",
+        "app": "0 0 0 1px rgba(255,255,255,0.06),0 24px 56px rgba(0,0,0,0.55)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-accent",
+        "canonical": "0 0 0 1px color-mix(in srgb,var(--accent)50%,transparent),0 0 32px color-mix(in srgb,var(--accent)25%,transparent)",
+        "app": "0 0 0 1px color-mix(in srgb,var(--accent)50%,transparent),0 0 32px color-mix(in srgb,var(--accent)25%,transparent)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere",
+        "canonical": "radial-gradient(ellipse 1200px 800px at 50% -20%,rgba(255,255,255,0.03),transparent 60%)",
+        "app": "radial-gradient(ellipse 1200px 800px at 50% -20%,rgba(255,255,255,0.03),transparent 60%)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere-size",
+        "canonical": "auto",
+        "app": "auto",
+        "status": "match"
+      },
+      {
+        "token": "--grain-opacity",
+        "canonical": "0",
+        "app": "0",
+        "status": "match"
+      },
+      {
+        "token": "--radius-xs",
+        "canonical": null,
+        "app": "3px",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-fast",
+        "canonical": null,
+        "app": "160ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-base",
+        "canonical": null,
+        "app": "240ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-slow",
+        "canonical": null,
+        "app": "400ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-ease",
+        "canonical": null,
+        "app": "cubic-bezier(0.2,0.65,0.3,1)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--shell-footer-measure",
+        "canonical": null,
+        "app": "var(--content-max)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-base",
+        "canonical": null,
+        "app": "hsl(var(--muted))",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-shine",
+        "canonical": null,
+        "app": "hsl(var(--muted)/ 0.5)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-content-gap",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-control-height",
+        "canonical": null,
+        "app": "2.75rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-panel-padding",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-page-measure",
+        "canonical": null,
+        "app": "80rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-chrome-opacity",
+        "canonical": null,
+        "app": "0.88",
+        "status": "runtime-only"
+      }
+    ],
+    "brutalist": [
+      {
+        "token": "--bg",
+        "canonical": "#000000",
+        "app": "#000000",
+        "status": "match"
+      },
+      {
+        "token": "--bg-2",
+        "canonical": "#0a0a0a",
+        "app": "#0a0a0a",
+        "status": "match"
+      },
+      {
+        "token": "--surface",
+        "canonical": "rgba(255,255,255,0.025)",
+        "app": "rgba(255,255,255,0.025)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-2",
+        "canonical": "rgba(255,255,255,0.06)",
+        "app": "rgba(255,255,255,0.06)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-3",
+        "canonical": "rgba(255,255,255,0.1)",
+        "app": "rgba(255,255,255,0.1)",
+        "status": "match"
+      },
+      {
+        "token": "--border",
+        "canonical": "rgba(245,245,240,0.85)",
+        "app": "rgba(245,245,240,0.85)",
+        "status": "match"
+      },
+      {
+        "token": "--border-strong",
+        "canonical": "rgba(245,245,240,1)",
+        "app": "rgba(245,245,240,1)",
+        "status": "match"
+      },
+      {
+        "token": "--hairline",
+        "canonical": "rgba(245,245,240,0.18)",
+        "app": "rgba(245,245,240,0.18)",
+        "status": "match"
+      },
+      {
+        "token": "--text",
+        "canonical": "#f5f5f0",
+        "app": "#f5f5f0",
+        "status": "match"
+      },
+      {
+        "token": "--text-2",
+        "canonical": "rgba(245,245,240,0.7)",
+        "app": "rgba(245,245,240,0.7)",
+        "status": "match"
+      },
+      {
+        "token": "--text-3",
+        "canonical": "rgba(245,245,240,0.4)",
+        "app": "rgba(245,245,240,0.52)",
+        "status": "documented-deviation"
+      },
+      {
+        "token": "--text-4",
+        "canonical": "rgba(245,245,240,0.22)",
+        "app": "rgba(245,245,240,0.22)",
+        "status": "match"
+      },
+      {
+        "token": "--font-body",
+        "canonical": "'Space Grotesk',system-ui,sans-serif",
+        "app": "'Space Grotesk',system-ui,sans-serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-display",
+        "canonical": "'Instrument Serif','Times New Roman',serif",
+        "app": "'Instrument Serif','Times New Roman',serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-mono",
+        "canonical": "'JetBrains Mono',ui-monospace,monospace",
+        "app": "'JetBrains Mono',ui-monospace,monospace",
+        "status": "match"
+      },
+      {
+        "token": "--display-weight",
+        "canonical": "400",
+        "app": "400",
+        "status": "match"
+      },
+      {
+        "token": "--display-tracking",
+        "canonical": "-0.04em",
+        "app": "-0.04em",
+        "status": "match"
+      },
+      {
+        "token": "--display-leading",
+        "canonical": "0.92",
+        "app": "0.92",
+        "status": "match"
+      },
+      {
+        "token": "--body-leading",
+        "canonical": "1.5",
+        "app": "1.5",
+        "status": "match"
+      },
+      {
+        "token": "--eyebrow-tracking",
+        "canonical": "0.24em",
+        "app": "0.24em",
+        "status": "match"
+      },
+      {
+        "token": "--mono-size-step",
+        "canonical": "11px",
+        "app": "11px",
+        "status": "match"
+      },
+      {
+        "token": "--radius",
+        "canonical": "0px",
+        "app": "0px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-sm",
+        "canonical": "0px",
+        "app": "0px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-pill",
+        "canonical": "0px",
+        "app": "0px",
+        "status": "match"
+      },
+      {
+        "token": "--border-w",
+        "canonical": "2px",
+        "app": "2px",
+        "status": "match"
+      },
+      {
+        "token": "--hairline-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-sm",
+        "canonical": "2px 2px 0 0 var(--text)",
+        "app": "2px 2px 0 0 var(--text)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow",
+        "canonical": "4px 4px 0 0 var(--text)",
+        "app": "4px 4px 0 0 var(--text)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-lg",
+        "canonical": "8px 8px 0 0 var(--text)",
+        "app": "8px 8px 0 0 var(--text)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-accent",
+        "canonical": "4px 4px 0 0 var(--accent)",
+        "app": "4px 4px 0 0 var(--accent)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere",
+        "canonical": "none",
+        "app": "none",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere-size",
+        "canonical": "auto",
+        "app": "auto",
+        "status": "match"
+      },
+      {
+        "token": "--grain-opacity",
+        "canonical": "0.55",
+        "app": "0.55",
+        "status": "match"
+      },
+      {
+        "token": "--radius-xs",
+        "canonical": null,
+        "app": "3px",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-fast",
+        "canonical": null,
+        "app": "160ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-base",
+        "canonical": null,
+        "app": "240ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-slow",
+        "canonical": null,
+        "app": "400ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-ease",
+        "canonical": null,
+        "app": "cubic-bezier(0.2,0.65,0.3,1)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--shell-footer-measure",
+        "canonical": null,
+        "app": "var(--content-max)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-base",
+        "canonical": null,
+        "app": "hsl(var(--muted))",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-shine",
+        "canonical": null,
+        "app": "hsl(var(--muted)/ 0.5)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-content-gap",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-control-height",
+        "canonical": null,
+        "app": "2.75rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-panel-padding",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-page-measure",
+        "canonical": null,
+        "app": "80rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-chrome-opacity",
+        "canonical": null,
+        "app": "0.88",
+        "status": "runtime-only"
+      }
+    ],
+    "swiss": [
+      {
+        "token": "--bg",
+        "canonical": "#000000",
+        "app": "#000000",
+        "status": "match"
+      },
+      {
+        "token": "--bg-2",
+        "canonical": "#050506",
+        "app": "#050506",
+        "status": "match"
+      },
+      {
+        "token": "--surface",
+        "canonical": "rgba(250,250,248,0.018)",
+        "app": "rgba(250,250,248,0.018)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-2",
+        "canonical": "rgba(250,250,248,0.04)",
+        "app": "rgba(250,250,248,0.04)",
+        "status": "match"
+      },
+      {
+        "token": "--surface-3",
+        "canonical": "rgba(250,250,248,0.07)",
+        "app": "rgba(250,250,248,0.07)",
+        "status": "match"
+      },
+      {
+        "token": "--border",
+        "canonical": "rgba(250,250,248,0.085)",
+        "app": "rgba(250,250,248,0.085)",
+        "status": "match"
+      },
+      {
+        "token": "--border-strong",
+        "canonical": "rgba(250,250,248,0.18)",
+        "app": "rgba(250,250,248,0.18)",
+        "status": "match"
+      },
+      {
+        "token": "--hairline",
+        "canonical": "rgba(250,250,248,0.05)",
+        "app": "rgba(250,250,248,0.05)",
+        "status": "match"
+      },
+      {
+        "token": "--text",
+        "canonical": "#fafaf8",
+        "app": "#fafaf8",
+        "status": "match"
+      },
+      {
+        "token": "--text-2",
+        "canonical": "rgba(250,250,248,0.62)",
+        "app": "rgba(250,250,248,0.62)",
+        "status": "match"
+      },
+      {
+        "token": "--text-3",
+        "canonical": "rgba(250,250,248,0.38)",
+        "app": "rgba(250,250,248,0.52)",
+        "status": "documented-deviation"
+      },
+      {
+        "token": "--text-4",
+        "canonical": "rgba(250,250,248,0.2)",
+        "app": "rgba(250,250,248,0.2)",
+        "status": "match"
+      },
+      {
+        "token": "--font-body",
+        "canonical": "'Manrope',system-ui,sans-serif",
+        "app": "'Manrope',system-ui,sans-serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-display",
+        "canonical": "'Manrope',system-ui,sans-serif",
+        "app": "'Manrope',system-ui,sans-serif",
+        "status": "match"
+      },
+      {
+        "token": "--font-mono",
+        "canonical": "'IBM Plex Mono',ui-monospace,monospace",
+        "app": "'IBM Plex Mono',ui-monospace,monospace",
+        "status": "match"
+      },
+      {
+        "token": "--display-weight",
+        "canonical": "700",
+        "app": "700",
+        "status": "match"
+      },
+      {
+        "token": "--display-tracking",
+        "canonical": "-0.045em",
+        "app": "-0.045em",
+        "status": "match"
+      },
+      {
+        "token": "--display-leading",
+        "canonical": "1",
+        "app": "1",
+        "status": "match"
+      },
+      {
+        "token": "--body-leading",
+        "canonical": "1.55",
+        "app": "1.55",
+        "status": "match"
+      },
+      {
+        "token": "--eyebrow-tracking",
+        "canonical": "0.14em",
+        "app": "0.14em",
+        "status": "match"
+      },
+      {
+        "token": "--mono-size-step",
+        "canonical": "10.5px",
+        "app": "10.5px",
+        "status": "match"
+      },
+      {
+        "token": "--radius",
+        "canonical": "4px",
+        "app": "4px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-sm",
+        "canonical": "2px",
+        "app": "2px",
+        "status": "match"
+      },
+      {
+        "token": "--radius-pill",
+        "canonical": "999px",
+        "app": "999px",
+        "status": "match"
+      },
+      {
+        "token": "--border-w",
+        "canonical": "1px",
+        "app": "1px",
+        "status": "match"
+      },
+      {
+        "token": "--hairline-w",
+        "canonical": "0.5px",
+        "app": "0.5px",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-sm",
+        "canonical": "none",
+        "app": "none",
+        "status": "match"
+      },
+      {
+        "token": "--shadow",
+        "canonical": "none",
+        "app": "none",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-lg",
+        "canonical": "0 24px 60px rgba(0,0,0,0.5)",
+        "app": "0 24px 60px rgba(0,0,0,0.5)",
+        "status": "match"
+      },
+      {
+        "token": "--shadow-accent",
+        "canonical": "0 0 0 1px var(--accent)",
+        "app": "0 0 0 1px var(--accent)",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere",
+        "canonical": "linear-gradient(0deg,transparent calc(100% - 1px),rgba(250,250,248,0.04)calc(100% - 1px)),linear-gradient(90deg,transparent calc(100% - 1px),rgba(250,250,248,0.04)calc(100% - 1px))",
+        "app": "linear-gradient(0deg,transparent calc(100% - 1px),rgba(250,250,248,0.04)calc(100% - 1px)),linear-gradient(90deg,transparent calc(100% - 1px),rgba(250,250,248,0.04)calc(100% - 1px))",
+        "status": "match"
+      },
+      {
+        "token": "--bg-atmosphere-size",
+        "canonical": "64px 64px,64px 64px",
+        "app": "64px 64px,64px 64px",
+        "status": "match"
+      },
+      {
+        "token": "--grain-opacity",
+        "canonical": "0.18",
+        "app": "0.18",
+        "status": "match"
+      },
+      {
+        "token": "--radius-xs",
+        "canonical": null,
+        "app": "3px",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-fast",
+        "canonical": null,
+        "app": "160ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-base",
+        "canonical": null,
+        "app": "240ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-slow",
+        "canonical": null,
+        "app": "400ms",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--motion-ease",
+        "canonical": null,
+        "app": "cubic-bezier(0.2,0.65,0.3,1)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--shell-footer-measure",
+        "canonical": null,
+        "app": "var(--content-max)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-base",
+        "canonical": null,
+        "app": "hsl(var(--muted))",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--skeleton-shine",
+        "canonical": null,
+        "app": "hsl(var(--muted)/ 0.5)",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-content-gap",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-control-height",
+        "canonical": null,
+        "app": "2.75rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-panel-padding",
+        "canonical": null,
+        "app": "1.5rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-page-measure",
+        "canonical": null,
+        "app": "80rem",
+        "status": "runtime-only"
+      },
+      {
+        "token": "--profile-chrome-opacity",
+        "canonical": null,
+        "app": "0.88",
+        "status": "runtime-only"
+      }
+    ]
+  },
+  "geometry": [
+    {
+      "token": "--shell-sidebar-w",
+      "canonical": "280px",
+      "app": "280px",
+      "status": "match"
+    },
+    {
+      "token": "--shell-sidebar-w-tablet",
+      "canonical": "240px",
+      "app": "240px",
+      "status": "match"
+    },
+    {
+      "token": "--shell-rail-w",
+      "canonical": "56px",
+      "app": "56px",
+      "status": "match"
+    },
+    {
+      "token": "--shell-header-h",
+      "canonical": "60px",
+      "app": "60px",
+      "status": "match"
+    },
+    {
+      "token": "--page-pad-y",
+      "canonical": "48px",
+      "app": "48px",
+      "status": "match"
+    },
+    {
+      "token": "--page-pad-x",
+      "canonical": "40px",
+      "app": "40px",
+      "status": "match"
+    },
+    {
+      "token": "--content-max",
+      "canonical": "1240px",
+      "app": "1240px",
+      "status": "match"
+    },
+    {
+      "token": "--content-max-admin",
+      "canonical": "1400px",
+      "app": "1400px",
+      "status": "match"
+    },
+    {
+      "token": "--footer-pad",
+      "canonical": "48px 40px 32px",
+      "app": "48px 40px 32px",
+      "status": "match"
+    }
+  ],
+  "responsive": [
+    {
+      "token": "--shell-sidebar-w",
+      "context": "@media (min-width: 768px) and (max-width: 1023px)",
+      "canonical": "240px",
+      "app": "240px",
+      "declared": "var(--shell-sidebar-w-tablet)",
+      "status": "match"
+    },
+    {
+      "token": "--shell-header-h",
+      "context": "@media (max-width: 767px)",
+      "canonical": "56px",
+      "app": "56px",
+      "declared": "56px",
+      "status": "match"
+    }
+  ],
+  "combos": [
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff3d52",
+        "app": "#ff3d52"
+      },
+      "--accent-2": {
+        "canonical": "#b84dff",
+        "app": "#b84dff"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "crimson",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff3d52",
+        "app": "#ff3d52"
+      },
+      "--accent-2": {
+        "canonical": "#b84dff",
+        "app": "#b84dff"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "crimson",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff3d52",
+        "app": "#ff3d52"
+      },
+      "--accent-2": {
+        "canonical": "#b84dff",
+        "app": "#b84dff"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "crimson",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff3d52",
+        "app": "#ff3d52"
+      },
+      "--accent-2": {
+        "canonical": "#b84dff",
+        "app": "#b84dff"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "crimson",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff3d52",
+        "app": "#ff3d52"
+      },
+      "--accent-2": {
+        "canonical": "#b84dff",
+        "app": "#b84dff"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "magenta",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ec4899",
+        "app": "#ec4899"
+      },
+      "--accent-2": {
+        "canonical": "#f472b6",
+        "app": "#f472b6"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "magenta",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ec4899",
+        "app": "#ec4899"
+      },
+      "--accent-2": {
+        "canonical": "#f472b6",
+        "app": "#f472b6"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "magenta",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ec4899",
+        "app": "#ec4899"
+      },
+      "--accent-2": {
+        "canonical": "#f472b6",
+        "app": "#f472b6"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "magenta",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ec4899",
+        "app": "#ec4899"
+      },
+      "--accent-2": {
+        "canonical": "#f472b6",
+        "app": "#f472b6"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "magenta",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ec4899",
+        "app": "#ec4899"
+      },
+      "--accent-2": {
+        "canonical": "#f472b6",
+        "app": "#f472b6"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "orange",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a3d",
+        "app": "#ff7a3d"
+      },
+      "--accent-2": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "orange",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a3d",
+        "app": "#ff7a3d"
+      },
+      "--accent-2": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "orange",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a3d",
+        "app": "#ff7a3d"
+      },
+      "--accent-2": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "orange",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a3d",
+        "app": "#ff7a3d"
+      },
+      "--accent-2": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a3d",
+        "app": "#ff7a3d"
+      },
+      "--accent-2": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "amber",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      },
+      "--accent-2": {
+        "canonical": "#ffd86b",
+        "app": "#ffd86b"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "amber",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      },
+      "--accent-2": {
+        "canonical": "#ffd86b",
+        "app": "#ffd86b"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "amber",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      },
+      "--accent-2": {
+        "canonical": "#ffd86b",
+        "app": "#ffd86b"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      },
+      "--accent-2": {
+        "canonical": "#ffd86b",
+        "app": "#ffd86b"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "amber",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ffb84d",
+        "app": "#ffb84d"
+      },
+      "--accent-2": {
+        "canonical": "#ffd86b",
+        "app": "#ffd86b"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "emerald",
+      "status": "match",
+      "--accent": {
+        "canonical": "#34d08c",
+        "app": "#34d08c"
+      },
+      "--accent-2": {
+        "canonical": "#5ee6b8",
+        "app": "#5ee6b8"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "emerald",
+      "status": "match",
+      "--accent": {
+        "canonical": "#34d08c",
+        "app": "#34d08c"
+      },
+      "--accent-2": {
+        "canonical": "#5ee6b8",
+        "app": "#5ee6b8"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "emerald",
+      "status": "match",
+      "--accent": {
+        "canonical": "#34d08c",
+        "app": "#34d08c"
+      },
+      "--accent-2": {
+        "canonical": "#5ee6b8",
+        "app": "#5ee6b8"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "emerald",
+      "status": "match",
+      "--accent": {
+        "canonical": "#34d08c",
+        "app": "#34d08c"
+      },
+      "--accent-2": {
+        "canonical": "#5ee6b8",
+        "app": "#5ee6b8"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "emerald",
+      "status": "match",
+      "--accent": {
+        "canonical": "#34d08c",
+        "app": "#34d08c"
+      },
+      "--accent-2": {
+        "canonical": "#5ee6b8",
+        "app": "#5ee6b8"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "matrix",
+      "status": "match",
+      "--accent": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      },
+      "--accent-2": {
+        "canonical": "#39ff14",
+        "app": "#39ff14"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "status": "match",
+      "--accent": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      },
+      "--accent-2": {
+        "canonical": "#39ff14",
+        "app": "#39ff14"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "matrix",
+      "status": "match",
+      "--accent": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      },
+      "--accent-2": {
+        "canonical": "#39ff14",
+        "app": "#39ff14"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "matrix",
+      "status": "match",
+      "--accent": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      },
+      "--accent-2": {
+        "canonical": "#39ff14",
+        "app": "#39ff14"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "matrix",
+      "status": "match",
+      "--accent": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      },
+      "--accent-2": {
+        "canonical": "#39ff14",
+        "app": "#39ff14"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "cyan",
+      "status": "match",
+      "--accent": {
+        "canonical": "#5eddf2",
+        "app": "#5eddf2"
+      },
+      "--accent-2": {
+        "canonical": "#7dd3fc",
+        "app": "#7dd3fc"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "cyan",
+      "status": "match",
+      "--accent": {
+        "canonical": "#5eddf2",
+        "app": "#5eddf2"
+      },
+      "--accent-2": {
+        "canonical": "#7dd3fc",
+        "app": "#7dd3fc"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "status": "match",
+      "--accent": {
+        "canonical": "#5eddf2",
+        "app": "#5eddf2"
+      },
+      "--accent-2": {
+        "canonical": "#7dd3fc",
+        "app": "#7dd3fc"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "cyan",
+      "status": "match",
+      "--accent": {
+        "canonical": "#5eddf2",
+        "app": "#5eddf2"
+      },
+      "--accent-2": {
+        "canonical": "#7dd3fc",
+        "app": "#7dd3fc"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "cyan",
+      "status": "match",
+      "--accent": {
+        "canonical": "#5eddf2",
+        "app": "#5eddf2"
+      },
+      "--accent-2": {
+        "canonical": "#7dd3fc",
+        "app": "#7dd3fc"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "violet",
+      "status": "match",
+      "--accent": {
+        "canonical": "#9d4edd",
+        "app": "#9d4edd"
+      },
+      "--accent-2": {
+        "canonical": "#c77dff",
+        "app": "#c77dff"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "violet",
+      "status": "match",
+      "--accent": {
+        "canonical": "#9d4edd",
+        "app": "#9d4edd"
+      },
+      "--accent-2": {
+        "canonical": "#c77dff",
+        "app": "#c77dff"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "violet",
+      "status": "match",
+      "--accent": {
+        "canonical": "#9d4edd",
+        "app": "#9d4edd"
+      },
+      "--accent-2": {
+        "canonical": "#c77dff",
+        "app": "#c77dff"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "violet",
+      "status": "match",
+      "--accent": {
+        "canonical": "#9d4edd",
+        "app": "#9d4edd"
+      },
+      "--accent-2": {
+        "canonical": "#c77dff",
+        "app": "#c77dff"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "violet",
+      "status": "match",
+      "--accent": {
+        "canonical": "#9d4edd",
+        "app": "#9d4edd"
+      },
+      "--accent-2": {
+        "canonical": "#c77dff",
+        "app": "#c77dff"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "lime",
+      "status": "match",
+      "--accent": {
+        "canonical": "#aaff00",
+        "app": "#aaff00"
+      },
+      "--accent-2": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "lime",
+      "status": "match",
+      "--accent": {
+        "canonical": "#aaff00",
+        "app": "#aaff00"
+      },
+      "--accent-2": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "lime",
+      "status": "match",
+      "--accent": {
+        "canonical": "#aaff00",
+        "app": "#aaff00"
+      },
+      "--accent-2": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "lime",
+      "status": "match",
+      "--accent": {
+        "canonical": "#aaff00",
+        "app": "#aaff00"
+      },
+      "--accent-2": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "lime",
+      "status": "match",
+      "--accent": {
+        "canonical": "#aaff00",
+        "app": "#aaff00"
+      },
+      "--accent-2": {
+        "canonical": "#00ff88",
+        "app": "#00ff88"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "rose",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a8a",
+        "app": "#ff7a8a"
+      },
+      "--accent-2": {
+        "canonical": "#ffb3c1",
+        "app": "#ffb3c1"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "rose",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a8a",
+        "app": "#ff7a8a"
+      },
+      "--accent-2": {
+        "canonical": "#ffb3c1",
+        "app": "#ffb3c1"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "rose",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a8a",
+        "app": "#ff7a8a"
+      },
+      "--accent-2": {
+        "canonical": "#ffb3c1",
+        "app": "#ffb3c1"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "rose",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a8a",
+        "app": "#ff7a8a"
+      },
+      "--accent-2": {
+        "canonical": "#ffb3c1",
+        "app": "#ffb3c1"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "rose",
+      "status": "match",
+      "--accent": {
+        "canonical": "#ff7a8a",
+        "app": "#ff7a8a"
+      },
+      "--accent-2": {
+        "canonical": "#ffb3c1",
+        "app": "#ffb3c1"
+      }
+    }
+  ],
+  "elsewhere": [],
+  "cascade": {
+    "rootBlocks": 2,
+    "systemBlocks": {
+      "terminal": 1,
+      "geist": 1,
+      "brutalist": 1,
+      "swiss": 1
+    },
+    "scopedDeclarations": 2,
+    "siblingDeclarations": 35,
+    "layers": [
+      "base",
+      "theme",
+      "components",
+      "utilities"
+    ],
+    "layerAmbiguities": [],
+    "sheets": [
+      {
+        "file": "client/index.html",
+        "position": "0",
+        "order": [
+          0
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "client/src/index.css",
+        "position": "1",
+        "order": [
+          1
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "client/src/styles/design-system.css",
+        "position": "1.0",
+        "order": [
+          1,
+          0
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "shared/styles/product-profiles.css",
+        "position": "1.0.0",
+        "order": [
+          1,
+          0,
+          0
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "client/src/styles/mobile-optimizations.css",
+        "position": "1.1",
+        "order": [
+          1,
+          1
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "client/src/styles/skeleton-animations.css",
+        "position": "1.2",
+        "order": [
+          1,
+          2
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "client/src/styles/scrolling-fix.css",
+        "position": "1.3",
+        "order": [
+          1,
+          3
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "node_modules/tailwindcss/index.css",
+        "position": "1.4",
+        "order": [
+          1,
+          4
+        ],
+        "layer": null,
+        "context": null
+      },
+      {
+        "file": "client/src/components/admin/admin-canonical.css",
+        "position": "1000000",
+        "order": 1000000,
+        "layer": null,
+        "context": null
+      }
+    ],
+    "document": {
+      "entry": "client/src/index.css",
+      "main": {
+        "reached": true,
+        "context": "",
+        "importer": "client/src/index.css"
+      },
+      "misplaced": [],
+      "unresolved": [],
+      "duplicates": []
+    }
+  },
+  "utilities": [
+    {
+      "rule": ".page",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "position",
+          "canonical": "relative",
+          "app": "relative",
+          "status": "match"
+        },
+        {
+          "prop": "min-height",
+          "canonical": "100vh",
+          "app": "100vh",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "var(--bg-atmosphere),var(--bg)",
+          "app": "var(--bg-atmosphere),var(--bg)",
+          "status": "match"
+        },
+        {
+          "prop": "background-size",
+          "canonical": "var(--bg-atmosphere-size,auto),auto",
+          "app": "var(--bg-atmosphere-size,auto),auto",
+          "status": "match"
+        },
+        {
+          "prop": "background-color",
+          "canonical": "var(--bg)",
+          "app": "var(--bg)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".grain",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "position",
+          "canonical": "fixed",
+          "app": "fixed",
+          "status": "match"
+        },
+        {
+          "prop": "inset",
+          "canonical": "0",
+          "app": "0",
+          "status": "match"
+        },
+        {
+          "prop": "pointer-events",
+          "canonical": "none",
+          "app": "none",
+          "status": "match"
+        },
+        {
+          "prop": "z-index",
+          "canonical": "1",
+          "app": "1",
+          "status": "match"
+        },
+        {
+          "prop": "opacity",
+          "canonical": "var(--grain-opacity,0.32)",
+          "app": "var(--grain-opacity,0.32)",
+          "status": "match"
+        },
+        {
+          "prop": "mix-blend-mode",
+          "canonical": "overlay",
+          "app": "overlay",
+          "status": "match"
+        },
+        {
+          "prop": "background-image",
+          "canonical": "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScgb3BhY2l0eT0nMC41Jy8+PC9zdmc+')",
+          "app": "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScgb3BhY2l0eT0nMC41Jy8+PC9zdmc+')",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".mono",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "font-family",
+          "canonical": "var(--font-mono)",
+          "app": "var(--font-mono)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".display",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "font-family",
+          "canonical": "var(--font-display)",
+          "app": "var(--font-display)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".serif-italic",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "font-family",
+          "canonical": "var(--font-display)",
+          "app": "var(--font-display)",
+          "status": "match"
+        },
+        {
+          "prop": "font-style",
+          "canonical": "italic",
+          "app": "italic",
+          "status": "match"
+        },
+        {
+          "prop": "font-weight",
+          "canonical": "400",
+          "app": "400",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"editorial\"] .serif-italic"
+        ],
+        "app": [
+          "[data-system=\"editorial\"] .serif-italic"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".display-h",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "font-family",
+          "canonical": "var(--font-display)",
+          "app": "var(--font-display)",
+          "status": "match"
+        },
+        {
+          "prop": "font-weight",
+          "canonical": "var(--display-weight)",
+          "app": "var(--display-weight)",
+          "status": "match"
+        },
+        {
+          "prop": "letter-spacing",
+          "canonical": "var(--display-tracking)",
+          "app": "var(--display-tracking)",
+          "status": "match"
+        },
+        {
+          "prop": "line-height",
+          "canonical": "var(--display-leading)",
+          "app": "var(--display-leading)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"geist\"] .display-h",
+          "[data-system=\"swiss\"] .display-h"
+        ],
+        "app": [
+          "[data-system=\"geist\"] .display-h",
+          "[data-system=\"swiss\"] .display-h"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".card",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "background",
+          "canonical": "var(--surface)",
+          "app": "var(--surface)",
+          "status": "match"
+        },
+        {
+          "prop": "border",
+          "canonical": "var(--border-w)solid var(--border)",
+          "app": "var(--border-w)solid var(--border)",
+          "status": "match"
+        },
+        {
+          "prop": "border-radius",
+          "canonical": "var(--radius)",
+          "app": "var(--radius)",
+          "status": "match"
+        },
+        {
+          "prop": "transition",
+          "canonical": "transform 220ms cubic-bezier(0.2,0.65,0.3,1),background 220ms ease,border-color 220ms ease,box-shadow 220ms ease",
+          "app": "transform 220ms cubic-bezier(0.2,0.65,0.3,1),background 220ms ease,border-color 220ms ease,box-shadow 220ms ease",
+          "status": "match"
+        },
+        {
+          "prop": "position",
+          "canonical": "relative",
+          "app": "relative",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"terminal\"] .card"
+        ],
+        "app": [
+          ".no-anim *",
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"terminal\"] .card"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".card.hoverable",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "cursor",
+          "canonical": "pointer",
+          "app": "pointer",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"brutalist\"] .card.hoverable:hover",
+          "[data-system=\"geist\"] .card.hoverable:hover",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"swiss\"] .card.hoverable:hover",
+          "[data-system=\"terminal\"] .card",
+          "[data-system=\"terminal\"] .card.hoverable:hover"
+        ],
+        "app": [
+          ".no-anim *",
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"brutalist\"] .card.hoverable:hover",
+          "[data-system=\"geist\"] .card.hoverable:hover",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"swiss\"] .card.hoverable:hover",
+          "[data-system=\"terminal\"] .card",
+          "[data-system=\"terminal\"] .card.hoverable:hover"
+        ],
+        "contexts": 6
+      }
+    },
+    {
+      "rule": ".card.hoverable:hover",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "transform",
+          "canonical": "translateY(-2px)",
+          "app": "translateY(-2px)",
+          "status": "match"
+        },
+        {
+          "prop": "border-color",
+          "canonical": "var(--border-strong)",
+          "app": "var(--border-strong)",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "var(--surface-2)",
+          "app": "var(--surface-2)",
+          "status": "match"
+        },
+        {
+          "prop": "box-shadow",
+          "canonical": "var(--shadow)",
+          "app": "var(--shadow)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"brutalist\"] .card.hoverable:hover",
+          "[data-system=\"geist\"] .card.hoverable:hover",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"swiss\"] .card.hoverable:hover",
+          "[data-system=\"terminal\"] .card",
+          "[data-system=\"terminal\"] .card.hoverable:hover"
+        ],
+        "app": [
+          ".no-anim *",
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"brutalist\"] .card.hoverable:hover",
+          "[data-system=\"geist\"] .card.hoverable:hover",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"swiss\"] .card.hoverable:hover",
+          "[data-system=\"terminal\"] .card",
+          "[data-system=\"terminal\"] .card.hoverable:hover"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".card.glow:hover",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "box-shadow",
+          "canonical": "var(--shadow-accent)",
+          "app": "var(--shadow-accent)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"terminal\"] .card"
+        ],
+        "app": [
+          ".no-anim *",
+          "[data-system=\"brutalist\"] .card",
+          "[data-system=\"swiss\"] .card",
+          "[data-system=\"terminal\"] .card"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".chip",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "display",
+          "canonical": "inline-flex",
+          "app": "inline-flex",
+          "status": "match"
+        },
+        {
+          "prop": "align-items",
+          "canonical": "center",
+          "app": "center",
+          "status": "match"
+        },
+        {
+          "prop": "gap",
+          "canonical": "6px",
+          "app": "6px",
+          "status": "match"
+        },
+        {
+          "prop": "padding",
+          "canonical": "4px 10px",
+          "app": "4px 10px",
+          "status": "match"
+        },
+        {
+          "prop": "border-radius",
+          "canonical": "var(--radius-pill)",
+          "app": "var(--radius-pill)",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "var(--surface)",
+          "app": "var(--surface)",
+          "status": "match"
+        },
+        {
+          "prop": "border",
+          "canonical": "var(--hairline-w)solid var(--border)",
+          "app": "var(--hairline-w)solid var(--border)",
+          "status": "match"
+        },
+        {
+          "prop": "font-family",
+          "canonical": "var(--font-mono)",
+          "app": "var(--font-mono)",
+          "status": "match"
+        },
+        {
+          "prop": "font-size",
+          "canonical": "10.5px",
+          "app": "10.5px",
+          "status": "match"
+        },
+        {
+          "prop": "letter-spacing",
+          "canonical": "0.6px",
+          "app": "0.6px",
+          "status": "match"
+        },
+        {
+          "prop": "color",
+          "canonical": "var(--text-2)",
+          "app": "var(--text-2)",
+          "status": "match"
+        },
+        {
+          "prop": "text-transform",
+          "canonical": "uppercase",
+          "app": "uppercase",
+          "status": "match"
+        },
+        {
+          "prop": "white-space",
+          "canonical": "nowrap",
+          "app": "nowrap",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".chip.accent",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "color",
+          "canonical": "var(--accent)",
+          "app": "var(--accent)",
+          "status": "match"
+        },
+        {
+          "prop": "border-color",
+          "canonical": "color-mix(in srgb,var(--accent)35%,var(--border))",
+          "app": "color-mix(in srgb,var(--accent)35%,var(--border))",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "color-mix(in srgb,var(--accent)8%,transparent)",
+          "app": "color-mix(in srgb,var(--accent)8%,transparent)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".chip.ok",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "color",
+          "canonical": "#34d08c",
+          "app": "#34d08c",
+          "status": "match"
+        },
+        {
+          "prop": "border-color",
+          "canonical": "rgba(52,208,140,0.3)",
+          "app": "rgba(52,208,140,0.3)",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "rgba(52,208,140,0.08)",
+          "app": "rgba(52,208,140,0.08)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".chip.warn",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "color",
+          "canonical": "#ffb84d",
+          "app": "#ffb84d",
+          "status": "match"
+        },
+        {
+          "prop": "border-color",
+          "canonical": "rgba(255,184,77,0.3)",
+          "app": "rgba(255,184,77,0.3)",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "rgba(255,184,77,0.08)",
+          "app": "rgba(255,184,77,0.08)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".chip.bad",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "color",
+          "canonical": "#ff5c7a",
+          "app": "#ff5c7a",
+          "status": "match"
+        },
+        {
+          "prop": "border-color",
+          "canonical": "rgba(255,92,122,0.3)",
+          "app": "rgba(255,92,122,0.3)",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "rgba(255,92,122,0.08)",
+          "app": "rgba(255,92,122,0.08)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".chip.muted",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "color",
+          "canonical": "var(--text-3)",
+          "app": "var(--text-3)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .chip",
+          "[data-system=\"geist\"] .chip",
+          "[data-system=\"swiss\"] .chip",
+          "[data-system=\"terminal\"] .chip"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".dot",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "width",
+          "canonical": "8px",
+          "app": "8px",
+          "status": "match"
+        },
+        {
+          "prop": "height",
+          "canonical": "8px",
+          "app": "8px",
+          "status": "match"
+        },
+        {
+          "prop": "border-radius",
+          "canonical": "50%",
+          "app": "50%",
+          "status": "match"
+        },
+        {
+          "prop": "display",
+          "canonical": "inline-block",
+          "app": "inline-block",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".dot.ok",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "background",
+          "canonical": "#34d08c",
+          "app": "#34d08c",
+          "status": "match"
+        },
+        {
+          "prop": "box-shadow",
+          "canonical": "0 0 8px #34d08c",
+          "app": "0 0 8px #34d08c",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".dot.warn",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "background",
+          "canonical": "#ffb84d",
+          "app": "#ffb84d",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".dot.bad",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "background",
+          "canonical": "#ff5c7a",
+          "app": "#ff5c7a",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".eyebrow",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "font-family",
+          "canonical": "var(--font-mono)",
+          "app": "var(--font-mono)",
+          "status": "match"
+        },
+        {
+          "prop": "font-size",
+          "canonical": "var(--mono-size-step)",
+          "app": "var(--mono-size-step)",
+          "status": "match"
+        },
+        {
+          "prop": "letter-spacing",
+          "canonical": "var(--eyebrow-tracking)",
+          "app": "var(--eyebrow-tracking)",
+          "status": "match"
+        },
+        {
+          "prop": "text-transform",
+          "canonical": "uppercase",
+          "app": "uppercase",
+          "status": "match"
+        },
+        {
+          "prop": "color",
+          "canonical": "var(--accent)",
+          "app": "var(--accent)",
+          "status": "match"
+        },
+        {
+          "prop": "display",
+          "canonical": "inline-flex",
+          "app": "inline-flex",
+          "status": "match"
+        },
+        {
+          "prop": "align-items",
+          "canonical": "center",
+          "app": "center",
+          "status": "match"
+        },
+        {
+          "prop": "gap",
+          "canonical": "8px",
+          "app": "8px",
+          "status": "match"
+        },
+        {
+          "prop": "font-weight",
+          "canonical": "600",
+          "app": "600",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .eyebrow",
+          "[data-system=\"editorial\"] .eyebrow",
+          "[data-system=\"swiss\"] .eyebrow",
+          "[data-system=\"terminal\"] .eyebrow"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .eyebrow",
+          "[data-system=\"editorial\"] .eyebrow",
+          "[data-system=\"swiss\"] .eyebrow",
+          "[data-system=\"terminal\"] .eyebrow"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": ".kbd",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "font-family",
+          "canonical": "var(--font-mono)",
+          "app": "var(--font-mono)",
+          "status": "match"
+        },
+        {
+          "prop": "font-size",
+          "canonical": "10.5px",
+          "app": "12px",
+          "status": "documented-deviation"
+        },
+        {
+          "prop": "color",
+          "canonical": "var(--text-3)",
+          "app": "var(--text-3)",
+          "status": "match"
+        },
+        {
+          "prop": "padding",
+          "canonical": "2px 6px",
+          "app": "2px 6px",
+          "status": "match"
+        },
+        {
+          "prop": "border",
+          "canonical": "var(--hairline-w)solid var(--border)",
+          "app": "var(--hairline-w)solid var(--border)",
+          "status": "match"
+        },
+        {
+          "prop": "border-radius",
+          "canonical": "4px",
+          "app": "4px",
+          "status": "match"
+        },
+        {
+          "prop": "background",
+          "canonical": "var(--surface)",
+          "app": "var(--surface)",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [
+          "[data-system=\"brutalist\"] .kbd",
+          "[data-system=\"terminal\"] .kbd"
+        ],
+        "app": [
+          "[data-system=\"brutalist\"] .kbd",
+          "[data-system=\"terminal\"] .kbd"
+        ],
+        "contexts": 4
+      }
+    },
+    {
+      "rule": "@media (max-width: 768px)||.hide-mobile",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "display",
+          "canonical": "none !important",
+          "app": "none !important",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 6
+      }
+    },
+    {
+      "rule": "@media (min-width: 769px)||.show-mobile",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "display",
+          "canonical": "none !important",
+          "app": "none !important",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 6
+      }
+    },
+    {
+      "rule": "@media (max-width: 1024px)||.hide-tablet",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "display",
+          "canonical": "none !important",
+          "app": "none !important",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 6
+      }
+    },
+    {
+      "rule": "@media (min-width: 1025px)||.show-tablet",
+      "status": "match",
+      "occurrences": {
+        "canonical": 1,
+        "app": 1
+      },
+      "declarations": [
+        {
+          "prop": "display",
+          "canonical": "none !important",
+          "app": "none !important",
+          "status": "match"
+        }
+      ],
+      "shadows": {
+        "canonical": [],
+        "app": [],
+        "contexts": 6
+      }
+    }
+  ],
+  "canaries": [
+    {
+      "id": "control",
+      "note": "unmodified inputs",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "later-root-override",
+      "note": "a second :root at the end of the file re-declares --bg",
+      "expect": "FAIL /^editorial: --bg differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --bg differs — design #000000 vs runtime #123456"
+    },
+    {
+      "id": "later-root-important",
+      "note": "a later :root sets --radius !important",
+      "expect": "FAIL /^editorial: --radius differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --radius differs — design 12px vs runtime 10px !important"
+    },
+    {
+      "id": "earlier-important-wins",
+      "note": "an earlier !important --radius survives a later plain override (browser semantics)",
+      "expect": "FAIL /^editorial: --radius differs — design 12px vs runtime 9px !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --radius differs — design 12px vs runtime 9px !important"
+    },
+    {
+      "id": "later-system-block",
+      "note": "a second :root[data-system=\"geist\"] block overrides --surface",
+      "expect": "FAIL /^geist: --surface differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "geist: --surface differs — design rgba(255,255,255,0.04) vs runtime rgba(255,255,255,0.05)"
+    },
+    {
+      "id": "important-root-vs-system",
+      "note": "a :root !important --surface outranks a later, canonical-valued editorial system block (importance beats specificity)",
+      "expect": "FAIL /^editorial: --surface differs — design .+ vs runtime #010203 !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --surface differs — design rgba(244,243,238,0.025) vs runtime #010203 !important"
+    },
+    {
+      "id": "important-accent-combo",
+      "note": "a system block sets --accent !important, outranking every accent block",
+      "expect": "FAIL /^accent combo geist\\/cyan: --accent resolves to #ff0000 !important in the runtime but the design paints/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "accent combo geist/cyan: --accent resolves to #ff0000 !important in the runtime but the design paints #5eddf2"
+    },
+    {
+      "id": "late-system-accent",
+      "note": "a system block after the accent blocks sets --accent (same specificity, later wins)",
+      "expect": "FAIL /^accent combo geist\\/cyan: --accent resolves to #ff0000 in the runtime but the design paints/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "accent combo geist/cyan: --accent resolves to #ff0000 in the runtime but the design paints #5eddf2"
+    },
+    {
+      "id": "system-geometry-drift",
+      "note": "a system block re-declares --content-max (geometry is system-independent in the design)",
+      "expect": "FAIL /^geometry: --content-max differs in geist — design 1240px vs runtime 1000px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "geometry: --content-max differs in geist — design 1240px vs runtime 1000px"
+    },
+    {
+      "id": "later-utility-override",
+      "note": "a repeated .chip rule changes font-size",
+      "expect": "FAIL /^utility \\.chip: font-size differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "utility .chip: font-size differs — design 10.5px vs runtime 12px"
+    },
+    {
+      "id": "later-utility-under-media",
+      "note": ".chip re-declared under a media query",
+      "expect": "FAIL /^shadow rule: @media \\(max-width: 600px\\)\\|\\|\\.chip re-declares font-size for \\.chip under @media \\(max-width:600px\\)/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: @media (max-width: 600px)||.chip re-declares font-size for .chip under @media (max-width:600px) — runtime resolves 12px, design resolves 10.5px"
+    },
+    {
+      "id": "descendant-override",
+      "note": ".page .chip re-declares font-size",
+      "expect": "FAIL /^shadow rule: \\.page \\.chip re-declares font-size/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: .page .chip re-declares font-size for .chip — runtime resolves 12px, design resolves 10.5px"
+    },
+    {
+      "id": "state-override",
+      "note": ".chip:hover re-declares background",
+      "expect": "FAIL /^shadow rule: \\.chip:hover re-declares background for \\.chip when :hover/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: .chip:hover re-declares background for .chip when :hover — runtime resolves red, design resolves var(--surface)"
+    },
+    {
+      "id": "escaped-class-shadow",
+      "note": ".\\63 hip is .chip spelled with a hex escape — the engine must decode it, not split on the terminator space",
+      "expect": "FAIL /^shadow rule: \\.\\\\63 hip re-declares font-size for \\.chip — runtime resolves 99px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: .\\63 hip re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "attribute-class-shadow",
+      "note": "[class~=\"chip\"] re-declares font-size (same element, same specificity, later wins)",
+      "expect": "FAIL /^shadow rule: \\[class~=\"chip\"\\] re-declares font-size for \\.chip — runtime resolves 99px, design resolves 10\\.5px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: [class~=\"chip\"] re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "is-shadow",
+      "note": ":is(.chip) re-declares font-size",
+      "expect": "FAIL /^shadow rule: :is\\(\\.chip\\) re-declares font-size for \\.chip/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: :is(.chip) re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "not-shadow",
+      "note": ".chip:not(.accent) re-declares font-size (higher specificity)",
+      "expect": "FAIL /^shadow rule: \\.chip:not\\(\\.accent\\) re-declares font-size for \\.chip/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: .chip:not(.accent) re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "tag-qualified-shadow",
+      "note": "span.chip re-declares font-size (type selector adds specificity)",
+      "expect": "FAIL /^shadow rule: span\\.chip re-declares font-size for \\.chip/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: span.chip re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "where-no-op",
+      "note": ":where(.chip) re-declares font-size at zero specificity — the canonical rule still wins",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "where-important-shadow",
+      "note": ":where(.chip) !important outranks the canonical rule despite zero specificity",
+      "expect": "FAIL /^shadow rule: :where\\(\\.chip\\) re-declares font-size for \\.chip — runtime resolves 99px !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: :where(.chip) re-declares font-size for .chip — runtime resolves 99px !important, design resolves 10.5px"
+    },
+    {
+      "id": "system-scoped-shadow",
+      "note": ":root[data-system=\"geist\"] .chip re-declares font-size for one system only",
+      "expect": "FAIL /^shadow rule: :root\\[data-system=\"geist\"\\] \\.chip re-declares font-size for \\.chip — runtime resolves 99px, design resolves 10\\.5px \\[geist\\]$/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: :root[data-system=\"geist\"] .chip re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px [geist]"
+    },
+    {
+      "id": "sibling-shadow",
+      "note": "another client stylesheet (position unknown → ranked last) re-declares .chip font-size",
+      "expect": "FAIL /^shadow rule: client\\/src\\/styles\\/canary\\.css \\.chip re-declares font-size for \\.chip/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/styles/canary.css .chip re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "admin-descendant-shadow",
+      "note": "the admin sheet scopes a .chip override under .admin-dashboard",
+      "expect": "FAIL /^shadow rule: client\\/src\\/components\\/admin\\/admin-canonical\\.css \\.admin-dashboard \\.chip re-declares font-size for \\.chip/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/components/admin/admin-canonical.css .admin-dashboard .chip re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "layered-shadow-no-op",
+      "note": "a sibling re-declares .chip inside @layer — unlayered canonical rules outrank it",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "two-layer-important-earlier-wins",
+      "note": "reviewer bypass: earlier layer :where() !important beats a later layer's higher-specificity !important restore and the unlayered canonical rule",
+      "expect": "FAIL /^shadow rule: client\\/src\\/styles\\/canary\\.css @media \\(max-width: 1024px\\) @layer early\\|\\|:where\\(\\.hide-tablet\\) re-declares display for \\.hide-tablet under @media \\(max-width:1024px\\) — runtime resolves block !important, design resolves none !important$/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/styles/canary.css @media (max-width: 1024px) @layer early||:where(.hide-tablet) re-declares display for .hide-tablet under @media (max-width:1024px) — runtime resolves block !important, design resolves none !important"
+    },
+    {
+      "id": "two-layer-important-canonical-earlier",
+      "note": "two layers, canonical restore in the earlier layer — the browser paints the design value",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "layer-statement-sets-order-pass",
+      "note": "`@layer late, early;` declares late first, so its restore outranks the early-block bypass",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "layer-statement-sets-order-fail",
+      "note": "`@layer early, late;` makes the later-written early block the winner",
+      "expect": "FAIL /^shadow rule: client\\/src\\/styles\\/canary\\.css @media \\(max-width: 1024px\\) @layer early\\|\\|:where\\(\\.hide-tablet\\) re-declares display for \\.hide-tablet under @media \\(max-width:1024px\\) — runtime resolves block !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/styles/canary.css @media (max-width: 1024px) @layer early||:where(.hide-tablet) re-declares display for .hide-tablet under @media (max-width:1024px) — runtime resolves block !important, design resolves none !important"
+    },
+    {
+      "id": "anonymous-layers-first-wins",
+      "note": "two anonymous @layer {} blocks are two layers; the first wins under !important",
+      "expect": "FAIL /^shadow rule: client\\/src\\/styles\\/canary\\.css @media \\(max-width: 1024px\\) @layer\\|\\|:where\\(\\.hide-tablet\\) re-declares display for \\.hide-tablet under @media \\(max-width:1024px\\) — runtime resolves block !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/styles/canary.css @media (max-width: 1024px) @layer||:where(.hide-tablet) re-declares display for .hide-tablet under @media (max-width:1024px) — runtime resolves block !important, design resolves none !important"
+    },
+    {
+      "id": "nested-sublayer-precedes-parent",
+      "note": "a sublayer precedes its parent's direct styles even when written after them",
+      "expect": "FAIL /^shadow rule: client\\/src\\/styles\\/canary\\.css @media \\(max-width: 1024px\\) @layer outer @layer inner\\|\\|:where\\(\\.hide-tablet\\) re-declares display for \\.hide-tablet under @media \\(max-width:1024px\\) — runtime resolves block !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/styles/canary.css @media (max-width: 1024px) @layer outer @layer inner||:where(.hide-tablet) re-declares display for .hide-tablet under @media (max-width:1024px) — runtime resolves block !important, design resolves none !important"
+    },
+    {
+      "id": "nested-sublayer-canonical",
+      "note": "dotted `@layer outer.inner` holds the canonical restore and outranks outer's bypass",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "layered-important-beats-unlayered-important",
+      "note": "an !important inside any layer beats the unlayered canonical !important",
+      "expect": "FAIL /^shadow rule: client\\/src\\/styles\\/canary\\.css @media \\(max-width: 1024px\\) @layer x\\|\\|:where\\(\\.hide-tablet\\) re-declares display for \\.hide-tablet under @media \\(max-width:1024px\\) — runtime resolves block !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/styles/canary.css @media (max-width: 1024px) @layer x||:where(.hide-tablet) re-declares display for .hide-tablet under @media (max-width:1024px) — runtime resolves block !important, design resolves none !important"
+    },
+    {
+      "id": "two-layer-normal-later-wins",
+      "note": "normal declarations: the later layer wins over an earlier layer's higher specificity",
+      "expect": "FAIL /^shadow rule: client\\/src\\/styles\\/canary\\.css @layer b\\|\\|:where\\(\\.chip\\) re-declares outline-offset for \\.chip — runtime resolves 2px, design resolves nothing$/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/src/styles/canary.css @layer b||:where(.chip) re-declares outline-offset for .chip — runtime resolves 2px, design resolves nothing"
+    },
+    {
+      "id": "vendor-statement-orders-named-layers",
+      "note": "Tailwind's `@layer theme, base, components, utilities;` statement orders layers this sheet only uses — components (restore) beats utilities (bypass)",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "import-layer-statement-above-imports",
+      "note": "reviewer bypass: `@layer early;` above index.css's imports registers before the layer(late) import — early < late, the early bypass wins",
+      "expect": "FAIL /^shadow rule: client\\/canary\\/bypass\\.css @media \\(max-width: 1024px\\) @layer early\\|\\|:where\\(\\.hide-tablet\\) re-declares display for \\.hide-tablet under @media \\(max-width:1024px\\) — runtime resolves block !important, design resolves none !important$/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/canary/bypass.css @media (max-width: 1024px) @layer early||:where(.hide-tablet) re-declares display for .hide-tablet under @media (max-width:1024px) — runtime resolves block !important, design resolves none !important"
+    },
+    {
+      "id": "import-layer-statement-control",
+      "note": "`@layer late, early;` above the same imports puts late first — the restore wins",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "import-layers-without-statement",
+      "note": "no statement: the layer(late) import declares late ahead of the bypass sheet's early",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "misplaced-import-after-rule",
+      "note": "an @import after index.css's rules is inlined there by the Tailwind compiler (the shadow is modelled) and reported as misplaced",
+      "expect": "FAIL /^misplaced @import: \"\\.\\.\\/canary\\/bypass\\.css\" in client\\/src\\/index\\.css it follows another rule/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "misplaced @import: \"../canary/bypass.css\" in client/src/index.css it follows another rule — the Tailwind compiler inlines it where it sits (so it IS modelled there), but css-syntax, postcss-import and a browser given the raw sheet drop an @import that is not at the top of its sheet (only @charset, @layer statements and other @imports may precede it); move it up so every pipeline agrees"
+    },
+    {
+      "id": "misplaced-import-nested-in-media",
+      "note": "an @import nested in @media is inlined inside it — modelled under the enclosing condition and reported as misplaced",
+      "expect": "FAIL /^misplaced @import: \"\\.\\.\\/canary\\/bypass\\.css\" in client\\/src\\/index\\.css it is nested inside @media \\(max-width: 1024px\\)/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "misplaced @import: \"../canary/bypass.css\" in client/src/index.css it is nested inside @media (max-width: 1024px) — the Tailwind compiler inlines it where it sits (so it IS modelled there), but css-syntax, postcss-import and a browser given the raw sheet drop an @import that is not at the top of its sheet (only @charset, @layer statements and other @imports may precede it); move it up so every pipeline agrees"
+    },
+    {
+      "id": "duplicate-import",
+      "note": "a sheet imported twice is inlined twice — reported, first copy modelled",
+      "expect": "FAIL /^duplicate @import: client\\/canary\\/bypass\\.css is imported again by client\\/src\\/index\\.css \\(\"\\.\\.\\/canary\\/bypass\\.css\"\\) after client\\/src\\/index\\.css already loaded it/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "duplicate @import: client/canary/bypass.css is imported again by client/src/index.css (\"../canary/bypass.css\") after client/src/index.css already loaded it — the Tailwind compiler inlines both copies, so every rule of it applies twice at two document positions; import it once"
+    },
+    {
+      "id": "conditional-import-media-matches",
+      "note": "an @import with a media list is a media-scoped sheet — modelled under that condition",
+      "expect": "FAIL /^shadow rule: client\\/canary\\/bypass\\.css @media \\(min-width: 800px\\) @media \\(max-width: 1024px\\) @layer early\\|\\|:where\\(\\.hide-tablet\\) re-declares display for \\.hide-tablet under @media \\(min-width:800px\\) @media \\(max-width:1024px\\) — runtime resolves block !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: client/canary/bypass.css @media (min-width: 800px) @media (max-width: 1024px) @layer early||:where(.hide-tablet) re-declares display for .hide-tablet under @media (min-width:800px) @media (max-width:1024px) — runtime resolves block !important, design resolves nothing"
+    },
+    {
+      "id": "conditional-import-print-only",
+      "note": "an @import … print is print-only and not a screen parity surface",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "main-sheet-import-after-rule",
+      "note": "the main sheet's import moved below index.css's first rule still loads (inlined) but is misplaced — rule 13",
+      "expect": "FAIL /^misplaced @import: \"\\.\\/styles\\/design-system\\.css\" in client\\/src\\/index\\.css it follows another rule/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "misplaced @import: \"./styles/design-system.css\" in client/src/index.css it follows another rule — the Tailwind compiler inlines it where it sits (so it IS modelled there), but css-syntax, postcss-import and a browser given the raw sheet drop an @import that is not at the top of its sheet (only @charset, @layer statements and other @imports may precede it); move it up so every pipeline agrees"
+    },
+    {
+      "id": "main-sheet-import-removed",
+      "note": "without its import the main sheet never loads — rule 12",
+      "expect": "FAIL /^document: client\\/src\\/styles\\/design-system\\.css is never loaded — no @import chain from client\\/src\\/index\\.css \\(or client\\/index\\.html\\) reaches it — the runtime paints no design token at all$/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "document: client/src/styles/design-system.css is never loaded — no @import chain from client/src/index.css (or client/index.html) reaches it — the runtime paints no design token at all"
+    },
+    {
+      "id": "main-sheet-import-conditional",
+      "note": "the main sheet imported under a media list applies only while it matches",
+      "expect": "FAIL /^document: client\\/src\\/styles\\/design-system\\.css is imported under \"@media \\(min-width: 1200px\\)\" \\(client\\/src\\/index\\.css\\)/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "document: client/src/styles/design-system.css is imported under \"@media (min-width: 1200px)\" (client/src/index.css) — its tokens apply only while that condition holds; import it unconditionally"
+    },
+    {
+      "id": "layer-order-conditional-first-declaration",
+      "note": "late is first declared only at ≥1200px, so at 900px early registers first and its bypass wins — the shadow computation (all conditions true) sees the restore win, only rule 14 catches it",
+      "expect": "FAIL /^layer order: cascade layers \"late\" and \"early\" are ordered by a condition — ahead of \"early\" \\(client\\/canary\\/bypass-late\\.css inside @media \\(max-width:1024px\\)\\) \"late\" is declared only conditionally \\(client\\/canary\\/late-desktop\\.css inside @media \\(min-width:1200px\\)\\) and it is declared again after it \\(client\\/canary\\/bypass-late\\.css inside @media \\(max-width:1024px\\)\\)/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "layer order: cascade layers \"late\" and \"early\" are ordered by a condition — ahead of \"early\" (client/canary/bypass-late.css inside @media (max-width:1024px)) \"late\" is declared only conditionally (client/canary/late-desktop.css inside @media (min-width:1200px)) and it is declared again after it (client/canary/bypass-late.css inside @media (max-width:1024px)), so while the condition is false the browser puts \"early\" first and every !important contest between the two flips; fix the order with an unconditional `@layer late, early;` statement ahead of both"
+    },
+    {
+      "id": "import-layer-main-sheet",
+      "note": "index.css imports design-system.css with layer(theme): an EARLIER unlayered index.html :root now beats it (unlayered outranks any layer) — rule 3 must see the browser value",
+      "expect": "FAIL /^editorial: --bg differs — design .+ vs runtime #000001$/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --bg differs — design #000000 vs runtime #000001"
+    },
+    {
+      "id": "import-layer-sibling-loses",
+      "note": "a LATER sibling imported with layer(x) re-declares .chip — the unlayered canonical rule still wins",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "print-shadow-ignored",
+      "note": "a print-only .chip override is not a screen parity surface",
+      "expect": "PASS",
+      "verdict": "PASS",
+      "matched": true,
+      "ok": true,
+      "firstFailure": ""
+    },
+    {
+      "id": "not-print-shadow-resolves",
+      "note": "@media not print DOES apply on screen — only a print-only query list is excluded",
+      "expect": "FAIL /^shadow rule: @media not print\\|\\|\\.chip re-declares font-size for \\.chip under @media not print — runtime resolves 99px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: @media not print||.chip re-declares font-size for .chip under @media not print — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "screen-print-list-shadow-resolves",
+      "note": "@media screen, print matches screens too",
+      "expect": "FAIL /^shadow rule: @media screen, print\\|\\|\\.chip re-declares font-size for \\.chip under @media screen, print — runtime resolves 99px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: @media screen, print||.chip re-declares font-size for .chip under @media screen, print — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "nested-descendant-shadow",
+      "note": "CSS Nesting: .page { .chip {} } is .page .chip and outranks the utility",
+      "expect": "FAIL /^shadow rule: \\.page \\.chip re-declares font-size for \\.chip — runtime resolves 99px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: .page .chip re-declares font-size for .chip — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "nested-ampersand-media-shadow",
+      "note": "CSS Nesting: .chip { @media (…) { … } } is a media-scoped .chip rule",
+      "expect": "FAIL /^shadow rule: @media \\(min-width: 0px\\)\\|\\|\\.chip re-declares font-size for \\.chip under @media \\(min-width:0px\\) — runtime resolves 99px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: @media (min-width: 0px)||.chip re-declares font-size for .chip under @media (min-width:0px) — runtime resolves 99px, design resolves 10.5px"
+    },
+    {
+      "id": "nested-root-media-geometry",
+      "note": "CSS Nesting: :root { @media (tablet) { --shell-sidebar-w } } is the responsive geometry contract",
+      "expect": "FAIL /^responsive geometry: --shell-sidebar-w inside @media \\(min-width: 768px\\) and \\(max-width: 1023px\\) resolves to 200px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "responsive geometry: --shell-sidebar-w inside @media (min-width: 768px) and (max-width: 1023px) resolves to 200px but the design uses 240px (tablet 768–1023: the sidebar narrows to the design's tablet .sidebar width)"
+    },
+    {
+      "id": "nested-ampersand-root-token",
+      "note": "CSS Nesting: :root { & { --bg } } is a later :root declaration",
+      "expect": "FAIL /^editorial: --bg differs — design #000000 vs runtime #010204/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --bg differs — design #000000 vs runtime #010204"
+    },
+    {
+      "id": "universal-important-shadow",
+      "note": "* { font-size !important } outranks every utility rule",
+      "expect": "FAIL /^shadow rule: \\* re-declares font-size for \\.chip — runtime resolves 99px !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "shadow rule: * re-declares font-size for .chip — runtime resolves 99px !important, design resolves 10.5px"
+    },
+    {
+      "id": "no-anim-deviation-stale",
+      "note": "the runtime narrows .no-anim * to the design's scope (entry becomes stale)",
+      "expect": "FAIL /^deviation shadow:\\.no-anim \\*:transition is stale/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "deviation shadow:.no-anim *:transition is stale — no non-canonical rule by that key wins the property any more; drop the entry"
+    },
+    {
+      "id": "no-anim-deviation-no-longer-holds",
+      "note": ".no-anim * still wins but no longer freezes (the reason cites a blanket freeze)",
+      "expect": "FAIL /^deviation shadow:\\.no-anim \\*:transition no longer holds/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "deviation shadow:.no-anim *:transition no longer holds (design transform 220ms cubic-bezier(0.2,0.65,0.3,1),background 220ms ease,border-color 220ms ease,box-shadow 220ms ease, runtime all 1s !important): shadow rule: .no-anim * re-declares transition for .card — runtime resolves all 1s !important, design resolves transform 220ms cubic-bezier(0.2,0.65,0.3,1),background 220ms ease,border-color 220ms ease,box-shadow 220ms ease"
+    },
+    {
+      "id": "extra-tablet-override",
+      "note": "a later tablet media block sets --shell-sidebar-w to 200px",
+      "expect": "FAIL /^responsive geometry: --shell-sidebar-w inside @media \\(min-width: 768px\\) and \\(max-width: 1023px\\) resolves to 200px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "responsive geometry: --shell-sidebar-w inside @media (min-width: 768px) and (max-width: 1023px) resolves to 200px but the design uses 240px (tablet 768–1023: the sidebar narrows to the design's tablet .sidebar width)"
+    },
+    {
+      "id": "removed-tablet-override",
+      "note": "the tablet --shell-sidebar-w re-assignment is deleted",
+      "expect": "FAIL /^responsive geometry: --shell-sidebar-w is not re-assigned inside/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "responsive geometry: --shell-sidebar-w is not re-assigned inside @media (min-width: 768px) and (max-width: 1023px) (tablet 768–1023: the sidebar narrows to the design's tablet .sidebar width; design value 240px)"
+    },
+    {
+      "id": "changed-media-query",
+      "note": "the tablet query upper bound moves to 1100px",
+      "expect": "FAIL /^responsive geometry: --shell-sidebar-w is not re-assigned inside/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "responsive geometry: --shell-sidebar-w is not re-assigned inside @media (min-width: 768px) and (max-width: 1023px) (tablet 768–1023: the sidebar narrows to the design's tablet .sidebar width; design value 240px)"
+    },
+    {
+      "id": "changed-media-value",
+      "note": "the mobile --shell-header-h drops to 60px",
+      "expect": "FAIL /^responsive geometry: --shell-header-h inside @media \\(max-width: 767px\\) resolves to 60px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "responsive geometry: --shell-header-h inside @media (max-width: 767px) resolves to 60px but the design uses 56px (mobile <768: the header drops to the design's mobile .header height)"
+    },
+    {
+      "id": "tablet-alias-drift",
+      "note": "--shell-sidebar-w-tablet (the var the tablet override resolves through) changes",
+      "expect": "FAIL /^geometry: --shell-sidebar-w-tablet differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "geometry: --shell-sidebar-w-tablet differs in editorial — design 240px vs runtime 220px"
+    },
+    {
+      "id": "scoped-root-token",
+      "note": "a media-scoped :root re-declares --bg",
+      "expect": "FAIL /^scoped token: @media \\(max-width: 600px\\) \\{ :root \\{ --bg/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "scoped token: @media (max-width: 600px) { :root { --bg: #111111 } } re-declares a tracked token outside the responsive geometry contract — the design has no responsive token values"
+    },
+    {
+      "id": "supports-scoped-token",
+      "note": "an @supports-scoped :root re-declares --surface",
+      "expect": "FAIL /^scoped token: @supports/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "scoped token: @supports (color: color-mix(in srgb, red, blue)) { :root { --surface: red } } re-declares a tracked token outside the responsive geometry contract — the design has no responsive token values"
+    },
+    {
+      "id": "html-selector-token",
+      "note": "html { --text } re-declares a tracked token",
+      "expect": "FAIL /^single source: html \\{ --text/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "single source: html { --text: #ffffff } declares a tracked token outside :root / :root[data-system] / :root[data-accent] — custom properties inherit, so this repaints every element below it"
+    },
+    {
+      "id": "universal-token",
+      "note": "* { --bg } re-declares a tracked token on every element",
+      "expect": "FAIL /^single source: \\* \\{ --bg/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "single source: * { --bg: #111111 } declares a tracked token outside :root / :root[data-system] / :root[data-accent] — custom properties inherit, so this repaints every element below it"
+    },
+    {
+      "id": "component-token",
+      "note": ".page { --radius } re-declares a tracked token for a subtree",
+      "expect": "FAIL /^single source: \\.page \\{ --radius/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "single source: .page { --radius: 4px } declares a tracked token outside :root / :root[data-system] / :root[data-accent] — custom properties inherit, so this repaints every element below it"
+    },
+    {
+      "id": "compound-layer",
+      "note": ":root[data-system][data-accent] compound declares --bg",
+      "expect": "FAIL /^single source: :root\\[data-system=\"geist\"\\]\\[data-accent=\"cyan\"\\] \\{ --bg/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "single source: :root[data-system=\"geist\"][data-accent=\"cyan\"] { --bg: #000001 } declares a tracked token outside :root / :root[data-system] / :root[data-accent] — custom properties inherit, so this repaints every element below it"
+    },
+    {
+      "id": "accent-block-token",
+      "note": "an accent block re-declares --surface",
+      "expect": "FAIL /^accent \"cyan\": :root\\[data-accent=\"cyan\"\\] re-declares --surface/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "accent \"cyan\": :root[data-accent=\"cyan\"] re-declares --surface — an accent block may only set --accent/--accent-2"
+    },
+    {
+      "id": "sibling-root-token",
+      "note": "another client stylesheet declares --bg on :root",
+      "expect": "FAIL /^single source: client\\/src\\/styles\\/canary\\.css :root \\{ --bg/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "single source: client/src/styles/canary.css :root { --bg: #111111 } declares a tracked token outside client/src/styles/design-system.css"
+    },
+    {
+      "id": "sibling-important-root-resolves",
+      "note": "a sibling :root !important --bg also changes what every system RESOLVES (rule 3, not only rule 10)",
+      "expect": "FAIL /^editorial: --bg differs — design .+ vs runtime #000001 !important/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --bg differs — design #000000 vs runtime #000001 !important"
+    },
+    {
+      "id": "index-html-early-root-loses",
+      "note": "client/index.html <style> :root --bg (first in document order) loses to design-system.css — rule 10 still flags it, rule 3 must not",
+      "expect": "FAIL /^single source: client\\/index\\.html :root \\{ --bg/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "single source: client/index.html :root { --bg: #000001 } declares a tracked token outside client/src/styles/design-system.css"
+    },
+    {
+      "id": "sibling-scoped-token",
+      "note": "another client stylesheet re-declares --text under print",
+      "expect": "FAIL /^single source: client\\/src\\/index\\.css @media print \\{ :root \\} \\{ --text/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "single source: client/src/index.css @media print { :root } { --text: #000000 } declares a tracked token outside client/src/styles/design-system.css"
+    },
+    {
+      "id": "value-drift",
+      "note": "geist --surface alpha changes",
+      "expect": "FAIL /^geist: --surface differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "geist: --surface differs — design rgba(255,255,255,0.04) vs runtime rgba(255,255,255,0.05)"
+    },
+    {
+      "id": "root-value-drift",
+      "note": "root --radius 12px -> 10px (cascades to editorial)",
+      "expect": "FAIL /^editorial: --radius differs — design 12px vs runtime 10px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --radius differs — design 12px vs runtime 10px"
+    },
+    {
+      "id": "missing-token",
+      "note": "root --hairline removed",
+      "expect": "FAIL /^editorial: design token --hairline .* is absent from the runtime cascade/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: design token --hairline (rgba(244,243,238,0.06)) is absent from the runtime cascade"
+    },
+    {
+      "id": "bogus-accent",
+      "note": "extra :root[data-accent=\"mint\"] block",
+      "expect": "FAIL /^runtime declares :root\\[data-accent=\"mint\"\\] but the design ships no such accent/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "runtime declares :root[data-accent=\"mint\"] but the design ships no such accent"
+    },
+    {
+      "id": "accent-pair-drift",
+      "note": "crimson --accent-2 changed",
+      "expect": "FAIL /^accent:crimson: --accent-2 differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "accent:crimson: --accent-2 differs — design #b84dff vs runtime #b84dfe"
+    },
+    {
+      "id": "stale-deviation",
+      "note": "editorial --text-3 set back to the canonical alpha (entry becomes stale)",
+      "expect": "FAIL /^deviation editorial:--text-3 is stale/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "deviation editorial:--text-3 is stale — --text-3 now matches the design (or is absent on one side); drop the entry"
+    },
+    {
+      "id": "deviation-no-longer-holds",
+      "note": "editorial --text-3 alpha 0.45 (fails 4.5:1)",
+      "expect": "FAIL /^deviation editorial:--text-3 no longer holds/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "deviation editorial:--text-3 no longer holds (canonical rgba(244,243,238,0.4) vs runtime rgba(244,243,238,0.45)) — its check returned false; align the value or rewrite the entry"
+    },
+    {
+      "id": "registry-default-accent",
+      "note": "registry geist defaultAccent cyan -> matrix",
+      "expect": "FAIL /^registry: default accent for \"geist\" is matrix/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "registry: default accent for \"geist\" is matrix in the runtime but cyan in the design"
+    },
+    {
+      "id": "registry-boot-default",
+      "note": "registry defaultSystem editorial -> swiss",
+      "expect": "FAIL /^registry: boot default is swiss\\/crimson/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "registry: boot default is swiss/crimson; the design boots editorial/crimson"
+    },
+    {
+      "id": "geometry-drift",
+      "note": "--content-max 1240px -> 1280px",
+      "expect": "FAIL /^geometry: --content-max differs in editorial — design 1240px vs runtime 1280px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "geometry: --content-max differs in editorial — design 1240px vs runtime 1280px"
+    },
+    {
+      "id": "geometry-missing",
+      "note": "--footer-pad removed",
+      "expect": "FAIL /^geometry: --footer-pad .* is not declared in the runtime's :root/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "geometry: --footer-pad (48px 40px 32px in the design) is not declared in the runtime's :root"
+    },
+    {
+      "id": "grain-asset-drift",
+      "note": ".grain background-image swapped to a different data URI",
+      "expect": "FAIL /^utility \\.grain: background-image differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "utility .grain: background-image differs — design url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScgb3BhY2l0eT0nMC41Jy8+PC9zdmc+') vs runtime url('data:image/svg+xml;utf8,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScgb3BhY2l0eT0nMC41Jy8+PC9zdmc+')"
+    },
+    {
+      "id": "utility-drift",
+      "note": ".chip font-size 10.5px -> 12px in place",
+      "expect": "FAIL /^utility \\.chip: font-size differs — design 10\\.5px vs runtime 12px/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "utility .chip: font-size differs — design 10.5px vs runtime 12px"
+    },
+    {
+      "id": "utility-missing",
+      "note": ".hide-tablet rule removed",
+      "expect": "FAIL /^utility @media \\(max-width: 1024px\\)\\|\\|\\.hide-tablet: rule is missing/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "utility @media (max-width: 1024px)||.hide-tablet: rule is missing from the runtime stylesheet"
+    },
+    {
+      "id": "kbd-deviation-stale",
+      "note": ".kbd font-size 12px -> canonical 10.5px (entry becomes stale)",
+      "expect": "FAIL /^deviation rule:\\.kbd:font-size is stale/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "deviation rule:.kbd:font-size is stale — the declaration now matches the design (or the rule is absent); drop the entry"
+    },
+    {
+      "id": "kbd-deviation-no-longer-holds",
+      "note": ".kbd font-size 12px -> 11px (below the floor the reason cites)",
+      "expect": "FAIL /^deviation rule:\\.kbd:font-size no longer holds/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "deviation rule:.kbd:font-size no longer holds (canonical 10.5px vs runtime 11px) — align the value or rewrite the entry"
+    },
+    {
+      "id": "canonical-moves",
+      "note": "canonical jsx editorial --bg-2 changed (runtime now behind)",
+      "expect": "FAIL /^editorial: --bg-2 differs/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "editorial: --bg-2 differs — design #070707 vs runtime #070706"
+    },
+    {
+      "id": "canonical-shape",
+      "note": "the design itself declares a token outside :root",
+      "expect": "FAIL /^canonical shape changed: styles\\.css \\.sidebar declares --bg/",
+      "verdict": "FAIL",
+      "matched": true,
+      "ok": true,
+      "firstFailure": "canonical shape changed: styles.css .sidebar declares --bg outside :root — extend the cascade model before trusting this gate"
+    }
+  ]
+}

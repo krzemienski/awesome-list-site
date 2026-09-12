@@ -12,8 +12,8 @@
 - [Dedup cascade safety](resource-dedup-cascade-safety.md) — bulk hard-delete of duplicate resources silently cascades dependent rows; journal row contents and repoint them before deleting.
 - [Empty taxonomy cleanup](empty-taxonomy-cleanup.md) — empty nodes hard-delete-safe; pre-check full-chain 0 across ALL statuses + 0 orphans; prod=no direct write, rename-then-delete via admin API (guard is name-global).
 - [Dev server no hot-reload](dev-server-no-watch.md) — tsx runs without --watch; restart the workflow after every server edit before API-testing.
-- [Reference sync gate history](design-reference-independence.md) — why the archive root is frozen out of palette/profile gates (125 findings + hard fail when raw-copied); the frozen check reads a gitignored zip by upload name → ENOENT in other workspaces.
-- [Dev listener selection](dev-listener-selection.md) — the proxied dev hostname can serve the artifact's HTML for /api/*; address 127.0.0.1:5000 vs the artifact port explicitly; `eslint .` is pre-existing red on all .mjs.
+- [Reference sync gate history](design-reference-independence.md) — the design archive root is a frozen reference excluded from palette/profile gates; the frozen check reads a gitignored zip by recorded path → ENOENT elsewhere.
+- [Dev listener selection](dev-listener-selection.md) — the proxied dev hostname can serve the artifact's HTML for /api/*; address the app port vs the artifact port explicitly.
 - [Pre-boot param scrubber honesty](scrubbed-params-honesty.md) — index.html deletes XSS-shaped query params before React boots; "silent full-catalog fallback" on q/tags = the scrubber, surface via window.__scrubbedParams notice.
 - [SPA crawler/SEO prerender](spa-crawler-prerender.md) — crawler visibility = og-middleware injecting content into `<!--app-html-->`, NOT React SSR (no prod server bundle; never set __INITIAL_DATA__ → createRoot replaces).
 - [SEO soft-404 + sitemap](seo-soft-404-architecture.md) — SPA hard-codes 200, so set 404 in og-middleware's buffered res.end; indexable set must equal sitemap; malformed %-URLs crash vite dev via decodeURI — guard before next().
@@ -120,3 +120,5 @@
 - [Headless capture determinism](headless-capture-determinism.md) — backdrop-filter off both sides; `--disable-partial-raster`; stamp + API-quiet + font checks around every frame; wait, THEN snapshot.
 - [Shared test DB vs vitest file parallelism](vitest-shared-db-file-parallelism.md) — per-file cleanupDatabase() on ONE DB: parallel files wipe each other (500/401/never-429); run serially.
 - [Vitest spy calls vanish on mockRestore](vitest-spy-mockrestore.md) — `mockRestore()` also clears `mock.calls`; collect observed lines inside the mockImplementation or a live warning looks like "the observer never ran".
+- [Token parity by effective cascade](token-parity-effective-cascade.md) — one resolver over every sheet with ORDERED cascade layers (not a bit); element model + selector engine for shadows; in-gate canaries.
+- [Filmstrip prepaint proof](filmstrip-prepaint-check.md) — screencast frames before responseStart are the prior about:blank (white ≠ flash); prove no-flash via first document frame + attr timeline.
