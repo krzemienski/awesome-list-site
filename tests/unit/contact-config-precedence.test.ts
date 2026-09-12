@@ -8,7 +8,10 @@
  *   env var (non-blank) > YAML block > built-in default, for every field
  *   `enabled` is environment-only and never reads YAML
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+import yaml from "js-yaml";
 import { resolveContactConfig } from "../../server/config";
 
 const BLANK_YAML = {
@@ -93,5 +96,70 @@ describe("resolveContactConfig", () => {
     expect(resolved.email).toBe("");
     expect(resolved.issues_url).toBe("");
     expect(resolved.retention_days).toBe(180);
+  });
+});
+
+/**
+ * The wiring test: loadConfig() runs at module load against the checked-in
+ * awesome-list.config.yaml (blank contact block). Re-importing the module
+ * with controlled env proves the env actually reaches `config.contact`
+ * through the YAML merge — the exact path that regressed.
+ */
+describe("server/config contact block through loadConfig()", () => {
+  const CONTACT_KEYS = [
+    "CONTACT_ENABLED",
+    "CONTACT_EMAIL",
+    "CONTACT_ISSUES_URL",
+    "CONTACT_DISCUSSIONS_URL",
+    "CONTACT_DISCUSSIONS_VERIFIED",
+  ] as const;
+  const saved: Partial<Record<(typeof CONTACT_KEYS)[number], string | undefined>> = {};
+
+  beforeEach(() => {
+    for (const key of CONTACT_KEYS) {
+      saved[key] = process.env[key];
+      delete process.env[key];
+    }
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    for (const key of CONTACT_KEYS) {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key];
+    }
+    vi.resetModules();
+  });
+
+  it("the checked-in YAML still ships a blank contact block (the precondition this suite guards)", () => {
+    const file = fs.readFileSync(path.join(process.cwd(), "awesome-list.config.yaml"), "utf8");
+    const parsed = yaml.load(file) as { contact?: Record<string, unknown> };
+    expect(parsed.contact).toMatchObject({ email: "", issues_url: "", discussions_url: "", discussions_verified: false });
+    expect(parsed.contact).not.toHaveProperty("enabled");
+  });
+
+  it("env destinations survive the YAML merge in the loaded config", async () => {
+    Object.assign(process.env, FULL_ENV);
+    const { config } = await import("../../server/config");
+    expect(config.contact).toEqual({
+      enabled: true,
+      email: FULL_ENV.CONTACT_EMAIL,
+      issues_url: FULL_ENV.CONTACT_ISSUES_URL,
+      discussions_url: FULL_ENV.CONTACT_DISCUSSIONS_URL,
+      discussions_verified: true,
+      retention_days: 180,
+    });
+  });
+
+  it("without env the loaded config falls back to the YAML block and stays disabled", async () => {
+    const { config } = await import("../../server/config");
+    expect(config.contact).toEqual({
+      enabled: false,
+      email: "",
+      issues_url: "",
+      discussions_url: "",
+      discussions_verified: false,
+      retention_days: 180,
+    });
   });
 });
