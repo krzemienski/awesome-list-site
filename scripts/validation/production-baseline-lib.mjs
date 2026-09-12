@@ -100,23 +100,63 @@ const LIGHTHOUSE_CATEGORIES = ["performance", "accessibility", "best-practices",
 const RETRYABLE_STATUSES = new Set([429, 503]);
 const MAX_ATTEMPTS = 6;
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
-// Runs before any page script (Playwright addInitScript / Puppeteer
-// evaluateOnNewDocument): every WebSocket construction is recorded and refused,
-// because socket frames never pass through request routing. Dedicated workers
-// have their own global and are outside this stub; the product opens no
-// sockets at all (nothing in client/src references WebSocket).
-const WEBSOCKET_STUB_SOURCE = `(() => {
-  const attempted = [];
-  Object.defineProperty(window, "__baselineBlockedWebSockets", { value: attempted });
+// Read-only guard, layer 2 of 2 (layer 1 is the browser-wide Fetch guard in
+// launchBrowser). Runs before any page script in EVERY document of a page —
+// main frame, iframes, popups (Playwright addInitScript / Puppeteer
+// evaluateOnNewDocument). WebSocket handshakes never pass through request
+// interception, so sockets are refused at the only place they can be created:
+// a window realm. Realms this script cannot reach are prevented from existing
+// instead — Worker/SharedWorker constructors and service-worker registration
+// are sealed (blob/data URLs never touch the network, so aborting worker
+// script loads would not be enough) — and window.open is sealed so no page
+// can spawn a window outside the hooks of a page-scoped driver (Lighthouse).
+// Every property is non-configurable: a page cannot delete or reassign it to
+// recover the native constructor. Attempts are recorded on
+// window.__baselineRefused for the capture record.
+const READ_ONLY_WINDOW_SOURCE = `(() => {
+  const refused = { webSockets: [], workers: [], popups: [], serviceWorkers: [] };
+  Object.defineProperty(window, "__baselineRefused", { value: refused });
+  const seal = (target, name, value) =>
+    Object.defineProperty(target, name, { value, writable: false, configurable: false, enumerable: false });
+  const deny = (kind) => new DOMException(kind + " refused: production-baseline capture is read-only", "SecurityError");
   class BlockedWebSocket {
     constructor(url) {
-      attempted.push(String(url));
-      throw new DOMException("WebSocket refused: production-baseline capture is read-only", "SecurityError");
+      refused.webSockets.push(String(url));
+      throw deny("WebSocket");
     }
   }
   Object.assign(BlockedWebSocket, { CONNECTING: 0, OPEN: 1, CLOSING: 2, CLOSED: 3 });
-  window.WebSocket = BlockedWebSocket;
+  seal(window, "WebSocket", BlockedWebSocket);
+  seal(window, "Worker", class BlockedWorker {
+    constructor(url) {
+      refused.workers.push("Worker " + String(url));
+      throw deny("Worker");
+    }
+  });
+  seal(window, "SharedWorker", class BlockedSharedWorker {
+    constructor(url) {
+      refused.workers.push("SharedWorker " + String(url));
+      throw deny("SharedWorker");
+    }
+  });
+  seal(window, "open", function open(url) {
+    refused.popups.push(String(url ?? ""));
+    return null;
+  });
+  if (navigator.serviceWorker) {
+    seal(navigator.serviceWorker, "register", (url) => {
+      refused.serviceWorkers.push(String(url));
+      return Promise.reject(deny("ServiceWorker"));
+    });
+  }
 })();`;
+const EMPTY_REFUSALS = () => ({ webSockets: [], workers: [], popups: [], serviceWorkers: [] });
+// Read back what the window guard refused (structured clone across the
+// driver boundary; a page without the guard reports nothing refused).
+function readRefusals() {
+  const refused = window.__baselineRefused;
+  return refused ? JSON.parse(JSON.stringify(refused)) : { webSockets: [], workers: [], popups: [], serviceWorkers: [] };
+}
 const MAX_REDIRECT_HOPS = 10;
 const CHROMIUM_MAX_CAPTURE_HEIGHT = 16384;
 const USER_AGENT =
@@ -337,14 +377,60 @@ export async function freePort() {
   });
 }
 
+// Every browser this module launches is read-only by construction: launch
+// fails if the guard cannot be installed.
 export async function launchBrowser(label, { remoteDebuggingPort } = {}) {
   const args = ["--disable-dev-shm-usage"];
   if (remoteDebuggingPort) args.push(`--remote-debugging-port=${remoteDebuggingPort}`);
-  return launchBrowserWithLease(
+  const browser = await launchBrowserWithLease(
     chromium,
     { headless: true, executablePath: chromiumExecutable(), chromiumSandbox: true, args },
     label,
   );
+  try {
+    await installReadOnlyGuard(browser);
+  } catch (error) {
+    await browser.close().catch(() => {});
+    throw error;
+  }
+  return browser;
+}
+
+// Read-only guard, layer 1 of 2: a Fetch interceptor on the BROWSER target.
+// Chromium pauses every HTTP request from every target of the browser here —
+// pages, popups, iframes, dedicated/shared/service workers, and a page that
+// Lighthouse drives over the remote-debugging port — regardless of which
+// context or driver issued it. Anything but GET/HEAD/OPTIONS is failed with
+// BlockedByClient. Page-level routing (context.route / puppeteer
+// interception) stays in place only for per-viewport attribution; this layer
+// is what makes the property hold for targets those hooks never see.
+const readOnlyGuards = new WeakMap();
+async function installReadOnlyGuard(browser) {
+  const session = await browser.newBrowserCDPSession();
+  const guard = { blocked: [], continued: 0 };
+  session.on("Fetch.requestPaused", (event) => {
+    const { requestId, request, resourceType } = event;
+    if (SAFE_METHODS.has(request.method)) {
+      guard.continued += 1;
+      // A request routed by Playwright as well may already be gone by the
+      // time this reply lands; the request cannot proceed without both
+      // clients, so a late error here can only mean it was already decided.
+      session.send("Fetch.continueRequest", { requestId }).catch(() => {});
+      return;
+    }
+    guard.blocked.push({ method: request.method, url: request.url, resourceType: resourceType ?? null });
+    session.send("Fetch.failRequest", { requestId, errorReason: "BlockedByClient" }).catch(() => {});
+  });
+  await session.send("Fetch.enable", { patterns: [{ urlPattern: "*", requestStage: "Request" }] });
+  readOnlyGuards.set(browser, guard);
+  return guard;
+}
+
+// Tally of what the browser-wide guard refused for a browser from
+// launchBrowser (null for any other browser).
+export function readOnlyGuardOf(browser) {
+  const guard = readOnlyGuards.get(browser);
+  return guard ? { blocked: [...guard.blocked], continued: guard.continued } : null;
 }
 
 async function settleFrames(page) {
@@ -437,7 +523,6 @@ function extractDom() {
     navLabels,
     visibleTestIds: testIds,
     documentHeight: document.documentElement.scrollHeight,
-    attemptedWebSockets: [...(window.__baselineBlockedWebSockets ?? [])],
   };
 }
 
@@ -515,13 +600,13 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
       return route.abort("blockedbyclient");
     });
     // WebSocket frames bypass request routing, so sockets are never connected
-    // to the server (the page sees a mocked, silent socket) and the
-    // constructor is stubbed as a second line for code that checks the class.
+    // to the server (the page sees a mocked, silent socket); the window guard
+    // below refuses the constructor before this can even fire.
     const blockedWebSockets = [];
     await context.routeWebSocket("**", (ws) => {
       blockedWebSockets.push(ws.url());
     });
-    await context.addInitScript(WEBSOCKET_STUB_SOURCE);
+    await context.addInitScript(READ_ONLY_WINDOW_SOURCE);
     const page = await context.newPage();
     const clientNavigations = [];
     page.on("framenavigated", (frame) => {
@@ -552,7 +637,8 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
       await page.waitForTimeout(250);
       await settleFrames(page);
 
-      const { attemptedWebSockets, ...dom } = await page.evaluate(extractDom);
+      const dom = await page.evaluate(extractDom);
+      const refused = await page.evaluate(readRefusals);
       const capture = {
         capturedAt: new Date().toISOString(),
         requestedUrl: url,
@@ -562,7 +648,10 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
         httpRedirects,
         clientNavigations: [...new Set(clientNavigations)],
         blockedRequests,
-        blockedWebSockets: [...new Set([...blockedWebSockets, ...attemptedWebSockets])],
+        blockedWebSockets: [...new Set([...blockedWebSockets, ...refused.webSockets])],
+        blockedWorkers: refused.workers,
+        blockedPopups: refused.popups,
+        blockedServiceWorkers: refused.serviceWorkers,
         consentBanner,
         attempts: attempt,
         viewport: { ...viewport },
@@ -753,11 +842,12 @@ async function captureApi(base, endpoint, { telemetry, log } = {}) {
 // ---------------------------------------------------------------------------
 //
 // Lighthouse drives its own page over the remote-debugging port, outside the
-// Playwright contexts whose request routing enforces read-only traffic. So the
-// page is created here, through the puppeteer-core that Lighthouse itself
-// resolves (the only version its navigation runner is built against), with
-// request interception refusing every non-safe method and the WebSocket stub
-// installed, and handed to Lighthouse's page-mode API.
+// Playwright contexts. The browser-wide Fetch guard from launchBrowser already
+// covers that page's HTTP traffic; the page is still created here, through the
+// puppeteer-core that Lighthouse itself resolves (the only version its
+// navigation runner is built against), so the read-only window script can be
+// installed in it and its refusals attributed per audit, then handed to
+// Lighthouse's page-mode API.
 
 async function importLighthousePuppeteer() {
   const requireFromLighthouse = createRequire(createRequire(import.meta.url).resolve("lighthouse/package.json"));
@@ -781,7 +871,7 @@ async function openReadOnlyPage(puppeteerBrowser) {
     blockedRequests.push({ method: request.method(), url: request.url() });
     request.abort("blockedbyclient").catch(() => {});
   });
-  await page.evaluateOnNewDocument(WEBSOCKET_STUB_SOURCE);
+  await page.evaluateOnNewDocument(READ_ONLY_WINDOW_SOURCE);
   return { page, blockedRequests };
 }
 
@@ -792,10 +882,10 @@ async function runLighthouse({ url, puppeteerBrowser, log = console, telemetry, 
     budget.take(`lighthouse ${url} attempt ${attempt}`);
     const { page, blockedRequests } = await openReadOnlyPage(puppeteerBrowser);
     let result;
-    let blockedWebSockets = [];
+    let refused = EMPTY_REFUSALS();
     try {
       result = await lighthouse(url, { output: "json", logLevel: "error", onlyCategories: LIGHTHOUSE_CATEGORIES }, undefined, page);
-      blockedWebSockets = await page.evaluate(() => [...(window.__baselineBlockedWebSockets ?? [])]).catch(() => []);
+      refused = await page.evaluate(readRefusals).catch(() => EMPTY_REFUSALS());
     } finally {
       await page.close().catch(() => {});
     }
@@ -840,7 +930,10 @@ async function runLighthouse({ url, puppeteerBrowser, log = console, telemetry, 
       formFactor: lhr.configSettings?.formFactor ?? null,
       requestCount: lhr.audits?.["network-requests"]?.details?.items?.length ?? null,
       blockedRequests,
-      blockedWebSockets,
+      blockedWebSockets: refused.webSockets,
+      blockedWorkers: refused.workers,
+      blockedPopups: refused.popups,
+      blockedServiceWorkers: refused.serviceWorkers,
     };
   }
   throw new Error(`Lighthouse for ${url}: still failing after 4 attempts (${lastReason})`);

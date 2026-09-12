@@ -76,17 +76,24 @@ thumbnails below the fold are fetched → back to top → full-page PNG with
 animations disabled and caret hidden → DOM extraction → axe at 375 and 1440.
 Chromium caps a capture at 16 384 px; no route reached it (`screenshot.truncated`
 is `false` everywhere). Nothing was signed in, no admin key was sent, nothing
-was POSTed. Since the post-review hardening the browser context aborts every
-non-`GET`/`HEAD`/`OPTIONS` request outright and lists them in
-`dom.json.byViewport[w].blockedRequests`, refuses every WebSocket (a routed
-socket that never connects plus a `window.WebSocket` stub that throws; attempts
-land in `blockedWebSockets`), and Lighthouse audits run on a page with the
-same interception and stub (`scores.json` entries record `requestCount`,
-`blockedRequests`, `blockedWebSockets`). This capture predates those fields;
-the same-day re-captures used to verify them recorded zero blocked requests
-and zero socket attempts on `/`, `/sign-in`, `/submit` and `/recommendations`,
-and a local probe origin whose page tries to POST/PUT/beacon/open a socket
-saw none of it arrive (`docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md`).
+was POSTed. Since the post-review hardening every browser the tool launches is
+read-only by construction, in two layers: a `Fetch` interceptor on the
+**browser target** fails every non-`GET`/`HEAD`/`OPTIONS` request from every
+target (pages, popups, iframes, workers, and the page Lighthouse drives over
+the remote-debugging port), and an init script in every document seals
+`WebSocket`, `Worker`, `SharedWorker`, `window.open` and service-worker
+registration (non-configurable, recording, throwing) so a socket can only be
+attempted from a realm that refuses it and no realm outside the script can be
+created. Page-level routing stays for attribution: refusals land in
+`dom.json.byViewport[w].blockedRequests` / `blockedWebSockets` /
+`blockedWorkers` / `blockedPopups` / `blockedServiceWorkers`, Lighthouse's
+`scores.json` entries record `requestCount` plus the same fields, and the
+manifest records `browserGuard` per invocation. This capture predates those
+fields; the same-day re-captures used to verify them recorded zero refusals on
+`/`, `/sign-in`, `/submit` and `/recommendations`, and a local probe origin
+whose page tries to POST/PUT/beacon, open a socket, spawn a blob worker that
+does the same, and open a popup saw nothing but `GET`s arrive
+(`docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md`).
 Lighthouse's `bf-cache` gatherer restores the audited page a second time, so
 one attempt shows up twice in its list.
 
@@ -180,10 +187,11 @@ Tracked deltas: status, redirect chain, final URL, visible `data-testid`s per
 viewport, title, h1, axe serious+critical **rules and node counts** at 375/1440,
 document counts **and body**, API status, key paths, item/total counts. URLs and
 document bodies count as equal when byte-identical or when they only differ by
-each side's own origin (`{origin}` placeholder) — a hop to a foreign host or a
-different fragment is always a delta, and a document body file missing on
-either side is reported as missing (exit 3), never assumed. `--against` must
-be a bare origin. Canonical, robots meta, JSON-LD types, nav labels and
+each side's own origin (`{origin}` placeholder) — a hop to a foreign host, a
+different fragment or credentials in the URL is always a delta (the password
+is redacted in the report), and a document body file missing on either side
+is reported as missing (exit 3), never assumed. `--against` must be a bare
+origin. Canonical, robots meta, JSON-LD types, nav labels and
 `cache-control` are notes.
 
 `compare` re-captures the candidate with the same library (routes + API, no

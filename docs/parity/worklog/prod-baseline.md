@@ -120,18 +120,27 @@ all are fixed and re-verified
    or query is an error, not silently prefixed onto every URL).
 4. **Lighthouse and WebSockets read-only** — Lighthouse attaches over the
    remote-debugging port, outside `context.route`, so it now audits a
-   puppeteer page (Lighthouse's own `puppeteer-core`, no new dependency) with
-   request interception aborting non-safe methods and the same
-   `window.WebSocket` stub the capture contexts install alongside
-   `context.routeWebSocket`. A probe page that tries POST/PUT/beacon/socket on
-   load: nothing reached the origin from either path; a control run without
-   the stub showed socket upgrades *do* get through interception alone.
-   Compare also reports a missing document body file as missing (exit 3)
-   instead of trusting the recorded digest.
+   puppeteer page (Lighthouse's own `puppeteer-core`, no new dependency).
+   The reviewer's re-check then showed that *page-scoped* hooks (request
+   interception, init scripts) leave dedicated workers and popups uncovered,
+   so the property is now enforced for every browser the library launches in
+   two layers: a `Fetch` interceptor on the **browser target** that fails
+   every non-safe request from every target (pages, popups, iframes, workers,
+   Lighthouse's page — proven independent of page-level routing: a context
+   that continued every request still had all its POST/PUT attempts failed),
+   and an init script in every document that seals `WebSocket`, `Worker`,
+   `SharedWorker`, `window.open` and service-worker registration
+   (non-configurable, recording, throwing) so a socket can only be attempted
+   from a realm that refuses it and no unreachable realm can be created.
+   A probe page that tries POST/PUT/beacon/socket, spawns a blob worker that
+   does the same, and opens a popup: only `GET`s reached the origin. Compare
+   also reports a missing document body file as missing (exit 3) instead of
+   trusting the recorded digest, and keeps URL credentials (password
+   redacted) so a credential-bearing redirect is always a delta.
 
-Residual, documented: dedicated workers get neither WebSocket hook (`client/src`
-opens no sockets); Lighthouse's `bf-cache` gatherer re-executes the page once
-from cache, so each refused attempt appears twice in its list.
+Residual, documented: the browser layer sees HTTP requests only (sockets are
+layer 2's job); Lighthouse's `bf-cache` gatherer re-executes the page once from
+cache, so each refused attempt appears twice in its list.
 
 ## Gates run
 
@@ -145,7 +154,7 @@ from cache, so each refused attempt appears twice in its list.
 | lint + root-script-drift transcript | see above | `docs/parity/evidence/prod-baseline/gates-2026-09-12.md` |
 | hardened compare re-run on the stored candidates (offline) | prod 0 deltas · local 37 deltas | `docs/parity/evidence/prod-baseline/compare-{prod,local}-2026-09-12-recheck.md` |
 | hardening smoke + mutation probe | 5/5 planted changes caught · live resume/budget/blocking checks pass · 0 deltas on re-captured routes | `docs/parity/evidence/prod-baseline/review-hardening-2026-09-12.md` |
-| second-round smoke + mutation probe | 6/6 planted changes caught (+ missing body → exit 3) · per-attempt budget, unit binding ×3 tamperings, read-only Lighthouse/WebSockets against a local probe origin · backfilled baseline resumes 26/26 with 0 loads | `docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md` |
+| second-round smoke + mutation probe | 7/7 planted changes caught incl. fragment + URL credentials (+ missing body → exit 3) · per-attempt budget, unit binding ×3 tamperings, two-layer read-only guard (browser-target Fetch + sealed window realm) against a local probe origin with page/worker/popup mutation attempts · backfilled baseline resumes 26/26 with 0 loads | `docs/parity/evidence/prod-baseline/review-hardening-2-2026-09-12.md` |
 
 ### Reading the local compare
 

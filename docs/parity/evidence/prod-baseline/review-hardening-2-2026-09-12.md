@@ -51,8 +51,9 @@ commit.
 - **WebSockets.** Capture contexts call `context.routeWebSocket("**", …)`
   (never connects) and install an init script that replaces `window.WebSocket`
   with a constructor that records the URL and throws; the union is stored per
-  viewport as `blockedWebSockets`. Residual: dedicated workers get neither
-  hook (they have no `window`); `client/src` opens no WebSockets.
+  viewport as `blockedWebSockets`. *(Superseded by the two-layer guard in §6:
+  the reviewer's re-check showed page-scoped hooks leave workers and popups
+  uncovered.)*
 - **Compare.** A document body file missing on either side is reported as
   `missing: … body` (exit 3) instead of falling back to the recorded digest.
 
@@ -335,3 +336,267 @@ node scripts/validation/dead-exports.mjs                   PASS (gate scope is c
                                                            createNavigationBudget export is imported by the capture
                                                            script and NavigationBudgetExhausted stays module-private)
 ```
+
+## 6. Re-check by the same reviewer → two residuals, closed
+
+The reviewer re-checked the four findings against the committed fix
+(`ff2a2d81`): unit binding and budget **PASS**; two residuals remained.
+
+**Finding 3 residual — `normalizeUrl` dropped userinfo.** `URL.origin` has no
+credentials, so `https://user:secret@host/x` normalised to the same string as
+`https://host/x` and `equivalent()` called them the same. Fix: userinfo is
+re-attached in front of the origin (`user:<password>@…`, the password itself
+redacted so the report never echoes a secret); a URL carrying credentials can
+no longer normalise to one that does not. Mutant A gained a seventh planted
+change — `/categories` final URL rewritten to `https://qa:hunter2@awesome.video/categories`:
+
+```
+- tracked deltas: **7** (7 routes, 0 endpoints)
+| `/categories` | 200 | same | +0 / −0 | same | same | 0/0 | 0/0 | final-url |  |
+grep -c hunter2 compare-report.md → 0
+```
+
+**Finding 4 residual — page-scoped hooks.** `page.setRequestInterception`,
+`context.route`, `evaluateOnNewDocument`/`addInitScript` are all page-scoped:
+a dedicated worker (blob URL — never loads over the network) or a popup opened
+from Lighthouse's page had neither the method filter nor the WebSocket stub.
+The probe origin's page was extended to spawn exactly that — a blob worker
+that `POST /worker-mutate`s and opens `ws://…/worker-socket`, plus
+`window.open("/popup")` — and, unguarded, all of it reached the origin
+(`POST /mutate`, `PUT /put`, `POST /beacon`, `/socket`, `/worker-socket`, and
+a popup storm of `GET /popup`).
+
+The read-only property is now enforced by construction in two layers, both
+installed for every browser the library launches (`launchBrowser` fails if
+the first cannot be installed):
+
+1. **Browser-target `Fetch` interceptor** (`browser.newBrowserCDPSession()` →
+   `Fetch.enable` with `urlPattern: "*"`). Chromium pauses every HTTP request
+   from every target of the browser there — pages, popups, iframes,
+   dedicated/shared/service workers, and the page Lighthouse drives over the
+   remote-debugging port — and anything but `GET`/`HEAD`/`OPTIONS` is failed
+   with `BlockedByClient`. This layer is independent of page-level routing: a
+   probe context whose `context.route` **continued** every request still had
+   all 45 of its `POST`/`PUT` attempts (page, popups and blob worker) failed
+   by the browser layer, and the origin saw none.
+2. **Sealed window realm** (init script in every document — main frame,
+   iframes, popups — for Playwright contexts and Lighthouse's puppeteer page).
+   WebSocket handshakes are not fetches, so sockets are refused where they are
+   created: `WebSocket`, `Worker`, `SharedWorker` and `window.open` are
+   replaced with recording constructors/functions that throw or return null,
+   `navigator.serviceWorker.register` rejects, and every property is
+   non-configurable so a page cannot delete or reassign it to recover the
+   native one. A realm this script cannot reach (a worker) therefore cannot
+   come into existence; a popup cannot be opened outside a page-scoped
+   driver's hooks. Attempts are recorded as `blockedWebSockets`,
+   `blockedWorkers`, `blockedPopups`, `blockedServiceWorkers` per viewport and
+   per Lighthouse audit; the manifest gains `browserGuard`
+   (`continued`/`blocked`/`sample`) per invocation.
+
+Page-level routing is kept only for per-viewport attribution — because it
+decides first, `browserGuard.blocked` is normally `0` and the refusals show
+up in the per-viewport `blockedRequests` instead.
+
+Full smoke, same nine steps as §4, now against the page with worker + popup:
+
+```
+smoke origin on 37699
+== 1 /about (503 on every odd navigation) with budget 1: the 503 attempt is charged, retry refused (expect exit 2, nav 1, no unit)
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+  base http://127.0.0.1:37699 · commit ff2a2d81189ac5cd14c14d14dd5c339b426f1cf3 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+Phase: routes
+  status probe /about
+  capture /about @375 +axe
+  throttled (HTTP 503) loading http://127.0.0.1:37699/about@375; attempt 1/6
+Playwright lease released (production-baseline-capture)
+Done in 3s · 1 navigations · 1 throttle retries · 0 failures
+  routes complete 0/1 · api 0/12 · lighthouse 0/3
+  stopped by --max-navigations; re-run the same command to resume
+exit 2
+   manifest: nav 1 budget 1 stopped true fail 0 throttled 1 guard continued 1 blocked 0
+   pngs: none | dom viewports: no dom.json | axe viewports: no axe.json
+== 2 budget 2: 503 + retry = one bound unit (expect exit 2, nav 2, @375 attempts=2)
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+  base http://127.0.0.1:37699 · commit ff2a2d81189ac5cd14c14d14dd5c339b426f1cf3 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+Phase: routes
+  capture /about @375 +axe
+  capture /about @768
+  throttled (HTTP 503) loading http://127.0.0.1:37699/about@768; attempt 1/6
+Playwright lease released (production-baseline-capture)
+Done in 4s · 2 navigations · 1 throttle retries · 0 failures
+  routes complete 0/1 · api 0/12 · lighthouse 0/3
+  stopped by --max-navigations; re-run the same command to resume
+exit 2
+   manifest: nav 2 budget 2 stopped true fail 0 throttled 1 guard continued 2 blocked 0
+   pngs: about@375.png | dom viewports: 375 | axe viewports: 375
+   @375 attempts=1 unit=2286d3f9 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+== 3 unlimited: remaining three viewports, two loads each (expect exit 0, nav 6)
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+  base http://127.0.0.1:37699 · commit ff2a2d81189ac5cd14c14d14dd5c339b426f1cf3 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+Phase: routes
+  capture /about @768
+  capture /about @1024
+  throttled (HTTP 503) loading http://127.0.0.1:37699/about@1024; attempt 1/6
+  capture /about @1440 +axe
+  throttled (HTTP 503) loading http://127.0.0.1:37699/about@1440; attempt 1/6
+Playwright lease released (production-baseline-capture)
+Done in 8s · 5 navigations · 2 throttle retries · 0 failures
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+exit 0
+   manifest: nav 5 budget null stopped false fail 0 throttled 2 guard continued 5 blocked 0
+   pngs: about@1024.png,about@1440.png,about@375.png,about@768.png | dom viewports: 375,768,1024,1440 | axe viewports: 375,1440
+   @375 attempts=1 unit=2286d3f9 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @768 attempts=1 unit=741149b4 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1024 attempts=2 unit=8fbbd013 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1440 attempts=2 unit=59535cf5 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+== 4a foreign PNG under a bound record (sha mismatch) → only @768 recaptured
+  throttled (HTTP 503) loading http://127.0.0.1:37699/about@768; attempt 1/6
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+  capture /about @768
+Playwright lease released (production-baseline-capture)
+Done in 4s · 2 navigations · 1 throttle retries · 0 failures
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+   manifest: nav 2 budget null stopped false fail 0 throttled 1 guard continued 2 blocked 0
+   pngs: about@1024.png,about@1440.png,about@375.png,about@768.png | dom viewports: 375,768,1024,1440 | axe viewports: 375,1440
+   @375 attempts=1 unit=2286d3f9 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @768 attempts=2 unit=33c082e6 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1024 attempts=2 unit=8fbbd013 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1440 attempts=2 unit=59535cf5 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+== 4b axe record without the unit id → only @1440 recaptured
+  throttled (HTTP 503) loading http://127.0.0.1:37699/about@1440; attempt 1/6
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+  capture /about @1440 +axe
+Playwright lease released (production-baseline-capture)
+Done in 4s · 2 navigations · 1 throttle retries · 0 failures
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+   manifest: nav 2 budget null stopped false fail 0 throttled 1 guard continued 2 blocked 0
+   pngs: about@1024.png,about@1440.png,about@375.png,about@768.png | dom viewports: 375,768,1024,1440 | axe viewports: 375,1440
+   @375 attempts=1 unit=2286d3f9 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @768 attempts=2 unit=33c082e6 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1024 attempts=2 unit=8fbbd013 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1440 attempts=2 unit=61f95bbd pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+== 4c DOM record from another generation (unit id differs from axe) → only @375 recaptured
+  throttled (HTTP 503) loading http://127.0.0.1:37699/about@375; attempt 1/6
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+  capture /about @375 +axe
+Playwright lease released (production-baseline-capture)
+Done in 4s · 2 navigations · 1 throttle retries · 0 failures
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+   manifest: nav 2 budget null stopped false fail 0 throttled 1 guard continued 2 blocked 0
+   pngs: about@1024.png,about@1440.png,about@375.png,about@768.png | dom viewports: 375,768,1024,1440 | axe viewports: 375,1440
+   @375 attempts=2 unit=5f82e8ef pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @768 attempts=2 unit=33c082e6 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1024 attempts=2 unit=8fbbd013 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1440 attempts=2 unit=61f95bbd pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+== 4d document body deleted → refetched, no navigation
+  status probe /robots.txt
+Done in 1s · 0 navigations · 0 throttle retries · 0 failures
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+Done in 1s · 0 navigations · 0 throttle retries · 0 failures
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+body.txt dom.json status.json 
+== 5 mutation attempts from the page are refused in the routed contexts
+Done in 7s · 4 navigations · 0 throttle retries · 0 failures
+  routes complete 1/1 · api 0/12 · lighthouse 0/3
+   pngs: home@1024.png,home@1440.png,home@375.png,home@768.png | dom viewports: 375,768,1024,1440 | axe viewports: 375,1440
+   @375 attempts=1 unit=4393af5d pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @768 attempts=1 unit=f13238de pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1024 attempts=1 unit=a4517684 pngSha=bound axeUnit=- blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+   @1440 attempts=1 unit=aad3f092 pngSha=bound axeUnit=same blocked=POST /mutate,PUT /put,POST /beacon ws=/socket workers=Worker:blob: popups=/popup
+== 6 Lighthouse runs on a read-only page (expect exit 0, nav 3, blocked POST/PUT + ws recorded)
+Production baseline capture → ../../../tmp/validation/pb-smoke3
+  base http://127.0.0.1:37699 · commit ff2a2d81189ac5cd14c14d14dd5c339b426f1cf3 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+Phase: lighthouse
+  lighthouse /
+  lighthouse http://127.0.0.1:37699/: refused 6 non-safe request(s)
+  lighthouse /category/encoding-codecs
+  lighthouse http://127.0.0.1:37699/category/encoding-codecs: refused 6 non-safe request(s)
+  lighthouse /resource/185020
+  lighthouse http://127.0.0.1:37699/resource/185020: refused 6 non-safe request(s)
+Playwright lease released (production-baseline-capture)
+Done in 28s · 3 navigations · 0 throttle retries · 0 failures
+  routes complete 3/26 · api 0/12 · lighthouse 3/3
+exit 0
+   manifest: nav 3 budget null stopped false fail 0 throttled 0 guard continued 15 blocked 0
+   / scores {"performance":1,"accessibility":1,"best-practices":0.93,"seo":1} requests 5 blocked POST /mutate,PUT /put,POST /beacon,POST /mutate,PUT /put,POST /beacon ws /socket workers 1 popups 1
+   /category/encoding-codecs scores {"performance":1,"accessibility":1,"best-practices":0.93,"seo":0.92} requests 5 blocked POST /mutate,PUT /put,POST /beacon,POST /mutate,PUT /put,POST /beacon ws /socket workers 1 popups 1
+   /resource/185020 scores {"performance":1,"accessibility":1,"best-practices":0.93,"seo":0.92} requests 5 blocked POST /mutate,PUT /put,POST /beacon,POST /mutate,PUT /put,POST /beacon ws /socket workers 1 popups 1
+== 6b Lighthouse --force with budget 1 (expect exit 2, nav 1)
+  lighthouse http://127.0.0.1:37699/: refused 6 non-safe request(s)
+  base http://127.0.0.1:37699 · commit ff2a2d81189ac5cd14c14d14dd5c339b426f1cf3 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Phase: lighthouse
+  lighthouse /
+Done in 7s · 1 navigations · 0 throttle retries · 0 failures
+  routes complete 3/26 · api 0/12 · lighthouse 3/3
+  stopped by --max-navigations; re-run the same command to resume
+exit 2
+   manifest: nav 1 budget 1 stopped true fail 0 throttled 0 guard continued 5 blocked 0
+== 7 origin log: every non-safe method / upgrade that reached the origin (expect none)
+   requests logged: 39
+   none reached the origin
+   only GET/HEAD/OPTIONS in the origin log
+== 8 committed baseline (copy) resumes as complete with zero loads
+Production baseline capture → ../../../tmp/validation/pb-committed-copy
+  base https://awesome.video · commit ff2a2d81189ac5cd14c14d14dd5c339b426f1cf3 · chromium chromium-1223 · lighthouse 12.8.2 · axe 4.13.0
+Phase: api
+Playwright lease acquired (production-baseline-capture, slot 1/1)
+Phase: routes
+Phase: lighthouse
+Playwright lease released (production-baseline-capture)
+Done in 1s · 0 navigations · 0 throttle retries · 0 failures
+  routes complete 26/26 · api 12/12 · lighthouse 3/3
+exit 0
+   manifest: nav 0 fail 0 routes 0 routes with loads
+== 9 base with a path is rejected
+Error: --base must be a bare origin without path, query or fragment, got "http://127.0.0.1:37699/foo"
+exit 1
+Error: --against must be a bare origin without path, query or fragment, got "http://127.0.0.1:37699/foo?x=1"
+exit 3
+== done
+```
+
+Origin log after the run — 39 requests, all `GET`, no upgrade, no
+`/worker-mutate`, no `/popup`:
+
+```
+     14 GET /about browser:navigate
+      8 GET /favicon.ico browser:no-cors
+      6 GET / browser:navigate
+      4 GET /robots.txt browser:no-cors
+      3 GET /robots.txt browser:cors
+      1 GET /resource/185020 browser:navigate
+      1 GET /category/encoding-codecs browser:navigate
+      1 GET / browser:cors
+      1 GET /about browser:cors
+```
+
+Layer-independence probe (`/tmp/validation/pb-guard-probe2.mjs`; no window
+guard, so sockets still connect — that is layer 2's job):
+
+```
+=== none  (no page-level route)
+guard continued=90 blocked=[POST /mutate, PUT /put, POST /beacon × 30]
+origin: 8 upgrades /socket · 7 upgrades /worker-socket · 90 GET · 0 mutations
+=== route (context.route continues everything)
+page-route saw: GET /, POST /mutate, PUT /put, POST /beacon, GET /popup, … (all continued)
+guard continued=45 blocked=[POST /mutate, PUT /put, POST /beacon × 15]
+origin: 9 upgrades /socket · 7 upgrades /worker-socket · 45 GET · 0 mutations
+```
+
+Known limits, stated rather than hidden: the browser layer covers HTTP
+requests only (WebSocket upgrades are not `Fetch` events — hence layer 2), and
+layer 2 relies on Chromium running `addScriptToEvaluateOnNewDocument` before
+any page script in every new document, which is the contract both drivers
+build their init scripts on. Nothing in `client/src` constructs a WebSocket, a
+Worker or a SharedWorker, so the sealed realm changes nothing about what the
+product renders during capture.
+
+Static gates after this pass: `node --check` ×3 ok; JS-only eslint 0
+problems; `root-script-drift` PASS; `dead-exports` PASS.

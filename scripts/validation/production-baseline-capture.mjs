@@ -25,8 +25,11 @@
 // loads, their retries, and Lighthouse attempts are all charged before they
 // start) for callers that must stay under a short shell timeout; otherwise
 // run it in the background. A dated directory belongs to one origin: resuming
-// it with a different --base fails. All browser traffic is read-only: non-GET
-// requests are aborted and WebSockets refused, in Lighthouse's page too.
+// it with a different --base fails. All browser traffic is read-only by
+// construction: a browser-wide interceptor fails every non-GET request from
+// every target (pages, popups, workers, Lighthouse's page), and every window
+// gets WebSocket, Worker, SharedWorker, window.open and service-worker
+// registration sealed shut; the manifest records what was refused.
 //
 //   npm run baseline:capture                       # everything, today's dir
 //   npm run baseline:capture -- --max-navigations 8
@@ -58,6 +61,7 @@ import {
   launchBrowser,
   parseOriginUrl,
   readJson,
+  readOnlyGuardOf,
   routeIsComplete,
   toolVersions,
   todayStamp,
@@ -221,6 +225,13 @@ async function main() {
         }
       }
     } finally {
+      const guard = readOnlyGuardOf(browser);
+      invocation.browserGuard = {
+        continued: guard.continued,
+        blocked: guard.blocked.length,
+        sample: guard.blocked.slice(0, 25),
+      };
+      if (guard.blocked.length) console.warn(`  browser guard refused ${guard.blocked.length} non-safe request(s) across all targets`);
       await browser.close();
     }
   }

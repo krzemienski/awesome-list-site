@@ -97,9 +97,11 @@ redirect chains, axe results, raw API bodies with shape descriptions, and
 mobile Lighthouse reports. It is captured with `npm run baseline:capture`
 (`scripts/validation/production-baseline-capture.mjs`, resumable per route ×
 viewport as one unit bound by a shared `unitId` and the PNG's sha256,
-sandboxed Chromium that aborts every non-GET request and refuses WebSockets —
-Lighthouse included — and a navigation budget charged before every page load
-so exit 2 from `--max-navigations` is exact) and diffed with
+sandboxed Chromium made read-only by construction — a browser-target `Fetch`
+interceptor fails every non-GET request from every target, Lighthouse and
+workers included, and every window has WebSocket/Worker/popup creation
+sealed — and a navigation budget charged before every page load so exit 2
+from `--max-navigations` is exact) and diffed with
 `npm run baseline:compare -- --baseline <dir> --against <url>`
 (`production-baseline-compare.mjs`, exit 1 on tracked deltas — status,
 redirects, final URL, testids, title, h1, axe serious+critical rules and nodes,

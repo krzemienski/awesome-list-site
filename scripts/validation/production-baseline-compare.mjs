@@ -82,14 +82,18 @@ const setDiff = (before = [], after = []) => {
   return { added: [...b].filter((x) => !a.has(x)).sort(), removed: [...a].filter((x) => !b.has(x)).sort() };
 };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-// Own-origin URLs collapse to "{origin}/path?query"; anything else keeps its
-// host, so a hop to another site can never read as "same".
+// Own-origin URLs collapse to "{origin}/path?query#hash"; anything else keeps
+// its host, so a hop to another site can never read as "same". URL.origin
+// drops userinfo, so credentials are re-attached (user visible, password
+// redacted — the report must not echo a secret): a URL that carries
+// credentials never normalises to one that does not.
 const normalizeUrl = (url, ownOrigin) => {
   if (!url) return null;
   try {
     const parsed = new URL(url, ownOrigin);
     const prefix = parsed.origin === new URL(ownOrigin).origin ? "{origin}" : parsed.origin;
-    return `${prefix}${parsed.pathname}${parsed.search}${parsed.hash}`;
+    const userinfo = parsed.username || parsed.password ? `${parsed.username}${parsed.password ? ":<password>" : ""}@` : "";
+    return `${userinfo}${prefix}${parsed.pathname}${parsed.search}${parsed.hash}`;
   } catch {
     return url;
   }
