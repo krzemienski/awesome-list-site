@@ -1,28 +1,400 @@
 {
-  "schemaVersion": 1,
-  "widths": [375, 768, 1024, 1440],
+  "schemaVersion": 2,
+  "generatedBy": "tests/parity/inventory.mjs --write",
+  "generatedFrom": [
+    "tests/parity/inventory/account.json",
+    "tests/parity/inventory/admin.json",
+    "tests/parity/inventory/artifact.json",
+    "tests/parity/inventory/config.json",
+    "tests/parity/inventory/home.json",
+    "tests/parity/inventory/resource.json",
+    "tests/parity/inventory/shell.json",
+    "tests/parity/inventory/static.json",
+    "tests/parity/inventory/taxonomy.json"
+  ],
+  "widths": [
+    375,
+    768,
+    1024,
+    1440
+  ],
   "viewportHeights": {
     "375": 812,
     "768": 1024,
     "1024": 768,
     "1440": 900
   },
-  "screens": [
+  "families": [
     {
-      "id": "app.home.index",
-      "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/",
-      "referencePath": "/index.html",
-      "referenceAction": "home-index",
-      "actualReadySelector": "[data-testid=list-categories]",
-      "referenceReadySelector": "main",
-      "identityCheck": "home"
+      "family": "account",
+      "summary": "Authentication, account and settings screens.",
+      "screens": 11
     },
     {
+      "family": "admin",
+      "summary": "Admin console tabs. The design ships 15 tabs, the app 17; the 14 shared tabs are pixel rows behind the disposable admin session.",
+      "screens": 18
+    },
+    {
+      "family": "artifact",
+      "summary": "Registered design-system artifact: showcase page plus documentation chapters.",
+      "screens": 23
+    },
+    {
+      "family": "home",
+      "summary": "Home page layouts (index and curated), search and discovery entry points.",
+      "screens": 4
+    },
+    {
+      "family": "resource",
+      "summary": "Resource detail page.",
+      "screens": 1
+    },
+    {
+      "family": "shell",
+      "summary": "App shell states: header, sidebar, command palette, mobile drawer and error shells.",
+      "screens": 7
+    },
+    {
+      "family": "static",
+      "summary": "About, Submit, legal and the in-app design-system showcase.",
+      "screens": 4
+    },
+    {
+      "family": "taxonomy",
+      "summary": "Category, subcategory and sub-subcategory listings plus tag and collection browsing.",
+      "screens": 6
+    }
+  ],
+  "screens": [
+    {
+      "family": "static",
+      "id": "app.about",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/about",
+      "referencePath": "/index.html",
+      "referenceAction": "about",
+      "actualReadySelector": "main h1",
+      "referenceReadySelector": "main"
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.approvals",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:approvals",
+      "referenceAction": "admin-tab:approvals",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Approvals\" ↔ app tab [data-testid=tab-approvals]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.audit",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:audit",
+      "referenceAction": "admin-tab:audit",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Audit\" ↔ app tab [data-testid=tab-audit]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.categories",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:categories",
+      "referenceAction": "admin-tab:categories",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Categories\" ↔ app tab [data-testid=tab-categories]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.database",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:database",
+      "referenceAction": "admin-tab:database",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Database\" ↔ app tab [data-testid=tab-database]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.digests",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/admin",
+      "actualAction": "admin-tab:digests",
+      "reason": "App tab \"Digests\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.edits",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:edits",
+      "referenceAction": "admin-tab:edits",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Edits\" ↔ app tab [data-testid=tab-edits]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.enrichment",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:enrichment",
+      "referenceAction": "admin-tab:enrichment",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Enrichment\" ↔ app tab [data-testid=tab-enrichment]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.export",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:export",
+      "referenceAction": "admin-tab:export",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Export\" ↔ app tab [data-testid=tab-export]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.github",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:github",
+      "referenceAction": "admin-tab:github",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"GitHub\" ↔ app tab [data-testid=tab-github]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.journeys",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/admin",
+      "actualAction": "admin-tab:journeys",
+      "reason": "App tab \"Journeys\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.linkhealth",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:linkhealth",
+      "referenceAction": "admin-tab:linkhealth",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Link Health\" ↔ app tab [data-testid=tab-linkhealth]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.overview",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:overview",
+      "referenceAction": "admin-tab:overview",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Overview\" ↔ app tab [data-testid=tab-overview]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.research",
+      "kind": "app",
+      "eligibility": "blocked",
+      "reason": "Design tab \"Research\" (the 15th ADMIN_TABS entry) has no app counterpart; the app folds research into the Researcher tab."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.researcher",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:researcher",
+      "referenceAction": "admin-tab:researcher",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Researcher\" ↔ app tab [data-testid=tab-researcher]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.resources",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:resources",
+      "referenceAction": "admin-tab:resources",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Resources\" ↔ app tab [data-testid=tab-resources]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.subcategories",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:subcategories",
+      "referenceAction": "admin-tab:subcategories",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Subcategories\" ↔ app tab [data-testid=tab-subcategories]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.subsubcategories",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/admin",
+      "actualAction": "admin-tab:subsubcategories",
+      "reason": "App tab \"Sub-subcategories\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "family": "admin",
+      "id": "app.admin.users",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:users",
+      "referenceAction": "admin-tab:users",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Users\" ↔ app tab [data-testid=tab-users]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "family": "home",
+      "id": "app.advanced",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/advanced",
+      "reason": "No independently configured active-reference state exists for advanced search."
+    },
+    {
+      "family": "account",
+      "id": "app.auth.sign-in",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/sign-in",
+      "reason": "Sign-in is Clerk's hosted component; the reference has no sign-in screen and no auth fixture is permitted."
+    },
+    {
+      "family": "account",
+      "id": "app.auth.sign-up",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/sign-up",
+      "reason": "Sign-up is Clerk's hosted component (captcha-gated); the reference has no sign-up screen."
+    },
+    {
+      "family": "account",
+      "id": "app.bookmarks",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/bookmarks",
+      "reason": "The reference has no bookmarks page; verified through list-pattern tokens."
+    },
+    {
+      "family": "taxonomy",
+      "id": "app.categories",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/categories",
+      "reason": "No independently configured active-reference state exists for the all-categories page."
+    },
+    {
+      "family": "taxonomy",
       "id": "app.category",
       "kind": "app",
-      "classification": "pixel-gated",
+      "eligibility": "pixel",
       "actualPath": "/category/{categorySlug}",
       "referencePath": "/index.html",
       "referenceAction": "category",
@@ -31,20 +403,135 @@
       "identityCheck": "category"
     },
     {
-      "id": "app.subcategory",
+      "family": "taxonomy",
+      "id": "app.collection",
       "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/subcategory/{subcategorySlug}",
-      "referencePath": "/index.html",
-      "referenceAction": "subcategory",
-      "actualReadySelector": "[data-testid=taxonomy-results-region]",
-      "referenceReadySelector": "main",
-      "identityCheck": "subcategory"
+      "eligibility": "token-only",
+      "reason": "The reference has no collection page; verified through shared list-pattern tokens instead of pixels."
     },
     {
+      "family": "account",
+      "id": "app.contributions",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/contributions",
+      "reason": "The reference has no contributions page; verified through table tokens."
+    },
+    {
+      "family": "static",
+      "id": "app.design-system",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/design-system",
+      "reason": "The application showcase is distinct from the registered artifact baseline (artifact.showcase covers the design-system page)."
+    },
+    {
+      "family": "shell",
+      "id": "app.error.empty",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "Empty states need an empty catalog slice; verified through empty-state tokens, not pixels."
+    },
+    {
+      "family": "shell",
+      "id": "app.error.loading",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "Loading skeletons are transient; verified through skeleton tokens, not pixels."
+    },
+    {
+      "family": "shell",
+      "id": "app.error.route",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "Error injection is prohibited; no naturally occurring real error state is supplied."
+    },
+    {
+      "family": "home",
+      "id": "app.home.curated",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "actualAction": "home-curated",
+      "referenceAction": "home-curated",
+      "actualReadySelector": "[data-testid=list-categories]",
+      "referenceReadySelector": "main",
+      "notes": "Reference switches the tweaks-panel Home Layout to 'Curated · featured-first' (homeLayout=curated) before capture. The app has no curated layout selector yet, so the actual action reports BLOCKED until a page task adds [data-testid=home-layout-curated] or a control named /curated/i."
+    },
+    {
+      "family": "home",
+      "id": "app.home.index",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "referenceAction": "home-index",
+      "actualReadySelector": "[data-testid=list-categories]",
+      "referenceReadySelector": "main",
+      "identityCheck": "home"
+    },
+    {
+      "family": "account",
+      "id": "app.journey-detail",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/journey/{journeySlug}",
+      "reason": "A real journey identity has not been aligned with the reference."
+    },
+    {
+      "family": "account",
+      "id": "app.journeys",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/journeys",
+      "reason": "No independently configured active-reference state exists for journeys."
+    },
+    {
+      "family": "static",
+      "id": "app.legal",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/terms",
+      "reason": "The reference has no legal pages; verified through prose tokens instead of pixels."
+    },
+    {
+      "family": "shell",
+      "id": "app.not-found",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/__parity-not-found__",
+      "reason": "The active modular reference does not expose a 404 state."
+    },
+    {
+      "family": "account",
+      "id": "app.notifications",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/notifications",
+      "reason": "The reference has no notifications page; verified through list-pattern tokens."
+    },
+    {
+      "family": "account",
+      "id": "app.onboarding",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/onboarding",
+      "reason": "The reference has no onboarding flow; verified through form tokens."
+    },
+    {
+      "family": "account",
+      "id": "app.profile",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/profile",
+      "reason": "The reference has no profile page; verified through form and card tokens."
+    },
+    {
+      "family": "resource",
       "id": "app.resource.detail",
       "kind": "app",
-      "classification": "pixel-gated",
+      "eligibility": "pixel",
       "actualPath": "/resource/{resourceId}",
       "referencePath": "/index.html",
       "referenceAction": "resource",
@@ -53,37 +540,44 @@
       "identityCheck": "resource"
     },
     {
-      "id": "app.about",
+      "family": "home",
+      "id": "app.search",
       "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/about",
-      "referencePath": "/index.html",
-      "referenceAction": "about",
-      "actualReadySelector": "main h1",
-      "referenceReadySelector": "main"
+      "eligibility": "blocked",
+      "actualPath": "/search",
+      "reason": "The modular reference has no independently routeable search-results state; the command palette row (app.shell.palette) covers the search affordance."
     },
     {
+      "family": "account",
+      "id": "app.settings",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/settings",
+      "reason": "No independently configured active-reference state exists for settings."
+    },
+    {
+      "family": "account",
+      "id": "app.settings.theme",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/settings/theme",
+      "reason": "The theme picker's counterpart is the tweaks panel, which is a host overlay rather than a routeable reference page."
+    },
+    {
+      "family": "shell",
       "id": "app.shell.default",
       "kind": "app",
-      "classification": "pixel-gated",
+      "eligibility": "pixel",
       "aliasOf": "app.home.index"
     },
     {
-      "id": "app.shell.palette",
-      "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/",
-      "referencePath": "/index.html",
-      "actualAction": "palette",
-      "referenceAction": "palette",
-      "actualReadySelector": "[role=dialog]",
-      "referenceReadySelector": ".modal-backdrop"
-    },
-    {
+      "family": "shell",
       "id": "app.shell.mobile-drawer",
       "kind": "app",
-      "classification": "pixel-gated",
-      "widths": [375],
+      "eligibility": "pixel",
+      "widths": [
+        375
+      ],
       "actualPath": "/",
       "referencePath": "/index.html",
       "actualAction": "mobile-drawer",
@@ -92,138 +586,294 @@
       "referenceReadySelector": ".mobile-drawer.open"
     },
     {
-      "id": "app.search",
+      "family": "shell",
+      "id": "app.shell.palette",
       "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/search",
-      "referencePath": null,
-      "blocked": "The current modular reference has no independently routeable search-results state."
+      "eligibility": "pixel",
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "actualAction": "palette",
+      "referenceAction": "palette",
+      "actualReadySelector": "[role=dialog]",
+      "referenceReadySelector": ".modal-backdrop"
     },
     {
+      "family": "taxonomy",
+      "id": "app.subcategory",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/subcategory/{subcategorySlug}",
+      "referencePath": "/index.html",
+      "referenceAction": "subcategory",
+      "actualReadySelector": "[data-testid=taxonomy-results-region]",
+      "referenceReadySelector": "main",
+      "identityCheck": "subcategory"
+    },
+    {
+      "family": "static",
       "id": "app.submit",
       "kind": "app",
-      "classification": "pixel-gated",
+      "eligibility": "pixel",
       "actualPath": "/submit",
       "referencePath": "/index.html",
       "referenceAction": "submit",
-      "blocked": "Authentication is fail-closed; no privileged fixture or test identity is supplied."
+      "actualReadySelector": "main form",
+      "referenceReadySelector": "main",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Submit is sign-in gated in the app; the disposable admin identity satisfies the guard. No fixture data is submitted."
     },
     {
-      "id": "app.admin.overview",
+      "family": "taxonomy",
+      "id": "app.subsubcategory",
       "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/admin",
+      "eligibility": "pixel",
+      "actualPath": "/sub-subcategory/{subSubcategorySlug}",
       "referencePath": "/index.html",
-      "referenceAction": "admin",
-      "blocked": "Admin requires a real authorized session, and reference admin statistics are demonstrator data rather than an approved real-data adapter."
+      "referenceAction": "subsubcategory",
+      "actualReadySelector": "[data-testid=taxonomy-results-region]",
+      "referenceReadySelector": "main",
+      "identityCheck": "subsubcategory",
+      "notes": "Both sides resolve the first sub-subcategory of the first subcategory that has one; the reference opens it via __avGo('subcategory', {cat, sub, subSub})."
     },
     {
-      "id": "app.settings.theme",
+      "family": "taxonomy",
+      "id": "app.tag",
       "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/settings/theme",
-      "referencePath": null,
-      "blocked": "Counterpart belongs to an older non-active page family and is not routeable in the approved modular target."
+      "eligibility": "token-only",
+      "actualPath": "/tag/{tagSlug}",
+      "reason": "The reference has no tag listing; verified through shared list-pattern tokens instead of pixels."
     },
     {
-      "id": "app.not-found",
-      "kind": "app",
-      "classification": "pixel-gated",
-      "actualPath": "/__parity-not-found__",
-      "referencePath": null,
-      "blocked": "The active modular reference does not expose a 404 state."
-    },
-    {
-      "id": "artifact.showcase",
-      "kind": "artifact",
-      "classification": "pixel-gated",
-      "actualPath": "/",
-      "referencePath": "/design-system.html",
-      "readySelector": "main"
-    },
-    {
+      "family": "artifact",
       "id": "artifact.anatomy.flows",
       "kind": "artifact",
-      "classification": "pixel-gated",
+      "eligibility": "artifact-docs",
       "actualPath": "/#anatomy",
       "referencePath": "/design-system.html",
       "readySelector": "main",
-      "missingActualNavigationCounterpart": "The registered artifact has no independently routeable anatomy state; both captures are diagnostic only."
+      "reason": "The registered artifact has no independently routeable anatomy state; both captures are diagnostic only."
     },
     {
+      "family": "artifact",
+      "id": "artifact.docs.a11y",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-a11y",
+      "referencePath": "/docs.html#a11y",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Accessibility\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.buttons",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-buttons",
+      "referencePath": "/docs.html#buttons",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Buttons\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.cards",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-cards",
+      "referencePath": "/docs.html#cards",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Cards\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.checklist",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-checklist",
+      "referencePath": "/docs.html#checklist",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Launch checklist\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.color",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-color",
+      "referencePath": "/docs.html#color",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Color & accent\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.data-density",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-data-density",
+      "referencePath": "/docs.html#data-density",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Data density\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.flows",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-flows",
+      "referencePath": "/docs.html#flows",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Flow diagrams\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.forms",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-forms",
+      "referencePath": "/docs.html#forms",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Forms\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.getting-started",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-getting-started",
+      "referencePath": "/docs.html#getting-started",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Getting started\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.integration",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-integration",
+      "referencePath": "/docs.html#integration",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Integrate the system\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.lists",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-lists",
+      "referencePath": "/docs.html#lists",
+      "readySelector": "main",
+      "reason": "Docs chapter \"List patterns\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.motion",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-motion",
+      "referencePath": "/docs.html#motion",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Motion\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.navigation",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-navigation",
+      "referencePath": "/docs.html#navigation",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Navigation\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
       "id": "artifact.docs.overview",
       "kind": "artifact",
-      "classification": "pixel-gated",
+      "eligibility": "artifact-docs",
       "actualPath": "/#docs-overview",
       "referencePath": "/docs.html#overview",
       "readySelector": "main",
-      "missingActualNavigationCounterpart": "The registered artifact has no docs hash router; both captures are diagnostic only."
+      "reason": "Docs chapter \"Overview\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.pages",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-pages",
+      "referencePath": "/docs.html#pages",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Page templates\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.principles",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-principles",
+      "referencePath": "/docs.html#principles",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Principles\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.spacing",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-spacing",
+      "referencePath": "/docs.html#spacing",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Spacing & layout\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.theming",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-theming",
+      "referencePath": "/docs.html#theming",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Theming & switching\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.theming-app",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-theming-app",
+      "referencePath": "/docs.html#theming-app",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Theming an app\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.tokens",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-tokens",
+      "referencePath": "/docs.html#tokens",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Token contract\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.docs.typography",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-typography",
+      "referencePath": "/docs.html#typography",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Typography\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "family": "artifact",
+      "id": "artifact.showcase",
+      "kind": "artifact",
+      "eligibility": "pixel",
+      "actualPath": "/",
+      "referencePath": "/design-system.html",
+      "readySelector": "main"
     }
-  ],
-  "tokenOnly": [
-    "app.tag",
-    "app.collection",
-    "app.bookmarks",
-    "app.profile",
-    "app.contributions",
-    "app.notifications",
-    "app.onboarding",
-    "app.legal",
-    "app.error.loading",
-    "app.error.empty",
-    "app.admin.subsubcategories",
-    "app.admin.journeys",
-    "app.admin.digests"
-  ],
-  "artifactDocs": [
-    ["overview", "Overview"],
-    ["principles", "Principles"],
-    ["getting-started", "Getting started"],
-    ["tokens", "Token contract"],
-    ["theming", "Theming & switching"],
-    ["typography", "Typography"],
-    ["color", "Color & accent"],
-    ["spacing", "Spacing & layout"],
-    ["motion", "Motion"],
-    ["buttons", "Buttons"],
-    ["cards", "Cards"],
-    ["forms", "Forms"],
-    ["navigation", "Navigation"],
-    ["lists", "List patterns"],
-    ["flows", "Flow diagrams"],
-    ["pages", "Page templates"],
-    ["data-density", "Data density"],
-    ["integration", "Integrate the system"],
-    ["theming-app", "Theming an app"],
-    ["a11y", "Accessibility"],
-    ["checklist", "Launch checklist"]
-  ],
-  "unconfiguredScreens": [
-    ["app.auth.sign-in", "pixel-gated", "Real Clerk state is required; no auth fixture is permitted."],
-    ["app.auth.sign-up", "pixel-gated", "Real Clerk state is required; no auth fixture is permitted."],
-    ["app.categories", "pixel-gated", "No independently configured active-reference state yet."],
-    ["app.subsubcategory", "pixel-gated", "No independently configured active-reference state yet."],
-    ["app.advanced", "pixel-gated", "No independently configured active-reference state yet."],
-    ["app.journeys", "pixel-gated", "No independently configured active-reference state yet."],
-    ["app.journey-detail", "pixel-gated", "A real journey identity has not been aligned."],
-    ["app.settings", "pixel-gated", "No independently configured active-reference state yet."],
-    ["app.design-system", "pixel-gated", "Application showcase is distinct from the registered artifact baseline."],
-    ["app.error.route", "token-only", "Error injection is prohibited; no naturally occurring real error state supplied."]
-  ],
-  "adminSections": [
-    "approvals",
-    "edits",
-    "enrichment",
-    "researcher",
-    "export",
-    "database",
-    "resources",
-    "categories",
-    "subcategories",
-    "users",
-    "github",
-    "linkhealth",
-    "audit"
   ],
   "sourceInventoryProvenance": {
     "copiedFrom": [
@@ -233,7 +883,9 @@
     "copiedAtImplementationTime": true,
     "runtimeDependencyOnTmp": false,
     "adminRoute": "client/src/pages/AdminDashboard.tsx",
-    "routeSource": "client/src/App.tsx"
+    "routeSource": "client/src/App.tsx",
+    "designAdminTabs": "awesome-list-site-ds/admin.jsx ADMIN_TABS",
+    "splitIntoFragments": "2026-09-12 (harness hardening); one fragment per screen family"
   },
   "sourceInventoryAliases": {
     "screen.home.default": "app.home.index",

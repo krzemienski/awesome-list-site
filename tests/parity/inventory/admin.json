@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "admin",
+  "summary": "Admin console tabs. The design ships 15 tabs, the app 17; the 14 shared tabs are pixel rows behind the disposable admin session.",
+  "screens": [
+    {
+      "id": "app.admin.overview",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:overview",
+      "referenceAction": "admin-tab:overview",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Overview\" ↔ app tab [data-testid=tab-overview]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.approvals",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:approvals",
+      "referenceAction": "admin-tab:approvals",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Approvals\" ↔ app tab [data-testid=tab-approvals]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.edits",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:edits",
+      "referenceAction": "admin-tab:edits",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Edits\" ↔ app tab [data-testid=tab-edits]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.enrichment",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:enrichment",
+      "referenceAction": "admin-tab:enrichment",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Enrichment\" ↔ app tab [data-testid=tab-enrichment]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.researcher",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:researcher",
+      "referenceAction": "admin-tab:researcher",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Researcher\" ↔ app tab [data-testid=tab-researcher]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.export",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:export",
+      "referenceAction": "admin-tab:export",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Export\" ↔ app tab [data-testid=tab-export]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.database",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:database",
+      "referenceAction": "admin-tab:database",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Database\" ↔ app tab [data-testid=tab-database]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.resources",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:resources",
+      "referenceAction": "admin-tab:resources",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Resources\" ↔ app tab [data-testid=tab-resources]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.categories",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:categories",
+      "referenceAction": "admin-tab:categories",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Categories\" ↔ app tab [data-testid=tab-categories]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.subcategories",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:subcategories",
+      "referenceAction": "admin-tab:subcategories",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Subcategories\" ↔ app tab [data-testid=tab-subcategories]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.users",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:users",
+      "referenceAction": "admin-tab:users",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Users\" ↔ app tab [data-testid=tab-users]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.github",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:github",
+      "referenceAction": "admin-tab:github",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"GitHub\" ↔ app tab [data-testid=tab-github]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.linkhealth",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:linkhealth",
+      "referenceAction": "admin-tab:linkhealth",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Link Health\" ↔ app tab [data-testid=tab-linkhealth]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.audit",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:audit",
+      "referenceAction": "admin-tab:audit",
+      "actualReadySelector": "[role=tabpanel][data-state=active]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Audit\" ↔ app tab [data-testid=tab-audit]. Reference admin globals (users, recent activity, pending counts) come from /api/admin/* through the disposable admin session; see docs/parity/assumptions/harness.md."
+    },
+    {
+      "id": "app.admin.subsubcategories",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/admin",
+      "actualAction": "admin-tab:subsubcategories",
+      "reason": "App tab \"Sub-subcategories\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "id": "app.admin.journeys",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/admin",
+      "actualAction": "admin-tab:journeys",
+      "reason": "App tab \"Journeys\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "id": "app.admin.digests",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/admin",
+      "actualAction": "admin-tab:digests",
+      "reason": "App tab \"Digests\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "id": "app.admin.research",
+      "kind": "app",
+      "eligibility": "blocked",
+      "reason": "Design tab \"Research\" (the 15th ADMIN_TABS entry) has no app counterpart; the app folds research into the Researcher tab."
+    }
+  ]
+}

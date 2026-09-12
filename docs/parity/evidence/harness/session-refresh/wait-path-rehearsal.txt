@@ -1,0 +1,17 @@
+# excerpt of the 14:46 UTC rehearsal log, copied before the restart
+[parity] app.home.index @ 375
+  … waiting 8s for the app limiter behind POST /api/recommendations to reset before app.home.index@375 (429 received (window filled before this run); reopening once)
+  FAIL 40.6085% (1272619px)
+[parity] app.home.index @ 768
+  …
+[parity] app.shell.palette @ 375
+  FAIL 39.8782% (1249733px)
+[parity] app.shell.palette @ 768
+  … waiting 475s for the app limiter behind POST /api/recommendations to reset before app.shell.palette@768 (0 of 10 left, a load consumes 2)
+  FAIL 28.3214% (1097114px)
+[parity] app.shell.palette @ 1024
+  FAIL 24.4292% (1106688px)
+[parity] app.shell.palette @ 1440
+  FAIL 29.1863% (1692061px)
+Gate lease released (db-heavy: parity-baseline)
+[parity] selected-rows-diagnostic: 0/8 pixel rows pass, 8 fail, 0 blocked → tests/parity/baseline/2026-09-12T14-46-15-803Z-50401 (exit 1)

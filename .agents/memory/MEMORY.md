@@ -55,7 +55,7 @@
 - [Admin password rotation path](admin-password-rotation.md) — rotate via ADMIN_PASSWORD secret + boot sync (restart/republish); PROD_ADMIN_PASSWORD is stale; prod scripts must pin connect.sid from login only.
 - [Audit-key header auth](audit-key-header-auth.md) — scripts auth via X-Admin-Audit-Key: ADMIN_PASSWORD (fails closed <8 chars); task envs get the key from gitignored .env, never setEnvVars.
 - [RHF formState Proxy](rhf-formstate-proxy.md) — formState.isDirty etc. must be READ during render to subscribe; first read inside an event handler returns stale false forever.
-- [Vite workspace watch reload](vite-workspace-watch-reload.md) — repo file writes (tee/rm) during live Playwright runs trigger SPA reloads → ERR_ABORTED flakes; stage output in /tmp, cp after.
+- [Vite workspace watch reload](vite-workspace-watch-reload.md) — ANY repo write (docs, touch, dir delete too) during a browser run reloads every open app page; stage in /tmp, copy after the last capture.
 - [Flex-anchor min-width:auto](flex-anchor-min-width.md) — raw text in a flex container is an anonymous item with min-width:auto that never wraps; wrap it in a min-w-0 span or long URLs blow dialogs.
 - [Full-origin CSRF comparison](origin-check-port-normalization.md) — compare normalized scheme+host+effective port; scripts hitting prod admin API MUST send Origin header or 403.
 - [Clerk headless UI sign-in](clerk-headless-ui-signin.md) — client-trust fields need accessible-label selection and sequential keypresses; only sign-UP has a captcha, and testing tokens alone don't bypass it.
@@ -114,3 +114,5 @@
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
 - [Read-only browser capture](read-only-browser-capture.md) — three layers (browser Fetch / context guards / sealed realm); page-scoped hooks miss anchor popups; LH needs a Playwright-context page via puppeteer handle; keep popup blocker ON.
+- [Parity harness disposable admin](parity-harness-disposable-admin.md) — int4-guarded admin routes need a NUMERIC bridge id (prefix the email); sweep fails closed on Clerk leftovers too; identity checks scope to main.
+- [Headless capture determinism](headless-capture-determinism.md) — neutralise backdrop-filter both sides; `--disable-partial-raster` for stable fullPage; stamp+reopen on reload; wait, THEN snapshot.

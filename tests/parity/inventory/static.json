@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "static",
+  "summary": "About, Submit, legal and the in-app design-system showcase.",
+  "screens": [
+    {
+      "id": "app.about",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/about",
+      "referencePath": "/index.html",
+      "referenceAction": "about",
+      "actualReadySelector": "main h1",
+      "referenceReadySelector": "main"
+    },
+    {
+      "id": "app.submit",
+      "kind": "app",
+      "eligibility": "pixel",
+      "requires": ["admin-session"],
+      "actualPath": "/submit",
+      "referencePath": "/index.html",
+      "referenceAction": "submit",
+      "actualReadySelector": "main form",
+      "referenceReadySelector": "main",
+      "notes": "Submit is sign-in gated in the app; the disposable admin identity satisfies the guard. No fixture data is submitted."
+    },
+    {
+      "id": "app.legal",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/terms",
+      "reason": "The reference has no legal pages; verified through prose tokens instead of pixels."
+    },
+    {
+      "id": "app.design-system",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/design-system",
+      "reason": "The application showcase is distinct from the registered artifact baseline (artifact.showcase covers the design-system page)."
+    }
+  ]
+}

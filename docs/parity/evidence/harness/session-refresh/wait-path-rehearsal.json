@@ -1,0 +1,25 @@
+{
+  "reconstructedFrom": "results.json of run 2026-09-12T14-46-15-803Z-50401, read before the workspace restart",
+  "runId": "2026-09-12T14-46-15-803Z-50401",
+  "claim": "selected-rows-diagnostic",
+  "command": "node tests/parity/runner.mjs --only app.home.index,app.shell.palette",
+  "rowTimeoutMs": 150000,
+  "throttleWaits": [
+    { "screen": "app.home.index", "width": 375, "waitedSeconds": 7, "why": "429 received (window filled before this run); reopening once" },
+    { "screen": "app.shell.palette", "width": 768, "waitedSeconds": 475, "why": "0 of 10 left, a load consumes 2" }
+  ],
+  "throttleDeferrals": 0,
+  "documentReloads": [],
+  "rows": [
+    { "screen": "app.home.index", "width": 375, "status": "FAIL", "diffPercent": 40.6085, "differingPixels": 1272619 },
+    { "screen": "app.home.index", "width": 768, "status": "FAIL", "diffPercent": 29.1390, "differingPixels": 1128783 },
+    { "screen": "app.home.index", "width": 1024, "status": "FAIL", "diffPercent": 24.9440, "differingPixels": 1130008 },
+    { "screen": "app.home.index", "width": 1440, "status": "FAIL", "diffPercent": 29.6808, "differingPixels": 1720725 },
+    { "screen": "app.shell.palette", "width": 375, "status": "FAIL", "diffPercent": 39.8782, "differingPixels": 1249733 },
+    { "screen": "app.shell.palette", "width": 768, "status": "FAIL", "diffPercent": 28.3214, "differingPixels": 1097114 },
+    { "screen": "app.shell.palette", "width": 1024, "status": "FAIL", "diffPercent": 24.4292, "differingPixels": 1106688 },
+    { "screen": "app.shell.palette", "width": 1440, "status": "FAIL", "diffPercent": 29.1863, "differingPixels": 1692061 }
+  ],
+  "identityTeardown": { "localDeleted": true, "clerkDeleted": true, "verification": { "localQaUsersRemaining": [] } },
+  "inputsChangedDuringRun": false
+}

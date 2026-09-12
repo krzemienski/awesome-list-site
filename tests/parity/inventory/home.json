@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "home",
+  "summary": "Home page layouts (index and curated), search and discovery entry points.",
+  "screens": [
+    {
+      "id": "app.home.index",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "referenceAction": "home-index",
+      "actualReadySelector": "[data-testid=list-categories]",
+      "referenceReadySelector": "main",
+      "identityCheck": "home"
+    },
+    {
+      "id": "app.home.curated",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/",
+      "referencePath": "/index.html",
+      "actualAction": "home-curated",
+      "referenceAction": "home-curated",
+      "actualReadySelector": "[data-testid=list-categories]",
+      "referenceReadySelector": "main",
+      "notes": "Reference switches the tweaks-panel Home Layout to 'Curated · featured-first' (homeLayout=curated) before capture. The app has no curated layout selector yet, so the actual action reports BLOCKED until a page task adds [data-testid=home-layout-curated] or a control named /curated/i."
+    },
+    {
+      "id": "app.search",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/search",
+      "reason": "The modular reference has no independently routeable search-results state; the command palette row (app.shell.palette) covers the search affordance."
+    },
+    {
+      "id": "app.advanced",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/advanced",
+      "reason": "No independently configured active-reference state exists for advanced search."
+    }
+  ]
+}

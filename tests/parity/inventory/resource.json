@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "resource",
+  "summary": "Resource detail page.",
+  "screens": [
+    {
+      "id": "app.resource.detail",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/resource/{resourceId}",
+      "referencePath": "/index.html",
+      "referenceAction": "resource",
+      "actualReadySelector": "main h1",
+      "referenceReadySelector": "main",
+      "identityCheck": "resource"
+    }
+  ]
+}

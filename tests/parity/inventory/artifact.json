@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "artifact",
+  "summary": "Registered design-system artifact: showcase page plus documentation chapters.",
+  "screens": [
+    {
+      "id": "artifact.showcase",
+      "kind": "artifact",
+      "eligibility": "pixel",
+      "actualPath": "/",
+      "referencePath": "/design-system.html",
+      "readySelector": "main"
+    },
+    {
+      "id": "artifact.anatomy.flows",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#anatomy",
+      "referencePath": "/design-system.html",
+      "readySelector": "main",
+      "reason": "The registered artifact has no independently routeable anatomy state; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.overview",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-overview",
+      "referencePath": "/docs.html#overview",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Overview\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.principles",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-principles",
+      "referencePath": "/docs.html#principles",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Principles\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.getting-started",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-getting-started",
+      "referencePath": "/docs.html#getting-started",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Getting started\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.tokens",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-tokens",
+      "referencePath": "/docs.html#tokens",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Token contract\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.theming",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-theming",
+      "referencePath": "/docs.html#theming",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Theming & switching\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.typography",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-typography",
+      "referencePath": "/docs.html#typography",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Typography\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.color",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-color",
+      "referencePath": "/docs.html#color",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Color & accent\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.spacing",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-spacing",
+      "referencePath": "/docs.html#spacing",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Spacing & layout\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.motion",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-motion",
+      "referencePath": "/docs.html#motion",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Motion\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.buttons",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-buttons",
+      "referencePath": "/docs.html#buttons",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Buttons\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.cards",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-cards",
+      "referencePath": "/docs.html#cards",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Cards\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.forms",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-forms",
+      "referencePath": "/docs.html#forms",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Forms\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.navigation",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-navigation",
+      "referencePath": "/docs.html#navigation",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Navigation\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.lists",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-lists",
+      "referencePath": "/docs.html#lists",
+      "readySelector": "main",
+      "reason": "Docs chapter \"List patterns\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.flows",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-flows",
+      "referencePath": "/docs.html#flows",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Flow diagrams\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.pages",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-pages",
+      "referencePath": "/docs.html#pages",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Page templates\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.data-density",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-data-density",
+      "referencePath": "/docs.html#data-density",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Data density\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.integration",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-integration",
+      "referencePath": "/docs.html#integration",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Integrate the system\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.theming-app",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-theming-app",
+      "referencePath": "/docs.html#theming-app",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Theming an app\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.a11y",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-a11y",
+      "referencePath": "/docs.html#a11y",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Accessibility\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    },
+    {
+      "id": "artifact.docs.checklist",
+      "kind": "artifact",
+      "eligibility": "artifact-docs",
+      "actualPath": "/#docs-checklist",
+      "referencePath": "/docs.html#checklist",
+      "readySelector": "main",
+      "reason": "Docs chapter \"Launch checklist\": the registered artifact has no docs hash router; both captures are diagnostic only."
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "account",
+  "summary": "Authentication, account and settings screens.",
+  "screens": [
+    {
+      "id": "app.auth.sign-in",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/sign-in",
+      "reason": "Sign-in is Clerk's hosted component; the reference has no sign-in screen and no auth fixture is permitted."
+    },
+    {
+      "id": "app.auth.sign-up",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/sign-up",
+      "reason": "Sign-up is Clerk's hosted component (captcha-gated); the reference has no sign-up screen."
+    },
+    {
+      "id": "app.bookmarks",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/bookmarks",
+      "reason": "The reference has no bookmarks page; verified through list-pattern tokens."
+    },
+    {
+      "id": "app.profile",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/profile",
+      "reason": "The reference has no profile page; verified through form and card tokens."
+    },
+    {
+      "id": "app.contributions",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/contributions",
+      "reason": "The reference has no contributions page; verified through table tokens."
+    },
+    {
+      "id": "app.notifications",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/notifications",
+      "reason": "The reference has no notifications page; verified through list-pattern tokens."
+    },
+    {
+      "id": "app.onboarding",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/onboarding",
+      "reason": "The reference has no onboarding flow; verified through form tokens."
+    },
+    {
+      "id": "app.settings",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/settings",
+      "reason": "No independently configured active-reference state exists for settings."
+    },
+    {
+      "id": "app.settings.theme",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/settings/theme",
+      "reason": "The theme picker's counterpart is the tweaks panel, which is a host overlay rather than a routeable reference page."
+    },
+    {
+      "id": "app.journeys",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/journeys",
+      "reason": "No independently configured active-reference state exists for journeys."
+    },
+    {
+      "id": "app.journey-detail",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/journey/{journeySlug}",
+      "reason": "A real journey identity has not been aligned with the reference."
+    }
+  ]
+}

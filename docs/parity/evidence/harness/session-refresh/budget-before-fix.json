@@ -1,0 +1,17 @@
+{
+  "reconstructedFrom": "results.json of run 2026-09-12T13-38-35-298Z-38486, read before the workspace restart",
+  "runId": "2026-09-12T13-38-35-298Z-38486",
+  "rowTimeoutMs": 150000,
+  "throttleWaits": [
+    { "screen": "app.shell.palette", "width": 1024, "waitedSeconds": 660, "why": "0 of 10 left, a load consumes 2" },
+    { "screen": "app.shell.palette", "width": 1440, "waitedSeconds": 510, "why": "0 of 10 left, a load consumes 2" }
+  ],
+  "rows": [
+    { "screen": "app.shell.palette", "width": 375, "status": "FAIL", "measured": true },
+    { "screen": "app.shell.palette", "width": 768, "status": "FAIL", "diffPercent": 28.49, "measured": true },
+    { "screen": "app.shell.palette", "width": 1024, "status": "FAIL", "reason": "exceeded the 150s row budget", "measured": false },
+    { "screen": "app.shell.palette", "width": 1440, "status": "FAIL", "reason": "exceeded the 150s row budget", "measured": false }
+  ],
+  "rootCause": "withTimeout(promise) summed the wait ledger after captureRow had already pushed its synchronous wait entry",
+  "fix": "withTimeout(() => captureRow(...)) reads the ledger before invoking the thunk"
+}

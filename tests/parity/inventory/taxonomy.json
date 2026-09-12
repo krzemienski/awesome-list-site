@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "taxonomy",
+  "summary": "Category, subcategory and sub-subcategory listings plus tag and collection browsing.",
+  "screens": [
+    {
+      "id": "app.category",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/category/{categorySlug}",
+      "referencePath": "/index.html",
+      "referenceAction": "category",
+      "actualReadySelector": "[data-testid=taxonomy-results-region]",
+      "referenceReadySelector": "main",
+      "identityCheck": "category"
+    },
+    {
+      "id": "app.subcategory",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/subcategory/{subcategorySlug}",
+      "referencePath": "/index.html",
+      "referenceAction": "subcategory",
+      "actualReadySelector": "[data-testid=taxonomy-results-region]",
+      "referenceReadySelector": "main",
+      "identityCheck": "subcategory"
+    },
+    {
+      "id": "app.subsubcategory",
+      "kind": "app",
+      "eligibility": "pixel",
+      "actualPath": "/sub-subcategory/{subSubcategorySlug}",
+      "referencePath": "/index.html",
+      "referenceAction": "subsubcategory",
+      "actualReadySelector": "[data-testid=taxonomy-results-region]",
+      "referenceReadySelector": "main",
+      "identityCheck": "subsubcategory",
+      "notes": "Both sides resolve the first sub-subcategory of the first subcategory that has one; the reference opens it via __avGo('subcategory', {cat, sub, subSub})."
+    },
+    {
+      "id": "app.categories",
+      "kind": "app",
+      "eligibility": "blocked",
+      "actualPath": "/categories",
+      "reason": "No independently configured active-reference state exists for the all-categories page."
+    },
+    {
+      "id": "app.tag",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/tag/{tagSlug}",
+      "reason": "The reference has no tag listing; verified through shared list-pattern tokens instead of pixels."
+    },
+    {
+      "id": "app.collection",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "The reference has no collection page; verified through shared list-pattern tokens instead of pixels."
+    }
+  ]
+}

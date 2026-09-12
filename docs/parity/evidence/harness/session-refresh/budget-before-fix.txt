@@ -1,0 +1,13 @@
+# excerpt of the 13:38 UTC full-run log (grep palette), copied before the restart
+155:[parity] app.shell.palette @ 375 deferred 385s: app limiter behind POST /api/recommendations is closed
+156:[parity] app.shell.palette @ 768 deferred 385s: app limiter behind POST /api/recommendations is closed
+157:[parity] app.shell.palette @ 1024 deferred 385s: app limiter behind POST /api/recommendations is closed
+158:[parity] app.shell.palette @ 1440 deferred 385s: app limiter behind POST /api/recommendations is closed
+373:[parity] app.shell.palette @ 375
+375:[parity] app.shell.palette @ 768
+377:[parity] app.shell.palette @ 1024
+378:  … waiting 660s for the app limiter behind POST /api/recommendations to reset before app.shell.palette@1024 (0 of 10 left, a load consumes 2)
+379:  ✗ app.shell.palette@1024 exceeded the 150s row budget
+380:[parity] app.shell.palette @ 1440
+381:  … waiting 510s for the app limiter behind POST /api/recommendations to reset before app.shell.palette@1440 (0 of 10 left, a load consumes 2)
+382:  ✗ app.shell.palette@1440 exceeded the 150s row budget

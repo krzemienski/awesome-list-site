@@ -145,3 +145,12 @@ repomix-output.xml
 
 # Local awesome_bot gem installs (script installs into ~/.cache, but guard the repo too)
 /.gem/
+
+# Visual parity harness: raw capture-stability frames stay local. results.json and
+# OUTPUT-MANIFEST.json record their hashes; only the accepted captures are committed.
+tests/parity/baseline/**/*.attempt-*.png
+tests/parity/baseline/**/*.repeat.png
+tests/parity/actual/*.attempt-*.png
+tests/parity/actual/*.repeat.png
+tests/parity/expected/*.attempt-*.png
+tests/parity/expected/*.repeat.png
