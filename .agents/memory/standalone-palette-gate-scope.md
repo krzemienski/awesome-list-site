@@ -23,8 +23,7 @@ completion of every later task. "Treat it as informational" is not an option
 the platform offers.
 
 **How to apply:** when a drift gate turns red on files you may not edit, ask
-first whether the files are a reference corpus. If yes: exclusion + archive
-verification + mutation probe (edited / extra / missing file must each fail),
-then `--update-baseline` retires the orphaned entries (a shrink-only ratchet
-refuses growth even with `--init`, so fix regressions before ratcheting). If
+first whether the files are a reference corpus. If yes: reasoned exclusion +
+archive verification (hash, member count, no symlinks) + a mutation probe in
+the evidence dir; ratchet the baseline only after regressions are zero. If
 no: tokenize or tag; never pin exceptions to force green.

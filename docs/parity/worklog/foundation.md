@@ -112,9 +112,9 @@ Also green (not in the required list): `theme-registry-types`,
 
 `standalone-palette-drift`: red at `e519de14` (89) and 125 at the start of
 this task; now **PASS** (3 roots, 82 files) after the frozen-reference scope
-decision in assumptions §7. Mutation probe (edited / extra / missing archive
-file, untagged artifact literal, bare `DS-OK`): all five fail, restored tree
-passes — `docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt`.
+decision in assumptions §7. Mutation probe (edited / extra / missing / symlinked
+archive file, wrong member count or missing digest in the sync record,
+untagged artifact literal, bare `DS-OK`): all fail, restored tree passes — `docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt`.
 
 ### Flakes seen during the run (each green on a single rerun)
 

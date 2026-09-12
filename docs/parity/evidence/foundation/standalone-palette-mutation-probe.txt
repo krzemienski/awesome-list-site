@@ -43,3 +43,27 @@ exit=1
 PASS font-family :: 0 legacy match(es) across 0 file(s), all pinned at baseline
 PASS standalone-palette-drift :: 3 root(s), 82 source file(s); no new hardcoded design values
 exit=0
+
+# review-round hardening — 2026-09-12T05:48Z
+
+## 7. archived file replaced by a symlink to identical bytes
+FAIL frozen-reference :: awesome-list-site-ds/HANDOFF.md: symbolic link
+FAIL frozen-reference :: awesome-list-site-ds/HANDOFF.md: missing (present in archive)
+2 frozen reference file(s) drifted from attached_assets/awesome_list_site_2_1789019068732.zip.
+exit=1
+
+## 8. sync record originalEntries disagrees with the archive
+FAIL frozen-reference :: attached_assets/awesome_list_site_2_1789019068732.zip holds 103 file entries, docs/parity/source-sync.json records 102
+exit=1
+
+## 9. sync record without a pinned digest
+FAIL frozen-reference :: docs/parity/source-sync.json lacks a pinned archive.sha256
+exit=1
+
+## 10. in-script canaries (run on every invocation): zip parser rejects duplicate members, empty archives, traversal names, zip64 sentinels, size mismatches; directory walk reports symlinks.
+   probe: removing the duplicate-entry guard -> 'FAIL canary :: duplicate archive members are rejected'; removing the symlink branch -> canary 'directory walk reports symlinks instead of following them' throws.
+
+## 11. restored tree
+PASS frozen-reference :: awesome-list-site-ds byte-identical to attached_assets/awesome_list_site_2_1789019068732.zip (103 files)
+PASS standalone-palette-drift :: 3 root(s), 82 source file(s); no new hardcoded design values
+exit=0

@@ -141,6 +141,98 @@ function runCanaries() {
   } finally {
     fs.rmSync(canaryRoot, { recursive: true, force: true });
   }
+
+  runFrozenReferenceCanaries();
+}
+
+/**
+ * Build a minimal stored-method zip in memory (local headers, central
+ * directory, EOCD) so the frozen-reference checker can be exercised without
+ * touching the real archive. `patch` lets a canary corrupt specific fields.
+ */
+function buildStoredZip(files, patch = () => {}) {
+  const locals = [];
+  const centrals = [];
+  let cursor = 0;
+  for (const [name, body] of files) {
+    const nameBuffer = Buffer.from(name, 'utf8');
+    const content = Buffer.from(body);
+    const local = Buffer.alloc(30 + nameBuffer.length);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt32LE(content.length, 18);
+    local.writeUInt32LE(content.length, 22);
+    local.writeUInt16LE(nameBuffer.length, 26);
+    nameBuffer.copy(local, 30);
+    const central = Buffer.alloc(46 + nameBuffer.length);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 6);
+    central.writeUInt32LE(content.length, 20);
+    central.writeUInt32LE(content.length, 24);
+    central.writeUInt16LE(nameBuffer.length, 28);
+    central.writeUInt32LE(cursor, 42);
+    nameBuffer.copy(central, 46);
+    locals.push(local, content);
+    centrals.push(central);
+    cursor += local.length + content.length;
+  }
+  const centralStart = cursor;
+  const centralBuffer = Buffer.concat(centrals);
+  const eocd = Buffer.alloc(22);
+  eocd.writeUInt32LE(0x06054b50, 0);
+  eocd.writeUInt16LE(files.length, 8);
+  eocd.writeUInt16LE(files.length, 10);
+  eocd.writeUInt32LE(centralBuffer.length, 12);
+  eocd.writeUInt32LE(centralStart, 16);
+  const zip = Buffer.concat([...locals, centralBuffer, eocd]);
+  patch(zip, { centralStart, eocd: zip.length - 22 });
+  return zip;
+}
+
+function assertThrows(fn, pattern, label) {
+  let caught;
+  try { fn(); } catch (error) { caught = error; }
+  if (!caught || !pattern.test(String(caught.message))) {
+    console.error(`FAIL canary :: ${label} — expected an error matching ${pattern}, got ${caught ? JSON.stringify(caught.message) : 'no error'}`);
+    process.exit(1);
+  }
+}
+
+function runFrozenReferenceCanaries() {
+  const sample = [['a.txt', 'alpha\n'], ['nested/b.css', 'b { color: red }\n'], ['nested/', '']];
+  const parsed = readZipEntries(buildStoredZip(sample));
+  assertEqual([...parsed.keys()], ['a.txt', 'nested/b.css'], 'zip parser skips directory entries and keeps files');
+  assertEqual(parsed.get('a.txt'), sha256(Buffer.from('alpha\n')), 'zip parser hashes stored content');
+  assertThrows(() => readZipEntries(buildStoredZip([['dup.txt', '1'], ['dup.txt', '1']])), /duplicate entry/, 'duplicate archive members are rejected');
+  assertThrows(() => readZipEntries(buildStoredZip([])), /no entries/, 'an empty archive is rejected');
+  assertThrows(() => readZipEntries(buildStoredZip([['../escape.txt', 'x']])), /unsafe entry name/, 'path traversal names are rejected');
+  assertThrows(
+    () => readZipEntries(buildStoredZip([['a.txt', 'alpha']], (zip, { eocd }) => zip.writeUInt16LE(0xffff, eocd + 10))),
+    /zip64/,
+    'zip64 EOCD sentinel is rejected',
+  );
+  assertThrows(
+    () => readZipEntries(buildStoredZip([['a.txt', 'alpha']], (zip, { centralStart }) => zip.writeUInt32LE(0xffffffff, centralStart + 20))),
+    /zip64 sentinel/,
+    'zip64 per-entry size sentinel is rejected',
+  );
+  assertThrows(
+    () => readZipEntries(buildStoredZip([['a.txt', 'alpha']], (zip, { centralStart }) => zip.writeUInt32LE(3, centralStart + 24))),
+    /header says 3/,
+    'size mismatch between header and content is rejected',
+  );
+
+  const canaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'standalone-palette-frozen-canary-'));
+  try {
+    fs.mkdirSync(path.join(canaryRoot, 'nested'));
+    fs.writeFileSync(path.join(canaryRoot, 'a.txt'), 'alpha\n');
+    fs.symlinkSync(path.join(canaryRoot, 'a.txt'), path.join(canaryRoot, 'nested', 'b.css'));
+    const listing = listFilesRecursively(canaryRoot);
+    assertEqual(listing.files, ['a.txt'], 'directory walk lists regular files only');
+    assertEqual(listing.irregular, ['nested/b.css: symbolic link'], 'directory walk reports symlinks instead of following them');
+  } finally {
+    fs.rmSync(canaryRoot, { recursive: true, force: true });
+  }
 }
 
 function formatDiff(value) {
@@ -408,46 +500,82 @@ function readZipEntries(zipBuffer) {
   const EOCD_SIG = 0x06054b50;
   const CENTRAL_SIG = 0x02014b50;
   const LOCAL_SIG = 0x04034b50;
+  const ZIP64_EXTRA_ID = 0x0001;
+  const SENTINEL16 = 0xffff;
+  const SENTINEL32 = 0xffffffff;
   let eocd = -1;
   for (let i = zipBuffer.length - 22; i >= Math.max(0, zipBuffer.length - 22 - 0xffff); i--) {
     if (zipBuffer.readUInt32LE(i) === EOCD_SIG) { eocd = i; break; }
   }
   if (eocd === -1) throw new Error('zip: end-of-central-directory record not found');
+  const diskNumber = zipBuffer.readUInt16LE(eocd + 4);
   const entryCount = zipBuffer.readUInt16LE(eocd + 10);
+  const centralSize = zipBuffer.readUInt32LE(eocd + 12);
   let offset = zipBuffer.readUInt32LE(eocd + 16);
-  if (entryCount === 0xffff || offset === 0xffffffff) throw new Error('zip: zip64 archives are not supported');
+  if (diskNumber === SENTINEL16 || entryCount === SENTINEL16 || centralSize === SENTINEL32 || offset === SENTINEL32) {
+    throw new Error('zip: zip64 archives are not supported');
+  }
+  if (entryCount === 0) throw new Error('zip: archive has no entries');
   const entries = new Map();
   for (let index = 0; index < entryCount; index++) {
     if (zipBuffer.readUInt32LE(offset) !== CENTRAL_SIG) throw new Error(`zip: bad central directory entry at ${offset}`);
     const method = zipBuffer.readUInt16LE(offset + 10);
     const compressedSize = zipBuffer.readUInt32LE(offset + 20);
+    const uncompressedSize = zipBuffer.readUInt32LE(offset + 24);
     const nameLength = zipBuffer.readUInt16LE(offset + 28);
     const extraLength = zipBuffer.readUInt16LE(offset + 30);
     const commentLength = zipBuffer.readUInt16LE(offset + 32);
+    const entryDisk = zipBuffer.readUInt16LE(offset + 34);
     const localOffset = zipBuffer.readUInt32LE(offset + 42);
     const name = zipBuffer.toString('utf8', offset + 46, offset + 46 + nameLength);
+    const extra = zipBuffer.subarray(offset + 46 + nameLength, offset + 46 + nameLength + extraLength);
+    for (let cursor = 0; cursor + 4 <= extra.length; cursor += 4 + extra.readUInt16LE(cursor + 2)) {
+      if (extra.readUInt16LE(cursor) === ZIP64_EXTRA_ID) throw new Error(`zip: zip64 extra field on ${name} is not supported`);
+    }
+    if (compressedSize === SENTINEL32 || uncompressedSize === SENTINEL32 || localOffset === SENTINEL32 || entryDisk === SENTINEL16) {
+      throw new Error(`zip: zip64 sentinel on ${name} is not supported`);
+    }
     offset += 46 + nameLength + extraLength + commentLength;
     if (name.endsWith('/')) continue;
+    if (name.startsWith('/') || name.split('/').some((segment) => segment === '..' || segment === '')) {
+      throw new Error(`zip: unsafe entry name ${JSON.stringify(name)}`);
+    }
+    if (entries.has(name)) throw new Error(`zip: duplicate entry ${name}`);
     if (zipBuffer.readUInt32LE(localOffset) !== LOCAL_SIG) throw new Error(`zip: bad local header for ${name}`);
     const dataStart = localOffset + 30 + zipBuffer.readUInt16LE(localOffset + 26) + zipBuffer.readUInt16LE(localOffset + 28);
+    if (dataStart + compressedSize > zipBuffer.length) throw new Error(`zip: entry ${name} runs past the end of the archive`);
     const raw = zipBuffer.subarray(dataStart, dataStart + compressedSize);
     let content;
     if (method === 0) content = raw;
     else if (method === 8) content = inflateRawSync(raw);
     else throw new Error(`zip: unsupported compression method ${method} for ${name}`);
+    if (content.length !== uncompressedSize) throw new Error(`zip: entry ${name} inflated to ${content.length} bytes, header says ${uncompressedSize}`);
     entries.set(name, sha256(content));
   }
   return entries;
 }
 
+/**
+ * Every non-directory entry under `dir`, as archive-style relative paths.
+ * Symlinks and other special files are reported separately: `readFileSync`
+ * would follow a symlink to identical bytes, so a link is NOT byte-identical
+ * to a regular file even when the hashes agree.
+ */
 function listFilesRecursively(dir, base = dir) {
   const files = [];
+  const irregular = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) files.push(...listFilesRecursively(full, base));
-    else files.push(path.relative(base, full).split(path.sep).join('/'));
+    const rel = path.relative(base, full).split(path.sep).join('/');
+    if (entry.isSymbolicLink()) irregular.push(`${rel}: symbolic link`);
+    else if (entry.isDirectory()) {
+      const nested = listFilesRecursively(full, base);
+      files.push(...nested.files);
+      irregular.push(...nested.irregular);
+    } else if (entry.isFile()) files.push(rel);
+    else irregular.push(`${rel}: not a regular file`);
   }
-  return files;
+  return { files, irregular };
 }
 
 function checkFrozenReferenceRoots() {
@@ -455,11 +583,24 @@ function checkFrozenReferenceRoots() {
   const archivePath = path.join(ROOT, syncRecord.archive.path);
   const zipBuffer = fs.readFileSync(archivePath);
   const zipDigest = sha256(zipBuffer);
+  if (!/^[0-9a-f]{64}$/.test(syncRecord.archive?.sha256 ?? '')) {
+    console.error(`FAIL frozen-reference :: ${path.relative(ROOT, SYNC_RECORD_PATH)} lacks a pinned archive.sha256`);
+    process.exit(1);
+  }
   if (zipDigest !== syncRecord.archive.sha256) {
     console.error(`FAIL frozen-reference :: ${syncRecord.archive.path} sha256 ${zipDigest} does not match ${path.relative(ROOT, SYNC_RECORD_PATH)} (${syncRecord.archive.sha256})`);
     process.exit(1);
   }
   const archiveEntries = readZipEntries(zipBuffer);
+  const expectedEntries = syncRecord.archive.originalEntries;
+  if (!Number.isInteger(expectedEntries) || expectedEntries <= 0) {
+    console.error(`FAIL frozen-reference :: ${path.relative(ROOT, SYNC_RECORD_PATH)} lacks a positive archive.originalEntries count`);
+    process.exit(1);
+  }
+  if (archiveEntries.size !== expectedEntries) {
+    console.error(`FAIL frozen-reference :: ${syncRecord.archive.path} holds ${archiveEntries.size} file entries, ${path.relative(ROOT, SYNC_RECORD_PATH)} records ${expectedEntries}`);
+    process.exit(1);
+  }
 
   const problems = [];
   for (const frozen of STANDALONE_SCOPE.frozenReferenceRoots) {
@@ -468,7 +609,9 @@ function checkFrozenReferenceRoots() {
       problems.push(`${frozen.path}: directory missing`);
       continue;
     }
-    const onDisk = new Set(listFilesRecursively(dir));
+    const listing = listFilesRecursively(dir);
+    for (const irregular of listing.irregular) problems.push(`${frozen.path}/${irregular}`);
+    const onDisk = new Set(listing.files);
     for (const [name, digest] of archiveEntries) {
       if (!onDisk.has(name)) { problems.push(`${frozen.path}/${name}: missing (present in archive)`); continue; }
       if (sha256(fs.readFileSync(path.join(dir, name))) !== digest) problems.push(`${frozen.path}/${name}: content differs from archive`);

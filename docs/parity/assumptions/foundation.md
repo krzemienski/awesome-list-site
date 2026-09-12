@@ -104,10 +104,13 @@ match on every run):
   can carry neither tokens nor `DS-OK` tags, so scanning it could only ever
   produce findings nobody is allowed to fix.
 - The exclusion is enforced, not trusted: on every run the gate hashes the
-  archive (digest pinned in `docs/parity/source-sync.json`), reads its 103
-  members straight out of the zip, and compares them with the working tree.
-  An edited, missing or extra file fails the gate until the directory is
-  restored or the change moves into the artifact
+  archive (digest and member count pinned in `docs/parity/source-sync.json`),
+  reads its 103 members straight out of the zip with a small parser that
+  rejects zip64, duplicate or traversal names and size mismatches, and
+  compares them with the working tree. An edited, missing or extra file — or
+  a symlink standing in for a file — fails the gate until the directory is
+  restored or the change moves into the artifact. The parser and the
+  directory walk self-test on every run
   (`docs/parity/evidence/foundation/standalone-palette-mutation-probe.txt`).
 - The artifact's 36 findings are tagged at their definition sites with
   reasoned `DS-OK` comments, the mechanism the audit skill prescribes:
