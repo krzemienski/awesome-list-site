@@ -1,0 +1,79 @@
+## root-script-drift
+       scripts/verify-docker-deployment.sh — manual-runbook: retained self-hosted Docker deployment verification runbook
+       scripts/verify-non-replit-build.sh — manual-runbook: retained non-Replit production build verification runbook
+       scripts/vg2-ga4-validate.mjs — manual-runbook: retained real-browser GA4 validation runbook, invoked after analytics changes
+       scripts/vg2-teardown.ts — manual-runbook: retained cleanup runbook for the GA4 validation harness when automatic cleanup is incomplete
+exit=0
+
+## openapi-drift
+
+> rest-express@1.0.0 validate:openapi
+> tsx scripts/validation/openapi-drift.ts
+
+Claude service initialized successfully (Replit-managed integration)
+OpenAPI drift PASS: 174 API routes, 174 named contracts, 146 paths
+exit=0
+## response-contract-drift
+}
+
+
+
+
+[contract] response mismatch for "get:/api/__contract-drift-probe" (GET /api/__contract-drift-probe) status 401: message: Invalid input: expected string, received undefined
+  ok  GET /api/auth/user (anonymous) -> 200
+  ok  GET /api/auth/user (audit-key admin) -> 200
+  ok  GET /api/resources -> 200
+  ok  GET /api/awesome-list/listing (first category) -> 200
+  ok  GET /api/recommendations -> 200
+  ok  POST /api/recommendations (audit-key admin) -> 200
+  ok  GET /api/admin/pending-resources (audit-key) -> 200
+  ok  GET /api/resources/:id (id=188015) -> 200
+  ok  GET /api/auth/me (audit-key admin) -> 200
+  ok  GET /api/admin/stats (audit-key) -> 200
+  ok  GET /api/journeys (anonymous) -> 200
+  ok  GET /api/config (anonymous) -> 200
+  ok  POST /api/contact (default-off) -> 404
+  ok  GET /api/admin/contact-submissions (audit-key) -> 200
+  ok  GET /api/__contract-drift-probe (observer liveness) -> 401
+Response-contract drift PASS: 15 endpoint checks, 0 real mismatches, observer liveness verified
+exit=0
+## pool-probe
+
+> rest-express@1.0.0 validate:pool
+> node scripts/validation/db-pool-probe.mjs
+
+Gate lease acquired (db-heavy: db-pool-probe)
+Pool probe against http://127.0.0.1:5000: 3 rounds × 20 concurrent faceted listings (each = 3 parallel DB ops)
+
+  round 1: 20/20 OK  wall=1290ms  p50=1028ms  p95=1273ms
+  round 2: 20/20 OK  wall=810ms  p50=570ms  p95=801ms
+  round 3: 20/20 OK  wall=792ms  p50=542ms  p95=777ms
+
+Total: 60/60 OK  p50=693ms  p75=819ms  p95=1230ms  max=1281ms
+
+PASS: zero pool-timeout/5xx errors under burst.
+Gate lease released (db-heavy: db-pool-probe)
+exit=0
+
+## task302-resilience (BASE_URL=http://127.0.0.1:5000 npm run validate:resilience)
+PASS cache coalescing: 20 readers, 1 rebuild, 19 coalesced
+PASS mutation invalidation: racing body/nav rebuilds retried; create and delete visible immediately
+PASS real lock: readiness 519ms; catalog 2024ms; related 2031ms; OG 2020ms; admin 2027ms
+PASS HTTP cache admission: 80/80 SSR routes returned 503; fastest bounded rejection 30ms
+PASS cache admission: in-flight stayed <= 64; excess real DB rebuilds rejected
+PASS recovery/no-late-write: readiness 200 in 19ms; row count stayed 0
+PASS pool exhaustion: acquisition failed in 3004ms
+exit=0
+
+## migration-drift
+Step 3/3: id-sequence drift check (every serial-id table)...
+  ✓ 27 serial-id sequence(s) checked — none behind max(id).
+
+✅ No migration drift: migrations/ fully reproduces shared/schema.ts, and no id-sequence drift.
+exit=0
+
+## npm run check
+> rest-express@1.0.0 check
+> tsc
+
+exit=0

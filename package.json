@@ -30,7 +30,7 @@
     "validate:product-profiles": "node scripts/validation/product-profile-drift.mjs",
     "validate:product-profile-browser": "node scripts/validation/product-profile-drift.mjs --browser",
     "test:unit": "vitest run tests/unit",
-    "test:integration": "vitest run tests/integration",
+    "test:integration": "vitest run tests/integration --no-file-parallelism",
     "test:e2e": "playwright test",
     "test:parity": "node tests/parity/runner.mjs",
     "bundle:report": "node scripts/validation/bundle-budget.mjs",

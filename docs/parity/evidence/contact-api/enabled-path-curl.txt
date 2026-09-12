@@ -1,0 +1,74 @@
+# Temporary instance: CONTACT_ENABLED=true CONTACT_IP_HASH_SECRET=<local-only, 37 chars> PORT=5055 (env set only in the launching shell; never persisted)
+
+$ curl -s http://127.0.0.1:5055/api/config | jq -c .contact.form
+{"available":true,"persistence":"database"}
+
+$ six valid POSTs from one IP (message tagged __qa_test_)
+request 1: HTTP/1.1 200 OK
+  body: {"id":"04f03f48-b42c-4993-a31c-a7ae0f4acf76","status":"received"}
+request 2: HTTP/1.1 200 OK
+  body: {"id":"f65f8b77-aab2-4386-9893-f88f94b529c7","status":"received"}
+request 3: HTTP/1.1 200 OK
+  body: {"id":"3a6807cd-2853-42d2-9987-57d2a5c6c070","status":"received"}
+request 4: HTTP/1.1 200 OK
+  body: {"id":"c91ea66c-eba3-408a-b1a3-141deb6f575b","status":"received"}
+request 5: HTTP/1.1 200 OK
+  body: {"id":"3d654929-a559-492f-af57-5ed7d626ece7","status":"received"}
+request 6: HTTP/1.1 429 Too Many Requests
+  body: {"message":"Too many contact requests. Please try again later.","error":"Rate limit exceeded","retryAfter":3600}
+
+$ headers of request 6
+HTTP/1.1 429 Too Many Requests
+RateLimit-Policy: 5;w=3600
+RateLimit-Limit: 5
+RateLimit-Remaining: 0
+RateLimit-Reset: 3600
+Retry-After: 3600
+
+$ honeypot: website filled → receipt, nothing stored
+{"message":"Too many contact requests. Please try again later.","error":"Rate limit exceeded","retryAfter":3600} (429)
+
+$ wrong Origin → 403
+{"message":"Cross-origin request rejected"} (403)
+
+$ invalid payload → 400
+{"message":"Too many contact requests. Please try again later.","error":"Rate limit exceeded","retryAfter":3600} (429)
+
+
+# The honeypot/invalid probes above ran after the budget was spent, so they show the limiter precedes validation (by design).
+# Reset the contact counter (dev DB, limiter row only) and re-run them with budget left:
+$ psql $DATABASE_URL -c "delete from rate_limit_hits where limiter = 'contact'"
+DELETE 1
+
+$ honeypot: website filled → receipt-shaped 200, nothing stored
+{"id":"dd3b0f08-6c0a-41e0-8adf-ef6c47af2f2b","status":"received"} (200)
+
+$ invalid payload → 400 envelope
+{"error":"validation_failed","message":"Validation failed","fieldErrors":{"name":"Too small: expected string to have >=1 characters","replyTo":"must be a valid email address","message":"message must be at least 20 characters"},"errors":[{"origin":"string","code":"too_small","minimum":1,"inclusive":true,"path":["name"],
+
+
+$ no Origin → 403
+{"message":"A same-origin request is required"} (403)
+
+$ rows persisted in dev contact_submissions (5 accepted; honeypot row absent; ip_hash is a 64-hex HMAC, not an address)
+$ psql $DATABASE_URL -c "select subject, length(ip_hash) hash_len, ip_hash ~ '^[0-9a-f]{64}$' hex, user_id, name from contact_submissions where message like '%__qa_test_%' order by created_at"
+       subject        | hash_len | hex | user_id |   name   
+----------------------+----------+-----+---------+----------
+ Enabled-path probe 1 |       64 | t   |         | QA Probe
+ Enabled-path probe 2 |       64 | t   |         | QA Probe
+ Enabled-path probe 3 |       64 | t   |         | QA Probe
+ Enabled-path probe 4 |       64 | t   |         | QA Probe
+ Enabled-path probe 5 |       64 | t   |         | QA Probe
+(5 rows)
+
+$ rate_limit_hits rows (contact limiter = 2 hits: the honeypot and the invalid-payload probes; the origin-rejected probe never reached the limiter)
+   limiter    | hits 
+--------------+------
+ api-backstop | ... (69 rows: one key per client IP seen by the dev server; the /api backstop limiter keeps its own rows, unrelated to contact)
+ contact      |    2
+(70 rows)
+
+$ teardown: delete the __qa_test_ rows and the contact limiter row
+DELETE 5
+DELETE 1
+0

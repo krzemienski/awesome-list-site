@@ -21,9 +21,11 @@ checkable statement.
 
 **How to apply:**
 - Lint: `eslint --format json` in both trees, diff per file over `git ls-files`.
-- Integration: compare totals; the failing *set* drifts by a few
-  data-dependent names between identical runs, so name-level diffs need two
-  runs before they mean anything.
+- Integration: compare per test name with `--reporter=json --outputFile=`
+  in both trees. The old "failing set drifts by a few names between identical
+  runs" was cross-file interference on the shared test DB, not data
+  nondeterminism — run both trees with `--no-file-parallelism` (see
+  vitest-shared-db-file-parallelism.md) and the set is byte-stable.
 - e2e: check `git log` of a failing spec — if its last change predates the last
   green commit and the selector it wants exists in neither tree, it is stale,
   not broken by you. Only Chromium is installed here (`--project=chromium

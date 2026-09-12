@@ -5,11 +5,19 @@
  */
 import { chromium } from "playwright";
 import { launchBrowserWithLease } from "./playwright-launch-lease.mjs";
+import { acquireGateLease } from "./gate-lease.mjs";
 
 const base = process.env.BASE_URL ?? "http://127.0.0.1:5000";
 const executablePath =
   process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ??
   "/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium";
+
+// Every assertion below waits for a real listing to render. While the
+// DB-resilience gate holds its ACCESS EXCLUSIVE lock (or the pool probe
+// saturates the pool) that listing never arrives and the 30 s card wait times
+// out. Serialize against those gates via the shared "db-heavy" lease, acquired
+// BEFORE the browser lease (same order as print-audit / collections-audit).
+const releaseGateLease = await acquireGateLease("db-heavy", "taxonomy-no-corpus-fetch");
 
 const nav = await (await fetch(`${base}/api/awesome-list/nav`)).json();
 const slug = nav.categories?.find((category) => category.resourceCount > 0)?.slug;
@@ -203,4 +211,5 @@ try {
   console.log("ok filtered taxonomy deep link retains page 2 while facets load");
 } finally {
   await browser.close();
+  releaseGateLease();
 }

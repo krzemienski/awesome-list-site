@@ -24,3 +24,11 @@ ds-button-sweep do this). Acquiring them in the opposite order can deadlock
 against a gate using the established order. Multi-step authed browser flows
 (Clerk sign-in + JIT provisioning) cannot tolerate a DB outage mid-flow, so
 any gate that signs in belongs in the db-heavy group.
+**Widen the "who needs the lease" test:** it is not only outage-causers and
+crawls. Any gate that (a) waits for a real listing to render in a browser or
+(b) fires racing writes expecting deterministic status pairs (one 200 + one
+409) also fails under the outage/probe window — as a 30 s card-wait timeout or
+`fetch failed … ECONNRESET`, which look like app bugs. Both pass solo every
+time; the tell is the failure timestamp overlapping the resilience/pool-probe
+log window in `.local/state/workflow-logs/<runId>/`. Add the lease rather than
+rerunning and hoping.

@@ -6,7 +6,7 @@
  * so without an explicit env-after-YAML step the environment was silently
  * discarded. These tests pin the contract:
  *   env var (non-blank) > YAML block > built-in default, for every field
- *   `enabled` is environment-only and never reads YAML
+ *   `enabled` and `ip_hash_secret` are environment-only and never read YAML
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import fs from "node:fs";
@@ -40,6 +40,7 @@ describe("resolveContactConfig", () => {
       discussions_url: "https://github.com/example/repo/discussions",
       discussions_verified: true,
       retention_days: 180,
+      ip_hash_secret: "",
     });
   });
 
@@ -51,7 +52,7 @@ describe("resolveContactConfig", () => {
       discussions_verified: true,
       retention_days: 30,
     };
-    expect(resolveContactConfig(yaml, {})).toEqual({ ...yaml, enabled: false });
+    expect(resolveContactConfig(yaml, {})).toEqual({ ...yaml, enabled: false, ip_hash_secret: "" });
   });
 
   it("falls back to built-in defaults when neither env nor YAML provides a field", () => {
@@ -62,8 +63,21 @@ describe("resolveContactConfig", () => {
       discussions_url: "",
       discussions_verified: false,
       retention_days: 180,
+      ip_hash_secret: "",
     });
     expect(resolveContactConfig(null, {})).toEqual(resolveContactConfig(undefined, {}));
+  });
+
+  it("keeps the IP hash secret environment-only and fails closed on short values", () => {
+    const yaml = { ...BLANK_YAML, ip_hash_secret: "committed-secret-must-not-count" } as Partial<typeof BLANK_YAML> & {
+      ip_hash_secret: string;
+    };
+    expect(resolveContactConfig(yaml, {}).ip_hash_secret).toBe("");
+    expect(resolveContactConfig(yaml, { CONTACT_IP_HASH_SECRET: "too-short" }).ip_hash_secret).toBe("");
+    expect(resolveContactConfig(yaml, { CONTACT_IP_HASH_SECRET: "   " }).ip_hash_secret).toBe("");
+    expect(
+      resolveContactConfig(yaml, { CONTACT_IP_HASH_SECRET: "exactly-16-chars" }).ip_hash_secret,
+    ).toBe("exactly-16-chars");
   });
 
   it("treats blank env vars as absent so an empty .env line cannot erase a YAML value", () => {
@@ -112,6 +126,7 @@ describe("server/config contact block through loadConfig()", () => {
     "CONTACT_ISSUES_URL",
     "CONTACT_DISCUSSIONS_URL",
     "CONTACT_DISCUSSIONS_VERIFIED",
+    "CONTACT_IP_HASH_SECRET",
   ] as const;
   const saved: Partial<Record<(typeof CONTACT_KEYS)[number], string | undefined>> = {};
 
@@ -148,6 +163,7 @@ describe("server/config contact block through loadConfig()", () => {
       discussions_url: FULL_ENV.CONTACT_DISCUSSIONS_URL,
       discussions_verified: true,
       retention_days: 180,
+      ip_hash_secret: "",
     });
   });
 
@@ -160,6 +176,7 @@ describe("server/config contact block through loadConfig()", () => {
       discussions_url: "",
       discussions_verified: false,
       retention_days: 180,
+      ip_hash_secret: "",
     });
   });
 });

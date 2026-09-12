@@ -28,16 +28,21 @@ import {
 // change-password, /api/login, /api/callback) was removed and
 // /api/auth/logout-all was reintroduced Clerk-backed. Route registration no
 // longer branches on REPL_ID, so both environments share one baseline.
+//
+// 174 routes = 171 + the default-off contact surface (GET /api/config,
+// POST /api/contact, GET /api/admin/contact-submissions). When another task
+// lands routes in parallel, recompute from this gate's own "got N/hash" line
+// after merging instead of adding counts by hand.
 const BASELINES = {
   replit: {
-    apiCount: 171,
-    apiHash: "834349f3386fa99cd9e12c04ee467f44ab568beb1dfae1f6bedbaf63a3f132f3",
+    apiCount: 174,
+    apiHash: "99f88be34a832112d5999951152fbe780cef86e2147fb14a743d64bfeb804648",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
   portable: {
-    apiCount: 171,
-    apiHash: "834349f3386fa99cd9e12c04ee467f44ab568beb1dfae1f6bedbaf63a3f132f3",
+    apiCount: 174,
+    apiHash: "99f88be34a832112d5999951152fbe780cef86e2147fb14a743d64bfeb804648",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },

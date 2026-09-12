@@ -18,6 +18,7 @@ import {
   AuditRepository,
   CategoryRepository,
   CollectionRepository,
+  ContactRepository,
   EnrichmentRepository,
   GithubSyncRepository,
   LearningJourneyRepository,
@@ -59,6 +60,7 @@ import {
   type ExportLinkHealthContext,
 } from "./routes/domains/export-link-health";
 import { registerAiJobsRoutes } from "./routes/domains/ai-jobs";
+import { registerContactRoutes } from "./routes/domains/contact";
 import { registerNonApiRoutes } from "./routes/non-api";
 import { registerOperationsRoutes } from "./routes/domains/operations";
 
@@ -76,6 +78,7 @@ const githubSyncRepo = new GithubSyncRepository();
 const enrichmentRepo = new EnrichmentRepository();
 const adminRepo = new AdminRepository();
 const legacyRepo = new LegacyRepository();
+const contactRepo = new ContactRepository();
 
 function sendOperationalFailure(
   res: Response,
@@ -365,6 +368,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     stripInternalResourceFields,
     parseBoundedInt,
   });
+
+  // Default-off contact surface (docs/CONTACT-VARIANTS.md "Backend").
+  registerContactRoutes(app, { isAuthenticated, isAdmin, contactRepo });
 
   // Must remain last: this registrar mounts method and not-found fallbacks.
   registerOperationsRoutes(app, { isAuthenticated, isAdmin, userRepo });

@@ -266,6 +266,67 @@ const awesomeListListingQuerySchema = z.object({
   subSubcategory: z.string().min(1).max(512).optional(),
   general: z.literal("1").optional(),
 });
+
+// ---------------------------------------------------------------------------
+// Contact (docs/CONTACT-VARIANTS.md "Backend"; client type ContactPublicConfig)
+// ---------------------------------------------------------------------------
+
+/** A link destination: `href` only when available, a safe reason otherwise. */
+const contactDestinationSchema = z.object({
+  available: z.boolean(),
+  href: z.string().optional(),
+  unavailableReason: z.string().optional(),
+}).strict();
+
+const contactFormConfigSchema = z.object({
+  available: z.boolean(),
+  persistence: z.literal("database").optional(),
+  unavailableReason: z.string().optional(),
+}).strict();
+
+const publicConfigResponseSchema = z.object({
+  site: z.object({
+    title: z.string(),
+    description: z.string(),
+    url: z.string(),
+    author: z.string(),
+  }).passthrough(),
+  contact: z.object({
+    email: contactDestinationSchema,
+    issues: contactDestinationSchema,
+    discussions: contactDestinationSchema,
+    form: contactFormConfigSchema,
+  }).strict(),
+}).strict();
+
+const contactSubmissionReceiptSchema = z.object({
+  id: z.string().uuid(),
+  status: z.literal("received"),
+}).strict();
+
+/** Admin inbox row: the persisted columns; never the raw sender IP. */
+const contactSubmissionRowSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  replyTo: z.string(),
+  subject: z.string(),
+  message: z.string(),
+  createdAt: requiredTimestampField,
+  ipHash: z.string().length(64).nullable(),
+  userId: z.string().nullable(),
+}).strict();
+
+const adminContactSubmissionsResponseSchema = z.object({
+  submissions: z.array(contactSubmissionRowSchema),
+  total: z.number().int().nonnegative(),
+  limit: z.number().int().positive(),
+  offset: z.number().int().nonnegative(),
+}).strict();
+
+const adminContactSubmissionsQuerySchema = z.object({
+  limit: z.string().regex(/^\d+$/).optional(),
+  offset: z.string().regex(/^\d+$/).optional(),
+});
 /**
  * Register structural 200 schemas for all key endpoints. Must be called
  * before `installApiContractRegistration` so that when the auto-installer
@@ -341,5 +402,29 @@ export function registerCoreEndpointSchemas(): void {
   setRouteQuerySchema("get", "/api/awesome-list/listing", {
     name: "AwesomeListListingQuery",
     schema: awesomeListListingQuerySchema,
+  });
+
+  // --- Contact (default-off) ---
+
+  setRouteResponseSchema("get", "/api/config", {
+    name: "PublicConfigResponse",
+    description: "Public site metadata plus contact destinations derived only from server config; every destination is unavailable until configured",
+    schema: publicConfigResponseSchema,
+  });
+
+  setRouteResponseSchema("post", "/api/contact", {
+    name: "ContactSubmissionReceipt",
+    description: "Receipt for a persisted (or honeypot-discarded) contact submission; never claims email delivery",
+    schema: contactSubmissionReceiptSchema,
+  });
+
+  setRouteResponseSchema("get", "/api/admin/contact-submissions", {
+    name: "AdminContactSubmissionsResponse",
+    description: "Newest-first page of the private contact inbox with the real total",
+    schema: adminContactSubmissionsResponseSchema,
+  });
+  setRouteQuerySchema("get", "/api/admin/contact-submissions", {
+    name: "AdminContactSubmissionsQuery",
+    schema: adminContactSubmissionsQuerySchema,
   });
 }

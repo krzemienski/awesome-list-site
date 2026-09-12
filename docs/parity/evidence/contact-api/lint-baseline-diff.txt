@@ -1,0 +1,16 @@
+# eslint per-file comparison: HEAD 6ee20a60 (/tmp/base506) vs this tree, files touched by this task. Repo lint baseline is red (see worklog/foundation.md).
+scripts/validation/openapi-drift.ts                  base: 1e/0w  after: 1e/0w 
+scripts/validation/response-contract-drift.ts        base: 1e/0w  after: 1e/0w 
+server/config.ts                                     base: 8e/0w  after: 8e/0w 
+server/contracts/endpointSchemas.ts                  base: 0e/0w  after: 0e/0w 
+server/repositories/ContactRepository.ts             base: 0e/0w  after: 0e/0w 
+server/routes.ts                                     base: 24e/0w  after: 25e/0w   <-- changed
+      @typescript-eslint/no-misused-promises 6 -> 7
+server/routes/domains/contact.ts                     base: 3e/0w  after: 4e/0w   <-- changed
+      @typescript-eslint/no-misused-promises 1 -> 2
+shared/contact.ts                                    base: 0e/0w  after: 0e/0w 
+tests/helpers/db-helper.ts                           base: 1e/0w  after: 1e/0w 
+tests/integration/api/contact.test.ts                base: (new)  after: 0e/1w 
+tests/unit/contact-config-precedence.test.ts         base: (new)  after: 0e/1w 
+
+(test files report 1 warning each = "File ignored because of a matching ignore pattern": tests/ are excluded from lint by config.)

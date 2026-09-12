@@ -16,6 +16,41 @@ Contact is build-time opt-in through `VITE_CONTACT_VARIANT`. Only `a`, `b`, `c`,
 
 `POST /api/contact` accepts `{ name, replyTo, subject, message, website? }`. The hidden `website` field is a honeypot. Success is `{ id, status: "received" }`. Validation and rate-limit failures use the existing API error envelope and `Retry-After` for 429 responses. Failed submissions retain all entered values.
 
+## Backend
+
+Everything below is default-off: a deployment that sets none of the `CONTACT_*` variables (see `docs/ENVIRONMENT.md`) behaves exactly like one without the feature. Production keeps `CONTACT_ENABLED` unset.
+
+### Endpoints
+
+| Endpoint | Auth | Behaviour |
+| --- | --- | --- |
+| `GET /api/config` | none | Public site metadata plus the `contact` object above. Destinations are derived only from server config/env; the response carries `Cache-Control: public, max-age=300`. With the default configuration every destination is `available: false` and `form` is `{ available: false, unavailableReason: "The contact form is disabled" }`. |
+| `POST /api/contact` | none (same-origin required) | `404 { "message": "Not found" }` unless `CONTACT_ENABLED=true` — the disabled route is indistinguishable from a missing one and answers before any validation, origin, or limiter work. When enabled but `CONTACT_IP_HASH_SECRET` is missing or shorter than 16 characters it answers `503 { "message": "Contact form is not fully configured" }` (and `/api/config` reports the form unavailable with the matching reason). Otherwise the chain is: same-origin check → rate limiter → Zod validation (`shared/contact.ts`) → honeypot → persistence, and success is `200 { id, status: "received" }`. |
+| `GET /api/admin/contact-submissions?limit=&offset=` | authenticated admin | Newest-first page of the inbox: `{ submissions, total, limit, offset }` with `limit` 1–500 (default 50) and `offset` ≥ 0; anything else is `400`. Rows expose `id, name, replyTo, subject, message, createdAt, ipHash, userId` — never a raw IP. `Cache-Control: no-store`. There is no delete endpoint yet. |
+
+### Submission rules
+
+- **Validation** — `name` 1–100 and `subject` 1–200 single-line characters, `replyTo` a valid email ≤ 320, `message` 20–4000 characters (all after trimming; control characters and NUL are rejected); unknown fields and bodies larger than the global 256 kB JSON limit are rejected with the canonical `400` validation envelope (`{ error: "validation_failed", message, fieldErrors, errors }`).
+- **Origin** — the request must declare an `Origin` matching the request origin (scheme + host + effective port) or `PUBLIC_SITE_URL`; a missing Origin, a mismatch, or `Sec-Fetch-Site: cross-site` is `403`. This is the same rule the global mutating-request guard applies, enforced again at the route so it also holds for in-process test apps.
+- **Rate limit** — 5 submissions per rolling hour per client IP, counted in the shared PostgreSQL `rate_limit_hits` store under its own limiter name `contact` (key prefix `contact:`), so the `/api` backstop and other tiers are never double-charged. The sixth request is `429` with `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`, `RateLimit-Policy`, `Retry-After`, and the negotiated body `{ error: "Rate limit exceeded", message, retryAfter }`. Honeypot hits are counted too, so a bot flood still throttles.
+- **Honeypot** — a non-empty `website` returns an indistinguishable `200 { id: <random uuid>, status: "received" }`, logs a `[contact] honeypot triggered` line containing only the first 12 characters of the IP hash, and stores nothing.
+- **Persistence** — `contact_submissions(id uuid, name, reply_to, subject, message, created_at, ip_hash, user_id)`. `ip_hash` is `HMAC-SHA256(CONTACT_IP_HASH_SECRET, normalized client IP)` — the raw address is never written; `user_id` is the signed-in user's id when a session is present (cascade-deleted with the user), otherwise `null`.
+- **Delivery** — persistence only. No email is sent and the receipt never claims delivery; maintainers read the inbox through the admin endpoint.
+- **Retention** — `contact.retention_days` (default 180) is consumed by `purgeExpiredContactSubmissions()`, which is implemented but not yet scheduled; rows are kept until it is wired into the maintenance scheduler.
+
+### Configuration and defaults
+
+| Setting | Source | Default | Effect |
+| --- | --- | --- | --- |
+| `CONTACT_ENABLED` | env only | unset (off) | Exactly `true` enables `POST /api/contact`. |
+| `CONTACT_IP_HASH_SECRET` | env only | unset | ≥ 16 characters; required once enabled, otherwise `503` + form unavailable. |
+| `CONTACT_EMAIL` / YAML `contact.email` | env > YAML | empty | `mailto:` destination; anything else is unavailable. |
+| `CONTACT_ISSUES_URL` / YAML `contact.issues_url` | env > YAML | empty | `https:` issue tracker; never derived from `source.url`. |
+| `CONTACT_DISCUSSIONS_URL` + `CONTACT_DISCUSSIONS_VERIFIED` / YAML | env > YAML | empty / `false` | Discussions is offered only when both the URL and the verified flag are set. |
+| YAML `contact.retention_days` | YAML only | 180 | Retention horizon for the (unscheduled) purge. |
+
+Contracts live in `docs/api/openapi.yaml` (`PublicConfigResponse`, `ContactSubmissionReceipt`, `AdminContactSubmissionsResponse`) and are enforced by the `openapi-drift` and `response-contract-drift` gates; behaviour is covered by `tests/integration/api/contact.test.ts` (disabled 404, misconfigured 503, happy path with keyed IP hash and user id, honeypot, validation 400, origin 403, sixth-request 429 with headers, admin listing and pagination).
+
 ## Evidence status
 
 No contact screenshot or end-to-end persistence check was performed while these files were authored. All screenshot cells intentionally remain **UNVERIFIED** and must be replaced only after real configured browser validation.

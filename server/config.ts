@@ -83,7 +83,15 @@ interface ContactConfig {
   discussions_verified: boolean;
   /** Days a contact submission is kept before the retention purge deletes it. */
   retention_days: number;
+  /**
+   * HMAC key for the stored sender-IP hash (CONTACT_IP_HASH_SECRET, env-only,
+   * at least 16 characters). Empty means "not configured": the submission
+   * endpoint then answers 503 rather than storing a raw or unkeyed address.
+   */
+  ip_hash_secret: string;
 }
+
+export const CONTACT_IP_HASH_SECRET_MIN_LENGTH = 16;
 
 interface AwesomeListConfig {
   site: SiteConfig;
@@ -101,12 +109,12 @@ interface AwesomeListConfig {
 
 /**
  * process.env (or a test double with the same shape). The contact block reads
- * CONTACT_ENABLED, CONTACT_EMAIL, CONTACT_ISSUES_URL, CONTACT_DISCUSSIONS_URL
- * and CONTACT_DISCUSSIONS_VERIFIED.
+ * CONTACT_ENABLED, CONTACT_EMAIL, CONTACT_ISSUES_URL, CONTACT_DISCUSSIONS_URL,
+ * CONTACT_DISCUSSIONS_VERIFIED and CONTACT_IP_HASH_SECRET.
  */
 type ContactEnv = Readonly<Record<string, string | undefined>>;
 
-const CONTACT_DEFAULTS: Omit<ContactConfig, "enabled"> = {
+const CONTACT_DEFAULTS: Omit<ContactConfig, "enabled" | "ip_hash_secret"> = {
   email: "",
   issues_url: "",
   discussions_url: "",
@@ -123,8 +131,10 @@ function envValue(value: string | undefined): string | undefined {
  * Resolve the contact block. Precedence for every destination field is
  * environment variable, then the YAML block, then the built-in default —
  * env must win even though the YAML file is merged last, because the
- * checked-in YAML ships blank values. `enabled` is environment-only (see
- * ContactConfig) and never falls back to YAML.
+ * checked-in YAML ships blank values. `enabled` and `ip_hash_secret` are
+ * environment-only (see ContactConfig) and never fall back to YAML: a secret
+ * must not live in a committed file, and a too-short one counts as absent so
+ * the endpoint fails closed instead of hashing with a guessable key.
  */
 export function resolveContactConfig(
   yamlContact: Partial<ContactConfig> | null | undefined,
@@ -137,9 +147,11 @@ export function resolveContactConfig(
   const discussionsUrl = envValue(env.CONTACT_DISCUSSIONS_URL);
   const discussionsVerified = envValue(env.CONTACT_DISCUSSIONS_VERIFIED);
   const retentionDays = yamlContact?.retention_days;
+  const ipHashSecret = envValue(env.CONTACT_IP_HASH_SECRET) ?? "";
 
   return {
     enabled: env.CONTACT_ENABLED === "true",
+    ip_hash_secret: ipHashSecret.length >= CONTACT_IP_HASH_SECRET_MIN_LENGTH ? ipHashSecret : "",
     email: email ?? yamlString(yamlContact?.email, CONTACT_DEFAULTS.email),
     issues_url: issuesUrl ?? yamlString(yamlContact?.issues_url, CONTACT_DEFAULTS.issues_url),
     discussions_url: discussionsUrl ?? yamlString(yamlContact?.discussions_url, CONTACT_DEFAULTS.discussions_url),

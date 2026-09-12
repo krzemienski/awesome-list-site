@@ -1,0 +1,28 @@
+$ curl -si -X POST http://127.0.0.1:5000/api/contact -H "Content-Type: application/json" -H "Origin: http://127.0.0.1:5000" -d "{}"
+HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+{"message":"Not found"}
+$ curl -si -X POST http://127.0.0.1:5000/api/contact -H "Content-Type: application/json" -d "{\"name\":\"QA\",\"replyTo\":\"qa@example.com\",\"subject\":\"probe\",\"message\":\"__qa_test_ a valid body still gets 404 while disabled\"}"
+HTTP/1.1 404 Not Found
+{"message":"Not found"}
+$ curl -s http://127.0.0.1:5000/api/config | jq .contact
+{
+  "email": {
+    "available": false,
+    "unavailableReason": "No contact email is configured"
+  },
+  "issues": {
+    "available": false,
+    "unavailableReason": "No issue tracker is configured"
+  },
+  "discussions": {
+    "available": false,
+    "unavailableReason": "No verified discussions destination is configured"
+  },
+  "form": {
+    "available": false,
+    "unavailableReason": "The contact form is disabled"
+  }
+}
+$ curl -sI http://127.0.0.1:5000/api/config | grep -i cache-control
+Cache-Control: public, max-age=300

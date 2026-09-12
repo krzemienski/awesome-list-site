@@ -334,11 +334,13 @@ export type Resource = typeof resources.$inferSelect;
 
 /**
  * Contact submissions - private inbox for the default-off in-app contact form
- * (migrations/0047_resource_kind_and_contact.sql).
+ * (migrations/0047_resource_kind_and_contact.sql, provenance columns in
+ * 0048_contact_submission_provenance.sql).
  *
- * Rows are never exposed publicly. Retention is enforced by
- * purgeExpiredContactSubmissions (server/repositories/ContactRepository.ts)
- * using config.contact.retention_days. Length checks mirror
+ * Rows are never exposed publicly; admins read them through
+ * GET /api/admin/contact-submissions. purgeExpiredContactSubmissions
+ * (server/repositories/ContactRepository.ts) deletes rows older than
+ * config.contact.retention_days but is not scheduled yet. Length checks mirror
  * shared/contact.ts so the database rejects anything validation let through.
  */
 export const contactSubmissions = pgTable(
@@ -350,9 +352,18 @@ export const contactSubmissions = pgTable(
     subject: varchar("subject", { length: 200 }).notNull(),
     message: text("message").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    // HMAC-SHA256 (hex, 64 chars) of the submitter's IP keyed with
+    // CONTACT_IP_HASH_SECRET. The raw address is never written; without the
+    // key a database dump cannot be brute-forced back to addresses. Nullable
+    // only so the additive migration stays trivial — the route always sets it.
+    ipHash: varchar("ip_hash", { length: 64 }),
+    // Signed-in submitter, when there was one. Cascades with the account like
+    // the other user-owned rows, so deleting a user removes their messages.
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
   },
   (table) => [
     index("idx_contact_submissions_created_at").on(table.createdAt),
+    index("idx_contact_submissions_user_id").on(table.userId),
     check("contact_submissions_name_length_check", sql`char_length(trim(${table.name})) BETWEEN 1 AND 100`),
     check("contact_submissions_reply_to_length_check", sql`char_length(${table.replyTo}) BETWEEN 3 AND 320`),
     check("contact_submissions_subject_length_check", sql`char_length(trim(${table.subject})) BETWEEN 1 AND 200`),
@@ -365,6 +376,8 @@ const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).pic
   replyTo: true,
   subject: true,
   message: true,
+  ipHash: true,
+  userId: true,
 });
 
 export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;

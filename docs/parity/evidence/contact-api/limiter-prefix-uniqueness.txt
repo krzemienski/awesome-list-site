@@ -1,0 +1,11 @@
+$ grep -rn "new PgRateLimitStore(" server/ | sed ...  (each limiter name = its own key prefix in rate_limit_hits)
+      1 "ai-generation"
+      1 "api-backstop"
+      1 "contact"
+      1 "resource-read"
+      1 `tier:${tier.name}`
+
+$ grep -rn "prefix:" server/
+server/middleware/pgRateLimitStore.ts:94:  prefix: string;
+server/contracts/middleware.ts:74:  const walk = (layers: any[], prefix: string) => {
+(tier limiter names: tier:free, tier:standard, tier:premium — none collide with "contact")

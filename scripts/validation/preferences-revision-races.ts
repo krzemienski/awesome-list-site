@@ -21,6 +21,7 @@
  * CLERK_SECRET_KEY, DATABASE_URL.
  */
 import { Pool } from "pg";
+import { acquireGateLease } from "./gate-lease.mjs";
 
 const BASE_URL = process.env.BASE_URL ?? "http://127.0.0.1:5000";
 const CLERK_API = "https://api.clerk.com/v1";
@@ -136,6 +137,13 @@ async function teardown() {
     dirty.map((row) => `${row.surface}=${row.count}`),
   );
 }
+
+// The completion runner starts every gate at once. The racing PUT/DELETE pairs
+// below assume the server answers each request (exactly one 200 + one 409);
+// under the pool probe's 60-way burst or the DB-resilience gate's ACCESS
+// EXCLUSIVE lock they surface as ECONNRESET / 503 instead. Serialize against
+// those gates via the shared "db-heavy" lease, like the other DB-sensitive gates.
+const releaseGateLease = await acquireGateLease("db-heavy", "preferences-revision-races");
 
 try {
   // ---- Setup: throwaway Clerk account whose bridge id is our QA prefix ----
@@ -280,6 +288,7 @@ try {
     await teardown();
   } finally {
     await pool.end();
+    releaseGateLease();
   }
 }
 

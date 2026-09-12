@@ -118,3 +118,4 @@
 - [Read-only browser capture](read-only-browser-capture.md) — three layers (browser Fetch / context guards / sealed realm); page-scoped hooks miss anchor popups; LH needs a Playwright-context page via puppeteer handle; keep popup blocker ON.
 - [Parity harness disposable admin](parity-harness-disposable-admin.md) — NUMERIC bridge id (int4 admin routes; prefix the email); sweep fails closed on Clerk leftovers; identity checks scope to main.
 - [Headless capture determinism](headless-capture-determinism.md) — backdrop-filter off both sides; `--disable-partial-raster`; stamp + API-quiet + font checks around every frame; wait, THEN snapshot.
+- [Shared test DB vs vitest file parallelism](vitest-shared-db-file-parallelism.md) — per-file cleanupDatabase() on ONE DB: parallel files wipe each other (500/401/never-429); run serially.

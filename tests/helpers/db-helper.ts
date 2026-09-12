@@ -84,6 +84,7 @@ export async function cleanupDatabase() {
     await db.delete(schema.githubSyncQueue);
     await db.delete(schema.githubSyncHistory);
     await db.delete(schema.userPreferences);
+    await db.delete(schema.contactSubmissions);
     await db.delete(schema.resources);
     await db.delete(schema.subSubcategories);
     await db.delete(schema.subcategories);

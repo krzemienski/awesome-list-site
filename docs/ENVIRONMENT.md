@@ -51,6 +51,12 @@ these in the **Secrets** pane instead of a file.
 | `VITE_AMPLITUDE_API_KEY` | ❌ | – | Amplitude browser analytics |
 | `VITE_MIXPANEL_TOKEN` / `MIXPANEL_TOKEN` | ❌ | – | Mixpanel browser/server analytics |
 | `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` | ❌ | – | PostHog browser analytics |
+| `CONTACT_ENABLED` | ❌ | unset (form off, `POST /api/contact` → 404) | `server/config.ts`, `server/routes/domains/contact.ts` |
+| `CONTACT_IP_HASH_SECRET` | ❌ (required once enabled) | – | `server/config.ts`, `server/routes/domains/contact.ts` |
+| `CONTACT_EMAIL` | ❌ | YAML `contact.email` (empty) | `server/config.ts` |
+| `CONTACT_ISSUES_URL` | ❌ | YAML `contact.issues_url` (empty) | `server/config.ts` |
+| `CONTACT_DISCUSSIONS_URL` | ❌ | YAML `contact.discussions_url` (empty) | `server/config.ts` |
+| `CONTACT_DISCUSSIONS_VERIFIED` | ❌ | YAML `contact.discussions_verified` (`false`) | `server/config.ts` |
 
 Only `VITE_*` values are exposed to the browser, and they are fixed when the
 Vite bundle is built. Never put a server secret in a `VITE_*` variable.
@@ -201,6 +207,45 @@ Default repository URL used as a fallback for export operations
 ### `EXPORT_LINK_CHECK`
 Set to `1` to enable live outbound-link checking during export. Leave unset for
 the normal deterministic export path.
+
+---
+
+## Contact (optional, default off)
+
+Backend for the five build-time contact variants (`docs/CONTACT-VARIANTS.md`).
+With nothing set, `GET /api/config` reports every destination `available:
+false` and `POST /api/contact` answers `404` — the deployment looks exactly like
+one without the feature. Precedence for every value is env var (non-blank) >
+`awesome-list.config.yaml` `contact:` block > built-in default, except the two
+env-only switches below. Only the derived public destinations reach the client;
+no `CONTACT_*` value is ever sent as-is.
+
+### `CONTACT_ENABLED`
+Environment-only; YAML can never turn the form on. Exactly `true` enables
+`POST /api/contact` (validated, same-origin, 5 submissions/hour/IP, honeypot,
+stored in `contact_submissions`). Anything else keeps it disabled.
+
+### `CONTACT_IP_HASH_SECRET`
+Environment-only HMAC key for the stored sender-IP hash (the raw address is
+never written). At least 16 characters; shorter values are treated as unset.
+Required once `CONTACT_ENABLED=true`: without it the server logs an error at
+boot, `/api/config` reports `form.available: false` with
+`"The contact form is not fully configured"`, and `POST /api/contact` answers
+`503` instead of storing an unhashed address. Rotating the key only breaks
+correlation between old and new rows.
+
+### `CONTACT_EMAIL`
+Public `mailto:` destination (for example `mailto:hello@example.com`). Anything
+that is not a `mailto:` URL is reported unavailable.
+
+### `CONTACT_ISSUES_URL`
+Public `https:` issue-tracker URL. It is never derived from `source.url`; leave
+it empty to keep the issues destination unavailable.
+
+### `CONTACT_DISCUSSIONS_URL` / `CONTACT_DISCUSSIONS_VERIFIED`
+Public `https:` GitHub Discussions URL, offered only when
+`CONTACT_DISCUSSIONS_VERIFIED=true` as well (a repository without Discussions
+enabled would otherwise get a dead link, which blocks variant `c`).
 
 ---
 

@@ -8199,6 +8199,299 @@ components:
             items:
               type: string
               maxLength: 512
+    get_3a__2f_api_2f_config.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 512
+          - type: string
+            maxLength: 0
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    PublicConfigResponse:
+      type: object
+      properties:
+        site:
+          type: object
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+            url:
+              type: string
+            author:
+              type: string
+          required:
+            - title
+            - description
+            - url
+            - author
+          additionalProperties: {}
+        contact:
+          type: object
+          properties:
+            email:
+              type: object
+              properties:
+                available:
+                  type: boolean
+                href:
+                  type: string
+                unavailableReason:
+                  type: string
+              required:
+                - available
+              additionalProperties: false
+            issues:
+              type: object
+              properties:
+                available:
+                  type: boolean
+                href:
+                  type: string
+                unavailableReason:
+                  type: string
+              required:
+                - available
+              additionalProperties: false
+            discussions:
+              type: object
+              properties:
+                available:
+                  type: boolean
+                href:
+                  type: string
+                unavailableReason:
+                  type: string
+              required:
+                - available
+              additionalProperties: false
+            form:
+              type: object
+              properties:
+                available:
+                  type: boolean
+                persistence:
+                  type: string
+                  enum:
+                    - database
+                unavailableReason:
+                  type: string
+              required:
+                - available
+              additionalProperties: false
+          required:
+            - email
+            - issues
+            - discussions
+            - form
+          additionalProperties: false
+      required:
+        - site
+        - contact
+      additionalProperties: false
+    post_3a__2f_api_2f_contact.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 512
+          - type: string
+            maxLength: 0
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    post_3a__2f_api_2f_contact.Body:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        replyTo:
+          type: string
+          maxLength: 320
+          format: email
+          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 200
+        message:
+          type: string
+          minLength: 20
+          maxLength: 4000
+        website:
+          type: string
+          maxLength: 2048
+      required:
+        - name
+        - replyTo
+        - subject
+        - message
+      additionalProperties: false
+    ContactSubmissionReceipt:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: >-
+            ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+        status:
+          type: string
+          enum:
+            - received
+      required:
+        - id
+        - status
+      additionalProperties: false
+    AdminContactSubmissionsQuery:
+      type: object
+      properties:
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+    AdminContactSubmissionsResponse:
+      type: object
+      properties:
+        submissions:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                pattern: >-
+                  ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+              name:
+                type: string
+              replyTo:
+                type: string
+              subject:
+                type: string
+              message:
+                type: string
+              createdAt:
+                anyOf:
+                  - {}
+                  - type: string
+                  - type: string
+                    nullable: true
+                    enum:
+                      - null
+              ipHash:
+                nullable: true
+                type: string
+                minLength: 64
+                maxLength: 64
+              userId:
+                nullable: true
+                type: string
+            required:
+              - id
+              - name
+              - replyTo
+              - subject
+              - message
+              - createdAt
+              - ipHash
+              - userId
+            additionalProperties: false
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        limit:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 9007199254740991
+        offset:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+      required:
+        - submissions
+        - total
+        - limit
+        - offset
+      additionalProperties: false
     get_3a__2f_api_2f_health.Query:
       type: object
       properties:
@@ -32517,6 +32810,389 @@ paths:
       x-contract-schemas:
         query: post_3a__2f_api_2f_interactions.Query
         body: JsonObjectBody
+  /api/config:
+    get:
+      operationId: get:/api/config
+      responses:
+        '200':
+          description: >-
+            Public site metadata plus contact destinations derived only from server config; every destination is
+            unavailable until configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicConfigResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - config
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      x-domain: config
+      x-middleware: []
+      x-contract-schemas:
+        query: get_3a__2f_api_2f_config.Query
+  /api/contact:
+    post:
+      operationId: post:/api/contact
+      responses:
+        '200':
+          description: Receipt for a persisted (or honeypot-discarded) contact submission; never claims email delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactSubmissionReceipt'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - contact
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post_3a__2f_api_2f_contact.Body'
+      x-domain: contact
+      x-middleware:
+        - contactAvailable
+        - contactSameOrigin
+        - middleware
+      x-contract-schemas:
+        query: post_3a__2f_api_2f_contact.Query
+        body: post_3a__2f_api_2f_contact.Body
+  /api/admin/contact-submissions:
+    get:
+      operationId: get:/api/admin/contact-submissions
+      responses:
+        '200':
+          description: Newest-first page of the private contact inbox with the real total
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminContactSubmissionsResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - admin
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+      security:
+        - SessionCookie: []
+      x-domain: admin
+      x-requires-auth: true
+      x-requires-admin: true
+      x-middleware:
+        - requireAuth
+        - isAdmin
+      x-contract-schemas:
+        query: AdminContactSubmissionsQuery
   /api/health:
     get:
       operationId: get:/api/health
@@ -34215,6 +34891,8 @@ tags:
   - name: switch-list
   - name: recommendations
   - name: interactions
+  - name: config
+  - name: contact
   - name: health
   - name: openapi.json
   - name: docs

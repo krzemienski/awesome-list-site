@@ -1,0 +1,44 @@
+# test:integration baseline comparison (HEAD 6ee20a60 extracted to /tmp/base506 vs this working tree; same node_modules, same heliumdb_test)
+# The legacy suite has a long-standing red baseline (mock-era tests); compare per test, not exit codes.
+
+## Default vitest mode (files in parallel; every file runs cleanupDatabase() against the ONE shared test DB)
+BASE : tests 207 passed 35 failed 171
+AFTER: tests 223 passed 48 failed 174  (contact.test.ts 12/4: users + rate_limit_hits wiped mid-test by sibling files)
+
+## Serial mode (`--no-file-parallelism`, now the test:integration script)
+BASE : tests 207 passed 44 failed 162
+AFTER: tests 223 passed 60 failed 162
+
+per file passed/failed/skipped (serial):
+  tests/integration/security-headers.test.ts         base: 7/0/0  after: 7/0/0
+  tests/integration/api/admin.test.ts                base: 0/52/0  after: 0/52/0
+  tests/integration/api/auth.test.ts                 base: 1/27/0  after: 1/27/0
+  tests/integration/api/categories.test.ts           base: 10/21/0  after: 10/21/0
+  tests/integration/api/collections.test.ts          base: 0/0/1  after: 0/0/1
+  tests/integration/api/favorites.test.ts            base: 6/28/0  after: 6/28/0
+  tests/integration/api/not-found.test.ts            base: 3/0/0  after: 3/0/0
+  tests/integration/api/resources.test.ts            base: 17/34/0  after: 17/34/0
+  tests/integration/api/contact.test.ts              base: (absent)  after: 16/0/0
+
+tests that passed in base (serial) and fail after (serial):
+  count: 0
+tests that failed in base (serial) and pass after (serial):
+  count: 0
+
+contact.test.ts (serial, after):
+   ✓ Contact API default configuration (nothing set) GET /api/config reports every destination unavailable and the form disabled
+   ✓ Contact API default configuration (nothing set) POST /api/contact is indistinguishable from a missing route (404) even for a valid body
+   ✓ Contact API default configuration (nothing set) POST /api/contact answers 404 before validating or checking the origin
+   ✓ Contact API enabled without CONTACT_IP_HASH_SECRET keeps the form unavailable with an explicit reason
+   ✓ Contact API enabled without CONTACT_IP_HASH_SECRET refuses submissions with 503 instead of storing an unhashed IP
+   ✓ Contact API enabled and configured GET /api/config exposes configured destinations and keeps discussions gated on verification
+   ✓ Contact API enabled and configured persists a valid submission with a keyed IP hash and returns a receipt
+   ✓ Contact API enabled and configured records the signed-in user's id when a session is present
+   ✓ Contact API enabled and configured silently discards honeypot submissions with a receipt-shaped 200
+   ✓ Contact API enabled and configured rejects invalid payloads with the canonical 400 envelope
+   ✓ Contact API enabled and configured rejects unknown fields and an empty body
+   ✓ Contact API enabled and configured rejects cross-origin and origin-less submissions with 403
+   ✓ Contact API enabled and configured limits an IP to 5 submissions per hour through the shared store's own prefix
+   ✓ Contact API enabled and configured GET /api/admin/contact-submissions requires an authenticated admin
+   ✓ Contact API enabled and configured GET /api/admin/contact-submissions lists submissions newest first with pagination and the real total
+   ✓ Contact API enabled and configured GET /api/admin/contact-submissions rejects out-of-range pagination with 400

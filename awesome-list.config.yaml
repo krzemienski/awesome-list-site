@@ -142,10 +142,11 @@ resource_kinds:
 contact:
   # mailto: address, e.g. "mailto:hello@example.com" (empty = unavailable)
   email: ""
-  # https: issue tracker (empty = derived from source.url when it is a GitHub raw URL)
+  # https: issue tracker (empty = unavailable; never derived from source.url)
   issues_url: ""
   # https: discussions destination; only offered when discussions_verified is true
   discussions_url: ""
   discussions_verified: false
-  # Days to keep contact submissions before the retention purge removes them
+  # Days to keep contact submissions; consumed by purgeExpiredContactSubmissions(),
+  # which is not scheduled yet (see docs/CONTACT-VARIANTS.md "Backend")
   retention_days: 180

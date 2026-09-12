@@ -169,6 +169,13 @@
       "when": 1787243460000,
       "tag": "0047_resource_kind_and_contact",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1787243520000,
+      "tag": "0048_contact_submission_provenance",
+      "breakpoints": true
     }
   ]
 }

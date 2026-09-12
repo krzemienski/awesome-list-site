@@ -21,6 +21,9 @@ import "dotenv/config";
  *   - GET /api/auth/me                  (audit-key admin; anonymous → 401)
  *   - GET /api/admin/stats              (via X-Admin-Audit-Key header)
  *   - GET /api/journeys                 (anonymous)
+ *   - GET /api/config                   (anonymous; contact destinations)
+ *   - POST /api/contact                 (default-off → 404 before any work)
+ *   - GET /api/admin/contact-submissions (via X-Admin-Audit-Key header)
  *
  * Harness self-verification: a throwaway probe route deliberately returns a
  * 401 body violating the shared ErrorResponse schema. The run FAILS unless
@@ -171,9 +174,10 @@ async function main() {
     path: string,
     expectStatus: number,
     headers: Record<string, string> = {},
+    init: RequestInit = {},
   ): Promise<void> {
     try {
-      const res = await fetch(`${base}${path}`, { headers });
+      const res = await fetch(`${base}${path}`, { ...init, headers });
       // Drain the body so res.json (and the observer) fully complete.
       await res.text();
       checks.push({
@@ -341,6 +345,25 @@ async function main() {
 
   // GET /api/journeys — works for anonymous visitors
   await check("GET /api/journeys (anonymous)", "/api/journeys", 200);
+
+  // --- Default-off contact surface (docs/CONTACT-VARIANTS.md "Backend") ---
+  await check("GET /api/config (anonymous)", "/api/config", 200);
+  // Disabled deployments answer 404 before validation or the origin check;
+  // an enabled shell (CONTACT_ENABLED=true) hits the same-origin guard first.
+  const contactDisabled = process.env.CONTACT_ENABLED !== "true";
+  await check(
+    `POST /api/contact (${contactDisabled ? "default-off" : "enabled, no Origin"})`,
+    "/api/contact",
+    contactDisabled ? 404 : 403,
+    { "Content-Type": "application/json" },
+    { method: "POST", body: JSON.stringify({}) },
+  );
+  await check(
+    "GET /api/admin/contact-submissions (audit-key)",
+    "/api/admin/contact-submissions?limit=5",
+    200,
+    auditHeaders,
+  );
 
   await check(`GET ${PROBE_PATH} (observer liveness)`, PROBE_PATH, 401);
 

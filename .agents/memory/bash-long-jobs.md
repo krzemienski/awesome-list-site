@@ -28,3 +28,12 @@ A one-off `.ts` helper written to `/tmp` fails under `npx tsx` twice over: relat
 ## Poll-loop & workflow-log gotchas (2026-08)
 - `pgrep -f <pattern>` inside a poll loop **matches the loop's own `bash -c` wrapper** (the pattern appears in its command line) -> loop never exits / false "still running". Use `ps aux | grep <pattern> | grep -v grep` or anchor to the real binary.
 - Workflow log files under /tmp/logs are **snapshots at refresh time**, not live tails: a workflow can look wedged at its last drained line while it actually finished minutes ago. Confirm with a process check, then re-drain logs before diagnosing a hang.
+
+## `.env` is not shell-sourceable — and never `export $(grep … | xargs)`
+The repo `.env` contains prose lines, so `source .env` fails; the tempting
+`export $(grep -v '^#' .env | xargs)` **printed every variable, secret values
+included, into the tool output** when one line had a space. Pull one key at a
+time: `VAR="$(grep -E '^VAR=' .env | head -1 | cut -d= -f2- | tr -d '"')"`.
+Also: a temporary second server for an env-gated check (`FLAG=true PORT=5055
+npx tsx server/index.ts`) must be started with the tool's `run_in_background`,
+not `nohup … &` — the latter is gone before the first curl.
