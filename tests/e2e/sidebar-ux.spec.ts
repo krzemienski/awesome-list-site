@@ -24,8 +24,45 @@ import { test, expect, type Page } from '@playwright/test';
 
 const TARGET_PATH = '/category/community-events';
 
+for (const width of [375, 1024]) {
+  test(`nested taxonomy leaves are not clipped at ${width}`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/category/encoding-codecs');
+    const decline = page.getByTestId('consent-decline');
+    if (await decline.isVisible()) await decline.click();
+    if (width === 375) await page.locator('[data-sidebar="trigger"]').click();
+    const surface = page.locator(width === 375 ? '.av-sidebar-drawer' : '.av-sidebar-shell');
+    const category = surface.getByTestId('toggle-cat-encoding-codecs');
+    if (await category.getAttribute('aria-expanded') !== 'true') await category.click();
+    const toggle = surface.getByTestId('expand-sub-codecs');
+    if (await toggle.getAttribute('aria-expanded') !== 'true') await toggle.click();
+    const id = await toggle.getAttribute('aria-controls');
+    expect(id).toBeTruthy();
+    const body = surface.locator(`[id="${id}"]`);
+    const leaves = body.locator('[data-testid^="subsub-"]');
+    await expect(leaves).toHaveCount(3);
+    // Poll real clipping geometry, not computed min-height or source strings.
+    await expect.poll(() => body.evaluate(el => el.scrollHeight - el.clientHeight)).toBeLessThanOrEqual(1);
+    for (const leaf of await leaves.all()) {
+      await leaf.scrollIntoViewIfNeeded();
+      await expect.poll(() => leaf.evaluate(el => {
+        const r = el.getBoundingClientRect();
+        let visible = r.height >= 44;
+        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+          if (getComputedStyle(parent).overflowY === 'hidden') {
+            const bounds = parent.getBoundingClientRect();
+            visible &&= r.top >= bounds.top - 1 && r.bottom <= bounds.bottom + 1;
+          }
+        }
+        return visible;
+      })).toBe(true);
+    }
+  });
+}
+
 const VIEWPORTS = [
   { name: 'desktop-1440', width: 1440, height: 900 },
+  { name: 'tablet-1024', width: 1024, height: 768 },
   { name: 'tablet-768', width: 768, height: 1024 },
   { name: 'mobile-375', width: 375, height: 812 },
 ] as const;
@@ -34,6 +71,13 @@ async function openSidebarAndCategory(page: Page, width: number, height: number)
   await page.setViewportSize({ width, height });
   await page.goto(TARGET_PATH);
   await page.waitForLoadState('domcontentloaded');
+  // Canonical styles.css hides the sidebar at <=768; see
+  // docs/parity/assumptions/shell-sidebar.md. Exercise its real drawer.
+  if (width <= 768) {
+    const decline = page.getByTestId('consent-decline');
+    if (await decline.isVisible()) await decline.click();
+    await page.locator('button[data-sidebar="trigger"]').click();
+  }
   await page.waitForSelector('[data-testid^="toggle-cat-"]', { state: 'visible' });
   // Make sure every category chevron exists in the DOM even when its row is collapsed.
   const toggles = await page.locator('[data-testid^="toggle-cat-"]').count();
@@ -43,7 +87,7 @@ async function openSidebarAndCategory(page: Page, width: number, height: number)
     const t = page.locator('[data-testid^="toggle-cat-"]').nth(i);
     const state = await t.getAttribute('aria-expanded');
     if (state !== 'true') {
-      await t.click({ force: true });
+      await t.click();
     }
   }
 }

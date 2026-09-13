@@ -1,0 +1,260 @@
+/*
+ * Canonical shell sidebar
+ *
+ * Scope all rules to the primitive's .av-sidebar-shell or its navigation
+ * landmark. This file owns shell geometry only; palette and motion values stay
+ * in the parity token source (design-system.css).
+ */
+
+.av-sidebar-shell {
+  align-self: flex-start;
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 var(--shell-sidebar-w, 280px);
+  height: calc(100vh - var(--header-height, 60px));
+  /* Consent is an in-flow shell row: reserve it only while present. */
+  max-height: calc(100vh - var(--header-height, 60px) - var(--app-bottom-inset, 0px));
+  min-height: 0;
+  position: sticky;
+  top: var(--header-height, 60px);
+  width: var(--shell-sidebar-w, 280px);
+  z-index: 5;
+}
+
+.av-sidebar-shell > [data-sidebar="sidebar"] {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 88%, transparent),
+    color-mix(in srgb, var(--bg) 88%, transparent)
+  );
+  border-right: var(--hairline-w, 1px) solid var(--border);
+  box-sizing: border-box;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  /* DS-OK: canonical styles.css sidebar scrollbar is fixed white at 8%,
+     not foreground ink (which varies across typography profiles). */
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  scrollbar-width: thin;
+}
+
+.av-sidebar-shell [data-sidebar="content"] {
+  gap: 0;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+}
+
+.av-sidebar-shell [data-sidebar="footer"] {
+  flex-shrink: 0;
+}
+
+/* The rail remains in the DOM for baseline selector compatibility, but the
+   canonical default shell has no collapsed icon mode. An explicit future
+   variant can opt into its own class without changing this default. */
+.av-sidebar-shell .av-sidebar-icon-rail,
+.av-sidebar-shell .rail-icon-btn {
+  display: none;
+}
+
+/* AppSidebar shares one child tree between the visible tablet sidebar and the
+   optional drawer. The brand row belongs to the drawer only, as in the
+   canonical full-width-header handoff. */
+.av-sidebar-shell .av-sidebar-drawer-header {
+  display: none;
+}
+
+/* Canonical rows: hairline-separated category groups, a 44px disclosure
+   target, and a 2px accent bar for the active category. */
+.av-sidebar-shell .accordion-item,
+.av-sidebar-drawer .accordion-item {
+  border-bottom: var(--hairline-w, 1px) solid var(--border);
+  overflow: hidden;
+}
+
+.av-sidebar-shell .accordion-header,
+.av-sidebar-drawer .accordion-header {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+  color: inherit;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 13px 18px;
+  position: relative;
+  text-align: left;
+  transition: background var(--motion-fast, 160ms) ease;
+  width: 100%;
+}
+
+.av-sidebar-shell .accordion-header:hover,
+.av-sidebar-drawer .accordion-header:hover {
+  background: var(--surface);
+}
+
+/* Keep the canonical 22px icon + 26px vertical padding row while retaining
+   the existing 44px disclosure hit target inside that row. */
+.av-sidebar-shell .accordion-header > a,
+.av-sidebar-drawer .accordion-header > a {
+  min-height: 44px;
+  margin-block: -11px;
+}
+
+.av-sidebar-shell .accordion-header > a > span:first-child,
+.av-sidebar-drawer .accordion-header > a > span:first-child {
+  width: 22px !important;
+  height: 22px !important;
+  /* DS-OK: canonical category glyph tile has a fixed 5px radius, independent
+     of the profile's card/control radius scale. */
+  border-radius: 5px !important;
+}
+
+.av-sidebar-shell .accordion-header > span,
+.av-sidebar-drawer .accordion-header > span {
+  margin-block: -11px;
+}
+
+.av-sidebar-shell .accordion-header .font-mono,
+.av-sidebar-drawer .accordion-header .font-mono {
+  font-size: 10px !important;
+}
+
+.av-sidebar-shell .accordion-header > a > span:nth-child(2),
+.av-sidebar-drawer .accordion-header > a > span:nth-child(2),
+.av-sidebar-shell .sub-item > span:first-child,
+.av-sidebar-drawer .sub-item > span:first-child {
+  overflow-wrap: anywhere;
+}
+
+.av-sidebar-shell details,
+.av-sidebar-drawer details {
+  padding: 10px 18px;
+  color: var(--text-2);
+}
+
+.av-sidebar-shell summary,
+.av-sidebar-drawer summary {
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.av-sidebar-shell .accordion-header.active,
+.av-sidebar-drawer .accordion-header.active {
+  background: var(--surface-2);
+}
+
+.av-sidebar-shell .accordion-header.active::before,
+.av-sidebar-drawer .accordion-header.active::before {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  content: "";
+  left: 0;
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+}
+
+.av-sidebar-shell .accordion-body,
+.av-sidebar-drawer .accordion-body {
+  /* DS-OK: canonical accordion well is a fixed black compositing layer,
+     not a profile surface tint. */
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  transition: max-height 320ms var(--motion-ease, cubic-bezier(0.2, 0.65, 0.3, 1));
+}
+
+.av-sidebar-shell .accordion-body-inner,
+.av-sidebar-drawer .accordion-body-inner {
+  padding: 4px 16px 10px 30px;
+}
+
+/* Preserve the accessible full-label fallback for legacy consumers. */
+.av-sidebar-shell .accordion-header .truncate,
+.av-sidebar-drawer .accordion-header .truncate {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.av-sidebar-shell .sub-item,
+.av-sidebar-drawer .sub-item {
+  align-items: center;
+  border: var(--hairline-w) solid transparent;
+  /* DS-OK: canonical .sub-item uses a fixed 6px navigation radius rather
+     than the variable card/control radius. */
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  font-size: 12.5px;
+  gap: 10px;
+  justify-content: space-between;
+  margin: 1px 0;
+  padding: 7px 11px;
+  transition: all 140ms ease;
+}
+
+.av-sidebar-shell .sub-item:hover,
+.av-sidebar-drawer .sub-item:hover {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  transform: translateX(2px);
+}
+
+.av-sidebar-shell .sub-item[data-active="true"],
+.av-sidebar-drawer .sub-item[data-active="true"] {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+
+/* Keep keyboard focus visible even when a component's utility classes include
+   outline-none. The shared focus contract supplies the same ring globally;
+   this scoped declaration protects the shell when loaded independently. */
+.av-sidebar-shell :where(a, button):focus-visible,
+.av-sidebar-drawer :where(a, button):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The tablet sidebar remains visible at exactly 769–1024px and narrows to the
+   canonical 240px token. */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .av-sidebar-shell {
+    flex-basis: var(--shell-sidebar-w-tablet, 240px);
+    width: var(--shell-sidebar-w-tablet, 240px);
+  }
+}
+
+/* Canonical rule: at <=768px the sidebar is hidden and the drawer takes over.
+   Do not use an icon rail as a phone fallback. */
+@media (max-width: 768px) {
+  .av-sidebar-shell {
+    display: none;
+  }
+}
+
+/* Header owns the menu affordance. It is present through tablet and hidden
+   above the canonical 1024px cutoff. */
+[data-sidebar="trigger"] {
+  display: inline-flex;
+}
+
+@media (min-width: 1025px) {
+  [data-sidebar="trigger"] {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .av-sidebar-shell .accordion-header,
+  .av-sidebar-shell .accordion-body,
+  .av-sidebar-drawer .accordion-header,
+  .av-sidebar-drawer .accordion-body {
+    transition-duration: 0.01ms;
+  }
+}

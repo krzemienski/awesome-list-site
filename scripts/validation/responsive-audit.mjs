@@ -445,17 +445,22 @@ if (!AUTHED) {
   const kbPage = await ctx.newPage();
   try {
     await kbPage.setViewportSize({ width: 375, height: 812 });
-    await gotoPage(kbPage, '/');
+    // Canonical drawer remains the navigation surface at <=768, with the
+    // trigger also offered <=1024. See docs/parity/assumptions/shell-sidebar.md.
+    for (const drawerRoute of ['/', '/submit', '/journeys', '/advanced', '/settings/theme', '/admin']) {
+    const drawerLog = (key, pass, detail) => log(`${key}:${drawerRoute}`, pass, detail);
+    await gotoPage(kbPage, drawerRoute);
+    console.log(`Drawer keyboard route: ${drawerRoute}`);
     await kbPage.waitForTimeout(800);
     const trigger = kbPage.locator('button[data-sidebar="trigger"]').first();
     const trigOk = await trigger.waitFor({ state: 'visible', timeout: 15000 }).then(() => true).catch(() => false);
     if (!trigOk) {
-      log('drawer-trap-open@375', false, 'hamburger trigger not visible at 375px');
+      drawerLog('drawer-trap-open@375', false, 'hamburger trigger not visible at 375px');
     } else {
       await trigger.click();
       const SHEET = '[data-sidebar="sidebar"][data-mobile="true"][data-state="open"]';
       const opened = await kbPage.waitForSelector(SHEET, { timeout: 10000 }).then(() => true).catch(() => false);
-      log('drawer-trap-open@375', opened, opened ? 'mobile drawer opened' : 'drawer did not open after trigger click');
+      drawerLog('drawer-trap-open@375', opened, opened ? 'mobile drawer opened' : 'drawer did not open after trigger click');
       if (opened) {
         // Let the open animation + autofocus settle before sampling focus.
         await kbPage.waitForTimeout(600);
@@ -467,7 +472,7 @@ if (!AUTHED) {
             tag: ae ? `${ae.tagName.toLowerCase()}${ae.getAttribute('data-testid') ? `[${ae.getAttribute('data-testid')}]` : ''}` : 'none',
           };
         }, SHEET);
-        log('drawer-trap-autofocus@375', initial.inside, `initial focus=${initial.tag} insideSheet=${initial.inside}`);
+        drawerLog('drawer-trap-autofocus@375', initial.inside, `initial focus=${initial.tag} insideSheet=${initial.inside}`);
 
         const TABS = 12;
         const stops = [];
@@ -490,7 +495,7 @@ if (!AUTHED) {
         // least 4 distinct stops across 12 Tabs (a stuck container<->link
         // cycle yields exactly 2; a healthy drawer has close btn + many links).
         const walkPass = escapes === 0 && unique >= 4;
-        log('drawer-trap-walk@375', walkPass, `tabs=${TABS} escapes=${escapes} uniqueStops=${unique} stops=[${[...new Set(stops)].slice(0, 6).join(' | ')}...]`);
+        drawerLog('drawer-trap-walk@375', walkPass, `tabs=${TABS} escapes=${escapes} uniqueStops=${unique} stops=[${[...new Set(stops)].slice(0, 6).join(' | ')}...]`);
         if (!walkPass) await kbPage.screenshot({ path: `${OUT}/drawer-trap-walk.png` }).catch(() => {});
 
         // Escape closes the drawer and returns focus to the trigger.
@@ -501,9 +506,10 @@ if (!AUTHED) {
           const ae = document.activeElement;
           return { onTrigger: !!(ae && ae.getAttribute && ae.getAttribute('data-sidebar') === 'trigger'), tag: ae ? ae.tagName.toLowerCase() + (ae.getAttribute('data-sidebar') ? `[data-sidebar=${ae.getAttribute('data-sidebar')}]` : '') : 'none' };
         });
-        log('drawer-trap-escape@375', closed && focusBack.onTrigger, `closed=${closed} focusAfterClose=${focusBack.tag}`);
+        drawerLog('drawer-trap-escape@375', closed && focusBack.onTrigger, `closed=${closed} focusAfterClose=${focusBack.tag}`);
         if (!(closed && focusBack.onTrigger)) await kbPage.screenshot({ path: `${OUT}/drawer-trap-escape.png` }).catch(() => {});
       }
+    }
     }
   } finally {
     await kbPage.close().catch(() => {});

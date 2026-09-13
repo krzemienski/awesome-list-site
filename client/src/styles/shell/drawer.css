@@ -1,0 +1,283 @@
+/*
+ * Canonical mobile/tablet drawer.
+ *
+ * The owned Radix Dialog instance supplies the semantics, focus scope, Escape
+ * handling, backdrop dismissal, and trigger restoration. These rules own only
+ * the canonical geometry and motion; shared Sheet styles are not addressed.
+ */
+
+.av-sidebar-drawer-overlay {
+  backdrop-filter: blur(2px);
+  /* DS-OK: canonical drawer backdrop is fixed black at 60%; using --bg
+     would change overlay contrast when the profile changes. */
+  background: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition: opacity 280ms ease;
+  z-index: 99;
+}
+
+.av-sidebar-drawer-overlay[data-state="open"] {
+  animation: av-sidebar-overlay-in 280ms ease both;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.av-sidebar-drawer-overlay[data-state="closed"] {
+  animation: av-sidebar-overlay-out 280ms ease both;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.av-sidebar-drawer {
+  background: var(--bg-2);
+  border-right: var(--hairline-w) solid var(--border);
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  inset: 0 auto 0 0;
+  max-width: 340px;
+  padding: 0;
+  position: fixed;
+  transform: translateX(-100%);
+  transition: transform 280ms cubic-bezier(0.2, 0.65, 0.3, 1);
+  width: 86%;
+  will-change: transform;
+  z-index: 100;
+}
+
+.av-sidebar-drawer[data-state="open"] {
+  animation: av-sidebar-drawer-in 280ms cubic-bezier(0.2, 0.65, 0.3, 1) both;
+  transform: translateX(0);
+}
+
+.av-sidebar-drawer[data-state="closed"] {
+  animation: av-sidebar-drawer-out 280ms cubic-bezier(0.2, 0.65, 0.3, 1) both;
+  transform: translateX(-100%);
+}
+
+.av-sidebar-drawer > [data-sidebar="drawer-navigation"] {
+  background: var(--bg-2);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  width: 100%;
+}
+
+/* Match canonical .mobile-drawer > *: never let the long category list
+   shrink underneath the footer. The whole navigation scrolls together. */
+.av-sidebar-drawer > [data-sidebar="drawer-navigation"] > * {
+  flex-shrink: 0;
+}
+
+.av-sidebar-drawer .av-sidebar-drawer-header {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+}
+
+/* Extend the brand's hit area without changing its canonical 28px visual
+   line or the 56px header geometry. */
+.av-sidebar-drawer-header > a {
+  min-height: 44px;
+  margin-block: -8px;
+}
+
+.av-sidebar-drawer-wordmark {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+}
+
+.av-sidebar-drawer-search {
+  padding: 14px 18px;
+}
+
+.av-sidebar-drawer-search-control {
+  position: relative;
+}
+
+.av-sidebar-drawer-search-control > svg {
+  color: var(--text-3);
+  left: 12px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.av-sidebar-drawer-search-control input {
+  background: var(--surface);
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 9px 14px 9px 36px;
+  transition: border-color 160ms ease, background 160ms ease;
+  width: 100%;
+}
+
+.av-sidebar-drawer-search-control input:focus {
+  background: var(--surface-2);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong));
+  outline: none;
+}
+
+.av-sidebar-drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px;
+}
+
+.av-sidebar-drawer-nav .sub-item {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.av-sidebar-drawer-legacy-compat {
+  display: none;
+}
+
+.av-sidebar-drawer-categories-label {
+  margin-top: 8px;
+  padding: 12px 18px 6px;
+}
+
+.av-sidebar-drawer-categories-label > div {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+}
+
+.av-sidebar-drawer .av-sidebar-category-list {
+  min-height: 0;
+}
+
+.av-sidebar-drawer-footer {
+  align-items: center;
+  border-top: var(--hairline-w) solid var(--border);
+  display: flex;
+  flex-direction: row;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: auto;
+  padding: 18px;
+}
+
+.av-sidebar-drawer-footer > span {
+  color: var(--text-3);
+}
+
+.av-sidebar-drawer-footer > div {
+  display: flex;
+  gap: 14px;
+}
+
+.av-sidebar-drawer-footer a {
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.av-sidebar-drawer-footer a:hover {
+  color: var(--text);
+}
+
+.av-sidebar-drawer [data-sidebar="content"] {
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+}
+
+.av-sidebar-drawer [data-sidebar="footer"] {
+  flex-shrink: 0;
+}
+
+/* The Radix close control is the visible canonical drawer close affordance.
+   Keep its 44px target even when a consuming utility set changes. */
+.av-sidebar-drawer-close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-2);
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  z-index: 1;
+}
+
+.av-sidebar-drawer-close:hover {
+  color: var(--text);
+}
+
+.av-sidebar-drawer-close svg {
+  height: 20px;
+  width: 20px;
+}
+
+@keyframes av-sidebar-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes av-sidebar-drawer-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes av-sidebar-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes av-sidebar-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .av-sidebar-drawer-overlay,
+  .av-sidebar-drawer,
+  .av-sidebar-drawer[data-state="open"],
+  .av-sidebar-drawer[data-state="closed"] {
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms !important;
+  }
+}

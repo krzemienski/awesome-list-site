@@ -1,21 +1,16 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, X } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
+import { SheetDescription } from "@/components/ui/sheet"
 import {
   Tooltip,
   TooltipContent,
@@ -25,10 +20,13 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-// DS parity: reference .sidebar is 280px wide (awesome-list-site-ds/styles.css).
-const SIDEBAR_WIDTH = "17.5rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3.5rem"
+// Canonical shell geometry comes from the parity tokens. Keep these aliases in
+// the primitive so consumers that use the shadcn sidebar API still get the
+// same 280/240px shell as AppSidebar.
+const SIDEBAR_WIDTH = "var(--shell-sidebar-w, 280px)"
+const SIDEBAR_WIDTH_TABLET = "var(--shell-sidebar-w-tablet, 240px)"
+const SIDEBAR_WIDTH_MOBILE = "86%"
+const SIDEBAR_WIDTH_ICON = "var(--shell-rail-w, 56px)"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContextProps = {
@@ -38,6 +36,8 @@ type SidebarContextProps = {
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
+  isDrawer: boolean
+  isPhone: boolean
   toggleSidebar: () => void
 }
 
@@ -73,7 +73,32 @@ const SidebarProvider = React.forwardRef<
     ref
   ) => {
     const isMobile = useIsMobile()
+    const [isDrawer, setIsDrawer] = React.useState(false)
+    const [isPhone, setIsPhone] = React.useState(false)
     const [openMobile, setOpenMobile] = React.useState(false)
+
+    // The canonical shell keeps the 240px sidebar visible at tablet widths,
+    // but the header menu still opens the same drawer used on phones. This is
+    // intentionally distinct from useIsMobile(), which remains the public
+    // phone-only signal consumed by existing layout code.
+    React.useEffect(() => {
+      const media = window.matchMedia("(max-width: 1024px)")
+      const update = () => setIsDrawer(media.matches)
+      update()
+      media.addEventListener("change", update)
+      return () => media.removeEventListener("change", update)
+    }, [])
+
+    // useIsMobile intentionally preserves the historical <768 public hook
+    // contract. The canonical sidebar cutoff is <=768, so keep this separate
+    // for deciding whether the hidden static copy should be mounted.
+    React.useEffect(() => {
+      const media = window.matchMedia("(max-width: 768px)")
+      const update = () => setIsPhone(media.matches)
+      update()
+      media.addEventListener("change", update)
+      return () => media.removeEventListener("change", update)
+    }, [])
 
     const [_open, _setOpen] = React.useState<boolean>(() => {
       if (typeof window === "undefined") return defaultOpen
@@ -99,10 +124,10 @@ const SidebarProvider = React.forwardRef<
     )
 
     const toggleSidebar = React.useCallback(() => {
-      return isMobile
+      return isDrawer
         ? setOpenMobile((open) => !open)
         : setOpen((open) => !open)
-    }, [isMobile, setOpen, setOpenMobile])
+    }, [isDrawer, setOpen, setOpenMobile])
 
     // Adds a keyboard shortcut to toggle the sidebar on all screen sizes
     React.useEffect(() => {
@@ -119,29 +144,6 @@ const SidebarProvider = React.forwardRef<
       window.addEventListener("keydown", handleKeyDown)
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
-
-    // Audit2 BUG-004/005/017/018: at tablet widths (768–1023px) an expanded
-    // 17.5rem sidebar squeezes the content column to ~390px — /advanced
-    // subcategory chips and tabs clipped past the viewport, the home CTA row
-    // overflowed, and /search columns collapsed to 188px. Collapse to the
-    // icon rail whenever the viewport IS (or becomes) tablet-sized, which
-    // also overrides a stale expanded preference persisted from a desktop
-    // session. One-way: never auto-expands, and an explicit user expand at
-    // tablet sticks for the session (uses _setOpen so the user's stored
-    // preference isn't clobbered by an environmental adjustment).
-    React.useEffect(() => {
-      if (openProp !== undefined) return // controlled — the owner decides
-      const mql = window.matchMedia("(min-width: 768px) and (max-width: 1023px)")
-      const collapseIfTablet = () => {
-        if (mql.matches) _setOpen(false)
-      }
-      collapseIfTablet()
-      mql.addEventListener("change", collapseIfTablet)
-      return () => mql.removeEventListener("change", collapseIfTablet)
-      // mount-only by design; switching controlled/uncontrolled mid-session
-      // isn't a supported case.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
@@ -166,6 +168,12 @@ const SidebarProvider = React.forwardRef<
       }
     }, [openMobile]);
 
+    // A drawer is a viewport affordance, not a persisted preference. Do not
+    // leave a phone/tablet drawer logically open after crossing to desktop.
+    React.useEffect(() => {
+      if (!isDrawer && openMobile) setOpenMobile(false)
+    }, [isDrawer, openMobile])
+
     const contextValue = React.useMemo<SidebarContextProps>(
       () => ({
         state,
@@ -175,8 +183,20 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        isDrawer,
+        isPhone,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [
+        state,
+        open,
+        setOpen,
+        isMobile,
+        isDrawer,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+        isPhone,
+      ]
     )
 
     return (
@@ -186,6 +206,7 @@ const SidebarProvider = React.forwardRef<
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH,
+                "--sidebar-width-tablet": SIDEBAR_WIDTH_TABLET,
                 "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
                 ...style,
               } as React.CSSProperties
@@ -216,6 +237,7 @@ const Sidebar = React.forwardRef<
     side?: "left" | "right"
     variant?: "sidebar" | "floating" | "inset"
     collapsible?: "offcanvas" | "icon" | "none"
+    drawerContent?: React.ReactNode
   }
 >(
   (
@@ -223,91 +245,142 @@ const Sidebar = React.forwardRef<
       side = "left",
       variant = "sidebar",
       collapsible = "offcanvas",
+      drawerContent,
       className,
       children,
       ...props
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const {
+      isDrawer,
+      isPhone,
+      state,
+      openMobile,
+      setOpenMobile,
+    } = useSidebar()
 
-    if (collapsible === "none") {
-      return (
+    /*
+     * The canonical shell has one full sidebar at desktop and tablet widths.
+     * At <=1024 the header trigger additionally opens the owned Radix drawer; the
+     * tablet sidebar remains in place behind it. The static copy is display
+     * none at phone widths. Consumers may provide drawerContent for canonical
+     * drawer chrome while retaining the same category source and test IDs.
+     */
+    const staticSidebar = (
+      <div
+        ref={ref}
+        className={cn(
+          "av-sidebar-shell group peer shrink-0 text-sidebar-foreground",
+          className,
+        )}
+        data-state="expanded"
+        data-collapsible=""
+        data-variant={variant}
+        data-side={side}
+        {...props}
+      >
         <div
-          className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
-            className
-          )}
-          ref={ref}
-          {...props}
+          data-sidebar="sidebar"
+          role="navigation"
+          aria-label="Sidebar"
+          className="flex h-full w-full flex-col"
         >
           {children}
         </div>
-      )
-    }
+      </div>
+    )
 
-    if (isMobile) {
-      return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          {/* BUG-006 (run14): the built-in Sheet close button was hidden via
-              [&>button]:hidden, leaving the drawer with no visible close
-              control. It's now shown with a 44px touch target. */}
-          <SheetContent
+    const drawer = (
+      <DialogPrimitive.Root open={openMobile} onOpenChange={setOpenMobile}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="av-sidebar-drawer-overlay" />
+          <DialogPrimitive.Content
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] max-w-[80vw] bg-sidebar p-0 text-sidebar-foreground [&>button]:flex [&>button]:min-h-[44px] [&>button]:min-w-[44px] [&>button]:items-center [&>button]:justify-center [&>button]:z-20 [&>button]:right-1 [&>button]:top-1 [&>button_svg]:h-5 [&>button_svg]:w-5"
+            className="av-sidebar-drawer text-sidebar-foreground"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
               } as React.CSSProperties
             }
-            side={side}
             aria-modal="true"
             onOpenAutoFocus={(e) => {
-              // NB-002 (run18): give the drawer's Radix focus trap a
-              // deterministic entry point on the first real nav link so the
-              // whole nav list is inside the tab cycle (initial focus was
-              // landing on the logo, after which Tab could ping-pong to the
-              // content box and skip the nav). Radix still records the
-              // hamburger trigger separately for Escape/close focus return.
-              // BUG-019 (run26): the first a[href] can be a HIDDEN icon-mode
-              // duplicate (h=0) — focusing it silently fails, focus never
-              // enters the sheet, and the whole Radix focus trap disengages
-              // (Tab then walks the aria-hidden background). Only accept a
-              // VISIBLE candidate; otherwise let Radix focus the content box.
+              // Enter the Radix focus scope on the first visible nav control.
+              // The static tablet sidebar intentionally contains the same tree,
+              // so only query inside the open dialog.
               const content = e.currentTarget as HTMLElement
               const first = Array.from(
                 content.querySelectorAll<HTMLElement>(
-                  "a[href], button:not([disabled])"
+                  "a[href], button:not([disabled])",
+                ),
+              ).find((el) => {
+                const rect = el.getBoundingClientRect()
+                return (
+                  rect.width > 0 &&
+                  rect.height > 0 &&
+                  getComputedStyle(el).visibility !== "hidden"
                 )
-              ).find((el) => el.offsetWidth > 0 || el.offsetHeight > 0)
+              })
               if (first) {
                 e.preventDefault()
                 first.focus()
               }
             }}
             onCloseAutoFocus={(e) => {
-              // NB-002 (run20): Radix restores focus to the element focused at
-              // open time, but the header trigger re-renders when openMobile
-              // flips, so the saved ref can be a detached node and focus falls
-              // to <body>. Re-resolve the live trigger and focus it explicitly.
-              const trig = document.querySelector<HTMLElement>(
-                'button[data-sidebar="trigger"]'
+              // Radix's saved trigger can be detached when AppHeader rerenders
+              // with the open state. Resolve the live header trigger explicitly.
+              const trigger = document.querySelector<HTMLElement>(
+                'button[data-sidebar="trigger"]',
               )
-              if (trig) {
+              if (trigger) {
                 e.preventDefault()
-                trig.focus()
+                trigger.focus()
               }
             }}
           >
-            <SheetHeader className="sr-only">
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the sidebar navigation.</SheetDescription>
-            </SheetHeader>
-            <div className="flex h-full w-full flex-col">{children}</div>
-          </SheetContent>
-        </Sheet>
+            <DialogPrimitive.Title className="sr-only">
+              Sidebar
+            </DialogPrimitive.Title>
+            <SheetDescription className="sr-only">
+              Displays the sidebar navigation.
+            </SheetDescription>
+            <div
+              data-sidebar="drawer-navigation"
+              role="navigation"
+              aria-label="Sidebar"
+              className="flex h-full w-full flex-col"
+            >
+              {drawerContent ?? children}
+            </div>
+            <DialogPrimitive.Close
+              asChild
+              aria-label="Close sidebar"
+            >
+              <button
+                type="button"
+                className="av-sidebar-drawer-close"
+              >
+                <X aria-hidden="true" />
+                <span className="sr-only">Close</span>
+              </button>
+            </DialogPrimitive.Close>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+    )
+
+    if (isDrawer) {
+      return (
+        <>
+          {!isPhone && staticSidebar}
+          {drawer}
+        </>
       )
+    }
+
+    if (collapsible === "none") {
+      return staticSidebar
     }
 
     return (
@@ -699,7 +772,7 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
-    const { isMobile, state } = useSidebar()
+    const { isMobile, isDrawer, state } = useSidebar()
 
     const button = (
       <Comp
@@ -718,7 +791,10 @@ const SidebarMenuButton = React.forwardRef<
     // DOM mutation that Radix FocusScope's MutationObserver treats as "focused
     // element removed", bouncing Tab focus back to the sheet container and
     // making the drawer's nav unreachable by keyboard.
-    if (!tooltip || isMobile) {
+    // The tablet drawer is a Radix focus scope too. Mounting Tooltip around a
+    // focused control mutates that scope and can bounce keyboard focus out of
+    // the open drawer, just as it does on phones.
+    if (!tooltip || isMobile || isDrawer) {
       return button
     }
 

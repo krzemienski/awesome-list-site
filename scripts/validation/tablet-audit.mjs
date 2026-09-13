@@ -1,7 +1,7 @@
 // Repeatable tablet clipping + consent-banner-overlay validation (task #270,
 // promoted from the task #258 evidence checks). Guards the 14 tablet/mobile
 // layout & a11y fixes: /advanced tabs+chips in-bounds @768/320, sidebar
-// auto-collapsed @768, microtext >=12px, single "Toggle sidebar" label + no
+// hidden + drawer @768 and 240px @1024, microtext >=12px, single "Toggle sidebar" label + no
 // active rail, unique aria-labels on repeated Explore/Journey buttons, home
 // CTA reachable via hit-test @768/320, consent-banner clearance (banner is an
 // in-flow sticky shell row reserving its own space — nothing else is padded —
@@ -166,12 +166,16 @@ for (const w of [768, 320]) {
     `chips=${chips.count} clipped=${chips.clipped}${chips.sample ? ` sample="${chips.sample}"` : ''}`);
 
   if (w === 768) {
-    // ---- sidebar auto-collapsed @768 (tablet squeeze guard) ----
+    // Canonical styles.css @max-width:768 hides .sidebar; see
+    // docs/parity/assumptions/shell-sidebar.md. No default icon rail.
     const sb = await page.evaluate(() => {
-      const el = document.querySelector('div[data-state][data-collapsible], div[data-state][data-variant]');
-      return { found: !!el, state: el?.getAttribute('data-state'), collapsible: el?.getAttribute('data-collapsible') };
+      const visible = (el) => !!el && el.getBoundingClientRect().width > 0 && el.getBoundingClientRect().height > 0;
+      return {
+        sidebarVisible: [...document.querySelectorAll('[data-sidebar="sidebar"]:not([data-mobile])')].some(visible),
+        triggerVisible: visible(document.querySelector('button[data-sidebar="trigger"]')),
+      };
     });
-    log('sidebar-collapsed@768', sb.found && sb.state === 'collapsed', JSON.stringify(sb));
+    log('sidebar-drawer@768', !sb.sidebarVisible && sb.triggerVisible, JSON.stringify(sb));
 
     // ---- single "Toggle sidebar" accessible label + no interactive rail ----
     const tog = await page.evaluate(() => {
@@ -199,6 +203,17 @@ for (const w of [768, 320]) {
   } else {
     await page.screenshot({ path: `${OUT}/advanced-320.png` }).catch(() => {});
   }
+  await ctx.close();
+}
+
+// Canonical styles.css @max-width:1024 sets 240px; sidebar remains visible
+// until <=768. See docs/parity/assumptions/shell-sidebar.md.
+{
+  const { ctx, page } = await newPage(1024, 900);
+  await goto(page, '/');
+  const width = await page.locator('[data-sidebar="sidebar"]:not([data-mobile])').first()
+    .evaluate(el => el.getBoundingClientRect().width);
+  log('sidebar-width@1024', Math.abs(width - 240) <= 1, `width=${width}`);
   await ctx.close();
 }
 

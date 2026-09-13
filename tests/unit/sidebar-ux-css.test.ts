@@ -34,7 +34,7 @@ const APP_SIDEBAR = resolve(
 );
 const DESIGN_SYSTEM_CSS = resolve(
   process.cwd(),
-  'client/src/styles/design-system.css',
+  'client/src/styles/shell/sidebar.css',
 );
 
 describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
@@ -64,7 +64,7 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
       expect(expandButtonBlock![0]).toMatch(/min-h-\[44px\]/);
     });
 
-    it('design-system.css declares min-height: 44px on .accordion-header', () => {
+    it('sidebar.css declares min-height: 44px on .accordion-header', () => {
       const headerBlock = css.match(/\.accordion-header\s*\{[\s\S]*?\}/);
       expect(headerBlock, '.accordion-header rule must exist').toBeTruthy();
       expect(headerBlock![0]).toMatch(/min-height:\s*44px/);
@@ -95,7 +95,7 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
       expect(subLabelSpan![0], 'SubItem label must NOT truncate').not.toMatch(/\btruncate\b/);
     });
 
-    it('design-system.css declares a regression net under .accordion-header .truncate', () => {
+    it('sidebar.css declares a regression net under .accordion-header .truncate', () => {
       const fallbackBlock = css.match(
         /\.accordion-header\s+\.truncate\s*\{[\s\S]*?\}/,
       );
@@ -107,16 +107,20 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
       expect(fallbackBlock![0]).toMatch(/white-space:\s*normal/);
     });
 
-    it('expandedHeight calculator bumped to 44 px per row (no leftover 36)', () => {
-      // The expandedHeight useMemo should use 44 (or higher) per row, never 36.
-      // We assert: the literal "36" should NOT appear inside expandedHeight's body.
-      const expandedBlock = tsx.match(
-        /expandedHeight\s*=\s*useMemo\(\(\)[\s\S]*?\}\s*,\s*\[subs,\s*openSubs,\s*directCount\]\);/,
-      );
-      expect(expandedBlock, 'expandedHeight useMemo must exist').toBeTruthy();
-      // We DO permit the literal 36 in a comment or elsewhere, but inside the
-      // body of expandedHeight it should be 44.
-      expect(expandedBlock![0]).toMatch(/h\s*\+=\s*44/);
+    it('measures nested content instead of estimating fixed row heights', () => {
+      expect(tsx).toContain('new ResizeObserver(measure)');
+      expect(tsx).toContain('setHeight(content.scrollHeight)');
+      expect(tsx).not.toMatch(/subSubs\.length\s*\*\s*32/);
     });
+  });
+
+  it('uses canonical sticky geometry and the inclusive mobile cutoff', () => {
+    // Canonical styles.css .sidebar and responsive rules; rationale in
+    // docs/parity/assumptions/shell-sidebar.md.
+    expect(css).toMatch(/position:\s*sticky/);
+    expect(css).toMatch(/var\(--shell-sidebar-w[,)]/);
+    expect(css).toMatch(/var\(--shell-sidebar-w-tablet[,)]/);
+    expect(css).toMatch(/max-width:\s*768px/);
+    expect(css).toMatch(/max-width:\s*1024px/);
   });
 });

@@ -1,0 +1,36 @@
+[
+  {
+    "name": "deep-link@900",
+    "visible": true,
+    "top": 511.78125,
+    "bottom": 547.78125,
+    "shellBottom": 643
+  },
+  {
+    "name": "unique-disclosures@900",
+    "total": 18,
+    "unique": 18,
+    "controls": true
+  },
+  {
+    "name": "deep-link@1024",
+    "visible": true,
+    "top": 731.78125,
+    "bottom": 767.78125,
+    "shellBottom": 768
+  },
+  {
+    "name": "unique-disclosures@1024",
+    "total": 18,
+    "unique": 18,
+    "controls": true
+  },
+  {
+    "name": "brand-hit-area",
+    "height": 44
+  },
+  {
+    "name": "search-submit",
+    "url": "http://127.0.0.1:5000/search?q=ffmpeg"
+  }
+]
