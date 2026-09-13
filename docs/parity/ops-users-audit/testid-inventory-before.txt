@@ -1,0 +1,27 @@
+Task 549 local testid inventory (before)
+
+Source: client/src/components/admin/UsersTab.tsx
+button-cancel-role-change
+button-confirm-delete-user
+button-confirm-role-change
+button-export-users
+button-sort-${col.key}
+button-users-next-page
+button-users-prev-page
+input-user-search
+text-name-${user.id}
+text-email-${user.id}
+button-toggle-email-${user.id}
+button-delete-user-${user.id}
+
+Source: client/src/components/admin/AuditTab.tsx
+alert-audit-error
+button-audit-next
+button-audit-prev
+button-audit-retry
+error-audit-resource-id
+input-audit-resource-id
+text-audit-detail-changes
+text-audit-detail-notes
+text-audit-range
+row-audit-log-${log.id}

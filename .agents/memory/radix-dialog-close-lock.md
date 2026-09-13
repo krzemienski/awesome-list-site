@@ -11,3 +11,14 @@ Radix Dialog/AlertDialog keeps `body { pointer-events: none }` until the close a
 - before clicking a trigger: wait until no `[data-state="open"]` dialog exists AND `getComputedStyle(body).pointerEvents !== 'none'`; if that wait times out, FAIL the check (proceeding would measure the stale dialog under the next check's name — a false pass).
 - after clicking: `waitForSelector('[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"]')` with one retry click.
 - scope any metric `evaluate()` to the open dialog selector, not the first dialog in the DOM.
+
+For Select → AlertDialog transitions, wait for the option to disappear and then
+for the confirmation dialog to appear. Do not require body pointer events to
+be enabled between them: the newly opened modal legitimately owns that lock.
+
+**Why:** a generic post-Select cleanup helper can wait forever on correct modal
+behavior, falsely reporting a broken role change.
+
+**How to apply:** require the body lock to clear only after the final modal
+closes. For hover-revealed toast dismiss buttons, hover the visible toast first,
+not its initially pointer-inert close button.

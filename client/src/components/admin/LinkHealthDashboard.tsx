@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -24,9 +24,12 @@ import { formatAdminDateTime, formatAdminDate } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { CHART_PALETTE } from "@/lib/charts/palette";
 import type { LinkHealthJob, LinkHealthCheck } from "@shared/schema";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { AdminOpsTable as Table, Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import "@/styles/pages/admin-ops-github-links.css";
+import type { LinkHealthTrendPoint } from "@/components/admin/LinkHealthTrendChart";
+
+const LinkHealthTrendChart = lazy(() => import("@/components/admin/LinkHealthTrendChart"));
 
 interface LinkHealthStatusResponse {
   success: boolean;
@@ -140,17 +143,31 @@ export default function LinkHealthDashboard() {
   const jobs = Array.from(
     new Map((historyData?.jobs ?? []).map((j) => [j.id, j])).values()
   );
-  const isActiveJob = latestJob?.status === 'processing';
   // R4-043: a job can sit in 'pending' before it starts 'processing' — treat
   // both as in-progress so the panel never presents a stale all-clear/last-run
   // summary while a sweep is queued or running.
   const isJobInProgress = latestJob?.status === 'processing' || latestJob?.status === 'pending';
+  const isActiveJob = isJobInProgress;
+  const isTerminalWithoutResults = latestJob?.status === 'failed' || latestJob?.status === 'cancelled';
   // R4-044: one source of truth. The table filters this client-side; the
-  // summary counters tally the same array, so counts == rows by construction.
+  // summary counters tally the same API array. The recent-failures table
+  // includes problem statuses and review flags, while the residual problem
+  // table intentionally keeps every problem record available to its filters.
   const allProblemLinks = brokenLinksData?.checks ?? [];
+  const recentFailures = allProblemLinks.filter(
+    (check) =>
+      check.flaggedForReview ||
+      check.status === 'broken' ||
+      check.status === 'dns_failure' ||
+      check.status === 'timeout',
+  );
   const brokenLinks = statusFilter === 'all'
     ? allProblemLinks
-    : allProblemLinks.filter((c) => c.status === statusFilter);
+    : allProblemLinks.filter((c) =>
+        statusFilter === 'broken'
+          ? c.status === 'broken' || c.status === 'dns_failure'
+          : c.status === statusFilter
+      );
 
   // R4-044: summary counters tally the SAME array the table renders, so the
   // numbers always reconcile with the visible rows (dns_failure folds into
@@ -163,9 +180,11 @@ export default function LinkHealthDashboard() {
   // zero — binding the summary cards to it read as "0 healthy / 0% health" for
   // the whole ~20-minute sweep. Keep showing the LAST COMPLETED job's results
   // (with a "last completed" note) until the new run lands.
-  const lastCompletedJob = jobs.find((j) => j.status === 'completed');
-  const summaryJob = isJobInProgress ? lastCompletedJob : latestJob;
-  const summaryCounts = !isJobInProgress && brokenLinksData
+  const lastCompletedJob = jobs
+    .filter((job) => job.status === 'completed')
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  const summaryJob = isJobInProgress || isTerminalWithoutResults ? lastCompletedJob : latestJob;
+  const summaryCounts = !isJobInProgress && !isTerminalWithoutResults && brokenLinksData
     ? {
         total: latestJob?.totalLinks || 0,
         broken: countByStatus(['broken', 'dns_failure']),
@@ -256,7 +275,7 @@ export default function LinkHealthDashboard() {
   };
 
   // Prepare trend chart data from last 10 jobs
-  const trendData = jobs.slice(0, 10).reverse().map((job) => ({
+  const trendData: LinkHealthTrendPoint[] = jobs.slice(0, 10).reverse().map((job) => ({
     date: formatAdminDate(job.createdAt),
     healthy: ((job.healthyLinks || 0) / (job.totalLinks || 1)) * 100,
     broken: ((job.brokenLinks || 0) / (job.totalLinks || 1)) * 100,
@@ -265,24 +284,45 @@ export default function LinkHealthDashboard() {
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ops-link-health">
+      <div className="ops-link-health__stat-grid" aria-label="Link health status summary">
+        <Stat
+          label="200 OK"
+          value={summaryCounts.healthy}
+          className="ops-link-health__stat-card ops-link-health__stat-card--ok"
+        />
+        <Stat
+          label="301/302"
+          value={summaryCounts.redirect}
+          className="ops-link-health__stat-card ops-link-health__stat-card--warn"
+        />
+        <Stat
+          label="404 / DNS"
+          value={summaryCounts.broken}
+          className="ops-link-health__stat-card ops-link-health__stat-card--bad"
+        />
+        <Stat
+          label="Timeout"
+          value={summaryCounts.timeout}
+          className="ops-link-health__stat-card ops-link-health__stat-card--warn"
+        />
+      </div>
+
       {/* Summary Card */}
-      <Card>
+      <Card className="ops-link-health__summary-card">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle role="heading" aria-level={2} className="flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
               Link Health Summary
             </span>
             {latestJob && (
-              <Badge
-                className={getStatusBadgeClassName(latestJob.status)}
-              >
+              <StatusChip status={latestJob.status} className={getStatusBadgeClassName(latestJob.status)}>
                 {latestJob.status === 'processing' && (
                   <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
                 )}
                 {latestJob.status}
-              </Badge>
+              </StatusChip>
             )}
           </CardTitle>
           <CardDescription>
@@ -313,17 +353,11 @@ export default function LinkHealthDashboard() {
                 </>
               )}
 
-              {/* R4-044: counters come from summaryCounts (the same dataset as
-                  the Problem Links table) so counts always match the rows. */}
               {isJobInProgress && lastCompletedJob && (
                 <p className="text-xs text-muted-foreground" data-testid="text-summary-last-completed">
                   Showing results from the last completed check ({formatAdminDateTime(lastCompletedJob.createdAt)}) while the current check runs.
                 </p>
               )}
-              {/* BUG-014 (run25): state the check's ACTUAL scope instead of
-                  implying full-catalog coverage — a check snapshots the
-                  approved catalog at start time, which can be smaller than
-                  the catalog is now. */}
               {approvedTotal != null && summaryCounts.total > 0 && (
                 <p className="text-xs text-muted-foreground" data-testid="text-linkhealth-scope">
                   Scope: this check covered {summaryCounts.total.toLocaleString()} approved resource URLs
@@ -332,45 +366,23 @@ export default function LinkHealthDashboard() {
                     : " (the full approved catalog at check time)."}
                 </p>
               )}
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold font-mono" data-testid="counter-total-links">
-                    {summaryCounts.total}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Total Links</div>
-                </div>
-                <div>
-                  <div className={`text-2xl font-bold font-mono ${OK_TEXT_CLASS}`} data-testid="counter-healthy-links">
-                    {summaryCounts.healthy}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Healthy</div>
-                </div>
-                <div>
-                  <div className={`text-2xl font-bold font-mono ${BAD_TEXT_CLASS}`} data-testid="counter-broken-links">
-                    {summaryCounts.broken}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Broken</div>
-                </div>
-                <div>
-                  <div className={`text-2xl font-bold font-mono ${WARN_TEXT_CLASS}`} data-testid="counter-redirect-links">
-                    {summaryCounts.redirect}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Redirects</div>
-                </div>
-                <div>
-                  <div className={`text-2xl font-bold font-mono ${WARN_TEXT_CLASS}`} data-testid="counter-timeout-links">
-                    {summaryCounts.timeout}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Timeouts</div>
-                </div>
-                <div>
-                  {/* R4-001/023: 200-OK links flagged by the takeover / intent-flip
-                      / parked-domain heuristics — need human review. */}
-                  <div className={`text-2xl font-bold font-mono ${INFO2_TEXT_CLASS}`} data-testid="counter-suspect-links">
-                    {summaryCounts.suspect}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Suspect</div>
-                </div>
+              <div className="ops-link-health__summary-meta" aria-label="Detailed link counts">
+                <span data-testid="counter-total-links">Total {summaryCounts.total}</span>
+                <span className={OK_TEXT_CLASS} data-testid="counter-healthy-links">
+                  Healthy {summaryCounts.healthy}
+                </span>
+                <span className={BAD_TEXT_CLASS} data-testid="counter-broken-links">
+                  Broken {summaryCounts.broken}
+                </span>
+                <span className={WARN_TEXT_CLASS} data-testid="counter-redirect-links">
+                  Redirects {summaryCounts.redirect}
+                </span>
+                <span className={WARN_TEXT_CLASS} data-testid="counter-timeout-links">
+                  Timeouts {summaryCounts.timeout}
+                </span>
+                <span className={INFO2_TEXT_CLASS} data-testid="counter-suspect-links">
+                  Suspect {summaryCounts.suspect}
+                </span>
               </div>
 
               <Separator />
@@ -441,67 +453,112 @@ export default function LinkHealthDashboard() {
         </CardContent>
       </Card>
 
-      {/* Trend Chart */}
       {trendData.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Link Health Trends
-            </CardTitle>
-            <CardDescription>
-              {/* R5-039: pluralize correctly ("1 check" vs "N checks"). */}
-              Health status trends across the last {trendData.length} {trendData.length === 1 ? 'check' : 'checks'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                {/* MR-DS-07/08/09 — strokes sourced from centralized CHART_PALETTE
-                    (ok=[2], bad=[5], warn=[3], --accent-2=[1]).
-                    DS-OK: strokeWidth={2} recharts data-viz exception — CC-12's 1.5
-                    default scopes lucide iconography only. */}
-                <Line
-                  type="monotone"
-                  dataKey="healthy"
-                  stroke={CHART_PALETTE[2]}
-                  name="Healthy"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="broken"
-                  stroke={CHART_PALETTE[5]}
-                  name="Broken"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="redirect"
-                  stroke={CHART_PALETTE[3]}
-                  name="Redirects"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="timeout"
-                  stroke={CHART_PALETTE[1]}
-                  name="Timeouts"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <Suspense
+          fallback={
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Link Health Trends
+                </CardTitle>
+                <CardDescription>
+                  Health status trends across the last {trendData.length}{" "}
+                  {trendData.length === 1 ? "check" : "checks"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex h-[300px] items-center justify-center text-sm text-muted-foreground" aria-busy="true">
+                  Loading trend chart…
+                </div>
+              </CardContent>
+            </Card>
+          }
+        >
+          <LinkHealthTrendChart data={trendData} />
+        </Suspense>
       )}
 
-      {/* Broken Links Table */}
-      <Card>
+      <TableShell
+        title={
+          <span className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Recent failures
+            </span>
+            <StatusChip status={recentFailures.length > 0 ? "warning" : "complete"}>
+              {recentFailures.length}
+            </StatusChip>
+          </span>
+        }
+        sub="404s, DNS failures, timeouts, and links flagged for review."
+        className="ops-link-health__flagged-card"
+      >
+          {recentFailures.length === 0 ? (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                {isJobInProgress
+                  ? "Recent failures will appear when the current check completes."
+                  : latestJob
+                    ? "No recent failures or review flags were found."
+                    : "No link check has been run yet."}
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="ops-link-health__flagged-table-wrap">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Resource</TableHead>
+                    <TableHead>URL</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Last checked</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentFailures.map((check) => (
+                    <TableRow key={`flagged-${check.id}`}>
+                      <TableCell className="font-medium">
+                        {check.resource?.title ?? `Resource #${check.resourceId}`}
+                        {check.resource?.category && (
+                          <span className="mt-1 block text-xs text-muted-foreground">{check.resource.category}</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="max-w-[24rem]">
+                        <a
+                          href={check.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`block truncate font-mono text-xs hover:underline ${INFO_TEXT_CLASS}`}
+                          title={check.url}
+                        >
+                          {check.url}
+                        </a>
+                        {check.errorMessage && (
+                          <span className="mt-1 block truncate text-xs text-muted-foreground" title={check.errorMessage}>
+                            {check.errorMessage}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <StatusChip status={check.status} className={getHealthStatusBadge(check.status)}>
+                          {getHealthStatusIcon(check.status)}
+                          <span className="ml-1">{check.status}</span>
+                        </StatusChip>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                        {formatAdminDateTime(check.lastCheckedAt)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+      </TableShell>
+
+      <Card className="ops-link-health__problem-card">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
@@ -515,7 +572,7 @@ export default function LinkHealthDashboard() {
             )}
           </CardTitle>
           <CardDescription>
-            Links that require attention (broken, timeouts, redirects)
+            Links that require attention from the latest sweep.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -582,13 +639,10 @@ export default function LinkHealthDashboard() {
                   {brokenLinks.map((check) => (
                     <TableRow key={check.id}>
                       <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={getHealthStatusBadge(check.status)}
-                        >
+                        <StatusChip status={check.status} className={getHealthStatusBadge(check.status)}>
                           {getHealthStatusIcon(check.status)}
                           <span className="ml-1">{check.status}</span>
-                        </Badge>
+                        </StatusChip>
                       </TableCell>
                       <TableCell className="font-medium">
                         {check.resource?.title ?? `Resource #${check.resourceId}`}

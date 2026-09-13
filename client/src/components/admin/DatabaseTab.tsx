@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -12,18 +10,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Database,
-  RefreshCw,
   AlertCircle,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Database,
+  RefreshCw,
+  TerminalSquare,
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { AdminOpsTable as Table, Stat, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import "./admin-ops-export-database.css";
 
 /**
  * @description Props for the DatabaseTab component
@@ -58,14 +60,6 @@ interface SeedDatabaseResponse {
 }
 
 /**
- * Database operation feedback uses the global DS status constants:
- * DS-OK: #34d08c ok / #ffb84d warn.
- */
-const SUCCESS_ALERT_CLASS = "border-[#34d08c]/20 bg-[#34d08c]/5"; // DS-OK: status ok
-const OK_TEXT_CLASS = "text-[#34d08c]"; // DS-OK: status ok
-const WARN_TEXT_CLASS = "text-[#ffb84d]"; // DS-OK: status warn
-
-/**
  * @description Manages database seeding operations for the admin dashboard.
  * Provides functionality to seed and clear/reseed the database with video resources.
  * Extracted from the main Admin Dashboard component for better code organization.
@@ -85,25 +79,27 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
-      return await apiRequest('/api/admin/seed-database', {
-        method: 'POST',
-        body: JSON.stringify(options)
-      }) as SeedDatabaseResponse;
+      return (await apiRequest("/api/admin/seed-database", {
+        method: "POST",
+        body: JSON.stringify(options),
+      })) as SeedDatabaseResponse;
     },
     onSuccess: (data: SeedDatabaseResponse) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      void queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       toast({
         title: "Database Seeded Successfully",
         description: `Added ${data.counts.resourcesInserted} resources, ${data.counts.categoriesInserted} categories, ${data.counts.subcategoriesInserted} subcategories, and ${data.counts.subSubcategoriesInserted} sub-subcategories.`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast({
         title: "Database Seeding Failed",
-        description: error.message || "Failed to seed database. Please try again.",
+        description: error instanceof Error
+          ? error.message
+          : "Failed to seed database. Please try again.",
         variant: "destructive",
       });
-    }
+    },
   });
 
   const handleClearAndReseed = () => {
@@ -117,20 +113,52 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
     seedDatabaseMutation.mutate({ clearExisting: true });
   };
 
+  const tableRows = [
+    { name: "resources", rows: stats?.resources },
+    { name: "users", rows: stats?.users },
+    { name: "learning_journeys", rows: stats?.journeys },
+  ];
+
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Database Management
-          </CardTitle>
-          <CardDescription>
-            Seed the database with video resources from the awesome-video JSON source
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Alert className="border-primary/20 bg-primary/5">
+    <div className="admin-ops-database">
+      <div className="admin-ops-stat-strip">
+        <Stat
+          label="Tables"
+          value="—"
+          description="Schema count is not exposed by the admin API"
+        />
+        <Stat
+          label="Rows"
+          value={
+            <span data-testid="stat-db-live-resources">
+              {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()}
+            </span>
+          }
+          description={stats ? "Public resources reported by admin stats" : "Waiting for admin stats"}
+        />
+        <Stat
+          label="Disk"
+          value="—"
+          description="Storage size is not exposed by the admin API"
+        />
+        <Stat
+          label="Migrations"
+          value="—"
+          description="Migration status is not exposed by the admin API"
+          accent
+        />
+      </div>
+
+      <section className="card admin-ops-database__seed">
+        <header className="admin-ops-database__seed-header">
+          <Database className="h-5 w-5 text-[var(--accent)]" aria-hidden="true" />
+          <div>
+            <h2>Database Management</h2>
+            <p>Seed the database with video resources from the awesome-video JSON source</p>
+          </div>
+        </header>
+        <div className="admin-ops-database__seed-body">
+          <Alert className="admin-ops-database__seed-alert">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Database Seeding</AlertTitle>
             <AlertDescription>
@@ -140,8 +168,8 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             </AlertDescription>
           </Alert>
 
-          <div className="space-y-3">
-            <div className="flex items-center gap-4">
+          <div className="admin-ops-database__seed-actions">
+            <div className="admin-ops-database__seed-action">
               <Button
                 onClick={() => setSeedDialogOpen(true)}
                 disabled={seedDatabaseMutation.isPending}
@@ -149,22 +177,20 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               >
                 {seedDatabaseMutation.isPending ? (
                   <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    <RefreshCw className="h-4 w-4 animate-spin" />
                     Seeding Database...
                   </>
                 ) : (
                   <>
-                    <Database className="mr-2 h-4 w-4" />
+                    <Database className="h-4 w-4" />
                     Seed Database
                   </>
                 )}
               </Button>
-              <span className="text-sm text-[var(--text-2)]">
-                Add new resources without removing existing data
-              </span>
+              <p>Add new resources without removing existing data</p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="admin-ops-database__seed-action">
               <Button
                 onClick={handleClearAndReseed}
                 disabled={seedDatabaseMutation.isPending}
@@ -173,99 +199,102 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               >
                 {seedDatabaseMutation.isPending ? (
                   <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Clearing & Reseeding...
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Clearing &amp; Reseeding...
                   </>
                 ) : (
                   <>
-                    <AlertTriangle className="mr-2 h-4 w-4" />
-                    Clear & Re-seed
+                    <AlertTriangle className="h-4 w-4" />
+                    Clear &amp; Re-seed
                   </>
                 )}
               </Button>
-              <span className="text-sm text-[var(--text-2)]">
-                Remove all data and re-populate (use with caution)
-              </span>
+              <p>Remove all data and re-populate (use with caution)</p>
             </div>
           </div>
 
           {seedDatabaseMutation.isSuccess && seedDatabaseMutation.data && (
-            <Alert className={SUCCESS_ALERT_CLASS}>
-              <CheckCircle2 className={`h-4 w-4 ${OK_TEXT_CLASS}`} />
-              <AlertTitle>Seeding Completed Successfully</AlertTitle>
+            <Alert className="admin-ops-database__seed-result">
+              {/* DS-OK: global semantic status color for a completed seed result. */}
+              <CheckCircle2 className="h-4 w-4 text-[#34d08c]" />
+              <AlertTitle className="flex flex-wrap items-center gap-2">
+                Seeding Completed Successfully
+                <StatusChip status="Completed" />
+              </AlertTitle>
               <AlertDescription>
-                <div className="mt-2 space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span>Categories inserted:</span>
-                    <span className="font-mono font-semibold text-primary">
-                      {seedDatabaseMutation.data.counts.categoriesInserted}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Subcategories inserted:</span>
-                    <span className="font-mono font-semibold text-primary">
-                      {seedDatabaseMutation.data.counts.subcategoriesInserted}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sub-subcategories inserted:</span>
-                    <span className="font-mono font-semibold text-primary">
-                      {seedDatabaseMutation.data.counts.subSubcategoriesInserted}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Resources inserted:</span>
-                    <span className="font-mono font-semibold text-primary">
-                      {seedDatabaseMutation.data.counts.resourcesInserted}
-                    </span>
-                  </div>
-                  {seedDatabaseMutation.data.totalErrors > 0 && (
-                    <div className={`flex justify-between ${WARN_TEXT_CLASS}`}>
-                      <span>Errors:</span>
-                      <span className="font-mono font-semibold">
+                <dl>
+                  <dt>Categories inserted:</dt>
+                  <dd>{seedDatabaseMutation.data.counts.categoriesInserted}</dd>
+                  <dt>Subcategories inserted:</dt>
+                  <dd>{seedDatabaseMutation.data.counts.subcategoriesInserted}</dd>
+                  <dt>Sub-subcategories inserted:</dt>
+                  <dd>{seedDatabaseMutation.data.counts.subSubcategoriesInserted}</dd>
+                  <dt>Resources inserted:</dt>
+                  <dd>{seedDatabaseMutation.data.counts.resourcesInserted}</dd>
+                  {seedDatabaseMutation.data.totalErrors > 0 ? (
+                    <>
+                      <dt>Errors:</dt>
+                      <dd className="admin-ops-database__seed-errors">
                         {seedDatabaseMutation.data.totalErrors}
-                      </span>
-                    </div>
-                  )}
-                </div>
+                        <span className="ml-2"><StatusChip status="Warning" /></span>
+                      </dd>
+                    </>
+                  ) : null}
+                </dl>
               </AlertDescription>
             </Alert>
           )}
+        </div>
+      </section>
 
-          <div className="pt-4 border-t border-[var(--border)]">
-            <h4 className="text-sm font-semibold text-[var(--text)] mb-2">Current Database Stats</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="space-y-1">
-                <div className="text-xs text-[var(--text-2)]">Live Resources</div>
-                <div className="text-xl font-mono font-bold text-primary" data-testid="stat-db-live-resources">
-                  {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()}
-                </div>
-                {(stats?.totalPending ?? 0) + (stats?.totalRejected ?? 0) > 0 && (
-                  <div className="text-[10px] text-[var(--text-2)]">
-                    {/* R2-M22: only mention non-zero buckets (no "+0 pending"). */}
-                    {[
-                      (stats?.totalPending ?? 0) > 0 ? `+${stats?.totalPending} pending` : null,
-                      (stats?.totalRejected ?? 0) > 0 ? `${stats?.totalRejected} rejected` : null,
-                    ].filter(Boolean).join(" · ")}
-                  </div>
-                )}
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-[var(--text-2)]">Users</div>
-                <div className="text-xl font-mono font-bold text-primary">
-                  {stats?.users || 0}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-[var(--text-2)]">Journeys</div>
-                <div className="text-xl font-mono font-bold text-primary">
-                  {stats?.journeys || 0}
-                </div>
-              </div>
-            </div>
+      <TableShell title="Tables" sub="PostgreSQL — primary database">
+        <Table className="table admin-ops-table" data-testid="table-database-tables">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Rows</th>
+              <th>Size</th>
+              <th>Last write</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {tableRows.map((row) => (
+              <tr key={row.name}>
+                <td className="admin-ops-table__name">{row.name}</td>
+                <td className="admin-ops-table__mono">
+                  {typeof row.rows === "number" ? row.rows.toLocaleString() : "—"}
+                </td>
+                <td className="admin-ops-table__mono">—</td>
+                <td className="admin-ops-table__mono">—</td>
+                <td className="admin-ops-table__actions">
+                  <Button
+                    variant="outline"
+                    disabled
+                    className="admin-ops-table__action"
+                    title="Table inspection is not available from the admin API."
+                  >
+                    Inspect
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </TableShell>
+
+      <section className="card">
+        <div className="admin-ops-database__unsupported">
+          <TerminalSquare className="h-5 w-5" aria-hidden="true" />
+          <div>
+            <h2>SQL Console</h2>
+            <p>
+              No SQL-console endpoint is exposed by this admin API. Queries are not accepted or
+              executed here, so this surface does not provide a pretend editor or run action.
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       <AlertDialog open={seedDialogOpen} onOpenChange={setSeedDialogOpen}>
         <AlertDialogContent data-testid="dialog-seed-database">

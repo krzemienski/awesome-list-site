@@ -1,21 +1,27 @@
 import { useMemo, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GitBranch, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AdminOpsScrollArea as ScrollArea,
+  AdminOpsTable as Table,
+  StatusChip,
+  TableShell,
+} from "@/components/admin/AdminOpsPrimitives";
 // Run15 BUG-030: one explicit date format for the whole admin surface —
 // shared formatter keeps every admin table's timestamps identical.
 import { formatAdminDateTime as formatSyncDate } from "@/lib/utils";
 import { normalizeGithubRepoInput } from "@shared/validation";
+import "@/styles/pages/admin-ops-github-links.css";
 
 interface SyncHistory {
   id: number;
@@ -26,6 +32,8 @@ interface SyncHistory {
   commitSha?: string;
   commitMessage?: string;
   commitUrl?: string;
+  repositoryUrl?: string;
+  errorMessage?: string;
   resourcesAdded: number;
   resourcesUpdated: number;
   resourcesRemoved: number;
@@ -123,7 +131,13 @@ export default function GitHubSyncPanel() {
     }
   });
 
-  const lastSync = syncHistory?.[0];
+  const orderedHistory = useMemo(
+    () => [...(syncHistory ?? [])].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    ),
+    [syncHistory],
+  );
+  const lastSync = orderedHistory[0];
   const syncQueue = syncQueueData?.items || [];
   const pendingJobs = syncQueue.filter(item => item.status === 'pending' || item.status === 'processing').length;
   // Run16 BUG-015: a broken integration must be VISIBLE. Surface failed jobs
@@ -161,18 +175,19 @@ export default function GitHubSyncPanel() {
   }, [syncQueue]);
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 ops-github-panel">
+      <Card className="ops-github-panel__repository-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <GitBranch className="h-5 w-5" />
-            GitHub Sync
-          </CardTitle>
-          <CardDescription>
-            Import resources from and export to GitHub repositories
-          </CardDescription>
+          <div className="ops-github-panel__repository-heading">
+            <div className="ops-github-panel__repository-mark" aria-hidden="true">
+              <GitBranch className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-base">GitHub repository</CardTitle>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="repo-url">Target Repository</Label>
             <div className="flex gap-2">
@@ -207,93 +222,71 @@ export default function GitHubSyncPanel() {
             )}
           </div>
 
-          <Separator />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Import from GitHub
-              </h4>
-              <p className="text-xs text-muted-foreground mb-2">
-                Pull resources from the GitHub repository and update the database
-              </p>
+          <div className="ops-github-panel__repository-actions">
+            <div className="flex flex-wrap gap-2">
               <Button
+                variant="outline"
                 onClick={() => setConfirmAction("import")}
                 disabled={importMutation.isPending || !normalizedRepo}
-                className="w-full"
                 data-testid="button-import-github"
               >
                 {importMutation.isPending ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Importing...
-                  </>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <>
-                    <Download className="h-4 w-4 mr-2" />
-                    Import Resources
-                  </>
+                  <Download className="h-4 w-4 mr-2" />
                 )}
+                {importMutation.isPending ? "Importing..." : "Pull"}
               </Button>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold flex items-center gap-2">
-                <Upload className="h-4 w-4" />
-                Export to GitHub
-              </h4>
-              <p className="text-xs text-muted-foreground mb-2">
-                Push approved resources to GitHub README with smart commit message
-              </p>
               <Button
                 onClick={() => setConfirmAction("export")}
                 disabled={exportMutation.isPending || !normalizedRepo}
-                className="w-full"
                 data-testid="button-export-github"
               >
                 {exportMutation.isPending ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Exporting...
-                  </>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Export to GitHub
-                  </>
+                  <Upload className="h-4 w-4 mr-2" />
                 )}
+                {exportMutation.isPending ? "Exporting..." : "Sync now"}
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {(syncQueue.length > 0 || lastSync) && (
-        <Card>
+      <Card className="ops-github-panel__status-card">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex items-center justify-between gap-3">
               <span className="flex items-center gap-2">
                 <Activity className="h-5 w-5" />
                 Sync Status
               </span>
               <span className="flex items-center gap-2">
                 {failedJobs.length > 0 && (
-                  <Badge variant="destructive" data-testid="badge-failed-jobs">
+                  <StatusChip status="failed" data-testid="badge-failed-jobs">
                     <XCircle className="h-3 w-3 mr-1" />
                     {failedJobs.length} failed
-                  </Badge>
+                  </StatusChip>
                 )}
                 {pendingJobs > 0 && (
-                  <Badge variant="secondary" className="animate-pulse">
+                  <StatusChip status="pending" className="animate-pulse">
                     <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
                     {pendingJobs} in progress
-                  </Badge>
+                  </StatusChip>
                 )}
               </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!syncQueue.length && !lastSync && (
+              <div className="ops-github-panel__empty-state">
+                <Clock className="h-5 w-5" aria-hidden="true" />
+                <div>
+                  <p className="font-medium">No sync activity yet</p>
+                  <p className="text-sm text-muted-foreground">Start a pull or sync to see its progress here.</p>
+                </div>
+              </div>
+            )}
             {failedJobs.length > 0 && (
               <Alert variant="destructive" data-testid="alert-sync-failures">
                 <XCircle className="h-4 w-4" />
@@ -306,14 +299,9 @@ export default function GitHubSyncPanel() {
                       Latest error: {latestFailure.errorMessage}
                     </p>
                   )}
-                  {/* Run17 BUG-031: failure state gives concrete next steps. */}
-                  <p className="text-xs">
-                    Next steps: if errors mention credentials or tokens, reconnect
-                    the GitHub connection. "Timeout exceeded when trying to
-                    connect" came from an export bookkeeping bug that has been
-                    fixed — start a new export to confirm; older failed jobs can
-                    be ignored.
-                  </p>
+                   <p className="text-xs">
+                     Review the latest error before retrying the sync.
+                   </p>
                 </AlertDescription>
               </Alert>
             )}
@@ -330,10 +318,10 @@ export default function GitHubSyncPanel() {
                         Last {lastSync.direction === 'export' ? 'Export' : 'Import'}
                     </span>
                     {lastSyncFailed && (
-                      <Badge variant="destructive" data-testid="badge-last-sync-failed">
+                      <StatusChip status="failed" data-testid="badge-last-sync-failed">
                         <XCircle className="h-3 w-3 mr-1" />
                         failed
-                      </Badge>
+                      </StatusChip>
                     )}
                     <Badge variant="outline">
                       <Clock className="h-3 w-3 mr-1" />
@@ -344,6 +332,11 @@ export default function GitHubSyncPanel() {
                   {lastSync.commitMessage && (
                     <p className="text-sm font-mono bg-muted p-2 rounded">
                       {lastSync.commitMessage}
+                    </p>
+                  )}
+                  {lastSyncFailed && lastSync.errorMessage && (
+                    <p className="text-sm font-mono text-destructive break-words">
+                      Error: {lastSync.errorMessage}
                     </p>
                   )}
                   
@@ -412,13 +405,9 @@ export default function GitHubSyncPanel() {
                               </Badge>
                             )}
                           </div>
-                          <Badge variant={
-                            item.status === 'completed' ? 'default' :
-                            item.status === 'failed' ? 'destructive' :
-                            'secondary'
-                          }>
+                          <StatusChip status={item.status}>
                             {item.status}
-                          </Badge>
+                          </StatusChip>
                         </div>
                         {/* Run16 BUG-015: failed jobs must show WHY they failed. */}
                         {item.status === 'failed' && item.errorMessage && (
@@ -434,41 +423,44 @@ export default function GitHubSyncPanel() {
             )}
           </CardContent>
         </Card>
-      )}
 
       {syncHistory && syncHistory.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Sync History
-            </CardTitle>
-            <CardDescription>
-              Complete history of GitHub synchronizations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-4">
-                {syncHistory.map((sync) => {
+        <TableShell
+          title="Sync jobs"
+          sub={`All ${orderedHistory.length} import/export operation${orderedHistory.length === 1 ? "" : "s"}`}
+          className="ops-github-panel__history-shell"
+        >
+            <div className="ops-github-panel__history-table-wrap">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                {orderedHistory.map((sync) => {
                   // ADM-04: Sync History rows must carry the same failure
                   // legibility as Recent Sync Jobs — a failed/orphaned row
                   // gets a red badge + icon instead of reading like a success.
                   const syncFailed = sync.status === 'failed';
                   return (
-                  <div key={sync.id} className="border rounded-lg p-4 space-y-2" data-testid={`sync-history-row-${sync.id}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                  <TableRow key={sync.id} data-testid={`sync-history-row-${sync.id}`}>
+                       <TableCell className="font-mono text-xs">#{sync.id}</TableCell>
+                      <TableCell>
                         {sync.direction === 'export' ? (
                           <Upload className="h-4 w-4 text-primary" />
                         ) : (
                           <Download className="h-4 w-4 text-primary" />
                         )}
-                        <span className="font-semibold capitalize">{sync.direction}</span>
+                        <span className="ml-2 font-semibold capitalize">{sync.direction}</span>
+                      </TableCell>
+                      <TableCell>
                         {sync.status && (
-                          <Badge
-                            variant={syncFailed ? 'destructive' : 'default'}
-                            className="text-xs"
+                          <StatusChip
+                            status={sync.status}
                             data-testid={`badge-sync-history-status-${sync.id}`}
                           >
                             {syncFailed ? (
@@ -477,47 +469,37 @@ export default function GitHubSyncPanel() {
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                             )}
                             {sync.status}
-                          </Badge>
+                          </StatusChip>
                         )}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {formatSyncDate(sync.createdAt)}
-                      </span>
-                    </div>
-                    
-                    {sync.commitMessage && (
-                      <p className="text-sm font-mono bg-muted p-2 rounded">
-                        {sync.commitMessage}
-                      </p>
-                    )}
-                    
-                    <div className="flex gap-4 text-xs">
-                      <span className={"text-[#34d08c]" /* DS-OK: status ok */}>+{sync.resourcesAdded}</span>
-                      <span className={"text-[#ffb84d]" /* DS-OK: status warn */}>~{sync.resourcesUpdated}</span>
-                      <span className={"text-[#ff5c7a]" /* DS-OK: status bad */}>-{sync.resourcesRemoved}</span>
-                      <span className="text-muted-foreground">{sync.totalResources} total</span>
-                    </div>
-
-                    {sync.commitUrl && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full h-7 text-xs"
-                        asChild
-                      >
-                        <a href={sync.commitUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          View on GitHub
-                        </a>
-                      </Button>
-                    )}
-                  </div>
+                        {sync.errorMessage && (
+                           <span className="mt-1 block max-w-[20rem] truncate text-xs text-destructive" title={sync.errorMessage}>
+                            {sync.errorMessage}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {sync.commitUrl ? (
+                          <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
+                            <a href={sync.commitUrl} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3 mr-1" />
+                              View
+                            </a>
+                          </Button>
+                         ) : sync.commitMessage ? (
+                           <span className="block max-w-[16rem] truncate text-xs text-muted-foreground" title={sync.commitMessage}>
+                             {sync.commitMessage}
+                           </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                  </TableRow>
                   );
                 })}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
+                </TableBody>
+              </Table>
+            </div>
+        </TableShell>
       )}
 
       {/* Run16 BUG-039: confirm before firing import (rewrites local catalog)

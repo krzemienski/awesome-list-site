@@ -1,0 +1,36 @@
+Task549 post-change inventory
+The existing test-id contract is unchanged after the parity pass.
+
+client/src/components/admin/GitHubSyncPanel.tsx
+- alert-last-sync
+- alert-sync-failures
+- badge-failed-jobs
+- badge-last-sync-failed
+- badge-repeat-${item.id}
+- badge-sync-history-status-${sync.id}
+- button-cancel-sync-action
+- button-confirm-sync-action
+- button-export-github
+- button-import-github
+- button-reset-repo
+- button-view-commit
+- input-repo-url
+- sync-history-row-${sync.id}
+- text-repo-url-error
+
+client/src/components/admin/LinkHealthDashboard.tsx
+- button-cancel-link-check
+- button-confirm-link-check
+- counter-broken-links
+- counter-healthy-links
+- counter-redirect-links
+- counter-suspect-links
+- counter-timeout-links
+- counter-total-links
+- dialog-confirm-link-check
+- scroller-link-health-table
+- text-linkhealth-scope
+- text-summary-last-completed
+
+client/src/components/admin/DigestQueueHealth.tsx
+- card-digest-queue-health

@@ -1,0 +1,249 @@
+/*
+ * Admin operations: GitHub sync, link health, and digest health
+ *
+ * This is intentionally page-scoped. The frozen AdminGitHub/AdminLinkHealth
+ * reference uses compact TableShell cards, mono metadata, and token surfaces;
+ * these selectors port that composition without changing AdminDashboard or
+ * the shared card/table primitives used by other admin tabs.
+ */
+
+.ops-github-panel,
+.ops-link-health,
+.ops-digest-health {
+  color: var(--text);
+}
+
+.ops-github-panel__repository-card,
+.ops-github-panel__status-card,
+.ops-link-health__summary-card,
+.ops-link-health__flagged-card,
+.ops-link-health__problem-card,
+.ops-digest-health {
+  overflow: hidden;
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.ops-github-panel__repository-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+}
+
+.ops-github-panel__repository-mark {
+  display: grid;
+  flex: 0 0 2.75rem;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.ops-github-panel__repository-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ops-github-panel__empty-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+}
+
+.ops-github-panel__empty-state > svg {
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.ops-github-panel__history-table-wrap,
+.ops-link-health__flagged-table-wrap {
+  overflow-x: visible;
+}
+
+.ops-github-panel__history-table-wrap table,
+.ops-link-health__flagged-table-wrap table {
+  min-inline-size: 40rem;
+}
+
+.ops-github-panel__history-table-wrap th,
+.ops-link-health__flagged-table-wrap th {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ops-github-panel__history-table-wrap td,
+.ops-link-health__flagged-table-wrap td {
+  border-color: var(--hairline);
+  vertical-align: middle;
+}
+
+.ops-github-panel__history-table-wrap tbody tr:hover,
+.ops-link-health__flagged-table-wrap tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.ops-link-health__stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.875rem;
+}
+
+.ops-link-health__stat-card {
+  min-block-size: 7.75rem;
+  padding: 1.25rem;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: border-color var(--motion-fast, 160ms) ease;
+}
+
+.ops-link-health__stat-card.admin-ops-stat:hover {
+  transform: none;
+  border-color: var(--border-strong);
+}
+
+.ops-link-health__stat-card .admin-ops-stat__label {
+  margin-block-end: 0.625rem;
+}
+
+.ops-link-health__stat-card .admin-ops-stat__value {
+  margin-block-start: 0.5rem;
+  font-size: 1.875rem;
+  letter-spacing: -0.04em;
+}
+
+.ops-link-health__stat-card .admin-ops-stat__description {
+  margin-block-start: 0.45rem;
+}
+
+/* DS-OK: semantic status constants are shared by all admin operations. */
+.ops-link-health__stat-card--ok .admin-ops-stat__value {
+  color: #34d08c;
+}
+
+.ops-link-health__stat-card--warn .admin-ops-stat__value {
+  /* DS-OK: canonical global warning status ink, independent of accent. */
+  color: #ffb84d;
+}
+
+.ops-link-health__stat-card--bad .admin-ops-stat__value {
+  /* DS-OK: canonical global failure status ink, independent of accent. */
+  color: #ff5c7a;
+}
+
+.ops-link-health__summary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ops-link-health__summary-meta span {
+  white-space: nowrap;
+}
+
+.ops-link-health__flagged-card {
+  /* DS-OK: canonical warning status border, independent of accent. */
+  border-color: color-mix(in srgb, #ffb84d 25%, var(--border));
+}
+
+.ops-link-health__flagged-card .ops-link-health__flagged-table-wrap {
+  margin-inline: -0.25rem;
+}
+
+.ops-digest-health__header {
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.ops-digest-health__stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ops-digest-health__stat-card,
+.ops-digest-health__queue-card {
+  border: var(--hairline-w) solid var(--border);
+  background: var(--surface-2);
+  padding: 1rem;
+}
+
+.ops-digest-health__stat-card.admin-ops-stat {
+  min-block-size: 7rem;
+}
+
+.ops-digest-health__stat-label-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ops-digest-health__error-code {
+  /* DS-OK: semantic BAD status color, not a theme accent. */
+  color: #ff5c7a;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.ops-digest-health__stat-card--available .admin-ops-stat__value {
+  color: var(--accent);
+}
+
+.ops-digest-health__stat-card--unavailable .admin-ops-stat__value {
+  /* DS-OK: semantic BAD status color, not a theme accent. */
+  color: #ff5c7a;
+}
+
+.ops-digest-health__queue-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ops-digest-health__failure-list {
+  max-inline-size: 42rem;
+}
+
+@media (max-width: 48rem) {
+  .ops-github-panel__repository-actions {
+    align-items: stretch;
+  }
+
+  .ops-github-panel__repository-actions > .flex {
+    inline-size: 100%;
+  }
+
+  .ops-github-panel__repository-actions > .flex > button {
+    flex: 1;
+  }
+
+  .ops-link-health__stat-grid,
+  .ops-digest-health__stat-grid,
+  .ops-digest-health__queue-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ops-link-health__stat-card {
+    transition: none;
+  }
+}

@@ -1,0 +1,166 @@
+/*
+ * Operations-only translations of the canonical admin primitives.
+ * Catalog managers intentionally keep their own table contract.
+ */
+.admin-ops-table-shell {
+  overflow: hidden;
+  padding: 0;
+}
+
+.admin-ops-table-shell:hover,
+.admin-ops-stat:hover {
+  transform: none;
+  border-color: var(--border);
+}
+
+.admin-ops-table-shell__header {
+  align-items: center;
+  border-bottom: var(--hairline-w) solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+  justify-content: space-between;
+  padding: 1.125rem 1.375rem;
+}
+
+.admin-ops-table-shell__title {
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.admin-ops-table-shell__description {
+  color: var(--text-3, var(--text-2));
+  font-size: 0.75rem;
+  line-height: 1.45;
+  margin-top: 0.25rem;
+}
+
+.admin-ops-table-shell__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+  justify-content: flex-end;
+}
+
+.admin-ops-table-shell__pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+}
+
+.admin-ops-table-shell__content {
+  overflow: visible;
+}
+
+.admin-ops-stat-strip {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-ops-stat {
+  min-width: 0;
+  padding: 1.25rem;
+}
+
+.admin-ops-stat__label {
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.0875rem;
+  margin-bottom: 0.625rem;
+  text-transform: uppercase;
+}
+
+.admin-ops-stat__value {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.admin-ops-stat__value--accent {
+  color: var(--accent);
+}
+
+.admin-ops-stat__description {
+  color: var(--text-2);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  margin-top: 0.5rem;
+}
+
+.admin-ops-status-chip {
+  align-items: center;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  gap: 0.3rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 0.35rem 0.5rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* DS-OK: global semantic status constants, not theme decoration. */
+.admin-ops-status-chip--ok {
+  background: color-mix(in srgb, #34d08c 8%, transparent);
+  border-color: color-mix(in srgb, #34d08c 30%, transparent);
+  color: #34d08c;
+}
+
+.admin-ops-status-chip--accent {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--accent);
+}
+
+.admin-ops-status-chip--warn {
+  /* DS-OK: global semantic WARN status color. */
+  background: color-mix(in srgb, #ffb84d 8%, transparent);
+  border-color: color-mix(in srgb, #ffb84d 30%, transparent);
+  color: #ffb84d;
+}
+
+.admin-ops-status-chip--bad {
+  /* DS-OK: global semantic BAD status color. */
+  background: color-mix(in srgb, #ff5c7a 8%, transparent);
+  border-color: color-mix(in srgb, #ff5c7a 30%, transparent);
+  color: #ff5c7a;
+}
+
+.admin-ops-status-chip--muted {
+  color: var(--text-3, var(--text-2));
+}
+
+@media (max-width: 64rem) {
+  .admin-ops-stat-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 48rem) {
+  .admin-ops-table-shell__header {
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .admin-ops-table-shell__actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .admin-ops-stat-strip {
+    grid-template-columns: 1fr;
+  }
+}

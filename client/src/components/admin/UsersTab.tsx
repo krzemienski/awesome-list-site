@@ -3,17 +3,16 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tansta
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, ChevronLeft, ChevronRight, Shield, User as UserIcon, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, User as UserIcon, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import type { User } from "@shared/schema";
-import "@/styles/pages/admin-catalog-taxonomy.css";
+import { AdminOpsTable as Table, StatusChip, TableShell } from "@/components/admin/AdminOpsPrimitives";
+import "@/styles/pages/admin-ops-users-audit.css";
 
 /**
  * R2-H05: mask emails by default so an over-the-shoulder look at the admin
@@ -30,13 +29,6 @@ interface UsersResponse {
   users: User[];
   total: number;
 }
-
-/* WP-6 a11y: black ink passes AA on these global DS status/info constants. */
-const ROLE_COLORS: Record<string, string> = {
-  admin: "bg-[#ff5c7a] text-black", // DS-OK: status bad
-  moderator: "bg-[#ffb84d] text-black", // DS-OK: status warn
-  user: "bg-[#5eddf2] text-black", // DS-OK: cyan info (DS chart/info constant)
-};
 
 export default function UsersTab() {
   const { toast } = useToast();
@@ -147,31 +139,25 @@ export default function UsersTab() {
 
   if (isLoading) {
     return (
-      <Card className="admin-taxonomy-shell admin-users-shell">
-        <CardHeader className="admin-taxonomy-header"><Skeleton className="h-8 w-64" /></CardHeader>
-        <CardContent className="admin-taxonomy-content">
-          <div className="admin-taxonomy-loading space-y-4">
+      <TableShell
+        title={<Skeleton className="h-5 w-40" />}
+        className="admin-ops-users-shell"
+      >
+          <div className="admin-ops-loading space-y-4">
             {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
           </div>
-        </CardContent>
-      </Card>
+      </TableShell>
     );
   }
 
   return (
-    <Card className="admin-taxonomy-shell admin-users-shell">
-      <CardHeader className="admin-taxonomy-header">
-        <CardTitle className="admin-taxonomy-title flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          User Management
-        </CardTitle>
-        <CardDescription className="admin-taxonomy-description">
-          {data?.total || 0} {searchQuery ? 'matching' : 'registered'} user{(data?.total || 0) !== 1 ? 's' : ''}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="admin-taxonomy-content">
-        <div className="admin-users-toolbar flex flex-col sm:flex-row gap-2 mb-4">
-          <div className="admin-taxonomy-search relative flex-1 max-w-sm">
+    <TableShell
+      title={`Users (${data?.total ?? 0})`}
+      description="Admins and contributors"
+      className="admin-ops-users-shell"
+      actions={
+        <>
+          <div className="admin-ops-search relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={searchInput}
@@ -187,16 +173,18 @@ export default function UsersTab() {
               Export CSV
             </a>
           </Button>
-        </div>
+        </>
+      }
+    >
         {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
             right-edge fade + explicit hint make the hidden columns
             discoverable instead of silently clipping them. */}
-        <div className="relative">
+        <div className="admin-ops-table-wrap relative">
           <div
             className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
             aria-hidden="true"
           />
-          <Table className="admin-taxonomy-table admin-users-table">
+          <Table className="admin-ops-table admin-ops-users-table">
             <TableHeader>
             <TableRow>
               {/* Run16 BUG-087: sortable column headers (server-side sort). */}
@@ -228,11 +216,11 @@ export default function UsersTab() {
             <TableBody>
             {data?.users && data.users.length > 0 ? (
               data.users.map((user) => (
-                <TableRow key={user.id} className="admin-taxonomy-row">
+                <TableRow key={user.id} className="admin-ops-row">
                   {/* BUG-012 (run18): cap the name cell + truncate so a legal
                       101-char display name can't stretch the table (it was
                       unwrapping to ~2,369px); full value stays in the title. */}
-                  <TableCell className="admin-taxonomy-cell-name max-w-[240px]">
+                  <TableCell className="admin-ops-cell-name max-w-[240px]">
                     <div className="flex items-center gap-2 min-w-0">
                       {user.profileImageUrl ? (
                         <img
@@ -261,7 +249,7 @@ export default function UsersTab() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="admin-taxonomy-cell-email text-muted-foreground text-sm">
+                  <TableCell className="admin-ops-cell-email text-muted-foreground text-sm">
                     {user.email ? (
                       <span className="inline-flex items-center gap-1.5">
                         <span data-testid={`text-email-${user.id}`}>
@@ -285,16 +273,13 @@ export default function UsersTab() {
                       </span>
                     ) : "—"}
                   </TableCell>
-                  <TableCell className="admin-taxonomy-cell-role">
-                    <Badge className={`${ROLE_COLORS[user.role || 'user'] || 'bg-muted text-foreground'}`}>
-                      <Shield className="h-3 w-3 mr-1" />
-                      {user.role || 'user'}
-                    </Badge>
+                  <TableCell className="admin-ops-cell-role">
+                    <StatusChip status={user.role ?? "user"} />
                   </TableCell>
-                  <TableCell className="admin-taxonomy-cell-joined text-muted-foreground text-sm">
+                  <TableCell className="admin-ops-cell-joined text-muted-foreground text-sm">
                     {formatDate(user.createdAt)}
                   </TableCell>
-                  <TableCell className="admin-taxonomy-cell-actions">
+                  <TableCell className="admin-ops-cell-actions">
                     <div className="flex items-center gap-2">
                       {/* Run16 BUG-014: an admin must not be able to demote
                           themselves with one click — the delete button already
@@ -369,7 +354,7 @@ export default function UsersTab() {
             </TableBody>
           </Table>
         </div>
-        <p className="admin-users-scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
+        <p className="admin-ops-scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
           Swipe the table sideways to see role, join date, and actions.
         </p>
 
@@ -471,7 +456,6 @@ export default function UsersTab() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </CardContent>
-    </Card>
+    </TableShell>
   );
 }

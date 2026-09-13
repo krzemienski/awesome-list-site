@@ -1,0 +1,22 @@
+ExportTab.tsx
+  button-export-json (new)
+  button-export-markdown (new)
+  table-export-history (new)
+  error-group-${rule}
+  warning-group-${rule}
+  dialog-confirm-export-job
+  button-cancel-export-job
+  button-confirm-export-job
+
+DatabaseTab.tsx
+  button-seed-database
+  button-clear-reseed
+  table-database-tables (new)
+  stat-db-live-resources
+  dialog-seed-database
+  button-seed-cancel
+  button-seed-confirm
+  dialog-clear-reseed
+  input-reseed-confirm
+  button-reseed-cancel
+  button-reseed-confirm

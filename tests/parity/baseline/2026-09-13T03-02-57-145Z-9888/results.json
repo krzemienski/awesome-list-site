@@ -1,0 +1,3406 @@
+{
+  "schemaVersion": 2,
+  "runId": "2026-09-13T03-02-57-145Z-9888",
+  "executedAt": "2026-09-13T03:02:57.145Z",
+  "finishedAt": "2026-09-13T03:08:47.262Z",
+  "claim": "selected-rows-diagnostic",
+  "gatePassed": false,
+  "exitCode": 1,
+  "selection": {
+    "full": false,
+    "only": [
+      "app.admin.export",
+      "app.admin.database",
+      "app.admin.users",
+      "app.admin.github",
+      "app.admin.linkhealth",
+      "app.admin.audit"
+    ],
+    "widths": [
+      375,
+      768,
+      1024,
+      1440
+    ],
+    "description": "--only app.admin.export,app.admin.database,app.admin.users,app.admin.github,app.admin.linkhealth,app.admin.audit --width 375,768,1024,1440"
+  },
+  "identity": {
+    "mode": "admin",
+    "reason": null,
+    "bridgeId": "2131539660",
+    "displayName": "Nick",
+    "clerkUserId": "user_3JFtL6gMKmi9wRW9DBbbwp4wTu3",
+    "teardown": {
+      "keepUser": false,
+      "bridgeId": "2131539660",
+      "email": "__qa_test_parity_mtz8beua2c2905+clerk_test@example.com",
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "errors": [],
+      "verification": {
+        "localQaUsersRemaining": []
+      }
+    },
+    "teardownError": null,
+    "prefix": "__qa_test_parity_"
+  },
+  "configuration": {
+    "frozenAt": "2026-09-13T03:02:00.000Z",
+    "browserVersion": "148.0.7778.96",
+    "pixelmatchThreshold": 0.1,
+    "maximumDiffPercent": 0.5,
+    "viewportHeights": {
+      "375": 812,
+      "768": 1024,
+      "1024": 768,
+      "1440": 900
+    },
+    "captureNormalisations": [
+      "animations disabled",
+      "transitions disabled",
+      "caret hidden",
+      "backdrop-filter disabled on both sides (blur values compared via computed style)",
+      "Chromium partial raster disabled (--disable-partial-raster): full-page capture re-rasters tiles per frame and reused tile content flipped single anti-aliased pixels between consecutive frames"
+    ],
+    "chromiumArgs": [
+      "--disable-partial-raster"
+    ],
+    "captureState": {
+      "theme": {
+        "system": "editorial",
+        "accent": "crimson"
+      },
+      "app": {
+        "localStorage": {
+          "ds-system": "editorial",
+          "ds-accent": "crimson",
+          "analytics-consent": "denied"
+        }
+      },
+      "reference": {
+        "localStorage": {
+          "av-ds-system": "editorial",
+          "av-ds-accent": "crimson"
+        }
+      }
+    },
+    "throttleWaits": [],
+    "throttleDeferrals": [],
+    "documentReloads": [],
+    "fontFamilies": [
+      "Inter",
+      "Fraunces",
+      "JetBrains Mono",
+      "Geist",
+      "Instrument Serif",
+      "Space Grotesk",
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Manrope"
+    ],
+    "rowTimeoutMs": 150000,
+    "targets": {
+      "app": "http://127.0.0.1:5000",
+      "artifact": null,
+      "reference": "in-memory snapshot of awesome-list-site-ds on an ephemeral loopback port"
+    }
+  },
+  "inventory": {
+    "screens": 74,
+    "eligibility": {
+      "pixel": 26,
+      "token-only": 14,
+      "artifact-docs": 22,
+      "blocked": 12
+    },
+    "generatedHash": "adcbdd00010ea0fd167f26544bb3cff4b0d8896308c0535b21df8e020c69daf8"
+  },
+  "provenance": {
+    "gitCommit": "abb1cdf5c9e1f3ded134202e196ecd3100cc640f",
+    "gitDirtyPaths": [
+      "M client/src/components/admin/AuditTab.tsx",
+      " M client/src/components/admin/DatabaseTab.tsx",
+      " M client/src/components/admin/DigestQueueHealth.tsx",
+      " M client/src/components/admin/ExportTab.tsx",
+      " M client/src/components/admin/GitHubSyncPanel.tsx",
+      " M client/src/components/admin/LinkHealthDashboard.tsx",
+      " M client/src/components/admin/UsersTab.tsx",
+      "?? client/src/components/admin/AdminOpsPrimitives.tsx",
+      "?? client/src/components/admin/ContactSubmissions.tsx",
+      "?? client/src/components/admin/admin-ops-export-database.css",
+      "?? client/src/components/admin/admin-ops-primitives.css",
+      "?? client/src/styles/pages/admin-ops-github-links.css",
+      "?? client/src/styles/pages/admin-ops-users-audit.css"
+    ],
+    "snapshot": {
+      "sha256": "97b794cb99d8e4cc434397da7626f7879080393de0a2f529efd191fb2df94b33",
+      "categories": 9,
+      "totalResources": 1816,
+      "reconciledPaths": [
+        {
+          "resourceId": 188006,
+          "raw": [
+            "Players & Clients",
+            "Web Players",
+            "Web Players"
+          ],
+          "publicTree": [
+            "Players & Clients",
+            "Web Players",
+            null
+          ]
+        }
+      ]
+    },
+    "referenceAdapter": {
+      "adminGlobals": [
+        "AV_TOTAL_USERS",
+        "AV_USERS",
+        "AV_RECENT_ACTIVITY"
+      ],
+      "adminCounts": {
+        "users": 8,
+        "admins": 4,
+        "contributors": 4,
+        "pending": 0,
+        "oldestPendingMs": null
+      },
+      "placeholders": {
+        "applied": [
+          {
+            "file": "home-layouts.jsx",
+            "from": "'+12 this week'",
+            "to": "'+0 this week'",
+            "occurrences": 2,
+            "source": "count of catalog resources with createdAt inside the 7 days before the frozen clock"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "CURATED · WEEK 37 ·",
+            "to": "CURATED · WEEK 37 ·",
+            "occurrences": 1,
+            "source": "ISO week of the frozen clock"
+          },
+          {
+            "file": "home-layouts.jsx",
+            "from": "['CONTRIBUTORS', 3, 'reviewing']",
+            "to": "['CONTRIBUTORS', 8, 'reviewing']",
+            "occurrences": 1,
+            "source": "/api/admin/stats users (admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "sub=\"across 9 categories\"",
+            "to": "sub=\"across 9 categories\"",
+            "occurrences": 1,
+            "source": "nav category count"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "sub=\"2 admins · 1 contributor\"",
+            "to": "sub=\"4 admins · 4 contributors\"",
+            "occurrences": 1,
+            "source": "/api/admin/users roles (admin session only)"
+          },
+          {
+            "file": "admin.jsx",
+            "from": "value=\"7\" sub=\"oldest 14m ago\"",
+            "to": "value=\"0\" sub=\"nothing waiting\"",
+            "occurrences": 1,
+            "source": "/api/admin/stats pendingApprovals + oldest /api/admin/pending-resources createdAt vs frozen clock (admin session only)"
+          }
+        ],
+        "unadapted": [],
+        "rule": "Substitutions are applied to the served in-memory bytes only; files under awesome-list-site-ds/ are never modified. Unavailable literals are left as designed and listed under unadapted."
+      },
+      "rawHashes": {
+        ".thumbnail": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a",
+        "Awesome.Video - Standalone.html": "f40a5525c72adda5af874f1d475084f8a5ba9714a74a9e95403dc6b056662af5",
+        "HANDOFF.md": "2bcbf1d8e7e19f0e14e4413689e2c7bdfd9b45e1adee6f5416dc4d429fd9228f",
+        "REPLIT-REMEDIATION-PROMPT.md": "a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b",
+        "SKILL-verify-design-system.md": "37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6",
+        "_check/01-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/02-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/03-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/app-hero.png": "39c555adb98a3314c4e8e3d6db19f8a305a1d05911970b18beed2254a645aca5",
+        "_check/app-top.png": "ff61ca5519b51952519ede2abeb1472e83056a36d50010a36ef6d814feb917cf",
+        "_check/docs-overview.png": "87d751cdc133c43fd47ec2cbc30a0eccba14179aa35ed74bca8a7010fdf14e26",
+        "_check/flow-editorial.png": "37481b61470650c167a03a57a10054e96dcffc6075f600b2ec8ec99c7f5749f6",
+        "_check/flow.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/show-top.png": "a9d231c71cf0a3ae8fdb8e3200ca4d12e2de3f3eb009f1f4faefe828758d2dac",
+        "admin.jsx": "c32b6a11b58d54b6704955fd556e2014e9c0617d1720bfbbd9dab10c19d82360",
+        "app.jsx": "9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6",
+        "audit-report.md": "ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70",
+        "data.js": "5196b2a166673cc3c62a011028573d93e02b9f690b24db2e06b6372700b25a66",
+        "design-system-anatomy.jsx": "9cadf8f0a44a535f416e56e3e24d2e005556a0ea270e97dcdab28ebff505810a",
+        "design-system-showcase.jsx": "24c91a564df8e7a50425ab0db86ef61f9d029a809c37571da3c5c6efb1adbe11",
+        "design-system.html": "59a851a95949c36b2877b4bd57f554e84d9be9d662d3f23a895216a26d5f4dc7",
+        "design-systems.jsx": "30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c",
+        "docs/01-overview.md": "7434b385729ad6e1a8592161ae6bb8b0a0898bc8c58fad6152c4fc4ccee2582a",
+        "docs/02-principles.md": "d25feef86fb7ca5d184eaeabd6f5cb32ffc553e7b693329109bf00b6378d7b13",
+        "docs/03-getting-started.md": "99dbdf4ccf793d551985b5eb10bdafb99c8393848bb65af3c07bbe937b2f33b3",
+        "docs/04-tokens.md": "9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87",
+        "docs/05-theming.md": "98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371",
+        "docs/06-typography.md": "50636d27ae58414d3c5e36ab4013b82dfa92ce6d1c0ed0dfaa68887694cc562d",
+        "docs/07-color.md": "e6320c732732573000f3d8ff76d892c4c13fcbe74983aef69955d0071c1e2dd4",
+        "docs/08-spacing-layout.md": "637b852813c4565d534d4b844d8a3729c1f61372f883e6a989d44f72311edada",
+        "docs/09-motion.md": "8f8a4a3f86c154455764580cd43c2da613f150c273ceb5190b9b6e02d5cbac4c",
+        "docs/10-components.md": "083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf",
+        "docs/11-patterns.md": "9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761",
+        "docs/12-integration-html.md": "e9979c4781fda6b85a0539ec03b1c8d405d92e7ce717c1e05509385e7e0476a9",
+        "docs/13-integration-react.md": "4eaff2bbbc7aaf04809d81d5d8babbb02e020496e6f5aaeaebfb2cb8af7cf3b2",
+        "docs/14-integration-nextjs.md": "48a26566d786bc566fb808b016a61652ee542c0ded22ad81a2810d2f888697c7",
+        "docs/15-integration-vue.md": "be4ef659fc307401eb86a9c59434bdd201059120dba4bb11f87d2812608b2f5d",
+        "docs/16-migration.md": "7d5076e486008b51fae6d6a4ad48bcb5289a4b2b87036d561ef3f9cf454cb98a",
+        "docs/17-accessibility.md": "f1b0bdaf0b78fb8bcbea5348ea9dadd757cdbffb218de868009d36ebf3659e9e",
+        "docs/18-launch-checklist.md": "4fefbb090fca7699abbc7f59a274f751bb27c20d3f0510bc7408c8a41f91c707",
+        "docs/README.md": "995c700e5cd839a01627b7a4442f8ae3a98164b9c7fce52cca1e5eddd07ea7ca",
+        "docs-content-1.jsx": "b7b969b4aeb1b6e560b7fb1589626dd8def9145c3709bc31a127454ea5015982",
+        "docs-content-2.jsx": "fbf202ebdba472a6663c43e8a38cc86346ab2d0c9655fe012a66b579f6508f81",
+        "docs.html": "e3072e8e0f4722c0201b444ab270ccb32dacdf571329ac5b4cb4c4b954de45ec",
+        "docs.jsx": "d430fc4a9f5d2f3f95c789eab20ea36ae96eb307d495f07052a720f912f6eee2",
+        "home-layouts.jsx": "c91a2a679670684b4182b3c6015544265373e01cf2ee96efc778975a2257b4f2",
+        "index.html": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7",
+        "index.standalone.html": "7b62e47bf3ab24c6c1268be3a9ce078627d3074519af542bec07d1c40c7ffa47",
+        "layout.jsx": "911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a",
+        "pages-core.jsx": "fd370da82ed465d568a549816e607a4c59e3e764e7342ca176d1b4f65766aad9",
+        "pages-extra.jsx": "d9abd2edaf5df810b5cb2246059c4f4cba461c085771c00a465f107b64413e3a",
+        "pages.jsx": "ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58",
+        "sidebar-variants.jsx": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95",
+        "styles.css": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055",
+        "tweaks-panel.jsx": "ea982af775f053999f1f8841b7078ae20b37bdb3c20432fe293e3b4572c0c454",
+        "uploads/01_home.png": "43c6cb5b4f4ea68a25fff11c4d176709e95248ec80ea7ba47901c49f9d5015c4",
+        "uploads/02_about.png": "9d66e7e3b86841f708e19e74b4933207023a3aea864c18b264717206537dad9a",
+        "uploads/03_advanced.png": "8f004d07f1a2200365992f0ef9ea177df8c756da836332714c2934d3ecb76d38",
+        "uploads/04_learning_journeys.png": "bf0ad1aa3e384c5369a3afe7f57b48f07fa2362aef4b13b6401356404bb41921",
+        "uploads/05_journey_detail.png": "c8d13312128776fb51d8389b2d7bf43e863bb8d43095ed997e9ddec4e69eff10",
+        "uploads/06_login.png": "291baba8571c24f703b41acb3a1bde2731e02fb60ae3cdb94786980de4bbe506",
+        "uploads/07_submit_resource_authgate.png": "616819c0cf65707ed64c82a337deb5d15016bffdebb39ad7a110eca27cdc8cde",
+        "uploads/08_theme_settings.png": "9205753c5fd56106849fb5dc8ccae635084b5aa957641e3313e1fe36263c851e",
+        "uploads/09_category_community-events.png": "4a8b89350c6b0dc18f41ce85edf9d9babcac989419403c5c253e4991bfa81101",
+        "uploads/10_category_encoding-codecs.png": "b966ae38b27df934a18456c50e47c589d4a570d805b11a3580a8ecf6ac51df99",
+        "uploads/11_category_general-tools.png": "755c0115ce7d0726cdba5610f23988ecd368ba2da8c2c6ebb5ccb5b2b8e2d09b",
+        "uploads/12_category_infrastructure-delivery.png": "c72a990a404a3f819e35bf27908c47442e4970c2192cba774ed54b311f1caf1e",
+        "uploads/13_category_intro-learning.png": "6c945f36f389d1c6ea32583b7df1f1bd2551d735748636455833cf86404bf197",
+        "uploads/14_category_media-tools.png": "deadba69a700015bf508cc2dcc7305da44fe45e4a6a83e3448c90e79730667ae",
+        "uploads/15_category_players-clients.png": "91cbe5aba894bd35592598398657ee730162389c2591a423b123d481a0793e40",
+        "uploads/16_category_protocols-transport.png": "4d9cbb4d2d2081169b8af5f78514a0d1ed720e459a6705bed87399509eb765a1",
+        "uploads/17_category_standards-industry.png": "36e0cab03d177077dc6182d0f4ca89a7019a66759ee7e2151731a8b11a099d95",
+        "uploads/18_subcategory_ai-ml-tools.png": "4c91239b46395596cfc00ea91a7636493f55a903dcb075abcc67870ac97a53de",
+        "uploads/19_sub-subcategory_hls.png": "48fd44966fe7d3aa7cfe41be6c0500e957c32963122902c05e36a5a043c68b33",
+        "uploads/20_sub-subcategory_dash.png": "e8c7bb9b685c7ba2a0c31f5cb171a3521590a375743ee9746da29c93f4907241",
+        "uploads/21_resource_detail.png": "27e44c258f0ae9d2f14a865b6e51e893325b6bace8f0832e90b4e442586326ee",
+        "uploads/22_404_not_found.png": "ee9bbafa356eff6653a1a464a4e8f7adb8249d16cdcfff29a100b97ed344c835",
+        "uploads/IMG_3167.jpeg": "74fa937a2d4647d2d863e4afd08aa03c55eab946ece06923c05195785952d405",
+        "uploads/IMG_3169.jpeg": "b897452732a0cd8b639f8420796a9f4b1a713eed218706910dfb84fb090b0d01",
+        "uploads/IMG_3171.jpeg": "02d1130b7e87353010d2678440ecd7ace07c66a34d0631ca02dd60958cc83d9d",
+        "uploads/IMG_3173.jpeg": "791462af1ca505f23381d7b871b5ae4d122a579b83c176550c99b06a0c3a10bc",
+        "uploads/IMG_3175.jpeg": "ac8a23f8ac8133af86fb7ec21f0b9bd59bc8ae997e9bda43c1efb610845ca1f8",
+        "uploads/IMG_3177.jpeg": "28af1816a1987fdc40cb5f7af104e69749597bae7f1420d3259e8b44e953f997",
+        "uploads/IMG_3179.jpeg": "41fe819a15b4bbfe7cfbe2e085b1093b0cbbed8c042a1e8d45db2ab8e1490ac3",
+        "uploads/IMG_3181.jpeg": "a69d28c39b3dd58706a1d10a0238ebacf0ec3f03e14afe8a0c2885734e2a4120",
+        "uploads/IMG_3183.jpeg": "07abd8ffe6b91b03c923c87b521b00aee37637e0b9225ef2b4195799d087b2a0",
+        "uploads/IMG_3185.jpeg": "b645696f282e4fdb862a060c39434bc6c759a5a103afd9c5c66fd07faef540f1",
+        "uploads/IMG_3187.jpeg": "d5118ccbd8ffbb34eba1881b9ed669e83ca6884600eac41c983516ddbaeda912",
+        "uploads/IMG_3189.jpeg": "fea2d4ec82c95166c399214f3ac58300efc4d31d6ad1e6521928c3a6f48b4150",
+        "uploads/IMG_3191.jpeg": "13b7659661965d61ace34112cc07fba2704ae012ae38c9b8c3f3786af478d3af",
+        "uploads/IMG_3193.jpeg": "ce82d6451490b633016caba103131e1ff3ae14494bde60977414264461bc4fa0",
+        "uploads/IMG_3195.jpeg": "23d29bc41b152ef40c4b57d8724656c859704cc26c3f79cccc2ae33dd6e4b630",
+        "uploads/IMG_3197.jpeg": "7f3ae99ef3fdfa508816671fc6d4a50ae3b040ddc8bef1cebf6639e476e11730",
+        "uploads/IMG_3199.jpeg": "56896b8236a364fb0cfa25568d36b4360d3d9a2b60b58b14f48219942c862e2a",
+        "uploads/IMG_3201.jpeg": "b35514757788928eb7068c10fda0d2880ba1ca979397587344ab8cbd853bc65f",
+        "uploads/IMG_3203.jpeg": "39c1098f988a3b196646d62834a813e6b529a3191208cd992416a0a9d26eccf6",
+        "uploads/IMG_3205.jpeg": "3bbe6722397685b9e9c01f1f0cc3394badf259066cfac61da04b4c428adee0b7",
+        "uploads/IMG_3207.jpeg": "4f379c8b36c17eb5e25c2cb4911c81310ebc6d726d5a371e9def03c35041c1d6",
+        "uploads/IMG_3209.jpeg": "9ae400e5fe80693c174bce00ae496973a8f68caddc51d71a7daba85bf610ea4e",
+        "uploads/INDEX.md": "12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2",
+        "uploads/Screenshot 2026-05-22 at 15.26.17.png": "8e3633aded14b8e21dc3c0e06de81b2844d137ddec7fa429ceb59922ce4a2639",
+        "views-1.jsx": "0d772bc0ae8133a5e400a111f79ea04db0944b403eb75584747cdd49c151a40e",
+        "views-2.jsx": "a91dccea691004186155e46677e680e987a7f01651bff895eb5a5c86871ad9e0"
+      },
+      "servedHashes": {
+        ".thumbnail": "e9124eedc686b6e534b830fb103b9ab4092606db67e52fa46969bc8d5bc0337a",
+        "Awesome.Video - Standalone.html": "f40a5525c72adda5af874f1d475084f8a5ba9714a74a9e95403dc6b056662af5",
+        "HANDOFF.md": "2bcbf1d8e7e19f0e14e4413689e2c7bdfd9b45e1adee6f5416dc4d429fd9228f",
+        "REPLIT-REMEDIATION-PROMPT.md": "a7dc59083cc71dc2d1a08f34729fdb0812792af8c027251e9be07dfec1832b8b",
+        "SKILL-verify-design-system.md": "37f25dbce6d8e486086eb9f8d66029f335365a636261b4983a8aa84f2f325da6",
+        "_check/01-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/02-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/03-flow2.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/app-hero.png": "39c555adb98a3314c4e8e3d6db19f8a305a1d05911970b18beed2254a645aca5",
+        "_check/app-top.png": "ff61ca5519b51952519ede2abeb1472e83056a36d50010a36ef6d814feb917cf",
+        "_check/docs-overview.png": "87d751cdc133c43fd47ec2cbc30a0eccba14179aa35ed74bca8a7010fdf14e26",
+        "_check/flow-editorial.png": "37481b61470650c167a03a57a10054e96dcffc6075f600b2ec8ec99c7f5749f6",
+        "_check/flow.png": "2b6d59a5e7b9c227e46fdb3e82a2fecdf09aeb1d0818e62bf2be7aaf020d95e0",
+        "_check/show-top.png": "a9d231c71cf0a3ae8fdb8e3200ca4d12e2de3f3eb009f1f4faefe828758d2dac",
+        "admin.jsx": "c2236ed812987d1fe641b8ba25579b24426056fbfcf7da405975d548c8569558",
+        "app.jsx": "9d71619b1c70720d36b15803b818040f4515ca165b09388f9e60376fa81ae1c6",
+        "audit-report.md": "ed3dc0dc16f918cb276f2470f4522900c2d7c4a05932a0e93d15aeb344ff1f70",
+        "data.js": "ecf5836439c6f3ca46d6324c4f52eeac613ce45ff18958be37144e427d7142e5",
+        "design-system-anatomy.jsx": "9cadf8f0a44a535f416e56e3e24d2e005556a0ea270e97dcdab28ebff505810a",
+        "design-system-showcase.jsx": "24c91a564df8e7a50425ab0db86ef61f9d029a809c37571da3c5c6efb1adbe11",
+        "design-system.html": "59a851a95949c36b2877b4bd57f554e84d9be9d662d3f23a895216a26d5f4dc7",
+        "design-systems.jsx": "30c37539db397941f209055af28a5284fbdd14a3322adb869701c70b0e05bc7c",
+        "docs/01-overview.md": "7434b385729ad6e1a8592161ae6bb8b0a0898bc8c58fad6152c4fc4ccee2582a",
+        "docs/02-principles.md": "d25feef86fb7ca5d184eaeabd6f5cb32ffc553e7b693329109bf00b6378d7b13",
+        "docs/03-getting-started.md": "99dbdf4ccf793d551985b5eb10bdafb99c8393848bb65af3c07bbe937b2f33b3",
+        "docs/04-tokens.md": "9fa54765d1a5fe8bed234a8c7def608efe638cff2a11e608ae6b0fc8bd359d87",
+        "docs/05-theming.md": "98359a32a71ce808059c38c510c6bc83c199bdaea0be7b1835e0b9b9500d6371",
+        "docs/06-typography.md": "50636d27ae58414d3c5e36ab4013b82dfa92ce6d1c0ed0dfaa68887694cc562d",
+        "docs/07-color.md": "e6320c732732573000f3d8ff76d892c4c13fcbe74983aef69955d0071c1e2dd4",
+        "docs/08-spacing-layout.md": "637b852813c4565d534d4b844d8a3729c1f61372f883e6a989d44f72311edada",
+        "docs/09-motion.md": "8f8a4a3f86c154455764580cd43c2da613f150c273ceb5190b9b6e02d5cbac4c",
+        "docs/10-components.md": "083ffe1beac8b9529d53eb694588d3f51d9eae30bc49474895a8287bc17feeaf",
+        "docs/11-patterns.md": "9e220b1ab08c10d709ff02dfe40efccd80cbdb5fc32ed7e3d963b9483d37f761",
+        "docs/12-integration-html.md": "e9979c4781fda6b85a0539ec03b1c8d405d92e7ce717c1e05509385e7e0476a9",
+        "docs/13-integration-react.md": "4eaff2bbbc7aaf04809d81d5d8babbb02e020496e6f5aaeaebfb2cb8af7cf3b2",
+        "docs/14-integration-nextjs.md": "48a26566d786bc566fb808b016a61652ee542c0ded22ad81a2810d2f888697c7",
+        "docs/15-integration-vue.md": "be4ef659fc307401eb86a9c59434bdd201059120dba4bb11f87d2812608b2f5d",
+        "docs/16-migration.md": "7d5076e486008b51fae6d6a4ad48bcb5289a4b2b87036d561ef3f9cf454cb98a",
+        "docs/17-accessibility.md": "f1b0bdaf0b78fb8bcbea5348ea9dadd757cdbffb218de868009d36ebf3659e9e",
+        "docs/18-launch-checklist.md": "4fefbb090fca7699abbc7f59a274f751bb27c20d3f0510bc7408c8a41f91c707",
+        "docs/README.md": "995c700e5cd839a01627b7a4442f8ae3a98164b9c7fce52cca1e5eddd07ea7ca",
+        "docs-content-1.jsx": "b7b969b4aeb1b6e560b7fb1589626dd8def9145c3709bc31a127454ea5015982",
+        "docs-content-2.jsx": "fbf202ebdba472a6663c43e8a38cc86346ab2d0c9655fe012a66b579f6508f81",
+        "docs.html": "e3072e8e0f4722c0201b444ab270ccb32dacdf571329ac5b4cb4c4b954de45ec",
+        "docs.jsx": "d430fc4a9f5d2f3f95c789eab20ea36ae96eb307d495f07052a720f912f6eee2",
+        "home-layouts.jsx": "c87ccef0d0e651d11abf4da55b126943c2dbd47ff3b446832148e18800bbfc97",
+        "index.html": "7f561822fdbb5b67ebce62324d7f02ce0154eb90b2927f8d46510466cda5f8f7",
+        "index.standalone.html": "7b62e47bf3ab24c6c1268be3a9ce078627d3074519af542bec07d1c40c7ffa47",
+        "layout.jsx": "911f165b50f94d6b3930b2761545606105a9a4ba9727ed443a0681b039b3e76a",
+        "pages-core.jsx": "fd370da82ed465d568a549816e607a4c59e3e764e7342ca176d1b4f65766aad9",
+        "pages-extra.jsx": "d9abd2edaf5df810b5cb2246059c4f4cba461c085771c00a465f107b64413e3a",
+        "pages.jsx": "ee95572bb30f38424920918c49c9b483898ec975adf4bc0a8c04664cf2fd4a58",
+        "sidebar-variants.jsx": "86ae99e167f07d7679672b4224fdfc758424224603c3de5459b7cdc9aba39e95",
+        "styles.css": "f65694df1965889a6a6a4bff6404d9b47164f097ebcd417513a34d430e6a1055",
+        "tweaks-panel.jsx": "ea982af775f053999f1f8841b7078ae20b37bdb3c20432fe293e3b4572c0c454",
+        "uploads/01_home.png": "43c6cb5b4f4ea68a25fff11c4d176709e95248ec80ea7ba47901c49f9d5015c4",
+        "uploads/02_about.png": "9d66e7e3b86841f708e19e74b4933207023a3aea864c18b264717206537dad9a",
+        "uploads/03_advanced.png": "8f004d07f1a2200365992f0ef9ea177df8c756da836332714c2934d3ecb76d38",
+        "uploads/04_learning_journeys.png": "bf0ad1aa3e384c5369a3afe7f57b48f07fa2362aef4b13b6401356404bb41921",
+        "uploads/05_journey_detail.png": "c8d13312128776fb51d8389b2d7bf43e863bb8d43095ed997e9ddec4e69eff10",
+        "uploads/06_login.png": "291baba8571c24f703b41acb3a1bde2731e02fb60ae3cdb94786980de4bbe506",
+        "uploads/07_submit_resource_authgate.png": "616819c0cf65707ed64c82a337deb5d15016bffdebb39ad7a110eca27cdc8cde",
+        "uploads/08_theme_settings.png": "9205753c5fd56106849fb5dc8ccae635084b5aa957641e3313e1fe36263c851e",
+        "uploads/09_category_community-events.png": "4a8b89350c6b0dc18f41ce85edf9d9babcac989419403c5c253e4991bfa81101",
+        "uploads/10_category_encoding-codecs.png": "b966ae38b27df934a18456c50e47c589d4a570d805b11a3580a8ecf6ac51df99",
+        "uploads/11_category_general-tools.png": "755c0115ce7d0726cdba5610f23988ecd368ba2da8c2c6ebb5ccb5b2b8e2d09b",
+        "uploads/12_category_infrastructure-delivery.png": "c72a990a404a3f819e35bf27908c47442e4970c2192cba774ed54b311f1caf1e",
+        "uploads/13_category_intro-learning.png": "6c945f36f389d1c6ea32583b7df1f1bd2551d735748636455833cf86404bf197",
+        "uploads/14_category_media-tools.png": "deadba69a700015bf508cc2dcc7305da44fe45e4a6a83e3448c90e79730667ae",
+        "uploads/15_category_players-clients.png": "91cbe5aba894bd35592598398657ee730162389c2591a423b123d481a0793e40",
+        "uploads/16_category_protocols-transport.png": "4d9cbb4d2d2081169b8af5f78514a0d1ed720e459a6705bed87399509eb765a1",
+        "uploads/17_category_standards-industry.png": "36e0cab03d177077dc6182d0f4ca89a7019a66759ee7e2151731a8b11a099d95",
+        "uploads/18_subcategory_ai-ml-tools.png": "4c91239b46395596cfc00ea91a7636493f55a903dcb075abcc67870ac97a53de",
+        "uploads/19_sub-subcategory_hls.png": "48fd44966fe7d3aa7cfe41be6c0500e957c32963122902c05e36a5a043c68b33",
+        "uploads/20_sub-subcategory_dash.png": "e8c7bb9b685c7ba2a0c31f5cb171a3521590a375743ee9746da29c93f4907241",
+        "uploads/21_resource_detail.png": "27e44c258f0ae9d2f14a865b6e51e893325b6bace8f0832e90b4e442586326ee",
+        "uploads/22_404_not_found.png": "ee9bbafa356eff6653a1a464a4e8f7adb8249d16cdcfff29a100b97ed344c835",
+        "uploads/IMG_3167.jpeg": "74fa937a2d4647d2d863e4afd08aa03c55eab946ece06923c05195785952d405",
+        "uploads/IMG_3169.jpeg": "b897452732a0cd8b639f8420796a9f4b1a713eed218706910dfb84fb090b0d01",
+        "uploads/IMG_3171.jpeg": "02d1130b7e87353010d2678440ecd7ace07c66a34d0631ca02dd60958cc83d9d",
+        "uploads/IMG_3173.jpeg": "791462af1ca505f23381d7b871b5ae4d122a579b83c176550c99b06a0c3a10bc",
+        "uploads/IMG_3175.jpeg": "ac8a23f8ac8133af86fb7ec21f0b9bd59bc8ae997e9bda43c1efb610845ca1f8",
+        "uploads/IMG_3177.jpeg": "28af1816a1987fdc40cb5f7af104e69749597bae7f1420d3259e8b44e953f997",
+        "uploads/IMG_3179.jpeg": "41fe819a15b4bbfe7cfbe2e085b1093b0cbbed8c042a1e8d45db2ab8e1490ac3",
+        "uploads/IMG_3181.jpeg": "a69d28c39b3dd58706a1d10a0238ebacf0ec3f03e14afe8a0c2885734e2a4120",
+        "uploads/IMG_3183.jpeg": "07abd8ffe6b91b03c923c87b521b00aee37637e0b9225ef2b4195799d087b2a0",
+        "uploads/IMG_3185.jpeg": "b645696f282e4fdb862a060c39434bc6c759a5a103afd9c5c66fd07faef540f1",
+        "uploads/IMG_3187.jpeg": "d5118ccbd8ffbb34eba1881b9ed669e83ca6884600eac41c983516ddbaeda912",
+        "uploads/IMG_3189.jpeg": "fea2d4ec82c95166c399214f3ac58300efc4d31d6ad1e6521928c3a6f48b4150",
+        "uploads/IMG_3191.jpeg": "13b7659661965d61ace34112cc07fba2704ae012ae38c9b8c3f3786af478d3af",
+        "uploads/IMG_3193.jpeg": "ce82d6451490b633016caba103131e1ff3ae14494bde60977414264461bc4fa0",
+        "uploads/IMG_3195.jpeg": "23d29bc41b152ef40c4b57d8724656c859704cc26c3f79cccc2ae33dd6e4b630",
+        "uploads/IMG_3197.jpeg": "7f3ae99ef3fdfa508816671fc6d4a50ae3b040ddc8bef1cebf6639e476e11730",
+        "uploads/IMG_3199.jpeg": "56896b8236a364fb0cfa25568d36b4360d3d9a2b60b58b14f48219942c862e2a",
+        "uploads/IMG_3201.jpeg": "b35514757788928eb7068c10fda0d2880ba1ca979397587344ab8cbd853bc65f",
+        "uploads/IMG_3203.jpeg": "39c1098f988a3b196646d62834a813e6b529a3191208cd992416a0a9d26eccf6",
+        "uploads/IMG_3205.jpeg": "3bbe6722397685b9e9c01f1f0cc3394badf259066cfac61da04b4c428adee0b7",
+        "uploads/IMG_3207.jpeg": "4f379c8b36c17eb5e25c2cb4911c81310ebc6d726d5a371e9def03c35041c1d6",
+        "uploads/IMG_3209.jpeg": "9ae400e5fe80693c174bce00ae496973a8f68caddc51d71a7daba85bf610ea4e",
+        "uploads/INDEX.md": "12870b61be9bec03ae8da92b17fcc7f32a05df45fd4f4e23fd07d89bd0f9daf2",
+        "uploads/Screenshot 2026-05-22 at 15.26.17.png": "8e3633aded14b8e21dc3c0e06de81b2844d137ddec7fa429ceb59922ce4a2639",
+        "views-1.jsx": "0d772bc0ae8133a5e400a111f79ea04db0944b403eb75584747cdd49c151a40e",
+        "views-2.jsx": "a91dccea691004186155e46677e680e987a7f01651bff895eb5a5c86871ad9e0"
+      },
+      "live": {
+        "catalogStart": "97b794cb99d8e4cc434397da7626f7879080393de0a2f529efd191fb2df94b33",
+        "catalogEnd": "97b794cb99d8e4cc434397da7626f7879080393de0a2f529efd191fb2df94b33",
+        "adminStart": "47e7efb98c3efccb43dfce132a573ed38c668107b390d25913c5062d096f834f",
+        "adminEnd": "47e7efb98c3efccb43dfce132a573ed38c668107b390d25913c5062d096f834f",
+        "error": null
+      }
+    },
+    "workspace": {
+      "startFingerprints": "db31fffb9bafe1834336c270ede55e3b35a4118a2ab68cc58fed3459b18a49c7",
+      "endFingerprints": "db31fffb9bafe1834336c270ede55e3b35a4118a2ab68cc58fed3459b18a49c7",
+      "inputsChangedDuringRun": false
+    }
+  },
+  "summary": {
+    "denominator": 24,
+    "pass": 0,
+    "fail": 24,
+    "incomplete": 0,
+    "incompleteEvidence": false,
+    "fontGapOnlyFails": 0,
+    "blocked": 0,
+    "evidence": 0,
+    "unverified": 0,
+    "aliases": 0
+  },
+  "rows": [
+    {
+      "screen": "app.admin.audit",
+      "width": 375,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 1060505,
+        "overlapDifferingPixels": 38255,
+        "unmatchedDimensionPixels": 1022250,
+        "canvasPixels": 1584000,
+        "diffPercent": 66.95107323232324,
+        "actualDimensions": {
+          "width": 375,
+          "height": 4224
+        },
+        "expectedDimensions": {
+          "width": 375,
+          "height": 1498
+        },
+        "canvas": {
+          "width": 375,
+          "height": 4224
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-audit",
+        "expectedTab": "audit"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "a51cec983730be6e3b533c6d6defef7faf0687af0a79321992f0d37c056f2279",
+          "a51cec983730be6e3b533c6d6defef7faf0687af0a79321992f0d37c056f2279"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "538a56f218b5ee7b8c97e996a3b2a391cb48f50527a9460851aa9608755dbd9a",
+          "538a56f218b5ee7b8c97e996a3b2a391cb48f50527a9460851aa9608755dbd9a"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "a51cec983730be6e3b533c6d6defef7faf0687af0a79321992f0d37c056f2279",
+        "expected": "538a56f218b5ee7b8c97e996a3b2a391cb48f50527a9460851aa9608755dbd9a"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.audit-375.png",
+        "expected": "expected/app.admin.audit-375.png",
+        "diff": "diff/app.admin.audit-375.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "66.951% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 768,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 1900125,
+        "overlapDifferingPixels": 61533,
+        "unmatchedDimensionPixels": 1838592,
+        "canvasPixels": 2879232,
+        "diffPercent": 65.99416094291811,
+        "actualDimensions": {
+          "width": 768,
+          "height": 3749
+        },
+        "expectedDimensions": {
+          "width": 768,
+          "height": 1355
+        },
+        "canvas": {
+          "width": 768,
+          "height": 3749
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-audit",
+        "expectedTab": "audit"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "7b3494bb257c65e8e047e1f4eaac67977bee842340ab4d7ff66a5eec4243e32c",
+          "7b3494bb257c65e8e047e1f4eaac67977bee842340ab4d7ff66a5eec4243e32c"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "77f55349c30328d0d5d1d99b1f54a91fd896c5ce7d8655abd80bbeca8b40293b",
+          "77f55349c30328d0d5d1d99b1f54a91fd896c5ce7d8655abd80bbeca8b40293b"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "7b3494bb257c65e8e047e1f4eaac67977bee842340ab4d7ff66a5eec4243e32c",
+        "expected": "77f55349c30328d0d5d1d99b1f54a91fd896c5ce7d8655abd80bbeca8b40293b"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.audit-768.png",
+        "expected": "expected/app.admin.audit-768.png",
+        "diff": "diff/app.admin.audit-768.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "65.994% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 1024,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 2746062,
+        "overlapDifferingPixels": 58062,
+        "unmatchedDimensionPixels": 2688000,
+        "canvasPixels": 3873792,
+        "diffPercent": 70.88821495836638,
+        "actualDimensions": {
+          "width": 1024,
+          "height": 3783
+        },
+        "expectedDimensions": {
+          "width": 1024,
+          "height": 1158
+        },
+        "canvas": {
+          "width": 1024,
+          "height": 3783
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-audit",
+        "expectedTab": "audit"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "bf4f3753e648855b10dd5778949d69a07c859a0fca7c85be456c408cfa405fb5",
+          "bf4f3753e648855b10dd5778949d69a07c859a0fca7c85be456c408cfa405fb5"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "9dba14beb571b1d2fed9e7dc33345d007d91b611ad3828ddd68ac90a7698f105",
+          "9dba14beb571b1d2fed9e7dc33345d007d91b611ad3828ddd68ac90a7698f105"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "bf4f3753e648855b10dd5778949d69a07c859a0fca7c85be456c408cfa405fb5",
+        "expected": "9dba14beb571b1d2fed9e7dc33345d007d91b611ad3828ddd68ac90a7698f105"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.audit-1024.png",
+        "expected": "expected/app.admin.audit-1024.png",
+        "diff": "diff/app.admin.audit-1024.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "70.888% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.audit",
+      "width": 1440,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 3602196,
+        "overlapDifferingPixels": 64116,
+        "unmatchedDimensionPixels": 3538080,
+        "canvasPixels": 5205600,
+        "diffPercent": 69.19847856154911,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 3615
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 1158
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 3615
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-audit",
+        "expectedTab": "audit"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "04ae1b38cb6f64715f1a2a704933d9b42416fcd21749156cacaaeb4a701d33c3",
+          "04ae1b38cb6f64715f1a2a704933d9b42416fcd21749156cacaaeb4a701d33c3"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "5f333dd63fb1d8a3b98e2fc0516cfad566114255a4c4af256ffdbec78ab60cb3",
+          "5f333dd63fb1d8a3b98e2fc0516cfad566114255a4c4af256ffdbec78ab60cb3"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "04ae1b38cb6f64715f1a2a704933d9b42416fcd21749156cacaaeb4a701d33c3",
+        "expected": "5f333dd63fb1d8a3b98e2fc0516cfad566114255a4c4af256ffdbec78ab60cb3"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.audit-1440.png",
+        "expected": "expected/app.admin.audit-1440.png",
+        "diff": "diff/app.admin.audit-1440.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "69.198% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 375,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 486907,
+        "overlapDifferingPixels": 52657,
+        "unmatchedDimensionPixels": 434250,
+        "canvasPixels": 1095375,
+        "diffPercent": 44.45116969074518,
+        "actualDimensions": {
+          "width": 375,
+          "height": 2921
+        },
+        "expectedDimensions": {
+          "width": 375,
+          "height": 1763
+        },
+        "canvas": {
+          "width": 375,
+          "height": 2921
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-database",
+        "expectedTab": "database"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "8befa9293b0deb4eaa245c4056079024edfd9050c1a27bb879a79d0ad0385191",
+          "8befa9293b0deb4eaa245c4056079024edfd9050c1a27bb879a79d0ad0385191"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 13,
+          "completedAtCaptureEnd": 13,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "7408fb45b39c3e365c9215de5d081a1ded5159a9e8fbadf25ec1d732948c4a70",
+          "7408fb45b39c3e365c9215de5d081a1ded5159a9e8fbadf25ec1d732948c4a70"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "8befa9293b0deb4eaa245c4056079024edfd9050c1a27bb879a79d0ad0385191",
+        "expected": "7408fb45b39c3e365c9215de5d081a1ded5159a9e8fbadf25ec1d732948c4a70"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.database-375.png",
+        "expected": "expected/app.admin.database-375.png",
+        "diff": "diff/app.admin.database-375.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "44.451% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 768,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 803940,
+        "overlapDifferingPixels": 68196,
+        "unmatchedDimensionPixels": 735744,
+        "canvasPixels": 1820160,
+        "diffPercent": 44.168644514767934,
+        "actualDimensions": {
+          "width": 768,
+          "height": 2370
+        },
+        "expectedDimensions": {
+          "width": 768,
+          "height": 1412
+        },
+        "canvas": {
+          "width": 768,
+          "height": 2370
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-database",
+        "expectedTab": "database"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "c23256ee1987e2e318e7c2c78597af5edebbef9106fdec262a6d0ed07da7a551",
+          "c23256ee1987e2e318e7c2c78597af5edebbef9106fdec262a6d0ed07da7a551"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 13,
+          "completedAtCaptureEnd": 13,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "a4fcece7f610ed9cb156964b840606f32e735e69cf1dfeb3c9253635050b2e57",
+          "a4fcece7f610ed9cb156964b840606f32e735e69cf1dfeb3c9253635050b2e57"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "c23256ee1987e2e318e7c2c78597af5edebbef9106fdec262a6d0ed07da7a551",
+        "expected": "a4fcece7f610ed9cb156964b840606f32e735e69cf1dfeb3c9253635050b2e57"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.database-768.png",
+        "expected": "expected/app.admin.database-768.png",
+        "diff": "diff/app.admin.database-768.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "44.169% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 1024,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 854193,
+        "overlapDifferingPixels": 72881,
+        "unmatchedDimensionPixels": 781312,
+        "canvasPixels": 2070528,
+        "diffPercent": 41.25483934532641,
+        "actualDimensions": {
+          "width": 1024,
+          "height": 2022
+        },
+        "expectedDimensions": {
+          "width": 1024,
+          "height": 1259
+        },
+        "canvas": {
+          "width": 1024,
+          "height": 2022
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-database",
+        "expectedTab": "database"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "352b68b2ebd8179d4379874aa7772e66d8e5d2d657f40cd19ba68ebecd473701",
+          "352b68b2ebd8179d4379874aa7772e66d8e5d2d657f40cd19ba68ebecd473701"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 13,
+          "completedAtCaptureEnd": 13,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "078d2b52997f73e6c305924777aba49b5e5254b2dcec8c9805746bb4107b39fb",
+          "078d2b52997f73e6c305924777aba49b5e5254b2dcec8c9805746bb4107b39fb"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "352b68b2ebd8179d4379874aa7772e66d8e5d2d657f40cd19ba68ebecd473701",
+        "expected": "078d2b52997f73e6c305924777aba49b5e5254b2dcec8c9805746bb4107b39fb"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.database-1024.png",
+        "expected": "expected/app.admin.database-1024.png",
+        "diff": "diff/app.admin.database-1024.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "41.255% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.database",
+      "width": 1440,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 678539,
+        "overlapDifferingPixels": 73739,
+        "unmatchedDimensionPixels": 604800,
+        "canvasPixels": 2417760,
+        "diffPercent": 28.064778968963005,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1679
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 1259
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1679
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-database",
+        "expectedTab": "database"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "10707fbbb5e878c7bb3a6d1c96455caa552f596199339f7e078c52aaee913b77",
+          "10707fbbb5e878c7bb3a6d1c96455caa552f596199339f7e078c52aaee913b77"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 13,
+          "completedAtCaptureEnd": 13,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "8121c450ba86ecb3170e959bdc9b27b50670a9ed771bd8c6c238cd5f228ddd18",
+          "8121c450ba86ecb3170e959bdc9b27b50670a9ed771bd8c6c238cd5f228ddd18"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "10707fbbb5e878c7bb3a6d1c96455caa552f596199339f7e078c52aaee913b77",
+        "expected": "8121c450ba86ecb3170e959bdc9b27b50670a9ed771bd8c6c238cd5f228ddd18"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.database-1440.png",
+        "expected": "expected/app.admin.database-1440.png",
+        "diff": "diff/app.admin.database-1440.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "28.065% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 375,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 689160,
+        "overlapDifferingPixels": 97035,
+        "unmatchedDimensionPixels": 592125,
+        "canvasPixels": 1126500,
+        "diffPercent": 61.17709720372836,
+        "actualDimensions": {
+          "width": 375,
+          "height": 3004
+        },
+        "expectedDimensions": {
+          "width": 375,
+          "height": 1425
+        },
+        "canvas": {
+          "width": 375,
+          "height": 3004
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-export",
+        "expectedTab": "export"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "f70ef57eae3f33e8ab3509a51da9c930aa9ff9b00082908aaea91c770378866f",
+          "f70ef57eae3f33e8ab3509a51da9c930aa9ff9b00082908aaea91c770378866f"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "cf40c05a9a4e11dbcfded20e7817c237b925d5a2364c9ab9ea1378d4ebbd033e",
+          "cf40c05a9a4e11dbcfded20e7817c237b925d5a2364c9ab9ea1378d4ebbd033e"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "f70ef57eae3f33e8ab3509a51da9c930aa9ff9b00082908aaea91c770378866f",
+        "expected": "cf40c05a9a4e11dbcfded20e7817c237b925d5a2364c9ab9ea1378d4ebbd033e"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.export-375.png",
+        "expected": "expected/app.admin.export-375.png",
+        "diff": "diff/app.admin.export-375.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "61.177% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 768,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 1270457,
+        "overlapDifferingPixels": 123833,
+        "unmatchedDimensionPixels": 1146624,
+        "canvasPixels": 1933056,
+        "diffPercent": 65.72272091444842,
+        "actualDimensions": {
+          "width": 768,
+          "height": 2517
+        },
+        "expectedDimensions": {
+          "width": 768,
+          "height": 1024
+        },
+        "canvas": {
+          "width": 768,
+          "height": 2517
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-export",
+        "expectedTab": "export"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "4ff4bbfb735960a3079d45602eabd879336eaebe2e57db46e93fe87ebc361e6a",
+          "4ff4bbfb735960a3079d45602eabd879336eaebe2e57db46e93fe87ebc361e6a"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "f50b45fc06f4e99831d2d75365b70c8b99f9fc288f6a83158844f951e2373529",
+          "f50b45fc06f4e99831d2d75365b70c8b99f9fc288f6a83158844f951e2373529"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "4ff4bbfb735960a3079d45602eabd879336eaebe2e57db46e93fe87ebc361e6a",
+        "expected": "f50b45fc06f4e99831d2d75365b70c8b99f9fc288f6a83158844f951e2373529"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.export-768.png",
+        "expected": "expected/app.admin.export-768.png",
+        "diff": "diff/app.admin.export-768.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "65.723% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 1024,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 1335124,
+        "overlapDifferingPixels": 99156,
+        "unmatchedDimensionPixels": 1235968,
+        "canvasPixels": 2022400,
+        "diffPercent": 66.01681170886076,
+        "actualDimensions": {
+          "width": 1024,
+          "height": 1975
+        },
+        "expectedDimensions": {
+          "width": 1024,
+          "height": 768
+        },
+        "canvas": {
+          "width": 1024,
+          "height": 1975
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-export",
+        "expectedTab": "export"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "162870100e0d69b3893c56df3f53745bcd0e503d64b4541335a5d188adc201a8",
+          "162870100e0d69b3893c56df3f53745bcd0e503d64b4541335a5d188adc201a8"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "3aa8cc03e8f790473a982e0cc3e172b20da663f978afc9e692a0c52a44378089",
+          "3aa8cc03e8f790473a982e0cc3e172b20da663f978afc9e692a0c52a44378089"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "162870100e0d69b3893c56df3f53745bcd0e503d64b4541335a5d188adc201a8",
+        "expected": "3aa8cc03e8f790473a982e0cc3e172b20da663f978afc9e692a0c52a44378089"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.export-1024.png",
+        "expected": "expected/app.admin.export-1024.png",
+        "diff": "diff/app.admin.export-1024.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "66.017% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.export",
+      "width": 1440,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 1090773,
+        "overlapDifferingPixels": 125973,
+        "unmatchedDimensionPixels": 964800,
+        "canvasPixels": 2260800,
+        "diffPercent": 48.24721337579618,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1570
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 900
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1570
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-export",
+        "expectedTab": "export"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "678bc3835867e1690bda2256c5aeee195564f476f6d3b087e15f40bec2dcb169",
+          "678bc3835867e1690bda2256c5aeee195564f476f6d3b087e15f40bec2dcb169"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 15,
+          "completedAtCaptureEnd": 15,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "2b55b8a08e2f8750d6092c9ecd1339f533d8e57dab24071e3f15190abbfa59f4",
+          "2b55b8a08e2f8750d6092c9ecd1339f533d8e57dab24071e3f15190abbfa59f4"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "678bc3835867e1690bda2256c5aeee195564f476f6d3b087e15f40bec2dcb169",
+        "expected": "2b55b8a08e2f8750d6092c9ecd1339f533d8e57dab24071e3f15190abbfa59f4"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.export-1440.png",
+        "expected": "expected/app.admin.export-1440.png",
+        "diff": "diff/app.admin.export-1440.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "48.247% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 375,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 1518894,
+        "overlapDifferingPixels": 39144,
+        "unmatchedDimensionPixels": 1479750,
+        "canvasPixels": 1879125,
+        "diffPercent": 80.8298543204949,
+        "actualDimensions": {
+          "width": 375,
+          "height": 5011
+        },
+        "expectedDimensions": {
+          "width": 375,
+          "height": 1065
+        },
+        "canvas": {
+          "width": 375,
+          "height": 5011
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-github",
+        "expectedTab": "github"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "d89bed033953ce7ab65b7b9ced09e09c4534e3ede732fed117511d39d3907400",
+          "d89bed033953ce7ab65b7b9ced09e09c4534e3ede732fed117511d39d3907400"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "0cce25a433d429d6089030e4e6479468c84356f44563dace881cc926879767f3",
+          "0cce25a433d429d6089030e4e6479468c84356f44563dace881cc926879767f3"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "d89bed033953ce7ab65b7b9ced09e09c4534e3ede732fed117511d39d3907400",
+        "expected": "0cce25a433d429d6089030e4e6479468c84356f44563dace881cc926879767f3"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.github-375.png",
+        "expected": "expected/app.admin.github-375.png",
+        "diff": "diff/app.admin.github-375.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "80.830% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 768,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 2716373,
+        "overlapDifferingPixels": 67541,
+        "unmatchedDimensionPixels": 2648832,
+        "canvasPixels": 3435264,
+        "diffPercent": 79.0731949567777,
+        "actualDimensions": {
+          "width": 768,
+          "height": 4473
+        },
+        "expectedDimensions": {
+          "width": 768,
+          "height": 1024
+        },
+        "canvas": {
+          "width": 768,
+          "height": 4473
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-github",
+        "expectedTab": "github"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "1f0dadcf48d18208af5e33c77e81543f1027462d91f57084ee28d65d71788f38",
+          "1f0dadcf48d18208af5e33c77e81543f1027462d91f57084ee28d65d71788f38"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "9b67314f530c88f2334ba4279bb222578dd5a30bfae60e3a58eea932e3e19b21",
+          "9b67314f530c88f2334ba4279bb222578dd5a30bfae60e3a58eea932e3e19b21"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "1f0dadcf48d18208af5e33c77e81543f1027462d91f57084ee28d65d71788f38",
+        "expected": "9b67314f530c88f2334ba4279bb222578dd5a30bfae60e3a58eea932e3e19b21"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.github-768.png",
+        "expected": "expected/app.admin.github-768.png",
+        "diff": "diff/app.admin.github-768.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "79.073% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 1024,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 3769450,
+        "overlapDifferingPixels": 55402,
+        "unmatchedDimensionPixels": 3714048,
+        "canvasPixels": 4612096,
+        "diffPercent": 81.72965176787301,
+        "actualDimensions": {
+          "width": 1024,
+          "height": 4504
+        },
+        "expectedDimensions": {
+          "width": 1024,
+          "height": 877
+        },
+        "canvas": {
+          "width": 1024,
+          "height": 4504
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-github",
+        "expectedTab": "github"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "3d4933928155c3c18c6721324d23a78fd35c6523ac54198195df1393702cd9fa",
+          "3d4933928155c3c18c6721324d23a78fd35c6523ac54198195df1393702cd9fa"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "498eb03e2f13ffa1f4618edc3b3b0db76c2e369356c8e33ff93aa9bb1433176f",
+          "498eb03e2f13ffa1f4618edc3b3b0db76c2e369356c8e33ff93aa9bb1433176f"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "3d4933928155c3c18c6721324d23a78fd35c6523ac54198195df1393702cd9fa",
+        "expected": "498eb03e2f13ffa1f4618edc3b3b0db76c2e369356c8e33ff93aa9bb1433176f"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.github-1024.png",
+        "expected": "expected/app.admin.github-1024.png",
+        "diff": "diff/app.admin.github-1024.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "81.730% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.github",
+      "width": 1440,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 4910323,
+        "overlapDifferingPixels": 61843,
+        "unmatchedDimensionPixels": 4848480,
+        "canvasPixels": 6144480,
+        "diffPercent": 79.91437843397651,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 4267
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 900
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 4267
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-github",
+        "expectedTab": "github"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "d0cde9dba9bfe45e704b3ec08277e009d35dd6420626645cd2f3c31af4635a7d",
+          "d0cde9dba9bfe45e704b3ec08277e009d35dd6420626645cd2f3c31af4635a7d"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "5cc5dbb86d874cebbbe4df9250b7d0cf87a869047c9d872b1191c39f35fa0655",
+          "5cc5dbb86d874cebbbe4df9250b7d0cf87a869047c9d872b1191c39f35fa0655"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "d0cde9dba9bfe45e704b3ec08277e009d35dd6420626645cd2f3c31af4635a7d",
+        "expected": "5cc5dbb86d874cebbbe4df9250b7d0cf87a869047c9d872b1191c39f35fa0655"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.github-1440.png",
+        "expected": "expected/app.admin.github-1440.png",
+        "diff": "diff/app.admin.github-1440.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "79.914% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 375,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 448070,
+        "overlapDifferingPixels": 31070,
+        "unmatchedDimensionPixels": 417000,
+        "canvasPixels": 893250,
+        "diffPercent": 50.16176882171845,
+        "actualDimensions": {
+          "width": 375,
+          "height": 2382
+        },
+        "expectedDimensions": {
+          "width": 375,
+          "height": 1270
+        },
+        "canvas": {
+          "width": 375,
+          "height": 2382
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-linkhealth",
+        "expectedTab": "link health"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "a891579549a758f6cf17d11b6ccee8373a3391311bf6b09f383e649374201f11",
+          "a891579549a758f6cf17d11b6ccee8373a3391311bf6b09f383e649374201f11"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 16,
+          "completedAtCaptureEnd": 16,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "0914b3a4b3b84a120453e9cd5b85ba27cc3f860a95b407aa024ab5b00dd3bc3a",
+          "0914b3a4b3b84a120453e9cd5b85ba27cc3f860a95b407aa024ab5b00dd3bc3a"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "a891579549a758f6cf17d11b6ccee8373a3391311bf6b09f383e649374201f11",
+        "expected": "0914b3a4b3b84a120453e9cd5b85ba27cc3f860a95b407aa024ab5b00dd3bc3a"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.linkhealth-375.png",
+        "expected": "expected/app.admin.linkhealth-375.png",
+        "diff": "diff/app.admin.linkhealth-375.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "50.162% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 768,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 801458,
+        "overlapDifferingPixels": 42674,
+        "unmatchedDimensionPixels": 758784,
+        "canvasPixels": 1545216,
+        "diffPercent": 51.86705289098741,
+        "actualDimensions": {
+          "width": 768,
+          "height": 2012
+        },
+        "expectedDimensions": {
+          "width": 768,
+          "height": 1024
+        },
+        "canvas": {
+          "width": 768,
+          "height": 2012
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-linkhealth",
+        "expectedTab": "link health"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "f068ccf691cd0625439aff3c5db4f27dac71dc04daab7a6ca4a24b9f51075cde",
+          "f068ccf691cd0625439aff3c5db4f27dac71dc04daab7a6ca4a24b9f51075cde"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 16,
+          "completedAtCaptureEnd": 16,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "fa8a7e50192d70a2e6a92401f2d6bb9472bcb48468c6c190e5e0d1c7963f74b7",
+          "fa8a7e50192d70a2e6a92401f2d6bb9472bcb48468c6c190e5e0d1c7963f74b7"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "f068ccf691cd0625439aff3c5db4f27dac71dc04daab7a6ca4a24b9f51075cde",
+        "expected": "fa8a7e50192d70a2e6a92401f2d6bb9472bcb48468c6c190e5e0d1c7963f74b7"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.linkhealth-768.png",
+        "expected": "expected/app.admin.linkhealth-768.png",
+        "diff": "diff/app.admin.linkhealth-768.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "51.867% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 1024,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 904553,
+        "overlapDifferingPixels": 46441,
+        "unmatchedDimensionPixels": 858112,
+        "canvasPixels": 1667072,
+        "diffPercent": 54.25998397189803,
+        "actualDimensions": {
+          "width": 1024,
+          "height": 1628
+        },
+        "expectedDimensions": {
+          "width": 1024,
+          "height": 790
+        },
+        "canvas": {
+          "width": 1024,
+          "height": 1628
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-linkhealth",
+        "expectedTab": "link health"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "9a5bbb70f538c51e90fcc1fc9d7748af91aa3a0b3376268992acd2ee19788386",
+          "9a5bbb70f538c51e90fcc1fc9d7748af91aa3a0b3376268992acd2ee19788386"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 16,
+          "completedAtCaptureEnd": 16,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "dc491b8bf8522d70f2d7f2e9383d122b521353ba74138d3b00984ad59a901da5",
+          "dc491b8bf8522d70f2d7f2e9383d122b521353ba74138d3b00984ad59a901da5"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "9a5bbb70f538c51e90fcc1fc9d7748af91aa3a0b3376268992acd2ee19788386",
+        "expected": "dc491b8bf8522d70f2d7f2e9383d122b521353ba74138d3b00984ad59a901da5"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.linkhealth-1024.png",
+        "expected": "expected/app.admin.linkhealth-1024.png",
+        "diff": "diff/app.admin.linkhealth-1024.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "54.260% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.linkhealth",
+      "width": 1440,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 828806,
+        "overlapDifferingPixels": 51206,
+        "unmatchedDimensionPixels": 777600,
+        "canvasPixels": 2073600,
+        "diffPercent": 39.96942515432099,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1440
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 900
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1440
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-linkhealth",
+        "expectedTab": "link health"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "1f8ef6fbf4459e3f0302ab37f85fb7e4921b919da2983cc6618f2000eee83b8c",
+          "1f8ef6fbf4459e3f0302ab37f85fb7e4921b919da2983cc6618f2000eee83b8c"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 16,
+          "completedAtCaptureEnd": 16,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "ac27ad37642c1d9dc2a82a5c4321a842440f6f8be248d560f3867921541deb75",
+          "ac27ad37642c1d9dc2a82a5c4321a842440f6f8be248d560f3867921541deb75"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "1f8ef6fbf4459e3f0302ab37f85fb7e4921b919da2983cc6618f2000eee83b8c",
+        "expected": "ac27ad37642c1d9dc2a82a5c4321a842440f6f8be248d560f3867921541deb75"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.linkhealth-1440.png",
+        "expected": "expected/app.admin.linkhealth-1440.png",
+        "diff": "diff/app.admin.linkhealth-1440.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "39.969% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 375,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 249706,
+        "overlapDifferingPixels": 34081,
+        "unmatchedDimensionPixels": 215625,
+        "canvasPixels": 652500,
+        "diffPercent": 38.26911877394636,
+        "actualDimensions": {
+          "width": 375,
+          "height": 1740
+        },
+        "expectedDimensions": {
+          "width": 375,
+          "height": 1165
+        },
+        "canvas": {
+          "width": 375,
+          "height": 1740
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-users",
+        "expectedTab": "users"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "0359d92a5e65cf95e2c2bb2c3b11b040eb3db1e7cabf03b24237d79e145406ac",
+          "0359d92a5e65cf95e2c2bb2c3b11b040eb3db1e7cabf03b24237d79e145406ac"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "c8498e1f846a42231242047c5d1785fb6b1857744d142502ff4637ba52e68d93",
+          "c8498e1f846a42231242047c5d1785fb6b1857744d142502ff4637ba52e68d93"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "0359d92a5e65cf95e2c2bb2c3b11b040eb3db1e7cabf03b24237d79e145406ac",
+        "expected": "c8498e1f846a42231242047c5d1785fb6b1857744d142502ff4637ba52e68d93"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.users-375.png",
+        "expected": "expected/app.admin.users-375.png",
+        "diff": "diff/app.admin.users-375.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "38.269% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 768,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 241501,
+        "overlapDifferingPixels": 48733,
+        "unmatchedDimensionPixels": 192768,
+        "canvasPixels": 1072896,
+        "diffPercent": 22.50926464447626,
+        "actualDimensions": {
+          "width": 768,
+          "height": 1397
+        },
+        "expectedDimensions": {
+          "width": 768,
+          "height": 1146
+        },
+        "canvas": {
+          "width": 768,
+          "height": 1397
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-users",
+        "expectedTab": "users"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "9caca99265f3ec5cb76db5ae8e3aed456df95c1f5e6f68e8ebb8d0dbfc511c97",
+          "9caca99265f3ec5cb76db5ae8e3aed456df95c1f5e6f68e8ebb8d0dbfc511c97"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "d233bdabc925722dac7d65ead7fe35b564d0c9a1b2df5d7311b9efa26fa9241e",
+          "d233bdabc925722dac7d65ead7fe35b564d0c9a1b2df5d7311b9efa26fa9241e"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "9caca99265f3ec5cb76db5ae8e3aed456df95c1f5e6f68e8ebb8d0dbfc511c97",
+        "expected": "d233bdabc925722dac7d65ead7fe35b564d0c9a1b2df5d7311b9efa26fa9241e"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.users-768.png",
+        "expected": "expected/app.admin.users-768.png",
+        "diff": "diff/app.admin.users-768.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "22.509% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 1024,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 455025,
+        "overlapDifferingPixels": 49521,
+        "unmatchedDimensionPixels": 405504,
+        "canvasPixels": 1461248,
+        "diffPercent": 31.139478035213735,
+        "actualDimensions": {
+          "width": 1024,
+          "height": 1427
+        },
+        "expectedDimensions": {
+          "width": 1024,
+          "height": 1031
+        },
+        "canvas": {
+          "width": 1024,
+          "height": 1427
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-users",
+        "expectedTab": "users"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "3bd06bbdec16c8f3636561e3d2254f2690d2f1938ce4815b401a47d9c4bbdcdc",
+          "3bd06bbdec16c8f3636561e3d2254f2690d2f1938ce4815b401a47d9c4bbdcdc"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "4fdaca43ec198f67972e28f89d95b6aec4fa9193a62a4d99f8f10355c9352235",
+          "4fdaca43ec198f67972e28f89d95b6aec4fa9193a62a4d99f8f10355c9352235"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "3bd06bbdec16c8f3636561e3d2254f2690d2f1938ce4815b401a47d9c4bbdcdc",
+        "expected": "4fdaca43ec198f67972e28f89d95b6aec4fa9193a62a4d99f8f10355c9352235"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.users-1024.png",
+        "expected": "expected/app.admin.users-1024.png",
+        "diff": "diff/app.admin.users-1024.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "31.139% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    },
+    {
+      "screen": "app.admin.users",
+      "width": 1440,
+      "family": "admin",
+      "kind": "app",
+      "eligibility": "pixel",
+      "denominator": true,
+      "urls": {
+        "actual": "http://127.0.0.1:5000/admin",
+        "expected": "http://127.0.0.1:34501/index.html"
+      },
+      "session": {
+        "userId": "2131539660",
+        "role": "admin"
+      },
+      "comparison": {
+        "differingPixels": 514049,
+        "overlapDifferingPixels": 48929,
+        "unmatchedDimensionPixels": 465120,
+        "canvasPixels": 1812960,
+        "diffPercent": 28.35412805577619,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1259
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 936
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1259
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      },
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "actualTab": "tab-users",
+        "expectedTab": "users"
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "4a5be1002cbb529722a65bc90f10d41c0090754aab4f5b2f6fc18620d3b33580",
+          "4a5be1002cbb529722a65bc90f10d41c0090754aab4f5b2f6fc18620d3b33580"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 14,
+          "completedAtCaptureEnd": 14,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "d1acb11b4167d9c624f3a9dd9a046a4bc563aec39bc5051eb169e9546c3d2725",
+          "d1acb11b4167d9c624f3a9dd9a046a4bc563aec39bc5051eb169e9546c3d2725"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "captureHashes": {
+        "actual": "4a5be1002cbb529722a65bc90f10d41c0090754aab4f5b2f6fc18620d3b33580",
+        "expected": "d1acb11b4167d9c624f3a9dd9a046a4bc563aec39bc5051eb169e9546c3d2725"
+      },
+      "fontsSettled": {
+        "actual": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        },
+        "expected": {
+          "complete": true,
+          "forcedParityFaces": 39,
+          "failedFaces": [],
+          "nativeDefects": []
+        }
+      },
+      "links": {
+        "actual": "actual/app.admin.users-1440.png",
+        "expected": "expected/app.admin.users-1440.png",
+        "diff": "diff/app.admin.users-1440.png"
+      },
+      "status": "FAIL",
+      "fontGap": false,
+      "fontDefects": [],
+      "reason": "28.354% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])"
+    }
+  ]
+}

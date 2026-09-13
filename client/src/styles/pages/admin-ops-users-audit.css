@@ -1,0 +1,204 @@
+/*
+ * Operations users / audit surfaces.
+ *
+ * The frozen admin reference uses one TableShell contract: a flat card,
+ * compact title bar, scrollable table, mono metadata, and hairline row rules.
+ * Keep this file scoped to the users, audit, and private contact inbox tabs so
+ * the catalog taxonomy manager retains its own surface contract.
+ */
+
+.admin-ops-audit-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.admin-ops-loading {
+  padding: 1.375rem;
+}
+
+.admin-ops-audit-toolbar {
+  padding: 1rem 1.375rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.admin-ops-search {
+  width: 12.5rem;
+}
+
+.admin-ops-search input {
+  background: var(--surface);
+}
+
+.admin-ops-table-wrap {
+  width: 100%;
+}
+
+.admin-ops-table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.admin-ops-table thead th {
+  height: auto;
+  padding: 0.75rem 0.875rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.03125rem;
+  line-height: 1.35;
+  text-align: left;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.admin-ops-table tbody td {
+  padding: 0.875rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-2);
+  vertical-align: middle;
+}
+
+.admin-ops-table tbody tr {
+  border-bottom: 0;
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+
+.admin-ops-table tbody tr:hover > td {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.admin-ops-table .admin-ops-cell-name {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.admin-ops-table .admin-ops-cell-email,
+.admin-ops-table .admin-ops-cell-role,
+.admin-ops-table .admin-ops-cell-actions {
+  color: var(--text-2);
+}
+
+.admin-ops-table .admin-ops-cell-joined,
+.admin-ops-table .admin-ops-cell-email,
+.admin-ops-table .admin-ops-cell-actions {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.admin-ops-table .admin-ops-cell-actions {
+  white-space: nowrap;
+}
+
+.admin-ops-table .admin-ops-cell-actions button,
+.admin-ops-table .admin-ops-cell-actions [role="combobox"] {
+  min-height: 2rem;
+}
+
+.admin-ops-table .admin-ops-cell-actions button {
+  min-width: 2rem;
+}
+
+.admin-ops-audit-detail-button {
+  color: var(--text-3, var(--text-2));
+  vertical-align: middle;
+}
+
+.admin-ops-audit-detail-button:hover {
+  color: var(--text);
+}
+
+.admin-ops-table .admin-ops-clickable-row {
+  cursor: pointer;
+}
+
+.admin-ops-table .admin-ops-clickable-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.admin-ops-table .admin-ops-clickable-row:hover > td {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.admin-ops-users-table {
+  min-width: 52rem;
+}
+
+.admin-ops-audit-table {
+  min-width: 60rem;
+}
+
+.admin-ops-contact-table {
+  min-width: 52rem;
+}
+
+.admin-ops-scroll-hint {
+  padding: 0 1.375rem;
+}
+
+.admin-ops-status-panel {
+  margin: 1.375rem;
+  padding: 2rem;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.admin-ops-pagination {
+  margin-inline: 1.375rem;
+  padding-bottom: 1rem;
+  border-color: var(--border);
+}
+
+.admin-ops-contact-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-ops-contact-dialog {
+  background: var(--bg-2);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+.admin-ops-contact-detail {
+  color: var(--text-2);
+}
+
+.admin-ops-contact-detail p {
+  color: var(--text);
+}
+
+@media (max-width: 48rem) {
+  .admin-ops-audit-toolbar {
+    padding-inline: 1rem;
+  }
+
+  .admin-ops-loading {
+    padding-inline: 1rem;
+  }
+
+  .admin-ops-scroll-hint {
+    padding-inline: 1rem;
+  }
+
+  .admin-ops-pagination {
+    margin-inline: 1rem;
+  }
+
+  .admin-ops-audit-table {
+    min-width: 60rem;
+  }
+
+  .admin-ops-contact-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,17 +1,22 @@
 import { useState } from "react";
 import { ApiError } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Search, RefreshCw, AlertCircle } from "lucide-react";
+import { Eye, Search, RefreshCw, AlertCircle } from "lucide-react";
 import { parseIntInRange, PG_INT4_MAX } from "@shared/validation";
+import {
+  AdminOpsScrollArea as ScrollArea,
+  AdminOpsTable as Table,
+  StatusChip,
+  TableShell,
+} from "@/components/admin/AdminOpsPrimitives";
+import ContactSubmissions from "@/components/admin/ContactSubmissions";
+import "@/styles/pages/admin-ops-users-audit.css";
 
 interface AuditLogEntry {
   id: number;
@@ -30,22 +35,55 @@ interface AuditLogsResponse {
   total: number;
 }
 
-/* WP-6 a11y: per-color ink is baked into each entry. Black ink passes AA on
-   every DS status/info surface. These are global semantic DS constants. */
-const ACTION_COLORS: Record<string, string> = {
-  created: "bg-[#34d08c] text-black", // DS-OK: status ok
-  updated: "bg-[#5eddf2] text-black", // DS-OK: cyan info (DS chart/info constant)
-  approved: "bg-[#34d08c] text-black", // DS-OK: status ok
-  rejected: "bg-[#ff5c7a] text-black", // DS-OK: status bad
-  deleted: "bg-[#ff5c7a] text-black", // DS-OK: status bad
-  synced: "bg-[#9d4edd] text-black", // DS-OK: violet info (DS chart/info constant)
-  ai_enriched: "bg-[#5eddf2] text-black", // DS-OK: cyan info (DS chart/info constant)
-  ai_enrichment_failed: "bg-[#ffb84d] text-black", // DS-OK: status warn
-  edit_suggested: "bg-[#ffb84d] text-black", // DS-OK: status warn
-  edit_approved: "bg-[#34d08c] text-black", // DS-OK: status ok
-  edit_rejected: "bg-[#ff5c7a] text-black", // DS-OK: status bad
-  bulk_import: "bg-[#9d4edd] text-black", // DS-OK: violet info (DS chart/info constant)
-  status_changed: "bg-[#ffb84d] text-black", // DS-OK: status warn
+function maskEmail(email: string): string {
+  const at = email.indexOf("@");
+  if (at <= 0) return email;
+  return `${email[0]}•••${email.slice(at)}`;
+}
+
+/* A log entry is recorded after the operation it describes. Keep this
+   translation explicit: rejected operations are not failed requests, a
+   deletion is not a failure, and an unknown action is not silently reported
+   as successful. */
+const ACTION_STATUS: Record<string, string> = {
+  create: "completed",
+  created: "completed",
+  update: "completed",
+  updated: "completed",
+  approved: "approved",
+  rejected: "rejected",
+  deleted: "completed",
+  synced: "completed",
+  imported: "completed",
+  exported: "completed",
+  import: "completed",
+  export: "completed",
+  skip: "completed",
+  ai_enriched: "completed",
+  ai_enrichment_failed: "failed",
+  edit_suggested: "pending",
+  edit_approved: "approved",
+  edit_rejected: "rejected",
+  edit_superseded: "completed",
+  edit_withdrawn: "completed",
+  bulk_import: "completed",
+  status_changed: "completed",
+  withdrawn: "completed",
+  category_created: "completed",
+  category_updated: "completed",
+  category_deleted: "completed",
+  subcategory_created: "completed",
+  subcategory_updated: "completed",
+  subcategory_deleted: "completed",
+  sub_subcategory_created: "completed",
+  sub_subcategory_updated: "completed",
+  sub_subcategory_deleted: "completed",
+  "users.exported": "completed",
+  "catalog.exported": "completed",
+  "catalog.exported_github": "pending",
+  "database.exported": "completed",
+  maintenance_backfill_approved_at: "completed",
+  maintenance_canonicalize_tags: "completed",
 };
 
 const LIMIT_OPTIONS = ["25", "50", "100", "200"];
@@ -111,40 +149,37 @@ export default function AuditTab() {
     });
   };
 
-  const summarizeChanges = (changes: Record<string, any> | null): string => {
-    if (!changes) return "—";
-    const keys = Object.keys(changes);
-    if (keys.length === 0) return "—";
-    if (keys.length <= 3) return keys.join(", ");
-    return `${keys.slice(0, 3).join(", ")} +${keys.length - 3} more`;
+  const actorLabel = (log: AuditLogEntry): string => {
+    if (log.performedByEmail) return maskEmail(log.performedByEmail);
+    if (log.performedBy) return log.performedBy.slice(0, 12);
+    return "system";
   };
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader><Skeleton className="h-8 w-64" /></CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+      <div className="admin-ops-audit-stack">
+        <TableShell
+          title={<Skeleton className="h-5 w-32" />}
+          className="admin-ops-audit-shell"
+        >
+          <div className="admin-ops-loading space-y-4">
             {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
           </div>
-        </CardContent>
-      </Card>
+        </TableShell>
+        <ContactSubmissions />
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          Audit Log
-        </CardTitle>
-        <CardDescription>
-          View system activity and resource change history ({data?.total || 0} entries)
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+    <div className="admin-ops-audit-stack">
+    <TableShell
+      title="Audit Log"
+      description={`Append-only · ${data?.total ?? 0} events`}
+      className="admin-ops-audit-shell"
+    >
+      <div className="space-y-4">
+        <form onSubmit={handleSearch} className="admin-ops-audit-toolbar flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
             <Input
@@ -237,22 +272,20 @@ export default function AuditTab() {
         {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
             right-edge fade + explicit hint make the hidden columns
             discoverable instead of silently clipping them. */}
-        <div className="relative">
+        <div className="admin-ops-table-wrap relative">
           <div
             className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
             aria-hidden="true"
           />
-          <div className="overflow-x-auto">
-          <Table>
+          <Table className="admin-ops-table admin-ops-audit-table">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16">ID</TableHead>
+                <TableHead className="w-20">ID</TableHead>
+                <TableHead>Actor</TableHead>
                 <TableHead>Action</TableHead>
-                <TableHead>Resource</TableHead>
-                <TableHead>By</TableHead>
-                <TableHead>Changes</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Target</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>When</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -260,36 +293,52 @@ export default function AuditTab() {
                 data.logs.map((log) => (
                   <TableRow
                     key={log.id}
-                    /* Run16 BUG-083: row click opens the full-entry detail view. */
-                    className="cursor-pointer"
+                    className="admin-ops-clickable-row cursor-pointer"
                     onClick={() => setSelectedLog(log)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setSelectedLog(log);
+                      }
+                    }}
+                    tabIndex={0}
+                    aria-label={`View details for audit entry ${log.id}`}
                     data-testid={`row-audit-log-${log.id}`}
                   >
-                    <TableCell className="text-xs text-muted-foreground">{log.id}</TableCell>
-                    <TableCell>
-                      <Badge className={`${ACTION_COLORS[log.action] || 'bg-muted text-foreground'} text-xs`}>
-                        {log.action.replace(/_/g, ' ')}
-                      </Badge>
+                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                      <span>{log.id}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="admin-ops-audit-detail-button ml-1 h-8 w-8"
+                        aria-label={`View details for audit entry ${log.id}`}
+                        data-testid={`button-audit-detail-${log.id}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setSelectedLog(log);
+                        }}
+                      >
+                        <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Button>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground max-w-[160px] truncate">
+                      {actorLabel(log)}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <span className="truncate" title={log.action.replace(/_/g, " ")}>
+                        {log.action.replace(/_/g, " ")}
+                      </span>
                     </TableCell>
                     <TableCell className="text-sm">
                       {log.originalResourceId || log.resourceId
                         ? `#${log.originalResourceId || log.resourceId}`
-                        : "system"}
+                        : "System"}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground max-w-[160px] truncate">
-                      {/* Run16 BUG-084: show the actor's email when known
-                          instead of a truncated raw UUID. */}
-                      {log.performedByEmail
-                        ? log.performedByEmail
-                        : log.performedBy
-                          ? log.performedBy.slice(0, 12)
-                          : "system"}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
-                      {summarizeChanges(log.changes)}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
-                      {log.notes || "—"}
+                    <TableCell>
+                      <StatusChip status={ACTION_STATUS[log.action] ?? "recorded"} className="text-xs">
+                        {(ACTION_STATUS[log.action] ?? "recorded").replace(/_/g, " ")}
+                      </StatusChip>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatDate(log.createdAt)}
@@ -298,14 +347,13 @@ export default function AuditTab() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     No audit log entries found
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
-          </div>
         </div>
         <p className="text-xs text-muted-foreground mt-2 sm:hidden">
           Swipe the table sideways to see all columns.
@@ -367,7 +415,7 @@ export default function AuditTab() {
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Performed by: </span>
-                  {selectedLog.performedByEmail || selectedLog.performedBy || "system"}
+                  {actorLabel(selectedLog)}
                 </div>
                 <div>
                   <div className="text-muted-foreground mb-1">Notes</div>
@@ -391,7 +439,9 @@ export default function AuditTab() {
             )}
           </DialogContent>
         </Dialog>
-      </CardContent>
-    </Card>
+      </div>
+    </TableShell>
+    <ContactSubmissions />
+    </div>
   );
 }

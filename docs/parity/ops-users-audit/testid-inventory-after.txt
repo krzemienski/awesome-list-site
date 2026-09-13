@@ -1,0 +1,43 @@
+Task 549 local testid inventory (after)
+
+Source: client/src/components/admin/UsersTab.tsx
+button-cancel-role-change
+button-confirm-delete-user
+button-confirm-role-change
+button-delete-user-${user.id}
+button-export-users
+button-sort-${col.key}
+button-toggle-email-${user.id}
+button-users-next-page
+button-users-prev-page
+input-user-search
+text-email-${user.id}
+text-name-${user.id}
+
+Source: client/src/components/admin/AuditTab.tsx
+alert-audit-error
+button-audit-next
+button-audit-prev
+button-audit-retry
+error-audit-resource-id
+input-audit-resource-id
+row-audit-log-${log.id}
+text-audit-detail-changes
+text-audit-detail-notes
+text-audit-range
+
+Source: client/src/components/admin/ContactSubmissions.tsx
+alert-contact-submissions-error
+alert-contact-submissions-not-found
+button-contact-submissions-next
+button-contact-submissions-prev
+button-contact-submissions-retry
+contact-submissions-shell
+row-contact-submission-${submission.id}
+text-contact-detail-email
+text-contact-detail-message
+text-contact-detail-name
+text-contact-detail-subject
+text-contact-email-${submission.id}
+text-contact-submissions-empty
+text-contact-submissions-range

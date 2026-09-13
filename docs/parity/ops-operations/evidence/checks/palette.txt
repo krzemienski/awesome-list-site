@@ -1,0 +1,59 @@
+PASS palette-regex-parity :: .agents/skills/verify-design-system/SKILL.md:169 matches scripts/validation/design-system-stage5.mjs:9
+PASS canaries :: all stage-5 detectors + ratchet classifier verified against known-bad/known-good samples
+FAIL hex-colors :: client/src/components/admin/DatabaseTab.tsx — "#34d08c" ×1, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/DatabaseTab.tsx:215: <CheckCircle2 className="h-4 w-4 text-[#34d08c]" />
+FAIL hex-colors :: client/src/components/admin/ExportTab.tsx — "#34d08c" ×1, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/ExportTab.tsx:534: <CheckCircle2 className="h-4 w-4 text-[#34d08c]" aria-hidden="true" />
+FAIL hex-colors :: client/src/components/admin/ExportTab.tsx — "#ff5c7a" ×4, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/ExportTab.tsx:536: <XCircle className="h-4 w-4 text-[#ff5c7a]" aria-hidden="true" />
+       client/src/components/admin/ExportTab.tsx:649: <h3 className="text-sm font-semibold text-[#ff5c7a]">
+       client/src/components/admin/ExportTab.tsx:657: <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#ff5c7a]" />
+       client/src/components/admin/ExportTab.tsx:663: <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#ff5c7a]">
+FAIL hex-colors :: client/src/components/admin/GitHubSyncPanel.tsx — "#34d08c" ×1, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/GitHubSyncPanel.tsx:507: <span className="text-[#34d08c]">+{sync.resourcesAdded}</span>
+FAIL hex-colors :: client/src/components/admin/GitHubSyncPanel.tsx — "#ff5c7a" ×1, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/GitHubSyncPanel.tsx:509: <span className="text-[#ff5c7a]">-{sync.resourcesRemoved}</span>
+FAIL hex-colors :: client/src/components/admin/GitHubSyncPanel.tsx — "#ffb84d" ×1, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/GitHubSyncPanel.tsx:508: <span className="text-[#ffb84d]">~{sync.resourcesUpdated}</span>
+FAIL hex-colors :: client/src/components/admin/admin-ops-export-database.css — "#34d08c" ×4, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/admin-ops-export-database.css:200: color: #34d08c;
+       client/src/components/admin/admin-ops-export-database.css:421: border: var(--hairline-w) solid color-mix(in srgb, #34d08c 20%, transparent);
+       client/src/components/admin/admin-ops-export-database.css:422: background: color-mix(in srgb, #34d08c 5%, transparent);
+       client/src/components/admin/admin-ops-export-database.css:427: color: #34d08c;
+FAIL hex-colors :: client/src/components/admin/admin-ops-export-database.css — "#ff5c7a" ×5, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/admin-ops-export-database.css:208: color: #ff5c7a;
+       client/src/components/admin/admin-ops-export-database.css:236: color: #ff5c7a;
+       client/src/components/admin/admin-ops-export-database.css:250: border: var(--hairline-w) solid color-mix(in srgb, #ff5c7a 20%, transparent);
+       client/src/components/admin/admin-ops-export-database.css:273: color: #ff5c7a;
+       client/src/components/admin/admin-ops-export-database.css:350: color: #ff5c7a;
+FAIL hex-colors :: client/src/components/admin/admin-ops-export-database.css — "#ffb84d" ×5, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/admin-ops-export-database.css:204: color: #ffb84d;
+       client/src/components/admin/admin-ops-export-database.css:240: color: #ffb84d;
+       client/src/components/admin/admin-ops-export-database.css:254: border: var(--hairline-w) solid color-mix(in srgb, #ffb84d 20%, transparent);
+       client/src/components/admin/admin-ops-export-database.css:277: color: #ffb84d;
+       client/src/components/admin/admin-ops-export-database.css:456: color: #ffb84d;
+FAIL hex-colors :: client/src/components/admin/admin-ops-primitives.css — "#ff5c7a" ×3, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/admin-ops-primitives.css:135: background: color-mix(in srgb, #ff5c7a 8%, transparent);
+       client/src/components/admin/admin-ops-primitives.css:136: border-color: color-mix(in srgb, #ff5c7a 30%, transparent);
+       client/src/components/admin/admin-ops-primitives.css:137: color: #ff5c7a;
+FAIL hex-colors :: client/src/components/admin/admin-ops-primitives.css — "#ffb84d" ×3, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/components/admin/admin-ops-primitives.css:129: background: color-mix(in srgb, #ffb84d 8%, transparent);
+       client/src/components/admin/admin-ops-primitives.css:130: border-color: color-mix(in srgb, #ffb84d 30%, transparent);
+       client/src/components/admin/admin-ops-primitives.css:131: color: #ffb84d;
+FAIL hex-colors :: client/src/styles/pages/admin-ops-github-links.css — "#34d08c" ×1, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/styles/pages/admin-ops-github-links.css:61: background: #34d08c;
+FAIL hex-colors :: client/src/styles/pages/admin-ops-github-links.css — "#ff5c7a" ×1, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/styles/pages/admin-ops-github-links.css:173: color: #ff5c7a;
+FAIL hex-colors :: client/src/styles/pages/admin-ops-github-links.css — "#ffb84d" ×2, baseline allows ×0 (hex color literals (untagged — no reasoned DS-OK within 5 lines))
+       client/src/styles/pages/admin-ops-github-links.css:169: color: #ffb84d;
+       client/src/styles/pages/admin-ops-github-links.css:177: border-color: color-mix(in srgb, #ffb84d 25%, var(--border));
+FAIL rgb-colors :: client/src/styles/pages/admin-ops-github-links.css — "rgb(52208140/45%)" ×1, baseline allows ×0 (rgb()/rgba() literals (untagged, not var(--…)-composed, no reasoned DS-OK))
+       client/src/styles/pages/admin-ops-github-links.css:62: box-shadow: 0 0 0.5rem rgb(52 208 140 / 45%);
+       Fix: route through DS tokens (bridge utilities, var(--token) refs, status
+       constants) per .agents/skills/verify-design-system/SKILL.md stage 5.
+       A genuinely intentional hex/rgb/radius/font-family value needs a
+       /* DS-OK: written reason */ tag on the same line or within the 5 lines
+       above it. Raw Tailwind palette classes have no escape hatch.
+
+15 palette-drift failure(s) (15 regression(s), 0 unratcheted cleanup(s)).
+The stage-5 allowlist only ever shrinks (task #357 sweep).

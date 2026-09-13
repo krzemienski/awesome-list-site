@@ -1,0 +1,33 @@
+{
+  "proposalOnly": true,
+  "aggregateInventoryModified": false,
+  "widths": [375, 768, 1024, 1440],
+  "pixelThreshold": 0.1,
+  "maximumDifferencePercent": 0.5,
+  "pixelRows": [
+    "app.admin.export",
+    "app.admin.database",
+    "app.admin.users",
+    "app.admin.github",
+    "app.admin.linkhealth",
+    "app.admin.audit"
+  ],
+  "residuals": [
+    {
+      "id": "ops.digest-health",
+      "eligibility": "token-only",
+      "actualPath": "/admin#digests",
+      "status": "two-pass-unverified"
+    },
+    {
+      "id": "ops.contact-submissions",
+      "eligibility": "token-only",
+      "actualPath": "/admin#audit",
+      "endpointRequired": "/api/admin/contact-submissions",
+      "status": "two-pass-unverified"
+    }
+  ],
+  "agentSettings": "No separate owned panel identified; not implemented or measured",
+  "overallStatus": "owned-implementation-ready-for-integration; full-page-pixel-and-final-regression-not-passed",
+  "evidence": "../../../tests/parity/baseline/2026-09-13T03-02-57-145Z-9888/results.json"
+}

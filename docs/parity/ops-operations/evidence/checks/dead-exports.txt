@@ -1,0 +1,4 @@
+PASS canaries :: export/import extraction + re-export & star following + namespace/dynamic whole-module uses + allowlist contract verified against synthetic modules
+FAIL stale-allowlist :: client/src/components/ui/scroll-area.tsx#ScrollBar is pinned as dead but is imported again — remove the entry (reason was: vendored shadcn/ui primitive family — full upstream surface kept so the next `shadcn add` does not conflict)
+
+1 dead-export failure(s).
