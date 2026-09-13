@@ -1,0 +1,14 @@
+{
+  "REPORT.md": "e482125d3c9928a30f1709e421c41045993874a4f7eda49eb1f2a7d3f67e2a8f",
+  "actual/app.admin.resources-1440.attempt-1.png": "d48f7ad194ee07d5bfe4650d52e024568a4bd3e3b457bec8c296de5b757b2621",
+  "actual/app.admin.resources-1440.attempt-2.png": "d48f7ad194ee07d5bfe4650d52e024568a4bd3e3b457bec8c296de5b757b2621",
+  "actual/app.admin.resources-1440.png": "d48f7ad194ee07d5bfe4650d52e024568a4bd3e3b457bec8c296de5b757b2621",
+  "actual/app.admin.resources-1440.repeat.png": "d48f7ad194ee07d5bfe4650d52e024568a4bd3e3b457bec8c296de5b757b2621",
+  "diff/app.admin.resources-1440.png": "c07746bb889391829f6265f1bf6f11aacbec1152860f852abad13240ccdff499",
+  "expected/app.admin.resources-1440.attempt-1.png": "d5dfbda7cf73299e9a5db95456b6f38128c0c8fa063ccf336de312464beb3dc9",
+  "expected/app.admin.resources-1440.attempt-2.png": "d5dfbda7cf73299e9a5db95456b6f38128c0c8fa063ccf336de312464beb3dc9",
+  "expected/app.admin.resources-1440.png": "d5dfbda7cf73299e9a5db95456b6f38128c0c8fa063ccf336de312464beb3dc9",
+  "expected/app.admin.resources-1440.repeat.png": "d5dfbda7cf73299e9a5db95456b6f38128c0c8fa063ccf336de312464beb3dc9",
+  "font-gaps.md": "0ffe52e348480ffab5cd42804ef9d050899a7705ef6bdcd35245375d64baf851",
+  "results.json": "0f8500d30bd9a1a93a91128186e407ab465cd3775295a342ab3b7d05d13928f6"
+}

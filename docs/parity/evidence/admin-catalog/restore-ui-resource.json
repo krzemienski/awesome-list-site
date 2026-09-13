@@ -1,0 +1,29 @@
+[identity] creating disposable Clerk admin 2053876886
+[identity] 2053876886 signed in and promoted (display name "Nick")
+{
+  "before": {
+    "kind": null,
+    "featured": false
+  },
+  "patch": {
+    "kind": 200,
+    "featured": 200
+  },
+  "after": {
+    "kind": null,
+    "featured": false
+  }
+}
+{
+  "teardown": {
+    "keepUser": false,
+    "bridgeId": "2053876886",
+    "email": "__qa_test_parity_mtz5r7mqa47b77+clerk_test@example.com",
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "errors": [],
+    "verification": {
+      "localQaUsersRemaining": []
+    }
+  }
+}

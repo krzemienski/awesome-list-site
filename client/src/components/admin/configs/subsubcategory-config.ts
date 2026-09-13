@@ -13,7 +13,8 @@ export const subSubcategoryConfig: GenericCrudManagerProps<SubSubcategoryWithCou
   entityName: "Sub-Subcategory",
   entityNamePlural: "Sub-Subcategories",
   icon: Layers3,
-  description: "Manage level 3 sub-subcategories. Sub-subcategories with resources cannot be deleted.",
+  description: (items) =>
+    `${items?.length ?? 0} third-level groupings`,
   fetchUrl: "/api/admin/sub-subcategories",
   createUrl: "/api/admin/sub-subcategories",
   updateUrl: (id: number) => `/api/admin/sub-subcategories/${id}`,
@@ -40,17 +41,19 @@ export const subSubcategoryConfig: GenericCrudManagerProps<SubSubcategoryWithCou
   ],
   columns: [
     {
-      key: "id",
-      label: "ID",
-      width: "w-[50px]"
+      key: "name",
+      label: "Name",
+      className: "admin-taxonomy-column-name"
     },
     {
-      key: "name",
-      label: "Name"
+      key: "slug",
+      label: "Slug",
+      className: "admin-taxonomy-column-slug"
     },
     {
       key: "category",
       label: "Parent Category",
+      className: "admin-taxonomy-column-parent",
       // BUG-006 (run19): while the parent lists are still loading (or their
       // fetch failed — surfaced by the manager's error banner) render a
       // neutral "—" instead of the alarming-and-wrong "Unknown" on every row.
@@ -67,6 +70,7 @@ export const subSubcategoryConfig: GenericCrudManagerProps<SubSubcategoryWithCou
     {
       key: "subcategory",
       label: "Parent Subcategory",
+      className: "admin-taxonomy-column-parent",
       render: (item: SubSubcategoryWithCount, parentData) => {
         const subs = parentData?.subcategoryId;
         if (!subs?.length) return '—';
@@ -75,19 +79,17 @@ export const subSubcategoryConfig: GenericCrudManagerProps<SubSubcategoryWithCou
       }
     },
     {
-      key: "slug",
-      label: "Slug"
-    },
-    {
       key: "resourceCount",
       label: "Resources",
-      align: "right" as const
+      align: "right" as const,
+      className: "admin-taxonomy-column-count"
     },
     {
       key: "actions",
       label: "Actions",
       align: "right" as const,
-      width: "w-[120px]"
+      width: "w-[120px]",
+      className: "admin-taxonomy-column-actions"
     }
   ],
   createDialogTitle: "Create Sub-Subcategory",

@@ -13,7 +13,8 @@ export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = 
   entityName: "Subcategory",
   entityNamePlural: "Subcategories",
   icon: Layers,
-  description: "Manage subcategories within each category",
+  description: (items) =>
+    `${items?.length ?? 0} second-level groupings`,
   fetchUrl: "/api/admin/subcategories",
   createUrl: "/api/admin/subcategories",
   updateUrl: (id: number) => `/api/admin/subcategories/${id}`,
@@ -33,21 +34,19 @@ export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = 
   ],
   columns: [
     {
-      key: "id",
-      label: "ID",
-      width: "w-20"
-    },
-    {
       key: "name",
-      label: "Name"
+      label: "Name",
+      className: "admin-taxonomy-column-name"
     },
     {
       key: "slug",
-      label: "Slug"
+      label: "Slug",
+      className: "admin-taxonomy-column-slug"
     },
     {
       key: "category",
-      label: "Category",
+      label: "Parent",
+      className: "admin-taxonomy-column-parent",
       render: (item: SubcategoryWithCount, parentData) => {
         const category = parentData?.categoryId?.find((c: BaseEntityWithCount) => c.id === item.categoryId);
         return category ? category.name : `ID: ${item.categoryId}`;
@@ -57,13 +56,14 @@ export const subcategoryConfig: GenericCrudManagerProps<SubcategoryWithCount> = 
       key: "resourceCount",
       label: "Resources",
       align: "center" as const,
-      className: "w-32"
+      className: "admin-taxonomy-column-count w-32"
     },
     {
       key: "actions",
       label: "Actions",
       align: "right" as const,
-      width: "w-32"
+      width: "w-32",
+      className: "admin-taxonomy-column-actions"
     }
   ],
   createDialogTitle: "Create Subcategory",

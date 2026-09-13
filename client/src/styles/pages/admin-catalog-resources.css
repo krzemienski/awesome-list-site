@@ -1,0 +1,150 @@
+/* catalog */
+/* Resource catalog panel: the frozen TableShell translated to app primitives. */
+.admin-catalog-resources__shell {
+  overflow: hidden;
+  padding: 0;
+}
+
+.admin-catalog-resources__header {
+  align-items: center;
+  border-bottom: var(--hairline-w) solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 18px 22px;
+}
+
+.admin-catalog-resources__title {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-catalog-resources__subtitle {
+  color: var(--text-3);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.admin-catalog-resources__content {
+  padding: 18px 22px 22px;
+}
+
+.admin-catalog-resources__filters {
+  align-items: stretch;
+}
+
+.admin-catalog-resources__table-scroll {
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.admin-catalog-resources__table {
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 900px;
+  width: 100%;
+}
+
+.admin-catalog-resources__table th {
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 12px 14px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-catalog-resources__table td {
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-2);
+  padding: 14px;
+  vertical-align: middle;
+}
+
+.admin-catalog-resources__table tbody tr:hover td {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.admin-catalog-resources__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-catalog-resources__kind-cell {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 130px;
+}
+
+.admin-catalog-resources__meta {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.admin-catalog-resources__native-select {
+  appearance: auto;
+  background: var(--surface);
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  min-height: 44px;
+  padding: 10px 14px;
+  width: 100%;
+}
+
+.admin-catalog-resources__native-select:hover {
+  border-color: var(--border-strong);
+}
+
+.admin-catalog-resources__native-select:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.admin-catalog-resources__switch-field {
+  align-items: center;
+  border: var(--border-w) solid var(--border);
+  display: flex;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.admin-catalog-resources__switch-field:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.admin-catalog-resources__action-error {
+  color: var(--color-destructive);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .admin-catalog-resources__header,
+  .admin-catalog-resources__content {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .admin-catalog-resources__table-scroll {
+    margin-left: -14px;
+    margin-right: -14px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+}

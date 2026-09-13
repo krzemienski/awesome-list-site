@@ -12,14 +12,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
+import { Plus, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { humanizeApiError } from "@/lib/apiError";
 import { formatAdminDateTime, slugify } from "@/lib/utils";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+import { fetchAwesomeListNav, type AwesomeListNav } from "@/lib/static-data";
 // Task 275: same fast numbered + jump pagination as the public listings.
 import { Paginator } from "@/components/ui/paginator";
+import "@/styles/pages/admin-catalog-taxonomy.css";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -692,7 +694,11 @@ export interface ColumnConfig<T extends BaseEntityWithCount = BaseEntityWithCoun
   width?: string;
   align?: "left" | "center" | "right";
   className?: string;
-  render?: (item: T, parentData?: Record<string, BaseEntityWithCount[]>) => ReactNode;
+  render?: (
+    item: T,
+    parentData?: Record<string, BaseEntityWithCount[]>,
+    navTree?: AwesomeListNav,
+  ) => ReactNode;
   /** Field-level permissions - controls column visibility */
   permissions?: FieldPermissions;
 }
@@ -764,7 +770,7 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   entityName: string;
   entityNamePlural: string;
   icon: LucideIcon;
-  description: string;
+  description: string | ((items?: T[], navTree?: AwesomeListNav) => string);
   fetchUrl: string;
   createUrl: string;
   updateUrl: (id: number) => string;
@@ -1541,6 +1547,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   };
 
+  // The app shell already keeps this lightweight, cached taxonomy tree warm.
+  // Reusing its query gives catalog rows authoritative child counts without
+  // downloading the full resource corpus or adding a second tree shape.
+  const { data: navTree } = useQuery<AwesomeListNav>({
+    queryKey: ["awesome-list-nav"],
+    queryFn: fetchAwesomeListNav,
+    staleTime: 1000 * 60 * 60,
+  });
+
   // Fetch parent data
   const parentQueries = parents.map(parent =>
     useQuery<BaseEntityWithCount[]>({
@@ -1585,6 +1600,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     staleTime: 30_000,
     refetchOnWindowFocus: true
   });
+
+  const resolvedDescription = typeof description === "function"
+    ? description(items, navTree)
+    : description;
 
   // Filter items based on search query
   const filteredItems = useMemo(() => {
@@ -1735,6 +1754,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       });
     },
     onSuccess: (newEntity: T) => {
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
         queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
@@ -1791,6 +1812,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       return { updatedEntity, previousData };
     },
     onSuccess: ({ updatedEntity, previousData }) => {
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
         queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
@@ -1834,6 +1857,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       return { id, previousData };
     },
     onSuccess: ({ id, previousData }) => {
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+      void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
         queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
@@ -2427,26 +2452,26 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   };
 
   return (
-    <Card className="border-0" data-testid={testIdPrefix}>
-      <CardHeader>
+    <Card className="admin-taxonomy-shell border-0" data-testid={testIdPrefix}>
+      <CardHeader className="admin-taxonomy-header">
         {/* R5-003 (run24): the header row must WRAP — at 768/375 the rigid
             no-wrap flex row pushed the search input + "Add" button past the
             overflow-x-hidden clip edge, leaving the only CRUD entry point on
             the taxonomy tabs unreachable. */}
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="admin-taxonomy-header-row flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <CardTitle className="flex items-center gap-2">
+      <CardTitle className="admin-taxonomy-title flex items-center gap-2">
               <Icon className="h-5 w-5" />
-              {entityNamePlural} Manager
+              {entityNamePlural}
             </CardTitle>
-            <CardDescription>
-              {description}
+            <CardDescription className="admin-taxonomy-description">
+              {resolvedDescription}
             </CardDescription>
           </div>
-          <div className="flex flex-wrap items-center gap-3 min-w-0 max-w-full">
+          <div className="admin-taxonomy-header-actions flex flex-wrap items-center gap-3 min-w-0 max-w-full">
             {/* Bulk Actions Toolbar */}
             {bulkOperationsEnabled && selectedIds.size > 0 && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg" data-testid="bulk-actions-toolbar">
+              <div className="admin-taxonomy-bulk-actions flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg" data-testid="bulk-actions-toolbar">
                 <span className="text-sm font-medium" data-testid="text-selected-count">
                   {selectedIds.size} selected
                 </span>
@@ -2521,7 +2546,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             {searchEnabled && (
               /* R5-003: cap the search box to the available width so it never
                  forces the row past the viewport at 375px. */
-              <div className="relative w-64 max-w-full">
+              <div className="admin-taxonomy-search relative w-64 max-w-full">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder={searchPlaceholder || `Search ${entityNamePlural.toLowerCase()}...`}
@@ -2590,25 +2615,21 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               data-testid={`button-create-${testIdEntity}`}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add {entityName}
+              Add {entityName.toLowerCase()}
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        {(searchEnabled && searchQuery && filteredItems) || (paginationEnabled && totalItems > 0) ? (
-          <p className="text-sm text-muted-foreground mb-4" data-testid="text-search-results">
-            {searchQuery ? (
+      <CardContent className="admin-taxonomy-content">
+          {searchEnabled && searchQuery && filteredItems ? (
+          <p className="admin-taxonomy-results text-sm text-muted-foreground mb-4" data-testid="text-search-results">
               <>Showing {paginationEnabled ? `${Math.min((currentPage - 1) * pageSize + 1, totalItems)}-${Math.min(currentPage * pageSize, totalItems)} of ` : ''}{totalItems} result{totalItems !== 1 ? 's' : ''} (filtered from {items?.length || 0})</>
-            ) : paginationEnabled ? (
-              <>Showing {Math.min((currentPage - 1) * pageSize + 1, totalItems)}-{Math.min(currentPage * pageSize, totalItems)} of {totalItems} {entityNamePlural.toLowerCase()}</>
-            ) : null}
           </p>
         ) : null}
         {failedParentQueries.length > 0 && (
           <div
             role="alert"
-            className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm"
+            className="admin-taxonomy-parent-error mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm"
             data-testid="alert-parent-load-failed"
           >
             <span>
@@ -2626,14 +2647,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </div>
         )}
         {isLoading ? (
-          <div className="space-y-2">
+          <div className="admin-taxonomy-loading space-y-2">
             {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="h-12 w-full" />
             ))}
           </div>
         ) : (
           <>
-          <Table data-testid={`table-${testIdEntityPlural}`}>
+          <Table className="admin-taxonomy-table" data-testid={`table-${testIdEntityPlural}`}>
             <TableHeader>
               <TableRow>
                 {bulkOperationsEnabled && (
@@ -2651,7 +2672,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 {getVisibleColumns.map((col) => (
                   <TableHead
                     key={col.key}
-                    className={col.width ? col.width : col.align === "right" ? "text-right" : ""}
+                    className={`${col.className || ""} ${col.width ? col.width : col.align === "right" ? "text-right" : ""}`}
                   >
                     {col.label}
                   </TableHead>
@@ -2673,7 +2694,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 </TableRow>
               )}
               {paginatedItems?.map((item) => (
-                <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={selectedIds.has(item.id) ? "bg-muted/50" : ""}>
+                <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={`admin-taxonomy-row ${selectedIds.has(item.id) ? "bg-muted/50" : ""}`}>
                   {bulkOperationsEnabled && (
                     <TableCell className="w-[50px]">
                       <Checkbox
@@ -2692,27 +2713,28 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                       className={`${col.className || ""} ${col.align === "right" ? "text-right" : ""}`}
                       data-testid={col.key === "name" ? `text-${testIdEntity}-name-${item.id}` : undefined}
                     >
-                      {col.render ? col.render(item, parentData) : (
+                      {col.render ? col.render(item, parentData, navTree) : (
                         col.key === "id" ? (
-                          <span className="font-mono text-sm">{item.id}</span>
+                          <span className="admin-taxonomy-cell-id font-mono text-sm">{item.id}</span>
                         ) : col.key === "name" ? (
-                          <span className="font-medium">{item.name}</span>
+                          <span className="admin-taxonomy-cell-name font-medium">{item.name}</span>
                         ) : col.key === "slug" ? (
-                          <span className="font-mono text-sm text-muted-foreground">{item.slug}</span>
+                          <span className="admin-taxonomy-cell-slug font-mono text-sm text-muted-foreground">{item.slug}</span>
                         ) : col.key === "resourceCount" ? (
-                          <Badge variant="secondary" data-testid={`badge-count-${item.id}`}>
+                          <Badge className="admin-taxonomy-cell-count" variant="secondary" data-testid={`badge-count-${item.id}`}>
                             {item.resourceCount}
                           </Badge>
                         ) : col.key === "actions" ? (
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="admin-taxonomy-row-actions flex items-center justify-end gap-2">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditDialog(item)}
+                              className="admin-taxonomy-row-action"
                               aria-label={`Edit ${item.name}`}
                               data-testid={`button-edit-${item.id}`}
                             >
-                              <Pencil className="h-4 w-4" />
+                              <span>Edit</span>
                             </Button>
                             {/* Run16 BUG-081: disabled delete gets a visible reason.
                                 The title lives on a wrapping span because disabled
@@ -2728,6 +2750,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                                 size="sm"
                                 onClick={() => openDeleteDialog(item)}
                                 disabled={item.resourceCount > 0}
+                                className="admin-taxonomy-row-action"
                                 aria-label={item.resourceCount > 0
                                   ? `Delete unavailable: ${item.resourceCount} resources still assigned`
                                   : "Delete"}
@@ -2752,7 +2775,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               component as the public listings) so any page is reachable in ≤2
               interactions; rows-per-page selector kept alongside it. */}
           {paginationEnabled && totalPages > 1 && (
-            <div className="mt-4 pt-4 border-t" data-testid={`pagination-${testIdEntityPlural}`}>
+            <div className="admin-taxonomy-pagination mt-4 pt-4 border-t" data-testid={`pagination-${testIdEntityPlural}`}>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rows per page:</span>
                 <Select
@@ -2792,7 +2815,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       {/* Create Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent data-testid={`dialog-create-${testIdEntity}`}>
+        <DialogContent className="admin-taxonomy-dialog" data-testid={`dialog-create-${testIdEntity}`}>
           <DialogHeader>
             <DialogTitle>{createDialogTitle}</DialogTitle>
             <DialogDescription>
@@ -2809,7 +2832,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {formError}
             </div>
           )}
-          <div className="space-y-4 py-4">
+          <div className="admin-taxonomy-form space-y-4 py-4">
             {parents.map((parent, index) => {
               const options = getFilteredParentOptions(parent.fieldName);
               const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);
@@ -3039,7 +3062,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent data-testid={`dialog-edit-${testIdEntity}`}>
+        <DialogContent className="admin-taxonomy-dialog" data-testid={`dialog-edit-${testIdEntity}`}>
           <DialogHeader>
             <DialogTitle>{editDialogTitle}</DialogTitle>
             <DialogDescription>
@@ -3056,7 +3079,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {formError}
             </div>
           )}
-          <div className="space-y-4 py-4">
+          <div className="admin-taxonomy-form space-y-4 py-4">
             {parents.map((parent, index) => {
               const options = getFilteredParentOptions(parent.fieldName);
               const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);

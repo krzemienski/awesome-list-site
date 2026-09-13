@@ -1,0 +1,309 @@
+/* catalog */
+/*
+ * Admin catalog / taxonomy surface
+ *
+ * Selector inventory (before): Card, CardHeader, CardTitle, CardDescription,
+ * CardContent, Table, TableHead, TableCell, TableRow, Badge and Button are
+ * shared primitives. The selectors below are deliberately page-scoped: this
+ * surface owns the generic taxonomy manager and UsersTab without changing
+ * ResourceManager, shell chrome, or the shared table/card primitives.
+ *
+ * The table geometry mirrors the frozen AdminCategories /
+ * AdminSubcategories TableShell. Paint comes from the active design-system
+ * tokens so the surface remains valid for every personality and accent.
+ */
+
+.admin-taxonomy-shell {
+  overflow: hidden;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: none;
+  transition: border-color var(--motion-fast), background-color var(--motion-fast);
+}
+
+.admin-taxonomy-shell:hover {
+  transform: none;
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.admin-taxonomy-header {
+  padding: 1.125rem 1.375rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.admin-taxonomy-header-row {
+  align-items: center;
+}
+
+.admin-taxonomy-title {
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: normal;
+}
+
+.admin-taxonomy-title > svg {
+  display: none;
+}
+
+.admin-taxonomy-description {
+  margin-top: 0.25rem;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.admin-taxonomy-header-actions {
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.admin-taxonomy-bulk-actions {
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.admin-taxonomy-bulk-actions > span {
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.admin-taxonomy-search {
+  width: 12.5rem;
+}
+
+.admin-taxonomy-search input {
+  background: var(--surface);
+}
+
+.admin-taxonomy-content {
+  padding: 0;
+}
+
+.admin-taxonomy-results {
+  margin: 0;
+  padding: 0.875rem 1.375rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-3);
+  font-size: 0.75rem;
+}
+
+.admin-taxonomy-parent-error {
+  margin: 1rem 1.375rem;
+}
+
+.admin-taxonomy-loading {
+  padding: 1.375rem;
+}
+
+/* TableShell geometry from the frozen admin reference. */
+.admin-taxonomy-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.admin-taxonomy-table thead th {
+  height: auto;
+  padding: 0.75rem 0.875rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.03125rem;
+  line-height: 1.35;
+  text-align: left;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.admin-taxonomy-table tbody td {
+  padding: 0.875rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+  color: var(--text-2);
+  vertical-align: middle;
+}
+
+.admin-taxonomy-table tbody tr {
+  border-bottom: 0;
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+
+.admin-taxonomy-table tbody tr:hover > td {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.admin-taxonomy-table .admin-taxonomy-column-id,
+.admin-taxonomy-table .admin-taxonomy-cell-id,
+.admin-taxonomy-table .admin-taxonomy-cell-slug,
+.admin-taxonomy-table .admin-taxonomy-cell-joined {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.admin-taxonomy-table .admin-taxonomy-cell-id,
+.admin-taxonomy-table .admin-taxonomy-cell-slug,
+.admin-taxonomy-table .admin-taxonomy-cell-joined {
+  color: var(--text-3);
+}
+
+.admin-taxonomy-table .admin-taxonomy-cell-name {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.admin-taxonomy-table .admin-taxonomy-column-icon {
+  width: 5rem;
+  color: var(--accent);
+}
+
+.admin-taxonomy-category-icon {
+  display: block;
+  color: var(--accent);
+  stroke-width: 1.75;
+}
+
+.admin-taxonomy-table .admin-taxonomy-column-parent {
+  color: var(--text-2);
+}
+
+.admin-taxonomy-table .admin-taxonomy-cell-count {
+  display: inline-flex;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.admin-taxonomy-row-actions {
+  gap: 0.375rem;
+}
+
+.admin-taxonomy-row-action {
+  min-width: 44px;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 0.625rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 0.75rem;
+}
+
+.admin-taxonomy-row-action:hover {
+  color: var(--text);
+}
+
+.admin-taxonomy-pagination {
+  margin-inline: 1.375rem;
+  padding-bottom: 1rem;
+  border-color: var(--border);
+}
+
+.admin-taxonomy-pagination > div:first-child {
+  color: var(--text-3);
+}
+
+.admin-taxonomy-dialog {
+  background: var(--bg-2);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+.admin-taxonomy-form {
+  max-height: min(60vh, 32rem);
+  overflow-y: auto;
+  padding-inline: 0.125rem;
+}
+
+.admin-taxonomy-form label {
+  color: var(--text-2);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.admin-taxonomy-form p {
+  color: var(--text-3);
+}
+
+.admin-taxonomy-form input,
+.admin-taxonomy-form textarea {
+  background: var(--surface);
+}
+
+.admin-users-toolbar {
+  padding: 1rem 1.375rem;
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.admin-users-table .admin-taxonomy-cell-email,
+.admin-users-table .admin-taxonomy-cell-role,
+.admin-users-table .admin-taxonomy-cell-actions {
+  color: var(--text-2);
+}
+
+.admin-users-table .admin-taxonomy-cell-actions {
+  white-space: nowrap;
+}
+
+.admin-users-scroll-hint {
+  padding: 0 1.375rem;
+}
+
+@media (max-width: 48rem) {
+  .admin-taxonomy-header {
+    padding: 1rem;
+  }
+
+  .admin-taxonomy-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-taxonomy-search {
+    flex: 1 1 12rem;
+    width: auto;
+  }
+
+  .admin-taxonomy-results,
+  .admin-taxonomy-loading {
+    padding-inline: 1rem;
+  }
+
+  .admin-taxonomy-parent-error {
+    margin-inline: 1rem;
+  }
+
+  .admin-taxonomy-table {
+    min-width: 42rem;
+  }
+
+  .admin-taxonomy-pagination {
+    margin-inline: 1rem;
+  }
+
+  .admin-users-toolbar {
+    padding-inline: 1rem;
+  }
+
+  .admin-users-scroll-hint {
+    padding-inline: 1rem;
+  }
+
+  .admin-users-table {
+    min-width: 52rem;
+  }
+}

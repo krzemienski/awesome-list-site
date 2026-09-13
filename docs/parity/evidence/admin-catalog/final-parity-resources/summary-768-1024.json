@@ -1,0 +1,59 @@
+{
+  "identity": {
+    "mode": "admin",
+    "reason": null,
+    "bridgeId": "2108811145",
+    "displayName": "Nick",
+    "clerkUserId": "user_3JFkEsqbMFJ9oapg7hFb2B1MOgf",
+    "teardown": {
+      "keepUser": false,
+      "bridgeId": "2108811145",
+      "email": "__qa_test_parity_mtz5n81e76aca8+clerk_test@example.com",
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "errors": [],
+      "verification": {
+        "localQaUsersRemaining": [
+          {
+            "id": "2070874915",
+            "email": "__qa_test_parity_mtz5atz3bfb0a3+clerk_test@example.com"
+          },
+          {
+            "id": "2073814202",
+            "email": "__qa_test_parity_mtz4osrpfc5cf5+clerk_test@example.com"
+          }
+        ]
+      }
+    },
+    "teardownError": null,
+    "prefix": "__qa_test_parity_"
+  },
+  "summary": {
+    "denominator": 2,
+    "pass": 0,
+    "fail": 2,
+    "incomplete": 0,
+    "incompleteEvidence": false,
+    "fontGapOnlyFails": 0,
+    "blocked": 0,
+    "evidence": 0,
+    "unverified": 0,
+    "aliases": 0
+  },
+  "rows": [
+    {
+      "screen": "app.admin.resources",
+      "width": 768,
+      "status": "FAIL",
+      "reason": "98.738% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 98.73768482136434
+    },
+    {
+      "screen": "app.admin.resources",
+      "width": 1024,
+      "status": "FAIL",
+      "reason": "98.700% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 98.6998609721367
+    }
+  ]
+}

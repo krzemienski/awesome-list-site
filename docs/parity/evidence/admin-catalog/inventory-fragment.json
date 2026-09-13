@@ -1,0 +1,11 @@
+{
+  "owner": "admin-catalog",
+  "aggregateInventoryEdited": false,
+  "surfaces": [
+    { "id": "app.admin.resources", "eligibility": "pixel", "widths": [375, 768, 1024, 1440], "status": "FAIL", "evidence": "final-parity-resources" },
+    { "id": "app.admin.categories", "eligibility": "pixel", "widths": [375, 768, 1024, 1440], "status": "FAIL", "evidence": "final-parity-taxonomy/accepted-run" },
+    { "id": "app.admin.subcategories", "eligibility": "pixel", "widths": [375, 768, 1024, 1440], "status": "FAIL", "evidence": "final-parity-taxonomy/accepted-run" },
+    { "id": "app.admin.subsubcategories", "eligibility": "token-only", "widths": [375, 768, 1024, 1440], "status": "UNVERIFIED", "evidence": "final-pass/functional-axe.json" }
+  ],
+  "integrationNotes": "HANDOFF.md"
+}

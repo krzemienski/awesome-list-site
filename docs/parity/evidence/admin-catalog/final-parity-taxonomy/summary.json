@@ -1,0 +1,125 @@
+{
+  "identity": {
+    "mode": "admin",
+    "reason": null,
+    "bridgeId": "2112714128",
+    "displayName": "Nick",
+    "clerkUserId": "user_3JFjbXtN7ANorW3PUfWymWt3AaA",
+    "teardown": {
+      "keepUser": false,
+      "bridgeId": "2112714128",
+      "email": "__qa_test_parity_mtz5ghpf1af119+clerk_test@example.com",
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "errors": [],
+      "verification": {
+        "localQaUsersRemaining": [
+          {
+            "id": "2070874915",
+            "email": "__qa_test_parity_mtz5atz3bfb0a3+clerk_test@example.com"
+          },
+          {
+            "id": "2073814202",
+            "email": "__qa_test_parity_mtz4osrpfc5cf5+clerk_test@example.com"
+          }
+        ]
+      }
+    },
+    "teardownError": null,
+    "prefix": "__qa_test_parity_"
+  },
+  "summary": {
+    "denominator": 8,
+    "pass": 0,
+    "fail": 8,
+    "incomplete": 0,
+    "incompleteEvidence": false,
+    "fontGapOnlyFails": 0,
+    "blocked": 0,
+    "evidence": 0,
+    "unverified": 4,
+    "aliases": 0
+  },
+  "rows": [
+    {
+      "screen": "app.admin.categories",
+      "width": 375,
+      "status": "FAIL",
+      "reason": "38.008% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 38.008456021140056
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 768,
+      "status": "FAIL",
+      "reason": "31.148% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 31.147648951925266
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 1024,
+      "status": "FAIL",
+      "reason": "34.045% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 34.044893411693266
+    },
+    {
+      "screen": "app.admin.categories",
+      "width": 1440,
+      "status": "FAIL",
+      "reason": "21.336% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 21.33643857271906
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 375,
+      "status": "FAIL",
+      "reason": "26.215% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 26.215337657382676
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 768,
+      "status": "FAIL",
+      "reason": "25.835% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 25.835027865642417
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 1024,
+      "status": "FAIL",
+      "reason": "9.940% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 9.93969882729211
+    },
+    {
+      "screen": "app.admin.subcategories",
+      "width": 1440,
+      "status": "FAIL",
+      "reason": "21.539% differing pixels exceeds the 0.5% ceiling; backdrop-filter sets differ (app [\"blur(14px)\"] vs reference [\"blur(14px)\",\"blur(2px)\"])",
+      "diffPercent": 21.538846433770015
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 375,
+      "status": "UNVERIFIED",
+      "reason": "App tab \"Sub-subcategories\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 768,
+      "status": "UNVERIFIED",
+      "reason": "App tab \"Sub-subcategories\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 1024,
+      "status": "UNVERIFIED",
+      "reason": "App tab \"Sub-subcategories\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    },
+    {
+      "screen": "app.admin.subsubcategories",
+      "width": 1440,
+      "status": "UNVERIFIED",
+      "reason": "App tab \"Sub-subcategories\" has no design counterpart tab in ADMIN_TABS; verified through table and form tokens."
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -44,15 +45,70 @@ import {
   type ResourceProvider,
   type ResourceSkillLevel,
 } from "@shared/resourceFacets";
+import {
+  RESOURCE_KIND_VALUES,
+  resolveResourceKindFrom,
+  resourceKindSchema,
+  type ResourceKind,
+} from "@shared/resourceKinds";
+import "@/styles/pages/admin-catalog-resources.css";
 
-type ResourceKind = "tools" | "libraries" | "standards" | "events" | "protocols" | "other";
-const RESOURCE_KIND_OPTIONS: Array<{ value: ResourceKind; label: string }> = [
-  { value: "tools", label: "Tools" }, { value: "libraries", label: "Libraries" },
-  { value: "standards", label: "Standards" }, { value: "events", label: "Events" },
-  { value: "protocols", label: "Protocols" }, { value: "other", label: "Other" },
-];
-type AdminResource = Resource & { kind: ResourceKind | null; resolvedKind: ResourceKind; metadata: (Record<string, any> & { featured?: boolean }) | null };
+const RESOURCE_KIND_LABELS: Record<ResourceKind, string> = {
+  tools: "Tools",
+  libraries: "Libraries",
+  standards: "Standards",
+  events: "Events",
+  protocols: "Protocols",
+  other: "Other",
+};
+const resourceKindLabel = (kind: ResourceKind) => RESOURCE_KIND_LABELS[kind];
+type ResourceMetadata = Record<string, unknown> & { featured?: boolean };
+type AdminResourceWire = Omit<Resource, "kind" | "metadata"> & {
+  kind: ResourceKind | null;
+  metadata: ResourceMetadata | null;
+};
+type AdminResource = Omit<AdminResourceWire, "metadata"> & {
+  metadata: ResourceMetadata | null;
+  resolvedKind: ResourceKind;
+};
+type ResourcePatchResponse = AdminResourceWire;
+
+const safeResourceMetadata = (metadata: unknown): ResourceMetadata | null => {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return null;
+  return metadata as ResourceMetadata;
+};
+
+const safeResourceMetadataTags = (
+  metadata: ResourceMetadata | null,
+): readonly unknown[] | undefined => {
+  const tags = metadata?.tags;
+  return Array.isArray(tags) ? tags : undefined;
+};
+
+const normalizeAdminResource = (resource: AdminResourceWire): AdminResource => {
+  const metadata = safeResourceMetadata(resource.metadata);
+  const parsedKind = resourceKindSchema.safeParse(resource.kind);
+  const kind = parsedKind.success ? parsedKind.data : null;
+  const resolvedKind = resolveResourceKindFrom({
+    storedKind: kind,
+    tags: safeResourceMetadataTags(metadata),
+    taxonomy: [resource.category, resource.subcategory, resource.subSubcategory],
+  }).kind;
+  return { ...resource, kind, metadata, resolvedKind };
+};
+
 const featuredValue = (resource: AdminResource) => resource.metadata?.featured === true;
+
+const formatResourceUpdatedAt = (updatedAt: Date | string | null | undefined) => {
+  if (!updatedAt) return "—";
+  const date = new Date(updatedAt);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+};
 
 interface ResourcesResponse {
   resources: AdminResource[];
@@ -61,6 +117,21 @@ interface ResourcesResponse {
   limit: number;
   totalPages: number;
 }
+
+interface AdminResourcesWireResponse {
+  resources: AdminResourceWire[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+const normalizeAdminResourcesResponse = (
+  response: AdminResourcesWireResponse,
+): ResourcesResponse => ({
+  ...response,
+  resources: response.resources.map(normalizeAdminResource),
+});
 
 /* WP-6 a11y: black ink on mid-tone badges — white on -500 tones is 2.3–3.8:1 (fails AA). */
 /**
@@ -147,6 +218,9 @@ export default function ResourceManager() {
   // BUG-049: per-field inline errors + a dialog-level banner for server 400s.
   const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string; description?: string }>({});
   const [formError, setFormError] = useState<string | null>(null);
+  // Catalog controls use narrow PATCH endpoints. Keep failures next to the
+  // control that initiated them so an error never closes/remounts the dialog.
+  const [resourceActionErrors, setResourceActionErrors] = useState<Record<string, string>>({});
 
   const [editForm, setEditForm] = useState({
     title: "",
@@ -217,7 +291,9 @@ export default function ResourceManager() {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resources');
-      return response.json();
+      return normalizeAdminResourcesResponse(
+        (await response.json()) as AdminResourcesWireResponse,
+      );
     },
     // Audit2 BUG-003: hold the previous page while a new key fetches so the
     // table (and the search input above it) never unmounts between requests.
@@ -244,7 +320,9 @@ export default function ResourceManager() {
         credentials: 'include'
       });
       if (!response.ok) throw new ApiError(response.status, 'Failed to fetch resource total');
-      return response.json();
+      return normalizeAdminResourcesResponse(
+        (await response.json()) as AdminResourcesWireResponse,
+      );
     },
     staleTime: 60000
   });
@@ -273,13 +351,176 @@ export default function ResourceManager() {
       // BUG-049: keep the dialog open and surface the server's message inline
       // so the operator can correct the field, not just see a vanishing toast.
       setFormError(error.message || "Failed to update resource");
-      toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update resource",
-        variant: "destructive"
-      });
     }
   });
+
+  const invalidateResourceCaches = (resourceId?: number) => {
+    void queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+    void queryClient.invalidateQueries({ queryKey: ['/api/admin/audit-logs'] });
+    void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+    void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+    void queryClient.invalidateQueries({ queryKey: ['/api/resources/kinds/counts'] });
+    void queryClient.invalidateQueries({ queryKey: ["awesome-list-data"] });
+    void queryClient.invalidateQueries({ queryKey: ["awesome-list-nav"] });
+    if (resourceId !== undefined) {
+      // ResourceDetail uses the split key while older resource controls use
+      // the exact URL key; invalidate both rather than relying on a prefix.
+      void queryClient.invalidateQueries({ queryKey: ["/api/resources", String(resourceId)] });
+      void queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+    }
+  };
+
+  const patchAdminResourceCaches = (id: number, patch: Partial<AdminResource>) => {
+    const snapshots = queryClient.getQueriesData<ResourcesResponse>({
+      queryKey: ['/api/admin/resources'],
+    });
+    snapshots.forEach(([queryKey, snapshot]) => {
+      if (!snapshot?.resources) return;
+      queryClient.setQueryData<ResourcesResponse>(queryKey, {
+        ...snapshot,
+        resources: snapshot.resources.map((resource) =>
+          resource.id === id ? { ...resource, ...patch } : resource,
+        ),
+      });
+    });
+    return snapshots;
+  };
+
+  const clearResourceActionError = (key: string) => {
+    setResourceActionErrors((previous) => {
+      if (!previous[key]) return previous;
+      const next = { ...previous };
+      delete next[key];
+      return next;
+    });
+  };
+
+  const reconcilePatchedResource = (
+    id: number,
+    updated: ResourcePatchResponse,
+    field: "kind" | "featured",
+  ) => {
+    const normalized = normalizeAdminResource(updated);
+    patchAdminResourceCaches(id, {
+      ...normalized,
+    });
+
+    setSelectedResource((resource) => {
+      if (resource?.id !== id) return resource;
+      return normalized;
+    });
+
+    if (field === "kind") {
+      setEditForm((form) => ({ ...form, kind: normalized.kind ?? "" }));
+    } else {
+      setEditForm((form) => ({
+        ...form,
+        featured: featuredValue(normalized),
+      }));
+    }
+  };
+
+  const kindMutation = useMutation({
+    mutationFn: async ({ id, kind }: { id: number; kind: ResourceKind | null }) => {
+      const updated = (await apiRequest(`/api/admin/resources/${id}/kind`, {
+        method: 'PATCH',
+        body: JSON.stringify({ kind }),
+      })) as ResourcePatchResponse;
+      return updated;
+    },
+    onMutate: async ({ id, kind }) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/admin/resources'] });
+      clearResourceActionError(`kind:${id}`);
+      const current = data?.resources.find((resource) => resource.id === id) ?? selectedResource;
+      const previousResource = current ? { ...current } : undefined;
+      const snapshots = patchAdminResourceCaches(id, {
+        kind,
+        // The list stays responsive while the PATCH is in flight. Its
+        // read-time inferred kind is reconciled from the server response below.
+        resolvedKind: kind ?? current?.resolvedKind ?? "other",
+      });
+      setSelectedResource((resource) =>
+        resource?.id === id
+          ? { ...resource, kind, resolvedKind: kind ?? resource.resolvedKind }
+          : resource,
+      );
+      return { snapshots, previousResource };
+    },
+    onSuccess: (updated, { id }) => {
+      reconcilePatchedResource(id, updated, "kind");
+      clearResourceActionError(`kind:${id}`);
+    },
+    onError: (error, { id }, context) => {
+      context?.snapshots?.forEach(([queryKey, snapshot]) => {
+        queryClient.setQueryData<ResourcesResponse>(queryKey, snapshot);
+      });
+      const previous = context?.previousResource;
+      if (previous) {
+        setSelectedResource((resource) => resource?.id === id ? previous : resource);
+        setEditForm((form) => ({ ...form, kind: previous.kind ?? "" }));
+      }
+      setResourceActionErrors((previousErrors) => ({
+        ...previousErrors,
+        [`kind:${id}`]: error instanceof Error ? error.message : "Failed to update resource kind",
+      }));
+    },
+    onSettled: (_updated, _error, { id }) => {
+      invalidateResourceCaches(id);
+    },
+  });
+
+  const featuredMutation = useMutation({
+    mutationFn: async ({ id, featured }: { id: number; featured: boolean }) => {
+      const updated = (await apiRequest(`/api/admin/resources/${id}/featured`, {
+        method: 'PATCH',
+        body: JSON.stringify({ featured }),
+      })) as ResourcePatchResponse;
+      return updated;
+    },
+    onMutate: async ({ id, featured }) => {
+      await queryClient.cancelQueries({ queryKey: ['/api/admin/resources'] });
+      clearResourceActionError(`featured:${id}`);
+      const current = data?.resources.find((resource) => resource.id === id) ?? selectedResource;
+      const previousFeatured = current ? featuredValue(current) : false;
+      const snapshots = patchAdminResourceCaches(id, {
+        metadata: { ...(current?.metadata ?? {}), featured },
+      });
+      setSelectedResource((resource) =>
+        resource?.id === id
+          ? { ...resource, metadata: { ...(resource.metadata ?? {}), featured } }
+          : resource,
+      );
+      return { snapshots, previousFeatured };
+    },
+    onSuccess: (updated, { id }) => {
+      reconcilePatchedResource(id, updated, "featured");
+      clearResourceActionError(`featured:${id}`);
+    },
+    onError: (error, { id }, context) => {
+      context?.snapshots?.forEach(([queryKey, snapshot]) => {
+        queryClient.setQueryData<ResourcesResponse>(queryKey, snapshot);
+      });
+      const previousFeatured = context?.previousFeatured ?? false;
+      setSelectedResource((resource) =>
+        resource?.id === id
+          ? { ...resource, metadata: { ...(resource.metadata ?? {}), featured: previousFeatured } }
+          : resource,
+      );
+      setEditForm((form) => ({ ...form, featured: previousFeatured }));
+      setResourceActionErrors((previousErrors) => ({
+        ...previousErrors,
+        [`featured:${id}`]: error instanceof Error ? error.message : "Failed to update featured status",
+      }));
+    },
+    onSettled: (_updated, _error, { id }) => {
+      invalidateResourceCaches(id);
+    },
+  });
+
+  // PATCH mutations share cache snapshots, so serialize them rather than
+  // allowing a second optimistic edit to roll back the first one.
+  const resourcePatchPending = kindMutation.isPending || featuredMutation.isPending;
+  const editControlsPending = resourcePatchPending || updateMutation.isPending;
 
   const createMutation = useMutation({
     mutationFn: async (data: Partial<AdminResource>) => {
@@ -304,11 +545,6 @@ export default function ResourceManager() {
     onError: (error: Error) => {
       // BUG-049: surface server-side rejection inline in the open dialog.
       setFormError(error.message || "Failed to create resource");
-      toast({
-        title: "Creation Failed",
-        description: error.message || "Failed to create resource",
-        variant: "destructive"
-      });
     }
   });
 
@@ -429,6 +665,7 @@ export default function ResourceManager() {
     // BUG-049: stale errors must not carry over into a fresh dialog.
     setFieldErrors({});
     setFormError(null);
+    setResourceActionErrors({});
     setEditForm({
       title: "",
       url: "",
@@ -459,6 +696,12 @@ export default function ResourceManager() {
     // BUG-049: fresh dialog, fresh error state.
     setFieldErrors({});
     setFormError(null);
+    setResourceActionErrors((previous) => {
+      const next = { ...previous };
+      delete next[`kind:${resource.id}`];
+      delete next[`featured:${resource.id}`];
+      return next;
+    });
     setEditForm({
       title: resource.title || "",
       url: resource.url || "",
@@ -568,15 +811,30 @@ export default function ResourceManager() {
   const handleSaveEdit = () => {
     if (!selectedResource) return;
     if (!validateEditForm('edit')) return;
-    const { featured, kind, ...fields } = editForm;
+    // Kind and featured are immediate PATCH-owned controls. The general PUT
+    // must never replay either value (or its metadata envelope) on Save.
+    const fields = { ...editForm };
+    delete (fields as Partial<typeof editForm>).kind;
+    delete (fields as Partial<typeof editForm>).featured;
     updateMutation.mutate({
       id: selectedResource.id,
-      data: {
-        ...fields,
-        kind: kind || null,
-        metadata: { ...(selectedResource.metadata ?? {}), featured },
-      } as Partial<AdminResource>,
+      data: fields as Partial<AdminResource>,
     });
+  };
+
+  const handleKindChange = (value: string) => {
+    const kind = value === "" ? null : (value as ResourceKind);
+    setEditForm((form) => ({ ...form, kind: kind ?? "" }));
+    if (selectedResource) {
+      kindMutation.mutate({ id: selectedResource.id, kind });
+    }
+  };
+
+  const handleFeaturedChange = (featured: boolean) => {
+    setEditForm((form) => ({ ...form, featured }));
+    if (selectedResource) {
+      featuredMutation.mutate({ id: selectedResource.id, featured });
+    }
   };
 
   const handleCreate = () => {
@@ -584,11 +842,7 @@ export default function ResourceManager() {
     // Run16 BUG-031: require a category on create so new resources never
     // land in the catalog as "Uncategorized".
     if (!editForm.category) {
-      toast({
-        title: "Validation Error",
-        description: "Please select a category for the new resource",
-        variant: "destructive"
-      });
+      setFormError("Please select a category for the new resource");
       return;
     }
     const { featured, kind, ...fields } = editForm;
@@ -726,21 +980,18 @@ export default function ResourceManager() {
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
+    <div className="admin-catalog-resources space-y-4">
+      <Card className="admin-catalog-resources__shell">
+        <CardHeader className="admin-catalog-resources__header">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="admin-catalog-resources__title flex items-center gap-2">
                 <Database className="h-5 w-5" />
-                Resource Database Editor
+                Resources ({(data?.total ?? 0).toLocaleString()} of {((grandTotalData?.total ?? data?.total) ?? 0).toLocaleString()})
               </CardTitle>
-              <CardDescription>
-                {/* Run17 BUG-028: filtered views say "X of Y match" instead of
-                    binding "Manage all …" to the filtered count. */}
-                {(search || categoryFilter || statusFilter)
-                  ? `${(data?.total ?? 0).toLocaleString()} of ${(grandTotalData?.total ?? 0).toLocaleString()} resources match your filters`
-                  : `Manage all ${((grandTotalData?.total ?? data?.total) || 0).toLocaleString()} resources in the database (live + pending + rejected)`}
+              <CardDescription className="admin-catalog-resources__subtitle">
+                Manage every entry in the index
+                {(search || categoryFilter || statusFilter) ? " · Filters applied" : ""}
               </CardDescription>
             </div>
             <Button 
@@ -753,8 +1004,8 @@ export default function ResourceManager() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+        <CardContent className="admin-catalog-resources__content space-y-4">
+          <form onSubmit={handleSearch} className="admin-catalog-resources__filters flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
               <Input
@@ -988,8 +1239,8 @@ export default function ResourceManager() {
               </Button>
             </div>
           )}
-          <div className="h-[600px] overflow-auto">
-            <Table>
+          <div className="admin-catalog-resources__table-scroll h-[600px] overflow-auto">
+            <Table className="admin-catalog-resources__table">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">
@@ -1000,12 +1251,12 @@ export default function ResourceManager() {
                       className={`h-8 w-8 ${isSomeSelected ? "data-[state=checked]:bg-primary/50" : ""}`}
                     />
                   </TableHead>
-                  <TableHead className="w-12">ID</TableHead>
                   <TableHead>Title</TableHead>
-                  <TableHead className="hidden md:table-cell">Category</TableHead>
-                  <TableHead className="hidden lg:table-cell">Status</TableHead>
-                  <TableHead className="hidden xl:table-cell">Kind</TableHead>
-                  <TableHead className="hidden xl:table-cell">Featured</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Kind</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Featured</TableHead>
+                  <TableHead>Updated</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -1037,9 +1288,6 @@ export default function ResourceManager() {
                         className="h-8 w-8"
                       />
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-[var(--text-2)]">
-                      {resource.id}
-                    </TableCell>
                     <TableCell>
                       <div className="space-y-1">
                         <div className="font-medium line-clamp-1 break-words max-w-[300px]" title={resource.title || ''}>
@@ -1064,7 +1312,7 @@ export default function ResourceManager() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell>
                       <div className="text-sm text-[var(--text-2)]">
                         {resource.category || "Uncategorized"}
                       </div>
@@ -1072,15 +1320,24 @@ export default function ResourceManager() {
                         <div className="text-xs text-[var(--text-2)]">{resource.subcategory}</div>
                       )}
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">
+                    <TableCell>
+                      <div className="admin-catalog-resources__kind-cell">
+                        <Badge variant="chip">
+                          {resource.kind ? resourceKindLabel(resource.kind) : resourceKindLabel(resource.resolvedKind)}
+                        </Badge>
+                        <span className="admin-catalog-resources__meta">
+                          {resource.kind ? "Stored" : `resolved: ${resource.resolvedKind} (inferred)`}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       {getStatusBadge(resource.status || 'approved')}
                     </TableCell>
-                    <TableCell className="hidden xl:table-cell">
-                      <div className="text-xs font-medium text-[var(--text)]">{resource.kind ? RESOURCE_KIND_OPTIONS.find((option) => option.value === resource.kind)?.label : "No override"}</div>
-                      <div className="text-xs text-[var(--text-2)]">{resource.kind ? "Stored" : `Inferred: ${resource.resolvedKind}`}</div>
-                    </TableCell>
-                    <TableCell className="hidden xl:table-cell">
+                    <TableCell>
                       {featuredValue(resource) ? <Badge variant="accent">Featured</Badge> : <span className="text-xs text-[var(--text-2)]">—</span>}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-[var(--text-2)]">
+                      {formatResourceUpdatedAt(resource.updatedAt)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
@@ -1164,7 +1421,13 @@ export default function ResourceManager() {
         </CardContent>
       </Card>
 
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+      <Dialog
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          if (!open && editControlsPending) return;
+          setEditDialogOpen(open);
+        }}
+      >
         {/* NB-005 (run18): cap height to the small-viewport unit (svh accounts
             for mobile URL bars) and scroll internally so every field + the
             Save/Cancel footer stay reachable at 812×375 landscape. */}
@@ -1258,7 +1521,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger data-testid="select-edit-category">
+                  <SelectTrigger id="edit-category" data-testid="select-edit-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1274,7 +1537,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger data-testid="select-edit-status">
+                  <SelectTrigger id="edit-status" data-testid="select-edit-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1293,7 +1556,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger data-testid="select-edit-subcategory">
+                  <SelectTrigger id="edit-subcategory" data-testid="select-edit-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1310,7 +1573,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger data-testid="select-edit-subsubcategory">
+                  <SelectTrigger id="edit-subsubcategory" data-testid="select-edit-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1321,22 +1584,58 @@ export default function ResourceManager() {
                 </Select>
               </div>
             </div>
+            <p className="text-xs text-[var(--text-2)]">Kind and featured: Changes save immediately.</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="edit-kind">Kind override</Label>
-                <Select value={editForm.kind || "inferred"} onValueChange={(value) => setEditForm((form) => ({ ...form, kind: value === "inferred" ? "" : value as ResourceKind }))}>
-                  <SelectTrigger id="edit-kind" className="min-h-11" data-testid="select-edit-kind"><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="inferred">Use inferred ({selectedResource?.resolvedKind ?? "other"})</SelectItem>{RESOURCE_KIND_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
-                </Select>
-                <p className="text-xs text-[var(--text-2)]" data-testid="text-kind-storage-state">{editForm.kind ? `Stored override: ${editForm.kind}` : `Stored: null · resolved: ${selectedResource?.resolvedKind ?? "other"}`}</p>
+                <div className="admin-catalog-resources__legacy-control" data-testid="select-edit-kind">
+                  <select
+                    id="edit-kind"
+                    className="select admin-catalog-resources__native-select"
+                    value={editForm.kind}
+                    onChange={(event) => handleKindChange(event.target.value)}
+                    disabled={editControlsPending}
+                    aria-describedby="edit-kind-hint"
+                    data-testid="admin-resource-kind-select"
+                  >
+                    <option value="">
+                      Use inferred — resolved: {selectedResource?.resolvedKind ?? "other"} (inferred)
+                    </option>
+                    {RESOURCE_KIND_VALUES.map((kind) => (
+                      <option key={kind} value={kind}>{resourceKindLabel(kind)}</option>
+                    ))}
+                  </select>
+                </div>
+                <p id="edit-kind-hint" className="text-xs text-[var(--text-2)]" data-testid="text-kind-storage-state">
+                  {editForm.kind
+                    ? `Stored override: ${resourceKindLabel(editForm.kind)}`
+                    : `resolved: ${selectedResource?.resolvedKind ?? "other"} (inferred)`}
+                </p>
+                {selectedResource && resourceActionErrors[`kind:${selectedResource.id}`] && (
+                  <p role="alert" className="admin-catalog-resources__action-error" data-testid="error-resource-kind">
+                    {resourceActionErrors[`kind:${selectedResource.id}`]}
+                  </p>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-featured">Curated placement</Label>
-                <label htmlFor="edit-featured" className="flex min-h-11 cursor-pointer items-center gap-3 border border-[var(--border)] px-3 focus-within:ring-2 focus-within:ring-[var(--accent)]">
-                  <Checkbox id="edit-featured" checked={editForm.featured} onCheckedChange={(checked) => setEditForm((form) => ({ ...form, featured: checked === true }))} data-testid="checkbox-edit-featured" />
+                <div className="admin-catalog-resources__switch-field" data-testid="checkbox-edit-featured">
+                  <Switch
+                    id="edit-featured"
+                    checked={editForm.featured}
+                    onCheckedChange={handleFeaturedChange}
+                    disabled={editControlsPending}
+                    aria-label="Feature this resource"
+                    data-testid="admin-resource-featured-toggle"
+                  />
                   <span className="text-sm">Feature this resource</span>
-                </label>
+                </div>
                 <p className="text-xs text-[var(--text-2)]">Drives Curated cards and the Index rail.</p>
+                {selectedResource && resourceActionErrors[`featured:${selectedResource.id}`] && (
+                  <p role="alert" className="admin-catalog-resources__action-error" data-testid="error-resource-featured">
+                    {resourceActionErrors[`featured:${selectedResource.id}`]}
+                  </p>
+                )}
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -1391,12 +1690,16 @@ export default function ResourceManager() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setEditDialogOpen(false)}
+              disabled={editControlsPending}
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleSaveEdit}
-              disabled={updateMutation.isPending}
+              disabled={editControlsPending}
              
               data-testid="button-save-edit"
             >
@@ -1496,7 +1799,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger data-testid="select-create-category">
+                  <SelectTrigger id="create-category" data-testid="select-create-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1512,7 +1815,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger data-testid="select-create-status">
+                  <SelectTrigger id="create-status" data-testid="select-create-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1531,7 +1834,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger data-testid="select-create-subcategory">
+                  <SelectTrigger id="create-subcategory" data-testid="select-create-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1548,7 +1851,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger data-testid="select-create-subsubcategory">
+                  <SelectTrigger id="create-subsubcategory" data-testid="select-create-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1564,7 +1867,7 @@ export default function ResourceManager() {
                 <Label htmlFor="create-kind">Kind override</Label>
                 <Select value={editForm.kind || "inferred"} onValueChange={(value) => setEditForm((form) => ({ ...form, kind: value === "inferred" ? "" : value as ResourceKind }))}>
                   <SelectTrigger id="create-kind" className="min-h-11" data-testid="select-create-kind"><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="inferred">No override (infer from tags)</SelectItem>{RESOURCE_KIND_OPTIONS.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+                  <SelectContent><SelectItem value="inferred">No override (infer from tags)</SelectItem>{RESOURCE_KIND_VALUES.map((kind) => <SelectItem key={kind} value={kind}>{resourceKindLabel(kind)}</SelectItem>)}</SelectContent>
                 </Select>
                 <p className="text-xs text-[var(--text-2)]" data-testid="text-create-kind-storage-state">{editForm.kind ? `Stored override: ${editForm.kind}` : "Stored: null · resolved after creation"}</p>
               </div>

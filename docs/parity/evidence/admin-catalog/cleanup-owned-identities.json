@@ -1,0 +1,35 @@
+{
+  "ownedIds": [
+    "2073814202",
+    "2070874915"
+  ],
+  "local": {
+    "2070874915": {
+      "status": 200,
+      "message": null
+    },
+    "2073814202": {
+      "status": 200,
+      "message": null
+    }
+  },
+  "clerkMatched": [
+    {
+      "id": "user_3JFj4G8voc67NOQuIbzZG88Ghtj",
+      "external_id": "2070874915"
+    },
+    {
+      "id": "user_3JFgzBt5yfA0fracO0f9JddYuik",
+      "external_id": "2073814202"
+    }
+  ],
+  "clerkDeletes": {
+    "2070874915": {
+      "status": 200
+    },
+    "2073814202": {
+      "status": 200
+    }
+  },
+  "remaining": []
+}

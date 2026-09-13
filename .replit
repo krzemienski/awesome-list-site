@@ -175,6 +175,10 @@ args = "font-prepaint"
 task = "workflow.run"
 args = "canonical-token-parity"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "admin-catalog-kind-mappings"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -585,6 +589,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run validate:canonical-token-parity"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "admin-catalog-kind-mappings"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/validation/admin-catalog-kind-mappings.mjs"
 
 [workflows.workflow.metadata]
 isValidation = true

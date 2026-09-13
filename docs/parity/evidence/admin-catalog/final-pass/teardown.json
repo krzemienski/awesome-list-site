@@ -1,0 +1,20 @@
+{
+  "keepUser": false,
+  "bridgeId": "2031414892",
+  "email": "__qa_test_parity_mtz5ewq6ad86b0+clerk_test@example.com",
+  "localDeleted": true,
+  "clerkDeleted": true,
+  "errors": [],
+  "verification": {
+    "localQaUsersRemaining": [
+      {
+        "id": "2070874915",
+        "email": "__qa_test_parity_mtz5atz3bfb0a3+clerk_test@example.com"
+      },
+      {
+        "id": "2073814202",
+        "email": "__qa_test_parity_mtz4osrpfc5cf5+clerk_test@example.com"
+      }
+    ]
+  }
+}

@@ -1,0 +1,634 @@
+Skip to main content
+AWESOME.VIDEO
+Home
+Admin
+Search resources...
+/
+N
+BROWSE
+Categories · 9
+Home
+Community & Events
+80
+Community Groups
+40
+Online Forums
+1
+Events & Conferences
+40
+Podcasts & Webinars
+1
+Encoding & Codecs
+333
+Benchmarking & Performance Tools for Codecs
+2
+Cloud-Based Encoding Solutions
+9
+Codecs
+23
+AV1
+5
+HEVC
+10
+VP9
+1
+Comparative Analysis of Codecs
+1
+Containerization & Packaging Tools
+19
+Origin Servers
+1
+Encoding Tools
+120
+FFmpeg
+50
+FFmpeg-Based Tools
+14
+Hardware Accelerated Transcoding
+4
+Hardware Codecs & Acceleration
+2
+Multi-format Packaging Tools
+6
+Next-Generation Codecs AV1 VVC
+4
+Open Source Encoder Projects
+4
+Real-Time Encoding Solutions
+8
+Scripting & Automation Tools
+10
+Software Codecs
+1
+Software Transcoding Tools
+14
+Uncategorized
+92
+General Tools
+134
+API Libraries & SDKs
+3
+Build Scripts & Automation
+5
+Case Studies & Best Practices in DRM
+3
+Command-line Utilities & Wrappers
+3
+Community & Collaboration Platforms
+2
+Cross-Platform Media Tools
+2
+DRM
+5
+DRM Solutions & Implementations
+6
+DRM Testing & Validation Tools
+8
+Docker & Containerization Tools
+4
+Encryption Tools for Streaming
+4
+Independent & Hobbyist Projects
+2
+Logging & Debugging Tools
+3
+Research Projects & Academic Resources
+1
+Specialized Utility Scripts
+3
+Test Content & Sample Streams
+7
+Widevine FairPlay PlayReady Integrations
+1
+Uncategorized
+72
+Infrastructure & Delivery
+191
+CDN Integration & Distribution
+9
+CDN Integration
+1
+Cloud & CDN
+3
+Cloud Platforms
+3
+Edge Computing & Caching Solutions
+4
+Live Streaming Servers
+9
+Multi-CDN Management
+1
+Peer-to-Peer Streaming Solutions
+3
+RTMPRTSPHTTP Protocol Servers
+8
+Streaming Analytics & Monitoring
+5
+Streaming Servers
+23
+Storage Solutions
+3
+VOD Streaming Servers
+15
+Uncategorized
+111
+Intro & Learning
+187
+Books & Courses
+5
+Case Studies & Whitepapers
+2
+Community Blogs & Forums
+2
+Encoding & Transcoding Guides
+15
+Learning Resources
+11
+Player Development Documentation
+2
+Tutorials & Case Studies
+21
+Video Streaming Tutorials
+9
+Webinars & Conference Talks
+7
+Podcasts
+1
+Uncategorized
+113
+Media Tools
+266
+AI & Machine Learning Tools
+8
+Ads & QoE
+33
+Quality & Testing
+33
+Audio & Subtitles
+46
+Audio
+7
+Subtitles & Captions
+37
+Audio Analysis & Processing
+2
+Batch Processing & Automation
+4
+Color Grading & Correction Tools
+1
+Color Science & Histogram Analysis
+1
+Conversion & Format Tools
+1
+Effects & Compositing Tools
+1
+Metadata Extraction & Management
+14
+Quality Analysis & Metrics
+4
+Scene Detection & Segmentation
+3
+Subtitle & Caption Tools
+8
+VMAF PSNR SSIM Tools
+3
+Video Analytics & Benchmarking
+3
+Uncategorized
+134
+Players & Clients
+239
+Desktop Players
+4
+Embedded Players
+1
+Frameworks & UI Components
+6
+Hardware Players
+29
+Roku
+26
+Mobile & Web Players
+67
+Android
+10
+Web Players
+19
+iOS/tvOS
+28
+Mobile Players
+3
+Set-top Box Players
+1
+Smart TV Players
+5
+Chromecast
+1
+Smart TVs
+3
+Web Players
+6
+Uncategorized
+117
+Protocols & Transport
+213
+Adaptive Bitrate Algorithms & Tools
+1
+Adaptive Streaming
+108
+DASH
+41
+HLS
+59
+CMAF & fMP4 Packaging
+3
+DASH Tools
+2
+HLS Manifest Parsers & Generators
+6
+HLS Tools
+12
+Low-Latency Streaming Tools
+1
+Transport Protocols
+5
+SRT
+3
+Uncategorized
+75
+Standards & Industry
+173
+Adaptive Streaming Standards
+6
+Best Practices & Guidelines
+10
+HDR Guidelines
+1
+DRM & Content Protection Standards
+3
+Industry Forums & Standards Bodies
+7
+RIST
+1
+Specs & Standards
+18
+MPEG & Forums
+6
+Official Specs
+3
+Video Codec Specifications
+11
+Uncategorized
+118
+OPS
+1,816 resources
+92 subcategories
+9 top-level
+indexed
+More navigation
+Authorized admin area
+──
+ADMIN
+·
+OPERATIONS
+Operations dashboard
+
+Manage the live catalog, review queues, and operational jobs.
+
+Settings
+New entry
+Overview
+Approvals
+Edits
+Enrichment
+Researcher
+Export
+Database
+Resources
+Categories
+Subcategories
+Sub-Subcats
+Journeys
+Users
+GitHub
+Link Health
+Digests
+Audit
+Resources (1,993 of 1,993)
+Manage every entry in the index
+Add Resource
+All Categories
+All Categories
+Community & Events
+Encoding & Codecs
+General Tools
+Infrastructure & Delivery
+Intro & Learning
+Media Tools
+Players & Clients
+Protocols & Transport
+Standards & Industry
+All Status
+All Status
+Approved
+Pending
+Rejected
+Newest first
+Newest first
+Oldest first
+Title A–Z
+Title Z–A
+	TITLE	CATEGORY	KIND	STATUS	FEATURED	UPDATED	ACTIONS
+	
+srtdroid
+https://github.com/ThibaultBee/srtdroid
+	
+Protocols & Transport
+Transport Protocols
+	
+PROTOCOLS
+Stored
+	Approved	FEATURED	Sep 13, 2026	
+
+	
+SRT CookBook - Projects and Applications
+https://srtlab.github.io/srt-cookbook/apps/
+	
+Protocols & Transport
+Transport Protocols
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+HydraSRT
+https://github.com/abc3/hydra-srt
+	
+Protocols & Transport
+Transport Protocols
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+CTA-WAVE Device Playback Task Force
+https://github.com/cta-wave/device-playback-task-force
+	
+General Tools
+DRM Testing & Validation Tools
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+DRMreview
+https://github.com/espio999/DRMreview
+	
+General Tools
+DRM Testing & Validation Tools
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+Open Content Decryption Module (OCDM)
+https://github.com/fraunhoferfokus/open-content-decryption-module
+	
+General Tools
+DRM Testing & Validation Tools
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+DRM_PSSH_Decoder
+https://github.com/ALSAMEEMA/DRM_PSSH_Decoder
+	
+General Tools
+DRM Testing & Validation Tools
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+DRMSense
+https://github.com/avikekk/DRMSense
+	
+General Tools
+DRM Testing & Validation Tools
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+js_mse_eme
+https://github.com/youtube/js_mse_eme
+	
+General Tools
+DRM Testing & Validation Tools
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+Eyevinn WebRTC Player
+https://github.com/Eyevinn/webrtc-player
+	
+Players & Clients
+Web Players
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 24, 2026	
+
+	
+StreamPack - Multiprotocol live streaming broadcaster libraries for Android
+http://example.com/x
+	
+Encoding & Codecs
+Real-Time Encoding Solutions
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 20, 2026	
+
+	
+MediaMolder - FFmpeg for the AI era
+https://github.com/MediaMolder/mediamolder
+	
+Encoding & Codecs
+Software Transcoding Tools
+	
+OTHER
+resolved: other (inferred)
+	Approved	—	Jul 19, 2026	
+
+	
+How to Live Stream: Beginners Guide to Get Started
+https://academy.wedio.com/how-to-live-stream
+	
+Intro & Learning
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+How to Create a Video Streaming App: A Step-by-Step Guide to Building Your Own Platform
+https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform
+	
+Intro & Learning
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+Ant Media Video Streaming Tutorials
+https://antmedia.io/tutorial
+	
+Intro & Learning
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+Design of scheduling and rate-adaptation algorithms for adaptive HTTP streaming · dispar.at Blog
+https://dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming
+	
+Protocols & Transport
+Adaptive Bitrate Algorithms & Tools
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+Creating A Production Ready Multi Bitrate HLS VOD stream - Peer5 P2P Docs
+https://docs.peer5.com/guides/production-ready-hls-vod
+	
+Protocols & Transport
+HLS Tools
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+Live DASH DRM ClearKey Sample (DASH-IF)
+https://reference.dashif.org/dash.js/v/latest/samples/drm/clearkey
+	
+Protocols & Transport
+Adaptive Streaming
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+TSLemurs Transport Stream Tools
+https://tslemurs.com
+	
+Protocols & Transport
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+Peer5 HLS P2P
+https://docs.peer5.com
+	
+Protocols & Transport
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+HESP (High Efficiency Streaming Protocol) Whitepaper
+https://download2.diva-cdn.com/files/High%20Efficiency%20Streaming%20Protocol%20%28HESP%29%20Whitepaper%20v2.0.pdf
+	
+Protocols & Transport
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+Haivision SRT Protocol Technical Overview
+https://www.haivision.com/resources/white-paper/srt-protocol-technical-overview
+	
+Protocols & Transport
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+Comparing Video Transport Technologies: Which One is Best for Your Needs?
+https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs
+	
+Protocols & Transport
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+
+	
+HTTP Live Streaming (HLS) - Artillery.io Docs
+https://artillery.io/docs/plugin-hls
+	
+Media Tools
+Ads & QoE
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 16, 2026	
+
+	
+VPAID Specification
+https://www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0
+	
+Media Tools
+	
+OTHER
+resolved: other (inferred)
+	Rejected	—	Jul 2, 2026	
+Showing 1 - 25 of 1,993 resources
+25 / page
+Previous
+1
+2
+…
+80
+Next
+Page 1 of 80
+Go to page
+/ 80
+
+© 2026 Awesome Video · Built with React & shadcn/ui
+Home
+Categories
+Journeys
+Submit
+About
+Terms
+Privacy
+Code of Conduct
+Cookie settings
+GitHub
+
+We use analytics (Google Analytics, Mixpanel, PostHog and Amplitude) to understand how the site is used — only if you allow it. Decline and none of them load. Allow and, if you are signed in, your name and email are attached to your analytics profile. See our Privacy Policy.
+
+Decline
+Allow analytics

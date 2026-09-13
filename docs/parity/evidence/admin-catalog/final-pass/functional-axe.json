@@ -1,0 +1,563 @@
+{
+  "startedAt": "2026-09-13T01:41:53.709Z",
+  "base": "http://127.0.0.1:5000",
+  "resource": {
+    "selection": {
+      "id": 184739,
+      "title": "MPEG Standards Documentation",
+      "originalKind": null,
+      "originalFeatured": false,
+      "originalResolved": null,
+      "rawKeys": [
+        "approvedAt",
+        "approvedBy",
+        "category",
+        "contributorRejectionReason",
+        "createdAt",
+        "description",
+        "githubSynced",
+        "id",
+        "kind",
+        "lastSyncedAt",
+        "metadata",
+        "provider",
+        "resourceFormat",
+        "searchTsv",
+        "skillLevel",
+        "status",
+        "statusChangedAt",
+        "subSubcategory",
+        "subcategory",
+        "submittedBy",
+        "title",
+        "updatedAt",
+        "url"
+      ]
+    },
+    "kindPatches": [
+      {
+        "requested": "tools",
+        "status": 200,
+        "returnedKind": "tools",
+        "returnedResolvedKind": null
+      },
+      {
+        "requested": "libraries",
+        "status": 200,
+        "returnedKind": "libraries",
+        "returnedResolvedKind": null
+      },
+      {
+        "requested": "standards",
+        "status": 200,
+        "returnedKind": "standards",
+        "returnedResolvedKind": null
+      },
+      {
+        "requested": "events",
+        "status": 200,
+        "returnedKind": "events",
+        "returnedResolvedKind": null
+      },
+      {
+        "requested": "protocols",
+        "status": 200,
+        "returnedKind": "protocols",
+        "returnedResolvedKind": null
+      },
+      {
+        "requested": "other",
+        "status": 200,
+        "returnedKind": "other",
+        "returnedResolvedKind": null
+      }
+    ],
+    "kindClear": {
+      "status": 200,
+      "returnedKind": null,
+      "returnedResolvedKind": null
+    },
+    "featuredPatches": [
+      {
+        "requested": true,
+        "status": 200,
+        "returnedFeatured": true
+      },
+      {
+        "requested": false,
+        "status": 200,
+        "returnedFeatured": false
+      }
+    ],
+    "uiKindControl": {
+      "resourceId": 188015,
+      "status": 200,
+      "selected": "tools"
+    },
+    "uiFeaturedControl": {
+      "resourceId": 188015,
+      "status": 200,
+      "priorDataState": "checked",
+      "afterDataState": "unchecked"
+    },
+    "listAfter": {
+      "id": 184739,
+      "kind": null,
+      "featured": false,
+      "hasResolvedKind": false,
+      "resolvedKind": null
+    },
+    "audit": {
+      "total": 58,
+      "matching": [
+        {
+          "action": "updated",
+          "changes": {
+            "featured": false,
+            "previousFeatured": false
+          },
+          "notes": "Resource unfeatured by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": null,
+            "previousKind": null
+          },
+          "notes": "Resource kind cleared by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "featured": false,
+            "previousFeatured": true
+          },
+          "notes": "Resource unfeatured by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "featured": true,
+            "previousFeatured": false
+          },
+          "notes": "Resource featured by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": null,
+            "previousKind": "other"
+          },
+          "notes": "Resource kind cleared by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "other",
+            "previousKind": "protocols"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "protocols",
+            "previousKind": "events"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "events",
+            "previousKind": "standards"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "standards",
+            "previousKind": "libraries"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "libraries",
+            "previousKind": "tools"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "tools",
+            "previousKind": null
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "featured": false,
+            "previousFeatured": true
+          },
+          "notes": "Resource unfeatured by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "featured": true,
+            "previousFeatured": false
+          },
+          "notes": "Resource featured by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": null,
+            "previousKind": "other"
+          },
+          "notes": "Resource kind cleared by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "other",
+            "previousKind": "protocols"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "protocols",
+            "previousKind": "events"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "events",
+            "previousKind": "standards"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "standards",
+            "previousKind": "libraries"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "libraries",
+            "previousKind": "tools"
+          },
+          "notes": "Resource kind set by admin"
+        },
+        {
+          "action": "updated",
+          "changes": {
+            "kind": "tools",
+            "previousKind": null
+          },
+          "notes": "Resource kind set by admin"
+        }
+      ]
+    }
+  },
+  "taxonomy": {
+    "nonemptyGuard": {
+      "id": 1091,
+      "name": "Community & Events",
+      "resourceCount": 80,
+      "status": 400,
+      "body": {
+        "message": "Cannot delete category with 86 resources. Please reassign or delete resources first.",
+        "error": "validation_failed",
+        "fieldErrors": {},
+        "errors": []
+      },
+      "uiDeleteDisabled": true,
+      "uiDeleteLabel": "Delete unavailable: 80 resources still assigned"
+    },
+    "create": {
+      "requestedName": "QA Catalog 548 mtz5f5ug-8libg",
+      "generatedSlug": "qa-catalog-548-mtz5f5ug-8libg",
+      "id": 1257,
+      "responseCount": 10,
+      "resourceCount": 0
+    },
+    "rename": {
+      "id": 1257,
+      "responseName": "QA Catalog 548 mtz5f5ug-8libg Renamed",
+      "responseSlug": "qa-catalog-548-mtz5f5ug-8libg-renamed",
+      "navOrDataRequestsAfterRename": []
+    },
+    "deleteDialog": {
+      "text": "Delete Category\n\nAre you sure you want to delete \"QA Catalog 548 mtz5f5ug-8libg Renamed\"?\n\nCancel\nDelete"
+    },
+    "delete": {
+      "id": 1257,
+      "deleted": true,
+      "responseCount": 9
+    },
+    "audit": [
+      {
+        "action": "category_deleted",
+        "notes": "Deleted category: QA Catalog 548 mtz5f5ug-8libg Renamed",
+        "changes": {
+          "category": {
+            "id": 1257,
+            "name": "QA Catalog 548 mtz5f5ug-8libg Renamed",
+            "slug": "qa-catalog-548-mtz5f5ug-8libg-renamed",
+            "updatedAt": "2026-09-13T01:42:01.432Z"
+          }
+        }
+      },
+      {
+        "action": "category_updated",
+        "notes": "Updated category: QA Catalog 548 mtz5f5ug-8libg",
+        "changes": {
+          "after": {
+            "id": 1257,
+            "name": "QA Catalog 548 mtz5f5ug-8libg Renamed",
+            "slug": "qa-catalog-548-mtz5f5ug-8libg-renamed",
+            "updatedAt": "2026-09-13T01:42:01.432Z"
+          },
+          "before": {
+            "id": 1257,
+            "name": "QA Catalog 548 mtz5f5ug-8libg",
+            "slug": "qa-catalog-548-mtz5f5ug-8libg",
+            "updatedAt": "2026-09-13T01:41:59.929Z"
+          }
+        }
+      },
+      {
+        "action": "category_created",
+        "notes": "Created category: QA Catalog 548 mtz5f5ug-8libg",
+        "changes": {
+          "category": {
+            "id": 1257,
+            "name": "QA Catalog 548 mtz5f5ug-8libg",
+            "slug": "qa-catalog-548-mtz5f5ug-8libg",
+            "updatedAt": "2026-09-13T01:41:59.929Z"
+          }
+        }
+      }
+    ]
+  },
+  "axe": [
+    {
+      "key": "resources@375",
+      "label": "resources",
+      "width": 375,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/resources-375-closed.png"
+    },
+    {
+      "key": "resources@375:resource-edit-dialog",
+      "label": "resources",
+      "width": 375,
+      "state": "open-dialog",
+      "dialogTestId": "resource-edit-dialog",
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "help": "Buttons must have discernible text",
+          "nodes": 4,
+          "targets": [
+            [
+              "button[data-testid=\"select-edit-category\"]"
+            ],
+            [
+              "button[data-testid=\"select-edit-status\"]"
+            ],
+            [
+              "button[data-testid=\"select-edit-subcategory\"]"
+            ],
+            [
+              "button[data-testid=\"select-edit-subsubcategory\"]"
+            ]
+          ]
+        }
+      ],
+      "allViolationCount": 1,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/resources-375-open.png"
+    },
+    {
+      "key": "categories@375",
+      "label": "categories",
+      "width": 375,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/categories-375-closed.png"
+    },
+    {
+      "key": "categories@375:dialog-create-category",
+      "label": "categories",
+      "width": 375,
+      "state": "open-dialog",
+      "dialogTestId": "dialog-create-category",
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/categories-375-open.png"
+    },
+    {
+      "key": "subcategories@375",
+      "label": "subcategories",
+      "width": 375,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subcategories-375-closed.png"
+    },
+    {
+      "key": "subcategories@375:dialog-create-subcategory",
+      "label": "subcategories",
+      "width": 375,
+      "state": "open-dialog",
+      "dialogTestId": "dialog-create-subcategory",
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subcategories-375-open.png"
+    },
+    {
+      "key": "subsubcategories@375",
+      "label": "subsubcategories",
+      "width": 375,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subsubcategories-375-closed.png"
+    },
+    {
+      "key": "subsubcategories@375:dialog-create-subsubcategory",
+      "label": "subsubcategories",
+      "width": 375,
+      "state": "open-dialog",
+      "dialogTestId": "dialog-create-subsubcategory",
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subsubcategories-375-open.png"
+    },
+    {
+      "key": "resources@1440",
+      "label": "resources",
+      "width": 1440,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/resources-1440-closed.png"
+    },
+    {
+      "key": "resources@1440:resource-edit-dialog",
+      "label": "resources",
+      "width": 1440,
+      "state": "open-dialog",
+      "dialogTestId": "resource-edit-dialog",
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "help": "Buttons must have discernible text",
+          "nodes": 4,
+          "targets": [
+            [
+              "button[data-testid=\"select-edit-category\"]"
+            ],
+            [
+              "button[data-testid=\"select-edit-status\"]"
+            ],
+            [
+              "button[data-testid=\"select-edit-subcategory\"]"
+            ],
+            [
+              "button[data-testid=\"select-edit-subsubcategory\"]"
+            ]
+          ]
+        }
+      ],
+      "allViolationCount": 1,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/resources-1440-open.png"
+    },
+    {
+      "key": "categories@1440",
+      "label": "categories",
+      "width": 1440,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/categories-1440-closed.png"
+    },
+    {
+      "key": "categories@1440:dialog-create-category",
+      "label": "categories",
+      "width": 1440,
+      "state": "open-dialog",
+      "dialogTestId": "dialog-create-category",
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/categories-1440-open.png"
+    },
+    {
+      "key": "subcategories@1440",
+      "label": "subcategories",
+      "width": 1440,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subcategories-1440-closed.png"
+    },
+    {
+      "key": "subcategories@1440:dialog-create-subcategory",
+      "label": "subcategories",
+      "width": 1440,
+      "state": "open-dialog",
+      "dialogTestId": "dialog-create-subcategory",
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subcategories-1440-open.png"
+    },
+    {
+      "key": "subsubcategories@1440",
+      "label": "subsubcategories",
+      "width": 1440,
+      "state": "closed",
+      "dialogTestId": null,
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subsubcategories-1440-closed.png"
+    },
+    {
+      "key": "subsubcategories@1440:dialog-create-subsubcategory",
+      "label": "subsubcategories",
+      "width": 1440,
+      "state": "open-dialog",
+      "dialogTestId": "dialog-create-subsubcategory",
+      "violations": [],
+      "allViolationCount": 0,
+      "screenshot": "/tmp/catalog-548-browser/final-pass/axe/subsubcategories-1440-open.png"
+    }
+  ],
+  "network": [],
+  "finishedAt": "2026-09-13T01:42:41.995Z"
+}

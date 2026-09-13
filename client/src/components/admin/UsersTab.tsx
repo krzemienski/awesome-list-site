@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, ChevronLeft, ChevronRight, Shield, User as UserIcon, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import type { User } from "@shared/schema";
+import "@/styles/pages/admin-catalog-taxonomy.css";
 
 /**
  * R2-H05: mask emails by default so an over-the-shoulder look at the admin
@@ -146,10 +147,10 @@ export default function UsersTab() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader><Skeleton className="h-8 w-64" /></CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+      <Card className="admin-taxonomy-shell admin-users-shell">
+        <CardHeader className="admin-taxonomy-header"><Skeleton className="h-8 w-64" /></CardHeader>
+        <CardContent className="admin-taxonomy-content">
+          <div className="admin-taxonomy-loading space-y-4">
             {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
           </div>
         </CardContent>
@@ -158,19 +159,19 @@ export default function UsersTab() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="admin-taxonomy-shell admin-users-shell">
+      <CardHeader className="admin-taxonomy-header">
+        <CardTitle className="admin-taxonomy-title flex items-center gap-2">
           <Users className="h-5 w-5" />
           User Management
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="admin-taxonomy-description">
           {data?.total || 0} {searchQuery ? 'matching' : 'registered'} user{(data?.total || 0) !== 1 ? 's' : ''}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col sm:flex-row gap-2 mb-4">
-          <div className="relative flex-1 max-w-sm">
+      <CardContent className="admin-taxonomy-content">
+        <div className="admin-users-toolbar flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="admin-taxonomy-search relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={searchInput}
@@ -195,8 +196,8 @@ export default function UsersTab() {
             className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
             aria-hidden="true"
           />
-          <Table>
-          <TableHeader>
+          <Table className="admin-taxonomy-table admin-users-table">
+            <TableHeader>
             <TableRow>
               {/* Run16 BUG-087: sortable column headers (server-side sort). */}
               {([
@@ -223,15 +224,15 @@ export default function UsersTab() {
               ))}
               <TableHead>Actions</TableHead>
             </TableRow>
-          </TableHeader>
-          <TableBody>
+            </TableHeader>
+            <TableBody>
             {data?.users && data.users.length > 0 ? (
               data.users.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow key={user.id} className="admin-taxonomy-row">
                   {/* BUG-012 (run18): cap the name cell + truncate so a legal
                       101-char display name can't stretch the table (it was
                       unwrapping to ~2,369px); full value stays in the title. */}
-                  <TableCell className="max-w-[240px]">
+                  <TableCell className="admin-taxonomy-cell-name max-w-[240px]">
                     <div className="flex items-center gap-2 min-w-0">
                       {user.profileImageUrl ? (
                         <img
@@ -260,7 +261,7 @@ export default function UsersTab() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
+                  <TableCell className="admin-taxonomy-cell-email text-muted-foreground text-sm">
                     {user.email ? (
                       <span className="inline-flex items-center gap-1.5">
                         <span data-testid={`text-email-${user.id}`}>
@@ -284,16 +285,16 @@ export default function UsersTab() {
                       </span>
                     ) : "—"}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="admin-taxonomy-cell-role">
                     <Badge className={`${ROLE_COLORS[user.role || 'user'] || 'bg-muted text-foreground'}`}>
                       <Shield className="h-3 w-3 mr-1" />
                       {user.role || 'user'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
+                  <TableCell className="admin-taxonomy-cell-joined text-muted-foreground text-sm">
                     {formatDate(user.createdAt)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="admin-taxonomy-cell-actions">
                     <div className="flex items-center gap-2">
                       {/* Run16 BUG-014: an admin must not be able to demote
                           themselves with one click — the delete button already
@@ -365,10 +366,10 @@ export default function UsersTab() {
                 </TableCell>
               </TableRow>
             )}
-          </TableBody>
+            </TableBody>
           </Table>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 sm:hidden">
+        <p className="admin-users-scroll-hint text-xs text-muted-foreground mt-2 sm:hidden">
           Swipe the table sideways to see role, join date, and actions.
         </p>
 
