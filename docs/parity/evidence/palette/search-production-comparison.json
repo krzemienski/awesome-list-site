@@ -1,0 +1,1152 @@
+{
+  "meta": {
+    "baseline": "tests/parity/production-baseline/2026-09-12",
+    "baselineDate": "2026-09-12",
+    "baselineBase": "https://awesome.video",
+    "candidate": "../../../tmp/palette-baseline-compare/candidate",
+    "candidateBase": "http://127.0.0.1:5000",
+    "candidatePrecaptured": false,
+    "comparedAt": "2026-09-13T00:22:23.465Z",
+    "toolCommit": "7dfe06f7cad138a8364c4a421d752c06e641da1f",
+    "tools": {
+      "node": "v20.20.0",
+      "playwright": "1.61.1",
+      "axeCore": "4.13.0",
+      "axePlaywright": "4.13.0",
+      "lighthouse": "12.8.2",
+      "sharp": "0.33.5",
+      "pixelmatch": "7.1.0",
+      "chromium": "chromium-1223"
+    },
+    "routeCount": 1,
+    "apiCount": 12,
+    "deltaCount": 12,
+    "routesWithDeltas": 1,
+    "apiWithDeltas": 8,
+    "missing": 0,
+    "throttled": [],
+    "captureFailures": []
+  },
+  "routes": [
+    {
+      "route": "/search?q=ffmpeg",
+      "slug": "search-q-ffmpeg",
+      "kind": "html",
+      "deltas": [
+        "testids"
+      ],
+      "notes": [
+        "nav labels +126 −138"
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "redirects": {
+        "baseline": [],
+        "candidate": [],
+        "match": true
+      },
+      "title": {
+        "baseline": "Search: ffmpeg — Awesome Video",
+        "candidate": "Search: ffmpeg — Awesome Video",
+        "match": true
+      },
+      "h1": {
+        "baseline": [
+          "Search"
+        ],
+        "candidate": [
+          "Search"
+        ],
+        "match": true
+      },
+      "finalPath": {
+        "baseline": "{origin}/search?q=ffmpeg",
+        "candidate": "{origin}/search?q=ffmpeg",
+        "match": true
+      },
+      "linkCount": {
+        "baseline": 249,
+        "candidate": 236
+      },
+      "testIds": {
+        "375": {
+          "added": [
+            "button-suggest-edit-185101",
+            "button-suggest-edit-185298",
+            "button-suggest-edit-185767",
+            "button-suggest-edit-186063",
+            "button-suggest-edit-186113",
+            "button-suggest-edit-186482",
+            "button-suggest-edit-186677",
+            "button-visit-185101",
+            "button-visit-185298",
+            "button-visit-185767",
+            "button-visit-186063",
+            "button-visit-186113",
+            "button-visit-186482",
+            "button-visit-186677",
+            "card-resource-185101",
+            "card-resource-185298",
+            "card-resource-185767",
+            "card-resource-186063",
+            "card-resource-186113",
+            "card-resource-186482",
+            "card-resource-186677",
+            "link-page-9",
+            "link-resource-title-185101",
+            "link-resource-title-185298",
+            "link-resource-title-185767",
+            "link-resource-title-186063",
+            "link-resource-title-186113",
+            "link-resource-title-186482",
+            "link-resource-title-186677",
+            "link-view-details-185101",
+            "link-view-details-185298",
+            "link-view-details-185767",
+            "link-view-details-186063",
+            "link-view-details-186113",
+            "link-view-details-186482",
+            "link-view-details-186677"
+          ],
+          "removed": [
+            "button-suggest-edit-187996",
+            "button-suggest-edit-188024",
+            "button-suggest-edit-188325",
+            "button-suggest-edit-188365",
+            "button-suggest-edit-188601",
+            "button-suggest-edit-188932",
+            "button-suggest-edit-188951",
+            "button-visit-187996",
+            "button-visit-188024",
+            "button-visit-188325",
+            "button-visit-188365",
+            "button-visit-188601",
+            "button-visit-188932",
+            "button-visit-188951",
+            "card-resource-187996",
+            "card-resource-188024",
+            "card-resource-188325",
+            "card-resource-188365",
+            "card-resource-188601",
+            "card-resource-188932",
+            "card-resource-188951",
+            "link-page-19",
+            "link-resource-title-187996",
+            "link-resource-title-188024",
+            "link-resource-title-188325",
+            "link-resource-title-188365",
+            "link-resource-title-188601",
+            "link-resource-title-188932",
+            "link-resource-title-188951",
+            "link-view-details-187996",
+            "link-view-details-188024",
+            "link-view-details-188325",
+            "link-view-details-188365",
+            "link-view-details-188601",
+            "link-view-details-188932",
+            "link-view-details-188951"
+          ]
+        },
+        "768": {
+          "added": [
+            "button-suggest-edit-185101",
+            "button-suggest-edit-185298",
+            "button-suggest-edit-185767",
+            "button-suggest-edit-186063",
+            "button-suggest-edit-186113",
+            "button-suggest-edit-186482",
+            "button-suggest-edit-186677",
+            "button-visit-185101",
+            "button-visit-185298",
+            "button-visit-185767",
+            "button-visit-186063",
+            "button-visit-186113",
+            "button-visit-186482",
+            "button-visit-186677",
+            "card-resource-185101",
+            "card-resource-185298",
+            "card-resource-185767",
+            "card-resource-186063",
+            "card-resource-186113",
+            "card-resource-186482",
+            "card-resource-186677",
+            "link-page-9",
+            "link-resource-title-185101",
+            "link-resource-title-185298",
+            "link-resource-title-185767",
+            "link-resource-title-186063",
+            "link-resource-title-186113",
+            "link-resource-title-186482",
+            "link-resource-title-186677",
+            "link-view-details-185101",
+            "link-view-details-185298",
+            "link-view-details-185767",
+            "link-view-details-186063",
+            "link-view-details-186113",
+            "link-view-details-186482",
+            "link-view-details-186677"
+          ],
+          "removed": [
+            "button-suggest-edit-187996",
+            "button-suggest-edit-188024",
+            "button-suggest-edit-188325",
+            "button-suggest-edit-188365",
+            "button-suggest-edit-188601",
+            "button-suggest-edit-188932",
+            "button-suggest-edit-188951",
+            "button-visit-187996",
+            "button-visit-188024",
+            "button-visit-188325",
+            "button-visit-188365",
+            "button-visit-188601",
+            "button-visit-188932",
+            "button-visit-188951",
+            "card-resource-187996",
+            "card-resource-188024",
+            "card-resource-188325",
+            "card-resource-188365",
+            "card-resource-188601",
+            "card-resource-188932",
+            "card-resource-188951",
+            "link-page-19",
+            "link-resource-title-187996",
+            "link-resource-title-188024",
+            "link-resource-title-188325",
+            "link-resource-title-188365",
+            "link-resource-title-188601",
+            "link-resource-title-188932",
+            "link-resource-title-188951",
+            "link-view-details-187996",
+            "link-view-details-188024",
+            "link-view-details-188325",
+            "link-view-details-188365",
+            "link-view-details-188601",
+            "link-view-details-188932",
+            "link-view-details-188951"
+          ]
+        },
+        "1024": {
+          "added": [
+            "button-suggest-edit-185101",
+            "button-suggest-edit-185298",
+            "button-suggest-edit-185767",
+            "button-suggest-edit-186063",
+            "button-suggest-edit-186113",
+            "button-suggest-edit-186482",
+            "button-suggest-edit-186677",
+            "button-visit-185101",
+            "button-visit-185298",
+            "button-visit-185767",
+            "button-visit-186063",
+            "button-visit-186113",
+            "button-visit-186482",
+            "button-visit-186677",
+            "card-resource-185101",
+            "card-resource-185298",
+            "card-resource-185767",
+            "card-resource-186063",
+            "card-resource-186113",
+            "card-resource-186482",
+            "card-resource-186677",
+            "expand-sub-industry-forums-standards-bodies",
+            "link-page-9",
+            "link-resource-title-185101",
+            "link-resource-title-185298",
+            "link-resource-title-185767",
+            "link-resource-title-186063",
+            "link-resource-title-186113",
+            "link-resource-title-186482",
+            "link-resource-title-186677",
+            "link-view-details-185101",
+            "link-view-details-185298",
+            "link-view-details-185767",
+            "link-view-details-186063",
+            "link-view-details-186113",
+            "link-view-details-186482",
+            "link-view-details-186677"
+          ],
+          "removed": [
+            "button-suggest-edit-187996",
+            "button-suggest-edit-188024",
+            "button-suggest-edit-188325",
+            "button-suggest-edit-188365",
+            "button-suggest-edit-188601",
+            "button-suggest-edit-188932",
+            "button-suggest-edit-188951",
+            "button-visit-187996",
+            "button-visit-188024",
+            "button-visit-188325",
+            "button-visit-188365",
+            "button-visit-188601",
+            "button-visit-188932",
+            "button-visit-188951",
+            "card-resource-187996",
+            "card-resource-188024",
+            "card-resource-188325",
+            "card-resource-188365",
+            "card-resource-188601",
+            "card-resource-188932",
+            "card-resource-188951",
+            "expand-sub-vendors-hdr",
+            "facet-category-Community & Events",
+            "link-page-19",
+            "link-resource-title-187996",
+            "link-resource-title-188024",
+            "link-resource-title-188325",
+            "link-resource-title-188365",
+            "link-resource-title-188601",
+            "link-resource-title-188932",
+            "link-resource-title-188951",
+            "link-view-details-187996",
+            "link-view-details-188024",
+            "link-view-details-188325",
+            "link-view-details-188365",
+            "link-view-details-188601",
+            "link-view-details-188932",
+            "link-view-details-188951",
+            "sub-browser-extensions",
+            "sub-closed-captioning-subtitling-standards",
+            "sub-dash-manifest-tools",
+            "sub-ffmpeg-tools",
+            "sub-non-linear-editing-suites",
+            "sub-performance-monitoring-tools",
+            "sub-uncategorized-community-events",
+            "sub-vendors-hdr",
+            "subsub-advertising",
+            "subsub-conferences",
+            "subsub-rtmp",
+            "subsub-slack-meetups",
+            "subsub-vendor-docs"
+          ]
+        },
+        "1440": {
+          "added": [
+            "button-suggest-edit-185101",
+            "button-suggest-edit-185298",
+            "button-suggest-edit-185767",
+            "button-suggest-edit-186063",
+            "button-suggest-edit-186113",
+            "button-suggest-edit-186482",
+            "button-suggest-edit-186677",
+            "button-visit-185101",
+            "button-visit-185298",
+            "button-visit-185767",
+            "button-visit-186063",
+            "button-visit-186113",
+            "button-visit-186482",
+            "button-visit-186677",
+            "card-resource-185101",
+            "card-resource-185298",
+            "card-resource-185767",
+            "card-resource-186063",
+            "card-resource-186113",
+            "card-resource-186482",
+            "card-resource-186677",
+            "expand-sub-industry-forums-standards-bodies",
+            "link-page-9",
+            "link-resource-title-185101",
+            "link-resource-title-185298",
+            "link-resource-title-185767",
+            "link-resource-title-186063",
+            "link-resource-title-186113",
+            "link-resource-title-186482",
+            "link-resource-title-186677",
+            "link-view-details-185101",
+            "link-view-details-185298",
+            "link-view-details-185767",
+            "link-view-details-186063",
+            "link-view-details-186113",
+            "link-view-details-186482",
+            "link-view-details-186677"
+          ],
+          "removed": [
+            "button-suggest-edit-187996",
+            "button-suggest-edit-188024",
+            "button-suggest-edit-188325",
+            "button-suggest-edit-188365",
+            "button-suggest-edit-188601",
+            "button-suggest-edit-188932",
+            "button-suggest-edit-188951",
+            "button-visit-187996",
+            "button-visit-188024",
+            "button-visit-188325",
+            "button-visit-188365",
+            "button-visit-188601",
+            "button-visit-188932",
+            "button-visit-188951",
+            "card-resource-187996",
+            "card-resource-188024",
+            "card-resource-188325",
+            "card-resource-188365",
+            "card-resource-188601",
+            "card-resource-188932",
+            "card-resource-188951",
+            "expand-sub-vendors-hdr",
+            "facet-category-Community & Events",
+            "link-page-19",
+            "link-resource-title-187996",
+            "link-resource-title-188024",
+            "link-resource-title-188325",
+            "link-resource-title-188365",
+            "link-resource-title-188601",
+            "link-resource-title-188932",
+            "link-resource-title-188951",
+            "link-view-details-187996",
+            "link-view-details-188024",
+            "link-view-details-188325",
+            "link-view-details-188365",
+            "link-view-details-188601",
+            "link-view-details-188932",
+            "link-view-details-188951",
+            "sub-browser-extensions",
+            "sub-closed-captioning-subtitling-standards",
+            "sub-dash-manifest-tools",
+            "sub-ffmpeg-tools",
+            "sub-non-linear-editing-suites",
+            "sub-performance-monitoring-tools",
+            "sub-uncategorized-community-events",
+            "sub-vendors-hdr",
+            "subsub-advertising",
+            "subsub-conferences",
+            "subsub-rtmp",
+            "subsub-slack-meetups",
+            "subsub-vendor-docs"
+          ]
+        }
+      },
+      "testIdSummary": {
+        "added": [
+          "button-suggest-edit-185101",
+          "button-suggest-edit-185298",
+          "button-suggest-edit-185767",
+          "button-suggest-edit-186063",
+          "button-suggest-edit-186113",
+          "button-suggest-edit-186482",
+          "button-suggest-edit-186677",
+          "button-visit-185101",
+          "button-visit-185298",
+          "button-visit-185767",
+          "button-visit-186063",
+          "button-visit-186113",
+          "button-visit-186482",
+          "button-visit-186677",
+          "card-resource-185101",
+          "card-resource-185298",
+          "card-resource-185767",
+          "card-resource-186063",
+          "card-resource-186113",
+          "card-resource-186482",
+          "card-resource-186677",
+          "expand-sub-industry-forums-standards-bodies",
+          "link-page-9",
+          "link-resource-title-185101",
+          "link-resource-title-185298",
+          "link-resource-title-185767",
+          "link-resource-title-186063",
+          "link-resource-title-186113",
+          "link-resource-title-186482",
+          "link-resource-title-186677",
+          "link-view-details-185101",
+          "link-view-details-185298",
+          "link-view-details-185767",
+          "link-view-details-186063",
+          "link-view-details-186113",
+          "link-view-details-186482",
+          "link-view-details-186677"
+        ],
+        "removed": [
+          "button-suggest-edit-187996",
+          "button-suggest-edit-188024",
+          "button-suggest-edit-188325",
+          "button-suggest-edit-188365",
+          "button-suggest-edit-188601",
+          "button-suggest-edit-188932",
+          "button-suggest-edit-188951",
+          "button-visit-187996",
+          "button-visit-188024",
+          "button-visit-188325",
+          "button-visit-188365",
+          "button-visit-188601",
+          "button-visit-188932",
+          "button-visit-188951",
+          "card-resource-187996",
+          "card-resource-188024",
+          "card-resource-188325",
+          "card-resource-188365",
+          "card-resource-188601",
+          "card-resource-188932",
+          "card-resource-188951",
+          "expand-sub-vendors-hdr",
+          "facet-category-Community & Events",
+          "link-page-19",
+          "link-resource-title-187996",
+          "link-resource-title-188024",
+          "link-resource-title-188325",
+          "link-resource-title-188365",
+          "link-resource-title-188601",
+          "link-resource-title-188932",
+          "link-resource-title-188951",
+          "link-view-details-187996",
+          "link-view-details-188024",
+          "link-view-details-188325",
+          "link-view-details-188365",
+          "link-view-details-188601",
+          "link-view-details-188932",
+          "link-view-details-188951",
+          "sub-browser-extensions",
+          "sub-closed-captioning-subtitling-standards",
+          "sub-dash-manifest-tools",
+          "sub-ffmpeg-tools",
+          "sub-non-linear-editing-suites",
+          "sub-performance-monitoring-tools",
+          "sub-uncategorized-community-events",
+          "sub-vendors-hdr",
+          "subsub-advertising",
+          "subsub-conferences",
+          "subsub-rtmp",
+          "subsub-slack-meetups",
+          "subsub-vendor-docs"
+        ]
+      },
+      "axe": {
+        "375": {
+          "baseline": {
+            "rules": 0,
+            "nodes": 0,
+            "ruleIds": []
+          },
+          "candidate": {
+            "rules": 0,
+            "nodes": 0,
+            "ruleIds": []
+          },
+          "rules": {
+            "added": [],
+            "removed": []
+          }
+        },
+        "1440": {
+          "baseline": {
+            "rules": 0,
+            "nodes": 0,
+            "ruleIds": []
+          },
+          "candidate": {
+            "rules": 0,
+            "nodes": 0,
+            "ruleIds": []
+          },
+          "rules": {
+            "added": [],
+            "removed": []
+          }
+        }
+      }
+    }
+  ],
+  "api": [
+    {
+      "endpoint": "/api/resources?limit=24",
+      "slug": "resources-limit-24",
+      "deltas": [
+        "key-paths",
+        "counts"
+      ],
+      "notes": [
+        "first/last id 190152…190114 → 188015…186687",
+        "cache-control \"private\" → \"–\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [
+          "resources[].kind",
+          "resources[].resolvedKind"
+        ],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 24,
+        "candidate": 24
+      },
+      "arrayCounts": {
+        "resources": {
+          "baseline": 24,
+          "candidate": 24
+        }
+      },
+      "totals": {
+        "total": {
+          "baseline": 3824,
+          "candidate": 1816
+        },
+        "limit": {
+          "baseline": 24,
+          "candidate": 24
+        },
+        "offset": {
+          "baseline": 0,
+          "candidate": 0
+        },
+        "nextOffset": {
+          "baseline": 24,
+          "candidate": 24
+        },
+        "nextCursor": {
+          "baseline": 24,
+          "candidate": 24
+        },
+        "pagination.page": {
+          "baseline": 1,
+          "candidate": 1
+        },
+        "pagination.limit": {
+          "baseline": 24,
+          "candidate": 24
+        },
+        "pagination.total": {
+          "baseline": 3824,
+          "candidate": 1816
+        },
+        "pagination.totalPages": {
+          "baseline": 160,
+          "candidate": 76
+        }
+      },
+      "ids": {
+        "baseline": [
+          190152,
+          190114
+        ],
+        "candidate": [
+          188015,
+          186687
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/resources/185020",
+      "slug": "resources-185020",
+      "deltas": [
+        "key-paths"
+      ],
+      "notes": [
+        "cache-control \"private\" → \"–\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [
+          "kind",
+          "resolvedKind"
+        ],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": null,
+        "candidate": null
+      },
+      "arrayCounts": {},
+      "totals": {},
+      "ids": {
+        "baseline": [
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/categories",
+      "slug": "categories",
+      "deltas": [],
+      "notes": [
+        "cache-control \"private, max-age=60, must-revalidate\" → \"public, max-age=60, must-revalidate\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 9,
+        "candidate": 9
+      },
+      "arrayCounts": {
+        "$": {
+          "baseline": 9,
+          "candidate": 9
+        }
+      },
+      "totals": {},
+      "ids": {
+        "baseline": [
+          1091,
+          1088
+        ],
+        "candidate": [
+          1091,
+          1088
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/subcategories",
+      "slug": "subcategories",
+      "deltas": [
+        "item-count"
+      ],
+      "notes": [
+        "cache-control \"private, max-age=60, must-revalidate\" → \"public, max-age=60, must-revalidate\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 99,
+        "candidate": 92
+      },
+      "arrayCounts": {
+        "$": {
+          "baseline": 99,
+          "candidate": 92
+        }
+      },
+      "totals": {},
+      "ids": {
+        "baseline": [
+          2243,
+          2281
+        ],
+        "candidate": [
+          2243,
+          2281
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/sub-subcategories",
+      "slug": "sub-subcategories",
+      "deltas": [
+        "item-count"
+      ],
+      "notes": [
+        "cache-control \"private, max-age=60, must-revalidate\" → \"public, max-age=60, must-revalidate\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 32,
+        "candidate": 27
+      },
+      "arrayCounts": {
+        "$": {
+          "baseline": 32,
+          "candidate": 27
+        }
+      },
+      "totals": {},
+      "ids": {
+        "baseline": [
+          3629,
+          3633
+        ],
+        "candidate": [
+          3629,
+          3633
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/tags",
+      "slug": "tags",
+      "deltas": [
+        "item-count",
+        "counts"
+      ],
+      "notes": [
+        "cache-control \"private, max-age=60, must-revalidate\" → \"public, max-age=60, must-revalidate\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 1541,
+        "candidate": 1535
+      },
+      "arrayCounts": {
+        "tags": {
+          "baseline": 1541,
+          "candidate": 1535
+        }
+      },
+      "totals": {
+        "total": {
+          "baseline": 1541,
+          "candidate": 1535
+        }
+      },
+      "ids": {
+        "baseline": [
+          "open-source",
+          "zero-copy"
+        ],
+        "candidate": [
+          "open-source",
+          "zero-copy"
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/awesome-list/listing?level=category&slug=encoding-codecs",
+      "slug": "awesome-list-listing-level-category-slug-encoding-codecs",
+      "deltas": [
+        "key-paths",
+        "counts"
+      ],
+      "notes": [
+        "first/last id 184847…186240 → 184847…185016",
+        "cache-control \"private, max-age=0, must-revalidate\" → \"public, max-age=0, must-revalidate\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [
+          "resources[].kind",
+          "resources[].resolvedKind"
+        ],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 24,
+        "candidate": 24
+      },
+      "arrayCounts": {
+        "children": {
+          "baseline": 16,
+          "candidate": 16
+        },
+        "tags": {
+          "baseline": 275,
+          "candidate": 271
+        },
+        "resources": {
+          "baseline": 24,
+          "candidate": 24
+        }
+      },
+      "totals": {
+        "page": {
+          "baseline": 1,
+          "candidate": 1
+        },
+        "pageSize": {
+          "baseline": 24,
+          "candidate": 24
+        },
+        "total": {
+          "baseline": 579,
+          "candidate": 333
+        },
+        "totalPages": {
+          "baseline": 25,
+          "candidate": 14
+        },
+        "totalAll": {
+          "baseline": 579,
+          "candidate": 333
+        },
+        "generalCount": {
+          "baseline": 96,
+          "candidate": 92
+        }
+      },
+      "ids": {
+        "baseline": [
+          184847,
+          186240
+        ],
+        "candidate": [
+          184847,
+          185016
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/journeys",
+      "slug": "journeys",
+      "deltas": [],
+      "notes": [
+        "cache-control \"private\" → \"–\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 5,
+        "candidate": 5
+      },
+      "arrayCounts": {
+        "$": {
+          "baseline": 5,
+          "candidate": 5
+        }
+      },
+      "totals": {},
+      "ids": {
+        "baseline": [
+          7,
+          6
+        ],
+        "candidate": [
+          7,
+          6
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/journeys/7",
+      "slug": "journeys-7",
+      "deltas": [
+        "key-paths"
+      ],
+      "notes": [
+        "cache-control \"private\" → \"–\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [
+          "steps[].resource.kind",
+          "steps[].resource.resolvedKind"
+        ],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": 18,
+        "candidate": 18
+      },
+      "arrayCounts": {
+        "steps": {
+          "baseline": 18,
+          "candidate": 18
+        }
+      },
+      "totals": {
+        "stepCount": {
+          "baseline": 6,
+          "candidate": 6
+        }
+      },
+      "ids": {
+        "baseline": [
+          181,
+          198
+        ],
+        "candidate": [
+          181,
+          198
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/recommendations",
+      "slug": "recommendations",
+      "deltas": [
+        "key-paths"
+      ],
+      "notes": [
+        "first/last id 190135…190122 → 188015…186821",
+        "cache-control \"private\" → \"–\""
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [
+          "[].resource.kind",
+          "[].resource.resolvedKind"
+        ],
+        "removed": [
+          "[].resource.metadata.tags",
+          "[].resource.metadata.tags[]"
+        ]
+      },
+      "itemCount": {
+        "baseline": 10,
+        "candidate": 10
+      },
+      "arrayCounts": {
+        "$": {
+          "baseline": 10,
+          "candidate": 10
+        }
+      },
+      "totals": {},
+      "ids": {
+        "baseline": [
+          190135,
+          190122
+        ],
+        "candidate": [
+          188015,
+          186821
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/health",
+      "slug": "health",
+      "deltas": [],
+      "notes": [
+        "byte-identical body"
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": null,
+        "candidate": null
+      },
+      "arrayCounts": {},
+      "totals": {},
+      "ids": {
+        "baseline": [
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/health/ready",
+      "slug": "health-ready",
+      "deltas": [],
+      "notes": [
+        "byte-identical body"
+      ],
+      "missing": [],
+      "status": {
+        "baseline": 200,
+        "candidate": 200,
+        "match": true
+      },
+      "keyPaths": {
+        "added": [],
+        "removed": []
+      },
+      "itemCount": {
+        "baseline": null,
+        "candidate": null
+      },
+      "arrayCounts": {},
+      "totals": {},
+      "ids": {
+        "baseline": [
+          null,
+          null
+        ],
+        "candidate": [
+          null,
+          null
+        ]
+      }
+    }
+  ],
+  "strips": [
+    {
+      "file": "strips/search-q-ffmpeg@375.png",
+      "width": 774,
+      "height": 7070,
+      "sizeMatch": false
+    },
+    {
+      "file": "strips/search-q-ffmpeg@768.png",
+      "width": 1560,
+      "height": 4027,
+      "sizeMatch": false
+    },
+    {
+      "file": "strips/search-q-ffmpeg@1024.png",
+      "width": 2072,
+      "height": 6917,
+      "sizeMatch": false
+    },
+    {
+      "file": "strips/search-q-ffmpeg@1440.png",
+      "width": 2904,
+      "height": 3666,
+      "sizeMatch": false
+    }
+  ]
+}

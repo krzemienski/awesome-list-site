@@ -1,27 +1,21 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Clock, X, Loader2 } from "lucide-react";
+import { Clock, Folder, Grid2X2, Info, Loader2, Plus, Search, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
 import { normalizeSearchQuery } from "@shared/searchNormalize";
+import type { Category } from "@shared/schema";
 import { ContactPaletteItem } from "@/components/contact/contact-palette-item";
-import { contactVariant } from "@/lib/contact";
+import "./../../styles/shell/palette.css";
 
 interface SearchDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }
-
-// BUG-003/BUG-007 (run13): the palette used to run its own client-side Fuse
-// index over the static tree — different matcher, different counts than the
-// /search page, and result clicks opened external URLs instead of in-app
-// resource pages. It now runs the SAME server search as the /search page
-// (identical queryKey → shared React Query cache entry), so counts always
-// agree, and selecting a result navigates in-app to /resource/:id.
 
 interface DbSearchResource {
   id: number;
@@ -31,6 +25,15 @@ interface DbSearchResource {
   category: string | null;
   subcategory: string | null;
 }
+
+type PaletteCategory = Category & { resourceCount: number };
+
+const PAGES = [
+  { label: "Browse categories", detail: "Explore the full catalog", href: "/categories", icon: Grid2X2 },
+  { label: "Advanced discovery", detail: "Filter resources in detail", href: "/advanced", icon: Search },
+  { label: "Submit a resource", detail: "Suggest something useful", href: "/submit", icon: Plus },
+  { label: "About", detail: "Learn about this collection", href: "/about", icon: Info },
+] as const;
 
 // R2-L10: recent searches persisted in localStorage (max 5, most recent first).
 const RECENT_SEARCHES_KEY = "recent-searches";
@@ -67,21 +70,21 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const debouncedQuery = useDebounce(query, 300);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
+  // The palette is mounted by MainLayout only after its trigger opens it, so
+  // activeElement here is the real opener (header button or shortcut target).
+  const openerRef = useRef<HTMLElement | null>(
+    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+  );
 
-  // audit2: normalize exactly like the /search page + server matcher so the
-  // palette and /search share one cache entry per canonical query, and
-  // quoted/double-spaced queries hit the same results.
+  // Normalize exactly like the /search page + server matcher so the palette
+  // and /search share one cache entry per canonical query.
   const trimmed = normalizeSearchQuery(debouncedQuery);
+  const queryTrimmed = normalizeSearchQuery(query);
+  const showResults = queryTrimmed.length >= 2;
 
-  // Same queryKey + fetch as the /search page, so both surfaces share one
-  // cached result set and always report the same match count.
-  // NB-031 (run23): the palette used to fetch limit=1000 to render 15 rows,
-  // under a key /search never used — 1000-row payload per keystroke-settle
-  // AND a cold cache when the user landed on /search. It now fetches exactly
-  // the /search page's FIRST PAGE (same key ["/api/resources","search",q,1],
-  // same limit=24 URL), so the dropdown's fetch is dropdown-sized and "View
-  // all" lands on /search with the page-1 cache already warm (zero refetch).
-  const { data, isFetching } = useQuery<{ resources: DbSearchResource[]; total: number }>({
+  // Keep this query and cache key in lockstep with /search. Selecting a
+  // palette result still warms the first page that the destination will read.
+  const resourceQuery = useQuery<{ resources: DbSearchResource[]; total: number }>({
     queryKey: ["/api/resources", "search", trimmed, 1],
     queryFn: async () =>
       apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&page=1&limit=24`, {
@@ -91,271 +94,317 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     staleTime: 60 * 1000,
   });
 
-  // Normalized like `trimmed` above — otherwise a quoted zero-match query
-  // would keep `queryTrimmed !== trimmed` true forever and pin the pending
-  // spinner instead of showing "no results".
-  const queryTrimmed = normalizeSearchQuery(query);
-  const allMatches = trimmed.length >= 2 ? data?.resources ?? [] : [];
-  // NB-044 (run18): show the TRUE match count from the server (data.total),
-  // not the length of the (limit-capped) result page — the palette only renders
-  // the top 15 rows but the count must reflect the full match set (e.g. 255).
-  const totalMatches = trimmed.length >= 2 ? data?.total ?? allMatches.length : 0;
+  // Taxonomy is deliberately live rather than copied from the shell's nav
+  // data: it can change independently while the palette is open.
+  const categoriesQuery = useQuery<PaletteCategory[]>({
+    queryKey: ["/api/categories"],
+    queryFn: () => apiRequest("/api/categories", { method: "GET" }),
+    enabled: isOpen,
+    staleTime: 60 * 1000,
+  });
+
+  const allMatches = trimmed.length >= 2 ? resourceQuery.data?.resources ?? [] : [];
+  const totalMatches = trimmed.length >= 2 ? resourceQuery.data?.total ?? allMatches.length : 0;
   const results = allMatches.slice(0, 15);
-  // NB-045 (run18): gate every result surface on the TRIMMED query so a
-  // whitespace-only input ("   ") never shows results, a "View all" row, or
-  // routes to /search — it falls back to the recent/min-length empty states.
-  const showResults = queryTrimmed.length >= 2;
   const isPending =
-    showResults && results.length === 0 && (isFetching || queryTrimmed !== trimmed);
+    showResults && results.length === 0 && (resourceQuery.isFetching || queryTrimmed !== trimmed);
+  const categoryMatches = showResults
+    ? (categoriesQuery.data ?? []).filter((category) =>
+        category.name.toLocaleLowerCase().includes(queryTrimmed.toLocaleLowerCase()),
+      )
+    : (categoriesQuery.data ?? []).slice(0, 6);
+  const pageMatches = showResults
+    ? PAGES.filter((page) =>
+        `${page.label} ${page.detail}`.toLocaleLowerCase().includes(queryTrimmed.toLocaleLowerCase()),
+      )
+    : PAGES;
+  const hasNonResourceMatches = pageMatches.length > 0 || categoryMatches.length > 0;
 
   // Track the search once the debounced query settles and results arrive —
   // one `search` event per settled query, not one per keystroke.
-  // NB-029 (run23): recent-searches are NO LONGER saved here — every settled
-  // debounce (including junk keystroke prefixes like "asdf") used to pollute
-  // the list. Saving now happens only on an explicit commit: selecting a
-  // result, choosing "View all", or Enter-fallback to /search.
   useEffect(() => {
-    if (!trimmed || trimmed.length < 2 || !data) return;
-    trackSearch(trimmed, data.total, 'search_palette');
-  }, [trimmed, data]);
+    if (!trimmed || trimmed.length < 2 || !resourceQuery.data) return;
+    trackSearch(trimmed, resourceQuery.data.total, "search_palette");
+  }, [trimmed, resourceQuery.data]);
 
   // R2-L10: load persisted recent searches whenever the dialog opens.
   useEffect(() => {
-    if (isOpen) {
-      setRecentSearches(readRecentSearches());
-    }
+    if (isOpen) setRecentSearches(readRecentSearches());
   }, [isOpen]);
 
-  // Focus input when dialog opens
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-    }
-  }, [isOpen]);
-
-  // Clear search when dialog closes
-  useEffect(() => {
-    if (!isOpen) {
-      setQuery("");
-    }
+    if (!isOpen) setQuery("");
   }, [isOpen]);
 
   const openResource = (resource: DbSearchResource) => {
     trackResourceClick(resource.title, resource.url, resource.category || "");
-    // NB-029 (run23): an explicit selection is a real search — save it now.
     if (queryTrimmed.length >= 2) setRecentSearches(saveRecentSearch(queryTrimmed));
     setIsOpen(false);
     navigate(`/resource/${resource.id}`);
   };
 
-  // NB-029/NB-030 (run23): committing the query to the full /search page —
-  // via the "View all" row or the Enter fallback — is the other real-search
-  // signal that records a recent search.
   const commitToSearchPage = (q: string) => {
     if (q.length >= 2) setRecentSearches(saveRecentSearch(q));
     setIsOpen(false);
     navigate(`/search?q=${encodeURIComponent(q)}`);
   };
 
+  const openPage = (href: string) => {
+    setIsOpen(false);
+    navigate(href);
+  };
+
+  const openCategory = (category: PaletteCategory) => {
+    setIsOpen(false);
+    navigate(`/category/${category.slug}`);
+  };
+
+  const restoreOpenerFocus = (event: Event) => {
+    const opener = openerRef.current && openerRef.current !== document.body
+      ? openerRef.current
+      : Array.from(document.querySelectorAll<HTMLElement>('button[aria-label="Open search"], button[aria-label="Search resources"], button[aria-label="Search"]'))
+          .find((element) => element.getClientRects().length > 0);
+    if (opener?.isConnected) {
+      event.preventDefault();
+      opener.focus();
+    }
+  };
+
+  const renderPages = () => (
+    <CommandGroup heading="Pages" className="search-palette-group">
+      {pageMatches.map((page) => {
+        const Icon = page.icon;
+        return (
+          <CommandItem
+            key={page.href}
+            value={`page-${page.label}`}
+            onSelect={() => openPage(page.href)}
+            className="search-palette-row"
+          >
+            <span className="search-palette-kind"><Icon aria-hidden="true" />page</span>
+            <span className="search-palette-copy">
+              <span>{page.label}</span>
+              <small>{page.detail}</small>
+            </span>
+            <span className="search-palette-arrow" aria-hidden="true">→</span>
+          </CommandItem>
+        );
+      })}
+      <ContactPaletteItem closePalette={() => setIsOpen(false)} />
+    </CommandGroup>
+  );
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent
-        className="sm:max-w-lg max-h-[min(85svh,520px)] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden"
-        onCloseAutoFocus={(e) => {
-          // NB-026 (run18): both the header trigger click AND the "/"/⌘K
-          // shortcut opens must return focus to a real, visible control — never
-          // to <body>. Redirect to the header search chip (the palette's
-          // canonical trigger) so keyboard users land somewhere sensible.
-          const chip = document.querySelector<HTMLElement>(
-            'button[aria-label="Open search"]',
-          );
-          if (chip) {
-            e.preventDefault();
-            chip.focus();
-          }
-        }}
-      >
-        {/* NB-004 (run18): in short viewports (e.g. 812×375 landscape) the
-            header chrome squeezed the result list below one row's height, so
-            the keyboard-active item could never be fully visible. Under
-            max-height:480px the decorative eyebrow hides, the title shrinks,
-            and the description collapses to sr-only (kept for a11y). */}
-        <DialogHeader>
-          <div className="eyebrow [@media(max-height:480px)]:hidden" aria-hidden>// Search</div>
-          <DialogTitle className="font-display text-2xl font-medium tracking-tight [@media(max-height:480px)]:text-base">
-            Find <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>resources</em>
-          </DialogTitle>
-          <DialogDescription className="[@media(max-height:480px)]:sr-only">
-            Find video development resources in the awesome list.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Command className="min-h-0" shouldFilter={false}>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
+    <DialogPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="search-palette-overlay" />
+        <DialogPrimitive.Content
+          className="search-palette"
+          aria-label="Search resources, categories, and pages"
+          onKeyDownCapture={(event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+              event.preventDefault();
+              event.stopPropagation();
+              setIsOpen(false);
+            }
+          }}
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            inputRef.current?.focus();
+          }}
+          onCloseAutoFocus={restoreOpenerFocus}
+        >
+          <DialogPrimitive.Title className="sr-only">Search Resources</DialogPrimitive.Title>
+          <DialogPrimitive.Description className="sr-only">
+            Search resources, categories, and pages in the awesome video collection.
+          </DialogPrimitive.Description>
+
+          <Command className="search-palette-command" shouldFilter={false}>
             <CommandInput
               ref={inputRef}
-              placeholder="Search resources..."
+              aria-label="Search resources, categories, and pages"
+              placeholder="Search resources, categories, pages…"
+              trailing={
+                <DialogPrimitive.Close className="search-palette-close" aria-label="Close search">
+                  <kbd>esc</kbd>
+                </DialogPrimitive.Close>
+              }
               value={query}
               onValueChange={setQuery}
-              onKeyDown={(e) => {
-                // NB-030 (run23): before results render (debounce + fetch in
-                // flight) cmdk has no active item, so Enter used to be a dead
-                // no-op. Fall back to the full /search page for the typed
-                // query whenever nothing is keyboard-selected.
-                if (e.key !== "Enter" || queryTrimmed.length < 2) return;
+              onKeyDown={(event) => {
+                // Before a debounced result has an active cmdk row, commit to
+                // /search rather than making Enter a no-op.
+                if (event.key !== "Enter" || queryTrimmed.length < 2) return;
                 const active = document.querySelector(
                   '[cmdk-item][data-selected="true"], [cmdk-item][aria-selected="true"]',
                 );
                 if (!active) {
-                  e.preventDefault();
+                  event.preventDefault();
                   commitToSearchPage(queryTrimmed);
                 }
               }}
-              className="w-full pl-10 pr-4 py-2"
             />
-          </div>
-          
-          <CommandList className="flex-1 min-h-0 overflow-y-auto">
-            {showResults ? (
-              <>
-                {isPending ? (
-                  <div className="flex items-center justify-center gap-2 h-[120px] text-sm text-muted-foreground" data-testid="search-loading">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+
+            <CommandList className="search-palette-list">
+              {showResults ? (
+                isPending ? (
+                  <div className="search-palette-status" data-testid="search-loading" role="status">
+                    <Loader2 className="animate-spin" />
                     Searching…
+                  </div>
+                ) : resourceQuery.isError ? (
+                  <div className="search-palette-status search-palette-status-error" data-testid="search-error" role="alert">
+                    <span>Search failed. Please try again.</span>
+                    <button type="button" onClick={() => resourceQuery.refetch()}>Try again</button>
                   </div>
                 ) : (
                   <>
-                    {totalMatches > 0 && (
-                      <div
-                        className="px-3 pt-2 pb-1 text-xs text-muted-foreground"
-                        data-testid="search-result-count"
-                        aria-live="polite"
-                      >
-                        {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
-                        {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
+                    {results.length > 0 && (
+                      <CommandGroup heading="Resources" className="search-palette-group">
+                        {results.map((resource, index) => (
+                          <CommandItem
+                            key={`resource-${resource.id}`}
+                            value={`resource-${resource.id}`}
+                            onSelect={() => openResource(resource)}
+                            className="search-palette-row"
+                            data-testid={`search-result-${index}`}
+                          >
+                            <span className="search-palette-kind"><Grid2X2 aria-hidden="true" />item</span>
+                            <span className="search-palette-copy">
+                              <span>{resource.title}</span>
+                              <small>
+                                {resource.category}{resource.subcategory ? ` → ${resource.subcategory}` : ""}
+                              </small>
+                            </span>
+                            <span className="search-palette-arrow" aria-hidden="true">→</span>
+                          </CommandItem>
+                        ))}
+                        <CommandItem
+                          value={`view-all-${queryTrimmed}`}
+                          onSelect={() => commitToSearchPage(queryTrimmed)}
+                          className="search-palette-row search-palette-view-all"
+                          data-testid="search-view-all"
+                        >
+                          <span className="search-palette-kind"><Search aria-hidden="true" />all</span>
+                          <span className="search-palette-copy"><span>View all results for “{queryTrimmed}”</span></span>
+                          <span className="search-palette-arrow" aria-hidden="true">→</span>
+                        </CommandItem>
+                      </CommandGroup>
+                    )}
+                    {pageMatches.length > 0 && renderPages()}
+                    {categoryMatches.length > 0 && (
+                      <CommandGroup heading="Categories" className="search-palette-group">
+                        {categoryMatches.map((category) => (
+                          <CommandItem
+                            key={`category-${category.id}`}
+                            value={`category-${category.name}`}
+                            onSelect={() => openCategory(category)}
+                            className="search-palette-row"
+                          >
+                            <span className="search-palette-kind"><Folder aria-hidden="true" />cat</span>
+                            <span className="search-palette-copy">
+                              <span>{category.name}</span>
+                              <small>{category.resourceCount} resource{category.resourceCount === 1 ? "" : "s"}</small>
+                            </span>
+                            <span className="search-palette-arrow" aria-hidden="true">→</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    )}
+                    {!hasNonResourceMatches && results.length === 0 && (
+                      <div className="search-palette-status" data-testid="search-no-results">
+                        <Search aria-hidden="true" />
+                        <strong>No results for “{queryTrimmed}”</strong>
+                        <span>Try different keywords or check the spelling.</span>
                       </div>
                     )}
-                    <CommandGroup>
-                      {/* Pinned first so plain Enter goes to the full search page. */}
-                      <CommandItem
-                        key="view-all-results"
-                        value={`view-all-${queryTrimmed}`}
-                        onSelect={() => commitToSearchPage(queryTrimmed)}
-                        className="flex items-center gap-2 p-3 cursor-pointer"
-                        data-testid="search-view-all"
-                      >
-                        <Search className="h-4 w-4 shrink-0 text-[var(--accent)]" />
-                        <span className="text-sm font-medium">
-                          View all results for “{queryTrimmed}”
-                        </span>
-                      </CommandItem>
-                      {results.map((resource, index) => (
-                        <CommandItem
-                          key={`resource-${resource.id}`}
-                          value={`resource-${resource.id}`}
-                          onSelect={() => openResource(resource)}
-                          className="flex flex-col items-start gap-1 p-3 cursor-pointer"
-                          data-testid={`search-result-${index}`}
-                        >
-                          <div className="font-medium text-sm">{resource.title}</div>
-                          <div className="text-sm text-foreground/80">
-                            {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''}
-                          </div>
-                          {resource.description && (
-                            <div className="text-sm text-foreground/80 line-clamp-2">
-                              {resource.description}
-                            </div>
-                          )}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                    {!isFetching && results.length === 0 && (
-                      <div className="flex flex-col items-center justify-center h-[160px] text-center p-4">
-                        <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
-                          <Search className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                        <h3 className="mt-4 text-sm font-semibold">No results found</h3>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          Try different keywords or check the spelling
-                        </p>
+                    {categoriesQuery.isError && (
+                      <div className="search-palette-inline-error" role="status">
+                        Categories are unavailable right now.
                       </div>
                     )}
                   </>
-                )}
-              </>
-            ) : recentSearches.length > 0 ? (
-              /* R2-L10: recent searches shown while the input is empty. */
-              <CommandGroup>
-                <div className="flex items-center justify-between px-3 pt-2 pb-1">
-                  <span className="text-xs text-muted-foreground uppercase tracking-[0.14em]">Recent searches</span>
-                  <button
-                    type="button"
-                    className="text-xs text-muted-foreground hover:text-[color:var(--text)] flex min-h-6 items-center gap-1"
-                    onClick={() => {
-                      try {
-                        localStorage.removeItem(RECENT_SEARCHES_KEY);
-                      } catch {
-                        // ignore
-                      }
-                      setRecentSearches([]);
-                    }}
-                    data-testid="button-clear-recent-searches"
-                  >
-                    <X className="h-3 w-3" />
-                    Clear
-                  </button>
-                </div>
-                {recentSearches.map((recent, index) => (
-                  <CommandItem
-                    key={`recent-${recent}`}
-                    value={`recent-${recent}`}
-                    onSelect={() => setQuery(recent)}
-                    className="flex items-center gap-2 p-3 cursor-pointer"
-                    data-testid={`recent-search-${index}`}
-                  >
-                    <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="text-sm">{recent}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
-                <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
-                  <Search className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="mt-4 text-sm font-semibold">Start typing to search</h3>
-                <p className="mt-2 text-xs text-muted-foreground">Type at least 2 characters</p>
-              </div>
+                )
+              ) : (
+                <>
+                  {recentSearches.length > 0 && (
+                    <CommandGroup heading="Recent searches" className="search-palette-group">
+                      <button
+                        type="button"
+                        className="search-palette-clear"
+                        onClick={() => {
+                          try {
+                            localStorage.removeItem(RECENT_SEARCHES_KEY);
+                          } catch {
+                            // storage may be unavailable — clearing the UI is still useful
+                          }
+                          setRecentSearches([]);
+                        }}
+                        data-testid="button-clear-recent-searches"
+                      >
+                        <X aria-hidden="true" />
+                        Clear
+                      </button>
+                      {recentSearches.map((recent, index) => (
+                        <CommandItem
+                          key={`recent-${recent}`}
+                          value={`recent-${recent}`}
+                          onSelect={() => setQuery(recent)}
+                          className="search-palette-row"
+                          data-testid={`recent-search-${index}`}
+                        >
+                          <span className="search-palette-kind"><Clock aria-hidden="true" />recent</span>
+                          <span className="search-palette-copy"><span>{recent}</span></span>
+                          <span className="search-palette-arrow" aria-hidden="true">→</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                  {renderPages()}
+                  {categoryMatches.length > 0 && (
+                    <CommandGroup heading="Categories" className="search-palette-group">
+                      {categoryMatches.map((category) => (
+                        <CommandItem
+                          key={`category-${category.id}`}
+                          value={`category-${category.name}`}
+                          onSelect={() => openCategory(category)}
+                          className="search-palette-row"
+                        >
+                          <span className="search-palette-kind"><Folder aria-hidden="true" />cat</span>
+                          <span className="search-palette-copy">
+                            <span>{category.name}</span>
+                            <small>{category.resourceCount} resource{category.resourceCount === 1 ? "" : "s"}</small>
+                          </span>
+                          <span className="search-palette-arrow" aria-hidden="true">→</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                  {categoriesQuery.isLoading && (
+                    <div className="search-palette-inline-error" role="status">Loading categories…</div>
+                  )}
+                  {categoriesQuery.isError && (
+                    <div className="search-palette-inline-error" role="status">Categories are unavailable right now.</div>
+                  )}
+                </>
+              )}
+            </CommandList>
+          </Command>
+
+          <footer className="search-palette-footer">
+            <span><kbd>↑↓</kbd> navigate</span>
+            <span><kbd>↵</kbd> open</span>
+            <span><kbd>esc</kbd> close</span>
+            {showResults && results.length > 0 && (
+              <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">
+                {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
+                {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
+              </span>
             )}
-            {contactVariant === "e" ? (
-              <CommandGroup aria-label="Actions">
-                <ContactPaletteItem closePalette={() => setIsOpen(false)} />
-              </CommandGroup>
-            ) : null}
-          </CommandList>
-        </Command>
-        
-        {/* The command palette supports these keys through cmdk/Radix. Keep
-            the hints visible at every viewport so keyboard behavior is
-            discoverable without adding duplicate controls. */}
-        <DialogFooter className="flex-row flex-wrap items-center justify-start gap-x-4 gap-y-2">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            <kbd className="rounded border border-border bg-card px-1.5 py-0.5">↑ ↓</kbd>
-            <span>navigate</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            <kbd className="rounded border border-border bg-card px-1.5 py-0.5">enter</kbd>
-            <span>select</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            <kbd className="rounded border border-border bg-card px-1.5 py-0.5">esc</kbd>
-            <span>close</span>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </footer>
+
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }

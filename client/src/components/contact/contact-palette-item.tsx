@@ -11,8 +11,9 @@ export function ContactPaletteItem({
 }: {
   closePalette: () => void;
 }) {
-  const config = useContactConfig(contactVariant === "e");
-  if (contactVariant !== "e") return null;
+  const isPaletteVariant = contactVariant === "b" || contactVariant === "e";
+  const config = useContactConfig(isPaletteVariant);
+  if (!isPaletteVariant) return null;
 
   const contact = config.data?.contact;
   const destination = [
@@ -21,17 +22,11 @@ export function ContactPaletteItem({
     contact?.issues,
   ].find((item) => item?.available && item.href);
   const canOpenForm = contact?.form.available;
-  const unavailableReason =
-    contact?.form.unavailableReason ??
-    contact?.email.unavailableReason ??
-    contact?.discussions.unavailableReason ??
-    contact?.issues.unavailableReason ??
-    "No contact destination is configured.";
+  if (!contact || (!canOpenForm && !destination)) return null;
 
   return (
     <CommandItem
       value="contact-maintainers"
-      disabled={!canOpenForm && !destination}
       onSelect={() => {
         closePalette();
         if (canOpenForm) openContactForm();
@@ -43,15 +38,12 @@ export function ContactPaletteItem({
           );
         }
       }}
-      className="flex min-h-[44px] items-center gap-2 p-3 cursor-pointer"
+      className="search-palette-row"
       data-testid="contact-palette-item"
-      title={!canOpenForm && !destination ? unavailableReason : undefined}
     >
-      <Mail className="h-4 w-4 text-[var(--accent)]" />
-      <span>Contact maintainers</span>
-      {!canOpenForm && !destination ? (
-        <span className="ml-auto text-xs text-muted-foreground">Unavailable</span>
-      ) : null}
+      <span className="search-palette-kind"><Mail aria-hidden="true" />page</span>
+      <span className="search-palette-copy"><span>Get in touch</span><small>Contact the maintainers</small></span>
+      <span className="search-palette-arrow" aria-hidden="true">→</span>
     </CommandItem>
   );
 }

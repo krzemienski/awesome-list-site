@@ -127,3 +127,4 @@
 - [Admin kind resolution boundary](admin-kind-client-resolution.md) — shared client inference requires empty custom server mappings until admin responses expose authoritative resolution.
 - [Vite component probes](vite-browser-component-probes.md) — discover dependency URLs from transformed modules; optimized CJS React dependencies may expose default rather than named exports.
 - [Pixel reference reconciliation](pixel-reference-reconciliation.md) — preserve required live content/official branding; adapt expected captures in memory, never delete content or relax thresholds.
+- [cmdk live regions](cmdk-live-region-placement.md) — audit populated results too; aria-live count elements inside the listbox violate its required-child semantics.

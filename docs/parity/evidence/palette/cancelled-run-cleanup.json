@@ -1,0 +1,70 @@
+{
+  "operation": "exact-disposable-parity-identity-cleanup",
+  "targetBridgeId": "2008535825",
+  "startedAt": "2026-09-13T00:29:45.666Z",
+  "app": {
+    "base": "http://127.0.0.1:5000",
+    "localFilter": {
+      "q": "__qa_test_parity_mtz2qnl4b6f970+clerk_test@example.com",
+      "limit": 100,
+      "page": 1
+    }
+  },
+  "clerk": {
+    "filter": {
+      "external_id": "2008535825"
+    },
+    "userId": "user_3JFaLtE55dtG0NTUBnJ0ChaEkLQ",
+    "externalId": "2008535825",
+    "email": "__qa_test_parity_mtz2qnl4b6f970+clerk_test@example.com"
+  },
+  "preflight": {
+    "clerk": {
+      "status": 200,
+      "returned": 1,
+      "exactMatches": 1,
+      "verifiedUserId": "user_3JFaLtE55dtG0NTUBnJ0ChaEkLQ",
+      "verifiedExternalId": "2008535825"
+    },
+    "local": {
+      "status": 200,
+      "returned": 1,
+      "exactMatches": 1,
+      "verifiedUserId": "2008535825",
+      "verifiedEmail": "__qa_test_parity_mtz2qnl4b6f970+clerk_test@example.com"
+    }
+  },
+  "deletion": {
+    "local": {
+      "status": 200,
+      "exactUserId": "2008535825",
+      "result": "deleted"
+    },
+    "clerk": {
+      "status": 200,
+      "exactUserId": "user_3JFaLtE55dtG0NTUBnJ0ChaEkLQ",
+      "externalId": "2008535825",
+      "result": "deleted"
+    }
+  },
+  "verification": {
+    "local": {
+      "status": 200,
+      "exactBridgeIdMatches": 0,
+      "exactBridgeIdAbsent": true
+    },
+    "clerkExternalIdFilter": {
+      "status": 200,
+      "returned": 0,
+      "exactExternalIdMatches": 0,
+      "exactExternalIdAbsent": true
+    },
+    "clerkExactUserId": {
+      "status": 404,
+      "absent": true
+    }
+  },
+  "errors": [],
+  "ok": true,
+  "completedAt": "2026-09-13T00:29:46.761Z"
+}

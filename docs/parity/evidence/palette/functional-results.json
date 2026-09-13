@@ -1,0 +1,62 @@
+[
+  {
+    "width": 375,
+    "geometry": {
+      "width": 335,
+      "height": 684,
+      "scrollWidth": 333,
+      "clientWidth": 333,
+      "bodyLock": true
+    },
+    "axe": [],
+    "resourceURL": "http://127.0.0.1:5000/resource/185214",
+    "categoryURL": "http://127.0.0.1:5000/category/encoding-codecs",
+    "keyboardCycles": "PASS",
+    "empty": "PASS"
+  },
+  {
+    "width": 768,
+    "geometry": {
+      "width": 640,
+      "height": 684,
+      "scrollWidth": 638,
+      "clientWidth": 638,
+      "bodyLock": true
+    },
+    "axe": [],
+    "resourceURL": "http://127.0.0.1:5000/resource/185214",
+    "categoryURL": "http://127.0.0.1:5000/category/encoding-codecs",
+    "keyboardCycles": "PASS",
+    "empty": "PASS"
+  },
+  {
+    "width": 1024,
+    "geometry": {
+      "width": 640,
+      "height": 684,
+      "scrollWidth": 638,
+      "clientWidth": 638,
+      "bodyLock": true
+    },
+    "axe": [],
+    "resourceURL": "http://127.0.0.1:5000/resource/185214",
+    "categoryURL": "http://127.0.0.1:5000/category/encoding-codecs",
+    "keyboardCycles": "PASS",
+    "empty": "PASS"
+  },
+  {
+    "width": 1440,
+    "geometry": {
+      "width": 640,
+      "height": 684,
+      "scrollWidth": 638,
+      "clientWidth": 638,
+      "bodyLock": true
+    },
+    "axe": [],
+    "resourceURL": "http://127.0.0.1:5000/resource/185214",
+    "categoryURL": "http://127.0.0.1:5000/category/encoding-codecs",
+    "keyboardCycles": "PASS",
+    "empty": "PASS"
+  }
+]
