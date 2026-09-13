@@ -1,0 +1,326 @@
+{
+  "task": "task546",
+  "check": "read-only real-system admin review queue and overview API check",
+  "environment": "development",
+  "baseUrl": "http://127.0.0.1:5000",
+  "checkedAt": "2026-09-13T04:33:13.360Z",
+  "auth": {
+    "method": "X-Admin-Audit-Key",
+    "secretName": "ADMIN_PASSWORD",
+    "configured": true,
+    "valueRecorded": false,
+    "adminRequestsAuthorized": true
+  },
+  "sourceEndpoints": {
+    "adminStats": {
+      "source": "client/src/hooks/useAdmin.ts",
+      "endpoint": "/api/admin/stats"
+    },
+    "adminStatsPending": {
+      "source": "client/src/components/admin/AdminStats.tsx",
+      "endpoint": "/api/admin/pending-resources",
+      "requestedEndpoint": "/api/admin/pending-resources?limit=100",
+      "pathMatchesAfterQueryNormalization": true
+    },
+    "adminOverview": {
+      "source": "client/src/components/admin/AdminOverview.tsx",
+      "getEndpoints": [
+        "/api/admin/audit-logs?limit=6&offset=0",
+        "/api/admin/operations/health",
+        "/api/health/ai",
+        "/api/github/sync-status",
+        "/api/github/sync-history",
+        "/api/admin/link-health/status",
+        "/api/admin/link-health/history",
+        "/api/enrichment/jobs?limit=100",
+        "/api/categories"
+      ]
+    },
+    "adminStatsSupportingGets": [
+      "/api/admin/users?page=1&limit=100",
+      "/api/categories",
+      "/api/subcategories"
+    ]
+  },
+  "checks": {
+    "adminStats": {
+      "endpoint": "/api/admin/stats",
+      "httpStatus": 200,
+      "ok": true,
+      "responseShape": {
+        "type": "object",
+        "keys": [
+          "journeys",
+          "pendingApprovals",
+          "pendingEdits",
+          "resources",
+          "totalPending",
+          "totalPublic",
+          "totalRejected",
+          "users"
+        ]
+      },
+      "counts": {
+        "users": 13,
+        "resources": 1993,
+        "journeys": 5,
+        "pendingApprovals": 0,
+        "pendingEdits": 0,
+        "totalPublic": 1816,
+        "totalPending": 0,
+        "totalRejected": 177
+      }
+    },
+    "pendingResources": {
+      "requested": {
+        "endpoint": "/api/admin/pending-resources?limit=100",
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "resources",
+            "total"
+          ],
+          "resourcesCount": 0
+        },
+        "total": 0,
+        "resourceStatusCounts": {}
+      },
+      "adminStatsSourcePath": {
+        "endpoint": "/api/admin/pending-resources",
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "resources",
+            "total"
+          ],
+          "resourcesCount": 0
+        },
+        "total": 0,
+        "resourceStatusCounts": {}
+      },
+      "requestedAndSourceTotalsMatch": true,
+      "dbComparison": {
+        "query": "SELECT count(*) FROM resources WHERE status='pending'",
+        "target": "replit_database",
+        "environment": "development",
+        "databaseReachable": true,
+        "querySucceeded": true,
+        "pendingCount": 0,
+        "endpointTotal": 0,
+        "match": true
+      }
+    },
+    "overviewEndpoints": {
+      "/api/admin/audit-logs?limit=6&offset=0": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "limit",
+            "logs",
+            "offset",
+            "total"
+          ],
+          "logsCount": 6
+        },
+        "total": 6117
+      },
+      "/api/admin/operations/health": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "databasePool",
+            "heavyWork",
+            "publicCache",
+            "readiness",
+            "status",
+            "telemetry"
+          ],
+          "readinessKeys": [
+            "lastProbe",
+            "migrations",
+            "policy",
+            "probeInFlight"
+          ]
+        },
+        "status": "ready",
+        "lastProbeReady": true
+      },
+      "/api/health/ai": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "available",
+            "cacheHitRate",
+            "cacheSize",
+            "requestCount",
+            "status"
+          ]
+        },
+        "status": "healthy"
+      },
+      "/api/admin/link-health/status": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "job",
+            "success"
+          ]
+        },
+        "success": true,
+        "jobPresent": false,
+        "jobStatus": null
+      },
+      "/api/admin/link-health/history": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "jobs",
+            "success"
+          ],
+          "jobsCount": 0
+        },
+        "success": true,
+        "jobStatusCounts": {}
+      },
+      "/api/enrichment/jobs?limit=100": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "jobs",
+            "success"
+          ],
+          "jobsCount": 25
+        },
+        "success": true,
+        "jobStatusCounts": {
+          "cancelled": 2,
+          "completed": 18,
+          "failed": 5
+        }
+      },
+      "/api/categories": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "array",
+          "length": 9
+        },
+        "count": 9
+      }
+    },
+    "adminStatsSupportingGets": {
+      "/api/admin/users?page=1&limit=100": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "object",
+          "keys": [
+            "total",
+            "users"
+          ],
+          "usersCount": 11
+        }
+      },
+      "/api/subcategories": {
+        "httpStatus": 200,
+        "ok": true,
+        "responseShape": {
+          "type": "array",
+          "length": 92
+        },
+        "count": 92
+      }
+    }
+  },
+  "github": {
+    "queue": {
+      "endpoint": "/api/github/sync-status",
+      "httpStatus": 200,
+      "ok": true,
+      "responseShape": {
+        "type": "object",
+        "keys": [
+          "items",
+          "total"
+        ],
+        "itemsCount": 38
+      },
+      "total": 38,
+      "statusCounts": {
+        "completed": 7,
+        "failed": 31
+      },
+      "failedCount": 31
+    },
+    "failedQueueFilter": {
+      "endpoint": "/api/github/sync-status?status=failed",
+      "httpStatus": 200,
+      "ok": true,
+      "responseShape": {
+        "type": "object",
+        "keys": [
+          "items",
+          "total"
+        ],
+        "itemsCount": 31
+      },
+      "total": 31,
+      "statusCounts": {
+        "failed": 31
+      },
+      "filterMatchesFailedCount": true
+    },
+    "history": {
+      "endpoint": "/api/github/sync-history",
+      "httpStatus": 200,
+      "ok": true,
+      "responseShape": {
+        "type": "array",
+        "length": 38
+      },
+      "itemCount": 38,
+      "statusCounts": {
+        "completed": 7,
+        "failed": 31
+      },
+      "failedCount": 31,
+      "latestStatus": "failed"
+    },
+    "failedStatusConfirmed": true,
+    "queueAndHistoryFailedCountsMatch": true
+  },
+  "infrastructure": {
+    "devServerReachable": true,
+    "developmentDatabaseReachable": true,
+    "blockers": []
+  },
+  "safety": {
+    "httpMethodsUsed": [
+      "GET"
+    ],
+    "sqlReadOnly": true,
+    "mutationsAttempted": false,
+    "identitiesCreated": false,
+    "browserTestsRun": false,
+    "cleanupPerformed": false,
+    "productionQueried": false,
+    "secretsRecorded": false,
+    "piiOrFullBodiesRecorded": false
+  }
+}

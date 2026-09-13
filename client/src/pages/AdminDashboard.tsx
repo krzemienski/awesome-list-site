@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Shield, Link, Sparkles, Brain, ListOrdered, MailCheck, LayoutDashboard, Plus, Settings } from "lucide-react";
+import { Shield, Activity, Sparkles, Zap, List, ArrowRight, Database, Folder, Users, LayoutGrid, Plus, Settings } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink, useRoute } from "wouter";
@@ -9,6 +8,7 @@ import AdminStats from "@/components/admin/AdminStats";
 import AdminOverview from "@/components/admin/AdminOverview";
 import { Button } from "@/components/ui/button";
 import "@/components/admin/admin-canonical.css";
+import "@/styles/pages/admin-shell.css";
 import SEOHead from "@/components/layout/SEOHead";
 import ExportTab from "@/components/admin/ExportTab";
 import DatabaseTab from "@/components/admin/DatabaseTab";
@@ -34,7 +34,17 @@ import { ApiError } from "@/lib/queryClient";
 const ADMIN_TAB_IDS = [
   "overview", "approvals", "edits", "enrichment", "researcher", "export", "database",
   "resources", "categories", "subcategories", "subsubcategories", "journeys",
-  "users", "github", "linkhealth", "digests", "audit",
+   "users", "github", "linkhealth", "digests", "audit", "research",
+] as const;
+const CANONICAL_TABS = [
+  ["overview", "Overview", LayoutGrid], ["approvals", "Approvals", Shield],
+  ["edits", "Edits", List], ["enrichment", "Enrichment", Sparkles],
+  ["researcher", "Researcher", Zap], ["export", "Export", ArrowRight],
+  ["database", "Database", Database], ["resources", "Resources", Folder],
+  ["categories", "Categories", List], ["subcategories", "Subcategories", List],
+  ["users", "Users", Users], ["github", "GitHub", Settings],
+  ["linkhealth", "Link Health", Activity], ["audit", "Audit", List],
+  ["research", "Research", Sparkles],
 ] as const;
 
 // Run16 BUG-085: human-guessable slug aliases → canonical tab ids.
@@ -80,6 +90,7 @@ export default function AdminDashboard() {
     if (sectionTab) return sectionTab;
     return tabFromWindow() ?? "overview";
   });
+  const visibleTab = ({ subsubcategories: "subcategories", journeys: "research", digests: "github" } as Record<string, string>)[activeTab] ?? activeTab;
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
   useEffect(() => {
@@ -152,8 +163,8 @@ export default function AdminDashboard() {
           {signedInNonAdmin ? (
             <>
               <p className="text-sm text-[var(--text)] mb-3" data-testid="text-admin-forbidden">
-                You don't have permission to view this page. It's restricted to
-                administrators — your account is signed in, but doesn't have the
+                You don&apos;t have permission to view this page. It&apos;s restricted to
+                administrators — your account is signed in, but doesn&apos;t have the
                 admin role.
               </p>
               <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-home">
@@ -219,90 +230,70 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="admin-dashboard overflow-x-hidden">
+    <div className="admin-dashboard">
       <SEOHead
         title="Admin"
         description="Awesome Video admin panel."
         noindex
       />
       <div className="admin-dashboard__masthead">
-        <div className="space-y-3">
-        <div className="eyebrow flex items-center gap-3">
-          <span aria-hidden="true" className="text-[var(--accent)]">──</span>
-          <span>Admin</span>
-          <span aria-hidden="true" className="text-[var(--text-2)]">·</span>
-          <span>Operations</span>
+        <div>
+        <div className="admin-dashboard__eyebrow-slot">
+        <div className="eyebrow">
+          <span aria-hidden="true" className="live-dot" />
+          <span>Admin console · {user?.name ?? "Administrator"}</span>
         </div>
-        <h1 className="display-h text-3xl sm:text-4xl text-[var(--text)] flex items-center gap-3">
-          <Shield className="h-7 w-7 text-[var(--accent)]" />
-          <span>Operations <em className="not-italic italic">dashboard</em></span>
+        </div>
+        <h1>
+          Operations <em>dashboard</em>
         </h1>
-        <p className="text-sm sm:text-base text-[var(--text-2)]">Manage the live catalog, review queues, and operational jobs.</p>
+        <p>Manage the {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()} resources, jobs, and contributors that keep the index alive.</p>
         </div>
         <div className="admin-dashboard__actions">
-          <Button asChild variant="outline" className="min-h-11"><WLink href="/settings/theme"><Settings className="h-4 w-4" /> Settings</WLink></Button>
-          <Button className="min-h-11" onClick={handleNewEntry}><Plus className="h-4 w-4" /> New entry</Button>
+          <Button asChild variant="outline" className="btn ghost"><WLink href="/settings/theme"><Settings className="h-4 w-4" /> Settings</WLink></Button>
+          <Button className="btn primary" onClick={handleNewEntry}><Plus className="h-4 w-4" /> New entry</Button>
         </div>
       </div>
-
-      {/* R4-L17: stat cards jump straight to their admin tab. */}
-      {activeTab === "overview" ? <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} /> : null}
 
       {/* NB-020 (run18): `activeTab` is always one of the TabsTrigger values
           (normalizeTab yields a valid id or the "approvals" default), so Radix's
           roving tabindex always makes exactly the active trigger tabbable
           (tabindex=0) and arrow keys move focus between tabs — never all -1. */}
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        {/* BUG-020 (run14): the 15-tab strip used to overflow-scroll with no
-            visible affordance — off-screen tabs were undiscoverable at 1440px
-            AND 375px. Tabs now wrap onto extra rows so every tab is always
-            visible; the scroller class is kept only as a safety net. */}
+      <Tabs value={visibleTab} onValueChange={handleTabChange}>
+        {/* Canonical single-row strip. Radix keeps off-screen triggers
+            keyboard reachable; extra tools live in the related tab panels. */}
         <div className="w-full pb-2 admin-tab-scroller">
           {/* F017: keep every trigger a comfortable ≥40px touch target at the
               usage site (the global ui/tabs default is h-9/36px). */}
           <TabsList className="admin-dashboard__tabs flex flex-wrap h-auto w-full justify-start gap-1">
-            <TabsTrigger value="overview" className="whitespace-nowrap" data-testid="tab-overview"><LayoutDashboard className="h-4 w-4 mr-1" />Overview</TabsTrigger>
-            <TabsTrigger value="approvals" className="whitespace-nowrap" data-testid="tab-approvals">
-              Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}
-            </TabsTrigger>
-            <TabsTrigger value="edits" className="whitespace-nowrap" data-testid="tab-edits">
-              Edits {stats?.pendingEdits ? <Badge variant="accent" className="ml-2">{stats.pendingEdits}</Badge> : null}
-            </TabsTrigger>
-            <TabsTrigger value="enrichment" className="whitespace-nowrap" data-testid="tab-enrichment">
-              <Sparkles className="h-4 w-4 mr-1" />
-              Enrichment
-            </TabsTrigger>
-            <TabsTrigger value="researcher" className="whitespace-nowrap" data-testid="tab-researcher">
-              <Brain className="h-4 w-4 mr-1" />
-              Researcher
-            </TabsTrigger>
-            <TabsTrigger value="export" className="whitespace-nowrap" data-testid="tab-export">Export</TabsTrigger>
-            <TabsTrigger value="database" className="whitespace-nowrap" data-testid="tab-database">Database</TabsTrigger>
-            <TabsTrigger value="resources" className="whitespace-nowrap" data-testid="tab-resources">Resources</TabsTrigger>
-            <TabsTrigger value="categories" className="whitespace-nowrap" data-testid="tab-categories">Categories</TabsTrigger>
-            <TabsTrigger value="subcategories" className="whitespace-nowrap" data-testid="tab-subcategories">Subcategories</TabsTrigger>
-            <TabsTrigger value="subsubcategories" className="whitespace-nowrap" data-testid="tab-subsubcategories">Sub-Subcats</TabsTrigger>
-            <TabsTrigger value="journeys" className="whitespace-nowrap" data-testid="tab-journeys">
-              <ListOrdered className="h-4 w-4 mr-1" />
-              Journeys
-            </TabsTrigger>
-            <TabsTrigger value="users" className="whitespace-nowrap" data-testid="tab-users">Users</TabsTrigger>
-            <TabsTrigger value="github" className="whitespace-nowrap" data-testid="tab-github">GitHub</TabsTrigger>
-            <TabsTrigger value="linkhealth" className="whitespace-nowrap" data-testid="tab-linkhealth">
-              <Link className="h-4 w-4 mr-1" />
-              Link Health
-            </TabsTrigger>
-            <TabsTrigger value="digests" className="whitespace-nowrap" data-testid="tab-digests">
-              <MailCheck className="h-4 w-4 mr-1" />
-              Digests
-            </TabsTrigger>
-            <TabsTrigger value="audit" className="whitespace-nowrap" data-testid="tab-audit">Audit</TabsTrigger>
+            {CANONICAL_TABS.map(([id, label, Icon]) => (
+              <TabsTrigger
+                key={id}
+                value={id}
+                data-testid={`tab-${id}`}
+                onClick={() => {
+                  // Radix suppresses same-value changes. A folded subsection
+                  // still needs to return to its already-selected parent.
+                  if (visibleTab === id && activeTab !== id) handleTabChange(id);
+                }}
+                onKeyDown={(event) => {
+                  if (visibleTab === id && activeTab !== id &&
+                    (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault();
+                    handleTabChange(id);
+                  }
+                }}
+              >
+                <Icon aria-hidden="true" size={12} />{label}
+              </TabsTrigger>
+            ))}
           </TabsList>
         </div>
 
         {/* R2-L13: each tab body sits in its own ErrorBoundary so a render
             crash in one panel can't blank the entire admin dashboard. */}
         <TabsContent value="overview" data-testid="content-overview">
+          <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} />
           <ErrorBoundary label="Overview tab"><AdminOverview stats={stats} onNavigate={handleTabChange} /></ErrorBoundary>
         </TabsContent>
 
@@ -339,15 +330,10 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="subcategories" data-testid="content-subcategories">
-          <ErrorBoundary label="Subcategories tab"><SubcategoryManager /></ErrorBoundary>
-        </TabsContent>
-
-        <TabsContent value="subsubcategories" data-testid="content-subsubcategories">
-          <ErrorBoundary label="Sub-Subcategories tab"><SubSubcategoryManager /></ErrorBoundary>
-        </TabsContent>
-
-        <TabsContent value="journeys" data-testid="content-journeys">
-          <ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary>
+          <Button variant="ghost" data-testid="tab-subsubcategories" onClick={() => handleTabChange("subsubcategories")}>Sub-Subcats</Button>
+          {activeTab === "subsubcategories"
+            ? <div data-testid="content-subsubcategories"><ErrorBoundary label="Sub-Subcategories tab"><SubSubcategoryManager /></ErrorBoundary></div>
+            : <ErrorBoundary label="Subcategories tab"><SubcategoryManager /></ErrorBoundary>}
         </TabsContent>
 
         <TabsContent value="users">
@@ -355,19 +341,24 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="github">
-          <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>
+          <Button variant="ghost" data-testid="tab-digests" onClick={() => handleTabChange("digests")}>Digests</Button>
+          {activeTab === "digests"
+            ? <div data-testid="content-digests"><ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary></div>
+            : <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>}
         </TabsContent>
 
         <TabsContent value="linkhealth">
           <ErrorBoundary label="Link Health tab"><LinkHealthDashboard /></ErrorBoundary>
         </TabsContent>
 
-        <TabsContent value="digests" data-testid="content-digests">
-          <ErrorBoundary label="Digests tab"><DigestQueueHealth /></ErrorBoundary>
-        </TabsContent>
-
         <TabsContent value="audit">
           <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
+        </TabsContent>
+        <TabsContent value="research" data-testid="content-research">
+          <Button variant="ghost" data-testid="tab-journeys" onClick={() => handleTabChange("journeys")}>Journeys</Button>
+          {activeTab === "journeys"
+            ? <div data-testid="content-journeys"><ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary></div>
+            : <ErrorBoundary label="Research tab"><ResearcherTab /></ErrorBoundary>}
         </TabsContent>
       </Tabs>
     </div>

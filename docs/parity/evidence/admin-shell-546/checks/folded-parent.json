@@ -1,0 +1,80 @@
+{
+  "target": "folded-parent-navigation",
+  "origin": "http://127.0.0.1:5000",
+  "checks": [
+    {
+      "link": "journeys",
+      "parent": "research",
+      "initial": {
+        "selected": "true",
+        "url": "http://127.0.0.1:5000/admin/journeys"
+      },
+      "click": {
+        "selected": "true",
+        "hash": "#research",
+        "contentVisible": true
+      },
+      "enter": {
+        "selected": "true",
+        "hash": "#research",
+        "contentVisible": true
+      },
+      "space": {
+        "selected": "true",
+        "hash": "#research",
+        "contentVisible": true
+      }
+    },
+    {
+      "link": "subsubcategories",
+      "parent": "subcategories",
+      "initial": {
+        "selected": "true",
+        "url": "http://127.0.0.1:5000/admin/subsubcategories"
+      },
+      "click": {
+        "selected": "true",
+        "hash": "#subcategories",
+        "contentVisible": true
+      },
+      "enter": {
+        "selected": "true",
+        "hash": "#subcategories",
+        "contentVisible": true
+      },
+      "space": {
+        "selected": "true",
+        "hash": "#subcategories",
+        "contentVisible": true
+      }
+    },
+    {
+      "link": "digests",
+      "parent": "github",
+      "initial": {
+        "selected": "true",
+        "url": "http://127.0.0.1:5000/admin/digests"
+      },
+      "click": {
+        "selected": "true",
+        "hash": "#github",
+        "activePanel": 1,
+        "githubText": 2
+      },
+      "enter": {
+        "selected": "true",
+        "hash": "#github",
+        "activePanel": 1,
+        "githubText": 2
+      },
+      "space": {
+        "selected": "true",
+        "hash": "#github",
+        "activePanel": 1,
+        "githubText": 2
+      }
+    }
+  ],
+  "errors": [],
+  "cleanup": "current disposable identity only"
+}

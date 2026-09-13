@@ -1,0 +1,363 @@
+/*
+ * Admin overview only. The legacy admin shell keeps its own stylesheet; every
+ * selector here is scoped to the overview/stat hooks so other admin tabs can
+ * add their own page styles without inheriting these layout rules.
+ */
+.admin-overview-stats-canonical.admin-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-block-end: var(--space-6, 1.5rem);
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat {
+  min-width: 0;
+  border-color: var(--border);
+  border-radius: var(--radius, var(--radius-md));
+  box-shadow: none;
+  text-align: start;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat--interactive {
+  cursor: pointer;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat--interactive:hover {
+  border-color: var(--accent);
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__header {
+  padding: var(--space-5, 1.25rem) var(--space-5, 1.25rem) 0;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__label {
+  color: var(--text-3, var(--text-2));
+  font-size: 0.625rem;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__title-link {
+  color: inherit;
+  text-align: start;
+  text-decoration: none;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__title-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__content {
+  padding: 10px var(--space-5, 1.25rem) var(--space-5, 1.25rem);
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__value {
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__value--accent {
+  color: var(--accent);
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__sub {
+  margin-block-start: var(--space-2, 0.5rem);
+  color: var(--text-2);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.admin-overview-stats-canonical .admin-canonical-stat__sub button {
+  min-height: 1.5rem;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.2em;
+}
+
+.admin-overview-canonical.admin-overview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+}
+
+.admin-overview-canonical .admin-canonical-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+  gap: 16px;
+}
+
+.admin-overview-canonical .admin-canonical-table-shell {
+  min-width: 0;
+  overflow: hidden;
+  padding: 22px;
+  border-color: var(--border);
+  border-radius: var(--radius, var(--radius-md));
+  background: var(--surface-1, var(--card));
+  box-shadow: none;
+}
+
+.admin-overview-canonical .admin-canonical-table-shell__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3, 0.75rem);
+  padding: 0;
+}
+
+.admin-overview-canonical .admin-canonical-table-shell__heading h2 {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.admin-overview-canonical .admin-canonical-table-shell__heading p {
+  margin-block-start: 0.35rem;
+  color: var(--text-3, var(--text-2));
+  font-size: 0.75rem;
+}
+
+.admin-overview-canonical .admin-canonical-table-shell__actions {
+  flex-shrink: 0;
+}
+
+.admin-overview-canonical .admin-canonical-table-shell__body {
+  padding: 0;
+  margin-block-start: var(--space-4, 1rem);
+}
+
+.admin-overview-canonical .admin-canonical-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-overview-canonical .admin-canonical-table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+}
+
+.admin-overview-canonical .admin-canonical-table th,
+.admin-overview-canonical .admin-canonical-table td {
+  border-block-end: var(--hairline-w) solid var(--border);
+  padding: 0.65rem 0.4rem;
+  text-align: start;
+  vertical-align: middle;
+}
+
+.admin-overview-canonical .admin-canonical-table tr:last-child td {
+  border-block-end: 0;
+}
+
+.admin-overview-canonical .admin-canonical-table th {
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-overview-canonical .admin-canonical-table td {
+  color: var(--text-2);
+  font-size: 0.75rem;
+}
+
+.admin-overview-canonical .admin-canonical-table td:first-child,
+.admin-overview-canonical .admin-canonical-table td:last-child {
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.admin-overview-canonical .admin-canonical-table td:nth-child(4) {
+  max-width: 12rem;
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-overview-canonical .admin-canonical-status-chip {
+  padding: 0.3rem 0.45rem;
+  font-size: 0.5625rem;
+}
+
+.admin-overview-canonical .admin-canonical-empty {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 0.8125rem;
+}
+
+.admin-overview-canonical .admin-canonical-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-overview-canonical .admin-canonical-activity-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+  border-block-end: var(--hairline-w) solid var(--border);
+  padding: 6px 0;
+  font-size: 0.78125rem;
+}
+
+.admin-overview-canonical .admin-canonical-activity-row:last-child {
+  border-block-end: 0;
+}
+
+.admin-overview-canonical .admin-canonical-activity-id,
+.admin-overview-canonical .admin-canonical-activity-time {
+  flex: 0 0 auto;
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+}
+
+.admin-overview-canonical .admin-canonical-activity-id {
+  inline-size: 38px;
+}
+
+.admin-overview-canonical .admin-canonical-activity-actor {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--accent);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-overview-canonical .admin-canonical-activity-action {
+  flex: 0 1 auto;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.admin-overview-canonical .admin-canonical-activity-target {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-overview-canonical .admin-canonical-workflow-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 12px;
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-overview-canonical .admin-canonical-workflow-links button {
+  min-height: 24px;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.admin-overview-canonical .admin-canonical-health-list,
+.admin-overview-canonical .admin-canonical-category-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.admin-overview-canonical .admin-canonical-health-list { gap: 12px; }
+.admin-overview-canonical .admin-canonical-category-list { gap: 10px; }
+
+.admin-overview-canonical .admin-canonical-health-row {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  gap: 10px;
+  border: 0;
+  border-block-end: var(--hairline-w) solid var(--border);
+  padding: 8px 0;
+  font-size: 0.8125rem;
+  text-align: start;
+}
+
+.admin-overview-canonical .admin-canonical-health-row:last-child {
+  border-block-end: 0;
+}
+
+.admin-overview-canonical .admin-canonical-health-row > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-overview-canonical .admin-canonical-health-row > span:nth-child(3) {
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-align: end;
+}
+
+.admin-overview-canonical .admin-canonical-health-row > .dot.muted {
+  background: var(--text-3, var(--text-2));
+}
+
+.admin-overview-canonical .admin-canonical-category-row {
+  padding-block: 0;
+}
+
+.admin-overview-canonical .admin-canonical-category-row:last-child {
+  padding-block-end: 0;
+}
+
+.admin-overview-canonical .admin-canonical-category-label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3, 0.75rem);
+  margin-block-end: 4px;
+  color: var(--text);
+  font-size: 0.75rem;
+}
+
+.admin-overview-canonical .admin-canonical-category-label strong {
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.admin-overview-canonical .admin-canonical-category-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--border);
+}
+
+.admin-overview-canonical .admin-canonical-category-bar {
+  display: block;
+  height: 100%;
+  min-width: 0.25rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+@media (max-width: 48rem) {
+  .admin-overview-canonical .admin-canonical-table-shell__heading {
+    flex-wrap: wrap;
+  }
+}

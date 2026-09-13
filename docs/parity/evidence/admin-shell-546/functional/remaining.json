@@ -1,0 +1,60 @@
+{
+  "pending": {
+    "stats": {
+      "message": "Unauthorized"
+    },
+    "pendShape": [
+      "message"
+    ]
+  },
+  "newEntryModal": {
+    "visible": false,
+    "url": "http://127.0.0.1:5000/admin#resources"
+  },
+  "github": {
+    "failed": true,
+    "snippet": "Authorized admin area\nADMIN CONSOLE · NICK\nOperations dashboard\n\nManage the 1,816 resources, jobs, and contributors that keep the index alive.\n\nSettings\nNew entry\nOverview\nApprovals\nEdits\nEnrichment\nResearcher\nExport\nDatabase\nResources\nCategories\nSubcategories\nUsers\nGitHub\nLink Health\nAudit\nResearch\nDigests\nGitHub Sync\nImport resources from and export to GitHub repositories\nTarget Repository\n\nFormat: owner/repository (e.g., krzemienski/awesome-video)\n\nImport from GitHub\n\nPull resources from the GitHub repository and update the database\n\nImport Resources\nExport to GitHub\n\nPush approved resource"
+  },
+  "health": {
+    "/api/health": {
+      "status": 200,
+      "body": "{\"status\":\"ok\"}"
+    },
+    "/api/health/live": {
+      "status": 200,
+      "body": "{\"status\":\"ok\"}"
+    },
+    "/api/health/ready": {
+      "status": 200,
+      "body": "{\"status\":\"ready\"}"
+    },
+    "/api/admin/operations/health": {
+      "status": 401,
+      "body": "{\"message\":\"Unauthorized\"}"
+    },
+    "/api/health/ai": {
+      "status": 200,
+      "body": "{\"status\":\"healthy\"}"
+    }
+  },
+  "axe375": {
+    "violations": [
+      {
+        "id": "aria-allowed-role",
+        "impact": "minor",
+        "nodes": 4
+      }
+    ],
+    "seriousCritical": 0
+  },
+  "axe1440": {
+    "violations": [
+      {
+        "id": "aria-allowed-role",
+        "impact": "minor",
+        "nodes": 4
+      }
+    ],
+    "seriousCritical": 0
+  }
+}

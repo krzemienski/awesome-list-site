@@ -1,0 +1,90 @@
+{
+  "note": "Static source inventory; canonical Stat receives testId/valueTestId props, tabs are mapped to tab-${id}. Not a pre-change browser capture.",
+  "files": [
+    {
+      "file": "client/src/pages/AdminDashboard.tsx",
+      "before": [
+        "text-admin-forbidden",
+        "link-admin-home",
+        "link-admin-login",
+        "text-session-expired",
+        "link-session-expired-login",
+        "tab-overview",
+        "tab-approvals",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-researcher",
+        "tab-export",
+        "tab-database",
+        "tab-resources",
+        "tab-categories",
+        "tab-subcategories",
+        "tab-subsubcategories",
+        "tab-journeys",
+        "tab-users",
+        "tab-github",
+        "tab-linkhealth",
+        "tab-digests",
+        "tab-audit",
+        "content-overview",
+        "content-approvals",
+        "content-edits",
+        "content-enrichment",
+        "content-categories",
+        "content-subcategories",
+        "content-subsubcategories",
+        "content-journeys",
+        "content-digests"
+      ],
+      "after": [
+        "text-admin-forbidden",
+        "link-admin-home",
+        "link-admin-login",
+        "text-session-expired",
+        "link-session-expired-login",
+        "`tab-${id",
+        "content-overview",
+        "content-approvals",
+        "content-edits",
+        "content-enrichment",
+        "content-categories",
+        "content-subcategories",
+        "tab-subsubcategories",
+        "content-subsubcategories",
+        "tab-digests",
+        "content-digests",
+        "content-research",
+        "tab-journeys",
+        "content-journeys"
+      ]
+    },
+    {
+      "file": "client/src/components/admin/AdminStats.tsx",
+      "before": [
+        "link-stat-pending",
+        "link-stat-rejected",
+        "clickable ? `stat-card-${tab",
+        "`stat-title-${tab",
+        "testId"
+      ],
+      "after": [
+        "admin-stats"
+      ]
+    },
+    {
+      "file": "client/src/components/admin/AdminOverview.tsx",
+      "before": [
+        "admin-overview",
+        "queue-pending-resources",
+        "queue-pending-edits",
+        "unsupported-cms-record"
+      ],
+      "after": [
+        "admin-overview",
+        "link-stat-pending",
+        "link-stat-rejected",
+        "`top-category-${index + 1"
+      ]
+    }
+  ]
+}

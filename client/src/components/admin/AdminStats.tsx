@@ -1,158 +1,231 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileText, Activity, GitBranch } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import Stat from "@/components/admin/canonical/Stat";
 
-/**
- * @description Props for the AdminStats component
- */
 interface AdminStatsProps {
   stats?: {
     users?: number;
     resources?: number;
     journeys?: number;
     pendingApprovals?: number;
+    pendingEdits?: number;
     totalPublic?: number;
     totalPending?: number;
     /** Rows with status='rejected' (Audit2 BUG-050: was misnamed totalDeleted). */
     totalRejected?: number;
+    /** Present in the repository response but not yet forwarded by the stats route. */
+    activeUsers?: number;
   };
   isLoading: boolean;
   /** R4-L17: when provided, stat cards become clickable and jump to the matching admin tab. */
   onNavigate?: (tab: string) => void;
 }
 
+interface PendingResource {
+  createdAt?: string | null;
+}
+
+interface PendingResponse {
+  resources?: PendingResource[];
+  total?: number;
+}
+
+interface UserSummary {
+  id: string;
+  role?: string | null;
+  updatedAt?: string | null;
+}
+
+interface UserPage {
+  users?: UserSummary[];
+  total?: number;
+}
+
+interface CategorySummary {
+  resourceCount?: number;
+}
+
+const PAGE_SIZE = 100;
+const getDate = (value: string | null | undefined) => {
+  if (!value) return null;
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : null;
+};
+
+async function getAllUsers(): Promise<UserSummary[]> {
+  const firstPage = await apiRequest(
+    `/api/admin/users?page=1&limit=${PAGE_SIZE}`,
+  ) as UserPage;
+  const firstUsers = firstPage.users ?? [];
+  const total = firstPage.total ?? firstUsers.length;
+  const pageCount = Math.ceil(total / PAGE_SIZE);
+
+  if (pageCount <= 1) return firstUsers;
+  // Keep overview pagination below the shared database pool's concurrency.
+  const remainingPages: UserPage[] = [];
+  for (let page = 2; page <= pageCount; page++) {
+    remainingPages.push(await apiRequest(
+      `/api/admin/users?page=${page}&limit=${PAGE_SIZE}`,
+    ) as UserPage);
+  }
+  return [
+    ...firstUsers,
+    ...remainingPages.flatMap((page) => page.users ?? []),
+  ];
+}
+
+function oldestPendingAge(resources: PendingResource[] | undefined): string {
+  const oldest = (resources ?? [])
+    .map((resource) => getDate(resource.createdAt))
+    .filter((value): value is number => value !== null)
+    .reduce<number | null>((minimum, value) => (
+      minimum === null ? value : Math.min(minimum, value)
+    ), null);
+
+  if (oldest === null) return "none waiting";
+  const elapsed = Math.max(0, Date.now() - oldest);
+  const minutes = Math.floor(elapsed / 60_000);
+  if (minutes < 1) return "oldest just now";
+  if (minutes < 60) return `oldest ${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `oldest ${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `oldest ${days}d ago`;
+}
+
+function countActiveUsers(users: UserSummary[]): number {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  const cutoffTime = cutoff.getTime();
+  return users.reduce((count, user) => {
+    const updatedAt = getDate(user.updatedAt);
+    return updatedAt !== null && updatedAt > cutoffTime ? count + 1 : count;
+  }, 0);
+}
+
 /**
- * @description Displays admin dashboard statistics in a responsive grid of cards.
- * Shows metrics for users, resources, learning journeys, and pending approvals.
- * The resources card shows the LIVE (approved/public) count so it matches the
- * public catalog exactly (run3 audit R3-01); pending/rejected are a sublabel.
- * R4-L17: each card deep-links to its admin tab when onNavigate is supplied.
+ * Canonical four-card admin metric strip:
+ * approved resources, canonical subcategories, users active in the existing
+ * 30-day updatedAt window, and pending approvals plus their oldest age.
  */
-export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsProps) {
-  const publicCount = stats?.totalPublic ?? stats?.resources;
-  const pendingCount = stats?.totalPending ?? 0;
-  const rejectedCount = stats?.totalRejected ?? 0;
+export default function AdminStats({
+  stats,
+  isLoading,
+  onNavigate,
+}: AdminStatsProps) {
+  const pending = useQuery<PendingResponse>({
+    queryKey: ["/api/admin/pending-resources", "overview-stat"],
+    queryFn: () => apiRequest("/api/admin/pending-resources"),
+    staleTime: 30_000,
+  });
+  const users = useQuery<UserSummary[]>({
+    queryKey: ["/api/admin/users", "overview-all"],
+    queryFn: getAllUsers,
+    staleTime: 30_000,
+  });
+  const categories = useQuery<CategorySummary[]>({
+    queryKey: ["/api/categories", "overview-stat"],
+    queryFn: () => apiRequest("/api/categories"),
+    staleTime: 60_000,
+  });
+  const subcategories = useQuery<CategorySummary[]>({
+    queryKey: ["/api/subcategories", "overview-stat"],
+    queryFn: () => apiRequest("/api/subcategories"),
+    staleTime: 60_000,
+  });
+  const pendingResources = pending.data?.resources ?? [];
+  const pendingCount = pending.data?.total
+    ?? pending.data?.resources?.length
+    ?? stats?.totalPending
+    ?? stats?.pendingApprovals;
+  // The stats route intentionally does not forward the repository's
+  // all-users count. Keep this card tied to the sequential user pages so its
+  // value and role split use the same 30-day updatedAt definition.
+  const activeUsers = users.data ? countActiveUsers(users.data) : undefined;
+  const activeUserRows = users.data?.filter((user) => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+    const updatedAt = getDate(user.updatedAt);
+    return updatedAt !== null && updatedAt > cutoff.getTime();
+  }) ?? [];
+  const activeAdmins = activeUserRows.filter((user) => user.role === "admin").length;
+  const activeContributors = activeUserRows.filter((user) => user.role !== "admin").length;
+  const categoryCount = categories.data?.length;
+  const subcategoryCount = subcategories.data?.length;
+  const pendingUnavailable = pending.isError;
+  const value = (number: number | undefined) => (
+    number === undefined ? 0 : number.toLocaleString()
+  );
+  const subcategoryValue = subcategories.isError ? "Error" : value(subcategoryCount);
+  const activeUserValue = users.isError && activeUsers === undefined ? "Error" : value(activeUsers);
+  const pendingValue = pendingUnavailable && pendingCount === undefined
+    ? "Error"
+    : value(pendingCount);
+  const usersLoading = users.isPending || (isLoading && !stats);
+  const subcategoriesLoading = subcategories.isPending || (isLoading && !stats);
+  const pendingLoading = pending.isPending || (isLoading && !stats);
+
   return (
-    <div className="admin-stat-strip">
-      {[
-        { icon: Users, label: "Total Users", value: stats?.users, tab: "users" },
-        {
-          icon: FileText,
-          label: "Live Resources",
-          value: publicCount,
-          /* R2-M22: only mention non-zero buckets (no "+0 pending").
-             Run16 BUG-029: pending/rejected are now deep-links — pending jumps
-             to the approvals tab, rejected opens the resources tab pre-filtered
-             to status=rejected (ResourceManager reads ?status= on mount). */
-          sublabel:
-            pendingCount || rejectedCount ? (
-              <>
-                {pendingCount ? (
-                  <button
-                    type="button"
-                    className="inline-flex items-center min-h-[32px] underline decoration-dotted hover:text-[var(--accent)]"
-                    data-testid="link-stat-pending"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onNavigate?.("approvals");
-                    }}
-                  >
-                    +{pendingCount.toLocaleString()} pending
-                  </button>
-                ) : null}
-                {pendingCount && rejectedCount ? " · " : null}
-                {rejectedCount ? (
-                  <button
-                    type="button"
-                    className="inline-flex items-center min-h-[32px] underline decoration-dotted hover:text-[var(--accent)]"
-                    data-testid="link-stat-rejected"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const url = new URL(window.location.href);
-                      url.searchParams.set("status", "rejected");
-                      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-                      onNavigate?.("resources");
-                    }}
-                  >
-                    {rejectedCount.toLocaleString()} rejected
-                  </button>
-                ) : null}
-              </>
-            ) : undefined,
-          testId: "stat-live-resources",
-          tab: "resources",
-        },
-        { icon: Activity, label: "Learning Journeys", value: stats?.journeys, tab: "journeys" },
-        { icon: GitBranch, label: "Pending Approvals", value: stats?.pendingApprovals, tab: "approvals" },
-      ].map(({ icon: Icon, label, value, sublabel, testId, tab }: any) => {
-        const clickable = Boolean(onNavigate && tab);
-        // Run24 (axe nested-interactive): a card that carries its own nested
-        // buttons (the pending/rejected deep-links) must NOT itself be a
-        // role=button — interactive controls can't nest. Such cards keep the
-        // mouse onClick for convenience but expose keyboard/AT access through
-        // an inner button on the title instead of the container.
-        const hasNestedControls = Boolean(sublabel);
-        const containerInteractive = clickable && !hasNestedControls;
-        return (
-          <Card
-            key={label}
-            role={containerInteractive ? "button" : undefined}
-            tabIndex={containerInteractive ? 0 : undefined}
-            aria-label={containerInteractive ? `${label} — open the ${tab} tab` : undefined}
-            title={containerInteractive ? `Open the ${tab} tab` : undefined}
-            onClick={clickable ? () => onNavigate!(tab) : undefined}
-            onKeyDown={
-              containerInteractive
-                ? (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      onNavigate!(tab);
-                    }
-                  }
-                : undefined
-            }
-            className={clickable ? "admin-stat cursor-pointer focus-ring" : "admin-stat"}
-            // Stage-6 card sweep (task #363): every clickable/hoverable
-            // bg-card surface must carry the card-hover hook so per-system
-            // hover skins apply — this also marks the nested deep-link
-            // buttons below as in-card chrome for the button sweep.
-            data-ds={clickable ? "card-hover" : undefined}
-            data-testid={clickable ? `stat-card-${tab}` : undefined}
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="eyebrow flex items-center gap-2 normal-case">
-                <Icon className="h-4 w-4 text-[var(--accent)]" />
-                {clickable && hasNestedControls ? (
-                  <button
-                    type="button"
-                    className="inline-flex items-center min-h-[32px] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-                    aria-label={`${label} — open the ${tab} tab`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onNavigate!(tab);
-                    }}
-                    data-testid={`stat-title-${tab}`}
-                  >
-                    {label}
-                  </button>
-                ) : (
-                  label
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div
-                className="admin-stat__value"
-                data-testid={testId}
-              >
-                {isLoading ? "—" : (value ?? 0).toLocaleString()}
-              </div>
-              {!isLoading && sublabel && (
-                <div className="text-xs text-[var(--text-2)] mt-1">{sublabel}</div>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+    <div
+      className="admin-stat-strip admin-overview-stats-canonical"
+      data-testid="admin-stats"
+    >
+      <Stat
+        label="Resources"
+        value={value(stats?.totalPublic ?? stats?.resources)}
+        sub={
+          <>
+            {categories.isError
+              ? "category data unavailable"
+              : categoryCount === undefined
+                ? "across — categories"
+                : `across ${categoryCount} categories`}
+          </>
+        }
+        loading={isLoading && !stats}
+        onNavigate={onNavigate ? () => onNavigate("resources") : undefined}
+        navigateLabel="Resources — open the resources tab"
+        titleTestId="stat-title-resources"
+        valueTestId="stat-live-resources"
+        testId="stat-card-resources"
+      />
+      <Stat
+        label="Subcategories"
+        value={subcategoryValue}
+        sub={subcategories.isError ? "unavailable" : "all canonical"}
+        loading={subcategoriesLoading}
+        onNavigate={onNavigate ? () => onNavigate("subcategories") : undefined}
+        navigateLabel="Subcategories — open the subcategories tab"
+        titleTestId="stat-title-journeys"
+        testId="stat-card-journeys"
+      />
+      <Stat
+        label="Active users"
+        value={activeUserValue}
+        sub={
+          users.isError
+            ? "unavailable"
+            : users.data
+            ? `${activeAdmins} admins · ${activeContributors} contributors`
+            : "updated within 30 days"
+        }
+        loading={usersLoading}
+        onNavigate={onNavigate ? () => onNavigate("users") : undefined}
+        navigateLabel="Active users — open the users tab"
+        titleTestId="stat-title-users"
+        testId="stat-card-users"
+      />
+      <Stat
+        label="Pending approvals"
+        value={pendingValue}
+        sub={pendingUnavailable ? "unavailable" : oldestPendingAge(pendingResources)}
+        accent
+        loading={pendingLoading}
+        onNavigate={onNavigate ? () => onNavigate("approvals") : undefined}
+        navigateLabel="Pending approvals — open the approvals tab"
+        titleTestId="stat-title-approvals"
+        testId="stat-card-approvals"
+      />
     </div>
   );
 }

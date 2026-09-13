@@ -122,5 +122,6 @@
 - [Vitest spy calls vanish on mockRestore](vitest-spy-mockrestore.md) — `mockRestore()` also clears `mock.calls`; collect observed lines inside the mockImplementation or a live warning looks like "the observer never ran".
 - [Token parity by effective cascade](token-parity-effective-cascade.md) — one resolver over every sheet with ORDERED cascade layers (not a bit); element model + selector engine for shadows; in-gate canaries.
 - [Filmstrip prepaint proof](filmstrip-prepaint-check.md) — screencast frames before responseStart are the prior about:blank (white ≠ flash); prove no-flash via first document frame + attr timeline.
+- [Folded Radix tabs](radix-folded-tab-activation.md) — same-value selection suppresses onValueChange; verify subsection → highlighted-parent activation with pointer and keyboard.
 - [Tablet dual navigation](tablet-dual-navigation.md) — drawer availability does not imply hidden sidebar; simultaneous copies need unique disclosure IDs and surface-scoped scrolling.
 - [Admin kind resolution boundary](admin-kind-client-resolution.md) — shared client inference requires empty custom server mappings until admin responses expose authoritative resolution.
