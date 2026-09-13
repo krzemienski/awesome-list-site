@@ -1,0 +1,17 @@
+[
+  {
+    "route": "/search?q=ffmpeg",
+    "width": 375,
+    "selector": "[data-testid=\"card-resource-185214\"]",
+    "cards": 24,
+    "firstCardText": "FFmpeg\n\nFFmpeg is a free and open-source software project consisting of a suite of libraries and programs for handling video, audio, and other multimedia files and streams. It is widely used for format transcoding, basic editing, and standa",
+    "fontsReady": "loaded"
+  },
+  {
+    "route": "/advanced?tab=export",
+    "width": 1440,
+    "selector": "text=Multi-Format Export System + [data-testid=\"button-format-markdown\"]",
+    "exportHeading": "Multi-Format Export System",
+    "fontsReady": "loaded"
+  }
+]

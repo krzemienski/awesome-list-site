@@ -1,0 +1,94 @@
+{
+  "auth": {
+    "authenticated": true
+  },
+  "journey": {
+    "groups": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "allRowIds": [
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198
+    ],
+    "apiCompletedSteps": [
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198
+    ],
+    "allRowIdsPresent": true,
+    "completedAt": "2026-09-13T05:24:17.784Z",
+    "completedAtPresent": true
+  },
+  "captures": [
+    {
+      "name": "journeys",
+      "width": 375
+    },
+    {
+      "name": "journeys",
+      "width": 768
+    },
+    {
+      "name": "journeys",
+      "width": 1024
+    },
+    {
+      "name": "journeys",
+      "width": 1440
+    }
+  ],
+  "axe": [
+    {
+      "name": "journeys",
+      "width": 375,
+      "violations": []
+    },
+    {
+      "name": "journeys",
+      "width": 1440,
+      "violations": []
+    }
+  ],
+  "teardown": {
+    "localBefore": 1,
+    "localAfter": 0,
+    "clerkRemaining": 0
+  },
+  "error": "TimeoutError: locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Building Your First Streaming Platform').first() to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <span role=\"link\" aria-current=\"page\" aria-disabled=\"true\" data-component-name=\"BreadcrumbPage\" class=\"font-normal text-foreground truncate\" title=\"Building Your First Streaming Platform\" data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:375:18\">Building Your First Streaming Platform</span>\u001b[22m\n"
+}

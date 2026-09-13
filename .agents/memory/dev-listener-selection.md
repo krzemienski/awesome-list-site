@@ -15,3 +15,12 @@ like "the catalog is empty / the API is broken" when it is neither.
 **How to apply:** parity/audit harnesses should take explicit origins
 (`PARITY_APP_ORIGIN`, `PARITY_ARTIFACT_ORIGIN`) and verify a route marker from
 the intended listener before capturing.
+
+For authenticated app captures, a sign-in-token link may redirect back to the
+default proxied artifact origin even when the capture began on the app port.
+The real email/password Clerk UI flow can still bind the app-port session.
+Confirm `/api/auth/user` on the target listener; a successful artifact
+handshake is not proof of an authenticated app session.
+
+**Why:** A token-link capture reached the design-system showcase while the
+existing collection audit's actual UI sign-in succeeded on the app listener.

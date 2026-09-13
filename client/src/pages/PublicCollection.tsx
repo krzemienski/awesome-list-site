@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import "@/styles/pages/discovery.css";
 import { Link } from "wouter";
 import { BookOpen, FolderOpen } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
@@ -30,7 +31,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
 
   if (isLoading) {
     return (
-      <div className="space-y-6" aria-busy="true" aria-live="polite">
+      <div className="discovery-page space-y-6" aria-busy="true" aria-live="polite">
         <SEOHead
           title="Loading shared collection"
           description="Loading a shared Awesome Video collection"
@@ -38,7 +39,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
           ogUrl={publicUrl}
         />
         <PageHeaderSkeleton />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="discovery-grid">
           {Array.from({ length: 3 }).map((_, index) => (
             <ResourceCardSkeleton key={index} />
           ))}
@@ -49,7 +50,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
 
   if (error || !data) {
     return (
-      <div className="space-y-6">
+      <div className="discovery-page space-y-6">
         <SEOHead
           title="Collection Not Found"
           description="This shared collection is unavailable or no longer published."
@@ -57,9 +58,9 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
           ogUrl={`${CANONICAL_BASE}/`}
         />
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <CardContent className="discovery-state">
             <FolderOpen className="h-12 w-12 text-muted-foreground mb-4" aria-hidden="true" />
-            <h1 className="text-2xl font-semibold mb-2">Collection not found</h1>
+            <h1 className="display-h text-2xl mb-2">Collection not found</h1>
             <p className="max-w-md text-muted-foreground">
               This link may be invalid, deleted, or no longer shared by its owner.
             </p>
@@ -81,7 +82,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
   const description = collectionDescription(data.resources.length);
 
   return (
-    <div className="space-y-6">
+    <div className="discovery-page space-y-6">
       <SEOHead
         title={`${data.name} — Shared collection`}
         description={description}
@@ -89,12 +90,12 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
         follow
         ogUrl={publicUrl}
       />
-      <header className="border-b pb-6">
+      <header className="discovery-header">
         <div className="eyebrow" aria-hidden>// Shared collection</div>
         <div className="mt-2 flex items-start gap-3">
           <BookOpen className="h-8 w-8 shrink-0 text-primary" aria-hidden="true" />
           <div className="min-w-0">
-            <h1 className="display-h break-words text-3xl sm:text-4xl">{data.name}</h1>
+            <h1 className="display-h discovery-title">{data.name}</h1>
             {/* Task #379 (uxv1-06): unbounded prose ran the full page width on wide
                 desktop screens; max-w-prose holds it to a readable measure. */}
             <p className="mt-2 max-w-prose text-muted-foreground">{description}</p>
@@ -103,7 +104,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
       </header>
 
       {data.resources.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="discovery-grid">
           {data.resources.map((resource) => (
             <ResourceCard
               key={resource.id}
@@ -120,7 +121,7 @@ export default function PublicCollection({ shareId }: { shareId: string }) {
         </div>
       ) : (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-14 text-center">
+          <CardContent className="discovery-state">
             <FolderOpen className="h-10 w-10 text-muted-foreground mb-4" aria-hidden="true" />
             <h2 className="text-xl font-semibold mb-2">No public resources yet</h2>
             <p className="max-w-md text-muted-foreground">

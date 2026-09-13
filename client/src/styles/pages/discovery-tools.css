@@ -1,0 +1,575 @@
+/*
+ * Discovery tools page composition.
+ *
+ * Advanced and Recommendations share the public-discovery page grammar, but
+ * their catalog controls are intentionally not shared-card variants. Keep
+ * this layer local to the two discovery pages and consume only the canonical
+ * design-system and product-profile tokens.
+ */
+
+.discovery-tools-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--profile-content-gap);
+  width: 100%;
+  max-width: var(--content-max);
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--text);
+}
+
+
+.discovery-tools-page--advanced,
+.discovery-tools-page--recommendations {
+  animation: fadeIn var(--motion-slow) var(--motion-ease) both;
+}
+
+.discovery-tools-masthead {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.discovery-tools-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.discovery-tools-masthead-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.discovery-tools-page-title {
+  min-width: 0;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 32px);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: var(--display-leading);
+  overflow-wrap: anywhere;
+}
+
+.discovery-tools-page-lede {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: var(--body-leading);
+}
+
+.discovery-tools-tabs-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--profile-content-gap);
+  min-width: 0;
+}
+
+.discovery-tools-tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-bottom: var(--hairline-w) solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+}
+
+.discovery-tools-tab {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: max-content;
+  min-height: var(--profile-control-height);
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+  transition: color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
+}
+
+.discovery-tools-tab:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.discovery-tools-tab[data-state="active"] {
+  border-bottom-color: var(--accent);
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.discovery-tools-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--profile-content-gap);
+  min-width: 0;
+}
+
+.discovery-tools-tab-panel[hidden] {
+  display: none;
+}
+
+.discovery-tools-panel,
+.discovery-tools-owned-panel > article,
+.discovery-tools-state-card {
+  min-width: 0;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.discovery-tools-panel:hover,
+.discovery-tools-state-card:hover {
+  border-color: var(--border);
+}
+
+.discovery-tools-panel-header {
+  padding: var(--profile-panel-padding);
+  gap: 4px;
+}
+
+.discovery-tools-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: 1.25;
+}
+
+.discovery-tools-panel-title svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.discovery-tools-panel-description {
+  max-width: 920px;
+  margin: 0;
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: var(--body-leading);
+}
+
+.discovery-tools-panel-content {
+  min-width: 0;
+  padding: 0 var(--profile-panel-padding) var(--profile-panel-padding);
+}
+
+.discovery-tools-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--profile-content-gap);
+}
+
+.discovery-tools-stat-card {
+  min-width: 0;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.discovery-tools-stat-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--profile-panel-padding);
+  text-align: center;
+}
+
+.discovery-tools-stat-value {
+  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: 1;
+}
+
+.discovery-tools-stat-value--primary {
+  color: var(--accent);
+}
+
+.discovery-tools-stat-value--secondary {
+  color: var(--accent-2);
+}
+
+.discovery-tools-stat-value--tertiary {
+  color: var(--text-2);
+}
+
+.discovery-tools-stat-value--quaternary {
+  color: var(--text-3);
+}
+
+.discovery-tools-stat-label {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  letter-spacing: var(--eyebrow-tracking);
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.discovery-tools-format-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--profile-content-gap);
+  margin-bottom: var(--profile-content-gap);
+}
+
+.discovery-tools-format-option {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.discovery-tools-format-card {
+  height: 100%;
+  min-width: 0;
+  cursor: pointer;
+  transition: border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease);
+}
+
+.discovery-tools-format-card:hover,
+.discovery-tools-format-option:focus-visible .discovery-tools-format-card {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+.discovery-tools-format-card--selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.discovery-tools-format-card--selected:hover {
+  border-color: var(--accent);
+}
+
+.discovery-tools-format-card-content {
+  min-height: 92px;
+  padding: var(--profile-panel-padding);
+  text-align: center;
+}
+
+.discovery-tools-format-card svg {
+  color: var(--accent);
+}
+
+.discovery-tools-owned-panel {
+  min-width: 0;
+}
+
+/* Components with an existing space-y rhythm use this root class as their
+   local handoff hook. The page owns the rhythm so nested panels do not add a
+   second margin stack. */
+.discovery-tools-page .discovery-tools-owned-panel > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0;
+}
+
+.discovery-tools-owned-panel > article {
+  box-shadow: var(--shadow-sm);
+}
+
+.discovery-tools-results-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--profile-content-gap);
+  min-width: 0;
+}
+
+.discovery-tools-section-title {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: var(--display-tracking);
+  line-height: 1.25;
+}
+
+.discovery-tools-recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: var(--profile-content-gap);
+  min-width: 0;
+}
+
+.discovery-tools-recommendation-skeleton {
+  min-width: 0;
+  min-height: 10rem;
+  border-radius: var(--radius);
+}
+
+.discovery-tools-signin-panel {
+  margin-top: 0;
+}
+
+.discovery-tools-cta-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--profile-panel-padding);
+  text-align: center;
+}
+
+.discovery-tools-cta-title {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: 1.2;
+}
+
+.discovery-tools-cta-copy {
+  max-width: 620px;
+  margin: 0 0 var(--profile-content-gap);
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+.discovery-tools-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.discovery-tools-cta-primary,
+.discovery-tools-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--profile-control-height);
+  padding: 9px 16px;
+  border: var(--border-w) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  transition: background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease);
+}
+
+.discovery-tools-cta-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.discovery-tools-cta-primary:hover,
+.discovery-tools-cta-primary:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  box-shadow: var(--shadow-accent);
+}
+
+.discovery-tools-cta-secondary {
+  background: transparent;
+  color: var(--text);
+}
+
+.discovery-tools-cta-secondary:hover,
+.discovery-tools-cta-secondary:focus-visible {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.discovery-tools-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 280px;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.discovery-tools-state--loading {
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: var(--profile-panel-padding) 0 0;
+  text-align: left;
+}
+
+.discovery-tools-state-badge,
+.discovery-tools-state-eyebrow {
+  margin-bottom: 2px;
+}
+
+.discovery-tools-state-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--accent);
+}
+
+.discovery-tools-state-title {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: 1.15;
+}
+
+.discovery-tools-state-copy {
+  max-width: 36rem;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: var(--body-leading);
+}
+
+.discovery-tools-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--profile-content-gap);
+}
+
+.discovery-tools-skeleton {
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.discovery-tools-skeleton--title {
+  width: min(75%, 36rem);
+  height: 3rem;
+}
+
+.discovery-tools-skeleton--lede {
+  width: 100%;
+  height: 1.5rem;
+  margin-top: 4px;
+}
+
+.discovery-tools-skeleton--panel {
+  min-height: 16rem;
+}
+
+/* The recommendation panel owns its data state, while this page owns the
+   canonical empty/loading/error geometry around that state. */
+.discovery-tools-ai-panel [data-testid="loading-state"],
+.discovery-tools-ai-panel [data-testid="error-state"],
+.discovery-tools-ai-panel [data-testid="no-recommendations"] {
+  min-width: 0;
+  border-color: var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.discovery-tools-ai-panel [data-testid="loading-state"] > div:first-child {
+  padding: var(--profile-panel-padding);
+}
+
+.discovery-tools-ai-panel [data-testid="loading-state"] > div:last-child {
+  padding: 0 var(--profile-panel-padding) var(--profile-panel-padding);
+}
+
+.discovery-tools-ai-panel [data-testid="error-state"],
+.discovery-tools-ai-panel [data-testid="no-recommendations"] {
+  min-height: 280px;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.discovery-tools-ai-panel [data-testid="error-state"] [data-slot="alert-description"],
+.discovery-tools-ai-panel [data-testid="no-recommendations"] [data-slot="alert-description"] {
+  max-width: 36rem;
+  color: var(--text-2);
+}
+
+@media (max-width: 1023px) {
+  .discovery-tools-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .discovery-tools-format-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .discovery-tools-recommendation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .discovery-tools-stat-grid,
+  .discovery-tools-format-grid,
+  .discovery-tools-recommendation-grid,
+  .discovery-tools-loading-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .discovery-tools-tabs-list {
+    background: transparent;
+  }
+
+  .discovery-tools-tab {
+    flex: 1 1 50%;
+    justify-content: flex-start;
+  }
+
+  .discovery-tools-format-card-content {
+    min-height: 0;
+  }
+
+  .discovery-tools-cta-actions {
+    width: 100%;
+  }
+
+  .discovery-tools-cta-primary,
+  .discovery-tools-cta-secondary {
+    width: 100%;
+  }
+}

@@ -1,4 +1,6 @@
 import { TaxonomyCardSkeleton } from "@/components/ui/skeletons";
+import "@/styles/pages/discovery.css";
+import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
 import { TaxonomyCard } from "@/components/ui/taxonomy-card";
 import {
@@ -138,15 +140,15 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
   }, [baseCategories, sort]);
 
   return (
-    <div className="max-w-6xl mx-auto px-0 sm:px-4 space-y-6">
+    <div className="discovery-page space-y-6">
       <SEOHead
         title="All Categories"
         description="Browse all categories of curated video development resources on Awesome Video — players, encoders, codecs, streaming, AI, tools, and more."
       />
 
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <header className="discovery-header flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-2">
-          <h1 className="display-h text-2xl">All Categories</h1>
+          <h1 className="display-h discovery-title">All Categories</h1>
           <p className="text-muted-foreground">
             Browse every category of curated video development resources.
           </p>
@@ -192,7 +194,7 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
            eternal skeleton (or a misleading "No categories") when the nav
            fetch failed. */
         <div
-          className="flex flex-col items-center gap-4 border border-[var(--border)] bg-[var(--surface)] px-6 py-12 text-center"
+          className="discovery-state"
           role="alert"
           data-testid="categories-error-card"
         >
@@ -201,25 +203,24 @@ export default function Categories({ nav, isLoading, error, onRetry }: Categorie
             Something went wrong while fetching the category list. Check your
             connection and try again.
           </p>
-          <button
+          <Button
             type="button"
             onClick={onRetry}
-            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             data-testid="button-categories-retry"
           >
             Retry
-          </button>
+          </Button>
         </div>
       ) : isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="discovery-grid" aria-busy="true">
           {Array.from({ length: 9 }).map((_, i) => (
             <TaxonomyCardSkeleton key={i} />
           ))}
         </div>
       ) : categories.length === 0 ? (
-        <p className="text-muted-foreground">No categories available yet.</p>
+        <div className="discovery-state"><h2>No categories available yet.</h2><p>Check back for curated video development resources.</p></div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="discovery-grid">
           {categories.map((cat) => {
             const Icon = getCategoryIcon(cat.name);
             const slug = cat.slug || getCategorySlug(cat.name);

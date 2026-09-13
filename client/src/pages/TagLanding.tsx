@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import "@/styles/pages/discovery.css";
 import { ArrowLeft } from "lucide-react";
 import { Link, Redirect, useLocation, useParams, useSearch } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
@@ -80,16 +81,16 @@ export default function TagLanding() {
   if (!slug) return <NotFound />;
   if (listing.isLoading && !listing.data) {
     return (
-      <div className="space-y-6" aria-busy="true">
+      <div className="discovery-page space-y-6" aria-busy="true">
         <PageHeaderSkeleton />
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="discovery-grid">
           {Array.from({ length: 9 }).map((_, index) => <ResourceCardSkeleton key={index} />)}
         </div>
       </div>
     );
   }
   if (listing.error) {
-    return <div className="py-12 text-center"><h2 className="text-xl font-semibold">Error Loading Tag</h2><p className="text-muted-foreground">Please try again.</p></div>;
+    return <div className="discovery-page discovery-state" role="alert"><h1 className="display-h">Error Loading Tag</h1><p>Please try again.</p><Button variant="outline" onClick={() => void listing.refetch()}>Retry</Button></div>;
   }
 
   const data = listing.data;
@@ -125,7 +126,7 @@ export default function TagLanding() {
     nextPage > 1 ? `${canonicalPath}?page=${nextPage}` : canonicalPath;
 
   return (
-    <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
+    <div className="discovery-page space-y-4 sm:space-y-6">
       <SEOHead
         title={pagedSeoTitleCore(titleCore, page)}
         description={pagedSeoDescription(description, page, totalPages)}
@@ -141,9 +142,9 @@ export default function TagLanding() {
       {/* Task #379 (uxv2-14): the tag total was stated three times — subtitle,
           badge, and the results heading. It is now stated once, in the results
           heading below. */}
-      <h1 className="display-h text-2xl sm:text-3xl">{name}</h1>
+      <h1 className="display-h discovery-title discovery-header">{name}</h1>
       <section aria-labelledby="tag-scope-heading" data-seo-section="tag-intro">
-        <h2 id="tag-scope-heading" className="text-base font-semibold">About this collection</h2>
+        <h2 id="tag-scope-heading" className="discovery-section-title">About this collection</h2>
         {/* Task #379 (uxv1-06): max-w-prose (65ch) instead of max-w-3xl (~105ch
             at this size) keeps the measure readable on wide desktop screens. */}
         <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{intro}</p>
@@ -156,7 +157,7 @@ export default function TagLanding() {
       <p className="text-sm text-muted-foreground" data-testid="text-results-count" data-total={data.total}>
         Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, data.total)} of {data.total} {resourceNoun(data.total)}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="discovery-grid">
         {data.resources.map((resource, index) => (
           <ResourceCard
             key={`${resource.id}-${index}`}

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "discovery",
+  "summary": "Proposed replacement discovery rows; merge existing IDs before activating this fragment.",
+  "screens": [
+    {
+      "id": "app.categories", "kind": "app", "eligibility": "token-only",
+      "actualPath": "/categories",
+      "reason": "No active canonical counterpart; category-grid pattern and canonical tokens apply.",
+      "notes": "Four widths: docs/parity/evidence/discovery/final-grids/categories-{width}.png; assertions.json records theme, title and baseline testid differences."
+    },
+    {
+      "id": "app.search", "kind": "app", "eligibility": "token-only",
+      "actualPath": "/search?q=ffmpeg",
+      "reason": "No active canonical results counterpart; filtered-list pattern and shared ResourceCard apply.",
+      "notes": "docs/parity/evidence/discovery/browser/search-ffmpeg-{width}.png; 375 replaced by browser/followup/search-ffmpeg-375-populated.png."
+    },
+    {
+      "id": "app.tag", "kind": "app", "eligibility": "token-only",
+      "actualPath": "/tag/open-source",
+      "reason": "No active canonical tag counterpart; bounded listing and detail-introduction patterns apply.",
+      "notes": "Four widths: docs/parity/evidence/discovery/final-grids/tag-open-source-{width}.png."
+    },
+    {
+      "id": "app.collection", "kind": "app", "eligibility": "token-only",
+      "reason": "No canonical shared-collection counterpart; capture requires a freshly published disposable collection.",
+      "notes": "Actual route /collection/:shareId. Four-width guest captures and live auth/share/teardown proof: docs/parity/evidence/discovery/browser/signed-in-followup/collection-clean-assertions.json. The captured disposable share was deleted."
+    },
+    {
+      "id": "app.journeys", "kind": "app", "eligibility": "token-only",
+      "actualPath": "/journeys",
+      "reason": "Historical journey sketches are not loaded by the active canonical index; list/grid tokens apply.",
+      "notes": "Guest browser/journeys-{width}.png and signed-in browser/signed-in-followup/journeys-{width}.png under docs/parity/evidence/discovery/."
+    },
+    {
+      "id": "app.journey", "kind": "app", "eligibility": "token-only",
+      "actualPath": "/journey/7",
+      "reason": "No active canonical journey detail counterpart; reading-column and step-list tokens apply.",
+      "notes": "Guest browser/journey-7-{width}.png and signed-in browser/signed-in-followup/journey-7-signed-{width}.png under docs/parity/evidence/discovery/. journey-assertions.json proves all grouped rows and completedAt."
+    },
+    {
+      "id": "app.advanced", "kind": "app", "eligibility": "token-only",
+      "actualPath": "/advanced",
+      "reason": "Historical Advanced sketch is not active; composed panels/tabs use canonical tokens.",
+      "notes": "Four tabs at four widths: docs/parity/evidence/discovery/browser/advanced-{tab}-{width}.png. Export1440 uses browser/followup/advanced-export-1440-populated.png. Initial contrast observation is unresolved, not a pixel pass."
+    },
+    {
+      "id": "app.recommendations", "kind": "app", "eligibility": "token-only",
+      "actualPath": "/recommendations",
+      "reason": "No active canonical recommendation counterpart; guest listing and authenticated panel retain separate behavior.",
+      "notes": "Guest browser/recommendations-{width}.png and signed-in browser/signed-in-followup/recommendations-signed-{width}.png under docs/parity/evidence/discovery/."
+    }
+  ]
+}

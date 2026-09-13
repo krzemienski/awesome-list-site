@@ -29,6 +29,7 @@ import {
 import { AwesomeList } from "@/types/awesome-list";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import "@/styles/pages/discovery-tools.css";
 
 const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
 // audit2 BUG-036: inner sub-tabs of the Metrics panel, deep-linkable via
@@ -93,12 +94,14 @@ export default function Advanced() {
 
   if (isLoading && tab !== "recommendations") {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Skeleton className="h-12 w-3/4 mb-4" />
-        <Skeleton className="h-6 w-full mb-8" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="discovery-tools-page discovery-tools-page--advanced">
+        <div className="discovery-tools-state discovery-tools-state--loading" aria-busy="true">
+          <Skeleton className="discovery-tools-skeleton discovery-tools-skeleton--title" />
+          <Skeleton className="discovery-tools-skeleton discovery-tools-skeleton--lede" />
+        </div>
+        <div className="discovery-tools-loading-grid">
           {Array(4).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-64 w-full" />
+            <Skeleton key={i} className="discovery-tools-skeleton discovery-tools-skeleton--panel" />
           ))}
         </div>
       </div>
@@ -110,16 +113,17 @@ export default function Advanced() {
   // instead of the ambiguous "Unable to load" dead-end that offered no recovery.
   if (isError && tab !== "recommendations") {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="discovery-tools-page discovery-tools-page--advanced">
         <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
         <div
-          className="max-w-md mx-auto flex flex-col items-center gap-3 py-16 text-center"
+          className="discovery-tools-state discovery-tools-state--error"
           role="alert"
           data-testid="advanced-error"
         >
-          <AlertCircle className="h-10 w-10 text-[var(--accent)]" />
-          <h1 className="display-h text-xl">Couldn&apos;t load advanced features</h1>
-          <p className="text-sm text-muted-foreground">
+          <span className="chip bad discovery-tools-state-badge">Error · Catalog</span>
+          <AlertCircle className="discovery-tools-state-icon" aria-hidden="true" />
+          <h1 className="display-h discovery-tools-state-title">Couldn&apos;t load advanced features</h1>
+          <p className="discovery-tools-state-copy">
             We couldn&apos;t reach the catalog data. This is usually a temporary
             network problem.
           </p>
@@ -139,24 +143,27 @@ export default function Advanced() {
 
   if (!awesomeList && tab !== "recommendations") {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="display-h text-2xl mb-4">Advanced Features</h1>
-        <p className="text-muted-foreground">Unable to load awesome list data</p>
+      <div className="discovery-tools-page discovery-tools-page--advanced">
+        <div className="discovery-tools-state discovery-tools-state--empty">
+          <span className="eyebrow discovery-tools-state-eyebrow">No catalog data</span>
+          <h1 className="display-h discovery-tools-state-title">Advanced Features</h1>
+          <p className="discovery-tools-state-copy">Unable to load awesome list data</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="discovery-tools-page discovery-tools-page--advanced">
       <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
 
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <Sparkles className="h-8 w-8 text-primary" />
-          <h1 className="display-h text-3xl">Advanced Features</h1>
+      <div className="discovery-tools-masthead">
+        <div className="discovery-tools-title-row">
+          <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
+          <h1 className="display-h discovery-tools-page-title">Advanced Features</h1>
         </div>
-        <p className="text-lg text-muted-foreground">
+        <p className="discovery-tools-page-lede">
           Discover powerful tools for exploring, analyzing, and sharing awesome list data
         </p>
       </div>
@@ -166,105 +173,97 @@ export default function Advanced() {
       {/* BUG-036 (run14): the 4-col grid only engages at lg — at 768px the
           equal columns hard-truncated "AI Recommendations"; below lg the list
           stays a scrollable flex row with full-width labels. */}
-      <Tabs value={tab} onValueChange={handleTabChange} className="space-y-6">
+      <Tabs value={tab} onValueChange={handleTabChange} className="discovery-tools-tabs-shell">
         {/* Run16 BUG-066: at 375px the 4th tab ("AI Recommendations") was
             clipped off-screen with no scroll cue — wrap the tab bar on small
             screens so every tab stays visible. */}
         {/* BUG-005 (audit2): sm:flex-nowrap + overflow-x-auto clipped the 4th
             tab at squeezed widths with no visible scroll affordance — below
             lg the list now WRAPS so every tab stays visible and tappable. */}
-        <TabsList className="flex w-full flex-wrap justify-start lg:grid lg:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
+        <TabsList className="discovery-tools-tabs-list">
           <TabsTrigger
             value="explorer"
-            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
+            className="discovery-tools-tab"
           >
             <Compass className="h-4 w-4" />
             Explorer
           </TabsTrigger>
           <TabsTrigger
             value="metrics"
-            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
+            className="discovery-tools-tab"
           >
             <BarChart3 className="h-4 w-4" />
             Metrics
           </TabsTrigger>
           <TabsTrigger
             value="export"
-            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
+            className="discovery-tools-tab"
           >
             <Download className="h-4 w-4" />
             Export
           </TabsTrigger>
           <TabsTrigger
             value="recommendations"
-            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
+            className="discovery-tools-tab"
           >
             <Lightbulb className="h-4 w-4" />
             <span>AI Recommendations</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="explorer" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+        <TabsContent value="explorer" className="discovery-tools-tab-panel">
+          <Card className="discovery-tools-panel">
+            <CardHeader className="discovery-tools-panel-header">
+              <CardTitle className="discovery-tools-panel-title">
                 <Compass className="h-5 w-5" />
                 Interactive Category Explorer
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="discovery-tools-panel-description">
                 Advanced search and filtering capabilities with real-time category statistics and interactive exploration
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              {/* DS-OK: stat semantic colors (primary/blue/green/purple) intentionally honor the design reference; do not flatten in DS sweeps. */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-                <Card className="lg:col-span-1">
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{categories.length}</div>
-                      <div className="text-sm text-muted-foreground">Categories</div>
-                    </div>
+            <CardContent className="discovery-tools-panel-content">
+              <div className="discovery-tools-stat-grid">
+                <Card className="discovery-tools-stat-card">
+                  <CardContent className="discovery-tools-stat-card-content">
+                    <div className="discovery-tools-stat-value discovery-tools-stat-value--primary">{categories.length}</div>
+                    <div className="eyebrow discovery-tools-stat-label">Categories</div>
                   </CardContent>
                 </Card>
-                <Card className="lg:col-span-1">
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-[#5eddf2]">{/* DS-OK: cyan info (DS chart/info constant) */}{resources.length.toLocaleString()}</div>
-                      <div className="text-sm text-muted-foreground">Resources</div>
-                    </div>
+                <Card className="discovery-tools-stat-card">
+                  <CardContent className="discovery-tools-stat-card-content">
+                    <div className="discovery-tools-stat-value discovery-tools-stat-value--secondary">{resources.length.toLocaleString()}</div>
+                    <div className="eyebrow discovery-tools-stat-label">Resources</div>
                   </CardContent>
                 </Card>
-                <Card className="lg:col-span-1">
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-[#34d08c]"> {/* DS-OK: status ok */}
-                        {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? [])).size}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Unique Tags</div>
+                <Card className="discovery-tools-stat-card">
+                  <CardContent className="discovery-tools-stat-card-content">
+                    <div className="discovery-tools-stat-value discovery-tools-stat-value--tertiary">
+                      {new Set(resources.flatMap((r) => r.metadata?.tags ?? r.tags ?? [])).size}
                     </div>
+                    <div className="eyebrow discovery-tools-stat-label">Unique Tags</div>
                   </CardContent>
                 </Card>
-                <Card className="lg:col-span-1">
-                  <CardContent className="p-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-[#9d4edd]"> {/* DS-OK: violet info (DS chart/info constant) */}
-                        {categories.reduce((sum, cat) => sum + (cat.subcategories?.length || 0), 0)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Subcategories</div>
+                <Card className="discovery-tools-stat-card">
+                  <CardContent className="discovery-tools-stat-card-content">
+                    <div className="discovery-tools-stat-value discovery-tools-stat-value--quaternary">
+                      {categories.reduce((sum, cat) => sum + (cat.subcategories?.length || 0), 0)}
                     </div>
+                    <div className="eyebrow discovery-tools-stat-label">Subcategories</div>
                   </CardContent>
                 </Card>
               </div>
             </CardContent>
           </Card>
 
-          <CategoryExplorer 
+          <CategoryExplorer
             categories={categories}
             resources={resources}
+            className="discovery-tools-owned-panel discovery-tools-category-explorer"
           />
         </TabsContent>
 
-        <TabsContent value="metrics" className="space-y-6">
+        <TabsContent value="metrics" className="discovery-tools-tab-panel">
           {/* BUG-049 (run13): the old "Activity High / Quality A+ / Completeness
               95%" cards were hard-coded vanity numbers with no data source —
               removed. CommunityMetrics below computes real counts from the
@@ -274,24 +273,25 @@ export default function Advanced() {
             categories={categories}
             subTab={metricsSubTab}
             onSubTabChange={handleMetricsSubChange}
+            className="discovery-tools-owned-panel discovery-tools-community-metrics"
           />
         </TabsContent>
 
-        <TabsContent value="export" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+        <TabsContent value="export" className="discovery-tools-tab-panel">
+          <Card className="discovery-tools-panel">
+            <CardHeader className="discovery-tools-panel-header">
+              <CardTitle className="discovery-tools-panel-title">
                 <Download className="h-5 w-5" />
                 Multi-Format Export System
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="discovery-tools-panel-description">
                 Export your curated lists in multiple formats including Markdown, JSON, CSV, YAML, HTML, and PDF with advanced filtering options
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="discovery-tools-panel-content">
               {/* BUG-026 (run13): format cards are now buttons that select the
                   matching format in the export panel below. */}
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+              <div className="discovery-tools-format-grid">
                 {([
                   { format: "Markdown", value: "markdown", icon: FileText, desc: "GitHub-ready" },
                   { format: "JSON", value: "json", icon: Code, desc: "API-friendly" },
@@ -308,17 +308,17 @@ export default function Advanced() {
                       onClick={() => setExportFormat(item.value)}
                       aria-pressed={exportFormat === item.value}
                       aria-label={`Select ${item.format} export format`}
-                      className="text-left"
+                      className="discovery-tools-format-option"
                       data-testid={`button-format-${item.value}`}
                     >
                       <Card
                         className={
                           exportFormat === item.value
-                            ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
-                            : "hover:border-[var(--accent)] transition-colors cursor-pointer"
+                            ? "discovery-tools-format-card discovery-tools-format-card--selected"
+                            : "discovery-tools-format-card"
                         }
                       >
-                        <CardContent className="p-3 text-center">
+                        <CardContent className="discovery-tools-format-card-content">
                           <FormatIcon className="mx-auto mb-1 h-6 w-6" aria-hidden="true" />
                           <div className="font-medium text-sm">{item.format}</div>
                           <div className="text-xs text-muted-foreground">{item.desc}</div>
@@ -332,37 +332,43 @@ export default function Advanced() {
           </Card>
 
           {awesomeList ? (
-            <ExportTools awesomeList={awesomeList} formatOverride={exportFormat} />
+            <ExportTools
+              awesomeList={awesomeList}
+              formatOverride={exportFormat}
+              className="discovery-tools-owned-panel discovery-tools-export-tools"
+            />
           ) : null}
         </TabsContent>
 
-        <TabsContent value="recommendations" className="space-y-6">
-          <AIRecommendationsPanel />
+        <TabsContent value="recommendations" className="discovery-tools-tab-panel">
+          <div className="discovery-tools-owned-panel discovery-tools-ai-panel">
+            <AIRecommendationsPanel />
+          </div>
         </TabsContent>
       </Tabs>
 
       {/* Call to Action */}
-      <Card className="mt-8">
-        <CardContent className="p-6 text-center">
-          <h3 className="text-xl font-semibold mb-2">Explore More Features</h3>
-          <p className="text-muted-foreground mb-4">
+      <Card className="discovery-tools-panel discovery-tools-cta-panel">
+        <CardContent className="discovery-tools-cta-content">
+          <h3 className="discovery-tools-cta-title">Explore More Features</h3>
+          <p className="discovery-tools-cta-copy">
             These advanced features help you discover, analyze, and share awesome list data more effectively
           </p>
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="discovery-tools-cta-actions">
             {/* BUG-011 (run19) linked this to /search because an empty query
                 used to browse the full catalog; audit2 BUG-019 made empty
                 /search an explicit "enter a search term" prompt, so the
                 honest browse-everything destination is the categories hub. */}
             <Link
               href="/categories"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              className="discovery-tools-cta-primary"
               data-testid="link-browse-all-resources"
             >
               Browse All Resources
             </Link>
             <Link
               href={categories[0]?.slug ? `/category/${categories[0].slug}` : "/"}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors"
+              className="discovery-tools-cta-secondary"
             >
               Explore Categories
             </Link>

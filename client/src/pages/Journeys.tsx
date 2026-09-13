@@ -2,7 +2,7 @@ import { JourneyCardSkeleton } from "@/components/ui/skeletons";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,7 +10,6 @@ import { journeysHubDescription } from "@shared/seo-templates";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Clock, Award, ArrowRight, Play, CheckCircle2, Trophy, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getDifficultyColor } from "@/lib/difficulty";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -18,6 +17,7 @@ import { humanizeApiError } from "@/lib/apiError";
 import { trackJourneyStart } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import "@/styles/pages/discovery-journeys.css";
 
 interface Journey {
   id: number;
@@ -61,7 +61,12 @@ export default function Journeys() {
   const { toast } = useToast();
 
   // Fetch all published journeys (includes enrollment and progress data)
-  const { data: journeys = [], isLoading: journeysLoading } = useQuery<Journey[]>({
+  const {
+    data: journeys = [],
+    isLoading: journeysLoading,
+    isError: journeysError,
+    refetch: refetchJourneys,
+  } = useQuery<Journey[]>({
     queryKey: ['/api/journeys'],
   });
 
@@ -145,31 +150,18 @@ export default function Journeys() {
     ? journeys 
     : journeys.filter(j => j.category === selectedCategory);
 
-  const getDifficultyIcon = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "●";
-      case "intermediate":
-        return "●●";
-      case "advanced":
-        return "●●●";
-      default:
-        return "●";
-    }
-  };
-
   if (journeysLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl" aria-busy={true} aria-live="polite">
+      <div className="journeys-page journeys-page--loading" aria-busy={true} aria-live="polite">
         <SEOHead
           title="Learning Journeys"
           description={journeysHubDescription}
         />
-        <div className="mb-8">
+        <div className="journeys-page__header journeys-page__header--loading">
           <Skeleton className="h-10 w-64 mb-4" />
           <Skeleton className="h-6 w-96" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="journeys-grid">
           {Array(6).fill(0).map((_, i) => (
             <JourneyCardSkeleton key={i} />
           ))}
@@ -178,30 +170,61 @@ export default function Journeys() {
     );
   }
 
+  if (journeysError) {
+    return (
+      <div className="journeys-page journeys-page--state" role="alert">
+        <SEOHead
+          title="Learning Journeys"
+          description={journeysHubDescription}
+        />
+        <div className="journeys-state journeys-state--error">
+          <Badge variant="destructive" className="journeys-state__error-label">
+            Error · unavailable
+          </Badge>
+          <h1 className="display-h journeys-state__title">Couldn’t load journeys.</h1>
+          <p className="journeys-state__copy">
+            Something went wrong while fetching the learning paths. Please try again.
+          </p>
+          <Button
+            variant="outline"
+            className="journeys-state__action"
+            onClick={() => void refetchJourneys()}
+            data-testid="button-retry-journeys"
+          >
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="journeys-page">
       <SEOHead
         title="Learning Journeys"
         description={journeysHubDescription}
       />
       
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="display-h text-2xl sm:text-3xl md:text-4xl mb-2 flex items-center gap-3">
-          <BookOpen className="h-8 w-8 text-primary" />
+      <header className="journeys-page__header">
+          <span className="eyebrow journeys-page__eyebrow">
+          <BookOpen className="journeys-page__eyebrow-icon" aria-hidden />
+          Discovery · Learning paths
+        </span>
+        <h1 className="display-h journeys-page__title">
           Learning Journeys
         </h1>
-        <p className="text-muted-foreground text-base md:text-lg">
+        <p className="journeys-page__lede">
           Explore structured learning paths to master new skills step by step
         </p>
-      </div>
+      </header>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-          <span className="text-sm text-muted-foreground">Filter by category:</span>
+      <div className="journeys-toolbar">
+        <div className="journeys-filter">
+          <span className="journeys-filter__label">Filter by category:</span>
           <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="w-full sm:w-[200px]" aria-label="Filter by category" data-testid="select-category-filter">
+            <SelectTrigger className="journeys-filter__control" aria-label="Filter by category" data-testid="select-category-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -214,21 +237,22 @@ export default function Journeys() {
             </SelectContent>
           </Select>
         </div>
-        <div className="text-sm text-muted-foreground">
+        <div className="journeys-toolbar__count">
           {filteredJourneys.length} {filteredJourneys.length === 1 ? 'journey' : 'journeys'} available
         </div>
       </div>
 
       {/* Journey Grid */}
       {filteredJourneys.length === 0 ? (
-        <Card className="p-12 text-center">
-          <div className="flex flex-col items-center gap-4">
-            <BookOpen className="h-12 w-12 text-muted-foreground" />
+        <Card className="journeys-state journeys-state--empty">
+          <div className="journeys-state__content">
+            <BookOpen className="journeys-state__icon" aria-hidden />
             <div>
+              <span className="eyebrow journeys-state__eyebrow">No journeys</span>
               {/* BUG-037 (run26): h2 — /journeys had no heading level below
                   the H1, so the empty state and card titles are now h2s. */}
-              <h2 className="text-lg font-semibold mb-2">No journeys found</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className="journeys-state__title">No journeys found</h2>
+              <p className="journeys-state__copy">
                 {selectedCategory === "all" 
                   ? "No learning journeys are available at the moment." 
                   : `No journeys found in the "${selectedCategory}" category.`}
@@ -237,6 +261,7 @@ export default function Journeys() {
             {selectedCategory !== "all" && (
               <Button 
                 variant="outline" 
+                className="journeys-state__action"
                 onClick={() => handleCategoryChange("all")}
                 data-testid="button-clear-filter"
               >
@@ -248,7 +273,7 @@ export default function Journeys() {
       ) : (
         // BUG-012 (run22): 3 columns only from xl — at lg (1024–1279) the
         // docked sidebar left ~220px cards and the CTA labels ellipsized.
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="journeys-grid">
           {filteredJourneys.map((journey) => {
             const enrolled = journey.isEnrolled || false;
             const progressPercent = journey.stepCount && journey.stepCount > 0
@@ -262,22 +287,21 @@ export default function Journeys() {
               <Card 
                 key={journey.id}
                 className={cn(
-                  "overflow-hidden transition-all hover:border-primary/50 hover:shadow-lg flex flex-col",
-                  enrolled && "border-primary/30"
+                  "journey-card flex flex-col",
+                  enrolled && "journey-card--enrolled"
                 )}
                 data-testid={`card-journey-${journey.id}`}
               >
-                <CardHeader>
-                  <div className="flex items-start justify-between mb-2">
+                <CardHeader className="journey-card__header">
+                  <div className="journey-card__topline">
                     <BookOpen
-                      className="h-10 w-10 flex-shrink-0"
-                      style={{ color: 'var(--accent)' }}
+                      className="journey-card__icon"
                       aria-hidden
                       data-testid={`icon-journey-${journey.id}`}
                     />
                     <Badge 
                       variant="outline"
-                      className={cn("text-xs capitalize", getDifficultyColor(journey.difficulty))}
+                      className={cn("journey-difficulty text-xs capitalize", `journey-difficulty--${journey.difficulty}`)}
                       data-testid={`badge-difficulty-${journey.id}`}
                     >
                       <Award className="h-3 w-3 mr-1" />
@@ -286,7 +310,7 @@ export default function Journeys() {
                   </div>
                   {/* BUG-037 (run26): real <h2> heading (CardTitle is a div) so
                       the journey list has a navigable heading structure. */}
-                  <h2 className="text-lg sm:text-xl font-semibold leading-tight tracking-tight">
+                  <h2 className="journey-card__title">
                     {/* BUG-010 (run13): journey titles are links, matching the
                         card-title-as-link pattern used on resource cards. */}
                     {/* Run17 BUG-048: ≥24px tap target. */}
@@ -294,7 +318,7 @@ export default function Journeys() {
                         at two lines (line-clamp-2) with word-boundary wrapping. */}
                     <Link
                       href={`/journey/${journey.id}`}
-                      className="hover:underline hover:text-[var(--accent)] transition-colors line-clamp-2 break-words min-h-10 text-left"
+                      className="journey-card__title-link line-clamp-2 break-words"
                       title={journey.title}
                       data-testid={`link-journey-title-${journey.id}`}
                     >
@@ -304,26 +328,26 @@ export default function Journeys() {
                   {/* Full text is shown (no clamp), so an unbreakable token in a
                       description must not be able to widen the card. */}
                   <CardDescription
-                    className="min-w-0 break-words [overflow-wrap:anywhere]"
+                    className="journey-card__description min-w-0 break-words"
                     data-testid={`description-journey-${journey.id}`}
                   >
                     {journey.description}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="flex-1">
-                  <div className="space-y-3">
+                <CardContent className="journey-card__content flex-1">
+                  <div className="journey-card__details">
                     {/* Meta Information */}
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary" className="text-xs">
+                    <div className="journey-card__meta">
+                      <Badge variant="chip" className="text-xs">
                         <Clock className="h-3 w-3 mr-1" />
                         {journey.estimatedDuration}
                       </Badge>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="chip" className="text-xs">
                         {journey.category}
                       </Badge>
                       {journey.stepCount && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="chip" className="text-xs">
                           {journey.stepCount} steps
                         </Badge>
                       )}
@@ -331,17 +355,17 @@ export default function Journeys() {
 
                     {/* Progress Bar for Enrolled Journeys */}
                     {enrolled && journey.stepCount && journey.stepCount > 0 && (
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">Progress</span>
-                          <span className="font-medium text-primary">
+                      <div className="journey-card__progress">
+                        <div className="journey-card__progress-label">
+                          <span>Progress</span>
+                          <span className="journey-card__progress-value">
                             {progressPercent}%
                           </span>
                         </div>
                         {/* NB-058 (run18): progress bar exposes progressbar ARIA
                             semantics so assistive tech announces the percent. */}
                         <div
-                          className="h-2 bg-muted rounded-full overflow-hidden"
+                          className="journey-card__progress-track"
                           role="progressbar"
                           aria-valuenow={progressPercent}
                           aria-valuemin={0}
@@ -350,11 +374,11 @@ export default function Journeys() {
                           data-testid={`progressbar-journey-${journey.id}`}
                         >
                           <div 
-                            className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500"
+                            className="journey-card__progress-fill"
                             style={{ width: `${progressPercent}%` }}
                           />
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="journey-card__progress-copy">
                           {journey.completedStepCount || 0} of {journey.stepCount} steps completed
                         </p>
                       </div>
@@ -362,11 +386,11 @@ export default function Journeys() {
                   </div>
                 </CardContent>
 
-                <CardFooter>
+                <CardFooter className="journey-card__footer">
                   <Button 
                     className={cn(
-                      "w-full group h-auto min-h-10 whitespace-normal",
-                      enrolled ? "bg-primary/20 hover:bg-primary/30 text-primary" : ""
+                      "journey-card__cta group h-auto min-h-10 whitespace-normal",
+                      enrolled && "journey-card__cta--enrolled"
                     )}
                     variant={enrolled ? "outline" : "default"}
                     // Task #330: one-click start/continue — signed-in users

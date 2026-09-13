@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation, Link } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,16 +15,14 @@ import {
   ArrowLeft, 
   Play, 
   CheckCircle2, 
-  Circle,
   ExternalLink,
   Trophy,
   AlertCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getDifficultyColor } from "@/lib/difficulty";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { queryClient, apiRequest, ApiError } from "@/lib/queryClient";
 import { humanizeApiError } from "@/lib/apiError";
 import { mpTrack } from "@/lib/mixpanel";
 import {
@@ -35,6 +33,7 @@ import {
 import SEOHead from "@/components/layout/SEOHead";
 import { isLogicalJourneyStepComplete } from "@shared/journeyProgress";
 import { journeySeoDescription } from "@shared/seo-templates";
+import "@/styles/pages/discovery-journeys.css";
 
 interface JourneyStep {
   id: number;
@@ -83,11 +82,17 @@ export default function JourneyDetail() {
   const { toast } = useToast();
 
   // Fetch journey details (includes progress if authenticated)
-  const { data: journey, isLoading: journeyLoading } = useQuery<Journey>({
+  const {
+    data: journey,
+    isLoading: journeyLoading,
+    isError: journeyError,
+    error: journeyFetchError,
+    refetch: refetchJourney,
+  } = useQuery<Journey>({
     queryKey: [`/api/journeys/${id}`],
     queryFn: async () => {
       const response = await fetch(`/api/journeys/${id}`);
-      if (!response.ok) throw new Error('Failed to fetch journey');
+      if (!response.ok) throw new ApiError(response.status, await response.text());
       return response.json();
     },
   });
@@ -330,17 +335,46 @@ export default function JourneyDetail() {
 
   if (journeyLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl" aria-busy={true} aria-live="polite">
+      <div className="journey-detail-page journey-detail-page--loading" aria-busy={true} aria-live="polite">
         {/* BUG-031 (run22): swap the head with the route — never leave the
             previous route's title/canonical up while the journey loads. */}
         <SEOHead title="Loading journey" description="Loading learning journey on Awesome Video." />
-        <Skeleton className="h-8 w-32 mb-6" />
-        <Skeleton className="h-12 w-96 mb-4" />
-        <Skeleton className="h-24 w-full mb-8" />
-        <div className="space-y-4">
+        <Skeleton className="journey-detail-skeleton__back" />
+        <Skeleton className="journey-detail-skeleton__title" />
+        <Skeleton className="journey-detail-skeleton__lede" />
+        <div className="journey-detail-skeleton__steps">
           {Array(5).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-32" />
+            <Skeleton key={i} className="journey-detail-skeleton__step" />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (journeyError && !(journeyFetchError instanceof ApiError && journeyFetchError.status === 404)) {
+    return (
+      <div className="journey-detail-page journey-detail-page--state" role="alert">
+        <SEOHead
+          title="Journey unavailable"
+          description="This learning journey could not be loaded."
+          noindex
+        />
+        <div className="journeys-state journeys-state--error">
+          <Badge variant="destructive" className="journeys-state__error-label">
+            Error · unavailable
+          </Badge>
+          <h1 className="display-h journeys-state__title">Couldn’t load this journey.</h1>
+          <p className="journeys-state__copy">
+            Something went wrong while fetching the learning path. Please try again.
+          </p>
+          <Button
+            variant="outline"
+            className="journeys-state__action"
+            onClick={() => void refetchJourney()}
+            data-testid="button-retry-journey"
+          >
+            Try again
+          </Button>
         </div>
       </div>
     );
@@ -348,11 +382,11 @@ export default function JourneyDetail() {
 
   if (!journey) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="journey-detail-page journey-detail-page--state">
         {/* BUG-031 (run22): not-found state gets its own head (noindex — matches
             the server's soft-404 contract) instead of inheriting a stale one. */}
         <SEOHead title="Journey Not Found" description="This learning journey may have been removed or archived." noindex />
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="journeys-alert">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Journey not found. It may have been removed or archived.
@@ -360,7 +394,7 @@ export default function JourneyDetail() {
         </Alert>
         <Button 
           variant="outline" 
-          className="mt-4"
+          className="journeys-state__action mt-4"
           onClick={() => setLocation('/journeys')}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -409,7 +443,7 @@ export default function JourneyDetail() {
   const isCompleted = !!journey?.progress?.completedAt;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="journey-detail-page">
       {/* BUG-035 (run27): mirror the server's ONE journey title template
           ("<Name> — Awesome Video") — the old "— Learning Journey" suffix
           survived the SERP clamp only for short names, so 2 of 5 journeys
@@ -422,7 +456,7 @@ export default function JourneyDetail() {
       {/* Back Button */}
       <Button 
         variant="ghost" 
-        className="mb-6"
+        className="journey-detail__back"
         onClick={() => setLocation('/journeys')}
         data-testid="button-back-to-journeys"
       >
@@ -431,19 +465,21 @@ export default function JourneyDetail() {
       </Button>
 
       {/* Journey Header */}
-      <Card className="mb-8">
-        <CardHeader>
-          <div className="flex items-start justify-between mb-4">
+      <Card className="journey-detail-card journey-detail-card--hero">
+        <CardHeader className="journey-detail-card__header">
+          <div className="journey-detail-card__topline">
             <BookOpen
-              className="h-14 w-14 flex-shrink-0"
-              style={{ color: 'var(--accent)' }}
+              className="journey-detail-card__icon"
               aria-hidden
               data-testid="icon-journey-header"
             />
             <div className="flex flex-col gap-2 items-end">
               <Badge 
                 variant="outline"
-                className={cn("text-xs capitalize", getDifficultyColor(journey.difficulty))}
+                className={cn(
+                  "journey-difficulty text-xs capitalize",
+                  `journey-difficulty--${journey.difficulty}`,
+                )}
                 data-testid="badge-journey-difficulty"
               >
                 <Award className="h-3 w-3 mr-1" />
@@ -452,7 +488,7 @@ export default function JourneyDetail() {
               {isCompleted && (
                 <Badge 
                   variant="outline"
-                  className="bg-[#34d08c]/10 text-[#34d08c] border-[#34d08c]/30" // DS-OK: status ok — completed
+                  className="journey-status journey-status--complete"
                   data-testid="badge-journey-completed"
                 >
                   <Trophy className="h-3 w-3 mr-1" />
@@ -461,20 +497,20 @@ export default function JourneyDetail() {
               )}
             </div>
           </div>
-          <h1 className="display-h text-2xl sm:text-3xl mb-2">{journey.title}</h1>
-          <CardDescription className="text-sm sm:text-base">{journey.description}</CardDescription>
+          <h1 className="display-h journey-detail-card__title">{journey.title}</h1>
+          <CardDescription className="journey-detail-card__description">{journey.description}</CardDescription>
         </CardHeader>
 
-        <CardContent>
-          <div className="flex flex-wrap gap-3 mb-6">
-            <Badge variant="secondary">
+        <CardContent className="journey-detail-card__content">
+          <div className="journey-detail-card__meta">
+            <Badge variant="chip">
               <Clock className="h-3 w-3 mr-1" />
               {journey.estimatedDuration}
             </Badge>
-            <Badge variant="secondary">
+            <Badge variant="chip">
               {journey.category}
             </Badge>
-            <Badge variant="secondary">
+            <Badge variant="chip">
               {totalSteps} {totalSteps === 1 ? 'step' : 'steps'}
             </Badge>
           </div>
@@ -482,23 +518,23 @@ export default function JourneyDetail() {
           {/* Progress Section */}
           {isEnrolled && (
             <>
-              <Separator className="mb-6" />
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
+              <Separator className="journey-detail-card__rule mb-6" />
+              <div className="journey-detail-card__progress">
+                <div className="journey-detail-card__progress-label">
                   {/* Run22 BUG-037: h2 — this section heading rendered before
                       the "Learning Path" h2, so an h3 here skipped a level. */}
                   <h2 className="text-sm font-semibold">Your Progress</h2>
-                  <span className="text-sm font-medium text-primary">
+                  <span className="journey-detail-card__progress-value">
                     {progressPercent}%
                   </span>
                 </div>
                 <Progress
                   value={progressPercent}
-                  className="h-3"
+                  className="journey-detail-card__progress-bar h-3"
                   aria-label={`${journey.title} progress: ${progressPercent}%`}
                   data-testid="progress-bar-journey"
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="journey-detail-card__progress-copy">
                   {completedCount} of {totalSteps} steps completed
                 </p>
               </div>
@@ -507,7 +543,7 @@ export default function JourneyDetail() {
 
           {/* Enroll Button */}
           {!isAuthenticated ? (
-            <Alert className="mt-6">
+            <Alert className="journey-enroll-note mt-6">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 {/* R5-027 (run24): print-keep-text — in print this button's
@@ -533,8 +569,8 @@ export default function JourneyDetail() {
               </AlertDescription>
             </Alert>
           ) : !isEnrolled && (
-            <Button 
-              className="w-full mt-6"
+            <Button
+              className="journey-detail-card__start mt-6"
               onClick={() => startJourneyMutation.mutate()}
               disabled={startJourneyMutation.isPending}
               data-testid="button-start-journey"
@@ -553,8 +589,8 @@ export default function JourneyDetail() {
       </Card>
 
       {/* Journey Steps */}
-      <div className="space-y-4" data-seo-section="journey-syllabus">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4">Learning Path</h2>
+      <div className="journey-syllabus" data-seo-section="journey-syllabus">
+        <h2 className="journey-syllabus__title">Learning Path</h2>
         
         {logicalSteps.length > 0 ? (
           logicalSteps.map((step, index: number) => {
@@ -570,20 +606,20 @@ export default function JourneyDetail() {
                   id={`step-${step.stepNumber}`}
                   tabIndex={-1}
                   className={cn(
-                    "scroll-mt-24 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
-                    isStepCompleted && "border-[#34d08c]/30 bg-[#34d08c]/5", // DS-OK: status ok — completed step
-                    isCurrentStep && !isStepCompleted && "border-primary/50 shadow-lg"
+                    "journey-step-card scroll-mt-24",
+                    isStepCompleted && "journey-step-card--complete",
+                    isCurrentStep && !isStepCompleted && "journey-step-card--current"
                   )}
                   data-testid={`card-step-${step.stepNumber}`}
                 >
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex items-start gap-3 sm:gap-4">
+                  <CardContent className="journey-step-card__content">
+                    <div className="journey-step-card__layout">
                       {/* Step Number/Status */}
                       <div className={cn(
-                        "flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm",
+                        "journey-step-card__number",
                         isStepCompleted
-                          ? "bg-[#34d08c] text-black" // DS-OK: status ok fill + on-accent ink
-                          : "bg-muted text-muted-foreground"
+                          ? "journey-step-card__number--complete"
+                          : "journey-step-card__number--pending"
                       )}>
                         {isStepCompleted ? (
                           <CheckCircle2 className="h-5 w-5" />
@@ -593,19 +629,19 @@ export default function JourneyDetail() {
                       </div>
 
                       {/* Step Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4 mb-2">
+                      <div className="journey-step-card__body min-w-0">
+                        <div className="journey-step-card__heading">
                           <div className="flex-1">
-                            <h3 className="text-base sm:text-lg font-semibold mb-1">
+                            <h3 className="journey-step-card__title">
                               {step.title}
                               {step.isOptional && (
-                                <Badge variant="outline" className="ml-2 text-xs">
+                                <Badge variant="chip" className="journey-step-card__optional ml-2 text-xs">
                                   Optional
                                 </Badge>
                               )}
                             </h3>
                             {step.description && (
-                              <p className="text-sm text-muted-foreground mb-3" data-seo-step-description>
+                              <p className="journey-step-card__description mb-3" data-seo-step-description>
                                 {step.description}
                               </p>
                             )}
@@ -614,9 +650,9 @@ export default function JourneyDetail() {
 
                         {/* Resource Links */}
                         {step.resources.length > 0 && (
-                          <div className="space-y-2 mb-4">
+                          <div className="journey-step-card__resources mb-4">
                             {step.resources.map((resource) => (
-                              <div key={resource.id} className="p-3 bg-muted/50 rounded-lg">
+                              <div key={resource.id} className="journey-resource">
                                 {/* Run3 audit R3-30: the resource title links to the
                                     internal detail page (keeps users in the journey
                                     flow); the external-link icon still opens the
@@ -624,7 +660,7 @@ export default function JourneyDetail() {
                                 <div className="flex items-center gap-1">
                                   <Link
                                     href={`/resource/${resource.id}`}
-                                    className="flex items-center gap-2 text-sm hover:text-primary transition-colors min-h-[44px] py-2 flex-1 min-w-0"
+                                    className="journey-resource__link flex items-center gap-2 text-sm min-h-[44px] py-2 flex-1 min-w-0"
                                     data-testid={`link-resource-${resource.id}`}
                                   >
                                     <BookOpen className="h-4 w-4 flex-shrink-0" />
@@ -645,7 +681,7 @@ export default function JourneyDetail() {
                                     href={resource.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+                                    className="journey-resource__external flex items-center justify-center min-h-[44px] min-w-[44px] flex-shrink-0"
                                     aria-label={`Open ${resource.title} on its source site (new tab)`}
                                     data-testid={`link-resource-external-${resource.id}`}
                                   >
@@ -662,7 +698,7 @@ export default function JourneyDetail() {
                                     the print stylesheet. */}
                                 {resource.description && (
                                   <p
-                                    className="text-xs text-muted-foreground mt-1 ml-6 line-clamp-2 sm:line-clamp-none"
+                                    className="journey-resource__description text-xs mt-1 ml-6 line-clamp-2 sm:line-clamp-none"
                                     title={resource.description}
                                   >
                                     {resource.description}
@@ -678,8 +714,8 @@ export default function JourneyDetail() {
                           <Button 
                             variant="outline"
                             className={cn(
-                              "min-h-[44px]",
-                              completeStepMutation.isPending && "opacity-60",
+                              "journey-step-card__complete min-h-[44px]",
+                              completeStepMutation.isPending && "journey-step-card__complete--pending",
                             )}
                             onClick={() => handleToggleStep(step.rowIds, true, step.stepNumber, index + 1)}
                             aria-disabled={completeStepMutation.isPending}
@@ -701,8 +737,8 @@ export default function JourneyDetail() {
                           <Button
                             variant="ghost"
                             className={cn(
-                              "min-h-[44px] px-2 text-[#34d08c] hover:text-[#34d08c]/80", // DS-OK: status ok
-                              completeStepMutation.isPending && "opacity-60",
+                              "journey-step-card__undo min-h-[44px] px-2",
+                              completeStepMutation.isPending && "journey-step-card__complete--pending",
                             )}
                             onClick={() => handleToggleStep(step.rowIds, false, step.stepNumber, index + 1)}
                             aria-disabled={completeStepMutation.isPending}
@@ -720,7 +756,7 @@ export default function JourneyDetail() {
               );
             })
         ) : (
-          <Alert>
+          <Alert className="journeys-alert">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               This journey doesn't have any steps yet. Check back later!
@@ -731,11 +767,11 @@ export default function JourneyDetail() {
 
       {/* Completion Message — DS-OK: status ok, journey-complete celebration surface */}
       {isCompleted && (
-        <Card className="mt-8 bg-gradient-to-r from-[#34d08c]/10 to-[#34d08c]/5 border-[#34d08c]/30">
-          <CardContent className="p-6 text-center">
-            <Trophy className="h-12 w-12 text-[#34d08c] mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">🎉 Congratulations!</h3>
-            <p className="text-muted-foreground">
+        <Card className="journey-completion-card mt-8">
+          <CardContent className="journey-completion-card__content p-6 text-center">
+            <Trophy className="journey-completion-card__icon" aria-hidden />
+            <h3 className="journey-completion-card__title">🎉 Congratulations!</h3>
+            <p className="journey-completion-card__copy">
               You've completed the "{journey.title}" learning journey!
             </p>
           </CardContent>

@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-09-13T05:31:19.285Z",
+  "base": "http://127.0.0.1:5000",
+  "siteOrigin": "https://awesome.video",
+  "mode": {
+    "gate": true,
+    "parity": true,
+    "limit": null
+  },
+  "corpus": {
+    "total": 2334,
+    "sitemap": 2325,
+    "probes": 9,
+    "fetchErrors": 0,
+    "byType": {
+      "home": 1,
+      "categories-hub": 1,
+      "journeys-hub": 1,
+      "static": 6,
+      "category": 79,
+      "subcategory": 107,
+      "sub-subcategory": 36,
+      "resource": 1816,
+      "tag": 273,
+      "journey": 5
+    }
+  },
+  "schema": {
+    "passRate": 1,
+    "failingUrls": 0,
+    "failureCount": 0,
+    "warningCount": 0,
+    "resourceEntityTypes": {
+      "CreativeWork": 1816
+    },
+    "journeysWithSyllabus": "5/5",
+    "collectionsWithItemListElement": 497,
+    "resourceEnrichment": {
+      "providerCount": 0,
+      "keywordsCount": 1047,
+      "aboutCount": 1816,
+      "isPartOfCount": 1816,
+      "itemListElementPages": 497
+    },
+    "crawlerJourneysWithSteps": "5/5"
+  },
+  "crawlerContent": {
+    "proseBytesByType": {
+      "home": {
+        "urls": 1,
+        "averageBytes": 467,
+        "medianBytes": 467,
+        "minimumBytes": 467,
+        "uniquePageRate": 1
+      },
+      "categories-hub": {
+        "urls": 1,
+        "averageBytes": 484,
+        "medianBytes": 484,
+        "minimumBytes": 484,
+        "uniquePageRate": 1
+      },
+      "journeys-hub": {
+        "urls": 1,
+        "averageBytes": 1010,
+        "medianBytes": 1010,
+        "minimumBytes": 1010,
+        "uniquePageRate": 1
+      },
+      "static": {
+        "urls": 6,
+        "averageBytes": 1039,
+        "medianBytes": 477,
+        "minimumBytes": 0,
+        "uniquePageRate": 0.6667
+      },
+      "category": {
+        "urls": 79,
+        "averageBytes": 4366,
+        "medianBytes": 4638,
+        "minimumBytes": 1477,
+        "uniquePageRate": 1
+      },
+      "subcategory": {
+        "urls": 107,
+        "averageBytes": 1612,
+        "medianBytes": 1166,
+        "minimumBytes": 408,
+        "uniquePageRate": 1
+      },
+      "sub-subcategory": {
+        "urls": 36,
+        "averageBytes": 1563,
+        "medianBytes": 1355,
+        "minimumBytes": 457,
+        "uniquePageRate": 1
+      },
+      "resource": {
+        "urls": 1816,
+        "averageBytes": 2548,
+        "medianBytes": 2687,
+        "minimumBytes": 1272,
+        "uniquePageRate": 1
+      },
+      "tag": {
+        "urls": 273,
+        "averageBytes": 2656,
+        "medianBytes": 2176,
+        "minimumBytes": 746,
+        "uniquePageRate": 1
+      },
+      "journey": {
+        "urls": 5,
+        "averageBytes": 4187,
+        "medianBytes": 4457,
+        "minimumBytes": 3431,
+        "uniquePageRate": 1
+      }
+    },
+    "taxonomyParentChildNearDuplicates": {
+      "threshold": 0.85,
+      "pairs": 119,
+      "nearDuplicates": 0,
+      "rate": 0,
+      "averageSimilarity": 0.0563,
+      "samples": []
+    }
+  },
+  "sitemapLastmod": {
+    "eligible": 2043,
+    "dated": 2043,
+    "invalid": 0,
+    "coverage": 1
+  },
+  "duplicates": {
+    "titleRate": 0.0017,
+    "titleDupUrls": 4,
+    "descriptionRate": 0,
+    "descriptionDupUrls": 0
+  },
+  "parity": {
+    "sampled": 20,
+    "failed": 0
+  }
+}

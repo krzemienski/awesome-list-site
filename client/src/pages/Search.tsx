@@ -1,4 +1,5 @@
 import { ResourceCardSkeleton } from "@/components/ui/skeletons";
+import "@/styles/pages/discovery.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -229,9 +230,9 @@ export default function Search() {
   const gotoPage = (n: number) => { setState(s => ({ ...s, page: n })); writeFilterParams({ page: n > 1 ? String(n) : null }, "push"); setPageNotice(null); pendingResultsFocusRef.current = true; window.scrollTo({ top: 0, behavior: "smooth" }); };
   const makePageHref = (n: number) => { const p = new URLSearchParams(window.location.search); n > 1 ? p.set("page", String(n)) : p.delete("page"); return `/search?${p.toString()}`; };
   const invalid = query.error instanceof ApiError && query.error.status === 400;
-  return <div className="space-y-6">
+  return <div className="discovery-page space-y-6">
     <SEOHead title={normalized ? `Search: ${normalized} — Awesome Video` : "Search — Awesome Video"} description="Search curated video development tools, libraries, players, codecs, and learning resources." noindex />
-    <header className="space-y-4"><div className="flex items-center gap-3"><SearchIcon className="h-6 w-6 text-[var(--accent)]" /><div><h1 className="display-h text-2xl sm:text-3xl">Search</h1><p className="text-sm text-muted-foreground">A precise index of tools, standards, and ideas for video developers.</p></div></div>
+    <header className="discovery-header space-y-4"><div className="flex items-center gap-3"><SearchIcon className="h-6 w-6 text-[var(--accent)]" /><div><h1 className="display-h discovery-title">Search</h1><p className="discovery-lede text-sm">A precise index of tools, standards, and ideas for video developers.</p></div></div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center"><div className="relative min-w-0 flex-1"><SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input ref={inputRef} value={input} onChange={e => { pristine.current = false; setInput(e.target.value); }} onMouseDown={() => { pristine.current = false; }} onKeyDown={e => { if (e.key === "/" && pristine.current && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); window.dispatchEvent(new Event("awesome:open-search-palette")); } if (e.key === "Escape" && input) { e.preventDefault(); setInput(""); } pristine.current = false; }} placeholder="Search resources..." className="min-h-11 pl-10" aria-label="Search resources" data-testid="input-search-page" /></div>
         <div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">Sort</span><Select value={state.sort} onValueChange={v => update("sort", v)}><SelectTrigger className="min-h-11 w-36" aria-label="Sort results" data-testid="select-search-sort"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(sortLabels).map(([v, text]) => <SelectItem key={v} value={v}>{text}</SelectItem>)}</SelectContent></Select></div></div>
     </header>

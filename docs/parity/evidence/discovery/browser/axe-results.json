@@ -1,0 +1,131 @@
+[
+  {
+    "screen": "categories",
+    "width": 375,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "categories",
+    "width": 1440,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "search-ffmpeg",
+    "width": 375,
+    "violations": [
+      {
+        "id": "landmark-main-is-top-level",
+        "impact": "moderate",
+        "nodes": 1
+      },
+      {
+        "id": "landmark-no-duplicate-main",
+        "impact": "moderate",
+        "nodes": 1
+      }
+    ],
+    "seriousCritical": []
+  },
+  {
+    "screen": "search-ffmpeg",
+    "width": 1440,
+    "violations": [
+      {
+        "id": "landmark-main-is-top-level",
+        "impact": "moderate",
+        "nodes": 1
+      },
+      {
+        "id": "landmark-no-duplicate-main",
+        "impact": "moderate",
+        "nodes": 1
+      }
+    ],
+    "seriousCritical": []
+  },
+  {
+    "screen": "tag-open-source",
+    "width": 375,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "tag-open-source",
+    "width": 1440,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "journeys",
+    "width": 375,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "journeys",
+    "width": 1440,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "journey-7",
+    "width": 375,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "journey-7",
+    "width": 1440,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "advanced",
+    "width": 375,
+    "violations": [
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "nodes": 1
+      }
+    ],
+    "seriousCritical": []
+  },
+  {
+    "screen": "advanced",
+    "width": 1440,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "nodes": 1
+      }
+    ],
+    "seriousCritical": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 5
+      }
+    ]
+  },
+  {
+    "screen": "recommendations",
+    "width": 375,
+    "violations": [],
+    "seriousCritical": []
+  },
+  {
+    "screen": "recommendations",
+    "width": 1440,
+    "violations": [],
+    "seriousCritical": []
+  }
+]

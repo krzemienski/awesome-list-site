@@ -1,0 +1,33 @@
+{
+  "auth": true,
+  "shareId": "X1CIZ-o_lY9WctDQbDRKOl9h",
+  "captures": [
+    {
+      "width": 375
+    },
+    {
+      "width": 768
+    },
+    {
+      "width": 1024
+    },
+    {
+      "width": 1440
+    }
+  ],
+  "axe": [
+    {
+      "width": 375,
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "violations": []
+    }
+  ],
+  "teardown": {
+    "localBefore": 1,
+    "localAfter": 0,
+    "clerkRemaining": 0
+  }
+}

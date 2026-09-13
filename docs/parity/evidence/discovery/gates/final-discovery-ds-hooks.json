@@ -1,0 +1,35 @@
+[
+  {
+    "route": "/journeys",
+    "h1": {
+      "total": 1,
+      "strays": []
+    },
+    "eyebrows": {
+      "total": 1,
+      "strays": []
+    }
+  },
+  {
+    "route": "/advanced",
+    "h1": {
+      "total": 1,
+      "strays": []
+    },
+    "eyebrows": {
+      "total": 4,
+      "strays": []
+    }
+  },
+  {
+    "route": "/recommendations",
+    "h1": {
+      "total": 1,
+      "strays": []
+    },
+    "eyebrows": {
+      "total": 0,
+      "strays": []
+    }
+  }
+]

@@ -1,0 +1,799 @@
+/*
+ * Journey discovery surfaces.
+ *
+ * The learning-path pages share the canonical discovery grammar (eyebrow,
+ * display heading, token-backed cards, chips, and explicit state panels) while
+ * keeping their composition local to these two routes.
+ */
+
+.journeys-page,
+.journey-detail-page {
+  width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--text);
+}
+
+.journeys-page {
+  max-width: var(--profile-page-measure, var(--content-max));
+  padding: var(--page-pad-y) var(--page-pad-x);
+}
+
+.journey-detail-page {
+  max-width: 900px;
+  padding: var(--page-pad-y) var(--page-pad-x);
+}
+
+.journeys-page__header {
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.journeys-page__header--loading {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.journeys-page__eyebrow,
+.journeys-state__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  font-weight: 600;
+  letter-spacing: var(--eyebrow-tracking);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.journeys-state__error-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 14px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  font-weight: 600;
+  letter-spacing: var(--eyebrow-tracking);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.journeys-page__eyebrow-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+}
+
+.journeys-page__title {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: clamp(32px, 4.5vw, 48px);
+}
+
+.journeys-page__lede {
+  max-width: 680px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: var(--body-leading);
+}
+
+.journeys-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.journeys-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.journeys-filter__label,
+.journeys-toolbar__count {
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.journeys-filter__label {
+  white-space: nowrap;
+}
+
+.journeys-filter__control {
+  width: 200px;
+  min-height: max(44px, var(--profile-control-height));
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.journeys-filter__control:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+.journeys-toolbar__count {
+  flex: 0 0 auto;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+}
+
+.journeys-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.journeys-page .journey-card {
+  min-width: 0;
+  overflow: hidden;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--motion-base) var(--motion-ease),
+    background var(--motion-base) ease,
+    border-color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease;
+}
+
+.journeys-page .journey-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+}
+
+.journeys-page .journey-card--enrolled {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+
+.journeys-page .journey-card__header {
+  min-width: 0;
+}
+
+.journeys-page .journey-card__topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+}
+
+.journey-card__topline,
+.journey-detail-card__topline {
+  min-width: 0;
+}
+
+.journeys-page .journey-card__icon,
+.journey-detail-page .journey-detail-card__icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  color: var(--accent);
+  stroke-width: 1.5;
+}
+
+.journeys-page .journey-card__title {
+  margin: 2px 0 8px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: 1.15;
+}
+
+.journey-card__title-link {
+  display: block;
+  min-height: 2.3em;
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition: color var(--motion-fast) ease;
+}
+
+.journey-card__title-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.journeys-page .journey-card__description {
+  min-height: 3.2em;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+.journeys-page .journey-card__content {
+  padding-top: 0;
+}
+
+.journey-card__details {
+  display: grid;
+  gap: 16px;
+}
+
+.journey-card__meta,
+.journey-detail-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.journeys-page .journey-card [data-ds="chip"],
+.journey-detail-page [data-ds="chip"] {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.journeys-page .journey-difficulty,
+.journey-detail-page .journey-difficulty {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+
+.journeys-page .journey-difficulty--beginner,
+.journey-detail-page .journey-difficulty--beginner {
+  border-color: color-mix(in srgb, var(--accent-2) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
+  color: var(--accent-2);
+}
+
+.journeys-page .journey-difficulty--intermediate,
+.journey-detail-page .journey-difficulty--intermediate {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+
+.journeys-page .journey-difficulty--advanced,
+.journey-detail-page .journey-difficulty--advanced {
+  border-color: color-mix(in srgb, var(--accent-2) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+  color: var(--accent-2);
+}
+
+.journey-card__progress {
+  display: grid;
+  gap: 8px;
+}
+
+.journey-card__progress-label,
+.journey-detail-card__progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.journey-card__progress-value,
+.journey-detail-card__progress-value {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.journey-card__progress-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+}
+
+.journey-card__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width var(--motion-slow) var(--motion-ease);
+}
+
+.journey-card__progress-copy,
+.journey-detail-card__progress-copy {
+  margin: 0;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+}
+
+.journeys-page .journey-card__footer {
+  padding-top: 0;
+}
+
+.journeys-page .journey-card__cta {
+  width: 100%;
+  min-height: 44px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  box-shadow: none;
+}
+
+.journeys-page .journey-card__cta:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  box-shadow: var(--shadow-accent);
+}
+
+.journeys-page .journey-card__cta--enrolled {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--accent);
+}
+
+.journeys-page .journey-card__cta--enrolled:hover {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+
+.journeys-page .journeys-state,
+.journey-detail-page .journeys-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 64px 24px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: center;
+}
+
+.journeys-page .journeys-state--error,
+.journey-detail-page .journeys-state--error {
+  border-color: color-mix(in srgb, var(--accent) 36%, var(--border));
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+}
+
+.journeys-page .journeys-state--empty {
+  min-height: 280px;
+  margin-top: 8px;
+}
+
+.journeys-page .journeys-state__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.journeys-page .journeys-state__icon {
+  width: 44px;
+  height: 44px;
+  color: var(--accent);
+  stroke-width: 1.5;
+}
+
+.journeys-page .journeys-state__title,
+.journey-detail-page .journeys-state__title {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: var(--display-leading);
+}
+
+.journeys-page .journeys-state__copy,
+.journey-detail-page .journeys-state__copy {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: var(--body-leading);
+}
+
+.journeys-page .journeys-state__action,
+.journey-detail-page .journeys-state__action {
+  min-height: 44px;
+  margin-top: 4px;
+}
+
+.journey-detail__back {
+  min-height: 44px;
+  margin-bottom: 24px;
+  padding-inline: 8px;
+  color: var(--text-2);
+}
+
+.journey-detail__back:hover {
+  color: var(--text);
+}
+
+.journey-detail-page .journey-detail-card,
+.journey-detail-page .journey-step-card,
+.journey-detail-page .journey-completion-card {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.journey-detail-page .journey-detail-card--hero {
+  margin-bottom: 32px;
+}
+
+.journey-detail-page .journey-detail-card__topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.journey-detail-page .journey-detail-card__icon {
+  width: 56px;
+  height: 56px;
+}
+
+.journey-detail-page .journey-detail-card__title {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: clamp(30px, 5vw, 44px);
+}
+
+.journey-detail-page .journey-detail-card__description {
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: var(--body-leading);
+}
+
+.journey-detail-page .journey-detail-card__content {
+  display: grid;
+  gap: 24px;
+}
+
+.journey-detail-card__rule {
+  margin: 0;
+  background: var(--hairline);
+}
+
+.journey-detail-card__progress {
+  display: grid;
+  gap: 10px;
+}
+
+.journey-detail-page .journey-detail-card__progress-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+}
+
+.journey-detail-page .journey-detail-card__progress-bar > div {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.journey-detail-page .journey-status--complete {
+  border-color: color-mix(in srgb, var(--accent-2) 42%, var(--border));
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+  color: var(--accent-2);
+}
+
+.journey-detail-page .journey-enroll-note,
+.journey-detail-page .journeys-alert {
+  border-color: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.journey-enroll-note a,
+.journey-enroll-note button {
+  color: var(--accent);
+}
+
+.journey-detail-card__start {
+  width: 100%;
+  min-height: 44px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.journey-detail-card__start:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  box-shadow: var(--shadow-accent);
+}
+
+.journey-syllabus {
+  display: grid;
+  gap: 16px;
+}
+
+.journey-syllabus__title {
+  margin: 0 0 4px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: var(--display-leading);
+}
+
+.journey-detail-page .journey-step-card {
+  scroll-margin-top: calc(var(--shell-header-h) + 24px);
+  transition:
+    background var(--motion-base) ease,
+    border-color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease;
+}
+
+.journey-detail-page .journey-step-card--current {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: var(--shadow-accent);
+}
+
+.journey-detail-page .journey-step-card--complete {
+  border-color: color-mix(in srgb, var(--accent-2) 34%, var(--border));
+  background: color-mix(in srgb, var(--accent-2) 6%, var(--surface));
+}
+
+.journey-step-card__content {
+  padding: 20px 24px;
+}
+
+.journey-step-card__layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.journey-step-card__number {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  font-weight: 600;
+}
+
+.journey-step-card__number--pending {
+  background: var(--surface-2);
+}
+
+.journey-step-card__number--complete {
+  border-color: var(--accent-2);
+  background: var(--accent-2);
+  color: var(--bg);
+}
+
+.journey-step-card__body {
+  flex: 1 1 auto;
+}
+
+.journey-step-card__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.journey-step-card__title {
+  margin: 0 0 4px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.journey-step-card__description {
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+.journey-step-card__optional {
+  vertical-align: middle;
+}
+
+.journey-step-card__resources {
+  display: grid;
+  gap: 8px;
+}
+
+.journey-resource {
+  min-width: 0;
+  padding: 8px 12px;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.journey-resource__link {
+  min-width: 0;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.journey-resource__link:hover,
+.journey-resource__external:hover {
+  color: var(--accent);
+}
+
+.journey-resource__external {
+  color: var(--text-2);
+}
+
+.journey-resource__description {
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.journey-step-card__complete,
+.journey-step-card__undo {
+  min-height: 44px;
+}
+
+.journey-step-card__complete {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--accent);
+}
+
+.journey-step-card__complete:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+
+.journey-step-card__undo {
+  color: var(--accent-2);
+}
+
+.journey-step-card__undo:hover {
+  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
+  color: var(--accent-2);
+}
+
+.journey-step-card__complete--pending {
+  opacity: 0.6;
+}
+
+.journey-completion-card {
+  border-color: color-mix(in srgb, var(--accent-2) 38%, var(--border));
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--accent-2) 11%, var(--surface)),
+    color-mix(in srgb, var(--accent) 5%, var(--surface))
+  );
+}
+
+.journey-completion-card__content {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.journey-completion-card__icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 4px;
+  color: var(--accent-2);
+}
+
+.journey-completion-card__title {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+}
+
+.journey-completion-card__copy {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.journey-detail-page--loading {
+  display: grid;
+  gap: 16px;
+}
+
+.journey-detail-skeleton__back {
+  width: 160px;
+  height: 44px;
+}
+
+.journey-detail-skeleton__title {
+  width: min(72%, 480px);
+  height: 48px;
+}
+
+.journey-detail-skeleton__lede {
+  width: 100%;
+  height: 88px;
+  margin-bottom: 16px;
+}
+
+.journey-detail-skeleton__steps {
+  display: grid;
+  gap: 16px;
+}
+
+.journey-detail-skeleton__step {
+  width: 100%;
+  height: 132px;
+}
+
+@media (max-width: 1100px) {
+  .journeys-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .journeys-page,
+  .journey-detail-page {
+    padding: 32px 20px;
+  }
+
+  .journeys-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .journeys-filter {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .journeys-filter__control {
+    width: 100%;
+  }
+
+  .journeys-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .journey-step-card__content {
+    padding: 18px 16px;
+  }
+
+  .journey-step-card__layout {
+    gap: 12px;
+  }
+
+  .journey-step-card__heading {
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journeys-page .journey-card,
+  .journey-detail-page .journey-step-card,
+  .journey-card__title-link,
+  .journey-card__progress-fill {
+    transition: none;
+  }
+}

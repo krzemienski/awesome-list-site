@@ -1,0 +1,106 @@
+{
+  "auth": true,
+  "captures": [
+    {
+      "name": "journey-7-signed",
+      "width": 375
+    },
+    {
+      "name": "journey-7-signed",
+      "width": 768
+    },
+    {
+      "name": "journey-7-signed",
+      "width": 1024
+    },
+    {
+      "name": "journey-7-signed",
+      "width": 1440
+    },
+    {
+      "name": "recommendations-signed",
+      "width": 375
+    },
+    {
+      "name": "recommendations-signed",
+      "width": 768
+    },
+    {
+      "name": "recommendations-signed",
+      "width": 1024
+    },
+    {
+      "name": "recommendations-signed",
+      "width": 1440
+    },
+    {
+      "name": "collection",
+      "width": 375
+    },
+    {
+      "name": "collection",
+      "width": 768
+    },
+    {
+      "name": "collection",
+      "width": 1024
+    },
+    {
+      "name": "collection",
+      "width": 1440
+    }
+  ],
+  "axe": [
+    {
+      "name": "journey-7-signed",
+      "width": 375,
+      "violations": []
+    },
+    {
+      "name": "journey-7-signed",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "name": "recommendations-signed",
+      "width": 375,
+      "violations": [
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "name": "recommendations-signed",
+      "width": 1440,
+      "violations": [
+        {
+          "id": "heading-order",
+          "impact": "moderate",
+          "nodes": 1
+        }
+      ]
+    },
+    {
+      "name": "collection",
+      "width": 375,
+      "violations": []
+    },
+    {
+      "name": "collection",
+      "width": 1440,
+      "violations": []
+    }
+  ],
+  "collection": {
+    "collectionId": 150,
+    "shareId": "TVaqT56XdxqiETYqUaANRA8g"
+  },
+  "teardown": {
+    "localBefore": 1,
+    "localAfter": 0,
+    "clerkRemaining": 0
+  }
+}

@@ -1,0 +1,46 @@
+[
+  {
+    "page": "Categories",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": []
+  },
+  {
+    "page": "Search",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": []
+  },
+  {
+    "page": "TagLanding",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": []
+  },
+  {
+    "page": "PublicCollection",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": []
+  },
+  {
+    "page": "Journeys",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": [
+      "button-retry-journeys"
+    ]
+  },
+  {
+    "page": "JourneyDetail",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": [
+      "button-retry-journey"
+    ]
+  },
+  {
+    "page": "Advanced",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": []
+  },
+  {
+    "page": "Recommendations",
+    "removedTestidExpressions": [],
+    "addedTestidExpressions": []
+  }
+]

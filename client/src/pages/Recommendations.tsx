@@ -10,6 +10,7 @@ import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { useAuth } from "@/hooks/useAuth";
 import type { RecommendationResult } from "@/hooks/useAIRecommendations";
+import "@/styles/pages/discovery-tools.css";
 
 export default function Recommendations() {
   const { isAuthenticated } = useAuth();
@@ -41,7 +42,7 @@ export default function Recommendations() {
   const anonRecommendations = Array.isArray(anonData) ? anonData : [];
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="discovery-tools-page discovery-tools-page--recommendations">
       <SEOHead
         title="Personalized Recommendations — Awesome Video"
         description="Personalized video development resource recommendations based on your interests and learning goals."
@@ -52,44 +53,47 @@ export default function Recommendations() {
           everyone and only admit further down that guests get popular picks.
           The heading and lead now describe what the visitor is actually about
           to see. */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Sparkles className="h-6 w-6 text-[var(--accent)] shrink-0" />
-          <h1 className="display-h text-2xl sm:text-3xl">
+      <header className="discovery-tools-masthead discovery-tools-recommendations-masthead">
+        <div className="discovery-tools-title-row">
+          <Sparkles className="discovery-tools-masthead-icon" aria-hidden="true" />
+          <h1 className="display-h discovery-tools-page-title">
             {isAuthenticated ? "Personalized Recommendations" : "Recommended Resources"}
           </h1>
         </div>
-        <p className="text-sm sm:text-base text-[color:var(--text-2)]">
+        <p className="discovery-tools-page-lede">
           {isAuthenticated
             ? "Get personalized resource recommendations based on your interests and learning goals."
             : "Popular picks from across the catalog. Sign in to tailor them to your interests and learning goals."}
         </p>
-      </div>
+      </header>
 
       {isAuthenticated ? (
-        <AIRecommendationsPanel showHeader={false} />
+        <div className="discovery-tools-owned-panel discovery-tools-ai-panel">
+          <AIRecommendationsPanel showHeader={false} />
+        </div>
       ) : (
         <>
           {/* Task #379 (uxv2-11): the sign-in gate used to occupy the first
               screen, so a guest scrolled past an offer they could not take up
               before reaching a single resource. The picks come first; the
               sign-in card follows them as the next step. */}
-          <div className="space-y-4">
-            <h2 className="font-sans font-semibold text-lg sm:text-xl tracking-tight">
+          <section className="discovery-tools-results-section">
+            <h2 className="discovery-tools-section-title">
               Start here
             </h2>
 
             {anonLoading ? (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="discovery-tools-recommendation-grid discovery-tools-recommendation-grid--anonymous">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <Skeleton key={i} className="h-40 rounded-lg" />
+                  <Skeleton key={i} className="discovery-tools-recommendation-skeleton" />
                 ))}
               </div>
             ) : anonError ? (
-              <Card>
-                <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
-                  <AlertCircle className="h-8 w-8 text-[var(--accent)]" />
-                  <p className="text-sm text-muted-foreground">
+              <Card className="discovery-tools-state-card">
+                <CardContent className="discovery-tools-state discovery-tools-state--error">
+                  <span className="chip bad discovery-tools-state-badge">Error · Recommendations</span>
+                  <AlertCircle className="discovery-tools-state-icon" aria-hidden="true" />
+                  <p className="discovery-tools-state-copy">
                     We couldn&apos;t load recommendations right now.
                   </p>
                   <Button variant="outline" onClick={() => void refetch()} data-testid="button-retry-recommendations">
@@ -98,13 +102,16 @@ export default function Recommendations() {
                 </CardContent>
               </Card>
             ) : anonRecommendations.length === 0 ? (
-              <Card>
-                <CardContent className="py-8 text-center text-sm text-muted-foreground">
+              <Card className="discovery-tools-state-card">
+                <CardContent className="discovery-tools-state discovery-tools-state--empty">
+                  <span className="eyebrow discovery-tools-state-eyebrow">No recommendations</span>
+                  <p className="discovery-tools-state-copy">
                   No recommendations available yet. Browse the categories on the home page to get started.
+                  </p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="discovery-tools-recommendation-grid discovery-tools-recommendation-grid--anonymous">
                 {anonRecommendations.map((rec) => (
                   <ResourceCard
                     key={rec.resource.id}
@@ -119,20 +126,20 @@ export default function Recommendations() {
                 ))}
               </div>
             )}
-          </div>
+          </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Card className="discovery-tools-panel discovery-tools-signin-panel">
+            <CardHeader className="discovery-tools-panel-header">
+              <CardTitle className="discovery-tools-panel-title">
                 <LogIn className="h-5 w-5" />
                 Sign in to personalize these picks
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="discovery-tools-panel-description">
                 Signed-in recommendations use your skill level, topics, goals, and the
                 feedback you leave on resources.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="discovery-tools-panel-content">
               {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
               <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
                 <Link href="/sign-in">
