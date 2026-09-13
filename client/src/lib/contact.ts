@@ -17,6 +17,14 @@ export interface ContactFormConfig {
 }
 
 export interface ContactPublicConfig {
+  site: {
+    title: string;
+    description: string;
+    url: string;
+    author: string;
+    repoUrl: string;
+    repoBranch: string;
+  };
   contact: {
     email: ContactDestination;
     issues: ContactDestination;

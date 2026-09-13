@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   LearningPreferencesUpdate,
   LearningPreferencesValues,
+  HomeLayout,
   OnboardingStatus,
 } from "@shared/onboarding-values";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -21,6 +22,7 @@ export interface LearningPreferencesRecord extends LearningPreferencesValues {
 
 interface LearningPreferencesResponse {
   preferences: LearningPreferencesRecord | null;
+  homeLayout: HomeLayout;
   revision: number | null;
 }
 
@@ -31,6 +33,9 @@ function parseLearningPreferencesResponse(
     throw new Error("Invalid learning preferences response");
   }
   const response = value as Partial<LearningPreferencesResponse>;
+  if (response.homeLayout !== "index" && response.homeLayout !== "curated") {
+    throw new Error("Invalid learning preferences response");
+  }
   if (
     response.revision !== null
     && response.revision !== undefined
@@ -47,6 +52,7 @@ function parseLearningPreferencesResponse(
   }
   return {
     preferences: response.preferences ?? null,
+    homeLayout: response.homeLayout,
     revision: response.revision ?? null,
   };
 }

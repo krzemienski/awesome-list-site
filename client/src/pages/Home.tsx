@@ -1,49 +1,41 @@
-import { TaxonomyCardSkeleton, PageHeaderSkeleton } from "@/components/ui/skeletons";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { Link } from "wouter";
+import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { TaxonomyCard } from "@/components/ui/taxonomy-card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CardContent } from "@/components/ui/card";
-import { Category, Resource } from "@/types/awesome-list";
-import { processAwesomeListData } from "@/lib/parser";
+import { Category, Resource, Subcategory } from "@/types/awesome-list";
 import {
-  fetchStaticAwesomeList,
+  fetchKindCounts,
+  STRIP_KINDS,
   type AwesomeListNav,
   type AwesomeListNavNode,
+  type ResourceKindCounts,
 } from "@/lib/static-data";
+import {
+  resolveResourceKindFrom,
+  type ResourceKind,
+} from "@shared/resourceKinds";
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import { useAuth } from "@/hooks/useAuth";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
-import {
-  FileText,
-  Video,
-  Code,
-  Play,
-  Settings,
-  Package,
-  Server,
-  Layers,
-  Users,
-  Sparkles,
-  LogIn,
-  Clapperboard,
-} from "lucide-react";
-
-// Run23 R-06: Home renders from the ~few-KB nav tree (+ /api/tags for the
-// filter panel). The 3.1MB corpus is fetched lazily ONLY when a tag filter is
-// active (per-category match counts need per-resource tags).
+import { processAwesomeListData } from "@/lib/parser";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { DEFAULT_LEARNING_PREFERENCES } from "@shared/onboarding-values";
+import { useHomeLayout } from "@/components/home/use-home-layout";
+import HomePresentation, {
+  type HomeCategoryView,
+  type HomeStats,
+} from "@/components/home/HomePresentation";
+import "@/styles/pages/home.css";
 
-// Account-only home features are separate from the anonymous landing path.
-// Their imports start only after auth resolves true; the route-level error
-// boundary in App still provides the established one-shot chunk recovery UI.
+// Account-only home features remain available in an explicit account context
+// (?context=account or ?account=1). Keeping these chunks and their UI out of the
+// default index preserves the canonical reference-book geometry for anonymous
+// and signed-in visitors alike.
 const AIRecommendationsPanel = lazy(
   () => import("@/components/ui/ai-recommendations-panel"),
 );
@@ -82,13 +74,26 @@ interface HomeProps {
   navLoading: boolean;
 }
 
-// Unified card shape whether the grid renders from the nav tree (default) or
-// the corpus (tag-filter mode).
+interface HomeApiResource extends Resource {
+  // Public /api/home currently exposes this additive convenience flag. The
+  // featured list itself remains authoritative, so this is optional here.
+  featured?: boolean;
+}
+
+interface HomeApiResponse {
+  total: number;
+  approvedThisWeek: number;
+  featuredCount: number;
+  recent: HomeApiResource[];
+  featured: HomeApiResource[];
+}
+
 interface DisplayCategory {
   name: string;
   slug: string;
-  displayCount: number;
+  count: number;
   teaser?: { title: string; description: string };
+  subcategories: AwesomeListNavNode[];
 }
 
 const EXCLUDED_CATEGORY_NAMES = ["Contributing", "License", "External Links", "Anti-features"];
@@ -102,305 +107,222 @@ function isRealCategory(name: string): boolean {
 }
 
 function navTotalCount(node: AwesomeListNavNode): number {
-  let total = node.resourceCount || 0;
-  for (const sub of node.subcategories || []) total += navTotalCount(sub);
-  for (const ss of node.subSubcategories || []) total += navTotalCount(ss);
+  let total = node.resourceCount ?? 0;
+  for (const sub of node.subcategories ?? []) total += navTotalCount(sub);
+  for (const nested of node.subSubcategories ?? []) total += navTotalCount(nested);
   return total;
 }
 
-const categoryIcons: { [key: string]: any } = {
-  "Intro & Learning": FileText,
-  "Protocols & Transport": Server,
-  "Encoding & Codecs": Code,
-  "Players & Clients": Play,
-  "Media Tools": Clapperboard,
-  "Standards & Industry": Package,
-  "Infrastructure & Delivery": Layers,
-  "General Tools": Settings,
-  "Community & Events": Users,
+function countSubcategories(categories: AwesomeListNavNode[]): number {
+  return categories.reduce(
+    (total, category) => total + (category.subcategories?.length ?? 0),
+    0,
+  );
+}
+
+function countNestedGroups(categories: AwesomeListNavNode[]): number {
+  return categories.reduce((total, category) => {
+    const direct = category.subSubcategories?.length ?? 0;
+    const nested = (category.subcategories ?? []).reduce(
+      (subtotal, subcategory) => subtotal + (subcategory.subSubcategories?.length ?? 0),
+      0,
+    );
+    return total + direct + nested;
+  }, 0);
+}
+
+const categoryMarks: Record<string, string> = {
+  "community-events": "◈",
+  "encoding-codecs": "◇",
+  "general-tools": "◆",
+  "infrastructure-delivery": "▣",
+  "intro-learning": "▤",
+  "media-tools": "▥",
+  "players-clients": "▶",
+  "protocols-transport": "⟁",
+  "standards-industry": "◉",
 };
 
-function getTotalResourceCount(item: any): number {
-  let total = item.resources?.length || 0;
-  if (item.subcategories) {
-    total += item.subcategories.reduce((sum: number, sub: any) => sum + getTotalResourceCount(sub), 0);
-  }
-  if (item.subSubcategories) {
-    total += item.subSubcategories.reduce((sum: number, subSub: any) => sum + getTotalResourceCount(subSub), 0);
-  }
-  return total;
+function categoryIcon(name: string, slug: string): string {
+  return categoryMarks[slug] ?? name.slice(0, 1).toUpperCase() ?? "◆";
 }
 
 function getAllResources(category: Category): Resource[] {
-  let all = [...(category.resources || [])];
-  if (category.subcategories) {
-    for (const sub of category.subcategories) {
-      all = all.concat(sub.resources || []);
-      if (sub.subSubcategories) {
-        for (const ss of sub.subSubcategories) {
-          all = all.concat(ss.resources || []);
-        }
-      }
+  let all = [...(category.resources ?? [])];
+  for (const subcategory of category.subcategories ?? []) {
+    all = all.concat(subcategory.resources ?? []);
+    for (const nested of subcategory.subSubcategories ?? []) {
+      all = all.concat(nested.resources ?? []);
     }
   }
   return all;
 }
 
-export default function Home({ nav, navLoading }: HomeProps) {
-  const { isAuthenticated } = useAuth();
-  const { toast } = useToast();
-  const {
-    preferences,
-    isLoading: preferencesLoading,
-    savePreferences: saveLearningPreferences,
-    isSaving: dismissingPreferences,
-  } = useLearningPreferences();
-  const showOnboardingInvitation =
-    isAuthenticated &&
-    !preferencesLoading &&
-    (!preferences ||
-      preferences.onboardingStatus === "not_started" ||
-      preferences.onboardingStatus === "in_progress");
+function getAllSubcategoryResources(subcategory: Subcategory): Resource[] {
+  let all = [...(subcategory.resources ?? [])];
+  for (const nested of subcategory.subSubcategories ?? []) {
+    all = all.concat(nested.resources ?? []);
+  }
+  return all;
+}
 
-  // BUG-047 (run13): the register flow lands here with ?welcome=1 after its
-  // full-page nav (which drops any in-flight toast). Greet once, then strip
-  // the param so refreshes don't re-fire.
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("welcome") === "1") {
-      toast({
-        title: "Welcome to Awesome Video!",
-        description:
-          "Your account is ready. Bookmark resources, track journeys, and submit your own finds.",
-      });
-      params.delete("welcome");
-      const qs = params.toString();
-      window.history.replaceState(
-        null,
-        "",
-        `${window.location.pathname}${qs ? `?${qs}` : ""}`,
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+function resourceMatchesTags(resource: Resource, selectedTags: string[]): boolean {
+  const tags = (Array.isArray(resource.tags)
+    ? resource.tags
+    : Array.isArray(resource.metadata?.tags)
+      ? resource.metadata.tags
+      : []
+  ).filter((tag): tag is string => typeof tag === "string").map(normalizeTag);
+  const normalizedSelectedTags = selectedTags.map(normalizeTag);
+  return normalizedSelectedTags.some((tag) => tags.includes(tag));
+}
 
-  // BUG-017 (run13): tag filters survive refresh + are deep-linkable via
-  // ?tags=a,b (same replaceState pattern as ?sort= below). ResourceDetail tag
-  // badges link here as /?tags=<tag>.
-  // BUG-064 (run27): shared parser — repeated ?tags=A&tags=B, the ?tag=
-  // alias, comma lists, and whitespace/empty chunks all resolve identically
-  // on every page that accepts a tag filter (Home previously read only the
-  // first ?tags= occurrence, silently dropping the rest).
-  const [selectedTags, setSelectedTagsState] = useState<string[]>(() =>
-    parseTagsParam(new URLSearchParams(window.location.search)),
+function resourceMatchesFilters(
+  resource: Resource,
+  selectedTags: string[],
+  selectedKind: ResourceKind | null,
+): boolean {
+  const matchesTags =
+    selectedTags.length === 0 || resourceMatchesTags(resource, selectedTags);
+  const resolvedKind =
+    resource.resolvedKind ??
+    resolveResourceKindFrom({
+      storedKind: resource.kind,
+      tags: resource.tags ?? resource.metadata?.tags,
+      taxonomy: [
+        resource.category,
+        resource.subcategory,
+        resource.subSubcategory,
+        ...(resource.metadata?.sourceCategories ?? []),
+      ],
+    }).kind;
+  const matchesKind = selectedKind === null || resolvedKind === selectedKind;
+  return matchesTags && matchesKind;
+}
+
+function truncateAtWord(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.substring(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > max * 0.5 ? cut.substring(0, lastSpace) : cut).replace(/[\s.,;:!?]+$/, "")}…`;
+}
+
+function HomeSkeleton({
+  layout,
+  nav,
+}: {
+  layout: "index" | "curated";
+  nav?: AwesomeListNav;
+}) {
+  const knownCategories = (nav?.categories ?? []).filter((category) =>
+    isRealCategory(category.name),
   );
+  const categorySkeletons =
+    knownCategories.length > 0
+      ? knownCategories
+      : Array.from({ length: 9 }, () => undefined);
 
-  // BUG-064 (run27): a present-but-empty tag filter (?tags=+++ or ?tags=)
-  // used to be silently ignored — surface a small dismissible note so the
-  // visitor knows their link's filter didn't apply.
-  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return (
-      (params.has("tags") || params.has("tag")) &&
-      parseTagsParam(params).length === 0
-    );
-  });
-
-  const setSelectedTags = (next: string[]) => {
-    setSelectedTagsState(next);
-    // Run22 BUG-016: push (not replace) so Back steps through filter changes.
-    writeFilterParams({ tags: next.length === 0 ? null : next.join(",") });
-  };
-  // R2-M25: sort survives refresh via ?sort= URL param. wouter's useLocation()
-  // is path-only, so read/write window.location.search directly (no
-  // navigation, no og-middleware impact — the server only keys off ?page=).
-  const VALID_SORTS = ["default", "name-asc", "name-desc", "count-desc", "count-asc"];
-  const [sortBy, setSortBy] = useState(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get("sort");
-    return fromUrl && VALID_SORTS.includes(fromUrl) ? fromUrl : "default";
-  });
-
-  const handleSortChange = (next: string) => {
-    setSortBy(next);
-    // Run22 BUG-016: push (not replace) so Back steps through sort changes.
-    writeFilterParams({ sort: next === "default" ? null : next });
-  };
-
-  // Run22 BUG-016: Back/Forward re-read the query into state so each history
-  // step visibly reverses/restores one tag/sort change.
-  usePopstateParams((params) => {
-    // BUG-064 (run27): same shared parser as the initializer.
-    setSelectedTagsState(parseTagsParam(params));
-    const s = params.get("sort");
-    setSortBy(s && VALID_SORTS.includes(s) ? s : "default");
-  });
-
-  // Run23 R-06: corpus is a lazy dependency — only fetched once a tag filter
-  // activates (deep-link ?tags= or a chip click). Same query key as the
-  // listing routes, so navigating here from a category page reuses the cache.
-  const tagFilterActive = selectedTags.length > 0;
-  const {
-    data: rawCorpus,
-    isLoading: corpusLoading,
-    error: corpusError,
-  } = useQuery({
-    queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60,
-    enabled: tagFilterActive,
-  });
-  const awesomeList = rawCorpus ? processAwesomeListData(rawCorpus) : undefined;
-
-  // Filter-panel tag list comes from /api/tags (same SQL normalization the
-  // old client-side fold mirrored) — no corpus needed to SHOW the panel.
-  const { data: tagsData } = useQuery<{ total: number; tags: { tag: string; count: number }[] }>({
-    queryKey: ["/api/tags"],
-    staleTime: 1000 * 60 * 5,
-  });
-  const availableTags = tagsData?.tags ?? [];
-
-  // Nav-derived categories (default, no-filter render path). Counts come from
-  // the single deduplicated tree (same source as the sidebar, category pages,
-  // and SSR) so every surface agrees.
-  const navCategories = useMemo<DisplayCategory[]>(() => {
-    if (!nav?.categories) return [];
-    return nav.categories
-      .filter((cat) => isRealCategory(cat.name) && navTotalCount(cat) > 0)
-      .map((cat) => ({
-        name: cat.name,
-        slug: cat.slug || "",
-        displayCount: navTotalCount(cat),
-        teaser: cat.teaser,
-      }));
-  }, [nav?.categories]);
-
-  // Corpus-derived categories (tag-filter render path only).
-  const corpusBaseCategories = useMemo(() => {
-    if (!awesomeList?.categories) return [] as Category[];
-    return awesomeList.categories.filter(
-      (cat) => getTotalResourceCount(cat) > 0 && isRealCategory(cat.name)
-    );
-  }, [awesomeList?.categories]);
-
-  const filteredCategories = useMemo<DisplayCategory[]>(() => {
-    let cats: DisplayCategory[];
-    if (!tagFilterActive) {
-      cats = [...navCategories];
-    } else {
-      cats = corpusBaseCategories
-        .map((cat) => {
-          const allRes = getAllResources(cat);
-          const matchCount = allRes.filter((r: any) => {
-            const tags = (r.tags || r.metadata?.tags || []).map(normalizeTag);
-            return selectedTags.some((t) => tags.includes(normalizeTag(t)));
-          }).length;
-          const firstResource = cat.resources[0];
-          return {
-            name: cat.name,
-            slug: cat.slug || "",
-            displayCount: matchCount,
-            teaser: firstResource
-              ? { title: firstResource.title, description: firstResource.description || "" }
-              : undefined,
-          };
-        })
-        .filter((c) => c.displayCount > 0);
-    }
-
-    switch (sortBy) {
-      case "name-asc":
-        cats.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "name-desc":
-        cats.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case "count-desc":
-        cats.sort((a, b) => b.displayCount - a.displayCount);
-        break;
-      case "count-asc":
-        cats.sort((a, b) => a.displayCount - b.displayCount);
-        break;
-    }
-
-    return cats;
-  }, [tagFilterActive, navCategories, corpusBaseCategories, selectedTags, sortBy]);
-
-  // Total comes from the same deduplicated tree as the per-category counts, the
-  // sidebar, and SSR — one source of truth, so the sum of the cards equals the
-  // headline total (the raw resources table double-counts near-duplicate URLs).
-  const totalResourceCount = useMemo(() => {
-    return navCategories.reduce((sum, cat) => sum + cat.displayCount, 0);
-  }, [navCategories]);
-
-  // Grid busy-state: nav still loading, or a tag filter is waiting on the
-  // lazily-fetched corpus.
-  const isLoading = navLoading || (tagFilterActive && !awesomeList && corpusLoading);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6" aria-busy={true} aria-live="polite">
-        {/* BUG-031 (run22): head swaps with the route immediately — default
-            brand head while the catalog loads. */}
-        <SEOHead />
-        <div className="space-y-4">
-          <PageHeaderSkeleton />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <TaxonomyCardSkeleton key={i} />
+  return (
+    <div className="home-page" aria-busy="true" aria-live="polite" data-testid="home-skeleton">
+      <div className="home-meta-row">
+        <div className="home-skeleton-line home-skeleton-eyebrow" />
+        <div className="home-skeleton-kinds">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div className="home-skeleton-chip" key={index} />
+          ))}
+        </div>
+      </div>
+      <div className="home-stat-strip home-stat-strip-skeleton">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div className="home-stat-cell" key={index}>
+            <div className="home-skeleton-line home-skeleton-stat-label" />
+            <div className="home-skeleton-line home-skeleton-stat-value" />
+            <div className="home-skeleton-line home-skeleton-stat-sub" />
+          </div>
+        ))}
+      </div>
+      {layout === "index" ? (
+        <div className="home-index-grid home-index-grid-skeleton">
+          <div className="home-category-grid">
+            {categorySkeletons.map((category, index) => (
+              <div className="home-category-section" key={category?.slug ?? index}>
+                <div className="home-skeleton-line home-skeleton-category" />
+                {(category?.subcategories ?? Array.from({ length: 3 }, () => undefined)).map(
+                  (_, row) => (
+                    <div className="home-skeleton-line home-skeleton-row" key={row} />
+                  ),
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="home-skeleton-rail">
+            <div className="home-skeleton-line home-skeleton-rail-heading" />
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div className="home-skeleton-line home-skeleton-recent" key={index} />
+            ))}
+            <div className="home-skeleton-contribute" />
+          </div>
+        </div>
+      ) : (
+        <div className="home-curated-skeleton">
+          <div className="home-skeleton-line home-skeleton-section-heading" />
+          <div className="home-resource-grid">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div className="home-skeleton-resource-card" key={index}>
+                <div className="home-skeleton-line home-skeleton-card-title" />
+                <div className="home-skeleton-line home-skeleton-card-copy" />
+                <div className="home-skeleton-line home-skeleton-card-copy short" />
+              </div>
+            ))}
+          </div>
+          <div className="home-skeleton-line home-skeleton-section-heading" />
+          <div className="home-skeleton-recent-table">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div className="home-skeleton-line home-skeleton-recent" key={index} />
+            ))}
+          </div>
+          <div className="home-skeleton-line home-skeleton-section-heading" />
+          <div className="home-curated-category-grid">
+            {categorySkeletons.map((category, index) => (
+              <div className="home-skeleton-resource-card" key={category?.slug ?? index}>
+                <div className="home-skeleton-line home-skeleton-card-title" />
+                <div className="home-skeleton-line home-skeleton-card-copy short" />
+              </div>
             ))}
           </div>
         </div>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
+}
 
-  if (!nav || (tagFilterActive && !awesomeList && corpusError)) {
-    // NB-055 (run18): the catalog error card previously surfaced raw internals
-    // (the "/api/awesome-list (attempt 2/2)" fetch string). Show friendly,
-    // non-technical copy plus a Retry action instead — no endpoint paths or
-    // attempt counters leak into user-visible UI here.
-    return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <h1 className="display-h text-2xl mb-4">We couldn't load the catalog</h1>
-          <p className="text-muted-foreground mb-6">
-            We couldn't load the catalog. Please try again.
-          </p>
-          <Button onClick={() => window.location.reload()} data-testid="button-retry-catalog">
-            Retry
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
+function CatalogError({ onRetry, message }: { onRetry: () => void; message: string }) {
   return (
-    <div className="space-y-6">
-      {/* Home title/description counts MUST read the same flat tree arrays the
-          server reads (data.resources.length / data.categories.length in
-          og-middleware), NOT the filtered per-category sum (totalResourceCount) —
-          otherwise the crawl-pass and render-pass <title> could disagree.
-          Run23 R-06: nav.totalResources IS data.resources.length and
-          nav.categories is the same unfiltered array, so parity holds. */}
-      <SEOHead
-        title={homeSeoTitle(nav.totalResources)}
-        description={homeSeoDescription(nav.totalResources, nav.categories.length)}
-      />
+    <div className="home-error" role="alert">
+      <h1 className="display-h">We couldn&apos;t load the catalog</h1>
+      <p>{message}</p>
+      <Button onClick={onRetry} data-testid="button-retry-catalog">
+        Retry
+      </Button>
+    </div>
+  );
+}
 
-      <div className="space-y-3 pt-2 sm:pt-4">
-        <h1 className="display-h text-[var(--text)] text-3xl sm:text-4xl">
-          Awesome Video Resources
-        </h1>
-        <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-3xl">
-          {/* BUG-027 (run14): with a tag filter active BOTH numbers reflect the
-              filter — mixing a filtered category count with the global resource
-              total read as nonsense ("7 categories with 2,140 resources"). */}
-          {selectedTags.length > 0
-            ? `Showing ${filteredCategories.reduce((sum, c) => sum + c.displayCount, 0).toLocaleString()} matching resource${filteredCategories.reduce((sum, c) => sum + c.displayCount, 0) === 1 ? "" : "s"} across ${filteredCategories.length} categor${filteredCategories.length === 1 ? "y" : "ies"}.`
-            : `Explore ${filteredCategories.length} categories with ${totalResourceCount.toLocaleString()} curated resources.`}
-        </p>
-      </div>
-
+function AccountFeatures({
+  isAuthenticated,
+  showOnboardingInvitation,
+  preferences,
+  saveLearningPreferences,
+  dismissingPreferences,
+}: {
+  isAuthenticated: boolean;
+  showOnboardingInvitation: boolean;
+  preferences: ReturnType<typeof useLearningPreferences>["preferences"];
+  saveLearningPreferences: ReturnType<typeof useLearningPreferences>["savePreferences"];
+  dismissingPreferences: boolean;
+}) {
+  return (
+    <div className="home-account-context" data-testid="home-account-context">
       {isAuthenticated ? (
         <Suspense
           fallback={<AccountFeatureFallback label="Loading your learning progress" />}
@@ -409,27 +331,6 @@ export default function Home({ nav, navLoading }: HomeProps) {
         </Suspense>
       ) : null}
 
-      {/* BUG-064 (run27): honest feedback when the link carried a tag param
-          that parsed to nothing (?tags=+++ / ?tags=) — previously the page
-          rendered unfiltered with no hint. */}
-      {emptyTagParamNotice && selectedTags.length === 0 && (
-        <div
-          className="flex flex-wrap items-center justify-between gap-2 border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] px-4 py-2 text-sm text-[color:var(--text-2)]"
-          role="status"
-          data-testid="notice-empty-tag-param"
-        >
-          <span>The tag filter in the link you followed was empty, so it was ignored.</span>
-          <button
-            type="button"
-            className="underline underline-offset-2 min-h-8"
-            onClick={() => setEmptyTagParamNotice(false)}
-            data-testid="button-dismiss-empty-tag-param"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
       {showOnboardingInvitation ? (
         <Card
           className="border-[var(--accent)] bg-[var(--surface-2)]"
@@ -437,9 +338,7 @@ export default function Home({ nav, navLoading }: HomeProps) {
         >
           <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="min-w-0">
-              <p className="eyebrow">
-                Optional · about two minutes
-              </p>
+              <p className="eyebrow">Optional · about two minutes</p>
               <h2 className="mt-1 font-sans text-lg font-semibold">
                 Make personalized recommendations more relevant
               </h2>
@@ -470,11 +369,9 @@ export default function Home({ nav, navLoading }: HomeProps) {
                       preferences?.preferredCategories ??
                       DEFAULT_LEARNING_PREFERENCES.preferredCategories,
                     skillLevel:
-                      preferences?.skillLevel ??
-                      DEFAULT_LEARNING_PREFERENCES.skillLevel,
+                      preferences?.skillLevel ?? DEFAULT_LEARNING_PREFERENCES.skillLevel,
                     learningGoals:
-                      preferences?.learningGoals ??
-                      DEFAULT_LEARNING_PREFERENCES.learningGoals,
+                      preferences?.learningGoals ?? DEFAULT_LEARNING_PREFERENCES.learningGoals,
                     preferredResourceTypes:
                       preferences?.preferredResourceTypes ??
                       DEFAULT_LEARNING_PREFERENCES.preferredResourceTypes,
@@ -494,113 +391,22 @@ export default function Home({ nav, navLoading }: HomeProps) {
         </Card>
       ) : null}
 
-      <Suspense fallback={<FilterControlsFallback />}>
-        <AdvancedFilter
-          selectedTags={selectedTags}
-          sortBy={sortBy}
-          availableTags={availableTags}
-          onTagsChange={setSelectedTags}
-          onSortChange={handleSortChange}
-        />
-      </Suspense>
-
-      {filteredCategories.length === 0 ? (
-        <div
-          className="border border-[var(--border)] rounded-[var(--radius)] bg-[var(--surface)] p-8 text-center"
-          data-testid="empty-categories"
-        >
-          <p className="text-sm text-[color:var(--text-2)] mb-3">
-            No categories match the selected tags.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSelectedTags([])}
-            data-testid="button-clear-filters"
-          >
-            Clear filters
-          </Button>
-        </div>
-      ) : (
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-        data-testid="list-categories"
-      >
-        {filteredCategories.map((category) => {
-          const Icon = categoryIcons[category.name] || FileText;
-          const totalCount = category.displayCount;
-          // Run23 R-06: teaser comes from the nav payload (default path) or
-          // the corpus (tag-filter path) — same {title, description} shape.
-          const teaser = category.teaser;
-          // R2-M23: truncate on a word boundary so cards never end mid-word
-          // like "faster tha...".
-          const truncateAtWord = (text: string, max: number) => {
-            if (text.length <= max) return text;
-            const cut = text.substring(0, max);
-            const lastSpace = cut.lastIndexOf(" ");
-            return `${(lastSpace > max * 0.5 ? cut.substring(0, lastSpace) : cut).replace(/[\s.,;:!?]+$/, "")}…`;
-          };
-          const description = teaser?.description
-            ? truncateAtWord(teaser.description, 90)
-            : "";
-
-          return (
-            <TaxonomyCard
-              key={category.slug}
-              // BUG-025 (run14): active tag filter survives the drill-down —
-              // Category reads ?tags= on mount, so the chip journey ends on a
-              // tag-filtered resource list instead of silently unfiltering.
-              href={`/category/${category.slug}${selectedTags.length > 0 ? `?tags=${encodeURIComponent(selectedTags.join(","))}` : ""}`}
-              name={category.name}
-              count={totalCount}
-              icon={Icon}
-              ariaLabel={`View ${category.name} category with ${totalCount} resources`}
-              linkTestId={`link-category-${category.slug}`}
-              countTestId={`badge-count-${category.slug}`}
-              extra={
-                // Run19 BUG-016: the teaser is one resource's blurb, not a
-                // category description — label it so it can't read as
-                // category copy.
-                description && teaser ? (
-                  <CardDescription
-                    className="line-clamp-2 text-xs"
-                    data-testid={`text-category-teaser-${category.slug}`}
-                  >
-                    <span className="font-medium text-foreground/70">
-                      Featured: {teaser.title} —
-                    </span>{" "}
-                    {description}
-                  </CardDescription>
-                ) : undefined
-              }
-            />
-          );
-        })}
-      </div>
-      )}
-
-      <div className="mt-8 sm:mt-12">
-        <div className="mb-4 sm:mb-6 space-y-2">
+      <div className="home-account-recommendations">
+        <div className="mb-4 space-y-2">
           <Link
             href="/recommendations"
-            className="flex items-center gap-2 sm:gap-3 no-underline text-inherit hover:text-[var(--accent)] transition-colors w-fit"
+            className="flex w-fit items-center gap-2 text-inherit no-underline transition-colors hover:text-[var(--accent)] sm:gap-3"
             data-testid="link-recommendations-heading"
           >
-            <Sparkles className="h-6 w-6 text-[var(--accent)] shrink-0" />
-            <h2 className="font-sans font-bold text-2xl sm:text-3xl tracking-tight">
+            <h2 className="font-sans text-2xl font-bold tracking-tight sm:text-3xl">
               Personalized Recommendations
             </h2>
           </Link>
-          <p className="text-sm sm:text-base text-[color:var(--text-2)]">
+          <p className="text-sm text-[color:var(--text-2)] sm:text-base">
             Get personalized resource recommendations based on your interests and learning goals.
           </p>
         </div>
-
         {isAuthenticated ? (
-          // Run23 R-06: no corpus prop — the panel renders each card from the
-          // full Resource object already embedded in the /api/recommendations
-          // response (rec.resource), so Home never needs the 3.1MB corpus
-          // for recommendations.
           <Suspense
             fallback={<AccountFeatureFallback label="Loading personalized recommendations" />}
           >
@@ -608,39 +414,398 @@ export default function Home({ nav, navLoading }: HomeProps) {
           </Suspense>
         ) : (
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <LogIn className="h-5 w-5" />
-                Login to See Personalized Recommendations
-              </CardTitle>
-              {/* Run17 BUG-045: honest copy — quick recommendations work without
-                  an account, so say so instead of implying a hard login gate. */}
-              <CardDescription>
-                Sign in for AI-powered recommendations tailored to your skill level and interests — or browse quick recommendations below, no account needed
-              </CardDescription>
-            </CardHeader>
-            {/* BUG-017 (audit2): at 768px with the sidebar expanded the nowrap
-                row pushed "Browse recommendations" past the viewport edge —
-                let the CTA pair wrap whenever the buttons don't fit. */}
-            <CardContent className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-center">
-              {/* BUG-049 (run26): Button asChild renders ONE anchor instead of
-                  an <a> wrapping a <button> (invalid nesting, double tab stop). */}
+            <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center">
               <Button asChild className="w-full sm:w-auto">
-                <Link href="/sign-in">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Login to Get Started
-                </Link>
+                <Link href="/sign-in">Login to Get Started</Link>
               </Button>
-              <Button asChild variant="outline" className="w-full sm:w-auto" data-testid="button-browse-recommendations">
-                <Link href="/recommendations">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Browse recommendations
-                </Link>
+              <Button
+                asChild
+                variant="outline"
+                className="w-full sm:w-auto"
+                data-testid="button-browse-recommendations"
+              >
+                <Link href="/recommendations">Browse recommendations</Link>
               </Button>
             </CardContent>
           </Card>
         )}
       </div>
     </div>
+  );
+}
+
+export default function Home({ nav, navLoading }: HomeProps) {
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const { layout, isLoading: layoutLoading } = useHomeLayout();
+  const {
+    preferences,
+    isLoading: preferencesLoading,
+    savePreferences: saveLearningPreferences,
+    isSaving: dismissingPreferences,
+  } = useLearningPreferences();
+
+  const search = useSearch();
+  const currentParams = useMemo(() => new URLSearchParams(search), [search]);
+  const accountContext =
+    currentParams.get("context") === "account" || currentParams.get("account") === "1";
+  const showOnboardingInvitation =
+    accountContext &&
+    isAuthenticated &&
+    !preferencesLoading &&
+    (!preferences ||
+      preferences.onboardingStatus === "not_started" ||
+      preferences.onboardingStatus === "in_progress");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("welcome") === "1") {
+      toast({
+        title: "Welcome to Awesome Video!",
+        description:
+          "Your account is ready. Bookmark resources, track journeys, and submit your own finds.",
+      });
+      params.delete("welcome");
+      const qs = params.toString();
+      window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    }
+    // The welcome marker is intentionally consumed once, not on every state
+    // update. This mirrors the established register-flow behavior.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [selectedTags, setSelectedTagsState] = useState<string[]>(() =>
+    parseTagsParam(new URLSearchParams(window.location.search)),
+  );
+  const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return (
+      (params.has("tags") || params.has("tag")) &&
+      parseTagsParam(params).length === 0
+    );
+  });
+  const [selectedKind, setSelectedKindState] = useState<ResourceKind | null>(() => {
+    if (typeof window === "undefined") return null;
+    const rawKind = new URLSearchParams(window.location.search).get("kind");
+    return rawKind && (STRIP_KINDS as readonly string[]).includes(rawKind)
+      ? (rawKind as ResourceKind)
+      : null;
+  });
+
+  const setSelectedTags = (next: string[]) => {
+    setSelectedTagsState(next);
+    writeFilterParams({ tags: next.length === 0 ? null : next.join(",") });
+  };
+
+  const VALID_SORTS = ["default", "name-asc", "name-desc", "count-desc", "count-asc"] as const;
+  type HomeSort = (typeof VALID_SORTS)[number];
+  const [sortBy, setSortBy] = useState<HomeSort>(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("sort");
+    return fromUrl && (VALID_SORTS as readonly string[]).includes(fromUrl)
+      ? (fromUrl as HomeSort)
+      : "default";
+  });
+
+  const handleSortChange = (next: string) => {
+    const safeNext = (VALID_SORTS as readonly string[]).includes(next)
+      ? (next as HomeSort)
+      : "default";
+    setSortBy(safeNext);
+    writeFilterParams({ sort: safeNext === "default" ? null : safeNext });
+  };
+
+  const handleKindChange = (next: ResourceKind | null) => {
+    setSelectedKindState(next);
+    writeFilterParams({ kind: next });
+  };
+
+  usePopstateParams((params) => {
+    setSelectedTagsState(parseTagsParam(params));
+    const kind = params.get("kind");
+    setSelectedKindState(
+      kind && (STRIP_KINDS as readonly string[]).includes(kind)
+        ? (kind as ResourceKind)
+        : null,
+    );
+    const sort = params.get("sort");
+    setSortBy(
+      sort && (VALID_SORTS as readonly string[]).includes(sort)
+        ? (sort as HomeSort)
+        : "default",
+    );
+  });
+
+  const corpusFilterActive = selectedTags.length > 0 || selectedKind !== null;
+  const {
+    data: rawCorpus,
+    isLoading: corpusLoading,
+    error: corpusError,
+  } = useQuery<unknown>({
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
+    staleTime: 1000 * 60 * 60,
+    enabled: corpusFilterActive,
+  });
+  const awesomeList = rawCorpus ? processAwesomeListData(rawCorpus) : undefined;
+
+  const { data: tagsData } = useQuery<{
+    total: number;
+    tags: { tag: string; count: number }[];
+  }>({
+    queryKey: ["/api/tags"],
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const {
+    data: homeData,
+    isLoading: homeLoading,
+    error: homeError,
+    refetch: refetchHome,
+  } = useQuery<HomeApiResponse>({
+    queryKey: ["/api/home"],
+    staleTime: 1000 * 60,
+  });
+
+  const {
+    data: kindCounts,
+    isLoading: kindCountsLoading,
+    isError: kindCountsError,
+  } = useQuery<ResourceKindCounts>({
+    queryKey: ["/api/resources/kinds/counts"],
+    queryFn: () => fetchKindCounts(),
+    staleTime: 1000 * 60,
+  });
+
+  const navCategories = useMemo<DisplayCategory[]>(() => {
+    if (!nav?.categories) return [];
+    return nav.categories
+      .filter((category) => isRealCategory(category.name) && navTotalCount(category) > 0)
+      .map((category) => ({
+        name: category.name,
+        slug: category.slug ?? "",
+        count: navTotalCount(category),
+        teaser: category.teaser,
+        subcategories: category.subcategories ?? [],
+      }));
+  }, [nav?.categories]);
+
+  const corpusBaseCategories = useMemo(() => {
+    if (!awesomeList?.categories) return [] as Category[];
+    return awesomeList.categories.filter(
+      (category) => isRealCategory(category.name) && getAllResources(category).length > 0,
+    );
+  }, [awesomeList?.categories]);
+
+  const filteredCategories = useMemo<DisplayCategory[]>(() => {
+    let categories: DisplayCategory[];
+    if (!corpusFilterActive) {
+      categories = [...navCategories];
+    } else {
+      categories = navCategories
+        .map((navCategory) => {
+          const corpusCategory = corpusBaseCategories.find(
+            (category) =>
+              category.slug === navCategory.slug || category.name === navCategory.name,
+          );
+          const count = corpusCategory
+            ? getAllResources(corpusCategory).filter((resource) =>
+                resourceMatchesFilters(resource, selectedTags, selectedKind),
+              ).length
+            : 0;
+          return { ...navCategory, count };
+        })
+        .filter((category) => category.count > 0);
+    }
+
+    switch (sortBy) {
+      case "name-asc":
+        categories.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "name-desc":
+        categories.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case "count-desc":
+        categories.sort((a, b) => b.count - a.count);
+        break;
+      case "count-asc":
+        categories.sort((a, b) => a.count - b.count);
+        break;
+    }
+    return categories;
+  }, [corpusFilterActive, navCategories, corpusBaseCategories, selectedTags, selectedKind, sortBy]);
+
+  const categoriesForPresentation = useMemo<HomeCategoryView[]>(
+    () =>
+      filteredCategories.map((category) => {
+        const corpusCategory = corpusBaseCategories.find(
+          (candidate) =>
+            candidate.slug === category.slug || candidate.name === category.name,
+        );
+
+        return {
+          name: category.name,
+          slug: category.slug,
+          count: category.count,
+          icon: categoryIcon(category.name, category.slug),
+          description: category.teaser?.description,
+          teaserTitle: category.teaser?.title,
+          teaserDescription: category.teaser
+            ? truncateAtWord(category.teaser.description, 110)
+            : undefined,
+          subcategories: category.subcategories.map((subcategory) => {
+            const corpusSubcategory = corpusCategory?.subcategories.find(
+              (candidate) =>
+                candidate.slug === subcategory.slug || candidate.name === subcategory.name,
+            );
+            const matchingResources = corpusSubcategory
+              ? getAllSubcategoryResources(corpusSubcategory).filter((resource) =>
+                  resourceMatchesFilters(resource, selectedTags, selectedKind),
+                )
+              : [];
+            const filteredNestedCount = corpusSubcategory
+              ? (corpusSubcategory.subSubcategories ?? []).filter((nested) =>
+                  (nested.resources ?? []).some((resource) =>
+                    resourceMatchesFilters(resource, selectedTags, selectedKind),
+                  ),
+                ).length
+              : 0;
+
+            return {
+              name: subcategory.name,
+              slug: subcategory.slug ?? "",
+              count: corpusFilterActive ? matchingResources.length : navTotalCount(subcategory),
+              nestedCount: corpusFilterActive
+                ? filteredNestedCount
+                : (subcategory.subSubcategories?.length ?? 0) +
+                  (subcategory.subcategories?.length ?? 0),
+            };
+          }),
+        };
+      }),
+    [
+      corpusBaseCategories,
+      corpusFilterActive,
+      filteredCategories,
+      selectedKind,
+      selectedTags,
+    ],
+  );
+
+  const stats = useMemo<HomeStats>(() => {
+    const realCategories = navCategories.length;
+    const rawCategories = nav?.categories ?? [];
+    return {
+      total: homeData?.total ?? nav?.totalResources ?? 0,
+      categories: realCategories,
+      subcategories: countSubcategories(rawCategories),
+      nestedGroups: countNestedGroups(rawCategories),
+      featured: homeData?.featuredCount ?? homeData?.featured?.length ?? 0,
+      approvedThisWeek: homeData?.approvedThisWeek ?? 0,
+    };
+  }, [homeData, nav?.categories, nav?.totalResources, navCategories.length]);
+
+  const showFilters =
+    selectedTags.length > 0 || sortBy !== "default" || currentParams.get("filters") === "1";
+  const filters = showFilters ? (
+    <Suspense fallback={<FilterControlsFallback />}>
+      <AdvancedFilter
+        selectedTags={selectedTags}
+        sortBy={sortBy}
+        availableTags={tagsData?.tags ?? []}
+        onTagsChange={setSelectedTags}
+        onSortChange={handleSortChange}
+      />
+    </Suspense>
+  ) : null;
+
+  const accountFeatures =
+    accountContext ? (
+      <AccountFeatures
+        isAuthenticated={isAuthenticated}
+        showOnboardingInvitation={showOnboardingInvitation}
+        preferences={preferences}
+        saveLearningPreferences={saveLearningPreferences}
+        dismissingPreferences={dismissingPreferences}
+      />
+    ) : null;
+
+  const isLoading =
+    navLoading ||
+    layoutLoading ||
+    homeLoading ||
+    (corpusFilterActive && !awesomeList && corpusLoading);
+
+  if (isLoading) {
+    return (
+      <>
+        <SEOHead />
+        <HomeSkeleton layout={layout === "curated" ? "curated" : "index"} nav={nav} />
+      </>
+    );
+  }
+
+  if (!nav || homeError || (corpusFilterActive && !awesomeList && corpusError)) {
+    const message = homeError
+      ? "The home index is temporarily unavailable. Please try again."
+      : "We couldn't load the catalog. Please try again.";
+    return (
+      <>
+        <SEOHead />
+        <CatalogError
+          onRetry={() => {
+            if (homeError) {
+              void refetchHome();
+            } else {
+              window.location.reload();
+            }
+          }}
+          message={message}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <SEOHead
+        title={homeSeoTitle(nav.totalResources)}
+        description={homeSeoDescription(nav.totalResources, nav.categories.length)}
+      />
+      <HomePresentation
+        layout={layout === "curated" ? "curated" : "index"}
+        categories={categoriesForPresentation}
+        recent={homeData?.recent ?? []}
+        featured={homeData?.featured ?? []}
+        stats={stats}
+        kindCounts={kindCounts}
+        kindCountsLoading={kindCountsLoading}
+        kindCountsError={kindCountsError}
+        selectedKind={selectedKind}
+        onKindChange={handleKindChange}
+        selectedTags={selectedTags}
+        onClearFilters={() => {
+          setSelectedTags([]);
+          setSelectedKindState(null);
+          writeFilterParams({ kind: null });
+        }}
+        filters={filters}
+        emptyTagParamNotice={
+          emptyTagParamNotice && selectedTags.length === 0 ? (
+            <div className="home-empty-tag-notice" role="status" data-testid="notice-empty-tag-param">
+              <span>The tag filter in the link you followed was empty, so it was ignored.</span>
+              <button
+                type="button"
+                className="underline underline-offset-2"
+                onClick={() => setEmptyTagParamNotice(false)}
+                data-testid="button-dismiss-empty-tag-param"
+              >
+                Dismiss
+              </button>
+            </div>
+          ) : null
+        }
+        accountFeatures={accountFeatures}
+      />
+    </>
   );
 }

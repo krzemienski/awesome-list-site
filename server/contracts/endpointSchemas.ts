@@ -380,6 +380,8 @@ const publicConfigResponseSchema = z.object({
     description: z.string(),
     url: z.string(),
     author: z.string(),
+    repoUrl: z.string().url(),
+    repoBranch: z.string().min(1),
   }).passthrough(),
   contact: z.object({
     email: contactDestinationSchema,
@@ -519,6 +521,18 @@ export function registerCoreEndpointSchemas(): void {
   });
 
   // --- Resource kinds (design parity W1) ---
+
+  setRouteResponseSchema("get", "/api/home", {
+    name: "HomeFeedResponse",
+    description: "Approved totals, rolling seven-day indexing delta, and bounded recent/featured public feeds",
+    schema: z.object({
+      total: z.number().int().nonnegative(),
+      approvedThisWeek: z.number().int().nonnegative(),
+      featuredCount: z.number().int().nonnegative(),
+      recent: z.array(publicResourceSchema).max(5),
+      featured: z.array(publicResourceSchema).max(6),
+    }),
+  });
 
   setRouteResponseSchema("get", "/api/resources/kinds/counts", {
     name: "ResourceKindCountsResponse",

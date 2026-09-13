@@ -176,6 +176,13 @@
       "when": 1787243520000,
       "tag": "0048_contact_submission_provenance",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1787329800000,
+      "tag": "0049_home_layout_preferences",
+      "breakpoints": true
     }
   ]
 }

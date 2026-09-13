@@ -637,6 +637,155 @@ components:
             items:
               type: string
               maxLength: 512
+    get_3a__2f_api_2f_home.Query:
+      type: object
+      properties:
+        page:
+          type: string
+          pattern: ^\d+$
+        limit:
+          type: string
+          pattern: ^\d+$
+        offset:
+          type: string
+          pattern: ^\d+$
+        afterSeq:
+          type: string
+          pattern: ^\d+$
+        jobId:
+          type: string
+          pattern: ^\d+$
+        resourceId:
+          type: string
+          pattern: ^\d+$
+        categoryId:
+          type: string
+          pattern: ^\d+$
+        subcategoryId:
+          type: string
+          pattern: ^\d+$
+        per_page:
+          type: string
+          pattern: ^\d+$
+        cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+      additionalProperties:
+        anyOf:
+          - type: string
+            minLength: 1
+            maxLength: 512
+          - type: string
+            maxLength: 0
+          - type: array
+            items:
+              type: string
+              maxLength: 512
+    HomeFeedResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        approvedThisWeek:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        featuredCount:
+          type: integer
+          minimum: 0
+          maximum: 9007199254740991
+        recent:
+          maxItems: 5
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              status:
+                type: string
+              kind:
+                nullable: true
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+              resolvedKind:
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+            required:
+              - id
+              - title
+              - url
+              - status
+              - kind
+              - resolvedKind
+            additionalProperties: {}
+        featured:
+          maxItems: 6
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              title:
+                type: string
+              url:
+                type: string
+              status:
+                type: string
+              kind:
+                nullable: true
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+              resolvedKind:
+                type: string
+                enum:
+                  - tools
+                  - libraries
+                  - standards
+                  - events
+                  - protocols
+                  - other
+            required:
+              - id
+              - title
+              - url
+              - status
+              - kind
+              - resolvedKind
+            additionalProperties: {}
+      required:
+        - total
+        - approvedThisWeek
+        - featuredCount
+        - recent
+        - featured
+      additionalProperties: false
     get_3a__2f_api_2f_resources.Query:
       type: object
       properties:
@@ -8691,11 +8840,19 @@ components:
               type: string
             author:
               type: string
+            repoUrl:
+              type: string
+              format: uri
+            repoBranch:
+              type: string
+              minLength: 1
           required:
             - title
             - description
             - url
             - author
+            - repoUrl
+            - repoBranch
           additionalProperties: {}
         contact:
           type: object
@@ -11070,6 +11227,144 @@ paths:
       x-middleware: []
       x-contract-schemas:
         query: get_3a__2f_api_2f_auth_2f_status.Query
+  /api/home:
+    get:
+      operationId: get:/api/home
+      responses:
+        '200':
+          description: Approved totals, rolling seven-day indexing delta, and bounded recent/featured public feeds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeFeedResponse'
+        '400':
+          description: Request validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Request conflicts with current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Request body too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '422':
+          description: Request could not be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - home
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: afterSeq
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: jobId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: resourceId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: subcategoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^\d+$
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      x-domain: home
+      x-middleware: []
+      x-contract-schemas:
+        query: get_3a__2f_api_2f_home.Query
   /api/resources:
     get:
       operationId: get:/api/resources
@@ -35707,6 +36002,7 @@ tags:
   - name: notifications
   - name: admin
   - name: auth
+  - name: home
   - name: resources
   - name: search
   - name: telemetry

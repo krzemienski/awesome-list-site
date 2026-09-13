@@ -1,0 +1,250 @@
+[
+  {
+    "layout": "index",
+    "width": 375,
+    "before": {
+      "meta": {
+        "x": 16,
+        "y": 88,
+        "width": 343
+      },
+      "stats": {
+        "x": 16,
+        "y": 203.140625,
+        "width": 343
+      },
+      "body": {
+        "x": 16,
+        "y": 441.078125,
+        "width": 343
+      }
+    },
+    "after": {
+      "meta": {
+        "x": 16,
+        "y": 88,
+        "width": 343
+      },
+      "stats": {
+        "x": 16,
+        "y": 203.1875,
+        "width": 343
+      },
+      "body": {
+        "x": 16,
+        "y": 441.125,
+        "width": 343
+      },
+      "cls": 0.011438263374485596,
+      "shifts": [
+        {
+          "value": 0.0025493744855967075,
+          "sources": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "value": 0.008888888888888889,
+          "sources": [
+            "BODY"
+          ]
+        }
+      ]
+    },
+    "maxAnchorDelta": 0.046875,
+    "pass": true
+  },
+  {
+    "layout": "index",
+    "width": 1440,
+    "before": {
+      "meta": {
+        "x": 328,
+        "y": 92,
+        "width": 1064
+      },
+      "stats": {
+        "x": 328,
+        "y": 138.78125,
+        "width": 1064
+      },
+      "body": {
+        "x": 328,
+        "y": 278.25,
+        "width": 1064
+      }
+    },
+    "after": {
+      "meta": {
+        "x": 328,
+        "y": 92,
+        "width": 1064
+      },
+      "stats": {
+        "x": 328,
+        "y": 138.796875,
+        "width": 1064
+      },
+      "body": {
+        "x": 328,
+        "y": 278.265625,
+        "width": 1064
+      },
+      "cls": 0.007301772380561986,
+      "shifts": [
+        {
+          "value": 0.0012487139917695474,
+          "sources": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "value": 0.005555555555555556,
+          "sources": [
+            "BODY"
+          ]
+        },
+        {
+          "value": 0.0004975028332368827,
+          "sources": [
+            "group-data-[collapsible=icon]:hidden"
+          ]
+        }
+      ]
+    },
+    "maxAnchorDelta": 0.015625,
+    "pass": true
+  },
+  {
+    "layout": "curated",
+    "width": 375,
+    "before": {
+      "meta": {
+        "x": 16,
+        "y": 88,
+        "width": 343
+      },
+      "stats": {
+        "x": 16,
+        "y": 203.140625,
+        "width": 343
+      },
+      "body": {
+        "x": 16,
+        "y": 449.078125,
+        "width": 343
+      }
+    },
+    "after": {
+      "meta": {
+        "x": 16,
+        "y": 88,
+        "width": 343
+      },
+      "stats": {
+        "x": 16,
+        "y": 203.1875,
+        "width": 343
+      },
+      "body": {
+        "x": 16,
+        "y": 449.125,
+        "width": 343
+      },
+      "cls": 0.011438263374485596,
+      "shifts": [
+        {
+          "value": 0.0025493744855967075,
+          "sources": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "value": 0.008888888888888889,
+          "sources": [
+            "BODY"
+          ]
+        }
+      ]
+    },
+    "maxAnchorDelta": 0.046875,
+    "pass": true
+  },
+  {
+    "layout": "curated",
+    "width": 1440,
+    "before": {
+      "meta": {
+        "x": 328,
+        "y": 92,
+        "width": 1064
+      },
+      "stats": {
+        "x": 328,
+        "y": 138.78125,
+        "width": 1064
+      },
+      "body": {
+        "x": 328,
+        "y": 286.25,
+        "width": 1064
+      }
+    },
+    "after": {
+      "meta": {
+        "x": 328,
+        "y": 92,
+        "width": 1064
+      },
+      "stats": {
+        "x": 328,
+        "y": 138.796875,
+        "width": 1064
+      },
+      "body": {
+        "x": 328,
+        "y": 286.265625,
+        "width": 1064
+      },
+      "cls": 0.007301772380561986,
+      "shifts": [
+        {
+          "value": 0.0012487139917695474,
+          "sources": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "value": 0.005555555555555556,
+          "sources": [
+            "BODY"
+          ]
+        },
+        {
+          "value": 0.0004975028332368827,
+          "sources": [
+            "group-data-[collapsible=icon]:hidden"
+          ]
+        }
+      ]
+    },
+    "maxAnchorDelta": 0.015625,
+    "pass": true
+  }
+]

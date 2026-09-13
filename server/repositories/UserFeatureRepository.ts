@@ -43,9 +43,11 @@ import type {
   LearningGoal,
   LearningSkillLevel,
   LearningTimeCommitment,
+  HomeLayout,
   OnboardingStatus,
 } from "@shared/onboarding";
 import {
+  DEFAULT_HOME_LAYOUT,
   DEFAULT_LEARNING_PREFERENCES,
   normalizeLearningFormats,
   normalizeLearningGoals,
@@ -378,6 +380,7 @@ export class UserFeatureRepository {
       learningGoals: LearningGoal[];
       preferredResourceTypes: LearningFormat[];
       timeCommitment: LearningTimeCommitment;
+      homeLayout?: HomeLayout;
       onboardingStatus: OnboardingStatus;
       onboardingStep: number;
       onboardingCompletedAt: Date | null;
@@ -387,6 +390,7 @@ export class UserFeatureRepository {
   ): Promise<UserPreferences | undefined> {
     const updateValues = {
       ...values,
+      ...(values.homeLayout === undefined ? {} : { homeLayout: values.homeLayout }),
       updatedAt: new Date(),
       revision: sql`${userPreferences.revision} + 1`,
     };
@@ -416,7 +420,11 @@ export class UserFeatureRepository {
         );
         const [preferences] = await tx
           .insert(userPreferences)
-          .values({ userId, ...values })
+          .values({
+            userId,
+            ...values,
+            homeLayout: values.homeLayout ?? DEFAULT_HOME_LAYOUT,
+          })
           .onConflictDoNothing({ target: userPreferences.userId })
           .returning();
         return preferences;

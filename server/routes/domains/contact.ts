@@ -99,6 +99,21 @@ function configuredDiscussions(): ContactLinkEntry {
     : unavailable("No verified discussions destination is configured");
 }
 
+function configuredSourceRepository(): { repoUrl: string; repoBranch: string } {
+  const parsed = new URL(config.source.url);
+  if (parsed.hostname !== "raw.githubusercontent.com") {
+    throw new Error("The configured source URL is not a raw GitHub repository URL");
+  }
+  const [owner, repo, branch] = parsed.pathname.split("/").filter(Boolean);
+  if (!owner || !repo || !branch) {
+    throw new Error("The configured source URL is missing its GitHub owner, repository, or branch");
+  }
+  return {
+    repoUrl: `https://github.com/${owner}/${repo}`,
+    repoBranch: branch,
+  };
+}
+
 function isFormReady(): boolean {
   return config.contact.enabled && config.contact.ip_hash_secret.length > 0;
 }
@@ -212,12 +227,14 @@ export function registerContactRoutes(app: Express, ctx: ContactRoutesContext): 
     // Pure function of process config: safe to cache briefly at the edge and
     // in the browser; a redeploy is the only thing that changes it.
     res.set("Cache-Control", "public, max-age=300");
+    const sourceRepository = configuredSourceRepository();
     res.json({
       site: {
         title: config.site.title,
         description: config.site.description,
         url: config.site.url,
         author: config.site.author,
+        ...sourceRepository,
       },
       contact: {
         email: configuredEmail(),

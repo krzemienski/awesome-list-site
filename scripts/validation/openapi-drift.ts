@@ -29,22 +29,23 @@ import {
 // /api/auth/logout-all was reintroduced Clerk-backed. Route registration no
 // longer branches on REPL_ID, so both environments share one baseline.
 //
-// 177 routes = 171 + the default-off contact surface (GET /api/config,
+// 178 routes = 171 + the default-off contact surface (GET /api/config,
 // POST /api/contact, GET /api/admin/contact-submissions) + the resource-kind
 // surface (GET /api/resources/kinds/counts, PATCH /api/admin/resources/:id/kind,
-// PATCH /api/admin/resources/:id/featured). When another task lands routes in
+// PATCH /api/admin/resources/:id/featured) + the bounded Home feed
+// (GET /api/home). When another task lands routes in
 // parallel, recompute from this gate's own "got N/hash" line after merging
 // instead of adding counts by hand.
 const BASELINES = {
   replit: {
-    apiCount: 177,
-    apiHash: "05fabbd4bea70da7eb86546b61c060d7e96bc0ff34caf0fffedc030f8bf03f8b",
+    apiCount: 178,
+    apiHash: "d568620c2ab082f81f5903e9ef7b51155345295419cea9e1dfaf412e517b4be8",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },
   portable: {
-    apiCount: 177,
-    apiHash: "05fabbd4bea70da7eb86546b61c060d7e96bc0ff34caf0fffedc030f8bf03f8b",
+    apiCount: 178,
+    apiHash: "d568620c2ab082f81f5903e9ef7b51155345295419cea9e1dfaf412e517b4be8",
     nonApiCount: 7,
     nonApiHash: "d8f02ed21a7ee98464146ef8958d38a24113b0a47dbbe4132e2da54f00d61a89",
   },

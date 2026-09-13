@@ -38,6 +38,7 @@ import {
   type LearningGoal,
   type LearningSkillLevel,
   type LearningTimeCommitment,
+  type HomeLayout,
   type OnboardingStatus,
 } from "./onboarding";
 
@@ -1124,6 +1125,7 @@ export type GithubSyncQueue = typeof githubSyncQueue.$inferSelect;
  * @property {string[]} learningGoals - Array of learning objectives (default: empty array)
  * @property {string[]} preferredResourceTypes - Array of preferred content types (default: empty array)
  * @property {string} timeCommitment - Learning frequency: 'daily', 'weekly', or 'flexible' (default: 'flexible')
+ * @property {string} homeLayout - Home presentation: 'index' or 'curated' (default: 'index')
  * @property {timestamp} createdAt - Preferences creation timestamp
  * @property {timestamp} updatedAt - Last modification timestamp
  *
@@ -1147,6 +1149,7 @@ export const userPreferences = pgTable(
     learningGoals: jsonb("learning_goals").$type<LearningGoal[]>().default([]).notNull(),
     preferredResourceTypes: jsonb("preferred_resource_types").$type<LearningFormat[]>().default([]).notNull(),
     timeCommitment: text("time_commitment").$type<LearningTimeCommitment>().default("flexible").notNull(),
+    homeLayout: text("home_layout").$type<HomeLayout>().default("index").notNull(),
     onboardingStatus: text("onboarding_status").$type<OnboardingStatus>().default("not_started").notNull(),
     onboardingStep: integer("onboarding_step").default(1).notNull(),
     onboardingCompletedAt: timestamp("onboarding_completed_at"),
@@ -1160,6 +1163,7 @@ export const userPreferences = pgTable(
     unique("user_preferences_user_id_unique").on(table.userId),
     check("user_preferences_skill_level_check", sql`${table.skillLevel} IN ('beginner','intermediate','advanced')`),
     check("user_preferences_time_commitment_check", sql`${table.timeCommitment} IN ('daily','weekly','flexible')`),
+    check("user_preferences_home_layout_check", sql`${table.homeLayout} IN ('index','curated')`),
     check("user_preferences_onboarding_status_check", sql`${table.onboardingStatus} IN ('not_started','in_progress','completed','dismissed')`),
     check("user_preferences_onboarding_step_check", sql`${table.onboardingStep} BETWEEN 1 AND 5`),
     check("user_preferences_revision_check", sql`${table.revision} >= 1`),
@@ -1175,6 +1179,7 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).p
   learningGoals: true,
   preferredResourceTypes: true,
   timeCommitment: true,
+  homeLayout: true,
   onboardingStatus: true,
   onboardingStep: true,
   onboardingCompletedAt: true,

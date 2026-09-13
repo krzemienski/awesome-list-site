@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   LEARNING_FORMAT_VALUES,
   LEARNING_GOAL_VALUES,
+  HOME_LAYOUT_VALUES,
   ONBOARDING_STATUS_VALUES,
   ONBOARDING_STEP_COUNT,
   SKILL_LEVEL_VALUES,
@@ -62,5 +63,6 @@ export const learningPreferencesUpdateSchema = learningPreferencesValuesSchema
       .min(1)
       .max(ONBOARDING_STEP_COUNT)
       .optional(),
+    homeLayout: z.enum(HOME_LAYOUT_VALUES).optional(),
   })
   .strict();

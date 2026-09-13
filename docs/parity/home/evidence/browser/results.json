@@ -1,0 +1,468 @@
+{
+  "checks": [
+    {
+      "name": "Index is the guest default",
+      "ok": true
+    },
+    {
+      "name": "Default Home avoids the corpus",
+      "ok": true
+    },
+    {
+      "name": "Kind filtering leaves full-set chip counts unchanged",
+      "ok": true
+    },
+    {
+      "name": "Kind filtering changes category totals",
+      "ok": true
+    },
+    {
+      "name": "Guest saved Curated survives navigation",
+      "ok": true
+    },
+    {
+      "name": "Guest saved Curated survives reload",
+      "ok": true
+    },
+    {
+      "name": "Explicit Index overrides guest Curated",
+      "ok": true
+    },
+    {
+      "name": "Every index category/subcategory route resolves",
+      "ok": true,
+      "detail": {
+        "links": 101,
+        "failedLinks": []
+      }
+    },
+    {
+      "name": "index 375: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 375,
+        "scrollWidth": 375,
+        "root": {
+          "x": 16,
+          "y": 88,
+          "width": 343,
+          "height": 4771.765625,
+          "top": 88,
+          "right": 359,
+          "bottom": 4859.765625,
+          "left": 16
+        }
+      }
+    },
+    {
+      "name": "index 375: Home axe serious/critical zero",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "index 768: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 768,
+        "scrollWidth": 768,
+        "root": {
+          "x": 104,
+          "y": 92,
+          "width": 616,
+          "height": 4619,
+          "top": 92,
+          "right": 720,
+          "bottom": 4711,
+          "left": 104
+        }
+      }
+    },
+    {
+      "name": "index 1024: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 1024,
+        "scrollWidth": 1024,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 648,
+          "height": 3343.890625,
+          "top": 92,
+          "right": 976,
+          "bottom": 3435.890625,
+          "left": 328
+        }
+      }
+    },
+    {
+      "name": "index 1440: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 1064,
+          "height": 2775.90625,
+          "top": 92,
+          "right": 1392,
+          "bottom": 2867.90625,
+          "left": 328
+        }
+      }
+    },
+    {
+      "name": "index 1440: Home axe serious/critical zero",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "curated 375: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 375,
+        "scrollWidth": 375,
+        "root": {
+          "x": 16,
+          "y": 88,
+          "width": 343,
+          "height": 3125.078125,
+          "top": 88,
+          "right": 359,
+          "bottom": 3213.078125,
+          "left": 16
+        }
+      }
+    },
+    {
+      "name": "curated 375: Home axe serious/critical zero",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "curated 768: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 768,
+        "scrollWidth": 768,
+        "root": {
+          "x": 104,
+          "y": 92,
+          "width": 616,
+          "height": 2066.46875,
+          "top": 92,
+          "right": 720,
+          "bottom": 2158.46875,
+          "left": 104
+        }
+      }
+    },
+    {
+      "name": "curated 1024: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 1024,
+        "scrollWidth": 1024,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 648,
+          "height": 2067.984375,
+          "top": 92,
+          "right": 976,
+          "bottom": 2159.984375,
+          "left": 328
+        }
+      }
+    },
+    {
+      "name": "curated 1440: no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 1064,
+          "height": 1591.78125,
+          "top": 92,
+          "right": 1392,
+          "bottom": 1683.78125,
+          "left": 328
+        }
+      }
+    },
+    {
+      "name": "curated 1440: Home axe serious/critical zero",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Account layout PUT succeeds without enrolling learning profile",
+      "ok": true
+    },
+    {
+      "name": "Stale layout revision is rejected",
+      "ok": true
+    },
+    {
+      "name": "Signed-in saved Curated loads",
+      "ok": true
+    },
+    {
+      "name": "Signed-in Curated survives reload",
+      "ok": true
+    },
+    {
+      "name": "Learning reset preserves layout",
+      "ok": false
+    },
+    {
+      "name": "Layout-only tombstone update stays cleared",
+      "ok": true
+    }
+  ],
+  "frames": [
+    {
+      "layout": "index",
+      "width": 375,
+      "filename": "index-375-visitor.png",
+      "geometry": {
+        "width": 375,
+        "scrollWidth": 375,
+        "root": {
+          "x": 16,
+          "y": 88,
+          "width": 343,
+          "height": 4771.765625,
+          "top": 88,
+          "right": 359,
+          "bottom": 4859.765625,
+          "left": 16
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "index",
+      "width": 768,
+      "filename": "index-768-visitor.png",
+      "geometry": {
+        "width": 768,
+        "scrollWidth": 768,
+        "root": {
+          "x": 104,
+          "y": 92,
+          "width": 616,
+          "height": 4619,
+          "top": 92,
+          "right": 720,
+          "bottom": 4711,
+          "left": 104
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "index",
+      "width": 1024,
+      "filename": "index-1024-visitor.png",
+      "geometry": {
+        "width": 1024,
+        "scrollWidth": 1024,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 648,
+          "height": 3343.890625,
+          "top": 92,
+          "right": 976,
+          "bottom": 3435.890625,
+          "left": 328
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "index",
+      "width": 1440,
+      "filename": "index-1440-visitor.png",
+      "geometry": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 1064,
+          "height": 2775.90625,
+          "top": 92,
+          "right": 1392,
+          "bottom": 2867.90625,
+          "left": 328
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "curated",
+      "width": 375,
+      "filename": "curated-375-visitor.png",
+      "geometry": {
+        "width": 375,
+        "scrollWidth": 375,
+        "root": {
+          "x": 16,
+          "y": 88,
+          "width": 343,
+          "height": 3125.078125,
+          "top": 88,
+          "right": 359,
+          "bottom": 3213.078125,
+          "left": 16
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "curated",
+      "width": 768,
+      "filename": "curated-768-visitor.png",
+      "geometry": {
+        "width": 768,
+        "scrollWidth": 768,
+        "root": {
+          "x": 104,
+          "y": 92,
+          "width": 616,
+          "height": 2066.46875,
+          "top": 92,
+          "right": 720,
+          "bottom": 2158.46875,
+          "left": 104
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "curated",
+      "width": 1024,
+      "filename": "curated-1024-visitor.png",
+      "geometry": {
+        "width": 1024,
+        "scrollWidth": 1024,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 648,
+          "height": 2067.984375,
+          "top": 92,
+          "right": 976,
+          "bottom": 2159.984375,
+          "left": 328
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "curated",
+      "width": 1440,
+      "filename": "curated-1440-visitor.png",
+      "geometry": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "root": {
+          "x": 328,
+          "y": 92,
+          "width": 1064,
+          "height": 1591.78125,
+          "top": 92,
+          "right": 1392,
+          "bottom": 1683.78125,
+          "left": 328
+        }
+      },
+      "identity": "visitor"
+    },
+    {
+      "layout": "index",
+      "width": 375,
+      "filename": "index-375-nick.png",
+      "identity": "Nick"
+    },
+    {
+      "layout": "index",
+      "width": 768,
+      "filename": "index-768-nick.png",
+      "identity": "Nick"
+    },
+    {
+      "layout": "index",
+      "width": 1024,
+      "filename": "index-1024-nick.png",
+      "identity": "Nick"
+    },
+    {
+      "layout": "index",
+      "width": 1440,
+      "filename": "index-1440-nick.png",
+      "identity": "Nick"
+    },
+    {
+      "layout": "curated",
+      "width": 375,
+      "filename": "curated-375-nick.png",
+      "identity": "Nick"
+    },
+    {
+      "layout": "curated",
+      "width": 768,
+      "filename": "curated-768-nick.png",
+      "identity": "Nick"
+    },
+    {
+      "layout": "curated",
+      "width": 1024,
+      "filename": "curated-1024-nick.png",
+      "identity": "Nick"
+    },
+    {
+      "layout": "curated",
+      "width": 1440,
+      "filename": "curated-1440-nick.png",
+      "identity": "Nick"
+    }
+  ],
+  "errors": [
+    "Home checks failed\n\n1 !== 0\n"
+  ],
+  "axe": [
+    {
+      "layout": "index",
+      "width": 375,
+      "violations": []
+    },
+    {
+      "layout": "index",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "layout": "curated",
+      "width": 375,
+      "violations": []
+    },
+    {
+      "layout": "curated",
+      "width": 1440,
+      "violations": []
+    }
+  ],
+  "teardown": {
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "errors": []
+  }
+}

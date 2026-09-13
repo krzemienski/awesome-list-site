@@ -13,6 +13,15 @@ export const ONBOARDING_STATUS_VALUES = [
 ] as const;
 export type OnboardingStatus = (typeof ONBOARDING_STATUS_VALUES)[number];
 
+/**
+ * The home feed has two intentionally stable presentation modes. Keep this
+ * vocabulary beside the other persisted preference values so the browser and
+ * API cannot drift.
+ */
+export const HOME_LAYOUT_VALUES = ["index", "curated"] as const;
+export type HomeLayout = (typeof HOME_LAYOUT_VALUES)[number];
+export const DEFAULT_HOME_LAYOUT: HomeLayout = "index";
+
 export const SKILL_LEVEL_VALUES = [
   "beginner",
   "intermediate",
@@ -182,6 +191,7 @@ export type LearningPreferencesUpdate = Partial<LearningPreferencesValues> & {
   expectedRevision?: number | null;
   onboardingStatus?: OnboardingStatus;
   onboardingStep?: number;
+  homeLayout?: HomeLayout;
 };
 
 export const DEFAULT_LEARNING_PREFERENCES: LearningPreferencesValues = {

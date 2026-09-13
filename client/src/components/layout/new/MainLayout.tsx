@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Link } from "wouter";
 import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
@@ -7,15 +6,14 @@ import AppHeader from "./AppHeader";
 import PageBreadcrumb from "./PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { openCookieSettings } from "@/components/ui/consent-banner";
 import type { ProductProfileId } from "@/lib/design-system";
-import { contactVariant } from "@/lib/contact";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
 // VITE_CONTACT_VARIANT; with it unset (the default) neither chunk is fetched
 // and the shell renders exactly as before. Variants a/b/c add footer links,
 // b/e host the contact dialog.
-const ContactFooter = lazy(() => import("@/components/contact/contact-footer").then((module) => ({ default: module.ContactFooter })));
+import AppFooter from "./AppFooter";
+import { contactVariant, useContactConfig } from "@/lib/contact";
 const ContactDialogHost = lazy(() => import("@/components/contact/contact-dialog").then((module) => ({ default: module.ContactDialogHost })));
 
 /** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
@@ -81,6 +79,7 @@ interface MainLayoutProps {
 
 export default function MainLayout({ productProfile, nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, renderSearchDialog }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const { data: publicConfig } = useContactConfig(true);
 
   // Keep the lightweight global trigger in the eager shell. The palette code
   // itself is loaded only after one of these controls opens it.
@@ -195,68 +194,19 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           <PageBreadcrumb categories={nav?.categories ?? []} />
           {children}
         </main>
-        {/* R1 — minimal app footer; R2-M19 — navigation links + copyright. */}
-        <footer className="border-t border-[var(--border)] mt-auto">
-          <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[color:var(--text-3)]">
-            <span data-testid="footer-copyright">
-              © {new Date().getFullYear()} Awesome Video · Built with React &amp; shadcn/ui
-            </span>
-            {/* BUG-013 (run9): footer links get 44px-tall hit areas (WCAG 2.5.5)
-                — text stays small, the tap target grows. BUG-030: GitHub source
-                link added alongside internal nav. */}
-            <nav aria-label="Footer" className="flex items-center gap-4 flex-wrap justify-center">
-              <Link href="/" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-home">
-                Home
-              </Link>
-              <Link href="/categories" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-categories">
-                Categories
-              </Link>
-              <Link href="/journeys" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-journeys">
-                Journeys
-              </Link>
-              <Link href="/submit" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-submit">
-                Submit
-              </Link>
-              <Link href="/about" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-about">
-                About
-              </Link>
-              {/* BUG-019 (run13): real legal pages instead of dead promises. */}
-              <Link href="/terms" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-terms">
-                Terms
-              </Link>
-              <Link href="/privacy" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-privacy">
-                Privacy
-              </Link>
-              <Link href="/code-of-conduct" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-code-of-conduct">
-                Code of Conduct
-              </Link>
-              {/* R5-025 (run24): in-product consent-reset path — re-opens the
-                  analytics consent banner so a persisted choice can be changed. */}
-              <button
-                type="button"
-                onClick={openCookieSettings}
-                className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors"
-                data-testid="footer-cookie-settings"
-              >
-                Cookie settings
-              </button>
-              <a
-                href="https://github.com/krzemienski/awesome-video"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors"
-                data-testid="footer-github"
-              >
-                GitHub
-              </a>
-              {contactVariant === "a" || contactVariant === "b" || contactVariant === "c" ? (
-                <Suspense fallback={null}><ContactFooter /></Suspense>
-              ) : null}
-            </nav>
-          </div>
-        </footer>
         </SidebarInset>
         </div>
+        {publicConfig?.site ? (
+          <AppFooter
+            nav={nav}
+            site={{
+              name: publicConfig.site.title.replace(/\s+Dashboard$/, ""),
+              tagline: publicConfig.site.description,
+              repoUrl: publicConfig.site.repoUrl,
+              repoBranch: publicConfig.site.repoBranch,
+            }}
+          />
+        ) : null}
       </div>
       {contactVariant === "b" || contactVariant === "e" ? (
         <Suspense fallback={null}><ContactDialogHost /></Suspense>

@@ -35,9 +35,11 @@ import {
 import { storage } from "../../storage";
 import { db } from "../../db";
 import {
+  DEFAULT_HOME_LAYOUT,
   DEFAULT_LEARNING_PREFERENCES,
   completedLearningPreferencesSchema,
   learningPreferencesUpdateSchema,
+  type HomeLayout,
   type LearningPreferencesValues,
   type OnboardingStatus,
 } from "@shared/onboarding";
@@ -807,20 +809,25 @@ export function registerUserFeatureRoutes(
 
   // --- Learning preferences / optional onboarding ---
 
+  const isClearedLearningPreferences = (preferences: Awaited<
+    ReturnType<UserFeatureRepository["getUserPreferences"]>
+  >): boolean =>
+    preferences?.onboardingStatus === 'not_started' &&
+    preferences.preferredCategories.length === 0 &&
+    preferences.learningGoals.length === 0 &&
+    preferences.preferredResourceTypes.length === 0;
+
   // GET does not create a row. A missing row is meaningful: the user has not
   // started onboarding and can be invited without being blocked from browsing.
   app.get('/api/user/preferences', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.dbUser?.id;
       const preferences = await userFeatureRepo.getUserPreferences(userId);
-      const isCleared =
-        preferences?.onboardingStatus === 'not_started' &&
-        preferences.preferredCategories.length === 0 &&
-        preferences.learningGoals.length === 0 &&
-        preferences.preferredResourceTypes.length === 0;
+      const isCleared = isClearedLearningPreferences(preferences);
       res.set('Cache-Control', 'private, no-store');
       res.json({
         preferences: isCleared ? null : preferences ?? null,
+        homeLayout: preferences?.homeLayout ?? DEFAULT_HOME_LAYOUT,
         // A cleared row remains hidden from the form model but its version
         // prevents a stale tab from resurrecting pre-reset values.
         revision: preferences?.revision ?? null,
@@ -892,6 +899,10 @@ export function registerUserFeatureRoutes(
           current?.timeCommitment ??
           DEFAULT_LEARNING_PREFERENCES.timeCommitment,
       };
+      const homeLayout: HomeLayout =
+        parsed.data.homeLayout ??
+        current?.homeLayout ??
+        DEFAULT_HOME_LAYOUT;
 
       // Taxonomy values are intentionally resolved at write time. A stale tab
       // cannot persist a deleted/renamed category, and no hard-coded client list
@@ -935,6 +946,7 @@ export function registerUserFeatureRoutes(
         userId,
         {
           ...values,
+          homeLayout,
           onboardingStatus,
           onboardingStep: onboardingStatus === 'completed' ? 5 : onboardingStep,
           onboardingCompletedAt:
@@ -956,8 +968,10 @@ export function registerUserFeatureRoutes(
       }
 
       res.set('Cache-Control', 'private, no-store');
+      const isCleared = isClearedLearningPreferences(preferences);
       res.json({
-        preferences,
+        preferences: isCleared ? null : preferences,
+        homeLayout: preferences.homeLayout,
         revision: preferences.revision,
       });
     } catch (error) {
@@ -990,6 +1004,7 @@ export function registerUserFeatureRoutes(
       res.set('Cache-Control', 'private, no-store');
       res.json({
         preferences: null,
+        homeLayout: reset.homeLayout,
         revision: reset.revision,
       });
     } catch (error) {

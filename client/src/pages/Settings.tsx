@@ -26,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import NotificationPreferencesCard from "@/components/notifications/NotificationPreferencesCard";
+import HomeLayoutPreferenceControl from "@/components/home/HomeLayoutPreferenceControl";
 
 interface CategoryOption {
   name: string;
@@ -132,7 +133,7 @@ export default function Settings() {
   }, [preferences]);
 
   const links = SETTINGS_LINKS.filter(
-    (l) => isAuthenticated || isLoading || (l as any).anonSafe,
+    (link) => isAuthenticated || isLoading || ("anonSafe" in link && link.anonSafe),
   );
   const showSignInPrompt = !isLoading && !isAuthenticated;
   const categoryNames = (categories ?? [])
@@ -238,6 +239,20 @@ export default function Settings() {
           </Link>
         ))}
       </div>
+
+      <section aria-labelledby="home-layout-settings-title">
+        <Card data-testid="card-home-layout-preference">
+          <CardHeader>
+            <CardTitle id="home-layout-settings-title">Home layout</CardTitle>
+            <CardDescription>
+              Choose the default view you see on the Home page.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <HomeLayoutPreferenceControl />
+          </CardContent>
+        </Card>
+      </section>
 
       {isAuthenticated ? (
         <section id="learning-preferences" aria-labelledby="learning-preferences-title">

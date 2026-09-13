@@ -383,7 +383,7 @@ const main = async () => {
     const admin = identity ? await buildAdminAdapter(identity.fetchJson, frozenAt.getTime()) : null;
     const substitutions = buildPlaceholderSubstitutions({
       adapter: catalogBinding.adapter,
-      createdAts: catalogBinding.createdAts,
+      home: catalogBinding.home,
       frozenAt,
       admin,
     });

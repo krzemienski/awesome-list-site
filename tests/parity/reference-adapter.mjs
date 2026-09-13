@@ -39,9 +39,10 @@ const recursiveCount = (node) =>
 
 /** Bind the public catalog snapshot to the reference's AV_* catalog globals. */
 export async function buildCatalogAdapter(appBase) {
-  const [catalog, nav] = await Promise.all([
+  const [catalog, nav, home] = await Promise.all([
     fetchJson(`${appBase}/api/awesome-list`),
     fetchJson(`${appBase}/api/awesome-list/nav`),
+    fetchJson(`${appBase}/api/home`),
   ]);
   const categories = Array.isArray(nav?.categories) ? nav.categories : [];
   const corpusResources = Array.isArray(catalog?.resources)
@@ -59,6 +60,17 @@ export async function buildCatalogAdapter(appBase) {
     throw new Error("Approved public catalog snapshot is empty; refusing a blank or placeholder baseline");
   }
   const { byResourceId, reconciledPaths } = indexCatalogPaths(catalog, categories);
+  const recentIds = new Set((home?.recent || []).map((item) => String(item.id)));
+  const recentById = new Map((home?.recent || []).map((item) => [String(item.id), item]));
+  const orderedResources = [
+    ...(home?.recent || []).map((item) =>
+      corpusResources.find((candidate) => String(candidate.id) === String(item.id)) || item
+    ),
+    ...corpusResources.filter((item) => !recentIds.has(String(item.id))),
+  ];
+  if (recentById.size !== (home?.recent || []).length) {
+    throw new Error("Home recent feed contains duplicate resource identities; refusing false alignment");
+  }
   const adapter = {
     AV_CONFIG: { title: nav.title || catalog.title || null, source: "approved public application catalog snapshot" },
     AV_CATEGORIES: categories.map((item) => ({
@@ -83,7 +95,7 @@ export async function buildCatalogAdapter(appBase) {
         ]),
       ),
     ),
-    AV_RESOURCES: corpusResources.map((item) => {
+    AV_RESOURCES: orderedResources.map((item) => {
       const { category, subcategory, leaf } = byResourceId.get(String(item.id)) || {};
       return {
         id: item.id,
@@ -93,7 +105,7 @@ export async function buildCatalogAdapter(appBase) {
         subsub: leaf?.slug || null,
         desc: item.description || "",
         tags: Array.isArray(item.metadata?.tags) ? item.metadata.tags.map((tag) => tag.name || tag).filter(Boolean) : [],
-        featured: Boolean(item.featured),
+        featured: Boolean(item.featured ?? item.metadata?.featured),
         url: item.url,
       };
     }),
@@ -104,9 +116,9 @@ export async function buildCatalogAdapter(appBase) {
   if (mappingFailures.length) {
     throw new Error(`Catalog-to-nav identity mapping is incomplete for ${mappingFailures.length} resources; refusing false alignment`);
   }
-  const snapshotBytes = Buffer.from(JSON.stringify({ catalog, nav }));
+  const snapshotBytes = Buffer.from(JSON.stringify({ catalog, nav, home }));
   const createdAts = corpusResources.map((item) => Date.parse(item.createdAt)).filter(Number.isFinite);
-  return { adapter, catalog, nav, reconciledPaths, snapshotBytes, corpusResources, createdAts };
+  return { adapter, catalog, nav, home, reconciledPaths, snapshotBytes, corpusResources, createdAts };
 }
 
 /** Deterministic entity choices shared by both sides (first of each level). */
@@ -237,13 +249,18 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
  * source literal and the replacement; `available` is false when the value
  * cannot be derived from real data (the literal is then left untouched).
  */
-export function buildPlaceholderSubstitutions({ adapter, createdAts, frozenAt, admin }) {
+export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin }) {
   const frozenAtMs = frozenAt.getTime();
-  const weekAgo = frozenAtMs - 7 * 86_400_000;
-  const addedThisWeek = createdAts.filter((ms) => ms >= weekAgo && ms <= frozenAtMs).length;
+  const addedThisWeek = Number(home?.approvedThisWeek);
+  if (!Number.isInteger(addedThisWeek) || addedThisWeek < 0) {
+    throw new Error("Home feed approvedThisWeek is invalid; refusing a guessed reference substitution");
+  }
   const categoriesCount = adapter.AV_CATEGORIES.length;
+  const recentBinding = JSON.stringify(adapter.AV_RESOURCES.slice(0, 5));
   const entries = [
-    { file: "home-layouts.jsx", from: "'+12 this week'", to: `'+${addedThisWeek} this week'`, source: "count of catalog resources with createdAt inside the 7 days before the frozen clock", available: true },
+    { file: "home-layouts.jsx", from: "const recent = AV_RESOURCES.slice(0, 5);", to: `const recent = ${recentBinding};`, source: "/api/home recent resources in approved/indexed order", available: true },
+    { file: "home-layouts.jsx", from: "const recent = AV_RESOURCES.slice(6, 12);", to: `const recent = ${recentBinding};`, source: "/api/home recent resources in approved/indexed order", available: true },
+    { file: "home-layouts.jsx", from: "'+12 this week'", to: `'+${addedThisWeek} this week'`, source: "/api/home approvedThisWeek (approvedAt with createdAt fallback)", available: true },
     { file: "home-layouts.jsx", from: "CURATED · WEEK 37 ·", to: `CURATED · WEEK ${isoWeek(frozenAt)} ·`, source: "ISO week of the frozen clock", available: true },
     { file: "home-layouts.jsx", from: "['CONTRIBUTORS', 3, 'reviewing']", to: admin ? `['CONTRIBUTORS', ${admin.counts.users}, 'reviewing']` : null, source: "/api/admin/stats users (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: 'sub="across 9 categories"', to: `sub="across ${categoriesCount} categories"`, source: "nav category count", available: true },

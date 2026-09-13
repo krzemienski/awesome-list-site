@@ -88,6 +88,7 @@ import { claudeService } from "../../ai/claudeService";
 import { getPublicCacheValue } from "../../cache/publicCache";
 import { isDatabaseUnavailableError } from "../../db/errors";
 import { ServiceUnavailableError } from "../../middleware/errors";
+import { registerHomeFeed } from "./home-feed";
 
 /**
  * Copied verbatim from server/routes.ts (module-level helper). Duplicated here
@@ -151,6 +152,8 @@ export function registerCatalogContributionsRoutes(
   // it); admin surfaces read the unstripped rows via /api/admin/* routes.
   const toPublicResource = <T extends Record<string, any>>(r: T) =>
     stripInternalResourceFields(r);
+
+  registerHomeFeed(app, resourceReadLimiter);
 
   // BUG-v3-M07 (run12): duplicated query params (?q=a&q=b) arrive as arrays,
   // and `(array as string).replace(...)` threw → 500. Coerce every scalar

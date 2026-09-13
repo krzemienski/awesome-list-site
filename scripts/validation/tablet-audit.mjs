@@ -470,7 +470,7 @@ for (const w of [768, 375, 320]) {
 
   // ---- home CTA reachable (hit-test) with the banner still visible ----
   const cta = await page.evaluate((vw) => {
-    const el = document.querySelector('[data-testid="button-browse-recommendations"], [data-testid="link-browse-all-resources"], a[href="/login"]');
+    const el = document.querySelector('.home-page a[href="/submit"], [data-testid="button-browse-recommendations"], [data-testid="link-browse-all-resources"], a[href="/login"]');
     if (!el) return { found: false };
     el.scrollIntoView({ block: 'center', behavior: 'instant' });
     const r = el.getBoundingClientRect();
