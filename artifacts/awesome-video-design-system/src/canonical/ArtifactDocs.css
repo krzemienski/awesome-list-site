@@ -1,0 +1,21 @@
+/* Docs-only layout from the frozen docs.html. Keep showcase controls untouched. */
+.artifact-docs .docs-nav-item { min-height: 0; }
+.artifact-docs .docs-nav > div:first-child > a {
+  display: block !important;
+  min-height: 0;
+}
+.artifact-docs .docs-nav .chip { min-height: 0; }
+.artifact-docs .docs-main h2,
+.artifact-docs .docs-main h3 { scroll-margin-top: 28px; }
+
+/* The canonical docs breakpoint is 900px, not the app's drawer breakpoints. */
+@media (max-width: 900px) {
+  .artifact-docs .docs-shell { grid-template-columns: 1fr; }
+  .artifact-docs .docs-nav {
+    position: relative;
+    height: auto;
+    border-right: none;
+    border-bottom: var(--hairline-w) solid var(--border);
+  }
+  .artifact-docs .docs-main { padding: 40px 24px 80px; }
+}

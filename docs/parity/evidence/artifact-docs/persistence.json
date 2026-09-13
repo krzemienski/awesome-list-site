@@ -1,0 +1,8 @@
+{
+  "system": "terminal",
+  "accent": "cyan",
+  "savedSystem": "terminal",
+  "savedAccent": "cyan",
+  "route": "#docs-overview",
+  "mono": "\"IBM Plex Mono\", ui-monospace, monospace"
+}

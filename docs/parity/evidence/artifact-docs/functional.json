@@ -1,0 +1,124 @@
+{
+  "nav": [
+    {
+      "id": "artifact.docs.overview",
+      "hash": "#docs-overview",
+      "active": "Overview"
+    },
+    {
+      "id": "artifact.docs.principles",
+      "hash": "#docs-principles",
+      "active": "Principles"
+    },
+    {
+      "id": "artifact.docs.getting-started",
+      "hash": "#docs-getting-started",
+      "active": "Getting started"
+    },
+    {
+      "id": "artifact.docs.tokens",
+      "hash": "#docs-tokens",
+      "active": "Token contract"
+    },
+    {
+      "id": "artifact.docs.theming",
+      "hash": "#docs-theming",
+      "active": "Theming & switching"
+    },
+    {
+      "id": "artifact.docs.typography",
+      "hash": "#docs-typography",
+      "active": "Typography"
+    },
+    {
+      "id": "artifact.docs.color",
+      "hash": "#docs-color",
+      "active": "Color & accent"
+    },
+    {
+      "id": "artifact.docs.spacing",
+      "hash": "#docs-spacing",
+      "active": "Spacing & layout"
+    },
+    {
+      "id": "artifact.docs.motion",
+      "hash": "#docs-motion",
+      "active": "Motion"
+    },
+    {
+      "id": "artifact.docs.buttons",
+      "hash": "#docs-buttons",
+      "active": "Buttons"
+    },
+    {
+      "id": "artifact.docs.cards",
+      "hash": "#docs-cards",
+      "active": "Cards"
+    },
+    {
+      "id": "artifact.docs.forms",
+      "hash": "#docs-forms",
+      "active": "Forms"
+    },
+    {
+      "id": "artifact.docs.navigation",
+      "hash": "#docs-navigation",
+      "active": "Navigation"
+    },
+    {
+      "id": "artifact.docs.lists",
+      "hash": "#docs-lists",
+      "active": "List patterns"
+    },
+    {
+      "id": "artifact.docs.flows",
+      "hash": "#docs-flows",
+      "active": "Flow diagrams"
+    },
+    {
+      "id": "artifact.docs.pages",
+      "hash": "#docs-pages",
+      "active": "Page templates"
+    },
+    {
+      "id": "artifact.docs.data-density",
+      "hash": "#docs-data-density",
+      "active": "Data density"
+    },
+    {
+      "id": "artifact.docs.integration",
+      "hash": "#docs-integration",
+      "active": "Integrate the system"
+    },
+    {
+      "id": "artifact.docs.theming-app",
+      "hash": "#docs-theming-app",
+      "active": "Theming an app"
+    },
+    {
+      "id": "artifact.docs.a11y",
+      "hash": "#docs-a11y",
+      "active": "Accessibility"
+    },
+    {
+      "id": "artifact.docs.checklist",
+      "hash": "#docs-checklist",
+      "active": "Launch checklist"
+    }
+  ],
+  "anchor": {
+    "hash": "#docs-tokens/border",
+    "y": 27.953125
+  },
+  "reloaded": {
+    "hash": "#docs-tokens/border",
+    "y": 27.953125
+  },
+  "unknown": {
+    "hash": "#docs-overview",
+    "title": "Awesome.Video Design System"
+  },
+  "back": "#docs-tokens/border",
+  "forward": "#docs-overview",
+  "errors": []
+}

@@ -1,0 +1,1262 @@
+[
+  {
+    "id": "overview",
+    "width": 375,
+    "diffPercent": 0.46382783882783885,
+    "pass": true,
+    "actualSize": [
+      375,
+      2912
+    ],
+    "referenceSize": [
+      375,
+      2912
+    ],
+    "heading": "Awesome.Video Design System"
+  },
+  {
+    "id": "principles",
+    "width": 375,
+    "diffPercent": 2.85790527018012,
+    "pass": false,
+    "actualSize": [
+      375,
+      2975
+    ],
+    "referenceSize": [
+      375,
+      2998
+    ],
+    "heading": "Principles"
+  },
+  {
+    "id": "getting-started",
+    "width": 375,
+    "diffPercent": 0.7655356925696218,
+    "pass": false,
+    "actualSize": [
+      420,
+      2741
+    ],
+    "referenceSize": [
+      420,
+      2741
+    ],
+    "heading": "Getting started"
+  },
+  {
+    "id": "tokens",
+    "width": 375,
+    "diffPercent": 0.21658007888027878,
+    "pass": true,
+    "actualSize": [
+      409,
+      5526
+    ],
+    "referenceSize": [
+      409,
+      5526
+    ],
+    "heading": "Token contract"
+  },
+  {
+    "id": "theming",
+    "width": 375,
+    "diffPercent": 0.5809276602710255,
+    "pass": false,
+    "actualSize": [
+      585,
+      2924
+    ],
+    "referenceSize": [
+      585,
+      2924
+    ],
+    "heading": "Theming & switching"
+  },
+  {
+    "id": "typography",
+    "width": 375,
+    "diffPercent": 0.6710608611979794,
+    "pass": false,
+    "actualSize": [
+      375,
+      4157
+    ],
+    "referenceSize": [
+      375,
+      4157
+    ],
+    "heading": "Typography"
+  },
+  {
+    "id": "color",
+    "width": 375,
+    "diffPercent": 0.4752890342016704,
+    "pass": true,
+    "actualSize": [
+      458,
+      3331
+    ],
+    "referenceSize": [
+      458,
+      3331
+    ],
+    "heading": "Color & accent"
+  },
+  {
+    "id": "spacing",
+    "width": 375,
+    "diffPercent": 0.3810615711252654,
+    "pass": true,
+    "actualSize": [
+      375,
+      3140
+    ],
+    "referenceSize": [
+      375,
+      3140
+    ],
+    "heading": "Spacing & layout"
+  },
+  {
+    "id": "motion",
+    "width": 375,
+    "diffPercent": 0.32095682203968545,
+    "pass": true,
+    "actualSize": [
+      428,
+      3353
+    ],
+    "referenceSize": [
+      428,
+      3353
+    ],
+    "heading": "Motion"
+  },
+  {
+    "id": "buttons",
+    "width": 375,
+    "diffPercent": 2.5226282569386207,
+    "pass": false,
+    "actualSize": [
+      409,
+      3379
+    ],
+    "referenceSize": [
+      409,
+      3363
+    ],
+    "heading": "Buttons"
+  },
+  {
+    "id": "cards",
+    "width": 375,
+    "diffPercent": 0.182715902401598,
+    "pass": true,
+    "actualSize": [
+      428,
+      2826
+    ],
+    "referenceSize": [
+      428,
+      2826
+    ],
+    "heading": "Cards"
+  },
+  {
+    "id": "forms",
+    "width": 375,
+    "diffPercent": 1.703279634314117,
+    "pass": false,
+    "actualSize": [
+      406,
+      2775
+    ],
+    "referenceSize": [
+      406,
+      2771
+    ],
+    "heading": "Forms"
+  },
+  {
+    "id": "navigation",
+    "width": 375,
+    "diffPercent": 0.3406305949198225,
+    "pass": true,
+    "actualSize": [
+      389,
+      3301
+    ],
+    "referenceSize": [
+      389,
+      3301
+    ],
+    "heading": "Navigation"
+  },
+  {
+    "id": "lists",
+    "width": 375,
+    "diffPercent": 0.3139440178185566,
+    "pass": true,
+    "actualSize": [
+      542,
+      2664
+    ],
+    "referenceSize": [
+      542,
+      2664
+    ],
+    "heading": "List patterns"
+  },
+  {
+    "id": "flows",
+    "width": 375,
+    "diffPercent": 0.35744554071682905,
+    "pass": true,
+    "actualSize": [
+      428,
+      3231
+    ],
+    "referenceSize": [
+      428,
+      3231
+    ],
+    "heading": "Flow diagrams"
+  },
+  {
+    "id": "pages",
+    "width": 375,
+    "diffPercent": 0.734803738317757,
+    "pass": false,
+    "actualSize": [
+      375,
+      2675
+    ],
+    "referenceSize": [
+      375,
+      2675
+    ],
+    "heading": "Page templates"
+  },
+  {
+    "id": "data-density",
+    "width": 375,
+    "diffPercent": 0.26625829504849413,
+    "pass": true,
+    "actualSize": [
+      375,
+      2612
+    ],
+    "referenceSize": [
+      375,
+      2612
+    ],
+    "heading": "Data density"
+  },
+  {
+    "id": "integration",
+    "width": 375,
+    "diffPercent": 0.20050920485703097,
+    "pass": true,
+    "actualSize": [
+      920,
+      2775
+    ],
+    "referenceSize": [
+      920,
+      2775
+    ],
+    "heading": "Integrate the system"
+  },
+  {
+    "id": "theming-app",
+    "width": 375,
+    "diffPercent": 0.5705024311183143,
+    "pass": false,
+    "actualSize": [
+      375,
+      2468
+    ],
+    "referenceSize": [
+      375,
+      2468
+    ],
+    "heading": "Theming an app"
+  },
+  {
+    "id": "a11y",
+    "width": 375,
+    "diffPercent": 0.24970146180770025,
+    "pass": true,
+    "actualSize": [
+      375,
+      3238
+    ],
+    "referenceSize": [
+      375,
+      3238
+    ],
+    "heading": "Accessibility"
+  },
+  {
+    "id": "checklist",
+    "width": 375,
+    "diffPercent": 0.2149085794655415,
+    "pass": true,
+    "actualSize": [
+      375,
+      3318
+    ],
+    "referenceSize": [
+      375,
+      3318
+    ],
+    "heading": "Launch checklist"
+  },
+  {
+    "id": "overview",
+    "width": 768,
+    "diffPercent": 0.29455994545705605,
+    "pass": true,
+    "actualSize": [
+      768,
+      2414
+    ],
+    "referenceSize": [
+      768,
+      2414
+    ],
+    "heading": "Awesome.Video Design System"
+  },
+  {
+    "id": "principles",
+    "width": 768,
+    "diffPercent": 0.4694199162923642,
+    "pass": true,
+    "actualSize": [
+      768,
+      2449
+    ],
+    "referenceSize": [
+      768,
+      2449
+    ],
+    "heading": "Principles"
+  },
+  {
+    "id": "getting-started",
+    "width": 768,
+    "diffPercent": 0.458612567987568,
+    "pass": true,
+    "actualSize": [
+      768,
+      2574
+    ],
+    "referenceSize": [
+      768,
+      2574
+    ],
+    "heading": "Getting started"
+  },
+  {
+    "id": "tokens",
+    "width": 768,
+    "diffPercent": 0.15500238124189364,
+    "pass": true,
+    "actualSize": [
+      768,
+      4112
+    ],
+    "referenceSize": [
+      768,
+      4112
+    ],
+    "heading": "Token contract"
+  },
+  {
+    "id": "theming",
+    "width": 768,
+    "diffPercent": 0.45372034244974285,
+    "pass": true,
+    "actualSize": [
+      768,
+      2852
+    ],
+    "referenceSize": [
+      768,
+      2852
+    ],
+    "heading": "Theming & switching"
+  },
+  {
+    "id": "typography",
+    "width": 768,
+    "diffPercent": 0.4419229497354497,
+    "pass": true,
+    "actualSize": [
+      768,
+      3150
+    ],
+    "referenceSize": [
+      768,
+      3150
+    ],
+    "heading": "Typography"
+  },
+  {
+    "id": "color",
+    "width": 768,
+    "diffPercent": 0.31119405036841524,
+    "pass": true,
+    "actualSize": [
+      768,
+      3031
+    ],
+    "referenceSize": [
+      768,
+      3031
+    ],
+    "heading": "Color & accent"
+  },
+  {
+    "id": "spacing",
+    "width": 768,
+    "diffPercent": 0.22852683229003654,
+    "pass": true,
+    "actualSize": [
+      768,
+      2556
+    ],
+    "referenceSize": [
+      768,
+      2556
+    ],
+    "heading": "Spacing & layout"
+  },
+  {
+    "id": "motion",
+    "width": 768,
+    "diffPercent": 0.2020685927672956,
+    "pass": true,
+    "actualSize": [
+      768,
+      2968
+    ],
+    "referenceSize": [
+      768,
+      2968
+    ],
+    "heading": "Motion"
+  },
+  {
+    "id": "buttons",
+    "width": 768,
+    "diffPercent": 1.6471023688663284,
+    "pass": false,
+    "actualSize": [
+      768,
+      2758
+    ],
+    "referenceSize": [
+      768,
+      2750
+    ],
+    "heading": "Buttons"
+  },
+  {
+    "id": "cards",
+    "width": 768,
+    "diffPercent": 0.1180163415468857,
+    "pass": true,
+    "actualSize": [
+      768,
+      2435
+    ],
+    "referenceSize": [
+      768,
+      2435
+    ],
+    "heading": "Cards"
+  },
+  {
+    "id": "forms",
+    "width": 768,
+    "diffPercent": 1.0302486448469876,
+    "pass": false,
+    "actualSize": [
+      768,
+      2429
+    ],
+    "referenceSize": [
+      768,
+      2425
+    ],
+    "heading": "Forms"
+  },
+  {
+    "id": "navigation",
+    "width": 768,
+    "diffPercent": 0.21843010236724247,
+    "pass": true,
+    "actualSize": [
+      768,
+      2605
+    ],
+    "referenceSize": [
+      768,
+      2605
+    ],
+    "heading": "Navigation"
+  },
+  {
+    "id": "lists",
+    "width": 768,
+    "diffPercent": 0.24460604019892251,
+    "pass": true,
+    "actualSize": [
+      768,
+      2413
+    ],
+    "referenceSize": [
+      768,
+      2413
+    ],
+    "heading": "List patterns"
+  },
+  {
+    "id": "flows",
+    "width": 768,
+    "diffPercent": 0.2477317577974586,
+    "pass": true,
+    "actualSize": [
+      768,
+      2597
+    ],
+    "referenceSize": [
+      768,
+      2597
+    ],
+    "heading": "Flow diagrams"
+  },
+  {
+    "id": "pages",
+    "width": 768,
+    "diffPercent": 0.4182289555465478,
+    "pass": true,
+    "actualSize": [
+      768,
+      2467
+    ],
+    "referenceSize": [
+      768,
+      2467
+    ],
+    "heading": "Page templates"
+  },
+  {
+    "id": "data-density",
+    "width": 768,
+    "diffPercent": 0.15541571319603356,
+    "pass": true,
+    "actualSize": [
+      768,
+      2185
+    ],
+    "referenceSize": [
+      768,
+      2185
+    ],
+    "heading": "Data density"
+  },
+  {
+    "id": "integration",
+    "width": 768,
+    "diffPercent": 0.20050920485703097,
+    "pass": true,
+    "actualSize": [
+      920,
+      2775
+    ],
+    "referenceSize": [
+      920,
+      2775
+    ],
+    "heading": "Integrate the system"
+  },
+  {
+    "id": "theming-app",
+    "width": 768,
+    "diffPercent": 0.3010070052539404,
+    "pass": true,
+    "actualSize": [
+      768,
+      2284
+    ],
+    "referenceSize": [
+      768,
+      2284
+    ],
+    "heading": "Theming an app"
+  },
+  {
+    "id": "a11y",
+    "width": 768,
+    "diffPercent": 0.15085657877977326,
+    "pass": true,
+    "actualSize": [
+      768,
+      2617
+    ],
+    "referenceSize": [
+      768,
+      2617
+    ],
+    "heading": "Accessibility"
+  },
+  {
+    "id": "checklist",
+    "width": 768,
+    "diffPercent": 0.1166813281948168,
+    "pass": true,
+    "actualSize": [
+      768,
+      2984
+    ],
+    "referenceSize": [
+      768,
+      2984
+    ],
+    "heading": "Launch checklist"
+  },
+  {
+    "id": "overview",
+    "width": 1024,
+    "diffPercent": 0.7287043603587116,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1366
+    ],
+    "referenceSize": [
+      1024,
+      1366
+    ],
+    "heading": "Awesome.Video Design System"
+  },
+  {
+    "id": "principles",
+    "width": 1024,
+    "diffPercent": 0.7207568049682875,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1419
+    ],
+    "referenceSize": [
+      1024,
+      1419
+    ],
+    "heading": "Principles"
+  },
+  {
+    "id": "getting-started",
+    "width": 1024,
+    "diffPercent": 0.7317893863341969,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1544
+    ],
+    "referenceSize": [
+      1024,
+      1544
+    ],
+    "heading": "Getting started"
+  },
+  {
+    "id": "tokens",
+    "width": 1024,
+    "diffPercent": 0.18683017828525642,
+    "pass": true,
+    "actualSize": [
+      1024,
+      3120
+    ],
+    "referenceSize": [
+      1024,
+      3120
+    ],
+    "heading": "Token contract"
+  },
+  {
+    "id": "theming",
+    "width": 1024,
+    "diffPercent": 0.8003141511401557,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1798
+    ],
+    "referenceSize": [
+      1024,
+      1798
+    ],
+    "heading": "Theming & switching"
+  },
+  {
+    "id": "typography",
+    "width": 1024,
+    "diffPercent": 0.5988076434813415,
+    "pass": false,
+    "actualSize": [
+      1024,
+      2117
+    ],
+    "referenceSize": [
+      1024,
+      2117
+    ],
+    "heading": "Typography"
+  },
+  {
+    "id": "color",
+    "width": 1024,
+    "diffPercent": 0.4087533984572585,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1977
+    ],
+    "referenceSize": [
+      1024,
+      1977
+    ],
+    "heading": "Color & accent"
+  },
+  {
+    "id": "spacing",
+    "width": 1024,
+    "diffPercent": 0.44221820869420386,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1501
+    ],
+    "referenceSize": [
+      1024,
+      1501
+    ],
+    "heading": "Spacing & layout"
+  },
+  {
+    "id": "motion",
+    "width": 1024,
+    "diffPercent": 0.2593510230179028,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1955
+    ],
+    "referenceSize": [
+      1024,
+      1955
+    ],
+    "heading": "Motion"
+  },
+  {
+    "id": "buttons",
+    "width": 1024,
+    "diffPercent": 1.8934079738849765,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1704
+    ],
+    "referenceSize": [
+      1024,
+      1696
+    ],
+    "heading": "Buttons"
+  },
+  {
+    "id": "cards",
+    "width": 1024,
+    "diffPercent": 0.18611965966690802,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1381
+    ],
+    "referenceSize": [
+      1024,
+      1381
+    ],
+    "heading": "Cards"
+  },
+  {
+    "id": "forms",
+    "width": 1024,
+    "diffPercent": 1.2688205058224162,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1374
+    ],
+    "referenceSize": [
+      1024,
+      1370
+    ],
+    "heading": "Forms"
+  },
+  {
+    "id": "navigation",
+    "width": 1024,
+    "diffPercent": 0.3743388677929324,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1613
+    ],
+    "referenceSize": [
+      1024,
+      1613
+    ],
+    "heading": "Navigation"
+  },
+  {
+    "id": "lists",
+    "width": 1024,
+    "diffPercent": 0.44937465983309144,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1378
+    ],
+    "referenceSize": [
+      1024,
+      1378
+    ],
+    "heading": "List patterns"
+  },
+  {
+    "id": "flows",
+    "width": 1024,
+    "diffPercent": 0.4212908878504673,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1605
+    ],
+    "referenceSize": [
+      1024,
+      1605
+    ],
+    "heading": "Flow diagrams"
+  },
+  {
+    "id": "pages",
+    "width": 1024,
+    "diffPercent": 0.7160767206298655,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1413
+    ],
+    "referenceSize": [
+      1024,
+      1413
+    ],
+    "heading": "Page templates"
+  },
+  {
+    "id": "data-density",
+    "width": 1024,
+    "diffPercent": 0.38680698848827105,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1151
+    ],
+    "referenceSize": [
+      1024,
+      1151
+    ],
+    "heading": "Data density"
+  },
+  {
+    "id": "integration",
+    "width": 1024,
+    "diffPercent": 0.43846078044934966,
+    "pass": true,
+    "actualSize": [
+      1180,
+      1720
+    ],
+    "referenceSize": [
+      1180,
+      1720
+    ],
+    "heading": "Integrate the system"
+  },
+  {
+    "id": "theming-app",
+    "width": 1024,
+    "diffPercent": 0.6067635533146964,
+    "pass": false,
+    "actualSize": [
+      1024,
+      1252
+    ],
+    "referenceSize": [
+      1024,
+      1252
+    ],
+    "heading": "Theming an app"
+  },
+  {
+    "id": "a11y",
+    "width": 1024,
+    "diffPercent": 0.2868035827020202,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1584
+    ],
+    "referenceSize": [
+      1024,
+      1584
+    ],
+    "heading": "Accessibility"
+  },
+  {
+    "id": "checklist",
+    "width": 1024,
+    "diffPercent": 0.2442908653846154,
+    "pass": true,
+    "actualSize": [
+      1024,
+      1950
+    ],
+    "referenceSize": [
+      1024,
+      1950
+    ],
+    "heading": "Launch checklist"
+  },
+  {
+    "id": "overview",
+    "width": 1440,
+    "diffPercent": 0.6623667920388654,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1418
+    ],
+    "referenceSize": [
+      1440,
+      1418
+    ],
+    "heading": "Awesome.Video Design System"
+  },
+  {
+    "id": "principles",
+    "width": 1440,
+    "diffPercent": 0.5745506535947712,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1360
+    ],
+    "referenceSize": [
+      1440,
+      1360
+    ],
+    "heading": "Principles"
+  },
+  {
+    "id": "getting-started",
+    "width": 1440,
+    "diffPercent": 0.591025222874538,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1533
+    ],
+    "referenceSize": [
+      1440,
+      1533
+    ],
+    "heading": "Getting started"
+  },
+  {
+    "id": "tokens",
+    "width": 1440,
+    "diffPercent": 0.17557908070937386,
+    "pass": true,
+    "actualSize": [
+      1440,
+      3070
+    ],
+    "referenceSize": [
+      1440,
+      3070
+    ],
+    "heading": "Token contract"
+  },
+  {
+    "id": "theming",
+    "width": 1440,
+    "diffPercent": 0.6621571875575188,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1811
+    ],
+    "referenceSize": [
+      1440,
+      1811
+    ],
+    "heading": "Theming & switching"
+  },
+  {
+    "id": "typography",
+    "width": 1440,
+    "diffPercent": 0.4625678309888836,
+    "pass": true,
+    "actualSize": [
+      1440,
+      2109
+    ],
+    "referenceSize": [
+      1440,
+      2109
+    ],
+    "heading": "Typography"
+  },
+  {
+    "id": "color",
+    "width": 1440,
+    "diffPercent": 0.3823632049134562,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1990
+    ],
+    "referenceSize": [
+      1440,
+      1990
+    ],
+    "heading": "Color & accent"
+  },
+  {
+    "id": "spacing",
+    "width": 1440,
+    "diffPercent": 0.43206820682068203,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1515
+    ],
+    "referenceSize": [
+      1440,
+      1515
+    ],
+    "heading": "Spacing & layout"
+  },
+  {
+    "id": "motion",
+    "width": 1440,
+    "diffPercent": 0.24125109361329833,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1905
+    ],
+    "referenceSize": [
+      1440,
+      1905
+    ],
+    "heading": "Motion"
+  },
+  {
+    "id": "buttons",
+    "width": 1440,
+    "diffPercent": 1.3797482689445415,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1717
+    ],
+    "referenceSize": [
+      1440,
+      1709
+    ],
+    "heading": "Buttons"
+  },
+  {
+    "id": "cards",
+    "width": 1440,
+    "diffPercent": 0.18137492918993284,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1373
+    ],
+    "referenceSize": [
+      1440,
+      1373
+    ],
+    "heading": "Cards"
+  },
+  {
+    "id": "forms",
+    "width": 1440,
+    "diffPercent": 0.9460554755043227,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1388
+    ],
+    "referenceSize": [
+      1440,
+      1384
+    ],
+    "heading": "Forms"
+  },
+  {
+    "id": "navigation",
+    "width": 1440,
+    "diffPercent": 0.3061949417448139,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1564
+    ],
+    "referenceSize": [
+      1440,
+      1564
+    ],
+    "heading": "Navigation"
+  },
+  {
+    "id": "lists",
+    "width": 1440,
+    "diffPercent": 0.3680758017492711,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1372
+    ],
+    "referenceSize": [
+      1440,
+      1372
+    ],
+    "heading": "List patterns"
+  },
+  {
+    "id": "flows",
+    "width": 1440,
+    "diffPercent": 0.38677859586494123,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1494
+    ],
+    "referenceSize": [
+      1440,
+      1494
+    ],
+    "heading": "Flow diagrams"
+  },
+  {
+    "id": "pages",
+    "width": 1440,
+    "diffPercent": 0.5606689262895435,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1426
+    ],
+    "referenceSize": [
+      1440,
+      1426
+    ],
+    "heading": "Page templates"
+  },
+  {
+    "id": "data-density",
+    "width": 1440,
+    "diffPercent": 0.3074616355866356,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1144
+    ],
+    "referenceSize": [
+      1440,
+      1144
+    ],
+    "heading": "Data density"
+  },
+  {
+    "id": "integration",
+    "width": 1440,
+    "diffPercent": 0.41478437780340893,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1734
+    ],
+    "referenceSize": [
+      1440,
+      1734
+    ],
+    "heading": "Integrate the system"
+  },
+  {
+    "id": "theming-app",
+    "width": 1440,
+    "diffPercent": 0.5360016090104586,
+    "pass": false,
+    "actualSize": [
+      1440,
+      1243
+    ],
+    "referenceSize": [
+      1440,
+      1243
+    ],
+    "heading": "Theming an app"
+  },
+  {
+    "id": "a11y",
+    "width": 1440,
+    "diffPercent": 0.22450472363226168,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1576
+    ],
+    "referenceSize": [
+      1440,
+      1576
+    ],
+    "heading": "Accessibility"
+  },
+  {
+    "id": "checklist",
+    "width": 1440,
+    "diffPercent": 0.25536827357465547,
+    "pass": true,
+    "actualSize": [
+      1440,
+      1943
+    ],
+    "referenceSize": [
+      1440,
+      1943
+    ],
+    "heading": "Launch checklist"
+  }
+]

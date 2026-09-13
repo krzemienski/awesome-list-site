@@ -1,0 +1,42 @@
+[
+  {
+    "id": "overview",
+    "width": 375,
+    "violations": []
+  },
+  {
+    "id": "forms",
+    "width": 375,
+    "violations": []
+  },
+  {
+    "id": "flows",
+    "width": 375,
+    "violations": []
+  },
+  {
+    "id": "checklist",
+    "width": 375,
+    "violations": []
+  },
+  {
+    "id": "overview",
+    "width": 1440,
+    "violations": []
+  },
+  {
+    "id": "forms",
+    "width": 1440,
+    "violations": []
+  },
+  {
+    "id": "flows",
+    "width": 1440,
+    "violations": []
+  },
+  {
+    "id": "checklist",
+    "width": 1440,
+    "violations": []
+  }
+]
