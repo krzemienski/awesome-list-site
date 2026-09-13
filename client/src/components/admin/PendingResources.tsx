@@ -1,19 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource } from "@shared/schema";
+import "./queues-review.css";
 
 // BUG-040 (run19): the detail dialog renders whatever string is stored in
 // resource.url — only make it clickable when it is a well-formed http(s)
@@ -35,6 +37,31 @@ interface PendingResourcesResponse {
   total: number;
 }
 
+interface BulkResourceResponse {
+  message?: string;
+  succeeded: number;
+  failed: number;
+}
+
+interface BulkResourceOutcome {
+  action: "approved" | "rejected";
+  requested: number;
+  succeeded: number;
+  failed: number;
+}
+
+// Keep queue bulk requests within the shared API body-array ceiling.
+const MAX_BULK_RESOURCE_IDS = 10_000;
+const MIN_REJECTION_REASON_LENGTH = 10;
+
+function StatusChip({ status }: { status: "pending" | "approved" | "rejected" }) {
+  return (
+    <Badge variant="chip" className={`admin-chip queue-review-status queue-review-status--${status}`}>
+      {status}
+    </Badge>
+  );
+}
+
 export default function PendingResources() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -46,6 +73,17 @@ export default function PendingResources() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [resourceToApprove, setResourceToApprove] = useState<Resource | null>(null);
   const [resourceToReject, setResourceToReject] = useState<Resource | null>(null);
+  const [selectedResourceIds, setSelectedResourceIds] = useState<Set<number>>(new Set());
+  const [bulkApproveIds, setBulkApproveIds] = useState<number[]>([]);
+  const [bulkRejectIds, setBulkRejectIds] = useState<number[]>([]);
+  const [bulkApproveDialogOpen, setBulkApproveDialogOpen] = useState(false);
+  const [bulkRejectDialogOpen, setBulkRejectDialogOpen] = useState(false);
+  const [bulkRejectionReason, setBulkRejectionReason] = useState("");
+  const [approveError, setApproveError] = useState<string | null>(null);
+  const [rejectError, setRejectError] = useState<string | null>(null);
+  const [bulkApproveError, setBulkApproveError] = useState<string | null>(null);
+  const [bulkRejectError, setBulkRejectError] = useState<string | null>(null);
+  const [bulkOutcome, setBulkOutcome] = useState<BulkResourceOutcome | null>(null);
   // Run17 BUG-027: "Check again" busy/outcome state for the empty view.
   const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked'>('idle');
 
@@ -56,10 +94,33 @@ export default function PendingResources() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
 
-  const { data, isLoading } = useQuery<PendingResourcesResponse>({
+  const { data, isLoading, isError, refetch, isFetching } = useQuery<PendingResourcesResponse>({
     queryKey: ['/api/admin/pending-resources'],
     refetchInterval: 10000
   });
+
+  const pendingResourceData = data?.resources;
+  const pendingResources = useMemo(
+    () => pendingResourceData ?? [],
+    [pendingResourceData],
+  );
+  const totalPending = data?.total ?? 0;
+  const pendingResourceIds = useMemo(
+    () => pendingResources.map((resource) => resource.id),
+    [pendingResources],
+  );
+  const selectedPendingResourceIds = pendingResourceIds.filter((id) => selectedResourceIds.has(id));
+  const allResourcesSelected = pendingResources.length > 0 && selectedPendingResourceIds.length === pendingResources.length;
+
+  useEffect(() => {
+    setSelectedResourceIds((previous) => {
+      const next = new Set(previous);
+      for (const id of previous) {
+        if (!pendingResourceIds.includes(id)) next.delete(id);
+      }
+      return next.size === previous.size ? previous : next;
+    });
+  }, [pendingResourceIds]);
 
   // BUG-011 (run22): keep the hint in sync with real horizontal overflow.
   // Deps include the loading/count flags because the scroll container only
@@ -98,19 +159,16 @@ export default function PendingResources() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      setApproveDialogOpen(false);
+      setResourceToApprove(null);
+      setApproveError(null);
       toast({
         title: "Resource Approved",
         description: "The resource has been approved and added to the public catalog.",
       });
-      setApproveDialogOpen(false);
-      setResourceToApprove(null);
     },
     onError: (error: Error) => {
-      toast({
-        title: "Approval Failed",
-        description: error.message || "Failed to approve resource. Please try again.",
-        variant: "destructive"
-      });
+      setApproveError(error.message || "Failed to approve resource. Please try again.");
     }
   });
 
@@ -124,20 +182,91 @@ export default function PendingResources() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
       void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      setRejectDialogOpen(false);
+      setResourceToReject(null);
+      setRejectionReason("");
+      setRejectError(null);
       toast({
         title: "Resource Rejected",
         description: "The resource has been rejected.",
       });
-      setRejectDialogOpen(false);
-      setResourceToReject(null);
-      setRejectionReason("");
     },
     onError: (error: Error) => {
+      setRejectError(error.message || "Failed to reject resource. Please try again.");
+    }
+  });
+
+  const bulkApproveMutation = useMutation({
+    mutationFn: async (ids: number[]): Promise<BulkResourceResponse> => {
+      if (ids.length > MAX_BULK_RESOURCE_IDS) {
+        throw new Error(`Select no more than ${MAX_BULK_RESOURCE_IDS.toLocaleString()} resources at a time.`);
+      }
+      return await apiRequest('/api/admin/resources/bulk/approve', {
+        method: 'POST',
+        body: JSON.stringify({ ids })
+      }) as BulkResourceResponse;
+    },
+    onSuccess: (response, ids) => {
+      const outcome = {
+        action: "approved" as const,
+        requested: ids.length,
+        succeeded: response.succeeded,
+        failed: response.failed
+      };
+      setBulkOutcome(outcome);
+      setSelectedResourceIds(new Set());
+      setBulkApproveDialogOpen(false);
+      setBulkApproveIds([]);
+      setBulkApproveError(null);
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
-        title: "Rejection Failed",
-        description: error.message || "Failed to reject resource. Please try again.",
-        variant: "destructive"
+        title: response.failed > 0 ? "Bulk approval completed with failures" : "Resources Approved",
+        description: `${response.succeeded} approved${response.failed > 0 ? `, ${response.failed} failed` : ""}.`,
+        variant: response.failed > 0 ? "destructive" : undefined
       });
+    },
+    onError: (error: Error) => {
+      setBulkApproveError(error.message || "Failed to approve selected resources. Please try again.");
+    }
+  });
+
+  const bulkRejectMutation = useMutation({
+    mutationFn: async ({ ids, reason }: { ids: number[]; reason: string }): Promise<BulkResourceResponse> => {
+      if (ids.length > MAX_BULK_RESOURCE_IDS) {
+        throw new Error(`Select no more than ${MAX_BULK_RESOURCE_IDS.toLocaleString()} resources at a time.`);
+      }
+      if (reason.trim().length < MIN_REJECTION_REASON_LENGTH) {
+        throw new Error(`Rejection reason must be at least ${MIN_REJECTION_REASON_LENGTH} characters.`);
+      }
+      return await apiRequest('/api/admin/resources/bulk/reject', {
+        method: 'POST',
+        body: JSON.stringify({ ids, reason })
+      }) as BulkResourceResponse;
+    },
+    onSuccess: (response, variables) => {
+      const outcome = {
+        action: "rejected" as const,
+        requested: variables.ids.length,
+        succeeded: response.succeeded,
+        failed: response.failed
+      };
+      setBulkOutcome(outcome);
+      setSelectedResourceIds(new Set());
+      setBulkRejectDialogOpen(false);
+      setBulkRejectIds([]);
+      setBulkRejectionReason("");
+      setBulkRejectError(null);
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      toast({
+        title: response.failed > 0 ? "Bulk rejection completed with failures" : "Resources Rejected",
+        description: `${response.succeeded} rejected${response.failed > 0 ? `, ${response.failed} failed` : ""}.`,
+        variant: response.failed > 0 ? "destructive" : undefined
+      });
+    },
+    onError: (error: Error) => {
+      setBulkRejectError(error.message || "Failed to reject selected resources. Please try again.");
     }
   });
 
@@ -147,33 +276,89 @@ export default function PendingResources() {
   };
 
   const handleApproveClick = (resource: Resource) => {
+    setApproveError(null);
     setResourceToApprove(resource);
     setApproveDialogOpen(true);
   };
 
   const handleRejectClick = (resource: Resource) => {
+    setRejectError(null);
     setResourceToReject(resource);
     setRejectDialogOpen(true);
   };
 
-  const handleApproveConfirm = () => {
+  const handleApproveConfirm = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     if (resourceToApprove) {
       approveMutation.mutate(resourceToApprove.id);
     }
   };
 
-  const handleRejectConfirm = () => {
-    if (resourceToReject && rejectionReason.trim().length >= 10) {
+  const handleRejectConfirm = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (resourceToReject && rejectionReason.trim().length >= MIN_REJECTION_REASON_LENGTH) {
       rejectMutation.mutate({
         resourceId: resourceToReject.id,
         reason: rejectionReason.trim()
       });
     } else {
-      toast({
-        title: "Invalid Reason",
-        description: "Rejection reason must be at least 10 characters.",
-        variant: "destructive"
+      setRejectError(`Rejection reason must be at least ${MIN_REJECTION_REASON_LENGTH} characters.`);
+    }
+  };
+
+  const toggleResourceSelection = (resourceId: number, checked: boolean) => {
+    setSelectedResourceIds((previous) => {
+      const next = new Set(previous);
+      if (checked) next.add(resourceId);
+      else next.delete(resourceId);
+      return next;
+    });
+  };
+
+  const toggleAllResources = (checked: boolean) => {
+    setSelectedResourceIds(checked ? new Set(pendingResourceIds) : new Set());
+  };
+
+  const openBulkApproveDialog = () => {
+    const ids = selectedPendingResourceIds.length > 0 ? selectedPendingResourceIds : pendingResourceIds;
+    if (ids.length === 0) return;
+    setBulkApproveError(
+      ids.length > MAX_BULK_RESOURCE_IDS
+        ? `Select no more than ${MAX_BULK_RESOURCE_IDS.toLocaleString()} resources at a time.`
+        : null,
+    );
+    setBulkApproveIds(ids);
+    setBulkApproveDialogOpen(true);
+  };
+
+  const openBulkRejectDialog = () => {
+    if (selectedPendingResourceIds.length === 0) return;
+    setBulkRejectError(
+      selectedPendingResourceIds.length > MAX_BULK_RESOURCE_IDS
+        ? `Select no more than ${MAX_BULK_RESOURCE_IDS.toLocaleString()} resources at a time.`
+        : null,
+    );
+    setBulkRejectIds(selectedPendingResourceIds);
+    setBulkRejectDialogOpen(true);
+  };
+
+  const handleBulkRejectConfirm = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (
+      bulkRejectIds.length > 0 &&
+      bulkRejectIds.length <= MAX_BULK_RESOURCE_IDS &&
+      bulkRejectionReason.trim().length >= MIN_REJECTION_REASON_LENGTH
+    ) {
+      bulkRejectMutation.mutate({
+        ids: bulkRejectIds,
+        reason: bulkRejectionReason.trim()
       });
+    } else {
+      setBulkRejectError(
+        bulkRejectIds.length > MAX_BULK_RESOURCE_IDS
+          ? `Select no more than ${MAX_BULK_RESOURCE_IDS.toLocaleString()} resources at a time.`
+          : `Rejection reason must be at least ${MIN_REJECTION_REASON_LENGTH} characters.`,
+      );
     }
   };
 
@@ -194,93 +379,127 @@ export default function PendingResources() {
     return formatAdminDate(date);
   };
 
-  if (isLoading) {
+  if (isError) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Pending Approvals</CardTitle>
-          <CardDescription>Resources awaiting admin review</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <section className="admin-panel queue-review-shell" aria-label="Approvals">
+        <div className="admin-panel__heading queue-review-shell-heading"><h2>Approvals</h2></div>
+        <div className="queue-review-empty" role="alert" data-testid="pending-resources-load-error">
+          <p>Unable to load pending resources. The queue may still contain items awaiting review.</p>
+          <Button onClick={() => void refetch()} disabled={isFetching} data-testid="pending-resources-retry">
+            {isFetching ? "Retrying…" : "Retry"}
+          </Button>
+        </div>
+      </section>
     );
   }
 
-  const pendingResources = data?.resources ?? [];
-  const totalPending = data?.total ?? 0;
+  if (isLoading) {
+    return (
+      <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
+        <div className="admin-panel__heading queue-review-shell-heading">
+          <div>
+            <h2 id="pending-resources-heading">Pending Approvals</h2>
+            <p>Resources awaiting admin review</p>
+          </div>
+        </div>
+        <div className="queue-review-loading-table" aria-label="Loading pending approvals">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div className="queue-review-loading-row" key={i}>
+              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-1/5" />
+              <Skeleton className="h-4 w-1/3" />
+              <Skeleton className="h-4 w-1/6" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (totalPending === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className={"h-5 w-5 text-[#34d08c]" /* DS-OK: status ok */} />
-            Pending Approvals
-          </CardTitle>
-          <CardDescription>Resources awaiting admin review</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12">
-            <CheckCircle2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-lg font-semibold mb-2">All Caught Up!</h3>
-            <p className="text-muted-foreground mb-4">
-              There are no pending resources to review at this time.
-            </p>
-            {/* Run16 BUG-078: empty state gets an explicit refresh control.
-                Run17 BUG-027: it now shows a busy state while re-fetching and
-                announces the outcome via role="status". */}
-            <Button
-              variant="outline"
-              disabled={recheckState === 'checking'}
-              onClick={async () => {
-                setRecheckState('checking');
-                await queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
-                setRecheckState('checked');
-              }}
-              data-testid="button-refresh-pending-resources"
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
-              {recheckState === 'checking' ? 'Checking…' : 'Check again'}
-            </Button>
-            <p role="status" aria-live="polite" className="text-sm text-muted-foreground mt-3">
-              {recheckState === 'checked' ? 'Checked — still no pending resources.' : ''}
-            </p>
+      <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
+        <div className="admin-panel__heading queue-review-shell-heading">
+          <div>
+            <h2 id="pending-resources-heading">Pending Approvals</h2>
+            <p>Resources awaiting admin review</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        {bulkOutcome && (
+          <div className={`queue-review-result ${bulkOutcome.failed > 0 ? "queue-review-result--error" : ""}`} role={bulkOutcome.failed > 0 ? "alert" : "status"} data-testid="bulk-result-resources">
+            <strong>{bulkOutcome.action === "approved" ? "Bulk approval" : "Bulk rejection"} complete.</strong>
+            <span>{bulkOutcome.succeeded} succeeded · {bulkOutcome.failed} failed · {bulkOutcome.requested} requested</span>
+          </div>
+        )}
+        <div className="queue-review-empty">
+          <CheckCircle2 className="queue-review-empty-icon" aria-hidden="true" />
+          <h3>All Caught Up!</h3>
+          <p>There are no pending resources to review at this time.</p>
+          {/* Run16 BUG-078: empty state gets an explicit refresh control.
+              Run17 BUG-027: it now shows a busy state while re-fetching and
+              announces the outcome via role="status". */}
+          <Button
+            variant="outline"
+            disabled={recheckState === 'checking'}
+            onClick={() => {
+              setRecheckState('checking');
+              void queryClient
+                .invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })
+                .then(() => setRecheckState('checked'), () => setRecheckState('checked'));
+            }}
+            data-testid="button-refresh-pending-resources"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
+            {recheckState === 'checking' ? 'Checking…' : 'Check again'}
+          </Button>
+          <p role="status" aria-live="polite" className="queue-review-empty-status">
+            {recheckState === 'checked' ? 'Checked — still no pending resources.' : ''}
+          </p>
+        </div>
+      </section>
     );
   }
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                Pending Approvals
-                <Badge variant="destructive" className="ml-2">
-                  {totalPending}
-                </Badge>
-              </CardTitle>
-              <CardDescription>Resources awaiting admin review</CardDescription>
-            </div>
+      <section className="admin-panel queue-review-shell" aria-labelledby="pending-resources-heading">
+        <div className="admin-panel__heading queue-review-shell-heading">
+          <div>
+            <h2 id="pending-resources-heading" className="queue-review-title">
+              Pending Approvals
+              <Badge variant="accent" className="queue-review-count">{totalPending}</Badge>
+            </h2>
+            <p>{totalPending} submissions awaiting review</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          {/* R4-011 (run21): shared narrow-admin-table strategy — a single
+          <div className="queue-review-actions" role="toolbar" aria-label="Pending approval actions">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={openBulkRejectDialog}
+              disabled={selectedPendingResourceIds.length === 0 || bulkRejectMutation.isPending || bulkApproveMutation.isPending}
+              data-testid="button-bulk-reject"
+            >
+              Bulk reject{selectedPendingResourceIds.length > 0 ? ` (${selectedPendingResourceIds.length})` : ""}
+            </Button>
+            <Button
+              size="sm"
+              className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+              onClick={openBulkApproveDialog}
+              disabled={pendingResources.length === 0 || bulkApproveMutation.isPending || bulkRejectMutation.isPending}
+              data-testid="button-bulk-approve"
+            >
+              {selectedPendingResourceIds.length > 0 ? `Approve selected (${selectedPendingResourceIds.length})` : "Approve all"}
+            </Button>
+          </div>
+        </div>
+        {bulkOutcome && (
+          <div className={`queue-review-result ${bulkOutcome.failed > 0 ? "queue-review-result--error" : ""}`} role={bulkOutcome.failed > 0 ? "alert" : "status"} data-testid="bulk-result-resources">
+            <strong>{bulkOutcome.action === "approved" ? "Bulk approval" : "Bulk rejection"} complete.</strong>
+            <span>{bulkOutcome.succeeded} succeeded · {bulkOutcome.failed} failed · {bulkOutcome.requested} requested</span>
+          </div>
+        )}
+        {/* R4-011 (run21): shared narrow-admin-table strategy — a single
               contained overflow-auto viewport (scrolls BOTH axes) around a
               min-w table. The previous sticky-right Actions cell (338px) was
               WIDER than the ≤768px scrollport and clamped over the Title cell;
@@ -300,7 +519,7 @@ export default function PendingResources() {
             )}
             <div
               ref={scrollRef}
-              className="max-h-[600px] overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+              className="admin-table-wrap queue-review-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
               tabIndex={0}
               role="region"
               aria-label="Pending approvals table, scrollable"
@@ -322,19 +541,36 @@ export default function PendingResources() {
                 (no scroll) while min-w-[960px] keeps the ≤768px scroll+hint
                 behavior (px column widths act as minimums in fixed layout).
                 Tighter py-2 keeps tablet rows compact. */}
-            <Table className="min-w-[960px] table-fixed [&_td]:py-2">
+            <Table className="queue-review-table queue-review-table--resources min-w-[960px] table-fixed [&_td]:py-2">
               <TableHeader>
                 <TableRow>
+                  <TableHead className="queue-review-select-cell">
+                    <Checkbox
+                      checked={allResourcesSelected ? true : selectedPendingResourceIds.length > 0 ? "indeterminate" : false}
+                      onCheckedChange={(checked) => toggleAllResources(checked === true)}
+                      aria-label="Select all pending resources"
+                      data-testid="checkbox-select-all-pending-resources"
+                    />
+                  </TableHead>
                   <TableHead className="w-[170px]">Title</TableHead>
                   <TableHead className="w-[115px]">Category</TableHead>
                   <TableHead className="w-[220px]">Description</TableHead>
                   <TableHead className="w-[150px]">Submitted</TableHead>
+                  <TableHead className="w-[90px]">Status</TableHead>
                   <TableHead className="w-[320px] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {pendingResources.map((resource) => (
                   <TableRow key={resource.id} data-testid={`row-pending-resource-${resource.id}`}>
+                    <TableCell className="queue-review-select-cell">
+                      <Checkbox
+                        checked={selectedResourceIds.has(resource.id)}
+                        onCheckedChange={(checked) => toggleResourceSelection(resource.id, checked === true)}
+                        aria-label={`Select ${resource.title}`}
+                        data-testid={`checkbox-pending-resource-${resource.id}`}
+                      />
+                    </TableCell>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="line-clamp-1 break-words min-w-0" title={resource.title}>{resource.title}</span>
@@ -399,7 +635,10 @@ export default function PendingResources() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>
+                      <StatusChip status="pending" />
+                    </TableCell>
+                    <TableCell className="queue-review-action-cell text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
@@ -450,8 +689,7 @@ export default function PendingResources() {
               Swipe the table sideways to see all columns, including Approve/Reject.
             </p>
           )}
-        </CardContent>
-      </Card>
+      </section>
 
       {/* View Details Dialog */}
       <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
@@ -570,7 +808,10 @@ export default function PendingResources() {
       </Dialog>
 
       {/* Approve Confirmation Dialog */}
-      <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+      <AlertDialog open={approveDialogOpen} onOpenChange={(open) => {
+        setApproveDialogOpen(open);
+        if (!open) setApproveError(null);
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Resource?</AlertDialogTitle>
@@ -579,6 +820,12 @@ export default function PendingResources() {
               You can manually sync it to GitHub later using the GitHub Sync panel.
             </AlertDialogDescription>
           </AlertDialogHeader>
+           {approveError && (
+             <Alert variant="destructive" data-testid="error-approve-dialog">
+               <AlertCircle className="h-4 w-4" />
+               <AlertDescription>{approveError}</AlertDescription>
+             </Alert>
+           )}
           {resourceToApprove && (
             <div className="bg-muted p-4 rounded-md min-w-0">
               <p className="font-semibold min-w-0 break-words [overflow-wrap:anywhere]">{resourceToApprove.title}</p>
@@ -602,15 +849,24 @@ export default function PendingResources() {
       </AlertDialog>
 
       {/* Reject Confirmation Dialog */}
-      <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+       <AlertDialog open={rejectDialogOpen} onOpenChange={(open) => {
+         setRejectDialogOpen(open);
+         if (!open) setRejectError(null);
+       }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Resource?</AlertDialogTitle>
             <AlertDialogDescription>
-              Please provide a reason for rejecting this resource (minimum 10 characters).
+              Please provide a reason for rejecting this resource (minimum {MIN_REJECTION_REASON_LENGTH} characters).
               This message is shown to the contributor, so keep it factual and do not include internal notes.
             </AlertDialogDescription>
           </AlertDialogHeader>
+           {rejectError && (
+             <Alert variant="destructive" data-testid="error-reject-dialog">
+               <AlertCircle className="h-4 w-4" />
+               <AlertDescription>{rejectError}</AlertDescription>
+             </Alert>
+           )}
           {resourceToReject && (
             <div className="space-y-4">
               <div className="bg-muted p-4 rounded-md min-w-0">
@@ -628,21 +884,24 @@ export default function PendingResources() {
                   data-testid="textarea-rejection-reason"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  {rejectionReason.trim().length}/10 characters minimum · visible to the contributor
+                   {rejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to the contributor
                 </p>
               </div>
             </div>
           )}
           <AlertDialogFooter>
             <AlertDialogCancel
-              onClick={() => setRejectionReason("")}
+              onClick={() => {
+                setRejectionReason("");
+                setRejectError(null);
+              }}
               data-testid="button-cancel-reject"
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRejectConfirm}
-              disabled={rejectMutation.isPending || rejectionReason.trim().length < 10}
+               disabled={rejectMutation.isPending || rejectionReason.trim().length < MIN_REJECTION_REASON_LENGTH}
               className="bg-destructive hover:bg-destructive/90"
               data-testid="button-confirm-reject"
             >
@@ -651,6 +910,105 @@ export default function PendingResources() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+       {/* Bulk Approve Confirmation Dialog */}
+       <AlertDialog open={bulkApproveDialogOpen} onOpenChange={(open) => {
+         setBulkApproveDialogOpen(open);
+         if (!open) setBulkApproveError(null);
+       }}>
+         <AlertDialogContent>
+           <AlertDialogHeader>
+             <AlertDialogTitle>Approve pending resources?</AlertDialogTitle>
+             <AlertDialogDescription>
+               This will approve {bulkApproveIds.length} pending {bulkApproveIds.length === 1 ? "resource" : "resources"} and add them to the public catalog.
+             </AlertDialogDescription>
+           </AlertDialogHeader>
+           {bulkApproveError && (
+             <Alert variant="destructive" data-testid="error-bulk-approve-dialog">
+               <AlertCircle className="h-4 w-4" />
+               <AlertDescription>{bulkApproveError}</AlertDescription>
+             </Alert>
+           )}
+           <AlertDialogFooter>
+             <AlertDialogCancel data-testid="button-cancel-bulk-approve">Cancel</AlertDialogCancel>
+             <AlertDialogAction
+                onClick={(event) => {
+                  event.preventDefault();
+                  bulkApproveMutation.mutate(bulkApproveIds);
+                }}
+                disabled={
+                  bulkApproveMutation.isPending ||
+                  bulkApproveIds.length === 0 ||
+                  bulkApproveIds.length > MAX_BULK_RESOURCE_IDS
+                }
+               className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
+               data-testid="button-confirm-bulk-approve"
+             >
+               {bulkApproveMutation.isPending ? "Approving..." : `Approve ${bulkApproveIds.length}`}
+             </AlertDialogAction>
+           </AlertDialogFooter>
+         </AlertDialogContent>
+       </AlertDialog>
+
+       {/* Bulk Reject Dialog */}
+       <Dialog open={bulkRejectDialogOpen} onOpenChange={(open) => {
+         setBulkRejectDialogOpen(open);
+         if (!open) {
+           setBulkRejectError(null);
+           setBulkRejectionReason("");
+         }
+       }}>
+         <DialogContent>
+           <DialogHeader>
+             <DialogTitle>Reject pending resources?</DialogTitle>
+             <DialogDescription>
+               Provide a reason for rejecting {bulkRejectIds.length} pending {bulkRejectIds.length === 1 ? "resource" : "resources"}. This message is shown to contributors.
+             </DialogDescription>
+           </DialogHeader>
+           {bulkRejectError && (
+             <Alert variant="destructive" data-testid="error-bulk-reject-dialog">
+               <AlertCircle className="h-4 w-4" />
+               <AlertDescription>{bulkRejectError}</AlertDescription>
+             </Alert>
+           )}
+           <div className="space-y-2">
+             <Label htmlFor="bulk-rejection-reason">Rejection Reason *</Label>
+             <Textarea
+               id="bulk-rejection-reason"
+               placeholder="Explain why these resources are being rejected..."
+               value={bulkRejectionReason}
+               onChange={(event) => setBulkRejectionReason(event.target.value)}
+               className="min-h-[100px]"
+               data-testid="textarea-bulk-rejection-reason"
+             />
+             <p className="text-xs text-muted-foreground">
+                  {bulkRejectionReason.trim().length}/{MIN_REJECTION_REASON_LENGTH} characters minimum · visible to contributors
+             </p>
+           </div>
+           <DialogFooter>
+             <Button
+               variant="outline"
+               onClick={() => setBulkRejectDialogOpen(false)}
+               data-testid="button-cancel-bulk-reject"
+             >
+               Cancel
+             </Button>
+             <Button
+               variant="destructive"
+               onClick={handleBulkRejectConfirm}
+                disabled={
+                  bulkRejectMutation.isPending ||
+                  bulkRejectionReason.trim().length < MIN_REJECTION_REASON_LENGTH ||
+                  bulkRejectIds.length === 0 ||
+                  bulkRejectIds.length > MAX_BULK_RESOURCE_IDS
+                }
+               data-testid="button-confirm-bulk-reject"
+             >
+               {bulkRejectMutation.isPending ? "Rejecting..." : `Reject ${bulkRejectIds.length}`}
+             </Button>
+           </DialogFooter>
+         </DialogContent>
+       </Dialog>
     </>
   );
 }

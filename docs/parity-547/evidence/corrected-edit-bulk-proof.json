@@ -1,0 +1,101 @@
+[
+  {
+    "seed": {
+      "uid": "2001233521",
+      "ea": 59,
+      "er": 60,
+      "b1": 188327,
+      "b2": 188328,
+      "b3": 188329,
+      "exactTimestamps": {
+        "ea": "2026-09-13T07:59:23.054Z",
+        "er": "2026-09-13T07:59:23.063Z"
+      },
+      "changes": {
+        "title": {
+          "old": "__qa_test_parity547_edit-approve-resource",
+          "new": "__qa_test_parity547_edit-approve-resource-new"
+        }
+      }
+    }
+  },
+  {
+    "editRowsRendered": 2
+  },
+  {
+    "editUiText": [
+      "Edit Approved",
+      "Edit ApprovedThe changes have been applied to the resource."
+    ]
+  },
+  {
+    "editRows": [
+      {
+        "id": 59,
+        "status": "approved",
+        "rejection_reason": null,
+        "handled_at": "2026-09-13T07:59:24.470Z"
+      },
+      {
+        "id": 60,
+        "status": "pending",
+        "rejection_reason": null,
+        "handled_at": null
+      }
+    ],
+    "resources": [
+      {
+        "id": 188325,
+        "title": "__qa_test_parity547_edit-approve-resource-new",
+        "status": "approved",
+        "updated_at": "2026-09-13T07:59:24.470Z"
+      },
+      {
+        "id": 188326,
+        "title": "__qa_test_parity547_edit-reject-resource",
+        "status": "approved",
+        "updated_at": "2026-09-13T07:59:23.063Z"
+      }
+    ]
+  },
+  {
+    "bulkApprove": {
+      "status": 200,
+      "body": {
+        "message": "Approved 2 resource(s)",
+        "succeeded": 2,
+        "failed": 1
+      }
+    },
+    "bulkReject": {
+      "status": 200,
+      "body": {
+        "message": "Rejected 1 resource(s)",
+        "succeeded": 1,
+        "failed": 1
+      }
+    },
+    "bulkStatuses": [
+      {
+        "id": 188325,
+        "status": "approved"
+      },
+      {
+        "id": 188326,
+        "status": "approved"
+      },
+      {
+        "id": 188327,
+        "status": "approved"
+      },
+      {
+        "id": 188328,
+        "status": "approved"
+      },
+      {
+        "id": 188329,
+        "status": "rejected"
+      }
+    ]
+  }
+]

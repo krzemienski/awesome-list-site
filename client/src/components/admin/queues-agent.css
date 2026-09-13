@@ -1,0 +1,275 @@
+/*
+ * Task 547 — review queue parity (owned styles).
+ *
+ * These rules deliberately stay scoped to the four queue/agent surfaces.  The
+ * canonical admin.css/admin-canonical.css files remain shared foundations; this
+ * file only supplies the secondary controls and agent visualizations that do
+ * not exist on the canonical reference page.
+ */
+.queues-agent {
+  --queues-surface: var(--surface-1, var(--card));
+  --queues-surface-raised: var(--surface-2, var(--muted));
+  --queues-muted: var(--text-3, var(--muted-foreground));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+  min-width: 0;
+}
+
+.queues-agent .queues-agent__table-shell {
+  background: var(--queues-surface);
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: var(--radius, var(--radius-md, .5rem));
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.queues-agent .queues-agent__table-heading {
+  align-items: center;
+  border-bottom: var(--hairline-w, 1px) solid var(--border);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-3, .75rem);
+  justify-content: space-between;
+  padding: 18px 22px;
+}
+
+.queues-agent .queues-agent__table-title {
+  color: var(--text);
+  font-size: .875rem !important;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.queues-agent .queues-agent__table-description {
+  color: var(--queues-muted);
+  font-size: .75rem !important;
+  line-height: 1.45;
+  margin-top: .25rem;
+}
+
+.queues-agent .queues-agent__table-body {
+  padding: 0 !important;
+}
+
+.queues-agent .queues-agent__table-body > .relative,
+.queues-agent .queues-agent__table-body > .overflow-auto,
+.queues-agent .queues-agent__table-body > [data-testid="scroller-enrichment-jobs-table"] {
+  max-height: 600px;
+}
+
+.queues-agent .queues-agent__table-body table {
+  border-collapse: collapse;
+  min-width: 42rem;
+  width: 100%;
+}
+
+.queues-agent .queues-agent__table-body th {
+  color: var(--queues-muted);
+  font-family: var(--font-mono);
+  font-size: .625rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.queues-agent .queues-agent__table-body td,
+.queues-agent .queues-agent__table-body th {
+  border-bottom: var(--hairline-w, 1px) solid var(--border);
+  font-size: .75rem;
+  padding: .75rem 1rem;
+  text-align: start;
+  vertical-align: middle;
+}
+
+.queues-agent .queues-agent__table-body tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.queues-agent .queues-agent__table-body tbody tr:hover td {
+  background: var(--surface-2, color-mix(in srgb, var(--border) 25%, transparent));
+}
+
+.queues-agent .queues-agent__table-body .queues-agent__mono {
+  color: var(--queues-muted);
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.queues-agent .queues-agent__status {
+  align-items: center;
+  background: var(--surface, transparent);
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: var(--radius-pill, 999px);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: .625rem;
+  font-weight: 500;
+  letter-spacing: .06em;
+  line-height: 1;
+  padding: .35rem .5rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.queues-agent .queues-agent__status--ok {
+  background: color-mix(in srgb, var(--color-chart-2) 8%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-chart-2) 30%, var(--border)) !important;
+  color: var(--color-chart-2) !important;
+}
+
+.queues-agent .queues-agent__status--warn {
+  background: color-mix(in srgb, var(--color-chart-4) 8%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-chart-4) 30%, var(--border)) !important;
+  color: var(--color-chart-4) !important;
+}
+
+.queues-agent .queues-agent__status--bad {
+  background: color-mix(in srgb, var(--color-destructive) 8%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-destructive) 30%, var(--border)) !important;
+  color: var(--color-destructive) !important;
+}
+
+.queues-agent .queues-agent__status--muted {
+  color: var(--queues-muted);
+}
+
+.queues-agent .queues-agent__control-shell,
+.queues-agent .queues-agent__active-shell {
+  box-shadow: none;
+}
+
+.queues-agent .queues-agent__control-shell > .p-\[var\(--profile-panel-padding\)\],
+.queues-agent .queues-agent__active-shell > .p-\[var\(--profile-panel-padding\)\] {
+  padding: 20px 22px;
+}
+
+.queues-agent .queues-agent__control-shell .text-2xl,
+.queues-agent .queues-agent__active-shell .text-2xl {
+  font-size: 1rem;
+}
+
+.queues-agent .queues-agent__section-title {
+  font-size: .875rem !important;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.queues-agent .queues-agent__section-description {
+  color: var(--queues-muted);
+  font-size: .75rem !important;
+  line-height: 1.45;
+}
+
+.queues-agent .queues-agent__tabs {
+  margin-bottom: 0;
+}
+
+.queues-agent .queues-agent__tabs [role="tab"] {
+  min-height: 2.5rem;
+}
+
+.queues-agent .queues-agent__dialog {
+  max-width: min(56rem, calc(100vw - 2rem));
+}
+
+.queues-agent .queues-agent__inline-error {
+  align-items: flex-start;
+  margin: 0;
+}
+
+.queues-agent .queues-agent__table-body [role="region"] {
+  outline-offset: 2px;
+}
+
+.queues-agent .queues-agent__table-body [role="region"]:focus-visible,
+.queues-agent .queues-agent__event-log [role="log"]:focus-visible,
+.queues-agent .queues-agent__graph:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.queues-agent .queues-agent__event-log,
+.queues-agent .queues-agent__graph {
+  min-width: 0;
+}
+
+.queues-agent .queues-agent__event-heading,
+.queues-agent .queues-agent__graph-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  justify-content: space-between;
+}
+
+.queues-agent .queues-agent__event-heading h3,
+.queues-agent .queues-agent__graph-heading h3 {
+  color: var(--queues-muted);
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.queues-agent .queues-agent__event-log [role="log"] {
+  background: color-mix(in srgb, var(--background) 90%, #000);
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: var(--radius, .5rem);
+  min-height: 7.5rem;
+}
+
+.queues-agent .queues-agent__event-log [data-testid^="row-event-"] {
+  min-width: 0;
+}
+
+.queues-agent .queues-agent__event-log [data-testid^="button-toggle-detail-"] {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  min-height: 2rem;
+  min-width: 2rem;
+}
+
+.queues-agent .queues-agent__graph [data-testid="agent-comms-graph"] {
+  background: color-mix(in srgb, var(--background) 90%, #000);
+  border: var(--hairline-w, 1px) solid var(--border);
+  border-radius: var(--radius, .5rem);
+}
+
+.queues-agent .queues-agent__graph svg {
+  display: block;
+}
+
+@media (max-width: 48rem) {
+  .queues-agent {
+    gap: var(--space-4, 1rem);
+  }
+
+  .queues-agent .queues-agent__table-heading {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .queues-agent .queues-agent__table-heading > :last-child {
+    width: 100%;
+  }
+
+  .queues-agent .queues-agent__table-heading > :last-child > * {
+    flex: 1 1 auto;
+  }
+
+  .queues-agent .queues-agent__table-body td,
+  .queues-agent .queues-agent__table-body th {
+    padding: .65rem .75rem;
+  }
+
+  .queues-agent .queues-agent__control-shell > .p-\[var\(--profile-panel-padding\)\],
+  .queues-agent .queues-agent__active-shell > .p-\[var\(--profile-panel-padding\)\] {
+    padding: 16px;
+  }
+}

@@ -46,6 +46,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import type { EnrichmentJob } from "@shared/schema";
+import "./queues-agent.css";
 
 interface JobsResponse {
   success: boolean;
@@ -77,6 +78,11 @@ const OK_OUTLINE_CLASS = 'border-[#34d08c] text-[#34d08c]'; // DS-OK: status ok
 const WARN_OUTLINE_CLASS = 'border-[#ffb84d] text-[#ffb84d]'; // DS-OK: status warn
 const BAD_OUTLINE_CLASS = 'border-[#ff5c7a] text-[#ff5c7a]'; // DS-OK: status bad
 
+function mutationErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) return error.message;
+  return "The request could not be completed. Please try again.";
+}
+
 export default function BatchEnrichmentPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -102,7 +108,14 @@ export default function BatchEnrichmentPanel() {
   // Start was clicked).
   const batchSizeInvalid = !Number.isInteger(batchSize) || batchSize < 1 || batchSize > 50;
 
-  const { data: jobsData, isLoading } = useQuery<JobsResponse>({
+  const {
+    data: jobsData,
+    error: jobsError,
+    isError: jobsIsError,
+    isLoading,
+    isFetching: jobsIsFetching,
+    refetch: refetchJobs,
+  } = useQuery<JobsResponse>({
     queryKey: ['/api/enrichment/jobs'],
     refetchInterval: isPolling ? 3000 : false,
     // R5-037: refresh admin data when the operator returns to the tab.
@@ -125,7 +138,11 @@ export default function BatchEnrichmentPanel() {
     refetchOnWindowFocus: true,
   });
 
-  const { data: selectedJobData } = useQuery<JobStatusResponse>({
+  const {
+    data: selectedJobData,
+    error: selectedJobError,
+    isError: selectedJobIsError,
+  } = useQuery<JobStatusResponse>({
     queryKey: ['/api/enrichment/jobs', selectedJobId],
     enabled: !!selectedJobId && isDetailsModalOpen,
     // Explicit queryFn — the default fetcher only reads queryKey[0] and would
@@ -155,19 +172,15 @@ export default function BatchEnrichmentPanel() {
     onSuccess: () => {
       setIsPolling(true);
       setAuthToken("");
+      setConfirmStart(false);
       queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
       toast({
         title: "Batch enrichment started",
         description: "AI enrichment job has been queued successfully."
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to start enrichment",
-        description: error.message || "An error occurred while starting the job.",
-        variant: "destructive"
-      });
-    }
+    // The confirmation dialog remains open on failure so the inline error is
+    // visible and the operator can retry without reopening/remounting it.
   });
 
   const cancelMutation = useMutation({
@@ -178,22 +191,28 @@ export default function BatchEnrichmentPanel() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
+      setJobToCancel(null);
       toast({
         title: "Job cancelled",
         description: "Enrichment job has been cancelled."
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to cancel job",
-        description: error.message || "An error occurred while cancelling the job.",
-        variant: "destructive"
-      });
-    }
+    // The confirmation dialog remains open on failure so the inline error is
+    // visible and the operator can retry without reopening/remounting it.
   });
 
   const jobs = jobsData?.jobs || [];
-  const activeJob = jobs.find(job => job.status === 'processing');
+  // A missing or failed list response cannot establish whether another job is
+  // active. Keep paid launches disabled until the active-job state is known.
+  const activeJobStateKnown =
+    !isLoading &&
+    !jobsIsFetching &&
+    !jobsIsError &&
+    Array.isArray(jobsData?.jobs);
+  // Pending jobs are already accepted by the queue and must keep polling until
+  // the worker claims them. Treating only processing as active made queued jobs
+  // look idle and left the operator with stale progress.
+  const activeJob = jobs.find(job => job.status === 'processing' || job.status === 'pending');
   const hasActiveJob = !!activeJob;
 
   useEffect(() => {
@@ -201,6 +220,16 @@ export default function BatchEnrichmentPanel() {
   }, [hasActiveJob]);
 
   const handleStartEnrichment = () => {
+    if (!activeJobStateKnown) {
+      toast({
+        title: jobsIsError ? "Unable to check active jobs" : "Checking active jobs",
+        description: jobsIsError
+          ? "Retry loading job history before starting a paid enrichment job."
+          : "Please wait until the current job status is known.",
+        variant: jobsIsError ? "destructive" : undefined,
+      });
+      return;
+    }
     if (batchSize < 1 || batchSize > 50) {
       toast({
         title: "Invalid batch size",
@@ -214,7 +243,7 @@ export default function BatchEnrichmentPanel() {
   };
 
   const launchEnrichment = () => {
-    setConfirmStart(false);
+    if (!activeJobStateKnown || hasActiveJob) return;
     startMutation.mutate({
       filter,
       batchSize,
@@ -328,14 +357,14 @@ export default function BatchEnrichmentPanel() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="queues-agent queues-agent--enrichment">
+      <Card className="queues-agent__control-shell">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="queues-agent__section-title flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
             Job Control
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="queues-agent__section-description">
             Configure and start a new batch enrichment job
           </CardDescription>
         </CardHeader>
@@ -482,7 +511,7 @@ export default function BatchEnrichmentPanel() {
           <div className="flex items-center justify-between">
             <Button
               onClick={handleStartEnrichment}
-              disabled={hasActiveJob || startMutation.isPending || batchSizeInvalid}
+              disabled={!activeJobStateKnown || hasActiveJob || startMutation.isPending || batchSizeInvalid}
              
               data-testid="button-start-enrichment"
             >
@@ -499,11 +528,20 @@ export default function BatchEnrichmentPanel() {
               )}
             </Button>
             
-            {hasActiveJob && (
+            {hasActiveJob ? (
               <Alert className={`flex-1 ml-4 ${WARN_PANEL_CLASS}`}>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   A job is currently running. Please wait for it to complete.
+                </AlertDescription>
+              </Alert>
+            ) : !activeJobStateKnown && (
+              <Alert variant={jobsIsError ? "destructive" : "default"} className="flex-1 ml-4" role={jobsIsError ? "alert" : undefined}>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {jobsIsError
+                    ? "Unable to check for active jobs. Retry Job History before starting a paid enrichment job."
+                    : "Checking for active jobs. The paid launch will be enabled when the current status is known."}
                 </AlertDescription>
               </Alert>
             )}
@@ -512,15 +550,15 @@ export default function BatchEnrichmentPanel() {
       </Card>
 
       {activeJob && (
-        <Card className={INFO_PANEL_CLASS}>
+        <Card className={`queues-agent__active-shell ${INFO_PANEL_CLASS}`}>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <RefreshCw className={`h-5 w-5 animate-spin ${INFO_TEXT_CLASS}`} />
                 Active Job Monitor
               </span>
-              <Badge className={JOB_PROCESSING_CLASS}>
-                Processing
+              <Badge className={`queues-agent__status queues-agent__status--warn ${JOB_PROCESSING_CLASS}`}>
+                {activeJob.status === 'pending' ? 'Pending' : 'Processing'}
               </Badge>
             </CardTitle>
             <CardDescription>
@@ -600,9 +638,9 @@ export default function BatchEnrichmentPanel() {
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+      <Card className="queues-agent__table-shell">
+        <CardHeader className="queues-agent__table-heading">
+          <CardTitle className="queues-agent__table-title flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
               Job History
@@ -611,18 +649,35 @@ export default function BatchEnrichmentPanel() {
                 and separate JSX text children become flex items whose
                 boundary whitespace is dropped ("31 totaljobs"). */}
             {jobs.length > 0 && (
-              <Badge variant="outline">{`${jobs.length} total jobs`}</Badge>
+              <Badge variant="outline" className="queues-agent__status">{`${jobs.length} total jobs`}</Badge>
             )}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="queues-agent__table-description">
             Complete history of all enrichment jobs
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="queues-agent__table-body">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
+          ) : jobsIsError ? (
+            <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-enrichment-jobs">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="flex flex-wrap items-center gap-3">
+                <span>Unable to load enrichment jobs: {mutationErrorMessage(jobsError)}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { void refetchJobs(); }}
+                  disabled={jobsIsFetching}
+                  data-testid="button-retry-enrichment-jobs"
+                >
+                  {jobsIsFetching ? "Retrying…" : "Retry"}
+                </Button>
+              </AlertDescription>
+            </Alert>
           ) : jobs.length === 0 ? (
             <Alert>
               <Info className="h-4 w-4" />
@@ -656,7 +711,12 @@ export default function BatchEnrichmentPanel() {
                       <TableCell>
                         <Badge
                           variant={getStatusBadgeVariant(effectiveStatus(job))}
-                          className={getStatusBadgeClassName(effectiveStatus(job))}
+                          className={`queues-agent__status ${
+                            effectiveStatus(job) === 'completed' ? 'queues-agent__status--ok' :
+                            effectiveStatus(job) === 'failed' ? 'queues-agent__status--bad' :
+                            effectiveStatus(job) === 'processing' || effectiveStatus(job) === 'pending' ? 'queues-agent__status--warn' :
+                            'queues-agent__status--muted'
+                          } ${getStatusBadgeClassName(effectiveStatus(job))}`}
                           data-testid={`status-badge-${job.id}`}
                         >
                           {effectiveStatus(job) === 'processing' && (
@@ -772,7 +832,7 @@ export default function BatchEnrichmentPanel() {
       </Card>
 
       <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh]">
+        <DialogContent className="queues-agent__dialog max-w-3xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
@@ -780,6 +840,12 @@ export default function BatchEnrichmentPanel() {
             </DialogTitle>
           </DialogHeader>
           
+          {selectedJobIsError && (
+            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{mutationErrorMessage(selectedJobError)}</AlertDescription>
+            </Alert>
+          )}
           {selectedJobData?.job && (
             <ScrollArea className="max-h-[60vh] pr-4">
               <div className="space-y-6">
@@ -940,7 +1006,7 @@ export default function BatchEnrichmentPanel() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={jobToCancel !== null} onOpenChange={(open) => { if (!open) setJobToCancel(null); }}>
+      <AlertDialog open={jobToCancel !== null} onOpenChange={(open) => { if (!open && !cancelMutation.isPending) setJobToCancel(null); }}>
         <AlertDialogContent data-testid="dialog-cancel-job">
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel this enrichment job?</AlertDialogTitle>
@@ -950,10 +1016,20 @@ export default function BatchEnrichmentPanel() {
               cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {cancelMutation.isError && (
+            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{mutationErrorMessage(cancelMutation.error)}</AlertDescription>
+            </Alert>
+          )}
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-job-dismiss">Keep running</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-job-dismiss" disabled={cancelMutation.isPending}>Keep running</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => { if (jobToCancel !== null) { cancelMutation.mutate(jobToCancel); setJobToCancel(null); } }}
+              onClick={(event) => {
+                event.preventDefault();
+                if (jobToCancel !== null) cancelMutation.mutate(jobToCancel);
+              }}
+              disabled={cancelMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-cancel-job-confirm"
             >
@@ -964,7 +1040,7 @@ export default function BatchEnrichmentPanel() {
       </AlertDialog>
 
       {/* Run23 NB-040: explicit confirmation before starting a paid enrichment job. */}
-      <AlertDialog open={confirmStart} onOpenChange={(open) => { if (!open) setConfirmStart(false); }}>
+      <AlertDialog open={confirmStart} onOpenChange={(open) => { if (!open && !startMutation.isPending) setConfirmStart(false); }}>
         <AlertDialogContent data-testid="dialog-confirm-enrichment">
           <AlertDialogHeader>
             <AlertDialogTitle>Start enrichment job?</AlertDialogTitle>
@@ -973,10 +1049,23 @@ export default function BatchEnrichmentPanel() {
               in batches of {batchSize}. The job runs in the background and incurs real API cost.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {startMutation.isError && (
+            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{mutationErrorMessage(startMutation.error)}</AlertDescription>
+            </Alert>
+          )}
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-enrichment-start">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={launchEnrichment} data-testid="button-confirm-enrichment-start">
-              Start enrichment
+            <AlertDialogCancel data-testid="button-cancel-enrichment-start" disabled={startMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault();
+                launchEnrichment();
+              }}
+              disabled={startMutation.isPending || !activeJobStateKnown || hasActiveJob}
+              data-testid="button-confirm-enrichment-start"
+            >
+              {startMutation.isPending ? "Starting…" : "Start enrichment"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

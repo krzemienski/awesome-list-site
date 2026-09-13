@@ -50,6 +50,7 @@ import { apiRequest, ApiError } from "@/lib/queryClient";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
+import "./queues-agent.css";
 
 const INFO_STATUS_BADGE = "bg-[#5eddf2]/20 text-[#5eddf2] border-[#5eddf2]/30"; // DS-OK: cyan info (DS chart/info constant)
 const OK_STATUS_BADGE = "bg-[#34d08c]/20 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
@@ -88,17 +89,25 @@ const AGENT_ROLE_TEXT_STYLES: Record<string, string> = {
 };
 
 function getStatusBadge(status: string) {
+  const statusClass =
+    status === "completed" || status === "approved"
+      ? "queues-agent__status--ok"
+      : status === "failed" || status === "rejected"
+        ? "queues-agent__status--bad"
+        : status === "processing" || status === "pending" || status === "pending_review"
+          ? "queues-agent__status--warn"
+          : "queues-agent__status--muted";
   switch (status) {
     case "processing":
-      return <Badge variant="default" className={INFO_STATUS_BADGE}><Activity className="w-3 h-3 mr-1 animate-pulse" />Running</Badge>;
+      return <Badge variant="default" className={`queues-agent__status ${statusClass} ${INFO_STATUS_BADGE}`}><Activity className="w-3 h-3 mr-1 animate-pulse" />Running</Badge>;
     case "completed":
-      return <Badge variant="default" className={OK_STATUS_BADGE}><CheckCircle2 className="w-3 h-3 mr-1" />Completed</Badge>;
+      return <Badge variant="default" className={`queues-agent__status ${statusClass} ${OK_STATUS_BADGE}`}><CheckCircle2 className="w-3 h-3 mr-1" />Completed</Badge>;
     case "failed":
-      return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Failed</Badge>;
+      return <Badge variant="destructive" className={`queues-agent__status ${statusClass}`}><AlertCircle className="w-3 h-3 mr-1" />Failed</Badge>;
     case "cancelled":
-      return <Badge variant="outline"><XCircle className="w-3 h-3 mr-1" />Cancelled</Badge>;
+      return <Badge variant="outline" className={`queues-agent__status ${statusClass}`}><XCircle className="w-3 h-3 mr-1" />Cancelled</Badge>;
     default:
-      return <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{status}</Badge>;
+      return <Badge variant="outline" className={`queues-agent__status ${statusClass}`}><Clock className="w-3 h-3 mr-1" />{status}</Badge>;
   }
 }
 
@@ -121,16 +130,21 @@ function formatCost(value: string | number | null | undefined): string {
   return `$${Number(value ?? 0).toFixed(4)}`;
 }
 
+function mutationErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) return error.message;
+  return "The request could not be completed. Please try again.";
+}
+
 function getDiscoveryStatusBadge(status: string) {
   switch (status) {
     case "pending_review":
-      return <Badge variant="outline" className={WARN_OUTLINE}><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+      return <Badge variant="outline" className={`queues-agent__status queues-agent__status--warn ${WARN_OUTLINE}`}><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
     case "approved":
-      return <Badge variant="default" className={OK_STATUS_BADGE}><ThumbsUp className="w-3 h-3 mr-1" />Approved</Badge>;
+      return <Badge variant="default" className={`queues-agent__status queues-agent__status--ok ${OK_STATUS_BADGE}`}><ThumbsUp className="w-3 h-3 mr-1" />Approved</Badge>;
     case "rejected":
-      return <Badge variant="destructive"><ThumbsDown className="w-3 h-3 mr-1" />Rejected</Badge>;
+      return <Badge variant="destructive" className="queues-agent__status queues-agent__status--bad"><ThumbsDown className="w-3 h-3 mr-1" />Rejected</Badge>;
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return <Badge variant="outline" className="queues-agent__status queues-agent__status--muted">{status}</Badge>;
   }
 }
 
@@ -175,7 +189,13 @@ function getVerificationBadges(d: ResearchDiscovery) {
   return badges.length > 0 ? badges : null;
 }
 
-export default function ResearcherTab() {
+export type ResearcherInitialTab = "launch" | "review" | "history";
+
+interface ResearcherTabProps {
+  initialTab?: ResearcherInitialTab;
+}
+
+export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -220,7 +240,14 @@ export default function ResearcherTab() {
   // 20 (server caps at 200). Key stays prefixed by '/api/researcher/jobs' so
   // existing prefix invalidations keep working.
   const [jobsLimit, setJobsLimit] = useState(20);
-  const { data: jobsData, isLoading: jobsLoading } = useQuery<{ jobs: ResearchJob[]; total: number }>({
+  const {
+    data: jobsData,
+    error: jobsError,
+    isError: jobsIsError,
+    isLoading: jobsLoading,
+    isFetching: jobsFetching,
+    refetch: refetchJobs,
+  } = useQuery<{ jobs: ResearchJob[]; total: number }>({
     queryKey: ['/api/researcher/jobs', { limit: jobsLimit }],
     queryFn: async () => {
       const res = await fetch(`/api/researcher/jobs?limit=${jobsLimit}`, { credentials: 'include' });
@@ -234,6 +261,13 @@ export default function ResearcherTab() {
   });
   const jobs = jobsData?.jobs;
   const jobsTotal = jobsData?.total ?? 0;
+  // A failed or still-loading job list cannot establish whether a research
+  // job is active. Keep paid launches disabled until that state is known.
+  const activeJobStateKnown =
+    !jobsLoading &&
+    !jobsFetching &&
+    !jobsIsError &&
+    Array.isArray(jobsData?.jobs);
 
   // BUG-045 (run25): cost guidance is DERIVED from actual job history instead
   // of a hardcoded range that drifts stale as models/scopes change.
@@ -243,7 +277,11 @@ export default function ResearcherTab() {
   const costMin = finishedCosts.length > 0 ? Math.min(...finishedCosts) : null;
   const costMax = finishedCosts.length > 0 ? Math.max(...finishedCosts) : null;
 
-  const { data: selectedJob } = useQuery<ResearchJob & { isActive: boolean }>({
+  const {
+    data: selectedJob,
+    error: selectedJobError,
+    isError: selectedJobIsError,
+  } = useQuery<ResearchJob & { isActive: boolean }>({
     queryKey: ['/api/researcher/jobs', selectedJobId],
     enabled: !!selectedJobId,
     // Explicit queryFn — the default fetcher only reads queryKey[0] and would
@@ -257,18 +295,29 @@ export default function ResearcherTab() {
     refetchInterval: (query) => {
       const j = query.state.data as ResearchJob | undefined;
       // Stream while job is still running, even if dialog is closed.
-      if (j && j.status === 'processing') return 2000;
+      if (j && (j.status === 'processing' || j.status === 'pending')) return 2000;
       if (showJobDetails) return 3000;
       return false;
     },
   });
 
-  const { data: pendingDiscoveries } = useQuery<ResearchDiscovery[]>({
+  const {
+    data: pendingDiscoveries,
+    error: pendingDiscoveriesError,
+    isError: pendingDiscoveriesIsError,
+    isLoading: pendingDiscoveriesLoading,
+    isFetching: pendingDiscoveriesFetching,
+    refetch: refetchPendingDiscoveries,
+  } = useQuery<ResearchDiscovery[]>({
     queryKey: ['/api/researcher/discoveries'],
     refetchInterval: isPolling ? 10000 : false,
   });
 
-  const { data: jobDiscoveries } = useQuery<ResearchDiscovery[]>({
+  const {
+    data: jobDiscoveries,
+    error: jobDiscoveriesError,
+    isError: jobDiscoveriesIsError,
+  } = useQuery<ResearchDiscovery[]>({
     queryKey: ['/api/researcher/discoveries', selectedJobId ? `?jobId=${selectedJobId}` : ''],
     enabled: !!selectedJobId && showJobDetails,
     queryFn: async () => {
@@ -310,6 +359,7 @@ export default function ResearcherTab() {
       });
     },
     onSuccess: (data: any) => {
+      setConfirmLaunch(false);
       setIsPolling(true);
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
@@ -321,9 +371,8 @@ export default function ResearcherTab() {
       setAuthToken("");
       toast({ title: `Research job #${data?.jobId ?? ''} started`, description: "Live log opened — streaming updates every 2s." });
     },
-    onError: (error: any) => {
-      toast({ title: "Failed to start research", description: error.message, variant: "destructive" });
-    },
+    // The confirmation dialog stays mounted on failure so its inline error
+    // remains visible and the operator can retry without a toast remount.
   });
 
   // Run16 BUG-008: the launch button used to fire even while the native
@@ -331,6 +380,16 @@ export default function ResearcherTab() {
   // submission client-side, mirroring the server's min-$0.25 / 5–100 ranges
   // (Run20: no upper budget cap per user request).
   const handleLaunch = () => {
+    if (!activeJobStateKnown) {
+      toast({
+        title: jobsIsError ? "Unable to check active jobs" : "Checking active jobs",
+        description: jobsIsError
+          ? "Retry Job History before starting a paid research job."
+          : "Please wait until the current job status is known.",
+        variant: jobsIsError ? "destructive" : undefined,
+      });
+      return;
+    }
     // R4-051: the min-length rule used to only manifest as a disabled button
     // with no explanation — clicking a short prompt now yields explicit feedback
     // (a hint under the field covers the before-submit case).
@@ -421,6 +480,7 @@ export default function ResearcherTab() {
       return await apiRequest('/api/researcher/discoveries/approve-all', { method: 'POST', body: JSON.stringify({}) });
     },
     onSuccess: (data: any) => {
+      setConfirmApproveAll(false);
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       const parts = [`${data?.approved ?? 0} approved`];
@@ -432,9 +492,8 @@ export default function ResearcherTab() {
         variant: data?.failed?.length ? "destructive" : undefined,
       });
     },
-    onError: (error: any) => {
-      toast({ title: "Bulk approval failed", description: error.message, variant: "destructive" });
-    },
+    // The confirmation dialog stays mounted on failure so its inline error
+    // remains visible and the operator can retry without a toast remount.
   });
 
   const approveMutation = useMutation({
@@ -465,9 +524,11 @@ export default function ResearcherTab() {
       setRejectReason("");
       toast({ title: "Discovery rejected" });
     },
+    // The rejection dialog stays mounted on failure so its inline error remains
+    // visible and the operator can retry without a toast remount.
   });
 
-  const activeJobs = jobs?.filter(j => j.status === 'processing') || [];
+  const activeJobs = jobs?.filter(j => j.status === 'processing' || j.status === 'pending') || [];
 
   useEffect(() => {
     const hasActive = activeJobs.length > 0;
@@ -477,8 +538,8 @@ export default function ResearcherTab() {
   }, [activeJobs.length]);
 
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="launch" className="w-full">
+    <div className="queues-agent queues-agent--research">
+      <Tabs defaultValue={initialTab} className="w-full queues-agent__tabs">
         {/* Run16 BUG-030: wrap at narrow widths — the fixed inline-flex bar
             was 465px wide and pushed "Job History" off-screen at 375px. */}
         <TabsList className="mb-4 flex flex-wrap h-auto w-full justify-start gap-1">
@@ -494,10 +555,10 @@ export default function ResearcherTab() {
 
         <TabsContent value="launch">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card>
+            <Card className="queues-agent__control-shell">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Brain className="w-5 h-5 text-primary" />New Research Job</CardTitle>
-                <CardDescription>Configure and launch an AI researcher to discover new video streaming resources</CardDescription>
+                <CardTitle className="queues-agent__section-title flex items-center gap-2"><Brain className="w-5 h-5 text-primary" />New Research Job</CardTitle>
+                <CardDescription className="queues-agent__section-description">Configure and launch an AI researcher to discover new video streaming resources</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -755,7 +816,7 @@ export default function ResearcherTab() {
                     pending state disables; short prompts get a toast on click. */}
                 <Button
                   onClick={handleLaunch}
-                  disabled={startMutation.isPending}
+                  disabled={startMutation.isPending || !activeJobStateKnown}
                   className="w-full"
                 >
                   {startMutation.isPending ? (
@@ -766,21 +827,32 @@ export default function ResearcherTab() {
                 </Button>
 
                 {/* Run23 NB-040: explicit confirmation before starting a paid job. */}
-                <AlertDialog open={confirmLaunch} onOpenChange={(open) => { if (!open) setConfirmLaunch(false); }}>
-                  <AlertDialogContent>
+                <AlertDialog open={confirmLaunch} onOpenChange={(open) => { if (!open && !startMutation.isPending) setConfirmLaunch(false); }}>
+                  <AlertDialogContent className="queues-agent__dialog">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Launch research job?</AlertDialogTitle>
                       <AlertDialogDescription>
                         This starts a Claude research agent with {maxBudget.trim() === "" ? "an UNLIMITED budget" : `a budget of up to $${maxBudget}`} and {maxTurns.trim() === "" ? "unlimited turns" : `${maxTurns} turns`}.{targetDiscoveries.trim() !== "" ? ` It will stop automatically after ${targetDiscoveries} new ${Number(targetDiscoveries) === 1 ? "discovery" : "discoveries"}.` : ""} The job runs in the background and incurs real API cost{maxBudget.trim() === "" && targetDiscoveries.trim() === "" ? " with no spending cap — cancel it manually when you're satisfied" : ""}.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
+                    {startMutation.isError && (
+                      <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+                        <AlertCircle className="w-4 h-4" />
+                        <AlertDescription>{mutationErrorMessage(startMutation.error)}</AlertDescription>
+                      </Alert>
+                    )}
                     <AlertDialogFooter>
-                      <AlertDialogCancel data-testid="button-cancel-launch">Cancel</AlertDialogCancel>
+                      <AlertDialogCancel data-testid="button-cancel-launch" disabled={startMutation.isPending}>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         data-testid="button-confirm-launch"
-                        onClick={() => { setConfirmLaunch(false); startMutation.mutate(); }}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          if (!activeJobStateKnown) return;
+                          startMutation.mutate();
+                        }}
+                        disabled={startMutation.isPending || !activeJobStateKnown}
                       >
-                        Launch
+                        {startMutation.isPending ? "Launching…" : "Launch"}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -788,13 +860,35 @@ export default function ResearcherTab() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="queues-agent__active-shell">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Activity className="w-5 h-5 text-primary" />Active Jobs</CardTitle>
-                <CardDescription>Currently running research jobs</CardDescription>
+                <CardTitle className="queues-agent__section-title flex items-center gap-2"><Activity className="w-5 h-5 text-primary" />Active Jobs</CardTitle>
+                <CardDescription className="queues-agent__section-description">Currently running research jobs</CardDescription>
               </CardHeader>
               <CardContent>
-                {activeJobs.length === 0 ? (
+                {jobsLoading ? (
+                  <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Checking for active research jobs…
+                  </div>
+                ) : jobsIsError ? (
+                  <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-research-jobs">
+                    <AlertCircle className="w-4 h-4" />
+                    <AlertDescription className="flex flex-wrap items-center gap-3">
+                      <span>Unable to load research jobs: {mutationErrorMessage(jobsError)}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { void refetchJobs(); }}
+                        disabled={jobsFetching}
+                        data-testid="button-retry-research-jobs"
+                      >
+                        {jobsFetching ? "Retrying…" : "Retry"}
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                ) : activeJobs.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">No active research jobs</p>
                 ) : (
                   <div className="space-y-3">
@@ -867,18 +961,18 @@ export default function ResearcherTab() {
         </TabsContent>
 
         <TabsContent value="review">
-          <Card>
-            <CardHeader>
+          <Card className="queues-agent__table-shell" data-testid="research-review-panel">
+            <CardHeader className="queues-agent__table-heading">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="queues-agent__table-title flex items-center gap-2">
                     <Search className="w-5 h-5 text-primary" />
                     Pending Discoveries
                     {pendingDiscoveries && pendingDiscoveries.length > 0 && (
-                      <Badge variant="destructive" className="ml-2">{pendingDiscoveries.length}</Badge>
+                      <Badge variant="destructive" className="queues-agent__status queues-agent__status--bad ml-2">{pendingDiscoveries.length}</Badge>
                     )}
                   </CardTitle>
-                  <CardDescription className="mt-1.5">Review and approve or reject AI-discovered resources</CardDescription>
+                  <CardDescription className="queues-agent__table-description mt-1.5">Review and approve or reject AI-discovered resources</CardDescription>
                 </div>
                 {pendingDiscoveries && pendingDiscoveries.length > 0 && (
                   <Button
@@ -897,83 +991,116 @@ export default function ResearcherTab() {
                 )}
               </div>
               {/* Explicit confirmation — bulk approval creates real resources. */}
-              <AlertDialog open={confirmApproveAll} onOpenChange={(open) => { if (!open) setConfirmApproveAll(false); }}>
-                <AlertDialogContent>
+              <AlertDialog open={confirmApproveAll} onOpenChange={(open) => { if (!open && !approveAllMutation.isPending) setConfirmApproveAll(false); }}>
+                <AlertDialogContent className="queues-agent__dialog">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Approve all pending discoveries?</AlertDialogTitle>
                     <AlertDialogDescription>
                       This approves all {pendingDiscoveries?.length ?? 0} pending discoveries and publishes them as live resources. Discoveries whose URL already exists in the database are skipped as duplicates. This cannot be undone in bulk — each resource would need to be removed individually.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
+                  {approveAllMutation.isError && (
+                    <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+                      <AlertCircle className="w-4 h-4" />
+                      <AlertDescription>{mutationErrorMessage(approveAllMutation.error)}</AlertDescription>
+                    </Alert>
+                  )}
                   <AlertDialogFooter>
-                    <AlertDialogCancel data-testid="button-cancel-approve-all">Cancel</AlertDialogCancel>
+                    <AlertDialogCancel data-testid="button-cancel-approve-all" disabled={approveAllMutation.isPending}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       data-testid="button-confirm-approve-all"
-                      onClick={() => { setConfirmApproveAll(false); approveAllMutation.mutate(); }}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        approveAllMutation.mutate();
+                      }}
+                      disabled={approveAllMutation.isPending}
                     >
-                      Approve All
+                      {approveAllMutation.isPending ? "Approving…" : "Approve All"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </CardHeader>
-            <CardContent>
-              {!pendingDiscoveries || pendingDiscoveries.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">No pending discoveries to review</p>
+            <CardContent className="queues-agent__table-body">
+              {pendingDiscoveriesLoading ? (
+                <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Loading pending discoveries…
+                </div>
+              ) : pendingDiscoveriesIsError ? (
+                <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-research-discoveries">
+                  <AlertCircle className="w-4 h-4" />
+                  <AlertDescription className="flex flex-wrap items-center gap-3">
+                    <span>Unable to load pending discoveries: {mutationErrorMessage(pendingDiscoveriesError)}</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { void refetchPendingDiscoveries(); }}
+                      disabled={pendingDiscoveriesFetching}
+                      data-testid="button-retry-research-discoveries"
+                    >
+                      {pendingDiscoveriesFetching ? "Retrying…" : "Retry"}
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              ) : !pendingDiscoveries || pendingDiscoveries.length === 0 ? (
+                <p className="admin-empty text-center">No pending discoveries to review</p>
               ) : (
-                <div className="space-y-3">
-                  {pendingDiscoveries.map(d => (
-                    <Card key={d.id} className="border-border/50">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0 space-y-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-sm line-clamp-1 break-words" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</h4>
-                              {d.confidence && (
-                                <Badge variant="outline" className="text-xs shrink-0">
-                                  {d.confidence}% confident
-                                </Badge>
-                              )}
-                              {getVerificationBadges(d)}
+                <div className="overflow-auto" role="region" aria-label="Pending discoveries table, scrollable" tabIndex={0}>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Confidence</TableHead>
+                        <TableHead>Job</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingDiscoveries.map(d => (
+                        <TableRow key={d.id} data-testid={`row-research-discovery-${d.id}`}>
+                          <TableCell className="max-w-[320px]">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium line-clamp-1 break-words" title={sanitizeDisplay(d.title)}>{sanitizeDisplay(d.title)}</span>
+                                {getVerificationBadges(d)}
+                              </div>
+                              <a href={d.url} target="_blank" rel="noopener noreferrer"
+                                className="mt-1 flex min-w-0 items-center gap-1 truncate text-xs text-primary hover:underline">
+                                <span className="truncate">{sanitizeDisplay(d.url)}</span><ExternalLink className="h-3 w-3 shrink-0" />
+                              </a>
+                              {d.description && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground" title={sanitizeDisplay(d.description)}>{sanitizeDisplay(d.description)}</p>}
+                              {d.reasoning && <p className="mt-1 line-clamp-1 text-xs italic text-muted-foreground" title={sanitizeDisplay(d.reasoning)}>"{sanitizeDisplay(d.reasoning)}"</p>}
                             </div>
-                            <a href={d.url} target="_blank" rel="noopener noreferrer"
-                              className="text-xs text-primary hover:underline flex items-center gap-1 truncate">
-                              {sanitizeDisplay(d.url)} <ExternalLink className="w-3 h-3 shrink-0" />
-                            </a>
-                            {d.description && (
-                              <p className="text-xs text-muted-foreground line-clamp-2">{sanitizeDisplay(d.description)}</p>
-                            )}
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              {d.suggestedCategory && <Badge variant="secondary" className="text-xs">{d.suggestedCategory}</Badge>}
-                              {d.suggestedSubcategory && <Badge variant="outline" className="text-xs">{d.suggestedSubcategory}</Badge>}
-                              <span>Job #{d.jobId}</span>
+                          </TableCell>
+                          <TableCell>{getDiscoveryStatusBadge(d.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-1">
+                              {d.suggestedCategory && <Badge variant="secondary" className="w-fit text-xs">{d.suggestedCategory}</Badge>}
+                              {d.suggestedSubcategory && <Badge variant="outline" className="w-fit text-xs">{d.suggestedSubcategory}</Badge>}
                             </div>
-                            {d.reasoning && (
-                              <p className="text-xs text-muted-foreground italic mt-1">"{sanitizeDisplay(d.reasoning)}"</p>
-                            )}
-                          </div>
-                          <div className="flex gap-1 shrink-0">
-                            <Button
-                              size="sm"
-                              variant="default"
-                              className={OK_SOLID_BUTTON}
-                              onClick={() => approveMutation.mutate(d.id)}
-                              disabled={approveMutation.isPending}
-                            >
-                              <ThumbsUp className="w-3 h-3 mr-1" />Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => setRejectDialogId(d.id)}
-                            >
-                              <ThumbsDown className="w-3 h-3 mr-1" />Reject
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          </TableCell>
+                          <TableCell className="queues-agent__mono">{d.confidence ? `${d.confidence}%` : "—"}</TableCell>
+                          <TableCell className="queues-agent__mono">#{d.jobId}</TableCell>
+                          <TableCell className="text-right">
+                            {d.status === "pending_review" ? (
+                              <div className="flex justify-end gap-1">
+                                <Button size="sm" variant="default" className={OK_SOLID_BUTTON} onClick={() => approveMutation.mutate(d.id)} disabled={approveMutation.isPending}>
+                                  <ThumbsUp className="h-3 w-3 mr-1" />Approve
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={() => setRejectDialogId(d.id)}>
+                                  <ThumbsDown className="h-3 w-3 mr-1" />Reject
+                                </Button>
+                              </div>
+                            ) : <span className="text-xs text-muted-foreground">Reviewed</span>}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               )}
             </CardContent>
@@ -981,10 +1108,10 @@ export default function ResearcherTab() {
         </TabsContent>
 
         <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <CardTitle>Research Job History</CardTitle>
-              <CardDescription data-testid="text-job-history-range">
+          <Card className="queues-agent__table-shell">
+            <CardHeader className="queues-agent__table-heading">
+              <CardTitle className="queues-agent__table-title">Research Job History</CardTitle>
+              <CardDescription className="queues-agent__table-description" data-testid="text-job-history-range">
                 {/* Run23 NB-039: say when the list is truncated instead of
                     silently capping at the latest 20. */}
                 {jobs && jobsTotal > jobs.length
@@ -992,7 +1119,7 @@ export default function ResearcherTab() {
                   : 'All past research jobs and their results'}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="queues-agent__table-body">
               {jobsLoading ? (
                 /* Run16 BUG-077: skeleton rows instead of a bare text node. */
                 <div className="space-y-3 py-2" aria-label="Loading research jobs">
@@ -1000,6 +1127,23 @@ export default function ResearcherTab() {
                     <Skeleton key={i} className="h-10 w-full" />
                   ))}
                 </div>
+              ) : jobsIsError ? (
+                <Alert variant="destructive" className="queues-agent__inline-error" role="alert" data-testid="error-research-jobs">
+                  <AlertCircle className="w-4 h-4" />
+                  <AlertDescription className="flex flex-wrap items-center gap-3">
+                    <span>Unable to load research jobs: {mutationErrorMessage(jobsError)}</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { void refetchJobs(); }}
+                      disabled={jobsFetching}
+                      data-testid="button-retry-research-jobs"
+                    >
+                      {jobsFetching ? "Retrying…" : "Retry"}
+                    </Button>
+                  </AlertDescription>
+                </Alert>
               ) : !jobs || jobs.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">No research jobs yet</p>
               ) : (
@@ -1112,7 +1256,7 @@ export default function ResearcherTab() {
                               >
                                 <Eye className="w-3 h-3" />
                               </Button>
-                              {job.status === 'processing' && (
+                              {(job.status === 'processing' || job.status === 'pending') && (
                                 <Button
                                   size="sm"
                                   variant="ghost"
@@ -1162,7 +1306,7 @@ export default function ResearcherTab() {
       </Tabs>
 
       <Dialog open={showJobDetails} onOpenChange={setShowJobDetails}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+        <DialogContent className="queues-agent__dialog max-w-4xl max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               Research Job #{selectedJob?.id}
@@ -1178,6 +1322,12 @@ export default function ResearcherTab() {
               Live agent log, token usage, cost, and discovery results for this research run.
             </DialogDescription>
           </DialogHeader>
+          {selectedJobIsError && (
+            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+              <AlertCircle className="w-4 h-4" />
+              <AlertDescription>{mutationErrorMessage(selectedJobError)}</AlertDescription>
+            </Alert>
+          )}
           {selectedJob && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1351,19 +1501,31 @@ export default function ResearcherTab() {
                   </div>
                 </>
               )}
+              {jobDiscoveriesIsError && (
+                <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+                  <AlertCircle className="w-4 h-4" />
+                  <AlertDescription>{mutationErrorMessage(jobDiscoveriesError)}</AlertDescription>
+                </Alert>
+              )}
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!rejectDialogId} onOpenChange={(open) => { if (!open) { setRejectDialogId(null); setRejectReason(""); } }}>
-        <DialogContent>
+      <Dialog open={!!rejectDialogId} onOpenChange={(open) => { if (!open && !rejectMutation.isPending) { setRejectDialogId(null); setRejectReason(""); } }}>
+        <DialogContent className="queues-agent__dialog">
           <DialogHeader>
             <DialogTitle>Reject Discovery</DialogTitle>
             <DialogDescription>
               Mark this discovered resource as rejected. Optionally include a reason for the audit trail.
             </DialogDescription>
           </DialogHeader>
+          {rejectMutation.isError && (
+            <Alert variant="destructive" className="queues-agent__inline-error" role="alert">
+              <AlertCircle className="w-4 h-4" />
+              <AlertDescription>{mutationErrorMessage(rejectMutation.error)}</AlertDescription>
+            </Alert>
+          )}
           <div className="space-y-3">
             <div>
               <Label>Reason (optional)</Label>
@@ -1375,7 +1537,7 @@ export default function ResearcherTab() {
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setRejectDialogId(null)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setRejectDialogId(null)} disabled={rejectMutation.isPending}>Cancel</Button>
               <Button
                 variant="destructive"
                 onClick={() => rejectDialogId && rejectMutation.mutate({ id: rejectDialogId, reason: rejectReason || undefined })}

@@ -1,0 +1,15 @@
+{
+  "note": "Leaf handoff only; not an aggregate inventory replacement or a parity pass.",
+  "profile": "Editorial × Crimson",
+  "widths": [375, 768, 1024, 1440],
+  "pixelmatchThreshold": 0.1,
+  "maximumDifferingPercent": 0.5,
+  "canvas": "full union, no masking or cropping",
+  "rows": [
+    { "id": "admin.approvals", "component": "PendingResources", "eligibility": "pixel", "status": "UNVERIFIED" },
+    { "id": "admin.edits", "component": "PendingEdits", "eligibility": "pixel", "status": "UNVERIFIED" },
+    { "id": "admin.enrichment", "component": "BatchEnrichmentPanel", "eligibility": "pixel", "status": "UNVERIFIED" },
+    { "id": "admin.researcher", "component": "ResearcherTab", "eligibility": "pixel", "status": "UNVERIFIED" },
+    { "id": "admin.research", "component": "ResearcherTab", "props": { "initialTab": "review" }, "eligibility": "pixel", "status": "BLOCKED", "handoff": "Wire review-mode instance in shell and extend real-data reference adapter." }
+  ]
+}

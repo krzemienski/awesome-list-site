@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Label } from "@/components/ui/label";
 import type { AgentEvent } from "@shared/schema";
+import "./queues-agent.css";
 
 type NodeType = "orchestrator" | "subagent" | "tool" | "system";
 
@@ -175,9 +175,9 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
   }, [graph]);
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-xs text-muted-foreground">Communication Graph</Label>
+    <section className="queues-agent__graph space-y-2" aria-labelledby={`agent-comms-heading-${jobType}-${jobId}`}>
+      <div className="queues-agent__graph-heading">
+        <h3 id={`agent-comms-heading-${jobType}-${jobId}`}>Communication Graph</h3>
         <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
           <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: TYPE_STROKE.orchestrator }} />orchestrator</span>
           <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: TYPE_STROKE.subagent }} />subagent</span>
@@ -190,7 +190,13 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
           {isActive ? "Waiting for agent activity…" : "No agent activity recorded."}
         </div>
       ) : (
-        <div className="border rounded bg-black/40 overflow-x-auto" data-testid="agent-comms-graph">
+        <div
+          className="border rounded bg-black/40 overflow-x-auto"
+          data-testid="agent-comms-graph"
+          role="region"
+          aria-label={`Agent communication graph for ${jobType} job ${jobId}`}
+          tabIndex={0}
+        >
           <svg
             viewBox={`0 0 ${graph.width} ${graph.height}`}
             width="100%"
@@ -199,6 +205,10 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
             aria-label={summary}
           >
             <title>{summary}</title>
+              <desc>
+                Directed communication paths between the orchestrator, research
+                subagents, and tools used by this {jobType} run.
+              </desc>
             <defs>
               <marker id="arrow-delegation" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill={EDGE_DELEGATION} />
@@ -286,6 +296,6 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
           </svg>
         </div>
       )}
-    </div>
+    </section>
   );
 }

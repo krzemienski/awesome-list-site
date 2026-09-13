@@ -1,0 +1,287 @@
+/*
+ * Queue review surfaces intentionally own their parity skin here instead of
+ * adding queue-specific rules to the shared admin stylesheet. The structure
+ * follows the canonical TableShell: bordered panel, 18/22px heading row,
+ * horizontally scrollable table, and mono status chips.
+ */
+.queue-review-shell {
+  overflow: hidden;
+}
+
+.queue-review-shell-heading {
+  min-height: 74px;
+  padding: 18px 22px;
+}
+
+.queue-review-shell-heading h2 {
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.queue-review-shell-heading p {
+  color: var(--text-3, var(--text-2));
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin-block-start: 0.25rem;
+}
+
+.queue-review-title {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.queue-review-count {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border: var(--hairline-w) solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius-pill);
+  color: var(--accent);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  min-height: 1.25rem;
+  min-width: 1.75rem;
+  justify-content: center;
+  padding-inline: 0.4rem;
+}
+
+.queue-review-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.queue-review-actions button {
+  min-height: 2rem;
+}
+
+.queue-review-table-wrap {
+  max-height: 37.5rem;
+  overflow: auto;
+  scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.queue-review-table-wrap::-webkit-scrollbar {
+  display: block;
+  height: 8px;
+  width: 8px;
+}
+
+.queue-review-table-wrap::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+.queue-review-table-wrap > .relative {
+  min-width: 100%;
+}
+
+.queue-review-table-wrap .queue-review-table {
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  min-width: 52rem;
+  width: 100%;
+}
+
+.queue-review-table-wrap .queue-review-table--resources {
+  min-width: 60rem;
+}
+
+.queue-review-table-wrap .queue-review-table--edits {
+  min-width: 52rem;
+}
+
+.queue-review-table-wrap .queue-review-table th {
+  border-block-end: var(--hairline-w) solid var(--border);
+  color: var(--text-3, var(--text-2));
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 0.75rem 0.875rem;
+  text-align: start;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.queue-review-table-wrap .queue-review-table td {
+  border-block-end: var(--hairline-w) solid var(--border);
+  color: var(--text-2);
+  padding: 0.875rem;
+  vertical-align: middle;
+}
+
+.queue-review-table-wrap .queue-review-table tbody tr:hover td {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.queue-review-table-wrap .queue-review-table td:first-of-type {
+  color: var(--text-2);
+}
+
+.queue-review-select-cell {
+  padding-inline-end: 0.25rem !important;
+  text-align: center !important;
+  width: 3rem;
+}
+
+.queue-review-select-cell [role="checkbox"] {
+  margin-inline: auto;
+}
+
+.queue-review-table .queue-review-action-cell {
+  min-width: 19rem;
+  white-space: nowrap;
+}
+
+.queue-review-status {
+  background: transparent;
+  font-size: 0.625rem;
+  min-height: 1.5rem;
+}
+
+.queue-review-status--pending {
+  background: color-mix(in srgb, var(--color-chart-4) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-chart-4) 30%, var(--border));
+  color: var(--color-chart-4);
+}
+
+.queue-review-status--approved {
+  background: color-mix(in srgb, var(--color-chart-2) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-chart-2) 30%, var(--border));
+  color: var(--color-chart-2);
+}
+
+.queue-review-status--rejected {
+  background: color-mix(in srgb, var(--color-destructive) 8%, transparent);
+  border-color: color-mix(in srgb, var(--color-destructive) 30%, var(--border));
+  color: var(--color-destructive);
+}
+
+.queue-review-result {
+  align-items: baseline;
+  background: color-mix(in srgb, var(--color-chart-2) 8%, transparent);
+  border-block-end: var(--hairline-w) solid color-mix(in srgb, var(--color-chart-2) 24%, var(--border));
+  color: var(--text-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1.375rem;
+}
+
+.queue-review-result strong {
+  color: var(--color-chart-2);
+  font-size: 0.75rem;
+}
+
+.queue-review-result span {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.queue-review-result--error {
+  background: color-mix(in srgb, var(--color-destructive) 8%, transparent);
+  border-block-end-color: color-mix(in srgb, var(--color-destructive) 24%, var(--border));
+}
+
+.queue-review-result--error strong {
+  color: var(--color-destructive);
+}
+
+.queue-review-empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 15rem;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.queue-review-empty-icon {
+  color: var(--text-3, var(--text-2));
+  height: 3rem;
+  margin-block-end: 0.5rem;
+  opacity: 0.6;
+  width: 3rem;
+}
+
+.queue-review-empty h3 {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.queue-review-empty p {
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  max-width: 34rem;
+}
+
+.queue-review-empty button {
+  margin-block-start: 0.75rem;
+}
+
+.queue-review-empty-status {
+  font-size: 0.75rem !important;
+  min-height: 1.125rem;
+}
+
+.queue-review-loading-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.queue-review-loading-row {
+  align-items: center;
+  border-block-end: var(--hairline-w) solid var(--border);
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: 1rem 1.4fr 1fr 1.8fr 0.75fr;
+  min-height: 4.25rem;
+  padding: 0.875rem 1.375rem;
+}
+
+@media (max-width: 48rem) {
+  .queue-review-shell-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .queue-review-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .queue-review-actions button {
+    flex: 1 1 auto;
+  }
+
+  .queue-review-empty {
+    min-height: 13rem;
+  }
+
+  .queue-review-loading-row {
+    grid-template-columns: 1rem 1.5fr 1fr;
+  }
+
+  .queue-review-loading-row :nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media print {
+  .queue-review-table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+}

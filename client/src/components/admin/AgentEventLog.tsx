@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import type { AgentEvent } from "@shared/schema";
+import "./queues-agent.css";
 
 /**
  * Agent actors and event kinds use the global DS status/info constants.
@@ -80,12 +80,12 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
   const DETAIL_MAX = 2000;
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-xs text-muted-foreground">Agent Events (structured)</Label>
-        <Label className="text-xs text-muted-foreground" data-testid="text-event-count">
+    <section className="queues-agent__event-log space-y-2" aria-labelledby={`agent-events-heading-${jobType}-${jobId}`}>
+      <div className="queues-agent__event-heading">
+        <h3 id={`agent-events-heading-${jobType}-${jobId}`}>Agent Events (structured)</h3>
+        <span className="text-xs text-muted-foreground" data-testid="text-event-count">
           {events.length} event{events.length === 1 ? "" : "s"}
-        </Label>
+        </span>
       </div>
 
       {isLoading && events.length === 0 ? (
@@ -97,13 +97,22 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
           {isActive ? "Waiting for first event…" : "No events recorded."}
         </div>
       ) : (
-        <ScrollArea className="border rounded p-2 bg-black/40" style={{ height }}>
-          <div className="space-y-1.5 font-mono text-xs">
+        <ScrollArea
+          className="border rounded p-2 bg-black/40"
+          style={{ height }}
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-busy={isLoading}
+          aria-label={`Structured agent events for ${jobType} job ${jobId}`}
+          tabIndex={0}
+        >
+          <div className="space-y-1.5 font-mono text-xs" role="list">
             {events.map((ev) => {
               const showDetail = hasDetail(ev.detail);
               const isOpen = !!expanded[ev.id];
               return (
-                <div key={ev.id} className="border-b border-border/30 pb-1.5 last:border-0" data-testid={`row-event-${ev.seq}`}>
+                <div key={ev.id} className="border-b border-border/30 pb-1.5 last:border-0" data-testid={`row-event-${ev.seq}`} role="listitem">
                   <div className="flex gap-2 items-start">
                     <span className="text-muted-foreground shrink-0 w-[64px]">
                       {ev.ts ? new Date(ev.ts).toLocaleTimeString() : ""}
@@ -191,6 +200,6 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
           </div>
         </ScrollArea>
       )}
-    </div>
+    </section>
   );
 }

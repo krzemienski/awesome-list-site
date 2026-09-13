@@ -1,0 +1,58 @@
+# Task 547 owned testid inventory — after
+
+## client/src/components/admin/BatchEnrichmentPanel.tsx
+<AlertDialogAction onClick={launchEnrichment} data-testid="button-confirm-enrichment-start">
+<AlertDialogCancel data-testid="button-cancel-enrichment-start">Cancel</AlertDialogCancel>
+<AlertDialogCancel data-testid="button-cancel-job-dismiss">Keep running</AlertDialogCancel>
+<AlertDialogContent data-testid="dialog-cancel-job">
+<AlertDialogContent data-testid="dialog-confirm-enrichment">
+<Badge variant="outline" className={WARN_OUTLINE_CLASS} data-testid={`skipped-rate-${job.id}`}>
+data-testid={`button-cancel-job-${activeJob.id}`}
+data-testid="button-cancel-job-confirm"
+data-testid="button-start-enrichment"
+data-testid="button-toggle-advanced-enrichment"
+data-testid={`button-view-details-${job.id}`}
+data-testid="error-batch-size"
+data-testid="input-batch-size"
+data-testid="input-enrich-baseurl"
+data-testid="input-enrich-model"
+data-testid="input-enrich-token"
+data-testid="progress-bar"
+data-testid={`status-badge-${job.id}`}
+<div className="max-h-[400px] overflow-auto" data-testid="scroller-enrichment-jobs-table">
+<p className="text-[11px] text-muted-foreground mt-2" data-testid="text-enrichment-legend">
+<p className="text-sm text-muted-foreground" data-testid="text-tag-coverage">
+<SelectTrigger id="filter" data-testid="select-filter">
+## client/src/components/admin/ResearcherTab.tsx
+<AlertDialogCancel data-testid="button-cancel-approve-all">Cancel</AlertDialogCancel>
+<AlertDialogCancel data-testid="button-cancel-launch">Cancel</AlertDialogCancel>
+<Badge key="dead" variant="destructive" className="text-xs shrink-0" title={v.suspicion || v.error || undefined} data-testid={`badge-verification-dead-${d.id}`}>
+<Badge key="ok" variant="outline" className={OK_OUTLINE} data-testid={`badge-verification-ok-${d.id}`}>
+<Card className="queues-agent__table-shell" data-testid="research-review-panel">
+<CardDescription className="queues-agent__table-description" data-testid="text-job-history-range">
+data-testid="button-approve-all"
+data-testid="button-confirm-approve-all"
+data-testid="button-confirm-launch"
+data-testid="button-generate-brief"
+data-testid="button-load-more-jobs"
+data-testid={`button-research-details-${job.id}`}
+data-testid="button-toggle-advanced-researcher"
+data-testid="input-research-baseurl"
+data-testid="input-research-model"
+data-testid="input-research-scout-model"
+data-testid="input-research-token"
+data-testid="input-target-discoveries"
+data-testid="text-prompt-hint"
+data-testid="text-target-hint"
+data-testid="text-turns-hint"
+<p className="text-xs mt-1 text-muted-foreground" data-testid="text-target-hint">
+<p className="text-xs mt-1 text-muted-foreground" data-testid="text-turns-hint">
+<p className="text-xs text-muted-foreground mt-1" data-testid="text-discovery-cap">
+<TableRow key={d.id} data-testid={`row-research-discovery-${d.id}`}>
+## client/src/components/admin/AgentEventLog.tsx
+data-testid={`button-toggle-detail-${ev.seq}`}
+<div key={ev.id} className="border-b border-border/30 pb-1.5 last:border-0" data-testid={`row-event-${ev.seq}`} role="listitem">
+<span className="text-xs text-muted-foreground" data-testid="text-event-count">
+## client/src/components/admin/AgentCommsGraph.tsx
+data-testid="agent-comms-graph"
+<g key={n.id} data-testid={`graph-node-${n.id}`}>

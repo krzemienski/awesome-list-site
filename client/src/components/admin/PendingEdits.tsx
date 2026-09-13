@@ -1,22 +1,33 @@
-import { useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle, Sparkles, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import type { Resource, ResourceEdit } from "@shared/schema";
+import "./queues-review.css";
 
 interface ResourceEditWithResource extends ResourceEdit {
   resource: Resource;
+}
+
+const MIN_REJECTION_REASON_LENGTH = 10;
+
+function StatusChip({ status }: { status: "pending" | "approved" | "rejected" }) {
+  return (
+    <Badge variant="chip" className={`admin-chip queue-review-status queue-review-status--${status}`}>
+      {status}
+    </Badge>
+  );
 }
 
 // BUG-012 (run25): invisible characters must be VISIBLE in review. A
@@ -65,8 +76,10 @@ export default function PendingEdits() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [editToApprove, setEditToApprove] = useState<ResourceEditWithResource | null>(null);
   const [editToReject, setEditToReject] = useState<ResourceEditWithResource | null>(null);
+  const [approveError, setApproveError] = useState<string | null>(null);
+  const [rejectError, setRejectError] = useState<string | null>(null);
 
-  const { data: edits = [], isLoading } = useQuery<ResourceEditWithResource[]>({
+  const { data: edits = [], isLoading, isError, refetch, isFetching } = useQuery<ResourceEditWithResource[]>({
     queryKey: ['/api/admin/resource-edits'],
     refetchInterval: 10000
   });
@@ -110,20 +123,17 @@ export default function PendingEdits() {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      setApproveDialogOpen(false);
+      setEditToApprove(null);
+      setApproveError(null);
       toast({
         title: "Edit Approved",
         description: "The changes have been applied to the resource.",
       });
-      setApproveDialogOpen(false);
-      setEditToApprove(null);
     },
     onError: (error: Error) => {
-      const isConflict = error.message?.includes('Conflict');
-      toast({
-        title: isConflict ? "Merge Conflict" : "Approval Failed",
-        description: error.message || "Failed to approve edit. Please try again.",
-        variant: "destructive"
-      });
+      setApproveError(error.message || "Failed to approve edit. Please try again.");
+      // The dialog remains open so the inline error can be read and retried.
     }
   });
 
@@ -137,20 +147,17 @@ export default function PendingEdits() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      setRejectDialogOpen(false);
+      setEditToReject(null);
+      setRejectionReason("");
+      setRejectError(null);
       toast({
         title: "Edit Rejected",
         description: "The edit suggestion has been rejected.",
       });
-      setRejectDialogOpen(false);
-      setEditToReject(null);
-      setRejectionReason("");
     },
     onError: (error: Error) => {
-      toast({
-        title: "Rejection Failed",
-        description: error.message || "Failed to reject edit. Please try again.",
-        variant: "destructive"
-      });
+      setRejectError(error.message || "Failed to reject edit. Please try again.");
     }
   });
 
@@ -160,33 +167,32 @@ export default function PendingEdits() {
   };
 
   const handleApproveClick = (edit: ResourceEditWithResource) => {
+    setApproveError(null);
     setEditToApprove(edit);
     setApproveDialogOpen(true);
   };
 
   const handleRejectClick = (edit: ResourceEditWithResource) => {
+    setRejectError(null);
     setEditToReject(edit);
     setRejectDialogOpen(true);
   };
 
-  const handleApproveConfirm = () => {
+  const handleApproveConfirm = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     if (editToApprove) {
       approveMutation.mutate(editToApprove.id);
     }
   };
 
   const handleRejectConfirm = () => {
-    if (editToReject && rejectionReason.trim().length >= 10) {
+    if (editToReject && rejectionReason.trim().length >= MIN_REJECTION_REASON_LENGTH) {
       rejectMutation.mutate({
         editId: editToReject.id,
         reason: rejectionReason.trim()
       });
     } else {
-      toast({
-        title: "Invalid Reason",
-        description: "Rejection reason must be at least 10 characters.",
-        variant: "destructive"
-      });
+      setRejectError(`Rejection reason must be at least ${MIN_REJECTION_REASON_LENGTH} characters.`);
     }
   };
 
@@ -218,116 +224,123 @@ export default function PendingEdits() {
     ));
   };
 
+  if (isError) {
+    return (
+      <section className="admin-panel queue-review-shell" aria-label="Pending edits">
+        <div className="admin-panel__heading queue-review-shell-heading"><h2>Pending edits</h2></div>
+        <div className="queue-review-empty" role="alert" data-testid="pending-edits-load-error">
+          <p>Unable to load pending edits. The queue may still contain suggestions awaiting review.</p>
+          <Button onClick={() => void refetch()} disabled={isFetching} data-testid="pending-edits-retry">
+            {isFetching ? "Retrying…" : "Retry"}
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Pending Edits</CardTitle>
-          <CardDescription>Edit suggestions awaiting review</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </div>
-            ))}
+      <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
+        <div className="admin-panel__heading queue-review-shell-heading">
+          <div>
+            <h2 id="pending-edits-heading">Pending Edits</h2>
+            <p>Edit suggestions awaiting review</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="queue-review-loading-table" aria-label="Loading pending edits">
+          {[...Array(4)].map((_, i) => (
+            <div className="queue-review-loading-row" key={i}>
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-1/6" />
+              <Skeleton className="h-4 w-1/5" />
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-1/6" />
+            </div>
+          ))}
+        </div>
+      </section>
     );
   }
 
   if (edits.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className={"h-5 w-5 text-[#34d08c]" /* DS-OK: status ok */} />
-            Pending Edits
-          </CardTitle>
-          <CardDescription>Edit suggestions awaiting review</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12">
-            <CheckCircle2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-lg font-semibold mb-2">All Caught Up!</h3>
-            <p className="text-muted-foreground mb-4">
-              There are no pending edits to review at this time.
-            </p>
-            {/* Run16 BUG-078: empty state gets an explicit refresh control. */}
-            <Button
-              variant="outline"
-              onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] })}
-              data-testid="button-refresh-pending-edits"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Check again
-            </Button>
+      <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
+        <div className="admin-panel__heading queue-review-shell-heading">
+          <div>
+            <h2 id="pending-edits-heading">Pending Edits</h2>
+            <p>Edit suggestions awaiting review</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="queue-review-empty">
+          <CheckCircle2 className="queue-review-empty-icon" aria-hidden="true" />
+          <h3>All Caught Up!</h3>
+          <p>There are no pending edits to review at this time.</p>
+          {/* Run16 BUG-078: empty state gets an explicit refresh control. */}
+          <Button
+            variant="outline"
+            onClick={() => {
+              void queryClient.invalidateQueries({ queryKey: ['/api/admin/resource-edits'] });
+            }}
+            data-testid="button-refresh-pending-edits"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Check again
+          </Button>
+        </div>
+      </section>
     );
   }
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                Pending Edits
-                <Badge variant="destructive" className="ml-2">
-                  {edits.length}
-                </Badge>
-              </CardTitle>
-              <CardDescription>Edit suggestions awaiting review</CardDescription>
-            </div>
+      <section className="admin-panel queue-review-shell" aria-labelledby="pending-edits-heading">
+        <div className="admin-panel__heading queue-review-shell-heading">
+          <div>
+            <h2 id="pending-edits-heading" className="queue-review-title">
+              Pending Edits
+              <Badge variant="accent" className="queue-review-count">{edits.length}</Badge>
+            </h2>
+            <p>{edits.length} edit suggestions awaiting review</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          {/* R4-012 (run21): shared narrow-admin-table strategy — a native
-              overflow-auto viewport (scrolls BOTH axes) around a min-w table.
-              The prior Radix ScrollArea rendered its viewport at
-              min-width:100%, so it never scrolled horizontally and clipped the
-              Actions column ≤768px. max-h keeps short lists compact; the
-              desktop layout (table already fits, no scroll) is unchanged. */}
-          <div className="relative">
-            {showSwipeHint && (
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
-                data-testid="gradient-scroll-cue-edits"
-              />
-            )}
+        </div>
+        {/* R4-012 (run21): shared narrow-admin-table strategy — a native
+            overflow-auto viewport (scrolls BOTH axes) around a min-w table.
+            The prior Radix ScrollArea rendered its viewport at
+            min-width:100%, so it never scrolled horizontally and clipped the
+            Actions column ≤768px. max-h keeps short lists compact; the
+            desktop layout (table already fits, no scroll) is unchanged. */}
+        <div className="relative">
+          {showSwipeHint && (
             <div
-              ref={scrollRef}
-              className="max-h-[600px] overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
-              tabIndex={0}
-              role="region"
-              aria-label="Pending edits table, scrollable"
-              onKeyDown={(e) => {
-                const el = scrollRef.current;
-                if (!el) return;
-                // R5-058: scroll the shadcn <Table>'s own inner overflow-auto
-                // wrapper — the outer viewport only overflows vertically.
-                const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
-                if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
-                else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
-              }}
-            >
-            <Table className="min-w-[720px]">
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent z-10"
+              data-testid="gradient-scroll-cue-edits"
+            />
+          )}
+          <div
+            ref={scrollRef}
+            className="admin-table-wrap queue-review-table-wrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+            tabIndex={0}
+            role="region"
+            aria-label="Pending edits table, scrollable"
+            onKeyDown={(e) => {
+              const el = scrollRef.current;
+              if (!el) return;
+              // R5-058: scroll the shadcn <Table>'s own inner overflow-auto
+              // wrapper — the outer viewport only overflows vertically.
+              const scroller = (el.querySelector('table')?.parentElement ?? el) as HTMLElement;
+              if (e.key === 'ArrowRight') { scroller.scrollBy({ left: 80 }); e.preventDefault(); }
+              else if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -80 }); e.preventDefault(); }
+            }}
+          >
+            <Table className="queue-review-table queue-review-table--edits min-w-[720px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Resource</TableHead>
                   <TableHead>Changes</TableHead>
                   <TableHead>AI Analysis</TableHead>
                   <TableHead>Submitted</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -376,7 +389,10 @@ export default function PendingEdits() {
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDate(edit.createdAt)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>
+                      <StatusChip status="pending" />
+                    </TableCell>
+                    <TableCell className="queue-review-action-cell text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
@@ -419,15 +435,14 @@ export default function PendingEdits() {
                 ))}
               </TableBody>
             </Table>
-            </div>
-            {showSwipeHint && (
-              <p className="mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
-                Swipe the table sideways to see all columns, including Approve/Reject.
-              </p>
-            )}
           </div>
-        </CardContent>
-      </Card>
+          {showSwipeHint && (
+            <p className="mt-2 text-xs text-muted-foreground" data-testid="text-swipe-hint-edits">
+              Swipe the table sideways to see all columns, including Approve/Reject.
+            </p>
+          )}
+        </div>
+      </section>
 
       {/* View Details Dialog */}
       <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
@@ -520,7 +535,10 @@ export default function PendingEdits() {
       </Dialog>
 
       {/* Approve Confirmation Dialog */}
-      <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+      <AlertDialog open={approveDialogOpen} onOpenChange={(open) => {
+        setApproveDialogOpen(open);
+        if (!open) setApproveError(null);
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Edit Suggestion?</AlertDialogTitle>
@@ -543,29 +561,50 @@ export default function PendingEdits() {
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {approveError && (
+            <Alert variant="destructive" data-testid="error-approve-edit-dialog">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{approveError}</AlertDescription>
+            </Alert>
+          )}
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel
+              onClick={() => setApproveError(null)}
+              data-testid="button-cancel-approve-edit"
+            >
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApproveConfirm}
+              disabled={approveMutation.isPending}
               className={"bg-[#34d08c] text-black hover:bg-[#34d08c]/90" /* DS-OK: status ok */}
               data-testid="button-confirm-approve-edit"
             >
-              Approve & Merge
+              {approveMutation.isPending ? "Approving..." : "Approve & Merge"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Reject Dialog */}
-      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+      <Dialog open={rejectDialogOpen} onOpenChange={(open) => {
+        setRejectDialogOpen(open);
+        if (!open) setRejectError(null);
+      }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject Edit Suggestion</DialogTitle>
             <DialogDescription>
-              Provide a reason for rejecting this edit suggestion (minimum 10 characters).
+              Provide a reason for rejecting this edit suggestion (minimum {MIN_REJECTION_REASON_LENGTH} characters).
               This message is shown to the contributor, so keep internal moderation notes out of it.
             </DialogDescription>
           </DialogHeader>
+          {rejectError && (
+            <Alert variant="destructive" data-testid="error-reject-edit-dialog">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{rejectError}</AlertDescription>
+            </Alert>
+          )}
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="rejection-reason">Rejection Reason</Label>
@@ -578,7 +617,7 @@ export default function PendingEdits() {
                 data-testid="input-rejection-reason"
               />
               <p className="text-sm text-muted-foreground">
-                {rejectionReason.trim().length} / 10 characters minimum · visible to the contributor
+                {rejectionReason.trim().length} / {MIN_REJECTION_REASON_LENGTH} characters minimum · visible to the contributor
               </p>
             </div>
           </div>
@@ -588,14 +627,16 @@ export default function PendingEdits() {
               onClick={() => {
                 setRejectDialogOpen(false);
                 setRejectionReason("");
+                setRejectError(null);
               }}
+              data-testid="button-cancel-reject-edit"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleRejectConfirm}
-              disabled={rejectionReason.trim().length < 10 || rejectMutation.isPending}
+              disabled={rejectionReason.trim().length < MIN_REJECTION_REASON_LENGTH || rejectMutation.isPending}
               data-testid="button-confirm-reject-edit"
             >
               {rejectMutation.isPending ? "Rejecting..." : "Reject Edit"}

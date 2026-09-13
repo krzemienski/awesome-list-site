@@ -1,0 +1,21 @@
+{
+  "editId": 61,
+  "exactTimestamp": "2026-09-13T07:59:45.557Z",
+  "changes": {
+    "title": {
+      "old": "__qa_test_parity547_reject_resource",
+      "new": "__qa_test_parity547_reject_resource-new"
+    }
+  },
+  "buttonDisabled": null,
+  "row": {
+    "id": 61,
+    "status": "rejected",
+    "rejection_reason": "Parity 547 corrected rejection reason",
+    "handled_at": "2026-09-13T07:59:46.865Z"
+  },
+  "toast": [
+    "Edit Rejected",
+    "Edit RejectedThe edit suggestion has been rejected."
+  ]
+}
