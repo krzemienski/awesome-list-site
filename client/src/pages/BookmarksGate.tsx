@@ -1,6 +1,7 @@
 import Bookmarks from "@/pages/Bookmarks";
 import GuestBookmarks from "@/pages/GuestBookmarks";
 import { useAuth } from "@/hooks/useAuth";
+import "@/styles/pages/account.css";
 
 // Task #329: /bookmarks is no longer a blind auth wall.
 // - Signed in            → the full library (unchanged).
@@ -11,10 +12,10 @@ export default function BookmarksGate() {
   if (isLoading) {
     // Same shell AuthGuard shows while auth resolves.
     return (
-      <div className="min-h-full flex items-center justify-center bg-background">
+      <div className="account-page account-page--wide min-h-full flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="account-spinner animate-spin"></div>
+          <p className="account-gate-loading">Loading...</p>
         </div>
       </div>
     );

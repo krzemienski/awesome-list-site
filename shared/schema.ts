@@ -32,6 +32,7 @@ import type {
   DigestJobStatus,
   NotificationKind,
 } from "./notifications";
+import type { ThemeAccentId, ThemeSystemId } from "./onboarding-values";
 import type { RecommendationFeedbackValue } from "./recommendations";
 import {
   type LearningFormat,
@@ -1154,6 +1155,8 @@ export const userPreferences = pgTable(
     onboardingStep: integer("onboarding_step").default(1).notNull(),
     onboardingCompletedAt: timestamp("onboarding_completed_at"),
     onboardingDismissedAt: timestamp("onboarding_dismissed_at"),
+    themeSystem: text("theme_system").$type<ThemeSystemId>(),
+    themeAccent: text("theme_accent").$type<ThemeAccentId>(),
     revision: integer("revision").default(1).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
@@ -1167,6 +1170,8 @@ export const userPreferences = pgTable(
     check("user_preferences_onboarding_status_check", sql`${table.onboardingStatus} IN ('not_started','in_progress','completed','dismissed')`),
     check("user_preferences_onboarding_step_check", sql`${table.onboardingStep} BETWEEN 1 AND 5`),
     check("user_preferences_revision_check", sql`${table.revision} >= 1`),
+    check("user_preferences_theme_system_check", sql`${table.themeSystem} IS NULL OR ${table.themeSystem} IN ('editorial','terminal','geist','brutalist','swiss')`),
+    check("user_preferences_theme_accent_check", sql`${table.themeAccent} IS NULL OR ${table.themeAccent} IN ('crimson','magenta','orange','amber','emerald','matrix','cyan','violet','lime','rose')`),
     check("user_preferences_learning_goals_values_check", sql`${table.learningGoals} <@ '["learn-fundamentals","build-video-apps","improve-streaming","optimize-encoding","operate-infrastructure","keep-current"]'::jsonb`),
     check("user_preferences_resource_types_values_check", sql`${table.preferredResourceTypes} <@ '["video","course","article","book","specification","tool","library","community"]'::jsonb`),
   ]
@@ -1184,6 +1189,8 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).p
   onboardingStep: true,
   onboardingCompletedAt: true,
   onboardingDismissedAt: true,
+  themeSystem: true,
+  themeAccent: true,
 });
 
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import NotificationPreferencesCard from "@/components/notifications/NotificationPreferencesCard";
 import HomeLayoutPreferenceControl from "@/components/home/HomeLayoutPreferenceControl";
+import "@/styles/pages/account.css";
 
 interface CategoryOption {
   name: string;
@@ -196,7 +197,7 @@ export default function Settings() {
     }
   };
   return (
-    <div className="max-w-3xl space-y-8">
+    <div className="account-page account-page--form max-w-3xl space-y-8">
       <SEOHead
         title="Settings"
         description="Manage your Awesome Video preferences — appearance, account, security, and saved resources."

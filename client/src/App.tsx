@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
+import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAnalytics } from "./hooks/use-analytics";
@@ -808,6 +809,7 @@ function App() {
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
+      <AccountThemePreferenceBridge>
       <ClerkQueryClientCacheInvalidator />
       {/* Task #393: fires the GA4 login / sign_up conversions once per
           completed Clerk auth attempt (never on a session restore or token
@@ -827,6 +829,7 @@ function App() {
           content, with Escape still dismissing it for the session. */}
       <Router />
       <ConsentBanner />
+      </AccountThemePreferenceBridge>
     </ClerkProvider>
   );
 }

@@ -15,6 +15,7 @@ import {
   useGuestBookmarks,
 } from "@/lib/guestBookmarks";
 import { trackAuthPromptShown } from "@/lib/analytics";
+import "@/styles/pages/account.css";
 
 // Task #329: the guest view of /bookmarks. Signed-out visitors with ≥1
 // on-device save see their list plus a "sign in to keep these everywhere"
@@ -90,14 +91,14 @@ export default function GuestBookmarks() {
 
   if (count === 0) {
     return (
-      <div className="space-y-6">
+      <div className="account-page account-page--wide space-y-6">
         <SEOHead
           title="Saved on This Device"
           description="Resources you saved as a guest — sign in to keep them in your account"
           noindex
         />
         <div className="text-center py-12">
-          <div className="rounded-full bg-primary/10 p-6 mb-6 inline-flex">
+          <div className="account-empty-icon p-6 mb-6 inline-flex">
             <BookmarkX className="h-12 w-12 text-primary" aria-hidden="true" />
           </div>
           <h1 className="text-2xl font-bold mb-2">Nothing saved on this device</h1>
@@ -124,7 +125,7 @@ export default function GuestBookmarks() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="account-page account-page--wide space-y-6">
       <SEOHead
         title="Saved on This Device"
         description="Resources you saved as a guest — sign in to keep them in your account"
@@ -149,7 +150,7 @@ export default function GuestBookmarks() {
 
       <section
         aria-label="Keep your saved resources"
-        className="border bg-card p-4 sm:p-5"
+        className="account-callout account-callout--accent p-4 sm:p-5"
         data-testid="banner-guest-signin-prompt"
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -185,7 +186,7 @@ export default function GuestBookmarks() {
         </div>
         {!persistent && (
           <p
-            className="mt-3 flex items-start gap-1.5 text-sm text-destructive"
+            className="account-callout--danger mt-3 flex items-start gap-1.5 text-sm"
             data-testid="text-guest-storage-warning"
           >
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -204,7 +205,7 @@ export default function GuestBookmarks() {
       {failedIds.length > 0 && (
         <div
           role="alert"
-          className="flex flex-wrap items-center justify-between gap-3 border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm"
+          className="account-callout account-callout--danger flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
           data-testid="banner-guest-load-failed"
         >
           <span>

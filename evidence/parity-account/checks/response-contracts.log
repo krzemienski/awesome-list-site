@@ -1,0 +1,136 @@
+
+> rest-express@1.0.0 validate:response-contracts
+> tsx scripts/validation/response-contract-drift.ts
+
+Claude service initialized successfully (Replit-managed integration)
+Attention: Clerk collects telemetry data from its SDKs when connected to development instances.
+The data collected is used to inform Clerk's product roadmap.
+To learn more, including how to opt-out from the telemetry program, visit: https://clerk.com/docs/telemetry.
+
+[clerkAuth] audit-key bypass: GET /api/auth/user
+[COLD-START DEBUG] {
+  userId: 'anonymous',
+  viewHistoryLength: 0,
+  completedResourcesLength: 0,
+  ratingsCount: 0,
+  bookmarksLength: 0,
+  isColdStart: true
+}
+[COLD-START] Generating popular resources for new user: anonymous
+[clerkAuth] audit-key bypass: POST /api/recommendations
+[COLD-START DEBUG] {
+  userId: 'd460f5e7-a085-4083-96a2-2f20dc9315c4',
+  viewHistoryLength: 0,
+  completedResourcesLength: 0,
+  ratingsCount: 1,
+  bookmarksLength: 1,
+  isColdStart: false
+}
+[PERSONALIZATION DEBUG] {
+  userId: 'd460f5e7-a085-4083-96a2-2f20dc9315c4',
+  totalResources: 1000,
+  eligibleResources: 1000,
+  excludedByViews: 0,
+  excludedByCompleted: 0,
+  excludedByJourneys: 0,
+  bookmarksCount: 1,
+  viewedCategories: {},
+  bookmarkedCategories: { 'Intro & Learning': 1 },
+  journeyCategories: {},
+  preferredCategories: [],
+  activeJourneys: 2,
+  completedJourneys: 1
+}
+[RULE-BASED DEBUG] Category frequency from bookmarks/favorites: { 'Intro & Learning': 1 }
+[RULE-BASED DEBUG] Journey category frequency: {}
+[RULE-BASED DEBUG] Rating-based category preferences: { 'Infrastructure & Delivery': { positive: 1, negative: 0 } }
+[RECOMMENDATIONS DEBUG] {
+  userId: 'd460f5e7-a085-4083-96a2-2f20dc9315c4',
+  totalRecommendations: 10,
+  recommendedCategories: [
+    {
+      category: 'Encoding & Codecs',
+      confidence: 60,
+      type: 'ai_powered',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Encoding & Codecs',
+      confidence: 60,
+      type: 'ai_powered',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Infrastructure & Delivery',
+      confidence: 60,
+      type: 'ai_powered',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Encoding & Codecs',
+      confidence: 60,
+      type: 'ai_powered',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Media Tools',
+      confidence: 60,
+      type: 'ai_powered',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Media Tools',
+      confidence: 60,
+      type: 'ai_powered',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Media Tools',
+      confidence: 60,
+      type: 'ai_powered',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Intro & Learning',
+      confidence: 46,
+      type: 'rule_based',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Intro & Learning',
+      confidence: 46,
+      type: 'rule_based',
+      reason: 'A good fit for getting started'
+    },
+    {
+      category: 'Intro & Learning',
+      confidence: 46,
+      type: 'rule_based',
+      reason: 'A good fit for getting started'
+    }
+  ]
+}
+[clerkAuth] audit-key bypass: GET /api/admin/pending-resources
+[clerkAuth] audit-key bypass: GET /api/auth/me
+[clerkAuth] audit-key bypass: GET /api/admin/stats
+[clerkAuth] audit-key bypass: GET /api/admin/contact-submissions
+  ok  GET /api/auth/user (anonymous) -> 200
+  ok  GET /api/auth/user (audit-key admin) -> 200
+  ok  GET /api/resources -> 200
+  ok  GET /api/awesome-list/listing (first category) -> 200
+  ok  GET /api/recommendations -> 200
+  ok  POST /api/recommendations (audit-key admin) -> 200
+  ok  GET /api/admin/pending-resources (audit-key) -> 200
+  ok  GET /api/resources/:id (id=188015) -> 200
+  ok  GET /api/auth/me (audit-key admin) -> 200
+  ok  GET /api/admin/stats (audit-key) -> 200
+  ok  GET /api/journeys (anonymous) -> 200
+  ok  GET /api/config (anonymous) -> 200
+  ok  POST /api/contact (default-off) -> 404
+  ok  GET /api/admin/contact-submissions (audit-key) -> 200
+  ok  GET /api/resources/kinds/counts -> 200
+  ok  GET /api/resources/kinds/counts (first category) -> 200
+  ok  GET /api/resources?kind=tools -> 200
+  ok  GET /api/public/collections/:shareId (no published collection in this database; 404 envelope) -> 404
+  ok  GET /api/__contract-drift-probe (observer liveness) -> 401
+Response-contract drift PASS: 19 endpoint checks, 0 real mismatches, observer liveness verified

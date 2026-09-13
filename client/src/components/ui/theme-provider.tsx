@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from "react";
 import {
   DESIGN_SYSTEMS,
   ACCENTS,
@@ -21,8 +21,9 @@ import {
   applyFontOverride,
   resolveFontOverrideId,
 } from "@/lib/font-options";
+import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 
-type ThemeProviderState = {
+interface ThemeProviderState {
   systemId: DesignSystemId;
   accentId: AccentId;
   setSystem: (id: string) => void;
@@ -30,7 +31,7 @@ type ThemeProviderState = {
   systems: typeof DESIGN_SYSTEMS;
   accents: typeof ACCENTS;
   systemDefaultAccent: typeof SYSTEM_DEFAULT_ACCENT;
-};
+}
 
 const initialState: ThemeProviderState = {
   systemId: DEFAULT_SYSTEM,
@@ -130,6 +131,90 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         systemDefaultAccent: SYSTEM_DEFAULT_ACCENT,
       }}
     >
+      {children}
+    </ThemeProviderContext.Provider>
+  );
+}
+
+/**
+ * Adds signed-in persistence below ClerkProvider while ThemeProvider itself
+ * remains usable during SSR and before Clerk mounts.
+ */
+export function AccountThemePreferenceBridge({ children }: { children: ReactNode }) {
+  const theme = useContext(ThemeProviderContext);
+  const {
+    setSystem: applySystem,
+    setAccent: applyAccent,
+  } = theme;
+  const {
+    theme: accountTheme,
+    isLoading,
+    isAuthenticated,
+    saveThemeAsync,
+    refetch,
+  } = useLearningPreferences();
+  const localSelectionMade = useRef(false);
+  const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const selectedSystem = useRef(theme.systemId);
+  const selectedAccent = useRef(theme.accentId);
+
+  useEffect(() => {
+    selectedSystem.current = theme.systemId;
+    selectedAccent.current = theme.accentId;
+  }, [theme.accentId, theme.systemId]);
+
+  useEffect(() => {
+    if (
+      isLoading ||
+      localSelectionMade.current ||
+      !accountTheme ||
+      !isSystemId(accountTheme.systemId) ||
+      !isAccentId(accountTheme.accentId)
+    ) return;
+    selectedSystem.current = accountTheme.systemId;
+    selectedAccent.current = accountTheme.accentId;
+    applySystem(accountTheme.systemId);
+    applyAccent(accountTheme.accentId);
+  }, [accountTheme, applyAccent, applySystem, isLoading]);
+
+  const persist = useCallback(
+    (themeSystem: DesignSystemId, themeAccent: AccentId) => {
+      if (!isAuthenticated) return;
+      saveQueue.current = saveQueue.current
+        .catch(() => undefined)
+        .then(() => saveThemeAsync({ themeSystem, themeAccent }))
+        .catch(async () => {
+          await refetch();
+        });
+    },
+    [isAuthenticated, refetch, saveThemeAsync],
+  );
+
+  const setSystem = useCallback((id: string) => {
+    if (!isSystemId(id)) return;
+    localSelectionMade.current = true;
+    const previousDefault =
+      SYSTEM_DEFAULT_ACCENT[selectedSystem.current] || DEFAULT_ACCENT;
+    const nextAccent =
+      selectedAccent.current === previousDefault
+        ? SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT
+        : selectedAccent.current;
+    selectedSystem.current = id;
+    selectedAccent.current = nextAccent;
+    applySystem(id);
+    persist(id, nextAccent);
+  }, [applySystem, persist]);
+
+  const setAccent = useCallback((id: string) => {
+    if (!isAccentId(id)) return;
+    localSelectionMade.current = true;
+    selectedAccent.current = id;
+    applyAccent(id);
+    persist(selectedSystem.current, id);
+  }, [applyAccent, persist]);
+
+  return (
+    <ThemeProviderContext.Provider value={{ ...theme, setSystem, setAccent }}>
       {children}
     </ThemeProviderContext.Provider>
   );

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "token-only-account",
+  "summary": "Proposed token-only account coverage; reconcile with account.json during integration. Evidence is partial, not final acceptance.",
+  "screens": [
+    {"id":"app.account-token.settings","kind":"app","eligibility":"token-only","actualPath":"/settings","reason":"Submit/admin pattern. Evidence: evidence/parity-account/signedIn.settings-{375,768,1024,1440}.png. See docs/parity/assumptions/token-only-account.md for unexecuted checks."},
+    {"id":"app.account-token.theme","kind":"app","eligibility":"token-only","actualPath":"/settings/theme","reason":"Form/specimen pattern, no loaded canonical ThemePage. Evidence: evidence/parity-account/theme-matrix.json, results.json, signed-theme-reload.png and signedIn.settings_theme-{375,768,1024,1440}.png."},
+    {"id":"app.account-token.profile","kind":"app","eligibility":"token-only","actualPath":"/profile","reason":"Detail/stats pattern. Evidence: evidence/parity-account/signedIn.profile-{375,768,1024,1440}.png."},
+    {"id":"app.account-token.bookmarks","kind":"app","eligibility":"token-only","actualPath":"/bookmarks","reason":"Category list pattern. Evidence: evidence/parity-account/signedIn.bookmarks-{375,768,1024,1440}.png. Empty guest/gate: guest.bookmarks-{375,768,1024,1440}.png. Populated four-width coverage pending."},
+    {"id":"app.account-token.contributions","kind":"app","eligibility":"token-only","actualPath":"/contributions","reason":"Filtered list pattern. Evidence: evidence/parity-account/signedIn.contributions-{375,768,1024,1440}.png."},
+    {"id":"app.account-token.notifications","kind":"app","eligibility":"token-only","actualPath":"/notifications","reason":"List/empty pattern. Evidence: evidence/parity-account/signedIn.notifications-{375,768,1024,1440}.png. Mark-read check pending."},
+    {"id":"app.account-token.onboarding","kind":"app","eligibility":"token-only","actualPath":"/onboarding","reason":"Submit/admin progress pattern. Evidence: evidence/parity-account/signedIn.onboarding-{375,768,1024,1440}.png. Completion check pending."},
+    {"id":"app.account-token.continue-learning","kind":"app","eligibility":"token-only","actualPath":"/continue-learning","reason":"Detail/list pattern. Evidence: evidence/parity-account/signedIn.continue-learning-{375,768,1024,1440}.png."},
+    {"id":"app.account-token.sign-in","kind":"app","eligibility":"token-only","actualPath":"/sign-in","reason":"Real Clerk form with canonical appearance, no fixture. Evidence: evidence/parity-account/auth.sign-in-{375,1440}.png and account-552.json."},
+    {"id":"app.account-token.sign-up","kind":"app","eligibility":"token-only","actualPath":"/sign-up","reason":"Real Clerk form with canonical appearance, no fixture. Evidence: evidence/parity-account/auth.sign-up-{375,1440}.png."}
+  ]
+}

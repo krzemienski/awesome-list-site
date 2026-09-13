@@ -45,6 +45,8 @@ import type {
   LearningTimeCommitment,
   HomeLayout,
   OnboardingStatus,
+  ThemeAccentId,
+  ThemeSystemId,
 } from "@shared/onboarding";
 import {
   DEFAULT_HOME_LAYOUT,
@@ -385,6 +387,8 @@ export class UserFeatureRepository {
       onboardingStep: number;
       onboardingCompletedAt: Date | null;
       onboardingDismissedAt: Date | null;
+      themeSystem: ThemeSystemId | null;
+      themeAccent: ThemeAccentId | null;
     },
     expectedRevision?: number | null,
   ): Promise<UserPreferences | undefined> {

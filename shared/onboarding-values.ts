@@ -22,6 +22,34 @@ export const HOME_LAYOUT_VALUES = ["index", "curated"] as const;
 export type HomeLayout = (typeof HOME_LAYOUT_VALUES)[number];
 export const DEFAULT_HOME_LAYOUT: HomeLayout = "index";
 
+export const THEME_SYSTEM_VALUES = [
+  "editorial",
+  "terminal",
+  "geist",
+  "brutalist",
+  "swiss",
+] as const;
+export type ThemeSystemId = (typeof THEME_SYSTEM_VALUES)[number];
+
+export const THEME_ACCENT_VALUES = [
+  "crimson",
+  "magenta",
+  "orange",
+  "amber",
+  "emerald",
+  "matrix",
+  "cyan",
+  "violet",
+  "lime",
+  "rose",
+] as const;
+export type ThemeAccentId = (typeof THEME_ACCENT_VALUES)[number];
+
+export interface ThemePreferencesValues {
+  themeSystem: ThemeSystemId;
+  themeAccent: ThemeAccentId;
+}
+
 export const SKILL_LEVEL_VALUES = [
   "beginner",
   "intermediate",
@@ -192,6 +220,8 @@ export type LearningPreferencesUpdate = Partial<LearningPreferencesValues> & {
   onboardingStatus?: OnboardingStatus;
   onboardingStep?: number;
   homeLayout?: HomeLayout;
+  themeSystem?: ThemeSystemId;
+  themeAccent?: ThemeAccentId;
 };
 
 export const DEFAULT_LEARNING_PREFERENCES: LearningPreferencesValues = {

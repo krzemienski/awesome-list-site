@@ -1,0 +1,12 @@
+Step 1/3: journal integrity check...
+  ✓ 26 migration file(s), all journaled, no orphans.
+Step 2/3: schema reproduction check on scratch database...
+  ✓ Created scratch database "mig_drift_check".
+  ✓ Legacy goals/types normalize; incomplete and dismissed lifecycle states remain honest.
+  ✓ Drizzle migrator ran cleanly against the scratch database.
+  ✓ drizzle-kit push reports no changes — migrations reproduce shared/schema.ts exactly.
+  ✓ Dropped scratch database "mig_drift_check".
+Step 3/3: id-sequence drift check (every serial-id table)...
+  ✓ 27 serial-id sequence(s) checked — none behind max(id).
+
+✅ No migration drift: migrations/ fully reproduces shared/schema.ts, and no id-sequence drift.

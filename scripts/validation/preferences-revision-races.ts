@@ -265,8 +265,42 @@ try {
     { final: finalC.body?.revision, reset: resetC.body?.revision },
   );
 
+  // ---- Scenario D: theme shares the revision guard but survives learning reset
+  const themeSave = await api(jwt, "PUT", "/api/user/preferences", {
+    themeSystem: "swiss",
+    themeAccent: "rose",
+    expectedRevision: finalC.body?.revision,
+  });
+  check(
+    themeSave.status === 200 &&
+      themeSave.body?.theme?.systemId === "swiss" &&
+      themeSave.body?.theme?.accentId === "rose",
+    "account theme saves through the revision-backed preferences API",
+    themeSave,
+  );
+  const themeGet = await api(jwt, "GET", "/api/user/preferences");
+  check(
+    themeGet.status === 200 &&
+      themeGet.body?.theme?.systemId === "swiss" &&
+      themeGet.body?.theme?.accentId === "rose",
+    "account theme persists through a fresh GET",
+    themeGet,
+  );
+  const resetWithTheme = await api(jwt, "DELETE", "/api/user/preferences", {
+    expectedRevision: themeGet.body?.revision,
+  });
+  check(
+    resetWithTheme.status === 200 &&
+      resetWithTheme.body?.preferences === null &&
+      resetWithTheme.body?.theme?.systemId === "swiss" &&
+      resetWithTheme.body?.theme?.accentId === "rose",
+    "learning reset preserves the independently selected account theme",
+    resetWithTheme,
+  );
+
   const { rows: dbRows } = await pool.query(
-    `SELECT skill_level, learning_goals, preferred_resource_types, preferred_categories
+    `SELECT skill_level, learning_goals, preferred_resource_types, preferred_categories,
+            theme_system, theme_accent
      FROM user_preferences WHERE user_id = $1`,
     [bridgeId],
   );
@@ -276,8 +310,10 @@ try {
       Array.isArray(dbRows[0].learning_goals) &&
       dbRows[0].learning_goals.length === 0 &&
       dbRows[0].preferred_resource_types.length === 0 &&
-      dbRows[0].preferred_categories.length === 0,
-    "physical row is the cleared tombstone (no stale values on disk)",
+      dbRows[0].preferred_categories.length === 0 &&
+      dbRows[0].theme_system === "swiss" &&
+      dbRows[0].theme_accent === "rose",
+    "physical row is cleared learning data plus the persisted account theme",
     dbRows,
   );
 } catch (error) {

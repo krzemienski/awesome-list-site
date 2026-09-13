@@ -7,6 +7,8 @@ import {
   ONBOARDING_STEP_COUNT,
   SKILL_LEVEL_VALUES,
   TIME_COMMITMENT_VALUES,
+  THEME_ACCENT_VALUES,
+  THEME_SYSTEM_VALUES,
 } from "./onboarding-values";
 export * from "./onboarding-values";
 
@@ -64,5 +66,7 @@ export const learningPreferencesUpdateSchema = learningPreferencesValuesSchema
       .max(ONBOARDING_STEP_COUNT)
       .optional(),
     homeLayout: z.enum(HOME_LAYOUT_VALUES).optional(),
+    themeSystem: z.enum(THEME_SYSTEM_VALUES).optional(),
+    themeAccent: z.enum(THEME_ACCENT_VALUES).optional(),
   })
   .strict();

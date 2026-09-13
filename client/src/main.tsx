@@ -194,14 +194,14 @@ const rootElement = document.getElementById("root")!;
   }
 })();
 const AppComponent = (
-  <ThemeProvider>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
       <TooltipProvider>
         <Toaster />
         <App />
       </TooltipProvider>
-    </QueryClientProvider>
-  </ThemeProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
 );
 
 // Use hydration if we have server-rendered content, otherwise use client rendering

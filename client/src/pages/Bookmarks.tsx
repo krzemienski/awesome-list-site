@@ -65,6 +65,7 @@ import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { writeFilterParams, usePopstateParams } from "@/lib/url-filter-state";
+import "@/styles/pages/account.css";
 
 type StatusFilter = BookmarkQueueStatus | "all";
 type ArchiveFilter = "active" | "archived";
@@ -340,7 +341,7 @@ export default function Bookmarks() {
 
   if (bookmarksLoading || collectionsLoading) {
     return (
-      <div className="space-y-6" aria-busy="true" aria-live="polite">
+      <div className="account-page account-page--wide space-y-6" aria-busy="true" aria-live="polite">
         <SEOHead title="My Library - Loading" description="View your saved library" noindex />
         <PageHeaderSkeleton />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -354,7 +355,7 @@ export default function Bookmarks() {
 
   if (bookmarksError || collectionsError) {
     return (
-      <div className="space-y-6">
+      <div className="account-page account-page--wide space-y-6">
         <SEOHead title="My Library - Error" description="View your saved library" noindex />
         <div className="text-center py-12" role="alert">
           <BookmarkX className="h-16 w-16 mx-auto text-destructive mb-4" />
@@ -369,7 +370,7 @@ export default function Bookmarks() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="account-page account-page--wide space-y-6">
       <SEOHead
         title="My Learning Library"
         description="Organize saved video development resources into collections and a learning queue"
@@ -413,7 +414,7 @@ export default function Bookmarks() {
             key={key}
             type="button"
             data-ds="card-hover"
-            className="min-h-[72px] border bg-card px-4 py-3 text-left transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="account-list-item min-h-[72px] px-4 py-3 text-left"
             onClick={() => {
               if (key === "active" || key === "archived") {
                 chooseArchive(key);
@@ -432,12 +433,12 @@ export default function Bookmarks() {
 
       <div className="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-6">
         <aside className="hidden lg:block" aria-label="Bookmark collections">
-          <div className="sticky top-24 space-y-2 border bg-card p-3">
+          <div className="account-collection-panel sticky top-24 space-y-2 p-3">
             <button
               type="button"
               aria-pressed={collectionFilter === "all"}
-              className={`flex min-h-11 w-full items-center justify-between px-3 text-left text-sm ${
-                collectionFilter === "all" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+              className={`account-collection-button flex min-h-11 w-full items-center justify-between px-3 text-left text-sm ${
+                collectionFilter === "all" ? "account-collection-button--active" : ""
               }`}
               onClick={() => chooseCollection("all")}
             >
@@ -452,10 +453,10 @@ export default function Bookmarks() {
                 <button
                   type="button"
                   aria-pressed={collectionFilter === String(collection.id)}
-                  className={`min-h-11 min-w-0 flex-1 px-3 text-left text-sm ${
+                  className={`account-collection-button min-h-11 min-w-0 flex-1 px-3 text-left text-sm ${
                     collectionFilter === String(collection.id)
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted"
+                      ? "account-collection-button--active"
+                      : ""
                   }`}
                   onClick={() => chooseCollection(String(collection.id))}
                   title={collection.name}
@@ -517,7 +518,7 @@ export default function Bookmarks() {
           </div>
 
           {selectedCollection && (
-            <section className="border bg-card p-4" aria-label="Selected collection controls">
+            <section className="account-bookmarks-panel p-4" aria-label="Selected collection controls">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
@@ -625,7 +626,7 @@ export default function Bookmarks() {
             </section>
           )}
 
-          <section className="grid gap-3 border bg-card p-4 sm:grid-cols-3" aria-label="Library filters">
+          <section className="account-bookmarks-filters grid gap-3 p-4 sm:grid-cols-3" aria-label="Library filters">
             <div>
               <Label htmlFor="status-filter" className="mb-2 block">Queue status</Label>
               <Select value={statusFilter} onValueChange={(value) => chooseStatus(value as StatusFilter)}>
@@ -664,7 +665,7 @@ export default function Bookmarks() {
           </section>
 
           {filteredBookmarks.length > 0 && (
-            <section className="space-y-3 border bg-muted/25 p-4" aria-label="Bulk bookmark actions">
+            <section className="account-bookmarks-bulk space-y-3 p-4" aria-label="Bulk bookmark actions">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium">
                   <Checkbox
@@ -790,10 +791,10 @@ export default function Bookmarks() {
                   key={resource.id}
                   id={`bookmark-${resource.id}`}
                   tabIndex={-1}
-                  className="scroll-mt-24 border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="account-bookmark-card scroll-mt-24 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   data-testid={`bookmark-card-${resource.id}`}
                 >
-                  <div className="flex flex-wrap items-center gap-2 border-b p-3">
+                  <div className="account-bookmark-toolbar flex flex-wrap items-center gap-2 p-3">
                     <label className="flex min-h-11 cursor-pointer items-center gap-2 px-1">
                       <Checkbox
                         checked={selected.has(resource.id)}
@@ -880,7 +881,7 @@ export default function Bookmarks() {
                       bookmarkNotes: resource.notes,
                     }}
                     fullResource={resource}
-                    className="border-0 shadow-none"
+                     className="account-resource-card"
                   />
                 </article>
               ))}
@@ -888,7 +889,7 @@ export default function Bookmarks() {
           ) : bookmarks.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="rounded-full bg-primary/10 p-6 mb-6">
+                  <div className="account-empty-icon p-6 mb-6">
                   <BookmarkX className="h-12 w-12 text-primary" aria-hidden="true" />
                 </div>
                 <h2 className="font-display text-2xl font-medium tracking-tight mb-3">

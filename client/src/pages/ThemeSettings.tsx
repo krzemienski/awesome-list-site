@@ -21,6 +21,8 @@ import {
 import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { isSystemId } from "@/lib/design-system";
+import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
+import "@/styles/pages/account.css";
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
@@ -33,17 +35,17 @@ export default function ThemeSettings() {
   // I1 — Font override state
   const [fontId, setFontId] = useState<string>(() => {
     if (typeof window === "undefined") return "system";
-    return resolveFontOverrideId(localStorage.getItem(FONT_LS_KEY));
+    return resolveFontOverrideId(safeGetItem(FONT_LS_KEY));
   });
   useEffect(() => {
     applyFontOverride(fontId);
-    localStorage.setItem(FONT_LS_KEY, fontId);
+    safeSetItem(FONT_LS_KEY, fontId);
   }, [fontId]);
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.storageArea !== localStorage) return;
       if (event.key !== FONT_LS_KEY && event.key !== null) return;
-      setFontId(resolveFontOverrideId(localStorage.getItem(FONT_LS_KEY)));
+      setFontId(resolveFontOverrideId(safeGetItem(FONT_LS_KEY)));
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -111,7 +113,7 @@ export default function ThemeSettings() {
     };
 
   return (
-    <div className="max-w-5xl space-y-10">
+    <div className="account-theme max-w-5xl space-y-10">
       <SEOHead
         title="Theme Settings"
         description="Customize the look and feel of Awesome Video — switch fonts and color themes."
@@ -137,7 +139,7 @@ export default function ThemeSettings() {
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
           Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
-          <span className="text-[color:var(--text-3)]" data-testid="text-active-preset">
+          <span role="status" aria-live="polite" aria-atomic="true" className="text-[color:var(--text-3)]" data-testid="text-active-preset">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
         </p>
@@ -223,9 +225,6 @@ export default function ThemeSettings() {
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
                   borderColor: isActive ? "var(--accent)" : "var(--border)",
-                  boxShadow: isActive
-                    ? "0 0 0 1px var(--accent), 0 0 16px color-mix(in srgb, var(--accent) 25%, transparent)"
-                    : "none",
                 }}
               >
                 <div className="flex items-center justify-between mb-1">
@@ -269,9 +268,6 @@ export default function ThemeSettings() {
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-3 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
                   borderColor: isActive ? a.primary : "var(--border)",
-                  boxShadow: isActive
-                    ? `0 0 0 1px ${a.primary}, 0 0 14px color-mix(in srgb, ${a.primary} 25%, transparent)`
-                    : "none",
                 }}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -325,9 +321,6 @@ export default function ThemeSettings() {
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
                   borderColor: isActive ? "var(--accent)" : "var(--border)",
-                  boxShadow: isActive
-                    ? "0 0 0 1px var(--accent), 0 0 14px color-mix(in srgb, var(--accent) 25%, transparent)"
-                    : "none",
                 }}
               >
                 <div className="flex items-center justify-between mb-1">

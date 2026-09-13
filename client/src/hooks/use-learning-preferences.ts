@@ -4,6 +4,7 @@ import type {
   LearningPreferencesValues,
   HomeLayout,
   OnboardingStatus,
+  ThemePreferencesValues,
 } from "@shared/onboarding-values";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +24,10 @@ export interface LearningPreferencesRecord extends LearningPreferencesValues {
 interface LearningPreferencesResponse {
   preferences: LearningPreferencesRecord | null;
   homeLayout: HomeLayout;
+  theme: {
+    systemId: ThemePreferencesValues["themeSystem"];
+    accentId: ThemePreferencesValues["themeAccent"];
+  } | null;
   revision: number | null;
 }
 
@@ -53,6 +58,7 @@ function parseLearningPreferencesResponse(
   return {
     preferences: response.preferences ?? null,
     homeLayout: response.homeLayout,
+    theme: response.theme ?? null,
     revision: response.revision ?? null,
   };
 }
@@ -127,8 +133,33 @@ export function useLearningPreferences() {
     },
   });
 
+  const saveThemeMutation = useMutation({
+    mutationFn: async (
+      theme: ThemePreferencesValues,
+    ): Promise<LearningPreferencesResponse> => {
+      const current = queryClient.getQueryData<LearningPreferencesResponse>([
+        "/api/user/preferences",
+      ]);
+      const response: unknown = await apiRequest("/api/user/preferences", {
+        method: "PUT",
+        body: JSON.stringify({
+          ...theme,
+          expectedRevision:
+            current?.revision ?? current?.preferences?.revision ?? null,
+        }),
+      });
+      return parseLearningPreferencesResponse(response);
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/user/preferences"], data);
+    },
+  });
+
   return {
     preferences: query.data?.preferences ?? null,
+    homeLayout: query.data?.homeLayout ?? "index",
+    theme: query.data?.theme ?? null,
+    isAuthenticated,
     isLoading: authLoading || query.isLoading,
     isError: query.isError,
     error: query.error,
@@ -141,5 +172,8 @@ export function useLearningPreferences() {
     resetPreferencesAsync: resetMutation.mutateAsync,
     isResetting: resetMutation.isPending,
     resetError: resetMutation.error,
+    saveThemeAsync: saveThemeMutation.mutateAsync,
+    isSavingTheme: saveThemeMutation.isPending,
+    saveThemeError: saveThemeMutation.error,
   };
 }

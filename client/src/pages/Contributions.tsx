@@ -46,6 +46,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ApiError, apiRequest, queryClient } from "@/lib/queryClient";
 import { writeFilterParams } from "@/lib/url-filter-state";
+import "@/styles/pages/account.css";
 
 type ContributionKind = "resource" | "edit";
 type ContributionStatus =
@@ -152,11 +153,9 @@ function readState(search: string): FilterState {
 }
 
 /**
- * Contribution statuses use the global DS status constants rather than raw
- * palette classes.
- *
- * DS-OK: global status constants #34d08c (ok) / #ffb84d (warn) / #ff5c7a (bad)
- * DS-OK: #9d4edd (violet info) — semantics, not theme.
+ * Contribution statuses use the active account accent roles rather than
+ * hand-pinned palette classes. This keeps the token-only surface coherent
+ * across all five design systems.
  */
 const statusConfig: Record<
   ContributionStatus,
@@ -170,35 +169,31 @@ const statusConfig: Record<
   pending: {
     label: "Pending",
     description: "Waiting for moderator review.",
-    className:
-      "border-[#ffb84d]/40 bg-[#ffb84d]/10 text-[#ffb84d]", // DS-OK: status warn
+    className: "chip warn account-status",
     icon: Clock3,
   },
   approved: {
     label: "Approved",
     description: "Accepted by a moderator.",
-    className:
-      "border-[#34d08c]/40 bg-[#34d08c]/10 text-[#34d08c]", // DS-OK: status ok
+    className: "chip ok account-status",
     icon: CheckCircle2,
   },
   rejected: {
     label: "Rejected",
     description: "Not accepted after review.",
-    className:
-      "border-[#ff5c7a]/40 bg-[#ff5c7a]/10 text-[#ff5c7a]", // DS-OK: status bad
+    className: "chip bad account-status",
     icon: XCircle,
   },
   withdrawn: {
     label: "Withdrawn",
     description: "Withdrawn by you before review.",
-    className: "border-border bg-muted text-muted-foreground",
+    className: "account-status account-status--neutral",
     icon: Undo2,
   },
   superseded: {
     label: "Superseded",
     description: "The resource changed before this work could be handled.",
-    className:
-      "border-[#9d4edd]/40 bg-[#9d4edd]/10 text-[#9d4edd]", // DS-OK: violet info (DS chart/info constant)
+    className: "account-status account-status--info",
     icon: RefreshCw,
   },
 };
@@ -257,13 +252,13 @@ function ContributionCard({
 
   return (
     <article
-      className="relative border border-[var(--border)] bg-[var(--surface)]"
+      className="account-contribution-card relative"
       data-testid={`contribution-${item.kind}-${item.id}`}
     >
       <div className="flex flex-col gap-4 p-4 sm:p-5">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[var(--border)] bg-muted/40">
-            <KindIcon className="h-5 w-5 text-[var(--accent)]" aria-hidden="true" />
+          <div className="account-kind-icon flex h-10 w-10 shrink-0 items-center justify-center">
+            <KindIcon className="account-accent-icon h-5 w-5" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex flex-wrap items-center gap-2">
@@ -285,7 +280,7 @@ function ContributionCard({
         </div>
 
         {item.kind === "resource" && item.submission && (
-          <div className="grid gap-3 border-l-2 border-[var(--accent)] pl-4">
+          <div className="account-submission-detail grid gap-3 pl-4">
             <p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">
               {item.submission.description}
             </p>
@@ -293,7 +288,7 @@ function ContributionCard({
               href={item.submission.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-8 min-w-0 items-center gap-1.5 text-sm text-[var(--accent)] underline-offset-4 hover:underline"
+              className="account-accent inline-flex min-h-8 min-w-0 items-center gap-1.5 text-sm underline-offset-4 hover:underline"
               title={item.submission.url}
             >
               <span className="truncate">{item.submission.url}</span>
@@ -317,12 +312,12 @@ function ContributionCard({
         )}
 
         {item.kind === "edit" && item.changes && item.changes.length > 0 && (
-          <details className="group border border-[var(--border)] bg-muted/20" open>
+          <details className="account-change-details group" open>
             <summary className="min-h-11 cursor-pointer px-4 py-3 text-sm font-medium">
               {item.changes.length} proposed{" "}
               {item.changes.length === 1 ? "change" : "changes"}
             </summary>
-            <div className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
+            <div className="account-change-list divide-y divide-border">
               {item.changes.map((change) => (
                 <div
                   key={change.field}
@@ -367,7 +362,7 @@ function ContributionCard({
           </Alert>
         )}
 
-        <div className="flex flex-col gap-2 border-t border-[var(--border)] pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="account-contribution-footer flex flex-col gap-2 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-muted-foreground">
             {statusConfig[item.status].description}
           </p>
@@ -387,7 +382,7 @@ function ContributionCard({
               <Button
                 variant="outline"
                 size="sm"
-                className="text-destructive hover:text-destructive"
+                className="account-action-danger"
                 onClick={() => onWithdraw(item)}
                 disabled={withdrawing}
                 data-testid={`button-withdraw-${item.kind}-${item.id}`}
@@ -588,14 +583,14 @@ export default function Contributions() {
   ];
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8 sm:py-10">
+    <div className="account-page account-page--wide container mx-auto px-4 py-8 sm:py-10">
       <SEOHead
         title="Your Contributions — Awesome Video"
         description="Track your resource submissions, edit suggestions, and public impact."
         noindex
       />
 
-      <header className="mb-8 border-b border-[var(--border)] pb-6">
+      <header className="account-page-header mb-8 pb-6">
         <div className="eyebrow mb-3">// Contributor dashboard</div>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
@@ -631,12 +626,12 @@ export default function Contributions() {
           {metricCards.map((metric) => {
             const Icon = metric.icon;
             return (
-              <Card key={metric.label} className="rounded-none">
+              <Card key={metric.label} className="account-metric-card">
                 <CardContent className="p-4">
                   <div className="mb-5 flex items-center justify-between">
                     <span className="eyebrow">{metric.label}</span>
                     <Icon
-                      className="h-4 w-4 text-[var(--accent)]"
+                      className="account-accent-icon h-4 w-4"
                       aria-hidden="true"
                     />
                   </div>
@@ -672,7 +667,7 @@ export default function Contributions() {
           </p>
         </div>
 
-        <Card className="mb-5 rounded-none">
+        <Card className="account-filter-card mb-5">
           <CardHeader className="p-4">
             <div className="grid gap-3 md:grid-cols-[minmax(13rem,1fr)_repeat(3,minmax(9rem,auto))]">
               <div className="relative">
@@ -778,10 +773,10 @@ export default function Contributions() {
             {Array.from({ length: 3 }).map((_, index) => (
               <div
                 key={index}
-                className="space-y-4 border border-[var(--border)] p-5"
+                className="account-contribution-card space-y-4 p-5"
               >
                 <div className="flex gap-3">
-                  <Skeleton className="h-10 w-10 rounded-none" />
+                  <Skeleton className="h-10 w-10" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-6 w-2/3" />
@@ -792,9 +787,9 @@ export default function Contributions() {
             ))}
           </div>
         ) : query.isError ? (
-          <Card className="rounded-none">
+          <Card>
             <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-              <RefreshCw className="h-8 w-8 text-[var(--accent)]" />
+              <RefreshCw className="account-accent-icon h-8 w-8" />
               <h3 className="font-semibold">We couldn't load your contributions</h3>
               <p className="max-w-md text-sm text-muted-foreground">
                 Your data is unchanged. Check your connection and try again.
@@ -815,7 +810,7 @@ export default function Contributions() {
             </CardContent>
           </Card>
         ) : summary?.total === 0 ? (
-          <Card className="rounded-none">
+          <Card>
             <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
               <Inbox className="h-10 w-10 text-muted-foreground" />
               <h3 className="text-lg font-semibold">No contributions yet</h3>
@@ -829,7 +824,7 @@ export default function Contributions() {
             </CardContent>
           </Card>
         ) : query.data?.items.length === 0 ? (
-          <Card className="rounded-none">
+          <Card>
             <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
               <Search className="h-8 w-8 text-muted-foreground" />
               <h3 className="font-semibold">No contributions match</h3>

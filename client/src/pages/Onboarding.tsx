@@ -17,6 +17,7 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { useLearningPreferences } from "@/hooks/use-learning-preferences";
 import { safeGetItem, safeRemoveItem, safeSetItem } from "@/lib/safeStorage";
+import "@/styles/pages/account.css";
 
 interface CategoryOption {
   name: string;
@@ -283,7 +284,7 @@ export default function Onboarding() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl space-y-4 py-8" aria-busy="true">
+      <div className="account-page account-page--form space-y-4 py-8" aria-busy="true">
         <SEOHead title="Learning Preferences" noindex />
         <div className="h-7 w-52 animate-pulse bg-muted" />
         <div className="h-48 animate-pulse bg-muted" />
@@ -293,12 +294,12 @@ export default function Onboarding() {
 
   if (loadError) {
     return (
-      <Card className="mx-auto max-w-xl p-6 text-center" role="alert">
+      <Card className="account-page account-page--form p-6 text-center" role="alert">
         <SEOHead title="Learning Preferences" noindex />
         <h1 className="display-h text-xl">
           We couldn’t load your preferences
         </h1>
-        <p className="mt-2 text-sm text-[color:var(--text-2)]">
+        <p className="account-muted mt-2 text-sm">
           Your account and the rest of the catalog are still available.
         </p>
         <Button
@@ -316,10 +317,10 @@ export default function Onboarding() {
 
   if (completed) {
     return (
-      <Card className="mx-auto max-w-2xl overflow-hidden">
+      <Card className="account-page account-page--form overflow-hidden">
         <SEOHead title="Learning Preferences Saved" noindex />
         <CardContent className="p-6 sm:p-10">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent)] text-white">
+          <div className="account-onboarding-complete-icon flex h-12 w-12 items-center justify-center">
             <Check className="h-6 w-6" />
           </div>
           <h1
@@ -329,7 +330,7 @@ export default function Onboarding() {
           >
             Your learning profile is ready
           </h1>
-          <p className="mt-3 text-[color:var(--text-2)]">
+          <p className="account-muted mt-3">
             Personalized Recommendations can now use these choices. Public
             browsing and search stay the same for everyone.
           </p>
@@ -352,7 +353,7 @@ export default function Onboarding() {
   const activeStep = LEARNING_PREFERENCE_STEPS[step - 1];
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 pb-10 pt-3 sm:pt-6">
+    <div className="account-page account-page--form space-y-5 pb-10 pt-3 sm:pt-6">
       <SEOHead
         title="Personalize Your Learning"
         description="Choose optional learning preferences for personalized Awesome Video recommendations."
@@ -377,7 +378,7 @@ export default function Onboarding() {
           size="sm"
           onClick={() => void handleSkip()}
           disabled={isSaving}
-          className="px-2 text-sm font-normal text-[color:var(--text-2)] underline hover:text-[var(--text)]"
+          className="account-onboarding-link px-2 text-sm font-normal underline"
           data-testid="button-skip-onboarding"
         >
           Save and browse later
@@ -385,7 +386,7 @@ export default function Onboarding() {
       </div>
 
       <div aria-label={`Step ${step} of ${ONBOARDING_STEP_COUNT}`}>
-        <div className="mb-2 flex justify-between text-xs text-[color:var(--text-2)]">
+        <div className="account-meta mb-2 flex justify-between text-xs">
           <span>
             Step {step} of {ONBOARDING_STEP_COUNT}
           </span>
@@ -412,7 +413,7 @@ export default function Onboarding() {
 
       {requestError ? (
         <p
-          className="border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+          className="account-onboarding-error p-3 text-sm"
           role="alert"
         >
           {requestError}

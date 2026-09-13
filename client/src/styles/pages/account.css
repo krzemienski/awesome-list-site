@@ -1,0 +1,390 @@
+.account-theme {
+  width: 100%;
+  color: var(--text);
+}
+
+.account-theme [role="radio"] {
+  border-width: var(--border-w);
+  border-radius: var(--radius);
+}
+
+.account-theme [role="radio"][aria-checked="true"] {
+  box-shadow: var(--shadow-accent);
+}
+
+/*
+ * Account surfaces.
+ *
+ * The account routes do not have a pixel-gated source counterpart. Keep their
+ * composition close to the canonical centered-column, card, list, and empty
+ * state patterns while letting the active design system provide every visual
+ * value. This sheet is deliberately scoped so the account page owns its
+ * production-only composition without changing shared primitives.
+ */
+
+.account-page {
+  width: 100%;
+  color: var(--text);
+}
+
+.account-page--wide {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.account-page--form {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.account-page .account-accent {
+  color: var(--accent);
+}
+
+.account-page .account-muted {
+  color: var(--text-2);
+}
+
+.account-page .account-meta {
+  color: var(--text-3);
+}
+
+.account-page .account-avatar {
+  border: var(--border-w) solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.account-page .account-avatar-fallback {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.account-page .account-profile-meta {
+  color: var(--text-2);
+}
+
+.account-page .account-stat--accent {
+  color: var(--accent);
+}
+
+.account-page .account-stat--secondary {
+  color: var(--accent-2);
+}
+
+.account-page .account-stat-hint {
+  color: var(--text-3);
+  font-size: 10px;
+}
+
+.account-page .account-progress {
+  overflow: hidden;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.account-page .account-progress-fill {
+  width: var(--account-progress, 0%);
+  min-height: 100%;
+  background: var(--accent);
+  transition: width var(--motion-base) var(--motion-ease);
+}
+
+.account-page .account-profile-callout {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.account-page .account-list-item {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition:
+    background-color var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease);
+}
+
+.account-page .account-list-item:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-sm);
+}
+
+.account-page .account-profile-metric {
+  border: var(--border-w) solid var(--border);
+  background: var(--surface);
+}
+
+.account-page .account-profile-divider {
+  border-top: var(--hairline-w) solid var(--border);
+}
+
+.account-page .account-page-header {
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.account-page .account-empty-icon {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+
+.account-page .account-collection-panel,
+.account-page .account-bookmarks-panel {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.account-page .account-collection-button {
+  border: var(--border-w) solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease);
+}
+
+.account-page .account-collection-button:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.account-page .account-collection-button--active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.account-page .account-collection-button--active:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.account-page .account-bookmarks-filters,
+.account-page .account-bookmarks-bulk {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.account-page .account-bookmarks-bulk {
+  background: var(--surface-2);
+}
+
+.account-page .account-bookmark-card {
+  overflow: hidden;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.account-page .account-bookmark-toolbar {
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.account-page .account-resource-card {
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.account-page .account-callout {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.account-page .account-callout--accent {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.account-page .account-callout--danger {
+  border-color: color-mix(in srgb, var(--accent-2) 40%, var(--border));
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+  color: var(--accent-2);
+}
+
+.account-page .account-gate-loading {
+  color: var(--text-2);
+}
+
+.account-page .account-spinner {
+  width: 3rem;
+  height: 3rem;
+  margin-inline: auto;
+  margin-bottom: 1rem;
+  border: var(--border-w) solid var(--border);
+  border-bottom-color: var(--accent);
+  border-radius: var(--radius-pill);
+}
+
+.account-page .account-contribution-card {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.account-page .account-kind-icon {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.account-page .account-submission-detail {
+  border-left: 2px solid var(--accent);
+}
+
+.account-page .account-change-details {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.account-page .account-change-list {
+  border-top: var(--hairline-w) solid var(--border);
+}
+
+.account-page .account-contribution-footer {
+  border-top: var(--hairline-w) solid var(--border);
+}
+
+.account-page .account-metric-card {
+  border-radius: var(--radius);
+}
+
+.account-page .account-filter-card {
+  border-radius: var(--radius);
+}
+
+.account-page .account-action-danger {
+  color: var(--color-destructive);
+}
+
+.account-page .account-action-danger:hover {
+  color: var(--color-destructive);
+}
+
+.account-page .account-status {
+  border-width: var(--border-w);
+}
+
+.account-page .account-status--neutral {
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.account-page .account-status--info {
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.account-page .account-accent-icon {
+  color: var(--accent);
+}
+
+.account-page .account-accent-rule {
+  background: var(--accent);
+}
+
+.account-page .account-notification-error {
+  border: var(--border-w) solid color-mix(in srgb, var(--accent-2) 40%, var(--border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+  color: var(--accent-2);
+}
+
+.account-page .account-notification-header {
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.account-page .account-notification-row {
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.account-page .account-notification-row:last-child {
+  border-bottom: 0;
+}
+
+.account-page .account-notification-row--unread {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.account-page .account-notification-dot {
+  border-radius: var(--radius-pill);
+}
+
+.account-page .account-notification-dot--read {
+  background: var(--border-strong);
+}
+
+.account-page .account-notification-dot--unread {
+  background: var(--accent);
+}
+
+.account-page .account-onboarding-complete-icon {
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.account-page .account-onboarding-link {
+  color: var(--text-2);
+}
+
+.account-page .account-onboarding-link:hover {
+  color: var(--text);
+}
+
+.account-page .account-onboarding-error {
+  border: var(--border-w) solid color-mix(in srgb, var(--accent-2) 40%, var(--border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+  color: var(--accent-2);
+}
+
+.account-page .account-journey-next-step {
+  border-left: 2px solid var(--accent);
+}
+
+.account-page .account-recent-resource {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition:
+    border-color var(--motion-base) var(--motion-ease),
+    background-color var(--motion-base) var(--motion-ease);
+}
+
+.account-page .account-recent-resource:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.account-page .account-recent-resource:hover .account-recent-resource-title {
+  color: var(--accent);
+}
+
+.account-page .account-completed-icon {
+  color: var(--accent);
+}
+
+.account-page .account-reason {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-page .account-list-item,
+  .account-page .account-collection-button,
+  .account-page .account-progress-fill,
+  .account-page .account-recent-resource {
+    transition: none;
+  }
+}

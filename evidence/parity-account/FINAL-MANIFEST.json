@@ -1,0 +1,494 @@
+{
+  "task": "552",
+  "stagedAt": "2026-09-13T05:19:33.990Z",
+  "port": "http://127.0.0.1:5000",
+  "files": [
+    "FINAL-MANIFEST.json",
+    "account-552.json",
+    "auth.sign-in-1440.png",
+    "auth.sign-in-375.png",
+    "auth.sign-up-1440.png",
+    "auth.sign-up-375.png",
+    "guest.bookmarks-1024.png",
+    "guest.bookmarks-1440.png",
+    "guest.bookmarks-375.png",
+    "guest.bookmarks-768.png",
+    "guest.continue-learning-1024.png",
+    "guest.continue-learning-1440.png",
+    "guest.continue-learning-375.png",
+    "guest.continue-learning-768.png",
+    "guest.contributions-1024.png",
+    "guest.contributions-1440.png",
+    "guest.contributions-375.png",
+    "guest.contributions-768.png",
+    "guest.notifications-1024.png",
+    "guest.notifications-1440.png",
+    "guest.notifications-375.png",
+    "guest.notifications-768.png",
+    "guest.onboarding-1024.png",
+    "guest.onboarding-1440.png",
+    "guest.onboarding-375.png",
+    "guest.onboarding-768.png",
+    "guest.profile-1024.png",
+    "guest.profile-1440.png",
+    "guest.profile-375.png",
+    "guest.profile-768.png",
+    "guest.settings-1024.png",
+    "guest.settings-1440.png",
+    "guest.settings-375.png",
+    "guest.settings-768.png",
+    "guest.settings_theme-1024.png",
+    "guest.settings_theme-1440.png",
+    "guest.settings_theme-375.png",
+    "guest.settings_theme-768.png",
+    "signed-behavior.json",
+    "signedIn.bookmarks-1024.png",
+    "signedIn.bookmarks-1440.png",
+    "signedIn.bookmarks-375.png",
+    "signedIn.bookmarks-768.png",
+    "signedIn.continue-learning-1024.png",
+    "signedIn.continue-learning-1440.png",
+    "signedIn.continue-learning-375.png",
+    "signedIn.continue-learning-768.png",
+    "signedIn.contributions-1024.png",
+    "signedIn.contributions-1440.png",
+    "signedIn.contributions-375.png",
+    "signedIn.contributions-768.png",
+    "signedIn.notifications-1024.png",
+    "signedIn.notifications-1440.png",
+    "signedIn.notifications-375.png",
+    "signedIn.notifications-768.png",
+    "signedIn.onboarding-1024.png",
+    "signedIn.onboarding-1440.png",
+    "signedIn.onboarding-375.png",
+    "signedIn.onboarding-768.png",
+    "signedIn.profile-1024.png",
+    "signedIn.profile-1440.png",
+    "signedIn.profile-375.png",
+    "signedIn.profile-768.png",
+    "signedIn.settings-1024.png",
+    "signedIn.settings-1440.png",
+    "signedIn.settings-375.png",
+    "signedIn.settings-768.png",
+    "signedIn.settings_theme-1024.png",
+    "signedIn.settings_theme-1440.png",
+    "signedIn.settings_theme-375.png",
+    "signedIn.settings_theme-768.png",
+    "theme-brutalist.json",
+    "theme-editorial.json",
+    "theme-geist.json",
+    "theme-matrix.json",
+    "theme-swiss.json",
+    "theme-terminal.json"
+  ],
+  "routeCapture": {
+    "guest": 32,
+    "signedIn": 32,
+    "auth": 6,
+    "axe": 32
+  },
+  "identity": {
+    "bridgeId": "2017208697",
+    "email": "__qa_test_parity_mtzcyyv2759e89+clerk_test@example.com",
+    "localUserId": "2017208697"
+  },
+  "teardown": {
+    "keepUser": false,
+    "bridgeId": "2017208697",
+    "email": "__qa_test_parity_mtzcyyv2759e89+clerk_test@example.com",
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "errors": [],
+    "verification": {
+      "localQaUsersRemaining": []
+    }
+  },
+  "themeMatrix": {
+    "count": 50,
+    "systems": [
+      "editorial",
+      "terminal",
+      "geist",
+      "brutalist",
+      "swiss"
+    ],
+    "accentCount": 10,
+    "allChecked": true,
+    "allTokens": true,
+    "matrix": [
+      {
+        "system": "editorial",
+        "accent": "#ff3d52",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "editorial",
+        "accent": "#ec4899",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "editorial",
+        "accent": "#ff7a3d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "editorial",
+        "accent": "#ffb84d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "editorial",
+        "accent": "#34d08c",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "editorial",
+        "accent": "#00ff88",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "editorial",
+        "accent": "#5eddf2",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "editorial",
+        "accent": "#9d4edd",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "editorial",
+        "accent": "#aaff00",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "editorial",
+        "accent": "#ff7a8a",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "terminal",
+        "accent": "#ff3d52",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "terminal",
+        "accent": "#ec4899",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "terminal",
+        "accent": "#ff7a3d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "terminal",
+        "accent": "#ffb84d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "terminal",
+        "accent": "#34d08c",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "terminal",
+        "accent": "#00ff88",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "terminal",
+        "accent": "#5eddf2",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "terminal",
+        "accent": "#9d4edd",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "terminal",
+        "accent": "#aaff00",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "terminal",
+        "accent": "#ff7a8a",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "geist",
+        "accent": "#ff3d52",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "geist",
+        "accent": "#ec4899",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "geist",
+        "accent": "#ff7a3d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "geist",
+        "accent": "#ffb84d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "geist",
+        "accent": "#34d08c",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "geist",
+        "accent": "#00ff88",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "geist",
+        "accent": "#5eddf2",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "geist",
+        "accent": "#9d4edd",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "geist",
+        "accent": "#aaff00",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "geist",
+        "accent": "#ff7a8a",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#ff3d52",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#ec4899",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#ff7a3d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#ffb84d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#34d08c",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#00ff88",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#5eddf2",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#9d4edd",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#aaff00",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "brutalist",
+        "accent": "#ff7a8a",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "swiss",
+        "accent": "#ff3d52",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "swiss",
+        "accent": "#ec4899",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "swiss",
+        "accent": "#ff7a3d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "swiss",
+        "accent": "#ffb84d",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "swiss",
+        "accent": "#34d08c",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "swiss",
+        "accent": "#00ff88",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "swiss",
+        "accent": "#5eddf2",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "swiss",
+        "accent": "#9d4edd",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      },
+      {
+        "system": "swiss",
+        "accent": "#aaff00",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "pointer"
+      },
+      {
+        "system": "swiss",
+        "accent": "#ff7a8a",
+        "checked": "true",
+        "bg": "#000000",
+        "mode": "keyboard"
+      }
+    ]
+  },
+  "guestBookmark": {
+    "resourceId": 184847,
+    "countAfterSave": 1,
+    "countAfterReload": 1,
+    "ariaLabelAfterReload": "Remove bookmark saved on this device"
+  },
+  "knownMissing": "Signed-in theme persistence intentionally not marked pass; not verified as a passing capability.",
+  "signedBehavior": {
+    "file": "signed-behavior.json",
+    "routes": [
+      "settings",
+      "settings#learning-preferences",
+      "notifications",
+      "onboarding",
+      "continue-learning"
+    ],
+    "notificationsEmpty": true,
+    "continueLearningEmpty": true,
+    "onboardingInitialStep": true,
+    "learningSaveNotExecuted": true,
+    "notificationMarkReadNotExecuted": true,
+    "onboardingCompletionNotExecuted": true
+  }
+}

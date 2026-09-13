@@ -21,6 +21,12 @@
    off <html> — but it is still a DS token, not the 0px literal the widget
    used to be pinned to while every other surface on the site rounded.
 
+   Font stacks are also read from <html> as authored. Unlike colors, Clerk
+   needs the family list itself so it can apply the site's body and mono
+   families to its own shadow DOM. No font fallback is invented here: a
+   missing custom property leaves that Clerk variable at the base-theme
+   default, just like an unparseable color.
+
    Re-resolving whenever data-system / data-accent flip on <html> keeps the
    auth screens tracking the visitor's selection like every other page.
    ───────────────────────────────────────────────────────────────────── */
@@ -41,6 +47,7 @@ const BACKDROP: Channels = [0, 0, 0, 1];
 /** DS tokens the auth screens need, keyed by the role they play there. */
 const TOKENS = {
   accent: "--accent",
+  danger: "--color-destructive",
   background: "--bg",
   ink: "--text",
   mutedInk: "--text-3",
@@ -73,9 +80,24 @@ const RADIUS_TOKENS = {
 
 type DesignSystemRadii = Partial<Record<keyof typeof RADIUS_TOKENS, string>>;
 
-/** Everything the widget reads off <html>: the colors Clerk re-parses plus
- *  the corner radii it rounds with. */
-type DesignSystemTokens = { palette: DesignSystemPalette; radii: DesignSystemRadii };
+/** DS font stacks, keyed by the Clerk role they fill. Font custom properties
+ *  are returned from CSSOM as authored (including the fallback list), so they
+ *  must not go through the color canonicaliser. */
+const FONT_TOKENS = {
+  body: "--font-body",
+  display: "--font-display",
+  mono: "--font-mono",
+} as const;
+
+type DesignSystemTypography = Partial<Record<keyof typeof FONT_TOKENS, string>>;
+
+/** Everything the widget reads off <html>: the colors Clerk re-parses, the
+ *  corner radii it rounds with, and the font stacks it applies to text. */
+type DesignSystemTokens = {
+  palette: DesignSystemPalette;
+  radii: DesignSystemRadii;
+  typography: DesignSystemTypography;
+};
 
 /** A plain, non-negative CSS length. Clerk does not hand `borderRadius`
  *  straight to CSS — it splits the value into number + unit and derives its
@@ -124,7 +146,7 @@ function toHex(channels: Channels, backdrop: Channels): string {
  *  `undefined`. */
 function resolveDesignSystemTokens(): DesignSystemTokens {
   if (typeof document === "undefined" || typeof window === "undefined") {
-    return { palette: {}, radii: {} };
+    return { palette: {}, radii: {}, typography: {} };
   }
 
   const root = document.documentElement;
@@ -160,7 +182,16 @@ function resolveDesignSystemTokens(): DesignSystemTokens {
       if (CSS_LENGTH.test(length)) radii[surface] = length;
     }
 
-    return { palette, radii };
+    const typography: DesignSystemTypography = {};
+    for (const [role, token] of Object.entries(FONT_TOKENS) as [
+      keyof typeof FONT_TOKENS,
+      string,
+    ][]) {
+      const family = tokens.getPropertyValue(token).trim();
+      if (family) typography[role] = family;
+    }
+
+    return { palette, radii, typography };
   } finally {
     probe.remove();
   }
@@ -173,6 +204,9 @@ function sameTokens(a: DesignSystemTokens, b: DesignSystemTokens): boolean {
     ) &&
     (Object.keys(RADIUS_TOKENS) as (keyof typeof RADIUS_TOKENS)[]).every(
       (surface) => a.radii[surface] === b.radii[surface],
+    ) &&
+    (Object.keys(FONT_TOKENS) as (keyof typeof FONT_TOKENS)[]).every(
+      (role) => a.typography[role] === b.typography[role],
     )
   );
 }
@@ -181,7 +215,10 @@ function sameTokens(a: DesignSystemTokens, b: DesignSystemTokens): boolean {
  *  `dark` base theme supplies everything not listed here (including the
  *  on-accent ink, which it already keeps at black — the same choice the DS
  *  makes for accent CTAs). */
-function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: string) {
+function buildClerkAppearance(
+  { palette, radii, typography }: DesignSystemTokens,
+  basePath: string,
+) {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   // The card's mark is an IMAGE URL to Clerk, not a node, so it cannot follow
@@ -196,6 +233,10 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
 
   return {
     theme: dark,
+    // Keep Clerk's injected stylesheet in its own cascade layer. The app's
+    // unlayered DS rules remain authoritative without requiring selectors that
+    // reach into Clerk's generated class names.
+    cssLayerName: "clerk",
     options: {
       logoPlacement: "inside" as const,
       logoLinkUrl: basePath || "/",
@@ -203,9 +244,13 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
     },
     variables: {
       ...(palette.accent ? { colorPrimary: palette.accent } : {}),
+      // Validation errors retain their semantic role independently of accent.
+      ...(palette.danger ? { colorDanger: palette.danger } : {}),
+      ...(palette.border ? { colorNeutral: palette.border } : {}),
       ...(palette.background ? { colorBackground: palette.background } : {}),
       ...(palette.ink ? { colorForeground: palette.ink } : {}),
       ...(palette.mutedInk ? { colorMutedForeground: palette.mutedInk } : {}),
+      ...(palette.fieldSurface ? { colorMuted: palette.fieldSurface } : {}),
       // Task #390: the dark base theme fills every input with a mid-grey of its
       // own (~15% lightness), which reads as a lighter patch stuck onto the
       // true-black card. The DS paints text fields as the surface token over
@@ -216,6 +261,11 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       ...(palette.fieldSurface ? { colorInput: palette.fieldSurface } : {}),
       ...(palette.ink ? { colorInputForeground: palette.ink } : {}),
       ...(palette.border ? { colorBorder: palette.border } : {}),
+      ...(palette.accent ? { colorRing: palette.accent } : {}),
+      ...(typography.body
+        ? { fontFamily: typography.body, fontFamilyButtons: typography.body }
+        : {}),
+      ...(typography.mono ? { fontFamilyMono: typography.mono } : {}),
       // Task #404: the widget used to be pinned to square corners while every
       // other surface on the site rounds with the active system. Clerk derives
       // its whole radius ladder from this one base, so it gets the DS CONTROL
@@ -232,7 +282,34 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       // clipping surface (it wraps the card and the sign-up footer strip), so
       // it is the corner a visitor actually sees; pin it to the card token and
       // let Clerk's slightly tighter inner step nest inside it as designed.
-      ...(radii.card ? { cardBox: { borderRadius: radii.card } } : {}),
+      ...(radii.card || palette.background
+        ? {
+            cardBox: {
+              ...(radii.card ? { borderRadius: radii.card } : {}),
+              // Clerk's card/footer are transparent in the auth treatment;
+              // this outer clipping surface owns the single DS background.
+              ...(palette.background ? { backgroundColor: palette.background } : {}),
+            },
+          }
+        : {}),
+      ...(palette.ink || typography.body
+        ? {
+            headerTitle: {
+              ...(typography.display ? { fontFamily: typography.display } : {}),
+              ...(palette.ink ? { color: palette.ink } : {}),
+            },
+            headerSubtitle: {
+              ...(typography.body ? { fontFamily: typography.body } : {}),
+              ...(palette.mutedInk ? { color: palette.mutedInk } : {}),
+            },
+          }
+        : {}),
+      ...(palette.background
+        ? {
+            card: { backgroundColor: "transparent" },
+            footer: { backgroundColor: "transparent" },
+          }
+        : {}),
       // Clerk picks the OAuth button VARIANT itself — the labelled row
       // ("Continue with GitHub") when few providers are enabled, the mark-only
       // square once there are several — and the element keys are
@@ -248,11 +325,13 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       // per-element override would only be a dormant second source of truth.)
       socialButtonsIconButton: {
         ...(palette.ink ? { color: palette.ink } : {}),
+        ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
         minHeight: "44px",
         minWidth: "44px",
       },
       socialButtonsBlockButton: {
         ...(palette.ink ? { color: palette.ink } : {}),
+        ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
         minHeight: "44px",
       },
       socialButtonsBlockButtonText: {
@@ -277,21 +356,38 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
       // (submit, inputs, OTP cells, and the footer sign-up/sign-in switch)
       // without altering the branded look.
       formButtonPrimary: {
+        ...(palette.accent ? { backgroundColor: palette.accent } : {}),
         minHeight: "44px",
       },
       formFieldInput: {
+        ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
+        ...(palette.ink ? { color: palette.ink } : {}),
         minHeight: "44px",
       },
       otpCodeFieldInput: {
+        ...(palette.fieldSurface ? { backgroundColor: palette.fieldSurface } : {}),
+        ...(palette.ink ? { color: palette.ink } : {}),
         minHeight: "44px",
         minWidth: "44px",
       },
+      formFieldLabel: {
+        ...(palette.ink ? { color: palette.ink } : {}),
+        ...(typography.body ? { fontFamily: typography.body } : {}),
+      },
+      formFieldErrorText: {
+        ...(palette.danger ? { color: palette.danger } : {}),
+      },
+      formFieldAction: {
+        ...(palette.accent ? { color: palette.accent } : {}),
+      },
       footerActionLink: {
+        ...(palette.accent ? { color: palette.accent } : {}),
         display: "inline-flex",
         alignItems: "center",
         minHeight: "44px",
       },
       identityPreviewEditButton: {
+        ...(palette.accent ? { color: palette.accent } : {}),
         // Confirmed on Clerk's live email-code verification variant: this is
         // the rendered edit-email key (the client-trust OTP variant omits the
         // edit affordance entirely).
@@ -299,6 +395,7 @@ function buildClerkAppearance({ palette, radii }: DesignSystemTokens, basePath: 
         minWidth: "44px",
       },
       formResendCodeLink: {
+        ...(palette.accent ? { color: palette.accent } : {}),
         // The email-code verification link is rendered as a 16px-tall button
         // by default; keep the full interactive surface easy to tap on phones.
         display: "inline-flex",

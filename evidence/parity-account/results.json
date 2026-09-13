@@ -1,0 +1,61 @@
+[
+  {
+    "ok": true,
+    "label": "signed theme persisted to API",
+    "detail": {
+      "preferences": null,
+      "theme": {
+        "systemId": "terminal",
+        "accentId": "rose"
+      },
+      "revision": 2
+    }
+  },
+  {
+    "ok": true,
+    "label": "server theme restored after reload",
+    "detail": {
+      "system": "terminal",
+      "accent": "rose",
+      "systemChecked": "true",
+      "accentChecked": "true"
+    }
+  },
+  {
+    "ok": true,
+    "label": "paired storage events synchronize second tab",
+    "detail": [
+      {
+        "system": "terminal",
+        "accent": "cyan"
+      },
+      {
+        "system": "terminal",
+        "accent": "cyan"
+      }
+    ]
+  },
+  {
+    "ok": true,
+    "label": "cross-tab selection persisted to account API",
+    "detail": {
+      "system": "terminal",
+      "accent": "cyan"
+    }
+  },
+  {
+    "ok": true,
+    "label": "teardown",
+    "detail": {
+      "keepUser": false,
+      "bridgeId": "2038877073",
+      "email": "__qa_test_parity_mtziw87l377aa3+clerk_test@example.com",
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "errors": [],
+      "verification": {
+        "localQaUsersRemaining": []
+      }
+    }
+  }
+]

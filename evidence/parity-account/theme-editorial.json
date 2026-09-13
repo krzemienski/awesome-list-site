@@ -1,0 +1,74 @@
+{
+  "row": [
+    {
+      "system": "editorial",
+      "accent": "#ff3d52",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "pointer"
+    },
+    {
+      "system": "editorial",
+      "accent": "#ec4899",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "keyboard"
+    },
+    {
+      "system": "editorial",
+      "accent": "#ff7a3d",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "pointer"
+    },
+    {
+      "system": "editorial",
+      "accent": "#ffb84d",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "keyboard"
+    },
+    {
+      "system": "editorial",
+      "accent": "#34d08c",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "pointer"
+    },
+    {
+      "system": "editorial",
+      "accent": "#00ff88",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "keyboard"
+    },
+    {
+      "system": "editorial",
+      "accent": "#5eddf2",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "pointer"
+    },
+    {
+      "system": "editorial",
+      "accent": "#9d4edd",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "keyboard"
+    },
+    {
+      "system": "editorial",
+      "accent": "#aaff00",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "pointer"
+    },
+    {
+      "system": "editorial",
+      "accent": "#ff7a8a",
+      "checked": "true",
+      "bg": "#000000",
+      "mode": "keyboard"
+    }
+  ]
+}

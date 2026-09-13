@@ -31,6 +31,7 @@ configuration, generated contracts, and runtime behavior on August 19, 2026.
 |----------|----------------|
 | [COMPONENT-LIBRARY.md](./COMPONENT-LIBRARY.md) | Component groups and shadcn/ui conventions |
 | [DESIGN-SYSTEM.md](./DESIGN-SYSTEM.md) | 5-system × 10-accent design system |
+| [AUTH-APPEARANCE.md](./AUTH-APPEARANCE.md) | Clerk auth appearance token mapping and verification harness |
 | [UX-DECISIONS-2026-09-01.md](./UX-DECISIONS-2026-09-01.md) | Product decisions for the 2026-09-01 audit's content-strategy findings |
 | [TANSTACK-QUERY.md](./TANSTACK-QUERY.md) | Data-fetching conventions (query client, apiRequest) |
 

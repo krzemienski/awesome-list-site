@@ -1,0 +1,20 @@
+PASS: fresh account starts with preferences:null, revision:null
+PASS: seed save with expectedRevision:null succeeds
+PASS: seed save returns an integer revision
+PASS: concurrent same-revision saves → exactly one 200 and one 409
+PASS: winning save advanced the revision monotonically
+PASS: row physically removed: API reports no preferences and no revision
+PASS: missing-row save vs reset: both requests resolve to 200 or 409
+PASS: after save-vs-reset race the public state is preferences:null
+PASS: cleared-state tombstone retains a revision after the race
+PASS: save on top of the tombstone succeeds
+PASS: reset with the current revision succeeds and returns preferences:null
+PASS: stale save carrying the pre-reset revision is rejected with 409
+PASS: old preference values were NOT restored (preferences stays null)
+PASS: revision unchanged by the rejected stale save
+PASS: account theme saves through the revision-backed preferences API
+PASS: account theme persists through a fresh GET
+PASS: learning reset preserves the independently selected account theme
+PASS: physical row is cleared learning data plus the persisted account theme
+PASS: net-zero teardown (no QA residue remains)
+preferences-revision-races: all checks passed

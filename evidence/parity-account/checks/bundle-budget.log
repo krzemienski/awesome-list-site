@@ -1,0 +1,14 @@
+
+> rest-express@1.0.0 bundle:budget
+> node scripts/validation/bundle-budget.mjs --check
+
+Bundle report (logical Vite manifest graph)
+  initial  raw 613.8 KiB | gzip 189.2 KiB | brotli 159.2 KiB
+  reduction vs b79375f22d06: raw 32.5% | gzip 29.8% | brotli 28.6%
+  route:admin           gzip 221.3 KiB | brotli 186.6 KiB | 39 incremental chunks
+  route:category        gzip 79.8 KiB | brotli 71.1 KiB | 34 incremental chunks
+  route:resource        gzip 65.0 KiB | brotli 57.8 KiB | 29 incremental chunks
+  route:search          gzip 70.4 KiB | brotli 62.6 KiB | 28 incremental chunks
+  route:journeys        gzip 13.5 KiB | brotli 12.0 KiB | 12 incremental chunks
+  route:recommendations gzip 70.4 KiB | brotli 62.6 KiB | 27 incremental chunks
+  initial isolation: 272 modules checked against 11 forbidden feature patterns

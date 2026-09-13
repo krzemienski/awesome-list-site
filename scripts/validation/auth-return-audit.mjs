@@ -25,6 +25,10 @@ const OUT = "/tmp/validation/auth-return-audit";
 const PREFIX = "__qa_test_auth_return_audit_";
 fs.mkdirSync(OUT, { recursive: true });
 
+function screenshotNameForRoute(route) {
+  return route.replace(/^\/+/, "").replaceAll("/", "-");
+}
+
 if (!DATABASE_URL) {
   console.error("FATAL: DATABASE_URL is required for guaranteed QA teardown");
   process.exit(1);
@@ -570,7 +574,9 @@ try {
       }
     }
     await page.screenshot({
-      path: `${OUT}/auth-return-${route.slice(1)}.png`,
+      // Keep route separators out of the filename: /admin/resources would
+      // otherwise target a directory that is not created under OUT.
+      path: `${OUT}/auth-return-${screenshotNameForRoute(route)}.png`,
       fullPage: true,
     });
     await context.close();

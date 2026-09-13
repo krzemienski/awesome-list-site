@@ -35,6 +35,7 @@ import {
   useContinueLearningSummary,
   useResumeJourney,
 } from "@/hooks/useContinueLearning";
+import "@/styles/pages/account.css";
 
 function relativeTime(value: string): string {
   const date = new Date(value);
@@ -81,7 +82,7 @@ function ActiveJourneyCard({
             data-testid={`progress-active-journey-${item.journeyId}`}
           />
         </div>
-        <div className="border-l-2 border-[var(--accent)] pl-3">
+        <div className="account-journey-next-step pl-3">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Next logical step
           </p>
@@ -118,7 +119,7 @@ function RecentResourceCard({ item }: { item: ContinueLearningRecentResource }) 
   return (
     <Link
       href={item.href}
-      className="group block min-w-0 border border-[var(--border)] bg-[var(--surface)] p-4 transition-colors hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+      className="account-recent-resource group block min-w-0 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       data-testid={`link-recent-resource-${item.resourceId}`}
     >
       <span className="mb-2 flex items-center justify-between gap-3 text-xs text-muted-foreground">
@@ -126,7 +127,7 @@ function RecentResourceCard({ item }: { item: ContinueLearningRecentResource }) 
         <span className="shrink-0">{relativeTime(item.viewedAt)}</span>
       </span>
       <span className="flex items-start justify-between gap-3">
-        <span className="min-w-0 break-words font-semibold leading-snug group-hover:text-[var(--accent)]">
+        <span className="account-recent-resource-title min-w-0 break-words font-semibold leading-snug">
           {item.title}
         </span>
         <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" />
@@ -173,7 +174,7 @@ export default function ContinueLearning() {
 
   if (authLoading) {
     return (
-      <div className="container mx-auto max-w-6xl px-4 py-8">
+      <div className="account-page account-page--wide container mx-auto px-4 py-8">
         <SEOHead title="Continue Learning" description="Resume your learning activity on Awesome Video." noindex />
         <LoadingState />
       </div>
@@ -182,13 +183,13 @@ export default function ContinueLearning() {
 
   if (!isAuthenticated) {
     return (
-      <div className="container mx-auto max-w-3xl px-4 py-12">
+      <div className="account-page account-page--form container mx-auto px-4 py-12">
         <SEOHead title="Continue Learning" description="Sign in to resume your learning activity on Awesome Video." noindex />
         <Card className="overflow-hidden text-center" data-testid="continue-learning-sign-in">
-          <div className="h-1 bg-[var(--accent)]" aria-hidden />
+          <div className="account-accent-rule h-1" aria-hidden />
           <CardHeader className="items-center pt-10">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)]">
-              <LogIn className="h-6 w-6 text-[var(--accent)]" />
+            <div className="account-empty-icon mb-3 flex h-12 w-12 items-center justify-center">
+              <LogIn className="account-accent-icon h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold leading-none tracking-tight">
               Your progress lives with your account
@@ -222,7 +223,7 @@ export default function ContinueLearning() {
 
   if (isError || !data) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-12">
+      <div className="account-page account-page--form container mx-auto px-4 py-12">
         <SEOHead title="Continue Learning" description="Resume your learning activity on Awesome Video." noindex />
         <Alert variant="destructive" data-testid="continue-learning-error">
           <RefreshCw className="h-4 w-4" />
@@ -251,7 +252,7 @@ export default function ContinueLearning() {
   const preferredCategory = data.emptyState.preferredCategories[0];
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-10 px-4 py-8">
+    <div className="account-page account-page--wide container mx-auto space-y-10 px-4 py-8">
       <SEOHead
         title="Continue Learning"
         description="Resume journeys, revisit resources, and see learning milestones on Awesome Video."
@@ -271,10 +272,10 @@ export default function ContinueLearning() {
 
       {!hasHistory ? (
         <Card className="overflow-hidden" data-testid="continue-learning-empty">
-          <div className="h-1 bg-[var(--accent)]" aria-hidden />
+          <div className="account-accent-rule h-1" aria-hidden />
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
-              <BookOpen className="h-6 w-6 text-[var(--accent)]" />
+              <BookOpen className="account-accent-icon h-6 w-6" />
               Build your first learning thread
             </CardTitle>
             <CardDescription className="text-base">
@@ -349,7 +350,7 @@ export default function ContinueLearning() {
               // Recent
             </p>
             <h2 id="recent-resources-heading" className="flex items-center gap-2 text-2xl font-bold">
-              <History className="h-5 w-5 text-[var(--accent)]" />
+              <History className="account-accent-icon h-5 w-5" />
               Recently opened resources
             </h2>
           </div>
@@ -368,7 +369,7 @@ export default function ContinueLearning() {
               // Milestones
             </p>
             <h2 id="completed-learning-heading" className="flex items-center gap-2 text-2xl font-bold">
-              <Trophy className="h-5 w-5 text-[var(--accent)]" />
+              <Trophy className="account-accent-icon h-5 w-5" />
               Completed journeys
             </h2>
           </div>
@@ -378,7 +379,7 @@ export default function ContinueLearning() {
                 <CardContent className="flex h-full flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     <p className="mb-1 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-[#34d08c]" /> {/* DS-OK: status ok */}
+                      <CheckCircle2 className="account-completed-icon h-4 w-4" />
                       Completed {relativeTime(item.completedAt!)}
                     </p>
                     <h3 className="break-words font-semibold">{item.title}</h3>
@@ -403,7 +404,7 @@ export default function ContinueLearning() {
               // Next up
             </p>
             <h2 id="suggested-learning-heading" className="flex items-center gap-2 text-2xl font-bold">
-              <Sparkles className="h-5 w-5 text-[var(--accent)]" />
+              <Sparkles className="account-accent-icon h-5 w-5" />
               Suggested journeys
             </h2>
           </div>
@@ -423,7 +424,7 @@ export default function ContinueLearning() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-xs font-medium text-[var(--accent)]">
+                  <p className="account-reason text-xs font-medium">
                     {item.reason}
                   </p>
                 </CardContent>

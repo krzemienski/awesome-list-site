@@ -828,6 +828,12 @@ export function registerUserFeatureRoutes(
       res.json({
         preferences: isCleared ? null : preferences ?? null,
         homeLayout: preferences?.homeLayout ?? DEFAULT_HOME_LAYOUT,
+        theme: preferences?.themeSystem && preferences?.themeAccent
+          ? {
+              systemId: preferences.themeSystem,
+              accentId: preferences.themeAccent,
+            }
+          : null,
         // A cleared row remains hidden from the form model but its version
         // prevents a stale tab from resurrecting pre-reset values.
         revision: preferences?.revision ?? null,
@@ -947,6 +953,10 @@ export function registerUserFeatureRoutes(
         {
           ...values,
           homeLayout,
+          themeSystem:
+            parsed.data.themeSystem ?? current?.themeSystem ?? null,
+          themeAccent:
+            parsed.data.themeAccent ?? current?.themeAccent ?? null,
           onboardingStatus,
           onboardingStep: onboardingStatus === 'completed' ? 5 : onboardingStep,
           onboardingCompletedAt:
@@ -972,6 +982,12 @@ export function registerUserFeatureRoutes(
       res.json({
         preferences: isCleared ? null : preferences,
         homeLayout: preferences.homeLayout,
+        theme: preferences.themeSystem && preferences.themeAccent
+          ? {
+              systemId: preferences.themeSystem,
+              accentId: preferences.themeAccent,
+            }
+          : null,
         revision: preferences.revision,
       });
     } catch (error) {
@@ -1005,6 +1021,12 @@ export function registerUserFeatureRoutes(
       res.json({
         preferences: null,
         homeLayout: reset.homeLayout,
+        theme: reset.themeSystem && reset.themeAccent
+          ? {
+              systemId: reset.themeSystem,
+              accentId: reset.themeAccent,
+            }
+          : null,
         revision: reset.revision,
       });
     } catch (error) {

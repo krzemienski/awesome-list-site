@@ -1,0 +1,2 @@
+PASS canaries :: extraction + resolution + scope + reachability verified against synthetic samples
+PASS dead-components :: 202 in-scope file(s) checked (client/src/ + shared/), 202 reachable, 0 pinned exception(s)

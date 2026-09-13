@@ -60,6 +60,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { useLocation, Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
+import "@/styles/pages/account.css";
 
 interface ProfileProps {
   user?: any;
@@ -298,7 +299,7 @@ export default function Profile({ user }: ProfileProps) {
       label: "Learning Streak",
       value: `${progress?.streakDays || 0}d`,
       icon: Trophy,
-      color: "text-[#ffb84d]", // DS-OK: status warn
+      color: "account-stat--secondary",
       // BUG-052 (run14): streak counts consecutive days signed in, not
       // resources viewed — say so, or "2d streak / 0 viewed" reads broken.
       hint: "Consecutive days signed in",
@@ -309,21 +310,21 @@ export default function Profile({ user }: ProfileProps) {
       label: "Journeys Completed",
       value: progress?.completedResources || 0,
       icon: Target,
-      color: "text-[#34d08c]", // DS-OK: status ok
+      color: "account-stat--accent",
       hint: "Learning journeys finished",
     }
   ];
 
   if (!user) {
     return (
-      <div className="container mx-auto py-8 px-4 text-center">
+      <div className="account-page account-page--form py-8 px-4 text-center">
         <p className="text-muted-foreground">Please log in to view your profile.</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="account-page account-page--wide py-8 px-4">
       <SEOHead
         title="Profile"
         description="Your Awesome Video profile, bookmarks, and learning progress."
@@ -337,18 +338,11 @@ export default function Profile({ user }: ProfileProps) {
           that band; from lg the original one-row layout returns. */}
       <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap items-center gap-6 mb-8">
         <Avatar
-          className="h-24 w-24 ring-1"
-          style={{
-            boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent)',
-          }}
+          className="account-avatar h-24 w-24"
         >
           <AvatarImage src={user.avatar} alt={user.name} />
           <AvatarFallback
-            className="text-xl font-display font-medium tracking-tight"
-            style={{
-              background: 'color-mix(in srgb, var(--accent) 14%, transparent)',
-              color: 'var(--accent)',
-            }}
+            className="account-avatar-fallback text-xl font-display font-medium tracking-tight"
           >
             {getInitials(user.name)}
           </AvatarFallback>
@@ -373,7 +367,7 @@ export default function Profile({ user }: ProfileProps) {
               <Pencil className="h-4 w-4" />
             </Button>
           </h1>
-          <div className="flex flex-wrap items-center gap-4 text-sm justify-center sm:justify-start" style={{ color: 'var(--text-2)' }}>
+          <div className="account-profile-meta flex flex-wrap items-center gap-4 text-sm justify-center sm:justify-start">
             {user.email && (
               <span className="flex items-center gap-1 min-w-0 max-w-full">
                 <Mail className="h-4 w-4 shrink-0" />
@@ -473,7 +467,7 @@ export default function Profile({ user }: ProfileProps) {
                       <p className="text-xs text-muted-foreground">{stat.label}</p>
                       {/* BUG-052 (run14): explain what feeds the metric. */}
                       {"hint" in stat && stat.hint && (
-                        <p className="text-[10px] text-muted-foreground/70" data-testid={`stat-hint-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                        <p className="account-stat-hint" data-testid={`stat-hint-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
                           {stat.hint}
                         </p>
                       )}
@@ -534,15 +528,11 @@ export default function Profile({ user }: ProfileProps) {
                         {progress?.completedResources || 0} completed of {userJourneys?.length || 0} started
                       </span>
                     </div>
-                    <div
-                      className="h-2 rounded-full overflow-hidden"
-                      style={{ background: 'var(--surface-2)' }}
-                    >
+                    <div className="account-progress h-2">
                       <div
-                        className="h-full transition-[width] duration-[var(--motion-base)] ease-[var(--motion-ease)]"
+                        className="account-progress-fill h-full"
                         style={{
                           width: `${((progress?.completedResources || 0) / (userJourneys?.length || 1)) * 100}%`,
-                          background: 'var(--accent)',
                         }}
                       />
                     </div>
@@ -550,7 +540,7 @@ export default function Profile({ user }: ProfileProps) {
 
                   {/* Current Learning Path */}
                   {progress?.currentPath && (
-                    <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="account-profile-callout p-4">
                       <p className="text-sm font-medium mb-1">Current Learning Path</p>
                       <p className="text-lg">{progress.currentPath}</p>
                     </div>
@@ -611,7 +601,7 @@ export default function Profile({ user }: ProfileProps) {
                     {favorites.map((favorite) => (
                       <div
                         key={favorite.id}
-                        className="p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                        className="account-list-item p-3"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
@@ -692,7 +682,7 @@ export default function Profile({ user }: ProfileProps) {
                     {bookmarks.map((bookmark) => (
                       <div
                         key={bookmark.id}
-                        className="p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                        className="account-list-item p-3"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
@@ -788,7 +778,7 @@ export default function Profile({ user }: ProfileProps) {
                     ["Awaiting review", contributions?.summary.pending ?? 0, "Still pending moderation"],
                     ["Live resources", contributions?.summary.publicResources ?? 0, "Public resources you improved"],
                   ].map(([label, value, hint]) => (
-                    <div key={label} className="border border-border p-4">
+                    <div key={label} className="account-profile-metric p-4">
                       <p className="font-mono text-2xl font-semibold tabular-nums">{value}</p>
                       <p className="mt-1 text-sm font-medium">{label}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
@@ -796,7 +786,7 @@ export default function Profile({ user }: ProfileProps) {
                   ))}
                 </div>
               )}
-              <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="account-profile-divider flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-muted-foreground">
                   Review statuses, outcomes, submitted details, and recorded impact.
                 </p>

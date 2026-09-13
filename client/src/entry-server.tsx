@@ -34,14 +34,14 @@ export function render(context: SSRContext) {
 
   // Render the app to string with the pre-fetched data
   const html = renderToString(
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
         <TooltipProvider>
           <Toaster />
           <App />
         </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 
   return {

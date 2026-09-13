@@ -183,6 +183,13 @@
       "when": 1787329800000,
       "tag": "0049_home_layout_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1787330100000,
+      "tag": "0050_account_theme_preferences",
+      "breakpoints": true
     }
   ]
 }
