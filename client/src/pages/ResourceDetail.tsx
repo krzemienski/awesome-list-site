@@ -596,23 +596,56 @@ export default function ResourceDetail() {
         <div className="shimmer-line resource-detail-rule" aria-hidden="true" />
         <div className="resource-detail-chips">
           {resource.category && (
-            <Link href={`/category/${slugify(resource.category)}`} className="chip" data-testid="badge-category">
-              <FolderTree size={12} aria-hidden="true" />{resource.category}
-            </Link>
+            <span className="resource-detail-chip-wrap">
+              <Link href={`/category/${slugify(resource.category)}`} className="chip" data-testid="badge-category">
+                <FolderTree size={12} aria-hidden="true" />
+                <span className="resource-detail-chip-label">{resource.category}</span>
+              </Link>
+            </span>
           )}
-          {resource.featured && <span className="chip accent">★ FEATURED</span>}
+          {resource.featured && (
+            <span className="resource-detail-chip-wrap">
+              <span className="chip accent">
+                <span className="resource-detail-chip-label">★ FEATURED</span>
+              </span>
+            </span>
+          )}
           {resource.resolvedKind && (
-            <span className="chip" data-kind-source="resolvedKind">{resource.resolvedKind}</span>
+            <span className="resource-detail-chip-wrap">
+              <span className="chip" data-kind-source="resolvedKind">
+                <span className="resource-detail-chip-label">{resource.resolvedKind}</span>
+              </span>
+            </span>
           )}
           {resource.subcategory && (
-            taxonomySlugs.subcategory
-              ? <Link className="chip" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">{resource.subcategory}</Link>
-              : <span className="chip" data-testid="badge-subcategory">{resource.subcategory}</span>
+            <span className="resource-detail-chip-wrap">
+              {taxonomySlugs.subcategory
+                ? (
+                  <Link className="chip" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">
+                    <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                  </Link>
+                )
+                : (
+                  <span className="chip" data-testid="badge-subcategory">
+                    <span className="resource-detail-chip-label">{resource.subcategory}</span>
+                  </span>
+                )}
+            </span>
           )}
           {resource.subSubcategory && (
-            taxonomySlugs.subSubcategory
-              ? <Link className="chip" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">{resource.subSubcategory}</Link>
-              : <span className="chip" data-testid="badge-sub-subcategory">{resource.subSubcategory}</span>
+            <span className="resource-detail-chip-wrap">
+              {taxonomySlugs.subSubcategory
+                ? (
+                  <Link className="chip" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">
+                    <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                  </Link>
+                )
+                : (
+                  <span className="chip" data-testid="badge-sub-subcategory">
+                    <span className="resource-detail-chip-label">{resource.subSubcategory}</span>
+                  </span>
+                )}
+            </span>
           )}
         </div>
       </div>
@@ -893,14 +926,16 @@ export default function ResourceDetail() {
                     </h2>
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag, index) => (
-                        <Link key={index} href={tagLandingPath(tag)}>
-                          <span
-                            className="chip accent"
-                            data-testid={`tag-link-${index}`}
-                          >
-                            #{tag}
-                          </span>
-                        </Link>
+                        <span className="resource-detail-chip-wrap" key={index}>
+                          <Link href={tagLandingPath(tag)}>
+                            <span
+                              className="chip accent"
+                              data-testid={`tag-link-${index}`}
+                            >
+                              <span className="resource-detail-chip-label">#{tag}</span>
+                            </span>
+                          </Link>
+                        </span>
                       ))}
                     </div>
                   </div>

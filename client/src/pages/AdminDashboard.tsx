@@ -244,7 +244,7 @@ export default function AdminDashboard() {
           <span>Admin console · {user?.name ?? "Administrator"}</span>
         </div>
         </div>
-        <h1>
+        <h1 className="display-h">
           Operations <em>dashboard</em>
         </h1>
         <p>Manage the {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()} resources, jobs, and contributors that keep the index alive.</p>

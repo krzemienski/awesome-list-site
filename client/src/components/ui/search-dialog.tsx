@@ -227,6 +227,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
               trailing={
                 <DialogPrimitive.Close className="search-palette-close" aria-label="Close search">
                   <kbd>esc</kbd>
+                  <span className="sr-only">Close search</span>
                 </DialogPrimitive.Close>
               }
               value={query}

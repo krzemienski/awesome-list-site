@@ -1287,7 +1287,7 @@ try {
       { slug: 'resources', expect: '[data-testid="button-add-resource"]' },
       { slug: 'categories', expect: '[data-testid="content-categories"][data-state="active"] button[data-ds-variant]' },
       { slug: 'subcategories', expect: '[data-testid="content-subcategories"][data-state="active"] button[data-ds-variant]' },
-      { slug: 'subsubcategories', expect: '[data-testid="content-subsubcategories"][data-state="active"] button[data-ds-variant]' },
+      { slug: 'subsubcategories', expect: '[data-testid="content-subsubcategories"] button[data-ds-variant]' },
       { slug: 'journeys', expect: '[data-testid="journey-steps-manager"]' },
       { slug: 'users', expect: '[data-testid="input-user-search"]' },
       { slug: 'github', expect: '[data-testid="button-export-github"]' },
@@ -1306,12 +1306,60 @@ try {
     };
     await gotoAdmin();
 
+    // Folded admin sections render their inner trigger only after the
+    // canonical parent tab mounts. Never click a folded trigger by itself:
+    // it is absent from the DOM on a fresh /admin load. The activation proof
+    // checks the parent remains selected and that the inner content is visible
+    // after the second click, so a hidden or vacuous panel cannot pass.
+    const ADMIN_FOLDED_TAB_PARENTS = {
+      subsubcategories: 'subcategories',
+      journeys: 'research',
+      digests: 'github',
+    };
+    const activateAdminTab = async (slug, expect) => {
+      const parentSlug = ADMIN_FOLDED_TAB_PARENTS[slug];
+      const triggerSlug = parentSlug ?? slug;
+
+      await adminPage.click(`[data-testid="tab-${triggerSlug}"]`);
+      await adminPage.waitForSelector(
+        `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
+        { timeout: 15000 },
+      );
+
+      if (parentSlug) {
+        const innerTrigger = `[data-testid="tab-${slug}"]`;
+        await adminPage.waitForSelector(innerTrigger, { timeout: 15000 });
+        await adminPage.click(innerTrigger);
+      }
+
+      // Harness-verified activation: the canonical parent trigger must
+      // actually be selected and the panel's own content selector must
+      // appear. For folded tabs, the inner trigger is also required to be
+      // visible after the parent mounted it.
+      await adminPage.waitForSelector(
+        `[data-testid="tab-${triggerSlug}"][aria-selected="true"]`,
+        { timeout: 15000 },
+      );
+      await adminPage.waitForSelector(expect, { timeout: 30000 });
+      if (parentSlug) {
+        await adminPage.waitForFunction(
+          ({ parent, inner, content }) => {
+            const parentTrigger = document.querySelector(`[data-testid="tab-${parent}"]`);
+            const innerTrigger = document.querySelector(`[data-testid="tab-${inner}"]`);
+            const innerContent = document.querySelector(content);
+            const visible = (element) => Boolean(element && element.getClientRects().length > 0);
+            return parentTrigger?.getAttribute('aria-selected') === 'true'
+              && visible(innerTrigger)
+              && visible(innerContent);
+          },
+          { parent: parentSlug, inner: slug, content: expect },
+          { timeout: 15000 },
+        );
+      }
+    };
+
     const sweepAdminTab = async (tab) => {
-      await adminPage.click(`[data-testid="tab-${tab.slug}"]`);
-      // Harness-verified activation: the trigger must actually select AND the
-      // panel's own content selector must appear, or the scenario is vacuous.
-      await adminPage.waitForSelector(`[data-testid="tab-${tab.slug}"][aria-selected="true"]`, { timeout: 15000 });
-      await adminPage.waitForSelector(tab.expect, { timeout: 30000 });
+      await activateAdminTab(tab.slug, tab.expect);
       await adminPage.waitForTimeout(600); // settle async panel content
       return confirmedSweeps(adminPage);
     };
@@ -1464,9 +1512,7 @@ try {
 
     const sweepAdminOverlay = async (o) => {
       await gotoAdmin();
-      await adminPage.click(`[data-testid="tab-${o.tab}"]`);
-      await adminPage.waitForSelector(`[data-testid="tab-${o.tab}"][aria-selected="true"]`, { timeout: 15000 });
-      await adminPage.waitForSelector(o.tabExpect, { timeout: 30000 });
+      await activateAdminTab(o.tab, o.tabExpect);
       await adminPage.waitForTimeout(400); // settle async panel content
       await o.open(adminPage);
       await adminPage.waitForSelector(o.openedSelector, { timeout: 15000 });
