@@ -115,5 +115,14 @@ run_step build npm run build
 # by the production build above. It must run after (never before) that build.
 run_step bundle-budget npm run bundle:budget
 
+# Remove only development-only bulk, after all checks have consumed their
+# inputs. The helper also requires Replit's deployment marker so running this
+# gate with --publish in the editor cannot delete workspace evidence.
+if [ "$PUBLISH_MODE" = 1 ] && [ "${REPLIT_DEPLOYMENT:-}" = "1" ]; then
+  run_step trim-publish-image node scripts/deployment/trim-publish-image.mjs --apply
+else
+  echo "[pre-publish] SKIP image cleanup — not a Replit publishing container"
+fi
+
 echo ""
 echo "[pre-publish] ALL CHECKS PASSED — build artifacts are ready in dist/"

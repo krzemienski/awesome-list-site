@@ -1,3 +1,4 @@
+- [Publishing image size](publish-image-size.md) — bundle budgets do not measure image layers; preserve workspace evidence and trim development bulk only in the publishing copy.
 - [Clerk auth migration](clerk-auth-migration.md) — users.id = Clerk externalId bridge; JIT provisioning FAILS CLOSED on email collision (auto-bind = account takeover); FAPI proxy is prod-only (dev 404 expected).
 - [Identity sweep by claim token](identity-sweep-claim-token.md) — sweep auth refactors by claim pattern (claims.sub), not receiver name; `request.`/`(req as any).` aliases silently survive `req.user` seds and tsc can't catch them.
 - [Resource count source-of-truth](count-source-of-truth.md) — sidebar counts must come from ONE complete tree; orphan resources fold into nearest valid node or counts desync.
