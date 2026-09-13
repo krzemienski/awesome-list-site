@@ -18,6 +18,7 @@ The comparison target is always the local app on `127.0.0.1:5000`. Production
 | `CLERK_SECRET_KEY` (test instance) and `ADMIN_PASSWORD` (≥ 8 chars) | to create, promote and delete the disposable admin identity; without them the run degrades to `--as visitor` and says so |
 | Pinned Playwright Chromium under `.cache/ms-playwright` | the runner refuses to download a browser and refuses a version other than the pinned one |
 | `awesome-list-site-ds/` unchanged | the design snapshot is hashed at start and end; a change during the run marks the evidence stale |
+| Network access to `unpkg.com`, `fonts.googleapis.com` and `fonts.gstatic.com` | the frozen reference loads React, ReactDOM, Babel and the nine font families from these hosts; failed loads are infrastructure failures, not visual measurements |
 
 ## Commands
 
@@ -172,8 +173,10 @@ identities behind, and `--keep-user` to keep one for manual inspection.
   `/tmp` and copies it in only after the browser is closed. Notes or
   evidence you must write while a run is in flight belong in a git-ignored,
   watcher-excluded directory such as `.cache/` (`/tmp` does not survive a
-  workspace restart). A run killed mid-way leaves its disposable admin
-  behind — run `--sweep` before the next one.
+   workspace restart). A run killed mid-way can leave its disposable admin
+   behind. During parallel work, do not run the prefix-wide `--sweep`: it can
+   delete another worker's active identity. Coordinate cleanup with the other
+   workers first; normal teardown deletes only the current run's user.
 - The app's own same-origin `/api/` traffic must be idle (no request in flight
   for 750 ms, repeated until a settle round sees no new completions) before a
   frame counts, so the signed-in home is captured after its ~10 s
@@ -252,6 +255,30 @@ name the fragment and row.
 Run `--only <id>` for the new row, look at `actual/`, `expected/` and `diff/`,
 and commit the fragment together with the page change. The row is counted in
 the denominator as soon as its eligibility is `pixel`.
+
+During parallel page work, submit the owned fragment as an integration handoff
+rather than rewriting `inventory.json`, the schema or shared reports. The
+integrator runs the merge command after collecting the fragments. Selected
+captures require an in-sync merged inventory; do not bypass that validation.
+
+## Reliability evidence and release scope
+
+The retained three-fresh-context proof is
+[`determinism.json`](../../docs/parity/evidence/harness/determinism/determinism.json):
+Home Index, Category and mobile drawer at 375px, three byte-identical PNGs per
+row. Verify the recorded SHA-256 values against the actual PNG files before
+reusing this evidence; a report's `identical: true` alone is not proof.
+
+[`failure-paths.md`](../../docs/parity/evidence/harness/failure-paths.md)
+records focused live-local timeout cancellation (exit 2), normal visitor/admin
+captures, server-source fingerprinting, end-of-run catalog/admin rereads, and
+disposable identity cleanup. The historical full baseline predates those
+repairs and must not be cited as proof of the repaired integrity checks.
+
+Harness implementation acceptance reuses this valid proof and focused checks;
+it does not require another full baseline. Final integrated regression owns
+the full capture after page changes land. The 0.5% ceiling, union canvas,
+font assertions, eligibility classes and no-masking rule remain unchanged.
 
 ## Production baseline (`production-baseline/<YYYY-MM-DD>/`)
 

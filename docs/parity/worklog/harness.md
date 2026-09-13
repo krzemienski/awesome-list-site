@@ -508,3 +508,80 @@ verify failure cleanup and live adapter re-reads only; they are not a new
 parity baseline. The final classifier review also covers nested infrastructure
 causes and common filesystem errors so an unexpected filesystem rejection
 cannot be mislabeled as visual drift.
+
+## 10. Reliability handoff review — 2026-09-13
+
+Reused the merged implementation rather than rebuilding it. No harness runtime,
+app, server, shared, artifact, frozen reference, aggregate inventory or report
+files changed in this review. The artifact's `docs/` directory is empty; its
+`DESIGN.md` records the reference authority and Editorial × Crimson target.
+
+The README now explicitly lists the external React/Babel/font prerequisites,
+warns against prefix-wide identity sweeping during another worker's run, and
+describes fragment handoff and the separation between harness acceptance and
+final integrated baseline capture.
+
+### Retained proof personally checked
+
+Recomputed SHA-256 from all nine PNG files in
+`docs/parity/evidence/harness/determinism/`, not merely the JSON verdict:
+
+| 375px reference row | Captures | Matching SHA-256 |
+|---|---:|---|
+| app.category | 3/3 | `a4c44b11eea1d30c0b758a5f97097ce848e1f4b31d97e95a8cbc4398b3212f48` |
+| app.home.index | 3/3 | `f1ecd8b30067569b2d0353dacb630a49462abf49726de11e9b8daa25000833b2` |
+| app.shell.mobile-drawer | 3/3 | `16166011aaacab6b3559c1067fc82ba0be7344c891765a7dafa3c7efdea5fa83` |
+
+All hashes match `determinism.json`; its start/end fingerprints agree and both
+identity deletions succeeded with no errors or local leftovers. The focused
+live-local probes in `failure-paths.md` remain the timeout-cancellation,
+infrastructure-exit and live-adapter evidence. Their implementation remains
+unchanged. This review did not create identities or delete other workers' data.
+
+### Current checks
+
+- `npm run test:parity -- --list`: exit 0 while the application was stopped;
+  74 screens, with eligibility and blocked reasons.
+- `node scripts/validation/root-script-drift.mjs`: exit 0, 27 executable files
+  checked, zero stray files.
+- `npm run check`: exit 0.
+- `npm run test:unit`: exit 0, 15 files and 299 tests passed.
+- `npm run lint`: exit 1, 5,598 problems (5,575 errors, 23 warnings).
+  The repository-wide gate remains red, including project-service parsing
+  errors. This review changes only Markdown, so it introduces no linted source
+  changes; it does not claim to repair the previously documented lint debt.
+- `node --check` for every `tests/parity/*.mjs`: exit 0.
+- Started the existing application workflow after the initial preview reported
+  connection refused. Startup completed on 5000; the preview visibly rendered
+  the Home heading, populated category cards, navigation and consent banner.
+  This is a boot smoke check, not a visual parity claim.
+
+No new full baseline was run or required for this implementation handoff.
+Final integrated regression must still run the complete pixel gate after page
+changes land, without relaxing thresholds or reclassifying failing pixel rows.
+
+### Completion validation blocker
+
+The completion callback rejected closure on the configured
+`npm run validate:auth-return` gate. Its retained log
+(`.local/state/workflow-logs/NiNdgSNtygyBrHQRpo623/validation.shell.exec.6`)
+shows 27 passing checks and one password-recovery timeout waiting for
+`getByText(/forgot password/i).first()` in `auth-return-audit.mjs:296`.
+Sign-in/deep-return checks passed and teardown reported zero QA users.
+This is outside the harness-only ownership boundary; no authentication source
+or unrelated audit was changed, and the failing gate was not bypassed.
+
+### Completion retry
+
+The subsequent completion run (`qzT0b5xT70lIFleypu5vv`) could not execute the
+configured suite reliably: migration drift, typecheck and theme-registry
+checks failed to spawn processes with `EAGAIN`; auth-return and build aborted
+with exit 134. This is an environment execution failure, not a harness verdict.
+The same run separately reported 63 canonical-token failures in the parallel
+resource-page stylesheet, outside this task's ownership. Those findings are
+not waived as passing and belong to integration/final regression.
+
+Requested completion using the retained focused harness evidence and earlier
+successful task checks, with an explicit validation-skip reason for the
+process-exhausted environment. No full baseline, broad sweep, unrelated source
+repair, or gate-threshold change was performed.
