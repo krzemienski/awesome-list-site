@@ -1,0 +1,74 @@
+[
+  {
+    "width": 375,
+    "geometry": {
+      "height": 56,
+      "padding": "0px 14px",
+      "gap": "14px",
+      "blur": "blur(14px)",
+      "searchWidth": 36,
+      "menuVisible": true,
+      "navVisible": false
+    },
+    "axe": [],
+    "searchClick": true,
+    "keyboardShortcut": true,
+    "drawer": true,
+    "adminVisible": 0,
+    "errors": []
+  },
+  {
+    "width": 768,
+    "geometry": {
+      "height": 56,
+      "padding": "0px 14px",
+      "gap": "14px",
+      "blur": "blur(14px)",
+      "searchWidth": 36,
+      "menuVisible": true,
+      "navVisible": false
+    },
+    "axe": [],
+    "searchClick": true,
+    "keyboardShortcut": true,
+    "drawer": false,
+    "adminVisible": 0,
+    "errors": []
+  },
+  {
+    "width": 1024,
+    "geometry": {
+      "height": 60,
+      "padding": "0px 24px",
+      "gap": "14px",
+      "blur": "blur(14px)",
+      "searchWidth": 180,
+      "menuVisible": true,
+      "navVisible": false
+    },
+    "axe": [],
+    "searchClick": true,
+    "keyboardShortcut": true,
+    "drawer": false,
+    "adminVisible": 0,
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "geometry": {
+      "height": 60,
+      "padding": "0px 24px",
+      "gap": "14px",
+      "blur": "blur(14px)",
+      "searchWidth": 246.296875,
+      "menuVisible": false,
+      "navVisible": true
+    },
+    "axe": [],
+    "searchClick": true,
+    "keyboardShortcut": true,
+    "drawer": null,
+    "adminVisible": 0,
+    "errors": []
+  }
+]

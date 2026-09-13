@@ -4,6 +4,7 @@ import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
+import PageBreadcrumb from "./PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { openCookieSettings } from "@/components/ui/consent-banner";
@@ -144,7 +145,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
       // bottom row past the fold, and on a short page a first paint would show
       // that row over the end of this one. Growing past the column on long
       // pages still works: a flex item never shrinks below its content.
-      className="flex-col flex-1 min-h-[auto] [--header-height:56px] md:[--header-height:60px]"
+      className="flex-col flex-1 min-h-[auto] [--header-height:56px] min-[769px]:[--header-height:60px]"
     >
       {/* CC-17 — Skip-link is the first focusable element on every page. */}
       <a href="#main" className="skip-link">Skip to main content</a>
@@ -161,11 +162,11 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           user={user}
           onLogout={onLogout}
           logoutError={logoutError}
-          categories={nav?.categories || []}
+          categories={nav?.categories ?? []}
         />
         <div className="flex flex-1 w-full min-h-0">
         <AppSidebar
-          categories={nav?.categories || []}
+          categories={nav?.categories ?? []}
           totalResources={nav?.totalResources ?? 0}
           isLoading={isLoading}
           navError={navError}
@@ -191,6 +192,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           // axis leaves the other axis `visible`), so sticky works inside routes.
           className="flex-1 min-w-0 overflow-x-clip mx-auto w-full max-w-[var(--profile-page-measure)] px-4 sm:px-6 md:px-12 py-8 focus:outline-none"
         >
+          <PageBreadcrumb categories={nav?.categories ?? []} />
           {children}
         </main>
         {/* R1 — minimal app footer; R2-M19 — navigation links + copyright. */}

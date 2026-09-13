@@ -314,6 +314,36 @@ r = await resPage.evaluate(() => {
 });
 log('breadcrumb-titles@1440', r.crumbCount > 0 && r.withTitle === r.crumbCount && r.staticMenus === 0, JSON.stringify(r));
 
+// Complete route-label contract: valid static, dynamic, nested admin, and
+// unknown paths must remain distinguishable when breadcrumb ownership moves.
+for (const [name, route, expected] of [
+  ['breadcrumb-static-terms', '/terms', 'Terms'],
+  ['breadcrumb-static-design-system', '/design-system', 'Design System'],
+  ['breadcrumb-dynamic-tag', '/tag/open-source', 'Tag: Open Source'],
+  ['breadcrumb-unknown', '/__qa_test_unknown_route', 'Page Not Found'],
+]) {
+  await gotoPage(resPage, route);
+  await resPage.waitForTimeout(400);
+  const label = await resPage.getByTestId('breadcrumb-mobile-current').textContent().catch(() => null);
+  log(name, label?.trim() === expected, `label=${JSON.stringify(label?.trim())} expected=${JSON.stringify(expected)}`);
+}
+await gotoPage(resPage, resourceRoute);
+await resPage.waitForTimeout(700);
+const resourceLabel = await resPage.getByTestId('breadcrumb-mobile-current').textContent().catch(() => null);
+log(
+  'breadcrumb-dynamic-resource',
+  Boolean(resourceLabel?.trim() && !['Resource', 'Not found', 'Page Not Found'].includes(resourceLabel.trim())),
+  `label=${JSON.stringify(resourceLabel?.trim())}`,
+);
+if (AUTHED) {
+  await gotoPage(resPage, '/admin/users');
+  await resPage.waitForTimeout(700);
+  const adminLabels = await resPage.locator('nav[aria-label="breadcrumb"]').innerText().catch(() => '');
+  log('breadcrumb-nested-admin', /\bAdmin\b/.test(adminLabels) && /\bUsers\b/.test(adminLabels), JSON.stringify(adminLabels));
+} else {
+  console.log('SKIP breadcrumb-nested-admin :: authenticated check skipped (ADMIN_PASSWORD < 8 chars)');
+}
+
 // ---- R5-056: forced-colors button borders ----
 const fcPage = await ctx.newPage();
 await fcPage.emulateMedia({ forcedColors: 'active' });

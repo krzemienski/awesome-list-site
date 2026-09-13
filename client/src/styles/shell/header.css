@@ -1,0 +1,69 @@
+/* Header-only canonical geometry. Paint and typography resolve from the
+   merged parity tokens; no root tokens or other shell surfaces are changed. */
+.app-canonical-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: var(--shell-header-h);
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: var(--hairline-w) solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  /* layout.jsx's inline gap overrides the reference stylesheet's 18/10. */
+  gap: 14px;
+  font-family: var(--font-body);
+  line-height: var(--body-leading);
+  color: var(--text);
+}
+.app-canonical-header .header-brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex-shrink: 0; text-decoration: none; }
+/* DS-OK: canonical Logo has a fixed 6px tile radius across skins.
+   The reference requests 800 but its font download tops out at 700; request
+   the actual available face rather than requiring an unshipped weight. */
+.app-canonical-header .header-logo { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: var(--bg); display: flex; align-items: center; justify-content: center; font: 700 13px var(--font-mono); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); flex-shrink: 0; }
+.app-canonical-header .header-wordmark { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1.8px; white-space: nowrap; }
+.app-canonical-header .header-spacer { flex: 1; }
+.app-canonical-header .header-nav { display: flex; gap: 18px; align-items: center; }
+.app-canonical-header .nav-link { font-size: 13px; font-weight: 500; color: var(--text-2); white-space: nowrap; text-decoration: none; transition: color 160ms ease; }
+.app-canonical-header .nav-link:hover, .app-canonical-header .nav-link.active { color: var(--text); }
+.app-canonical-header .header-live-dot { position: relative; margin-left: 6px; }
+/* The reference inline span reserves only its margin. Paint the required live
+   indicator without adding an inline-block width to the canonical nav. */
+.app-canonical-header .header-live-dot::after { content: ""; position: absolute; left: 0; top: 50%; margin-top: -2.5px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.app-canonical-header button { line-height: normal; font-feature-settings: normal; font-variation-settings: normal; font-weight: 400; }
+.app-canonical-header .header-search-trigger { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px 0 12px; border: var(--hairline-w) solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2); cursor: pointer; font-family: inherit; font-size: 13px; min-width: 240px; max-width: 360px; transition: all 160ms ease; flex-shrink: 1; }
+.app-canonical-header .header-search-trigger > svg { width: 14px; height: 14px; color: var(--text-3); flex-shrink: 0; }
+.app-canonical-header .header-search-trigger:hover { border-color: var(--border-strong); background: var(--surface-2); color: var(--text); }
+.app-canonical-header .header-search-label { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.app-canonical-header .header-search-label > span { color: var(--text-3); }
+/* DS-OK: canonical .kbd uses a fixed 4px radius, not the skin's control radius. */
+.app-canonical-header .header-kbd { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-3); padding: 2px 6px; border: var(--hairline-w) solid var(--border); border-radius: 4px; background: var(--surface); }
+.app-canonical-header .user-pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border)); color: var(--text); cursor: pointer; font-family: inherit; transition: all 160ms ease; flex-shrink: 0; }
+.app-canonical-header .user-pill:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+.app-canonical-header .header-avatar, .app-canonical-header .header-avatar > span { width: 22px; height: 22px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--bg-2) 80%, var(--accent)); color: var(--accent); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+.app-canonical-header .header-account-name { font-size: 12px; font-weight: 600; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-canonical-header .mobile-menu-btn { display: none; align-items: center; justify-content: center; cursor: pointer; width: 36px; height: 36px; min-width: 36px; padding: 0; border: var(--border-w) solid var(--border); border-radius: var(--radius-sm); background: transparent; color: var(--text); box-shadow: none; }
+.app-canonical-header .header-menu-control { display: none; position: relative; width: 36px; height: 36px; flex-shrink: 0; }
+.app-canonical-header .mobile-menu-btn > svg { visibility: hidden; }
+.app-canonical-header .header-menu-icon { position: absolute; top: 10px; left: 10px; pointer-events: none; }
+.app-canonical-header .mobile-menu-btn:hover { background: var(--surface); border-color: var(--text-3); transform: translateY(-1px); }
+.app-canonical-header :is(button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.header-account-menu [role="menuitem"] { min-height: 44px; }
+@media (max-width: 1180px) { .app-canonical-header .header-search-trigger { min-width: 180px; } }
+@media (max-width: 1024px) {
+  .app-canonical-header .hide-tablet { display: none !important; }
+  .app-canonical-header .mobile-menu-btn { display: inline-flex !important; }
+  .app-canonical-header .header-menu-control { display: inline-flex; }
+  .app-canonical-header .header-search-trigger { min-width: 0; width: 180px; gap: 6px; padding: 0 10px; }
+  .app-canonical-header .header-search-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+}
+@media (max-width: 768px) {
+  .app-canonical-header { height: 56px; padding: 0 14px; }
+  .app-canonical-header .hide-mobile { display: none !important; }
+  .app-canonical-header .header-search-trigger { min-width: 36px; width: 36px; height: 36px; padding: 0; justify-content: center; background: transparent; }
+  .app-canonical-header .header-search-trigger > svg { width: 16px; height: 16px; color: var(--text); }
+  .app-canonical-header .user-pill { padding: 0 4px; gap: 0; }
+}

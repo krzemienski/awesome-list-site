@@ -1,0 +1,19 @@
+{
+  "owner": "shell-header",
+  "existingRow": "app.shell.default",
+  "alias": "app.home.index",
+  "eligibility": "pixel",
+  "fullCanvasGate": "not-passing",
+  "headerDiagnostic": {
+    "threshold": 0.1,
+    "maxPercent": 0.5,
+    "widths": [375, 768, 1024, 1440],
+    "percent": [0.185714, 0.090681, 0.112305, 0.209491]
+  },
+  "sharedImportsNeeded": ["PageBreadcrumb is wired in MainLayout"],
+  "docsLinkPending": "/design-system",
+  "handoffs": [
+    "Desktop visible-testids inventory intentionally hides mobile-drawer-trigger",
+    "Full-canvas shell alias remains a failing integration row"
+  ]
+}

@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const categoryLinks = (page: import('@playwright/test').Page) =>
+  page.locator('[data-testid="list-categories"] [data-testid^="link-category-"]');
 test.describe('Search and Discovery Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -12,21 +14,21 @@ test.describe('Search and Discovery Flow', () => {
       await expect(page.getByRole('heading', { level: 1, name: /Awesome Video Resources/i })).toBeVisible();
 
       // Check that category cards are displayed
-      const categoryCards = page.locator('[data-testid^="card-category-"]');
-      await expect(categoryCards.first()).toBeVisible();
+      const links = categoryLinks(page);
+      await expect(links.first()).toBeVisible();
 
       // Verify at least some categories are shown
-      const count = await categoryCards.count();
+      const count = await links.count();
       expect(count).toBeGreaterThan(0);
     });
 
     test('should show category with resource count', async ({ page }) => {
       // Find first category card
-      const firstCard = page.locator('[data-testid^="card-category-"]').first();
+      const firstCard = categoryLinks(page).first();
       await expect(firstCard).toBeVisible();
 
       // Check for badge with count
-      const badge = firstCard.locator('[data-testid^="badge-count-"]');
+      const badge = page.locator('[data-testid^="badge-count-"]').first();
       await expect(badge).toBeVisible();
 
       // Verify badge contains a number
@@ -49,7 +51,7 @@ test.describe('Search and Discovery Flow', () => {
       expect(page.url()).toContain(categorySlug || '/category/');
 
       // Verify category page content loaded
-      await expect(page.getByRole('button', { name: /Back to all categories/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Back to Home/i })).toBeVisible();
     });
 
     test('should display resource count in page description', async ({ page }) => {
@@ -66,12 +68,12 @@ test.describe('Search and Discovery Flow', () => {
   test.describe('Search Dialog', () => {
     test('should open search dialog when clicking search button', async ({ page }) => {
       // Click search button
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Verify dialog opened
       await expect(page.getByRole('dialog')).toBeVisible();
-      await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Find resources/i })).toBeVisible();
       await expect(page.getByPlaceholder(/Search resources/i)).toBeVisible();
     });
 
@@ -82,12 +84,12 @@ test.describe('Search and Discovery Flow', () => {
 
       // Verify dialog opened
       await expect(page.getByRole('dialog')).toBeVisible();
-      await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Find resources/i })).toBeVisible();
     });
 
     test('should focus search input when dialog opens', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Wait for dialog and input to be visible
@@ -101,7 +103,7 @@ test.describe('Search and Discovery Flow', () => {
 
     test('should show placeholder state before search', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Verify placeholder message
@@ -109,13 +111,12 @@ test.describe('Search and Discovery Flow', () => {
       await expect(page.getByText(/Type at least 2 characters/i)).toBeVisible();
     });
 
-    test('should close dialog when clicking cancel', async ({ page }) => {
+    test('should close dialog with the advertised Escape shortcut', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
-      // Click cancel button
-      await page.getByRole('button', { name: /Cancel/i }).click();
+      await page.keyboard.press('Escape');
 
       // Verify dialog closed
       await expect(page.getByRole('dialog')).not.toBeVisible();
@@ -123,7 +124,7 @@ test.describe('Search and Discovery Flow', () => {
 
     test('should close dialog when pressing Escape', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Press Escape
@@ -137,7 +138,7 @@ test.describe('Search and Discovery Flow', () => {
   test.describe('Search Functionality', () => {
     test('should show "no results" when search has no matches', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Type search query that won't match anything
@@ -154,7 +155,7 @@ test.describe('Search and Discovery Flow', () => {
 
     test('should display search results when typing valid query', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Type a common search term likely to have results
@@ -174,7 +175,7 @@ test.describe('Search and Discovery Flow', () => {
 
     test('should require minimum 2 characters to search', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Type single character
@@ -196,7 +197,7 @@ test.describe('Search and Discovery Flow', () => {
 
     test('should display resource details in search results', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Type search query
@@ -207,27 +208,23 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForTimeout(500);
 
       // Check if there are any results
-      const resultCount = await page.locator('[data-testid^="search-result-"]').count();
+      const resultCount = await page.locator('[data-testid^="search-result-"]:not([data-testid="search-result-count"])').count();
 
       if (resultCount > 0) {
-        const firstResult = page.locator('[data-testid^="search-result-"]').first();
+        const firstResult = page.locator('[data-testid^="search-result-"]:not([data-testid="search-result-count"])').first();
 
         // Verify result has title, category, and description structure
         await expect(firstResult).toBeVisible();
 
-        // Result should be a clickable link
-        const link = firstResult.locator('a');
-        await expect(link).toBeVisible();
-
-        // Should have href attribute
-        const href = await link.getAttribute('href');
-        expect(href).toBeTruthy();
+        // Command results are keyboard-selectable options that navigate on select.
+        await expect(firstResult).toHaveAttribute('role', 'option');
+        await expect(firstResult).toHaveAttribute('data-value', /resource-\d+/);
       }
     });
 
     test('should clear search when dialog closes', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Type search query
@@ -235,7 +232,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchInput.fill('test search');
 
       // Close dialog
-      await page.getByRole('button', { name: /Cancel/i }).click();
+      await page.keyboard.press('Escape');
 
       // Reopen dialog
       await searchButton.click();
@@ -255,7 +252,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Verify category page elements
-      await expect(page.getByRole('button', { name: /Back to all categories/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Back to Home/i })).toBeVisible();
 
       // Should have some resources or a message
       const pageContent = await page.textContent('body');
@@ -270,7 +267,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Click back button
-      await page.getByRole('button', { name: /Back to all categories/i }).click();
+      await page.getByRole('link', { name: /Back to Home/i }).click();
       await page.waitForLoadState('domcontentloaded');
 
       // Verify we're back on home page
@@ -321,7 +318,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Search button should be visible on mobile
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await expect(searchButton).toBeVisible();
 
       // Click should open dialog
@@ -338,11 +335,11 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Category cards should be visible
-      const categoryCards = page.locator('[data-testid^="card-category-"]');
-      await expect(categoryCards.first()).toBeVisible();
+      const links = categoryLinks(page);
+      await expect(links.first()).toBeVisible();
 
       // Should have at least one card
-      const count = await categoryCards.count();
+      const count = await links.count();
       expect(count).toBeGreaterThan(0);
     });
   });
@@ -370,7 +367,7 @@ test.describe('Search and Discovery Flow', () => {
 
     test('should have accessible search dialog', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
       // Dialog should have role="dialog"
@@ -378,7 +375,7 @@ test.describe('Search and Discovery Flow', () => {
       await expect(dialog).toBeVisible();
 
       // Should have accessible title
-      await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Find resources/i })).toBeVisible();
 
       // Search input should have placeholder
       const input = page.getByPlaceholder(/Search resources/i);
@@ -387,15 +384,13 @@ test.describe('Search and Discovery Flow', () => {
 
     test('should support keyboard navigation in search dialog', async ({ page }) => {
       // Open search dialog
-      const searchButton = page.locator('button:has(svg):has-text("Search")');
+      const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
-      // Tab to navigate to Cancel button
+      // Tab within the palette, then close with its advertised Escape shortcut.
       await page.keyboard.press('Tab');
-
-      // Should be able to press Enter to close
-      const cancelButton = page.getByRole('button', { name: /Cancel/i });
-      await expect(cancelButton).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('dialog')).not.toBeVisible();
     });
   });
 

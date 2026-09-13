@@ -1,202 +1,43 @@
 import { Link, useLocation } from "wouter";
-import { Search, Palette, LogIn, LogOut, User, Bookmark, Bell, Settings, Shield, MoreHorizontal } from "lucide-react";
+import { Bookmark, Bell, Settings, User, LogOut, LogIn, Palette, Shield } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
-import { BrandMark } from "@/components/BrandMark";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useTheme } from "@/hooks/use-theme";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import type { useAuth } from "@/hooks/useAuth";
+import type { AwesomeListNavNode } from "@/lib/static-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { deslugify } from "@/lib/utils";
-import { normalizeTagPathSegment, tagDisplayName } from "@shared/tagNormalize";
-import { useQuery } from "@tanstack/react-query";
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import "@/styles/shell/header.css";
 
 interface AppHeaderProps {
   onSearchOpen: () => void;
-  user?: any;
+  user?: ReturnType<typeof useAuth>["user"];
   onLogout?: () => void;
   logoutError?: string | null;
-  categories?: any[];
+  categories?: AwesomeListNavNode[];
 }
 
-// Resolve the true taxonomy parent chain for a category/subcategory/
-// sub-subcategory slug so each breadcrumb links to its REAL parent
-// (e.g. a subcategory's parent is its category, not a generic "/subcategory"
-// route that does not exist). Returns null when the tree has not loaded or the
-// slug is unknown, so the caller can fall back to the generic label chain.
-function taxonomyCrumbs(
-  kind: string,
-  slug: string,
-  categories: any[],
-): { label: string; href: string }[] | null {
-  if (!categories?.length) return null;
-  for (const cat of categories) {
-    if (kind === "category" && cat.slug === slug) {
-      return [{ label: cat.name, href: `/category/${cat.slug}` }];
-    }
-    for (const sub of cat.subcategories || []) {
-      if (kind === "subcategory" && sub.slug === slug) {
-        return [
-          { label: cat.name, href: `/category/${cat.slug}` },
-          { label: sub.name, href: `/subcategory/${sub.slug}` },
-        ];
-      }
-      for (const ss of sub.subSubcategories || []) {
-        if (kind === "sub-subcategory" && ss.slug === slug) {
-          return [
-            { label: cat.name, href: `/category/${cat.slug}` },
-            { label: sub.name, href: `/subcategory/${sub.slug}` },
-            { label: ss.name, href: `/sub-subcategory/${ss.slug}` },
-          ];
-        }
-      }
-    }
-  }
-  return null;
+// Same recursive sum as Home's navTotalCount; never fetch the full corpus.
+function totalCount(node: AwesomeListNavNode): number {
+  return node.resourceCount
+    + (node.subcategories ?? []).reduce((n, child) => n + totalCount(child), 0)
+    + (node.subSubcategories ?? []).reduce((n, child) => n + totalCount(child), 0);
 }
 
-function getBreadcrumbs(path: string, categories: any[] = []) {
-  if (path === "/") return [{ label: "Home", href: "/" }];
-  const segments = path.split("/").filter(Boolean);
-  const crumbs: { label: string; href: string }[] = [{ label: "Home", href: "/" }];
-  const routeLabels: Record<string, string> = {
-    category: "Category",
-    subcategory: "Subcategory",
-    "sub-subcategory": "Sub-subcategory",
-    resource: "Resource",
-    admin: "Admin",
-    profile: "Profile",
-    contributions: "Contributions",
-    bookmarks: "Bookmarks",
-    about: "About",
-    "code-of-conduct": "Code of Conduct",
-    advanced: "Advanced",
-    submit: "Submit Resource",
-    journeys: "Learning Journeys",
-    journey: "Journey",
-    tag: "Tag",
-    collection: "Shared collection",
-    "continue-learning": "Continue Learning",
-    login: "Sign in",
-    "sign-in": "Sign in",
-    "sign-up": "Create account",
-    settings: "Settings",
-    notifications: "Notifications",
-    onboarding: "Learning preferences",
-    // Task #346: living design-system showcase.
-    "design-system": "Design System",
-  };
-  // Taxonomy routes get a real parent chain resolved from the tree.
-  if (
-    segments.length >= 2 &&
-    ["category", "subcategory", "sub-subcategory"].includes(segments[0])
-  ) {
-    const resolved = taxonomyCrumbs(segments[0], segments[1], categories);
-    if (resolved) return [...crumbs, ...resolved];
-    // BUG-029 (run19): the tree is loaded and the slug is NOT in it — this is
-    // a 404, so say "Not found" instead of title-casing the raw slug into a
-    // fake page title. (While the tree is still loading we keep the generic
-    // fallback below to avoid a "Not found" flash on valid pages.)
-    if (categories?.length) {
-      return [
-        ...crumbs,
-        { label: routeLabels[segments[0]], href: `/${segments[0]}` },
-        { label: "Not found", href: path },
-      ];
-    }
-  }
-  // BUG-029 (run19): unknown first segments render the NotFound page, so the
-  // crumb must say "Not found" — never title-case a bogus slug into a fake
-  // page title ("/this-page-does-not-exist" ≠ "This Page Does Not Exist").
-  const knownFirstSegments = new Set([
-    ...Object.keys(routeLabels),
-    "logout",
-    "register",
-    "forgot-password",
-    "reset-password",
-    "auth",
-    "signup",
-    "explore",
-    "categories",
-    "recommendations",
-    "search",
-    "subsubcategory",
-    "terms",
-    "privacy",
-    "favorites",
-    "account",
-    "onboarding",
-  ]);
-  if (!knownFirstSegments.has(segments[0])) {
-    return [...crumbs, { label: "Not found", href: path }];
-  }
-  if (segments.length === 1) {
-    crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: path });
-  } else if (segments.length >= 2) {
-    if (segments[0] === "journey") {
-      // BUG-029 (run13): the intermediate crumb must point at the real listing
-      // page (/journeys), not the bare /journey redirect stub.
-      crumbs.push({ label: "Learning Journeys", href: "/journeys" });
-      // BUG-038 (run27): journeys are addressed by numeric id — a non-numeric
-      // segment can only be a 404, so never echo the (deslugify-transformed)
-      // raw slug back as a crumb ("/journey/abc" ≠ "Abc").
-      crumbs.push({
-        label: /^\d+$/.test(segments[1]) ? segments[1] : "Not found",
-        href: path,
-      });
-    } else if (segments[0] === "resource") {
-      // BUG-041 (run13): there is no /resource listing page — the old
-      // intermediate "Resource" crumb was a dead link, so it's dropped.
-      // BUG-038 (run27): resources are addressed by numeric id. A non-numeric
-      // or negative segment ("/resource/abc", "/resource/-1") is always a
-      // 404 — show "Not found" instead of a title-cased echo of user input
-      // ("Abc", "1"). Valid numeric ids keep the raw id until the title query
-      // below swaps it in (or flips it to "Not found" on a 404).
-      crumbs.push({
-        label: /^\d+$/.test(segments[1]) ? segments[1] : "Not found",
-        href: path,
-      });
-    } else if (segments[0] === "collection") {
-      // Share ids are opaque capabilities, not useful labels. Avoid both a
-      // dead intermediate /collection link and exposing the raw identifier.
-      crumbs.push({ label: "Shared collection", href: path });
-    } else if (segments[0] === "tag") {
-      // Tag pages have no useful /tag index, so keep a single live crumb
-      // rather than inserting a dead intermediate link.
-      crumbs.push({
-        label: tagDisplayName(normalizeTagPathSegment(segments[1])) || "Not found",
-        href: path,
-      });
-    } else {
-      crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: `/${segments[0]}` });
-      crumbs.push({ label: deslugify(segments[1]), href: path });
-    }
-  }
-  return crumbs;
+function SearchIcon() {
+  return <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="7" cy="7" r="5" /><path d="M11 11 L14 14" />
+  </svg>;
 }
 
-export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories }: AppHeaderProps) {
-  // Task #329: signed-out visitors with on-device saves get a header entry
-  // point to /bookmarks (their guest library).
+export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [] }: AppHeaderProps) {
+  const [location, navigate] = useLocation();
+  const { systemId } = useTheme();
   const guestSavedCount = useGuestBookmarkIds().size;
-  const [location, setLocation] = useLocation();
-  const crumbs = getBreadcrumbs(location, categories || []);
   const { data: notificationState } = useQuery<{ unreadCount: number }>({
     queryKey: ["/api/notifications?limit=50"],
     enabled: Boolean(user),
@@ -204,438 +45,82 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     refetchInterval: 60_000,
   });
   const unreadCount = notificationState?.unreadCount ?? 0;
-
-  // BUG-020 (run9): on /journey/:id the generic crumb chain ends in the raw
-  // numeric id ("Home > Journey > 6"). Resolve the journey title from the
-  // journeys list (tiny payload, shared cache with the Journeys page) and
-  // swap it in once loaded. Query only runs on journey routes.
-  const journeyMatch = location.match(/^\/journey\/(\d+)$/);
-  const { data: journeyList } = useQuery<{ id: number; title: string }[]>({
-    queryKey: ["/api/journeys"],
-    enabled: !!journeyMatch,
-    staleTime: 5 * 60 * 1000,
-  });
-  if (journeyMatch && Array.isArray(journeyList)) {
-    const j = journeyList.find((x) => x.id === Number(journeyMatch[1]));
-    const last = crumbs[crumbs.length - 1];
-    if (last && last.href === location) {
-      if (j?.title) {
-        last.label = j.title;
-      } else {
-        // BUG-038 (run27): the journeys list is loaded and this id isn't in
-        // it — a 404, so the crumb must not echo the raw id.
-        last.label = "Not found";
-      }
-    }
-  }
-
-  // BUG-017 (run10): same treatment for /resource/:id — the generic crumb
-  // chain ends in the raw numeric id ("Home > Resource > 2711"). Resolve the
-  // resource title from the detail endpoint and swap it in once loaded.
-  // Run16 BUG-058: the key now MATCHES ResourceDetail's ['/api/resources', id]
-  // entry (with an equivalent queryFn) so header + page share ONE cache entry
-  // and missing resources fire a single GET /api/resources/:id, not two.
-  const resourceMatch = location.match(/^\/resource\/(\d+)$/);
-  const resourceId = resourceMatch?.[1];
-  const { data: crumbResource, isError: crumbResourceError } = useQuery<{
-    id: number;
-    title?: string;
-    category?: string;
-    subcategory?: string;
-    subSubcategory?: string;
-  }>({
-    queryKey: ['/api/resources', resourceId],
-    queryFn: async () => {
-      const response = await fetch(`/api/resources/${resourceId}`, { credentials: 'include' });
-      if (!response.ok) throw new Error('Resource not found');
-      return response.json();
-    },
-    enabled: !!resourceMatch,
-  });
-  if (resourceMatch && crumbResource?.title) {
-    const last = crumbs[crumbs.length - 1];
-    if (last && last.href === location) {
-      last.label = crumbResource.title;
-      // Run16 BUG-059: insert the resource's taxonomy chain (category >
-      // subcategory > sub-subcategory) so the crumb reflects its real location
-      // instead of just "Home > <title>". Slugs come from the shared tree —
-      // DB slugs are NOT always slugify(name) (de-duplicated "-sc<id>" suffixes).
-      const chain: { label: string; href: string }[] = [];
-      const cat = (categories || []).find((c: any) => c.name === crumbResource.category);
-      if (cat?.slug) {
-        chain.push({ label: cat.name, href: `/category/${cat.slug}` });
-        const sub = (cat.subcategories || []).find(
-          (s: any) => s.name === crumbResource.subcategory,
-        );
-        if (sub?.slug) {
-          chain.push({ label: sub.name, href: `/subcategory/${sub.slug}` });
-          if (crumbResource.subSubcategory) {
-            const ss = (sub.subSubcategories || []).find(
-              (x: any) => x.name === crumbResource.subSubcategory,
-            );
-            if (ss?.slug) {
-              chain.push({ label: ss.name, href: `/sub-subcategory/${ss.slug}` });
-            }
-          }
-        }
-      }
-      crumbs.splice(crumbs.length - 1, 0, ...chain);
-    }
-  }
-  if (resourceMatch && crumbResourceError) {
-    // BUG-038 (run27): numeric id but the API 404'd — swap the raw-id crumb
-    // for "Not found" so /resource/999999999 doesn't echo the bogus id.
-    const last = crumbs[crumbs.length - 1];
-    if (last && last.href === location) last.label = "Not found";
-  }
-
-  // BUG-002 (run22): at 768–917px the md floors (breadcrumb 160px + search
-  // 200px + 18px gaps) summed past the 512–661px of header space left by the
-  // pinned 256px sidebar, pushing Theme + Sign in off-screen with no drawer
-  // fallback. The wide gaps and floors now only apply from lg up; md gets
-  // compact gaps and smaller floors so the right-side action cluster
-  // (shrink-0) always fits.
-  return (
-    <>
-    <header className="sticky top-0 z-30 flex h-[var(--header-height)] items-center gap-2 lg:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
-      <SidebarTrigger
-        className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]"
-        data-testid="mobile-drawer-trigger"
-        aria-label="Toggle sidebar"
-      />
-      {/* DS shell parity — the full-width header owns the brand (reference
-          layout.jsx Header: logo tile + AWESOME.VIDEO mono wordmark,
-          12px/700/tracking 1.8). Wordmark hides below lg to avoid crowding
-          the breadcrumb + search + action cluster. */}
-      <Link
-        href="/"
-        className="hidden min-[360px]:flex items-center justify-center gap-2.5 shrink-0 no-underline min-h-[44px] min-w-10"
-        aria-label="Awesome Video — home"
-        data-testid="header-brand"
-      >
-        <BrandMark className="size-7 shrink-0" />
-        <span
-          className="font-mono hidden lg:inline"
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: 1.8,
-            color: "var(--text)",
-          }}
-        >
-          AWESOME.VIDEO
-        </span>
-      </Link>
-      <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />
-
-      {/* BUG-017 (run14): breadcrumb must stay on ONE line inside the fixed
-          60px header — at 768px the wrapping chain clipped off-screen. The
-          list is nowrap + overflow-hidden and every crumb truncates. */}
-      {/* BUG-004 (run19): the nav also needs its own floor — with the search
-          trigger refusing to shrink below 200px, an unbounded-basis breadcrumb
-          absorbed ALL the flex shrink and clipped to 0px at md, hiding even
-          the "Home › …" collapse. 160px keeps Home › … › <truncated title>. */}
-      {/* BUG-002 (run22): the 160px floor only from lg — at md it overflowed
-          the header (see header comment); 80px still fits the collapsed
-          "Home › … › current" trail without clipping to 0 (run19 BUG-004). */}
-      <Breadcrumb className="hidden md:flex min-w-0 md:min-w-[80px] lg:min-w-[160px] shrink overflow-hidden">
-        <BreadcrumbList className="flex-nowrap overflow-hidden">
-          {crumbs.flatMap((crumb, i) => {
-            const isLast = i === crumbs.length - 1;
-            // Run15 BUG-045: the root "Home" crumb is short and must stay a
-            // usable link — never let flexbox squeeze it to zero width. Only
-            // the deeper (long) crumbs participate in truncation.
-            const isRoot = i === 0;
-            // Run17 BUG-023: at md–lg widths (768–1023px) there isn't room
-            // for the full trail — middle crumbs compressed to unreadable
-            // 2–8px slivers. Collapse all middle crumbs into a single
-            // ellipsis so only "Home › … › Current" renders, each part
-            // readable and clickable.
-            // BUG-004 (run19): the same sliver pathology reproduced at
-            // exactly lg (1024px) once search kept its 200px floor — the
-            // full trail only genuinely fits from xl (1280px) up, so the
-            // ellipsis collapse now holds through lg.
-            const isMiddle = !isRoot && !isLast;
-            const middleVis = "hidden xl:flex min-w-0";
-            const nodes = [
-              <BreadcrumbItem
-                key={`${crumb.href}-item`}
-                className={
-                  isRoot && !isLast
-                    ? "shrink-0"
-                    : isMiddle
-                      ? middleVis
-                      : "min-w-0"
-                }
-              >
-                {/* R5-057 (run24): title attrs — truncated crumbs ("Clou…" vs
-                    "Cloud…") were ambiguous with no way to read the full
-                    label; the native tooltip disambiguates at every width. */}
-                {isLast ? (
-                  <BreadcrumbPage className="truncate" title={crumb.label}>
-                    {crumb.label}
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink
-                    href={crumb.href}
-                    className={isRoot ? "whitespace-nowrap" : "truncate"}
-                    title={crumb.label}
-                  >
-                    {crumb.label}
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>,
-            ];
-            if (!isLast) {
-              nodes.push(
-                <BreadcrumbSeparator
-                  key={`${crumb.href}-sep`}
-                  className={isMiddle ? "hidden xl:flex" : undefined}
-                />,
-              );
-            }
-            if (isRoot && crumbs.length > 2) {
-              // Run22 BUG-022: the collapsed ellipsis used to be a dead
-              // aria-hidden span — the middle crumbs it stood for were
-              // unreachable below xl. It is now a real keyboard-focusable
-              // menu button listing every hidden crumb as a navigable link.
-              const hiddenCrumbs = crumbs.slice(1, -1);
-              nodes.push(
-                <BreadcrumbItem
-                  key="crumb-ellipsis"
-                  className="xl:hidden shrink-0"
-                >
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      aria-label={`Show ${hiddenCrumbs.length} hidden breadcrumb ${hiddenCrumbs.length === 1 ? "level" : "levels"}`}
-                      data-testid="button-breadcrumb-ellipsis"
-                      className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      {hiddenCrumbs.map((mid) => (
-                        <DropdownMenuItem key={mid.href} asChild>
-                          <Link
-                            href={mid.href}
-                            data-testid={`link-breadcrumb-hidden-${mid.href.split("/").pop()}`}
-                          >
-                            {mid.label}
-                          </Link>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </BreadcrumbItem>,
-                <BreadcrumbSeparator key="crumb-ellipsis-sep" className="xl:hidden" />,
-              );
-            }
-            return nodes;
-          })}
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      {/* R5-057 (run24): below md the full trail used to be display:none —
-          deep pages had NO location cue at 375/320 (findability gap). Show a
-          compact current-page crumb on small screens. Narrow-screen secondary
-          chrome yields space so realistic page names remain visible in full. */}
-      {crumbs.length > 1 && (
-        <nav
-          aria-label="Current page"
-          className="flex md:hidden min-w-0 shrink items-center text-xs text-muted-foreground"
-          data-testid="breadcrumb-mobile-current"
-        >
-          <span
-            aria-current="page"
-            className="truncate max-w-[40vw] text-foreground"
-            title={crumbs[crumbs.length - 1].label}
-          >
-            {crumbs[crumbs.length - 1].label}
-          </span>
-        </nav>
-      )}
-
-      {/* BUG-004 (run19): deep-taxonomy breadcrumbs used to flex-squeeze the
-          search trigger to a sliver. Reserve a usable floor for search at md+
-          (where the breadcrumb renders) — the breadcrumb, which truncates
-          gracefully, absorbs the shrink instead. */}
-      {/* BUG-002 (run22): 200px search floor only from lg; at md 110px fits
-          the short "Search..." label and returns the overflow budget to the
-          right-side controls. */}
-      {/* BUG-050 + BUG-024 (run26): a 44px floor below md — min-w-0 let deep
-          breadcrumbs squeeze this container to 0px, so the icon pill inside
-          bled over the action cluster at 320px (and measured 26px wide,
-          under the touch-target floor, at 375px). */}
-      <div className="flex-1 min-w-[44px] md:min-w-[110px] lg:min-w-[200px] mx-1 sm:mx-2">
-        <button
-          onClick={onSearchOpen}
-          className="w-full max-w-sm flex items-center min-h-[44px] sm:min-h-0 h-11 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
-          aria-label="Open search"
-        >
-          <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-          {/* Run16 BUG-047: at 768px the trigger is squeezed to ~78px of
-              label space, truncating "Search resources..." to "Search re…".
-              Show the full label only from lg up; tablet + mobile get the
-              short label that fits. */}
-          {/* Run25 C-02: on narrow phones the mobile breadcrumb squeezes the
-              pill until even "Search..." clips mid-glyph ("S.."). Below 520px
-              the pill is icon-only (button keeps aria-label="Open search");
-              the label margins moved off the icon so it centers cleanly. */}
-          <span className="ml-2 text-muted-foreground truncate hidden lg:inline">Search resources...</span>
-          <span className="ml-2 text-muted-foreground truncate hidden min-[520px]:inline lg:hidden">Search...</span>
-          {/* BUG-002 (run22): "/" hint from lg (was md) — saves ~20px at
-              768–1023px where header space is tightest. */}
-          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] lg:flex">
-            /
-          </kbd>
-        </button>
-      </div>
-
-      <div className="flex items-center gap-1 shrink-0">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hidden h-9 w-9 min-h-[44px] min-w-[44px] relative touch-manipulation sm:inline-flex"
-          onClick={() => setLocation("/settings/theme")}
-          title="Theme Settings"
-          aria-label="Theme Settings"
-        >
-          <Palette className="h-4 w-4" />
-        </Button>
-
-        {user ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative h-9 w-9 min-h-[44px] min-w-[44px] touch-manipulation"
-            onClick={() => setLocation("/notifications")}
-            title={
-              unreadCount > 0
-                ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
-                : "Notifications"
-            }
-            aria-label={
-              unreadCount > 0
-                ? `Notifications, ${unreadCount} unread`
-                : "Notifications"
-            }
-            data-testid="button-notifications"
-          >
-            <Bell className="h-4 w-4" />
-            {unreadCount > 0 ? (
-              <span
-                className="absolute right-0.5 top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold leading-none text-white"
-                aria-hidden="true"
-                data-testid="badge-notification-count"
-              >
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            ) : null}
-          </Button>
-        ) : null}
-
-        {user ? (
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              {/* Run16 BUG-079: icon-only avatar trigger needs an accessible name. */}
-              <Button
-                variant="ghost"
-                className="relative h-9 w-9 rounded-full"
-                aria-label="Open account menu"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.name ? user.name[0].toUpperCase() : "U"}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" sideOffset={8}>
-              <DropdownMenuLabel className="font-normal">
-                {/* BUG-012 (run24): long names/emails used to overflow the
-                    fixed-width menu — truncate the name, wrap the email. */}
-                <div className="flex min-w-0 flex-col space-y-1">
-                  <p className="truncate text-sm font-medium">{user.name || user.email}</p>
-                  <p className="break-all text-xs text-muted-foreground">{user.email}</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setLocation("/profile")} className="min-h-[44px]">
-                <User className="mr-2 h-4 w-4" /> Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setLocation("/bookmarks")} className="min-h-[44px]">
-                <Bookmark className="mr-2 h-4 w-4" /> Bookmarks
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setLocation("/notifications")} className="min-h-[44px]">
-                <Bell className="mr-2 h-4 w-4" /> Notifications
-                {unreadCount > 0 ? (
-                  <span className="ml-auto text-xs font-semibold text-[var(--accent)]">
-                    {unreadCount}
-                  </span>
-                ) : null}
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setLocation("/settings")} className="min-h-[44px]">
-                <Settings className="mr-2 h-4 w-4" /> Settings
-              </DropdownMenuItem>
-              {user.role === "admin" && (
-                <DropdownMenuItem onSelect={() => setLocation("/admin")} className="min-h-[44px]">
-                  <Shield className="mr-2 h-4 w-4" /> Admin
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={onLogout} className="min-h-[44px]">
-                <LogOut className="mr-2 h-4 w-4" /> Sign Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <>
-            {/* Task #329: guests with on-device saves get a visible entry
-                point to their library (badge mirrors the notification one). */}
-            {guestSavedCount > 0 ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative h-9 w-9 min-h-[44px] min-w-[44px] touch-manipulation"
-                onClick={() => setLocation("/bookmarks")}
-                title={`${guestSavedCount} saved on this device`}
-                aria-label={`Saved resources, ${guestSavedCount} on this device`}
-                data-testid="button-guest-saved"
-              >
-                <Bookmark className="h-4 w-4" />
-                <span
-                  className="absolute right-0.5 top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-bold leading-none text-white"
-                  aria-hidden="true"
-                  data-testid="badge-guest-saved-count"
-                >
-                  {guestSavedCount > 99 ? "99+" : guestSavedCount}
-                </span>
-              </Button>
-            ) : null}
-            {/* BUG-025 (run9): "Sign in" everywhere — matches the sign-in page
-                and sign-up flow instead of mixing "Login" and "Sign in". */}
-            <Button variant="ghost" size="sm" onClick={() => {
-              // BUG-023 (run13): carry the current page as redirect_url so
-              // signing in returns the user here (Clerk honors redirect_url).
-              const here = window.location.pathname + window.location.search;
-              const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
-              setLocation(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
-            }} aria-label="Sign in" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
-              <LogIn className="h-4 w-4" />
-              <span className="hidden sm:inline">Sign in</span>
-            </Button>
-          </>
-        )}
-      </div>
-    </header>
-    {logoutError ? (
-      <div
-        className="w-full border-b border-destructive/40 bg-destructive/10 px-4 py-2 text-center text-sm font-medium text-destructive"
-        role="alert"
-        data-testid="banner-logout-error"
-      >
-        Sign out failed. {logoutError}
-      </div>
-    ) : null}
-    </>
+  const count = categories
+    .filter(c => !["Table of contents", "Contributing", "License", "External Links", "Anti-features"].includes(c.name) && !c.name.startsWith("List of"))
+    .reduce((sum, node) => sum + totalCount(node), 0);
+  const firstName = user?.name?.trim() ? user.name.trim().split(/\s+/)[0] : "Account";
+  const role = user?.role === "admin" ? "Admin" : user ? "Member" : "Visitor";
+  const signIn = () => {
+    const here = window.location.pathname + window.location.search;
+    const skipNext = here === "/" || here.startsWith("/sign-in") || here.startsWith("/sign-up");
+    navigate(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
+  };
+  const navLink = (href: string, label: string) => (
+    <Link href={href} className={`nav-link${location === href || (href === "/categories" && location === "/") ? " active" : ""}`} aria-current={location === href ? "page" : undefined}>{label}</Link>
   );
+
+  return <>
+    <header className="app-canonical-header">
+      <span className="header-menu-control">
+        <SidebarTrigger className="mobile-menu-btn" data-testid="mobile-drawer-trigger" aria-label="Toggle sidebar" />
+        <svg className="header-menu-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M2 4 H14 M2 8 H14 M2 12 H14" /></svg>
+      </span>
+      <Link href="/" className="header-brand" aria-label="Awesome Video — home" data-testid="header-brand">
+        <span className="header-logo" aria-hidden="true" data-testid="brand-mark">av</span>
+        <span className="header-wordmark hide-tablet">AWESOME.VIDEO</span>
+      </Link>
+      <div className="header-spacer" />
+      {/* One responsive control preserves the existing search selector and focus
+          restoration contract without a hidden duplicate winning querySelector. */}
+      <button type="button" onClick={onSearchOpen} className="header-search-trigger" aria-label="Open search">
+        <SearchIcon />
+        <span className="header-search-label">Search <span>{categories.length ? count.toLocaleString() : "…"} resources…</span></span>
+        <span className="header-kbd hide-mobile">⌘K</span>
+      </button>
+      <nav className="header-nav hide-tablet" aria-label="Primary">
+        {navLink("/categories", "Browse")}
+        {navLink("/submit", "Submit")}
+        {navLink("/about", "About")}
+        <a className="nav-link" href="/design-system" target="_blank" rel="noopener noreferrer">Docs ↗</a>
+        {user?.role === "admin" && <Link href="/admin" className={`nav-link${location.startsWith("/admin") ? " active" : ""}`}>Admin<span className="header-live-dot" aria-hidden="true" /></Link>}
+      </nav>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <button type="button" className="user-pill" aria-label={`Account · ${role}`}>
+            {user ? <Avatar className="header-avatar">
+              <AvatarImage src={user.avatar} alt="" />
+              <AvatarFallback>{firstName[0].toUpperCase()}</AvatarFallback>
+            </Avatar> : <span className="header-avatar"><LogIn size={12} aria-hidden="true" /></span>}
+            <span className="header-account-name hide-mobile">{user ? firstName : "Sign in"}</span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="header-account-menu w-56" align="end" sideOffset={8}>
+          <DropdownMenuLabel className="font-normal">
+            {user ? <div className="flex min-w-0 flex-col space-y-1">
+              <p className="truncate text-sm font-medium">{user.name?.trim() ? user.name : user.email}</p>
+              <p className="break-all text-xs text-muted-foreground">{user.email}</p>
+            </div> : "Your account"}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {!user && <DropdownMenuItem onSelect={signIn} aria-label="Sign in"><LogIn className="mr-2 h-4 w-4" />Sign in</DropdownMenuItem>}
+          {user && <>
+            <DropdownMenuItem onSelect={() => navigate("/profile")}><User className="mr-2 h-4 w-4" />Profile</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate("/bookmarks")}><Bookmark className="mr-2 h-4 w-4" />Bookmarks</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate("/notifications")} data-testid="button-notifications" aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"}>
+              <Bell className="mr-2 h-4 w-4" />Notifications
+              {unreadCount > 0 && <span className="ml-auto" data-testid="badge-notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate("/settings")}><Settings className="mr-2 h-4 w-4" />Settings</DropdownMenuItem>
+          </>}
+          {!user && guestSavedCount > 0 && <DropdownMenuItem onSelect={() => navigate("/bookmarks")} data-testid="button-guest-saved" aria-label={`Saved resources, ${guestSavedCount} on this device`}>
+            <Bookmark className="mr-2 h-4 w-4" />Saved resources <span className="ml-auto" data-testid="badge-guest-saved-count">{guestSavedCount > 99 ? "99+" : guestSavedCount}</span>
+          </DropdownMenuItem>}
+          <DropdownMenuItem onSelect={() => navigate("/settings/theme")} aria-label="Theme Settings" title={`Current design: ${systemId}`}><Palette className="mr-2 h-4 w-4" />Theme Settings</DropdownMenuItem>
+          {user?.role === "admin" && <DropdownMenuItem onSelect={() => navigate("/admin")}><Shield className="mr-2 h-4 w-4" />Admin</DropdownMenuItem>}
+          {user && <><DropdownMenuSeparator /><DropdownMenuItem onSelect={onLogout}><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem></>}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </header>
+    {logoutError && <div className="w-full border-b border-destructive/40 bg-destructive/10 px-4 py-2 text-center text-sm font-medium text-destructive" role="alert" data-testid="banner-logout-error">Sign out failed. {logoutError}</div>}
+  </>;
 }

@@ -90,24 +90,22 @@ function openingTagAround(source, anchor, tagName) {
 
 function auditSharedHeaderHeightSource() {
   const mainLayout = readClientSource("client/src/components/layout/new/MainLayout.tsx");
-  const appHeader = readClientSource("client/src/components/layout/new/AppHeader.tsx");
+  const headerStyles = readClientSource("client/src/styles/shell/header.css");
   const themeSettings = readClientSource("client/src/pages/ThemeSettings.tsx");
 
   const shellClass = mainLayout.match(
     /<SidebarProvider\b[\s\S]*?\bclassName="([^"]*)"/,
   )?.[1] ?? "";
   const definesPhone = shellClass.split(/\s+/).includes("[--header-height:56px]");
-  const definesTablet = shellClass.split(/\s+/).includes("md:[--header-height:60px]");
+  const definesTablet = shellClass.split(/\s+/).includes("min-[769px]:[--header-height:60px]");
   log(
     "shared-header-height-shell-source",
     definesPhone && definesTablet,
     `phoneVariable=${definesPhone} tabletVariable=${definesTablet}`,
   );
 
-  const headerClass = appHeader.match(/<header\b\s+className="([^"]*)"/)?.[1] ?? "";
-  const headerConsumesVariable = headerClass
-    .split(/\s+/)
-    .includes("h-[var(--header-height)]");
+  const headerConsumesVariable =
+    /\.app-canonical-header\s*\{[\s\S]*?height:\s*var\(--shell-header-h\)/.test(headerStyles);
   log(
     "shared-header-height-header-source",
     headerConsumesVariable,
@@ -254,9 +252,9 @@ async function auditViewport(width, height, expectedOffset) {
 
 try {
   // Keep the existing phone regression check intact, and also exercise the
-  // visible md breakpoint where both the header and preview use a 60px offset.
+  // exact canonical 768px breakpoint where both use the 56px header offset.
   await auditViewport(375, 812, 56);
-  await auditViewport(768, 900, 60);
+  await auditViewport(768, 900, 56);
 } finally {
   fs.writeFileSync(`${OUT}/sticky-preview-audit.json`, JSON.stringify(results, null, 2));
   await browser.close();

@@ -1,0 +1,32 @@
+{
+  "widths": [
+    {
+      "width": 375,
+      "differentPixels": 1127,
+      "percent": 5.366666666666667
+    },
+    {
+      "width": 768,
+      "differentPixels": 1162,
+      "percent": 2.701822916666667
+    },
+    {
+      "width": 1024,
+      "differentPixels": 1431,
+      "percent": 2.3291015625
+    },
+    {
+      "width": 1440,
+      "differentPixels": 2306,
+      "percent": 2.6689814814814814
+    }
+  ],
+  "menuMinHeight": 44,
+  "signOut": true,
+  "adminHiddenAfterSignOut": true,
+  "teardown": {
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "errors": []
+  }
+}

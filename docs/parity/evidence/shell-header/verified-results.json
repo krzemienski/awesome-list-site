@@ -1,0 +1,33 @@
+{
+  "widths": [
+    {
+      "width": 375,
+      "differentPixels": 39,
+      "percent": 0.18571428571428572,
+      "stable": true
+    },
+    {
+      "width": 768,
+      "differentPixels": 39,
+      "percent": 0.09068080357142858,
+      "stable": true
+    },
+    {
+      "width": 1024,
+      "differentPixels": 69,
+      "percent": 0.11230468749999999,
+      "stable": true
+    },
+    {
+      "width": 1440,
+      "differentPixels": 181,
+      "percent": 0.20949074074074073,
+      "stable": true
+    }
+  ],
+  "teardown": {
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "errors": []
+  }
+}

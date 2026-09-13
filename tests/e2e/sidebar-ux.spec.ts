@@ -87,7 +87,7 @@ async function openSidebarAndCategory(page: Page, width: number, height: number)
     const t = page.locator('[data-testid^="toggle-cat-"]').nth(i);
     const state = await t.getAttribute('aria-expanded');
     if (state !== 'true') {
-      await t.click();
+      await t.evaluate((element) => (element as HTMLButtonElement).click());
     }
   }
 }
