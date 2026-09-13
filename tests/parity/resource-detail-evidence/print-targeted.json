@@ -1,0 +1,11 @@
+{
+  "route": "/resource/185020",
+  "viewport": [1440, 900],
+  "media": "print",
+  "check": "Real Chromium evaluate after content-header wrapper correction",
+  "headers": ["none"],
+  "headingVisible": "block",
+  "columnWidth": 880,
+  "font": "Inter, system-ui, sans-serif",
+  "scope": "Only the previously failing header-hidden predicate and retained content visibility; not a second full print-audit run."
+}

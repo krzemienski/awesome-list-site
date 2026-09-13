@@ -1,0 +1,135 @@
+/* Resource detail only. Shared shell and related-card skins are owned elsewhere. */
+.resource-detail {
+  width: 100%;
+  max-width: 880px;
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--text);
+}
+
+.resource-detail-navigation { margin-bottom: 28px; }
+
+.resource-detail-heading h1 {
+  margin-block: 18px;
+  font-family: var(--font-body);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  letter-spacing: -1.2px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-rule { width: 200px; max-width: 100%; margin-bottom: 24px; }
+
+.resource-detail-chips,
+.resource-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.resource-detail .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.resource-detail .chip.accent {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.resource-detail-navigation button,
+.resource-detail-actions > button {
+  background: transparent;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+}
+
+.resource-detail-navigation button,
+.resource-detail-actions > button,
+.resource-detail-actions > a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+}
+
+.resource-detail-actions > button[aria-pressed="true"] {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.resource-detail-navigation button:hover,
+.resource-detail-actions > button:hover { background: var(--surface); }
+
+.resource-detail-body { display: grid; gap: 24px; min-width: 0; }
+.resource-detail-content { background: none; border: 0; box-shadow: none; }
+.resource-detail-sections { padding: 0; display: grid; gap: 16px; }
+.resource-detail-sections > [data-orientation="horizontal"] { display: none; }
+
+.resource-detail-description,
+.resource-detail-sections > div {
+  padding: 28px;
+  min-width: 0;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.resource-detail-description h2,
+.resource-detail-sections h2 {
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1.4px;
+  line-height: var(--body-leading);
+  text-transform: uppercase;
+}
+
+.resource-detail-sections h2 svg { display: none; }
+.resource-detail-description { margin-bottom: 16px; }
+.resource-detail-image-shade { background: linear-gradient(to top, var(--bg), transparent); }
+.resource-detail-description [data-testid="text-description"] {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.resource-detail-sections dt {
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.resource-detail-sections [data-testid="link-url"] {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.resource-detail-sections [data-testid="link-url"] svg { display: inline; margin-left: 8px; }
+.resource-detail-related { display: grid; gap: 24px; min-width: 0; }
+.resource-detail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

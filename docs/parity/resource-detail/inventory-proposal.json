@@ -1,0 +1,16 @@
+{
+  "screenId": "app.resource.detail",
+  "eligibility": "pixel",
+  "actualPath": "/resource/185020",
+  "actualReadySelector": ".resource-detail h1",
+  "widths": [375, 768, 1024, 1440],
+  "status": "owned-layout-implemented-full-page-gate-open",
+  "stylesheet": "client/src/styles/pages/resource.css",
+  "handoff": "WORKLOG.md",
+  "residuals": [
+    "Required primary and secondary action row",
+    "Resolved kind and linked sub-taxonomy chips",
+    "Classification facts, dates, bookmark notes and related recommendations",
+    "Unmerged shared shell, footer and related card styling"
+  ]
+}

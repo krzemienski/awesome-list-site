@@ -20,7 +20,6 @@ import {
   Heart,
   Share2,
   Edit,
-  Globe,
   Tag,
   Image as ImageIcon,
   Link2,
@@ -34,7 +33,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useFavoriteToggle, useBookmarkToggle } from "@/hooks/useResourceToggle";
-import { trackSelectContent, trackShare, trackResourceFavorite } from "@/lib/analytics";
+import { trackSelectContent, trackShare, trackResourceFavorite, trackResourceClick } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { slugify, formatAdminDate } from "@/lib/utils";
@@ -53,6 +52,8 @@ import {
   type ResourceSkillLevel,
 } from "@shared/resourceFacets";
 import { tagLandingPath } from "@shared/tagNormalize";
+import type { ResourceKind } from "@shared/resourceKinds";
+import "@/styles/pages/resource.css";
 
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
@@ -63,7 +64,7 @@ export default function ResourceDetail() {
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const { data: resource, isLoading, error } = useQuery<Resource>({
+  const { data: resource, isLoading, error } = useQuery<Resource & { resolvedKind?: ResourceKind; featured?: boolean }>({
     queryKey: ['/api/resources', id],
     queryFn: async () => {
       const response = await fetch(`/api/resources/${id}`, { credentials: 'include' });
@@ -443,6 +444,9 @@ export default function ResourceDetail() {
   // asChild), so navigation is native and can never silently no-op;
   // middle-click/cmd-click also work. The click handler only fires the toast.
   const handleVisitResource = () => {
+    if (resource) {
+      trackResourceClick(resource.title, resource.url, resource.category ?? "uncategorized");
+    }
     toast({
       title: "Opening resource",
       description: "Opening in a new tab"
@@ -469,7 +473,6 @@ export default function ResourceDetail() {
 
   const metadata = resource?.metadata as Record<string, any> | undefined;
   const hasOgImage = metadata?.ogImage;
-  const hasFavicon = metadata?.favicon;
   const scrapedTitle = metadata?.scrapedTitle || metadata?.ogTitle;
   const scrapedDescription = metadata?.scrapedDescription || metadata?.ogDescription;
   const urlScraped = metadata?.urlScraped;
@@ -555,13 +558,13 @@ export default function ResourceDetail() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
+    <div className="resource-detail">
       <SEOHead 
         title={`${resource.title}`}
         description={resourceSeoDescription(resource.title, resource.description)}
       />
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="resource-detail-navigation">
         {/* BUG-011 (run13): "Back" now behaves like a real back button —
             history.back() when there is history, home as the fallback for
             direct/deep-linked visits. */}
@@ -582,11 +585,53 @@ export default function ResourceDetail() {
             }
           }}
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3 w-3" />
           Back
         </Button>
-        
-        <div className="flex flex-wrap items-center gap-2">
+      </div>
+
+      <div className="resource-detail-heading">
+        <div className="eyebrow">RESOURCE · DETAIL</div>
+        <h1 data-testid="text-resource-title">{resource.title}</h1>
+        <div className="shimmer-line resource-detail-rule" aria-hidden="true" />
+        <div className="resource-detail-chips">
+          {resource.category && (
+            <Link href={`/category/${slugify(resource.category)}`} className="chip" data-testid="badge-category">
+              <FolderTree size={12} aria-hidden="true" />{resource.category}
+            </Link>
+          )}
+          {resource.featured && <span className="chip accent">★ FEATURED</span>}
+          {resource.resolvedKind && (
+            <span className="chip" data-kind-source="resolvedKind">{resource.resolvedKind}</span>
+          )}
+          {resource.subcategory && (
+            taxonomySlugs.subcategory
+              ? <Link className="chip" href={`/subcategory/${taxonomySlugs.subcategory}`} data-testid="badge-subcategory">{resource.subcategory}</Link>
+              : <span className="chip" data-testid="badge-subcategory">{resource.subcategory}</span>
+          )}
+          {resource.subSubcategory && (
+            taxonomySlugs.subSubcategory
+              ? <Link className="chip" href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} data-testid="badge-sub-subcategory">{resource.subSubcategory}</Link>
+              : <span className="chip" data-testid="badge-sub-subcategory">{resource.subSubcategory}</span>
+          )}
+        </div>
+      </div>
+
+      <section className="resource-detail-description">
+        <h2>DESCRIPTION</h2>
+        <p data-testid="text-description">
+          {resource.description || 'No description available for this resource.'}
+        </p>
+      </section>
+
+      <div>
+        <div className="resource-detail-actions">
+          <Button asChild>
+            <a href={resource.url} target="_blank" rel="noopener noreferrer"
+              onClick={handleVisitResource} data-testid="button-visit">
+              Open resource <ExternalLink size={14} aria-hidden="true" />
+            </a>
+          </Button>
           {/* R2-L09: favorite/bookmark shown to anonymous users too — clicks
               prompt sign-in instead of hiding the affordance. */}
           <Button
@@ -693,9 +738,9 @@ export default function ResourceDetail() {
         collectionsLoading={collectionsLoading}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="overflow-hidden">
+      <div className="resource-detail-body">
+        <div>
+          <Card className="resource-detail-content">
             {hasOgImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent">
                 {metadata.ogImageBlurhash && !imageLoaded && (
@@ -720,118 +765,11 @@ export default function ResourceDetail() {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <div className="resource-detail-image-shade absolute inset-0" />
               </div>
             )}
             
-            <CardHeader className={hasOgImage ? "-mt-16 relative z-10" : ""}>
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-3">
-                      {hasFavicon && (
-                        <img 
-                          src={metadata.favicon} 
-                          alt=""
-                          className="w-8 h-8 rounded"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      )}
-                      <h1 className="display-h text-xl sm:text-2xl md:text-3xl" data-testid="text-resource-title">
-                        {resource.title}
-                      </h1>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {resource.category && (
-                        <Link href={`/category/${slugify(resource.category)}`} className="inline-flex items-center min-h-[32px]">
-                          <Badge 
-                            variant="secondary" 
-                            className="cursor-pointer hover:bg-secondary/80"
-                            data-testid="badge-category"
-                          >
-                            <FolderTree className="h-3 w-3 mr-1" />
-                            {resource.category}
-                          </Badge>
-                        </Link>
-                      )}
-                      {resource.subcategory && (
-                        taxonomySlugs.subcategory ? (
-                          <Link href={`/subcategory/${taxonomySlugs.subcategory}`} className="inline-flex items-center min-h-[32px]">
-                            <Badge
-                              variant="outline"
-                              className="cursor-pointer hover:bg-secondary/80"
-                              data-testid="badge-subcategory"
-                            >
-                              {resource.subcategory}
-                            </Badge>
-                          </Link>
-                        ) : (
-                          <Badge variant="outline" data-testid="badge-subcategory">
-                            {resource.subcategory}
-                          </Badge>
-                        )
-                      )}
-                      {resource.subSubcategory && (
-                        taxonomySlugs.subSubcategory ? (
-                          <Link href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`} className="inline-flex items-center min-h-[32px]">
-                            <Badge
-                              variant="outline"
-                              className="cursor-pointer hover:bg-secondary/80"
-                              data-testid="badge-sub-subcategory"
-                            >
-                              {resource.subSubcategory}
-                            </Badge>
-                          </Link>
-                        ) : (
-                          <Badge variant="outline" data-testid="badge-sub-subcategory">
-                            {resource.subSubcategory}
-                          </Badge>
-                        )
-                      )}
-                      {/* BUG-044 (run19): the admin-only "approved" badge leaked
-                          internal moderation vocabulary onto the public page.
-                          Moderation state now lives only in /admin (the "Edit
-                          in Admin" button below covers the workflow jump). */}
-                    </div>
-                  </div>
-                  
-                  <Button
-                    asChild
-                    className="flex-shrink-0 min-h-[44px]"
-                  >
-                    <a
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={handleVisitResource}
-                      data-testid="button-visit"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Visit Resource</span>
-                      <span className="sm:hidden">Visit</span>
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            
-            <Separator />
-            
-            <CardContent className="pt-6 space-y-6">
-              <div>
-                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-primary" />
-                  Description
-                </h2>
-                <CardDescription className="text-base leading-relaxed" data-testid="text-description">
-                  {resource.description || 'No description available for this resource.'}
-                </CardDescription>
-              </div>
-
-              <Separator />
-
+            <CardContent className="resource-detail-sections">
               <div data-seo-section="resource-details">
                 <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <FolderTree className="h-4 w-4 text-primary" />
@@ -930,12 +868,13 @@ export default function ResourceDetail() {
               <div>
                 <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
                   <Link2 className="h-4 w-4 text-primary" />
-                  URL
+                  Canonical URL
                 </h2>
                 <a 
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={handleVisitResource}
                   className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base min-h-[32px]"
                   data-testid="link-url"
                 >
@@ -955,13 +894,12 @@ export default function ResourceDetail() {
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag, index) => (
                         <Link key={index} href={tagLandingPath(tag)}>
-                          <Badge
-                            variant="outline"
-                            className="text-xs border-primary/30 text-primary cursor-pointer hover:bg-primary/10"
+                          <span
+                            className="chip accent"
                             data-testid={`tag-link-${index}`}
                           >
                             #{tag}
-                          </Badge>
+                          </span>
                         </Link>
                       ))}
                     </div>
@@ -1013,7 +951,7 @@ export default function ResourceDetail() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="resource-detail-related">
           {/* BUG-034 (run19): the "Quick Actions" card was removed — it held a
               single "Visit Resource" button duplicating the header CTA, so the
               page offered the same P0 action twice. The header button is now

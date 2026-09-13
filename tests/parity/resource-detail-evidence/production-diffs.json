@@ -1,0 +1,42 @@
+[
+  {
+    "resource": 185020,
+    "width": 375,
+    "canvas": [
+      375,
+      2799
+    ],
+    "differentPixels": 150995,
+    "differencePercent": 14.385613909729665
+  },
+  {
+    "resource": 185020,
+    "width": 1440,
+    "canvas": [
+      1440,
+      2355
+    ],
+    "differentPixels": 1595038,
+    "differencePercent": 47.03461901391838
+  },
+  {
+    "resource": 186190,
+    "width": 375,
+    "canvas": [
+      375,
+      2490
+    ],
+    "differentPixels": 139443,
+    "differencePercent": 14.933654618473895
+  },
+  {
+    "resource": 186190,
+    "width": 1440,
+    "canvas": [
+      1440,
+      2105
+    ],
+    "differentPixels": 1222760,
+    "differencePercent": 40.33913961467405
+  }
+]
