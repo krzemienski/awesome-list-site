@@ -1,0 +1,206 @@
+[
+  {
+    "width": 375,
+    "view": "showcase",
+    "comparison": "before",
+    "actualSize": [
+      720,
+      20683
+    ],
+    "expectedSize": [
+      720,
+      20683
+    ],
+    "differentPixels": 154,
+    "unionPixels": 14891760,
+    "percent": 0.0010341289411056854,
+    "pass": true
+  },
+  {
+    "width": 375,
+    "view": "showcase",
+    "comparison": "reference",
+    "actualSize": [
+      720,
+      20683
+    ],
+    "expectedSize": [
+      741,
+      20425
+    ],
+    "differentPixels": 3962334,
+    "unionPixels": 15326103,
+    "percent": 25.853499744847074,
+    "pass": false
+  },
+  {
+    "width": 375,
+    "view": "anatomy",
+    "comparison": "before",
+    "actualSize": [
+      375,
+      5407
+    ],
+    "expectedSize": [
+      375,
+      5407
+    ],
+    "differentPixels": 154,
+    "unionPixels": 2027625,
+    "percent": 0.007595092780962949,
+    "pass": true
+  },
+  {
+    "width": 768,
+    "view": "showcase",
+    "comparison": "before",
+    "actualSize": [
+      768,
+      12835
+    ],
+    "expectedSize": [
+      768,
+      12835
+    ],
+    "differentPixels": 180,
+    "unionPixels": 9857280,
+    "percent": 0.0018260615504479937,
+    "pass": true
+  },
+  {
+    "width": 768,
+    "view": "showcase",
+    "comparison": "reference",
+    "actualSize": [
+      768,
+      12835
+    ],
+    "expectedSize": [
+      768,
+      12723
+    ],
+    "differentPixels": 668320,
+    "unionPixels": 9857280,
+    "percent": 6.7799636410855735,
+    "pass": false
+  },
+  {
+    "width": 768,
+    "view": "anatomy",
+    "comparison": "before",
+    "actualSize": [
+      768,
+      3897
+    ],
+    "expectedSize": [
+      768,
+      3897
+    ],
+    "differentPixels": 180,
+    "unionPixels": 2992896,
+    "percent": 0.006014241724403387,
+    "pass": true
+  },
+  {
+    "width": 1024,
+    "view": "showcase",
+    "comparison": "before",
+    "actualSize": [
+      1024,
+      12148
+    ],
+    "expectedSize": [
+      1024,
+      12148
+    ],
+    "differentPixels": 185,
+    "unionPixels": 12439552,
+    "percent": 0.001487191821699045,
+    "pass": true
+  },
+  {
+    "width": 1024,
+    "view": "showcase",
+    "comparison": "reference",
+    "actualSize": [
+      1024,
+      12148
+    ],
+    "expectedSize": [
+      1024,
+      12036
+    ],
+    "differentPixels": 733647,
+    "unionPixels": 12439552,
+    "percent": 5.897696315751564,
+    "pass": false
+  },
+  {
+    "width": 1024,
+    "view": "anatomy",
+    "comparison": "before",
+    "actualSize": [
+      1024,
+      3907
+    ],
+    "expectedSize": [
+      1024,
+      3907
+    ],
+    "differentPixels": 180,
+    "unionPixels": 4000768,
+    "percent": 0.004499136165856156,
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "view": "showcase",
+    "comparison": "before",
+    "actualSize": [
+      1440,
+      11506
+    ],
+    "expectedSize": [
+      1440,
+      11506
+    ],
+    "differentPixels": 185,
+    "unionPixels": 16568640,
+    "percent": 0.0011165672016532437,
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "view": "showcase",
+    "comparison": "reference",
+    "actualSize": [
+      1440,
+      11506
+    ],
+    "expectedSize": [
+      1440,
+      11378
+    ],
+    "differentPixels": 875264,
+    "unionPixels": 16568640,
+    "percent": 5.2826544604747285,
+    "pass": false
+  },
+  {
+    "width": 1440,
+    "view": "anatomy",
+    "comparison": "before",
+    "actualSize": [
+      1440,
+      3861
+    ],
+    "expectedSize": [
+      1440,
+      3861
+    ],
+    "differentPixels": 180,
+    "unionPixels": 5559840,
+    "percent": 0.0032375032375032376,
+    "pass": true
+  }
+]

@@ -1,0 +1,894 @@
+{
+  "errors": [],
+  "combos": [
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "saved": {
+        "system": "editorial",
+        "accent": "crimson"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#ff3d52"
+    },
+    {
+      "system": "editorial",
+      "accent": "magenta",
+      "saved": {
+        "system": "editorial",
+        "accent": "magenta"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#ec4899"
+    },
+    {
+      "system": "editorial",
+      "accent": "orange",
+      "saved": {
+        "system": "editorial",
+        "accent": "orange"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#ff7a3d"
+    },
+    {
+      "system": "editorial",
+      "accent": "amber",
+      "saved": {
+        "system": "editorial",
+        "accent": "amber"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#ffb84d"
+    },
+    {
+      "system": "editorial",
+      "accent": "emerald",
+      "saved": {
+        "system": "editorial",
+        "accent": "emerald"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#34d08c"
+    },
+    {
+      "system": "editorial",
+      "accent": "matrix",
+      "saved": {
+        "system": "editorial",
+        "accent": "matrix"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#00ff88"
+    },
+    {
+      "system": "editorial",
+      "accent": "cyan",
+      "saved": {
+        "system": "editorial",
+        "accent": "cyan"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#5eddf2"
+    },
+    {
+      "system": "editorial",
+      "accent": "violet",
+      "saved": {
+        "system": "editorial",
+        "accent": "violet"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#9d4edd"
+    },
+    {
+      "system": "editorial",
+      "accent": "lime",
+      "saved": {
+        "system": "editorial",
+        "accent": "lime"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#aaff00"
+    },
+    {
+      "system": "editorial",
+      "accent": "rose",
+      "saved": {
+        "system": "editorial",
+        "accent": "rose"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Fraunces', Georgia, serif",
+      "color": "#ff7a8a"
+    },
+    {
+      "system": "terminal",
+      "accent": "crimson",
+      "saved": {
+        "system": "terminal",
+        "accent": "crimson"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#ff3d52"
+    },
+    {
+      "system": "terminal",
+      "accent": "magenta",
+      "saved": {
+        "system": "terminal",
+        "accent": "magenta"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#ec4899"
+    },
+    {
+      "system": "terminal",
+      "accent": "orange",
+      "saved": {
+        "system": "terminal",
+        "accent": "orange"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#ff7a3d"
+    },
+    {
+      "system": "terminal",
+      "accent": "amber",
+      "saved": {
+        "system": "terminal",
+        "accent": "amber"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#ffb84d"
+    },
+    {
+      "system": "terminal",
+      "accent": "emerald",
+      "saved": {
+        "system": "terminal",
+        "accent": "emerald"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#34d08c"
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "saved": {
+        "system": "terminal",
+        "accent": "matrix"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#00ff88"
+    },
+    {
+      "system": "terminal",
+      "accent": "cyan",
+      "saved": {
+        "system": "terminal",
+        "accent": "cyan"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#5eddf2"
+    },
+    {
+      "system": "terminal",
+      "accent": "violet",
+      "saved": {
+        "system": "terminal",
+        "accent": "violet"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#9d4edd"
+    },
+    {
+      "system": "terminal",
+      "accent": "lime",
+      "saved": {
+        "system": "terminal",
+        "accent": "lime"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#aaff00"
+    },
+    {
+      "system": "terminal",
+      "accent": "rose",
+      "saved": {
+        "system": "terminal",
+        "accent": "rose"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'IBM Plex Mono', ui-monospace, monospace",
+      "color": "#ff7a8a"
+    },
+    {
+      "system": "geist",
+      "accent": "crimson",
+      "saved": {
+        "system": "geist",
+        "accent": "crimson"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#ff3d52"
+    },
+    {
+      "system": "geist",
+      "accent": "magenta",
+      "saved": {
+        "system": "geist",
+        "accent": "magenta"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#ec4899"
+    },
+    {
+      "system": "geist",
+      "accent": "orange",
+      "saved": {
+        "system": "geist",
+        "accent": "orange"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#ff7a3d"
+    },
+    {
+      "system": "geist",
+      "accent": "amber",
+      "saved": {
+        "system": "geist",
+        "accent": "amber"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#ffb84d"
+    },
+    {
+      "system": "geist",
+      "accent": "emerald",
+      "saved": {
+        "system": "geist",
+        "accent": "emerald"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#34d08c"
+    },
+    {
+      "system": "geist",
+      "accent": "matrix",
+      "saved": {
+        "system": "geist",
+        "accent": "matrix"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#00ff88"
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "saved": {
+        "system": "geist",
+        "accent": "cyan"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#5eddf2"
+    },
+    {
+      "system": "geist",
+      "accent": "violet",
+      "saved": {
+        "system": "geist",
+        "accent": "violet"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#9d4edd"
+    },
+    {
+      "system": "geist",
+      "accent": "lime",
+      "saved": {
+        "system": "geist",
+        "accent": "lime"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#aaff00"
+    },
+    {
+      "system": "geist",
+      "accent": "rose",
+      "saved": {
+        "system": "geist",
+        "accent": "rose"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Geist', 'Inter', system-ui, sans-serif",
+      "color": "#ff7a8a"
+    },
+    {
+      "system": "brutalist",
+      "accent": "crimson",
+      "saved": {
+        "system": "brutalist",
+        "accent": "crimson"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#ff3d52"
+    },
+    {
+      "system": "brutalist",
+      "accent": "magenta",
+      "saved": {
+        "system": "brutalist",
+        "accent": "magenta"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#ec4899"
+    },
+    {
+      "system": "brutalist",
+      "accent": "orange",
+      "saved": {
+        "system": "brutalist",
+        "accent": "orange"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#ff7a3d"
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "saved": {
+        "system": "brutalist",
+        "accent": "amber"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#ffb84d"
+    },
+    {
+      "system": "brutalist",
+      "accent": "emerald",
+      "saved": {
+        "system": "brutalist",
+        "accent": "emerald"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#34d08c"
+    },
+    {
+      "system": "brutalist",
+      "accent": "matrix",
+      "saved": {
+        "system": "brutalist",
+        "accent": "matrix"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#00ff88"
+    },
+    {
+      "system": "brutalist",
+      "accent": "cyan",
+      "saved": {
+        "system": "brutalist",
+        "accent": "cyan"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#5eddf2"
+    },
+    {
+      "system": "brutalist",
+      "accent": "violet",
+      "saved": {
+        "system": "brutalist",
+        "accent": "violet"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#9d4edd"
+    },
+    {
+      "system": "brutalist",
+      "accent": "lime",
+      "saved": {
+        "system": "brutalist",
+        "accent": "lime"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#aaff00"
+    },
+    {
+      "system": "brutalist",
+      "accent": "rose",
+      "saved": {
+        "system": "brutalist",
+        "accent": "rose"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Instrument Serif', 'Times New Roman', serif",
+      "color": "#ff7a8a"
+    },
+    {
+      "system": "swiss",
+      "accent": "crimson",
+      "saved": {
+        "system": "swiss",
+        "accent": "crimson"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#ff3d52"
+    },
+    {
+      "system": "swiss",
+      "accent": "magenta",
+      "saved": {
+        "system": "swiss",
+        "accent": "magenta"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#ec4899"
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "saved": {
+        "system": "swiss",
+        "accent": "orange"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#ff7a3d"
+    },
+    {
+      "system": "swiss",
+      "accent": "amber",
+      "saved": {
+        "system": "swiss",
+        "accent": "amber"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#ffb84d"
+    },
+    {
+      "system": "swiss",
+      "accent": "emerald",
+      "saved": {
+        "system": "swiss",
+        "accent": "emerald"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#34d08c"
+    },
+    {
+      "system": "swiss",
+      "accent": "matrix",
+      "saved": {
+        "system": "swiss",
+        "accent": "matrix"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#00ff88"
+    },
+    {
+      "system": "swiss",
+      "accent": "cyan",
+      "saved": {
+        "system": "swiss",
+        "accent": "cyan"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#5eddf2"
+    },
+    {
+      "system": "swiss",
+      "accent": "violet",
+      "saved": {
+        "system": "swiss",
+        "accent": "violet"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#9d4edd"
+    },
+    {
+      "system": "swiss",
+      "accent": "lime",
+      "saved": {
+        "system": "swiss",
+        "accent": "lime"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#aaff00"
+    },
+    {
+      "system": "swiss",
+      "accent": "rose",
+      "saved": {
+        "system": "swiss",
+        "accent": "rose"
+      },
+      "app": [
+        "terminal",
+        "matrix"
+      ],
+      "font": "'Manrope', system-ui, sans-serif",
+      "color": "#ff7a8a"
+    }
+  ],
+  "captures": [
+    {
+      "width": 375,
+      "view": "showcase",
+      "geometry": {
+        "viewport": 375,
+        "width": 720,
+        "height": 20683
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    },
+    {
+      "width": 375,
+      "view": "anatomy",
+      "geometry": {
+        "viewport": 375,
+        "width": 375,
+        "height": 5407
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    },
+    {
+      "width": 768,
+      "view": "showcase",
+      "geometry": {
+        "viewport": 768,
+        "width": 768,
+        "height": 12835
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    },
+    {
+      "width": 768,
+      "view": "anatomy",
+      "geometry": {
+        "viewport": 768,
+        "width": 768,
+        "height": 3897
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    },
+    {
+      "width": 1024,
+      "view": "showcase",
+      "geometry": {
+        "viewport": 1024,
+        "width": 1024,
+        "height": 12148
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    },
+    {
+      "width": 1024,
+      "view": "anatomy",
+      "geometry": {
+        "viewport": 1024,
+        "width": 1024,
+        "height": 3907
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    },
+    {
+      "width": 1440,
+      "view": "showcase",
+      "geometry": {
+        "viewport": 1440,
+        "width": 1440,
+        "height": 11506
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    },
+    {
+      "width": 1440,
+      "view": "anatomy",
+      "geometry": {
+        "viewport": 1440,
+        "width": 1440,
+        "height": 3861
+      },
+      "fontRequest": "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Geist:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    }
+  ],
+  "accessibility": [
+    {
+      "width": 375,
+      "view": "showcase",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".active.ds-system-pill > span:nth-child(3)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "div:nth-child(4) > div:nth-child(3) > div:nth-child(4) > div:nth-child(1) > div > div > div > span:nth-child(2)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 375,
+      "view": "anatomy",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".active > span:nth-child(3)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "div:nth-child(4) > div:nth-child(3) > div:nth-child(4) > div:nth-child(1) > div > div > div > span:nth-child(2)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "view": "showcase",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".active.ds-system-pill > span:nth-child(3)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "div:nth-child(4) > div:nth-child(3) > div:nth-child(4) > div:nth-child(1) > div > div > div > span:nth-child(2)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "view": "anatomy",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".active > span:nth-child(3)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "div:nth-child(4) > div:nth-child(3) > div:nth-child(4) > div:nth-child(1) > div > div > div > span:nth-child(2)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.26 (foreground color: #4d1219, background color: #ff3d52, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "reload": {
+    "system": "swiss",
+    "accent": "rose"
+  },
+  "keyboard": {
+    "system": "editorial",
+    "accent": "crimson"
+  },
+  "history": true
+}

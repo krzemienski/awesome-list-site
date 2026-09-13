@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "artifact",
+  "summary": "PROPOSED ONLY: merge these two rows after reviewed anatomy reference composition and final pixel closure; preserve all documentation rows.",
+  "screens": [
+    {
+      "id": "artifact.showcase",
+      "kind": "artifact",
+      "eligibility": "pixel",
+      "actualPath": "/#showcase",
+      "referencePath": "/design-system.html",
+      "readySelector": "main.ds-shell"
+    },
+    {
+      "id": "artifact.anatomy.flows",
+      "kind": "artifact",
+      "eligibility": "pixel",
+      "actualPath": "/#anatomy",
+      "referencePath": "/design-system.html",
+      "readySelector": "main.ds-shell [data-canonical-section=\"anatomy\"]"
+    }
+  ]
+}

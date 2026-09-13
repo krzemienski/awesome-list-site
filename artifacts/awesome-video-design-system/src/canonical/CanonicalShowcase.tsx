@@ -1,6 +1,9 @@
 // @ts-nocheck
 import { useEffect, useMemo, useState } from "react";
-import { ACCENTS, DESIGN_SYSTEMS as RUNTIME_SYSTEMS, SYSTEM_DEFAULT_ACCENT, applyDesignSystem } from "../../../../client/src/lib/design-system";
+import { ACCENTS, DESIGN_SYSTEMS as RUNTIME_SYSTEMS } from "../../../../client/src/lib/design-system";
+import { Button, Card, Chip, Dot, Eyebrow, Kbd } from "./ShowcasePrimitives";
+import { useShowcaseTheme } from "./useShowcaseTheme";
+import showcaseStyles from "./ShowcaseParity.module.css";
 import tokenProjection from "../../tokens.json";
 const DESIGN_SYSTEMS = Object.fromEntries(Object.entries(RUNTIME_SYSTEMS).map(([id, meta]) => [id, { ...meta, vars: tokenProjection.themes[id].tokens }]));
 const TYPE_SCALE = [
@@ -211,7 +214,7 @@ function FlowNode({ sysId, label, sublabel, x, y, w = 140, h = 56, accent, varia
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 9, fontWeight: 400, marginTop: 3,
           // DS-OK: canonical per-system anatomy renderer value from awesome-list-site-ds/design-system-anatomy.jsx; pixel-gated against that source
-          color: sysId === 'brutalist' && isAccent ? 'rgba(0,0,0,0.7)' : s.textMuted,
+           color: sysId === 'brutalist' && isAccent ? txtColor : s.textMuted,
           letterSpacing: '0.08em',
           textTransform: sysId === 'brutalist' || sysId === 'terminal' ? 'uppercase' : 'none',
         }}>
@@ -717,10 +720,6 @@ window.FlowDiagramsSection = FlowDiagramsSection;
 /* Reusable showcase primitives                                       */
 /* ------------------------------------------------------------------ */
 
-function Eyebrow({ children }) {
-  return <div className="eyebrow" style={{ marginBottom: 14 }}>{children}</div>;
-}
-
 function SectionHead({ eyebrow, title, sub }) {
   return (
     <header style={{ marginBottom: 32 }}>
@@ -784,7 +783,7 @@ function SystemSwitcher({ system, accent, onSystem, onAccent }) {
             aria-pressed={system === k} onClick={() => onSystem(k)}>
             <span style={{ fontWeight: 600 }}>{sys.name}</span>
             <span style={{ opacity: 0.65 }}>·</span>
-            <span style={{ opacity: 0.7 }}>{sys.tag}</span>
+            <span className={showcaseStyles.systemTag} style={{ opacity: 0.7 }}>{sys.tag}</span>
           </button>
         ))}
       </div>
@@ -1160,13 +1159,13 @@ function Components() {
       <div style={{ marginBottom: 48 }}>
         <div className="mono" style={{ fontSize: 10, letterSpacing: '0.18em', color: 'var(--text-3)', marginBottom: 14 }}>BUTTONS</div>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button className="btn primary">Primary action</button>
-          <button className="btn">Default</button>
-          <button className="btn ghost">Ghost</button>
-          <button className="btn danger">Danger</button>
-          <button className="btn icon ghost" aria-label="search">
+          <Button variant="primary">Primary action</Button>
+          <Button>Default</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="danger">Danger</Button>
+          <Button variant="ghost" icon aria-label="search">
             <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11 L14 14"/></svg>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -1174,14 +1173,14 @@ function Components() {
       <div style={{ marginBottom: 48 }}>
         <div className="mono" style={{ fontSize: 10, letterSpacing: '0.18em', color: 'var(--text-3)', marginBottom: 14 }}>CHIPS</div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span className="chip">default</span>
-          <span className="chip accent">accent</span>
-          <span className="chip ok">ok · 12.4k</span>
-          <span className="chip warn">warn</span>
-          <span className="chip bad">bad</span>
-          <span className="chip muted">muted</span>
-          <span className="kbd">⌘K</span>
-          <span className="kbd">esc</span>
+          <Chip>default</Chip>
+          <Chip variant="accent">accent</Chip>
+          <Chip variant="ok">ok · 12.4k</Chip>
+          <Chip variant="warn">warn</Chip>
+          <Chip variant="bad">bad</Chip>
+          <Chip variant="muted">muted</Chip>
+          <Kbd>⌘K</Kbd>
+          <Kbd>esc</Kbd>
         </div>
       </div>
 
@@ -1241,7 +1240,7 @@ function Components() {
       {/* Table — list pattern, the core unit */}
       <div style={{ marginBottom: 48 }}>
         <div className="mono" style={{ fontSize: 10, letterSpacing: '0.18em', color: 'var(--text-3)', marginBottom: 14 }}>LIST PATTERN — the core unit of the site</div>
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <Card style={{ padding: 0, overflow: 'hidden' }}>
           <table className="table">
             <thead>
               <tr>
@@ -1270,7 +1269,7 @@ function Components() {
               ))}
             </tbody>
           </table>
-        </div>
+        </Card>
       </div>
 
       {/* Tabs */}
@@ -1293,15 +1292,15 @@ function Components() {
             <span className="mono" style={{ letterSpacing: '0.08em' }}>indexed · live</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-            <span className="dot ok" />
+            <Dot status="ok" />
             <span style={{ color: 'var(--text-2)' }}>up</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-            <span className="dot warn" />
+            <Dot status="warn" />
             <span style={{ color: 'var(--text-2)' }}>stale</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-            <span className="dot bad" />
+            <Dot status="bad" />
             <span style={{ color: 'var(--text-2)' }}>down</span>
           </span>
           <span className="caret" style={{ fontFamily: 'var(--font-mono)', fontSize: 13 }}>type to search</span>
@@ -1457,28 +1456,7 @@ function Footer({ system }) {
 /* ------------------------------------------------------------------ */
 
 export function CanonicalShowcase() {
-  const [system, setSystem] = useState(() => {
-    try { return localStorage.getItem('ds-system') || 'editorial'; } catch (e) { return 'editorial'; }
-  });
-  const [accent, setAccent] = useState(() => {
-    try { return localStorage.getItem('ds-accent') || 'crimson'; } catch (e) { return 'crimson'; }
-  });
-
-  useEffect(() => {
-    applyDesignSystem(system, accent);
-    try { localStorage.setItem('ds-system', system); } catch (e) {}
-    try { localStorage.setItem('ds-accent', accent); } catch (e) {}
-  }, [system, accent]);
-
-  /* When user picks a system, nudge accent to that system's natural default
-     UNLESS they've manually set a non-default accent already. */
-  const handleSystem = (k) => {
-    setSystem(k);
-    const naturalDefault = SYSTEM_DEFAULT_ACCENT?.[k];
-    /* Auto-shift accent only if current is the previous system's natural default */
-    const prevNatural = SYSTEM_DEFAULT_ACCENT?.[system];
-    if (naturalDefault && accent === prevNatural) setAccent(naturalDefault);
-  };
+  const { system, accent, setSystem: handleSystem, setAccent } = useShowcaseTheme();
 
   return (
     <div className="page">
@@ -1507,14 +1485,6 @@ export function CanonicalShowcase() {
 
 
 export function CanonicalAnatomy() {
-  const [system, setSystem] = useState(() => { try { return localStorage.getItem('ds-system') || 'editorial'; } catch { return 'editorial'; } });
-  const [accent, setAccent] = useState(() => { try { return localStorage.getItem('ds-accent') || 'crimson'; } catch { return 'crimson'; } });
-  useEffect(() => { applyDesignSystem(system, accent); }, [system, accent]);
-  const handleSystem = (nextSystem) => {
-    setSystem(nextSystem);
-    const natural = SYSTEM_DEFAULT_ACCENT[nextSystem];
-    const previousNatural = SYSTEM_DEFAULT_ACCENT[system];
-    if (natural && accent === previousNatural) setAccent(natural);
-  };
+  const { system, accent, setSystem: handleSystem, setAccent } = useShowcaseTheme();
   return <div className="page"><div className="grain" aria-hidden="true" /><SystemSwitcher system={system} accent={accent} onSystem={handleSystem} onAccent={setAccent} /><main className="ds-shell"><FlowDiagramsSection accent={accent} /><Footer system={system} /></main></div>;
 }
