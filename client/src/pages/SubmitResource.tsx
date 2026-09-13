@@ -47,6 +47,7 @@ import { trackGenerateLead } from "@/lib/analytics";
 import { serverConversionHeaders } from "@/lib/mixpanel";
 import SEOHead from "@/components/layout/SEOHead";
 import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
+import "@/styles/pages/submit.css";
 
 // BUG-009 (run10): reject raw HTML/script markup in text fields client-side
 // (mirrors the server-side guard — markup is never legitimate catalog content).
@@ -145,7 +146,7 @@ export default function SubmitResource() {
   const [showSuccess, setShowSuccess] = useState(false);
   // NB-054 (run18): styled discard-confirmation dialog state (replaces window.confirm)
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
-  const [duplicateResource, setDuplicateResource] = useState<{ id: number; title: string } | null>(null);
+  const [duplicateResource, setDuplicateResource] = useState(false);
 
   // Fetch categories
   const { data: categories = [] } = useQuery<Category[]>({
@@ -249,34 +250,30 @@ export default function SubmitResource() {
 
   // Check for duplicate URLs
   useEffect(() => {
+    let cancelled = false;
     const checkDuplicateUrl = async () => {
       // Only check if URL is valid and starts with https://
       if (!debouncedUrl?.startsWith("https://")) {
-        setDuplicateResource(null);
+        setDuplicateResource(false);
         return;
       }
 
       try {
         const response = await fetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
-        // BUG-025 (run10): the public check-url endpoint no longer returns
-        // internal moderation status, so the client type/UI dropped it too.
+        // The public endpoint exposes existence only, not resource details.
         const data = (await response.json()) as {
           exists?: boolean;
-          resource?: { id: number; title: string };
         };
 
-        if (data.exists && data.resource) {
-          setDuplicateResource(data.resource);
-        } else {
-          setDuplicateResource(null);
-        }
+        if (!cancelled) setDuplicateResource(data.exists === true);
       } catch {
         // Silently handle errors - don't block the user
-        setDuplicateResource(null);
+        if (!cancelled) setDuplicateResource(false);
       }
     };
 
     void checkDuplicateUrl();
+    return () => { cancelled = true; };
   }, [debouncedUrl]);
 
   // R4-055: draft persistence + unload guard so an accidental refresh, tab
@@ -527,24 +524,34 @@ export default function SubmitResource() {
     <>
       <SEOHead title={submitSeoTitle} description={submitSeoDescription} />
 
-      <div className="container max-w-2xl mx-auto px-4 py-12">
-        <h1 className="sr-only">Submit a Resource</h1>
+      <div className="submit-page">
+        <div className="submit-eyebrow">
+          <Plus aria-hidden="true" />
+          SUBMIT A RESOURCE
+        </div>
+        <h1 className="submit-title">
+          Add to the <span className="serif-italic submit-title-accent">index</span>
+        </h1>
+        <p className="submit-lede">
+          Submit a tool, library, paper, or talk. We hand-review every entry before it lands in the catalog.
+        </p>
+
         {/* Success Message */}
         {showSuccess && (
-          <Card className="mb-6 border-[#34d08c]/20 bg-[#34d08c]/5"> {/* DS-OK: status ok */}
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="h-6 w-6 text-[#34d08c]" /> {/* DS-OK: status ok */}
+          <Card className="submit-success-card"> {/* DS-OK: status ok */}
+            <CardHeader className="submit-success-header">
+              <div className="submit-success-heading">
+                <CheckCircle aria-hidden="true" />
                 <div>
-                  <CardTitle className="text-[#34d08c]">Submission Successful!</CardTitle> {/* DS-OK: status ok */}
+                  <CardTitle>Submission Successful!</CardTitle>
                   <CardDescription>
                     Your resource is pending review. You can submit another resource below.
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="flex flex-col gap-3 border-t border-[#34d08c]/20 pt-4 sm:flex-row sm:items-center sm:justify-between"> {/* DS-OK: status ok */}
-              <p className="text-sm text-muted-foreground">
+            <CardContent className="submit-success-content"> {/* DS-OK: status ok */}
+              <p>
                 Track review status and outcomes in your private contribution timeline.
               </p>
               <Button
@@ -559,32 +566,23 @@ export default function SubmitResource() {
           </Card>
         )}
 
-        {/* Main Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Plus className="h-6 w-6 text-primary" />
-              Submit a Resource
-            </CardTitle>
-            <CardDescription>
-              Share a valuable resource with the community. All submissions are reviewed before being published.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+        {/* Canonical SubmitPage form card. */}
+        <Card className="submit-form-card">
+          <CardContent className="submit-form-card-content">
             <Form {...form}>
               {authLoading ? (
-                <Alert className="mb-6" data-testid="alert-auth-loading">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                <Alert className="submit-auth-alert" data-testid="alert-auth-loading">
+                  <Loader2 className="submit-alert-icon animate-spin" />
                   <AlertTitle>Verifying sign-in…</AlertTitle>
                   <AlertDescription>
                     Checking your session. The form unlocks in a moment.
                   </AlertDescription>
                 </Alert>
               ) : authFailed ? (
-                <Alert variant="destructive" className="mb-6" data-testid="alert-auth-error">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Couldn't verify your sign-in</AlertTitle>
-                  <AlertDescription className="space-y-2">
+                <Alert variant="destructive" className="submit-auth-alert" data-testid="alert-auth-error">
+                  <AlertTriangle className="submit-alert-icon" />
+                  <AlertTitle>Couldn&apos;t verify your sign-in</AlertTitle>
+                  <AlertDescription className="submit-alert-description">
                     <p>
                       The sign-in check failed, so the form is locked. This is
                       usually a temporary network problem.
@@ -593,21 +591,23 @@ export default function SubmitResource() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => refetchAuth()}
+                      onClick={() => {
+                        void refetchAuth();
+                      }}
                       data-testid="button-auth-retry"
                     >
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      <RefreshCw aria-hidden="true" />
                       Retry
                     </Button>
                   </AlertDescription>
                 </Alert>
               ) : !isAuthenticated ? (
-                <Alert className="mb-6 border-[#ffb84d]/50 bg-[#ffb84d]/10" data-testid="alert-login-required"> {/* DS-OK: status warn */}
-                  <LogIn className="h-4 w-4 text-[#ffb84d]" /> {/* DS-OK: status warn */}
-                  <AlertTitle className="text-[#ffb84d]">Login required to submit</AlertTitle> {/* DS-OK: status warn */}
+                <Alert className="submit-auth-alert submit-login-alert" data-testid="alert-login-required"> {/* DS-OK: status warn */}
+                  <LogIn className="submit-alert-icon" /> {/* DS-OK: status warn */}
+                  <AlertTitle>Login required to submit</AlertTitle> {/* DS-OK: status warn */}
                   <AlertDescription>
                     The form below is read-only. Please{" "}
-                    <a href="/sign-in?redirect_url=%2Fsubmit" className="inline-flex items-center min-h-[24px] align-middle underline" data-testid="link-login">log in</a>{" "}
+                    <a href="/sign-in?redirect_url=%2Fsubmit" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
@@ -615,239 +615,231 @@ export default function SubmitResource() {
               {/* Run3 audit R3-04: explicit method="post" — submission goes via
                   fetch (react-hook-form onSubmit), but if JS ever fails the
                   browser must not leak form fields into the URL as a GET. */}
-              <form method="post" onSubmit={(e) => void form.handleSubmit(onSubmit, onInvalid)(e)} className="space-y-6" noValidate>
+              <form
+                method="post"
+                onSubmit={(e) => void form.handleSubmit(onSubmit, onInvalid)(e)}
+                className="submit-form"
+                noValidate
+              >
                 {/* Fields are disabled for logged-out visitors — they can see the
                     form layout as a preview but cannot fill or submit it (BUG-018). */}
-                <fieldset disabled={!isAuthenticated} className="space-y-6 border-0 p-0 m-0 min-w-0">
-                {/* Title Field */}
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., FFmpeg - Video encoding tool"
-                          {...field}
-                          data-testid="input-title"
-                        />
-                      </FormControl>
-                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
-                        A clear, descriptive title for the resource (1-200 characters)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* URL Field */}
-                <FormField
-                  control={form.control}
-                  name="url"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://example.com/resource"
-                          type="url"
-                          autoComplete="url"
-                          {...field}
-                          data-testid="input-url"
-                        />
-                      </FormControl>
-                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
-                        Must be a valid HTTPS URL
-                      </FormDescription>
-                      <FormMessage />
-
-                      {/* Duplicate URL Warning */}
-                      {duplicateResource && (
-                        <Alert className="mt-2 border-[#ffb84d]/50 bg-[#ffb84d]/10"> {/* DS-OK: status warn */}
-                          <AlertCircle className="h-4 w-4 text-[#ffb84d]" /> {/* DS-OK: status warn */}
-                          <AlertTitle className="text-[#ffb84d]">Duplicate URL Detected</AlertTitle> {/* DS-OK: status warn */}
-                          <AlertDescription>
-                            {/* Run16 BUG-061: the server hard-blocks duplicate
-                                URLs with a 409 — the old copy promised "you
-                                can still submit", which was never true. */}
-                            This URL is already in the catalog.
-                            <br />
-                            <span className="text-xs text-muted-foreground mt-1 block">
-                              It can't be submitted again — if something about the existing entry is wrong, use "Suggest Edit" on the resource page instead.
-                            </span>
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </FormItem>
-                  )}
-                />
-
-                {/* Description Field */}
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe what this resource is about and why it's useful..."
-                          className="min-h-[100px]"
-                          {...field}
-                          data-testid="input-description"
-                        />
-                      </FormControl>
-                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
-                        Provide a detailed description (10-1000 characters)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Category Field */}
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category *</FormLabel>
-                      {/* R3-04: name gives the hidden native select a non-empty
-                          name; the visible trigger is labeled via FormLabel. */}
-                      <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                <fieldset disabled={!isAuthenticated} className="submit-fields">
+                  {/* Title Field */}
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem className="submit-field">
+                        <FormLabel className="submit-label">Title</FormLabel>
                         <FormControl>
-                          <SelectTrigger data-testid="select-category">
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
+                          <Input
+                            className="submit-control"
+                            placeholder="e.g. ffmpeg-python"
+                            {...field}
+                            data-testid="input-title"
+                          />
                         </FormControl>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id.toString()}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
-                        Choose the most relevant category for this resource
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Subcategory Field */}
-                {filteredSubcategories.length > 0 && (
-                  <FormField
-                    control={form.control}
-                    name="subcategory"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Subcategory (Optional)</FormLabel>
-                        <Select name={field.name} onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger data-testid="select-subcategory">
-                              <SelectValue placeholder="Select a subcategory" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {filteredSubcategories.map((subcategory) => (
-                              <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
-                                {subcategory.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
-                          Narrow down the classification (optional)
+                        <FormDescription className="submit-help">
+                          A clear, descriptive title for the resource (1-200 characters)
                         </FormDescription>
-                        <FormMessage />
+                        <FormMessage className="submit-error" />
                       </FormItem>
                     )}
                   />
-                )}
 
-                {/* Sub-subcategory Field */}
-                {filteredSubSubcategories.length > 0 && (
+                  {/* URL Field */}
                   <FormField
                     control={form.control}
-                    name="subSubcategory"
+                    name="url"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Specific Topic (Optional)</FormLabel>
-                        <Select name={field.name} onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger data-testid="select-subsubcategory">
-                              <SelectValue placeholder="Select a specific topic" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {filteredSubSubcategories.map((subSubcategory) => (
-                              <SelectItem key={subSubcategory.id} value={subSubcategory.id.toString()}>
-                                {subSubcategory.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
-                          Further specify the topic (optional)
+                      <FormItem className="submit-field">
+                        <FormLabel className="submit-label">URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            className="submit-control"
+                            placeholder="https://github.com/..."
+                            type="url"
+                            autoComplete="url"
+                            {...field}
+                            data-testid="input-url"
+                          />
+                        </FormControl>
+                        <FormDescription className="submit-help">
+                          Must be a valid HTTPS URL
                         </FormDescription>
-                        <FormMessage />
+                        <FormMessage className="submit-error" />
+
+                        {/* Duplicate URL Warning */}
+                        {duplicateResource && (
+                          <Alert className="submit-inline-alert"> {/* DS-OK: status warn */}
+                            <AlertCircle className="submit-alert-icon" /> {/* DS-OK: status warn */}
+                            <AlertTitle>Duplicate URL Detected</AlertTitle> {/* DS-OK: status warn */}
+                            <AlertDescription>
+                              {/* Run16 BUG-061: the server hard-blocks duplicate
+                                  URLs with a 409 — the old copy promised "you
+                                  can still submit", which was never true. */}
+                              This URL is already in the catalog.
+                              <br />
+                              <span>
+                                It can&apos;t be submitted again — if something about the existing entry is wrong, use &quot;Suggest Edit&quot; on the resource page instead.
+                              </span>
+                            </AlertDescription>
+                          </Alert>
+                        )}
                       </FormItem>
                     )}
                   />
-                )}
 
-                {/* Tags Field */}
-                <FormField
-                  control={form.control}
-                  name="tags"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tags (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., video, encoding, streaming (comma-separated)"
-                          {...field}
-                          data-testid="input-tags"
-                        />
-                      </FormControl>
-                      <FormDescription className={!isAuthenticated ? "text-foreground" : undefined}>
-                        Add up to 10 tags, separated by commas
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
+                  {/* Canonical category + tags row. */}
+                  <div className="submit-form-row">
+                    {/* Category Field */}
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem className="submit-field">
+                          <FormLabel className="submit-label">Category</FormLabel>
+                          {/* R3-04: name gives the hidden native select a non-empty
+                              name; the visible trigger is labeled via FormLabel. */}
+                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="submit-control" data-testid="select-category">
+                                <SelectValue placeholder="Select…" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {categories.map((category) => (
+                                <SelectItem key={category.id} value={category.id.toString()}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription className="submit-help">
+                            Choose the most relevant category for this resource
+                          </FormDescription>
+                          <FormMessage className="submit-error" />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Tags Field */}
+                    <FormField
+                      control={form.control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem className="submit-field">
+                          <FormLabel className="submit-label">Tags</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="submit-control"
+                              placeholder="comma,separated"
+                              {...field}
+                              data-testid="input-tags"
+                            />
+                          </FormControl>
+                          <FormDescription className="submit-help">
+                            Add up to 10 tags, separated by commas
+                          </FormDescription>
+                          <FormMessage className="submit-error" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Extra taxonomy fields are real API-backed inputs. They stay
+                      hidden until a parent taxonomy has been selected, preserving
+                      the canonical empty form without dropping the fields. */}
+                  {filteredSubcategories.length > 0 && (
+                    <FormField
+                      control={form.control}
+                      name="subcategory"
+                      render={({ field }) => (
+                        <FormItem className="submit-field submit-taxonomy-field">
+                          <FormLabel className="submit-label">Subcategory (Optional)</FormLabel>
+                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="submit-control" data-testid="select-subcategory">
+                                <SelectValue placeholder="Select a subcategory" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {filteredSubcategories.map((subcategory) => (
+                                <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                                  {subcategory.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription className="submit-help">
+                            Narrow down the classification (optional)
+                          </FormDescription>
+                          <FormMessage className="submit-error" />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
 
+                  {filteredSubSubcategories.length > 0 && (
+                    <FormField
+                      control={form.control}
+                      name="subSubcategory"
+                      render={({ field }) => (
+                        <FormItem className="submit-field submit-taxonomy-field">
+                          <FormLabel className="submit-label">Specific Topic (Optional)</FormLabel>
+                          <Select name={field.name} onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="submit-control" data-testid="select-subsubcategory">
+                                <SelectValue placeholder="Select a specific topic" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {filteredSubSubcategories.map((subSubcategory) => (
+                                <SelectItem key={subSubcategory.id} value={subSubcategory.id.toString()}>
+                                  {subSubcategory.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription className="submit-help">
+                            Further specify the topic (optional)
+                          </FormDescription>
+                          <FormMessage className="submit-error" />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  {/* Description Field */}
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className="submit-field">
+                        <FormLabel className="submit-label">Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="submit-control submit-description-control"
+                            placeholder="What does this do? Why is it useful?"
+                            {...field}
+                            data-testid="input-description"
+                          />
+                        </FormControl>
+                        <FormDescription className="submit-help">
+                          Provide a detailed description (10-1000 characters)
+                        </FormDescription>
+                        <FormMessage className="submit-error" />
+                      </FormItem>
+                    )}
+                  />
                 </fieldset>
 
-                {/* Submit Button */}
-                {/* BUG-051 (run26): stacked below sm — the one-line row pushed
-                    Cancel past the viewport edge at 320px (clipped, untappable). */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <Button
-                    type="submit"
-                    disabled={submitMutation.isPending || !isAuthenticated}
-                    className="sm:flex-1"
-                    data-testid="button-submit"
-                  >
-                    {submitMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Submit Resource
-                      </>
-                    )}
-                  </Button>
+                {/* Canonical actions stay in one right-aligned row. */}
+                <div className="submit-actions">
                   <Button
                     type="button"
                     variant="outline"
+                    className="submit-cancel-button"
                     onClick={() => {
                       // BUG-033 (run14): don't silently discard a filled form.
                       // NB-054 (run18): native window.confirm() replaced with the
@@ -864,6 +856,24 @@ export default function SubmitResource() {
                   >
                     Cancel
                   </Button>
+                  <Button
+                    type="submit"
+                    disabled={submitMutation.isPending || !isAuthenticated}
+                    className="submit-submit-button"
+                    data-testid="button-submit"
+                  >
+                    {submitMutation.isPending ? (
+                      <>
+                        <Loader2 aria-hidden="true" className="animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Plus aria-hidden="true" />
+                        Submit for review
+                      </>
+                    )}
+                  </Button>
                 </div>
 
                 {/* NB-054 (run18): styled discard-confirmation dialog */}
@@ -873,7 +883,7 @@ export default function SubmitResource() {
                       <AlertDialogTitle>Discard your unsaved submission?</AlertDialogTitle>
                       <AlertDialogDescription>
                         You have unsaved changes in this form. Leaving now will
-                        discard everything you've entered.
+                        discard everything you&apos;ve entered.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -891,40 +901,6 @@ export default function SubmitResource() {
                 </AlertDialog>
               </form>
             </Form>
-          </CardContent>
-        </Card>
-
-        {/* Info Card */}
-        <Card className="mt-6 border-[#5eddf2]/20"> {/* DS-OK: cyan info (DS chart/info constant) */}
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <AlertCircle className="h-5 w-5 text-[#5eddf2]" /> {/* DS-OK: cyan info (DS chart/info constant) */}
-              Submission Guidelines
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2">
-                <span className="text-primary">•</span>
-                <span>Ensure the resource is relevant to video streaming, encoding, or related technologies</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary">•</span>
-                <span>Provide a clear, concise description that helps others understand the resource</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary">•</span>
-                <span>Only submit resources with valid HTTPS URLs that are publicly accessible</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary">•</span>
-                <span>Your submission will be reviewed by admins before being published</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-primary">•</span>
-                <span>Please check if the resource already exists before submitting</span>
-              </li>
-            </ul>
           </CardContent>
         </Card>
       </div>

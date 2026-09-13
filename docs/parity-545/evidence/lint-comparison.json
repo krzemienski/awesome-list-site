@@ -1,0 +1,160 @@
+{
+  "fullRepo": {
+    "errors": 5565,
+    "warnings": 23
+  },
+  "current": [
+    {
+      "file": "About.tsx",
+      "errors": 0,
+      "warnings": 0,
+      "messages": []
+    },
+    {
+      "file": "SubmitResource.tsx",
+      "errors": 9,
+      "warnings": 1,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 295
+        },
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 295
+        },
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 295
+        },
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 295
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-assignment",
+          "message": "Unsafe assignment of an `any` value.",
+          "line": 302
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-member-access",
+          "message": "Unsafe member access .values on an `any` value.",
+          "line": 305
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-assignment",
+          "message": "Unsafe assignment of an `any` value.",
+          "line": 306
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-member-access",
+          "message": "Unsafe member access .updatedAt on an `any` value.",
+          "line": 306
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-member-access",
+          "message": "Unsafe member access .updatedAt on an `any` value.",
+          "line": 306
+        },
+        {
+          "ruleId": null,
+          "message": "Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps').",
+          "line": 373
+        }
+      ]
+    }
+  ],
+  "previousSubmit": [
+    {
+      "file": "SubmitResource.tsx",
+      "errors": 15,
+      "warnings": 1,
+      "messages": [
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 298
+        },
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 298
+        },
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 298
+        },
+        {
+          "ruleId": "@typescript-eslint/prefer-nullish-coalescing",
+          "message": "Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.",
+          "line": 298
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-assignment",
+          "message": "Unsafe assignment of an `any` value.",
+          "line": 305
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-member-access",
+          "message": "Unsafe member access .values on an `any` value.",
+          "line": 308
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-assignment",
+          "message": "Unsafe assignment of an `any` value.",
+          "line": 309
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-member-access",
+          "message": "Unsafe member access .updatedAt on an `any` value.",
+          "line": 309
+        },
+        {
+          "ruleId": "@typescript-eslint/no-unsafe-member-access",
+          "message": "Unsafe member access .updatedAt on an `any` value.",
+          "line": 309
+        },
+        {
+          "ruleId": null,
+          "message": "Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps').",
+          "line": 376
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+          "line": 586
+        },
+        {
+          "ruleId": "@typescript-eslint/no-misused-promises",
+          "message": "Promise-returning function provided to attribute where a void return was expected.",
+          "line": 596
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+          "line": 677
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 677
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+          "line": 677
+        },
+        {
+          "ruleId": "react/no-unescaped-entities",
+          "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+          "line": 876
+        }
+      ]
+    }
+  ]
+}

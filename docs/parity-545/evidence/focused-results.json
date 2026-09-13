@@ -1,0 +1,72 @@
+[
+  {
+    "name": "about axe 375",
+    "pass": true,
+    "detail": []
+  },
+  {
+    "name": "FAQ opens 375",
+    "pass": true
+  },
+  {
+    "name": "FAQ closes 375",
+    "pass": true
+  },
+  {
+    "name": "about axe 1440",
+    "pass": true,
+    "detail": []
+  },
+  {
+    "name": "FAQ opens 1440",
+    "pass": true
+  },
+  {
+    "name": "FAQ closes 1440",
+    "pass": true
+  },
+  {
+    "name": "submit axe 375",
+    "pass": true,
+    "detail": []
+  },
+  {
+    "name": "submit axe 1440",
+    "pass": true,
+    "detail": []
+  },
+  {
+    "name": "existing URL inline warning",
+    "pass": true
+  },
+  {
+    "name": "cleared URL clears warning",
+    "pass": true
+  },
+  {
+    "name": "prior disposable resource removed",
+    "pass": false
+  },
+  {
+    "name": "visible consent does not cover CTA",
+    "pass": true,
+    "detail": {
+      "cta": {
+        "x": 164.9375,
+        "y": 545.71875,
+        "width": 165.0625,
+        "height": 44
+      },
+      "banner": {
+        "x": 0,
+        "y": -511,
+        "width": 375,
+        "height": 141
+      }
+    }
+  },
+  {
+    "name": "owned identity cleanup",
+    "pass": true
+  }
+]

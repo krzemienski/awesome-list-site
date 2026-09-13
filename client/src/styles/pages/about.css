@@ -1,0 +1,525 @@
+/*
+ * About page surface.
+ *
+ * The opening follows awesome-list-site-ds/pages.jsx AboutPage: 760px column,
+ * eyebrow, display heading, shimmer rule, lead card, and callout cards. The
+ * retained sections below use the same card grammar without changing the
+ * shared design-system tokens.
+ */
+
+.about-page {
+  width: 100%;
+  max-width: 760px;
+  animation: fadeIn 0.5s ease;
+}
+
+.about-hero {
+  width: 100%;
+}
+
+.about-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  font-weight: 600;
+  letter-spacing: var(--eyebrow-tracking);
+  line-height: var(--body-leading);
+  text-transform: uppercase;
+}
+
+.about-eyebrow-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  stroke-width: 1.5;
+}
+
+.about-title {
+  margin: 0 0 18px;
+  font-family: var(--font-body);
+  font-size: clamp(32px, 4.5vw, 48px);
+  font-weight: 700;
+  letter-spacing: -1.2px;
+  line-height: 1.1;
+}
+
+.about-title-accent {
+  color: var(--accent);
+}
+
+.about-shimmer-line {
+  width: 220px;
+  margin-bottom: 28px;
+}
+
+.about-card {
+  position: relative;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.about-lead-card {
+  margin-bottom: 14px;
+}
+
+.about-lead-content {
+  padding: 28px;
+}
+
+.about-lead-copy {
+  margin: 0;
+  color: var(--text);
+  font-size: 15.5px;
+  line-height: 1.7;
+}
+
+.about-strong {
+  font-weight: 600;
+}
+
+.about-callout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.about-callout-card {
+  padding: 18px;
+}
+
+.about-callout-index {
+  margin-bottom: 6px;
+  color: var(--accent);
+  font-size: 10px;
+  line-height: var(--body-leading);
+}
+
+.about-callout-title {
+  margin-bottom: 6px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: var(--body-leading);
+}
+
+.about-callout-copy {
+  color: var(--text-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.about-retained-content {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.about-card-header {
+  padding: 28px 28px 0;
+}
+
+.about-card-content {
+  padding: 20px 28px 28px;
+}
+
+.about-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.about-section-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--text-2);
+  stroke-width: 1.5;
+}
+
+.about-icon-accent {
+  color: var(--accent);
+}
+
+.about-copy-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.about-body-copy {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.about-inline-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  min-height: 24px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.about-inline-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.about-inline-link-text {
+  display: inline;
+  min-height: 24px;
+  vertical-align: baseline;
+}
+
+.about-inline-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.about-external-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: -2px;
+  margin-left: 2px;
+}
+
+.about-source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.about-source-link {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.65, 0.3, 1),
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.about-source-link:hover,
+.about-credit-link:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.about-source-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.about-source-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.about-source-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.about-source-external {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--text-2);
+}
+
+.about-source-copy {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.about-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.about-chip {
+  padding: 2px 8px;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.about-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.about-feature-card {
+  padding: 16px;
+}
+
+.about-feature-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 8px;
+  color: var(--text-2);
+  stroke-width: 1.5;
+}
+
+.about-feature-label {
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.about-feature-description,
+.about-tech-description,
+.about-credit-description {
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.about-tech-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.about-tech-column {
+  display: grid;
+  gap: 12px;
+}
+
+.about-tech-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.about-tech-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  margin-top: 7px;
+  border: var(--border-w) solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: transparent;
+}
+
+.about-tech-dot-filled {
+  background: var(--accent);
+}
+
+.about-tech-name {
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.about-accessibility-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.about-accessibility-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.about-accessibility-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+.about-credits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.about-credit-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.65, 0.3, 1),
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.about-credit-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.about-credit-name {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.about-faq-content {
+  padding-top: 12px;
+}
+
+.about-faq-list {
+  border-top: var(--hairline-w) solid var(--border);
+}
+
+.about-faq-item {
+  border-bottom: var(--hairline-w) solid var(--border);
+}
+
+.about-faq-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.about-faq-trigger:hover {
+  color: var(--accent);
+}
+
+.about-faq-trigger:focus-visible {
+  outline-offset: 4px;
+}
+
+.about-faq-chevron {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--text-2);
+  transition: transform 160ms ease;
+}
+
+.about-faq-chevron-open {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+.about-faq-panel {
+  padding: 0 34px 18px 0;
+}
+
+.about-faq-panel[hidden] {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .about-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about-accessibility-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .about-card-header {
+    padding: 22px 20px 0;
+  }
+
+  .about-card-content {
+    padding: 18px 20px 22px;
+  }
+
+  .about-source-grid,
+  .about-tech-grid,
+  .about-credits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-feature-grid,
+  .about-accessibility-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 420px) {
+  .about-feature-grid,
+  .about-accessibility-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-page {
+    animation: none;
+  }
+
+  .about-source-link,
+  .about-credit-link,
+  .about-faq-chevron {
+    transition: none;
+  }
+}

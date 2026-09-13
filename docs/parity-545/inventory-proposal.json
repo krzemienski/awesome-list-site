@@ -1,0 +1,24 @@
+{
+  "purpose": "Leaf handoff notes only; do not replace aggregate inventory",
+  "screens": [
+    {
+      "id": "app.about",
+      "eligibility": "pixel",
+      "widths": [375, 768, 1024, 1440],
+      "status": "measured-fail",
+      "evidence": "tests/parity/baseline/2026-09-13T00-25-55-020Z-5707",
+      "residual": "Shared shell and retained truthful/shared content; see WORKLOG.md"
+    },
+    {
+      "id": "app.submit",
+      "eligibility": "pixel",
+      "requires": ["admin-session"],
+      "state": "empty form, disposable admin Nick",
+      "widths": [375, 768, 1024, 1440],
+      "status": "measured-fail",
+      "evidence": "tests/parity/baseline/2026-09-13T00-18-20-664Z-2728",
+      "visitor": "200, no redirects, noindex, disabled fields and sign-in link",
+      "residual": "Shared shell, real helper text and taxonomy controls; no backend notes field"
+    }
+  ]
+}

@@ -1,40 +1,61 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import {
-  Sparkles,
-  Zap,
-  Search,
-  Palette,
   Accessibility,
-  Globe,
-  Keyboard,
+  BookOpen,
   Code2,
-  Wind,
   Component,
-  Rocket,
-  Heart,
-  Users,
-  Github,
   ExternalLink,
-  HelpCircle
+  Github,
+  Globe,
+  Heart,
+  HelpCircle,
+  Keyboard,
+  Palette,
+  Rocket,
+  Search,
+  Users,
+  Wind,
+  Zap,
+  ChevronDown,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getAboutFaqs } from "@shared/faq";
 import { MAINTAINER } from "@shared/about-content";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
+import "@/styles/pages/about.css";
+
+interface AboutCatalogData {
+  resources?: unknown[];
+}
 
 export default function About() {
   // Run22 BUG-018: FAQ resource-count claim rendered from the live catalog
   // (same shared cache key as App/Home — no extra network round-trip).
-  const { data: treeData } = useQuery({
+  const { data: treeData } = useQuery<AboutCatalogData>({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60,
   });
   const aboutFaqs = getAboutFaqs(treeData?.resources?.length);
+  const [openFaqs, setOpenFaqs] = useState<Set<number>>(() => new Set());
+
+  const toggleFaq = (faqIndex: number) => {
+    setOpenFaqs((current) => {
+      const next = new Set(current);
+      if (next.has(faqIndex)) {
+        next.delete(faqIndex);
+      } else {
+        next.add(faqIndex);
+      }
+      return next;
+    });
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="about-page">
       {/* R5-005 (run24): use the shared SEOHead (canonical + robots + full
           OG/Twitter set) — the bare Helmet block here declared only
           title+description, so the single-head-set reconciliation stripped
@@ -45,370 +66,453 @@ export default function About() {
         description="Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it."
       />
 
-      <div className="mb-10 space-y-3">
-        <div className="flex items-center gap-3">
-          <Sparkles className="h-5 w-5 text-[var(--accent)]" />
-          <h1 className="display-h text-3xl sm:text-4xl">
-            About
-          </h1>
+      {/* Canonical AboutPage opening: a narrow editorial column, eyebrow,
+          display heading, divider, lead card, and callout grid. The copy in
+          these surfaces stays grounded in the site's existing shared content. */}
+      <header className="about-hero">
+        <div className="about-eyebrow">
+          <BookOpen className="about-eyebrow-icon" aria-hidden="true" />
+          ABOUT THIS PROJECT
         </div>
-        {/* Task #379 (uxv1-06): max-w-prose to match every other paragraph on
-            this page and hold the lead to a readable measure on wide screens. */}
-        <p className="text-base sm:text-lg text-[color:var(--text-2)] max-w-prose leading-relaxed">
-          awesome.video is the web home of{" "}
-          <span className="font-semibold text-foreground">awesome-video</span> — a community-curated
-          list of the best streaming and video-development tools, frameworks, libraries, and learning
-          resources, maintained by Nick Krzemienski on GitHub.
-        </p>
-      </div>
+        <h1 className="display-h about-title">
+          A field journal for{" "}
+          <span className="serif-italic about-title-accent">video engineers</span>
+        </h1>
+        <div className="shimmer-line about-shimmer-line" aria-hidden="true" />
 
-      {/* Author / E-E-A-T bio — text shared verbatim with the server SSR body
-          (shared/about-content.ts) and the site's Organization.founder schema. */}
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-            <Users className="h-5 w-5 text-[var(--accent)]" />
-            About the maintainer
-          </h2>
-          <CardDescription>{MAINTAINER.role}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {MAINTAINER.bio.map((paragraph) => (
-              <p
-                key={paragraph.slice(0, 32)}
-                className="text-sm text-muted-foreground leading-relaxed max-w-prose"
-              >
-                {paragraph}
-              </p>
-            ))}
-            <a
-              href={MAINTAINER.profileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 min-h-[24px] text-sm font-medium text-[var(--accent)] hover:underline"
-            >
-              <Github className="h-4 w-4" />
-              {MAINTAINER.name} on GitHub
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-            {/* Run22 BUG-020: account/data-deletion requests now go through
-                the private, authenticated channel (Profile → Security) — the
-                public issue tracker is only for questions and corrections. */}
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
-              Need your account or personal data deleted? Sign in and use{" "}
-              <Link
-                href="/profile?tab=security"
-                className="inline-flex items-center min-h-[24px] align-middle font-medium text-[var(--accent)] hover:underline"
-                data-testid="link-about-deletion"
-              >
-                Profile → Security → Delete account &amp; data
-              </Link>
-              {" "}— it's private and authenticated, so you never have to post
-              personal details publicly.
+        <Card className="about-card about-lead-card">
+          <CardContent className="about-lead-content">
+            <p className="about-lead-copy">
+              awesome.video is the web home of{" "}
+              <span className="about-strong">awesome-video</span> — a
+              community-curated list of the best streaming and video-development
+              tools, frameworks, libraries, and learning resources, maintained by
+              Nick Krzemienski on GitHub.
             </p>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
-              Questions or corrections? The best way to reach us is to{" "}
-              <a
-                href="https://github.com/krzemienski/awesome-video/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 min-h-[24px] align-middle font-medium text-[var(--accent)] hover:underline"
-                data-testid="link-about-github-issues"
-              >
-                open an issue on GitHub
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-              .
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* The source list & the platform */}
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-            <Github className="h-5 w-5 text-[var(--accent)]" />
-            Open source at its core
-          </h2>
-          <CardDescription>
-            The curated list that feeds this site, and the platform that renders it
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a
-              href="https://github.com/krzemienski/awesome-video"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col gap-3 p-5 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Github className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold">awesome-video</span>
-                </div>
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
-                A curated list of awesome streaming video tools, frameworks, libraries, and learning
-                resources. Every resource on this site is sourced from and kept in sync with this
-                repository.
-              </p>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
-                  The source list
-                </span>
-                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
-                  CC0-1.0
-                </span>
-              </div>
-            </a>
-            <a
-              href="https://github.com/krzemienski/awesome-list-site"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col gap-3 p-5 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Rocket className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold">awesome-list-site</span>
-                </div>
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
-                The open-source platform that powers this site — it transforms any GitHub awesome list
-                into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced
-                search, and modern UI components.
-              </p>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
-                  The engine
-                </span>
-                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
-                  MIT
-                </span>
-              </div>
-            </a>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Features Grid */}
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-            <Zap className="h-5 w-5 text-[color:var(--text-2)]" />
-            Features
-          </h2>
-          <CardDescription>
-            Built for speed, accessibility, and user experience
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { icon: Wind, label: "Responsive Design", desc: "Mobile-first" },
-              { icon: Rocket, label: "Fast Performance", desc: "Optimized SPA" },
-              { icon: Search, label: "Fuzzy Search", desc: "Find anything" },
-              { icon: Palette, label: "Multiple Themes", desc: "Customizable" },
-              { icon: Accessibility, label: "Accessible", desc: "WCAG compliant" },
-              { icon: Globe, label: "SEO Optimized", desc: "Discoverable" },
-              { icon: Keyboard, label: "Keyboard Shortcuts", desc: "⌘K or / to search" },
-              { icon: Component, label: "Component Library", desc: "shadcn/ui" }
-            ].map((feature, idx) => (
-              <Card key={feature.label}>
-                <CardContent className="p-4">
-                  <feature.icon
-                    className={`h-6 w-6 mb-2 ${idx < 4 ? "text-[var(--accent)]" : "text-[color:var(--text-2)]"}`}
-                  />
-                  <div className="font-semibold text-sm mb-1">{feature.label}</div>
-                  <div className="text-xs text-muted-foreground">{feature.desc}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Technology Stack */}
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-            <Code2 className="h-5 w-5 text-[color:var(--text-2)]" />
-            Technology Stack
-          </h2>
-          <CardDescription>
-            Modern web technologies for optimal performance
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-[var(--accent)] rounded-full mt-2" />
-                <div>
-                  <div className="font-semibold">React</div>
-                  <div className="text-sm text-muted-foreground">UI component framework</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 rounded-full mt-2 border border-[var(--accent)] bg-transparent" />
-                <div>
-                  <div className="font-semibold">Tailwind CSS</div>
-                  <div className="text-sm text-muted-foreground">Utility-first styling</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-[var(--accent)] rounded-full mt-2" />
-                <div>
-                  <div className="font-semibold">shadcn/ui</div>
-                  <div className="text-sm text-muted-foreground">Component primitives</div>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 rounded-full mt-2 border border-[var(--accent)] bg-transparent" />
-                <div>
-                  <div className="font-semibold">Fuse.js</div>
-                  <div className="text-sm text-muted-foreground">Fuzzy search engine</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-[var(--accent)] rounded-full mt-2" />
-                <div>
-                  <div className="font-semibold">Framer Motion</div>
-                  <div className="text-sm text-muted-foreground">Smooth animations</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 rounded-full mt-2 border border-[var(--accent)] bg-transparent" />
-                <div>
-                  <div className="font-semibold">TypeScript</div>
-                  <div className="text-sm text-muted-foreground">Type safety</div>
-                </div>
-              </div>
+        <div className="about-callout-grid" aria-label="About this project">
+          <div className="about-card about-callout-card">
+            <div className="about-callout-index mono">01</div>
+            <div className="about-callout-title">The source list</div>
+            <div className="about-callout-copy">
+              Resources on this site are drawn from the open-source awesome-video
+              repository.
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Accessibility */}
-      <Card className="mb-4">
-        <CardHeader>
-          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-            <Accessibility className="h-5 w-5 text-[color:var(--text-2)]" />
-            Accessibility First
-          </h2>
-          <CardDescription>
-            Following WCAG 2.1 AA guidelines for inclusive design
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[
-              "Proper heading structure",
-              "Keyboard navigation",
-              "Sufficient color contrast",
-              "Appropriate ARIA attributes",
-              "Respect for user motion preferences",
-              "Screen reader optimized"
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 bg-accent rounded-full" />
-                <span className="text-sm text-foreground">{item}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Credits */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-            <Heart className="h-5 w-5 text-[color:var(--text-2)]" />
-            Credits
-          </h2>
-          <CardDescription>
-            Built with open source technologies
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <p className="text-muted-foreground max-w-prose">
-              This project was built with dedication using open source technologies.
-              Special thanks to:
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <a
-                href="https://github.com/krzemienski"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors group"
-              >
-                <Users className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
-                <div>
-                  <div className="font-semibold text-sm">Nick Krzemienski</div>
-                  <div className="text-xs text-muted-foreground">Maintainer</div>
-                </div>
-              </a>
-              <a
-                href="https://ui.shadcn.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors group"
-              >
-                <Component className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
-                <div>
-                  <div className="font-semibold text-sm">shadcn/ui</div>
-                  <div className="text-xs text-muted-foreground">Components</div>
-                </div>
-              </a>
-              <a
-                href="https://tailwindcss.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors group"
-              >
-                <Wind className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
-                <div>
-                  <div className="font-semibold text-sm">Tailwind CSS</div>
-                  <div className="text-xs text-muted-foreground">Styling</div>
-                </div>
-              </a>
+          <div className="about-card about-callout-card">
+            <div className="about-callout-index mono">02</div>
+            <div className="about-callout-title">Open source</div>
+            <div className="about-callout-copy">
+              The curated list and the platform that renders it are open source
+              on GitHub.
             </div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="about-card about-callout-card">
+            <div className="about-callout-index mono">03</div>
+            <div className="about-callout-title">Human reviewed</div>
+            <div className="about-callout-copy">
+              New submissions are reviewed by maintainers before they are
+              published.
+            </div>
+          </div>
+          <div className="about-card about-callout-card">
+            <div className="about-callout-index mono">04</div>
+            <div className="about-callout-title">For video builders</div>
+            <div className="about-callout-copy">
+              Browse practical tools, frameworks, libraries, and learning
+              resources for the video pipeline.
+            </div>
+          </div>
+        </div>
+      </header>
 
-      {/* FAQ — content shared verbatim with the server's FAQPage schema (shared/faq.ts) */}
-      <Card className="mt-4">
-        <CardHeader>
-          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-            <HelpCircle className="h-5 w-5 text-[var(--accent)]" />
-            Frequently asked questions
-          </h2>
-          <CardDescription>
-            Quick answers about the site, the list, and how to contribute
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {aboutFaqs.map((faq) => (
-              <div key={faq.question} className="space-y-1.5">
-                <h3 className="font-semibold text-sm">{faq.question}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
-                  {faq.answer}
+      {/* The sections below are retained product content. They are intentionally
+          kept after the canonical opening rather than replaced by claims from
+          the reference design that are not established by this application. */}
+      <div className="about-retained-content">
+        {/* Author / E-E-A-T bio — text shared verbatim with the server SSR body
+            (shared/about-content.ts) and the site's Organization.founder schema. */}
+        <Card className="about-card">
+          <CardHeader className="about-card-header">
+            <h2 className="about-section-title">
+              <Users className="about-section-icon about-icon-accent" aria-hidden="true" />
+              About the maintainer
+            </h2>
+            <CardDescription>{MAINTAINER.role}</CardDescription>
+          </CardHeader>
+          <CardContent className="about-card-content">
+            <div className="about-copy-stack">
+              {MAINTAINER.bio.map((paragraph) => (
+                <p key={paragraph.slice(0, 32)} className="about-body-copy">
+                  {paragraph}
                 </p>
+              ))}
+              <a
+                href={MAINTAINER.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-inline-link"
+              >
+                <Github className="about-inline-icon" aria-hidden="true" />
+                {MAINTAINER.name} on GitHub
+                <ExternalLink className="about-external-icon" aria-hidden="true" />
+              </a>
+              {/* Run22 BUG-020: account/data-deletion requests now go through
+                  the private, authenticated channel (Profile → Security) — the
+                  public issue tracker is only for questions and corrections. */}
+              <p className="about-body-copy">
+                Need your account or personal data deleted? Sign in and use{" "}
+                <Link
+                  href="/profile?tab=security"
+                  className="about-inline-link about-inline-link-text"
+                  data-testid="link-about-deletion"
+                >
+                  Profile → Security → Delete account &amp; data
+                </Link>{" "}
+                — it&apos;s private and authenticated, so you never have to post
+                personal details publicly.
+              </p>
+              <p className="about-body-copy">
+                Questions or corrections? The best way to reach us is to{" "}
+                <a
+                  href="https://github.com/krzemienski/awesome-video/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="about-inline-link about-inline-link-text"
+                  data-testid="link-about-github-issues"
+                >
+                  open an issue on GitHub
+                  <ExternalLink className="about-external-icon" aria-hidden="true" />
+                </a>
+                .
+              </p>
+              <p className="about-body-copy">
+                Review the{" "}
+                <Link
+                  href="/terms"
+                  className="about-inline-link about-inline-link-text"
+                >
+                  Terms of Use
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/privacy"
+                  className="about-inline-link about-inline-link-text"
+                >
+                  Privacy Policy
+                </Link>{" "}
+                for the site&apos;s legal and data practices.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* The source list & the platform */}
+        <Card className="about-card">
+          <CardHeader className="about-card-header">
+            <h2 className="about-section-title">
+              <Github className="about-section-icon about-icon-accent" aria-hidden="true" />
+              Open source at its core
+            </h2>
+            <CardDescription>
+              The curated list that feeds this site, and the platform that renders it
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="about-card-content">
+            <div className="about-source-grid">
+              <a
+                href="https://github.com/krzemienski/awesome-video"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-source-link about-card"
+              >
+                <div className="about-source-heading">
+                  <div className="about-source-name">
+                    <Github className="about-source-icon" aria-hidden="true" />
+                    <span>awesome-video</span>
+                  </div>
+                  <ExternalLink className="about-source-external" aria-hidden="true" />
+                </div>
+                <p className="about-source-copy">
+                  A curated list of awesome streaming video tools, frameworks,
+                  libraries, and learning resources. Every resource on this site
+                  is sourced from and kept in sync with this repository.
+                </p>
+                <div className="about-chip-row">
+                  <span className="about-chip">The source list</span>
+                  <span className="about-chip">CC0-1.0</span>
+                </div>
+              </a>
+              <a
+                href="https://github.com/krzemienski/awesome-list-site"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-source-link about-card"
+              >
+                <div className="about-source-heading">
+                  <div className="about-source-name">
+                    <Rocket className="about-source-icon" aria-hidden="true" />
+                    <span>awesome-list-site</span>
+                  </div>
+                  <ExternalLink className="about-source-external" aria-hidden="true" />
+                </div>
+                <p className="about-source-copy">
+                  The open-source platform that powers this site — it transforms
+                  any GitHub awesome list into a sophisticated, interactive web
+                  dashboard with AI-powered enhancements, advanced search, and
+                  modern UI components.
+                </p>
+                <div className="about-chip-row">
+                  <span className="about-chip">The engine</span>
+                  <span className="about-chip">MIT</span>
+                </div>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Features Grid */}
+        <Card className="about-card">
+          <CardHeader className="about-card-header">
+            <h2 className="about-section-title">
+              <Zap className="about-section-icon" aria-hidden="true" />
+              Features
+            </h2>
+            <CardDescription>
+              Built for speed, accessibility, and user experience
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="about-card-content">
+            <div className="about-feature-grid">
+              {[
+                { icon: Wind, label: "Responsive Design", desc: "Mobile-first" },
+                { icon: Rocket, label: "Fast Performance", desc: "Optimized SPA" },
+                { icon: Search, label: "Fuzzy Search", desc: "Find anything" },
+                { icon: Palette, label: "Multiple Themes", desc: "Customizable" },
+                { icon: Accessibility, label: "Accessible", desc: "WCAG compliant" },
+                { icon: Globe, label: "SEO Optimized", desc: "Discoverable" },
+                { icon: Keyboard, label: "Keyboard Shortcuts", desc: "⌘K or / to search" },
+                { icon: Component, label: "Component Library", desc: "shadcn/ui" },
+              ].map((feature, idx) => (
+                <div key={feature.label} className="about-feature-card about-card">
+                  <feature.icon
+                    className={`about-feature-icon ${idx < 4 ? "about-icon-accent" : ""}`}
+                    aria-hidden="true"
+                  />
+                  <div className="about-feature-label">{feature.label}</div>
+                  <div className="about-feature-description">{feature.desc}</div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Technology Stack */}
+        <Card className="about-card">
+          <CardHeader className="about-card-header">
+            <h2 className="about-section-title">
+              <Code2 className="about-section-icon" aria-hidden="true" />
+              Technology Stack
+            </h2>
+            <CardDescription>
+              Modern web technologies for optimal performance
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="about-card-content">
+            <div className="about-tech-grid">
+              <div className="about-tech-column">
+                <div className="about-tech-item">
+                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
+                  <div>
+                    <div className="about-tech-name">React</div>
+                    <div className="about-tech-description">UI component framework</div>
+                  </div>
+                </div>
+                <div className="about-tech-item">
+                  <div className="about-tech-dot" aria-hidden="true" />
+                  <div>
+                    <div className="about-tech-name">Tailwind CSS</div>
+                    <div className="about-tech-description">Utility-first styling</div>
+                  </div>
+                </div>
+                <div className="about-tech-item">
+                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
+                  <div>
+                    <div className="about-tech-name">shadcn/ui</div>
+                    <div className="about-tech-description">Component primitives</div>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <div className="about-tech-column">
+                <div className="about-tech-item">
+                  <div className="about-tech-dot" aria-hidden="true" />
+                  <div>
+                    <div className="about-tech-name">Fuse.js</div>
+                    <div className="about-tech-description">Fuzzy search engine</div>
+                  </div>
+                </div>
+                <div className="about-tech-item">
+                  <div className="about-tech-dot about-tech-dot-filled" aria-hidden="true" />
+                  <div>
+                    <div className="about-tech-name">Framer Motion</div>
+                    <div className="about-tech-description">Smooth animations</div>
+                  </div>
+                </div>
+                <div className="about-tech-item">
+                  <div className="about-tech-dot" aria-hidden="true" />
+                  <div>
+                    <div className="about-tech-name">TypeScript</div>
+                    <div className="about-tech-description">Type safety</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Accessibility */}
+        <Card className="about-card">
+          <CardHeader className="about-card-header">
+            <h2 className="about-section-title">
+              <Accessibility className="about-section-icon" aria-hidden="true" />
+              Accessibility First
+            </h2>
+            <CardDescription>
+              Following WCAG 2.1 AA guidelines for inclusive design
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="about-card-content">
+            <div className="about-accessibility-grid">
+              {[
+                "Proper heading structure",
+                "Keyboard navigation",
+                "Sufficient color contrast",
+                "Appropriate ARIA attributes",
+                "Respect for user motion preferences",
+                "Screen reader optimized",
+              ].map((item) => (
+                <div key={item} className="about-accessibility-item">
+                  <div className="about-accessibility-dot" aria-hidden="true" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Credits */}
+        <Card className="about-card">
+          <CardHeader className="about-card-header">
+            <h2 className="about-section-title">
+              <Heart className="about-section-icon" aria-hidden="true" />
+              Credits
+            </h2>
+            <CardDescription>
+              Built with open source technologies
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="about-card-content">
+            <div className="about-copy-stack">
+              <p className="about-body-copy">
+                This project was built with dedication using open source technologies.
+                Special thanks to:
+              </p>
+              <div className="about-credits-grid">
+                <a
+                  href="https://github.com/krzemienski"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="about-credit-link about-card"
+                >
+                  <Users className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <div>
+                    <div className="about-credit-name">Nick Krzemienski</div>
+                    <div className="about-credit-description">Maintainer</div>
+                  </div>
+                </a>
+                <a
+                  href="https://ui.shadcn.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="about-credit-link about-card"
+                >
+                  <Component className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <div>
+                    <div className="about-credit-name">shadcn/ui</div>
+                    <div className="about-credit-description">Components</div>
+                  </div>
+                </a>
+                <a
+                  href="https://tailwindcss.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="about-credit-link about-card"
+                >
+                  <Wind className="about-credit-icon about-icon-accent" aria-hidden="true" />
+                  <div>
+                    <div className="about-credit-name">Tailwind CSS</div>
+                    <div className="about-credit-description">Styling</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* FAQ — content shared verbatim with the server's FAQPage schema
+            (shared/faq.ts). Buttons/panels provide an accessible accordion
+            without forking the shared question or answer copy. */}
+        <Card className="about-card about-faq-card">
+          <CardHeader className="about-card-header">
+            <h2 className="about-section-title">
+              <HelpCircle className="about-section-icon about-icon-accent" aria-hidden="true" />
+              Frequently asked questions
+            </h2>
+            <CardDescription>
+              Quick answers about the site, the list, and how to contribute
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="about-card-content about-faq-content">
+            <div className="about-faq-list">
+              {aboutFaqs.map((faq, faqIndex) => {
+                const isOpen = openFaqs.has(faqIndex);
+                const buttonId = `about-faq-button-${faqIndex}`;
+                const panelId = `about-faq-panel-${faqIndex}`;
+                return (
+                  <div key={faq.question} className="about-faq-item">
+                    <button
+                      type="button"
+                      id={buttonId}
+                      className="about-faq-trigger"
+                      aria-expanded={isOpen}
+                      aria-controls={panelId}
+                      data-testid={`button-about-faq-${faqIndex}`}
+                      onClick={() => toggleFaq(faqIndex)}
+                    >
+                      <span>{faq.question}</span>
+                      <ChevronDown
+                        className={`about-faq-chevron ${isOpen ? "about-faq-chevron-open" : ""}`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <div
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={buttonId}
+                      className="about-faq-panel"
+                      hidden={!isOpen}
+                    >
+                      <p className="about-body-copy">{faq.answer}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

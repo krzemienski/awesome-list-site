@@ -1,0 +1,371 @@
+/*
+ * SubmitPage parity layer.
+ *
+ * The reference SubmitPage is a 720px column with an editorial heading and a
+ * single 28px-padded form card. This file owns only that page's composition;
+ * the shared DS tokens and shell continue to provide the personality, chrome,
+ * focus treatment, and responsive gutters.
+ */
+
+.submit-page {
+  width: 100%;
+  max-width: 720px;
+  animation: fadeIn 0.5s ease;
+}
+
+.submit-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  font-weight: 600;
+  letter-spacing: var(--eyebrow-tracking);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.submit-eyebrow svg {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+}
+
+.submit-title {
+  margin-bottom: 14px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.submit-title-accent {
+  color: var(--accent);
+}
+
+.submit-lede {
+  max-width: 680px;
+  margin-bottom: 36px;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.submit-form-card {
+  padding: 28px;
+  box-shadow: none;
+}
+
+.submit-form-card:hover {
+  border-color: var(--border);
+}
+
+.submit-form-card-content {
+  display: block;
+  padding: 0;
+}
+
+.submit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/*
+ * FormItem ships with shadcn's `space-y-2`. The canonical form uses the same
+ * 8px field gap, so reset the utility's sibling margins before applying the
+ * explicit flex gap below.
+ */
+.submit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.submit-field > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0;
+}
+
+.submit-fields {
+  display: contents;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.submit-label {
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.submit-control {
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  padding: 10px 14px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.25;
+  transition: border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease;
+}
+
+.submit-control:hover {
+  border-color: var(--border-strong);
+}
+
+.submit-control:focus,
+.submit-control:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong));
+  box-shadow: none;
+}
+
+.submit-control[aria-invalid="true"] {
+  border-color: #ff5c7a; /* DS-OK: status bad */
+  box-shadow: 0 0 0 1px #ff5c7a; /* DS-OK: status bad */
+}
+
+.submit-control::placeholder {
+  color: var(--text-3);
+  opacity: 1;
+}
+
+.submit-description-control {
+  min-height: 96px;
+  resize: vertical;
+  font-family: var(--font-mono);
+}
+
+.submit-help {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.submit-help--locked {
+  color: var(--text);
+}
+
+.submit-error {
+  margin: 0;
+  color: #ff5c7a; /* DS-OK: status bad */
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.submit-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.submit-taxonomy-field {
+  min-width: 0;
+}
+
+.submit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.submit-actions button {
+  min-height: 44px;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.submit-cancel-button {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.submit-cancel-button:hover {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.submit-submit-button {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #0a0a0a; /* DS-OK: on-accent ink */
+  font-weight: 600;
+}
+
+.submit-submit-button:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #0a0a0a; /* DS-OK: on-accent ink */
+  box-shadow: var(--shadow-accent);
+}
+
+.submit-actions button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* The auth, duplicate, and retry states retain their semantics while using
+   the same compact field rhythm as the reference card. */
+.submit-auth-alert,
+.submit-inline-alert {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px 12px 42px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.submit-alert-icon {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+}
+
+.submit-auth-alert [data-slot="alert-title"],
+.submit-auth-alert h5,
+.submit-inline-alert h5 {
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.submit-auth-alert [data-slot="alert-description"],
+.submit-auth-alert > div,
+.submit-inline-alert > div {
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.submit-auth-alert a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.submit-alert-description {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.submit-alert-description > p {
+  margin: 0;
+}
+
+.submit-alert-description button {
+  align-self: flex-start;
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.submit-login-alert {
+  border-color: color-mix(in srgb, #ffb84d 50%, var(--border)); /* DS-OK: status warn */
+  background: color-mix(in srgb, #ffb84d 10%, transparent); /* DS-OK: status warn */
+}
+
+.submit-login-alert .submit-alert-icon,
+.submit-login-alert h5 {
+  color: #ffb84d; /* DS-OK: status warn */
+}
+
+.submit-inline-alert {
+  border-color: color-mix(in srgb, #ffb84d 50%, var(--border)); /* DS-OK: status warn */
+  background: color-mix(in srgb, #ffb84d 10%, transparent); /* DS-OK: status warn */
+}
+
+.submit-inline-alert .submit-alert-icon,
+.submit-inline-alert h5 {
+  color: #ffb84d; /* DS-OK: status warn */
+}
+
+.submit-inline-alert > div > span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.submit-success-card {
+  margin-bottom: 24px;
+  border-color: color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
+  background: color-mix(in srgb, #34d08c 5%, transparent); /* DS-OK: status ok */
+  box-shadow: none;
+}
+
+.submit-success-card:hover {
+  border-color: color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
+}
+
+.submit-success-header {
+  padding: 20px 22px;
+}
+
+.submit-success-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.submit-success-heading > svg {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  color: #34d08c; /* DS-OK: status ok */
+}
+
+.submit-success-heading h2,
+.submit-success-heading [class*="text-2xl"] {
+  color: #34d08c; /* DS-OK: status ok */
+}
+
+.submit-success-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px 20px;
+  border-top: var(--border-w) solid color-mix(in srgb, #34d08c 20%, var(--border)); /* DS-OK: status ok */
+}
+
+.submit-success-content p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+@media (max-width: 560px) {
+  .submit-success-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
