@@ -1,0 +1,6 @@
+
+> rest-express@1.0.0 validate:openapi
+> tsx scripts/validation/openapi-drift.ts
+
+Claude service initialized successfully (Replit-managed integration)
+OpenAPI drift PASS: 177 API routes, 177 named contracts, 149 paths

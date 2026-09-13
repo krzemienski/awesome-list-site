@@ -18,7 +18,7 @@ Contact is build-time opt-in through `VITE_CONTACT_VARIANT`. Only `a`, `b`, `c`,
 
 ## Backend
 
-Everything below is default-off: a deployment that sets none of the `CONTACT_*` variables (see `docs/ENVIRONMENT.md`) behaves exactly like one without the feature. Production keeps `CONTACT_ENABLED` unset.
+Submission intake is default-off: a deployment that sets none of the `CONTACT_*` variables (see `docs/ENVIRONMENT.md`) accepts no contact submissions. Retention still removes expired rows left from previously enabled intake. Production keeps `CONTACT_ENABLED` unset.
 
 ### Endpoints
 
@@ -36,7 +36,7 @@ Everything below is default-off: a deployment that sets none of the `CONTACT_*` 
 - **Honeypot** — a non-empty `website` returns an indistinguishable `200 { id: <random uuid>, status: "received" }`, logs a `[contact] honeypot triggered` line containing only the first 12 characters of the IP hash, and stores nothing.
 - **Persistence** — `contact_submissions(id uuid, name, reply_to, subject, message, created_at, ip_hash, user_id)`. `ip_hash` is `HMAC-SHA256(CONTACT_IP_HASH_SECRET, normalized client IP)` — the raw address is never written; `user_id` is the signed-in user's id when a session is present (cascade-deleted with the user), otherwise `null`.
 - **Delivery** — persistence only. No email is sent and the receipt never claims delivery; maintainers read the inbox through the admin endpoint.
-- **Retention** — `contact.retention_days` (default 180) is consumed by `purgeExpiredContactSubmissions()`, which is implemented but not yet scheduled; rows are kept until it is wired into the maintenance scheduler.
+- **Retention** — `contact.retention_days` (default 180, clamped to 1–3650 days) is enforced by the live contact retention scheduler, 30 seconds after startup and hourly thereafter, outside test runs. It purges only when intake is enabled or stored rows exist, including after intake is disabled. Each cycle deletes expired rows in batches of 500, up to 10,000 per cycle; remaining backlog continues next hour. Overlapping cycles in one process are skipped. JSON ops events `ops.contact_retention_completed` report `deletedCount`, `batches`, and `batchLimitReached`; `ops.contact_retention_failed` is logged to stderr with the count already deleted, without personal data. Failures retry next hour. This is in-process maintenance: it runs while the server is up, with startup catch-up after downtime, not an external cron guarantee.
 
 ### Configuration and defaults
 
@@ -47,7 +47,7 @@ Everything below is default-off: a deployment that sets none of the `CONTACT_*` 
 | `CONTACT_EMAIL` / YAML `contact.email` | env > YAML | empty | `mailto:` destination; anything else is unavailable. |
 | `CONTACT_ISSUES_URL` / YAML `contact.issues_url` | env > YAML | empty | `https:` issue tracker; never derived from `source.url`. |
 | `CONTACT_DISCUSSIONS_URL` + `CONTACT_DISCUSSIONS_VERIFIED` / YAML | env > YAML | empty / `false` | Discussions is offered only when both the URL and the verified flag are set. |
-| YAML `contact.retention_days` | YAML only | 180 | Retention horizon for the (unscheduled) purge. |
+| YAML `contact.retention_days` | YAML only | 180 | Retention horizon for the scheduled hourly purge. |
 
 Contracts live in `docs/api/openapi.yaml` (`PublicConfigResponse`, `ContactSubmissionReceipt`, `AdminContactSubmissionsResponse`) and are enforced by the `openapi-drift` and `response-contract-drift` gates; behaviour is covered by `tests/integration/api/contact.test.ts` (disabled 404, misconfigured 503, happy path with keyed IP hash and user id, honeypot, validation 400, origin 403, sixth-request 429 with headers, admin listing and pagination).
 

@@ -1,0 +1,21 @@
+ ✓ tests/integration/api/contact.test.ts > Contact API > default configuration (nothing set) > GET /api/config reports every destination unavailable and the form disabled 70ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > default configuration (nothing set) > POST /api/contact is indistinguishable from a missing route (404) even for a valid body 25ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > default configuration (nothing set) > POST /api/contact answers 404 before validating or checking the origin 16ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled without CONTACT_IP_HASH_SECRET > keeps the form unavailable with an explicit reason 24ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled without CONTACT_IP_HASH_SECRET > refuses submissions with 503 instead of storing an unhashed IP 18ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > purges expired messages in bounded batches while preserving fresh messages 43ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > does not register retention timers during test runs 81ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > GET /api/config exposes configured destinations and keeps discussions gated on verification 66ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > persists a valid submission with a keyed IP hash and returns a receipt 40ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > records the signed-in user's id when a session is present 39ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > silently discards honeypot submissions with a receipt-shaped 200 26ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > rejects invalid payloads with the canonical 400 envelope 24ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > rejects unknown fields and an empty body 34ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > rejects cross-origin and origin-less submissions with 403 38ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > limits an IP to 5 submissions per hour through the shared store's own prefix 102ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > GET /api/admin/contact-submissions > requires an authenticated admin 31ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > GET /api/admin/contact-submissions > lists submissions newest first with pagination and the real total 97ms
+ ✓ tests/integration/api/contact.test.ts > Contact API > enabled and configured > GET /api/admin/contact-submissions > rejects out-of-range pagination with 400 43ms
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Duration  4.30s (transform 845ms, setup 235ms, import 97ms, tests 2.17s, environment 0ms)

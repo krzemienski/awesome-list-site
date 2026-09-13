@@ -157,5 +157,5 @@ contact:
   discussions_url: ""
   discussions_verified: false
   # Days to keep contact submissions; consumed by purgeExpiredContactSubmissions(),
-  # which is not scheduled yet (see docs/CONTACT-VARIANTS.md "Backend")
+  # scheduled hourly outside tests (see docs/CONTACT-VARIANTS.md "Backend").
   retention_days: 180

@@ -9,9 +9,7 @@ import { desc, sql } from "drizzle-orm";
 
 /**
  * Delete submissions older than config.contact.retention_days in bounded
- * batches. NOT scheduled anywhere yet (see docs/parity/assumptions/contact-api.md);
- * kept as the single retention primitive for the follow-up that wires it into
- * the background scheduler.
+ * batches. The contact retention scheduler invokes this hourly outside tests.
  */
 export async function purgeExpiredContactSubmissions(limit = 500): Promise<number> {
   const configuredRetentionDays = Number(config.contact.retention_days);

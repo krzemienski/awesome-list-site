@@ -1,0 +1,166 @@
+ FAIL  tests/integration/api/collections.test.ts > Collections and learning queue API
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/stats > should return admin dashboard statistics for admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/stats > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/stats > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/users > should return paginated list of users for admin
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/users > should support pagination parameters
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/users > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/users > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/users/:id/role > should allow admin to change user role to admin
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/users/:id/role > should allow admin to change user role to user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/users/:id/role > should return 400 for invalid role
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/users/:id/role > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/users/:id/role > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/pending-resources > should return list of pending resources for admin
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/pending-resources > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/pending-resources > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/approve > should allow admin to approve a pending resource
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/approve > should return 404 for non-existent resource
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/approve > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/approve > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/reject > should allow admin to reject a pending resource with reason
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/reject > should reject without reason if not provided
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/reject > should return 404 for non-existent resource
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/reject > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources/:id/reject > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/resources > should return paginated list of all resources for admin
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/resources > should support pagination parameters
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/resources > should support status filter
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/resources > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > GET /api/admin/resources > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources > should allow admin to create a new resource directly as approved
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources > should validate required fields
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources > should validate URL format
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources > auto-creates the sub_subcategories row implied by the resource tag (task #57)
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > POST /api/admin/resources > is idempotent when the implied sub_subcategories row already exists
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/resources/:id > should allow admin to update a resource
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/resources/:id > should allow admin to change resource status
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/resources/:id > should return 404 for non-existent resource
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/resources/:id > should validate URL format if provided
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/resources/:id > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > PUT /api/admin/resources/:id > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > DELETE /api/admin/resources/:id > should allow admin to delete a resource
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > DELETE /api/admin/resources/:id > should return 404 for non-existent resource
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > DELETE /api/admin/resources/:id > should return 403 for non-admin user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > DELETE /api/admin/resources/:id > should return 401 for unauthenticated user
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > Admin Access Control > should consistently deny non-admin access to all admin routes
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > Admin Access Control > should consistently deny unauthenticated access to all admin routes
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > Admin Edge Cases > should handle concurrent admin operations
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > Admin Edge Cases > should handle admin updating own role
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > Admin Edge Cases > should handle very long rejection reason
+ FAIL  tests/integration/api/admin.test.ts > Admin API Integration Tests > Admin Edge Cases > should handle malformed resource data in update
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should login with valid credentials
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should return 401 with invalid password
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should return 401 with non-existent email
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should return 401 with invalid email format
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should return 401 with password too short
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should return 400 with missing email
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should return 400 with missing password
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should return 400 with empty request body
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should handle case-sensitive email
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should reject user without password (OAuth user)
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/local/login > should set session cookie on successful login
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > GET /api/auth/user > should return user when authenticated
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > GET /api/auth/user > should return admin role for admin users
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > GET /api/auth/user > should include profile image URL if set
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/logout > should logout authenticated user
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/logout > should handle logout when not authenticated
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > POST /api/auth/logout > should clear session on logout
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Flow - Login -> Check User -> Logout > should complete full authentication flow
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Security > should not expose password in response
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Security > should rate limit login attempts (basic check)
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Security > should handle SQL injection attempts in email
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Security > should handle XSS attempts in credentials
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Edge Cases > should handle concurrent login attempts
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Edge Cases > should handle very long email
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Edge Cases > should handle very long password
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Edge Cases > should handle special characters in password
+ FAIL  tests/integration/api/auth.test.ts > Auth API Integration Tests > Auth Edge Cases > should handle unicode characters in name fields
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/categories > should return empty array when no categories exist
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/categories > should return categories with all fields
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/categories > should return multiple categories in order
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/categories > should handle database errors gracefully
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/subcategories > should return empty array when no subcategories exist
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/subcategories > should return 400 for invalid categoryId format
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/subcategories > should return 400 for negative categoryId
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/subcategories > should return 400 for zero categoryId
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/subcategories > should return subcategories with all fields
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/subcategories > should handle database errors gracefully
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/sub-subcategories > should return empty array when no sub-subcategories exist
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/sub-subcategories > should return 400 for invalid subcategoryId format
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/sub-subcategories > should return 400 for negative subcategoryId
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/sub-subcategories > should return 400 for zero subcategoryId
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/sub-subcategories > should return sub-subcategories with all fields
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > GET /api/sub-subcategories > should handle database errors gracefully
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > Categories API - Hierarchical Relationships > should maintain correct category hierarchy
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > Categories API - Edge Cases > should handle unicode in category names
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > Categories API - Edge Cases > should handle very long category names
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > Categories API - Edge Cases > should handle special characters in slugs
+ FAIL  tests/integration/api/categories.test.ts > Categories API Integration Tests > Categories API - Edge Cases > should handle decimal categoryId
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/favorites/:resourceId > should add favorite when authenticated
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/favorites/:resourceId > should handle invalid resource id
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/favorites/:resourceId > should allow multiple users to favorite same resource
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/favorites/:resourceId > should handle duplicate favorite gracefully
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > DELETE /api/favorites/:resourceId > should remove favorite when authenticated
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > DELETE /api/favorites/:resourceId > should handle removing non-existent favorite gracefully
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > DELETE /api/favorites/:resourceId > should only remove favorite for authenticated user
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > GET /api/favorites > should return user's favorites when authenticated
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > GET /api/favorites > should return empty array when user has no favorites
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > GET /api/favorites > should return only authenticated user's favorites
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/bookmarks/:resourceId > should add bookmark when authenticated
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/bookmarks/:resourceId > should add bookmark with notes
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/bookmarks/:resourceId > should add bookmark without notes
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/bookmarks/:resourceId > should allow multiple users to bookmark same resource
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > POST /api/bookmarks/:resourceId > should handle duplicate bookmark gracefully
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > DELETE /api/bookmarks/:resourceId > should remove bookmark when authenticated
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > DELETE /api/bookmarks/:resourceId > should handle removing non-existent bookmark gracefully
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > DELETE /api/bookmarks/:resourceId > should only remove bookmark for authenticated user
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > GET /api/bookmarks > should return user's bookmarks when authenticated
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > GET /api/bookmarks > should return empty array when user has no bookmarks
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > GET /api/bookmarks > should return only authenticated user's bookmarks
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > Favorites and Bookmarks - Integration Flows > should handle user favoriting and bookmarking same resource
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > Favorites and Bookmarks - Integration Flows > should maintain user favorites/bookmarks across multiple resources
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > Favorites and Bookmarks - Integration Flows > should keep favorites and bookmarks separate when removing one
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > Favorites and Bookmarks - Edge Cases > should handle non-existent resource id gracefully
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > Favorites and Bookmarks - Edge Cases > should handle very long bookmark notes
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > Favorites and Bookmarks - Edge Cases > should handle unicode in bookmark notes
+ FAIL  tests/integration/api/favorites.test.ts > Favorites and Bookmarks API Integration Tests > Favorites and Bookmarks - Edge Cases > should handle concurrent favorites/bookmarks operations
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources > should return paginated approved resources
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources > should support pagination
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources > should handle invalid page number
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources > should handle invalid limit
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/check-url > should return exists=true when URL exists
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/check-url > should find pending resources
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/check-url > should find rejected resources
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/:id > should return pending resource
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/:id > should handle invalid id format
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources > should create resource when authenticated
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources > should validate required fields
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources > should create resource with all optional fields
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources > should reject invalid URL format
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources > should create resource with admin user
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/pending > should return pending resources for admin
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/pending > should return 403 for non-admin users
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/pending > should support pagination for pending resources
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > GET /api/resources/pending > should return empty array when no pending resources
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > PUT /api/resources/:id/approve > should approve resource as admin
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > PUT /api/resources/:id/approve > should return 403 for non-admin users
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > PUT /api/resources/:id/approve > should approve already approved resource
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > PUT /api/resources/:id/approve > should approve rejected resource
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > PUT /api/resources/:id/reject > should reject resource as admin
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > PUT /api/resources/:id/reject > should return 403 for non-admin users
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > PUT /api/resources/:id/reject > should reject approved resource
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources/:id/edits > should create edit suggestion when authenticated
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources/:id/edits > should return 400 for invalid resource id
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources/:id/edits > should allow admin to suggest edits
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > POST /api/resources/:id/edits > should accept edit with claude metadata
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > Resources API - Integration Flows > should complete full resource lifecycle: create -> pending -> approve
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > Resources API - Integration Flows > should prevent duplicate URLs
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > Resources API - Edge Cases > should handle concurrent resource creation
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > Resources API - Edge Cases > should handle very long resource title
+ FAIL  tests/integration/api/resources.test.ts > Resources API Integration Tests > Resources API - Edge Cases > should handle unicode in resource data
+ Test Files  6 failed | 4 passed (10)
+      Tests  162 failed | 83 passed | 1 skipped (246)
+   Duration  57.39s (transform 1.06s, setup 2.04s, import 7.39s, tests 37.65s, environment 1ms)

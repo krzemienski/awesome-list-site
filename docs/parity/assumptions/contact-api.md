@@ -55,13 +55,14 @@ the check. The draft's `contactJsonBody` (415 on non-JSON) was dropped — the
 global JSON body parser and Zod already reject anything that is not a valid
 JSON object with the canonical 400 envelope.
 
-## 6. The retention purge exists but is not scheduled
+## 6. Retention is now scheduled
 
-`purgeExpiredContactSubmissions(retentionDays)` is implemented (default 180
-days from YAML `contact.retention_days`) but not wired into the maintenance
-scheduler. Scheduling a destructive job belongs with the admin inbox work, so
-an operator can see what is about to be purged; until then rows are kept.
-Proposed as a follow-up.
+The original scheduling deferral is superseded by
+`server/jobs/contactRetentionScheduler.ts`, registered beside digest/link-health
+maintenance in `server/index.ts`. It calls `purgeExpiredContactSubmissions(limit)`
+using the horizon from YAML (default 180 days), including when intake is disabled
+but stored messages remain. See [Backend → Retention](../../CONTACT-VARIANTS.md#submission-rules)
+for cadence, bounded backlog handling, test exclusion, and operator log events.
 
 ## 7. Rate limit: 5 per hour per IP, own limiter name, counted before validation
 

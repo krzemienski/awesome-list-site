@@ -187,6 +187,43 @@ describe("Contact API", () => {
       await deleteQaRows();
     });
 
+    it("purges expired messages in bounded batches while preserving fresh messages", async () => {
+      const { config } = await import("../../../server/config");
+      const { purgeExpiredContactSubmissions } = await import("../../../server/repositories/ContactRepository");
+      const oldDate = new Date(Date.now() - (config.contact.retention_days + 1) * 86_400_000);
+      const inserted = await getTestDb().insert(schema.contactSubmissions).values(
+        [oldDate, oldDate, new Date()].map((createdAt, index) => ({
+          name: "QA retention",
+          replyTo: "qa@example.com",
+          subject: `Retention ${index}`,
+          message: `${QA_MARKER}_retention`,
+          ipHash: "0".repeat(64),
+          createdAt,
+        })),
+      ).returning();
+      try {
+        expect(await purgeExpiredContactSubmissions(1)).toBe(1);
+        expect(await qaRows()).toHaveLength(2);
+        expect(await purgeExpiredContactSubmissions()).toBe(1);
+        expect((await qaRows()).map(row => row.id)).toEqual([inserted[2].id]);
+        expect(await purgeExpiredContactSubmissions()).toBe(0);
+      } finally {
+        await deleteQaRows();
+      }
+    });
+
+    it("does not register retention timers during test runs", async () => {
+      const { initializeContactRetentionScheduler } = await import("../../../server/jobs/contactRetentionScheduler");
+      vi.useFakeTimers();
+      try {
+        const before = vi.getTimerCount();
+        initializeContactRetentionScheduler();
+        expect(vi.getTimerCount()).toBe(before);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it("GET /api/config exposes configured destinations and keeps discussions gated on verification", async () => {
       const res = await request(app).get("/api/config");
       expect(res.status).toBe(200);
