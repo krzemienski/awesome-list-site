@@ -1,0 +1,28 @@
+/* Footer-owned refinements over the merged canonical shell foundations. */
+.app-footer .site-footer-inner {
+  width: min(100%, var(--content-max));
+  padding: var(--footer-pad);
+}
+.app-footer .footer-wordmark,
+.app-footer .footer-stats,
+.app-footer .footer-bottom { font-family: var(--font-mono); }
+.app-footer .app-footer-mark { width: 28px; height: 28px; flex-shrink: 0; }
+.app-footer .footer-brand-link { margin-bottom: 12px; color: var(--text); }
+.app-footer .footer-tagline { margin-top: 0; }
+.app-footer .footer-stats { margin: 0; }
+.app-footer .app-footer-links { display: flex; flex-direction: column; gap: 0; }
+.app-footer .footer-column a,
+.app-footer .footer-column button {
+  min-width: 0;
+  white-space: normal;
+  font-weight: 500;
+  transition: color 160ms ease;
+}
+.app-footer a:focus-visible,
+.app-footer button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.app-footer .app-footer-contact { display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 520px) {
+  .app-footer .site-footer-inner { padding: 36px 20px 24px; }
+}
+/* Keep the existing global print policy: footer navigation is screen-only. */
+@media print { .app-footer { display: none !important; } }

@@ -1,0 +1,60 @@
+{
+  "site": {
+    "name": "Awesome Video Dashboard",
+    "tagline": "A curated collection of awesome video resources, tools, and technologies for developers and content creators",
+    "repoUrl": "https://github.com/krzemienski/awesome-video",
+    "repoBranch": "master"
+  },
+  "threshold": 0.1,
+  "limitPercent": 0.5,
+  "rows": [
+    {
+      "width": 375,
+      "union": {
+        "width": 375,
+        "height": 1461
+      },
+      "actualHeight": 1461,
+      "expectedHeight": 1461,
+      "pixels": 2,
+      "percentage": 0.0003650467716176135,
+      "pass": true
+    },
+    {
+      "width": 768,
+      "union": {
+        "width": 768,
+        "height": 1043
+      },
+      "actualHeight": 1043,
+      "expectedHeight": 1043,
+      "pixels": 2,
+      "percentage": 0.0002496804090763822,
+      "pass": true
+    },
+    {
+      "width": 1024,
+      "union": {
+        "width": 1024,
+        "height": 538
+      },
+      "actualHeight": 538,
+      "expectedHeight": 538,
+      "pixels": 2,
+      "percentage": 0.00036303438661710035,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "union": {
+        "width": 1440,
+        "height": 538
+      },
+      "actualHeight": 538,
+      "expectedHeight": 538,
+      "pixels": 2,
+      "percentage": 0.0002581577860388269,
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "surface": "shell.default",
+  "region": "footer",
+  "component": "client/src/components/layout/new/AppFooter.tsx",
+  "stylesheet": "client/src/styles/shell/footer.css",
+  "selector": "[data-testid=\"site-footer\"]",
+  "widths": [375, 768, 1024, 1440],
+  "eligibility": "pixel",
+  "integrationStatus": "unwired-handoff",
+  "pixelStatus": "passed-isolated-reconciled-comparison",
+  "pixelEvidence": "pixels/results.json",
+  "axeSeriousCritical": 0,
+  "reference": "awesome-list-site-ds/layout.jsx:424",
+  "handoff": "docs/parity/worklog/footer.md"
+}

@@ -1,0 +1,108 @@
+{
+  "results": [
+    {
+      "width": 375,
+      "geometry": {
+        "overflow": false,
+        "columns": "335px",
+        "padding": "36px 20px 24px"
+      },
+      "axe": []
+    },
+    {
+      "width": 768,
+      "geometry": {
+        "overflow": false,
+        "columns": "328px 328px",
+        "padding": "48px 40px 32px"
+      },
+      "axe": []
+    },
+    {
+      "width": 1024,
+      "geometry": {
+        "overflow": false,
+        "columns": "294.953px 184.344px 184.344px 184.344px",
+        "padding": "48px 40px 32px"
+      },
+      "axe": []
+    },
+    {
+      "width": 1440,
+      "geometry": {
+        "overflow": false,
+        "columns": "370.078px 231.312px 231.297px 231.312px",
+        "padding": "48px 40px 32px"
+      },
+      "axe": []
+    }
+  ],
+  "statuses": [
+    {
+      "href": "/",
+      "status": 200
+    },
+    {
+      "href": "/category/community-events",
+      "status": 200
+    },
+    {
+      "href": "/category/encoding-codecs",
+      "status": 200
+    },
+    {
+      "href": "/category/general-tools",
+      "status": 200
+    },
+    {
+      "href": "/category/infrastructure-delivery",
+      "status": 200
+    },
+    {
+      "href": "/category/intro-learning",
+      "status": 200
+    },
+    {
+      "href": "/category/media-tools",
+      "status": 200
+    },
+    {
+      "href": "/categories",
+      "status": 200
+    },
+    {
+      "href": "/journeys",
+      "status": 200
+    },
+    {
+      "href": "/about",
+      "status": 200
+    },
+    {
+      "href": "/submit",
+      "status": 200
+    },
+    {
+      "href": "/admin",
+      "status": 200
+    },
+    {
+      "href": "/terms",
+      "status": 200
+    },
+    {
+      "href": "/privacy",
+      "status": 200
+    },
+    {
+      "href": "/code-of-conduct",
+      "status": 200
+    },
+    {
+      "href": "/sitemap.xml",
+      "status": 200
+    }
+  ],
+  "printHidden": true,
+  "adminHidden": true
+}
