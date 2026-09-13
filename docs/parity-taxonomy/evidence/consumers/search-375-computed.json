@@ -1,0 +1,54 @@
+{
+  "route": "http://127.0.0.1:5000/search?q=video",
+  "card": {
+    "backgroundColor": "rgba(244, 243, 238, 0.024)",
+    "color": "rgb(244, 243, 238)",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "16px",
+    "overflow": "hidden",
+    "rect": {
+      "width": 337,
+      "height": 367.984375,
+      "x": 16,
+      "y": 482.890625
+    }
+  },
+  "title": {
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "lineHeight": "20.8px",
+    "display": "block",
+    "overflow": "visible",
+    "textOverflow": "clip",
+    "webkitLineClamp": "none",
+    "rect": {
+      "width": 303,
+      "height": 41.59375,
+      "x": 33,
+      "y": 557.890625
+    }
+  },
+  "favorite": {
+    "rect": {
+      "width": 44,
+      "height": 44,
+      "x": 244,
+      "y": 499.890625
+    },
+    "minWidth": "44px",
+    "minHeight": "44px",
+    "aria": "Favorite to your account — sign in required"
+  },
+  "bookmark": {
+    "rect": {
+      "width": 44,
+      "height": 44,
+      "x": 292,
+      "y": 499.890625
+    },
+    "minWidth": "44px",
+    "minHeight": "44px",
+    "aria": "Bookmark on this device — no sign-in required"
+  }
+}

@@ -1,0 +1,143 @@
+.taxonomy-page {
+  width: 100%;
+  max-width: var(--content-max);
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--text);
+}
+
+.taxonomy-back {
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.taxonomy-eyebrow {
+  margin-bottom: 16px;
+}
+
+.taxonomy-eyebrow > span {
+  font-size: 14px;
+}
+
+.taxonomy-page .taxonomy-title {
+  margin: 0 0 16px;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  overflow-wrap: anywhere;
+}
+
+.taxonomy-page--subcategory .taxonomy-title,
+.taxonomy-page--sub-subcategory .taxonomy-title {
+  margin-bottom: 12px;
+  font-size: clamp(32px, 5vw, 52px);
+}
+
+.taxonomy-title-accent {
+  color: var(--accent);
+}
+
+.taxonomy-description {
+  max-width: 700px;
+  color: var(--text-2);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.taxonomy-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.taxonomy-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.taxonomy-breadcrumbs a {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  color: var(--text-2);
+}
+
+.taxonomy-breadcrumbs [aria-current] {
+  color: var(--accent);
+}
+
+.taxonomy-children,
+.taxonomy-controls {
+  margin-top: 56px;
+}
+
+.taxonomy-children h2 {
+  margin-bottom: 16px;
+  color: var(--text-2);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.taxonomy-child-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: 12px;
+}
+
+.taxonomy-child {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.taxonomy-child > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.taxonomy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 16px;
+}
+
+.taxonomy-controls ~ div {
+  margin-top: 24px;
+}
+
+.taxonomy-loading-header {
+  min-height: 260px;
+}
+
+.taxonomy-page [data-testid="empty-resources"] {
+  padding: 80px 20px;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.taxonomy-child:focus-visible,
+.taxonomy-breadcrumbs a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}

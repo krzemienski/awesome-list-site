@@ -1,0 +1,88 @@
+{
+  "task": "564",
+  "provenance": {
+    "type": "tester-observation",
+    "source": "Persistent Playwright browser verification pass against http://127.0.0.1:5000",
+    "note": "Axe results below are tester-observed serious/critical violation counts; raw axe output was not persisted."
+  },
+  "axe": {
+    "status": "PASS",
+    "routes": {
+      "/category/encoding-codecs": {
+        "375": { "serious": 0, "critical": 0 },
+        "1440": { "serious": 0, "critical": 0 }
+      },
+      "/subcategory/community-groups": {
+        "375": { "serious": 0, "critical": 0 },
+        "1440": { "serious": 0, "critical": 0 }
+      },
+      "/sub-subcategory/online-forums": {
+        "375": { "serious": 0, "critical": 0 },
+        "1440": { "serious": 0, "critical": 0 }
+      }
+    }
+  },
+  "url_interactions": {
+    "status": "PASS",
+    "assertions": [
+      {
+        "action": "Browse link",
+        "from": "/category/encoding-codecs",
+        "expected": "/",
+        "observed": "/",
+        "result": "PASS"
+      },
+      {
+        "action": "Uncategorized filter",
+        "from": "/category/encoding-codecs",
+        "expected": "/category/encoding-codecs?filter=general",
+        "observed": "/category/encoding-codecs?filter=general",
+        "result_count": "Showing 1–24 of 92 resources (filtered from 333)",
+        "result": "PASS"
+      },
+      {
+        "action": "Search av1",
+        "from": "/category/encoding-codecs",
+        "expected": "/category/encoding-codecs?search=av1",
+        "observed": "/category/encoding-codecs?search=av1",
+        "result_count": "Showing 1–20 of 20 resources (filtered from 333)",
+        "result": "PASS"
+      },
+      {
+        "action": "List view",
+        "expected": "view=list query and list presentation",
+        "observed": "/category/encoding-codecs?search=av1&view=list; view-mode-list aria-checked=true; row-resource-* rendered",
+        "result": "PASS"
+      },
+      {
+        "action": "Tag AMD",
+        "expected": "tag state reflected in URL",
+        "observed": "/category/encoding-codecs?tags=AMD; 2 results",
+        "result": "PASS"
+      },
+      {
+        "action": "Empty search",
+        "expected": "empty state",
+        "observed": "/sub-subcategory/online-forums?search=zzzz-no-such-resource-564; 0 cards; No resources match this combination",
+        "result": "PASS"
+      }
+    ]
+  },
+  "community_events_page_2": {
+    "status": "PASS",
+    "route": "/category/community-events?page=2",
+    "observed_range": "Showing 25–48 of 80 resources",
+    "api": "/api/awesome-list/listing?level=category&slug=community-events&page=2",
+    "api_count": 24,
+    "rendered_count": 24,
+    "sameOrder": true
+  },
+  "shared_search_tag_bookmarks_tokens": {
+    "status": "NOT_RUN",
+    "note": "Shared consumer token checks were incomplete as a dedicated acceptance check; partial guest-card observations occurred during route checks but are not claimed here."
+  },
+  "pixel_baseline": {
+    "status": "NOT_RUN",
+    "note": "Pixel harness was not run or claimed PASS because the generated inventory was stale/blocking."
+  }
+}

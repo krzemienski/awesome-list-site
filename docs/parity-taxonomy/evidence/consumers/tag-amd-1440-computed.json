@@ -1,0 +1,54 @@
+{
+  "route": "http://127.0.0.1:5000/tag/amd",
+  "card": {
+    "backgroundColor": "rgba(244, 243, 238, 0.024)",
+    "color": "rgb(244, 243, 238)",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "16px",
+    "overflow": "hidden",
+    "rect": {
+      "width": 342,
+      "height": 399.984375,
+      "x": 328,
+      "y": 425.6875
+    }
+  },
+  "title": {
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "16px",
+    "fontWeight": "600",
+    "lineHeight": "20.8px",
+    "display": "block",
+    "overflow": "visible",
+    "textOverflow": "clip",
+    "webkitLineClamp": "none",
+    "rect": {
+      "width": 300,
+      "height": 41.59375,
+      "x": 349,
+      "y": 504.6875
+    }
+  },
+  "favorite": {
+    "rect": {
+      "width": 44,
+      "height": 44,
+      "x": 557,
+      "y": 446.6875
+    },
+    "minWidth": "44px",
+    "minHeight": "44px",
+    "aria": "Favorite to your account — sign in required"
+  },
+  "bookmark": {
+    "rect": {
+      "width": 44,
+      "height": 44,
+      "x": 605,
+      "y": 446.6875
+    },
+    "minWidth": "44px",
+    "minHeight": "44px",
+    "aria": "Bookmark on this device — no sign-in required"
+  }
+}

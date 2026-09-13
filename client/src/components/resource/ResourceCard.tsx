@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 import { tagLandingPath } from "@shared/tagNormalize";
+import "@/styles/components/resource-card.css";
 
 interface ResourceCardProps {
   resource: {
@@ -34,6 +35,31 @@ interface ResourceCardProps {
   /** Public read-only collections hide account/edit actions while preserving
    * the card's real detail and external links. */
   showPersonalActions?: boolean;
+}
+
+const RESOURCE_CATEGORY_MARKS: Record<string, string> = {
+  "community-events": "◈",
+  "encoding-codecs": "◇",
+  "general-tools": "◆",
+  "infrastructure-delivery": "▣",
+  "intro-learning": "▤",
+  "media-tools": "▥",
+  "players-clients": "▶",
+  "protocols-transport": "⟁",
+  "standards-industry": "◉",
+};
+
+function resourceCategoryMark(category?: string): string {
+  if (!category) return "◆";
+
+  const slug = category
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return RESOURCE_CATEGORY_MARKS[slug] || "◆";
 }
 
 function ResourceCard({
@@ -94,6 +120,7 @@ function ResourceCard({
     updatedAt: new Date(),
     searchTsv: null,
   };
+  const categoryMark = resourceCategoryMark(resource.category);
 
   // Run3 audit R3-31: the card title is a REAL anchor (stretched-link pattern)
   // instead of a JS-only onClick <div>, so middle-click / cmd-click / "open in
@@ -110,13 +137,13 @@ function ResourceCard({
   // block-level; min-h-10 keeps the title target large without padding extra
   // text into the clamp box (which would expose part of a third line).
   const titleContent = onClick ? (
-    <span className="line-clamp-2 break-words min-h-10">
+    <span className="resource-card__title-link">
       {resource.name}
     </span>
   ) : isValidDbResource ? (
     <Link
       href={`/resource/${resource.id}`}
-      className="line-clamp-2 break-words min-h-10 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="resource-card__title-link"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -126,7 +153,7 @@ function ResourceCard({
       href={resource.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="line-clamp-2 break-words min-h-10 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="resource-card__title-link"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -139,32 +166,22 @@ function ResourceCard({
     <Card 
       ref={cardRef}
       className={cn(
-        "group relative hover:border-primary/50 transition-all cursor-pointer",
+        "resource-card card hoverable glow group relative",
         className
       )}
       data-ds="card-hover"
       onClick={onClick ? handleCardClick : undefined}
       data-testid={`card-resource-${resource.id}`}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          {/* BUG-021/036 (run10): full title via native tooltip — the visual
-              title is line-clamped so hover/long-press reveals the rest.
-              BUG-v3-H02 (run12): rendered as a real h2 so resource cards sit
-              beneath the page h1 in the heading hierarchy. */}
-          <h2
-            /* NB-050 (run18): allow titles to wrap to two lines with an
-               ellipsis (break-words) instead of hard-clipping mid-word in the
-               grid; the native title tooltip still reveals the full text. */
-            className="text-lg font-semibold leading-tight tracking-tight break-words flex-1 min-w-0 min-h-10"
-            title={resource.name}
-          >
-            {titleContent}
-          </h2>
+      <CardHeader className="resource-card__header">
+        <div className="resource-card__top">
+          <div className="resource-card__mark" aria-hidden="true">
+            {categoryMark}
+          </div>
           {/* R2-L09: shown to anonymous users too — the buttons themselves
               prompt sign-in on click instead of hiding the affordance. */}
           {showPersonalActions && (
-            <div className="no-print relative z-10 flex items-center gap-1 ml-2">
+            <div className="resource-card__personal-actions no-print relative z-10">
               <FavoriteButton
                 resourceId={resource.id}
                 isFavorited={resource.isFavorited}
@@ -181,14 +198,29 @@ function ResourceCard({
             </div>
           )}
         </div>
+        <div className="resource-card__title-row">
+          {/* BUG-021/036 (run10): full title via native tooltip — the visual
+              title is line-clamped so hover/long-press reveals the rest.
+              BUG-v3-H02 (run12): rendered as a real h2 so resource cards sit
+              beneath the page h1 in the heading hierarchy. */}
+          <h2
+            /* NB-050 (run18): allow titles to wrap to two lines with an
+               ellipsis (break-words) instead of hard-clipping mid-word in the
+               grid; the native title tooltip still reveals the full text. */
+            className="resource-card__title"
+            title={resource.name}
+          >
+            {titleContent}
+          </h2>
+        </div>
         {/* R5-053 (run24): printed card grids previously showed dead buttons
             and never a URL. Print the destination under the title so a paper
             catalog stays actionable (screen: hidden). */}
-        <p className="print-only text-xs text-muted-foreground" aria-hidden="true">
+        <p className="resource-card__print-url print-only" aria-hidden="true">
           {resource.url}
         </p>
         {resource.description && (
-          <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+          <p className="resource-card__description">
             {resource.description}
           </p>
         )}
@@ -196,10 +228,10 @@ function ResourceCard({
             show the saved note on the card (the /bookmarks page passes it). */}
         {resource.bookmarkNotes && (
           <p
-            className="text-xs text-muted-foreground italic mt-2 flex items-start gap-1.5"
+            className="resource-card__bookmark-note"
             data-testid={`text-bookmark-notes-${resource.id}`}
           >
-            <NotebookPen className="h-3.5 w-3.5 shrink-0 mt-0.5" aria-hidden="true" />
+            <NotebookPen className="resource-card__bookmark-note-icon" aria-hidden="true" />
             {/* line-clamp sits on the element that directly holds the text;
                 min-w-0 lets long unbroken notes wrap inside the flex row. */}
             <span className="min-w-0 line-clamp-2">{resource.bookmarkNotes}</span>
@@ -207,13 +239,13 @@ function ResourceCard({
         )}
       </CardHeader>
       
-      <CardContent className="pt-0">
+      <CardContent className="resource-card__content">
         {fullResource?.metadata?.urlScraped && (
-          <div className="mb-3 space-y-2">
+          <div className="resource-card__scraped">
             {fullResource.metadata.ogImage && (
-              <div className="rounded-md overflow-hidden border border-border relative h-32">
+              <div className="resource-card__image-frame">
                 {fullResource.metadata.ogImageBlurhash && !imageLoaded && (
-                  <div className="absolute inset-0">
+                  <div className="resource-card__blurhash">
                     <Blurhash
                       hash={fullResource.metadata.ogImageBlurhash}
                       width="100%"
@@ -227,7 +259,7 @@ function ResourceCard({
                 <img
                   src={fullResource.metadata.ogImage}
                   alt={fullResource.metadata.ogTitle || resource.name}
-                  className="w-full h-32 object-cover relative z-10"
+                  className="resource-card__image"
                   loading="lazy"
                   onLoad={() => setImageLoaded(true)}
                   onError={(e) => {
@@ -237,19 +269,19 @@ function ResourceCard({
               </div>
             )}
             {fullResource.metadata.scrapedTitle && fullResource.metadata.scrapedTitle !== resource.name && (
-              <div className="text-xs text-muted-foreground">
-                <span className="font-medium">Page Title:</span> {fullResource.metadata.scrapedTitle}
+              <div className="resource-card__scraped-copy">
+                <span>Page Title:</span> {fullResource.metadata.scrapedTitle}
               </div>
             )}
             {fullResource.metadata.scrapedDescription && fullResource.metadata.scrapedDescription !== resource.description && (
-              <div className="text-xs text-muted-foreground line-clamp-2">
-                <span className="font-medium">Page Description:</span> {fullResource.metadata.scrapedDescription}
+              <div className="resource-card__scraped-copy resource-card__scraped-copy--clamp">
+                <span>Page Description:</span> {fullResource.metadata.scrapedDescription}
               </div>
             )}
           </div>
         )}
         
-        <div className="flex flex-wrap items-center gap-2 mb-3">
+        <div className="resource-card__metadata">
           {/* BUG-012 (run14): "View Details" is a real link to the detail page
               (was a decorative Badge that swallowed clicks under the
               stretched-link overlay). */}
@@ -258,18 +290,18 @@ function ResourceCard({
           {isValidDbResource && (
             <Link
               href={`/resource/${resource.id}`}
-              className="no-print relative z-10 inline-flex items-center min-h-[32px]"
+              className="resource-card__meta-link no-print relative z-10"
               data-testid={`link-view-details-${resource.id}`}
               aria-label={`View details for ${resource.name}`}
             >
-              <Badge variant="outline" className="text-xs border-primary/30 text-primary hover:bg-primary/10 transition-colors">
-                <ChevronRight className="h-3 w-3 mr-0.5" />
+              <Badge variant="outline" className="resource-card__meta-badge">
+                <ChevronRight className="resource-card__meta-icon" />
                 View Details
               </Badge>
             </Link>
           )}
           {resource.category && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="chip" className="resource-card__category-badge">
               {resource.category}
             </Badge>
           )}
@@ -281,7 +313,7 @@ function ResourceCard({
                 <Link
                   key={tag}
                   href={tagLandingPath(tag)}
-                  className="relative z-10 inline-flex items-center min-h-[32px]"
+                  className="resource-card__tag-link relative z-10"
                   onClick={onTagClick ? (event) => {
                     event.preventDefault();
                     event.stopPropagation();
@@ -290,7 +322,7 @@ function ResourceCard({
                   data-testid={`tag-pill-${resource.id}-${tag}`}
                   aria-label={onTagClick ? `Filter by tag ${tag}` : `Browse resources tagged ${tag}`}
                 >
-                  <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                  <Badge variant="chip" className="resource-card__tag">
                     #{tag}
                   </Badge>
                 </Link>
@@ -300,7 +332,7 @@ function ResourceCard({
               {resource.tags.length > 3 && (
                 <button
                   type="button"
-                  className="relative z-10 inline-flex items-center min-h-[32px] text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline cursor-pointer"
+                  className="resource-card__more-tags relative z-10"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAllTags((v) => !v);
@@ -322,14 +354,14 @@ function ResourceCard({
         
         {/* R5-053 (run24): no-print — the "Open Link" action is an anchor
             styled as a button; on paper it printed as a dead rectangle. */}
-        <div className="no-print relative z-10 flex gap-2">
+        <div className="resource-card__actions no-print relative z-10">
           {/* Run16 BUG-006/BUG-020: real anchor (not JS window.open) so the
               action can never silently fail and middle-click/cmd-click work */}
           <Button
             asChild
             variant="outline"
             size="sm"
-            className="flex-1 border-primary/50 hover:bg-primary/10 hover:border-primary min-h-[44px]"
+              className="resource-card__visit-button"
           >
             <a
               href={resource.url}

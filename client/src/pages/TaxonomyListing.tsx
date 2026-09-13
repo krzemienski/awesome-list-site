@@ -23,6 +23,8 @@ import {
   subSubcategorySeoTitleCore,
 } from "@shared/seo-templates";
 import NotFound from "@/pages/not-found";
+import ErrorPage from "@/pages/ErrorPage";
+import "@/styles/pages/taxonomy.css";
 import { parsePageParamStrict, pageNoticeFor } from "@/lib/page-param";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { normalizeTag, parseTagsParam } from "@/lib/tags";
@@ -35,6 +37,11 @@ import { trackCategoryView, trackFilterUsage, trackSearch, trackSortChange, trac
 
 const PAGE_SIZE = 24;
 type Props = { level: ListingLevel };
+const categoryMarks: Record<string, string> = {
+  "community-events": "◈", "encoding-codecs": "◇", "general-tools": "◆",
+  "infrastructure-delivery": "▣", "intro-learning": "▤", "media-tools": "▥",
+  "players-clients": "▶", "protocols-transport": "⟁", "standards-industry": "◉",
+};
 
 const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc"]);
 
@@ -313,13 +320,13 @@ export default function TaxonomyListing({ level }: Props) {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
-  if (loading) return <div className="space-y-6" aria-busy="true"><SEOHead title="Loading resources" description="Loading Awesome Video resources." /><PageHeaderSkeleton /><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
+  if (loading) return <div className={`taxonomy-page taxonomy-page--${level}`} aria-busy="true"><SEOHead title="Loading resources" description="Loading Awesome Video resources." /><div className="taxonomy-loading-header"><PageHeaderSkeleton /></div><div className="taxonomy-grid">{Array.from({ length: 9 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div></div>;
   // An unknown top-level slug 404s from the listing endpoint. Treat that as a
   // real not-found page (with navigation), not a transient "please try again"
   // error — matching the resource-detail 404 UX. Genuine 5xx/network errors
   // still surface the retry-able error state.
   if (isNotFoundError(listing.error)) return <NotFound />;
-  if (listing.error || taxonomySearch.error) return <div className="py-12 text-center"><h2 className="text-xl font-semibold">Error Loading Resources</h2><p className="text-muted-foreground">Please try again.</p></div>;
+  if (listing.error || taxonomySearch.error) return <ErrorPage error={listing.error ?? taxonomySearch.error} />;
   if (!listingData || !name) return <NotFound />;
 
   const optionChildren = listingData.children.flatMap((child: any) => [
@@ -438,29 +445,33 @@ export default function TaxonomyListing({ level }: Props) {
   const broadenBase = level === "category" ? "/search" : back;
   const broadenHref = `${broadenBase}${broadenParams.size ? `?${broadenParams}` : ""}`;
 
-  return <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
+  return <div className={`taxonomy-page taxonomy-page--${level}`}>
     <SEOHead title={pagedSeoTitleCore(seoCore, currentPage)} description={pagedSeoDescription(seoDescription, currentPage, totalPages)} category={name} resourceCount={listingData.totalAll} pageParam={currentPage} />
-    <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]"><Link href={back}><ArrowLeft className="h-4 w-4" />Back to {level === "category" ? "Home" : parentCategory?.name ?? "Category"}</Link></Button>
-    {/* Task #379 (uxv1-07): the count used to be stated three times in a row —
-        header subtitle, header badge, and the results heading. A listing states
-        its count ONCE, in the results heading below, where the visible range and
-        the total belong together and stay correct as filters change. */}
-    <h1 className="display-h text-2xl sm:text-3xl">{name}</h1>
+    {level === "category" ? <Button asChild variant="ghost" size="sm" className="taxonomy-back"><Link href="/"><ArrowLeft size={12} aria-hidden="true" />Browse</Link></Button> :
+      <nav className="taxonomy-breadcrumbs" aria-label="Collection breadcrumb">
+        <Link href="/">Home</Link><span aria-hidden="true">/</span>
+        {parentCategory && <><Link href={routeFor("category", parentCategory.slug)}>{parentCategory.name}</Link><span aria-hidden="true">/</span></>}
+        {level === "sub-subcategory" && parentSubcategory && <><Link href={routeFor("subcategory", parentSubcategory.slug)}>{parentSubcategory.name}</Link><span aria-hidden="true">/</span></>}
+        <span aria-current="page">{name}</span>
+      </nav>}
+    <header className="taxonomy-header">
+      {level === "category" && <div className="eyebrow taxonomy-eyebrow"><span aria-hidden="true">{categoryMarks[slug] ?? name.slice(0, 1)}</span>CATEGORY · {slug === "infrastructure-delivery" ? "INFRA" : name.split(/[ &]/)[0].toUpperCase()}</div>}
+      <h1 className="display-h taxonomy-title">{level === "category" ? name : <><span className="serif-italic taxonomy-title-accent">{name.split(" ")[0]}</span>{name.includes(" ") ? ` ${name.split(" ").slice(1).join(" ")}` : ""}</>}</h1>
     <section aria-labelledby="taxonomy-scope-heading" data-seo-section="taxonomy-intro">
-      <h2 id="taxonomy-scope-heading" className="text-base font-semibold">About this collection</h2>
-      {/* Task #379 (uxv1-06): max-w-3xl at 14px runs ~105 characters per line.
-          max-w-prose (65ch) keeps long-form prose at a readable measure on wide
-          desktop screens. */}
-      <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">{listingData.scopeIntro}</p>
+      <h2 id="taxonomy-scope-heading" className="sr-only">About this collection</h2>
+      <p className="taxonomy-description">{listingData.scopeIntro}</p>
     </section>
-    <div className="flex flex-col gap-4"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
+    <div className="taxonomy-summary"><span className="chip accent" data-ds="chip">{listingData.totalAll} {resourceNoun(listingData.totalAll)}</span>{listingData.children.length > 0 && <span className="chip" data-ds="chip">{listingData.children.length} {level === "category" ? (listingData.children.length === 1 ? "subcategory" : "subcategories") : (listingData.children.length === 1 ? "group" : "groups")}</span>}{parentCategory && <span>in {parentCategory.name}</span>}</div>
+    </header>
+    {listingData.children.length > 0 && <section className="taxonomy-children" aria-labelledby="taxonomy-children-heading"><h2 id="taxonomy-children-heading">{level === "category" ? "Subcategories" : "Groups"}</h2><div className="taxonomy-child-grid">{listingData.children.map(child => <Link key={child.slug} className="taxonomy-child card hoverable" href={routeFor(level === "category" ? "subcategory" : "sub-subcategory", child.slug)}><span>{child.name}</span><span className="chip mono" data-ds="chip">{child.count}</span></Link>)}</div></section>}
+    <div className="taxonomy-controls flex flex-col gap-4"><div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input className="pl-10" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder={`Search in ${name}...`} aria-label={`Search in ${name}`} data-testid="input-search-resources" /></div>
       {level !== "sub-subcategory" && optionChildren.length > 0 && <select className="min-h-11 rounded-md border bg-background px-3" aria-label={`Limit ${name} by subcategory`} value={selection} onChange={(event) => { const nextSelection = event.target.value; const next = { ...currentFilterState, selection: nextSelection }; setSelection(nextSelection); setGeneral(nextSelection === "__general__"); setPage(1); queueAnalytics(next, "taxonomy_scope", nextSelection); requestResultsFocus(); }} data-testid="select-subcategory-filter"><option value="all">All subcategories</option>{listingData.generalCount > 0 && <option value="__general__">Uncategorized ({listingData.generalCount})</option>}{optionChildren.map((item) => <option key={item.value} value={item.value}>{item.value} ({item.count})</option>)}</select>}
       <AdvancedFilter selectedTags={tags} sortBy={sort} availableTags={listingData.tags} onTagsChange={(value) => onFacetChange("tags", value)} onSortChange={(value) => onFacetChange("sort", value)} showCountSorts={false} showTagFilter={false} />
     </div>
     <ActiveFilters state={filterState} onChange={onFacetChange} onClear={clearFacetFilters} defaultSort="default" />
     <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6">
       <SearchFilters state={filterState} facets={taxonomySearch.data?.facets} onChange={onFacetChange} onClear={clearFacetFilters} hideTaxonomyFacets />
-      <main className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1">
         <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
           {/* The listing's single count statement: visible range, matching total,
               and — only while a filter narrows the collection — what it was
@@ -469,17 +480,17 @@ export default function TaxonomyListing({ level }: Props) {
           {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 min-h-8 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
           {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 min-h-8 underline" onClick={broadenScope}>Remove it</button></div>}
           {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
-          {resultsLoading ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" data-testid="taxonomy-results-loading">{Array.from({ length: 6 }).map((_, index) => <ResourceCardSkeleton key={index} />)}</div>
+          {resultsLoading ? <div className="taxonomy-grid" data-testid="taxonomy-results-loading">{Array.from({ length: 6 }).map((_, index) => <ResourceCardSkeleton key={index} />)}</div>
           : resources.length === 0 ? <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-resources"><h3 className="text-lg font-semibold">No resources match this combination</h3><p className="text-muted-foreground">Clear a filter, remove the search, or broaden where you're looking.</p><div className="flex flex-wrap justify-center gap-2">{(tags.length > 0 || provider || format || skillLevel || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? "Search all of Awesome Video" : "Search the broader category"}</Link></Button>}</div></div> :
-            <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4" : view === "list" ? "flex flex-col gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>{resources.map((resource: any, index: number) => {
+            <div className={view === "grid" ? "taxonomy-grid" : view === "list" ? "flex flex-col gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>{resources.map((resource: any, index: number) => {
               const normalized = { id: String(resource.id ?? ""), title: resource.title, url: resource.url, description: resource.description ?? "" };
               if (view === "list") return <ResourceListRow key={`${normalized.id}-${index}`} resource={normalized} />;
               if (view === "compact") return <ResourceCompactCard key={`${normalized.id}-${index}`} resource={normalized} />;
-              return <ResourceCard key={`${normalized.id}-${index}`} resource={{ id: normalized.id, name: normalized.title, url: normalized.url, description: normalized.description, tags: resource.tags ?? resource.metadata?.tags ?? [] }} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
+              return <ResourceCard key={`${normalized.id}-${index}`} resource={{ id: normalized.id, name: normalized.title, url: normalized.url, description: normalized.description, category: level === "category" ? name : parentCategory?.name, tags: resource.tags ?? resource.metadata?.tags ?? [] }} onTagClick={(tag) => onFacetChange("tags", tags.some(old => normalizeTag(old) === normalizeTag(tag)) ? tags : [...tags, tag])} />;
             })}</div>}
           <Paginator currentPage={currentPage} totalPages={totalPages} makeHref={makeHref} onNavigate={onPage} />
         </div>
-      </main>
+      </div>
     </div>
   </div>;
 }

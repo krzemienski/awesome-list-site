@@ -1,0 +1,1167 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUtc": "2026-09-13T10:25:43Z/2026-09-13T10:42:00Z",
+  "claim": "Full-union measured evidence; not a parity pass.",
+  "harnessMirror": "/tmp/parity-taxonomy-harness",
+  "canonicalReference": "awesome-list-site-ds (served from an in-memory snapshot; frozen files untouched)",
+  "appTarget": "http://127.0.0.1:5000",
+  "inventory": {
+    "fragments": 10,
+    "screensInDisposableGeneratedInventory": 84,
+    "generatedInventorySha256": "3a7ba1eb54f8c2693adfc221f331d5d98b91ad269fe73aa2246bc95ad40f88d0",
+    "canonicalAggregateModified": false
+  },
+  "selection": [
+    "app.category",
+    "app.subcategory",
+    "app.subsubcategory"
+  ],
+  "widths": [
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "identityMode": "visitor",
+  "capture": {
+    "theme": "Editorial × Crimson",
+    "browser": "Chromium 148.0.7778.96",
+    "dpr": 1,
+    "pixelmatchThreshold": 0.1,
+    "maximumDiffPercent": 0.5,
+    "canvas": "max(actual width, expected width) × max(actual height, expected height), top-left placement; no crop/resize/mask",
+    "includeAA": false,
+    "backdropNormalisation": "backdrop-filter disabled symmetrically for raster stability; pre-normalisation sets retained and compared",
+    "sourceInventoryCanonicalHashBefore": "61edadfdc379542890bbe936650a95535ae3e717c8c68a2883943acb9a4ef862"
+  },
+  "cells": [
+    {
+      "id": "app.category",
+      "width": 375,
+      "runId": "2026-09-13T10-25-43-979Z-9526",
+      "status": "EVIDENCE",
+      "diffPercent": 58.85874504495794,
+      "differingPixels": 6848730,
+      "overlapDifferingPixels": 331605,
+      "unmatchedDimensionPixels": 6517125,
+      "canvasPixels": 11635875,
+      "canvas": {
+        "width": 375,
+        "height": 31029
+      },
+      "actualDimensions": {
+        "width": 375,
+        "height": 13650
+      },
+      "expectedDimensions": {
+        "width": 375,
+        "height": 31029
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community & Events"
+        ],
+        "scope": "main",
+        "actualHeading": "community & events",
+        "expectedHeading": "community & events"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "5b504089fafb0a061db8f0dc1ea6c1b9c9e87c91ea4f57abcd6744643ed74079",
+          "5b504089fafb0a061db8f0dc1ea6c1b9c9e87c91ea4f57abcd6744643ed74079"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "a4c44b11eea1d30c0b758a5f97097ce848e1f4b31d97e95a8cbc4398b3212f48",
+          "a4c44b11eea1d30c0b758a5f97097ce848e1f4b31d97e95a8cbc4398b3212f48"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/category-375.png",
+        "expected": "expected/category-375.png",
+        "diff": "diff/category-375.png",
+        "rawRun": "runs/category-375.json"
+      }
+    },
+    {
+      "id": "app.category",
+      "width": 768,
+      "runId": "2026-09-13T10-27-14-054Z-10251",
+      "status": "EVIDENCE",
+      "diffPercent": 58.64271538678568,
+      "differingPixels": 7316359,
+      "overlapDifferingPixels": 319879,
+      "unmatchedDimensionPixels": 6996480,
+      "canvasPixels": 12476160,
+      "canvas": {
+        "width": 768,
+        "height": 16245
+      },
+      "actualDimensions": {
+        "width": 768,
+        "height": 7135
+      },
+      "expectedDimensions": {
+        "width": 768,
+        "height": 16245
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community & Events"
+        ],
+        "scope": "main",
+        "actualHeading": "community & events",
+        "expectedHeading": "community & events"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "16d1586fed0af67343b6b565980d1d0b658b93d9548db81adefa10f7efab7137",
+          "16d1586fed0af67343b6b565980d1d0b658b93d9548db81adefa10f7efab7137"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "909159ce58f74e741415b34a0f6e07c13bb58dc789a708a0258e08023804a015",
+          "909159ce58f74e741415b34a0f6e07c13bb58dc789a708a0258e08023804a015"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/category-768.png",
+        "expected": "expected/category-768.png",
+        "diff": "diff/category-768.png",
+        "rawRun": "runs/category-768.json"
+      }
+    },
+    {
+      "id": "app.category",
+      "width": 1024,
+      "runId": "2026-09-13T10-28-36-122Z-10438",
+      "status": "EVIDENCE",
+      "diffPercent": 33.18056209311974,
+      "differingPixels": 5323500,
+      "overlapDifferingPixels": 475884,
+      "unmatchedDimensionPixels": 4847616,
+      "canvasPixels": 16044032,
+      "canvas": {
+        "width": 1024,
+        "height": 15668
+      },
+      "actualDimensions": {
+        "width": 1024,
+        "height": 10934
+      },
+      "expectedDimensions": {
+        "width": 1024,
+        "height": 15668
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community & Events"
+        ],
+        "scope": "main",
+        "actualHeading": "community & events",
+        "expectedHeading": "community & events"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "b7da0baa713d3c3e5433ba65d06a6b49a9f9cc5c6230f1efee65fdba7bc0f177",
+          "b7da0baa713d3c3e5433ba65d06a6b49a9f9cc5c6230f1efee65fdba7bc0f177"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "1c99264ca61a55dd17c55c7b76df4020bc4cf4eb63cee9a54dd40737548ad93b",
+          "1c99264ca61a55dd17c55c7b76df4020bc4cf4eb63cee9a54dd40737548ad93b"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/category-1024.png",
+        "expected": "expected/category-1024.png",
+        "diff": "diff/category-1024.png",
+        "rawRun": "runs/category-1024.json"
+      }
+    },
+    {
+      "id": "app.category",
+      "width": 1440,
+      "runId": "2026-09-13T10-30-01-639Z-10619",
+      "status": "EVIDENCE",
+      "diffPercent": 44.436506861682915,
+      "differingPixels": 7087374,
+      "overlapDifferingPixels": 430254,
+      "unmatchedDimensionPixels": 6657120,
+      "canvasPixels": 15949440,
+      "canvas": {
+        "width": 1440,
+        "height": 11076
+      },
+      "actualDimensions": {
+        "width": 1440,
+        "height": 6453
+      },
+      "expectedDimensions": {
+        "width": 1440,
+        "height": 11076
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community & Events"
+        ],
+        "scope": "main",
+        "actualHeading": "community & events",
+        "expectedHeading": "community & events"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "c4f1ed3c833dbcabc3127fae93fec9cb6e902da20856adb6794340b2799c3dcc",
+          "c4f1ed3c833dbcabc3127fae93fec9cb6e902da20856adb6794340b2799c3dcc"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "d76c7478c7fe0252be31ac332fb75db0f76eb881df4c9eec26809d371dbe2d70",
+          "d76c7478c7fe0252be31ac332fb75db0f76eb881df4c9eec26809d371dbe2d70"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/category-1440.png",
+        "expected": "expected/category-1440.png",
+        "diff": "diff/category-1440.png",
+        "rawRun": "runs/category-1440.json"
+      }
+    },
+    {
+      "id": "app.subcategory",
+      "width": 375,
+      "runId": "2026-09-13T10-31-29-362Z-10800",
+      "status": "EVIDENCE",
+      "diffPercent": 19.937379514881897,
+      "differingPixels": 1176430,
+      "overlapDifferingPixels": 334555,
+      "unmatchedDimensionPixels": 841875,
+      "canvasPixels": 5900625,
+      "canvas": {
+        "width": 375,
+        "height": 15735
+      },
+      "actualDimensions": {
+        "width": 375,
+        "height": 13490
+      },
+      "expectedDimensions": {
+        "width": 375,
+        "height": 15735
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community Groups"
+        ],
+        "scope": "main",
+        "actualHeading": "community groups",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "d26db17ae27f541f33226af33715caf1005225366d7f2687c39e38f0382dc7b3",
+          "d26db17ae27f541f33226af33715caf1005225366d7f2687c39e38f0382dc7b3"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "76020bb08e8c79dfc2e59338d9149e04cbca394cac552502f37b69dcadcc70e7",
+          "76020bb08e8c79dfc2e59338d9149e04cbca394cac552502f37b69dcadcc70e7"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subcategory-375.png",
+        "expected": "expected/subcategory-375.png",
+        "diff": "diff/subcategory-375.png",
+        "rawRun": "runs/subcategory-375.json"
+      }
+    },
+    {
+      "id": "app.subcategory",
+      "width": 768,
+      "runId": "2026-09-13T10-32-51-726Z-11185",
+      "status": "EVIDENCE",
+      "diffPercent": 20.004291099124075,
+      "differingPixels": 1274539,
+      "overlapDifferingPixels": 332203,
+      "unmatchedDimensionPixels": 942336,
+      "canvasPixels": 6371328,
+      "canvas": {
+        "width": 768,
+        "height": 8296
+      },
+      "actualDimensions": {
+        "width": 768,
+        "height": 7069
+      },
+      "expectedDimensions": {
+        "width": 768,
+        "height": 8296
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community Groups"
+        ],
+        "scope": "main",
+        "actualHeading": "community groups",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "fc237077de8612affba45c8784bd1364d23b69b73b955d54c8c4f295bd3079f4",
+          "fc237077de8612affba45c8784bd1364d23b69b73b955d54c8c4f295bd3079f4"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "478cc60877119b1540a51bf4ca3da3041480ee4ef0e3b8cc8bad0549faaf50c3",
+          "478cc60877119b1540a51bf4ca3da3041480ee4ef0e3b8cc8bad0549faaf50c3"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subcategory-768.png",
+        "expected": "expected/subcategory-768.png",
+        "diff": "diff/subcategory-768.png",
+        "rawRun": "runs/subcategory-768.json"
+      }
+    },
+    {
+      "id": "app.subcategory",
+      "width": 1024,
+      "runId": "2026-09-13T10-34-20-482Z-11366",
+      "status": "EVIDENCE",
+      "diffPercent": 30.75957117512422,
+      "differingPixels": 3423181,
+      "overlapDifferingPixels": 352205,
+      "unmatchedDimensionPixels": 3070976,
+      "canvasPixels": 11128832,
+      "canvas": {
+        "width": 1024,
+        "height": 10868
+      },
+      "actualDimensions": {
+        "width": 1024,
+        "height": 10868
+      },
+      "expectedDimensions": {
+        "width": 1024,
+        "height": 7869
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community Groups"
+        ],
+        "scope": "main",
+        "actualHeading": "community groups",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "eea956320bc47b4f3d83e8fa32d7662820da07ce3c395018a168481339c88a0b",
+          "eea956320bc47b4f3d83e8fa32d7662820da07ce3c395018a168481339c88a0b"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "32a6e61fd3b382a05887fcef6a0a94e5e9618291dd312da1c91fc8d880e392e0",
+          "32a6e61fd3b382a05887fcef6a0a94e5e9618291dd312da1c91fc8d880e392e0"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subcategory-1024.png",
+        "expected": "expected/subcategory-1024.png",
+        "diff": "diff/subcategory-1024.png",
+        "rawRun": "runs/subcategory-1024.json"
+      }
+    },
+    {
+      "id": "app.subcategory",
+      "width": 1440,
+      "runId": "2026-09-13T10-35-47-850Z-11553",
+      "status": "EVIDENCE",
+      "diffPercent": 14.232459562074167,
+      "differingPixels": 1313508,
+      "overlapDifferingPixels": 389028,
+      "unmatchedDimensionPixels": 924480,
+      "canvasPixels": 9228960,
+      "canvas": {
+        "width": 1440,
+        "height": 6409
+      },
+      "actualDimensions": {
+        "width": 1440,
+        "height": 6409
+      },
+      "expectedDimensions": {
+        "width": 1440,
+        "height": 5767
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Community Groups"
+        ],
+        "scope": "main",
+        "actualHeading": "community groups",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "b608d50298dbdb03ece87840f148e41e22dfbe079b8ac160697dd89a987b8036",
+          "b608d50298dbdb03ece87840f148e41e22dfbe079b8ac160697dd89a987b8036"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "c759bf107ffde4b08bb4413d99a451df4b6baa2ab720f0232b42d47b308ac29c",
+          "c759bf107ffde4b08bb4413d99a451df4b6baa2ab720f0232b42d47b308ac29c"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subcategory-1440.png",
+        "expected": "expected/subcategory-1440.png",
+        "diff": "diff/subcategory-1440.png",
+        "rawRun": "runs/subcategory-1440.json"
+      }
+    },
+    {
+      "id": "app.subsubcategory",
+      "width": 375,
+      "runId": "2026-09-13T10-37-10-411Z-11735",
+      "status": "EVIDENCE",
+      "diffPercent": 84.32660946933588,
+      "differingPixels": 4975797,
+      "overlapDifferingPixels": 58422,
+      "unmatchedDimensionPixels": 4917375,
+      "canvasPixels": 5900625,
+      "canvas": {
+        "width": 375,
+        "height": 15735
+      },
+      "actualDimensions": {
+        "width": 375,
+        "height": 2622
+      },
+      "expectedDimensions": {
+        "width": 375,
+        "height": 15735
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Online Forums"
+        ],
+        "scope": "main",
+        "actualHeading": "online forums",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "8bb93ff6332bf021c0df46c496c446fa0fef23d8bf40d46bf21936f11db33a42",
+          "8bb93ff6332bf021c0df46c496c446fa0fef23d8bf40d46bf21936f11db33a42"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "f64e54e6764069bb3cc73da3416b91020961511f29126cf551a943c5b9bf3c80",
+          "f64e54e6764069bb3cc73da3416b91020961511f29126cf551a943c5b9bf3c80"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subsubcategory-375.png",
+        "expected": "expected/subsubcategory-375.png",
+        "diff": "diff/subsubcategory-375.png",
+        "rawRun": "runs/subsubcategory-375.json"
+      }
+    },
+    {
+      "id": "app.subsubcategory",
+      "width": 768,
+      "runId": "2026-09-13T10-38-27-771Z-11924",
+      "status": "EVIDENCE",
+      "diffPercent": 75.51684672332047,
+      "differingPixels": 4811426,
+      "overlapDifferingPixels": 75170,
+      "unmatchedDimensionPixels": 4736256,
+      "canvasPixels": 6371328,
+      "canvas": {
+        "width": 768,
+        "height": 8296
+      },
+      "actualDimensions": {
+        "width": 768,
+        "height": 2129
+      },
+      "expectedDimensions": {
+        "width": 768,
+        "height": 8296
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Online Forums"
+        ],
+        "scope": "main",
+        "actualHeading": "online forums",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "2ecc35470fec248c3c1e16896e4f82ede11464222771210d662d5f6b584a92df",
+          "2ecc35470fec248c3c1e16896e4f82ede11464222771210d662d5f6b584a92df"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "49576751cd561334e4bdd5601e6495d318f6f92f2df857977145f77062dfb1ad",
+          "49576751cd561334e4bdd5601e6495d318f6f92f2df857977145f77062dfb1ad"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subsubcategory-768.png",
+        "expected": "expected/subsubcategory-768.png",
+        "diff": "diff/subsubcategory-768.png",
+        "rawRun": "runs/subsubcategory-768.json"
+      }
+    },
+    {
+      "id": "app.subsubcategory",
+      "width": 1024,
+      "runId": "2026-09-13T10-39-45-815Z-12104",
+      "status": "EVIDENCE",
+      "diffPercent": 81.41292174990468,
+      "differingPixels": 6560136,
+      "overlapDifferingPixels": 83336,
+      "unmatchedDimensionPixels": 6476800,
+      "canvasPixels": 8057856,
+      "canvas": {
+        "width": 1024,
+        "height": 7869
+      },
+      "actualDimensions": {
+        "width": 1024,
+        "height": 1544
+      },
+      "expectedDimensions": {
+        "width": 1024,
+        "height": 7869
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Online Forums"
+        ],
+        "scope": "main",
+        "actualHeading": "online forums",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "60b45b47150b7707071ce0f9d3e3a79b8d87b6cf08b3bd1de5c62dec63ed9fc8",
+          "60b45b47150b7707071ce0f9d3e3a79b8d87b6cf08b3bd1de5c62dec63ed9fc8"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "c39b876b790ea7c1ec9bfbe4be31910ecf9aafc54ba5d1b7f86fd357f1a25ac5",
+          "c39b876b790ea7c1ec9bfbe4be31910ecf9aafc54ba5d1b7f86fd357f1a25ac5"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subsubcategory-1024.png",
+        "expected": "expected/subsubcategory-1024.png",
+        "diff": "diff/subsubcategory-1024.png",
+        "rawRun": "runs/subsubcategory-1024.json"
+      }
+    },
+    {
+      "id": "app.subsubcategory",
+      "width": 1440,
+      "runId": "2026-09-13T10-41-05-424Z-12283",
+      "status": "EVIDENCE",
+      "diffPercent": 74.47045450166657,
+      "differingPixels": 6184384,
+      "overlapDifferingPixels": 104704,
+      "unmatchedDimensionPixels": 6079680,
+      "canvasPixels": 8304480,
+      "canvas": {
+        "width": 1440,
+        "height": 5767
+      },
+      "actualDimensions": {
+        "width": 1440,
+        "height": 1545
+      },
+      "expectedDimensions": {
+        "width": 1440,
+        "height": 5767
+      },
+      "dimensionsMatch": false,
+      "withinCeiling": false,
+      "identity": {
+        "checked": true,
+        "ok": true,
+        "required": [
+          "Online Forums"
+        ],
+        "scope": "main",
+        "actualHeading": "online forums",
+        "expectedHeading": "community groups"
+      },
+      "backdropFilters": {
+        "actual": [
+          "blur(14px)"
+        ],
+        "expected": [
+          "blur(14px)",
+          "blur(2px)"
+        ],
+        "match": false
+      },
+      "fontParity": {
+        "ok": true,
+        "sharedFaces": 39,
+        "gaps": [],
+        "familiesMissingOnActual": [],
+        "familiesMissingOnExpected": []
+      },
+      "apiFailures": [],
+      "referenceApiFailures": [],
+      "actualCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "242c61edf948fa30ab8558d525bf1b6df03c3660b50ec8b1d7114c138ccca9e1",
+          "242c61edf948fa30ab8558d525bf1b6df03c3660b50ec8b1d7114c138ccca9e1"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 5,
+          "completedAtCaptureEnd": 5,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "expectedCaptureStability": {
+        "stableAttempts": [
+          1,
+          2
+        ],
+        "attemptHashes": [
+          "44bb07051e5ed6b733bae59f81060fde9848ccef1fdaecf9b36a134e5916abda",
+          "44bb07051e5ed6b733bae59f81060fde9848ccef1fdaecf9b36a134e5916abda"
+        ],
+        "discardedFrames": [],
+        "apiTraffic": {
+          "completedAtCaptureStart": 0,
+          "completedAtCaptureEnd": 0,
+          "failures": 0
+        },
+        "reopenedAfterReload": 0
+      },
+      "links": {
+        "actual": "actual/subsubcategory-1440.png",
+        "expected": "expected/subsubcategory-1440.png",
+        "diff": "diff/subsubcategory-1440.png",
+        "rawRun": "runs/subsubcategory-1440.json"
+      }
+    }
+  ]
+}

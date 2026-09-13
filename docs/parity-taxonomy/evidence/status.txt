@@ -1,0 +1,6 @@
+0 npm run check
+1 npm run lint
+0 npm run lint:css
+0 npm run test:unit
+0 node scripts/validation/dead-components.mjs
+0 node scripts/validation/taxonomy-listing-parity.mjs

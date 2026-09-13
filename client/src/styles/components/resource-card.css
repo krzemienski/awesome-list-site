@@ -1,0 +1,297 @@
+/*
+ * Shared resource-card composition.
+ *
+ * The home reference card is the visual source for this production card:
+ * compact mark row, editorial title/copy rhythm, mono metadata, and the
+ * design-system hover treatment. Runtime actions and scraped previews remain
+ * production-only additions inside the same geometry.
+ */
+.resource-card {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+.resource-card > .resource-card__header,
+.resource-card > .resource-card__content {
+  min-width: 0;
+  padding: 0;
+}
+
+.resource-card > .resource-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* CardHeader ships with shadcn's space-y utility; this card owns the rhythm. */
+.resource-card__header > .resource-card__top,
+.resource-card__header > .resource-card__title-row,
+.resource-card__header > .resource-card__print-url,
+.resource-card__header > .resource-card__description,
+.resource-card__header > .resource-card__bookmark-note {
+  margin-top: 0 !important;
+}
+
+.resource-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem !important;
+}
+
+.resource-card__mark {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--accent);
+  font-size: 1rem;
+  background: var(--surface-2);
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.resource-card__personal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.resource-card__personal-actions > button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+.resource-card__title-row {
+  min-width: 0;
+}
+
+.resource-card__title {
+  min-width: 0;
+  min-height: 2.6rem;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.0125rem;
+  line-height: 1.3;
+}
+
+.resource-card__title-link {
+  display: -webkit-box;
+  min-height: 2.6rem;
+  overflow: hidden;
+  color: inherit;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Keep the card's stretched target while leaving controls above it. */
+.resource-card__title-link:not(span)::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.resource-card__title-link:hover,
+.resource-card__title-link:focus-visible {
+  color: var(--accent);
+}
+
+.resource-card__print-url {
+  margin-bottom: 0.5rem;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  overflow-wrap: anywhere;
+}
+
+.resource-card__description {
+  display: -webkit-box;
+  min-height: 3.9rem;
+  margin: 0 0 0.875rem;
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.resource-card__bookmark-note {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.375rem;
+  margin: 0 0 0.875rem;
+  color: var(--text-2);
+  font-size: 0.6875rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.resource-card__bookmark-note-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: 0 0 auto;
+  margin-top: 0.125rem;
+}
+
+.resource-card__bookmark-note > span {
+  min-width: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.resource-card > .resource-card__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.resource-card__scraped {
+  margin-bottom: 0.75rem;
+}
+
+.resource-card__image-frame {
+  position: relative;
+  height: 8rem;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.resource-card__blurhash {
+  position: absolute;
+  inset: 0;
+}
+
+.resource-card__image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 8rem;
+  object-fit: cover;
+}
+
+.resource-card__scraped-copy {
+  color: var(--text-2);
+  font-size: 0.6875rem;
+  line-height: 1.45;
+}
+
+.resource-card__scraped-copy > span {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.resource-card__scraped-copy--clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.resource-card__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.resource-card__meta-link,
+.resource-card__tag-link {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  text-decoration: none;
+}
+
+.resource-card__meta-badge {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  font-size: 0.625rem;
+}
+
+.resource-card__meta-badge:hover,
+.resource-card__meta-badge:focus-visible {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.resource-card__meta-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.125rem;
+}
+
+.resource-card__category-badge,
+.resource-card__tag {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+}
+
+.resource-card__tag {
+  text-decoration: none;
+}
+
+.resource-card__more-tags {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  padding: 0 0.25rem;
+  color: var(--text-2);
+  font-size: 0.6875rem;
+  text-decoration: none;
+}
+
+.resource-card__more-tags:hover,
+.resource-card__more-tags:focus-visible {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 0.125rem;
+}
+
+.resource-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.resource-card__visit-button {
+  min-height: 2.75rem;
+  flex: 1;
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+.resource-card__visit-button:hover,
+.resource-card__visit-button:focus-visible {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+@media (max-width: 40rem) {
+  .resource-card {
+    padding: 1rem;
+  }
+
+  .resource-card__actions {
+    flex-wrap: wrap;
+  }
+
+  .resource-card__visit-button {
+    flex-basis: 100%;
+  }
+}

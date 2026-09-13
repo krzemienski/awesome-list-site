@@ -24,7 +24,10 @@ test.describe('Browse Categories Flow', () => {
 
       // Verify category page header
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-      await expect(page.getByRole('button', { name: /Back to all categories/i })).toBeVisible();
+      const browseLink = page.locator('a.taxonomy-back');
+      await expect(browseLink).toBeVisible();
+      await expect(browseLink).toHaveAccessibleName('Browse');
+      await expect(browseLink).toHaveAttribute('href', '/');
     });
 
     // Task #379: the header count badge was removed — the listing states its
@@ -50,8 +53,10 @@ test.describe('Browse Categories Flow', () => {
       await page.locator('[data-testid^="link-category-"]').first().click();
       await page.waitForLoadState('domcontentloaded');
 
-      // Click back button
-      await page.getByRole('button', { name: /Back to all categories/i }).click();
+      // The canonical category navigation is a Browse link to home.
+      const browseLink = page.locator('a.taxonomy-back');
+      await expect(browseLink).toHaveAttribute('href', '/');
+      await browseLink.click();
       await page.waitForLoadState('domcontentloaded');
 
       // Verify we're back on home page
@@ -121,7 +126,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory filter
-      const subcategoryFilter = page.locator('[data-testid="select-subcategory"]');
+      const subcategoryFilter = page.locator('[data-testid="select-subcategory-filter"]');
 
       // Filter may not exist if category has no subcategories
       const filterExists = await subcategoryFilter.count() > 0;
@@ -137,7 +142,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for sort dropdown
-      const sortSelect = page.locator('[data-testid="select-sort"]');
+      const sortSelect = page.getByRole('combobox', { name: 'Sort resources' });
       await expect(sortSelect).toBeVisible();
     });
 
@@ -263,11 +268,13 @@ test.describe('Browse Categories Flow', () => {
     test('should navigate to subcategory page from category', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
+      const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
       await page.locator('[data-testid^="link-category-"]').first().click();
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      // TaxonomyListing renders child navigation as taxonomy-child links.
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
@@ -279,32 +286,32 @@ test.describe('Browse Categories Flow', () => {
         // Verify navigation to subcategory page
         expect(page.url()).toContain(subcategorySlug || '/subcategory/');
 
-        // Verify subcategory page has back button
-        await expect(page.getByRole('button', { name: /Back to/i })).toBeVisible();
+        // Verify the nested page exposes its parent category breadcrumb.
+        const breadcrumbs = page.locator('nav[aria-label="Collection breadcrumb"]');
+        await expect(breadcrumbs).toBeVisible();
+        await expect(breadcrumbs.locator('a').nth(1)).toHaveAttribute('href', categorySlug!);
       }
     });
 
     test('should display breadcrumbs on subcategory page', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      const categoryName = await page.locator('[data-testid^="link-category-"]').first().textContent();
+      const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
       await page.locator('[data-testid^="link-category-"]').first().click();
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
         await page.waitForLoadState('domcontentloaded');
 
-        // Look for breadcrumbs
-        const breadcrumbs = page.locator('[data-testid="breadcrumbs"], nav[aria-label="breadcrumb"], nav[aria-label="Breadcrumb"]');
-
-        if (await breadcrumbs.count() > 0) {
-          await expect(breadcrumbs.first()).toBeVisible();
-        }
+        // The parent category is the second link after Home.
+        const breadcrumbs = page.locator('nav[aria-label="Collection breadcrumb"]');
+        await expect(breadcrumbs).toBeVisible();
+        await expect(breadcrumbs.locator('a').nth(1)).toHaveAttribute('href', categorySlug!);
       }
     });
 
@@ -316,16 +323,19 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
         await page.waitForLoadState('domcontentloaded');
 
-        // Click back button
-        const backButton = page.getByRole('button', { name: /Back to/i }).first();
-        await backButton.click();
+        // Follow the canonical parent breadcrumb back to the category.
+        const breadcrumbs = page.locator('nav[aria-label="Collection breadcrumb"]');
+        await expect(breadcrumbs).toBeVisible();
+        const parentBreadcrumb = breadcrumbs.locator('a').nth(1);
+        await expect(parentBreadcrumb).toHaveAttribute('href', categorySlug!);
+        await parentBreadcrumb.click();
         await page.waitForLoadState('domcontentloaded');
 
         // Verify we're back on category page
@@ -340,7 +350,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
@@ -364,20 +374,18 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
         await page.waitForLoadState('domcontentloaded');
 
-        // Look for tag filter component
-        const tagFilter = page.locator('[data-testid="tag-filter"]');
-
-        // Tag filter may not exist if no tags available
-        if (await tagFilter.count() > 0) {
-          await expect(tagFilter).toBeVisible();
-        }
+        // The tag facet is a collapsed disclosure in SearchFilters.
+        const tagDisclosure = page.locator('details').filter({ hasText: 'Tags' }).first();
+        await expect(tagDisclosure).toBeVisible();
+        await tagDisclosure.locator('summary').click();
+        await expect(page.locator('[data-testid="input-search-tags"]').first()).toBeVisible();
       }
     });
 
@@ -388,7 +396,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
@@ -430,10 +438,13 @@ test.describe('Browse Categories Flow', () => {
 
       // Verify on category page
       expect(page.url()).toContain(categorySlug || '/category/');
-      await expect(page.getByRole('button', { name: /Back to all categories/i })).toBeVisible();
+      const browseLink = page.locator('a.taxonomy-back');
+      await expect(browseLink).toBeVisible();
+      await expect(browseLink).toHaveAccessibleName('Browse');
+      await expect(browseLink).toHaveAttribute('href', '/');
 
       // Check for subcategories
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
@@ -445,14 +456,18 @@ test.describe('Browse Categories Flow', () => {
         // Verify on subcategory page
         expect(page.url()).toContain(subcategorySlug || '/subcategory/');
 
-        // Navigate back to category
-        await page.getByRole('button', { name: /Back to/i }).first().click();
+        // Navigate back to category via its parent breadcrumb.
+        const breadcrumbs = page.locator('nav[aria-label="Collection breadcrumb"]');
+        await expect(breadcrumbs).toBeVisible();
+        const parentBreadcrumb = breadcrumbs.locator('a').nth(1);
+        await expect(parentBreadcrumb).toHaveAttribute('href', categorySlug!);
+        await parentBreadcrumb.click();
         await page.waitForLoadState('domcontentloaded');
         expect(page.url()).toContain(categorySlug || '/category/');
       }
 
       // Navigate back to home
-      await page.getByRole('button', { name: /Back to all categories/i }).click();
+      await browseLink.click();
       await page.waitForLoadState('domcontentloaded');
       expect(page.url()).toMatch(/\/$|\/$/);
       await expect(page.getByRole('heading', { level: 1, name: /Awesome Video Resources/i })).toBeVisible();
@@ -466,25 +481,40 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
+        const subcategorySlug = await subcategoryLinks.first().getAttribute('href');
         await subcategoryLinks.first().click();
         await page.waitForLoadState('domcontentloaded');
 
-        // Look for breadcrumb navigation
-        const breadcrumbLinks = page.locator('[data-testid="breadcrumbs"] a, nav[aria-label*="breadcrumb" i] a');
-        const breadcrumbCount = await breadcrumbLinks.count();
-
-        if (breadcrumbCount > 0) {
-          // Click first breadcrumb link (should go to category)
-          await breadcrumbLinks.first().click();
+        // If this subcategory has a nested group, verify its parent
+        // subcategory breadcrumb before returning to the category.
+        const nestedLinks = page.locator('a.taxonomy-child');
+        if (await nestedLinks.count() > 0) {
+          const subSubcategorySlug = await nestedLinks.first().getAttribute('href');
+          await nestedLinks.first().click();
           await page.waitForLoadState('domcontentloaded');
+          expect(page.url()).toContain(subSubcategorySlug || '/sub-subcategory/');
 
-          // Should be back on category page
-          expect(page.url()).toContain(categorySlug || '/category/');
+          const nestedBreadcrumbLinks = page.locator('nav[aria-label="Collection breadcrumb"] a');
+          await expect(nestedBreadcrumbLinks).toHaveCount(3);
+          await expect(nestedBreadcrumbLinks.nth(2)).toHaveAttribute('href', subcategorySlug!);
+          await nestedBreadcrumbLinks.nth(2).click();
+          await page.waitForLoadState('domcontentloaded');
+          expect(page.url()).toContain(subcategorySlug || '/subcategory/');
         }
+
+        // Click the parent category breadcrumb (Home is the first link).
+        const breadcrumbLinks = page.locator('nav[aria-label="Collection breadcrumb"] a');
+        await expect(breadcrumbLinks).toHaveCount(2);
+        await expect(breadcrumbLinks.nth(1)).toHaveAttribute('href', categorySlug!);
+        await breadcrumbLinks.nth(1).click();
+        await page.waitForLoadState('domcontentloaded');
+
+        // Should be back on category page
+        expect(page.url()).toContain(categorySlug || '/category/');
       }
     });
   });
@@ -566,19 +596,20 @@ test.describe('Browse Categories Flow', () => {
       await expect(h1).toBeVisible();
     });
 
-    test('should have accessible back buttons', async ({ page }) => {
+    test('should have accessible category navigation', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
       await page.waitForLoadState('domcontentloaded');
 
-      // Check back button
-      const backButton = page.getByRole('button', { name: /Back to all categories/i });
-      await expect(backButton).toBeVisible();
+      // The category page uses a canonical link to the home catalog.
+      const browseLink = page.locator('a.taxonomy-back');
+      await expect(browseLink).toBeVisible();
+      await expect(browseLink).toHaveAttribute('href', '/');
 
-      // Should be a button element
-      const tagName = await backButton.evaluate(el => el.tagName.toLowerCase());
-      expect(tagName).toBe('button');
+      // Should be an anchor element
+      const tagName = await browseLink.evaluate(el => el.tagName.toLowerCase());
+      expect(tagName).toBe('a');
     });
 
     test('should have accessible resource links', async ({ page }) => {
@@ -633,7 +664,7 @@ test.describe('Browse Categories Flow', () => {
 
       // Verify category page loads on mobile
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-      await expect(page.getByRole('button', { name: /Back to all categories/i })).toBeVisible();
+      await expect(page.locator('a.taxonomy-back')).toBeVisible();
     });
 
     test('should stack view mode toggles on mobile', async ({ page }) => {
@@ -667,7 +698,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
-      const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
+      const subcategoryLinks = page.locator('a.taxonomy-child');
       const subcategoryCount = await subcategoryLinks.count();
 
       if (subcategoryCount > 0) {
@@ -676,7 +707,9 @@ test.describe('Browse Categories Flow', () => {
 
         // Verify subcategory page loads on mobile
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Back to/i })).toBeVisible();
+        const breadcrumbs = page.locator('nav[aria-label="Collection breadcrumb"]');
+        await expect(breadcrumbs).toBeVisible();
+        await expect(breadcrumbs.locator('a').nth(1)).toBeVisible();
       }
     });
   });

@@ -1,0 +1,38 @@
+{
+  "purpose": "Proposed integration fragment; not an aggregate inventory edit",
+  "screens": [
+    {
+      "id": "app.category",
+      "eligibility": "pixel",
+      "actualPath": "/category/encoding-codecs",
+      "referenceAction": "category",
+      "widths": [375, 768, 1024, 1440]
+    },
+    {
+      "id": "app.subcategory",
+      "eligibility": "pixel",
+      "actualPath": "/subcategory/community-groups",
+      "referenceAction": "subcategory",
+      "widths": [375, 768, 1024, 1440]
+    },
+    {
+      "id": "app.subsubcategory",
+      "eligibility": "pixel",
+      "actualPath": "/sub-subcategory/online-forums",
+      "referenceAction": "subsubcategory",
+      "widths": [375, 768, 1024, 1440],
+      "notes": "Canonical SubcategoryPage accepts subSub; preserve pixel eligibility. Reconcile expected live leaf identity and ordered page without editing frozen source."
+    }
+  ],
+  "pixelStatus": "MEASURED FAIL: twelve full-union visitor evidence cells captured at 375/768/1024/1440; no pixel pass claimed",
+  "measurement": {
+    "evidence": "evidence/pixel-final/comparisons.json",
+    "harnessMirror": "/tmp/parity-taxonomy-harness",
+    "generatedInventorySha256": "3a7ba1eb54f8c2693adfc221f331d5d98b91ad269fe73aa2246bc95ad40f88d0",
+    "pixelmatchThreshold": 0.1,
+    "maximumDiffPercent": 0.5,
+    "masking": "none",
+    "identityMode": "visitor evidence only; not counted as an admin parity gate",
+    "canonicalAggregateModified": false
+  }
+}

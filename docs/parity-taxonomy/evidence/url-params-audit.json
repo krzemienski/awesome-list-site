@@ -1,0 +1,177 @@
+[
+  {
+    "k": "scrub:banner",
+    "pass": true,
+    "detail": "banner visible=true; text: Part of the link you followed was ignored: the “q” parameter contained unsafe content and "
+  },
+  {
+    "k": "scrub:param-removed",
+    "pass": true,
+    "detail": "location.search after boot: \"\""
+  },
+  {
+    "k": "scrub-benign:colon-scheme-prose",
+    "pass": true,
+    "detail": "banner=false, emptyPrompt=false, q=\"javascript: the good parts\", input=\"javascript: the good parts\""
+  },
+  {
+    "k": "scrub-benign:angle-bracket-prose",
+    "pass": true,
+    "detail": "banner=false, emptyPrompt=false, q=\"a < b > c\", input=\"a < b > c\""
+  },
+  {
+    "k": "scrub-encoded:double-encoded",
+    "pass": true,
+    "detail": "banner=true; location.search after boot: \"\""
+  },
+  {
+    "k": "scrub-encoded:triple-encoded",
+    "pass": true,
+    "detail": "banner=true; location.search after boot: \"\""
+  },
+  {
+    "k": "search-clamp:notice",
+    "pass": true,
+    "detail": "notice visible=true; text: Page 99 is beyond the available results. Showing page 47.Dismiss"
+  },
+  {
+    "k": "search-clamp:url-rewritten",
+    "pass": true,
+    "detail": "?page after load: 47 (search: \"?q=video&page=47\")"
+  },
+  {
+    "k": "category-clamp:notice",
+    "pass": true,
+    "detail": "notice visible=true; text: Page 999 is not available; showing page 14 instead.Dismiss"
+  },
+  {
+    "k": "category-clamp:content",
+    "pass": true,
+    "detail": "21 resource cards rendered on clamped page"
+  },
+  {
+    "k": "jump:present",
+    "pass": true,
+    "detail": "paginator indicator: Page 2 of 14"
+  },
+  {
+    "k": "jump:zero-clamps-to-1",
+    "pass": true,
+    "detail": "after jump \"0\": Page 1 of 14"
+  },
+  {
+    "k": "jump:999-clamps-to-last",
+    "pass": true,
+    "detail": "after jump \"999\": Page 14 of 14 (totalPages=14)"
+  },
+  {
+    "k": "breadcrumb:not-found",
+    "pass": true,
+    "detail": "breadcrumb text: \"Home Not found | Not found\""
+  },
+  {
+    "k": "subcategory:notice",
+    "pass": true,
+    "detail": "notice visible=true; text: “bogus” isn't a subcategory of Encoding & Codecs, so that filter was ignored.Remove it"
+  },
+  {
+    "k": "subcategory:full-category-shown",
+    "pass": true,
+    "detail": "24 resource cards (filter ignored, category still renders)"
+  },
+  {
+    "k": "whitespace:search-prompt",
+    "pass": true,
+    "detail": "text-search-prompt visible=true"
+  },
+  {
+    "k": "whitespace:category-shows-all",
+    "pass": true,
+    "detail": "bare: \"Showing 1–24 of 333 resources\" vs ?search=+++: \"Showing 1–24 of 333 resources\""
+  },
+  {
+    "k": "tags:repeated-equals-comma",
+    "pass": true,
+    "detail": "repeated {count:\"Showing 1–3 of 3 resources (filtered from 333)\", chips:\"HLS0|Hls2|RTMP0|Rtmp1\"} vs comma {count:\"Showing 1–3 of 3 resources (filtered from 333)\", chips:\"HLS0|Hls2|RTMP0|Rtmp1\"}"
+  },
+  {
+    "k": "tags:api-repeated-comma-alias-parity",
+    "pass": true,
+    "detail": "repeated={\"status\":200,\"total\":79,\"ids\":[185020,185550,185202,185393,185573,185602,184940,185562,186415,185682,185589,185532,185231,185017,185178,185482,185582,185571,185425,185261,184850,186414,185600,185203,185659,185609,185578,185575,185673,185030,186444,185601,185688,185515,185632,185294,185611,185619,186499,185273,184923,185574,185585,185029,184829,185576,185577,186349,184817,185663,185664,184833,184787,184924,184869,185182,184927,185407,186418,186400,185259,185607,184914,185033,184986,187906,185341,185406,185370,185019,184848,185656,185428,184987,184998,184834,185018,185371,185097]} comma={\"status\":200,\"total\":79,\"ids\":[185020,185550,185202,185393,185573,185602,184940,185562,186415,185682,185589,185532,185231,185017,185178,185482,185582,185571,185425,185261,184850,186414,185600,185203,185659,185609,185578,185575,185673,185030,186444,185601,185688,185515,185632,185294,185611,185619,186499,185273,184923,185574,185585,185029,184829,185576,185577,186349,184817,185663,185664,184833,184787,184924,184869,185182,184927,185407,186418,186400,185259,185607,184914,185033,184986,187906,185341,185406,185370,185019,184848,185656,185428,184987,184998,184834,185018,185371,185097]} mixedAlias={\"status\":200,\"total\":79,\"ids\":[185020,185550,185202,185393,185573,185602,184940,185562,186415,185682,185589,185532,185231,185017,185178,185482,185582,185571,185425,185261,184850,186414,185600,185203,185659,185609,185578,185575,185673,185030,186444,185601,185688,185515,185632,185294,185611,185619,186499,185273,184923,185574,185585,185029,184829,185576,185577,186349,184817,185663,185664,184833,184787,184924,184869,185182,184927,185407,186418,186400,185259,185607,184914,185033,184986,187906,185341,185406,185370,185019,184848,185656,185428,184987,184998,184834,185018,185371,185097]}"
+  },
+  {
+    "k": "facets:invalid-controlled-values-400",
+    "pass": true,
+    "detail": "provider=400, format=400, skillLevel=400, sort=400"
+  },
+  {
+    "k": "facets:approved-only",
+    "pass": true,
+    "detail": "status=200; rows=100; statuses=approved"
+  },
+  {
+    "k": "facets:unknown-filter",
+    "pass": true,
+    "detail": "rows=100; formats=unknown"
+  },
+  {
+    "k": "facets:counts-returned",
+    "pass": true,
+    "detail": "facet groups=categories,subcategories,subSubcategories,tags,providers,formats,skillLevels"
+  },
+  {
+    "k": "facets:url-state-restored",
+    "pass": true,
+    "detail": "location.search=\"?format=unknown&provider=unknown&skillLevel=unknown&sort=name-asc\""
+  },
+  {
+    "k": "facets:unknown-chips-visible",
+    "pass": true,
+    "detail": "chips=\"Provider: Not yet classifiedFormat: Not yet classifiedSkill Level: Not yet classifiedClear all\""
+  },
+  {
+    "k": "facets:filter-only-results",
+    "pass": true,
+    "detail": "24 cards rendered without q"
+  },
+  {
+    "k": "facets:singular-plural-tags",
+    "pass": true,
+    "detail": "\"open-sources\" total=158 vs \"open-source\" total=158"
+  },
+  {
+    "k": "facets:disjunctive-counts",
+    "pass": true,
+    "detail": "category=\"Encoding & Codecs\", tag=\"open-source\", combined=43, selectedCounts=43/43, categoryFacetMatchesTagOnly=true, tagFacetMatchesCategoryOnly=true"
+  },
+  {
+    "k": "facets:stable-pagination",
+    "pass": true,
+    "detail": "page1=24, repeated=true, page2=24, overlap=0"
+  },
+  {
+    "k": "facets:relevance-parity",
+    "pass": true,
+    "detail": "exactFirst=\"FFmpeg\", multiWordRows=20, reversedSame=true"
+  },
+  {
+    "k": "facets:back-forward-restores",
+    "pass": true,
+    "detail": "category=\"Encoding & Codecs\", backRowsMatch=true, forwardRowsMatch=true"
+  },
+  {
+    "k": "search-alias:input-hydrated",
+    "pass": true,
+    "detail": "input=\"ffmpeg\""
+  },
+  {
+    "k": "search-alias:url-canonicalized",
+    "pass": true,
+    "detail": "location.search=\"?q=ffmpeg\""
+  },
+  {
+    "k": "search-alias:matching-results",
+    "pass": true,
+    "detail": "first result=\"FFmpeg\""
+  }
+]
