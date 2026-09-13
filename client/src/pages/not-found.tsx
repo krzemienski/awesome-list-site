@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { AlertCircle, Home, List, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackEvent } from "@/lib/analytics";
 import { reportDeadLink } from "@/lib/route-monitor";
+import "@/styles/pages/system.css";
 
 // Must equal the server's SITE_URL so the 404 og:url/og:image match the
 // crawl-pass head byte-for-byte (same env-override rule as SEOHead's base).
@@ -34,7 +35,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
   // leaves (see index.css), so filling main centers this card without claiming
   // a viewport height the shell may not have to give.
   return (
-    <div className="flex items-center justify-center min-h-full">
+    <div className="system-state">
       {/* R5-050: ONE 404 head shared by every not-found surface (unknown path,
           unknown taxonomy slug, unknown resource) — mirrors the server's
           notFoundMeta: same title/description/noindex, og tags kept, og:url
@@ -47,11 +48,12 @@ export default function NotFound({ suggestion }: NotFoundProps) {
         image={`${SITE_BASE}/og-image.png?path=%2F`}
       />
 
-      <Card className="w-full max-w-md">
+      <Card className="system-state-card">
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <AlertCircle className="h-6 w-6 text-[var(--accent)]" />
-            <h1 className="display-h text-xl">Page Not Found</h1>
+          <span className="chip bad system-state-code">Error · 404</span>
+          <div className="system-state-heading flex items-center gap-2">
+            <AlertCircle className="h-6 w-6 text-[var(--accent)]" aria-hidden="true" />
+            <h1 className="display-h system-state-title">Page Not Found</h1>
           </div>
         </CardHeader>
         <CardContent>
@@ -78,7 +80,7 @@ export default function NotFound({ suggestion }: NotFoundProps) {
             categories" 9px off the left viewport edge. Stack the CTAs
             full-width on narrow screens; row layout resumes at sm. The
             categories CTA also now points at /categories, not home. */}
-        <CardFooter className="flex flex-col sm:flex-row flex-wrap sm:justify-end gap-2">
+        <CardFooter className="system-state-actions flex-col sm:flex-row">
           <Button variant="outline" asChild className="w-full sm:w-auto">
             <Link href="/categories" data-testid="link-browse-categories">
               <List className="mr-2 h-4 w-4" />

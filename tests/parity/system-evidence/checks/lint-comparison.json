@@ -1,0 +1,62 @@
+[
+  {
+    "file": "client/src/components/ui/consent-banner.tsx",
+    "now": 0,
+    "baseline": 0,
+    "newRules": []
+  },
+  {
+    "file": "client/src/components/ui/skeleton.tsx",
+    "now": 0,
+    "baseline": 0,
+    "newRules": []
+  },
+  {
+    "file": "client/src/components/ui/toast.tsx",
+    "now": 0,
+    "baseline": 0,
+    "newRules": []
+  },
+  {
+    "file": "client/src/components/ui/toaster.tsx",
+    "now": 1,
+    "baseline": 1,
+    "newRules": []
+  },
+  {
+    "file": "client/src/pages/CodeOfConduct.tsx",
+    "now": 4,
+    "baseline": 4,
+    "newRules": []
+  },
+  {
+    "file": "client/src/pages/DesignSystemShowcase.tsx",
+    "now": 1,
+    "baseline": 1,
+    "newRules": []
+  },
+  {
+    "file": "client/src/pages/ErrorPage.tsx",
+    "now": 1,
+    "baseline": 1,
+    "newRules": []
+  },
+  {
+    "file": "client/src/pages/Privacy.tsx",
+    "now": 7,
+    "baseline": 7,
+    "newRules": []
+  },
+  {
+    "file": "client/src/pages/Terms.tsx",
+    "now": 5,
+    "baseline": 5,
+    "newRules": []
+  },
+  {
+    "file": "client/src/pages/not-found.tsx",
+    "now": 7,
+    "baseline": 8,
+    "newRules": []
+  }
+]

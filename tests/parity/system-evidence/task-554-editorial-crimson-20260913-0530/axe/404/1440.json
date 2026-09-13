@@ -1,0 +1,17 @@
+{
+  "route": "404",
+  "path": "/this-route-does-not-exist",
+  "width": 1440,
+  "height": 900,
+  "url": "http://localhost:5000/this-route-does-not-exist",
+  "axeVersion": "4.13.0",
+  "byImpact": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0
+  },
+  "violations": [],
+  "incomplete": 2,
+  "passes": 24
+}

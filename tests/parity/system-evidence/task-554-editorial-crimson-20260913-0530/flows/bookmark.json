@@ -1,0 +1,28 @@
+{
+  "route": "/resource/185020",
+  "buttonFound": true,
+  "screenshots": [
+    "flows/bookmark-guest-added-375.png",
+    "flows/bookmark-guest-removed-375.png"
+  ],
+  "toastSelector": "li[data-state]",
+  "added": {
+    "toastCount": 1,
+    "toastText": [
+      "Saved on this deviceYour saved resource will move to your account when you sign in.Sign in"
+    ],
+    "buttonPressed": "true",
+    "guestStore": "[{\"id\":185020,\"savedAt\":\"2026-09-13T05:18:39.948Z\"}]"
+  },
+  "removed": {
+    "toastCount": 1,
+    "toastText": [
+      "Removed from this device's savesUndo"
+    ],
+    "buttonPressed": "false",
+    "guestStore": "[]"
+  },
+  "toastPass": true,
+  "guestTogglePass": true,
+  "apiFailures": []
+}

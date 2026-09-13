@@ -1,0 +1,4 @@
+The timed-out ds-button-sweep process was verified dead by PID and only its own
+slot-0 lease (label ds-button-sweep) was removed. No other lease identities or
+processes were touched. Subsequent system-554-missing-states and print-audit
+leases released normally.

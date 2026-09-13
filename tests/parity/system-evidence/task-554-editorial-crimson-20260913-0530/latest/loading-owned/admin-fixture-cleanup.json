@@ -1,0 +1,26 @@
+{
+  "mode": "development DB exact-key read/delete/read; no browser",
+  "adminSuffix": "1789276853708_1a1xzr",
+  "resourceUrl": "https://example.com/__qa_test_ds_admin_1789276853708_1a1xzr",
+  "categoryName": "__qa_test_ds_admin_1789276853708_1a1xzr category",
+  "categorySlug": "qa-ds-admin-1789276853708-1a1xzr",
+  "before": {
+    "resourceRows": 0,
+    "categoryRows": 0
+  },
+  "exactDeletes": {
+    "resource": "DELETE 0",
+    "category": "DELETE 0"
+  },
+  "after": {
+    "resourceRows": 0,
+    "categoryRows": 0
+  },
+  "persistentAdmin": {
+    "email": "ds-button-sweep-admin+clerk_test@example.com",
+    "id": "user_3IkBEy4dCY6z8snb5U1q89YWugZ",
+    "role": "admin",
+    "touched": false
+  },
+  "scope": "No prefix query/cleanup; no other worker fixtures or persistent admin changed."
+}

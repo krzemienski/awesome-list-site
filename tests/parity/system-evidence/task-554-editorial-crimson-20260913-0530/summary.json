@@ -1,0 +1,503 @@
+{
+  "generatedAt": "2026-09-13T05:31:27.825Z",
+  "evidenceRoot": "/tmp/system-554-evidence",
+  "base": "http://localhost:5000",
+  "theme": "Editorial × Crimson",
+  "widths": [
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "capturePhases": {
+    "broadRoutePass": "completed before the targeted destructive-toast/showcase fixes; retained as raw captures",
+    "latestFocusedPass": "completed after fixes; latest state/showcase screenshots and axe JSON are authoritative for changed surfaces"
+  },
+  "gates": {
+    "ds-showcase": {
+      "status": "PASS",
+      "checks": 20,
+      "log": "gates/ds-showcase.log"
+    },
+    "ds-button-sweep": {
+      "status": "NOT_RERUN_BY_REQUEST",
+      "priorAttempt": "timed out after 300s; partial log retained; admin failures out of scope",
+      "log": "gates/ds-button-sweep-partial.log"
+    },
+    "print-audit": {
+      "status": "PASS",
+      "checks": 49,
+      "log": "gates/print-audit.log"
+    },
+    "leaseCleanup": "gates/lease-cleanup.txt"
+  },
+  "broadRoutes": {
+    "coverage": 32,
+    "routeStatuses": {
+      "404": [
+        {
+          "width": 375,
+          "status": 404,
+          "finalUrl": "http://localhost:5000/this-route-does-not-exist"
+        },
+        {
+          "width": 768,
+          "status": 404,
+          "finalUrl": "http://localhost:5000/this-route-does-not-exist"
+        },
+        {
+          "width": 1024,
+          "status": 404,
+          "finalUrl": "http://localhost:5000/this-route-does-not-exist"
+        },
+        {
+          "width": 1440,
+          "status": 404,
+          "finalUrl": "http://localhost:5000/this-route-does-not-exist"
+        }
+      ],
+      "terms": [
+        {
+          "width": 375,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/terms"
+        },
+        {
+          "width": 768,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/terms"
+        },
+        {
+          "width": 1024,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/terms"
+        },
+        {
+          "width": 1440,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/terms"
+        }
+      ],
+      "privacy": [
+        {
+          "width": 375,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/privacy"
+        },
+        {
+          "width": 768,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/privacy"
+        },
+        {
+          "width": 1024,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/privacy"
+        },
+        {
+          "width": 1440,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/privacy"
+        }
+      ],
+      "code-of-conduct": [
+        {
+          "width": 375,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/code-of-conduct"
+        },
+        {
+          "width": 768,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/code-of-conduct"
+        },
+        {
+          "width": 1024,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/code-of-conduct"
+        },
+        {
+          "width": 1440,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/code-of-conduct"
+        }
+      ],
+      "empty-search": [
+        {
+          "width": 375,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/search?q=zzqxv-nothing"
+        },
+        {
+          "width": 768,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/search?q=zzqxv-nothing"
+        },
+        {
+          "width": 1024,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/search?q=zzqxv-nothing"
+        },
+        {
+          "width": 1440,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/search?q=zzqxv-nothing"
+        }
+      ],
+      "design-system": [
+        {
+          "width": 375,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/design-system"
+        },
+        {
+          "width": 768,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/design-system"
+        },
+        {
+          "width": 1024,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/design-system"
+        },
+        {
+          "width": 1440,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/design-system"
+        }
+      ],
+      "home": [
+        {
+          "width": 375,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/"
+        },
+        {
+          "width": 768,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/"
+        },
+        {
+          "width": 1024,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/"
+        },
+        {
+          "width": 1440,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/"
+        }
+      ],
+      "submit": [
+        {
+          "width": 375,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/submit"
+        },
+        {
+          "width": 768,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/submit"
+        },
+        {
+          "width": 1024,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/submit"
+        },
+        {
+          "width": 1440,
+          "status": 200,
+          "finalUrl": "http://localhost:5000/submit"
+        }
+      ]
+    },
+    "unknownRoute": {
+      "path": "/this-route-does-not-exist",
+      "observedStatuses": [
+        404
+      ],
+      "noRedirect": true,
+      "baselineStatusParity": true,
+      "note": "matches retained production baseline HTTP 404/no redirect"
+    },
+    "naturalEmptySearch": {
+      "path": "/search?q=zzqxv-nothing",
+      "owningPage": "client/src/pages/Search.tsx",
+      "loadingTestId": "search-results-loading",
+      "terminalTestId": "text-no-results",
+      "apiRequest": "/api/resources?...&search=zzqxv-nothing"
+    },
+    "legalAxeSeriousCritical": 0,
+    "preFixRouteAxeSevere": [
+      {
+        "route": "design-system",
+        "width": 375,
+        "ids": [
+          "color-contrast"
+        ],
+        "impact": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      {
+        "route": "design-system",
+        "width": 1440,
+        "ids": [
+          "color-contrast"
+        ],
+        "impact": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    ],
+    "testIdInventory": {
+      "baseline": "tests/parity/production-baseline/2026-09-12",
+      "rows": 32,
+      "rowsWithDiff": 24,
+      "totalMissing": 280,
+      "commonMissingByWidth": {
+        "375": [],
+        "768": [
+          "rail-about",
+          "rail-advanced",
+          "rail-home",
+          "rail-learning-journeys",
+          "rail-submit-resource",
+          "rail-theme"
+        ],
+        "1024": [
+          "expand-sub-vendors-hdr",
+          "sub-browser-extensions",
+          "sub-closed-captioning-subtitling-standards",
+          "sub-dash-manifest-tools",
+          "sub-ffmpeg-tools",
+          "sub-non-linear-editing-suites",
+          "sub-performance-monitoring-tools",
+          "sub-uncategorized-community-events",
+          "sub-vendors-hdr",
+          "subsub-advertising",
+          "subsub-conferences",
+          "subsub-rtmp",
+          "subsub-slack-meetups",
+          "subsub-vendor-docs"
+        ],
+        "1440": [
+          "expand-sub-vendors-hdr",
+          "mobile-drawer-trigger",
+          "sub-browser-extensions",
+          "sub-closed-captioning-subtitling-standards",
+          "sub-dash-manifest-tools",
+          "sub-ffmpeg-tools",
+          "sub-non-linear-editing-suites",
+          "sub-performance-monitoring-tools",
+          "sub-uncategorized-community-events",
+          "sub-vendors-hdr",
+          "subsub-advertising",
+          "subsub-conferences",
+          "subsub-rtmp",
+          "subsub-slack-meetups",
+          "subsub-vendor-docs"
+        ]
+      },
+      "addedIds": [
+        "expand-sub-industry-forums-standards-bodies",
+        "input-search-tags"
+      ],
+      "detail": "testid-diff-concise.json"
+    }
+  },
+  "latestFocused": {
+    "consent": {
+      "surfaces": 8,
+      "allBannersPresent": true,
+      "ctaClearanceAt375": {
+        "states": 2,
+        "overlapCounts": [
+          0,
+          0
+        ]
+      },
+      "ctaGeometryByWidth": {
+        "375": {
+          "states": 2,
+          "overlapCounts": [
+            0,
+            0
+          ]
+        },
+        "768": {
+          "states": 2,
+          "overlapCounts": [
+            2,
+            2
+          ]
+        },
+        "1024": {
+          "states": 2,
+          "overlapCounts": [
+            3,
+            0
+          ]
+        },
+        "1440": {
+          "states": 2,
+          "overlapCounts": [
+            3,
+            2
+          ]
+        }
+      },
+      "externalAnalyticsBeforeDecisionHosts": {},
+      "axeSeriousCriticalAt375And1440": 0,
+      "note": "higher-width overlap counts are retained as measured fixed-banner/content geometry; required CTA clearance at 375 has zero overlaps"
+    },
+    "guestBookmarkToast": {
+      "widths": 4,
+      "allButtonsFound": true,
+      "allToastsVisible": true,
+      "ariaPressedAfterAdd": true,
+      "selector": "li[data-state]",
+      "axeSeriousCriticalAt375And1440": 0
+    },
+    "loadingSkeleton": {
+      "widths": 4,
+      "route": "/search?q=zzqxv-nothing warm terminal -> new ffmpeg query",
+      "owner": "client/src/pages/Search.tsx:242 data-testid=search-results-loading",
+      "capturePath": "latest/loading-owned/summary.json",
+      "skeletonVisibleAtAllWidths": true,
+      "routeChunkFallbackCountAtCapture": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "systemSkeletonCounts": [
+        {
+          "width": 375,
+          "count": 36
+        },
+        {
+          "width": 768,
+          "count": 36
+        },
+        {
+          "width": 1024,
+          "count": 36
+        },
+        {
+          "width": 1440,
+          "count": 36
+        }
+      ],
+      "replacementsObservedAtAllWidths": true,
+      "replacementContentCards": [
+        {
+          "width": 375,
+          "count": 24
+        },
+        {
+          "width": 768,
+          "count": 24
+        },
+        {
+          "width": 1024,
+          "count": 24
+        },
+        {
+          "width": 1440,
+          "count": 24
+        }
+      ],
+      "replacementQuery": "ffmpeg",
+      "incrementalCls": [
+        {
+          "width": 375,
+          "value": 0.07444197530864197
+        },
+        {
+          "width": 768,
+          "value": 0.08190802469135802
+        },
+        {
+          "width": 1024,
+          "value": 0.09008076084984673
+        },
+        {
+          "width": 1440,
+          "value": 0.08356041023662553
+        }
+      ],
+      "mainHeightDeltasSkeletonToContent": [
+        {
+          "width": 375,
+          "delta": 5361
+        },
+        {
+          "width": 768,
+          "delta": 2740
+        },
+        {
+          "width": 1024,
+          "delta": 5338
+        },
+        {
+          "width": 1440,
+          "delta": 2738
+        }
+      ],
+      "axeSeriousCriticalAt375And1440": 0,
+      "axeDetail": "latest/loading-owned/axe-summary.json",
+      "note": "Authoritative correction: Search results loading was captured after lazy route warm-up; route-chunk-skeleton was absent. Geometry and non-zero CLS are retained as measured; not a zero-shift pass."
+    },
+    "showcaseCorrection": {
+      "widths": 4,
+      "latestScreenshotsAllWidths": true,
+      "captionReadable": true,
+      "decorativeSwatchesHidden": true,
+      "axeSeriousCriticalAt375And1440": 0,
+      "axeDetail": "axe-focused/showcase-correction/"
+    }
+  },
+  "evidenceFiles": {
+    "routeScreenshots": "screenshots/",
+    "latestStateScreenshots": "latest/",
+    "routeAxe": "axe/",
+    "focusedAxe": "axe-focused/",
+    "rawNetworkAndDOM": [
+      "summary-raw.json",
+      "captures.json",
+      "flows/"
+    ],
+    "ownedLoading": "latest/loading-owned/",
+    "ownedLoadingCorrection": "latest/loading-owned/CORRECTION-REPORT.md",
+    "ownedLoadingAxe": "latest/loading-owned/axe/"
+  },
+  "cleanup": {
+    "mode": "exact development-DB parameterized checks; no browser",
+    "adminSuffix": "1789276853708_1a1xzr",
+    "resourceUrl": "https://example.com/__qa_test_ds_admin_1789276853708_1a1xzr",
+    "categoryName": "__qa_test_ds_admin_1789276853708_1a1xzr category",
+    "categorySlug": "qa-ds-admin-1789276853708-1a1xzr",
+    "before": {
+      "resourceRows": 0,
+      "categoryRows": 0
+    },
+    "exactDeletes": {
+      "resource": "DELETE 0",
+      "category": "DELETE 0"
+    },
+    "after": {
+      "resourceRows": 0,
+      "categoryRows": 0
+    },
+    "authedDisposablePhase": "PASS in retained log: remaining __qa_test_ds_sweep_* users=0",
+    "persistentQaAdmin": "untouched; exact user remains admin",
+    "action": "no prefix query/cleanup and no other worker identity touched"
+  }
+}

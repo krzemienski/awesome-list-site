@@ -1,0 +1,79 @@
+{
+  "route": "design-system",
+  "path": "/design-system",
+  "width": 375,
+  "height": 812,
+  "url": "http://localhost:5000/design-system",
+  "axeVersion": "4.13.0",
+  "byImpact": {
+    "critical": 0,
+    "serious": 1,
+    "moderate": 0,
+    "minor": 0
+  },
+  "violations": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ],
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fgColor": "#3a3a39",
+                "bgColor": "#060606",
+                "contrastRatio": 1.77,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": null,
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Des...\" data-component-name=\"Card\" class=\"rounded-lg border te...\">",
+                  "target": [
+                    ".space-y-5"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/component...\" data-component-name=\"SidebarInset\" class=\"relative flex min-w-...\">",
+                  "target": [
+                    ".max-w-full"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element has insufficient color contrast of 1.77 (foreground color: #3a3a39, background color: #060606, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/DesignSystemShowcase.tsx:382:12\" data-component-name=\"p\" class=\"text-[color:var(--text-4)]\">Ink tier 4 — faintest: decorative dividers, ghost text</p>",
+          "target": [
+            ".text-\\[color\\:var\\(--text-4\\)\\]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.77 (foreground color: #3a3a39, background color: #060606, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+        }
+      ]
+    }
+  ],
+  "incomplete": 1,
+  "passes": 21
+}

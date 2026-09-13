@@ -1,0 +1,53 @@
+{
+  "systemResults": [
+    {
+      "id": "editorial",
+      "htmlSystem": "editorial",
+      "tokenRows": 38,
+      "mismatches": [],
+      "radius": "12px",
+      "display": "'Fraunces', Georgia, serif"
+    },
+    {
+      "id": "terminal",
+      "htmlSystem": "terminal",
+      "tokenRows": 38,
+      "mismatches": [],
+      "radius": "0px",
+      "display": "'IBM Plex Mono', ui-monospace, monospace"
+    },
+    {
+      "id": "geist",
+      "htmlSystem": "geist",
+      "tokenRows": 38,
+      "mismatches": [],
+      "radius": "10px",
+      "display": "'Geist', 'Inter', system-ui, sans-serif"
+    },
+    {
+      "id": "brutalist",
+      "htmlSystem": "brutalist",
+      "tokenRows": 38,
+      "mismatches": [],
+      "radius": "0px",
+      "display": "'Instrument Serif', 'Times New Roman', serif"
+    },
+    {
+      "id": "swiss",
+      "htmlSystem": "swiss",
+      "tokenRows": 38,
+      "mismatches": [],
+      "radius": "4px",
+      "display": "'Manrope', system-ui, sans-serif"
+    }
+  ],
+  "accentResult": {
+    "htmlAccent": "violet",
+    "shown": "#9d4edd",
+    "live": "#9d4edd",
+    "matches": true
+  },
+  "allSystemsMatch": true,
+  "accentSwitchMatch": true,
+  "screenshot": "flows/design-system-switched-1024.png"
+}

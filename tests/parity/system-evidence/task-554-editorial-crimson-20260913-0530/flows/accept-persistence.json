@@ -1,0 +1,280 @@
+{
+  "accepted": {
+    "consent": "granted",
+    "bannerPresent": false
+  },
+  "persisted": {
+    "consent": "granted",
+    "bannerPresent": false
+  },
+  "persistencePass": true,
+  "analyticsRequestsAfterAccept": [
+    {
+      "at": 1789276714072,
+      "method": "GET",
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-76D744KQCJ",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714132,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/web-vitals.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714133,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/exception-autocapture.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714135,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/dead-clicks-autocapture.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714137,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/array/phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8/config.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714147,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276714163,
+      "method": "POST",
+      "url": "https://api-js.mixpanel.com/track/?ip=1&_=1789276714161",
+      "resourceType": "xhr"
+    },
+    {
+      "at": 1789276714253,
+      "method": "POST",
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=1&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&ep.debug_mode=true&tfd=1780",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276714268,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276714279,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "other"
+    },
+    {
+      "at": 1789276714294,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/posthog-recorder.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714296,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/surveys.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714309,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276714312,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "other"
+    },
+    {
+      "at": 1789276714412,
+      "method": "GET",
+      "url": "https://cdn.amplitude.com/engagement-browser/prod/index.min.js.gz",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276714898,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/config",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276714898,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/resource_center",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276715264,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/decide",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276715285,
+      "method": "POST",
+      "url": "https://api2.amplitude.com/2/httpapi",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276715492,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/state",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276715731,
+      "method": "POST",
+      "url": "https://api-sr.amplitude.com/sessions/v2/track?device_id=819b007d-9aaf-4ec0-a217-d238eebaba79&session_id=1789276714270&type=replay",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276716634,
+      "method": "POST",
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&_s=2&tfd=4143",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276716636,
+      "method": "POST",
+      "url": "https://api-sr.amplitude.com/sessions/v2/track?device_id=819b007d-9aaf-4ec0-a217-d238eebaba79&session_id=1789276714270&type=replay",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276716636,
+      "method": "POST",
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=3&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=performance&_ee=1&ep.debug_mode=true&ep.metric_name=inp&epn.value=24&_et=1&tfd=4151",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276716636,
+      "method": "POST",
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=4&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=performance&_ee=1&ep.debug_mode=true&ep.metric_name=cls&epn.value=0.0415&tfd=4156",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276716636,
+      "method": "POST",
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=5&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=performance&_ee=1&ep.debug_mode=true&ep.metric_name=lcp&epn.value=96&tfd=4160",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276716636,
+      "method": "POST",
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=6&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=page_engaged&_ee=1&ep.debug_mode=true&_et=3651&tfd=4166",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276716640,
+      "method": "POST",
+      "url": "https://api-js.mixpanel.com/track/?verbose=1&ip=1&_=1789276716636",
+      "resourceType": "ping"
+    },
+    {
+      "at": 1789276717030,
+      "method": "GET",
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-76D744KQCJ",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717045,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/web-vitals.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717045,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/exception-autocapture.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717046,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/posthog-recorder.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717047,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/dead-clicks-autocapture.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717048,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/array/phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8/config.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717050,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276717071,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "other"
+    },
+    {
+      "at": 1789276717074,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276717116,
+      "method": "GET",
+      "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276717172,
+      "method": "GET",
+      "url": "https://cdn.amplitude.com/engagement-browser/prod/index.min.js.gz",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717218,
+      "method": "GET",
+      "url": "https://us-assets.i.posthog.com/static/surveys.js?v=1.409.4",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276717267,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/config",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276717267,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/resource_center",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276717302,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/decide",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276717347,
+      "method": "GET",
+      "url": "https://gs.amplitude.com/sdk/v1/state",
+      "resourceType": "fetch"
+    }
+  ],
+  "screenshots": [
+    "flows/consent-home-375-accepted-persisted.png"
+  ]
+}

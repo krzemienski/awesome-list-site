@@ -1,0 +1,179 @@
+{
+  "viewport": {
+    "width": 768,
+    "height": 900
+  },
+  "warmQuery": "zzqxv-nothing",
+  "newQuery": "ffmpeg",
+  "throttle": {
+    "latencyMs": 900,
+    "downloadBytesPerSecond": 18432,
+    "uploadBytesPerSecond": 18432,
+    "cacheDisabled": true
+  },
+  "warmed": {
+    "url": "http://localhost:5000/search?q=zzqxv-nothing",
+    "input": "zzqxv-nothing",
+    "noResults": true,
+    "routeChunkCount": 0,
+    "loadingCount": 0,
+    "contentGridCount": 0
+  },
+  "baseline": {
+    "at": 1346.2000000001863,
+    "url": "http://localhost:5000/search?q=zzqxv-nothing",
+    "input": "zzqxv-nothing",
+    "main": {
+      "x": 48,
+      "y": 287.1875,
+      "width": 672,
+      "height": 246,
+      "bottom": 533.1875
+    },
+    "empty": {
+      "x": 257.515625,
+      "y": 380.1875,
+      "width": 252.953125,
+      "height": 20,
+      "bottom": 400.1875
+    },
+    "routeChunkCount": 0,
+    "loadingCount": 0,
+    "systemSkeletonCount": 0,
+    "gridCount": 0
+  },
+  "skeleton": {
+    "at": 1684.3999999999069,
+    "url": "http://localhost:5000/search?q=ffmpeg",
+    "input": "ffmpeg",
+    "main": {
+      "x": 48,
+      "y": 287.1875,
+      "width": 672,
+      "height": 554,
+      "bottom": 841.1875
+    },
+    "loading": {
+      "x": 48,
+      "y": 287.1875,
+      "width": 672,
+      "height": 554,
+      "bottom": 841.1875
+    },
+    "routeChunkCount": 0,
+    "loadingCount": 1,
+    "systemSkeletonCount": 36,
+    "gridCount": 0,
+    "cards": 6
+  },
+  "replacement": {
+    "at": 5074.399999999907,
+    "url": "http://localhost:5000/search?q=ffmpeg",
+    "input": "ffmpeg",
+    "main": {
+      "x": 48,
+      "y": 287.1875,
+      "width": 672,
+      "height": 3294,
+      "bottom": 3581.1875
+    },
+    "loading": null,
+    "grid": {
+      "x": 48,
+      "y": 323.1875,
+      "width": 672,
+      "height": 3158,
+      "bottom": 3481.1875
+    },
+    "routeChunkCount": 0,
+    "loadingCount": 0,
+    "systemSkeletonCount": 0,
+    "gridCount": 1,
+    "cards": 24,
+    "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+    "contentHasFfmpeg": true,
+    "cls": 0.08190802469135802,
+    "clsIncludingInput": 0.08190802469135802,
+    "layoutShiftEntries": [
+      {
+        "value": 0.05190802469135803,
+        "hadRecentInput": false,
+        "startTime": 1680.8999999999069,
+        "sources": [
+          {
+            "node": "FOOTER",
+            "previousRect": {
+              "x": 0,
+              "y": 616.8125,
+              "width": 768,
+              "height": 137
+            },
+            "currentRect": {
+              "x": 0,
+              "y": 873.1875,
+              "width": 768,
+              "height": 26.8125
+            }
+          }
+        ]
+      },
+      {
+        "value": 0.03,
+        "hadRecentInput": false,
+        "startTime": 3571.2000000001863,
+        "sources": [
+          {
+            "node": "FOOTER",
+            "previousRect": {
+              "x": 0,
+              "y": 873.1875,
+              "width": 768,
+              "height": 26.8125
+            },
+            "currentRect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "geometryDelta": {
+    "baselineToSkeletonMainHeight": 308,
+    "skeletonToReplacementMainHeight": 2740,
+    "skeletonToReplacementLoadingHeight": null,
+    "skeletonToReplacementGridHeight": 2604
+  },
+  "apiEvents": [
+    {
+      "phase": "request",
+      "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+      "at": 1789278578612
+    },
+    {
+      "phase": "response",
+      "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+      "status": 200,
+      "at": 1789278578761
+    },
+    {
+      "phase": "request",
+      "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+      "at": 1789278579147
+    },
+    {
+      "phase": "response",
+      "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+      "status": 200,
+      "at": 1789278580286
+    }
+  ],
+  "screenshots": {
+    "skeleton": "screenshots/skeleton@768.png",
+    "replacement": "screenshots/replacement@768.png",
+    "axe": null
+  }
+}

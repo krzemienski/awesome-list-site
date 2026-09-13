@@ -15,6 +15,14 @@ description: Tab/panel audit sweeps must assert the target panel is actually act
 - Cross-check evidence integrity: md5 dumps per cell must differ; each dump must show its own tab active.
 - Viewport-dependent columns (`hidden lg:table-cell`) mean a component can pass at 375/768 and fail at 1280 — sweep all breakpoints before declaring a surface green.
 
+## Loading-state ownership
+
+**Rule:** a skeleton screenshot must prove the intended component is mounted, not merely that the page looks unfinished.
+
+**Why:** network throttling before navigating a lazy route captures its Suspense fallback instead of the data-loading skeleton. A convincing screenshot can therefore have zero instances of the component being validated.
+
+**How to apply:** warm the lazy route to a terminal state, then throttle and trigger a new uncached data query. Assert the data-loading container and a positive count of the owned skeleton primitive, plus zero route-fallback nodes, before capturing. Verify replacement with real populated content separately from a natural empty-result scenario.
+
 ## Detector canaries — activation proof isn't coverage proof
 
 **Rule:** when a sweep opens UI (overlay, tab, panel) and runs a *filter/detector* over it, verifying the UI opened is not enough — the detector itself can be blind there (e.g. a blanket `closest(container)` exclusion trusts the entire overlay interior). Inject a synthetic violating element inside the opened region, assert the detector flags it, then remove it. Fail the scenario if the canary isn't caught.

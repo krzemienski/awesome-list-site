@@ -1,0 +1,76 @@
+{
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "before": {
+    "skeletonPresent": true,
+    "noResultsPresent": false,
+    "mainRect": {
+      "x": 0,
+      "y": 56,
+      "width": 375,
+      "height": 1104
+    },
+    "cls": 0.009852216748768473,
+    "pendingResourceTypes": 2
+  },
+  "after": {
+    "skeletonPresent": false,
+    "noResultsPresent": true,
+    "mainRect": {
+      "x": 0,
+      "y": 56,
+      "width": 375,
+      "height": 626.953125
+    },
+    "cls": 0.009852216748768473,
+    "bodyText": false
+  },
+  "skeletonReplaced": true,
+  "cls": 0.009852216748768473,
+  "mainHeightDelta": -477.046875,
+  "screenshots": [
+    "flows/loading-skeleton-search-375.png",
+    "flows/loading-replacement-search-375.png"
+  ],
+  "apiRequests": [
+    {
+      "at": 1789276722426,
+      "method": "GET",
+      "url": "http://localhost:5000/api/awesome-list/nav",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276722899,
+      "method": "GET",
+      "url": "http://localhost:5000/api/auth/user",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276722899,
+      "method": "GET",
+      "url": "http://localhost:5000/api/tags",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276726147,
+      "method": "GET",
+      "url": "http://localhost:5000/api/awesome-list/nav",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276753318,
+      "method": "GET",
+      "url": "http://localhost:5000/api/auth/user",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276768842,
+      "method": "GET",
+      "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+      "resourceType": "fetch"
+    }
+  ],
+  "apiFailures": []
+}

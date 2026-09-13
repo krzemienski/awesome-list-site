@@ -1,0 +1,36 @@
+{
+  "state": "loading-skeleton-owned",
+  "viewport": 375,
+  "owner": "client/src/pages/Search.tsx:242 data-testid=search-results-loading",
+  "routeChunkSkeletonCount": 0,
+  "systemSkeletonCount": 36,
+  "seriousCritical": 0,
+  "seriousCriticalNodes": 0,
+  "violations": [
+    {
+      "id": "landmark-main-is-top-level",
+      "impact": "moderate",
+      "help": "Main landmark should not be contained in another landmark",
+      "nodes": 1,
+      "targets": [
+        [
+          "main[aria-label=\"Search results\"]"
+        ]
+      ]
+    },
+    {
+      "id": "landmark-no-duplicate-main",
+      "impact": "moderate",
+      "help": "Document should not have more than one main landmark",
+      "nodes": 1,
+      "targets": [
+        [
+          "#main"
+        ]
+      ]
+    }
+  ],
+  "incomplete": 1,
+  "passes": 39,
+  "raw": "latest/loading-owned/axe/loading@375.json"
+}

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "kind": "family",
+  "family": "token-only-system",
+  "summary": "Owned system-surface evidence fragment; reconcile legacy static rows during integration. Token-only eligibility is not a full-page PASS.",
+  "screens": [
+    {
+      "id": "app.system.terms",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/terms",
+      "reason": "No canonical legal counterpart; canonical 760px prose composition and tokens.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/terms@{375,768,1024,1440}.png; axe/terms/. Shared titleTestId support remains an integration handoff."
+    },
+    {
+      "id": "app.system.privacy",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/privacy",
+      "reason": "No canonical legal counterpart; canonical prose and responsive table tokens.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/privacy@{375,768,1024,1440}.png; axe/privacy/."
+    },
+    {
+      "id": "app.system.code-of-conduct",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/code-of-conduct",
+      "reason": "No canonical legal counterpart; canonical 760px prose composition and tokens.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/code-of-conduct@{375,768,1024,1440}.png; axe/code-of-conduct/."
+    },
+    {
+      "id": "app.system.not-found",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/this-route-does-not-exist",
+      "reason": "Naturally reachable 404 uses the canonical error-state pattern; no fault injection.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/404@{375,768,1024,1440}.png; HTTP 404 at every width; no-store verified separately in checks/404-headers.txt."
+    },
+    {
+      "id": "app.system.error",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface.",
+      "notes": "Static presentation/contract review only; natural 404 supplies error-pattern evidence. Existing retry and external reload guards were not changed."
+    },
+    {
+      "id": "app.system.empty-search",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/search?q=zzqxv-nothing",
+      "reason": "A real zero-result query supplies natural empty-state evidence; page composition belongs to discovery integration.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/empty-search@{375,768,1024,1440}.png. Search.tsx is not modified by this leaf task."
+    },
+    {
+      "id": "app.system.loading",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/search?q=ffmpeg",
+      "reason": "After warming the lazy route, a real throttled uncached query demonstrates the owned token-backed skeleton without response mocks.",
+      "notes": "Authoritative evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/loading-owned/screenshots/{skeleton,replacement}@{375,768,1024,1440}.png. 36 owned primitives, zero route fallbacks, 24 real content cards afterward; axe zero serious/critical at 375/1440. Full-page zero-shift remains an integration handoff (six placeholders versus 24 content cards). Earlier fallback captures are not owned-skeleton proof."
+    },
+    {
+      "id": "app.system.consent",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/",
+      "reason": "Global consent uses canonical surface/button tokens and retains analytics gating and in-flow mobile behavior.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/consent/{home,submit}@{375,768,1024,1440}.png. Zero pre-consent external analytics; accept/decline persist; no CTA overlap at 375. Larger-width shell intersection measurements are handed off."
+    },
+    {
+      "id": "app.system.toast",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/toast/guest-bookmark-added@{375,768,1024,1440}.png. Destructive variant uses the canonical destructive background/foreground pair; no artificial error toast generated."
+    },
+    {
+      "id": "app.system.design-system",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/design-system",
+      "reason": "Internal live-token/component reference is distinct from the registered artifact and has no canonical page counterpart.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/showcase/design-system@{375,768,1024,1440}.png; focused axe zero serious/critical. Integrator must reconcile the legacy blocked app.design-system row, without changing artifact eligibility."
+    }
+  ]
+}

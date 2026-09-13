@@ -1,0 +1,94 @@
+[
+  {
+    "state": {
+      "system": "editorial",
+      "accent": "crimson",
+      "captionFound": true,
+      "captionColor": "rgba(244, 243, 238, 0.66)",
+      "captionText": "Ink tier 4 — faintest: decorative dividers, ghost text",
+      "swatchAriaHidden": "true",
+      "swatchBackground": "rgba(244, 243, 238, 0.22)",
+      "cls": 0.01015882098975143
+    },
+    "route": "/design-system",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "screenshot": "latest/showcase/design-system@375.png",
+    "focusedAxe": {
+      "state": "showcase-correction",
+      "viewport": 375,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 1,
+      "passes": 21
+    }
+  },
+  {
+    "state": {
+      "system": "editorial",
+      "accent": "crimson",
+      "captionFound": true,
+      "captionColor": "rgba(244, 243, 238, 0.66)",
+      "captionText": "Ink tier 4 — faintest: decorative dividers, ghost text",
+      "swatchAriaHidden": "true",
+      "swatchBackground": "rgba(244, 243, 238, 0.22)",
+      "cls": 0.14230659681682784
+    },
+    "route": "/design-system",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "screenshot": "latest/showcase/design-system@768.png",
+    "focusedAxe": null
+  },
+  {
+    "state": {
+      "system": "editorial",
+      "accent": "crimson",
+      "captionFound": true,
+      "captionColor": "rgba(244, 243, 238, 0.66)",
+      "captionText": "Ink tier 4 — faintest: decorative dividers, ghost text",
+      "swatchAriaHidden": "true",
+      "swatchBackground": "rgba(244, 243, 238, 0.22)",
+      "cls": 0.14951664799203473
+    },
+    "route": "/design-system",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "screenshot": "latest/showcase/design-system@1024.png",
+    "focusedAxe": null
+  },
+  {
+    "state": {
+      "system": "editorial",
+      "accent": "crimson",
+      "captionFound": true,
+      "captionColor": "rgba(244, 243, 238, 0.66)",
+      "captionText": "Ink tier 4 — faintest: decorative dividers, ghost text",
+      "swatchAriaHidden": "true",
+      "swatchBackground": "rgba(244, 243, 238, 0.22)",
+      "cls": 0.07938553254136659
+    },
+    "route": "/design-system",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "screenshot": "latest/showcase/design-system@1440.png",
+    "focusedAxe": {
+      "state": "showcase-correction",
+      "viewport": 1440,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 2,
+      "passes": 24
+    }
+  }
+]

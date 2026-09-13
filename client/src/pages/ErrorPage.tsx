@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Helmet } from "react-helmet";
+import "@/styles/pages/system.css";
 
 interface ErrorPageProps {
   error: Error | unknown;
@@ -17,31 +18,32 @@ export default function ErrorPage({ error }: ErrorPageProps) {
   // min-h-full: fill <main>, which already fills the app shell, rather than
   // claiming a viewport height the shell may not have to give.
   return (
-    <div className="flex items-center justify-center min-h-full">
+    <div className="system-state">
       <Helmet>
         <title>Error — Awesome Video</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <Card className="w-full max-w-md">
+      <Card className="system-state-card">
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <AlertCircle className="h-8 w-8 text-destructive" />
-            <CardTitle>Something went wrong</CardTitle>
+          <span className="chip bad system-state-code">Error</span>
+          <div className="system-state-heading flex items-center gap-2">
+            <AlertCircle className="h-6 w-6 text-destructive" aria-hidden="true" />
+            <h1 className="display-h system-state-title">Something went wrong</h1>
           </div>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
             We encountered an error while loading the awesome list:
           </p>
-          <div className="bg-muted p-3 rounded-md text-sm font-mono overflow-auto max-h-32">
+          <div className="system-state-detail">
             {errorMessage}
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
             This might be due to a network issue or a problem with the source repository.
           </p>
         </CardContent>
-        <CardFooter className="flex justify-end gap-4">
+        <CardFooter className="system-state-actions">
           <Button variant="outline" onClick={handleRetry}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Retry

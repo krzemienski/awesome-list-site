@@ -1,6 +1,7 @@
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { HeartHandshake } from "lucide-react";
+import "@/styles/pages/system-legal.css";
 
 // Companion to Terms and Privacy — see Terms.tsx for the routing notes. This is
 // a real static route (registered in App.tsx KNOWN_ROUTE_PATTERNS + <Route>,
@@ -8,21 +9,22 @@ import { HeartHandshake } from "lucide-react";
 // mirrors the server og-middleware title EXACTLY (two-pass SEO parity).
 export default function CodeOfConduct() {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="legal-page">
       <SEOHead
         title="Code of Conduct"
         description="The standards of behavior we expect from everyone who participates in Awesome Video — a free, community-curated directory of video development resources."
       />
-      <div className="space-y-2">
-        <h1 className="display-h text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-code-of-conduct">
+      <div className="legal-header">
+        <h1 className="display-h legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-code-of-conduct">
           <HeartHandshake className="h-6 w-6 text-[var(--accent)]" />
           Code of Conduct
         </h1>
-        <p className="text-sm text-[color:var(--text-3)]">Last updated: July 16, 2026</p>
+        <p className="legal-updated text-sm text-[color:var(--text-3)]">Last updated: July 16, 2026</p>
+        <div className="shimmer-line legal-rule" aria-hidden="true" />
       </div>
 
-      <Card>
-        <CardContent className="pt-6 space-y-6 text-sm leading-relaxed text-[color:var(--text-2)]">
+      <Card className="legal-card">
+        <CardContent className="legal-prose pt-6 space-y-6 text-sm leading-relaxed text-[color:var(--text-2)]">
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">1. Our pledge</h2>
             <p>
@@ -63,7 +65,7 @@ export default function CodeOfConduct() {
                 href="https://github.com/krzemienski/awesome-video/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-code-of-conduct-report"
               >
                 open an issue on the project's GitHub repository

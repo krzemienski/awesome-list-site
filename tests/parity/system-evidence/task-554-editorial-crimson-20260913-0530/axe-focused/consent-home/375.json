@@ -1,0 +1,9 @@
+{
+  "state": "consent-home",
+  "viewport": 375,
+  "seriousCritical": 0,
+  "seriousCriticalNodes": 0,
+  "violations": [],
+  "incomplete": 1,
+  "passes": 20
+}

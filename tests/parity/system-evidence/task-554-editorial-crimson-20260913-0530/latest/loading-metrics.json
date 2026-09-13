@@ -1,0 +1,170 @@
+[
+  {
+    "state": "loading-skeleton",
+    "route": "/search?q=zzqxv-nothing warm -> ffmpeg",
+    "owner": "client/src/pages/Search.tsx:242",
+    "viewport": {
+      "width": 375,
+      "height": 900
+    },
+    "screenshot": "latest/loading/skeleton@375.png",
+    "replacementScreenshot": "latest/loading/replaced@375.png",
+    "before": {
+      "skeletonPresent": true,
+      "skeletonCount": 36,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": false,
+      "mainHeight": 1124,
+      "cls": 0
+    },
+    "after": {
+      "skeletonPresent": false,
+      "skeletonCount": 0,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": true,
+      "contentCards": 24,
+      "mainHeight": 6485,
+      "cls": 0.07444197530864197
+    },
+    "skeletonReplaced": true,
+    "mainHeightDelta": 5361,
+    "incrementalCls": 0.07444197530864197,
+    "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+    "contentHasFfmpeg": true,
+    "ownedSelector": "[data-testid=\"search-results-loading\"] .system-skeleton",
+    "routeChunkExcluded": true,
+    "apiResponseStatuses": [
+      200
+    ],
+    "focusedAxe": {
+      "state": "loading-skeleton-owned",
+      "viewport": 375,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "detail": "latest/loading-owned/axe/loading@375.json"
+    }
+  },
+  {
+    "state": "loading-skeleton",
+    "route": "/search?q=zzqxv-nothing warm -> ffmpeg",
+    "owner": "client/src/pages/Search.tsx:242",
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "screenshot": "latest/loading/skeleton@768.png",
+    "replacementScreenshot": "latest/loading/replaced@768.png",
+    "before": {
+      "skeletonPresent": true,
+      "skeletonCount": 36,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": false,
+      "mainHeight": 554,
+      "cls": 0
+    },
+    "after": {
+      "skeletonPresent": false,
+      "skeletonCount": 0,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": true,
+      "contentCards": 24,
+      "mainHeight": 3294,
+      "cls": 0.08190802469135802
+    },
+    "skeletonReplaced": true,
+    "mainHeightDelta": 2740,
+    "incrementalCls": 0.08190802469135802,
+    "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+    "contentHasFfmpeg": true,
+    "ownedSelector": "[data-testid=\"search-results-loading\"] .system-skeleton",
+    "routeChunkExcluded": true,
+    "apiResponseStatuses": [
+      200
+    ],
+    "focusedAxe": null
+  },
+  {
+    "state": "loading-skeleton",
+    "route": "/search?q=zzqxv-nothing warm -> ffmpeg",
+    "owner": "client/src/pages/Search.tsx:242",
+    "viewport": {
+      "width": 1024,
+      "height": 900
+    },
+    "screenshot": "latest/loading/skeleton@1024.png",
+    "replacementScreenshot": "latest/loading/replaced@1024.png",
+    "before": {
+      "skeletonPresent": true,
+      "skeletonCount": 36,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": false,
+      "mainHeight": 1124,
+      "cls": 0
+    },
+    "after": {
+      "skeletonPresent": false,
+      "skeletonCount": 0,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": true,
+      "contentCards": 24,
+      "mainHeight": 6462,
+      "cls": 0.09008076084984673
+    },
+    "skeletonReplaced": true,
+    "mainHeightDelta": 5338,
+    "incrementalCls": 0.09008076084984673,
+    "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+    "contentHasFfmpeg": true,
+    "ownedSelector": "[data-testid=\"search-results-loading\"] .system-skeleton",
+    "routeChunkExcluded": true,
+    "apiResponseStatuses": [
+      200
+    ],
+    "focusedAxe": null
+  },
+  {
+    "state": "loading-skeleton",
+    "route": "/search?q=zzqxv-nothing warm -> ffmpeg",
+    "owner": "client/src/pages/Search.tsx:242",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "screenshot": "latest/loading/skeleton@1440.png",
+    "replacementScreenshot": "latest/loading/replaced@1440.png",
+    "before": {
+      "skeletonPresent": true,
+      "skeletonCount": 36,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": false,
+      "mainHeight": 554,
+      "cls": 0
+    },
+    "after": {
+      "skeletonPresent": false,
+      "skeletonCount": 0,
+      "routeChunkSkeletonCount": 0,
+      "terminalPresent": true,
+      "contentCards": 24,
+      "mainHeight": 3292,
+      "cls": 0.08356041023662553
+    },
+    "skeletonReplaced": true,
+    "mainHeightDelta": 2738,
+    "incrementalCls": 0.08356041023662553,
+    "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+    "contentHasFfmpeg": true,
+    "ownedSelector": "[data-testid=\"search-results-loading\"] .system-skeleton",
+    "routeChunkExcluded": true,
+    "apiResponseStatuses": [
+      200
+    ],
+    "focusedAxe": {
+      "state": "loading-skeleton-owned",
+      "viewport": 1440,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "detail": "latest/loading-owned/axe/loading@1440.json"
+    }
+  }
+]

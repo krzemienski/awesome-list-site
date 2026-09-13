@@ -1,0 +1,658 @@
+[
+  {
+    "route": "terms",
+    "viewport": 375,
+    "status": 200,
+    "cls": 0.009852216748768473,
+    "visualComparison": {
+      "diffPercent": 19.845157110463234,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 375,
+        "height": 2058
+      },
+      "expected": {
+        "width": 375,
+        "height": 1878
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "privacy",
+    "viewport": 375,
+    "status": 200,
+    "cls": 0.009852216748768473,
+    "visualComparison": {
+      "diffPercent": 23.489472780353772,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 375,
+        "height": 3882
+      },
+      "expected": {
+        "width": 375,
+        "height": 3426
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "code-of-conduct",
+    "viewport": 375,
+    "status": 200,
+    "cls": 0.009852216748768473,
+    "visualComparison": {
+      "diffPercent": 20.2900153609831,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 375,
+        "height": 1736
+      },
+      "expected": {
+        "width": 375,
+        "height": 1584
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "404",
+    "viewport": 375,
+    "status": 404,
+    "cls": 0.010042958101790062,
+    "visualComparison": {
+      "diffPercent": 8.333333333333332,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 375,
+        "height": 812
+      },
+      "expected": {
+        "width": 375,
+        "height": 812
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "empty-search",
+    "viewport": 375,
+    "status": 200,
+    "cls": 0.1687192118226601,
+    "visualComparison": {
+      "diffPercent": 0.2559241706161137,
+      "withinSystemThreshold": true,
+      "actual": {
+        "width": 375,
+        "height": 844
+      },
+      "expected": {
+        "width": 375,
+        "height": 844
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "design-system",
+    "viewport": 375,
+    "status": 200,
+    "cls": 0.009852216748768473,
+    "visualComparison": {
+      "diffPercent": 12.874323414568467,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 375,
+        "height": 7427
+      },
+      "expected": {
+        "width": 375,
+        "height": 7097
+      }
+    },
+    "axe": {
+      "serious": 1,
+      "critical": 0
+    }
+  },
+  {
+    "route": "home",
+    "viewport": 375,
+    "status": 200,
+    "cls": 0.05203195297143828,
+    "visualComparison": {
+      "diffPercent": 0.5149459560193813,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 375,
+        "height": 2683
+      },
+      "expected": {
+        "width": 375,
+        "height": 2683
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "submit",
+    "viewport": 375,
+    "status": 200,
+    "cls": 0.009852216748768473,
+    "visualComparison": {
+      "diffPercent": 41.209725814795654,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 375,
+        "height": 1239
+      },
+      "expected": {
+        "width": 375,
+        "height": 1933
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "terms",
+    "viewport": 768,
+    "status": 200,
+    "cls": 0.08475786245738466,
+    "visualComparison": {
+      "diffPercent": 19.668494435817806,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 1610
+      },
+      "expected": {
+        "width": 768,
+        "height": 1411
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "privacy",
+    "viewport": 768,
+    "status": 200,
+    "cls": 0.1416015625,
+    "visualComparison": {
+      "diffPercent": 15.329171680705977,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 2493
+      },
+      "expected": {
+        "width": 768,
+        "height": 2358
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "code-of-conduct",
+    "viewport": 768,
+    "status": 200,
+    "cls": 0.05066885054111481,
+    "visualComparison": {
+      "diffPercent": 19.75718842455621,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 1352
+      },
+      "expected": {
+        "width": 768,
+        "height": 1185
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "404",
+    "viewport": 768,
+    "status": 404,
+    "cls": 0.00787085376214236,
+    "visualComparison": {
+      "diffPercent": 2.923075358072917,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 1024
+      },
+      "expected": {
+        "width": 768,
+        "height": 1024
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "empty-search",
+    "viewport": 768,
+    "status": 200,
+    "cls": 0.0078125,
+    "visualComparison": {
+      "diffPercent": 1.8161773681640625,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 1024
+      },
+      "expected": {
+        "width": 768,
+        "height": 1024
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "design-system",
+    "viewport": 768,
+    "status": 200,
+    "cls": 0.1416015625,
+    "visualComparison": {
+      "diffPercent": 7.242905521262003,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 5781
+      },
+      "expected": {
+        "width": 768,
+        "height": 5832
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "home",
+    "viewport": 768,
+    "status": 200,
+    "cls": 0.04001879692077637,
+    "visualComparison": {
+      "diffPercent": 7.294881687242798,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 1758
+      },
+      "expected": {
+        "width": 768,
+        "height": 1782
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "submit",
+    "viewport": 768,
+    "status": 200,
+    "cls": 0.019571304321289062,
+    "visualComparison": {
+      "diffPercent": 33.54313636123441,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 768,
+        "height": 1114
+      },
+      "expected": {
+        "width": 768,
+        "height": 1577
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "terms",
+    "viewport": 1024,
+    "status": 200,
+    "cls": 0.1267091752961278,
+    "visualComparison": {
+      "diffPercent": 20.007437037892792,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 1623
+      },
+      "expected": {
+        "width": 1024,
+        "height": 1388
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "privacy",
+    "viewport": 1024,
+    "status": 200,
+    "cls": 0.1484206107755502,
+    "visualComparison": {
+      "diffPercent": 15.839579381152586,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 2438
+      },
+      "expected": {
+        "width": 1024,
+        "height": 2247
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "code-of-conduct",
+    "viewport": 1024,
+    "status": 200,
+    "cls": 0.09142558245609204,
+    "visualComparison": {
+      "diffPercent": 21.057692307692307,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 1365
+      },
+      "expected": {
+        "width": 1024,
+        "height": 1163
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "404",
+    "viewport": 1024,
+    "status": 404,
+    "cls": 0.0119026299022759,
+    "visualComparison": {
+      "diffPercent": 3.817621866861979,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 768
+      },
+      "expected": {
+        "width": 1024,
+        "height": 768
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "empty-search",
+    "viewport": 1024,
+    "status": 200,
+    "cls": 0.2124907833834489,
+    "visualComparison": {
+      "diffPercent": 2.9349009195963545,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 768
+      },
+      "expected": {
+        "width": 1024,
+        "height": 768
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "design-system",
+    "viewport": 1024,
+    "status": 200,
+    "cls": 0.1484206107755502,
+    "visualComparison": {
+      "diffPercent": 6.743578320584144,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 5677
+      },
+      "expected": {
+        "width": 1024,
+        "height": 5752
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "home",
+    "viewport": 1024,
+    "status": 200,
+    "cls": 0.10166796118331453,
+    "visualComparison": {
+      "diffPercent": 7.443356548480463,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 1358
+      },
+      "expected": {
+        "width": 1024,
+        "height": 1382
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "submit",
+    "viewport": 1024,
+    "status": 200,
+    "cls": 0.05922169300417105,
+    "visualComparison": {
+      "diffPercent": 32.43859483988586,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1024,
+        "height": 1123
+      },
+      "expected": {
+        "width": 1024,
+        "height": 1577
+      }
+    },
+    "axe": null
+  },
+  {
+    "route": "terms",
+    "viewport": 1440,
+    "status": 200,
+    "cls": 0.0392492100426526,
+    "visualComparison": {
+      "diffPercent": 25.221717499459224,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 1541
+      },
+      "expected": {
+        "width": 1440,
+        "height": 1215
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "privacy",
+    "viewport": 1440,
+    "status": 200,
+    "cls": 0.07710872395833332,
+    "visualComparison": {
+      "diffPercent": 22.93976577212806,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 2360
+      },
+      "expected": {
+        "width": 1440,
+        "height": 1954
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "code-of-conduct",
+    "viewport": 1440,
+    "status": 200,
+    "cls": 0.0265197107553155,
+    "visualComparison": {
+      "diffPercent": 23.880174504200223,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 1283
+      },
+      "expected": {
+        "width": 1440,
+        "height": 1034
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "404",
+    "viewport": 1440,
+    "status": 404,
+    "cls": 0.00821415126470872,
+    "visualComparison": {
+      "diffPercent": 2.1352623456790125,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 900
+      },
+      "expected": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "empty-search",
+    "viewport": 1440,
+    "status": 200,
+    "cls": 0.00818897087191358,
+    "visualComparison": {
+      "diffPercent": 0.8763888888888889,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 900
+      },
+      "expected": {
+        "width": 1440,
+        "height": 900
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "design-system",
+    "viewport": 1440,
+    "status": 200,
+    "cls": 0.07710872395833332,
+    "visualComparison": {
+      "diffPercent": 4.652565371236657,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 5558
+      },
+      "expected": {
+        "width": 1440,
+        "height": 5500
+      }
+    },
+    "axe": {
+      "serious": 1,
+      "critical": 0
+    }
+  },
+  {
+    "route": "home",
+    "viewport": 1440,
+    "status": 200,
+    "cls": 0.0402486917210541,
+    "visualComparison": {
+      "diffPercent": 0.9824378368979307,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 1278
+      },
+      "expected": {
+        "width": 1440,
+        "height": 1278
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  },
+  {
+    "route": "submit",
+    "viewport": 1440,
+    "status": 200,
+    "cls": 0.01623085479527017,
+    "visualComparison": {
+      "diffPercent": 32.54462628961627,
+      "withinSystemThreshold": false,
+      "actual": {
+        "width": 1440,
+        "height": 1063
+      },
+      "expected": {
+        "width": 1440,
+        "height": 1497
+      }
+    },
+    "axe": {
+      "serious": 0,
+      "critical": 0
+    }
+  }
+]

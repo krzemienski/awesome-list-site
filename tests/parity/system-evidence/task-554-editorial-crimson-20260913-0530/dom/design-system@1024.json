@@ -1,0 +1,1530 @@
+{
+  "route": "design-system",
+  "viewport": {
+    "width": 1024,
+    "height": 768
+  },
+  "url": "http://localhost:5000/design-system",
+  "title": "Design System — Awesome Video",
+  "h1": [
+    "Design System"
+  ],
+  "visibleTestIds": [
+    "accordion-cat-community-events",
+    "accordion-cat-encoding-codecs",
+    "accordion-cat-general-tools",
+    "accordion-cat-infrastructure-delivery",
+    "accordion-cat-intro-learning",
+    "accordion-cat-media-tools",
+    "accordion-cat-players-clients",
+    "accordion-cat-protocols-transport",
+    "accordion-cat-standards-industry",
+    "brand-mark",
+    "ds-accent-amber",
+    "ds-accent-crimson",
+    "ds-accent-cyan",
+    "ds-accent-emerald",
+    "ds-accent-lime",
+    "ds-accent-magenta",
+    "ds-accent-matrix",
+    "ds-accent-orange",
+    "ds-accent-ramp",
+    "ds-accent-rose",
+    "ds-accent-violet",
+    "ds-components",
+    "ds-display-only-note",
+    "ds-product-profiles",
+    "ds-skin-notes",
+    "ds-system-brutalist",
+    "ds-system-editorial",
+    "ds-system-geist",
+    "ds-system-swiss",
+    "ds-system-switcher",
+    "ds-system-terminal",
+    "ds-token-catalog",
+    "ds-token-group-accent",
+    "ds-token-group-atmosphere-motion",
+    "ds-token-group-borders",
+    "ds-token-group-ink-tiers",
+    "ds-token-group-radius-ladder",
+    "ds-token-group-shadow-ladder",
+    "ds-token-group-surfaces",
+    "ds-token-group-typography",
+    "ds-token-value-accent",
+    "ds-token-value-accent-2",
+    "ds-token-value-bg",
+    "ds-token-value-bg-2",
+    "ds-token-value-body-leading",
+    "ds-token-value-border",
+    "ds-token-value-border-strong",
+    "ds-token-value-border-w",
+    "ds-token-value-display-leading",
+    "ds-token-value-display-tracking",
+    "ds-token-value-display-weight",
+    "ds-token-value-eyebrow-tracking",
+    "ds-token-value-font-body",
+    "ds-token-value-font-display",
+    "ds-token-value-font-mono",
+    "ds-token-value-grain-opacity",
+    "ds-token-value-hairline",
+    "ds-token-value-hairline-w",
+    "ds-token-value-mono-size-step",
+    "ds-token-value-motion-base",
+    "ds-token-value-motion-ease",
+    "ds-token-value-motion-fast",
+    "ds-token-value-motion-slow",
+    "ds-token-value-radius",
+    "ds-token-value-radius-pill",
+    "ds-token-value-radius-sm",
+    "ds-token-value-radius-xs",
+    "ds-token-value-shadow",
+    "ds-token-value-shadow-accent",
+    "ds-token-value-shadow-lg",
+    "ds-token-value-shadow-sm",
+    "ds-token-value-surface",
+    "ds-token-value-surface-2",
+    "ds-token-value-surface-3",
+    "ds-token-value-text",
+    "ds-token-value-text-2",
+    "ds-token-value-text-3",
+    "ds-token-value-text-4",
+    "ds-type-scale",
+    "expand-sub-adaptive-streaming",
+    "expand-sub-ads-qoe",
+    "expand-sub-audio-subtitles",
+    "expand-sub-best-practices-guidelines",
+    "expand-sub-cdn-integration-distribution",
+    "expand-sub-cloud-cdn",
+    "expand-sub-codecs",
+    "expand-sub-community-groups",
+    "expand-sub-containerization-packaging-tools",
+    "expand-sub-encoding-tools",
+    "expand-sub-events-conferences",
+    "expand-sub-hardware-players",
+    "expand-sub-industry-forums-standards-bodies",
+    "expand-sub-mobile-web-players",
+    "expand-sub-smart-tv-players",
+    "expand-sub-specs-standards",
+    "expand-sub-streaming-servers",
+    "expand-sub-transport-protocols",
+    "expand-sub-webinars-conference-talks",
+    "footer-about",
+    "footer-categories",
+    "footer-code-of-conduct",
+    "footer-cookie-settings",
+    "footer-copyright",
+    "footer-github",
+    "footer-home",
+    "footer-journeys",
+    "footer-privacy",
+    "footer-submit",
+    "footer-terms",
+    "header-brand",
+    "link-back-theme-settings",
+    "mobile-drawer-trigger",
+    "nav-advanced",
+    "nav-home",
+    "nav-learning-journeys",
+    "nav-submit-resource",
+    "nav-theme",
+    "row-cat-community-events",
+    "row-cat-encoding-codecs",
+    "row-cat-general-tools",
+    "row-cat-infrastructure-delivery",
+    "row-cat-intro-learning",
+    "row-cat-media-tools",
+    "row-cat-players-clients",
+    "row-cat-protocols-transport",
+    "row-cat-standards-industry",
+    "sidebar-resource-count",
+    "sub-adaptive-bitrate-algorithms-tools",
+    "sub-adaptive-streaming",
+    "sub-adaptive-streaming-standards",
+    "sub-ads-qoe",
+    "sub-ai-machine-learning-tools",
+    "sub-api-libraries-sdks",
+    "sub-audio-analysis-processing",
+    "sub-audio-subtitles",
+    "sub-batch-processing-automation",
+    "sub-benchmarking-performance-tools-for-codecs",
+    "sub-best-practices-guidelines",
+    "sub-books-courses",
+    "sub-build-scripts-automation",
+    "sub-case-studies-best-practices-in-drm",
+    "sub-case-studies-whitepapers",
+    "sub-cdn-integration-distribution",
+    "sub-cloud-based-encoding-solutions",
+    "sub-cloud-cdn",
+    "sub-cmaf-fmp4-packaging",
+    "sub-codecs",
+    "sub-color-grading-correction-tools",
+    "sub-color-science-histogram-analysis",
+    "sub-command-line-utilities-wrappers",
+    "sub-community-blogs-forums",
+    "sub-community-collaboration-platforms",
+    "sub-community-groups",
+    "sub-comparative-analysis-of-codecs",
+    "sub-containerization-packaging-tools",
+    "sub-conversion-format-tools",
+    "sub-cross-platform-media-tools",
+    "sub-dash-tools",
+    "sub-desktop-players",
+    "sub-docker-containerization-tools",
+    "sub-drm",
+    "sub-drm-content-protection-standards",
+    "sub-drm-solutions-implementations",
+    "sub-drm-testing-validation-tools",
+    "sub-edge-computing-caching-solutions",
+    "sub-effects-compositing-tools",
+    "sub-embedded-players",
+    "sub-encoding-tools",
+    "sub-encoding-transcoding-guides",
+    "sub-encryption-tools-for-streaming",
+    "sub-events-conferences",
+    "sub-ffmpeg-based-tools",
+    "sub-frameworks-ui-components",
+    "sub-hardware-accelerated-transcoding",
+    "sub-hardware-codecs-acceleration",
+    "sub-hardware-players",
+    "sub-hls-manifest-parsers-generators",
+    "sub-hls-tools",
+    "sub-independent-hobbyist-projects",
+    "sub-industry-forums-standards-bodies",
+    "sub-learning-resources",
+    "sub-live-streaming-servers",
+    "sub-logging-debugging-tools",
+    "sub-low-latency-streaming-tools",
+    "sub-metadata-extraction-management",
+    "sub-mobile-players",
+    "sub-mobile-web-players",
+    "sub-multi-cdn-management",
+    "sub-multi-format-packaging-tools",
+    "sub-next-generation-codecs-av1-vvc",
+    "sub-open-source-encoder-projects",
+    "sub-peer-to-peer-streaming-solutions",
+    "sub-player-development-documentation",
+    "sub-quality-analysis-metrics",
+    "sub-real-time-encoding-solutions",
+    "sub-research-projects-academic-resources",
+    "sub-rtmprtsphttp-protocol-servers",
+    "sub-scene-detection-segmentation",
+    "sub-scripting-automation-tools",
+    "sub-set-top-box-players",
+    "sub-smart-tv-players",
+    "sub-software-codecs",
+    "sub-software-transcoding-tools",
+    "sub-specialized-utility-scripts",
+    "sub-specs-standards",
+    "sub-streaming-analytics-monitoring",
+    "sub-streaming-servers",
+    "sub-subtitle-caption-tools",
+    "sub-test-content-sample-streams",
+    "sub-transport-protocols",
+    "sub-tutorials-case-studies",
+    "sub-uncategorized-encoding-codecs",
+    "sub-uncategorized-general-tools",
+    "sub-uncategorized-infrastructure-delivery",
+    "sub-uncategorized-intro-learning",
+    "sub-uncategorized-media-tools",
+    "sub-uncategorized-players-clients",
+    "sub-uncategorized-protocols-transport",
+    "sub-uncategorized-standards-industry",
+    "sub-video-analytics-benchmarking",
+    "sub-video-codec-specifications",
+    "sub-video-streaming-tutorials",
+    "sub-vmaf-psnr-ssim-tools",
+    "sub-vod-streaming-servers",
+    "sub-web-players",
+    "sub-webinars-conference-talks",
+    "sub-widevine-fairplay-playready-integrations",
+    "subsub-android",
+    "subsub-audio",
+    "subsub-av1",
+    "subsub-cdn-integration",
+    "subsub-chromecast",
+    "subsub-cloud-platforms",
+    "subsub-dash",
+    "subsub-ffmpeg",
+    "subsub-hdr-guidelines",
+    "subsub-hevc",
+    "subsub-hls",
+    "subsub-ios-tvos",
+    "subsub-mpeg-forums",
+    "subsub-official-specs",
+    "subsub-online-forums",
+    "subsub-origin-servers",
+    "subsub-podcasts",
+    "subsub-podcasts-webinars",
+    "subsub-quality-testing",
+    "subsub-rist",
+    "subsub-roku",
+    "subsub-smart-tvs",
+    "subsub-srt",
+    "subsub-storage-solutions",
+    "subsub-subtitles-captions",
+    "subsub-vp9",
+    "subsub-web-players",
+    "text-ds-active",
+    "text-ds-title",
+    "toggle-cat-community-events",
+    "toggle-cat-encoding-codecs",
+    "toggle-cat-general-tools",
+    "toggle-cat-infrastructure-delivery",
+    "toggle-cat-intro-learning",
+    "toggle-cat-media-tools",
+    "toggle-cat-players-clients",
+    "toggle-cat-protocols-transport",
+    "toggle-cat-standards-industry"
+  ],
+  "allTestIds": [
+    "accordion-cat-community-events",
+    "accordion-cat-encoding-codecs",
+    "accordion-cat-general-tools",
+    "accordion-cat-infrastructure-delivery",
+    "accordion-cat-intro-learning",
+    "accordion-cat-media-tools",
+    "accordion-cat-players-clients",
+    "accordion-cat-protocols-transport",
+    "accordion-cat-standards-industry",
+    "brand-mark",
+    "breadcrumb-mobile-current",
+    "ds-accent-amber",
+    "ds-accent-crimson",
+    "ds-accent-cyan",
+    "ds-accent-emerald",
+    "ds-accent-lime",
+    "ds-accent-magenta",
+    "ds-accent-matrix",
+    "ds-accent-orange",
+    "ds-accent-ramp",
+    "ds-accent-rose",
+    "ds-accent-violet",
+    "ds-components",
+    "ds-display-only-note",
+    "ds-product-profiles",
+    "ds-skin-notes",
+    "ds-system-brutalist",
+    "ds-system-editorial",
+    "ds-system-geist",
+    "ds-system-swiss",
+    "ds-system-switcher",
+    "ds-system-terminal",
+    "ds-token-catalog",
+    "ds-token-group-accent",
+    "ds-token-group-atmosphere-motion",
+    "ds-token-group-borders",
+    "ds-token-group-ink-tiers",
+    "ds-token-group-radius-ladder",
+    "ds-token-group-shadow-ladder",
+    "ds-token-group-surfaces",
+    "ds-token-group-typography",
+    "ds-token-value-accent",
+    "ds-token-value-accent-2",
+    "ds-token-value-bg",
+    "ds-token-value-bg-2",
+    "ds-token-value-body-leading",
+    "ds-token-value-border",
+    "ds-token-value-border-strong",
+    "ds-token-value-border-w",
+    "ds-token-value-display-leading",
+    "ds-token-value-display-tracking",
+    "ds-token-value-display-weight",
+    "ds-token-value-eyebrow-tracking",
+    "ds-token-value-font-body",
+    "ds-token-value-font-display",
+    "ds-token-value-font-mono",
+    "ds-token-value-grain-opacity",
+    "ds-token-value-hairline",
+    "ds-token-value-hairline-w",
+    "ds-token-value-mono-size-step",
+    "ds-token-value-motion-base",
+    "ds-token-value-motion-ease",
+    "ds-token-value-motion-fast",
+    "ds-token-value-motion-slow",
+    "ds-token-value-radius",
+    "ds-token-value-radius-pill",
+    "ds-token-value-radius-sm",
+    "ds-token-value-radius-xs",
+    "ds-token-value-shadow",
+    "ds-token-value-shadow-accent",
+    "ds-token-value-shadow-lg",
+    "ds-token-value-shadow-sm",
+    "ds-token-value-surface",
+    "ds-token-value-surface-2",
+    "ds-token-value-surface-3",
+    "ds-token-value-text",
+    "ds-token-value-text-2",
+    "ds-token-value-text-3",
+    "ds-token-value-text-4",
+    "ds-type-scale",
+    "expand-sub-adaptive-streaming",
+    "expand-sub-ads-qoe",
+    "expand-sub-audio-subtitles",
+    "expand-sub-best-practices-guidelines",
+    "expand-sub-cdn-integration-distribution",
+    "expand-sub-cloud-cdn",
+    "expand-sub-codecs",
+    "expand-sub-community-groups",
+    "expand-sub-containerization-packaging-tools",
+    "expand-sub-encoding-tools",
+    "expand-sub-events-conferences",
+    "expand-sub-hardware-players",
+    "expand-sub-industry-forums-standards-bodies",
+    "expand-sub-mobile-web-players",
+    "expand-sub-smart-tv-players",
+    "expand-sub-specs-standards",
+    "expand-sub-streaming-servers",
+    "expand-sub-transport-protocols",
+    "expand-sub-webinars-conference-talks",
+    "footer-about",
+    "footer-categories",
+    "footer-code-of-conduct",
+    "footer-cookie-settings",
+    "footer-copyright",
+    "footer-github",
+    "footer-home",
+    "footer-journeys",
+    "footer-privacy",
+    "footer-submit",
+    "footer-terms",
+    "header-brand",
+    "link-back-theme-settings",
+    "mobile-drawer-trigger",
+    "nav-advanced",
+    "nav-home",
+    "nav-learning-journeys",
+    "nav-submit-resource",
+    "nav-theme",
+    "rail-about",
+    "rail-advanced",
+    "rail-home",
+    "rail-learning-journeys",
+    "rail-submit-resource",
+    "rail-theme",
+    "row-cat-community-events",
+    "row-cat-encoding-codecs",
+    "row-cat-general-tools",
+    "row-cat-infrastructure-delivery",
+    "row-cat-intro-learning",
+    "row-cat-media-tools",
+    "row-cat-players-clients",
+    "row-cat-protocols-transport",
+    "row-cat-standards-industry",
+    "sidebar-resource-count",
+    "sub-adaptive-bitrate-algorithms-tools",
+    "sub-adaptive-streaming",
+    "sub-adaptive-streaming-standards",
+    "sub-ads-qoe",
+    "sub-ai-machine-learning-tools",
+    "sub-api-libraries-sdks",
+    "sub-audio-analysis-processing",
+    "sub-audio-subtitles",
+    "sub-batch-processing-automation",
+    "sub-benchmarking-performance-tools-for-codecs",
+    "sub-best-practices-guidelines",
+    "sub-books-courses",
+    "sub-build-scripts-automation",
+    "sub-case-studies-best-practices-in-drm",
+    "sub-case-studies-whitepapers",
+    "sub-cdn-integration-distribution",
+    "sub-cloud-based-encoding-solutions",
+    "sub-cloud-cdn",
+    "sub-cmaf-fmp4-packaging",
+    "sub-codecs",
+    "sub-color-grading-correction-tools",
+    "sub-color-science-histogram-analysis",
+    "sub-command-line-utilities-wrappers",
+    "sub-community-blogs-forums",
+    "sub-community-collaboration-platforms",
+    "sub-community-groups",
+    "sub-comparative-analysis-of-codecs",
+    "sub-containerization-packaging-tools",
+    "sub-conversion-format-tools",
+    "sub-cross-platform-media-tools",
+    "sub-dash-tools",
+    "sub-desktop-players",
+    "sub-docker-containerization-tools",
+    "sub-drm",
+    "sub-drm-content-protection-standards",
+    "sub-drm-solutions-implementations",
+    "sub-drm-testing-validation-tools",
+    "sub-edge-computing-caching-solutions",
+    "sub-effects-compositing-tools",
+    "sub-embedded-players",
+    "sub-encoding-tools",
+    "sub-encoding-transcoding-guides",
+    "sub-encryption-tools-for-streaming",
+    "sub-events-conferences",
+    "sub-ffmpeg-based-tools",
+    "sub-frameworks-ui-components",
+    "sub-hardware-accelerated-transcoding",
+    "sub-hardware-codecs-acceleration",
+    "sub-hardware-players",
+    "sub-hls-manifest-parsers-generators",
+    "sub-hls-tools",
+    "sub-independent-hobbyist-projects",
+    "sub-industry-forums-standards-bodies",
+    "sub-learning-resources",
+    "sub-live-streaming-servers",
+    "sub-logging-debugging-tools",
+    "sub-low-latency-streaming-tools",
+    "sub-metadata-extraction-management",
+    "sub-mobile-players",
+    "sub-mobile-web-players",
+    "sub-multi-cdn-management",
+    "sub-multi-format-packaging-tools",
+    "sub-next-generation-codecs-av1-vvc",
+    "sub-open-source-encoder-projects",
+    "sub-peer-to-peer-streaming-solutions",
+    "sub-player-development-documentation",
+    "sub-quality-analysis-metrics",
+    "sub-real-time-encoding-solutions",
+    "sub-research-projects-academic-resources",
+    "sub-rtmprtsphttp-protocol-servers",
+    "sub-scene-detection-segmentation",
+    "sub-scripting-automation-tools",
+    "sub-set-top-box-players",
+    "sub-smart-tv-players",
+    "sub-software-codecs",
+    "sub-software-transcoding-tools",
+    "sub-specialized-utility-scripts",
+    "sub-specs-standards",
+    "sub-streaming-analytics-monitoring",
+    "sub-streaming-servers",
+    "sub-subtitle-caption-tools",
+    "sub-test-content-sample-streams",
+    "sub-transport-protocols",
+    "sub-tutorials-case-studies",
+    "sub-uncategorized-encoding-codecs",
+    "sub-uncategorized-general-tools",
+    "sub-uncategorized-infrastructure-delivery",
+    "sub-uncategorized-intro-learning",
+    "sub-uncategorized-media-tools",
+    "sub-uncategorized-players-clients",
+    "sub-uncategorized-protocols-transport",
+    "sub-uncategorized-standards-industry",
+    "sub-video-analytics-benchmarking",
+    "sub-video-codec-specifications",
+    "sub-video-streaming-tutorials",
+    "sub-vmaf-psnr-ssim-tools",
+    "sub-vod-streaming-servers",
+    "sub-web-players",
+    "sub-webinars-conference-talks",
+    "sub-widevine-fairplay-playready-integrations",
+    "subsub-android",
+    "subsub-audio",
+    "subsub-av1",
+    "subsub-cdn-integration",
+    "subsub-chromecast",
+    "subsub-cloud-platforms",
+    "subsub-dash",
+    "subsub-ffmpeg",
+    "subsub-hdr-guidelines",
+    "subsub-hevc",
+    "subsub-hls",
+    "subsub-ios-tvos",
+    "subsub-mpeg-forums",
+    "subsub-official-specs",
+    "subsub-online-forums",
+    "subsub-origin-servers",
+    "subsub-podcasts",
+    "subsub-podcasts-webinars",
+    "subsub-quality-testing",
+    "subsub-rist",
+    "subsub-roku",
+    "subsub-smart-tvs",
+    "subsub-srt",
+    "subsub-storage-solutions",
+    "subsub-subtitles-captions",
+    "subsub-vp9",
+    "subsub-web-players",
+    "text-ds-active",
+    "text-ds-title",
+    "toggle-cat-community-events",
+    "toggle-cat-encoding-codecs",
+    "toggle-cat-general-tools",
+    "toggle-cat-infrastructure-delivery",
+    "toggle-cat-intro-learning",
+    "toggle-cat-media-tools",
+    "toggle-cat-players-clients",
+    "toggle-cat-protocols-transport",
+    "toggle-cat-standards-industry"
+  ],
+  "documentHeight": 5677,
+  "mainRect": {
+    "x": 240,
+    "y": 60,
+    "width": 784,
+    "height": 5480.484375
+  },
+  "cls": 0.1484206107755502,
+  "htmlSystem": "editorial",
+  "htmlAccent": "crimson",
+  "localStorage": {
+    "consent": "denied",
+    "system": "editorial",
+    "accent": "crimson"
+  },
+  "responseStatus": 200,
+  "responseHeaders": {
+    "content-type": "text/html; charset=utf-8",
+    "cache-control": "no-store",
+    "x-robots-tag": null
+  },
+  "idCompare": {
+    "available": true,
+    "missing": [
+      "expand-sub-vendors-hdr",
+      "sub-browser-extensions",
+      "sub-closed-captioning-subtitling-standards",
+      "sub-dash-manifest-tools",
+      "sub-ffmpeg-tools",
+      "sub-non-linear-editing-suites",
+      "sub-performance-monitoring-tools",
+      "sub-uncategorized-community-events",
+      "sub-vendors-hdr",
+      "subsub-advertising",
+      "subsub-conferences",
+      "subsub-rtmp",
+      "subsub-slack-meetups",
+      "subsub-vendor-docs"
+    ],
+    "added": [
+      "expand-sub-industry-forums-standards-bodies"
+    ]
+  },
+  "requests": [
+    {
+      "at": 1789276664090,
+      "method": "GET",
+      "url": "http://localhost:5000/design-system",
+      "resourceType": "document"
+    },
+    {
+      "at": 1789276664124,
+      "method": "GET",
+      "url": "http://localhost:5000/@vite/client",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664124,
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+      "resourceType": "stylesheet"
+    },
+    {
+      "at": 1789276664124,
+      "method": "GET",
+      "url": "http://localhost:5000/src/main.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664133,
+      "method": "GET",
+      "url": "http://localhost:5000/api/awesome-list/nav",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276664133,
+      "method": "GET",
+      "url": "https://replit.com/public/js/replit-dev-banner.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664137,
+      "method": "GET",
+      "url": "http://localhost:5000/@react-refresh",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/App.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/index.css",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/queryClient.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/toaster.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/analytics.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/mixpanel.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/posthog.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/amplitude.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/static-data.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664141,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/font-options.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664142,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664143,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QCHXOAYK.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664144,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WOOG5QLI.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664151,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5GLF3XJW.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664151,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664155,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664155,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664164,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/apiError.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664167,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664167,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664167,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/utils.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664169,
+      "method": "GET",
+      "url": "http://localhost:5000/src/hooks/use-toast.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664170,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/toast.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664176,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/design-system.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664176,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/safeStorage.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664182,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/acquisition.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react_internal.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/hooks/use-analytics.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/nav-history.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/hooks/useAuth.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/crossTabSync.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/clerk-appearance.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/layout/new/MainLayout.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/pages/ErrorPage.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/pages/Home.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/auth/AuthConversionTracker.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/auth/GuestBookmarkMerge.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/pages/not-found.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/consent-banner.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/scrubbed-params-notice.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664186,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/button.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X2OPQIN4.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-W6RT6DV3.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LVDEG73Y.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6MTKRYAT.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-I6FXIVHP.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-EE6BFT2I.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X4PDBUAV.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-3Q24TQMP.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-56BEYTZG.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ZCXSXCNU.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664194,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VDJKUYV7.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664207,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664207,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664211,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664211,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664211,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664211,
+      "method": "GET",
+      "url": "http://localhost:5000/src/styles/pages/system-overlays.css",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664214,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ATWSVQG2.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664240,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/web-vitals.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664248,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_themes.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664248,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/brand-mark.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664253,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664258,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WNIFHWTW.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664268,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/card.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664268,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664268,
+      "method": "GET",
+      "url": "http://localhost:5000/src/styles/pages/system.css",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664270,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/shared/seo-templates.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664270,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664270,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/layout/new/AppHeader.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664270,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664270,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/contact.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664272,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/skeletons.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664272,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/taxonomy-card.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664272,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/parser.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664272,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/tags.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664272,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/url-filter-state.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664272,
+      "method": "GET",
+      "url": "http://localhost:5000/src/hooks/use-learning-preferences.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664272,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/shared/onboarding-values.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664279,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/guestBookmarks.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664279,
+      "method": "GET",
+      "url": "http://localhost:5000/src/lib/route-monitor.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664279,
+      "method": "GET",
+      "url": "http://localhost:5000/src/hooks/use-app-bottom-inset.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664284,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664292,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664302,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/shared/tagNormalize.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664317,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/BrandMark.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664317,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/separator.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664317,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664317,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664317,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/breadcrumb.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664317,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664317,
+      "method": "GET",
+      "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664318,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/input.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664318,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664318,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664324,
+      "method": "GET",
+      "url": "http://localhost:5000/src/config/navigation-icons.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664324,
+      "method": "GET",
+      "url": "http://localhost:5000/src/styles/shell/sidebar.css",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664324,
+      "method": "GET",
+      "url": "http://localhost:5000/src/styles/shell/drawer.css",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664331,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NU6VN6EF.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664331,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SOAJA32I.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664331,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SDX2BBLL.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664338,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664338,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664338,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664358,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WP7S2REC.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664358,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664428,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/tailwind.config.ts",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664539,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664539,
+      "method": "GET",
+      "url": "http://localhost:5000/src/pages/DesignSystemShowcase.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664540,
+      "method": "GET",
+      "url": "http://localhost:5000/api/auth/user",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276664540,
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+      "resourceType": "font"
+    },
+    {
+      "at": 1789276664540,
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "resourceType": "font"
+    },
+    {
+      "at": 1789276664571,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664585,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwindcss-animate.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664587,
+      "method": "GET",
+      "url": "http://localhost:5000/favicon.svg",
+      "resourceType": "other"
+    },
+    {
+      "at": 1789276664589,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/badge.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664589,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/textarea.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664589,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/tabs.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664589,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/switch.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664589,
+      "method": "GET",
+      "url": "http://localhost:5000/src/components/ui/checkbox.tsx",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664689,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-switch.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664690,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-checkbox.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664690,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664718,
+      "method": "GET",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=be5c9ae3",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664767,
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8.woff2",
+      "resourceType": "font"
+    },
+    {
+      "at": 1789276664767,
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQg.woff2",
+      "resourceType": "font"
+    },
+    {
+      "at": 1789276664807,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664848,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui.browser.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664912,
+      "method": "GET",
+      "url": "blob:http://localhost:5000/ac7f2b28-3b68-4060-90e7-86828ad17135",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276664916,
+      "method": "POST",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&_method=PATCH&__clerk_db_jwt=dvb_3JG9h9wsznffShVIQVtrlBZtvoi",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276664916,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&__clerk_db_jwt=dvb_3JG9h9wsznffShVIQVtrlBZtvoi",
+      "resourceType": "fetch"
+    },
+    {
+      "at": 1789276665032,
+      "method": "GET",
+      "url": "blob:http://localhost:5000/cd195c11-55d3-4186-9024-fff092d9e33b",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276665034,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276665034,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276665083,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js",
+      "resourceType": "script"
+    },
+    {
+      "at": 1789276665083,
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js",
+      "resourceType": "script"
+    }
+  ],
+  "apiFailures": [],
+  "consoleErrors": []
+}

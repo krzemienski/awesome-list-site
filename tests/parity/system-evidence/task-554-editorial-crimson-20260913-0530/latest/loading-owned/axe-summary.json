@@ -1,0 +1,34 @@
+{
+  "375": {
+    "passes": 39,
+    "violations": [
+      {
+        "id": "landmark-main-is-top-level",
+        "impact": "moderate",
+        "nodes": 1
+      },
+      {
+        "id": "landmark-no-duplicate-main",
+        "impact": "moderate",
+        "nodes": 1
+      }
+    ],
+    "seriousCritical": 0
+  },
+  "1440": {
+    "passes": 44,
+    "violations": [
+      {
+        "id": "landmark-main-is-top-level",
+        "impact": "moderate",
+        "nodes": 1
+      },
+      {
+        "id": "landmark-no-duplicate-main",
+        "impact": "moderate",
+        "nodes": 1
+      }
+    ],
+    "seriousCritical": 0
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "generatedAt": "2026-09-13T05:52:27.505Z",
+  "base": "http://localhost:5000",
+  "theme": "Editorial × Crimson",
+  "widths": [
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "consent": {
+    "states": 8,
+    "allBannersPresent": true,
+    "noCtaOverlap": false,
+    "axeSeriousCritical": 0,
+    "externalAnalyticsHosts": {}
+  },
+  "toast": {
+    "states": 4,
+    "allButtonsFound": true,
+    "allToastsVisible": true,
+    "allPressed": true,
+    "axeSeriousCritical": 0
+  },
+  "loading": {
+    "states": 4,
+    "owner": "client/src/pages/Search.tsx:242 data-testid=search-results-loading",
+    "warmRoute": "/search?q=zzqxv-nothing",
+    "newQuery": "ffmpeg",
+    "ownedSelector": "[data-testid=\"search-results-loading\"] .system-skeleton",
+    "routeChunkSkeletonCountAtCapture": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "systemSkeletonCounts": [
+      36,
+      36,
+      36,
+      36
+    ],
+    "replacementContentCards": [
+      24,
+      24,
+      24,
+      24
+    ],
+    "skeletonVisibleAtAllWidths": true,
+    "replacementsObservedAtAllWidths": true,
+    "mainHeightDeltas": [
+      {
+        "width": 375,
+        "delta": 5361
+      },
+      {
+        "width": 768,
+        "delta": 2740
+      },
+      {
+        "width": 1024,
+        "delta": 5338
+      },
+      {
+        "width": 1440,
+        "delta": 2738
+      }
+    ],
+    "incrementalCls": [
+      {
+        "width": 375,
+        "value": 0.07444197530864197
+      },
+      {
+        "width": 768,
+        "value": 0.08190802469135802
+      },
+      {
+        "width": 1024,
+        "value": 0.09008076084984673
+      },
+      {
+        "width": 1440,
+        "value": 0.08356041023662553
+      }
+    ],
+    "axeSeriousCritical": 0,
+    "axeWidths": [
+      375,
+      1440
+    ],
+    "evidence": "latest/loading-owned/"
+  },
+  "showcase": {
+    "states": 4,
+    "latestScreenshotsAllWidths": true,
+    "captionReadable": true,
+    "decorativeSwatchesHidden": true,
+    "axeSeriousCritical": 0
+  }
+}

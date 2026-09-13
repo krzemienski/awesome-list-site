@@ -1,0 +1,197 @@
+/*
+ * Legal-page composition.
+ *
+ * Legal routes use the same editorial page grammar as the other content
+ * surfaces, but keep the reading measure intentionally narrow: the canonical
+ * prose/form column is 760px. Cards and typography continue to consume the
+ * shared design-system tokens so every system personality remains intact.
+ */
+
+.legal-page {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  animation: fadeIn 0.5s ease;
+}
+
+.legal-header {
+  margin-bottom: 28px;
+}
+
+.legal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: clamp(32px, 4.5vw, 48px);
+  font-weight: 700;
+  letter-spacing: -1.2px;
+  line-height: 1.1;
+}
+
+.legal-title > svg {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  color: var(--accent);
+  stroke-width: 1.5;
+}
+
+.legal-updated {
+  margin: 0;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+.legal-rule {
+  width: 220px;
+  max-width: 100%;
+  margin-top: 24px;
+}
+
+.legal-card {
+  background: var(--surface);
+  border: var(--border-w) solid var(--border);
+  box-shadow: none;
+}
+
+.legal-card:hover {
+  border-color: var(--border);
+}
+
+.legal-prose {
+  display: grid;
+  gap: 28px;
+  padding: 28px;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Reset shadcn's space-y utilities before applying the explicit prose rhythm. */
+.legal-prose > :not([hidden]) ~ :not([hidden]),
+.legal-prose section > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0;
+}
+
+.legal-prose section {
+  display: grid;
+  gap: 8px;
+}
+
+.legal-prose h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.legal-prose p {
+  max-width: 72ch;
+  margin: 0;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.legal-prose .legal-inline-link {
+  display: inline;
+  min-height: 24px;
+  padding: 0;
+  vertical-align: baseline;
+  color: var(--accent);
+  font-size: inherit;
+  font-weight: 500;
+  line-height: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.legal-prose .legal-inline-link:hover {
+  color: var(--text);
+}
+
+.legal-table-wrap {
+  min-width: 0;
+  margin: 4px 0;
+  overflow-x: auto;
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.legal-table {
+  color: var(--text-2);
+}
+
+.legal-table th {
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.legal-table td {
+  padding: 12px;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.55;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.legal-table tr {
+  border-color: var(--border);
+}
+
+@media (min-width: 640px) {
+  .legal-table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 640px) {
+  .legal-header {
+    margin-bottom: 24px;
+  }
+
+  .legal-title {
+    gap: 8px;
+    font-size: clamp(30px, 10vw, 40px);
+  }
+
+  .legal-title > svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .legal-rule {
+    margin-top: 20px;
+  }
+
+  .legal-prose {
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .legal-table td {
+    padding: 8px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legal-page {
+    animation: none;
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "route": "terms",
+  "path": "/terms",
+  "width": 375,
+  "height": 812,
+  "url": "http://localhost:5000/terms",
+  "axeVersion": "4.13.0",
+  "byImpact": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0
+  },
+  "violations": [],
+  "incomplete": 1,
+  "passes": 21
+}

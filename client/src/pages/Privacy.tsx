@@ -3,25 +3,27 @@ import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield } from "lucide-react";
 import { openCookieSettings } from "@/components/ui/consent-banner";
+import "@/styles/pages/system-legal.css";
 
 // BUG-019 (run13): companion to Terms — see that file for the routing notes.
 export default function Privacy() {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="legal-page">
       <SEOHead
         title="Privacy Policy"
         description="How Awesome Video handles your data: what we collect, how it's used, and the analytics choices you control."
       />
-      <div className="space-y-2">
-        <h1 className="display-h text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-privacy">
+      <div className="legal-header">
+        <h1 className="display-h legal-title text-2xl sm:text-3xl flex items-center gap-2" data-testid="heading-privacy">
           <Shield className="h-6 w-6 text-[var(--accent)]" />
           Privacy Policy
         </h1>
-        <p className="text-sm text-[color:var(--text-3)]">Last updated: September 1, 2026</p>
+        <p className="legal-updated text-sm text-[color:var(--text-3)]">Last updated: September 1, 2026</p>
+        <div className="shimmer-line legal-rule" aria-hidden="true" />
       </div>
 
-      <Card>
-        <CardContent className="pt-6 space-y-6 text-sm leading-relaxed text-[color:var(--text-2)]">
+      <Card className="legal-card">
+        <CardContent className="legal-prose pt-6 space-y-6 text-sm leading-relaxed text-[color:var(--text-2)]">
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">1. What we collect</h2>
             <p>
@@ -72,7 +74,7 @@ export default function Privacy() {
               <button
                 type="button"
                 onClick={openCookieSettings}
-                className="inline-flex items-center min-h-[24px] underline underline-offset-4 hover:text-[color:var(--text)]"
+                className="legal-inline-link inline-flex items-center min-h-[24px] underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="button-privacy-cookie-settings"
               >
                 Open cookie settings
@@ -88,8 +90,8 @@ export default function Privacy() {
               your analytics consent choice are stored in your browser's local
               storage (not cookies). The cookies you may see are:
             </p>
-            <div className="overflow-x-auto">
-              <table className="block w-full text-left text-xs sm:table sm:text-sm border-collapse" data-testid="table-cookies">
+            <div className="legal-table-wrap overflow-x-auto">
+              <table className="legal-table block w-full text-left text-xs sm:table sm:text-sm border-collapse" data-testid="table-cookies">
                 <thead className="hidden sm:table-header-group">
                   <tr className="border-b border-[var(--border)] text-[color:var(--text)]">
                     <th className="py-2 pr-4 font-semibold align-top">Cookie</th>
@@ -187,7 +189,7 @@ export default function Privacy() {
                   would have required exposing personal data publicly. */}
               <Link
                 href="/profile?tab=security"
-                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-privacy-deletion"
               >
                 Profile → Security → Delete account &amp; data
@@ -200,7 +202,7 @@ export default function Privacy() {
                 href="https://github.com/krzemienski/awesome-video/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-privacy-github-issues"
               >
                 on the repository
@@ -228,7 +230,7 @@ export default function Privacy() {
                 href="https://github.com/krzemienski/awesome-video/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
+                className="legal-inline-link inline-flex items-center min-h-[24px] align-middle underline underline-offset-4 hover:text-[color:var(--text)]"
                 data-testid="link-privacy-contact"
               >
                 open an issue on the project's GitHub repository

@@ -1,0 +1,4598 @@
+{
+  "generatedAt": "2026-09-13T05:19:35.552Z",
+  "base": "http://localhost:5000",
+  "browser": "Chromium via launchBrowserWithLease",
+  "viewports": [
+    {
+      "width": 375,
+      "height": 812
+    },
+    {
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "terms",
+      "path": "/terms"
+    },
+    {
+      "id": "privacy",
+      "path": "/privacy"
+    },
+    {
+      "id": "code-of-conduct",
+      "path": "/code-of-conduct"
+    },
+    {
+      "id": "404",
+      "path": "/this-route-does-not-exist"
+    },
+    {
+      "id": "empty-search",
+      "path": "/search?q=zzqxv-nothing"
+    },
+    {
+      "id": "design-system",
+      "path": "/design-system"
+    },
+    {
+      "id": "home",
+      "path": "/"
+    },
+    {
+      "id": "submit",
+      "path": "/submit"
+    }
+  ],
+  "counts": {
+    "captures": 32,
+    "seriousCriticalAxeViolations": 2
+  },
+  "consent": [
+    {
+      "label": "home",
+      "route": "/",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "preConsentAnalyticsRequests": [],
+      "zeroAnalyticsPreConsent": true,
+      "before": {
+        "bannerPresent": true,
+        "bannerRect": {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 143.78125,
+          "bottom": 143.78125
+        },
+        "overlaps": [],
+        "cta": [
+          {
+            "testid": null,
+            "text": "Filter by Tag",
+            "rect": {
+              "x": 16,
+              "y": 358.15625,
+              "width": 167.5,
+              "height": 44
+            }
+          },
+          {
+            "testid": null,
+            "text": "Default",
+            "rect": {
+              "x": 191.5,
+              "y": 358.15625,
+              "width": 167.5,
+              "height": 44
+            }
+          },
+          {
+            "testid": "link-category-community-events",
+            "text": "Community & Events80 resourcesFeatured: AOSP and AAOS Meetup Archive — A compreh",
+            "rect": {
+              "x": 16,
+              "y": 426.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-encoding-codecs",
+            "text": "Encoding & Codecs333 resourcesFeatured: AMD Advanced Media Acceleration (AMA) SD",
+            "rect": {
+              "x": 16,
+              "y": 618.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-general-tools",
+            "text": "General Tools134 resourcesFeatured: AWS SPEKE Reference Server — The Secure Pack",
+            "rect": {
+              "x": 16,
+              "y": 810.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-infrastructure-delivery",
+            "text": "Infrastructure & Delivery191 resourcesFeatured: AVideo CDN Storage — AVideo offe",
+            "rect": {
+              "x": 16,
+              "y": 1002.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-intro-learning",
+            "text": "Intro & Learning187 resourcesFeatured: A Brief History of Video Coding — Authore",
+            "rect": {
+              "x": 16,
+              "y": 1194.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-media-tools",
+            "text": "Media Tools266 resourcesFeatured: 3DLUT Creator — A stand-alone software to crea",
+            "rect": {
+              "x": 16,
+              "y": 1386.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-players-clients",
+            "text": "Players & Clients239 resourcesFeatured: AVPlayer — AVPlayer is Apple's framework",
+            "rect": {
+              "x": 16,
+              "y": 1578.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-protocols-transport",
+            "text": "Protocols & Transport213 resourcesFeatured: 100ms: RTMP vs WebRTC vs HLS - Live ",
+            "rect": {
+              "x": 16,
+              "y": 1770.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-category-standards-industry",
+            "text": "Standards & Industry173 resourcesFeatured: AV1 Video Codec — AV1 is an open-sour",
+            "rect": {
+              "x": 16,
+              "y": 1962.15625,
+              "width": 343,
+              "height": 180
+            }
+          },
+          {
+            "testid": "link-recommendations-heading",
+            "text": "Personalized Recommendations",
+            "rect": {
+              "x": 16,
+              "y": 2174.15625,
+              "width": 343,
+              "height": 64
+            }
+          },
+          {
+            "testid": null,
+            "text": "Login to Get Started",
+            "rect": {
+              "x": 41,
+              "y": 2509.15625,
+              "width": 293,
+              "height": 44
+            }
+          },
+          {
+            "testid": "button-browse-recommendations",
+            "text": "Browse recommendations",
+            "rect": {
+              "x": 41,
+              "y": 2565.15625,
+              "width": 293,
+              "height": 44
+            }
+          }
+        ],
+        "consent": null
+      },
+      "declineState": {
+        "consent": "denied",
+        "bannerPresent": false
+      },
+      "declinePersisted": {
+        "consent": "denied",
+        "bannerPresent": false
+      },
+      "persistencePass": true,
+      "screenshots": [
+        "flows/consent-home-375-before.png",
+        "flows/consent-home-375-declined-persisted.png"
+      ],
+      "allRequests": [
+        {
+          "at": 1789276701146,
+          "method": "GET",
+          "url": "http://localhost:5000/",
+          "resourceType": "document"
+        },
+        {
+          "at": 1789276701178,
+          "method": "GET",
+          "url": "http://localhost:5000/@vite/client",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701178,
+          "method": "GET",
+          "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+          "resourceType": "stylesheet"
+        },
+        {
+          "at": 1789276701178,
+          "method": "GET",
+          "url": "http://localhost:5000/src/main.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701182,
+          "method": "GET",
+          "url": "http://localhost:5000/api/awesome-list/nav",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276701184,
+          "method": "GET",
+          "url": "http://localhost:5000/@react-refresh",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701186,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701198,
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701199,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701199,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701199,
+          "method": "GET",
+          "url": "http://localhost:5000/src/App.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/index.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/queryClient.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toaster.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/analytics.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/mixpanel.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/posthog.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/amplitude.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701200,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/static-data.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701201,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/font-options.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701232,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276701240,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5GLF3XJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QCHXOAYK.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WOOG5QLI.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/utils.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701241,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701242,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/apiError.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701242,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701242,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701242,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react_internal.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-analytics.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/nav-history.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/useAuth.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/crossTabSync.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/clerk-appearance.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/design-system.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/MainLayout.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/ErrorPage.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/Home.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthConversionTracker.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/GuestBookmarkMerge.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/not-found.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/consent-banner.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/scrubbed-params-notice.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701244,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/button.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701245,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-toast.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701245,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toast.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701245,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/safeStorage.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701245,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/acquisition.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X2OPQIN4.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-W6RT6DV3.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LVDEG73Y.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6MTKRYAT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-I6FXIVHP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-EE6BFT2I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X4PDBUAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-3Q24TQMP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-56BEYTZG.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ZCXSXCNU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701266,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VDJKUYV7.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701276,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701276,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701285,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ATWSVQG2.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701307,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/web-vitals.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701307,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_themes.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701307,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/brand-mark.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701330,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/seo-templates.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeletons.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/taxonomy-card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/parser.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/tags.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/url-filter-state.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-learning-preferences.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/onboarding-values.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppHeader.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701332,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/contact.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701351,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/guestBookmarks.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701351,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-app-bottom-inset.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701351,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system-overlays.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701351,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/route-monitor.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701363,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701363,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701363,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701381,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701404,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701404,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701404,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/tagNormalize.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701441,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/BrandMark.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701441,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/separator.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701441,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701441,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701441,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/breadcrumb.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701442,
+          "method": "GET",
+          "url": "http://localhost:5000/src/config/navigation-icons.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701442,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/sidebar.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701442,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/drawer.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701442,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701442,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701442,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/input.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701442,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701446,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WNIFHWTW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701458,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701458,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701471,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701472,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NU6VN6EF.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701472,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SOAJA32I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701472,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SDX2BBLL.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701482,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WP7S2REC.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701482,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701561,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/tailwind.config.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701663,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701664,
+          "method": "GET",
+          "url": "http://localhost:5000/api/auth/user",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276701664,
+          "method": "GET",
+          "url": "http://localhost:5000/api/tags",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276701685,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwindcss-animate.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701693,
+          "method": "GET",
+          "url": "http://localhost:5000/favicon.svg",
+          "resourceType": "other"
+        },
+        {
+          "at": 1789276701716,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/advanced-filter.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701734,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276701772,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/badge.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701772,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/popover.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701772,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/select.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701772,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701813,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701814,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701814,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701826,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276701826,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702033,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702192,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702229,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702297,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/c5dfda2f-6334-495a-9b60-3f42d58868d4",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702299,
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276702398,
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&_method=PATCH&__clerk_db_jwt=dvb_3JG9nHkeFIsqmIycx03aJ5E81fm",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276702399,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&__clerk_db_jwt=dvb_3JG9nHkeFIsqmIycx03aJ5E81fm",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276702582,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/13692518-6d3a-4812-ac64-88b9a23e4cce",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702584,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702584,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702725,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276702725,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705276,
+          "method": "GET",
+          "url": "http://localhost:5000/",
+          "resourceType": "document"
+        },
+        {
+          "at": 1789276705303,
+          "method": "GET",
+          "url": "http://localhost:5000/@vite/client",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705303,
+          "method": "GET",
+          "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+          "resourceType": "stylesheet"
+        },
+        {
+          "at": 1789276705303,
+          "method": "GET",
+          "url": "http://localhost:5000/src/main.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705312,
+          "method": "GET",
+          "url": "http://localhost:5000/api/awesome-list/nav",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276705312,
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705316,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276705316,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276705317,
+          "method": "GET",
+          "url": "http://localhost:5000/@react-refresh",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705320,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705320,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/App.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/index.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/queryClient.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toaster.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/analytics.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/mixpanel.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/posthog.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/amplitude.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/static-data.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705321,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/font-options.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705322,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705322,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QCHXOAYK.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705322,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WOOG5QLI.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705322,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5GLF3XJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705322,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705322,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705323,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705333,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/apiError.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705335,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705335,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705335,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/utils.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705336,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X2OPQIN4.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705336,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-W6RT6DV3.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LVDEG73Y.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6MTKRYAT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-I6FXIVHP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-EE6BFT2I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X4PDBUAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-3Q24TQMP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705337,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705338,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-56BEYTZG.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705338,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ZCXSXCNU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705338,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VDJKUYV7.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705338,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-toast.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705338,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toast.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705339,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/design-system.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705339,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/safeStorage.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705343,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react_internal.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-analytics.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/nav-history.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/useAuth.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/crossTabSync.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/clerk-appearance.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/MainLayout.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/ErrorPage.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/Home.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthConversionTracker.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/GuestBookmarkMerge.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705344,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/not-found.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705345,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/consent-banner.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705345,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/scrubbed-params-notice.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705345,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/button.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705345,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ATWSVQG2.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705345,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/acquisition.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705361,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705361,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705361,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705370,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705370,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705370,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705370,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system-overlays.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705370,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WNIFHWTW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705370,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/web-vitals.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705377,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_themes.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705377,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/brand-mark.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705377,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705377,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppHeader.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705377,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705377,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/contact.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705377,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705378,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/seo-templates.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705378,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705378,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705378,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705388,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeletons.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705388,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/taxonomy-card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705389,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/parser.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705389,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/tags.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705389,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/url-filter-state.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705389,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-learning-preferences.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705389,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/onboarding-values.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705394,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/guestBookmarks.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705394,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/route-monitor.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705394,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-app-bottom-inset.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705405,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705415,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/BrandMark.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705415,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/separator.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705415,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705415,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705415,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/breadcrumb.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705415,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/tagNormalize.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705417,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705417,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/input.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NU6VN6EF.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SOAJA32I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SDX2BBLL.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/src/config/navigation-icons.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/sidebar.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705418,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/drawer.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705433,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705434,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705435,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705435,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WP7S2REC.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705435,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705468,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/tailwind.config.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705508,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705508,
+          "method": "GET",
+          "url": "http://localhost:5000/api/auth/user",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276705508,
+          "method": "GET",
+          "url": "http://localhost:5000/api/tags",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276705543,
+          "method": "GET",
+          "url": "http://localhost:5000/favicon.svg",
+          "resourceType": "other"
+        },
+        {
+          "at": 1789276705552,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705552,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwindcss-animate.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705577,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/advanced-filter.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705602,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/badge.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705603,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/popover.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705603,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/select.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705603,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705626,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705626,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705627,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705627,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705627,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705682,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705718,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705783,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/5055f153-4972-4193-b46e-c53cd3893381",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705785,
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&_method=PATCH&__clerk_db_jwt=dvb_3JG9nHkeFIsqmIycx03aJ5E81fm",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276705785,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&__clerk_db_jwt=dvb_3JG9nHkeFIsqmIycx03aJ5E81fm",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276705898,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/05d6cb3c-7680-4f97-afac-79c3fb2e38f7",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705899,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705899,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705941,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276705941,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        }
+      ]
+    },
+    {
+      "label": "submit",
+      "route": "/submit",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "preConsentAnalyticsRequests": [],
+      "zeroAnalyticsPreConsent": true,
+      "before": {
+        "bannerPresent": true,
+        "bannerRect": {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 143.78125,
+          "bottom": 143.78125
+        },
+        "overlaps": [],
+        "cta": [
+          {
+            "testid": "link-login",
+            "text": "log in",
+            "rect": {
+              "x": 157,
+              "y": 475.859375,
+              "width": 30.6875,
+              "height": 15
+            }
+          },
+          {
+            "testid": "select-category",
+            "text": "Select…",
+            "rect": {
+              "x": 45,
+              "y": 793.140625,
+              "width": 135.5,
+              "height": 38.25
+            }
+          },
+          {
+            "testid": "button-cancel",
+            "text": "Cancel",
+            "rect": {
+              "x": 77.78125,
+              "y": 1116.375,
+              "width": 77.15625,
+              "height": 44
+            }
+          },
+          {
+            "testid": "button-submit",
+            "text": "Submit for review",
+            "rect": {
+              "x": 164.9375,
+              "y": 1116.375,
+              "width": 165.0625,
+              "height": 44
+            }
+          }
+        ],
+        "consent": null
+      },
+      "declineState": {
+        "consent": "denied",
+        "bannerPresent": false
+      },
+      "declinePersisted": {
+        "consent": "denied",
+        "bannerPresent": false
+      },
+      "persistencePass": true,
+      "screenshots": [
+        "flows/consent-submit-375-before.png",
+        "flows/consent-submit-375-declined-persisted.png"
+      ],
+      "allRequests": [
+        {
+          "at": 1789276706793,
+          "method": "GET",
+          "url": "http://localhost:5000/submit",
+          "resourceType": "document"
+        },
+        {
+          "at": 1789276706828,
+          "method": "GET",
+          "url": "http://localhost:5000/@vite/client",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706828,
+          "method": "GET",
+          "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+          "resourceType": "stylesheet"
+        },
+        {
+          "at": 1789276706828,
+          "method": "GET",
+          "url": "http://localhost:5000/src/main.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706836,
+          "method": "GET",
+          "url": "http://localhost:5000/api/awesome-list/nav",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276706837,
+          "method": "GET",
+          "url": "http://localhost:5000/@react-refresh",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706838,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706854,
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/App.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/index.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/queryClient.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toaster.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/analytics.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/mixpanel.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/posthog.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706855,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/amplitude.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706856,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/static-data.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706856,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/font-options.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706881,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276706888,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5GLF3XJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706888,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706888,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QCHXOAYK.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706888,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WOOG5QLI.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706890,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706890,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706890,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/utils.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706890,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-toast.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706890,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toast.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706890,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/apiError.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706891,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706891,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706902,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706902,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706902,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react_internal.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706902,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-analytics.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706902,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/nav-history.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706902,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/useAuth.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/crossTabSync.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/clerk-appearance.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/design-system.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/MainLayout.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/ErrorPage.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/Home.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthConversionTracker.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/GuestBookmarkMerge.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/not-found.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/consent-banner.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/scrubbed-params-notice.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706904,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/button.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706905,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/safeStorage.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706905,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/acquisition.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X2OPQIN4.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-W6RT6DV3.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LVDEG73Y.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6MTKRYAT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-I6FXIVHP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-EE6BFT2I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X4PDBUAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-3Q24TQMP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-56BEYTZG.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ZCXSXCNU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VDJKUYV7.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706932,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706933,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system-overlays.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706939,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ATWSVQG2.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706947,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/web-vitals.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706955,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706955,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppHeader.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706956,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706956,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/contact.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706956,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_themes.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706956,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/brand-mark.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706966,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706966,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/seo-templates.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706968,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706968,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706971,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeletons.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706971,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/taxonomy-card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706971,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/parser.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706971,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/tags.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706971,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/url-filter-state.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706971,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-learning-preferences.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706971,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/onboarding-values.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706983,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/guestBookmarks.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706983,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-app-bottom-inset.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706983,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276706983,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/route-monitor.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707001,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707012,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WNIFHWTW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707037,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/BrandMark.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707037,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/separator.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707037,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707037,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707037,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/breadcrumb.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707037,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/tagNormalize.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707041,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707041,
+          "method": "GET",
+          "url": "http://localhost:5000/src/config/navigation-icons.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707041,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/sidebar.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707041,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/drawer.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707044,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/input.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707053,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707082,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707085,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707085,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707101,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NU6VN6EF.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707101,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SOAJA32I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707101,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SDX2BBLL.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707110,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WP7S2REC.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707110,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707176,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/tailwind.config.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707276,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707276,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/SubmitResource.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707276,
+          "method": "GET",
+          "url": "http://localhost:5000/api/auth/user",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276707304,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwindcss-animate.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707309,
+          "method": "GET",
+          "url": "http://localhost:5000/favicon.svg",
+          "resourceType": "other"
+        },
+        {
+          "at": 1789276707310,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-hook-form.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707310,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@hookform_resolvers_zod.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707310,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707310,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/textarea.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707310,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/form.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707310,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/select.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707311,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/alert.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707311,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/alert-dialog.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707311,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/useDebounce.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707311,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/authUtils.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707311,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/submit.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707311,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/validation.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707331,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707340,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CHSSERJ4.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707342,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-63CGGXZU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707342,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/label.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707342,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707343,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-alert-dialog.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707361,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-label.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707362,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707362,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707471,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276707471,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQg.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276707510,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707557,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707623,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/6f08105c-e873-460b-9ade-c806f899a7bf",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707625,
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276707731,
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&_method=PATCH&__clerk_db_jwt=dvb_3JG9nslhRy3ULcQmwNKa1IMG4iz",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276707731,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&__clerk_db_jwt=dvb_3JG9nslhRy3ULcQmwNKa1IMG4iz",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276707948,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/8338523b-c82b-4630-b4a9-66f9e2051d8c",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707949,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276707949,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276708089,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276708089,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276710958,
+          "method": "GET",
+          "url": "http://localhost:5000/submit",
+          "resourceType": "document"
+        },
+        {
+          "at": 1789276710997,
+          "method": "GET",
+          "url": "http://localhost:5000/@vite/client",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276710997,
+          "method": "GET",
+          "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
+          "resourceType": "stylesheet"
+        },
+        {
+          "at": 1789276710997,
+          "method": "GET",
+          "url": "http://localhost:5000/src/main.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711006,
+          "method": "GET",
+          "url": "http://localhost:5000/api/awesome-list/nav",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276711006,
+          "method": "GET",
+          "url": "https://replit.com/public/js/replit-dev-banner.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711010,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUs8FyLNQOQZAnv9ZwNjucMHVn85Ni7emAe9lKqZTnbB-gzTK0K1ChJdt9vIVYX9G37lvd9mv0iQg.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276711010,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276711010,
+          "method": "GET",
+          "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+          "resourceType": "font"
+        },
+        {
+          "at": 1789276711011,
+          "method": "GET",
+          "url": "http://localhost:5000/@react-refresh",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/App.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/index.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/queryClient.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toaster.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/analytics.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/mixpanel.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/posthog.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/amplitude.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/static-data.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/font-options.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711017,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QCHXOAYK.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711018,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WOOG5QLI.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711018,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5GLF3XJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711018,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711018,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711018,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711018,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711029,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/apiError.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711029,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711030,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711030,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/utils.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711030,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-toast.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711030,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/toast.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711031,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X2OPQIN4.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711031,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-W6RT6DV3.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LVDEG73Y.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6MTKRYAT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-I6FXIVHP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-EE6BFT2I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-X4PDBUAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-3Q24TQMP.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-56BEYTZG.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ZCXSXCNU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711033,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VDJKUYV7.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711035,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/design-system.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711035,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/safeStorage.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711037,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/acquisition.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711042,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711043,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711043,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_react_internal.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-analytics.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/nav-history.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/useAuth.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/crossTabSync.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/clerk-appearance.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/MainLayout.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/ErrorPage.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/Home.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/AuthConversionTracker.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/auth/GuestBookmarkMerge.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/not-found.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/consent-banner.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/scrubbed-params-notice.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711044,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/button.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711045,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ATWSVQG2.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711063,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711063,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711065,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711065,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711065,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711065,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system-overlays.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711066,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711066,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WNIFHWTW.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711067,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/web-vitals.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711070,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@clerk_themes.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711070,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/brand-mark.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711076,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711076,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/layout/new/AppHeader.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711076,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711076,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/contact.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711079,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711079,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/seo-templates.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711080,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711081,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711081,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/system.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711087,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeletons.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711087,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/taxonomy-card.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711087,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/parser.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711087,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/tags.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711087,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/url-filter-state.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711087,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-learning-preferences.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711087,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/onboarding-values.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711090,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/guestBookmarks.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711095,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/route-monitor.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711097,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-app-bottom-inset.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711098,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711113,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/BrandMark.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711113,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/separator.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711113,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711113,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711113,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/breadcrumb.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711113,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/tagNormalize.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711113,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711114,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711114,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/input.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711114,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711114,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711114,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-NU6VN6EF.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711114,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SOAJA32I.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711114,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SDX2BBLL.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711121,
+          "method": "GET",
+          "url": "http://localhost:5000/src/config/navigation-icons.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711121,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/sidebar.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711121,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/shell/drawer.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711135,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711136,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711137,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WP7S2REC.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711137,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711139,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711171,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/tailwind.config.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711208,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711208,
+          "method": "GET",
+          "url": "http://localhost:5000/src/pages/SubmitResource.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711208,
+          "method": "GET",
+          "url": "http://localhost:5000/api/auth/user",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276711241,
+          "method": "GET",
+          "url": "http://localhost:5000/favicon.svg",
+          "resourceType": "other"
+        },
+        {
+          "at": 1789276711250,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711250,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwindcss-animate.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711257,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-hook-form.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711257,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@hookform_resolvers_zod.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/textarea.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/form.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/select.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/alert.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/alert-dialog.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/hooks/useDebounce.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/lib/authUtils.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/src/styles/pages/submit.css",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711258,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/shared/validation.ts",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711268,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CHSSERJ4.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711268,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-63CGGXZU.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711277,
+          "method": "GET",
+          "url": "http://localhost:5000/src/components/ui/label.tsx",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711280,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711280,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-alert-dialog.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711282,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711282,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711283,
+          "method": "GET",
+          "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-label.js?v=be5c9ae3",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711387,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711423,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui.browser.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711489,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/d2f0917d-780b-4114-92e2-9d1030438efb",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711490,
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&_method=PATCH&__clerk_db_jwt=dvb_3JG9nslhRy3ULcQmwNKa1IMG4iz",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276711490,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&__clerk_db_jwt=dvb_3JG9nslhRy3ULcQmwNKa1IMG4iz",
+          "resourceType": "fetch"
+        },
+        {
+          "at": 1789276711624,
+          "method": "GET",
+          "url": "blob:http://localhost:5000/b73d1405-f878-4a76-9d6a-dcc50f8fdd10",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711625,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711625,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711644,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        },
+        {
+          "at": 1789276711644,
+          "method": "GET",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js",
+          "resourceType": "script"
+        }
+      ]
+    }
+  ],
+  "accept": {
+    "accepted": {
+      "consent": "granted",
+      "bannerPresent": false
+    },
+    "persisted": {
+      "consent": "granted",
+      "bannerPresent": false
+    },
+    "persistencePass": true,
+    "analyticsRequestsAfterAccept": [
+      {
+        "at": 1789276714072,
+        "method": "GET",
+        "url": "https://www.googletagmanager.com/gtag/js?id=G-76D744KQCJ",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714132,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/web-vitals.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714133,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/exception-autocapture.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714135,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/dead-clicks-autocapture.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714137,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/array/phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8/config.js",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714147,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276714163,
+        "method": "POST",
+        "url": "https://api-js.mixpanel.com/track/?ip=1&_=1789276714161",
+        "resourceType": "xhr"
+      },
+      {
+        "at": 1789276714253,
+        "method": "POST",
+        "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=1&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&ep.debug_mode=true&tfd=1780",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276714268,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276714279,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "other"
+      },
+      {
+        "at": 1789276714294,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/posthog-recorder.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714296,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/surveys.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714309,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276714312,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "other"
+      },
+      {
+        "at": 1789276714412,
+        "method": "GET",
+        "url": "https://cdn.amplitude.com/engagement-browser/prod/index.min.js.gz",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276714898,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/config",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276714898,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/resource_center",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276715264,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/decide",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276715285,
+        "method": "POST",
+        "url": "https://api2.amplitude.com/2/httpapi",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276715492,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/state",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276715731,
+        "method": "POST",
+        "url": "https://api-sr.amplitude.com/sessions/v2/track?device_id=819b007d-9aaf-4ec0-a217-d238eebaba79&session_id=1789276714270&type=replay",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276716634,
+        "method": "POST",
+        "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&_s=2&tfd=4143",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276716636,
+        "method": "POST",
+        "url": "https://api-sr.amplitude.com/sessions/v2/track?device_id=819b007d-9aaf-4ec0-a217-d238eebaba79&session_id=1789276714270&type=replay",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276716636,
+        "method": "POST",
+        "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=3&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=performance&_ee=1&ep.debug_mode=true&ep.metric_name=inp&epn.value=24&_et=1&tfd=4151",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276716636,
+        "method": "POST",
+        "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=4&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=performance&_ee=1&ep.debug_mode=true&ep.metric_name=cls&epn.value=0.0415&tfd=4156",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276716636,
+        "method": "POST",
+        "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=5&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=performance&_ee=1&ep.debug_mode=true&ep.metric_name=lcp&epn.value=96&tfd=4160",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276716636,
+        "method": "POST",
+        "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je69a0h2v9253068394za200zd9253068394&_p=1789276714066&gcs=G1-1&gcd=13l3t3l3l5l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=197220333.1789276714&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=375x812&uaa=x86&uab=64&uafvl=Not%252FA)Brand%3B99.0.0.0%7CChromium%3B148.0.7778.96&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=6&tag_exp=115938465~115938468~118897920~118897930~120213116~120385422~120469145~120469153&dl=http%3A%2F%2Flocalhost%3A5000%2F&dp=%2F&dt=Awesome%20Video%20%E2%80%94%201816%2B%20Curated%20Video%20%26%20Streaming%20Resources&sid=1789276714&sct=1&seg=0&en=page_engaged&_ee=1&ep.debug_mode=true&_et=3651&tfd=4166",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276716640,
+        "method": "POST",
+        "url": "https://api-js.mixpanel.com/track/?verbose=1&ip=1&_=1789276716636",
+        "resourceType": "ping"
+      },
+      {
+        "at": 1789276717030,
+        "method": "GET",
+        "url": "https://www.googletagmanager.com/gtag/js?id=G-76D744KQCJ",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717045,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/web-vitals.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717045,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/exception-autocapture.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717046,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/posthog-recorder.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717047,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/dead-clicks-autocapture.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717048,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/array/phc_S8h7za1M71TeH99lB7zbTeKuRqAR8tBk1D5caFwvUt8/config.js",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717050,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276717071,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "other"
+      },
+      {
+        "at": 1789276717074,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276717116,
+        "method": "GET",
+        "url": "https://sr-client-cfg.amplitude.com/config/f5338474e281eac273d5ec975dd13c45?config_group=browser",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276717172,
+        "method": "GET",
+        "url": "https://cdn.amplitude.com/engagement-browser/prod/index.min.js.gz",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717218,
+        "method": "GET",
+        "url": "https://us-assets.i.posthog.com/static/surveys.js?v=1.409.4",
+        "resourceType": "script"
+      },
+      {
+        "at": 1789276717267,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/config",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276717267,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/resource_center",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276717302,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/decide",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276717347,
+        "method": "GET",
+        "url": "https://gs.amplitude.com/sdk/v1/state",
+        "resourceType": "fetch"
+      }
+    ],
+    "screenshots": [
+      "flows/consent-home-375-accepted-persisted.png"
+    ]
+  },
+  "bookmark": {
+    "route": "/resource/185020",
+    "buttonFound": true,
+    "screenshots": [
+      "flows/bookmark-guest-added-375.png",
+      "flows/bookmark-guest-removed-375.png"
+    ],
+    "toastSelector": "li[data-state]",
+    "added": {
+      "toastCount": 1,
+      "toastText": [
+        "Saved on this deviceYour saved resource will move to your account when you sign in.Sign in"
+      ],
+      "buttonPressed": "true",
+      "guestStore": "[{\"id\":185020,\"savedAt\":\"2026-09-13T05:18:39.948Z\"}]"
+    },
+    "removed": {
+      "toastCount": 1,
+      "toastText": [
+        "Removed from this device's savesUndo"
+      ],
+      "buttonPressed": "false",
+      "guestStore": "[]"
+    },
+    "toastPass": true,
+    "guestTogglePass": true,
+    "apiFailures": []
+  },
+  "loading": {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "before": {
+      "skeletonPresent": true,
+      "noResultsPresent": false,
+      "mainRect": {
+        "x": 0,
+        "y": 56,
+        "width": 375,
+        "height": 1104
+      },
+      "cls": 0.009852216748768473,
+      "pendingResourceTypes": 2
+    },
+    "after": {
+      "skeletonPresent": false,
+      "noResultsPresent": true,
+      "mainRect": {
+        "x": 0,
+        "y": 56,
+        "width": 375,
+        "height": 626.953125
+      },
+      "cls": 0.009852216748768473,
+      "bodyText": false
+    },
+    "skeletonReplaced": true,
+    "cls": 0.009852216748768473,
+    "mainHeightDelta": -477.046875,
+    "screenshots": [
+      "flows/loading-skeleton-search-375.png",
+      "flows/loading-replacement-search-375.png"
+    ],
+    "apiRequests": [
+      {
+        "at": 1789276722426,
+        "method": "GET",
+        "url": "http://localhost:5000/api/awesome-list/nav",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276722899,
+        "method": "GET",
+        "url": "http://localhost:5000/api/auth/user",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276722899,
+        "method": "GET",
+        "url": "http://localhost:5000/api/tags",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276726147,
+        "method": "GET",
+        "url": "http://localhost:5000/api/awesome-list/nav",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276753318,
+        "method": "GET",
+        "url": "http://localhost:5000/api/auth/user",
+        "resourceType": "fetch"
+      },
+      {
+        "at": 1789276768842,
+        "method": "GET",
+        "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+        "resourceType": "fetch"
+      }
+    ],
+    "apiFailures": []
+  },
+  "designSwitch": {
+    "systemResults": [
+      {
+        "id": "editorial",
+        "htmlSystem": "editorial",
+        "tokenRows": 38,
+        "mismatches": [],
+        "radius": "12px",
+        "display": "'Fraunces', Georgia, serif"
+      },
+      {
+        "id": "terminal",
+        "htmlSystem": "terminal",
+        "tokenRows": 38,
+        "mismatches": [],
+        "radius": "0px",
+        "display": "'IBM Plex Mono', ui-monospace, monospace"
+      },
+      {
+        "id": "geist",
+        "htmlSystem": "geist",
+        "tokenRows": 38,
+        "mismatches": [],
+        "radius": "10px",
+        "display": "'Geist', 'Inter', system-ui, sans-serif"
+      },
+      {
+        "id": "brutalist",
+        "htmlSystem": "brutalist",
+        "tokenRows": 38,
+        "mismatches": [],
+        "radius": "0px",
+        "display": "'Instrument Serif', 'Times New Roman', serif"
+      },
+      {
+        "id": "swiss",
+        "htmlSystem": "swiss",
+        "tokenRows": 38,
+        "mismatches": [],
+        "radius": "4px",
+        "display": "'Manrope', system-ui, sans-serif"
+      }
+    ],
+    "accentResult": {
+      "htmlAccent": "violet",
+      "shown": "#9d4edd",
+      "live": "#9d4edd",
+      "matches": true
+    },
+    "allSystemsMatch": true,
+    "accentSwitchMatch": true,
+    "screenshot": "flows/design-system-switched-1024.png"
+  }
+}

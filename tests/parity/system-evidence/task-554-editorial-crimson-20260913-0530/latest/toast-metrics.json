@@ -1,0 +1,98 @@
+[
+  {
+    "state": {
+      "toastCount": 1,
+      "toastText": [
+        "Saved on this deviceYour saved resource will move to your account when you sign in.Sign in"
+      ],
+      "ariaPressed": "true",
+      "store": "[{\"id\":185020,\"savedAt\":\"2026-09-13T05:27:04.797Z\"}]",
+      "cls": 0.05568694035283555
+    },
+    "route": "/resource/185020",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "screenshot": "latest/toast/guest-bookmark-added@375.png",
+    "buttonFound": true,
+    "focusedAxe": {
+      "state": "toast-guest-bookmark",
+      "viewport": 375,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 1,
+      "passes": 23
+    },
+    "apiFailures": 0
+  },
+  {
+    "state": {
+      "toastCount": 1,
+      "toastText": [
+        "Saved on this deviceYour saved resource will move to your account when you sign in.Sign in"
+      ],
+      "ariaPressed": "true",
+      "store": "[{\"id\":185020,\"savedAt\":\"2026-09-13T05:27:08.126Z\"}]",
+      "cls": 0.10068030577773848
+    },
+    "route": "/resource/185020",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "screenshot": "latest/toast/guest-bookmark-added@768.png",
+    "buttonFound": true,
+    "focusedAxe": null,
+    "apiFailures": 0
+  },
+  {
+    "state": {
+      "toastCount": 1,
+      "toastText": [
+        "Saved on this deviceYour saved resource will move to your account when you sign in.Sign in"
+      ],
+      "ariaPressed": "true",
+      "store": "[{\"id\":185020,\"savedAt\":\"2026-09-13T05:27:10.894Z\"}]",
+      "cls": 0.13265515506888428
+    },
+    "route": "/resource/185020",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "screenshot": "latest/toast/guest-bookmark-added@1024.png",
+    "buttonFound": true,
+    "focusedAxe": null,
+    "apiFailures": 0
+  },
+  {
+    "state": {
+      "toastCount": 1,
+      "toastText": [
+        "Saved on this deviceYour saved resource will move to your account when you sign in.Sign in"
+      ],
+      "ariaPressed": "true",
+      "store": "[{\"id\":185020,\"savedAt\":\"2026-09-13T05:27:13.759Z\"}]",
+      "cls": 0.04842706886574073
+    },
+    "route": "/resource/185020",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "screenshot": "latest/toast/guest-bookmark-added@1440.png",
+    "buttonFound": true,
+    "focusedAxe": {
+      "state": "toast-guest-bookmark",
+      "viewport": 1440,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 2,
+      "passes": 26
+    },
+    "apiFailures": 0
+  }
+]

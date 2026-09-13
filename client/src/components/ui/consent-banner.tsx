@@ -12,6 +12,7 @@ import {
 import { initMixpanel, optOutMixpanel } from "@/lib/mixpanel";
 import { initPosthog, optOutPosthog } from "@/lib/posthog";
 import { initAmplitude, optOutAmplitude } from "@/lib/amplitude";
+import "@/styles/pages/system-overlays.css";
 
 // R5-025 (run24): custom event that re-opens the consent banner. Dispatched
 // by the "Cookie settings" links in Footer and /privacy via
@@ -26,9 +27,7 @@ export function openCookieSettings() {
 // keeps the site fully functional with zero analytics. The choice persists in
 // localStorage, so the banner appears once per browser.
 export default function ConsentBanner() {
-  const [choiceMade, setChoiceMade] = useState(
-    () => getAnalyticsConsent() !== null,
-  );
+  const [choiceMade, setChoiceMade] = useState(() => getAnalyticsConsent() !== null);
   // NB-003 (run18): at very small widths (<360px, e.g. 320×568) the stacked
   // banner grew tall enough to sit over the /login submit button. Track a
   // compact breakpoint so we can render a single-row, reduced-copy bar there.
@@ -36,8 +35,7 @@ export default function ConsentBanner() {
   // landscape) — the two-row banner covered the Sign-in CTA there; the compact
   // single-row bar is short enough to leave it reachable at first paint.
   const isCompactViewport = () =>
-    typeof window !== "undefined" &&
-    (window.innerWidth < 360 || window.innerHeight < 500);
+    typeof window !== "undefined" && (window.innerWidth < 360 || window.innerHeight < 500);
   const [isCompact, setIsCompact] = useState(isCompactViewport);
   const bannerRef = useRef<HTMLDivElement | null>(null);
   // Two consumers of the same node: `bannerRef` for the focus move on re-open,
@@ -139,25 +137,25 @@ export default function ConsentBanner() {
         role="region"
         aria-label="Analytics consent"
         tabIndex={-1}
-        className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none sm:border-b-0 sm:border-t"
+        className="system-consent-banner system-consent-banner--compact relative order-first outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none"
         data-testid="consent-banner"
       >
-        <div className="mx-auto flex w-full max-w-[1280px] max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
-          <p className="min-w-0 flex-1 truncate text-xs text-[color:var(--text-2)]">
+        <div className="system-consent-banner__inner mx-auto flex w-full max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
+          <p className="system-consent-banner__copy min-w-0 flex-1 truncate text-xs">
             Analytics cookies?{" "}
             <Link
               href="/privacy"
-              className="inline-flex min-h-10 items-center align-middle underline hover:text-[color:var(--text)]"
+              className="system-consent-banner__privacy-link inline-flex min-h-10 items-center align-middle"
               data-testid="consent-privacy-link"
             >
               Privacy
             </Link>
           </p>
-          <div className="flex shrink-0 items-center gap-1.5">
+          <div className="system-consent-banner__actions flex shrink-0 items-center gap-1.5">
             <Button
               variant="outline"
               size="sm"
-              className="min-h-[36px] px-2 text-xs"
+              className="system-consent-banner__action min-h-[36px] px-2 text-xs"
               onClick={() => decide("denied")}
               data-testid="consent-decline"
             >
@@ -165,7 +163,7 @@ export default function ConsentBanner() {
             </Button>
             <Button
               size="sm"
-              className="min-h-[36px] px-2 text-xs"
+              className="system-consent-banner__action min-h-[36px] px-2 text-xs"
               onClick={() => decide("granted")}
               data-testid="consent-accept"
             >
@@ -183,36 +181,35 @@ export default function ConsentBanner() {
       role="region"
       aria-label="Analytics consent"
       tabIndex={-1}
-      className="relative order-first border-b border-[var(--border)] bg-[var(--bg)] shadow-lg outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none sm:border-b-0 sm:border-t"
+      className="system-consent-banner relative order-first outline-none sm:sticky sm:bottom-0 sm:z-50 sm:order-none"
       data-testid="consent-banner"
     >
       {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second
           sentence hidden on xs) so the bar takes less of the viewport at
           375px, where it sits in flow at the top and scrolls away. */}
-      <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-        <p className="text-xs sm:text-sm text-[color:var(--text-2)] flex-1">
-          We use analytics (Google Analytics, Mixpanel, PostHog and Amplitude)
-          to understand how the site is used — only if you allow it.{" "}
+      <div className="system-consent-banner__inner mx-auto w-full flex flex-col items-start gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6 sm:py-3 md:px-12">
+        <p className="system-consent-banner__copy flex-1 text-xs sm:text-sm">
+          We use analytics (Google Analytics, Mixpanel, PostHog and Amplitude) to understand how the
+          site is used — only if you allow it.{" "}
           <span className="hidden sm:inline">
-            Decline and none of them load. Allow and, if you are signed in,
-            your name and email are attached to your analytics profile.{" "}
+            Decline and none of them load. Allow and, if you are signed in, your name and email are
+            attached to your analytics profile.{" "}
           </span>
-          See our{" "}
-          {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
+          See our {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
           <Link
             href="/privacy"
-            className="underline hover:text-[color:var(--text)] inline-flex min-h-10 items-center align-middle"
+            className="system-consent-banner__privacy-link inline-flex min-h-10 items-center align-middle"
             data-testid="consent-privacy-link"
           >
             Privacy Policy
           </Link>
           .
         </p>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="system-consent-banner__actions flex shrink-0 items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="min-h-[44px]"
+            className="system-consent-banner__action min-h-[44px]"
             onClick={() => decide("denied")}
             data-testid="consent-decline"
           >
@@ -220,7 +217,7 @@ export default function ConsentBanner() {
           </Button>
           <Button
             size="sm"
-            className="min-h-[44px]"
+            className="system-consent-banner__action min-h-[44px]"
             onClick={() => decide("granted")}
             data-testid="consent-accept"
           >

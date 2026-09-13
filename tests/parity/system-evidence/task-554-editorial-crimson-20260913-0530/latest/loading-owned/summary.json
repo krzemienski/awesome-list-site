@@ -1,0 +1,742 @@
+{
+  "evidence": "owned Search.tsx search-results-loading state",
+  "captureMethod": "direct Playwright Chromium via launchBrowserWithLease; no response mocks",
+  "route": "/search?q=zzqxv-nothing warm terminal empty -> input ffmpeg",
+  "widths": [
+    375,
+    768,
+    1024,
+    1440
+  ],
+  "throttle": {
+    "latencyMs": 900,
+    "downloadBytesPerSecond": 18432,
+    "uploadBytesPerSecond": 18432,
+    "cacheDisabled": true,
+    "CDP": "Network.emulateNetworkConditions"
+  },
+  "ownership": {
+    "requiredSelector": "[data-testid=\"search-results-loading\"] .system-skeleton",
+    "routeChunkExcluded": "[data-testid=\"route-chunk-skeleton\"] count = 0 at owned skeleton capture",
+    "terminalContent": "[data-testid=\"search-results-grid\"] cards > 0 and body contains ffmpeg"
+  },
+  "results": {
+    "375": {
+      "viewport": {
+        "width": 375,
+        "height": 900
+      },
+      "warmQuery": "zzqxv-nothing",
+      "newQuery": "ffmpeg",
+      "throttle": {
+        "latencyMs": 900,
+        "downloadBytesPerSecond": 18432,
+        "uploadBytesPerSecond": 18432,
+        "cacheDisabled": true
+      },
+      "warmed": {
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "noResults": true,
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "contentGridCount": 0
+      },
+      "baseline": {
+        "at": 1020.7000000001863,
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "main": {
+          "x": 16,
+          "y": 496.734375,
+          "width": 343,
+          "height": 298,
+          "bottom": 794.734375
+        },
+        "empty": {
+          "x": 61.015625,
+          "y": 589.734375,
+          "width": 252.953125,
+          "height": 20,
+          "bottom": 609.734375
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 0
+      },
+      "skeleton": {
+        "at": 1376.3000000002794,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 16,
+          "y": 496.734375,
+          "width": 343,
+          "height": 1124,
+          "bottom": 1620.734375
+        },
+        "loading": {
+          "x": 16,
+          "y": 496.734375,
+          "width": 343,
+          "height": 1124,
+          "bottom": 1620.734375
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 1,
+        "systemSkeletonCount": 36,
+        "gridCount": 0,
+        "cards": 6
+      },
+      "replacement": {
+        "at": 4860.899999999907,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 16,
+          "y": 496.734375,
+          "width": 343,
+          "height": 6485,
+          "bottom": 6981.734375
+        },
+        "loading": null,
+        "grid": {
+          "x": 16,
+          "y": 552.734375,
+          "width": 343,
+          "height": 6329,
+          "bottom": 6881.734375
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 1,
+        "cards": 24,
+        "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+        "contentHasFfmpeg": true,
+        "cls": 0.07444197530864197,
+        "clsIncludingInput": 0.07444197530864197,
+        "layoutShiftEntries": [
+          {
+            "value": 0.07444197530864197,
+            "hadRecentInput": false,
+            "startTime": 1367,
+            "sources": [
+              {
+                "node": "FOOTER",
+                "previousRect": {
+                  "x": 0,
+                  "y": 826.734375,
+                  "width": 375,
+                  "height": 73.265625
+                },
+                "currentRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 0,
+                  "height": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "geometryDelta": {
+        "baselineToSkeletonMainHeight": 826,
+        "skeletonToReplacementMainHeight": 5361,
+        "skeletonToReplacementLoadingHeight": null,
+        "skeletonToReplacementGridHeight": 5205
+      },
+      "apiEvents": [
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "at": 1789278656839
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "status": 200,
+          "at": 1789278656974
+        },
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "at": 1789278657381
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "status": 200,
+          "at": 1789278658415
+        }
+      ],
+      "screenshots": {
+        "skeleton": "screenshots/skeleton@375.png",
+        "replacement": "screenshots/replacement@375.png",
+        "axe": "axe/loading@375.json"
+      }
+    },
+    "768": {
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "warmQuery": "zzqxv-nothing",
+      "newQuery": "ffmpeg",
+      "throttle": {
+        "latencyMs": 900,
+        "downloadBytesPerSecond": 18432,
+        "uploadBytesPerSecond": 18432,
+        "cacheDisabled": true
+      },
+      "warmed": {
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "noResults": true,
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "contentGridCount": 0
+      },
+      "baseline": {
+        "at": 1346.2000000001863,
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "main": {
+          "x": 48,
+          "y": 287.1875,
+          "width": 672,
+          "height": 246,
+          "bottom": 533.1875
+        },
+        "empty": {
+          "x": 257.515625,
+          "y": 380.1875,
+          "width": 252.953125,
+          "height": 20,
+          "bottom": 400.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 0
+      },
+      "skeleton": {
+        "at": 1684.3999999999069,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 48,
+          "y": 287.1875,
+          "width": 672,
+          "height": 554,
+          "bottom": 841.1875
+        },
+        "loading": {
+          "x": 48,
+          "y": 287.1875,
+          "width": 672,
+          "height": 554,
+          "bottom": 841.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 1,
+        "systemSkeletonCount": 36,
+        "gridCount": 0,
+        "cards": 6
+      },
+      "replacement": {
+        "at": 5074.399999999907,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 48,
+          "y": 287.1875,
+          "width": 672,
+          "height": 3294,
+          "bottom": 3581.1875
+        },
+        "loading": null,
+        "grid": {
+          "x": 48,
+          "y": 323.1875,
+          "width": 672,
+          "height": 3158,
+          "bottom": 3481.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 1,
+        "cards": 24,
+        "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+        "contentHasFfmpeg": true,
+        "cls": 0.08190802469135802,
+        "clsIncludingInput": 0.08190802469135802,
+        "layoutShiftEntries": [
+          {
+            "value": 0.05190802469135803,
+            "hadRecentInput": false,
+            "startTime": 1680.8999999999069,
+            "sources": [
+              {
+                "node": "FOOTER",
+                "previousRect": {
+                  "x": 0,
+                  "y": 616.8125,
+                  "width": 768,
+                  "height": 137
+                },
+                "currentRect": {
+                  "x": 0,
+                  "y": 873.1875,
+                  "width": 768,
+                  "height": 26.8125
+                }
+              }
+            ]
+          },
+          {
+            "value": 0.03,
+            "hadRecentInput": false,
+            "startTime": 3571.2000000001863,
+            "sources": [
+              {
+                "node": "FOOTER",
+                "previousRect": {
+                  "x": 0,
+                  "y": 873.1875,
+                  "width": 768,
+                  "height": 26.8125
+                },
+                "currentRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 0,
+                  "height": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "geometryDelta": {
+        "baselineToSkeletonMainHeight": 308,
+        "skeletonToReplacementMainHeight": 2740,
+        "skeletonToReplacementLoadingHeight": null,
+        "skeletonToReplacementGridHeight": 2604
+      },
+      "apiEvents": [
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "at": 1789278578612
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "status": 200,
+          "at": 1789278578761
+        },
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "at": 1789278579147
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "status": 200,
+          "at": 1789278580286
+        }
+      ],
+      "screenshots": {
+        "skeleton": "screenshots/skeleton@768.png",
+        "replacement": "screenshots/replacement@768.png",
+        "axe": null
+      }
+    },
+    "1024": {
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "warmQuery": "zzqxv-nothing",
+      "newQuery": "ffmpeg",
+      "throttle": {
+        "latencyMs": 900,
+        "downloadBytesPerSecond": 18432,
+        "uploadBytesPerSecond": 18432,
+        "cacheDisabled": true
+      },
+      "warmed": {
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "noResults": true,
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "contentGridCount": 0
+      },
+      "baseline": {
+        "at": 1125.0999999996275,
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "main": {
+          "x": 568,
+          "y": 227.1875,
+          "width": 408,
+          "height": 298,
+          "bottom": 525.1875
+        },
+        "empty": {
+          "x": 645.515625,
+          "y": 320.1875,
+          "width": 252.953125,
+          "height": 20,
+          "bottom": 340.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 0
+      },
+      "skeleton": {
+        "at": 1473.3999999999069,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 568,
+          "y": 227.1875,
+          "width": 408,
+          "height": 1124,
+          "bottom": 1351.1875
+        },
+        "loading": {
+          "x": 568,
+          "y": 227.1875,
+          "width": 408,
+          "height": 1124,
+          "bottom": 1351.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 1,
+        "systemSkeletonCount": 36,
+        "gridCount": 0,
+        "cards": 6
+      },
+      "replacement": {
+        "at": 4689.799999999814,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 568,
+          "y": 227.1875,
+          "width": 408,
+          "height": 6462,
+          "bottom": 6689.1875
+        },
+        "loading": null,
+        "grid": {
+          "x": 568,
+          "y": 263.1875,
+          "width": 408,
+          "height": 6326,
+          "bottom": 6589.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 1,
+        "cards": 24,
+        "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+        "contentHasFfmpeg": true,
+        "cls": 0.09008076084984673,
+        "clsIncludingInput": 0.09008076084984673,
+        "layoutShiftEntries": [
+          {
+            "value": 0.08260378572675917,
+            "hadRecentInput": false,
+            "startTime": 1470.8999999999069,
+            "sources": [
+              {
+                "node": "FOOTER",
+                "previousRect": {
+                  "x": 240,
+                  "y": 657.40625,
+                  "width": 784,
+                  "height": 137
+                },
+                "currentRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 0,
+                  "height": 0
+                }
+              }
+            ]
+          },
+          {
+            "value": 0.007476975123087566,
+            "hadRecentInput": false,
+            "startTime": 3187.6999999997206,
+            "sources": [
+              {
+                "node": "DETAILS",
+                "previousRect": {
+                  "x": 305,
+                  "y": 304.1875,
+                  "width": 222,
+                  "height": 44
+                },
+                "currentRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 0,
+                  "height": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "geometryDelta": {
+        "baselineToSkeletonMainHeight": 826,
+        "skeletonToReplacementMainHeight": 5338,
+        "skeletonToReplacementLoadingHeight": null,
+        "skeletonToReplacementGridHeight": 5202
+      },
+      "apiEvents": [
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "at": 1789278583921
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "status": 200,
+          "at": 1789278584044
+        },
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "at": 1789278584432
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "status": 200,
+          "at": 1789278585563
+        }
+      ],
+      "screenshots": {
+        "skeleton": "screenshots/skeleton@1024.png",
+        "replacement": "screenshots/replacement@1024.png",
+        "axe": null
+      }
+    },
+    "1440": {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "warmQuery": "zzqxv-nothing",
+      "newQuery": "ffmpeg",
+      "throttle": {
+        "latencyMs": 900,
+        "downloadBytesPerSecond": 18432,
+        "uploadBytesPerSecond": 18432,
+        "cacheDisabled": true
+      },
+      "warmed": {
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "noResults": true,
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "contentGridCount": 0
+      },
+      "baseline": {
+        "at": 1180.8000000002794,
+        "url": "http://localhost:5000/search?q=zzqxv-nothing",
+        "input": "zzqxv-nothing",
+        "main": {
+          "x": 608,
+          "y": 227.1875,
+          "width": 784,
+          "height": 246,
+          "bottom": 473.1875
+        },
+        "empty": {
+          "x": 873.515625,
+          "y": 320.1875,
+          "width": 252.953125,
+          "height": 20,
+          "bottom": 340.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 0
+      },
+      "skeleton": {
+        "at": 1534.2000000001863,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 608,
+          "y": 227.1875,
+          "width": 784,
+          "height": 554,
+          "bottom": 781.1875
+        },
+        "loading": {
+          "x": 608,
+          "y": 227.1875,
+          "width": 784,
+          "height": 554,
+          "bottom": 781.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 1,
+        "systemSkeletonCount": 36,
+        "gridCount": 0,
+        "cards": 6
+      },
+      "replacement": {
+        "at": 6196.100000000093,
+        "url": "http://localhost:5000/search?q=ffmpeg",
+        "input": "ffmpeg",
+        "main": {
+          "x": 608,
+          "y": 227.1875,
+          "width": 784,
+          "height": 3292,
+          "bottom": 3519.1875
+        },
+        "loading": null,
+        "grid": {
+          "x": 608,
+          "y": 263.1875,
+          "width": 784,
+          "height": 3156,
+          "bottom": 3419.1875
+        },
+        "routeChunkCount": 0,
+        "loadingCount": 0,
+        "systemSkeletonCount": 0,
+        "gridCount": 1,
+        "cards": 24,
+        "resultCountText": "Page 1 of 9 · showing 1–24 of 198 results for “ffmpeg”",
+        "contentHasFfmpeg": true,
+        "cls": 0.08356041023662553,
+        "clsIncludingInput": 0.08356041023662553,
+        "layoutShiftEntries": [
+          {
+            "value": 0.007103620113168724,
+            "hadRecentInput": false,
+            "startTime": 1530.8000000002794,
+            "sources": [
+              {
+                "node": "FOOTER",
+                "previousRect": {
+                  "x": 280,
+                  "y": 738,
+                  "width": 1160,
+                  "height": 77
+                },
+                "currentRect": {
+                  "x": 280,
+                  "y": 813.1875,
+                  "width": 1160,
+                  "height": 77
+                }
+              }
+            ]
+          },
+          {
+            "value": 0.0764567901234568,
+            "hadRecentInput": false,
+            "startTime": 3082.2000000001863,
+            "sources": [
+              {
+                "node": "FOOTER",
+                "previousRect": {
+                  "x": 280,
+                  "y": 813.1875,
+                  "width": 1160,
+                  "height": 77
+                },
+                "currentRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 0,
+                  "height": 0
+                }
+              },
+              {
+                "node": "DETAILS",
+                "previousRect": {
+                  "x": 345,
+                  "y": 304.1875,
+                  "width": 222,
+                  "height": 44
+                },
+                "currentRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 0,
+                  "height": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "geometryDelta": {
+        "baselineToSkeletonMainHeight": 308,
+        "skeletonToReplacementMainHeight": 2738,
+        "skeletonToReplacementLoadingHeight": null,
+        "skeletonToReplacementGridHeight": 2602
+      },
+      "apiEvents": [
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "at": 1789278589393
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=zzqxv-nothing",
+          "status": 200,
+          "at": 1789278589510
+        },
+        {
+          "phase": "request",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "at": 1789278589942
+        },
+        {
+          "phase": "response",
+          "url": "http://localhost:5000/api/resources?page=1&limit=24&facets=true&search=ffmpeg",
+          "status": 200,
+          "at": 1789278591054
+        }
+      ],
+      "screenshots": {
+        "skeleton": "screenshots/skeleton@1440.png",
+        "replacement": "screenshots/replacement@1440.png",
+        "axe": "axe/loading@1440.json"
+      }
+    }
+  },
+  "acceptance": {
+    "allWidthsOwnedLoading": true,
+    "allWidthsContentReplacement": true,
+    "axeCaptured": [
+      375,
+      1440
+    ]
+  }
+}

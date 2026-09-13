@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import SEOHead from "@/components/layout/SEOHead";
 import { PRODUCT_PROFILES } from "@/lib/design-system";
+import "@/styles/pages/system.css";
 
 /**
  * Design-system showcase (Task #346) — the living anatomy of the runtime
@@ -150,7 +151,7 @@ const SKIN_NOTES: Record<string, string[]> = {
   ],
 };
 
-const SECTION_HEADING = "font-sans font-semibold text-xl tracking-tight";
+const SECTION_HEADING = "system-showcase-heading";
 
 export default function DesignSystemShowcase() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
@@ -186,7 +187,7 @@ export default function DesignSystemShowcase() {
   }, []);
 
   return (
-    <div className="max-w-5xl space-y-12">
+    <div className="system-showcase space-y-12">
       <SEOHead
         title="Design System"
         description="The Awesome Video design system — 5 systems × 10 accents, live tokens, type scale, and core components."
@@ -331,7 +332,7 @@ export default function DesignSystemShowcase() {
               </div>
               <div className="divide-y divide-[color:var(--hairline)]">
                 {g.tokens.map((t) => (
-                  <div key={t.name} className="grid grid-cols-[10rem_1fr] sm:grid-cols-[12rem_1fr_5rem] items-center gap-3 py-2 text-xs">
+                  <div key={t.name} className="system-token-row">
                     <code className="font-mono text-[color:var(--text-2)]">{t.name}</code>
                     <code
                       className="font-mono text-[color:var(--text-3)] break-all"
@@ -378,7 +379,10 @@ export default function DesignSystemShowcase() {
             <p className="text-[color:var(--text)]">Ink tier 1 — primary copy and headings</p>
             <p className="text-[color:var(--text-2)]">Ink tier 2 — secondary and long-form muted copy</p>
             <p className="text-[color:var(--text-3)]">Ink tier 3 — meta: timestamps, counts, captions</p>
-            <p className="text-[color:var(--text-4)]">Ink tier 4 — faintest: decorative dividers, ghost text</p>
+            <p className="text-[color:var(--text-2)]">
+              <span aria-hidden="true" className="inline-block h-3 w-3 mr-2 rounded-[var(--radius-xs)] bg-[var(--text-4)]" />
+              Ink tier 4 — faintest: decorative dividers, ghost text
+            </p>
           </div>
           <code className="block font-mono text-xs text-[color:var(--text-3)]">
             mono · 0123456789 · const tokens = getComputedStyle(root);

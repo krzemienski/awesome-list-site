@@ -1,0 +1,287 @@
+[
+  {
+    "state": "consent-home",
+    "route": "/",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "screenshot": "latest/consent/home@375.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 143.78125,
+        "bottom": 143.78125
+      },
+      "ctaOverlaps": [],
+      "consent": null,
+      "cls": 0.042164586821648996
+    },
+    "focusedAxe": {
+      "state": "consent-home",
+      "viewport": 375,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 1,
+      "passes": 20
+    },
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  },
+  {
+    "state": "consent-submit",
+    "route": "/submit",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "screenshot": "latest/consent/submit@375.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 143.78125,
+        "bottom": 143.78125
+      },
+      "ctaOverlaps": [],
+      "consent": null,
+      "cls": 0.055216465658796225
+    },
+    "focusedAxe": {
+      "state": "consent-submit",
+      "viewport": 375,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 1,
+      "passes": 24
+    },
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  },
+  {
+    "state": "consent-home",
+    "route": "/",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "screenshot": "latest/consent/home@768.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 877.8125,
+        "width": 768,
+        "height": 146.1875,
+        "bottom": 1024
+      },
+      "ctaOverlaps": [
+        {
+          "testid": "link-category-players-clients",
+          "text": "Players & Clients239 resourcesFeatured: AVPlayer — AVPlayer "
+        },
+        {
+          "testid": "link-category-protocols-transport",
+          "text": "Protocols & Transport213 resourcesFeatured: 100ms: RTMP vs W"
+        }
+      ],
+      "consent": null,
+      "cls": 0.04658701495888332
+    },
+    "focusedAxe": null,
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  },
+  {
+    "state": "consent-submit",
+    "route": "/submit",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "screenshot": "latest/consent/submit@768.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 877.8125,
+        "width": 768,
+        "height": 146.1875,
+        "bottom": 1024
+      },
+      "ctaOverlaps": [
+        {
+          "testid": "button-cancel",
+          "text": "Cancel"
+        },
+        {
+          "testid": "button-submit",
+          "text": "Submit for review"
+        }
+      ],
+      "consent": null,
+      "cls": 0.05057822870245824
+    },
+    "focusedAxe": null,
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  },
+  {
+    "state": "consent-home",
+    "route": "/",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "screenshot": "latest/consent/home@1024.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 662.40625,
+        "width": 1024,
+        "height": 105.59375,
+        "bottom": 768
+      },
+      "ctaOverlaps": [
+        {
+          "testid": "link-category-players-clients",
+          "text": "Players & Clients239 resourcesFeatured: AVPlayer — AVPlayer "
+        },
+        {
+          "testid": "link-category-protocols-transport",
+          "text": "Protocols & Transport213 resourcesFeatured: 100ms: RTMP vs W"
+        },
+        {
+          "testid": "link-category-standards-industry",
+          "text": "Standards & Industry173 resourcesFeatured: AV1 Video Codec —"
+        }
+      ],
+      "consent": null,
+      "cls": 0.0928614589696129
+    },
+    "focusedAxe": null,
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  },
+  {
+    "state": "consent-submit",
+    "route": "/submit",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "screenshot": "latest/consent/submit@1024.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 662.40625,
+        "width": 1024,
+        "height": 105.59375,
+        "bottom": 768
+      },
+      "ctaOverlaps": [],
+      "consent": null,
+      "cls": 0.07186181878205389
+    },
+    "focusedAxe": null,
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  },
+  {
+    "state": "consent-home",
+    "route": "/",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "screenshot": "latest/consent/home@1440.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 814.703125,
+        "width": 1440,
+        "height": 85.296875,
+        "bottom": 900
+      },
+      "ctaOverlaps": [
+        {
+          "testid": "link-category-players-clients",
+          "text": "Players & Clients239 resourcesFeatured: AVPlayer — AVPlayer "
+        },
+        {
+          "testid": "link-category-protocols-transport",
+          "text": "Protocols & Transport213 resourcesFeatured: 100ms: RTMP vs W"
+        },
+        {
+          "testid": "link-category-standards-industry",
+          "text": "Standards & Industry173 resourcesFeatured: AV1 Video Codec —"
+        }
+      ],
+      "consent": null,
+      "cls": 0.04929394012158136
+    },
+    "focusedAxe": {
+      "state": "consent-home",
+      "viewport": 1440,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 2,
+      "passes": 25
+    },
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  },
+  {
+    "state": "consent-submit",
+    "route": "/submit",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "screenshot": "latest/consent/submit@1440.png",
+    "geometry": {
+      "present": true,
+      "rect": {
+        "x": 0,
+        "y": 814.703125,
+        "width": 1440,
+        "height": 85.296875,
+        "bottom": 900
+      },
+      "ctaOverlaps": [
+        {
+          "testid": "button-cancel",
+          "text": "Cancel"
+        },
+        {
+          "testid": "button-submit",
+          "text": "Submit for review"
+        }
+      ],
+      "consent": null,
+      "cls": 0.020182682308411568
+    },
+    "focusedAxe": {
+      "state": "consent-submit",
+      "viewport": 1440,
+      "seriousCritical": 0,
+      "seriousCriticalNodes": 0,
+      "violations": [],
+      "incomplete": 2,
+      "passes": 28
+    },
+    "externalAnalyticsBeforeDecision": {},
+    "apiFailures": 0
+  }
+]
