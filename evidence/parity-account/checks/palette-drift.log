@@ -1,9 +1,0 @@
-PASS palette-regex-parity :: .agents/skills/verify-design-system/SKILL.md:169 matches scripts/validation/design-system-stage5.mjs:9
-PASS canaries :: all stage-5 detectors + ratchet classifier verified against known-bad/known-good samples
-PASS palette-classes :: 0 legacy match(es) across 0 file(s), all pinned at baseline
-PASS hex-colors :: 0 legacy match(es) across 0 file(s), all pinned at baseline
-PASS rgb-colors :: 0 legacy match(es) across 0 file(s), all pinned at baseline
-PASS raw-radii :: 0 legacy match(es) across 0 file(s), all pinned at baseline
-PASS font-family :: 0 legacy match(es) across 0 file(s), all pinned at baseline
-
-PASS palette-drift :: no off-system color/radius/font drift beyond the pinned baseline

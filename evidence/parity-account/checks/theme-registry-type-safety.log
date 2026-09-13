@@ -1,7 +1,0 @@
-PASS baseline :: current design-system registry compiles
-PASS rejected :: duplicate system id
-PASS rejected :: duplicate accent id
-PASS rejected :: missing SYSTEM_DEFAULT_ACCENT row
-PASS rejected :: unknown mapped accent
-PASS rejected :: invalid DEFAULT_SYSTEM
-PASS rejected :: invalid DEFAULT_ACCENT
