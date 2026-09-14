@@ -23,7 +23,7 @@
 /* DS-OK: canonical Logo has a fixed 6px tile radius across skins.
    The reference requests 800 but its font download tops out at 700; request
    the actual available face rather than requiring an unshipped weight. */
-.app-canonical-header .header-logo { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: var(--bg); display: flex; align-items: center; justify-content: center; font: 700 13px var(--font-mono); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); flex-shrink: 0; }
+.app-canonical-header .header-logo { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font: 700 13px var(--font-mono); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); flex-shrink: 0; }
 .app-canonical-header .header-wordmark { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1.8px; white-space: nowrap; }
 .app-canonical-header .header-spacer { flex: 1; }
 .app-canonical-header .header-nav { display: flex; gap: 18px; align-items: center; }
@@ -43,9 +43,9 @@
 .app-canonical-header .header-kbd { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-3); padding: 2px 6px; border: var(--hairline-w) solid var(--border); border-radius: 4px; background: var(--surface); }
 .app-canonical-header .user-pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border)); color: var(--text); cursor: pointer; font-family: inherit; transition: all 160ms ease; flex-shrink: 0; }
 .app-canonical-header .user-pill:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
-.app-canonical-header .header-avatar, .app-canonical-header .header-avatar > span { width: 22px; height: 22px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--bg-2) 80%, var(--accent)); color: var(--accent); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+.app-canonical-header .header-avatar, .app-canonical-header .header-avatar > span { width: 22px; height: 22px; border-radius: var(--radius-pill); background: color-mix(in srgb, #0a0a0a 80%, var(--accent)); color: var(--accent); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
 .app-canonical-header .header-account-name { font-size: 12px; font-weight: 600; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.app-canonical-header .mobile-menu-btn { display: none; align-items: center; justify-content: center; cursor: pointer; width: 36px; height: 36px; min-width: 36px; padding: 0; border: var(--border-w) solid var(--border); border-radius: var(--radius-sm); background: transparent; color: var(--text); box-shadow: none; }
+.app-canonical-header .mobile-menu-btn { display: none; align-items: center; justify-content: center; cursor: pointer; width: 36px; height: 36px; min-width: 36px; min-height: 36px; padding: 0; border: var(--border-w) solid var(--border); border-radius: var(--radius-sm); background: transparent; color: var(--text); box-shadow: none; }
 .app-canonical-header .header-menu-control { display: none; position: relative; width: 36px; height: 36px; flex-shrink: 0; }
 .app-canonical-header .mobile-menu-btn > svg { visibility: hidden; }
 .app-canonical-header .header-menu-icon { position: absolute; top: 10px; left: 10px; pointer-events: none; }

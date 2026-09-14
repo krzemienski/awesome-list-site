@@ -26,6 +26,10 @@ interface DbSearchResource {
   subcategory: string | null;
 }
 
+interface HomeFeedResponse {
+  featured: DbSearchResource[];
+}
+
 type PaletteCategory = Category & { resourceCount: number };
 
 const PAGES = [
@@ -66,7 +70,9 @@ function saveRecentSearch(query: string): string[] {
 
 export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const [query, setQuery] = useState("");
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(readRecentSearches);
+  const [selectedValue, setSelectedValue] = useState("");
+  const selectionInteracted = useRef(false);
   const debouncedQuery = useDebounce(query, 300);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -103,9 +109,24 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     staleTime: 60 * 1000,
   });
 
+  // Keep the palette's featured jump targets in step with the curated home
+  // feed. The feed, rather than a copied metadata flag, is authoritative.
+  const featuredQuery = useQuery<HomeFeedResponse>({
+    queryKey: ["/api/home"],
+    queryFn: () => apiRequest("/api/home", { method: "GET" }),
+    enabled: isOpen,
+    staleTime: 60 * 1000,
+  });
+
   const allMatches = trimmed.length >= 2 ? resourceQuery.data?.resources ?? [] : [];
   const totalMatches = trimmed.length >= 2 ? resourceQuery.data?.total ?? allMatches.length : 0;
   const results = allMatches.slice(0, 15);
+  const defaultCategories = (categoriesQuery.data ?? []).slice(0, 5);
+  const featuredResources = (featuredQuery.data?.featured ?? []).slice(0, 4);
+  const defaultSuggestionCount = defaultCategories.length + featuredResources.length;
+  const firstCategoryValue = defaultCategories[0]
+    ? `category-${defaultCategories[0].name}`
+    : undefined;
   const isPending =
     showResults && results.length === 0 && (resourceQuery.isFetching || queryTrimmed !== trimmed);
   const categoryMatches = showResults
@@ -133,8 +154,22 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen) setQuery("");
+    if (!isOpen) {
+      setQuery("");
+      setSelectedValue("");
+      selectionInteracted.current = false;
+    }
   }, [isOpen]);
+
+  // Cached featured items can register before the live categories. Keep the
+  // untouched initial selection in displayed order, without overriding a
+  // person's keyboard/pointer choice or their recent-search shortcuts.
+  useEffect(() => {
+    if (isOpen && !query && recentSearches.length === 0 &&
+        !selectionInteracted.current && firstCategoryValue) {
+      setSelectedValue(firstCategoryValue);
+    }
+  }, [isOpen, query, recentSearches.length, firstCategoryValue]);
 
   const openResource = (resource: DbSearchResource) => {
     trackResourceClick(resource.title, resource.url, resource.category || "");
@@ -194,6 +229,85 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     </CommandGroup>
   );
 
+  const renderRecentSearches = (filterByQuery = false) => {
+    const visibleRecentSearches = filterByQuery
+      ? recentSearches.filter((recent) =>
+          recent.toLocaleLowerCase().includes(queryTrimmed.toLocaleLowerCase()),
+        )
+      : recentSearches;
+
+    if (visibleRecentSearches.length === 0) return null;
+
+    return (
+      <CommandGroup heading="Recent searches" className="search-palette-group">
+        <button
+          type="button"
+          className="search-palette-clear"
+          onClick={() => {
+            try {
+              localStorage.removeItem(RECENT_SEARCHES_KEY);
+            } catch {
+              // storage may be unavailable — clearing the UI is still useful
+            }
+            setRecentSearches([]);
+          }}
+          data-testid="button-clear-recent-searches"
+        >
+          <X aria-hidden="true" />
+          Clear
+        </button>
+        {visibleRecentSearches.map((recent, index) => (
+          <CommandItem
+            key={`recent-${recent}`}
+            value={`recent-${recent}`}
+            onSelect={() => setQuery(recent)}
+            className="search-palette-row"
+            data-testid={`recent-search-${index}`}
+          >
+            <span className="search-palette-kind"><Clock aria-hidden="true" />recent</span>
+            <span className="search-palette-copy"><span>{recent}</span></span>
+            <span className="search-palette-arrow" aria-hidden="true">→</span>
+          </CommandItem>
+        ))}
+      </CommandGroup>
+    );
+  };
+
+  const renderDefaultJumps = () => (
+    <CommandGroup heading="Jump to" className="search-palette-group search-palette-default-jump-group">
+      {defaultCategories.map((category) => (
+        <CommandItem
+          key={`jump-category-${category.id}`}
+          value={`category-${category.name}`}
+          onSelect={() => openCategory(category)}
+          className="search-palette-row search-palette-default-jump"
+        >
+          <span className="search-palette-kind search-palette-kind-category">cat</span>
+          <span className="search-palette-copy">
+            <span>{category.name}</span>
+            <small>category · {category.resourceCount}</small>
+          </span>
+          <span className="search-palette-arrow" aria-hidden="true">→</span>
+        </CommandItem>
+      ))}
+      {featuredResources.map((resource) => (
+        <CommandItem
+          key={`jump-featured-${resource.id}`}
+          value={`featured-${resource.id}`}
+          onSelect={() => openResource(resource)}
+          className="search-palette-row search-palette-default-jump"
+        >
+          <span className="search-palette-kind">item</span>
+          <span className="search-palette-copy">
+            <span>{resource.title}</span>
+            {resource.description ? <small>{resource.description.slice(0, 60)}</small> : null}
+          </span>
+          <span className="search-palette-arrow" aria-hidden="true">→</span>
+        </CommandItem>
+      ))}
+    </CommandGroup>
+  );
+
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
       <DialogPrimitive.Portal>
@@ -219,11 +333,18 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
             Search resources, categories, and pages in the awesome video collection.
           </DialogPrimitive.Description>
 
-          <Command className="search-palette-command" shouldFilter={false}>
+          <Command
+            className="search-palette-command"
+            shouldFilter={false}
+            value={selectedValue}
+            onValueChange={setSelectedValue}
+            onKeyDownCapture={() => { selectionInteracted.current = true; }}
+            onPointerMove={() => { selectionInteracted.current = true; }}
+          >
             <CommandInput
               ref={inputRef}
               aria-label="Search resources, categories, and pages"
-              placeholder="Search resources, categories, pages…"
+              placeholder="Find resources, categories, or pages…"
               trailing={
                 <DialogPrimitive.Close className="search-palette-close" aria-label="Close search">
                   <kbd>esc</kbd>
@@ -260,6 +381,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                   </div>
                 ) : (
                   <>
+                    {renderRecentSearches(true)}
                     {results.length > 0 && (
                       <CommandGroup heading="Resources" className="search-palette-group">
                         {results.map((resource, index) => (
@@ -302,7 +424,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                             onSelect={() => openCategory(category)}
                             className="search-palette-row"
                           >
-                            <span className="search-palette-kind"><Folder aria-hidden="true" />cat</span>
+                            <span className="search-palette-kind search-palette-kind-category"><Folder aria-hidden="true" />cat</span>
                             <span className="search-palette-copy">
                               <span>{category.name}</span>
                               <small>{category.resourceCount} resource{category.resourceCount === 1 ? "" : "s"}</small>
@@ -328,64 +450,17 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                 )
               ) : (
                 <>
-                  {recentSearches.length > 0 && (
-                    <CommandGroup heading="Recent searches" className="search-palette-group">
-                      <button
-                        type="button"
-                        className="search-palette-clear"
-                        onClick={() => {
-                          try {
-                            localStorage.removeItem(RECENT_SEARCHES_KEY);
-                          } catch {
-                            // storage may be unavailable — clearing the UI is still useful
-                          }
-                          setRecentSearches([]);
-                        }}
-                        data-testid="button-clear-recent-searches"
-                      >
-                        <X aria-hidden="true" />
-                        Clear
-                      </button>
-                      {recentSearches.map((recent, index) => (
-                        <CommandItem
-                          key={`recent-${recent}`}
-                          value={`recent-${recent}`}
-                          onSelect={() => setQuery(recent)}
-                          className="search-palette-row"
-                          data-testid={`recent-search-${index}`}
-                        >
-                          <span className="search-palette-kind"><Clock aria-hidden="true" />recent</span>
-                          <span className="search-palette-copy"><span>{recent}</span></span>
-                          <span className="search-palette-arrow" aria-hidden="true">→</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
+                  {renderDefaultJumps()}
                   {renderPages()}
-                  {categoryMatches.length > 0 && (
-                    <CommandGroup heading="Categories" className="search-palette-group">
-                      {categoryMatches.map((category) => (
-                        <CommandItem
-                          key={`category-${category.id}`}
-                          value={`category-${category.name}`}
-                          onSelect={() => openCategory(category)}
-                          className="search-palette-row"
-                        >
-                          <span className="search-palette-kind"><Folder aria-hidden="true" />cat</span>
-                          <span className="search-palette-copy">
-                            <span>{category.name}</span>
-                            <small>{category.resourceCount} resource{category.resourceCount === 1 ? "" : "s"}</small>
-                          </span>
-                          <span className="search-palette-arrow" aria-hidden="true">→</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                  {categoriesQuery.isLoading && (
+                  {renderRecentSearches()}
+                  {categoriesQuery.isLoading && defaultCategories.length === 0 && (
                     <div className="search-palette-inline-error" role="status">Loading categories…</div>
                   )}
-                  {categoriesQuery.isError && (
+                  {categoriesQuery.isError && defaultCategories.length === 0 && (
                     <div className="search-palette-inline-error" role="status">Categories are unavailable right now.</div>
+                  )}
+                  {featuredQuery.isError && (
+                    <div className="search-palette-inline-error" role="status">Featured resources are unavailable right now.</div>
                   )}
                 </>
               )}
@@ -396,12 +471,19 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
             <span><kbd>↑↓</kbd> navigate</span>
             <span><kbd>↵</kbd> open</span>
             <span><kbd>esc</kbd> close</span>
-            {showResults && results.length > 0 && (
+            <span className="search-palette-footer-spacer" aria-hidden="true" />
+            {(showResults && results.length > 0) || (!showResults && defaultSuggestionCount > 0) ? (
               <span className="search-palette-result-count" data-testid="search-result-count" aria-live="polite">
-                {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
-                {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
+                {showResults ? (
+                  <>
+                    {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
+                    {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
+                  </>
+                ) : (
+                  <>{defaultSuggestionCount} result{defaultSuggestionCount === 1 ? "" : "s"}</>
+                )}
               </span>
-            )}
+            ) : null}
           </footer>
 
         </DialogPrimitive.Content>

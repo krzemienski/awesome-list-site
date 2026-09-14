@@ -1,116 +1,165 @@
-import type { Express, Request, Response, NextFunction } from "express";
-import { renderToString } from "react-dom/server";
-import fs from "fs";
+import type { Request, Response, NextFunction } from "express";
+import fs from "fs/promises";
 import path from "path";
+import { pathToFileURL } from "url";
+import { loadHomeSSRData } from "./home-ssr-data";
+import type { HomeBoot } from "../client/src/lib/home-boot";
 
-export async function handleSSR(req: Request, res: Response, next: NextFunction) {
-  // CRITICAL FIX: Disable SSR in production until we have proper server bundle
-  // SSR was blocking serveStatic middleware, causing white screen
-  // The client/index.html references /src/main.tsx which doesn't exist in dist/
-  // Let serveStatic serve the actual built Vite assets instead.
-  //
-  // Production SSR remains intentionally disabled (the build produces no server
-  // React bundle). Crawler/SEO visibility is instead handled by the prerender
-  // injector in server/og-middleware.ts (Task #80), which runs in BOTH dev and
-  // prod and writes route-appropriate semantic content into the SPA shell. The
-  // renderAppWithData() helper below is legacy scaffolding kept for reference.
-  return next();
+type HomeRenderer = {
+  renderHome(context: {
+    boot: HomeBoot;
+    nav: unknown;
+    home: unknown;
+    kindCounts: unknown;
+  }): { html: string; dehydratedState: unknown };
+};
+
+let rendererPromise: Promise<HomeRenderer> | undefined;
+let templatePromise: Promise<string> | undefined;
+const ROOT_TEMPLATE_MARKER = '<div id="root"><!--app-html--></div>';
+const MODULE_SCRIPT_MARKER = '<script type="module"';
+const HTML_MARKER = "<html ";
+
+function countMarker(value: string, marker: string): number {
+  return value.split(marker).length - 1;
 }
 
-async function renderAppWithData(awesomeListData: any, url: string): Promise<string> {
-  // Dynamic import to avoid issues in development
+function assertSsrTemplate(template: string): void {
+  if (
+    countMarker(template, ROOT_TEMPLATE_MARKER) !== 1 ||
+    countMarker(template, MODULE_SCRIPT_MARKER) !== 1 ||
+    countMarker(template, HTML_MARKER) !== 1
+  ) {
+    throw new Error("Home SSR template replacement marker is missing or ambiguous");
+  }
+}
+
+function readCookie(req: Request, name: string): string | null {
+  const match = (req.headers.cookie || "").match(
+    new RegExp(`(?:^|;\\s*)${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=([^;]*)`),
+  );
+  if (!match) return null;
   try {
-    // We'll render a basic HTML structure with the data
-    // This ensures the initial HTML has the content
-    if (!awesomeListData) {
-      return '';
+    return decodeURIComponent(match[1]);
+  } catch {
+    return null;
+  }
+}
+
+function homeBoot(req: Request): HomeBoot {
+  const url = new URL(req.originalUrl || req.url, "http://home-ssr.invalid");
+  const requested = url.searchParams.get("layout");
+  const stored = readCookie(req, "awesome-video-home-layout");
+  const layout =
+    requested === "curated" || requested === "index"
+      ? requested
+      : stored === "curated"
+        ? "curated"
+        : "index";
+  const consent = readCookie(req, "analytics-consent");
+  const sidebar = readCookie(req, "sidebar_state");
+  const userAgent = req.headers["user-agent"] || "";
+  const viewport =
+    /(?:iphone|ipod|android.+mobile|windows phone)/i.test(userAgent)
+      ? "phone"
+      : /(?:ipad|tablet|android)/i.test(userAgent)
+        ? "tablet"
+        : "desktop";
+  return {
+    path: "/",
+    url: `${url.pathname}${url.search}`,
+    search: url.search,
+    layout,
+    layoutSource:
+      requested === "curated" || requested === "index"
+        ? "url"
+        : stored === "curated" || stored === "index"
+          ? "cookie"
+          : "default",
+    theme: "prepaint",
+    viewport,
+    // The persisted cookie wins; otherwise desktop starts expanded while
+    // tablet/phone start closed, matching the shell's breakpoint policy.
+    sidebarOpen: sidebar === "true" ? true : sidebar === "false" ? false : viewport === "desktop",
+    consent: consent === "granted" || consent === "denied" ? consent : null,
+    isAnonymous: true,
+  };
+}
+
+function safeJson(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
+async function renderer(): Promise<HomeRenderer> {
+  rendererPromise ??= import(
+    pathToFileURL(path.resolve(import.meta.dirname, "ssr", "entry-server.js")).href,
+  ) as Promise<HomeRenderer>;
+  return rendererPromise;
+}
+
+async function template(): Promise<string> {
+  templatePromise ??= fs.readFile(
+    path.resolve(import.meta.dirname, "public", "index.html"),
+    "utf8",
+  );
+  return templatePromise;
+}
+
+/**
+ * Exact-tree SSR is deliberately limited to the anonymous public Home route.
+ * Session-bearing requests retain the existing SPA path until Clerk's official
+ * server initial-state contract is available; we never serialize identity,
+ * claims, tokens, or a fabricated anonymous auth snapshot.
+ */
+export async function handleSSR(req: Request, res: Response, next: NextFunction) {
+  const requestedUrl = new URL(req.originalUrl || req.url, "http://home-ssr.invalid");
+  const layoutValues = requestedUrl.searchParams.getAll("layout");
+  const hasOnlyValidLayout =
+    [...requestedUrl.searchParams.keys()].every((key) => key === "layout") &&
+    layoutValues.length <= 1 &&
+    (layoutValues.length === 0 || layoutValues[0] === "index" || layoutValues[0] === "curated");
+  if (
+    req.method !== "GET" ||
+    req.path !== "/" ||
+    !hasOnlyValidLayout ||
+    /(?:^|;\s*)__session[^=;]*=/.test(req.headers.cookie || "")
+  ) {
+    return next();
+  }
+
+  try {
+    const [data, render, htmlTemplate] = await Promise.all([
+      loadHomeSSRData(),
+      renderer(),
+      template(),
+    ]);
+    assertSsrTemplate(htmlTemplate);
+    const boot = homeBoot(req);
+    const rendered = render.renderHome({ boot, ...data });
+    const state = safeJson({ boot, dehydratedState: rendered.dehydratedState });
+    const root = `<div id="root" data-home-ssr="true">${rendered.html}</div>`;
+    const bootstrap = `<script>window.__HOME_SSR__=${state};</script>\n    ${MODULE_SCRIPT_MARKER}`;
+    const document = htmlTemplate
+      .replace(HTML_MARKER, '<html data-home-ssr="true" ')
+      .replace(ROOT_TEMPLATE_MARKER, root)
+      .replace(MODULE_SCRIPT_MARKER, bootstrap);
+    if (
+      !document.includes('<html data-home-ssr="true" ') ||
+      !document.includes(root) ||
+      !document.includes(bootstrap)
+    ) {
+      throw new Error("Home SSR document replacement failed");
     }
-
-    const { title, description, resources, categories } = awesomeListData;
-    
-    // Build basic HTML with the actual data
-    let html = `
-      <div class="flex min-h-screen w-full">
-        <aside class="sidebar">
-          <div class="sidebar-header">
-            <h2>Awesome Video Resources</h2>
-          </div>
-          <nav class="sidebar-nav">
-            <ul>
-    `;
-
-    // Add categories to sidebar
-    if (categories && categories.length > 0) {
-      categories.forEach((category: any) => {
-        html += `
-          <li>
-            <a href="/category/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}" 
-               data-testid="category-${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}">
-              <span>${category.name}</span>
-              <span class="count">${category.resources?.length || 0}</span>
-            </a>
-        `;
-        
-        // Add subcategories if present
-        if (category.subcategories && category.subcategories.length > 0) {
-          html += '<ul class="subcategories">';
-          category.subcategories.forEach((sub: any) => {
-            html += `
-              <li>
-                <a href="/subcategory/${sub.slug}">
-                  <span>${sub.name}</span>
-                  <span class="count">${sub.resources?.length || 0}</span>
-                </a>
-              </li>
-            `;
-          });
-          html += '</ul>';
-        }
-        
-        html += '</li>';
-      });
-    }
-
-    html += `
-            </ul>
-          </nav>
-        </aside>
-        <main class="flex-1">
-          <div class="container">
-            <header>
-              <h1>${title || 'Awesome Video Resources'}</h1>
-              <p>${resources?.length || 0} Resources</p>
-            </header>
-            <div class="resources-grid" data-testid="resources-container">
-    `;
-
-    // Add some initial resources
-    if (resources && resources.length > 0) {
-      const initialResources = resources.slice(0, 24); // First 24 resources
-      initialResources.forEach((resource: any) => {
-        html += `
-          <div class="resource-card" data-testid="resource-${resource.title?.toLowerCase().replace(/\s+/g, '-')}">
-            <h3>${resource.title}</h3>
-            <p>${resource.description || ''}</p>
-            <div class="meta">
-              <span class="category">${resource.category || ''}</span>
-              ${resource.subcategory ? `<span class="subcategory">${resource.subcategory}</span>` : ''}
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    html += `
-            </div>
-          </div>
-        </main>
-      </div>
-    `;
-
-    return html;
+    res.type("html").send(document);
   } catch (error) {
-    console.error('Error rendering app with data:', error);
-    return '';
+    // A document-render failure must not turn a healthy public route into a
+    // blank/error page. The normal static SPA remains the explicit fallback.
+    console.error("[home-ssr] render failed; using the existing SPA fallback", error);
+    next();
   }
 }

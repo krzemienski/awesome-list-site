@@ -150,6 +150,45 @@
       })();
     </script>
 
+    <style>
+      #home-layout-boot-skeleton { display: none; }
+      html[data-home-ssr="true"][data-home-layout-pending="true"] #root[data-home-ssr="true"] { visibility: hidden; }
+      html[data-home-ssr="true"][data-home-layout-pending="true"] #home-layout-boot-skeleton {
+        display: block; min-height: 100vh; background: #000; padding: 40px 20px;
+      }
+      html[data-consent-known="true"] #root[data-home-ssr="true"] .system-consent-banner {
+        display: none !important;
+      }
+    </style>
+    <script>
+      // Browser-only legacy preference bridge. These markers alter paint only;
+      // React still hydrates the exact server DOM and clears them after its
+      // state has committed.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var params = new URLSearchParams(location.search);
+          var hasLayoutOverride = params.has('layout');
+          var hasLayoutCookie = /(?:^|;\s*)awesome-video-home-layout=(?:index|curated)(?:;|$)/.test(document.cookie);
+          var legacyLayout = localStorage.getItem('awesome-video-home-layout');
+          if (location.pathname === '/' && !hasLayoutOverride && !hasLayoutCookie && legacyLayout === 'curated') {
+            root.setAttribute('data-home-layout-pending', 'true');
+            // React normally clears this after it has committed curated
+            // markup. If the app bundle cannot run, never leave the only
+            // usable document hidden indefinitely.
+            window.setTimeout(function () {
+              root.removeAttribute('data-home-layout-pending');
+            }, 4000);
+          }
+          var hasConsentCookie = /(?:^|;\s*)analytics-consent=(?:granted|denied)(?:;|$)/.test(document.cookie);
+          var legacyConsent = localStorage.getItem('analytics-consent');
+          if (!hasConsentCookie && (legacyConsent === 'granted' || legacyConsent === 'denied')) {
+            root.setAttribute('data-consent-known', 'true');
+          }
+        } catch (_) {}
+      })();
+    </script>
+
     <script>
       // BUG-001 (run19): kick off the awesome-list fetch before the JS bundle
       // is even parsed. fetchStaticAwesomeList() consumes this promise (one
@@ -160,9 +199,14 @@
           // taxonomy views prefetch one 24-card listing slice; the full corpus
           // remains reserved for Advanced browse and taxonomy filter modes.
         try {
-          var n = fetch('/api/awesome-list/nav', { credentials: 'same-origin' });
-          window.__awesomeListNavEarlyFetch = n;
-          n.catch(function () {});
+          // Exact Home SSR already embeds the request-local nav cache. Avoid
+          // racing it with the legacy early request; non-SSR routes preserve
+          // their existing prefetch behavior.
+          if (document.documentElement.getAttribute('data-home-ssr') !== 'true') {
+            var n = fetch('/api/awesome-list/nav', { credentials: 'same-origin' });
+            window.__awesomeListNavEarlyFetch = n;
+            n.catch(function () {});
+          }
         } catch (e) {}
         try {
           var pth = location.pathname;
@@ -297,6 +341,13 @@
           <a href="https://github.com/krzemienski/awesome-video" style="color:#5eddf2;">github.com/krzemienski/awesome-video</a>.</p>
       </div>
     </noscript>
+    <div id="home-layout-boot-skeleton" aria-hidden="true">
+      <div style="max-width:960px;margin:0 auto">
+        <div style="height:2rem;width:55%;background:#1a1a22;margin-bottom:1rem"></div>
+        <div style="height:1rem;width:80%;background:#1a1a22;margin-bottom:2rem"></div>
+        <div style="height:12rem;background:#1a1a22;margin-bottom:1rem"></div>
+      </div>
+    </div>
     <div id="root"><!--app-html--></div>
     <script>
       // BUG-018 (run19): routes without server-injected content (admin,

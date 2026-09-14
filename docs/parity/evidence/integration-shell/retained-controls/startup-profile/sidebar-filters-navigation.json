@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "kind": "focused-sidebar-and-filters-navigation",
+  "base": "http://127.0.0.1:5104",
+  "binding": {
+    "sourceTrackedTreeSha256": "a3b5e914f33b2e2ef7271929e2acea93d46e1fb79796f4f5c78d0a58913785c2",
+    "sourceDirtyPatchSha256": "3d03c274ef0f41d83bb3477ccff76b45ec7fcac12cdd8a52abd0b0e483ac35e2",
+    "sourceUntrackedTreeSha256": "c21efa6595e917050b7313a27b7a870626c26a38e1d99b6c742e212207fa7ce0",
+    "buildTreeSha256": "2fe258eecfe9bfaf95ec4a6fd7d18df86352ea4561c05ce5092a507e0846dc14"
+  },
+  "source": {
+    "gitHead": "52623d636a7ee0338902fb190c39041eaf573bae",
+    "gitStatusSha256": "b23e0ef08e90b6888e121994b924197ba70b907bd463b2175b2d631a6ca09772",
+    "dirtyPatchSha256": "3d03c274ef0f41d83bb3477ccff76b45ec7fcac12cdd8a52abd0b0e483ac35e2",
+    "trackedFileCount": 7481,
+    "trackedTreeSha256": "a3b5e914f33b2e2ef7271929e2acea93d46e1fb79796f4f5c78d0a58913785c2",
+    "untrackedFileCount": 1,
+    "untrackedTreeSha256": "c21efa6595e917050b7313a27b7a870626c26a38e1d99b6c742e212207fa7ce0"
+  },
+  "build": {
+    "directory": "dist",
+    "fileCount": 165,
+    "treeSha256": "2fe258eecfe9bfaf95ec4a6fd7d18df86352ea4561c05ce5092a507e0846dc14"
+  },
+  "lighthouseEvidence": "docs/parity/evidence/integration-shell/retained-controls/startup-profile/normal-lighthouse-tags-sidebar-3cold/manifest.json",
+  "checks": {
+    "closedBodyLazyMount": {
+      "passed": true,
+      "ariaControlsTargetPresent": true,
+      "closedContentAbsent": true,
+      "closedInert": true,
+      "firstOpenDescendantCount": 2,
+      "closeRetainsContent": true,
+      "reopenRetainsDescendantCount": 2
+    },
+    "directCategoryInitialExpansion": {
+      "passed": true,
+      "categoryIdentifierSha256": "83ea6211661e8072df8748fc47ff6a6fe2e922b8c4c16464812c6f68d05fbcc5",
+      "ariaExpanded": true,
+      "contentMounted": true
+    },
+    "mobileDrawerClosesOnNavigation": {
+      "passed": true,
+      "drawerOpened": true,
+      "drawerDetachedAfterCategoryNavigation": true
+    },
+    "filtersUrlTagsReady": {
+      "passed": true,
+      "tagsResponseStatus": 200,
+      "enabledTagControl": true,
+      "tagSearchVisibleAfterOpen": true
+    }
+  },
+  "privacy": {
+    "retainedValues": "boolean assertions, HTTP status, public-path presence, and cryptographic identifiers only",
+    "rawNavigationDataPersisted": false,
+    "rawRequestsPersisted": false
+  }
+}

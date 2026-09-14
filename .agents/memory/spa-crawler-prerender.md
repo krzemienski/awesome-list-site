@@ -1,40 +1,35 @@
 ---
-name: SPA crawler/SEO prerender
-description: How non-JS crawler visibility is achieved without real SSR, and why SSR can't be revived as-is.
+name: SPA crawler prerender and exact Home SSR
+description: Keep crawler prerendering separate from the narrow exact-tree Home SSR exception.
 ---
 
-# SPA crawler visibility = og-middleware prerender, NOT React SSR
+# Crawler prerendering and exact-tree SSR have different contracts
 
-Public routes are made crawler-visible by injecting prerendered semantic HTML
-(heading, summary, internal links) into the `<!--app-html-->` placeholder inside
-`<div id="root">`. The injector lives in `server/og-middleware.ts` (it already
-buffers + rewrites the whole HTML in BOTH dev and prod); content builders are in
-`server/seo-content.ts`.
+Crawler-visible routes normally use injected semantic HTML as a progressive
+enhancement. That markup is not necessarily React-identical and must retain the
+client's replacement path rather than being hydrated as though it were the app.
 
-**Why not real SSR:** the prod build (`vite build && esbuild server/index.ts`)
-produces **no server React bundle**, and `package.json` is off-limits. The SSR
-scaffolding (`client/src/entry-server.tsx`, `server/ssr-dev.ts`, `server/ssr.ts`
-`handleSSR`) is **dead code** — `setupSSRDev` is never wired, `handleSSR` is a
-no-op `return next()`, and `entry-server.tsx` renders the whole `<App/>` with no
-wouter `ssrPath` and touches browser-only APIs. Don't try to revive it for SEO.
+An exact-tree SSR exception is safe only when all of these are true:
 
-**Critical: do NOT set `window.__INITIAL_DATA__` / `__DEHYDRATED_STATE__`.**
-`client/src/main.tsx` hydrates only when those flags exist; otherwise it uses
-`createRoot().render()`, which **replaces** the injected content on boot. That
-replace path is what we want — the injected markup is a static crawler/pre-JS
-view, not byte-identical to React's first render, so true hydration would warn
-and discard it. Keeping createRoot avoids all hydration-mismatch risk.
+- It is limited to one explicitly authorized public route and a bounded request
+  shape. Unsupported query-bearing and signed-in requests keep the established
+  SPA path.
+- The server renders the same provider and route tree that the client hydrates,
+  with every server-visible query explicitly preloaded. Missing data is a server
+  rendering failure, not a reason to fetch/retry during SSR.
+- The serialized bootstrap contains public data only. It must never contain a
+  session, identity, claims, token, or a client-cacheable assertion inferred
+  from an anonymous request.
+- A guessed anonymous auth query must not be dehydrated. Otherwise the fresh
+  client cache can suppress the real post-hydration auth check and hide a
+  session established between rendering and hydration.
+- Request-time guest hints exist only to make the initial hydration tree exact.
+  Retire them after the first hydrate so later SPA authentication, preferences,
+  and navigation use live browser/API state.
+- Rendering failures must fail open to the existing SPA rather than turn a
+  healthy public route into an error document.
 
-**Gotchas when injecting:**
-- Use the **function form** of `String.replace("<!--app-html-->", () => bodyHtml)`
-  — the string form interprets `$&`, `$$`, `` $` ``, `$'` in resource
-  titles/descriptions.
-- Inject only for `found && !meta.noindex` routes; soft-404s and auth/internal
-  routes (`/login`, `/admin`, `/profile`, `/settings`, `/submit`) keep the empty
-  shell.
-- Escape all text and sanitize hrefs (internal must start with `/` and not `//`;
-  outbound must be `http(s)` and carry `rel="nofollow noopener noreferrer"`).
-  This is progressive enhancement, served identically to all clients — not
-  cloaking.
-- `.txt`/static files (robots.txt, llms.txt, sitemap.xml) are served from
-  `client/public`; og-middleware skips any path with a file extension.
+For Home, the exception remains public-only: preserve prepaint theme/layout and
+consent behavior through hydration, then reconcile it through their normal live
+sources. Validate the exact allowed CSP origin rather than a wildcard, and
+verify that legacy consent controls can reopen after reconciliation.

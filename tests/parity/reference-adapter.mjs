@@ -8,7 +8,8 @@
  * awesome-list-site-ds/ is ever written.
  *
  * Two adapters exist:
- *   - catalog adapter: public, credential-less `/api/awesome-list(+/nav)`
+ *   - catalog adapter: public, credential-less `/api/awesome-list(+/nav)`,
+ *     `/api/config`, `/api/home`, and `/api/resources/kinds/counts`
  *   - admin adapter:   `/api/admin/*` through the disposable admin session
  *
  * Placeholder literals ("+12 this week", "WEEK 37", "CONTRIBUTORS 3", "oldest
@@ -20,6 +21,7 @@
  */
 import crypto from "node:crypto";
 import { indexCatalogPaths } from "./catalog-paths.mjs";
+import { buildReferenceReconciliation, projectOfficialBrandMark } from "./reference-reconciliation.mjs";
 
 export const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
@@ -38,11 +40,13 @@ const recursiveCount = (node) =>
   (node?.subSubcategories || []).reduce((sum, child) => sum + recursiveCount(child), 0);
 
 /** Bind the public catalog snapshot to the reference's AV_* catalog globals. */
-export async function buildCatalogAdapter(appBase) {
-  const [catalog, nav, home] = await Promise.all([
+export async function buildCatalogAdapter(appBase, { frozenAt } = {}) {
+  const [catalog, nav, home, config, kindCounts] = await Promise.all([
     fetchJson(`${appBase}/api/awesome-list`),
     fetchJson(`${appBase}/api/awesome-list/nav`),
     fetchJson(`${appBase}/api/home`),
+    fetchJson(`${appBase}/api/config`),
+    fetchJson(`${appBase}/api/resources/kinds/counts`),
   ]);
   const categories = Array.isArray(nav?.categories) ? nav.categories : [];
   const corpusResources = Array.isArray(catalog?.resources)
@@ -71,6 +75,7 @@ export async function buildCatalogAdapter(appBase) {
   if (recentById.size !== (home?.recent || []).length) {
     throw new Error("Home recent feed contains duplicate resource identities; refusing false alignment");
   }
+  const featuredIds = new Set((home?.featured || []).map((item) => String(item.id)));
   const adapter = {
     AV_CONFIG: { title: nav.title || catalog.title || null, source: "approved public application catalog snapshot" },
     AV_CATEGORIES: categories.map((item) => ({
@@ -105,7 +110,9 @@ export async function buildCatalogAdapter(appBase) {
         subsub: leaf?.slug || null,
         desc: item.description || "",
         tags: Array.isArray(item.metadata?.tags) ? item.metadata.tags.map((tag) => tag.name || tag).filter(Boolean) : [],
-        featured: Boolean(item.featured ?? item.metadata?.featured),
+        // /api/home.featured is the authoritative public curated feed. Do not
+        // resurrect stale metadata flags when that live feed is empty.
+        featured: featuredIds.has(String(item.id)),
         url: item.url,
       };
     }),
@@ -118,7 +125,38 @@ export async function buildCatalogAdapter(appBase) {
   }
   const snapshotBytes = Buffer.from(JSON.stringify({ catalog, nav, home }));
   const createdAts = corpusResources.map((item) => Date.parse(item.createdAt)).filter(Number.isFinite);
-  return { adapter, catalog, nav, home, reconciledPaths, snapshotBytes, corpusResources, createdAts };
+  const byId = new Map(adapter.AV_RESOURCES.map((item) => [String(item.id), item]));
+  const featuredResources = (home.featured || []).map((item) => {
+    const mapped = byId.get(String(item.id));
+    if (!mapped) {
+      throw new Error(`Home featured resource ${JSON.stringify(item.id)} is absent from the approved catalog snapshot`);
+    }
+    return mapped;
+  });
+  const officialBrandMark = await projectOfficialBrandMark();
+  const reconciliation = buildReferenceReconciliation({
+    config,
+    nav,
+    home,
+    kindCounts,
+    featuredResources,
+    frozenAt,
+    officialBrandMark,
+  });
+  const reconciliationSnapshot = Buffer.from(JSON.stringify({ config, kindCounts, reconciliation }));
+  return {
+    adapter,
+    catalog,
+    nav,
+    home,
+    config,
+    kindCounts,
+    reconciliation,
+    reconciledPaths,
+    snapshotBytes: Buffer.concat([snapshotBytes, reconciliationSnapshot]),
+    corpusResources,
+    createdAts,
+  };
 }
 
 /** Deterministic entity choices shared by both sides (first of each level). */
@@ -249,7 +287,7 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
  * source literal and the replacement; `available` is false when the value
  * cannot be derived from real data (the literal is then left untouched).
  */
-export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin }) {
+export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin, reconciliation }) {
   const frozenAtMs = frozenAt.getTime();
   const addedThisWeek = Number(home?.approvedThisWeek);
   if (!Number.isInteger(addedThisWeek) || addedThisWeek < 0) {
@@ -262,10 +300,12 @@ export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin }
     { file: "home-layouts.jsx", from: "const recent = AV_RESOURCES.slice(6, 12);", to: `const recent = ${recentBinding};`, source: "/api/home recent resources in approved/indexed order", available: true },
     { file: "home-layouts.jsx", from: "'+12 this week'", to: `'+${addedThisWeek} this week'`, source: "/api/home approvedThisWeek (approvedAt with createdAt fallback)", available: true },
     { file: "home-layouts.jsx", from: "CURATED · WEEK 37 ·", to: `CURATED · WEEK ${isoWeek(frozenAt)} ·`, source: "ISO week of the frozen clock", available: true },
-    { file: "home-layouts.jsx", from: "['CONTRIBUTORS', 3, 'reviewing']", to: admin ? `['CONTRIBUTORS', ${admin.counts.users}, 'reviewing']` : null, source: "/api/admin/stats users (admin session only)", available: Boolean(admin) },
+    { file: "home-layouts.jsx", from: "['CONTRIBUTORS', 3, 'reviewing']", to: `['APPROVED THIS WEEK', ${addedThisWeek}, 'newly indexed']`, source: "/api/home approvedThisWeek (approvedAt with createdAt fallback)", available: true },
+    { file: "design-systems.jsx", from: "'--text-3': 'rgba(244,243,238,0.4)'", to: "'--text-3': 'rgba(244,243,238,0.52)'", source: "approved expected-side Editorial AA contrast reconciliation (3.4:1 reference to 5.2:1 application)", available: true },
     { file: "admin.jsx", from: 'sub="across 9 categories"', to: `sub="across ${categoriesCount} categories"`, source: "nav category count", available: true },
     { file: "admin.jsx", from: 'sub="2 admins · 1 contributor"', to: admin ? `sub="${admin.counts.admins} admin${admin.counts.admins === 1 ? "" : "s"} · ${admin.counts.contributors} contributor${admin.counts.contributors === 1 ? "" : "s"}"` : null, source: "/api/admin/users roles (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: 'value="7" sub="oldest 14m ago"', to: admin ? `value="${admin.counts.pending}" sub="${admin.counts.oldestPendingMs ? `oldest ${relativeTime(admin.counts.oldestPendingMs, frozenAtMs)}` : "nothing waiting"}"` : null, source: "/api/admin/stats pendingApprovals + oldest /api/admin/pending-resources createdAt vs frozen clock (admin session only)", available: Boolean(admin) },
+    ...(reconciliation?.sourceSubstitutions || []),
   ];
   return entries;
 }
@@ -292,6 +332,10 @@ export function adaptReferenceSnapshot(referenceSnapshot, { adapterScript, subst
       unadapted.push({ file: entry.file, literal: entry.from, why: "literal not found in the reference source (design changed?)" });
       continue;
     }
+    const approvedLegacyMultiMatch = entry.file === "home-layouts.jsx" && entry.from === "'+12 this week'";
+    if (occurrences !== 1 && !approvedLegacyMultiMatch) {
+      throw new Error(`Expected source substitution must match exactly once: ${entry.file} ${JSON.stringify(entry.from)} matched ${occurrences} times`);
+    }
     served.set(entry.file, Buffer.from(text.split(entry.from).join(entry.to)));
     applied.push({ file: entry.file, from: entry.from, to: entry.to, occurrences, source: entry.source });
   }
@@ -307,13 +351,35 @@ export function adaptReferenceSnapshot(referenceSnapshot, { adapterScript, subst
   };
 }
 
-export function buildAdapterScript({ adapter, adminGlobals, appBase, snapshotBytes, frozenAt }) {
-  const bound = { ...adapter, ...(adminGlobals || {}) };
+export function buildAdapterScript({ adapter, adminGlobals, appBase, snapshotBytes, frozenAt, reconciliation }) {
+  const bound = {
+    ...adapter,
+    ...(adminGlobals || {}),
+    AV_KIND_COUNTS: reconciliation?.kindCounts || {},
+    AV_HOME_FEATURED: reconciliation?.featuredResources || [],
+    AV_HOME_FEATURED_COUNT: reconciliation?.home?.featuredCount ?? 0,
+    AV_OFFICIAL_BRAND_MARK: reconciliation?.officialBrandMark?.svg || "",
+  };
   return `\n;(()=>{const priorIcons=new Map((window.AV_CATEGORIES||[]).flatMap(x=>[[x.id,x.icon],[x.name,x.icon]]));const bound=${JSON.stringify(bound)};bound.AV_CATEGORIES=bound.AV_CATEGORIES.map(x=>({...x,icon:priorIcons.get(x.id)||priorIcons.get(x.name)||''}));Object.assign(window,bound);window.__PARITY_REFERENCE_ADAPTER__=${JSON.stringify({
-    source: `${appBase}/api/awesome-list + /api/awesome-list/nav${adminGlobals ? " + /api/admin/* (disposable admin session)" : ""}`,
+    source: `${appBase}/api/awesome-list + /api/awesome-list/nav + /api/config + /api/home + /api/resources/kinds/counts${adminGlobals ? " + /api/admin/* (disposable admin session)" : ""}`,
     sha256: sha256(snapshotBytes),
     frozenAt: frozenAt.toISOString(),
     adminGlobals: adminGlobals ? Object.keys(adminGlobals) : [],
+    reconciliation: reconciliation ? {
+      version: reconciliation.version,
+      source: reconciliation.source,
+      kindCounts: reconciliation.kindCounts,
+      home: reconciliation.home,
+      officialBrandMark: reconciliation.officialBrandMark ? {
+        source: reconciliation.officialBrandMark.source,
+        sha256: reconciliation.officialBrandMark.sha256,
+        sourceSha256: reconciliation.officialBrandMark.sourceSha256,
+      } : null,
+      palette: reconciliation.palette,
+      drawer: reconciliation.drawer,
+      approved44px: reconciliation.approved44px,
+      approved44pxControls: reconciliation.approved44pxControls,
+    } : null,
     iconProvenance: "canonical reference data.js icon matched by category slug/name; unmatched categories intentionally have no invented icon",
   })};})();\n`;
 }

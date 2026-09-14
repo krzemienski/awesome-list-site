@@ -14,7 +14,7 @@ import {
 import {
   resolveResourceKindFrom,
   type ResourceKind,
-} from "@shared/resourceKinds";
+} from "@shared/resourceKinds-core";
 import SEOHead from "@/components/layout/SEOHead";
 import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
@@ -475,10 +475,14 @@ export default function Home({ nav, navLoading }: HomeProps) {
   }, []);
 
   const [selectedTags, setSelectedTagsState] = useState<string[]>(() =>
-    parseTagsParam(new URLSearchParams(window.location.search)),
+    parseTagsParam(
+      new URLSearchParams(typeof window === "undefined" ? search : window.location.search),
+    ),
   );
   const [emptyTagParamNotice, setEmptyTagParamNotice] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(
+      typeof window === "undefined" ? search : window.location.search,
+    );
     return (
       (params.has("tags") || params.has("tag")) &&
       parseTagsParam(params).length === 0
@@ -500,7 +504,9 @@ export default function Home({ nav, navLoading }: HomeProps) {
   const VALID_SORTS = ["default", "name-asc", "name-desc", "count-desc", "count-asc"] as const;
   type HomeSort = (typeof VALID_SORTS)[number];
   const [sortBy, setSortBy] = useState<HomeSort>(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get("sort");
+    const fromUrl = new URLSearchParams(
+      typeof window === "undefined" ? search : window.location.search,
+    ).get("sort");
     return fromUrl && (VALID_SORTS as readonly string[]).includes(fromUrl)
       ? (fromUrl as HomeSort)
       : "default";
@@ -536,6 +542,8 @@ export default function Home({ nav, navLoading }: HomeProps) {
   });
 
   const corpusFilterActive = selectedTags.length > 0 || selectedKind !== null;
+  const showFilters =
+    selectedTags.length > 0 || sortBy !== "default" || currentParams.get("filters") === "1";
   const {
     data: rawCorpus,
     isLoading: corpusLoading,
@@ -554,6 +562,10 @@ export default function Home({ nav, navLoading }: HomeProps) {
   }>({
     queryKey: ["/api/tags"],
     staleTime: 1000 * 60 * 5,
+    // The default Home never renders AdvancedFilter, so fetching the full tag
+    // list there only competes with the visible Home data. Filter-bearing URLs
+    // still enable this query before the lazy control can render.
+    enabled: showFilters,
   });
 
   const {
@@ -704,8 +716,6 @@ export default function Home({ nav, navLoading }: HomeProps) {
     };
   }, [homeData, nav?.categories, nav?.totalResources, navCategories.length]);
 
-  const showFilters =
-    selectedTags.length > 0 || sortBy !== "default" || currentParams.get("filters") === "1";
   const filters = showFilters ? (
     <Suspense fallback={<FilterControlsFallback />}>
       <AdvancedFilter

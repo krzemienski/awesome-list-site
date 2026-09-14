@@ -1,0 +1,88 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "createdAt": "2026-09-13T22:27:30.492Z",
+  "invocations": [
+    {
+      "startedAt": "2026-09-13T22:27:30.492Z",
+      "command": "node scripts/validation/production-baseline-capture.mjs --base http://127.0.0.1:5101 --out docs/parity/evidence/integration-shell/retained-controls/authorized-lighthouse/faithful-prerender --only lighthouse --lighthouse-routes / --max-navigations 1 --allow-dev-clerk-bootstrap-from-build dist/public",
+      "base": "http://127.0.0.1:5101",
+      "outDir": "docs/parity/evidence/integration-shell/retained-controls/authorized-lighthouse/faithful-prerender",
+      "toolCommit": "687a7674eb0bc8a54d56426df1660fd36a018e65",
+      "tools": {
+        "node": "v20.20.0",
+        "playwright": "1.61.1",
+        "axeCore": "4.13.0",
+        "axePlaywright": "4.13.0",
+        "lighthouse": "12.8.2",
+        "sharp": "0.33.5",
+        "pixelmatch": "7.1.0",
+        "chromium": "chromium-1223",
+        "chromiumVersion": "148.0.7778.96"
+      },
+      "phases": [
+        "lighthouse"
+      ],
+      "routesRequested": [
+        "/",
+        "/categories",
+        "/category/encoding-codecs",
+        "/category/community-events?page=2",
+        "/subcategory/community-groups",
+        "/sub-subcategory/ffmpeg",
+        "/resource/185020",
+        "/resource/186190",
+        "/about",
+        "/submit",
+        "/search?q=ffmpeg",
+        "/search?q=zzqxv-nothing",
+        "/advanced",
+        "/journeys",
+        "/journey/7",
+        "/tag/open-source",
+        "/settings/theme",
+        "/recommendations",
+        "/design-system",
+        "/terms",
+        "/privacy",
+        "/code-of-conduct",
+        "/sign-in",
+        "/this-route-does-not-exist",
+        "/sitemap.xml",
+        "/robots.txt"
+      ],
+      "lighthouseRoutesRequested": [
+        "/"
+      ],
+      "readOnlyAuthInitialization": {
+        "kind": "development-clerk-initialization",
+        "allowedKinds": [
+          "development-clerk-dev-browser-bootstrap",
+          "development-clerk-environment-initialization"
+        ],
+        "compiledBuild": "dist/public",
+        "allowedHost": "gorgeous-jennet-4.clerk.accounts.dev"
+      },
+      "maxNavigations": 1,
+      "force": false,
+      "browserGuard": {
+        "continued": 41,
+        "blocked": 1,
+        "sample": [
+          {
+            "method": "POST",
+            "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0",
+            "resourceType": "XHR"
+          }
+        ],
+        "allowedAuthInitializations": []
+      },
+      "finishedAt": "2026-09-13T22:27:56.131Z",
+      "durationSeconds": 26,
+      "navigations": 1,
+      "stoppedByBudget": false,
+      "routes": [],
+      "throttled": [],
+      "failures": []
+    }
+  ]
+}

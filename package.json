@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "export BUILD_REVISION=\"${BUILD_REVISION:-$(git rev-parse HEAD 2>/dev/null)}\" && if [ -z \"$BUILD_REVISION\" ]; then echo 'BUILD_REVISION is required when git metadata is unavailable' >&2; exit 1; fi && vite build && esbuild server/index.ts --platform=node --packages=external --external:./vite-dev --bundle --format=esm --outdir=dist --define:process.env.BUILD_REVISION=\"$(node -p 'JSON.stringify(process.env.BUILD_REVISION)')\"",
+    "build": "export BUILD_REVISION=\"${BUILD_REVISION:-$(git rev-parse HEAD 2>/dev/null)}\" && if [ -z \"$BUILD_REVISION\" ]; then echo 'BUILD_REVISION is required when git metadata is unavailable' >&2; exit 1; fi && vite build && vite build --ssr src/entry-server.tsx --outDir ../dist/ssr --emptyOutDir false && esbuild server/index.ts --platform=node --packages=external --external:./vite-dev --bundle --format=esm --outdir=dist --define:process.env.BUILD_REVISION=\"$(node -p 'JSON.stringify(process.env.BUILD_REVISION)')\"",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push",
@@ -38,6 +38,7 @@
     "bundle:budget": "node scripts/validation/bundle-budget.mjs --check",
     "perf:serve": "node scripts/validation/serve-performance-build.mjs",
     "perf:mobile": "node scripts/validation/mobile-performance-audit.mjs",
+    "perf:lighthouse:normal": "node scripts/validation/normal-lighthouse.mjs",
     "digest:dispatch": "tsx scripts/run-digest-dispatch.ts",
     "audit:sidebar": "bash scripts/audit-sidebar.sh",
     "check:awesome-bot": "bash scripts/check-awesome-bot.sh",

@@ -58,7 +58,9 @@ export function useContactConfig(enabled = contactVariant !== null) {
   return useQuery<ContactPublicConfig>({
     queryKey: ["/api/config"],
     queryFn: () => apiRequest("/api/config", { method: "GET" }),
-    enabled,
+    // Contact configuration is client-only. It is intentionally not part of
+    // the bounded anonymous Home SSR payload.
+    enabled: enabled && typeof window !== "undefined",
     staleTime: 5 * 60 * 1000,
   });
 }

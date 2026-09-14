@@ -1,0 +1,46 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "preset": "mobile",
+  "categories": [
+    "performance",
+    "accessibility",
+    "best-practices",
+    "seo"
+  ],
+  "routes": {
+    "/": {
+      "scores": {
+        "performance": 0.57,
+        "accessibility": 0.98,
+        "best-practices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 3186,
+        "largestContentfulPaintMs": 3553,
+        "totalBlockingTimeMs": 1811,
+        "cumulativeLayoutShift": 0.001386,
+        "speedIndexMs": 3186,
+        "interactiveMs": 5681
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-13T22:09:01.516Z",
+      "finalDisplayedUrl": "http://127.0.0.1:5101/",
+      "formFactor": "mobile",
+      "requestCount": 23,
+      "blockedRequests": [],
+      "allowedAuthInitializations": [
+        {
+          "kind": "development-clerk-dev-browser-bootstrap",
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0"
+        }
+      ],
+      "blockedWebSockets": [],
+      "blockedWorkers": [],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "reportFile": "home.json"
+    }
+  }
+}

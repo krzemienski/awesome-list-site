@@ -358,7 +358,7 @@ export default function AdminDashboard() {
           <Button variant="ghost" data-testid="tab-journeys" onClick={() => handleTabChange("journeys")}>Journeys</Button>
           {activeTab === "journeys"
             ? <div data-testid="content-journeys"><ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary></div>
-            : <ErrorBoundary label="Research tab"><ResearcherTab /></ErrorBoundary>}
+            : <ErrorBoundary label="Research tab"><ResearcherTab initialTab="review" /></ErrorBoundary>}
         </TabsContent>
       </Tabs>
     </div>

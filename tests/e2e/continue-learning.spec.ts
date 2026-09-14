@@ -1,16 +1,8 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
-import { eq, sql } from 'drizzle-orm';
+import { expect, type APIRequestContext, type Page } from '@playwright/test';
+import { eq } from 'drizzle-orm';
 import { db, pool } from '../../server/db';
-import {
-  journeySteps,
-  learningJourneys,
-  resourceAuditLog,
-  sessions,
-  users,
-} from '../../shared/schema';
-
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
-const PASSWORD = 'QA!Continue2026#';
+import { journeySteps, learningJourneys } from '../../shared/schema';
+import { task549Test as test } from './task549-admin-fixtures';
 
 type Step = {
   id: number;
@@ -43,12 +35,14 @@ async function findGroupedJourney(page: Page): Promise<{
   completedGroupIndex: number;
   resourceId: number;
 }> {
-  const listResponse = await page.request.get('/api/journeys');
+  const listResponse = await page.request.get(new URL('/api/journeys', page.url()).toString());
   await expectOk(listResponse, 'list journeys');
   const list = (await listResponse.json()) as JourneyListItem[];
 
   for (const candidate of list.filter((item) => item.stepCount >= 2).slice(0, 20)) {
-    const response = await page.request.get(`/api/journeys/${candidate.id}`);
+    const response = await page.request.get(
+      new URL(`/api/journeys/${candidate.id}`, page.url()).toString(),
+    );
     if (!response.ok()) continue;
     const journey = (await response.json()) as Journey;
     const byStepNumber = new Map<number, Step[]>();
@@ -66,7 +60,9 @@ async function findGroupedJourney(page: Page): Promise<{
     if (completedGroupIndex < 0) continue;
 
     for (const step of journey.steps) {
-      const resourceResponse = await page.request.get(`/api/resources/${step.resourceId}`);
+      const resourceResponse = await page.request.get(
+        new URL(`/api/resources/${step.resourceId}`, page.url()).toString(),
+      );
       if (resourceResponse.ok()) {
         return {
           journey,
@@ -87,63 +83,21 @@ async function write(
   path: string,
   data?: unknown,
 ) {
-  const response = await page.request[method](path, {
+  const origin = new URL(page.url()).origin;
+  const response = await page.request[method](new URL(path, origin).toString(), {
     data,
-    headers: { Origin: BASE_URL },
+    headers: { Origin: origin },
   });
   await expectOk(response, `${method.toUpperCase()} ${path}`);
   return response;
 }
 
-async function registerAndLogin(page: Page): Promise<string> {
-  const email = `__qa_test_continue_learning_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`;
-  const registerResponse = await page.request.post('/api/auth/register', {
-    data: { email, password: PASSWORD },
-    headers: { Origin: BASE_URL },
-  });
-  await expectOk(registerResponse, 'register QA user');
-  const userId = ((await registerResponse.json()) as { id: string }).id;
-  await write(page, 'post', '/api/auth/local/login', {
-    email,
-    password: PASSWORD,
-  });
-  return userId;
-}
-
 test.describe.serial('Continue Learning permanent journey', () => {
   test.setTimeout(120_000);
 
-  let qaUserId: string | null = null;
   let qaJourneyId: number | null = null;
 
   test.afterEach(async () => {
-    if (qaUserId) {
-      const userId = qaUserId;
-      qaUserId = null;
-
-      // Audit rows use SET NULL on user deletion, so remove them first while
-      // the QA actor is still identifiable. Progress and interactions cascade
-      // with the user. Session JSON has no FK and needs targeted cleanup.
-      await db.delete(resourceAuditLog).where(eq(resourceAuditLog.performedBy, userId));
-      await db.delete(sessions).where(
-        sql`${sessions.sess}::text LIKE ${`%${userId}%`}`,
-      );
-      await db.delete(users).where(eq(users.id, userId));
-
-      const [remainingUser, remainingSession, remainingAudit] = await Promise.all([
-        db.select({ id: users.id }).from(users).where(eq(users.id, userId)),
-        db.select({ sid: sessions.sid }).from(sessions).where(
-          sql`${sessions.sess}::text LIKE ${`%${userId}%`}`,
-        ),
-        db.select({ id: resourceAuditLog.id }).from(resourceAuditLog).where(
-          eq(resourceAuditLog.performedBy, userId),
-        ),
-      ]);
-      expect(remainingUser).toHaveLength(0);
-      expect(remainingSession).toHaveLength(0);
-      expect(remainingAudit).toHaveLength(0);
-    }
-
     if (qaJourneyId) {
       const journeyId = qaJourneyId;
       qaJourneyId = null;
@@ -161,25 +115,24 @@ test.describe.serial('Continue Learning permanent journey', () => {
   });
 
   test('deduplicates resources, resumes the next grouped step, and records a milestone', async ({
-    page,
+    page: anonymousPage,
+    task549UserPage: page,
   }) => {
     const privateSummaryRequests: string[] = [];
-    page.on('request', (request) => {
+    anonymousPage.on('request', (request) => {
       if (new URL(request.url()).pathname === '/api/user/continue-learning') {
         privateSummaryRequests.push(request.url());
       }
     });
 
-    await page.goto('/continue-learning');
-    await expect(page.getByTestId('continue-learning-sign-in')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
-    await expect(page).toHaveTitle('Continue Learning — Awesome Video');
+    await anonymousPage.goto('/continue-learning');
+    await expect(anonymousPage.getByTestId('continue-learning-sign-in')).toBeVisible();
+    await expect(anonymousPage.getByRole('link', { name: 'Sign in' })).toBeVisible();
+    await expect(anonymousPage).toHaveTitle('Continue Learning — Awesome Video');
     await expect(
-      page.getByRole('navigation', { name: 'breadcrumb' }),
+      anonymousPage.getByRole('navigation', { name: 'breadcrumb' }),
     ).toContainText('Continue Learning');
     expect(privateSummaryRequests).toHaveLength(0);
-
-    qaUserId = await registerAndLogin(page);
 
     await page.goto('/continue-learning');
     await expect(page.getByRole('heading', { level: 1, name: 'Continue Learning' })).toBeVisible();
@@ -233,7 +186,10 @@ test.describe.serial('Continue Learning permanent journey', () => {
 
     // Compact signed-in modules reuse this same summary without duplicating
     // progress state.
-    await page.goto('/');
+    // The canonical Home index intentionally keeps account-only modules out of
+    // its default geometry. Use the explicit account context documented by
+    // Home.tsx instead of weakening the preview assertion.
+    await page.goto('/?context=account');
     await expect(page.getByTestId('continue-learning-preview')).toBeVisible();
     await page.goto('/profile');
     await expect(page.getByTestId('continue-learning-preview')).toBeVisible();
@@ -270,8 +226,9 @@ test.describe.serial('Continue Learning permanent journey', () => {
   });
 
   test('keeps mixed and all-optional grouped-step completion consistent', async ({
-    page,
+    task549UserPage: page,
   }) => {
+    await page.goto('/');
     const resourceResult = await pool.query<{ id: number }>(
       `SELECT id FROM resources WHERE status = 'approved' ORDER BY id LIMIT 4`,
     );
@@ -333,7 +290,6 @@ test.describe.serial('Continue Learning permanent journey', () => {
         isOptional: journeySteps.isOptional,
       });
 
-    qaUserId = await registerAndLogin(page);
     await write(page, 'post', `/api/journeys/${journey.id}/start`);
 
     const requiredMixedRow = insertedSteps.find(

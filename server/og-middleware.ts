@@ -814,7 +814,7 @@ function homeShellChrome(): string {
   // meta (noindex) instead of a soft-404. The section list mirrors
   // AdminDashboard's tab ids; unknown sections still fall through to 404.
   const adminSectionMatch = path.match(
-    /^\/admin\/(approvals|edits|enrichment|researcher|export|database|resources|categories|subcategories|subsubcategories|journeys|users|github|linkhealth|audit)$/,
+    /^\/admin\/(approvals|edits|enrichment|research|researcher|export|database|resources|categories|subcategories|subsubcategories|journeys|users|github|linkhealth|audit)$/,
   );
   const staticKey = adminSectionMatch ? "/admin" : path;
   if (staticRoutes[staticKey]) {
@@ -2467,8 +2467,19 @@ export function ogInjectionMiddleware() {
           return (origEnd as any)(buf, ...args);
         } catch (e) {
           console.warn("[og-middleware] rewrite failed", e);
-          // Fall through with original concatenated bytes
-          return (origEnd as any)(Buffer.concat(chunks), ...args);
+          // The security middleware has already issued a nonce-based CSP.
+          // Even when metadata rewriting fails, return a body whose inline
+          // boot scripts/styles carry that request's nonce rather than an
+          // otherwise healthy SPA that cannot execute its own bootstrap.
+          const fallback = Buffer.concat(chunks).toString("utf-8");
+          const cspNonce = String((res.locals as any)?.cspNonce || "");
+          const stamped = cspNonce ? stampNonce(fallback, cspNonce) : fallback;
+          const buf = Buffer.from(stamped, "utf-8");
+          res.setHeader("content-length", buf.length);
+          res.removeHeader("etag");
+          res.removeHeader("last-modified");
+          res.setHeader("Cache-Control", "no-store");
+          return (origEnd as any)(buf, ...args);
         }
       }
       // Task #327: HEAD responses for HTML documents carry no body chunks, so

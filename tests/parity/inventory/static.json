@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "kind": "family",
   "family": "static",
-  "summary": "About, Submit, legal and the in-app design-system showcase.",
+  "summary": "About, Submit and legal routes. The in-app design-system showcase is covered once by the token-only-system family.",
   "screens": [
     {
       "id": "app.about",
@@ -32,13 +32,6 @@
       "eligibility": "token-only",
       "actualPath": "/terms",
       "reason": "The reference has no legal pages; verified through prose tokens instead of pixels."
-    },
-    {
-      "id": "app.design-system",
-      "kind": "app",
-      "eligibility": "blocked",
-      "actualPath": "/design-system",
-      "reason": "The application showcase is distinct from the registered artifact baseline (artifact.showcase covers the design-system page)."
     }
   ]
 }

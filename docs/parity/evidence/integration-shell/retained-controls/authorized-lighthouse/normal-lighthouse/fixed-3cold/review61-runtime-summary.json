@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "kind": "production-home-ssr-critical-review-runtime-summary",
+  "base": "http://127.0.0.1:5105/",
+  "validation": {
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "bundleBudget": "passed"
+  },
+  "focusedBrowserChecks": [
+    {
+      "name": "anonymous-auth-bootstrap",
+      "passed": true,
+      "assertions": [
+        "/api/auth/user was absent from dehydrated state",
+        "the anonymous browser made a fresh /api/auth/user request after hydration"
+      ]
+    },
+    {
+      "name": "legacy-consent-reopen",
+      "passed": true,
+      "assertions": [
+        "legacy denied consent was reconciled and removed the prepaint marker",
+        "Footer Cookie settings reopened a visible consent banner"
+      ]
+    },
+    {
+      "name": "legacy-curated-timeout",
+      "passed": true,
+      "assertions": [
+        "with all app JavaScript assets deliberately aborted, the prepaint layout marker was removed within 4 seconds"
+      ]
+    },
+    {
+      "name": "theme-hydration",
+      "passed": true,
+      "assertions": [
+        "a persisted ds-system value produced no console, page, or hydration errors"
+      ]
+    },
+    {
+      "name": "csp-clerk-origin",
+      "passed": true,
+      "assertions": [
+        "CSP contained no wildcard Clerk tenant source",
+        "the configured development FAPI source was permitted without printing configuration values"
+      ]
+    }
+  ],
+  "notes": [
+    "No new Lighthouse run was made; the retained normal Lighthouse evidence remains a failing median 0.68 against the required 0.82 threshold.",
+    "No authenticated test session or secrets were requested. The first non-null Clerk listener invalidation is covered by the production code path, while the runtime probe verified the fresh anonymous auth boundary."
+  ]
+}

@@ -383,7 +383,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           <p className="admin-ops-export-card__description">
             Flat resource table for spreadsheet workflows.
           </p>
-          <div className="admin-ops-export-card__availability">
+          <div className="eyebrow admin-ops-export-card__availability">
             <StatusChip status="Unavailable" />
             <span className="sr-only">No supported admin endpoint is available.</span>
           </div>
@@ -433,7 +433,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             </div>
             <h3 className="admin-ops-export-card__title">{format.title}</h3>
             <p className="admin-ops-export-card__description">{format.description}</p>
-            <div className="admin-ops-export-card__availability">
+            <div className="eyebrow admin-ops-export-card__availability">
               <StatusChip status="Unavailable" />
               <span className="sr-only">No supported admin endpoint is available.</span>
             </div>

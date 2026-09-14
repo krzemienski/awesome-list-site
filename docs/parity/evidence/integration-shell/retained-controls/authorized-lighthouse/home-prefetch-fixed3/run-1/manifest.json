@@ -1,0 +1,74 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "createdAt": "2026-09-14T02:01:34.768Z",
+  "invocations": [
+    {
+      "startedAt": "2026-09-14T02:01:34.768Z",
+      "command": "node scripts/validation/production-baseline-capture.mjs --base http://127.0.0.1:5101 --out docs/parity/evidence/integration-shell/retained-controls/authorized-lighthouse/home-prefetch-fixed3/run-1 --only lighthouse --lighthouse-routes / --trace-summary --max-navigations 1",
+      "base": "http://127.0.0.1:5101",
+      "outDir": "docs/parity/evidence/integration-shell/retained-controls/authorized-lighthouse/home-prefetch-fixed3/run-1",
+      "toolCommit": "cbc4b6f4f2bd43637219f0f9e33e7ddc34cef10f",
+      "tools": {
+        "node": "v20.20.0",
+        "playwright": "1.61.1",
+        "axeCore": "4.13.0",
+        "axePlaywright": "4.13.0",
+        "lighthouse": "12.8.2",
+        "sharp": "0.33.5",
+        "pixelmatch": "7.1.0",
+        "chromium": "chromium-1223",
+        "chromiumVersion": "148.0.7778.96"
+      },
+      "phases": [
+        "lighthouse"
+      ],
+      "routesRequested": [
+        "/",
+        "/categories",
+        "/category/encoding-codecs",
+        "/category/community-events?page=2",
+        "/subcategory/community-groups",
+        "/sub-subcategory/ffmpeg",
+        "/resource/185020",
+        "/resource/186190",
+        "/about",
+        "/submit",
+        "/search?q=ffmpeg",
+        "/search?q=zzqxv-nothing",
+        "/advanced",
+        "/journeys",
+        "/journey/7",
+        "/tag/open-source",
+        "/settings/theme",
+        "/recommendations",
+        "/design-system",
+        "/terms",
+        "/privacy",
+        "/code-of-conduct",
+        "/sign-in",
+        "/this-route-does-not-exist",
+        "/sitemap.xml",
+        "/robots.txt"
+      ],
+      "lighthouseRoutesRequested": [
+        "/"
+      ],
+      "maxNavigations": 1,
+      "force": false,
+      "traceSummary": true,
+      "browserGuard": {
+        "continued": 38,
+        "blocked": 0,
+        "sample": [],
+        "allowedAuthInitializations": []
+      },
+      "finishedAt": "2026-09-14T02:02:00.445Z",
+      "durationSeconds": 26,
+      "navigations": 1,
+      "stoppedByBudget": false,
+      "routes": [],
+      "throttled": [],
+      "failures": []
+    }
+  ]
+}

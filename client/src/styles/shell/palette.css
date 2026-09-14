@@ -1,7 +1,7 @@
 .search-palette-overlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 200;
   /* DS-OK: frozen styles.css .modal-backdrop uses a fixed black 70% scrim across systems. */
   background: rgb(0 0 0 / 70%);
   backdrop-filter: blur(4px);
@@ -9,7 +9,7 @@
 
 .search-palette {
   position: fixed;
-  z-index: 50;
+  z-index: 200;
   top: 12vh;
   left: 50%;
   display: grid;
@@ -75,6 +75,11 @@
   overflow: visible;
 }
 
+/* The frozen initial Jump To heading has no enclosing group top inset. */
+.search-palette-default-jump-group {
+  padding-top: 2px;
+}
+
 .search-palette-group [cmdk-group-heading] {
   padding: 10px 12px 4px;
   color: var(--text-3);
@@ -98,6 +103,9 @@
   color: var(--text-2);
   cursor: pointer;
   font: inherit;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  line-height: normal;
   text-align: left;
   transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
 }
@@ -138,6 +146,10 @@
   height: 11px;
 }
 
+.search-palette-kind-category {
+  color: var(--accent);
+}
+
 .search-palette-row[data-selected="true"] .search-palette-kind,
 .search-palette-row:hover .search-palette-kind,
 .search-palette-view-all .search-palette-kind {
@@ -172,6 +184,12 @@
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 11px;
+}
+
+/* The frozen palette's initial category and featured-resource hints inherit
+   the dialog's Inter face. Page shortcuts intentionally retain mono detail. */
+.search-palette-default-jump .search-palette-copy small {
+  font-family: inherit;
 }
 
 .search-palette-arrow {
@@ -261,8 +279,11 @@
 }
 
 .search-palette-footer .search-palette-result-count {
-  margin-left: auto;
   padding: 0;
+}
+
+.search-palette-footer-spacer {
+  flex: 1;
 }
 
 .search-palette kbd {

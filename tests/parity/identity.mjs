@@ -160,10 +160,52 @@ const pollAuthUser = async (page, predicate, timeoutMs = 60_000) => {
 };
 
 /**
+ * Make the privacy choice through the shipped UI, never by writing storage.
+ * `appBase` may be a same-host static capture shell on a different port from
+ * the API-owning setup origin; visiting it lets storageState carry the
+ * origin-specific declined choice into the strict capture context.
+ *
+ * Only the resulting boolean leaves this helper. The stored consent value and
+ * browser storage are never returned or logged.
+ */
+export async function declineAnalyticsConsentViaUi({ page, appBase }) {
+  await page.goto(`${appBase}/privacy`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  const decline = page.getByTestId("consent-decline");
+  if (!await decline.isVisible().catch(() => false)) {
+    // A prior choice hides the banner. Reopen it through the real Privacy UI
+    // rather than dispatching the app event or altering localStorage.
+    const settings = page.getByTestId("button-privacy-cookie-settings");
+    await settings.waitFor({ state: "visible", timeout: 30_000 });
+    await settings.click();
+    await decline.waitFor({ state: "visible", timeout: 30_000 });
+  }
+  await decline.click();
+  await page.getByTestId("consent-banner").waitFor({ state: "hidden", timeout: 30_000 });
+  const consentDeclined = await page.evaluate(() => {
+    try {
+      return localStorage.getItem("analytics-consent") === "denied";
+    } catch {
+      return false;
+    }
+  });
+  if (!consentDeclined) {
+    throw new Error("Analytics consent decline was not persisted after the real consent UI action");
+  }
+  return consentDeclined;
+}
+
+/**
  * Create the disposable admin, sign in, promote, and return a handle whose
  * `storageState()` yields a fresh session for a new browser context.
  */
-export async function createDisposableAdmin({ browser, appBase, secretKey, auditKey, log = () => {} }) {
+export async function createDisposableAdmin({
+  browser,
+  appBase,
+  secretKey,
+  auditKey,
+  log = () => {},
+  onPage = undefined,
+}) {
   const suffix = `${Date.now().toString(36)}${crypto.randomBytes(3).toString("hex")}`;
   const bridgeId = String(QA_BRIDGE_ID_FLOOR + crypto.randomInt(0, QA_BRIDGE_ID_CEILING - QA_BRIDGE_ID_FLOOR + 1));
   const email = `${QA_PREFIX}${suffix}${CLERK_TEST_EMAIL_DOMAIN}`;
@@ -221,6 +263,7 @@ export async function createDisposableAdmin({ browser, appBase, secretKey, audit
   };
   try {
     const page = await authContext.newPage();
+    if (onPage) await onPage(page);
     await page.goto(`${appBase}/sign-in`, { waitUntil: "domcontentloaded", timeout: 60_000 });
     await signInWithClerk(page, email, password);
     const authUser = await pollAuthUser(page, (state) => state?.isAuthenticated === true);

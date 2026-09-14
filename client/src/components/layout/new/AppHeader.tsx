@@ -3,7 +3,6 @@ import { Bookmark, Bell, Settings, User, LogOut, LogIn, Palette, Shield } from "
 import { useQuery } from "@tanstack/react-query";
 import { useGuestBookmarkIds } from "@/lib/guestBookmarks";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useTheme } from "@/hooks/use-theme";
 import type { useAuth } from "@/hooks/useAuth";
 import type { AwesomeListNavNode } from "@/lib/static-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,7 +35,6 @@ function SearchIcon() {
 
 export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, categories = [] }: AppHeaderProps) {
   const [location, navigate] = useLocation();
-  const { systemId } = useTheme();
   const guestSavedCount = useGuestBookmarkIds().size;
   const { data: notificationState } = useQuery<{ unreadCount: number }>({
     queryKey: ["/api/notifications?limit=50"],
@@ -56,7 +54,13 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
     navigate(skipNext ? "/sign-in" : `/sign-in?redirect_url=${encodeURIComponent(here)}`);
   };
   const navLink = (href: string, label: string) => (
-    <Link href={href} className={`nav-link${location === href || (href === "/categories" && location === "/") ? " active" : ""}`} aria-current={location === href ? "page" : undefined}>{label}</Link>
+    <Link
+      href={href}
+      className={`nav-link${location === href || (href === "/categories" && location === "/") ? " active" : ""}`}
+      aria-current={location === href || (href === "/categories" && location === "/") ? "page" : undefined}
+    >
+      {label}
+    </Link>
   );
 
   return <>
@@ -82,7 +86,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
         {navLink("/submit", "Submit")}
         {navLink("/about", "About")}
         <a className="nav-link" href="/design-system" target="_blank" rel="noopener noreferrer">Docs ↗</a>
-        {user?.role === "admin" && <Link href="/admin" className={`nav-link${location.startsWith("/admin") ? " active" : ""}`}>Admin<span className="header-live-dot" aria-hidden="true" /></Link>}
+        {user?.role === "admin" && <Link href="/admin" className={`nav-link${location.startsWith("/admin") ? " active" : ""}`} aria-current={location.startsWith("/admin") ? "page" : undefined}>Admin<span className="header-live-dot" aria-hidden="true" /></Link>}
       </nav>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
@@ -115,7 +119,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, logoutError, c
           {!user && guestSavedCount > 0 && <DropdownMenuItem onSelect={() => navigate("/bookmarks")} data-testid="button-guest-saved" aria-label={`Saved resources, ${guestSavedCount} on this device`}>
             <Bookmark className="mr-2 h-4 w-4" />Saved resources <span className="ml-auto" data-testid="badge-guest-saved-count">{guestSavedCount > 99 ? "99+" : guestSavedCount}</span>
           </DropdownMenuItem>}
-          <DropdownMenuItem onSelect={() => navigate("/settings/theme")} aria-label="Theme Settings" title={`Current design: ${systemId}`}><Palette className="mr-2 h-4 w-4" />Theme Settings</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => navigate("/settings/theme")} aria-label="Theme Settings" title="Theme settings"><Palette className="mr-2 h-4 w-4" />Theme Settings</DropdownMenuItem>
           {user?.role === "admin" && <DropdownMenuItem onSelect={() => navigate("/admin")}><Shield className="mr-2 h-4 w-4" />Admin</DropdownMenuItem>}
           {user && <><DropdownMenuSeparator /><DropdownMenuItem onSelect={onLogout}><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem></>}
         </DropdownMenuContent>

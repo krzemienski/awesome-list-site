@@ -37,7 +37,9 @@
 //   npm run baseline:capture -- --max-navigations 8
 //   npm run baseline:capture -- --only api,lighthouse
 //   npm run baseline:capture -- --routes /,/about --force
+//   npm run baseline:capture -- --only lighthouse --lighthouse-routes / --force
 //   npm run baseline:capture -- --base http://127.0.0.1:5000 --out /tmp/x
+//   npm run baseline:capture -- --only lighthouse --lighthouse-routes / --trace-summary --force
 //
 // Exit codes: 0 complete · 2 stopped by --max-navigations (re-run to resume)
 //             1 at least one route/endpoint failed (details in manifest.json;
@@ -62,6 +64,7 @@ import {
   inventory,
   launchBrowser,
   parseOriginUrl,
+  redactEvidenceRequest,
   readJson,
   readOnlyGuardOf,
   routeIsComplete,
@@ -71,7 +74,18 @@ import {
 } from "./production-baseline-lib.mjs";
 
 function parseArgs(argv) {
-  const args = { base: DEFAULT_BASE, out: null, date: null, routes: null, only: new Set(["routes", "api", "lighthouse"]), maxNavigations: Infinity, force: false, list: false };
+  const args = {
+    base: DEFAULT_BASE,
+    out: null,
+    date: null,
+    routes: null,
+    lighthouseRoutes: null,
+    only: new Set(["routes", "api", "lighthouse"]),
+    maxNavigations: Infinity,
+    force: false,
+    list: false,
+    traceSummary: false,
+  };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     const next = () => {
@@ -84,6 +98,7 @@ function parseArgs(argv) {
       case "--out": args.out = next(); break;
       case "--date": args.date = next(); break;
       case "--routes": args.routes = next().split(",").map((route) => route.trim()).filter(Boolean); break;
+      case "--lighthouse-routes": args.lighthouseRoutes = next().split(",").map((route) => route.trim()).filter(Boolean); break;
       case "--only": args.only = new Set(next().split(",").map((phase) => phase.trim()).filter(Boolean)); break;
       case "--max-navigations": {
         const value = Number(next());
@@ -93,6 +108,9 @@ function parseArgs(argv) {
       }
       case "--force": args.force = true; break;
       case "--list": args.list = true; break;
+      // Uses Lighthouse's already-collected default-pass trace. The raw trace
+      // never reaches disk; this only retains a sanitized task summary.
+      case "--trace-summary": args.traceSummary = true; break;
       case "--help": case "-h":
         console.log(fs.readFileSync(new URL(import.meta.url), "utf8").split("\n").filter((line) => line.startsWith("//")).map((line) => line.slice(3)).join("\n"));
         process.exit(0);
@@ -103,6 +121,13 @@ function parseArgs(argv) {
   }
   for (const phase of args.only) {
     if (!["routes", "api", "lighthouse"].includes(phase)) throw new Error(`--only accepts routes, api, lighthouse (got ${phase})`);
+  }
+  if (args.lighthouseRoutes) {
+    const known = new Set(LIGHTHOUSE_ROUTES);
+    const unknown = args.lighthouseRoutes.filter((route) => !known.has(route));
+    if (unknown.length) {
+      throw new Error(`--lighthouse-routes accepts only ${LIGHTHOUSE_ROUTES.join(", ")} (got ${unknown.join(", ")})`);
+    }
   }
   args.base = parseOriginUrl(args.base, "--base");
   if (args.date && !/^\d{4}-\d{2}-\d{2}$/.test(args.date)) throw new Error("--date must be YYYY-MM-DD");
@@ -124,7 +149,6 @@ async function main() {
   const stamp = args.date ?? todayStamp();
   const outDir = path.resolve(args.out ?? path.join(BASELINE_ROOT, stamp));
   const routes = selectRoutes(args.routes);
-
   if (args.list) {
     console.log(JSON.stringify(inventory({ base: args.base, routes }), null, 2));
     return 0;
@@ -150,8 +174,10 @@ async function main() {
     tools: toolVersions(),
     phases: [...args.only],
     routesRequested: routes.map((route) => route.path),
+    lighthouseRoutesRequested: args.lighthouseRoutes ?? LIGHTHOUSE_ROUTES,
     maxNavigations: Number.isFinite(args.maxNavigations) ? args.maxNavigations : null,
     force: args.force,
+    traceSummary: args.traceSummary,
   };
   console.log(`Production baseline capture → ${invocation.outDir}`);
   console.log(`  base ${args.base} · commit ${invocation.toolCommit ?? "unknown"} · chromium ${invocation.tools.chromium} · lighthouse ${invocation.tools.lighthouse} · axe ${invocation.tools.axeCore}`);
@@ -175,7 +201,9 @@ async function main() {
   const needsBrowser = args.only.has("routes") || args.only.has("lighthouse");
   if (needsBrowser) {
     const port = args.only.has("lighthouse") ? await freePort() : null;
-    const browser = await launchBrowser("production-baseline-capture", { remoteDebuggingPort: port });
+    const browser = await launchBrowser("production-baseline-capture", {
+      remoteDebuggingPort: port,
+    });
     invocation.tools.chromiumVersion = browser.version();
     try {
       if (args.only.has("routes")) {
@@ -216,8 +244,9 @@ async function main() {
             outDir,
             browser,
             port,
-            routes: LIGHTHOUSE_ROUTES,
+            routes: args.lighthouseRoutes ?? LIGHTHOUSE_ROUTES,
             force: args.force,
+            traceSummary: args.traceSummary,
             telemetry,
             budget,
           });
@@ -232,7 +261,8 @@ async function main() {
       invocation.browserGuard = {
         continued: guard.continued,
         blocked: guard.blocked.length,
-        sample: guard.blocked.slice(0, 25),
+        sample: guard.blocked.slice(0, 25).map(redactEvidenceRequest),
+        allowedAuthInitializations: guard.allowedAuthInitializations.map(redactEvidenceRequest),
       };
       if (guard.blocked.length) console.warn(`  browser guard refused ${guard.blocked.length} non-safe request(s) across all targets`);
       await browser.close();

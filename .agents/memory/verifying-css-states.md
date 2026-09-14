@@ -36,3 +36,30 @@ description: How to reliably confirm interactive states render, and why getCompu
   You cannot measure fractional border widths through computed style. Prove the rule
   applied via a sibling declaration from the SAME rule (border-color, text-transform)
   plus an inline-probe baseline showing the measurement channel itself floors.
+
+## Geometry diagnosis before repeated pixel captures
+
+**Rule:** After a failed geometry correction, compare settled rectangles and
+computed styles for both the container and its children, not just declarations.
+
+**Why:** Matching parent styles can conceal child margins, inline formatting
+line boxes, and native-button defaults that differ from a reset React control.
+Repeated screenshot-driven nudges left cumulative vertical offsets unresolved;
+matched-element measurements isolated them directly.
+
+**How to apply:** Measure both sides on an unchanged checkout, include child
+margins/font/line-height and effective padding, then fix the winning cascade.
+Use full union screenshots to verify the coherent change, not to guess each
+individual spacing adjustment.
+
+**Rule:** Matching font files, size and weight is not sufficient when replacing
+native buttons with links or custom controls; compare effective font-feature
+and variation settings as well.
+
+**Why:** Chromium's native-button font shorthand reset OpenType features to
+normal, while reset-styled links inherited alternate body features. This
+changed glyph shapes and wrapping despite otherwise matching typography.
+
+**How to apply:** Probe both element types before changing spacing. Reset only
+the proven equivalents; native div-based rows and explicit mono children may
+correctly retain inherited features.

@@ -1,0 +1,15 @@
+{
+  "REPORT.md": "c6a757cb045db5a217563746483e5c84db5b2a0fb2048e998e39fe95c044cb55",
+  "actual/app.shell.mobile-drawer-375.attempt-1.png": "16b3cf7c77dfe16bd8fb499f76465a1ae7a31a01109b4f23244016004352f9a2",
+  "actual/app.shell.mobile-drawer-375.attempt-2.png": "436c61358befd7b4074955320325dca791b7061111e15be5e25c96e5cc0c4306",
+  "actual/app.shell.mobile-drawer-375.attempt-3.png": "436c61358befd7b4074955320325dca791b7061111e15be5e25c96e5cc0c4306",
+  "actual/app.shell.mobile-drawer-375.png": "436c61358befd7b4074955320325dca791b7061111e15be5e25c96e5cc0c4306",
+  "actual/app.shell.mobile-drawer-375.repeat.png": "436c61358befd7b4074955320325dca791b7061111e15be5e25c96e5cc0c4306",
+  "diff/app.shell.mobile-drawer-375.png": "8a8d3389eabf7c6016d2d2bc7a51527e8eee26e2f0776722f8669224e2c4e015",
+  "expected/app.shell.mobile-drawer-375.attempt-1.png": "9a4d10d6317dca9d6b947d271ae66343f590b6a7f335c14b24b81391cdb34e93",
+  "expected/app.shell.mobile-drawer-375.attempt-2.png": "9a4d10d6317dca9d6b947d271ae66343f590b6a7f335c14b24b81391cdb34e93",
+  "expected/app.shell.mobile-drawer-375.png": "9a4d10d6317dca9d6b947d271ae66343f590b6a7f335c14b24b81391cdb34e93",
+  "expected/app.shell.mobile-drawer-375.repeat.png": "9a4d10d6317dca9d6b947d271ae66343f590b6a7f335c14b24b81391cdb34e93",
+  "font-gaps.md": "947bd2799641815bab09c42af7243aeea5362f97825ae7a6f1847f57b56fc64a",
+  "results.json": "9c43cbb713776a7499368170447971c2c9797facce509ca33aeb01c27f1860db"
+}

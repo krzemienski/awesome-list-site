@@ -1,0 +1,93 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "createdAt": "2026-09-13T21:28:22.221Z",
+  "invocations": [
+    {
+      "startedAt": "2026-09-13T21:28:22.221Z",
+      "command": "node scripts/validation/production-baseline-capture.mjs --base http://127.0.0.1:5101 --out /tmp/task565-authorized-lighthouse --only lighthouse --lighthouse-routes / --allow-dev-clerk-bootstrap-from-build dist/public --force",
+      "base": "http://127.0.0.1:5101",
+      "outDir": "../../../tmp/task565-authorized-lighthouse",
+      "toolCommit": "a1f4226c60d0d79d7e3718cb7c3b09c4837231da",
+      "tools": {
+        "node": "v20.20.0",
+        "playwright": "1.61.1",
+        "axeCore": "4.13.0",
+        "axePlaywright": "4.13.0",
+        "lighthouse": "12.8.2",
+        "sharp": "0.33.5",
+        "pixelmatch": "7.1.0",
+        "chromium": "chromium-1223",
+        "chromiumVersion": "148.0.7778.96"
+      },
+      "phases": [
+        "lighthouse"
+      ],
+      "routesRequested": [
+        "/",
+        "/categories",
+        "/category/encoding-codecs",
+        "/category/community-events?page=2",
+        "/subcategory/community-groups",
+        "/sub-subcategory/ffmpeg",
+        "/resource/185020",
+        "/resource/186190",
+        "/about",
+        "/submit",
+        "/search?q=ffmpeg",
+        "/search?q=zzqxv-nothing",
+        "/advanced",
+        "/journeys",
+        "/journey/7",
+        "/tag/open-source",
+        "/settings/theme",
+        "/recommendations",
+        "/design-system",
+        "/terms",
+        "/privacy",
+        "/code-of-conduct",
+        "/sign-in",
+        "/this-route-does-not-exist",
+        "/sitemap.xml",
+        "/robots.txt"
+      ],
+      "lighthouseRoutesRequested": [
+        "/"
+      ],
+      "readOnlyAuthInitialization": {
+        "kind": "development-clerk-initialization",
+        "allowedKinds": [
+          "development-clerk-dev-browser-bootstrap",
+          "development-clerk-environment-initialization"
+        ],
+        "compiledBuild": "dist/public",
+        "allowedHost": "gorgeous-jennet-4.clerk.accounts.dev"
+      },
+      "maxNavigations": null,
+      "force": true,
+      "browserGuard": {
+        "continued": 48,
+        "blocked": 0,
+        "sample": [],
+        "allowedAuthInitializations": [
+          {
+            "kind": "development-clerk-dev-browser-bootstrap",
+            "method": "POST",
+            "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0"
+          },
+          {
+            "kind": "development-clerk-environment-initialization",
+            "method": "POST",
+            "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&_method=PATCH&__clerk_db_jwt=%5BREDACTED%5D"
+          }
+        ]
+      },
+      "finishedAt": "2026-09-13T21:31:16.821Z",
+      "durationSeconds": 175,
+      "navigations": 1,
+      "stoppedByBudget": false,
+      "routes": [],
+      "throttled": [],
+      "failures": []
+    }
+  ]
+}

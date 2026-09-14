@@ -80,7 +80,7 @@
       "eligibility": "token-only",
       "actualPath": "/design-system",
       "reason": "Internal live-token/component reference is distinct from the registered artifact and has no canonical page counterpart.",
-      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/showcase/design-system@{375,768,1024,1440}.png; focused axe zero serious/critical. Integrator must reconcile the legacy blocked app.design-system row, without changing artifact eligibility."
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/showcase/design-system@{375,768,1024,1440}.png; focused axe zero serious/critical. The legacy blocked app.design-system duplicate was removed during Task 565 integration; registered artifact eligibility is unchanged."
     }
   ]
 }

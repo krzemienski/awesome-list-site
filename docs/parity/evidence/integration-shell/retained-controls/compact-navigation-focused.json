@@ -1,0 +1,49 @@
+{
+  "rail": [
+    {
+      "id": "rail-home",
+      "href": "/",
+      "width": 44,
+      "height": 44,
+      "label": "Home"
+    },
+    {
+      "id": "rail-submit-resource",
+      "href": "/submit",
+      "width": 44,
+      "height": 44,
+      "label": "Submit Resource"
+    },
+    {
+      "id": "rail-learning-journeys",
+      "href": "/journeys",
+      "width": 44,
+      "height": 44,
+      "label": "Learning Journeys"
+    },
+    {
+      "id": "rail-advanced",
+      "href": "/advanced",
+      "width": 44,
+      "height": 44,
+      "label": "Advanced"
+    },
+    {
+      "id": "rail-theme",
+      "href": "/settings/theme",
+      "width": 44,
+      "height": 44,
+      "label": "Theme"
+    },
+    {
+      "id": "rail-about",
+      "href": "/about",
+      "width": 44,
+      "height": 44,
+      "label": "About"
+    }
+  ],
+  "accordionPreserved": true,
+  "accountHomeEntry": "http://127.0.0.1:5000/?context=account",
+  "recommendationControlsVisible": true
+}

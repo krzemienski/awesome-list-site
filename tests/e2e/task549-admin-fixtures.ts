@@ -4,6 +4,7 @@ import {
   test as base,
   type Browser,
   type BrowserContext,
+  type BrowserContextOptions,
   type Page,
 } from "@playwright/test";
 // The parity identity module is JavaScript by design: it is also consumed by
@@ -20,7 +21,7 @@ type DisposableAdmin = {
   email: string;
   localUserId: string | null;
   page: Page;
-  storageState: () => Promise<unknown>;
+  storageState: () => Promise<BrowserContextOptions["storageState"]>;
   teardown: (options?: { keepUser?: boolean }) => Promise<unknown>;
 };
 
@@ -32,6 +33,8 @@ type Task549WorkerFixtures = {
 type Task549TestFixtures = {
   task549Context: BrowserContext;
   task549Page: Page;
+  task549UserContext: BrowserContext;
+  task549UserPage: Page;
 };
 
 function requireClerkEnvironment() {
@@ -269,6 +272,34 @@ export const task549Test = base.extend<Task549TestFixtures, Task549WorkerFixture
         waitUntil: "domcontentloaded",
       });
       await waitForAdminReadiness(page, task549Admin);
+      await use(page);
+    } finally {
+      await page.close();
+    }
+  },
+
+  task549UserContext: async ({ browser, task549Secondary }, use) => {
+    // The secondary identity is deliberately demoted to an ordinary user
+    // before this context is created. Keep user-flow specs off the admin
+    // context above while reusing the real Clerk session and base origin.
+    const storageState = await task549Secondary.storageState();
+    const context = await browser.newContext({
+      baseURL: TASK549_APP_BASE,
+      locale: "en-US",
+      timezoneId: "UTC",
+      serviceWorkers: "block",
+      storageState,
+    });
+    try {
+      await use(context);
+    } finally {
+      await context.close();
+    }
+  },
+
+  task549UserPage: async ({ task549UserContext }, use) => {
+    const page = await task549UserContext.newPage();
+    try {
       await use(page);
     } finally {
       await page.close();

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "kind": "production-home-ssr-browser-hydration-summary",
+  "base": "http://127.0.0.1:5105/",
+  "browser": {
+    "playwrightVersion": "1.61.1",
+    "chromiumVersion": "148.0.7778.96",
+    "headless": true
+  },
+  "results": [
+    {
+      "scenario": "anonymous-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "passed": true,
+      "assertions": [
+        "exact Home SSR bootstrap was present before hydration",
+        "anonymous auth was deliberately excluded from dehydrated state and fetched fresh from /api/auth/user after hydration",
+        "full sidebar category link navigated to its actual href",
+        "the header account menu Sign in action navigated to /sign-in",
+        "no hydration, server-HTML, unprefetched-query, fallback, console, or page errors were observed"
+      ]
+    },
+    {
+      "scenario": "anonymous-phone",
+      "viewport": {
+        "width": 375,
+        "height": 667
+      },
+      "passed": true,
+      "assertions": [
+        "SSR boot viewport was phone and sidebar was initially closed",
+        "hydrated Home category list rendered",
+        "no hydration, server-HTML, unprefetched-query, fallback, console, or page errors were observed"
+      ]
+    },
+    {
+      "scenario": "legacy-layout-and-consent",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "storage": {
+        "awesome-video-home-layout": "curated",
+        "analytics-consent": "denied"
+      },
+      "passed": true,
+      "assertions": [
+        "prepaint layout and consent markers were applied",
+        "the consent banner was hidden before first paint",
+        "the final hydrated Home layout was curated",
+        "prepaint layout marker and consent banner were removed after reconciliation",
+        "no hydration, server-HTML, unprefetched-query, fallback, console, or page errors were observed"
+      ]
+    },
+    {
+      "scenario": "synthetic-session-cookie",
+      "passed": true,
+      "assertions": [
+        "a non-authentic synthetic __session cookie did not receive the exact Home SSR marker"
+      ]
+    }
+  ]
+}

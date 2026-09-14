@@ -59,7 +59,7 @@ export default function AppFooter({ nav, site }: {
             <Link href="/terms" data-testid="footer-terms">Terms</Link>
             <Link href="/privacy" data-testid="footer-privacy">Privacy</Link>
             <Link href="/code-of-conduct" data-testid="footer-code-of-conduct">Code of Conduct</Link>
-            <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings">Cookie settings</button>
+            <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings" className="footer-cookie-settings">Cookie settings</button>
           </Column>
           <Column title="SOURCE">
             <ExternalLink href={repo} testId="footer-github">{repo.replace(/^https?:\/\/(www\.)?github\.com\//, "")} ↗</ExternalLink>

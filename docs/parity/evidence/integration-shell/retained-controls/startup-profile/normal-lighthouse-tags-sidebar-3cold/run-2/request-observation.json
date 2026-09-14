@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "binding": {
+    "sourceTrackedTreeSha256": "a3b5e914f33b2e2ef7271929e2acea93d46e1fb79796f4f5c78d0a58913785c2",
+    "sourceDirtyPatchSha256": "3d03c274ef0f41d83bb3477ccff76b45ec7fcac12cdd8a52abd0b0e483ac35e2",
+    "sourceUntrackedTreeSha256": "c21efa6595e917050b7313a27b7a870626c26a38e1d99b6c742e212207fa7ce0",
+    "buildTreeSha256": "2fe258eecfe9bfaf95ec4a6fd7d18df86352ea4561c05ce5092a507e0846dc14"
+  },
+  "observedRequests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-CAfRtDAP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-BW9A8KV1.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/auth/user",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/home",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/resources/kinds/counts",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/config",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "chrome://terms/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-CAfRtDAP.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/assets/index-BW9A8KV1.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/auth/user",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/home",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/resources/kinds/counts",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/api/config",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5104/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    }
+  ],
+  "unsafeSameOriginRequests": []
+}

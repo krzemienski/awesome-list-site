@@ -531,7 +531,15 @@ if (!AUTHED) {
         // Escape closes the drawer and returns focus to the trigger.
         await kbPage.keyboard.press('Escape');
         const closed = await kbPage.waitForFunction((sel) => !document.querySelector(sel), SHEET, { timeout: 8000 }).then(() => true).catch(() => false);
-        await kbPage.waitForTimeout(400); // onCloseAutoFocus re-resolves the live trigger
+        // `data-state="open"` disappears when closing begins, but Radix calls
+        // onCloseAutoFocus only when its exit-presence teardown completes.
+        // Await that real focus contract rather than sampling a fixed 400ms
+        // mid-animation frame (the Advanced drawer trace observed restoration
+        // at ~687ms after Escape). The assertion below is unchanged.
+        await kbPage.waitForFunction(
+          () => document.activeElement?.getAttribute('data-sidebar') === 'trigger',
+          { timeout: 8000 },
+        ).catch(() => {});
         const focusBack = await kbPage.evaluate(() => {
           const ae = document.activeElement;
           return { onTrigger: !!(ae && ae.getAttribute && ae.getAttribute('data-sidebar') === 'trigger'), tag: ae ? ae.tagName.toLowerCase() + (ae.getAttribute('data-sidebar') ? `[data-sidebar=${ae.getAttribute('data-sidebar')}]` : '') : 'none' };

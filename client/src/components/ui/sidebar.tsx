@@ -39,6 +39,8 @@ type SidebarContextProps = {
   isDrawer: boolean
   isPhone: boolean
   toggleSidebar: () => void
+  setDrawerTrigger: (trigger: HTMLElement | null) => void
+  restoreDrawerFocus: () => boolean
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
@@ -56,6 +58,9 @@ const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     defaultOpen?: boolean
+    initialOpen?: boolean
+    initialDrawer?: boolean
+    initialPhone?: boolean
     open?: boolean
     onOpenChange?: (open: boolean) => void
   }
@@ -63,6 +68,9 @@ const SidebarProvider = React.forwardRef<
   (
     {
       defaultOpen = false,
+      initialOpen,
+      initialDrawer,
+      initialPhone,
       open: openProp,
       onOpenChange: setOpenProp,
       className,
@@ -73,9 +81,13 @@ const SidebarProvider = React.forwardRef<
     ref
   ) => {
     const isMobile = useIsMobile()
-    const [isDrawer, setIsDrawer] = React.useState(false)
-    const [isPhone, setIsPhone] = React.useState(false)
+    const [isDrawer, setIsDrawer] = React.useState(initialDrawer ?? false)
+    const [isPhone, setIsPhone] = React.useState(initialPhone ?? false)
     const [openMobile, setOpenMobile] = React.useState(false)
+    // Radix retains its own opener, but the responsive header can rerender
+    // while the drawer closes. Keep the element that actually opened this
+    // drawer so Escape never falls through to an unrelated header link.
+    const drawerTriggerRef = React.useRef<HTMLElement | null>(null)
 
     // The canonical shell keeps the 240px sidebar visible at tablet widths,
     // but the header menu still opens the same drawer used on phones. This is
@@ -101,11 +113,28 @@ const SidebarProvider = React.forwardRef<
     }, [])
 
     const [_open, _setOpen] = React.useState<boolean>(() => {
+      if (initialOpen !== undefined) return initialOpen
       if (typeof window === "undefined") return defaultOpen
       const stored = window.localStorage.getItem(SIDEBAR_COOKIE_NAME)
       return stored === null ? defaultOpen : stored === "true"
     })
     const open = openProp ?? _open
+    React.useEffect(() => {
+      if (initialOpen === undefined || openProp !== undefined) return
+      try {
+        const cookie = document.cookie.match(
+          new RegExp(`(?:^|;\\s*)${SIDEBAR_COOKIE_NAME}=([^;]*)`),
+        )?.[1]
+        if (cookie === "true" || cookie === "false") {
+          _setOpen(cookie === "true")
+          return
+        }
+        const stored = window.localStorage.getItem(SIDEBAR_COOKIE_NAME)
+        _setOpen(stored === null ? defaultOpen : stored === "true")
+      } catch {
+        _setOpen(defaultOpen)
+      }
+    }, [defaultOpen, initialOpen, openProp])
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value
@@ -115,6 +144,7 @@ const SidebarProvider = React.forwardRef<
           _setOpen(openState)
           try {
             window.localStorage.setItem(SIDEBAR_COOKIE_NAME, String(openState))
+            document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; Path=/; Max-Age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Lax`
           } catch {
             /* localStorage unavailable (private mode) — non-fatal */
           }
@@ -128,6 +158,30 @@ const SidebarProvider = React.forwardRef<
         ? setOpenMobile((open) => !open)
         : setOpen((open) => !open)
     }, [isDrawer, setOpen, setOpenMobile])
+
+    const setDrawerTrigger = React.useCallback((trigger: HTMLElement | null) => {
+      drawerTriggerRef.current = trigger
+    }, [])
+
+    const restoreDrawerFocus = React.useCallback(() => {
+      const isVisibleTrigger = (element: HTMLElement | null): element is HTMLElement =>
+        !!element &&
+        element.isConnected &&
+        !element.hasAttribute("disabled") &&
+        element.getClientRects().length > 0 &&
+        getComputedStyle(element).visibility !== "hidden"
+
+      // Prefer the exact control that opened the drawer. The query fallback
+      // covers non-pointer opens (for example the Ctrl/Cmd+B shortcut).
+      const trigger = isVisibleTrigger(drawerTriggerRef.current)
+        ? drawerTriggerRef.current
+        : Array.from(
+            document.querySelectorAll<HTMLElement>('button[data-sidebar="trigger"]'),
+          ).find(isVisibleTrigger)
+      if (!trigger) return false
+      trigger.focus({ preventScroll: true })
+      return document.activeElement === trigger
+    }, [])
 
     // Adds a keyboard shortcut to toggle the sidebar on all screen sizes
     React.useEffect(() => {
@@ -185,6 +239,8 @@ const SidebarProvider = React.forwardRef<
         toggleSidebar,
         isDrawer,
         isPhone,
+        setDrawerTrigger,
+        restoreDrawerFocus,
       }),
       [
         state,
@@ -196,6 +252,8 @@ const SidebarProvider = React.forwardRef<
         setOpenMobile,
         toggleSidebar,
         isPhone,
+        setDrawerTrigger,
+        restoreDrawerFocus,
       ]
     )
 
@@ -258,6 +316,7 @@ const Sidebar = React.forwardRef<
       state,
       openMobile,
       setOpenMobile,
+      restoreDrawerFocus,
     } = useSidebar()
 
     /*
@@ -328,15 +387,12 @@ const Sidebar = React.forwardRef<
               }
             }}
             onCloseAutoFocus={(e) => {
-              // Radix's saved trigger can be detached when AppHeader rerenders
-              // with the open state. Resolve the live header trigger explicitly.
-              const trigger = document.querySelector<HTMLElement>(
-                'button[data-sidebar="trigger"]',
-              )
-              if (trigger) {
-                e.preventDefault()
-                trigger.focus()
-              }
+              // Restore the actual opener rather than whichever matching
+              // header control happens to be first after responsive rerenders.
+              // This is intentionally explicit: Radix's saved trigger can be
+              // detached while AppHeader reacts to the drawer state.
+              e.preventDefault()
+              restoreDrawerFocus()
             }}
           >
             <DialogPrimitive.Title className="sr-only">
@@ -473,7 +529,7 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, isDrawer, setDrawerTrigger } = useSidebar()
 
   return (
     <Button
@@ -484,6 +540,7 @@ const SidebarTrigger = React.forwardRef<
       className={cn("h-7 w-7", className)}
       onClick={(event) => {
         onClick?.(event)
+        if (isDrawer) setDrawerTrigger(event.currentTarget)
         toggleSidebar()
       }}
       {...props}
@@ -972,7 +1029,6 @@ export {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarInput,
-  SidebarInset,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuBadge,

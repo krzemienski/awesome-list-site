@@ -45,7 +45,7 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
     it('AppSidebar top-level chevron declares a 40×44px minimum hit area', () => {
       // The top-level chevron is the toggle-cat-<slug> button.
       const toggleButtonBlock = tsx.match(
-        /data-testid=\{`toggle-cat-\$\{catSlug\}`\}[\s\S]{0,400}?<\/button>/,
+        /data-testid=\{`toggle-cat-\$\{catSlug\}`\}(?:(?!<\/?button\b)[\s\S])*<\/button>/,
       );
       expect(toggleButtonBlock, 'toggle-cat button block must exist').toBeTruthy();
       expect(toggleButtonBlock![0]).toMatch(/min-h-\[44px\]/);
@@ -55,8 +55,10 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
 
     it('AppSidebar subcategory chevron declares a 40×44px minimum hit area', () => {
       // The subcategory chevron is the expand-sub-<slug> button.
+      // Stop at this button's boundary, not a character budget that changes
+      // when a noninteractive nested-count badge or formatting is added.
       const expandButtonBlock = tsx.match(
-        /data-testid=\{`expand-sub-\$\{subSlug\}`\}[\s\S]{0,400}?<\/button>/,
+        /data-testid=\{`expand-sub-\$\{subSlug\}`\}(?:(?!<\/?button\b)[\s\S])*<\/button>/,
       );
       expect(expandButtonBlock, 'expand-sub button block must exist').toBeTruthy();
       expect(expandButtonBlock![0]).toMatch(/\bw-10\b/);

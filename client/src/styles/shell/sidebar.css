@@ -30,31 +30,118 @@
   border-right: var(--hairline-w, 1px) solid var(--border);
   box-sizing: border-box;
   min-height: 0;
-  overflow-x: clip;
-  overflow-y: auto;
+  overflow: hidden;
   /* DS-OK: canonical styles.css sidebar scrollbar is fixed white at 8%,
      not foreground ink (which varies across typography profiles). */
-  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent; /* DS-OK: frozen sidebar scrollbar uses fixed white at 8%, independent of theme ink. */
   scrollbar-width: thin;
 }
 
 .av-sidebar-shell [data-sidebar="content"] {
   gap: 0;
   min-height: 0;
+  overflow: hidden;
+}
+
+/*
+ * V2 sidebar anatomy: fixed Home + category heading, one scrolling taxonomy
+ * tree, then a fixed compact footer. Keeping the scrollport on this direct
+ * child prevents a long expanded tree from pushing footer controls below the
+ * viewport, while leaving every row free to grow for its complete label.
+ */
+.av-sidebar-tree-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-x: clip;
   overflow-y: auto;
+}
+
+.av-sidebar-shell .av-sidebar-tree-scroll {
+  /* DS-OK: frozen canonical sidebar scrollbar uses fixed white at 8%, not theme ink. */
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  scrollbar-width: thin;
+}
+
+.av-sidebar-shell .av-sidebar-home-navigation {
+  padding: 14px 14px 8px;
+}
+
+.av-sidebar-expanded-navigation {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.av-sidebar-shell .av-sidebar-home-navigation > .sub-item {
+  /*
+   * V2's Home stack is 56px tall. The link itself remains a 44px target; its
+   * negative block margins consume only wrapper whitespace, not hit area.
+   */
+  margin-block: -5px;
+}
+
+.av-sidebar-shell .av-sidebar-categories-heading {
+  padding: 6px 14px 10px;
 }
 
 .av-sidebar-shell [data-sidebar="footer"] {
   flex-shrink: 0;
 }
 
-/* The rail remains in the DOM for baseline selector compatibility, but the
-   canonical default shell has no collapsed icon mode. An explicit future
-   variant can opt into its own class without changing this default. */
-.av-sidebar-shell .av-sidebar-icon-rail,
-.av-sidebar-shell .rail-icon-btn {
+/* The canonical default remains expanded. The persisted SidebarProvider
+   preference opts into this real, keyboard-reachable compact rail. */
+.av-sidebar-shell .av-sidebar-icon-rail {
   display: none;
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact {
+  flex-basis: var(--shell-rail-w, 56px);
+  width: var(--shell-rail-w, 56px);
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact [data-sidebar="content"] {
+  align-items: center;
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact .av-sidebar-expanded-navigation {
+  display: none;
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact .av-sidebar-icon-rail {
+  display: flex;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact .rail-icon-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-2);
+  display: flex;
+  flex: 0 0 44px;
+  height: 44px;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0;
+  width: 44px;
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact .rail-icon-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact .rail-icon-btn[data-active="true"] {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+.av-sidebar-shell.av-sidebar-rail-compact .rail-expand-navigation {
+  margin-top: auto;
 }
 
 /* AppSidebar shares one child tree between the visible tablet sidebar and the
@@ -95,8 +182,10 @@
   background: var(--surface);
 }
 
-/* Keep the canonical 22px icon + 26px vertical padding row while retaining
-   the existing 44px disclosure hit target inside that row. */
+/* DS-OK: frozen awesome-list-site-ds/layout.jsx Sidebar and MobileDrawer
+   category glyph declarations use 22px dimensions and a 5px radius. Keep
+   that rendered glyph geometry while retaining the app's 44px disclosure
+   target around it. */
 .av-sidebar-shell .accordion-header > a,
 .av-sidebar-drawer .accordion-header > a {
   min-height: 44px;
@@ -107,9 +196,43 @@
 .av-sidebar-drawer .accordion-header > a > span:first-child {
   width: 22px !important;
   height: 22px !important;
-  /* DS-OK: canonical category glyph tile has a fixed 5px radius, independent
-     of the profile's card/control radius scale. */
-  border-radius: 5px !important;
+  border-radius: 5px !important; /* DS-OK: frozen awesome-list-site-ds/layout.jsx Sidebar/MobileDrawer category glyph radius. */
+}
+
+.av-sidebar-category-glyph {
+  /* DS-OK: frozen awesome-list-site-ds/layout.jsx category glyphs specify
+     fontSize: 12 independently of the surrounding accordion text. */
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* The frozen mobile drawer leaves its category title at the drawer's inherited
+   foreground color; the desktop reference retains its dim inactive title. */
+.av-sidebar-drawer .accordion-header > a > span:nth-child(2) {
+  color: var(--text) !important;
+}
+
+.av-sidebar-l3-indicator {
+  background: var(--surface);
+  /* DS-OK: frozen V2's noninteractive L3 taxonomy marker uses a 3px chip radius. */
+  border-radius: 3px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  padding: 1px 4px;
+}
+
+.av-sidebar-nested-count {
+  /* DS-OK: frozen V2's nested-count marker is a 1px bordered, 3px-radius chip. */
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 1px 3px;
 }
 
 .av-sidebar-shell .accordion-header > span,
@@ -129,6 +252,35 @@
   overflow-wrap: anywhere;
 }
 
+/*
+ * The frozen sidebar renders these taxonomy labels in native buttons, whose
+ * computed feature/variation settings are normal. AppSidebar uses links to
+ * preserve real navigation semantics; reset only their text spans, never the
+ * adjacent mono count badges or unrelated product-navigation links.
+ */
+.av-sidebar-shell .av-sidebar-home-navigation > .sub-item > span,
+.av-sidebar-shell .accordion-header > a > span:nth-child(2),
+.av-sidebar-shell .accordion-body .sub-item > span:first-child {
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+}
+
+/* Match the frozen drawer's body OpenType features explicitly: inheriting
+   here instead picks up the application's different base feature set.
+   Desktop native-button typography remains separate. */
+.av-sidebar-drawer .accordion-header > a > span:nth-child(2) {
+  font-feature-settings: "ss01", "cv11", "tnum";
+  font-variation-settings: inherit;
+}
+
+.av-sidebar-shell .accordion-header,
+.av-sidebar-drawer .accordion-header,
+.av-sidebar-shell .sub-item,
+.av-sidebar-drawer .sub-item,
+.av-sidebar-compact-footer-copy {
+  line-height: var(--body-leading);
+}
+
 .av-sidebar-shell details,
 .av-sidebar-drawer details {
   padding: 10px 18px;
@@ -139,6 +291,110 @@
 .av-sidebar-drawer summary {
   min-height: 44px;
   cursor: pointer;
+}
+
+/* V2's pinned site-identity footer is intentionally compact. More navigation
+   remains a native disclosure inside it so product routes and test IDs are
+   retained without displacing the taxonomy scrollport. */
+.av-sidebar-compact-footer {
+  background: var(--bg);
+  border-top: var(--hairline-w, 1px) solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: auto;
+  padding: 0;
+}
+
+.av-sidebar-compact-footer-status {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+}
+
+.av-sidebar-compact-footer-copy {
+  color: var(--text-3);
+  flex: 1 1 auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.av-sidebar-compact-footer-links {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.av-sidebar-compact-footer-links a {
+  align-items: center;
+  color: var(--text-2);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.av-sidebar-compact-footer-links a:hover {
+  color: var(--accent);
+}
+
+.av-sidebar-compact-footer .av-sidebar-more-navigation {
+  flex: 0 0 44px;
+  margin-left: 0;
+  padding: 0;
+  position: relative;
+}
+
+.av-sidebar-compact-footer .av-sidebar-more-navigation > summary {
+  align-items: center;
+  display: flex;
+  height: 44px;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  width: 44px;
+}
+
+.av-sidebar-compact-footer .av-sidebar-more-navigation > summary::-webkit-details-marker {
+  display: none;
+}
+
+.av-sidebar-compact-footer .av-sidebar-more-navigation > [data-sidebar="menu"] {
+  background: var(--bg-2);
+  border: var(--hairline-w, 1px) solid var(--border);
+  bottom: calc(100% + 6px);
+  box-shadow: var(--shadow);
+  min-width: 220px;
+  padding: 8px;
+  position: absolute;
+  right: -14px;
+  z-index: 6;
+}
+
+.av-sidebar-drawer .av-sidebar-compact-footer .av-sidebar-more-navigation > [data-sidebar="menu"] {
+  right: -18px;
+}
+
+/* SidebarMenuButton carries shadcn's generic single-line menu treatment.
+   Product links in this shell retain their complete labels instead. */
+.av-sidebar-compact-footer .av-sidebar-more-navigation [data-sidebar="menu-button"] {
+  height: auto;
+  overflow: visible;
+}
+
+.av-sidebar-compact-footer .av-sidebar-more-navigation [data-sidebar="menu-button"] > span:last-child {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .av-sidebar-shell .accordion-header.active,
@@ -210,6 +466,47 @@
 .av-sidebar-drawer .sub-item[data-active="true"] {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   color: var(--accent);
+}
+
+/*
+ * The frozen drawer scrolls as one document: categories retain natural height
+ * and the footer follows the complete taxonomy. These narrow overrides undo
+ * the desktop sidebar's inner tree scrollport only inside the drawer.
+ */
+.av-sidebar-drawer[data-sidebar="sidebar"] > [data-sidebar="drawer-navigation"] {
+  overflow-y: auto;
+}
+
+.av-sidebar-drawer[data-sidebar="sidebar"] > [data-sidebar="drawer-navigation"] > .av-sidebar-tree-scroll {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  min-height: auto;
+  overflow: visible;
+}
+
+.av-sidebar-drawer .av-sidebar-compact-footer {
+  background: var(--bg-2);
+  margin-top: auto;
+}
+
+.av-sidebar-drawer .av-sidebar-compact-footer-status {
+  min-height: 48px;
+  padding-inline: 18px;
+}
+
+/*
+ * Keep the source drawer's 64px header footprint while preserving 44px brand
+ * and close targets. The search control is a real 44px target as well; its
+ * 16px mobile text remains intact to prevent focus zoom.
+ */
+.av-sidebar-drawer .av-sidebar-drawer-header > a {
+  margin-block: -4px;
+}
+
+.av-sidebar-drawer .av-sidebar-drawer-search-control input {
+  height: 44px;
+  line-height: normal;
+  min-height: 44px;
 }
 
 /* Keep keyboard focus visible even when a component's utility classes include

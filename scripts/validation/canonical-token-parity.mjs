@@ -632,6 +632,10 @@ function closingParen(text, open) {
 
 /**
  * `@import <url> [layer | layer(<name>)] [supports(…)] [<media-query-list>]`
+ * Tailwind v4 additionally permits a `source(…)` modifier after the URL. It
+ * is a compiler directive, not a media query, so it is consumed before the
+ * real import modifiers are parsed.
+ *
  * → { spec, layer, conditions } where layer is the dotted name, '' for an
  * anonymous `layer` keyword and null when the import is unlayered, and
  * conditions is the context the import puts around the imported sheet
@@ -643,20 +647,86 @@ export function parseImportStatement(text) {
   if (!m) return null;
   let rest = m[2].trim();
   let layer = null;
-  const named = /^layer\(\s*([^)]+?)\s*\)\s*/.exec(rest);
-  if (named) {
-    layer = named[1].trim();
-    rest = rest.slice(named[0].length);
-  } else if (/^layer(?![\w(-])/.test(rest)) {
-    layer = '';
-    rest = rest.replace(/^layer\s*/, '');
-  }
   const conditions = [];
-  if (/^supports\(/.test(rest)) {
-    const close = closingParen(rest, 'supports'.length);
-    const end = close === -1 ? rest.length : close + 1;
-    conditions.push(`@supports ${rest.slice('supports'.length, end).trim()}`);
-    rest = rest.slice(end).trim();
+
+  /**
+   * Remove a top-level Tailwind `source(…)` modifier without touching a
+   * function with the same name inside a supports condition or media feature.
+   * Keeping this scan balanced matters for source paths and future source
+   * options that contain parentheses.
+   */
+  const stripSourceModifiers = (input) => {
+    let out = '';
+    let cursor = 0;
+    let depth = 0;
+    let quote = null;
+    for (let i = 0; i < input.length; i += 1) {
+      const ch = input[i];
+      if (quote) {
+        if (ch === '\\') i += 1;
+        else if (ch === quote) quote = null;
+        continue;
+      }
+      if (ch === '"' || ch === "'") {
+        quote = ch;
+        continue;
+      }
+      if (ch === '(') {
+        depth += 1;
+        continue;
+      }
+      if (ch === ')') {
+        depth = Math.max(0, depth - 1);
+        continue;
+      }
+      if (depth !== 0 || (i > 0 && /[A-Za-z0-9_-]/.test(input[i - 1]))) continue;
+      const source = /^source\s*\(/i.exec(input.slice(i));
+      if (!source) continue;
+      const open = i + source[0].lastIndexOf('(');
+      const close = closingParen(input, open);
+      if (close === -1) {
+        // Keep malformed input visible as media text instead of silently
+        // swallowing the remainder of an @import statement.
+        continue;
+      }
+      out += input.slice(cursor, i);
+      cursor = close + 1;
+      i = close;
+    }
+    return out + input.slice(cursor);
+  };
+
+  // `source(none)` is present on the live Tailwind v4 import. It must not
+  // become `@media source(none)`, which would make the vendor layer appear
+  // conditional to the document/layer walk.
+  rest = stripSourceModifiers(rest).trim();
+
+  // Parse the non-media import modifiers in either order. Tailwind's source()
+  // may be adjacent to these, and supports()/layer() are valid independently
+  // of the eventual media list.
+  while (rest) {
+    const named = /^layer\s*\(\s*([^)]+?)\s*\)\s*/i.exec(rest);
+    if (named) {
+      layer = named[1].trim();
+      rest = rest.slice(named[0].length).trim();
+      continue;
+    }
+    const anonymous = /^layer(?![\w-])\s*/i.exec(rest);
+    if (anonymous) {
+      layer = '';
+      rest = rest.slice(anonymous[0].length).trim();
+      continue;
+    }
+    const supports = /^supports\s*\(/i.exec(rest);
+    if (supports) {
+      const open = supports[0].lastIndexOf('(');
+      const close = closingParen(rest, open);
+      const end = close === -1 ? rest.length : close + 1;
+      conditions.push(`@supports ${rest.slice(supports[0].length - 1, end).trim()}`);
+      rest = rest.slice(end).trim();
+      continue;
+    }
+    break;
   }
   if (rest) conditions.push(`@media ${rest.replace(/\s+/g, ' ')}`);
   return { spec: m[1], layer, conditions: conditions.join(' ') };

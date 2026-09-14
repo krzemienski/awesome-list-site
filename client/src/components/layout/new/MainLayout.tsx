@@ -1,12 +1,15 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState, type CSSProperties } from "react";
+import { useLocation } from "wouter";
 import { ArrowUp } from "lucide-react";
 import type { AwesomeListNav } from "@/lib/static-data";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
 import PageBreadcrumb from "./PageBreadcrumb";
 import { Button } from "@/components/ui/button";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import "@/styles/shell/layout.css";
 import type { ProductProfileId } from "@/lib/design-system";
+import { useHomeBoot } from "@/lib/home-boot";
 
 // Contact variants (docs/CONTACT-VARIANTS.md) are opt-in via
 // VITE_CONTACT_VARIANT; with it unset (the default) neither chunk is fetched
@@ -78,6 +81,10 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ productProfile, nav, isLoading, navError, onRetryNav, children, user, onLogout, logoutError, renderSearchDialog }: MainLayoutProps) {
+  const homeBoot = useHomeBoot();
+  const [location] = useLocation();
+  const isAdmin = /^\/admin(?:\/|$)/.test(location);
+  const hasBrowseSidebar = location === "/" || /^\/(?:category|subcategory|sub-subcategory)\//.test(location);
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: publicConfig } = useContactConfig(true);
 
@@ -132,6 +139,9 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
       // to 188px. ui/sidebar.tsx additionally force-collapses when a viewport
       // ENTERS that range carrying a stale expanded preference.
       defaultOpen={typeof window !== "undefined" && window.innerWidth >= 1024}
+      initialOpen={homeBoot?.sidebarOpen}
+      initialDrawer={homeBoot?.viewport === "tablet" || homeBoot?.viewport === "phone"}
+      initialPhone={homeBoot?.viewport === "phone"}
       // DS shell parity: column layout — the full-width header owns the brand
       // (reference layout.jsx Header), and the sidebar/icon-rail starts BELOW
       // it. Keep the responsive header height in one shell variable so the
@@ -153,9 +163,12 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           and .grain is the SVG fractal-noise overlay at 0.32 opacity.
           MR-CH-03 — Wrap chrome subtree in `.page` to satisfy DS handoff
           contract (page-level structural class required by Editorial DS). */}
-      <div className="grain" aria-hidden="true" />
-
-      <div className="page contents" data-product-profile={productProfile}>
+      <div
+        className="page app-shell-page"
+        data-product-profile={productProfile}
+        style={{ "--shell-page-measure": "var(--profile-page-measure, var(--content-max))" } as CSSProperties}
+      >
+        <div className="grain" aria-hidden="true" />
         <AppHeader
           onSearchOpen={() => setSearchOpen(true)}
           user={user}
@@ -163,7 +176,7 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           logoutError={logoutError}
           categories={nav?.categories ?? []}
         />
-        <div className="flex flex-1 w-full min-h-0">
+        <div className="app-shell-row" data-browse-sidebar={hasBrowseSidebar}>
         <AppSidebar
           categories={nav?.categories ?? []}
           totalResources={nav?.totalResources ?? 0}
@@ -172,10 +185,9 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           onRetryNav={onRetryNav}
           user={user}
         />
-        <SidebarInset>
         {/*
           CC-14 (landmark half) — single <main id="main"> wrapping route content.
-          CC-16 — 1280 max-width with 48 px desktop gutters.
+          Canonical page-content-wrap owns the token-backed measure and gutters.
         */}
         <main
           id="main"
@@ -189,14 +201,15 @@ export default function MainLayout({ productProfile, nav, isLoading, navError, o
           // disables `position: sticky` for every descendant. `overflow-x-clip`
           // clips the same content without creating a scroll container (a `clip`
           // axis leaves the other axis `visible`), so sticky works inside routes.
-          className="flex-1 min-w-0 overflow-x-clip mx-auto w-full max-w-[var(--profile-page-measure)] px-4 sm:px-6 md:px-12 py-8 focus:outline-none"
+          className="app-shell-main focus:outline-none"
         >
+          <div className="page-content-wrap" data-admin={isAdmin}>
           <PageBreadcrumb categories={nav?.categories ?? []} />
           {children}
+          </div>
         </main>
-        </SidebarInset>
         </div>
-        {publicConfig?.site ? (
+        {!isAdmin && publicConfig?.site ? (
           <AppFooter
             nav={nav}
             site={{

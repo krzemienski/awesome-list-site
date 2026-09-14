@@ -173,8 +173,19 @@ export async function collectBackdropFilters(page) {
       const value = style.backdropFilter || style.webkitBackdropFilter;
       if (!value || value === "none") continue;
       const hint = `${node.tagName.toLowerCase()}${node.className && typeof node.className === "string" ? `.${node.className.trim().split(/\s+/).slice(0, 2).join(".")}` : ""}`;
-      const entry = values.get(value) || { value, count: 0, elements: [] };
+      const entry = values.get(value) || { value, count: 0, paintEligibleCount: 0, elements: [] };
       entry.count += 1;
+      // Closed mounted overlays and unmounted overlays contribute no pixels.
+      // Retain declarations, but compare only effects removed by normalization.
+      let paintEligible = style.visibility === "visible"
+        && [...node.getClientRects()].some((rect) => rect.width > 0 && rect.height > 0);
+      for (let ancestor = node; paintEligible && ancestor; ancestor = ancestor.parentElement) {
+        const ancestorStyle = getComputedStyle(ancestor);
+        if (ancestorStyle.display === "none" || Number(ancestorStyle.opacity) === 0) {
+          paintEligible = false;
+        }
+      }
+      if (paintEligible) entry.paintEligibleCount += 1;
       if (entry.elements.length < 4 && !entry.elements.includes(hint)) entry.elements.push(hint);
       values.set(value, entry);
     }

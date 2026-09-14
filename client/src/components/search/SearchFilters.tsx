@@ -8,7 +8,7 @@ import {
   RESOURCE_FORMAT_LABELS, RESOURCE_PROVIDER_LABELS, RESOURCE_SEARCH_SORT_LABELS,
   RESOURCE_SKILL_LEVEL_LABELS, type ResourceFormat, type ResourceProvider,
   type ResourceSearchSort, type ResourceSkillLevel, type ResourceSearchFacets,
-} from "@shared/resourceFacets";
+} from "@shared/resourceFacets-core";
 
 type State = { category: string; subcategory: string; subSubcategory: string; tags: string[]; provider: string; format: string; skillLevel: string; sort: string };
 type Props = {

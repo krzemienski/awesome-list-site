@@ -7,7 +7,9 @@
 @import './styles/skeleton-animations.css';
 @import './styles/scrolling-fix.css';
 
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "../index.html";
+@source ".";
 
 /*
   Tailwind v4 @theme inline — map shadcn color keys to DS tokens.

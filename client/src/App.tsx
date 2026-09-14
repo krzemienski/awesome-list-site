@@ -4,9 +4,9 @@ import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAnalytics } from "./hooks/use-analytics";
 import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
+import { useAnalytics } from "./hooks/use-analytics";
 import { useCrossTabSync } from "./lib/crossTabSync";
 import { useClerkAppearance } from "./lib/clerk-appearance";
 import {
@@ -16,16 +16,20 @@ import {
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
-import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
-import AdminGuard from "@/components/auth/AdminGuard";
-import AuthGuard from "@/components/auth/AuthGuard";
 import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
-import NotFound from "@/pages/not-found";
 import ConsentBanner from "@/components/ui/consent-banner";
 import ScrubbedParamsNotice from "@/components/ui/scrubbed-params-notice";
 import { Button } from "@/components/ui/button";
+
+// Guard and terminal error surfaces only render after routing has selected a
+// matching branch. Keep them out of the anonymous entry while the auth/theme
+// provider and the Home surface remain eager.
+const AdminGuard = lazy(() => import("@/components/auth/AdminGuard"));
+const AuthGuard = lazy(() => import("@/components/auth/AuthGuard"));
+const ErrorPage = lazy(() => import("@/pages/ErrorPage"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
@@ -65,7 +69,6 @@ const Terms = lazy(() => import("@/pages/Terms"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const CodeOfConduct = lazy(() => import("@/pages/CodeOfConduct"));
 const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
-
 /** Route-level Suspense fallback — mirrors the page skeletons so a code-split
  * route paints a familiar loading state instead of a blank main region. */
 function RouteFallback() {
@@ -332,7 +335,7 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
 // window hostname so the same build serves multiple domains, and pass the
 // proxy URL unconditionally (empty in dev is intentional — no PROD gates).
 const clerkPubKey = publishableKeyFromHost(
-  window.location.hostname,
+  typeof window === "undefined" ? "" : window.location.hostname,
   import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
 );
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
@@ -368,7 +371,9 @@ const clerkLocalization = {
 /** Legacy auth URL redirect: maps the old validated ?next= param onto Clerk's
  * ?redirect_url= so pre-migration links keep returning users to their page. */
 function LegacyAuthRedirect({ to }: { to: "/sign-in" | "/sign-up" }) {
-  const next = new URLSearchParams(window.location.search).get("next");
+  const next = new URLSearchParams(
+    typeof window === "undefined" ? "" : window.location.search,
+  ).get("next");
   const safeNext = next && /^\/(?![/\\])/.test(next) ? next : null;
   const suffix = safeNext ? `?redirect_url=${encodeURIComponent(safeNext)}` : "";
   return <Redirect to={`${to}${suffix}`} replace />;
@@ -423,8 +428,12 @@ function ClerkQueryClientCacheInvalidator() {
     const unsubscribe = addListener(({ user }) => {
       const userId = user?.id ?? null;
       if (
-        prevUserIdRef.current !== undefined &&
-        prevUserIdRef.current !== userId
+        // The first callback may already contain a restored/new Clerk user.
+        // Clear the anonymous SSR/query cache in that case too; otherwise its
+        // public values can survive the first authenticated observation.
+        (prevUserIdRef.current === undefined && userId !== null) ||
+        (prevUserIdRef.current !== undefined &&
+          prevUserIdRef.current !== userId)
       ) {
         qc.clear();
       }
@@ -497,6 +506,10 @@ function Logout() {
 }
 
 function Router() {
+  // Analytics tracking is consent-gated internally, but the hook itself stays
+  // in the eager graph. Deferring it only relocates bytes: Router mounts it on
+  // every route immediately, so visitors would still fetch this chunk on
+  // first paint.
   useAnalytics();
   // R4-081: refresh auth + bookmarks/favorites when another tab logs in/out or
   // toggles a bookmark/favorite (sentinel written via notifyCrossTabSync()).
@@ -576,7 +589,13 @@ function Router() {
    * MainLayout actually renders. */
 
   if (error) {
-    return <ErrorPage error={error} />;
+    return (
+      <RouteErrorBoundary location={location}>
+      <Suspense fallback={<RouteFallback />}>
+        <ErrorPage error={error} />
+      </Suspense>
+      </RouteErrorBoundary>
+    );
   }
 
   // BUG-009 (run14) → Task 169: shell-first paint, now content-first too.
@@ -593,7 +612,11 @@ function Router() {
   if (!isKnownRoute) {
     return (
       <MainLayout productProfile={productProfile} nav={nav} isLoading={navLoading} navError={navError} onRetryNav={() => refetchNav()} user={user ?? undefined} onLogout={logout} logoutError={logoutError} renderSearchDialog={renderSearchDialog}>
-        <NotFound />
+        <RouteErrorBoundary location={location}>
+        <Suspense fallback={<RouteFallback />}>
+          <NotFound />
+        </Suspense>
+        </RouteErrorBoundary>
       </MainLayout>
     );
   }
@@ -628,7 +651,9 @@ function Router() {
       <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={() => {
-          const q = new URLSearchParams(window.location.search).get("q");
+          const q = new URLSearchParams(
+            typeof window === "undefined" ? "" : window.location.search,
+          ).get("q");
           if (q && q.trim()) return <Redirect to={`/search?q=${encodeURIComponent(q.trim())}`} replace />;
           return <Home nav={nav} navLoading={navLoading} />;
         }} />
@@ -649,7 +674,9 @@ function Router() {
           <Redirect to="/search" replace />
         </Route>
         <Route path="/resource" component={() => {
-          const q = new URLSearchParams(window.location.search).get("q");
+          const q = new URLSearchParams(
+            typeof window === "undefined" ? "" : window.location.search,
+          ).get("q");
           return <Redirect to={q && q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search"} replace />;
         }} />
         <Route path="/category/:slug/:subSlug">

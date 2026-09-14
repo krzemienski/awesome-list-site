@@ -1,0 +1,1901 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Task 565 targeted non-pixel admin candidate contract and comparison",
+  "capturedAt": "2026-09-13T22:19:56.378Z",
+  "candidateBase": "http://127.0.0.1:5101/",
+  "identitySetupBase": "http://127.0.0.1:5000/",
+  "retainedProductionBaseline": "docs/parity/evidence/integration-shell/retained-controls/production-admin/summary.json",
+  "routeScope": [
+    "/admin",
+    "/admin#research",
+    "/admin/research"
+  ],
+  "viewports": [
+    375,
+    1440
+  ],
+  "limitations": [
+    "The production baseline is reused, not recaptured.",
+    "This is a status/test-id/axe/read-only contract; it is not a pixel sweep.",
+    "Data-derived test-id differences are reported but never silently classified as selector deletions.",
+    "A real disposable Clerk Nick session is initialized before the read-only capture; no audit key is injected into capture requests.",
+    "The authenticated Nick state is prepared before capture; this harness grants no Clerk/bootstrap write exception. All non-safe requests fail closed.",
+    "No identity identifier, audit key, cookie, raw response body, or screenshot is persisted."
+  ],
+  "identity": {
+    "kind": "shared-disposable-clerk-nick",
+    "authenticatedStorageStatePreparedBeforeReadOnlyCapture": true,
+    "teardown": {
+      "attempted": true,
+      "completed": true,
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "localQaUsersRemaining": 2
+    }
+  },
+  "captures": [
+    {
+      "route": "/admin",
+      "viewport": 375,
+      "status": 200,
+      "finalPath": "/admin",
+      "adminAuthorizedAfterApiQuiet": true,
+      "expectedTab": "overview",
+      "expectedTabVisible": true,
+      "expectedTabSelected": true,
+      "activePanelVisible": true,
+      "researchReviewVisible": null,
+      "visibleTestIds": [
+        "admin-authorized",
+        "admin-overview",
+        "admin-overview-activity",
+        "admin-overview-categories",
+        "admin-overview-health",
+        "admin-stats",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "consent-accept",
+        "consent-banner",
+        "consent-decline",
+        "consent-privacy-link",
+        "content-overview",
+        "header-brand",
+        "health-database",
+        "health-enrichment-queue",
+        "health-github-sync",
+        "health-linkhealth",
+        "health-researcher",
+        "link-breadcrumb-home",
+        "link-stat-rejected",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "stat-card-approvals",
+        "stat-card-approvals-value",
+        "stat-card-journeys",
+        "stat-card-journeys-value",
+        "stat-card-resources",
+        "stat-card-users",
+        "stat-card-users-value",
+        "stat-live-resources",
+        "stat-title-approvals",
+        "stat-title-journeys",
+        "stat-title-resources",
+        "stat-title-users",
+        "tab-approvals",
+        "tab-audit",
+        "tab-categories",
+        "tab-database",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-export",
+        "tab-github",
+        "tab-linkhealth",
+        "tab-overview",
+        "tab-research",
+        "tab-researcher",
+        "tab-resources",
+        "tab-subcategories",
+        "tab-users",
+        "top-category-1",
+        "top-category-2",
+        "top-category-3",
+        "top-category-4",
+        "top-category-5"
+      ],
+      "footer": {
+        "siteFooterVisible": false,
+        "visibleFooterTestIds": []
+      },
+      "axe": {
+        "violationCount": 0,
+        "violations": [],
+        "seriousCritical": {
+          "rules": 0,
+          "nodes": 0,
+          "ids": []
+        }
+      },
+      "actions": {
+        "settings": {
+          "linkVisible": true,
+          "navigated": true,
+          "themeHeadingVisible": true
+        },
+        "newEntry": {
+          "triggerVisible": true,
+          "dialogOpen": true,
+          "finalPath": "/admin#resources"
+        }
+      },
+      "readOnly": {
+        "observedSafeApiRequests": 44,
+        "safeApiResponses": [
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/pending-resources",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/users?page=1&limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/health/ai",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/operations/health",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-status",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-history",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/status",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/history",
+            "status": 200
+          },
+          {
+            "path": "/api/enrichment/jobs?limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/audit-logs?limit=6&offset=0",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/pending-resources",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/users?page=1&limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/operations/health",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/audit-logs?limit=6&offset=0",
+            "status": 200
+          },
+          {
+            "path": "/api/health/ai",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-status",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-history",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/status",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/history",
+            "status": 200
+          },
+          {
+            "path": "/api/enrichment/jobs?limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/sub-subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/resources?page=1&limit=1",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/resources?page=1&limit=25",
+            "status": 200
+          }
+        ],
+        "safeApiFailures": [],
+        "blockedNonSafeRequests": [
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          },
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          }
+        ],
+        "artificialReadAborts": 2,
+        "allowedAuthInitializations": [],
+        "blockedNonSafeRequestCount": 2,
+        "refusedWindowOperations": {
+          "webSockets": [],
+          "workers": [
+            "blob:http://127.0.0.1:5101/4e267d2a-c42d-40a6-9d53-911415122a9d",
+            "blob:http://127.0.0.1:5101/8f1d4b50-364c-4a34-b412-59348133c63f"
+          ],
+          "popups": [],
+          "serviceWorkers": []
+        }
+      }
+    },
+    {
+      "route": "/admin#research",
+      "viewport": 375,
+      "status": 200,
+      "finalPath": "/admin#research",
+      "adminAuthorizedAfterApiQuiet": true,
+      "expectedTab": "research",
+      "expectedTabVisible": true,
+      "expectedTabSelected": true,
+      "activePanelVisible": true,
+      "researchReviewVisible": true,
+      "visibleTestIds": [
+        "admin-authorized",
+        "badge-verification-dead-71",
+        "badge-verification-dead-76",
+        "badge-verification-ok-36",
+        "badge-verification-ok-37",
+        "badge-verification-ok-38",
+        "badge-verification-ok-39",
+        "badge-verification-ok-40",
+        "badge-verification-ok-41",
+        "badge-verification-ok-42",
+        "badge-verification-ok-43",
+        "badge-verification-ok-44",
+        "badge-verification-ok-45",
+        "badge-verification-ok-46",
+        "badge-verification-ok-47",
+        "badge-verification-ok-48",
+        "badge-verification-ok-49",
+        "badge-verification-ok-50",
+        "badge-verification-ok-51",
+        "badge-verification-ok-52",
+        "badge-verification-ok-53",
+        "badge-verification-ok-54",
+        "badge-verification-ok-55",
+        "badge-verification-ok-56",
+        "badge-verification-ok-57",
+        "badge-verification-ok-58",
+        "badge-verification-ok-59",
+        "badge-verification-ok-60",
+        "badge-verification-ok-61",
+        "badge-verification-ok-62",
+        "badge-verification-ok-63",
+        "badge-verification-ok-64",
+        "badge-verification-ok-65",
+        "badge-verification-ok-66",
+        "badge-verification-ok-67",
+        "badge-verification-ok-68",
+        "badge-verification-ok-69",
+        "badge-verification-ok-70",
+        "badge-verification-ok-72",
+        "badge-verification-ok-73",
+        "badge-verification-ok-74",
+        "badge-verification-ok-75",
+        "badge-verification-ok-77",
+        "badge-verification-ok-78",
+        "badge-verification-ok-79",
+        "badge-verification-ok-80",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-approve-all",
+        "consent-accept",
+        "consent-banner",
+        "consent-decline",
+        "consent-privacy-link",
+        "content-research",
+        "header-brand",
+        "link-breadcrumb-home",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "research-review-panel",
+        "row-research-discovery-36",
+        "row-research-discovery-37",
+        "row-research-discovery-38",
+        "row-research-discovery-39",
+        "row-research-discovery-40",
+        "row-research-discovery-41",
+        "row-research-discovery-42",
+        "row-research-discovery-43",
+        "row-research-discovery-44",
+        "row-research-discovery-45",
+        "row-research-discovery-46",
+        "row-research-discovery-47",
+        "row-research-discovery-48",
+        "row-research-discovery-49",
+        "row-research-discovery-50",
+        "row-research-discovery-51",
+        "row-research-discovery-52",
+        "row-research-discovery-53",
+        "row-research-discovery-54",
+        "row-research-discovery-55",
+        "row-research-discovery-56",
+        "row-research-discovery-57",
+        "row-research-discovery-58",
+        "row-research-discovery-59",
+        "row-research-discovery-60",
+        "row-research-discovery-61",
+        "row-research-discovery-62",
+        "row-research-discovery-63",
+        "row-research-discovery-64",
+        "row-research-discovery-65",
+        "row-research-discovery-66",
+        "row-research-discovery-67",
+        "row-research-discovery-68",
+        "row-research-discovery-69",
+        "row-research-discovery-70",
+        "row-research-discovery-71",
+        "row-research-discovery-72",
+        "row-research-discovery-73",
+        "row-research-discovery-74",
+        "row-research-discovery-75",
+        "row-research-discovery-76",
+        "row-research-discovery-77",
+        "row-research-discovery-78",
+        "row-research-discovery-79",
+        "row-research-discovery-80",
+        "tab-approvals",
+        "tab-audit",
+        "tab-categories",
+        "tab-database",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-export",
+        "tab-github",
+        "tab-journeys",
+        "tab-linkhealth",
+        "tab-overview",
+        "tab-research",
+        "tab-researcher",
+        "tab-resources",
+        "tab-subcategories",
+        "tab-users"
+      ],
+      "footer": {
+        "siteFooterVisible": false,
+        "visibleFooterTestIds": []
+      },
+      "axe": {
+        "violationCount": 0,
+        "violations": [],
+        "seriousCritical": {
+          "rules": 0,
+          "nodes": 0,
+          "ids": []
+        }
+      },
+      "actions": null,
+      "readOnly": {
+        "observedSafeApiRequests": 10,
+        "safeApiResponses": [
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/awesome-list",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/discoveries",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/jobs?limit=20",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          }
+        ],
+        "safeApiFailures": [],
+        "blockedNonSafeRequests": [
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          }
+        ],
+        "artificialReadAborts": 1,
+        "allowedAuthInitializations": [],
+        "blockedNonSafeRequestCount": 1,
+        "refusedWindowOperations": {
+          "webSockets": [],
+          "workers": [
+            "blob:http://127.0.0.1:5101/074a2df8-4c71-49f6-83a6-c2b79ba44922",
+            "blob:http://127.0.0.1:5101/2fdb7766-7793-4144-b2dd-448ad883ea77"
+          ],
+          "popups": [],
+          "serviceWorkers": []
+        }
+      }
+    },
+    {
+      "route": "/admin/research",
+      "viewport": 375,
+      "status": 200,
+      "finalPath": "/admin/research",
+      "adminAuthorizedAfterApiQuiet": true,
+      "expectedTab": "research",
+      "expectedTabVisible": true,
+      "expectedTabSelected": true,
+      "activePanelVisible": true,
+      "researchReviewVisible": true,
+      "visibleTestIds": [
+        "admin-authorized",
+        "badge-verification-dead-71",
+        "badge-verification-dead-76",
+        "badge-verification-ok-36",
+        "badge-verification-ok-37",
+        "badge-verification-ok-38",
+        "badge-verification-ok-39",
+        "badge-verification-ok-40",
+        "badge-verification-ok-41",
+        "badge-verification-ok-42",
+        "badge-verification-ok-43",
+        "badge-verification-ok-44",
+        "badge-verification-ok-45",
+        "badge-verification-ok-46",
+        "badge-verification-ok-47",
+        "badge-verification-ok-48",
+        "badge-verification-ok-49",
+        "badge-verification-ok-50",
+        "badge-verification-ok-51",
+        "badge-verification-ok-52",
+        "badge-verification-ok-53",
+        "badge-verification-ok-54",
+        "badge-verification-ok-55",
+        "badge-verification-ok-56",
+        "badge-verification-ok-57",
+        "badge-verification-ok-58",
+        "badge-verification-ok-59",
+        "badge-verification-ok-60",
+        "badge-verification-ok-61",
+        "badge-verification-ok-62",
+        "badge-verification-ok-63",
+        "badge-verification-ok-64",
+        "badge-verification-ok-65",
+        "badge-verification-ok-66",
+        "badge-verification-ok-67",
+        "badge-verification-ok-68",
+        "badge-verification-ok-69",
+        "badge-verification-ok-70",
+        "badge-verification-ok-72",
+        "badge-verification-ok-73",
+        "badge-verification-ok-74",
+        "badge-verification-ok-75",
+        "badge-verification-ok-77",
+        "badge-verification-ok-78",
+        "badge-verification-ok-79",
+        "badge-verification-ok-80",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-approve-all",
+        "consent-accept",
+        "consent-banner",
+        "consent-decline",
+        "consent-privacy-link",
+        "content-research",
+        "header-brand",
+        "link-breadcrumb-home",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "research-review-panel",
+        "row-research-discovery-36",
+        "row-research-discovery-37",
+        "row-research-discovery-38",
+        "row-research-discovery-39",
+        "row-research-discovery-40",
+        "row-research-discovery-41",
+        "row-research-discovery-42",
+        "row-research-discovery-43",
+        "row-research-discovery-44",
+        "row-research-discovery-45",
+        "row-research-discovery-46",
+        "row-research-discovery-47",
+        "row-research-discovery-48",
+        "row-research-discovery-49",
+        "row-research-discovery-50",
+        "row-research-discovery-51",
+        "row-research-discovery-52",
+        "row-research-discovery-53",
+        "row-research-discovery-54",
+        "row-research-discovery-55",
+        "row-research-discovery-56",
+        "row-research-discovery-57",
+        "row-research-discovery-58",
+        "row-research-discovery-59",
+        "row-research-discovery-60",
+        "row-research-discovery-61",
+        "row-research-discovery-62",
+        "row-research-discovery-63",
+        "row-research-discovery-64",
+        "row-research-discovery-65",
+        "row-research-discovery-66",
+        "row-research-discovery-67",
+        "row-research-discovery-68",
+        "row-research-discovery-69",
+        "row-research-discovery-70",
+        "row-research-discovery-71",
+        "row-research-discovery-72",
+        "row-research-discovery-73",
+        "row-research-discovery-74",
+        "row-research-discovery-75",
+        "row-research-discovery-76",
+        "row-research-discovery-77",
+        "row-research-discovery-78",
+        "row-research-discovery-79",
+        "row-research-discovery-80",
+        "tab-approvals",
+        "tab-audit",
+        "tab-categories",
+        "tab-database",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-export",
+        "tab-github",
+        "tab-journeys",
+        "tab-linkhealth",
+        "tab-overview",
+        "tab-research",
+        "tab-researcher",
+        "tab-resources",
+        "tab-subcategories",
+        "tab-users"
+      ],
+      "footer": {
+        "siteFooterVisible": false,
+        "visibleFooterTestIds": []
+      },
+      "axe": {
+        "violationCount": 0,
+        "violations": [],
+        "seriousCritical": {
+          "rules": 0,
+          "nodes": 0,
+          "ids": []
+        }
+      },
+      "actions": null,
+      "readOnly": {
+        "observedSafeApiRequests": 10,
+        "safeApiResponses": [
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/jobs?limit=20",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/discoveries",
+            "status": 200
+          },
+          {
+            "path": "/api/awesome-list",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          }
+        ],
+        "safeApiFailures": [],
+        "blockedNonSafeRequests": [
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          }
+        ],
+        "artificialReadAborts": 1,
+        "allowedAuthInitializations": [],
+        "blockedNonSafeRequestCount": 1,
+        "refusedWindowOperations": {
+          "webSockets": [],
+          "workers": [
+            "blob:http://127.0.0.1:5101/6fb31f83-9c9c-4dfa-b089-703f8a9fd1c4",
+            "blob:http://127.0.0.1:5101/83b65e26-4646-4d3d-8653-c2f6ba076ba7"
+          ],
+          "popups": [],
+          "serviceWorkers": []
+        }
+      }
+    },
+    {
+      "route": "/admin",
+      "viewport": 1440,
+      "status": 200,
+      "finalPath": "/admin",
+      "adminAuthorizedAfterApiQuiet": true,
+      "expectedTab": "overview",
+      "expectedTabVisible": true,
+      "expectedTabSelected": true,
+      "activePanelVisible": true,
+      "researchReviewVisible": null,
+      "visibleTestIds": [
+        "admin-authorized",
+        "admin-overview",
+        "admin-overview-activity",
+        "admin-overview-categories",
+        "admin-overview-health",
+        "admin-stats",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "consent-accept",
+        "consent-banner",
+        "consent-decline",
+        "consent-privacy-link",
+        "content-overview",
+        "header-brand",
+        "health-database",
+        "health-enrichment-queue",
+        "health-github-sync",
+        "health-linkhealth",
+        "health-researcher",
+        "link-breadcrumb-home",
+        "link-stat-rejected",
+        "page-breadcrumb",
+        "stat-card-approvals",
+        "stat-card-approvals-value",
+        "stat-card-journeys",
+        "stat-card-journeys-value",
+        "stat-card-resources",
+        "stat-card-users",
+        "stat-card-users-value",
+        "stat-live-resources",
+        "stat-title-approvals",
+        "stat-title-journeys",
+        "stat-title-resources",
+        "stat-title-users",
+        "tab-approvals",
+        "tab-audit",
+        "tab-categories",
+        "tab-database",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-export",
+        "tab-github",
+        "tab-linkhealth",
+        "tab-overview",
+        "tab-research",
+        "tab-researcher",
+        "tab-resources",
+        "tab-subcategories",
+        "tab-users",
+        "top-category-1",
+        "top-category-2",
+        "top-category-3",
+        "top-category-4",
+        "top-category-5"
+      ],
+      "footer": {
+        "siteFooterVisible": false,
+        "visibleFooterTestIds": []
+      },
+      "axe": {
+        "violationCount": 0,
+        "violations": [],
+        "seriousCritical": {
+          "rules": 0,
+          "nodes": 0,
+          "ids": []
+        }
+      },
+      "actions": {
+        "settings": {
+          "linkVisible": true,
+          "navigated": true,
+          "themeHeadingVisible": true
+        },
+        "newEntry": {
+          "triggerVisible": true,
+          "dialogOpen": true,
+          "finalPath": "/admin#resources"
+        }
+      },
+      "readOnly": {
+        "observedSafeApiRequests": 44,
+        "safeApiResponses": [
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/pending-resources",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/users?page=1&limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/audit-logs?limit=6&offset=0",
+            "status": 200
+          },
+          {
+            "path": "/api/health/ai",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/operations/health",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-status",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/status",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-history",
+            "status": 200
+          },
+          {
+            "path": "/api/enrichment/jobs?limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/history",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/pending-resources",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/users?page=1&limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/health/ai",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/audit-logs?limit=6&offset=0",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/operations/health",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-status",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/status",
+            "status": 200
+          },
+          {
+            "path": "/api/github/sync-history",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/link-health/history",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/enrichment/jobs?limit=100",
+            "status": 200
+          },
+          {
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/sub-subcategories",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/resources?page=1&limit=25",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/resources?page=1&limit=1",
+            "status": 200
+          }
+        ],
+        "safeApiFailures": [],
+        "blockedNonSafeRequests": [
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          },
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          }
+        ],
+        "artificialReadAborts": 2,
+        "allowedAuthInitializations": [],
+        "blockedNonSafeRequestCount": 2,
+        "refusedWindowOperations": {
+          "webSockets": [],
+          "workers": [
+            "blob:http://127.0.0.1:5101/a3fae3e7-3cea-448a-8e08-449c5138a304",
+            "blob:http://127.0.0.1:5101/b334ac6e-e3e1-47f5-977f-4a96b7ddab3a"
+          ],
+          "popups": [],
+          "serviceWorkers": []
+        }
+      }
+    },
+    {
+      "route": "/admin#research",
+      "viewport": 1440,
+      "status": 200,
+      "finalPath": "/admin#research",
+      "adminAuthorizedAfterApiQuiet": true,
+      "expectedTab": "research",
+      "expectedTabVisible": true,
+      "expectedTabSelected": true,
+      "activePanelVisible": true,
+      "researchReviewVisible": true,
+      "visibleTestIds": [
+        "admin-authorized",
+        "badge-verification-dead-71",
+        "badge-verification-dead-76",
+        "badge-verification-ok-36",
+        "badge-verification-ok-37",
+        "badge-verification-ok-38",
+        "badge-verification-ok-39",
+        "badge-verification-ok-40",
+        "badge-verification-ok-41",
+        "badge-verification-ok-42",
+        "badge-verification-ok-43",
+        "badge-verification-ok-44",
+        "badge-verification-ok-45",
+        "badge-verification-ok-46",
+        "badge-verification-ok-47",
+        "badge-verification-ok-48",
+        "badge-verification-ok-49",
+        "badge-verification-ok-50",
+        "badge-verification-ok-51",
+        "badge-verification-ok-52",
+        "badge-verification-ok-53",
+        "badge-verification-ok-54",
+        "badge-verification-ok-55",
+        "badge-verification-ok-56",
+        "badge-verification-ok-57",
+        "badge-verification-ok-58",
+        "badge-verification-ok-59",
+        "badge-verification-ok-60",
+        "badge-verification-ok-61",
+        "badge-verification-ok-62",
+        "badge-verification-ok-63",
+        "badge-verification-ok-64",
+        "badge-verification-ok-65",
+        "badge-verification-ok-66",
+        "badge-verification-ok-67",
+        "badge-verification-ok-68",
+        "badge-verification-ok-69",
+        "badge-verification-ok-70",
+        "badge-verification-ok-72",
+        "badge-verification-ok-73",
+        "badge-verification-ok-74",
+        "badge-verification-ok-75",
+        "badge-verification-ok-77",
+        "badge-verification-ok-78",
+        "badge-verification-ok-79",
+        "badge-verification-ok-80",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-approve-all",
+        "consent-accept",
+        "consent-banner",
+        "consent-decline",
+        "consent-privacy-link",
+        "content-research",
+        "header-brand",
+        "link-breadcrumb-home",
+        "page-breadcrumb",
+        "research-review-panel",
+        "row-research-discovery-36",
+        "row-research-discovery-37",
+        "row-research-discovery-38",
+        "row-research-discovery-39",
+        "row-research-discovery-40",
+        "row-research-discovery-41",
+        "row-research-discovery-42",
+        "row-research-discovery-43",
+        "row-research-discovery-44",
+        "row-research-discovery-45",
+        "row-research-discovery-46",
+        "row-research-discovery-47",
+        "row-research-discovery-48",
+        "row-research-discovery-49",
+        "row-research-discovery-50",
+        "row-research-discovery-51",
+        "row-research-discovery-52",
+        "row-research-discovery-53",
+        "row-research-discovery-54",
+        "row-research-discovery-55",
+        "row-research-discovery-56",
+        "row-research-discovery-57",
+        "row-research-discovery-58",
+        "row-research-discovery-59",
+        "row-research-discovery-60",
+        "row-research-discovery-61",
+        "row-research-discovery-62",
+        "row-research-discovery-63",
+        "row-research-discovery-64",
+        "row-research-discovery-65",
+        "row-research-discovery-66",
+        "row-research-discovery-67",
+        "row-research-discovery-68",
+        "row-research-discovery-69",
+        "row-research-discovery-70",
+        "row-research-discovery-71",
+        "row-research-discovery-72",
+        "row-research-discovery-73",
+        "row-research-discovery-74",
+        "row-research-discovery-75",
+        "row-research-discovery-76",
+        "row-research-discovery-77",
+        "row-research-discovery-78",
+        "row-research-discovery-79",
+        "row-research-discovery-80",
+        "tab-approvals",
+        "tab-audit",
+        "tab-categories",
+        "tab-database",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-export",
+        "tab-github",
+        "tab-journeys",
+        "tab-linkhealth",
+        "tab-overview",
+        "tab-research",
+        "tab-researcher",
+        "tab-resources",
+        "tab-subcategories",
+        "tab-users"
+      ],
+      "footer": {
+        "siteFooterVisible": false,
+        "visibleFooterTestIds": []
+      },
+      "axe": {
+        "violationCount": 0,
+        "violations": [],
+        "seriousCritical": {
+          "rules": 0,
+          "nodes": 0,
+          "ids": []
+        }
+      },
+      "actions": null,
+      "readOnly": {
+        "observedSafeApiRequests": 10,
+        "safeApiResponses": [
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/jobs?limit=20",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/discoveries",
+            "status": 200
+          },
+          {
+            "path": "/api/awesome-list",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          }
+        ],
+        "safeApiFailures": [],
+        "blockedNonSafeRequests": [
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          }
+        ],
+        "artificialReadAborts": 1,
+        "allowedAuthInitializations": [],
+        "blockedNonSafeRequestCount": 1,
+        "refusedWindowOperations": {
+          "webSockets": [],
+          "workers": [
+            "blob:http://127.0.0.1:5101/ef426c5b-c35a-4d1c-a252-506722803305",
+            "blob:http://127.0.0.1:5101/46a3dad3-d5ae-4c43-a3c4-c339f983be81"
+          ],
+          "popups": [],
+          "serviceWorkers": []
+        }
+      }
+    },
+    {
+      "route": "/admin/research",
+      "viewport": 1440,
+      "status": 200,
+      "finalPath": "/admin/research",
+      "adminAuthorizedAfterApiQuiet": true,
+      "expectedTab": "research",
+      "expectedTabVisible": true,
+      "expectedTabSelected": true,
+      "activePanelVisible": true,
+      "researchReviewVisible": true,
+      "visibleTestIds": [
+        "admin-authorized",
+        "badge-verification-dead-71",
+        "badge-verification-dead-76",
+        "badge-verification-ok-36",
+        "badge-verification-ok-37",
+        "badge-verification-ok-38",
+        "badge-verification-ok-39",
+        "badge-verification-ok-40",
+        "badge-verification-ok-41",
+        "badge-verification-ok-42",
+        "badge-verification-ok-43",
+        "badge-verification-ok-44",
+        "badge-verification-ok-45",
+        "badge-verification-ok-46",
+        "badge-verification-ok-47",
+        "badge-verification-ok-48",
+        "badge-verification-ok-49",
+        "badge-verification-ok-50",
+        "badge-verification-ok-51",
+        "badge-verification-ok-52",
+        "badge-verification-ok-53",
+        "badge-verification-ok-54",
+        "badge-verification-ok-55",
+        "badge-verification-ok-56",
+        "badge-verification-ok-57",
+        "badge-verification-ok-58",
+        "badge-verification-ok-59",
+        "badge-verification-ok-60",
+        "badge-verification-ok-61",
+        "badge-verification-ok-62",
+        "badge-verification-ok-63",
+        "badge-verification-ok-64",
+        "badge-verification-ok-65",
+        "badge-verification-ok-66",
+        "badge-verification-ok-67",
+        "badge-verification-ok-68",
+        "badge-verification-ok-69",
+        "badge-verification-ok-70",
+        "badge-verification-ok-72",
+        "badge-verification-ok-73",
+        "badge-verification-ok-74",
+        "badge-verification-ok-75",
+        "badge-verification-ok-77",
+        "badge-verification-ok-78",
+        "badge-verification-ok-79",
+        "badge-verification-ok-80",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "button-approve-all",
+        "consent-accept",
+        "consent-banner",
+        "consent-decline",
+        "consent-privacy-link",
+        "content-research",
+        "header-brand",
+        "link-breadcrumb-home",
+        "page-breadcrumb",
+        "research-review-panel",
+        "row-research-discovery-36",
+        "row-research-discovery-37",
+        "row-research-discovery-38",
+        "row-research-discovery-39",
+        "row-research-discovery-40",
+        "row-research-discovery-41",
+        "row-research-discovery-42",
+        "row-research-discovery-43",
+        "row-research-discovery-44",
+        "row-research-discovery-45",
+        "row-research-discovery-46",
+        "row-research-discovery-47",
+        "row-research-discovery-48",
+        "row-research-discovery-49",
+        "row-research-discovery-50",
+        "row-research-discovery-51",
+        "row-research-discovery-52",
+        "row-research-discovery-53",
+        "row-research-discovery-54",
+        "row-research-discovery-55",
+        "row-research-discovery-56",
+        "row-research-discovery-57",
+        "row-research-discovery-58",
+        "row-research-discovery-59",
+        "row-research-discovery-60",
+        "row-research-discovery-61",
+        "row-research-discovery-62",
+        "row-research-discovery-63",
+        "row-research-discovery-64",
+        "row-research-discovery-65",
+        "row-research-discovery-66",
+        "row-research-discovery-67",
+        "row-research-discovery-68",
+        "row-research-discovery-69",
+        "row-research-discovery-70",
+        "row-research-discovery-71",
+        "row-research-discovery-72",
+        "row-research-discovery-73",
+        "row-research-discovery-74",
+        "row-research-discovery-75",
+        "row-research-discovery-76",
+        "row-research-discovery-77",
+        "row-research-discovery-78",
+        "row-research-discovery-79",
+        "row-research-discovery-80",
+        "tab-approvals",
+        "tab-audit",
+        "tab-categories",
+        "tab-database",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-export",
+        "tab-github",
+        "tab-journeys",
+        "tab-linkhealth",
+        "tab-overview",
+        "tab-research",
+        "tab-researcher",
+        "tab-resources",
+        "tab-subcategories",
+        "tab-users"
+      ],
+      "footer": {
+        "siteFooterVisible": false,
+        "visibleFooterTestIds": []
+      },
+      "axe": {
+        "violationCount": 0,
+        "violations": [],
+        "seriousCritical": {
+          "rules": 0,
+          "nodes": 0,
+          "ids": []
+        }
+      },
+      "actions": null,
+      "readOnly": {
+        "observedSafeApiRequests": 10,
+        "safeApiResponses": [
+          {
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "path": "/api/notifications?limit=50",
+            "status": 200
+          },
+          {
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/jobs?limit=20",
+            "status": 200
+          },
+          {
+            "path": "/api/researcher/discoveries",
+            "status": 200
+          },
+          {
+            "path": "/api/awesome-list",
+            "status": 200
+          },
+          {
+            "path": "/api/auth/user",
+            "status": 200
+          }
+        ],
+        "safeApiFailures": [],
+        "blockedNonSafeRequests": [
+          {
+            "method": "POST",
+            "path": "<cross-origin-or-opaque>"
+          }
+        ],
+        "artificialReadAborts": 1,
+        "allowedAuthInitializations": [],
+        "blockedNonSafeRequestCount": 1,
+        "refusedWindowOperations": {
+          "webSockets": [],
+          "workers": [
+            "blob:http://127.0.0.1:5101/92209c58-3f58-4ba0-bbee-b88cec06541b",
+            "blob:http://127.0.0.1:5101/7c62b88b-52cb-441e-a7ba-e91a04f1e78e"
+          ],
+          "popups": [],
+          "serviceWorkers": []
+        }
+      }
+    }
+  ],
+  "productionComparison": {
+    "375": {
+      "baselineStatus": 200,
+      "candidateStatus": 200,
+      "visibleTestIds": {
+        "added": [
+          "admin-overview",
+          "admin-overview-activity",
+          "admin-overview-categories",
+          "admin-overview-health",
+          "admin-stats",
+          "content-overview",
+          "health-database",
+          "health-enrichment-queue",
+          "health-github-sync",
+          "health-linkhealth",
+          "health-researcher",
+          "link-breadcrumb-home",
+          "page-breadcrumb",
+          "stat-card-approvals-value",
+          "stat-card-journeys-value",
+          "stat-card-users-value",
+          "stat-title-approvals",
+          "stat-title-journeys",
+          "stat-title-users",
+          "tab-overview",
+          "tab-research",
+          "top-category-1",
+          "top-category-2",
+          "top-category-3",
+          "top-category-4",
+          "top-category-5"
+        ],
+        "removed": [
+          "button-approve-190153",
+          "button-approve-190154",
+          "button-approve-190155",
+          "button-notifications",
+          "button-reject-190153",
+          "button-reject-190154",
+          "button-reject-190155",
+          "button-view-details-190153",
+          "button-view-details-190154",
+          "button-view-details-190155",
+          "content-approvals",
+          "footer-about",
+          "footer-categories",
+          "footer-code-of-conduct",
+          "footer-cookie-settings",
+          "footer-copyright",
+          "footer-github",
+          "footer-home",
+          "footer-journeys",
+          "footer-privacy",
+          "footer-submit",
+          "footer-terms",
+          "gradient-scroll-cue",
+          "hint-swipe-pending-table",
+          "link-resource-url-190153",
+          "link-resource-url-190154",
+          "link-resource-url-190155",
+          "link-stat-pending",
+          "row-pending-resource-190153",
+          "row-pending-resource-190154",
+          "row-pending-resource-190155",
+          "tab-digests",
+          "tab-journeys",
+          "tab-subsubcategories",
+          "tags-pending-190153",
+          "tags-pending-190154",
+          "tags-pending-190155"
+        ]
+      },
+      "baselineFooterTestIds": [
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms"
+      ],
+      "candidateFooterTestIds": [],
+      "expectedFooterRemovalObserved": true
+    },
+    "1440": {
+      "baselineStatus": 200,
+      "candidateStatus": 200,
+      "visibleTestIds": {
+        "added": [
+          "admin-overview",
+          "admin-overview-activity",
+          "admin-overview-categories",
+          "admin-overview-health",
+          "admin-stats",
+          "breadcrumb-mobile-current",
+          "content-overview",
+          "health-database",
+          "health-enrichment-queue",
+          "health-github-sync",
+          "health-linkhealth",
+          "health-researcher",
+          "link-breadcrumb-home",
+          "page-breadcrumb",
+          "stat-card-approvals-value",
+          "stat-card-journeys-value",
+          "stat-card-users-value",
+          "stat-title-approvals",
+          "stat-title-journeys",
+          "stat-title-users",
+          "tab-overview",
+          "tab-research",
+          "top-category-1",
+          "top-category-2",
+          "top-category-3",
+          "top-category-4",
+          "top-category-5"
+        ],
+        "removed": [
+          "accordion-cat-community-events",
+          "accordion-cat-encoding-codecs",
+          "accordion-cat-general-tools",
+          "accordion-cat-infrastructure-delivery",
+          "accordion-cat-intro-learning",
+          "accordion-cat-media-tools",
+          "accordion-cat-players-clients",
+          "accordion-cat-protocols-transport",
+          "accordion-cat-standards-industry",
+          "button-approve-190153",
+          "button-approve-190154",
+          "button-approve-190155",
+          "button-notifications",
+          "button-reject-190153",
+          "button-reject-190154",
+          "button-reject-190155",
+          "button-view-details-190153",
+          "button-view-details-190154",
+          "button-view-details-190155",
+          "content-approvals",
+          "expand-sub-adaptive-streaming",
+          "expand-sub-ads-qoe",
+          "expand-sub-audio-subtitles",
+          "expand-sub-best-practices-guidelines",
+          "expand-sub-cdn-integration-distribution",
+          "expand-sub-cloud-cdn",
+          "expand-sub-codecs",
+          "expand-sub-community-groups",
+          "expand-sub-containerization-packaging-tools",
+          "expand-sub-encoding-tools",
+          "expand-sub-events-conferences",
+          "expand-sub-hardware-players",
+          "expand-sub-mobile-web-players",
+          "expand-sub-smart-tv-players",
+          "expand-sub-specs-standards",
+          "expand-sub-streaming-servers",
+          "expand-sub-transport-protocols",
+          "expand-sub-vendors-hdr",
+          "expand-sub-webinars-conference-talks",
+          "footer-about",
+          "footer-categories",
+          "footer-code-of-conduct",
+          "footer-cookie-settings",
+          "footer-copyright",
+          "footer-github",
+          "footer-home",
+          "footer-journeys",
+          "footer-privacy",
+          "footer-submit",
+          "footer-terms",
+          "link-resource-url-190153",
+          "link-resource-url-190154",
+          "link-resource-url-190155",
+          "link-stat-pending",
+          "mobile-drawer-trigger",
+          "nav-admin",
+          "nav-advanced",
+          "nav-home",
+          "nav-learning-journeys",
+          "nav-submit-resource",
+          "nav-theme",
+          "row-cat-community-events",
+          "row-cat-encoding-codecs",
+          "row-cat-general-tools",
+          "row-cat-infrastructure-delivery",
+          "row-cat-intro-learning",
+          "row-cat-media-tools",
+          "row-cat-players-clients",
+          "row-cat-protocols-transport",
+          "row-cat-standards-industry",
+          "row-pending-resource-190153",
+          "row-pending-resource-190154",
+          "row-pending-resource-190155",
+          "sidebar-resource-count",
+          "sub-adaptive-bitrate-algorithms-tools",
+          "sub-adaptive-streaming",
+          "sub-adaptive-streaming-standards",
+          "sub-ads-qoe",
+          "sub-ai-machine-learning-tools",
+          "sub-api-libraries-sdks",
+          "sub-audio-analysis-processing",
+          "sub-audio-subtitles",
+          "sub-batch-processing-automation",
+          "sub-benchmarking-performance-tools-for-codecs",
+          "sub-best-practices-guidelines",
+          "sub-books-courses",
+          "sub-browser-extensions",
+          "sub-build-scripts-automation",
+          "sub-case-studies-best-practices-in-drm",
+          "sub-case-studies-whitepapers",
+          "sub-cdn-integration-distribution",
+          "sub-closed-captioning-subtitling-standards",
+          "sub-cloud-based-encoding-solutions",
+          "sub-cloud-cdn",
+          "sub-cmaf-fmp4-packaging",
+          "sub-codecs",
+          "sub-color-grading-correction-tools",
+          "sub-color-science-histogram-analysis",
+          "sub-command-line-utilities-wrappers",
+          "sub-community-blogs-forums",
+          "sub-community-collaboration-platforms",
+          "sub-community-groups",
+          "sub-comparative-analysis-of-codecs",
+          "sub-containerization-packaging-tools",
+          "sub-conversion-format-tools",
+          "sub-cross-platform-media-tools",
+          "sub-dash-manifest-tools",
+          "sub-dash-tools",
+          "sub-desktop-players",
+          "sub-docker-containerization-tools",
+          "sub-drm",
+          "sub-drm-content-protection-standards",
+          "sub-drm-solutions-implementations",
+          "sub-drm-testing-validation-tools",
+          "sub-edge-computing-caching-solutions",
+          "sub-effects-compositing-tools",
+          "sub-embedded-players",
+          "sub-encoding-tools",
+          "sub-encoding-transcoding-guides",
+          "sub-encryption-tools-for-streaming",
+          "sub-events-conferences",
+          "sub-ffmpeg-based-tools",
+          "sub-ffmpeg-tools",
+          "sub-frameworks-ui-components",
+          "sub-hardware-accelerated-transcoding",
+          "sub-hardware-codecs-acceleration",
+          "sub-hardware-players",
+          "sub-hls-manifest-parsers-generators",
+          "sub-hls-tools",
+          "sub-independent-hobbyist-projects",
+          "sub-industry-forums-standards-bodies",
+          "sub-learning-resources",
+          "sub-live-streaming-servers",
+          "sub-logging-debugging-tools",
+          "sub-low-latency-streaming-tools",
+          "sub-metadata-extraction-management",
+          "sub-mobile-players",
+          "sub-mobile-web-players",
+          "sub-multi-cdn-management",
+          "sub-multi-format-packaging-tools",
+          "sub-next-generation-codecs-av1-vvc",
+          "sub-non-linear-editing-suites",
+          "sub-open-source-encoder-projects",
+          "sub-peer-to-peer-streaming-solutions",
+          "sub-performance-monitoring-tools",
+          "sub-player-development-documentation",
+          "sub-quality-analysis-metrics",
+          "sub-real-time-encoding-solutions",
+          "sub-research-projects-academic-resources",
+          "sub-rtmprtsphttp-protocol-servers",
+          "sub-scene-detection-segmentation",
+          "sub-scripting-automation-tools",
+          "sub-set-top-box-players",
+          "sub-smart-tv-players",
+          "sub-software-codecs",
+          "sub-software-transcoding-tools",
+          "sub-specialized-utility-scripts",
+          "sub-specs-standards",
+          "sub-streaming-analytics-monitoring",
+          "sub-streaming-servers",
+          "sub-subtitle-caption-tools",
+          "sub-test-content-sample-streams",
+          "sub-transport-protocols",
+          "sub-tutorials-case-studies",
+          "sub-uncategorized-community-events",
+          "sub-uncategorized-encoding-codecs",
+          "sub-uncategorized-general-tools",
+          "sub-uncategorized-infrastructure-delivery",
+          "sub-uncategorized-intro-learning",
+          "sub-uncategorized-media-tools",
+          "sub-uncategorized-players-clients",
+          "sub-uncategorized-protocols-transport",
+          "sub-uncategorized-standards-industry",
+          "sub-vendors-hdr",
+          "sub-video-analytics-benchmarking",
+          "sub-video-codec-specifications",
+          "sub-video-streaming-tutorials",
+          "sub-vmaf-psnr-ssim-tools",
+          "sub-vod-streaming-servers",
+          "sub-web-players",
+          "sub-webinars-conference-talks",
+          "sub-widevine-fairplay-playready-integrations",
+          "subsub-advertising",
+          "subsub-android",
+          "subsub-audio",
+          "subsub-av1",
+          "subsub-cdn-integration",
+          "subsub-chromecast",
+          "subsub-cloud-platforms",
+          "subsub-conferences",
+          "subsub-dash",
+          "subsub-ffmpeg",
+          "subsub-hdr-guidelines",
+          "subsub-hevc",
+          "subsub-hls",
+          "subsub-ios-tvos",
+          "subsub-mpeg-forums",
+          "subsub-official-specs",
+          "subsub-online-forums",
+          "subsub-origin-servers",
+          "subsub-podcasts",
+          "subsub-podcasts-webinars",
+          "subsub-quality-testing",
+          "subsub-rist",
+          "subsub-roku",
+          "subsub-rtmp",
+          "subsub-slack-meetups",
+          "subsub-smart-tvs",
+          "subsub-srt",
+          "subsub-storage-solutions",
+          "subsub-subtitles-captions",
+          "subsub-vendor-docs",
+          "subsub-vp9",
+          "subsub-web-players",
+          "tab-digests",
+          "tab-journeys",
+          "tab-subsubcategories",
+          "tags-pending-190153",
+          "tags-pending-190154",
+          "tags-pending-190155",
+          "toggle-cat-community-events",
+          "toggle-cat-encoding-codecs",
+          "toggle-cat-general-tools",
+          "toggle-cat-infrastructure-delivery",
+          "toggle-cat-intro-learning",
+          "toggle-cat-media-tools",
+          "toggle-cat-players-clients",
+          "toggle-cat-protocols-transport",
+          "toggle-cat-standards-industry"
+        ]
+      },
+      "baselineFooterTestIds": [
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms"
+      ],
+      "candidateFooterTestIds": [],
+      "expectedFooterRemovalObserved": true
+    }
+  },
+  "checks": [
+    {
+      "route": "/admin",
+      "viewport": 375,
+      "failures": [
+        "read-only guard refused 2 non-safe request(s)",
+        "read-only window guard refused 2 operation(s)"
+      ]
+    },
+    {
+      "route": "/admin#research",
+      "viewport": 375,
+      "failures": [
+        "read-only guard refused 1 non-safe request(s)",
+        "read-only window guard refused 2 operation(s)"
+      ]
+    },
+    {
+      "route": "/admin/research",
+      "viewport": 375,
+      "failures": [
+        "read-only guard refused 1 non-safe request(s)",
+        "read-only window guard refused 2 operation(s)"
+      ]
+    },
+    {
+      "route": "/admin",
+      "viewport": 1440,
+      "failures": [
+        "read-only guard refused 2 non-safe request(s)",
+        "read-only window guard refused 2 operation(s)"
+      ]
+    },
+    {
+      "route": "/admin#research",
+      "viewport": 1440,
+      "failures": [
+        "read-only guard refused 1 non-safe request(s)",
+        "read-only window guard refused 2 operation(s)"
+      ]
+    },
+    {
+      "route": "/admin/research",
+      "viewport": 1440,
+      "failures": [
+        "read-only guard refused 1 non-safe request(s)",
+        "read-only window guard refused 2 operation(s)"
+      ]
+    }
+  ],
+  "pass": false
+}

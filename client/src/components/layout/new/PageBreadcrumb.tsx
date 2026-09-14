@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import type { AwesomeListNavNode } from "@/lib/static-data";
 import {
@@ -10,6 +10,48 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { deslugify } from "@/lib/utils";
+
+const ResourceBreadcrumbAncestorDisclosure = lazy(
+  () => import("./ResourceBreadcrumbAncestorDisclosure"),
+);
+
+const RESOURCE_BREADCRUMB_DISCLOSURE_QUERY =
+  "(min-width: 768px) and (max-width: 1279px)";
+
+function ResourceBreadcrumbAncestorSlot({
+  resourceId,
+  categories,
+}: {
+  resourceId: string;
+  categories: AwesomeListNavNode[];
+}) {
+  const [eligible, setEligible] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia(RESOURCE_BREADCRUMB_DISCLOSURE_QUERY).matches,
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia(RESOURCE_BREADCRUMB_DISCLOSURE_QUERY);
+    const update = () => setEligible(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  // Do not load the resource-only chunk or render a hidden legacy selector
+  // outside the production tablet/tablet-desktop visibility interval.
+  if (!eligible) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <ResourceBreadcrumbAncestorDisclosure
+        resourceId={resourceId}
+        categories={categories}
+      />
+    </Suspense>
+  );
+}
 
 interface Crumb {
   href?: string;
@@ -60,6 +102,7 @@ const ADMIN_LABELS: Record<string, string> = {
   edits: "Edits",
   enrichment: "Enrichment",
   researcher: "Researcher",
+  research: "Research",
   export: "Export",
   database: "Database",
   resources: "Resources",
@@ -146,7 +189,11 @@ function resolveCrumbs(categories: AwesomeListNavNode[], pathname: string, title
 
 export default function PageBreadcrumb({ categories }: { categories: AwesomeListNavNode[] }) {
   const [location] = useLocation();
-  const [pageTitle, setPageTitle] = useState(() => document.title);
+  // `document` is unavailable while the public Home tree renders on Node.
+  // The effect below takes the authoritative title after hydration.
+  const [pageTitle, setPageTitle] = useState(
+    () => (typeof document === "undefined" ? "" : document.title),
+  );
   const [pageHeading, setPageHeading] = useState<string>();
 
   useEffect(() => {
@@ -170,6 +217,10 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
     [categories, location, pageHeading, pageTitle],
   );
   if (crumbs.length === 0) return null;
+  // ResourceDetail uses this exact string id in its public-detail query key.
+  // Restrict the lazy disclosure to routable public resource ids: it has no
+  // role on generic /resource 404s or any other breadcrumb shape.
+  const resourceId = /^\/resource\/(\d+)$/.exec(location)?.[1];
 
   return (
     <Breadcrumb className="mb-5 min-w-0" data-testid="page-breadcrumb">
@@ -182,6 +233,13 @@ export default function PageBreadcrumb({ categories }: { categories: AwesomeList
           const current = index === crumbs.length - 1;
           const href = crumb.href;
           return [
+            resourceId && current ? (
+              <ResourceBreadcrumbAncestorSlot
+                key={`resource-ancestor-disclosure-${resourceId}`}
+                resourceId={resourceId}
+                categories={categories}
+              />
+            ) : null,
             <BreadcrumbItem className={current ? "min-w-0" : undefined} key={`${crumb.href ?? "current"}-${crumb.label}`}>
               {current
                 ? <BreadcrumbPage className="block truncate" title={crumb.label} data-testid="breadcrumb-mobile-current">{crumb.label}</BreadcrumbPage>

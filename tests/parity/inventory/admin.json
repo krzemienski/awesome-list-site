@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "kind": "family",
   "family": "admin",
-  "summary": "Admin console tabs. The design ships 15 tabs, the app 17; the 14 shared tabs are pixel rows behind the disposable admin session.",
+  "summary": "Admin console tabs. The design ships 15 tabs; the app exposes those 15 plus three folded production-only tabs. Shared tabs are pixel rows behind the disposable admin session.",
   "screens": [
     {
       "id": "app.admin.overview",
@@ -255,8 +255,18 @@
     {
       "id": "app.admin.research",
       "kind": "app",
-      "eligibility": "blocked",
-      "reason": "Design tab \"Research\" (the 15th ADMIN_TABS entry) has no app counterpart; the app folds research into the Researcher tab."
+      "eligibility": "pixel",
+      "requires": [
+        "admin-session"
+      ],
+      "actualPath": "/admin/research",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:research",
+      "referenceAction": "admin-tab:research",
+      "actualReadySelector": "[data-testid=content-research] [data-testid=research-review-panel]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "notes": "Design tab \"Research\" (the 15th ADMIN_TABS entry) ↔ app [data-testid=tab-research]; the canonical panel passes initialTab=\"review\" to ResearcherTab. Real authorized data is required for capture."
     }
   ]
 }

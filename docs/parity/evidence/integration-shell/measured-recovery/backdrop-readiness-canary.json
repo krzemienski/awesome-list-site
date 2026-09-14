@@ -1,0 +1,144 @@
+{
+  "pass": true,
+  "before": [
+    {
+      "value": "blur(2px)",
+      "count": 1,
+      "paintEligibleCount": 1,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(3px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(4px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(5px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(6px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(7px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(8px)",
+      "count": 1,
+      "paintEligibleCount": 1,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(9px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    }
+  ],
+  "after": [
+    {
+      "value": "blur(2px)",
+      "count": 1,
+      "paintEligibleCount": 1,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(3px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(4px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(5px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(6px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(7px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(8px)",
+      "count": 1,
+      "paintEligibleCount": 1,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(99px)",
+      "count": 1,
+      "paintEligibleCount": 1,
+      "elements": [
+        "div.box"
+      ]
+    },
+    {
+      "value": "blur(9px)",
+      "count": 1,
+      "paintEligibleCount": 0,
+      "elements": [
+        "div.box"
+      ]
+    }
+  ],
+  "visibleMismatchRejected": true
+}

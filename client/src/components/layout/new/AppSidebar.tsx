@@ -1,7 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useMemo, useRef, useId, type ReactNode } from "react";
 import { useLocation, useSearch, Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import {
   Home,
   Plus,
@@ -12,10 +11,12 @@ import {
   Info,
   Palette,
   Search,
+  MoreHorizontal,
+  Github,
+  PanelLeft,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
 import { BrandMark } from "@/components/BrandMark";
-import { getCategoryIcon } from "@/config/navigation-icons";
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import "@/styles/shell/sidebar.css";
 import "@/styles/shell/drawer.css";
+import { useHomeBoot } from "@/lib/home-boot";
 
 /**
  * Run22 BUG-008: the sidebar renders from the lightweight nav tree
@@ -116,6 +118,71 @@ function formatCount(n: number): string {
   return String(n);
 }
 
+function categoryStorageKey(cat: NavCategory): string {
+  return cat.slug || getCategorySlug(cat.name);
+}
+
+/*
+ * The V2 navigation uses category glyphs as taxonomy markers. These are
+ * decorative because each category link already has an explicit accessible
+ * name, so keeping them local avoids changing the shared icon map used by
+ * other product surfaces.
+ */
+const CATEGORY_GLYPHS: Record<string, string> = {
+  "Community & Events": "◈",
+  "Encoding & Codecs": "◇",
+  "General Tools": "◆",
+  "Infrastructure & Delivery": "▣",
+  "Intro & Learning": "▤",
+  "Media Tools": "▥",
+  "Players & Clients": "▶",
+  "Protocols & Transport": "⟁",
+  "Standards & Industry": "◉",
+};
+
+function getCategoryGlyph(categoryName: string): string {
+  return CATEGORY_GLYPHS[categoryName] ?? "◈";
+}
+
+/*
+ * The reference AVSidebarV2 keeps disclosure state in localStorage so a user
+ * can move between taxonomy routes without losing their place in the tree.
+ * Keep the storage adapter deliberately defensive: this component also renders
+ * during SSR and older builds stored an object keyed by category id/name.
+ */
+const OPEN_CATEGORIES_STORAGE_KEY = "av-sb-cats";
+const OPEN_SUBCATEGORIES_STORAGE_KEY = "av-sb-subs";
+
+function readOpenKeys(key: string): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(key) || "null");
+    if (Array.isArray(stored)) {
+      return stored.filter((value): value is string => typeof value === "string");
+    }
+    if (stored && typeof stored === "object") {
+      return Object.entries(stored)
+        .filter(([, value]) => value === true)
+        .map(([name]) => name);
+    }
+  } catch {
+    // A malformed or unavailable preference must not prevent navigation.
+  }
+  return [];
+}
+
+function writeOpenKeys(key: string, values: string[]) {
+  try {
+    const state = values.reduce<Record<string, boolean>>((result, value) => {
+      result[value] = true;
+      return result;
+    }, {});
+    window.localStorage.setItem(key, JSON.stringify(state));
+  } catch {
+    // localStorage is optional (private mode and strict browser policies).
+  }
+}
+
 /* -------- sub-rows -------- */
 
 function SubItem({
@@ -146,6 +213,7 @@ function SubItem({
       }}
       data-testid={testId}
       data-active={active || undefined}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "sub-item touch-manipulation min-h-[44px] no-underline w-full",
         size === "xs" && "text-[12px]",
@@ -195,10 +263,23 @@ function SubItem({
 
 function MeasuredAccordionBody({
   id, open, children,
-}: { id: string; open: boolean; children: ReactNode }) {
+}: { id: string; open: boolean; children: () => ReactNode }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
+  // Keep the control's target in the DOM while closed, but delay the expensive
+  // taxonomy subtree (and its ResizeObserver) until a user opens it once.
+  // `open` makes an active route mount immediately; `hasBeenOpened` keeps the
+  // body mounted for the same subsequent close/reopen animation and focus
+  // behavior as before.
+  const [hasBeenOpened, setHasBeenOpened] = useState(open);
+  const shouldMountContent = open || hasBeenOpened;
+
   useEffect(() => {
+    if (open) setHasBeenOpened(true);
+  }, [open]);
+
+  useEffect(() => {
+    if (!shouldMountContent) return;
     const content = contentRef.current;
     if (!content) return;
     const measure = () => setHeight(content.scrollHeight);
@@ -208,12 +289,15 @@ function MeasuredAccordionBody({
     const observer = new ResizeObserver(measure);
     observer.observe(content);
     return () => observer.disconnect();
-  }, []);
+  }, [shouldMountContent]);
+
   return (
     <div id={id} className="accordion-body"
       style={{ maxHeight: open ? height : 0 }}
       {...(!open ? ({ inert: "" } as any) : {})}>
-      <div ref={contentRef} className="flow-root">{children}</div>
+      {shouldMountContent ? (
+        <div ref={contentRef} className="flow-root">{children()}</div>
+      ) : null}
     </div>
   );
 }
@@ -241,9 +325,9 @@ function CategoryAccordion({
   openSubs: string[];
   toggleSub: (key: string) => void;
 }) {
-  const subKey = (subName: string) => `${cat.name}::${subName}`;
-  const CategoryIcon = getCategoryIcon(cat.name);
   const catSlug = cat.slug || getCategorySlug(cat.name);
+  const subKey = (subName: string, subSlug?: string) =>
+    `${catSlug}::${subSlug || slugify(subName)}`;
   // Tablet can mount both the sidebar and drawer; disclosure IDs must belong
   // to the mounted instance, not just the shared category.
   const instanceId = useId();
@@ -255,6 +339,9 @@ function CategoryAccordion({
   // nearest valid node, so this always equals COUNT(*) WHERE category = X and
   // always equals (direct + sum of child badges) — no "mixed validators".
   const totalCount = getTotalResourceCount(cat);
+  const hasGrandchildren = subs.some(
+    (sub) => (sub.subSubcategories?.length ?? 0) > 0,
+  );
 
   // Resources assigned to this category but to no subcategory. They are real
   // and reachable on the category page, but without a "General" line the child
@@ -295,22 +382,27 @@ function CategoryAccordion({
         <Link
           href={catPath}
           data-testid={`row-cat-${catSlug}`}
-          aria-label={`Open ${cat.name} category page`}
+          aria-label={`Open ${cat.name} category page${hasGrandchildren ? ", contains nested groups" : ""}`}
+          aria-current={isActive ? "page" : undefined}
           className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm min-h-[44px] md:min-h-[36px]"
         >
           <span
-            className="flex items-center justify-center shrink-0"
+            className="av-sidebar-category-glyph flex items-center justify-center shrink-0"
             style={{
-              width: 24,
-              height: 24,
-              borderRadius: 6,
+              // DS-OK: frozen awesome-list-site-ds/layout.jsx Sidebar and
+              // MobileDrawer category glyphs use 22px, 5px radius, 12px ink,
+              // and this inactive rgba(255,255,255,0.04) fill exactly.
+              width: 22,
+              height: 22,
+              borderRadius: 5,
               background: isActive
-                ? "color-mix(in srgb, var(--accent) 22%, transparent)"
-                : "color-mix(in srgb, var(--text) 4%, transparent)",
+                ? "color-mix(in srgb, var(--accent) 25%, transparent)"
+                : "rgba(255,255,255,0.04)", // DS-OK: frozen awesome-list-site-ds/layout.jsx Sidebar/MobileDrawer category glyph inactive fill.
               color: isActive ? "var(--accent)" : "var(--text-2)",
             }}
+            aria-hidden="true"
           >
-            <CategoryIcon className="size-[13px]" />
+            {getCategoryGlyph(cat.name)}
           </span>
           <span
             className="min-w-0 break-words"
@@ -324,7 +416,16 @@ function CategoryAccordion({
             {cat.name}
           </span>
         </Link>
-        <span className="flex items-center gap-2 shrink-0 pl-2">
+        <span className="flex items-center gap-1.5 shrink-0 pl-2">
+          {hasGrandchildren && (
+            <span
+              className="av-sidebar-l3-indicator"
+              title="Contains nested subcategories"
+              aria-hidden="true"
+            >
+              L3
+            </span>
+          )}
           <span
             className="font-mono tabular-nums"
             style={{ fontSize: 12, color: "var(--text-3)" }}
@@ -356,10 +457,11 @@ function CategoryAccordion({
 
       {(subs.length > 0 || directCount > 0) && (
         <MeasuredAccordionBody id={bodyId} open={isOpen}>
-          <div className="accordion-body-inner">
-            {/* P4 — removed "All in {cat.name} →" link; not present in ref 09/10.
-                Users open the category page by clicking the category row itself. */}
-            {subs
+          {() => (
+            <div className="accordion-body-inner">
+              {/* P4 — removed "All in {cat.name} →" link; not present in ref 09/10.
+                  Users open the category page by clicking the category row itself. */}
+              {subs
               .filter(
                 (sub) =>
                   !matchQuery ||
@@ -394,13 +496,16 @@ function CategoryAccordion({
                       <button
                         type="button"
                         onClick={() => toggleSub(subKey(sub.name))}
-                        aria-label={`Toggle ${sub.name}`}
+                        aria-label={`${subOpen ? "Collapse" : "Expand"} ${subSubs.length} nested groups in ${sub.name}`}
                         aria-expanded={subOpen}
                         aria-controls={`${bodyId}-sub-${subSlug}`}
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
                         className="shrink-0 inline-flex items-center justify-center w-10 min-w-10 min-h-[44px] -mx-2 rounded-md hover:bg-[var(--surface)] text-[var(--text-3)] hover:text-[var(--text)]"
                       >
+                        <span className="av-sidebar-nested-count" aria-hidden="true">
+                          +{subSubs.length}
+                        </span>
                         <ChevronRight className={cn("size-3 chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                       <SubItem
@@ -413,52 +518,55 @@ function CategoryAccordion({
                       />
                     </div>
                     <MeasuredAccordionBody id={`${bodyId}-sub-${subSlug}`} open={subOpen}>
-                      <div
-                        style={{
-                          paddingLeft: 22,
-                          marginTop: 2,
-                          marginBottom: 4,
-                          borderLeft: "1px solid var(--border)",
-                          marginLeft: 10,
-                        }}
-                      >
-                        {subSubs.map((ss) => {
-                          const ssSlug = ss.slug || slugify(ss.name);
-                          const ssPath = `/sub-subcategory/${ssSlug}`;
-                          return (
-                            <SubItem
-                              key={ss.name}
-                              label={ss.name}
-                              count={getTotalResourceCount(ss)}
-                              href={ssPath}
-                              active={activePath === ssPath}
-                              onClick={() => navigate(ssPath)}
-                              testId={`subsub-${ssSlug}`}
-                              size="xs"
-                            />
-                          );
-                        })}
-                      </div>
+                      {() => (
+                        <div
+                          style={{
+                            paddingLeft: 22,
+                            marginTop: 2,
+                            marginBottom: 4,
+                            borderLeft: "1px solid var(--border)",
+                            marginLeft: 10,
+                          }}
+                        >
+                          {subSubs.map((ss) => {
+                            const ssSlug = ss.slug || slugify(ss.name);
+                            const ssPath = `/sub-subcategory/${ssSlug}`;
+                            return (
+                              <SubItem
+                                key={ss.name}
+                                label={ss.name}
+                                count={getTotalResourceCount(ss)}
+                                href={ssPath}
+                                active={activePath === ssPath}
+                                onClick={() => navigate(ssPath)}
+                                testId={`subsub-${ssSlug}`}
+                                size="xs"
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
                     </MeasuredAccordionBody>
                   </div>
                 );
               })}
-            {directCount > 0 &&
-              (!matchQuery ||
-                cat.name.toLowerCase().includes(matchQuery.toLowerCase()) ||
-                "uncategorized".includes(matchQuery.toLowerCase())) && (
-                <SubItem
-                  label="Uncategorized"
-                  count={directCount}
-                  href={generalPath}
-                  active={generalActive}
-                  onClick={() => navigate(generalPath)}
-                  testId={`sub-uncategorized-${catSlug}`}
-                  italic
-                />
-              )}
+              {directCount > 0 &&
+                (!matchQuery ||
+                  cat.name.toLowerCase().includes(matchQuery.toLowerCase()) ||
+                  "uncategorized".includes(matchQuery.toLowerCase())) && (
+                  <SubItem
+                    label="Uncategorized"
+                    count={directCount}
+                    href={generalPath}
+                    active={generalActive}
+                    onClick={() => navigate(generalPath)}
+                    testId={`sub-uncategorized-${catSlug}`}
+                    italic
+                  />
+                )}
 
-          </div>
+            </div>
+          )}
         </MeasuredAccordionBody>
       )}
     </div>
@@ -475,13 +583,49 @@ export default function AppSidebar({
   onRetryNav,
   user,
 }: AppSidebarProps) {
+  const homeBoot = useHomeBoot();
+  const isInitialHomeHydration = homeBoot?.isAnonymous === true;
   const [location, setLocation] = useLocation();
   const activeSearch = useSearch();
-  const [openCategories, setOpenCategories] = useState<string[]>([]);
-  const [openSubcategories, setOpenSubcategories] = useState<string[]>([]);
-  const { setOpenMobile, isMobile, isDrawer, isPhone, openMobile } = useSidebar();
+  const [openCategories, setOpenCategories] = useState<string[]>(() =>
+    isInitialHomeHydration ? [] : readOpenKeys(OPEN_CATEGORIES_STORAGE_KEY),
+  );
+  const [openSubcategories, setOpenSubcategories] = useState<string[]>(() =>
+    isInitialHomeHydration ? [] : readOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY),
+  );
+  const [openKeysReady, setOpenKeysReady] = useState(!isInitialHomeHydration);
+  const {
+    setOpenMobile,
+    isMobile,
+    isDrawer,
+    isPhone,
+    openMobile,
+    open,
+    setOpen,
+  } = useSidebar();
+  // `open` is the SidebarProvider's persisted desktop preference. Tablet and
+  // phone layouts retain the canonical expanded/drawer behavior, so only a
+  // desktop user choice exposes the compact rail.
+  const isRailCompact = !isDrawer && !open;
 
   const filtered = useMemo(() => filterCategories(categories), [categories]);
+
+  useEffect(() => {
+    if (!homeBoot || openKeysReady) return;
+    setOpenCategories(readOpenKeys(OPEN_CATEGORIES_STORAGE_KEY));
+    setOpenSubcategories(readOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY));
+    setOpenKeysReady(true);
+  }, [homeBoot, openKeysReady]);
+
+  useEffect(() => {
+    if (!openKeysReady) return;
+    writeOpenKeys(OPEN_CATEGORIES_STORAGE_KEY, openCategories);
+  }, [openCategories, openKeysReady]);
+
+  useEffect(() => {
+    if (!openKeysReady) return;
+    writeOpenKeys(OPEN_SUBCATEGORIES_STORAGE_KEY, openSubcategories);
+  }, [openSubcategories, openKeysReady]);
 
   /* auto-expand active category and subcategory on route change */
   useEffect(() => {
@@ -495,22 +639,25 @@ export default function AppSidebar({
       const slug = parts[2];
       const matchCat = categories.find(
         (cat) =>
-          getCategorySlug(cat.name) === slug ||
-          cat.subcategories?.some((sub) => sub.slug === slug) ||
+          (cat.slug || getCategorySlug(cat.name)) === slug ||
+          cat.subcategories?.some((sub) => (sub.slug || slugify(sub.name)) === slug) ||
           cat.subcategories?.some((sub) =>
-            sub.subSubcategories?.some((ss) => ss.slug === slug),
+            sub.subSubcategories?.some((ss) => (ss.slug || slugify(ss.name)) === slug),
           ),
       );
       if (matchCat) {
+        const matchCatKey = categoryStorageKey(matchCat);
         setOpenCategories((prev) =>
-          prev.includes(matchCat.name) ? prev : [...prev, matchCat.name],
+          prev.includes(matchCatKey) || prev.includes(matchCat.name)
+            ? prev
+            : [...prev, matchCatKey],
         );
         if (parts[1] === "sub-subcategory") {
           const matchSub = matchCat.subcategories?.find((sub) =>
-            sub.subSubcategories?.some((ss) => ss.slug === slug),
+            sub.subSubcategories?.some((ss) => (ss.slug || slugify(ss.name)) === slug),
           );
           if (matchSub) {
-            const key = `${matchCat.name}::${matchSub.name}`;
+            const key = `${matchCat.slug || getCategorySlug(matchCat.name)}::${matchSub.slug || slugify(matchSub.name)}`;
             setOpenSubcategories((prev) =>
               prev.includes(key) ? prev : [...prev, key],
             );
@@ -574,12 +721,14 @@ export default function AppSidebar({
     { label: "Advanced", icon: Zap, href: "/advanced" },
     { label: "Theme", icon: Palette, href: "/settings/theme" },
   ];
+  const accountDashboardItem = {
+    label: "Home dashboard",
+    icon: Home,
+    href: "/?context=account",
+    testId: "nav-home-dashboard",
+  };
 
   const totalCats = filtered.length;
-  const totalSubcategories = filtered.reduce(
-    (total, category) => total + (category.subcategories?.length ?? 0),
-    0,
-  );
 
   const brandHeader = (
     <SidebarHeader className="av-sidebar-drawer-header border-b p-0">
@@ -605,7 +754,7 @@ export default function AppSidebar({
   );
 
   const categoryList = (
-    <div className="av-sidebar-category-list">
+    <div className="av-sidebar-category-list av-sidebar-tree-scroll">
       {isLoading
         ? Array.from({ length: 8 }).map((_, i) => (
             <div
@@ -623,7 +772,9 @@ export default function AppSidebar({
             </div>
           ))
         : filtered.map((cat) => {
-            const isOpen = openCategories.includes(cat.name);
+            const catKey = categoryStorageKey(cat);
+            const isOpen =
+              openCategories.includes(catKey) || openCategories.includes(cat.name);
             const catSlug = cat.slug || getCategorySlug(cat.name);
             const catActive =
               activePath === `/category/${catSlug}` ||
@@ -648,9 +799,9 @@ export default function AppSidebar({
                 isOpen={isOpen}
                 onToggle={() =>
                   setOpenCategories((prev) =>
-                    prev.includes(cat.name)
-                      ? prev.filter((c) => c !== cat.name)
-                      : [...prev, cat.name],
+                    prev.includes(catKey) || prev.includes(cat.name)
+                      ? prev.filter((c) => c !== catKey && c !== cat.name)
+                      : [...prev, catKey],
                   )
                 }
                 isActive={catActive}
@@ -724,17 +875,28 @@ export default function AppSidebar({
       testId: "footer-about",
     },
   ];
-  const drawerMoreItems = navItems.slice(2);
+  const drawerMoreItems = [...navItems.slice(2), accountDashboardItem];
   const desktopMoreItems = [
     ...navItems.slice(1).map((item) => ({
       ...item,
       testId: `nav-${slugify(item.label)}`,
     })),
+    accountDashboardItem,
     ...(user?.role === "admin"
       ? [{ label: "Admin", icon: Shield, href: "/admin", testId: "nav-admin" }]
       : []),
     { label: "About", icon: Info, href: "/about", testId: "footer-about" },
   ];
+
+  const resourceStatus = (
+    <>
+      {navError && totalResources === 0
+        ? "Catalog unavailable"
+        : isLoading || totalResources === 0
+          ? "Loading resources"
+          : `${totalResources.toLocaleString()} indexed`}
+    </>
+  );
 
   const renderMoreNavigation = (
     items: Array<{
@@ -744,12 +906,41 @@ export default function AppSidebar({
       testId?: string;
     }>,
     className = "",
+    compact = false,
+    showNavigationModeToggle = false,
   ) => (
     <details className={`av-sidebar-more-navigation ${className}`}>
-      <summary className="flex min-h-[44px] cursor-pointer items-center px-3 text-xs font-medium text-[var(--text-2)]">
-        More navigation
+      <summary
+        className="flex min-h-[44px] cursor-pointer items-center px-3 text-xs font-medium text-[var(--text-2)]"
+        aria-label={compact ? "More navigation" : undefined}
+        title={compact ? "More navigation" : undefined}
+      >
+        {compact ? (
+          <MoreHorizontal aria-hidden="true" className="size-4" />
+        ) : (
+          "More navigation"
+        )}
       </summary>
       <SidebarMenu className="px-2 pb-2">
+        {showNavigationModeToggle && (
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild className="min-h-[44px]">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                data-testid="sidebar-compact-navigation"
+                aria-label="Compact navigation"
+                title="Compact navigation"
+                className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
+              >
+                <span className="flex min-w-0 items-center gap-[10px]">
+                  <PanelLeft aria-hidden="true" className="size-[14px] shrink-0" />
+                  <span className="break-words">Compact navigation</span>
+                </span>
+              </button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
         {items.map((item) => {
           const MoreIcon = item.icon;
           return (
@@ -763,6 +954,7 @@ export default function AppSidebar({
               }}
               data-testid={item.testId ?? `nav-${slugify(item.label)}`}
               data-active={isActive(item.href) || undefined}
+              aria-current={isActive(item.href) ? "page" : undefined}
               className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
             >
               <span className="flex min-w-0 items-center gap-[10px]">
@@ -776,6 +968,106 @@ export default function AppSidebar({
         })}
       </SidebarMenu>
     </details>
+  );
+
+  const homeNavigation = (
+    <div className="av-sidebar-home-navigation">
+      <a
+        href="/"
+        onClick={(e) => {
+          e.preventDefault();
+          navigate("/");
+        }}
+        data-testid="nav-home"
+        data-active={isActive("/") || undefined}
+        aria-current={isActive("/") ? "page" : undefined}
+        className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
+      >
+        <span className="flex min-w-0 items-center gap-[10px]">
+          <Home className="size-[14px] shrink-0" />
+          <span className="break-words">Home</span>
+        </span>
+      </a>
+    </div>
+  );
+
+  const categoriesHeading = (
+    <div className="av-sidebar-categories-heading">
+      <div
+        className="font-mono uppercase"
+        style={{
+          fontSize: 9.5,
+          letterSpacing: 1.8,
+          fontWeight: 700,
+          color: "var(--text-3)",
+        }}
+      >
+        CATEGORIES{" "}
+        {isLoading ? (
+          <Skeleton className="inline-block h-3 w-4 rounded align-middle" />
+        ) : (
+          `· ${totalCats}`
+        )}
+      </div>
+    </div>
+  );
+
+  /*
+   * The V2 reference ends the sidebar with a compact, pinned identity row.
+   * Product routes remain available in the same keyboard-operable disclosure
+   * rather than being removed to make room for that footer.
+   */
+  const compactFooter = (
+    items: Array<{
+      label: string;
+      icon: typeof Home;
+      href: string;
+      testId?: string;
+    }>,
+    className: string,
+    includeDocs = false,
+    exposeResourceTestId = false,
+    showNavigationModeToggle = false,
+  ) => (
+    <SidebarFooter className={`av-sidebar-compact-footer ${className}`}>
+      <div className="av-sidebar-compact-footer-status">
+        <span className="live-dot" aria-hidden="true" />
+        <span
+          className="av-sidebar-compact-footer-copy"
+          {...(exposeResourceTestId
+            ? { "data-testid": "sidebar-resource-count" }
+            : {})}
+        >
+          {resourceStatus} · live
+        </span>
+        <div className="av-sidebar-compact-footer-links">
+          {includeDocs && (
+            <a
+              href="https://github.com/krzemienski/awesome-video/tree/main/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Docs ↗
+            </a>
+          )}
+          <a
+            href="https://github.com/krzemienski/awesome-video"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Source: krzemienski/awesome-video"
+            title="Source: krzemienski/awesome-video"
+          >
+            <Github aria-hidden="true" className="size-[13px]" />
+          </a>
+        </div>
+        {renderMoreNavigation(
+          items,
+          "av-sidebar-footer-more",
+          true,
+          showNavigationModeToggle,
+        )}
+      </div>
+    </SidebarFooter>
   );
 
   const drawerContent = (
@@ -814,11 +1106,12 @@ export default function AppSidebar({
               }}
               data-testid={item.testId}
               data-active={isActive(item.href) || undefined}
+              aria-current={isActive(item.href) ? "page" : undefined}
               className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
             >
               <span className="flex items-center gap-[10px] min-w-0">
                 <DrawerIcon className="size-[14px] shrink-0" />
-                <span className="truncate">{item.label}</span>
+                <span className="break-words">{item.label}</span>
               </span>
             </a>
           );
@@ -832,58 +1125,21 @@ export default function AppSidebar({
             }}
             data-testid="nav-admin"
             data-active={isActive("/admin") || undefined}
+            aria-current={isActive("/admin") ? "page" : undefined}
             className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
           >
             <span className="flex items-center gap-[10px] min-w-0">
               <Shield className="size-[14px] shrink-0" />
-              <span className="truncate">Admin</span>
+              <span className="break-words">Admin</span>
             </span>
           </a>
         )}
       </nav>
-      {/* The rail remains a hidden baseline compatibility surface only; route
-          links themselves stay visible through More navigation below. */}
-      <div className="av-sidebar-drawer-legacy-compat" aria-hidden="true">
-        {[
-          ...navItems,
-          ...(user?.role === "admin"
-            ? [{ label: "Admin", icon: Shield, href: "/admin" }]
-            : []),
-          { label: "About", icon: Info, href: "/about" },
-        ].map((item) => (
-          <a
-            key={`rail-${item.href}`}
-            href={item.href}
-            data-testid={`rail-${slugify(item.label)}`}
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
       <div className="av-sidebar-drawer-categories-label">
         <div className="font-mono">CATEGORIES</div>
       </div>
       {categoryList}
-      {renderMoreNavigation(drawerMoreItems, "px-3 pt-2")}
-      <SidebarFooter className="av-sidebar-drawer-footer">
-        <span>{totalResources.toLocaleString()} indexed</span>
-        <div>
-          <a
-            href="https://github.com/krzemienski/awesome-video/tree/main/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Docs ↗
-          </a>
-          <a
-            href="https://github.com/krzemienski/awesome-video"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub ↗
-          </a>
-        </div>
-      </SidebarFooter>
+      {compactFooter(drawerMoreItems, "av-sidebar-drawer-footer", true)}
     </>
   );
 
@@ -892,6 +1148,7 @@ export default function AppSidebar({
       collapsible="none"
       variant="sidebar"
       drawerContent={drawerContent}
+      className={cn(isRailCompact && "av-sidebar-rail-compact")}
     >
       {/* DS shell parity — on desktop/tablet the brand lives in the full-width
           header, NEVER in the sidebar/rail (reference layout.jsx). The brand
@@ -901,135 +1158,63 @@ export default function AppSidebar({
       {(isMobile || isDrawer) && brandHeader}
 
       <SidebarContent className="gap-0">
-        {/* Legacy rail selectors remain in the tree for production baseline
-            compatibility, but the canonical default shell deliberately does
-            not expose a collapsed icon rail. sidebar.css keeps this hidden;
-            a future explicit variant may opt in without changing row IDs. */}
-        <div
-          className="av-sidebar-icon-rail hidden group-data-[collapsible=icon]:flex flex-col items-center gap-1.5 py-3"
-          aria-hidden="true"
-        >
-          {[
-            ...navItems,
-            ...(user?.role === "admin"
-              ? [{ label: "Admin", icon: Shield, href: "/admin" }]
-              : []),
-            { label: "About", icon: Info, href: "/about" },
-          ].map((item) => {
-            const RailIcon = item.icon;
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(item.href);
-                }}
-                title={item.label}
-                aria-label={item.label}
-                data-testid={`rail-${slugify(item.label)}`}
-                data-active={isActive(item.href) || undefined}
-                className={cn(
-                  "rail-icon-btn no-underline touch-manipulation",
-                  isActive(item.href) && "active",
-                )}
-              >
-                <RailIcon className="size-4" />
-              </a>
-            );
-          })}
-        </div>
-
-        {/* CANONICAL DESKTOP ORDER: BROWSE/Categories, Home, category tree,
-            then OPS counts. Product routes live in accessible More navigation
-            details below OPS rather than preceding the canonical tree. */}
-        <div className="px-[18px] pt-[18px] pb-2 group-data-[collapsible=icon]:hidden">
+        {isRailCompact && (
           <div
-            className="font-mono uppercase"
-            style={{
-              fontSize: 9.5,
-              letterSpacing: 1.8,
-              fontWeight: 700,
-              color: "var(--text-3)",
-            }}
+            className="av-sidebar-icon-rail flex flex-col items-center gap-1.5 py-3"
+            aria-hidden={false}
           >
-            Browse
-          </div>
-          <div
-            style={{ marginTop: 6, fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}
-          >
-            Categories{" "}
-            <span style={{ color: "var(--text-3)", fontWeight: 400 }}>
-              ·{" "}
-              {isLoading ? (
-                <Skeleton className="inline-block h-3 w-4 rounded align-middle" />
-              ) : (
-                totalCats
-              )}
-            </span>
-          </div>
-        </div>
-        <div className="px-3 pb-2 group-data-[collapsible=icon]:hidden">
-          <a
-            href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/");
-            }}
-            data-testid="nav-home"
-            data-active={isActive("/") || undefined}
-            className="sub-item touch-manipulation min-h-[44px] no-underline w-full"
-          >
-            <span className="flex min-w-0 items-center gap-[10px]">
-              <Home className="size-[14px] shrink-0" />
-              <span>Home</span>
-            </span>
-          </a>
-        </div>
-
-        {/* ACCORDION CATEGORY LIST */}
-        {categoryList}
-
-        <div className="px-[18px] py-[18px] group-data-[collapsible=icon]:hidden">
-          <div
-            className="font-mono uppercase"
-            style={{
-              fontSize: 9.5,
-              letterSpacing: 1.8,
-              fontWeight: 700,
-              color: "var(--text-3)",
-              marginBottom: 10,
-            }}
-          >
-            OPS
-          </div>
-          <div
-            className="font-mono"
-            style={{
-              fontSize: 11,
-              lineHeight: 1.7,
-              color: "var(--text-3)",
-            }}
-          >
-            <div data-testid="sidebar-resource-count">
-              {navError && totalResources === 0
-                ? "Catalog unavailable"
-                : isLoading || totalResources === 0
-                  ? "Loading resources"
-                  : `${totalResources.toLocaleString()} resources`}
-            </div>
-            <div>{totalSubcategories} subcategories</div>
-            <div>{totalCats} top-level</div>
-            <span
-              className="mt-1.5 inline-flex items-center gap-1.5"
-              style={{ color: "var(--accent)" }}
+            {[
+              ...navItems,
+              ...(user?.role === "admin"
+                ? [{ label: "Admin", icon: Shield, href: "/admin" }]
+                : []),
+              { label: "About", icon: Info, href: "/about" },
+            ].map((item) => {
+              const RailIcon = item.icon;
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(item.href);
+                  }}
+                  title={item.label}
+                  aria-label={item.label}
+                  data-testid={`rail-${slugify(item.label)}`}
+                  data-active={isActive(item.href) || undefined}
+                  className={cn(
+                    "rail-icon-btn no-underline touch-manipulation",
+                    isActive(item.href) && "active",
+                  )}
+                >
+                  <RailIcon aria-hidden="true" className="size-4" />
+                </a>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="rail-icon-btn rail-expand-navigation touch-manipulation"
+              data-testid="sidebar-expanded-navigation"
+              aria-label="Expand navigation"
+              title="Expand navigation"
             >
-              <span className="live-dot" aria-hidden="true" />
-              indexed
-            </span>
+              <PanelLeft aria-hidden="true" className="size-4" />
+            </button>
           </div>
+        )}
+
+        {/* V2 canonical order: Home, Categories, independently scrolling tree,
+            then the compact pinned footer. No OPS/Browse interstitials. */}
+        <div className="av-sidebar-expanded-navigation">
+          <div>
+            {homeNavigation}
+            {categoriesHeading}
+          </div>
+          {categoryList}
+          {compactFooter(desktopMoreItems, "", false, true, !isDrawer)}
         </div>
-        {renderMoreNavigation(desktopMoreItems, "group-data-[collapsible=icon]:hidden")}
 
       </SidebarContent>
     </Sidebar>

@@ -3,9 +3,11 @@ name: Long-running jobs under the 120s bash cap
 description: Pattern for multi-minute scripts when nohup/background processes get killed
 ---
 
-**Rule:** background processes (`nohup ... &`) launched from the bash tool are killed when the bash session ends — they do NOT survive. For any job longer than ~100s, make the script resumable: persist a cursor/state file + append-only JSONL output, give the script an internal time budget (~88s) so it exits cleanly, and re-invoke until done.
+**Rule:** detached processes (`nohup ... &`) launched from a short-lived shell do not reliably survive its end. Prefer the parent agent's managed `ShellExec` with `run_in_background: true`, retaining its task ID and log path. A worker's detached PID file is not proof of a live process. When managed background execution is unavailable, make the script resumable: persist a cursor/state file and append-only JSONL output, use an internal time budget (~88s), and re-invoke until done.
 
 **Why:** a 2,365-URL link scan died silently twice under nohup before switching to budget+cursor batching, which completed reliably across ~8 invocations.
+
+Delegated performance runs likewise left dead PID files and empty output while appearing started. Parent-managed background execution kept the server and capture alive. Temporary files can disappear between user turns; retain completed, sanitized evidence in the workspace once captures finish.
 
 **How to apply:**
 - Write state after every chunk; on start, resume from state. Idempotency note: append happens before cursor write, so a hard kill can duplicate rows — dedupe by id when consuming results.

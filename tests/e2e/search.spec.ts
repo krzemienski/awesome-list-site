@@ -4,6 +4,9 @@ const categoryLinks = (page: import('@playwright/test').Page) =>
   page.locator('[data-testid="list-categories"] [data-testid^="link-category-"]');
 test.describe('Search and Discovery Flow', () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('awesome-video-home-layout', 'index');
+    });
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
   });
@@ -51,17 +54,12 @@ test.describe('Search and Discovery Flow', () => {
       expect(page.url()).toContain(categorySlug || '/category/');
 
       // Verify category page content loaded
-      await expect(page.getByRole('link', { name: /Back to Home/i })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     });
 
     test('should display resource count in page description', async ({ page }) => {
-      const description = page.getByText(/Explore.*categories with.*curated resources/i);
-      await expect(description).toBeVisible();
-
-      // Verify numbers are present
-      const text = await description.textContent();
-      expect(text).toMatch(/\d+.*categories/i);
-      expect(text).toMatch(/\d+.*resources/i);
+      await expect(page.getByTestId('home-stat-resources')).toContainText(/\d/);
+      await expect(page.getByTestId('home-stat-categories')).toContainText(/\d/);
     });
   });
 
@@ -73,7 +71,7 @@ test.describe('Search and Discovery Flow', () => {
 
       // Verify dialog opened
       await expect(page.getByRole('dialog')).toBeVisible();
-      await expect(page.getByRole('heading', { name: /Find resources/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
       await expect(page.getByPlaceholder(/Search resources/i)).toBeVisible();
     });
 
@@ -84,7 +82,7 @@ test.describe('Search and Discovery Flow', () => {
 
       // Verify dialog opened
       await expect(page.getByRole('dialog')).toBeVisible();
-      await expect(page.getByRole('heading', { name: /Find resources/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
     });
 
     test('should focus search input when dialog opens', async ({ page }) => {
@@ -107,8 +105,8 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Verify placeholder message
-      await expect(page.getByText(/Start typing to search/i)).toBeVisible();
-      await expect(page.getByText(/Type at least 2 characters/i)).toBeVisible();
+      await expect(page.getByRole('listbox', { name: 'Suggestions' })).toBeVisible();
+      await expect(page.getByRole('group', { name: 'Pages' })).toBeVisible();
     });
 
     test('should close dialog with the advertised Escape shortcut', async ({ page }) => {
@@ -149,7 +147,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForTimeout(300);
 
       // Verify "no results" message
-      await expect(page.getByText(/No results found/i)).toBeVisible();
+      await expect(page.getByText(/No results for/i)).toBeVisible();
       await expect(page.getByText(/Try different keywords/i)).toBeVisible();
     });
 
@@ -182,8 +180,8 @@ test.describe('Search and Discovery Flow', () => {
       const searchInput = page.getByPlaceholder(/Search resources/i);
       await searchInput.fill('a');
 
-      // Should still show placeholder message
-      await expect(page.getByText(/Start typing to search/i)).toBeVisible();
+      // A one-character query retains the useful suggestion groups.
+      await expect(page.getByRole('group', { name: 'Pages' })).toBeVisible();
 
       // Type second character
       await searchInput.fill('ab');
@@ -191,8 +189,8 @@ test.describe('Search and Discovery Flow', () => {
       // Wait for search to process
       await page.waitForTimeout(300);
 
-      // Should now show results or no results (not placeholder)
-      await expect(page.getByText(/Start typing to search/i)).not.toBeVisible();
+      // The two-character query enters the live result state.
+      await expect(page.locator('[data-testid^="search-result-"], [data-testid="search-no-results"], [data-testid="search-view-all"]').first()).toBeVisible();
     });
 
     test('should display resource details in search results', async ({ page }) => {
@@ -252,7 +250,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Verify category page elements
-      await expect(page.getByRole('link', { name: /Back to Home/i })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
       // Should have some resources or a message
       const pageContent = await page.textContent('body');
@@ -267,7 +265,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForLoadState('domcontentloaded');
 
       // Click back button
-      await page.getByRole('link', { name: /Back to Home/i }).click();
+      await page.getByRole('link', { name: 'Home', exact: true }).first().click();
       await page.waitForLoadState('domcontentloaded');
 
       // Verify we're back on home page
@@ -375,7 +373,7 @@ test.describe('Search and Discovery Flow', () => {
       await expect(dialog).toBeVisible();
 
       // Should have accessible title
-      await expect(page.getByRole('heading', { name: /Find resources/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
 
       // Search input should have placeholder
       const input = page.getByPlaceholder(/Search resources/i);

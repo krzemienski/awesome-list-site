@@ -25,13 +25,14 @@
       "id": "app.shell.mobile-drawer",
       "kind": "app",
       "eligibility": "pixel",
-      "widths": [375],
+      "widths": [375, 768, 1024, 1440],
       "actualPath": "/",
       "referencePath": "/index.html",
-      "actualAction": "mobile-drawer",
-      "referenceAction": "mobile-drawer",
-      "actualReadySelector": "[role=dialog]",
-      "referenceReadySelector": ".mobile-drawer.open"
+      "actualAction": "mobile-drawer-responsive",
+      "referenceAction": "mobile-drawer-responsive",
+      "actualReadySelector": "header",
+      "referenceReadySelector": "header",
+      "notes": "Open drawer through the actual header trigger at <=1024; at 1440 assert the trigger is hidden and capture the canonical closed desktop state."
     },
     {
       "id": "app.not-found",

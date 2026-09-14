@@ -1,0 +1,163 @@
+{
+  "recoveredFromCompletedProfile": true,
+  "capture": {
+    "capturedAt": "2026-09-13T22:15:05.945Z",
+    "requestedUrl": "http://127.0.0.1:5101/",
+    "finalUrl": "http://127.0.0.1:5101/",
+    "viewport": {
+      "width": 412,
+      "height": 915
+    },
+    "sourceMappedBuild": "task565-cpu-profile-build"
+  },
+  "profile": {
+    "sampleDurationMs": 3147.796,
+    "sampledSelfTimeMs": 3147.166,
+    "runtime": {
+      "idleMs": 2504.847,
+      "programMs": 377.359,
+      "garbageCollectorMs": 7.638
+    },
+    "topModules": [
+      {
+        "source": "node_modules/react-dom/cjs/react-dom.production.min.js",
+        "selfMs": 42.623
+      },
+      {
+        "source": "client/src/components/layout/new/MainLayout.tsx",
+        "selfMs": 31.989
+      },
+      {
+        "source": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+        "selfMs": 31.959
+      },
+      {
+        "source": "client/src/components/layout/new/AppHeader.tsx",
+        "selfMs": 13.512
+      },
+      {
+        "source": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+        "selfMs": 12.077
+      },
+      {
+        "source": "node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+        "selfMs": 8.067
+      },
+      {
+        "source": "client/src/components/home/HomePresentation.tsx",
+        "selfMs": 5.578
+      },
+      {
+        "source": "client/src/lib/clerk-appearance.ts",
+        "selfMs": 4.83
+      },
+      {
+        "source": "client/src/components/layout/new/AppSidebar.tsx",
+        "selfMs": 2.286
+      }
+    ],
+    "mappedClientFunctions": [
+      {
+        "source": "client/src/components/layout/new/MainLayout.tsx",
+        "line": 26,
+        "column": 21,
+        "function": "n",
+        "selfMs": 30.901
+      },
+      {
+        "source": "client/src/components/layout/new/AppHeader.tsx",
+        "line": 37,
+        "column": 24,
+        "function": "AppHeader",
+        "selfMs": 13.512
+      },
+      {
+        "source": "client/src/lib/clerk-appearance.ts",
+        "line": 137,
+        "column": 16,
+        "function": "index",
+        "selfMs": 2.615
+      },
+      {
+        "source": "client/src/components/home/HomePresentation.tsx",
+        "line": 104,
+        "column": 9,
+        "function": "formatCount",
+        "selfMs": 5.578
+      },
+      {
+        "source": "client/src/components/layout/new/AppSidebar.tsx",
+        "line": 173,
+        "column": 9,
+        "function": "writeOpenKeys",
+        "selfMs": 1.125
+      },
+      {
+        "source": "client/src/components/ui/theme-provider.tsx",
+        "line": 48,
+        "column": 9,
+        "function": "readInitial",
+        "selfMs": 1.116
+      },
+      {
+        "source": "client/src/lib/clerk-appearance.ts",
+        "line": 113,
+        "column": 9,
+        "function": "parseColor",
+        "selfMs": 1.114
+      },
+      {
+        "source": "client/src/lib/safeStorage.ts",
+        "line": 1,
+        "column": 16,
+        "function": "safeGetItem",
+        "selfMs": 1.102
+      },
+      {
+        "source": "client/src/pages/Home.tsx",
+        "line": 109,
+        "column": 9,
+        "function": "navTotalCount",
+        "selfMs": 1.102
+      },
+      {
+        "source": "client/src/lib/clerk-appearance.ts",
+        "line": 147,
+        "column": 9,
+        "function": "resolveDesignSystemTokens",
+        "selfMs": 1.101
+      },
+      {
+        "source": "client/src/hooks/use-learning-preferences.ts",
+        "line": 66,
+        "column": 16,
+        "function": "useLearningPreferences",
+        "selfMs": 1.1
+      },
+      {
+        "source": "client/src/components/layout/new/PageBreadcrumb.tsx",
+        "line": 114,
+        "column": 9,
+        "function": "resolveCrumbs",
+        "selfMs": 1.097
+      }
+    ]
+  },
+  "readOnlyGuard": {
+    "routeBlockedRequests": 0,
+    "routeAllowedInitializations": 1,
+    "browserGlobalBlockedRequests": 1,
+    "browserGlobalAllowedInitializations": 0,
+    "browserGlobalRefusal": {
+      "method": "POST",
+      "resourceType": "XHR",
+      "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+      "path": "/v1/dev_browser",
+      "queryParameterNames": [
+        "__clerk_api_version",
+        "_clerk_js_version"
+      ]
+    }
+  },
+  "conclusion": "No concrete nonvisual app CPU optimization is proven. The largest mapped application frame is insufficient to explain the static-shell Lighthouse TBT and must not be changed as a score-fix without additional causal evidence."
+}

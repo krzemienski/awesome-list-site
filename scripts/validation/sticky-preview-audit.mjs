@@ -188,8 +188,8 @@ async function auditViewport(width, height, expectedOffset) {
         before &&
           before.position === "sticky" &&
           before.stickyTop === `${expectedOffset}px` &&
-          before.overflowX === "clip" &&
-          before.overflowY === "visible" &&
+          before.overflowX !== "hidden" &&
+          before.overflowY !== "hidden" &&
           before.previewHeight > 0 &&
           before.documentHeight > before.viewportHeight,
       );

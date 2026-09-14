@@ -1,8 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  checkArtifactDocs,
+  generateArtifactDocs,
+} from "./validation/design-system-artifact-docs.mjs";
 
 const checkOnly = process.argv.includes("--check");
+const docsOnly = process.argv.includes("--docs");
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
@@ -13,6 +18,24 @@ const profilePath = "shared/styles/product-profiles.css";
 const outputPath = "artifacts/awesome-video-design-system/tokens.json";
 
 const fromRoot = (relativePath) => path.join(projectRoot, relativePath);
+
+// Docs are a source-preserving projection and intentionally have an isolated
+// mode so generation never needs to parse the token registry first.
+if (docsOnly) {
+  if (checkOnly) {
+    const result = checkArtifactDocs({ rootDir: projectRoot });
+    console.log(
+      `Design-system artifact docs: up to date (${result.chapters} chapters, ${result.checked} files)`,
+    );
+  } else {
+    const result = generateArtifactDocs({ rootDir: projectRoot });
+    console.log(
+      `Generated ${result.outputRoot} (${result.chapters} chapters, ${result.generated} files)`,
+    );
+  }
+  process.exit(0);
+}
+
 const css = fs.readFileSync(fromRoot(cssPath), "utf8");
 const runtime = fs.readFileSync(fromRoot(runtimePath), "utf8");
 const profilesCss = fs.readFileSync(fromRoot(profilePath), "utf8");
@@ -305,6 +328,21 @@ const next = `${JSON.stringify(document, null, 2)}\n`;
 const current = fs.existsSync(fromRoot(outputPath))
   ? fs.readFileSync(fromRoot(outputPath), "utf8")
   : "";
+
+// Keep docs drift checks on the ordinary generator path too. This must run
+// before the token-current early exit or an up-to-date token projection would
+// silently skip docs generation/checking.
+if (checkOnly) {
+  const result = checkArtifactDocs({ rootDir: projectRoot });
+  console.log(
+    `Design-system artifact docs: up to date (${result.chapters} chapters, ${result.checked} files)`,
+  );
+} else {
+  const result = generateArtifactDocs({ rootDir: projectRoot });
+  console.log(
+    `Generated ${result.outputRoot} (${result.chapters} chapters, ${result.generated} files)`,
+  );
+}
 
 if (current === next) {
   console.log("Design-system artifact tokens: up to date");

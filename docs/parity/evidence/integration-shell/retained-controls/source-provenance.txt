@@ -1,0 +1,12 @@
+Git HEAD: caf848a72e13b6a5bac26492e103d8271f66921e
+
+Source diff SHA-256:
+b912f356540488e6a674841cf07ce53e73159fa6a2cc61702beec5dff3e791d9  -
+
+Changed source file SHA-256:
+71f1b62475501e6280a2fc48e3203fbeb25cbe1070ca1bcf56ce302d5e536ee4  client/src/components/layout/new/AppSidebar.tsx
+8df758fd5666593caeae544a95aa14a399688abca24af9dc625cef404da697e4  client/src/components/ui/search-dialog.tsx
+cfabc3c70d16d6cbf0c64ca809a4d44328c46f02582312af412947da86943054  client/src/styles/shell/sidebar.css
+bb424d4cfeb4e086f9a17a139f5d2a38d1dbe750420c4a2bd0e91c04abc5b289  tests/parity/reference-adapter.mjs
+e295374791f79ffd8d15724fd2325344d95c97e5b28fcb05fb2154fee30fec38  tests/parity/reference-reconciliation.mjs
+90f8ffbdda4fe846619385a0b8d5707742d520f108a6fc2d915c968c067fed88  tests/parity/runner.mjs

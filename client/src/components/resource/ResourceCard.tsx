@@ -1,4 +1,4 @@
-import { useState, useRef, memo } from "react";
+import { useState, useRef, memo, lazy, Suspense } from "react";
 import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +6,20 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Edit, ChevronRight, NotebookPen } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
-import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { cn } from "@/lib/utils";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 import { tagLandingPath } from "@shared/tagNormalize";
 import "@/styles/components/resource-card.css";
+
+// This form is only needed after an authenticated visitor explicitly chooses
+// "Suggest an edit". Keep its Zod/react-hook-form closure out of resource
+// listing routes while preserving the same dialog contract.
+const SuggestEditDialog = lazy(() =>
+  import("@/components/ui/suggest-edit-dialog").then(({ SuggestEditDialog }) => ({
+    default: SuggestEditDialog,
+  })),
+);
 
 interface ResourceCardProps {
   resource: {
@@ -393,11 +401,13 @@ function ResourceCard({
       </CardContent>
 
       {suggestEditOpen && showPersonalActions && (
-        <SuggestEditDialog 
-          resource={resourceForDialog}
-          open={suggestEditOpen}
-          onOpenChange={setSuggestEditOpen}
-        />
+        <Suspense fallback={null}>
+          <SuggestEditDialog
+            resource={resourceForDialog}
+            open={suggestEditOpen}
+            onOpenChange={setSuggestEditOpen}
+          />
+        </Suspense>
       )}
     </Card>
   );

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "production-home-ssr-continuity-review-summary",
+  "base": "http://127.0.0.1:5105/",
+  "validation": {
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "bundleBudget": "passed"
+  },
+  "focusedBrowserChecks": [
+    {
+      "name": "exact-home-auth-continuity",
+      "passed": true,
+      "assertions": [
+        "the fresh anonymous auth request completed after hydration",
+        "the rendered Home category content remained present",
+        "no Home skeleton replaced exact SSR content"
+      ]
+    },
+    {
+      "name": "spa-fallback-legacy-curated",
+      "passed": true,
+      "assertions": [
+        "the unsupported query used the SPA fallback rather than exact SSR",
+        "legacy curated storage did not display the SSR-only bridge skeleton"
+      ]
+    },
+    {
+      "name": "later-spa-home-navigation",
+      "passed": true,
+      "assertions": [
+        "after navigation away and client-side return, Home used the live curated guest preference",
+        "the retired initial SSR boot layout did not leak into the new Home mount"
+      ]
+    }
+  ],
+  "notes": [
+    "No Lighthouse run was performed."
+  ]
+}

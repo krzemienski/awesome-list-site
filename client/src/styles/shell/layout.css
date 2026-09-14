@@ -1,0 +1,75 @@
+/* The shell alone owns the outer page geometry. Keep the sidebar mounted
+   between routes so its accordion state and mobile navigation survive. */
+.page.app-shell-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: auto;
+  min-width: 0;
+}
+
+.app-shell-row {
+  display: flex;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+.app-shell-row[data-browse-sidebar="false"] > .av-sidebar-shell {
+  display: none;
+}
+
+.app-shell-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-shell-main > .page-content-wrap {
+  width: 100%;
+  max-width: var(--shell-page-measure, var(--content-max));
+  margin-inline: auto;
+  padding: var(--page-pad-y) var(--page-pad-x);
+}
+
+.app-shell-main > .page-content-wrap[data-admin="true"] {
+  max-width: var(--content-max-admin);
+}
+
+/* Integration boundary: leaf styles remain independently owned. Wide page
+   roots inherit the shell's measure; prose/form and admin inner measures are
+   intentional canonical exceptions, not additional viewport gutters. */
+.app-shell-main > .page-content-wrap > :is(
+  .taxonomy-page, .discovery-page, .discovery-tools-page,
+  .account-page--wide, .journeys-page
+) {
+  max-width: none;
+}
+
+.app-shell-main > .page-content-wrap > :is(
+  .journeys-page, .journey-detail-page, .account-page.container
+) {
+  padding: 0;
+}
+
+/* Integration boundary: legacy direct route roots must inherit the shell's
+ * outer measure and inline gutters. Excluding the form class preserves the
+ * documented 760px `.account-page--form` content measure; this does not touch
+ * component-local block padding. */
+.app-shell-main > .page-content-wrap > .container:not(.account-page--form) {
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+.app-shell-main > .page-content-wrap > div.account-page {
+  padding-inline: 0;
+}
+
+.app-shell-main > .page-content-wrap > .account-theme {
+  max-width: none;
+}
+
+/* The frozen app's inline comfortable-density padding stays 48px/40px at
+   mobile widths too. Its docs show a smaller suggested mobile gutter, but
+   styles.css does not apply that suggestion to the rendered pixel target. */

@@ -13,6 +13,7 @@ import { initMixpanel, optOutMixpanel } from "@/lib/mixpanel";
 import { initPosthog, optOutPosthog } from "@/lib/posthog";
 import { initAmplitude, optOutAmplitude } from "@/lib/amplitude";
 import "@/styles/pages/system-overlays.css";
+import { useHomeBoot } from "@/lib/home-boot";
 
 // R5-025 (run24): custom event that re-opens the consent banner. Dispatched
 // by the "Cookie settings" links in Footer and /privacy via
@@ -27,7 +28,16 @@ export function openCookieSettings() {
 // keeps the site fully functional with zero analytics. The choice persists in
 // localStorage, so the banner appears once per browser.
 export default function ConsentBanner() {
-  const [choiceMade, setChoiceMade] = useState(() => getAnalyticsConsent() !== null);
+  const homeBoot = useHomeBoot();
+  const isInitialHomeHydration = homeBoot?.isAnonymous === true;
+  // The first client render must use the same public cookie value as SSR.
+  // Legacy localStorage is reconciled after hydration by the normal decision
+  // path, while new choices mirror to the cookie in setAnalyticsConsent().
+  const [choiceMade, setChoiceMade] = useState(
+    () => isInitialHomeHydration
+      ? homeBoot?.consent !== null
+      : getAnalyticsConsent() !== null,
+  );
   // NB-003 (run18): at very small widths (<360px, e.g. 320×568) the stacked
   // banner grew tall enough to sit over the /login submit button. Track a
   // compact breakpoint so we can render a single-row, reduced-copy bar there.
@@ -36,7 +46,14 @@ export default function ConsentBanner() {
   // single-row bar is short enough to leave it reachable at first paint.
   const isCompactViewport = () =>
     typeof window !== "undefined" && (window.innerWidth < 360 || window.innerHeight < 500);
-  const [isCompact, setIsCompact] = useState(isCompactViewport);
+  // A server cannot know the exact visual viewport. Keep the first hydrated
+  // markup equal to SSR, then apply the compact breakpoint in the effect below.
+  const [isCompact, setIsCompact] = useState(
+    () => (isInitialHomeHydration ? false : isCompactViewport()),
+  );
+  const [legacyConsentReconciled, setLegacyConsentReconciled] = useState(
+    () => !isInitialHomeHydration,
+  );
   const bannerRef = useRef<HTMLDivElement | null>(null);
   // Two consumers of the same node: `bannerRef` for the focus move on re-open,
   // and state so the inset hook re-observes if React ever swaps the element.
@@ -56,9 +73,33 @@ export default function ConsentBanner() {
 
   useEffect(() => {
     const onResize = () => setIsCompact(isCompactViewport());
+    onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  // Existing installations stored consent only in localStorage. New decisions
+  // also set a small same-site cookie for SSR, while this one-time post-hydrate
+  // reconciliation preserves the legacy value without a server/client mismatch.
+  useEffect(() => {
+    if (!homeBoot || legacyConsentReconciled) return;
+    const legacyConsent = getAnalyticsConsent();
+    if (homeBoot?.consent === null && legacyConsent !== null) {
+      // Migrate the legacy choice to the public SSR cookie without changing
+      // its analytics semantics. This is intentionally post-hydration.
+      setAnalyticsConsent(legacyConsent);
+      setChoiceMade(true);
+    }
+    setLegacyConsentReconciled(true);
+  }, [homeBoot?.consent, isInitialHomeHydration, legacyConsentReconciled]);
+
+  // The prepaint marker is only a one-render bridge. In particular it must be
+  // removed once a persisted choice is reconciled, or Cookie settings would
+  // reopen a banner that CSS keeps permanently invisible.
+  useEffect(() => {
+    if (!legacyConsentReconciled || !choiceMade || typeof document === "undefined") return;
+    document.documentElement.removeAttribute("data-consent-known");
+  }, [choiceMade, legacyConsentReconciled]);
 
   // R4-071 / BUG-054 (run26): the banner used to steal focus on mount, which
   // made its Privacy link the page's FIRST tab stop — ahead of the skip link

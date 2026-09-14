@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { HomeLayout } from "@shared/onboarding-values";
 import { DEFAULT_HOME_LAYOUT } from "@shared/onboarding-values";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
+import { useHomeBoot } from "@/lib/home-boot";
 
 const HOME_LAYOUT_STORAGE_KEY = "awesome-video-home-layout";
 const PREFERENCES_QUERY_KEY = ["/api/user/preferences"] as const;
@@ -64,8 +65,22 @@ function parseHomeLayoutResponse(value: unknown): HomeLayoutResponse {
  * the preference control still saves the chosen value.
  */
 export function useHomeLayout() {
+  const homeBoot = useHomeBoot();
+  const isInitialHomeHydration = homeBoot?.isAnonymous === true;
+  // This is intentionally scoped to this mounted Home instance, not kept in
+  // HomeBoot context. It preserves the exact SSR pixels while the initial
+  // auth request settles, but cannot leak into a later client-side navigation
+  // back to Home after the boot assertion has been retired.
+  const exactHomeContinuityRef = useRef(isInitialHomeHydration);
+  const hasExactHomeContinuity = exactHomeContinuityRef.current;
+  const legacyLayoutReconciled = useRef(false);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [savedLayout, setSavedLayout] = useState<HomeLayout>(readGuestLayout);
+  const [savedLayout, setSavedLayout] = useState<HomeLayout>(
+    () =>
+      homeBoot?.isAnonymous
+        ? homeBoot.layout
+        : readGuestLayout(),
+  );
   const [layoutOverride, setLayoutOverride] = useState<HomeLayout | null>(readLayoutOverride);
 
   const preferencesQuery = useQuery<HomeLayoutResponse>({
@@ -82,6 +97,35 @@ export function useHomeLayout() {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
+
+  // Pre-cookie visitors may only have the legacy localStorage preference.
+  // Reconcile it after exact hydration (never during render) so their chosen
+  // layout still wins without making SSR guess browser-only storage.
+  useEffect(() => {
+    if (
+      !homeBoot ||
+      homeBoot.layoutSource !== "default" ||
+      legacyLayoutReconciled.current
+    ) {
+      return;
+    }
+    legacyLayoutReconciled.current = true;
+    setSavedLayout(readGuestLayout());
+  }, [homeBoot]);
+
+  const layout = layoutOverride ?? savedLayout;
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.documentElement.getAttribute("data-home-layout-pending") !== "true") return;
+    // Do not reveal index markup for a legacy curated visitor. This runs only
+    // after the state above has committed their local preference.
+    if (layout !== readGuestLayout()) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.documentElement.removeAttribute("data-home-layout-pending");
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [layout]);
 
   // Auth transitions must never leak a previous account's server value into
   // the guest view. Guest storage is deliberately left intact on sign-out so
@@ -141,14 +185,22 @@ export function useHomeLayout() {
         return;
       }
       safeSetItem(HOME_LAYOUT_STORAGE_KEY, nextLayout);
+      if (typeof document !== "undefined") {
+        document.cookie = `${HOME_LAYOUT_STORAGE_KEY}=${nextLayout}; Path=/; Max-Age=31536000; SameSite=Lax`;
+      }
       setSavedLayout(nextLayout);
     },
     [isAuthenticated, saveMutation],
   );
 
   return {
-    layout: layoutOverride ?? savedLayout,
+    layout,
     isLoading:
+      // Exact anonymous Home markup is already a valid guest presentation.
+      // Do not replace it with a skeleton merely because its fresh auth check
+      // is pending. Once a real user is known, resume normal preference
+      // loading so account layout state is never masked as a permanent guest.
+      !(hasExactHomeContinuity && (authLoading || !isAuthenticated)) &&
       !layoutOverride &&
       (authLoading ||
         (isAuthenticated && (preferencesQuery.isLoading || preferencesQuery.isFetching))),

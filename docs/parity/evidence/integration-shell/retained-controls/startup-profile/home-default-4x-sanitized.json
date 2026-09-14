@@ -1,0 +1,184 @@
+{
+  "profile": {
+    "navigationCount": 1,
+    "browser": "Chromium",
+    "viewport": "1440x900",
+    "cpuSlowdown": 4,
+    "cacheDisabled": true,
+    "samplingIntervalUs": 100,
+    "postReadyCaptureMs": 250
+  },
+  "timings": {
+    "domContentLoadedMs": 720.8,
+    "firstContentfulPaintMs": 652,
+    "homeReadyMs": 2924.7,
+    "loadEventEndMs": 744.3
+  },
+  "elapsedWallMs": 3471,
+  "defaultApiPaths": [
+    "/api/auth/user",
+    "/api/awesome-list/nav",
+    "/api/config",
+    "/api/home",
+    "/api/resources/kinds/counts"
+  ],
+  "topSourceFunctionCpu": [
+    {
+      "sourceFunction": "[runtime-or-native]::(root)",
+      "selfMs": 0,
+      "totalMs": 2986.3
+    },
+    {
+      "sourceFunction": "[runtime-or-native]::(program)",
+      "selfMs": 1309.5,
+      "totalMs": 1309.5
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::dk",
+      "selfMs": 2.1,
+      "totalMs": 1030.3
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::ck",
+      "selfMs": 10.2,
+      "totalMs": 1021.2
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Ek",
+      "selfMs": 0,
+      "totalMs": 687
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::jg",
+      "selfMs": 0,
+      "totalMs": 687
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Ik",
+      "selfMs": 3,
+      "totalMs": 581.2
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Uk",
+      "selfMs": 2.5,
+      "totalMs": 565.5
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Tk",
+      "selfMs": 0,
+      "totalMs": 565.5
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::[top-level]",
+      "selfMs": 3,
+      "totalMs": 525.4
+    },
+    {
+      "sourceFunction": "[runtime-or-native]::[top-level]",
+      "selfMs": 44.9,
+      "totalMs": 485.7
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::S0",
+      "selfMs": 11.1,
+      "totalMs": 465.9
+    },
+    {
+      "sourceFunction": "node_modules/scheduler::J",
+      "selfMs": 2.6,
+      "totalMs": 417.4
+    },
+    {
+      "sourceFunction": "node_modules/scheduler::R",
+      "selfMs": 0,
+      "totalMs": 417.4
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Gk",
+      "selfMs": 0.6,
+      "totalMs": 414.8
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Nh",
+      "selfMs": 60.6,
+      "totalMs": 414
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Wk",
+      "selfMs": 2.7,
+      "totalMs": 360
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Pk",
+      "selfMs": 0,
+      "totalMs": 360
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Hk",
+      "selfMs": 9.2,
+      "totalMs": 292.7
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Qj",
+      "selfMs": 4.2,
+      "totalMs": 280.3
+    },
+    {
+      "sourceFunction": "[runtime-or-native]::(idle)",
+      "selfMs": 278.3,
+      "totalMs": 278.3
+    },
+    {
+      "sourceFunction": "client/src/components/layout/new/AppSidebar.tsx::[top-level]",
+      "selfMs": 117.1,
+      "totalMs": 227.4
+    },
+    {
+      "sourceFunction": "[runtime-or-native]::_cached",
+      "selfMs": 0.9,
+      "totalMs": 203.2
+    },
+    {
+      "sourceFunction": "[runtime-or-native]::query",
+      "selfMs": 40.1,
+      "totalMs": 202.1
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::cj",
+      "selfMs": 0,
+      "totalMs": 128.7
+    },
+    {
+      "sourceFunction": "client/src/components/layout/new/MainLayout.tsx::n",
+      "selfMs": 122.2,
+      "totalMs": 122.2
+    },
+    {
+      "sourceFunction": "client/src/components/layout/new/MainLayout.tsx::[top-level]",
+      "selfMs": 0,
+      "totalMs": 122.2
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Yi",
+      "selfMs": 1.4,
+      "totalMs": 115.7
+    },
+    {
+      "sourceFunction": "client/src/components/layout/new/AppSidebar.tsx::a",
+      "selfMs": 105.5,
+      "totalMs": 106
+    },
+    {
+      "sourceFunction": "node_modules/react-dom::Sk",
+      "selfMs": 13.2,
+      "totalMs": 96.8
+    }
+  ],
+  "attribution": {
+    "rawProfilePersisted": false,
+    "sourceMapsTemporary": true,
+    "labelsContainNoURLsOrArguments": true
+  },
+  "evidenceScope": "One completed local production Home navigation after the default tag-query gate and before the sidebar lazy-mount change. Aggregate source/function CPU timing only; no trace, URLs, request payloads, DOM content, or PII retained.",
+  "retainedAt": "docs/parity/evidence/integration-shell/retained-controls/startup-profile/home-default-4x-sanitized.json"
+}

@@ -1,0 +1,527 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Task 565 partial read-only diagnostic: /admin at 375 only",
+  "capturedAt": "2026-09-13T22:33:27.949Z",
+  "candidateBase": "http://127.0.0.1:5101/",
+  "identitySetupBase": "http://127.0.0.1:5000/",
+  "retainedProductionBaseline": "docs/parity/evidence/integration-shell/retained-controls/production-admin/summary.json",
+  "captureMode": "partial-admin-375-diagnostic",
+  "routeScope": [
+    "/admin"
+  ],
+  "viewports": [
+    375
+  ],
+  "limitations": [
+    "The production baseline is reused, not recaptured.",
+    "This is a status/test-id/axe/read-only contract; it is not a pixel sweep.",
+    "Data-derived test-id differences are reported but never silently classified as selector deletions.",
+    "A real disposable Clerk Nick session is initialized before the read-only capture; no audit key is injected into capture requests.",
+    "The authenticated Nick state is prepared before capture; this harness grants no Clerk/bootstrap write exception. All non-safe requests fail closed.",
+    "Diagnostic mode is deliberately partial (/admin at 375 only) and does not replace the full capture matrix.",
+    "No identity identifier, audit key, cookie, raw response body, or screenshot is persisted."
+  ],
+  "identity": {
+    "kind": "shared-disposable-clerk-nick",
+    "authenticatedStorageStatePreparedBeforeReadOnlyCapture": true,
+    "consentDeclined": true,
+    "teardown": {
+      "attempted": true,
+      "completed": true,
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "localQaUsersRemaining": 2
+    }
+  },
+  "captures": [
+    {
+      "route": "/admin",
+      "viewport": 375,
+      "status": 200,
+      "finalPath": "/admin",
+      "adminAuthorizedAfterApiQuiet": true,
+      "expectedTab": "overview",
+      "expectedTabVisible": true,
+      "expectedTabSelected": true,
+      "activePanelVisible": true,
+      "researchReviewVisible": null,
+      "visibleTestIds": [
+        "admin-authorized",
+        "admin-overview",
+        "admin-overview-activity",
+        "admin-overview-categories",
+        "admin-overview-health",
+        "admin-stats",
+        "brand-mark",
+        "breadcrumb-mobile-current",
+        "content-overview",
+        "header-brand",
+        "health-database",
+        "health-enrichment-queue",
+        "health-github-sync",
+        "health-linkhealth",
+        "health-researcher",
+        "link-breadcrumb-home",
+        "link-stat-rejected",
+        "mobile-drawer-trigger",
+        "page-breadcrumb",
+        "stat-card-approvals",
+        "stat-card-approvals-value",
+        "stat-card-journeys",
+        "stat-card-journeys-value",
+        "stat-card-resources",
+        "stat-card-users",
+        "stat-card-users-value",
+        "stat-live-resources",
+        "stat-title-approvals",
+        "stat-title-journeys",
+        "stat-title-resources",
+        "stat-title-users",
+        "tab-approvals",
+        "tab-audit",
+        "tab-categories",
+        "tab-database",
+        "tab-edits",
+        "tab-enrichment",
+        "tab-export",
+        "tab-github",
+        "tab-linkhealth",
+        "tab-overview",
+        "tab-research",
+        "tab-researcher",
+        "tab-resources",
+        "tab-subcategories",
+        "tab-users",
+        "top-category-1",
+        "top-category-2",
+        "top-category-3",
+        "top-category-4",
+        "top-category-5"
+      ],
+      "footer": {
+        "siteFooterVisible": false,
+        "visibleFooterTestIds": []
+      },
+      "axe": {
+        "violationCount": 0,
+        "violations": [],
+        "seriousCritical": {
+          "rules": 0,
+          "nodes": 0,
+          "ids": []
+        }
+      },
+      "actions": {
+        "settings": {
+          "linkVisible": true,
+          "navigated": true,
+          "themeHeadingVisible": true
+        },
+        "newEntry": {
+          "triggerVisible": true,
+          "dialogOpen": true,
+          "finalPath": "/admin#resources"
+        }
+      },
+      "readOnly": {
+        "observedSafeApiRequests": 44,
+        "safeApiResponses": [
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/notifications",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/pending-resources",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/users",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/health/ai",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/audit-logs",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/operations/health",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/github/sync-status",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/github/sync-history",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/link-health/status",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/link-health/history",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/enrichment/jobs",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/awesome-list/nav",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/auth/user",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/config",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/notifications",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/user/preferences",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/stats",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/pending-resources",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/users",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/audit-logs",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/health/ai",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/operations/health",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/github/sync-history",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/link-health/status",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/link-health/history",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/github/sync-status",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/enrichment/jobs",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/categories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/subcategories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/sub-subcategories",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/resources",
+            "status": 200
+          },
+          {
+            "origin": "http://127.0.0.1:5101/",
+            "path": "/api/admin/resources",
+            "status": 200
+          }
+        ],
+        "safeApiFailures": [],
+        "blockedNonSafeRequests": [
+          {
+            "method": "POST",
+            "resourceType": "fetch",
+            "target": {
+              "origin": "https://gorgeous-jennet-4.clerk.accounts.dev/",
+              "path": "/v1/environment"
+            }
+          },
+          {
+            "method": "POST",
+            "resourceType": "fetch",
+            "target": {
+              "origin": "https://gorgeous-jennet-4.clerk.accounts.dev/",
+              "path": "/v1/environment"
+            }
+          }
+        ],
+        "artificialReadAborts": 2,
+        "allowedAuthInitializations": [],
+        "blockedNonSafeRequestCount": 2,
+        "refusedWindowOperations": {
+          "webSockets": [],
+          "workers": [
+            {
+              "kind": "Worker",
+              "source": {
+                "origin": "blob:http://127.0.0.1:5101",
+                "path": "/<uuid>"
+              },
+              "initiatorStack": [
+                "Error",
+                "    at workerRefusal (<anonymous>:12:28)",
+                "    at new <anonymous> (<anonymous>:20:45)",
+                "    at rd (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at rh (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at <instance_members_initializer> (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at new rm (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at sg.startPollingForToken (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)"
+              ],
+              "initiatorScriptPaths": [
+                "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js"
+              ]
+            },
+            {
+              "kind": "Worker",
+              "source": {
+                "origin": "blob:http://127.0.0.1:5101",
+                "path": "/<uuid>"
+              },
+              "initiatorStack": [
+                "Error",
+                "    at workerRefusal (<anonymous>:12:28)",
+                "    at new <anonymous> (<anonymous>:20:45)",
+                "    at rd (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at rh (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at new sy (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at #eY (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)",
+                "    at async ae.load (https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js)"
+              ],
+              "initiatorScriptPaths": [
+                "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js"
+              ]
+            }
+          ],
+          "popups": [],
+          "serviceWorkers": []
+        }
+      }
+    }
+  ],
+  "productionComparison": {
+    "375": {
+      "baselineStatus": 200,
+      "candidateStatus": 200,
+      "visibleTestIds": {
+        "added": [
+          "admin-overview",
+          "admin-overview-activity",
+          "admin-overview-categories",
+          "admin-overview-health",
+          "admin-stats",
+          "content-overview",
+          "health-database",
+          "health-enrichment-queue",
+          "health-github-sync",
+          "health-linkhealth",
+          "health-researcher",
+          "link-breadcrumb-home",
+          "page-breadcrumb",
+          "stat-card-approvals-value",
+          "stat-card-journeys-value",
+          "stat-card-users-value",
+          "stat-title-approvals",
+          "stat-title-journeys",
+          "stat-title-users",
+          "tab-overview",
+          "tab-research",
+          "top-category-1",
+          "top-category-2",
+          "top-category-3",
+          "top-category-4",
+          "top-category-5"
+        ],
+        "removed": [
+          "button-approve-190153",
+          "button-approve-190154",
+          "button-approve-190155",
+          "button-notifications",
+          "button-reject-190153",
+          "button-reject-190154",
+          "button-reject-190155",
+          "button-view-details-190153",
+          "button-view-details-190154",
+          "button-view-details-190155",
+          "consent-accept",
+          "consent-banner",
+          "consent-decline",
+          "consent-privacy-link",
+          "content-approvals",
+          "footer-about",
+          "footer-categories",
+          "footer-code-of-conduct",
+          "footer-cookie-settings",
+          "footer-copyright",
+          "footer-github",
+          "footer-home",
+          "footer-journeys",
+          "footer-privacy",
+          "footer-submit",
+          "footer-terms",
+          "gradient-scroll-cue",
+          "hint-swipe-pending-table",
+          "link-resource-url-190153",
+          "link-resource-url-190154",
+          "link-resource-url-190155",
+          "link-stat-pending",
+          "row-pending-resource-190153",
+          "row-pending-resource-190154",
+          "row-pending-resource-190155",
+          "tab-digests",
+          "tab-journeys",
+          "tab-subsubcategories",
+          "tags-pending-190153",
+          "tags-pending-190154",
+          "tags-pending-190155"
+        ]
+      },
+      "baselineFooterTestIds": [
+        "footer-about",
+        "footer-categories",
+        "footer-code-of-conduct",
+        "footer-cookie-settings",
+        "footer-copyright",
+        "footer-github",
+        "footer-home",
+        "footer-journeys",
+        "footer-privacy",
+        "footer-submit",
+        "footer-terms"
+      ],
+      "candidateFooterTestIds": [],
+      "expectedFooterRemovalObserved": true
+    }
+  },
+  "checks": [
+    {
+      "route": "/admin",
+      "viewport": 375,
+      "failures": [
+        "read-only guard refused 2 non-safe request(s)",
+        "read-only window guard refused 2 operation(s)"
+      ]
+    }
+  ],
+  "pass": false
+}

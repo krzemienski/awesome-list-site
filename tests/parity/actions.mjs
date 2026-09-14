@@ -150,8 +150,14 @@ export async function applyAction(page, action, side, { tokens }) {
     await page.locator(side === "actual" ? '[role="dialog"]' : ".modal-backdrop").first().waitFor({ state: "visible", timeout: 10_000 });
     return;
   }
-  if (action === "mobile-drawer") {
+  if (action === "mobile-drawer-responsive" && page.viewportSize().width > 1024) {
+    const trigger = page.getByRole("button", { name: side === "actual" ? "Toggle sidebar" : "Open menu", exact: true });
+    if (await trigger.isVisible()) throw new ActionUnavailableError("Desktop drawer trigger must be hidden above 1024px");
+    return;
+  }
+  if (action === "mobile-drawer" || action === "mobile-drawer-responsive") {
     await page.getByRole("button", { name: side === "actual" ? "Toggle sidebar" : "Open menu", exact: true }).click();
+    await page.locator(side === "actual" ? '[role="dialog"]' : ".mobile-drawer.open").first().waitFor({ state: "visible", timeout: 10_000 });
     return;
   }
   if (action.startsWith("admin-tab:")) {

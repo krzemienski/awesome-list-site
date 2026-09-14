@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Current four-width normal-auth admin-shell geometry/screenshots; token-only shell evidence, not admin-body pixel comparison",
+  "capturedAt": "2026-09-14T00:47:03.456Z",
+  "base": "http://127.0.0.1:5000",
+  "controls": {
+    "realDisposableNick": true,
+    "normalApplicationAuth": true,
+    "adminNavigations": 1,
+    "resizeOnlyAfterAdminNavigation": true,
+    "browserInterception": "none",
+    "sdkExceptions": "none",
+    "adminCrudInteractions": "none",
+    "retainedData": "viewport, shell geometry, booleans/counts, screenshot filenames, and created-identity teardown only"
+  },
+  "captures": [
+    {
+      "width": 375,
+      "height": 812,
+      "screenshot": "admin-shell-375.png",
+      "adminAuthorized": true,
+      "footerVisible": false,
+      "visibleFooterCount": 0,
+      "horizontalOverflow": false,
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "pageScrollWidth": 375,
+      "main": {
+        "x": 0,
+        "y": 199.78,
+        "width": 375,
+        "height": 2041.3
+      },
+      "content": {
+        "x": 0,
+        "y": 199.78,
+        "width": 375,
+        "height": 2041.3
+      },
+      "adminMaxWidthToken": "1400px",
+      "contentMaxWidth": "1400px",
+      "adminDataAttribute": true
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "screenshot": "admin-shell-768.png",
+      "adminAuthorized": true,
+      "footerVisible": false,
+      "visibleFooterCount": 0,
+      "horizontalOverflow": false,
+      "viewport": {
+        "width": 768,
+        "height": 900
+      },
+      "pageScrollWidth": 768,
+      "main": {
+        "x": 0,
+        "y": 56,
+        "width": 768,
+        "height": 1710.92
+      },
+      "content": {
+        "x": 0,
+        "y": 56,
+        "width": 768,
+        "height": 1710.92
+      },
+      "adminMaxWidthToken": "1400px",
+      "contentMaxWidth": "1400px",
+      "adminDataAttribute": true
+    },
+    {
+      "width": 1024,
+      "height": 900,
+      "screenshot": "admin-shell-1024.png",
+      "adminAuthorized": true,
+      "footerVisible": false,
+      "visibleFooterCount": 0,
+      "horizontalOverflow": false,
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "pageScrollWidth": 1024,
+      "main": {
+        "x": 0,
+        "y": 60,
+        "width": 1024,
+        "height": 1171.63
+      },
+      "content": {
+        "x": 0,
+        "y": 60,
+        "width": 1024,
+        "height": 1171.63
+      },
+      "adminMaxWidthToken": "1400px",
+      "contentMaxWidth": "1400px",
+      "adminDataAttribute": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "screenshot": "admin-shell-1440.png",
+      "adminAuthorized": true,
+      "footerVisible": false,
+      "visibleFooterCount": 0,
+      "horizontalOverflow": false,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "pageScrollWidth": 1440,
+      "main": {
+        "x": 0,
+        "y": 60,
+        "width": 1440,
+        "height": 870.52
+      },
+      "content": {
+        "x": 20,
+        "y": 60,
+        "width": 1400,
+        "height": 870.52
+      },
+      "adminMaxWidthToken": "1400px",
+      "contentMaxWidth": "1400px",
+      "adminDataAttribute": true
+    }
+  ],
+  "checks": {
+    "fourWidthsCaptured": true,
+    "adminAuthorized": true,
+    "footerAbsent": true,
+    "noHorizontalOverflow": true,
+    "adminMaxWidthToken1400": true,
+    "teardownCompleted": true
+  },
+  "teardown": {
+    "attempted": true,
+    "completed": true,
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "localQaUsersRemaining": 2,
+    "errorCount": 0
+  },
+  "runFailed": false,
+  "pass": true
+}

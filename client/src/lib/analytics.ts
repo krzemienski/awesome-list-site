@@ -49,6 +49,10 @@ export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
     // Storage unavailable (private mode) — treat as session-only choice.
   }
   if (typeof window !== 'undefined') {
+    // Keep a tiny, non-identifying mirror for the server-rendered Home shell.
+    // localStorage remains the canonical client preference; the cookie only
+    // lets the next document paint the same consent state before hydration.
+    document.cookie = `${CONSENT_KEY}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`;
     window.dispatchEvent(new Event('analytics-consent-changed'));
   }
 };

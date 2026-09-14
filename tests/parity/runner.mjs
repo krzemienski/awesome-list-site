@@ -6,7 +6,8 @@
  * Entry point for `npm run test:parity`. See cli.mjs for flags, inventory.mjs
  * for the row catalogue, readiness.mjs for the capture contract, actions.mjs
  * for per-row interactions, identity.mjs for the disposable admin,
- * reference-adapter.mjs for the data binding, and report.mjs for markdown.
+ * reference-adapter.mjs/reference-reconciliation.mjs for the data binding and
+ * expected-only handoffs, and report.mjs for markdown.
  */
 import fs from "node:fs";
 import fsp from "node:fs/promises";
@@ -44,6 +45,7 @@ import {
   adaptReferenceSnapshot,
   buildAdapterScript,
 } from "./reference-adapter.mjs";
+import { applyExpectedReferenceReconciliation } from "./reference-reconciliation.mjs";
 import { QA_PREFIX, identityAvailability, createDisposableAdmin, sweepDisposableAdmins } from "./identity.mjs";
 import { renderReport, renderStatus } from "./report.mjs";
 
@@ -378,7 +380,7 @@ const main = async () => {
     }
 
     // ---- reference data binding ----------------------------------------------
-    const catalogBinding = await buildCatalogAdapter(appBase);
+    const catalogBinding = await buildCatalogAdapter(appBase, { frozenAt });
     const tokens = resolveCatalogTokens(catalogBinding.adapter);
     const admin = identity ? await buildAdminAdapter(identity.fetchJson, frozenAt.getTime()) : null;
     const substitutions = buildPlaceholderSubstitutions({
@@ -386,6 +388,7 @@ const main = async () => {
       home: catalogBinding.home,
       frozenAt,
       admin,
+      reconciliation: catalogBinding.reconciliation,
     });
     const adapterScript = buildAdapterScript({
       adapter: catalogBinding.adapter,
@@ -393,6 +396,7 @@ const main = async () => {
       appBase,
       snapshotBytes: catalogBinding.snapshotBytes,
       frozenAt,
+      reconciliation: catalogBinding.reconciliation,
     });
     const rawSnapshot = await snapshotDirectory(referenceRoot);
     const adapted = adaptReferenceSnapshot(rawSnapshot, { adapterScript, substitutions });
@@ -423,7 +427,7 @@ const main = async () => {
     });
     const rehashLiveAdapters = async (phase) => {
       const [catalogResult, adminResult] = await Promise.allSettled([
-        buildCatalogAdapter(appBase),
+        buildCatalogAdapter(appBase, { frozenAt }),
         identity ? buildAdminAdapter(identity.fetchJson, frozenAt.getTime()) : Promise.resolve(null),
       ]);
       const errors = [catalogResult, adminResult]
@@ -442,7 +446,17 @@ const main = async () => {
 
     // ---- determinism mode ---------------------------------------------------
     if (cli.determinism) {
-      const determinism = await runDeterminism({ browser, plan, byId, cli, tokens, referenceBase, frozenAt, dirs, catalogBinding });
+      const determinism = await runDeterminism({
+        browser,
+        plan,
+        byId,
+        cli,
+        tokens,
+        referenceBase,
+        frozenAt,
+        dirs,
+        reconciliation: catalogBinding.reconciliation,
+      });
       const endAdapters = await rehashLiveAdapters("determinism end");
       const endCatalogBinding = endAdapters.catalog;
       const endAdmin = endAdapters.admin;
@@ -459,6 +473,23 @@ const main = async () => {
         browserVersion,
         referenceAdapter: {
           snapshot: sha256(catalogBinding.snapshotBytes),
+          reconciliation: {
+            version: catalogBinding.reconciliation.version,
+            source: catalogBinding.reconciliation.source,
+            site: catalogBinding.reconciliation.site,
+            kindCounts: catalogBinding.reconciliation.kindCounts,
+            home: catalogBinding.reconciliation.home,
+            sourceSubstitutions: catalogBinding.reconciliation.sourceSubstitutions,
+            officialBrandMark: {
+              source: catalogBinding.reconciliation.officialBrandMark.source,
+              sha256: catalogBinding.reconciliation.officialBrandMark.sha256,
+              sourceSha256: catalogBinding.reconciliation.officialBrandMark.sourceSha256,
+            },
+            palette: catalogBinding.reconciliation.palette,
+            drawer: catalogBinding.reconciliation.drawer,
+            approved44px: catalogBinding.reconciliation.approved44px,
+            approved44pxControls: catalogBinding.reconciliation.approved44pxControls,
+          },
           live: {
             catalogStart: sha256(catalogBinding.snapshotBytes),
             catalogEnd: endCatalogBinding ? sha256(endCatalogBinding.snapshotBytes) : null,
@@ -498,7 +529,7 @@ const main = async () => {
     };
     const throttleGuard = createThrottleGuard();
     const documentReloads = [];
-    const captureContext = { browser, appBase, artifactBase, referenceBase, frozenAt, tokens, adapter: catalogBinding.adapter, identity, dirs, plan, byId, throttleGuard, documentReloads };
+    const captureContext = { browser, appBase, artifactBase, referenceBase, frozenAt, tokens, adapter: catalogBinding.adapter, identity, dirs, plan, byId, throttleGuard, documentReloads, reconciliation: catalogBinding.reconciliation };
 
     // Cells run in plan order, except that a cell whose app limiter window is
     // currently closed is moved behind the remaining cells so the wait overlaps
@@ -557,14 +588,17 @@ const main = async () => {
         const diagnostics = error?.diagnostics || undefined;
         // Failed sides keep their same-origin API failures on the row as well as in the diagnostics record.
         const apiFailures = error?.apiFailures || [];
+        const referenceReconciliationFailure = error?.referenceReconciliation
+          ? { referenceReconciliation: error.referenceReconciliation }
+          : {};
         if (isInfrastructureFailure(error)) {
-          pushRow({ ...base, status: "INCOMPLETE", reason: `infrastructure failure: ${error.message}`, diagnostics, apiFailures });
+          pushRow({ ...base, ...referenceReconciliationFailure, status: "INCOMPLETE", reason: `infrastructure failure: ${error.message}`, diagnostics, apiFailures });
         } else if (error instanceof ActionUnavailableError) {
-          pushRow({ ...base, status: "BLOCKED", reason: error.message, diagnostics, apiFailures });
+          pushRow({ ...base, ...referenceReconciliationFailure, status: "BLOCKED", reason: error.message, diagnostics, apiFailures });
         } else if (evidenceKind) {
-          pushRow({ ...base, status: "EVIDENCE", evidenceKind, reason: `capture failed: ${error.message}`, diagnostics, apiFailures });
+          pushRow({ ...base, ...referenceReconciliationFailure, status: "EVIDENCE", evidenceKind, reason: `capture failed: ${error.message}`, diagnostics, apiFailures });
         } else {
-          pushRow({ ...base, status: "FAIL", denominator: true, reason: `capture failed: ${error.message}`, diagnostics, apiFailures });
+          pushRow({ ...base, ...referenceReconciliationFailure, status: "FAIL", denominator: true, reason: `capture failed: ${error.message}`, diagnostics, apiFailures });
         }
         log(`  ✗ ${error.message.split("\n")[0]}${diagnostics ? ` (see ${diagnostics})` : ""}`);
         continue;
@@ -708,6 +742,23 @@ const main = async () => {
           adminGlobals: admin ? Object.keys(admin.globals) : [],
           adminCounts: admin?.counts || null,
           placeholders: { applied: adapted.provenance.applied, unadapted: adapted.provenance.unadapted, rule: adapted.provenance.rule },
+          reconciliation: {
+            version: catalogBinding.reconciliation.version,
+            source: catalogBinding.reconciliation.source,
+            site: catalogBinding.reconciliation.site,
+            kindCounts: catalogBinding.reconciliation.kindCounts,
+            home: catalogBinding.reconciliation.home,
+            sourceSubstitutions: catalogBinding.reconciliation.sourceSubstitutions,
+            officialBrandMark: {
+              source: catalogBinding.reconciliation.officialBrandMark.source,
+              sha256: catalogBinding.reconciliation.officialBrandMark.sha256,
+              sourceSha256: catalogBinding.reconciliation.officialBrandMark.sourceSha256,
+            },
+            palette: catalogBinding.reconciliation.palette,
+            drawer: catalogBinding.reconciliation.drawer,
+            approved44px: catalogBinding.reconciliation.approved44px,
+            approved44pxControls: catalogBinding.reconciliation.approved44pxControls,
+          },
           rawHashes: adapted.provenance.rawHashes,
           servedHashes: adapted.provenance.servedHashes,
           live: {
@@ -1094,6 +1145,7 @@ const captureRow = async (ctx, screen, width) => {
   const diffFile = path.join(ctx.dirs.diff, `${stem}.png`);
   const sides = {};
   const reloads = { actual: 0, expected: 0 };
+  const referenceReconciliation = [];
   // A side whose document reloaded under the settle or between settle and a
   // frame is reopened from scratch (fresh context, same action, full settle)
   // instead of being captured mid-boot, at most MAX_DOCUMENT_RELOADS times per
@@ -1125,6 +1177,12 @@ const captureRow = async (ctx, screen, width) => {
     for (;;) {
       throwIfCaptureAborted(ctx.signal);
       const side = sides[sideName];
+      if (sideName === "expected" && ctx.reconciliation) {
+        referenceReconciliation.push(await applyExpectedReferenceReconciliation(side.page, {
+          actualPage: sides.actual?.page,
+          reconciliation: ctx.reconciliation,
+        }));
+      }
       try {
         return await stableFullPageCapture(side.page, file, {
           documentToken: side.settled.documentToken,
@@ -1165,15 +1223,17 @@ const captureRow = async (ctx, screen, width) => {
       familiesMissingOnActual: fontComparison.familiesMissingOnActual,
       familiesMissingOnExpected: fontComparison.familiesMissingOnExpected,
     };
-    const actualFilters = sides.actual.settled.backdropFilters.map((entry) => entry.value).sort();
-    const expectedFilters = sides.expected.settled.backdropFilters.map((entry) => entry.value).sort();
+    const declaredActual = sides.actual.settled.backdropFilters;
+    const declaredExpected = sides.expected.settled.backdropFilters;
+    const actualFilters = declaredActual.filter((entry) => entry.paintEligibleCount > 0).map((entry) => entry.value).sort();
+    const expectedFilters = declaredExpected.filter((entry) => entry.paintEligibleCount > 0).map((entry) => entry.value).sort();
     return {
       urls: { actual: sides.actual.url, expected: sides.expected.url },
       session: sides.actual.session,
       comparison,
       identity,
       fontParity,
-      backdropFilters: { actual: actualFilters, expected: expectedFilters, match: JSON.stringify(actualFilters) === JSON.stringify(expectedFilters) },
+      backdropFilters: { actual: actualFilters, expected: expectedFilters, match: JSON.stringify(actualFilters) === JSON.stringify(expectedFilters), declaredActual, declaredExpected },
       // Read from the live tracker after both captures and the identity reads —
       // never the settle-time snapshot.
       apiFailures: currentApiFailures(sides.actual.page),
@@ -1181,6 +1241,7 @@ const captureRow = async (ctx, screen, width) => {
       actualCaptureStability: { stableAttempts: actualCapture.stableAttempts, attemptHashes: actualCapture.attemptHashes, discardedFrames: actualCapture.discardedFrames, apiTraffic: actualCapture.apiTraffic, reopenedAfterReload: reloads.actual },
       expectedCaptureStability: { stableAttempts: expectedCapture.stableAttempts, attemptHashes: expectedCapture.attemptHashes, discardedFrames: expectedCapture.discardedFrames, apiTraffic: expectedCapture.apiTraffic, reopenedAfterReload: reloads.expected },
       captureHashes: { actual: actualCapture.sha256, expected: expectedCapture.sha256 },
+      referenceReconciliation,
       fontsSettled: {
         actual: { complete: sides.actual.settled.fonts.complete, forcedParityFaces: sides.actual.settled.fonts.forcedParityFaces, failedFaces: sides.actual.settled.fonts.failedFaces, nativeDefects: sides.actual.settled.fonts.nativeDefects },
         expected: { complete: sides.expected.settled.fonts.complete, forcedParityFaces: sides.expected.settled.fonts.forcedParityFaces, failedFaces: sides.expected.settled.fonts.failedFaces, nativeDefects: sides.expected.settled.fonts.nativeDefects },
@@ -1195,8 +1256,8 @@ const captureRow = async (ctx, screen, width) => {
 // ---------------------------------------------------------------------------
 // Determinism proof (reference side, fresh context per capture)
 // ---------------------------------------------------------------------------
-const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase, frozenAt, dirs }) => {
-  const ctx = { browser, referenceBase, frozenAt, tokens, dirs, throttleGuard: createThrottleGuard() };
+const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase, frozenAt, dirs, reconciliation }) => {
+  const ctx = { browser, referenceBase, frozenAt, tokens, dirs, throttleGuard: createThrottleGuard(), reconciliation };
   const cells = [];
   for (const { screen: candidate, width } of plan) {
     const screen = candidate.aliasOf ? byId.get(candidate.aliasOf) : candidate;
@@ -1204,11 +1265,16 @@ const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase,
     if ((screen.requires || []).includes("admin-session")) continue;
     const hashes = [];
     let failure = null;
+    let referenceReconciliationEvidence = null;
     for (let attempt = 1; attempt <= cli.determinism && !failure; attempt += 1) {
       const file = path.join(dirs.determinism, `${screen.id}-${width}.capture-${attempt}.png`);
       let side = null;
       try {
         side = await openSide(ctx, screen, width, "expected");
+        referenceReconciliationEvidence = await applyExpectedReferenceReconciliation(side.page, {
+          actualPage: null,
+          reconciliation,
+        });
         const capture = await stableFullPageCapture(side.page, file, { documentToken: side.settled.documentToken, side: "reference" });
         hashes.push(capture.sha256);
       } catch (error) {
@@ -1218,7 +1284,7 @@ const runDeterminism = async ({ browser, plan, byId, cli, tokens, referenceBase,
       }
     }
     const identical = !failure && hashes.length === cli.determinism && hashes.every((hash) => hash === hashes[0]);
-    cells.push({ screen: screen.id, width, hashes, identical, failure, files: hashes.map((_, index) => `determinism/${screen.id}-${width}.capture-${index + 1}.png`) });
+    cells.push({ screen: screen.id, width, hashes, identical, failure, referenceReconciliation: referenceReconciliationEvidence, files: hashes.map((_, index) => `determinism/${screen.id}-${width}.capture-${index + 1}.png`) });
     log(`[parity] determinism ${screen.id}@${width}: ${identical ? "identical" : failure ? `FAILED on capture ${failure.attempt}: ${failure.error}` : "DIFFERENT"} ${hashes.map((hash) => hash.slice(0, 12)).join(" ")}`);
   }
   if (!cells.length) throw new CliError("--determinism needs at least one visitor-capturable pixel row in the selection");

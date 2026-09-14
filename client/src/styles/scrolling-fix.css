@@ -1,14 +1,14 @@
 /* Scroll behavior */
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   scroll-padding-top: 80px;
   max-width: 100%;
   width: 100%;
 }
 
 body {
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   min-height: 100vh;
   overscroll-behavior: none;
   max-width: 100%;
@@ -17,7 +17,7 @@ body {
 }
 
 #root {
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   max-width: 100%;
   width: 100%;
 }

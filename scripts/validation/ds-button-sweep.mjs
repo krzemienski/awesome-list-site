@@ -192,15 +192,6 @@ if (process.argv.includes('--contract-only')) {
   process.exit(0);
 }
 
-// Fail closed: without these the signed-in half of the gate cannot run, and
-// a silently anonymous-only sweep would defeat the point of task #360.
-for (const key of ['CLERK_SECRET_KEY', 'DATABASE_URL']) {
-  if (!process.env[key]) {
-    console.error(`FATAL: ${key} is required (authed signed-in sweep + guaranteed QA teardown)`);
-    process.exit(1);
-  }
-}
-
 function chromePath() {
   const cache = path.join(ROOT, '.cache/ms-playwright');
   const dir = fs.readdirSync(cache).filter(d => /^chromium-\d+$/.test(d)).sort().pop();
@@ -222,6 +213,107 @@ const SWEEPS = [
   { kind: 'h1s', heading: '### Page-title sweep', marker: 'STAGE6-H1-FILTER', collect: collectStrayH1s },
   { kind: 'eyebrows', heading: '### Eyebrow sweep', marker: 'STAGE6-EYEBROW-FILTER', collect: collectStrayEyebrows },
 ];
+
+// An optional, explicit scenario filter is for focused rechecks after a gate
+// failure. With no flag every scenario below still runs, preserving the full
+// coverage contract. A scope name runs all six sweeps in that scope; a
+// scope-kind name (for example `admin-export-eyebrows`) reports just that
+// sweep while retaining the scenario's setup and meaningful canaries.
+//
+// Keep this registry in lockstep with the named route/overlay/tab scenarios
+// below. Validation happens before the app readiness wait, lease acquisition,
+// or browser launch, so a typo can never turn into a vacuous browser pass.
+const ONLY_SCOPE_NAMES = [
+  'route-home',
+  'route-home-tag-chips',
+  'route-category',
+  'route-category-tag-chips',
+  'route-journeys',
+  'route-advanced',
+  'route-search',
+  'route-search-active-chips',
+  'route-categories',
+  'overlay-search-dialog',
+  'overlay-tag-filter-popover',
+  'overlay-filters-sheet',
+  'route-authed-home',
+  'route-authed-notifications',
+  'route-authed-onboarding',
+  'route-authed-bookmarks',
+  'route-authed-bookmarks-collection',
+  'route-authed-settings',
+  'overlay-authed-bulk-bar',
+  'overlay-authed-new-collection-dialog',
+  'overlay-authed-note-dialog',
+  'overlay-authed-delete-collection-confirm',
+  'route-public-collection',
+  'admin-approvals',
+  'admin-edits',
+  'admin-enrichment',
+  'admin-researcher',
+  'admin-export',
+  'admin-database',
+  'admin-resources',
+  'admin-categories',
+  'admin-subcategories',
+  'admin-subsubcategories',
+  'admin-journeys',
+  'admin-users',
+  'admin-github',
+  'admin-linkhealth',
+  'admin-digests',
+  'admin-audit',
+  'overlay-admin-add-resource-dialog',
+  'overlay-admin-edit-resource-dialog',
+  'overlay-admin-pending-detail-dialog',
+  'overlay-admin-category-delete-confirm',
+  'overlay-admin-journey-step-editor',
+];
+const VALID_ONLY_TARGETS = new Set(
+  ONLY_SCOPE_NAMES.flatMap((scope) => [
+    scope,
+    ...SWEEPS.map(({ kind }) => `${scope}-${kind}`),
+  ]),
+);
+const onlyArgument = process.argv.find((argument) => argument.startsWith('--only='));
+const onlyScopes = onlyArgument
+  ? new Set(
+      onlyArgument
+        .slice('--only='.length)
+        .split(',')
+        .map((scope) => scope.trim())
+        .filter(Boolean),
+    )
+  : null;
+if (onlyArgument && onlyScopes.size === 0) {
+  console.error('FATAL: --only requires at least one scenario name');
+  process.exit(1);
+}
+const unknownOnlyTargets = onlyScopes === null
+  ? []
+  : [...onlyScopes].filter((target) => !VALID_ONLY_TARGETS.has(target));
+if (unknownOnlyTargets.length > 0) {
+  console.error(
+    `FATAL: unknown --only scenario${unknownOnlyTargets.length === 1 ? '' : 's'}: ${unknownOnlyTargets.join(', ')}`,
+  );
+  console.error('Use a named route/overlay/admin scope, optionally suffixed with a valid sweep kind.');
+  process.exit(1);
+}
+const shouldRunScope = (scope) =>
+  onlyScopes === null ||
+  [...onlyScopes].some((requested) => requested === scope || requested.startsWith(`${scope}-`));
+const shouldReportSweep = (scope, kind) =>
+  onlyScopes === null || onlyScopes.has(scope) || onlyScopes.has(`${scope}-${kind}`);
+
+// Fail closed: without these the signed-in half of the gate cannot run, and
+// a silently anonymous-only sweep would defeat the point of task #360.
+for (const key of ['CLERK_SECRET_KEY', 'DATABASE_URL']) {
+  if (!process.env[key]) {
+    console.error(`FATAL: ${key} is required (authed signed-in sweep + guaranteed QA teardown)`);
+    process.exit(1);
+  }
+}
+
 {
   const SKILL = path.join(ROOT, '.agents/skills/verify-design-system/SKILL.md');
   const MODULE = path.join(ROOT, 'scripts/validation/ds-button-filter.mjs');
@@ -351,8 +443,10 @@ const OVERLAYS = [
     // Home "Filter by Tag" popover (client/src/components/ui/advanced-filter.tsx).
     // Exercises the [data-radix-popper-content-wrapper] exclusion plus the
     // aria-pressed tag toggle rows and the Collapsible trigger (data-state).
+    // Home only mounts AdvancedFilter for an explicit filter state; the bare
+    // index intentionally omits it to retain the canonical home geometry.
     name: 'tag-filter-popover',
-    path: '/',
+    path: '/?filters=1',
     viewport: DESKTOP,
     open: async (page) => { await page.click('button:not([disabled]):has-text("Filter by Tag")'); },
     openedSelector: '[data-radix-popper-content-wrapper] button[aria-pressed]',
@@ -375,6 +469,10 @@ const OVERLAYS = [
 try {
   const page = await browser.newPage({ viewport: DESKTOP });
 
+  const awaitRouteSettle = async (pg, route) => {
+    if (route?.settle) await route.settle(pg);
+  };
+
   const gotoAndSettle = async (pg, route) => {
     await pg.goto(`${BASE}${route.path}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await pg.waitForSelector('.page', { timeout: 30000 });
@@ -386,6 +484,7 @@ try {
     await pg.waitForFunction(() => !document.querySelector('.ssr-chrome'), null, { timeout: 30000 });
     if (route.expect) await pg.waitForSelector(route.expect, { timeout: 20000 });
     for (const sel of route.expectAll ?? []) await pg.waitForSelector(sel, { timeout: 20000 });
+    await awaitRouteSettle(pg, route);
     await pg.waitForTimeout(600); // settle async chunks (cards, facets)
   };
 
@@ -395,13 +494,20 @@ try {
     return out;
   };
 
-  const confirmedSweeps = async (pg) => {
+  const confirmedSweeps = async (pg, route) => {
+    // A Clerk first-user observation intentionally clears anonymous query
+    // state. It can land after route navigation's initial wait, briefly
+    // replacing Home with its data skeleton. Reassert this scenario's real
+    // content immediately before EVERY DOM collection rather than scanning
+    // that transitional frame as an empty, vacuous document.
+    await awaitRouteSettle(pg, route);
     let sweeps = await runAll(pg);
     if (Object.values(sweeps).some(s => s.strays.length > 0)) {
       // Confirm before failing: transient pre-hydration/loading chrome can
       // linger when the whole validation suite saturates the machine. A real
       // hand-rolled element is still there 3s later.
       await pg.waitForTimeout(3000);
+      await awaitRouteSettle(pg, route);
       sweeps = await runAll(pg);
     }
     return sweeps;
@@ -409,7 +515,7 @@ try {
 
   const sweepRoute = async (pg, route) => {
     await gotoAndSettle(pg, route);
-    return confirmedSweeps(pg);
+    return confirmedSweeps(pg, route);
   };
 
   const strayReport = (name, routePath, kind, sweep) =>
@@ -417,6 +523,7 @@ try {
       `  ${i + 1}. ${s.tag ? `tag=${s.tag} ` : ''}testid=${s.testid ?? '—'} aria-label=${s.ariaLabel ?? '—'} text=${JSON.stringify(s.text ?? '')} class=${s.classPrefix ?? '—'}`).join('\n')}\n  → triage with the stage-6 ladder in .agents/skills/verify-design-system/SKILL.md; if it is new compliant composite chrome, add it to BOTH the skill list and scripts/validation/ds-button-filter.mjs`);
 
   for (const route of ROUTES) {
+    if (!shouldRunScope(`route-${route.name}`)) continue;
     let sweeps;
     try {
       sweeps = await sweepRoute(page, route);
@@ -426,6 +533,7 @@ try {
       catch (e2) { log(`route-${route.name}`, false, `sweep failed twice: ${e2.message.split('\n')[0]}`); continue; }
     }
     for (const { kind } of SWEEPS) {
+      if (!shouldReportSweep(`route-${route.name}`, kind)) continue;
       const sweep = sweeps[kind];
       // The button sweep doubles as the render-sanity probe (every route has
       // DS-hooked buttons) and every swept page must render a visible <h1>;
@@ -508,6 +616,7 @@ try {
   };
 
   for (const o of OVERLAYS) {
+    if (!shouldRunScope(`overlay-${o.name}`)) continue;
     let sweeps, overlayButtons, canaryCaught;
     try {
       ({ sweeps, overlayButtons, canaryCaught } = await sweepOverlay(o));
@@ -529,6 +638,7 @@ try {
       continue;
     }
     for (const { kind } of SWEEPS) {
+      if (!shouldReportSweep(`overlay-${o.name}`, kind)) continue;
       const sweep = sweeps[kind];
       if (sweep.strays.length === 0) {
         const extra = kind === 'buttons' ? `overlay open (${overlayButtons} button(s) inside), canary rogue detected, ` : '';
@@ -885,7 +995,30 @@ try {
     const AUTHED_ROUTES = [
       // Fresh user with no saved preferences → the signed-in-only onboarding
       // invitation card proves this is the authed Home branch.
-      { name: 'authed-home', path: '/', expect: '[data-testid="card-onboarding-invitation"]' },
+      {
+        name: 'authed-home',
+        // Account-only invitations are deliberately opt-in on Home; an
+        // authenticated bare index remains the canonical public geometry. The
+        // account card only appears after both fresh auth and preferences have
+        // resolved, then this extra condition proves the settled presentation
+        // replaced any transient Home skeleton before a sweep can pass.
+        path: '/?context=account',
+        expect: '[data-testid="card-onboarding-invitation"]',
+        settle: async (page) => {
+          await page.waitForFunction(() => {
+            const presentation = document.querySelector(
+              '[data-testid^="home-layout-"]',
+            );
+            return Boolean(
+              presentation &&
+              presentation.querySelector('h1.sr-only') &&
+              presentation.querySelector('[data-testid="home-account-context"]') &&
+              presentation.querySelector('[data-testid="card-onboarding-invitation"]') &&
+              !document.querySelector('[data-testid="home-skeleton"]'),
+            );
+          }, null, { timeout: 30000 });
+        },
+      },
       { name: 'authed-notifications', path: '/notifications', expect: `text=${NOTIF_TITLE}` },
       { name: 'authed-onboarding', path: '/onboarding', expect: '[data-testid="button-skip-onboarding"]' },
       // expectAll proves the collection sidebar row + its reorder arrows
@@ -917,6 +1050,7 @@ try {
     ];
 
     for (const route of AUTHED_ROUTES) {
+      if (!shouldRunScope(`route-${route.name}`)) continue;
       let sweeps;
       try {
         sweeps = await sweepRoute(authedPage, route);
@@ -925,6 +1059,7 @@ try {
         catch (e2) { log(`route-${route.name}`, false, `sweep failed twice: ${e2.message.split('\n')[0]}`); continue; }
       }
       for (const { kind } of SWEEPS) {
+        if (!shouldReportSweep(`route-${route.name}`, kind)) continue;
         const sweep = sweeps[kind];
         const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
           : kind === 'h1s' ? sweep.total > 0
@@ -1046,6 +1181,7 @@ try {
     };
 
     for (const o of AUTHED_OVERLAYS) {
+      if (!shouldRunScope(`overlay-${o.name}`)) continue;
       let sweeps, scopeButtons, canaryCaught;
       try {
         ({ sweeps, scopeButtons, canaryCaught } = await sweepAuthedOverlay(o));
@@ -1063,6 +1199,7 @@ try {
         continue;
       }
       for (const { kind } of SWEEPS) {
+        if (!shouldReportSweep(`overlay-${o.name}`, kind)) continue;
         const sweep = sweeps[kind];
         if (sweep.strays.length === 0) {
           const extra = kind === 'buttons' ? `chrome active (${scopeButtons} button(s) in scope), canary rogue detected, ` : '';
@@ -1090,43 +1227,46 @@ try {
       expect: `[data-testid="card-resource-${resourceId}"]`,
       expectAll: [`h1:has-text("${COLLECTION_NAME}")`],
     };
-    const publicContext = await browser.newContext({ viewport: DESKTOP });
-    try {
-      const publicPage = await publicContext.newPage();
-      let sweeps;
+    if (shouldRunScope('route-public-collection')) {
+      const publicContext = await browser.newContext({ viewport: DESKTOP });
       try {
-        sweeps = await sweepRoute(publicPage, publicRoute);
-      } catch (e) {
-        try { sweeps = await sweepRoute(publicPage, publicRoute); }
-        catch (e2) { throw new Error(`public shared-collection sweep failed twice: ${e2.message.split('\n')[0]}`); }
-      }
-      // Prove the context really is anonymous — if this context somehow had a
-      // session, the sweep would not represent what visitors see.
-      const authState = await publicPage.evaluate(async () => {
-        const r = await fetch('/api/auth/user', { credentials: 'include' });
-        return (await r.json().catch(() => null))?.isAuthenticated === true;
-      });
-      log('route-public-collection-anonymous', !authState, authState
-        ? `${publicRoute.path} — context is UNEXPECTEDLY authenticated; this sweep does not represent the anonymous visitor view`
-        : `${publicRoute.path} — swept in a fresh non-authed context (/api/auth/user reports anonymous)`);
-      for (const { kind } of SWEEPS) {
-        const sweep = sweeps[kind];
-        const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
-          : kind === 'h1s' ? sweep.total > 0
-          : true;
-        const pass = sane && sweep.strays.length === 0;
-        if (pass) {
-          const hooked = kind === 'buttons' ? `${sweep.dsVariantCount} DS-hooked of ${sweep.total}` : `${sweep.total} DS-hooked`;
-          log(`route-public-collection-${kind}`, true, `${publicRoute.path} (anonymous public) — 0 stray ${kind} (${hooked})`);
-        } else if (!sane) {
-          log(`route-public-collection-${kind}`, false, `${publicRoute.path} (anonymous public) — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
-        } else {
-          await publicPage.screenshot({ path: path.join(OUT, `public-collection-${kind}.png`), fullPage: true }).catch(() => {});
-          strayReport(`route-public-collection-${kind}`, `${publicRoute.path} (anonymous public)`, kind, sweep);
+        const publicPage = await publicContext.newPage();
+        let sweeps;
+        try {
+          sweeps = await sweepRoute(publicPage, publicRoute);
+        } catch (e) {
+          try { sweeps = await sweepRoute(publicPage, publicRoute); }
+          catch (e2) { throw new Error(`public shared-collection sweep failed twice: ${e2.message.split('\n')[0]}`); }
         }
+        // Prove the context really is anonymous — if this context somehow had a
+        // session, the sweep would not represent what visitors see.
+        const authState = await publicPage.evaluate(async () => {
+          const r = await fetch('/api/auth/user', { credentials: 'include' });
+          return (await r.json().catch(() => null))?.isAuthenticated === true;
+        });
+        log('route-public-collection-anonymous', !authState, authState
+          ? `${publicRoute.path} — context is UNEXPECTEDLY authenticated; this sweep does not represent the anonymous visitor view`
+          : `${publicRoute.path} — swept in a fresh non-authed context (/api/auth/user reports anonymous)`);
+        for (const { kind } of SWEEPS) {
+          if (!shouldReportSweep('route-public-collection', kind)) continue;
+          const sweep = sweeps[kind];
+          const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
+            : kind === 'h1s' ? sweep.total > 0
+            : true;
+          const pass = sane && sweep.strays.length === 0;
+          if (pass) {
+            const hooked = kind === 'buttons' ? `${sweep.dsVariantCount} DS-hooked of ${sweep.total}` : `${sweep.total} DS-hooked`;
+            log(`route-public-collection-${kind}`, true, `${publicRoute.path} (anonymous public) — 0 stray ${kind} (${hooked})`);
+          } else if (!sane) {
+            log(`route-public-collection-${kind}`, false, `${publicRoute.path} (anonymous public) — vacuous render (total=${sweep.total}, dsVariant=${sweep.dsVariantCount})`);
+          } else {
+            await publicPage.screenshot({ path: path.join(OUT, `public-collection-${kind}.png`), fullPage: true }).catch(() => {});
+            strayReport(`route-public-collection-${kind}`, `${publicRoute.path} (anonymous public)`, kind, sweep);
+          }
+        }
+      } finally {
+        await publicContext.close().catch(() => {});
       }
-    } finally {
-      await publicContext.close().catch(() => {});
     }
   } catch (e) {
     log('authed-scenario', false, `authed sweep failed: ${e.message.split('\n')[0]}`);
@@ -1365,6 +1505,7 @@ try {
     };
 
     for (const tab of ADMIN_TABS) {
+      if (!shouldRunScope(`admin-${tab.slug}`)) continue;
       let sweeps;
       try {
         sweeps = await sweepAdminTab(tab);
@@ -1374,6 +1515,7 @@ try {
         catch (e2) { log(`admin-${tab.slug}`, false, `admin tab sweep failed twice: ${e2.message.split('\n')[0]}`); continue; }
       }
       for (const { kind } of SWEEPS) {
+        if (!shouldReportSweep(`admin-${tab.slug}`, kind)) continue;
         const sweep = sweeps[kind];
         const sane = kind === 'buttons' ? (sweep.total > 0 && sweep.dsVariantCount > 0)
           : kind === 'h1s' ? sweep.total > 0
@@ -1541,6 +1683,7 @@ try {
     };
 
     for (const o of ADMIN_OVERLAYS) {
+      if (!shouldRunScope(`overlay-${o.name}`)) continue;
       let sweeps, scopeButtons, canaryCaught;
       try {
         ({ sweeps, scopeButtons, canaryCaught } = await sweepAdminOverlay(o));
@@ -1559,6 +1702,7 @@ try {
         continue;
       }
       for (const { kind } of SWEEPS) {
+        if (!shouldReportSweep(`overlay-${o.name}`, kind)) continue;
         const sweep = sweeps[kind];
         if (sweep.strays.length === 0) {
           const extra = kind === 'buttons' ? `overlay open (${scopeButtons} button(s) inside), canary rogue detected, ` : '';

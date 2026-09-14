@@ -1,17 +1,15 @@
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/ui/theme-provider";
+import { AppProviders } from "./app-providers";
 import { initGA } from "./lib/analytics";
 import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
-import { needsCorpusRoute } from "./lib/static-data";
 import { loadFontOverride } from "./lib/font-options";
+import type { DehydratedState } from "@tanstack/react-query";
+import type { HomeBoot } from "./lib/home-boot";
 
 function afterFirstPaint(callback: () => void): void {
   const scheduleIdle = () => {
@@ -80,53 +78,8 @@ document.documentElement.classList.add('dark');
 // (`.lucide { stroke-width: 1.5 }` lives in design-system.css). Per-instance
 // audit of explicit strokeWidth overrides is deferred to WP-6.
 
-// Types for SSR data
-interface QueryState {
-  queryKey: unknown[];
-  queryHash: string;
-  state: {
-    data: unknown;
-    dataUpdateCount: number;
-    dataUpdatedAt: number;
-    error: unknown;
-    errorUpdateCount: number;
-    errorUpdatedAt: number;
-    fetchFailureCount: number;
-    fetchMeta: unknown;
-    isFetching: boolean;
-    isInvalidated: boolean;
-    isPaused: boolean;
-    status: 'success' | 'error' | 'pending';
-  };
-}
-
-interface DehydratedState {
-  queries: QueryState[];
-  mutations: unknown[];
-}
-
-// Check if we have initial data from SSR
-declare global {
-  interface Window {
-    __INITIAL_DATA__?: unknown;
-    __DEHYDRATED_STATE__?: DehydratedState;
-  }
-}
-
-// Pre-populate query cache with SSR data if available
-if (window.__INITIAL_DATA__) {
-  queryClient.setQueryData(["awesome-list-data"], window.__INITIAL_DATA__);
-} else if (window.__DEHYDRATED_STATE__) {
-  // Handle dehydrated state from SSR
-  const dehydratedState = window.__DEHYDRATED_STATE__;
-  if (dehydratedState?.queries) {
-    dehydratedState.queries.forEach((query) => {
-      queryClient.setQueryData(query.queryKey, query.state.data);
-    });
-  }
-}
-
 const rootElement = document.getElementById("root")!;
+const homeSsr = rootElement.dataset.homeSsr === "true" ? window.__HOME_SSR__ : undefined;
 
 // Preserve crawler-injected content until React Query has supplied the page's
 // real data. This is event-driven: no DOM MutationObserver or 100ms polling is
@@ -140,6 +93,7 @@ const rootElement = document.getElementById("root")!;
 // real content to show. We still never hydrate this markup (see
 // .agents/memory/spa-crawler-prerender.md).
 (function holdSsrContent() {
+  if (homeSsr) return;
   const ssr = rootElement.querySelector("#ssr-seo-content");
   if (!ssr) return;
   try {
@@ -168,21 +122,9 @@ const rootElement = document.getElementById("root")!;
       window.clearTimeout(timeout);
       overlay.remove();
     };
-    const isSettled = () => {
-      const taxonomy = /^\/(category|subcategory|sub-subcategory)\//.test(window.location.pathname);
-      const settleKey = taxonomy
-        ? undefined
-        : needsCorpusRoute(window.location.pathname) ? ["awesome-list-data"] : ["awesome-list-nav"];
-      const matchingQueries = taxonomy
-        ? queryClient.getQueryCache().findAll({ queryKey: ["awesome-list-listing"] })
-        : [];
-      return taxonomy
-        ? matchingQueries.some((query) => query.state.data !== undefined || query.state.status === "error")
-        : !!settleKey && (
-          queryClient.getQueryData(settleKey) !== undefined ||
-          queryClient.getQueryState(settleKey)?.status === "error"
-        );
-    };
+    const isSettled = () =>
+      queryClient.getQueryData(["awesome-list-nav"]) !== undefined ||
+      queryClient.getQueryState(["awesome-list-nav"])?.status === "error";
     const handoff = () => {
       if (isSettled()) requestAnimationFrame(remove);
     };
@@ -194,18 +136,18 @@ const rootElement = document.getElementById("root")!;
   }
 })();
 const AppComponent = (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <App />
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <AppProviders
+    queryClient={queryClient}
+    dehydratedState={homeSsr?.dehydratedState as DehydratedState | undefined}
+    homeBoot={homeSsr?.boot as HomeBoot | undefined}
+  >
+    <App />
+  </AppProviders>
 );
 
-// Use hydration if we have server-rendered content, otherwise use client rendering
-if (rootElement.hasChildNodes() && (window.__INITIAL_DATA__ || window.__DEHYDRATED_STATE__)) {
+// Only the server-marked Home tree is hydrated. Crawler-only route HTML keeps
+// its established createRoot compatibility path.
+if (homeSsr) {
   hydrateRoot(rootElement, AppComponent);
 } else {
   createRoot(rootElement).render(AppComponent);

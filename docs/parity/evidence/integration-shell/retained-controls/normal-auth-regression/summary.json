@@ -1,0 +1,653 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Focused normal-app authentication regression reproduction; not a read-only matrix or pixel pass",
+  "capturedAt": "2026-09-14T00:29:59.998Z",
+  "base": "http://127.0.0.1:5000",
+  "controls": {
+    "realDisposableNick": true,
+    "normalDevelopmentApp": true,
+    "browserInterception": "none",
+    "sdkExceptions": "none",
+    "businessCrudInteractions": "none",
+    "identityWrites": "existing helper only; created identity teardown only",
+    "retainedClerkData": "HTTP status/failure and sanitized origin/path only"
+  },
+  "steps": {
+    "signIn": {
+      "status": 200,
+      "authenticated": true,
+      "admin": true
+    },
+    "adminAccess": {
+      "documentStatus": 200,
+      "authorizedVisible": true,
+      "auth": {
+        "status": 200,
+        "authenticated": true,
+        "admin": true
+      }
+    },
+    "reload": {
+      "documentStatus": 200,
+      "authorizedVisible": true,
+      "auth": {
+        "status": 200,
+        "authenticated": true,
+        "admin": true
+      }
+    },
+    "freshToken": {
+      "tokenOperation": {
+        "attempted": false,
+        "completed": false
+      },
+      "auth": {
+        "status": 200,
+        "authenticated": true,
+        "admin": true
+      }
+    },
+    "signOut": {
+      "status": 401,
+      "authenticated": false,
+      "admin": false
+    },
+    "protectedRoute": {
+      "documentStatus": 200,
+      "final": {
+        "origin": "http://127.0.0.1:5000",
+        "path": "/sign-in"
+      },
+      "localSignIn": true,
+      "adminLoginLink": false,
+      "passed": true
+    }
+  },
+  "clerkHttp": [
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6/dist/clerk.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1/dist/ui.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/dev_browser"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/environment"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/8746_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/signup_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/signin_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/2014_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client/sign_ins"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client/sign_ins/sia_<id>/attempt_first_factor"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client/sign_ins/sia_<id>/prepare_second_factor"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client/sign_ins/sia_<id>/attempt_second_factor"
+      },
+      "status": 200
+    },
+    {
+      "phase": "identity-setup",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client/sessions/sess_<id>/touch"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6/dist/clerk.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1/dist/ui.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/environment"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "admin-access",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "reload",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6/dist/clerk.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "reload",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "reload",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1/dist/ui.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "reload",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/environment"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6/dist/clerk.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1/dist/ui.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/environment"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "sign-out-ui",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client/sessions"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6/dist/clerk.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1/dist/ui.browser.js"
+      },
+      "status": 307
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui.browser.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/environment"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/v1/client"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/signup_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/8746_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/signin_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    },
+    {
+      "phase": "protected-route-after-sign-out",
+      "outcome": "response",
+      "target": {
+        "origin": "https://gorgeous-jennet-4.clerk.accounts.dev",
+        "path": "/npm/@clerk/ui@1.32.1/dist/2014_ui_13e6c8_1.32.1.js"
+      },
+      "status": 200
+    }
+  ],
+  "checks": {
+    "signInCompleted": true,
+    "adminAccess": true,
+    "reloadRetainsIdentity": true,
+    "freshTokenRetainsIdentity": false,
+    "signOutMakesAuthUnauthenticated": true,
+    "protectedRouteSignInBehavior": true,
+    "teardownCompleted": true
+  },
+  "teardown": {
+    "attempted": true,
+    "completed": true,
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "localQaUsersRemaining": 2,
+    "errorCount": 0
+  },
+  "pass": false
+}

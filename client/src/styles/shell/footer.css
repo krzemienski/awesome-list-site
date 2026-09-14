@@ -10,7 +10,7 @@
 .app-footer .footer-brand-link { margin-bottom: 12px; color: var(--text); }
 .app-footer .footer-tagline { margin-top: 0; }
 .app-footer .footer-stats { margin: 0; }
-.app-footer .app-footer-links { display: flex; flex-direction: column; gap: 0; }
+.app-footer .app-footer-links { display: flex; flex-direction: column; gap: 8px; }
 .app-footer .footer-column a,
 .app-footer .footer-column button {
   min-width: 0;
@@ -21,6 +21,14 @@
 .app-footer a:focus-visible,
 .app-footer button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .app-footer .app-footer-contact { display: flex; flex-direction: column; gap: 8px; }
+/* Footer links are normally deliberately borderless text controls. In Windows
+   High Contrast that makes the consent action indistinguishable from static
+   copy, so restore its button affordance without changing normal pixels. */
+@media (forced-colors: active) {
+  .app-footer .footer-cookie-settings {
+    border: var(--border-w) solid ButtonText;
+  }
+}
 @media (max-width: 520px) {
   .app-footer .site-footer-inner { padding: 36px 20px 24px; }
 }

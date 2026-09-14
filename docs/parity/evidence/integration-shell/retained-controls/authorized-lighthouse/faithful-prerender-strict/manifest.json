@@ -1,0 +1,73 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "createdAt": "2026-09-14T01:08:09.117Z",
+  "invocations": [
+    {
+      "startedAt": "2026-09-14T01:08:09.117Z",
+      "command": "node scripts/validation/production-baseline-capture.mjs --base http://127.0.0.1:5101 --out docs/parity/evidence/integration-shell/retained-controls/authorized-lighthouse/faithful-prerender-strict --only lighthouse --lighthouse-routes / --max-navigations 1",
+      "base": "http://127.0.0.1:5101",
+      "outDir": "docs/parity/evidence/integration-shell/retained-controls/authorized-lighthouse/faithful-prerender-strict",
+      "toolCommit": "e35ed24f841e845f7d010062eacb6efb2c7adf08",
+      "tools": {
+        "node": "v20.20.0",
+        "playwright": "1.61.1",
+        "axeCore": "4.13.0",
+        "axePlaywright": "4.13.0",
+        "lighthouse": "12.8.2",
+        "sharp": "0.33.5",
+        "pixelmatch": "7.1.0",
+        "chromium": "chromium-1223",
+        "chromiumVersion": "148.0.7778.96"
+      },
+      "phases": [
+        "lighthouse"
+      ],
+      "routesRequested": [
+        "/",
+        "/categories",
+        "/category/encoding-codecs",
+        "/category/community-events?page=2",
+        "/subcategory/community-groups",
+        "/sub-subcategory/ffmpeg",
+        "/resource/185020",
+        "/resource/186190",
+        "/about",
+        "/submit",
+        "/search?q=ffmpeg",
+        "/search?q=zzqxv-nothing",
+        "/advanced",
+        "/journeys",
+        "/journey/7",
+        "/tag/open-source",
+        "/settings/theme",
+        "/recommendations",
+        "/design-system",
+        "/terms",
+        "/privacy",
+        "/code-of-conduct",
+        "/sign-in",
+        "/this-route-does-not-exist",
+        "/sitemap.xml",
+        "/robots.txt"
+      ],
+      "lighthouseRoutesRequested": [
+        "/"
+      ],
+      "maxNavigations": 1,
+      "force": false,
+      "browserGuard": {
+        "continued": 40,
+        "blocked": 0,
+        "sample": [],
+        "allowedAuthInitializations": []
+      },
+      "finishedAt": "2026-09-14T01:08:33.301Z",
+      "durationSeconds": 24,
+      "navigations": 1,
+      "stoppedByBudget": false,
+      "routes": [],
+      "throttled": [],
+      "failures": []
+    }
+  ]
+}

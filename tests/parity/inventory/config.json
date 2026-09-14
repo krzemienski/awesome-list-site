@@ -38,7 +38,7 @@
     "screen.notifications": "app.notifications",
     "screen.settings": "app.settings",
     "screen.onboarding": "app.onboarding",
-    "screen.design-system": "app.design-system",
+    "screen.design-system": "app.system.design-system",
     "screen.legal": "app.legal",
     "screen.error.load": "app.error.loading"
   }

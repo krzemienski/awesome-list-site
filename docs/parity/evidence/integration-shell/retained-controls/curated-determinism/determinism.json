@@ -1,0 +1,624 @@
+{
+  "runId": "2026-09-13T17-16-34-952Z-70048",
+  "frozenAt": "2026-09-13T17:16:00.000Z",
+  "captures": 2,
+  "browserVersion": "148.0.7778.96",
+  "referenceAdapter": {
+    "snapshot": "e23ed3005a5671ab0cf026d3d7e4032727666776227bb23e093e915ef2014457",
+    "reconciliation": {
+      "version": 1,
+      "source": [
+        "/api/config",
+        "/api/awesome-list/nav",
+        "/api/home",
+        "/api/resources/kinds/counts"
+      ],
+      "site": {
+        "name": "Awesome Video",
+        "tagline": "A curated collection of awesome video resources, tools, and technologies for developers and content creators",
+        "repoUrl": "https://github.com/krzemienski/awesome-video",
+        "repoBranch": "master",
+        "copyrightYear": 2026
+      },
+      "kindCounts": {
+        "tools": 23,
+        "libraries": 62,
+        "standards": 47,
+        "events": 18,
+        "protocols": 11,
+        "other": 1656,
+        "total": 1817
+      },
+      "home": {
+        "total": 1817,
+        "approvedThisWeek": 1,
+        "featuredCount": 1,
+        "recentCount": 5,
+        "featuredCountReturned": 1
+      },
+      "sourceSubstitutions": [
+        {
+          "file": "home-layouts.jsx",
+          "from": "<button className=\"btn primary\" onClick={() => go('submit')} style={{ width: '100%' }}>",
+          "to": "<button className=\"btn primary\" onClick={() => go('submit')} style={{ width: '100%', minHeight: 44 }}>",
+          "source": "User-approved Home Submit 44px minimum target reconciliation (2026-09-13)",
+          "available": true
+        },
+        {
+          "file": "home-layouts.jsx",
+          "from": "<button className=\"btn ghost\" onClick={() => go('category', { cat: AV_CATEGORIES[1] })}>Browse all →</button>",
+          "to": "<button className=\"btn ghost\" style={{ minHeight: 44 }} onClick={() => go('category', { cat: AV_CATEGORIES[1] })}>Browse all →</button>",
+          "source": "User-approved Home Browse 44px minimum target reconciliation (2026-09-13)",
+          "available": true
+        },
+        {
+          "file": "home-layouts.jsx",
+          "from": "const kindCount = k => AV_RESOURCES.filter(k.match).length;",
+          "to": "const kindCount = k => Number(window.AV_KIND_COUNTS?.[k.id] ?? AV_RESOURCES.filter(k.match).length);",
+          "source": "/api/resources/kinds/counts",
+          "available": true
+        },
+        {
+          "file": "home-layouts.jsx",
+          "from": "const featured = AV_RESOURCES.filter(r => r.featured).slice(0, 6);",
+          "to": "const featured = (window.AV_HOME_FEATURED || AV_RESOURCES.filter(r => r.featured)).slice(0, 6);",
+          "source": "/api/home featured resource identities",
+          "available": true
+        },
+        {
+          "file": "home-layouts.jsx",
+          "from": "['FEATURED', AV_RESOURCES.filter(r => r.featured).length, 'hand-picked']",
+          "to": "['FEATURED', Number(window.AV_HOME_FEATURED_COUNT ?? AV_RESOURCES.filter(r => r.featured).length), 'hand-picked']",
+          "source": "/api/home featuredCount",
+          "available": true
+        },
+        {
+          "file": "home-layouts.jsx",
+          "from": "['FEATURED', featured.length, 'this week']",
+          "to": "['FEATURED', Number(window.AV_HOME_FEATURED_COUNT ?? featured.length), 'hand-picked']",
+          "source": "/api/home featuredCount and live curated stat label",
+          "available": true
+        }
+      ],
+      "officialBrandMark": {
+        "source": "client/src/components/BrandMark.tsx + client/src/lib/brand-mark.ts (esbuild TS projection)",
+        "sha256": "71ff42019de52cbc4808f28463203e6efd0ef9e9787123fec4b3c3d438cf4b73",
+        "sourceSha256": "02dfb5b928a00f24e21279ff7e08f36d1ab59e283ca3f31666eea4531fa6e101"
+      },
+      "palette": {
+        "pages": [
+          {
+            "label": "Browse categories",
+            "detail": "Explore the full catalog",
+            "href": "/categories",
+            "icon": "Grid2X2",
+            "kind": "page"
+          },
+          {
+            "label": "Advanced discovery",
+            "detail": "Filter resources in detail",
+            "href": "/advanced",
+            "icon": "Search",
+            "kind": "page"
+          },
+          {
+            "label": "Submit a resource",
+            "detail": "Suggest something useful",
+            "href": "/submit",
+            "icon": "Plus",
+            "kind": "page"
+          },
+          {
+            "label": "About",
+            "detail": "Learn about this collection",
+            "href": "/about",
+            "icon": "Info",
+            "kind": "page"
+          }
+        ],
+        "recentSearches": [],
+        "recentSearchesSource": "parity capture fixture: no recent-searches localStorage entry is seeded",
+        "scope": {
+          "root": ".modal-backdrop > .modal:has(> div:first-child > input[placeholder=\"Find resources, categories, or tags…\"])",
+          "pages": "[data-parity-palette=\"approved\"] .parity-palette-pages",
+          "rows": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]",
+          "focus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible",
+          "history": "[data-parity-palette=\"approved\"] .parity-palette-recent"
+        },
+        "sourceProof": {
+          "file": "client/src/components/ui/search-dialog.tsx",
+          "sha256": "018543569c0344d8adbdce9b624bb19cadd874015765157bdc7db5543165da69",
+          "declarations": [
+            {
+              "label": "Browse categories",
+              "detail": "Explore the full catalog",
+              "href": "/categories",
+              "icon": "Grid2X2"
+            },
+            {
+              "label": "Advanced discovery",
+              "detail": "Filter resources in detail",
+              "href": "/advanced",
+              "icon": "Search"
+            },
+            {
+              "label": "Submit a resource",
+              "detail": "Suggest something useful",
+              "href": "/submit",
+              "icon": "Plus"
+            },
+            {
+              "label": "About",
+              "detail": "Learn about this collection",
+              "href": "/about",
+              "icon": "Info"
+            }
+          ],
+          "iconProjection": {
+            "renderer": "react-dom/server renderToStaticMarkup",
+            "package": "lucide-react",
+            "components": [
+              "Grid2X2",
+              "Search",
+              "Plus",
+              "Info"
+            ],
+            "svgSha256": {
+              "Grid2X2": "79f952f181c863e6fd88b693a2ceffcafe032c368b117d4c0f7520b65732f3b1",
+              "Search": "eae4708bc8f9ef4651c585619c320831fd8636cee30f6027979c15e574ca2e69",
+              "Plus": "b208fd73aa48c54364eb6eaaa9c389de4de22759717542cb0a08172afad33980",
+              "Info": "13bda2d16f007046d221c75a7e05a00a284de461b4f61a5361a89b361195ffca"
+            }
+          },
+          "focusSource": {
+            "file": "client/src/styles/design-system.css",
+            "sha256": "c9c90fe6d0c0124835b7553b7c88dfdf7699d90bf7882a3ca598aed617477d4e",
+            "declaration": "input, select, textarea, summary, [contenteditable=\"true\"], [tabindex] + outline: 2px solid var(--accent) !important;"
+          }
+        }
+      },
+      "drawer": {
+        "moreLinks": [
+          {
+            "label": "Learning Journeys",
+            "href": "/journeys"
+          },
+          {
+            "label": "Advanced",
+            "href": "/advanced"
+          },
+          {
+            "label": "Theme",
+            "href": "/settings/theme"
+          },
+          {
+            "label": "Home dashboard",
+            "href": "/?context=account"
+          }
+        ],
+        "scope": {
+          "root": ".mobile-drawer.open",
+          "more": "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation",
+          "links": "[data-parity-drawer=\"approved\"] .parity-drawer-more-menu a",
+          "targets": [
+            "[data-parity-drawer=\"approved\"] > nav .sub-item",
+            "[data-parity-drawer=\"approved\"] .accordion-header",
+            "[data-parity-drawer=\"approved\"] > div:last-child a",
+            "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+          ]
+        },
+        "source": "client/src/components/layout/new/AppSidebar.tsx drawerMoreItems (navItems.slice(2) + accountDashboardItem; role-independent)",
+        "sourceProof": {
+          "file": "client/src/components/layout/new/AppSidebar.tsx",
+          "sha256": "71f1b62475501e6280a2fc48e3203fbeb25cbe1070ca1bcf56ce302d5e536ee4",
+          "declarations": [
+            {
+              "label": "Learning Journeys",
+              "href": "/journeys"
+            },
+            {
+              "label": "Advanced",
+              "href": "/advanced"
+            },
+            {
+              "label": "Theme",
+              "href": "/settings/theme"
+            },
+            {
+              "label": "Home dashboard",
+              "href": "/?context=account"
+            }
+          ],
+          "contract": "const drawerMoreItems = [...navItems.slice(2), accountDashboardItem];",
+          "iconProjection": {
+            "renderer": "react-dom/server renderToStaticMarkup",
+            "package": "lucide-react",
+            "component": "MoreHorizontal",
+            "svgSha256": "a8a8e1f0cfa7227533826f4fcbdf1d4485b3df0b62d38ff945d24ef7a0826873"
+          }
+        }
+      },
+      "approved44px": {
+        "selector": ".site-footer .footer-link",
+        "minHeightPx": 44,
+        "display": "inline-flex",
+        "alignItems": "center"
+      },
+      "approved44pxControls": {
+        "minHeightPx": 44,
+        "drawer": [
+          "[data-parity-drawer=\"approved\"] > nav .sub-item",
+          "[data-parity-drawer=\"approved\"] .accordion-header",
+          "[data-parity-drawer=\"approved\"] > div:last-child a",
+          "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+        ],
+        "paletteFocus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible"
+      }
+    },
+    "live": {
+      "catalogStart": "e23ed3005a5671ab0cf026d3d7e4032727666776227bb23e093e915ef2014457",
+      "catalogEnd": "e23ed3005a5671ab0cf026d3d7e4032727666776227bb23e093e915ef2014457",
+      "adminStart": "03d29b73f2873288b9ae75c823d5056ddcb565c6148604f2c3e6b5367ec76f62",
+      "adminEnd": "03d29b73f2873288b9ae75c823d5056ddcb565c6148604f2c3e6b5367ec76f62",
+      "error": null
+    }
+  },
+  "workspace": {
+    "startFingerprints": "6aa6fad597d2c49546b61c30b8e4f415f234d9a732414043deb20ef00d40c31c",
+    "endFingerprints": "6aa6fad597d2c49546b61c30b8e4f415f234d9a732414043deb20ef00d40c31c",
+    "inputsChangedDuringRun": false
+  },
+  "rows": [
+    {
+      "screen": "app.home.curated",
+      "width": 375,
+      "hashes": [
+        "08452ef21d77ee98177b21d7ddd151dccd64940ffbf88c583259cf5551471991",
+        "08452ef21d77ee98177b21d7ddd151dccd64940ffbf88c583259cf5551471991"
+      ],
+      "identical": true,
+      "failure": null,
+      "referenceReconciliation": {
+        "version": 1,
+        "source": [
+          "/api/config",
+          "/api/awesome-list/nav",
+          "/api/home",
+          "/api/resources/kinds/counts"
+        ],
+        "status": "source-projected",
+        "adjustments": [
+          "live site/tagline/stats",
+          "live footer destinations",
+          "official source-projected BrandMark SVG",
+          "approved 44px footer link/button target",
+          "official BrandMark 28px presentation"
+        ],
+        "expectedFooterCount": 1,
+        "actualFooterCount": null,
+        "retainedControls": {
+          "palette": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".modal-backdrop > .modal:has(> div:first-child > input[placeholder=\"Find resources, categories, or tags…\"])",
+              "pages": 0,
+              "history": 0,
+              "rows": 0,
+              "focus": 0
+            },
+            "source": []
+          },
+          "drawer": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".mobile-drawer.open",
+              "more": 0,
+              "links": 0,
+              "targets": 0
+            },
+            "source": []
+          }
+        },
+        "reason": "determinism uses source-projected official BrandMark; actual footer count intentionally unavailable",
+        "officialBrandMark": {
+          "source": "client/src/components/BrandMark.tsx + client/src/lib/brand-mark.ts (esbuild TS projection)",
+          "sha256": "71ff42019de52cbc4808f28463203e6efd0ef9e9787123fec4b3c3d438cf4b73",
+          "sourceSha256": "02dfb5b928a00f24e21279ff7e08f36d1ab59e283ca3f31666eea4531fa6e101"
+        },
+        "approved44px": {
+          "selector": ".site-footer .footer-link",
+          "minHeightPx": 44,
+          "display": "inline-flex",
+          "alignItems": "center"
+        },
+        "approved44pxControls": {
+          "minHeightPx": 44,
+          "drawer": [
+            "[data-parity-drawer=\"approved\"] > nav .sub-item",
+            "[data-parity-drawer=\"approved\"] .accordion-header",
+            "[data-parity-drawer=\"approved\"] > div:last-child a",
+            "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+          ],
+          "paletteFocus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible"
+        },
+        "styles": {
+          "inline": ".site-footer .footer-link{display:inline-flex!important;align-items:center!important;min-height:44px!important}.site-footer .footer-grid>div:first-child>div:first-child{min-height:44px}.site-footer .app-footer-mark{width:28px;height:28px;flex-shrink:0}",
+          "inlineSha256": "1490d34024bd465b47215ab3b5f08e02387f2c082fcc0fd7ebfa1fd4eafe7b65",
+          "canonical": "awesome-list-site-ds/styles.css and frozen reference inline styles only"
+        }
+      },
+      "files": [
+        "determinism/app.home.curated-375.capture-1.png",
+        "determinism/app.home.curated-375.capture-2.png"
+      ]
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 768,
+      "hashes": [
+        "c881f555dd72f512e0485f5eea0328ba3cd187937fb98671fb8531f897659991",
+        "c881f555dd72f512e0485f5eea0328ba3cd187937fb98671fb8531f897659991"
+      ],
+      "identical": true,
+      "failure": null,
+      "referenceReconciliation": {
+        "version": 1,
+        "source": [
+          "/api/config",
+          "/api/awesome-list/nav",
+          "/api/home",
+          "/api/resources/kinds/counts"
+        ],
+        "status": "source-projected",
+        "adjustments": [
+          "live site/tagline/stats",
+          "live footer destinations",
+          "official source-projected BrandMark SVG",
+          "approved 44px footer link/button target",
+          "official BrandMark 28px presentation"
+        ],
+        "expectedFooterCount": 1,
+        "actualFooterCount": null,
+        "retainedControls": {
+          "palette": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".modal-backdrop > .modal:has(> div:first-child > input[placeholder=\"Find resources, categories, or tags…\"])",
+              "pages": 0,
+              "history": 0,
+              "rows": 0,
+              "focus": 0
+            },
+            "source": []
+          },
+          "drawer": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".mobile-drawer.open",
+              "more": 0,
+              "links": 0,
+              "targets": 0
+            },
+            "source": []
+          }
+        },
+        "reason": "determinism uses source-projected official BrandMark; actual footer count intentionally unavailable",
+        "officialBrandMark": {
+          "source": "client/src/components/BrandMark.tsx + client/src/lib/brand-mark.ts (esbuild TS projection)",
+          "sha256": "71ff42019de52cbc4808f28463203e6efd0ef9e9787123fec4b3c3d438cf4b73",
+          "sourceSha256": "02dfb5b928a00f24e21279ff7e08f36d1ab59e283ca3f31666eea4531fa6e101"
+        },
+        "approved44px": {
+          "selector": ".site-footer .footer-link",
+          "minHeightPx": 44,
+          "display": "inline-flex",
+          "alignItems": "center"
+        },
+        "approved44pxControls": {
+          "minHeightPx": 44,
+          "drawer": [
+            "[data-parity-drawer=\"approved\"] > nav .sub-item",
+            "[data-parity-drawer=\"approved\"] .accordion-header",
+            "[data-parity-drawer=\"approved\"] > div:last-child a",
+            "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+          ],
+          "paletteFocus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible"
+        },
+        "styles": {
+          "inline": ".site-footer .footer-link{display:inline-flex!important;align-items:center!important;min-height:44px!important}.site-footer .footer-grid>div:first-child>div:first-child{min-height:44px}.site-footer .app-footer-mark{width:28px;height:28px;flex-shrink:0}",
+          "inlineSha256": "1490d34024bd465b47215ab3b5f08e02387f2c082fcc0fd7ebfa1fd4eafe7b65",
+          "canonical": "awesome-list-site-ds/styles.css and frozen reference inline styles only"
+        }
+      },
+      "files": [
+        "determinism/app.home.curated-768.capture-1.png",
+        "determinism/app.home.curated-768.capture-2.png"
+      ]
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 1024,
+      "hashes": [
+        "62eefbb031abb85a4a37e00cf0d53744ae072b0a566305a3f298a9fb433485ef",
+        "62eefbb031abb85a4a37e00cf0d53744ae072b0a566305a3f298a9fb433485ef"
+      ],
+      "identical": true,
+      "failure": null,
+      "referenceReconciliation": {
+        "version": 1,
+        "source": [
+          "/api/config",
+          "/api/awesome-list/nav",
+          "/api/home",
+          "/api/resources/kinds/counts"
+        ],
+        "status": "source-projected",
+        "adjustments": [
+          "live site/tagline/stats",
+          "live footer destinations",
+          "official source-projected BrandMark SVG",
+          "approved 44px footer link/button target",
+          "official BrandMark 28px presentation"
+        ],
+        "expectedFooterCount": 1,
+        "actualFooterCount": null,
+        "retainedControls": {
+          "palette": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".modal-backdrop > .modal:has(> div:first-child > input[placeholder=\"Find resources, categories, or tags…\"])",
+              "pages": 0,
+              "history": 0,
+              "rows": 0,
+              "focus": 0
+            },
+            "source": []
+          },
+          "drawer": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".mobile-drawer.open",
+              "more": 0,
+              "links": 0,
+              "targets": 0
+            },
+            "source": []
+          }
+        },
+        "reason": "determinism uses source-projected official BrandMark; actual footer count intentionally unavailable",
+        "officialBrandMark": {
+          "source": "client/src/components/BrandMark.tsx + client/src/lib/brand-mark.ts (esbuild TS projection)",
+          "sha256": "71ff42019de52cbc4808f28463203e6efd0ef9e9787123fec4b3c3d438cf4b73",
+          "sourceSha256": "02dfb5b928a00f24e21279ff7e08f36d1ab59e283ca3f31666eea4531fa6e101"
+        },
+        "approved44px": {
+          "selector": ".site-footer .footer-link",
+          "minHeightPx": 44,
+          "display": "inline-flex",
+          "alignItems": "center"
+        },
+        "approved44pxControls": {
+          "minHeightPx": 44,
+          "drawer": [
+            "[data-parity-drawer=\"approved\"] > nav .sub-item",
+            "[data-parity-drawer=\"approved\"] .accordion-header",
+            "[data-parity-drawer=\"approved\"] > div:last-child a",
+            "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+          ],
+          "paletteFocus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible"
+        },
+        "styles": {
+          "inline": ".site-footer .footer-link{display:inline-flex!important;align-items:center!important;min-height:44px!important}.site-footer .footer-grid>div:first-child>div:first-child{min-height:44px}.site-footer .app-footer-mark{width:28px;height:28px;flex-shrink:0}",
+          "inlineSha256": "1490d34024bd465b47215ab3b5f08e02387f2c082fcc0fd7ebfa1fd4eafe7b65",
+          "canonical": "awesome-list-site-ds/styles.css and frozen reference inline styles only"
+        }
+      },
+      "files": [
+        "determinism/app.home.curated-1024.capture-1.png",
+        "determinism/app.home.curated-1024.capture-2.png"
+      ]
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 1440,
+      "hashes": [
+        "d6197b07a420e0828699c38f566a661f527ee09a27e0c0cb0000f599765e97ab",
+        "d6197b07a420e0828699c38f566a661f527ee09a27e0c0cb0000f599765e97ab"
+      ],
+      "identical": true,
+      "failure": null,
+      "referenceReconciliation": {
+        "version": 1,
+        "source": [
+          "/api/config",
+          "/api/awesome-list/nav",
+          "/api/home",
+          "/api/resources/kinds/counts"
+        ],
+        "status": "source-projected",
+        "adjustments": [
+          "live site/tagline/stats",
+          "live footer destinations",
+          "official source-projected BrandMark SVG",
+          "approved 44px footer link/button target",
+          "official BrandMark 28px presentation"
+        ],
+        "expectedFooterCount": 1,
+        "actualFooterCount": null,
+        "retainedControls": {
+          "palette": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".modal-backdrop > .modal:has(> div:first-child > input[placeholder=\"Find resources, categories, or tags…\"])",
+              "pages": 0,
+              "history": 0,
+              "rows": 0,
+              "focus": 0
+            },
+            "source": []
+          },
+          "drawer": {
+            "status": "not-applicable",
+            "modified": [],
+            "scope": {
+              "root": ".mobile-drawer.open",
+              "more": 0,
+              "links": 0,
+              "targets": 0
+            },
+            "source": []
+          }
+        },
+        "reason": "determinism uses source-projected official BrandMark; actual footer count intentionally unavailable",
+        "officialBrandMark": {
+          "source": "client/src/components/BrandMark.tsx + client/src/lib/brand-mark.ts (esbuild TS projection)",
+          "sha256": "71ff42019de52cbc4808f28463203e6efd0ef9e9787123fec4b3c3d438cf4b73",
+          "sourceSha256": "02dfb5b928a00f24e21279ff7e08f36d1ab59e283ca3f31666eea4531fa6e101"
+        },
+        "approved44px": {
+          "selector": ".site-footer .footer-link",
+          "minHeightPx": 44,
+          "display": "inline-flex",
+          "alignItems": "center"
+        },
+        "approved44pxControls": {
+          "minHeightPx": 44,
+          "drawer": [
+            "[data-parity-drawer=\"approved\"] > nav .sub-item",
+            "[data-parity-drawer=\"approved\"] .accordion-header",
+            "[data-parity-drawer=\"approved\"] > div:last-child a",
+            "[data-parity-drawer=\"approved\"] .parity-drawer-more-navigation > summary"
+          ],
+          "paletteFocus": "[data-parity-palette=\"approved\"] [data-parity-palette-control=\"input\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"row\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"page\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"history\"]:focus-visible,[data-parity-palette=\"approved\"] [data-parity-palette-control=\"clear\"]:focus-visible"
+        },
+        "styles": {
+          "inline": ".site-footer .footer-link{display:inline-flex!important;align-items:center!important;min-height:44px!important}.site-footer .footer-grid>div:first-child>div:first-child{min-height:44px}.site-footer .app-footer-mark{width:28px;height:28px;flex-shrink:0}",
+          "inlineSha256": "1490d34024bd465b47215ab3b5f08e02387f2c082fcc0fd7ebfa1fd4eafe7b65",
+          "canonical": "awesome-list-site-ds/styles.css and frozen reference inline styles only"
+        }
+      },
+      "files": [
+        "determinism/app.home.curated-1440.capture-1.png",
+        "determinism/app.home.curated-1440.capture-2.png"
+      ]
+    }
+  ],
+  "identityTeardown": {
+    "keepUser": false,
+    "bridgeId": "2099547298",
+    "email": "__qa_test_parity_mu02t23y0a4eda+clerk_test@example.com",
+    "localDeleted": true,
+    "clerkDeleted": true,
+    "errors": [],
+    "verification": {
+      "localQaUsersRemaining": []
+    }
+  }
+}

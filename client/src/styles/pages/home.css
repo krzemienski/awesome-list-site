@@ -44,11 +44,22 @@
   flex-wrap: wrap;
 }
 
-.home-kind-chip {
+/*
+ * The shared `.chip` atom can be emitted after this page stylesheet. Keep the
+ * Home selector more specific so the canonical 6px × 12px chip geometry is
+ * not replaced by the atom's 4px × 10px defaults.
+ */
+button.home-kind-chip {
   padding: 0.375rem 0.75rem;
   font-size: 0.65625rem;
+  /*
+   * The reference atom is a span and therefore retains the document's 1.6
+   * leading. This is a button in the application, whose UA `normal` leading
+   * otherwise makes every wrapped chip row four pixels too short.
+   */
+  line-height: var(--body-leading);
   text-decoration: none;
-  white-space: normal;
+  white-space: nowrap;
   transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
 }
 
@@ -66,6 +77,7 @@
 }
 
 .home-kind-count {
+  margin-left: 0.375rem;
   color: var(--text-3);
 }
 
@@ -90,7 +102,7 @@
   color: var(--text-3);
   font-size: 0.59375rem;
   letter-spacing: 0.18em;
-  line-height: 1.3;
+  line-height: var(--body-leading);
 }
 
 .home-stat-value {
@@ -102,7 +114,7 @@
   margin-top: 0.25rem;
   color: var(--text-3);
   font-size: 0.71875rem;
-  line-height: 1.4;
+  line-height: var(--body-leading);
 }
 
 .home-index-grid {
@@ -132,10 +144,29 @@
   padding: 0 0 0.625rem;
   margin-bottom: 0.375rem;
   color: inherit;
+  /*
+   * The reference uses a native button. This restores its outer type context
+   * while allowing the title itself to retain the Home heading treatment.
+   */
+  font-size: 13.3333px;
+  line-height: normal;
   text-align: left;
   text-decoration: none;
   border-bottom: var(--hairline-w) solid var(--border-strong);
   transition: color 160ms ease;
+}
+
+/*
+ * These links replace the reference's native buttons. Native button font
+ * shorthand resets OpenType features, while application links otherwise
+ * inherit the body ss01/cv11/tnum settings.
+ */
+.home-category-heading,
+.home-subcategory-row,
+.home-recent-row,
+.home-curated-recent-row {
+  font-feature-settings: normal;
+  font-variation-settings: normal;
 }
 
 .home-category-heading:hover,
@@ -146,11 +177,12 @@
 .home-category-icon {
   display: inline-grid;
   flex: 0 0 auto;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: auto;
+  height: auto;
   place-items: center;
   color: var(--accent);
   font-size: 0.9375rem;
+  line-height: normal;
 }
 
 .home-category-heading h3 {
@@ -159,7 +191,11 @@
   overflow: hidden;
   font-size: 0.9375rem;
   font-weight: 600;
-  line-height: 1.35;
+  /*
+   * Canonical category titles are inside native buttons, so their unforced
+   * line box is `normal`; links inherit the page leading unless this is set.
+   */
+  line-height: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -170,6 +206,11 @@
   color: var(--text-3);
   font-size: 0.6875rem;
   font-feature-settings: "tnum";
+}
+
+.home-subcategory-count {
+  min-width: 1.75rem;
+  text-align: right;
 }
 
 .home-subcategory-list {
@@ -187,6 +228,7 @@
   font-size: 0.8125rem;
   text-align: left;
   text-decoration: none;
+  line-height: normal;
   border-bottom: var(--hairline-w) solid var(--hairline);
   transition: color 160ms ease;
 }
@@ -236,6 +278,7 @@
   color: inherit;
   text-align: left;
   text-decoration: none;
+  line-height: normal;
   border-bottom: var(--hairline-w) solid var(--hairline);
 }
 
@@ -257,12 +300,9 @@
 
 .home-recent-title {
   display: block;
-  overflow: hidden;
   font-size: 0.84375rem;
   font-weight: 600;
   line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   transition: color 160ms ease;
 }
 
@@ -272,13 +312,17 @@
   overflow: hidden;
   color: var(--text-3);
   font-size: 0.75rem;
-  line-height: 1.3;
+  line-height: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .home-contribute-card {
   padding: 1.125rem;
+}
+
+.home-contribute-card .home-rail-eyebrow {
+  margin-bottom: 0.5rem;
 }
 
 .home-contribute-card p {
@@ -366,6 +410,11 @@
   margin-top: 3rem;
 }
 
+.home-curated-recent,
+.home-curated-categories {
+  margin-top: 4rem;
+}
+
 .home-section-header {
   display: flex;
   align-items: flex-end;
@@ -398,6 +447,14 @@
   color: var(--text-2);
 }
 
+/*
+ * Editorial's global serif-italic accent is deliberately superseded only for
+ * the muted category-taxonomy qualifier, as in the canonical heading.
+ */
+[data-system="editorial"] .home-section-title .serif-italic.home-muted-italic {
+  color: var(--text-2);
+}
+
 .home-resource-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -413,12 +470,17 @@
   transform: translateY(-2px);
 }
 
-.home-resource-card-top,
-.home-curated-category-top {
+.home-resource-card-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
+}
+
+.home-curated-category-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .home-resource-card-top {
@@ -439,12 +501,14 @@
 }
 
 .home-featured-chip {
-  padding: 0.125rem 0.375rem;
+  padding: 0.25rem 0.625rem;
   color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.59375rem;
+  letter-spacing: 0.0375rem;
   background: color-mix(in srgb, var(--accent) 10%, transparent);
   border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius-pill);
 }
 
 .home-resource-title {
@@ -456,15 +520,13 @@
 }
 
 .home-resource-description {
-  display: -webkit-box;
-  min-height: 3.9rem;
+  display: block;
+  min-height: 0;
   margin-bottom: 0.875rem;
   overflow: hidden;
   color: var(--text-2);
   font-size: 0.8125rem;
   line-height: 1.55;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }
 
 .home-resource-tags {
@@ -474,8 +536,10 @@
 }
 
 .home-resource-tag {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.625rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.65625rem;
+  letter-spacing: 0.0375rem;
+  border-radius: var(--radius-pill);
   text-decoration: none;
 }
 
@@ -492,9 +556,16 @@
   width: 100%;
   padding: 0.875rem 1.125rem;
   color: inherit;
+  font-size: 13.3333px;
   text-align: left;
   text-decoration: none;
+  line-height: normal;
   transition: background 160ms ease;
+}
+
+.home-curated-recent-row .home-recent-number {
+  padding-top: 0;
+  font-size: 0.65625rem;
 }
 
 .home-curated-recent-row + .home-curated-recent-row {
@@ -515,11 +586,16 @@
   align-items: baseline;
   gap: 0.5rem;
   flex-wrap: wrap;
+}
+
+.home-curated-recent-title-text {
   font-size: 0.90625rem;
   font-weight: 600;
 }
 
-.home-curated-category {
+.home-curated-category.chip {
+  display: inline-flex;
+  align-items: center;
   padding: 0.0625rem 0.375rem;
   color: var(--text-3);
   font-size: 0.5625rem;
@@ -531,13 +607,14 @@
   overflow: hidden;
   color: var(--text-2);
   font-size: 0.78125rem;
-  line-height: 1.4;
+  line-height: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .home-recent-arrow {
   width: 0.75rem;
+  height: 0.75rem;
   color: var(--text-3);
 }
 
@@ -547,11 +624,93 @@
   gap: 0.875rem;
 }
 
-.home-curated-category {
+.home-curated-category.card {
   display: block;
   padding: 1.375rem;
   color: inherit;
   text-decoration: none;
+}
+
+.home-curated-category.card .home-category-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  color: var(--accent);
+  font-size: 1.125rem;
+  background: var(--surface-2);
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.home-curated-category.card .home-category-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  color: var(--text-2);
+  font-size: 0.65625rem;
+  letter-spacing: 0.0375rem;
+  white-space: nowrap;
+  background: var(--surface);
+  border: var(--hairline-w) solid var(--border);
+  border-radius: var(--radius-pill);
+}
+
+/*
+ * Home's Button primitive keeps the existing 44px accessible target while
+ * matching the canonical .btn paint. These selectors are deliberately scoped
+ * to Home rather than changing the shared shadcn primitive.
+ */
+.home-curated-featured .home-section-header > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 44px;
+  min-height: max(44px, var(--profile-control-height));
+  padding: 0.5625rem 1rem;
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: normal;
+  white-space: nowrap;
+  background: transparent;
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.home-curated-featured .home-section-header > a:hover {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--text-3);
+  transform: translateY(-1px);
+}
+
+.home-contribute-card > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 44px;
+  min-height: max(44px, var(--profile-control-height));
+  padding: 0.5625rem 1rem;
+  color: var(--bg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: normal;
+  white-space: nowrap;
+  background: var(--accent);
+  border: var(--border-w) solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+.home-contribute-card > a:hover {
+  color: var(--bg);
+  background: var(--surface-2);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent);
+  transform: translateY(-1px);
 }
 
 .home-curated-category-top {
@@ -572,7 +731,7 @@
 }
 
 .home-curated-explore {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.375rem;
   margin-top: 1rem;
@@ -779,16 +938,16 @@
   }
 
   .home-curated-recent-row {
-    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
-    gap: 0.625rem;
-    padding: 0.875rem;
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    gap: 0.875rem;
+    padding: 0.875rem 1.125rem;
   }
 
   .home-curated-recent-description {
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 

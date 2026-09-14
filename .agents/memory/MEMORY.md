@@ -21,6 +21,7 @@
 - [Anthropic mid-loop steering](anthropic-midloop-steering.md) — inject mid-run guidance as a text block on the tool_result user turn (a separate user msg → 400); research agent "don't give up" tuning lives here too.
 - [SEO title two-pass parity](seo-title-two-pass-parity.md) — client SEOHead titles must exactly mirror og-middleware templates or Googlebot's crawl/render passes see different titles.
 - [Verifying CSS states](verifying-css-states.md) — confirm focus/hover/active with a REAL click/hover+screenshot; getComputedStyle after programmatic .focus() lies (transition mid-value) and CSSOM cssRules is opaque for Vite's injected Tailwind sheet (read style.textContent).
+- [Tailwind v4 source roots](tailwind-v4-source-roots.md) — CSS-first scanning defaults to the workspace, not the legacy v3 `content` list; use `source(none)` with explicit runtime template roots so captures, skills, and caches cannot become accidental safelists.
 - [Playwright browser launch](playwright-browser-version-pin.md) — discover the cached executable instead of reinstalling; enabling the sandbox requires chromiumSandbox:true, not just removing an argument.
 - [Link-scan false positives](link-scan-false-positives.md) — connect timeouts from datacenter IPs are bot-blocks, never "dead"; only DNS/refused/404-410/SSL count; verify timeouts via web search.
 - [Prod status-change paths](prod-status-change-paths.md) — bulk/reject only works on pending resources; approved ones need PUT :id/reject|approve; bulk endpoints hide failures in counts.

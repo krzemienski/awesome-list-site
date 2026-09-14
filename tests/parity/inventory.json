@@ -4,13 +4,15 @@
   "generatedFrom": [
     "tests/parity/inventory/account.json",
     "tests/parity/inventory/admin.json",
+    "tests/parity/inventory/artifact-docs.json",
     "tests/parity/inventory/artifact.json",
     "tests/parity/inventory/config.json",
     "tests/parity/inventory/home.json",
     "tests/parity/inventory/resource.json",
     "tests/parity/inventory/shell.json",
     "tests/parity/inventory/static.json",
-    "tests/parity/inventory/taxonomy.json"
+    "tests/parity/inventory/taxonomy.json",
+    "tests/parity/inventory/token-only-system.json"
   ],
   "widths": [
     375,
@@ -32,13 +34,18 @@
     },
     {
       "family": "admin",
-      "summary": "Admin console tabs. The design ships 15 tabs, the app 17; the 14 shared tabs are pixel rows behind the disposable admin session.",
+      "summary": "Admin console tabs. The design ships 15 tabs; the app exposes those 15 plus three folded production-only tabs. Shared tabs are pixel rows behind the disposable admin session.",
       "screens": 18
+    },
+    {
+      "family": "artifact-docs",
+      "summary": "Registered design-system artifact documentation chapters.",
+      "screens": 21
     },
     {
       "family": "artifact",
       "summary": "Registered design-system artifact: showcase page plus documentation chapters.",
-      "screens": 23
+      "screens": 2
     },
     {
       "family": "home",
@@ -57,13 +64,18 @@
     },
     {
       "family": "static",
-      "summary": "About, Submit, legal and the in-app design-system showcase.",
-      "screens": 4
+      "summary": "About, Submit and legal routes. The in-app design-system showcase is covered once by the token-only-system family.",
+      "screens": 3
     },
     {
       "family": "taxonomy",
       "summary": "Category, subcategory and sub-subcategory listings plus tag and collection browsing.",
       "screens": 6
+    },
+    {
+      "family": "token-only-system",
+      "summary": "Owned system-surface evidence fragment; reconcile legacy static rows during integration. Token-only eligibility is not a full-page PASS.",
+      "screens": 10
     }
   ],
   "screens": [
@@ -270,8 +282,18 @@
       "family": "admin",
       "id": "app.admin.research",
       "kind": "app",
-      "eligibility": "blocked",
-      "reason": "Design tab \"Research\" (the 15th ADMIN_TABS entry) has no app counterpart; the app folds research into the Researcher tab."
+      "eligibility": "pixel",
+      "actualPath": "/admin/research",
+      "referencePath": "/index.html",
+      "actualAction": "admin-tab:research",
+      "referenceAction": "admin-tab:research",
+      "actualReadySelector": "[data-testid=content-research] [data-testid=research-review-panel]",
+      "referenceReadySelector": "main .tabs .tab.active",
+      "identityCheck": "admin-tab",
+      "requires": [
+        "admin-session"
+      ],
+      "notes": "Design tab \"Research\" (the 15th ADMIN_TABS entry) ↔ app [data-testid=tab-research]; the canonical panel passes initialTab=\"review\" to ResearcherTab. Real authorized data is required for capture."
     },
     {
       "family": "admin",
@@ -416,14 +438,6 @@
       "eligibility": "token-only",
       "actualPath": "/contributions",
       "reason": "The reference has no contributions page; verified through table tokens."
-    },
-    {
-      "family": "static",
-      "id": "app.design-system",
-      "kind": "app",
-      "eligibility": "blocked",
-      "actualPath": "/design-system",
-      "reason": "The application showcase is distinct from the registered artifact baseline (artifact.showcase covers the design-system page)."
     },
     {
       "family": "shell",
@@ -575,14 +589,18 @@
       "kind": "app",
       "eligibility": "pixel",
       "widths": [
-        375
+        375,
+        768,
+        1024,
+        1440
       ],
       "actualPath": "/",
       "referencePath": "/index.html",
-      "actualAction": "mobile-drawer",
-      "referenceAction": "mobile-drawer",
-      "actualReadySelector": "[role=dialog]",
-      "referenceReadySelector": ".mobile-drawer.open"
+      "actualAction": "mobile-drawer-responsive",
+      "referenceAction": "mobile-drawer-responsive",
+      "actualReadySelector": "header",
+      "referenceReadySelector": "header",
+      "notes": "Open drawer through the actual header trigger at <=1024; at 1440 assert the trigger is hidden and capture the canonical closed desktop state."
     },
     {
       "family": "shell",
@@ -637,6 +655,94 @@
       "notes": "Both sides resolve the first sub-subcategory of the first subcategory that has one; the reference opens it via __avGo('subcategory', {cat, sub, subSub})."
     },
     {
+      "family": "token-only-system",
+      "id": "app.system.code-of-conduct",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/code-of-conduct",
+      "reason": "No canonical legal counterpart; canonical 760px prose composition and tokens.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/code-of-conduct@{375,768,1024,1440}.png; axe/code-of-conduct/."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.consent",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/",
+      "reason": "Global consent uses canonical surface/button tokens and retains analytics gating and in-flow mobile behavior.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/consent/{home,submit}@{375,768,1024,1440}.png. Zero pre-consent external analytics; accept/decline persist; no CTA overlap at 375. Larger-width shell intersection measurements are handed off."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.design-system",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/design-system",
+      "reason": "Internal live-token/component reference is distinct from the registered artifact and has no canonical page counterpart.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/showcase/design-system@{375,768,1024,1440}.png; focused axe zero serious/critical. The legacy blocked app.design-system duplicate was removed during Task 565 integration; registered artifact eligibility is unchanged."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.empty-search",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/search?q=zzqxv-nothing",
+      "reason": "A real zero-result query supplies natural empty-state evidence; page composition belongs to discovery integration.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/empty-search@{375,768,1024,1440}.png. Search.tsx is not modified by this leaf task."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.error",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "ErrorPage consumes the canonical error-state pattern. No artificial failure was injected to capture this conditional surface.",
+      "notes": "Static presentation/contract review only; natural 404 supplies error-pattern evidence. Existing retry and external reload guards were not changed."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.loading",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/search?q=ffmpeg",
+      "reason": "After warming the lazy route, a real throttled uncached query demonstrates the owned token-backed skeleton without response mocks.",
+      "notes": "Authoritative evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/loading-owned/screenshots/{skeleton,replacement}@{375,768,1024,1440}.png. 36 owned primitives, zero route fallbacks, 24 real content cards afterward; axe zero serious/critical at 375/1440. Full-page zero-shift remains an integration handoff (six placeholders versus 24 content cards). Earlier fallback captures are not owned-skeleton proof."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.not-found",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/this-route-does-not-exist",
+      "reason": "Naturally reachable 404 uses the canonical error-state pattern; no fault injection.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/404@{375,768,1024,1440}.png; HTTP 404 at every width; no-store verified separately in checks/404-headers.txt."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.privacy",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/privacy",
+      "reason": "No canonical legal counterpart; canonical prose and responsive table tokens.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/privacy@{375,768,1024,1440}.png; axe/privacy/."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.terms",
+      "kind": "app",
+      "eligibility": "token-only",
+      "actualPath": "/terms",
+      "reason": "No canonical legal counterpart; canonical 760px prose composition and tokens.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/screenshots/terms@{375,768,1024,1440}.png; axe/terms/. Shared titleTestId support remains an integration handoff."
+    },
+    {
+      "family": "token-only-system",
+      "id": "app.system.toast",
+      "kind": "app",
+      "eligibility": "token-only",
+      "reason": "Real guest bookmark action demonstrates canonical Radix toast presentation with unchanged li[data-state] contract.",
+      "notes": "Evidence: tests/parity/system-evidence/task-554-editorial-crimson-20260913-0530/latest/toast/guest-bookmark-added@{375,768,1024,1440}.png. Destructive variant uses the canonical destructive background/foreground pair; no artificial error toast generated."
+    },
+    {
       "family": "taxonomy",
       "id": "app.tag",
       "kind": "app",
@@ -655,214 +761,193 @@
       "reason": "The registered artifact has no independently routeable anatomy state; both captures are diagnostic only."
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.a11y",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-a11y",
       "referencePath": "/docs.html#a11y",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Accessibility\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.buttons",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-buttons",
       "referencePath": "/docs.html#buttons",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Buttons\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.cards",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-cards",
       "referencePath": "/docs.html#cards",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Cards\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.checklist",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-checklist",
       "referencePath": "/docs.html#checklist",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Launch checklist\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.color",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-color",
       "referencePath": "/docs.html#color",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Color & accent\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.data-density",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-data-density",
       "referencePath": "/docs.html#data-density",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Data density\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.flows",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-flows",
       "referencePath": "/docs.html#flows",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Flow diagrams\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.forms",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-forms",
       "referencePath": "/docs.html#forms",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Forms\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.getting-started",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-getting-started",
       "referencePath": "/docs.html#getting-started",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Getting started\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.integration",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-integration",
       "referencePath": "/docs.html#integration",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Integrate the system\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.lists",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-lists",
       "referencePath": "/docs.html#lists",
-      "readySelector": "main",
-      "reason": "Docs chapter \"List patterns\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.motion",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-motion",
       "referencePath": "/docs.html#motion",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Motion\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.navigation",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-navigation",
       "referencePath": "/docs.html#navigation",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Navigation\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.overview",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-overview",
       "referencePath": "/docs.html#overview",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Overview\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.pages",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-pages",
       "referencePath": "/docs.html#pages",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Page templates\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.principles",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-principles",
       "referencePath": "/docs.html#principles",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Principles\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.spacing",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-spacing",
       "referencePath": "/docs.html#spacing",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Spacing & layout\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.theming",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-theming",
       "referencePath": "/docs.html#theming",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Theming & switching\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.theming-app",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-theming-app",
       "referencePath": "/docs.html#theming-app",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Theming an app\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.tokens",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-tokens",
       "referencePath": "/docs.html#tokens",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Token contract\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
-      "family": "artifact",
+      "family": "artifact-docs",
       "id": "artifact.docs.typography",
       "kind": "artifact",
-      "eligibility": "artifact-docs",
+      "eligibility": "pixel",
       "actualPath": "/#docs-typography",
       "referencePath": "/docs.html#typography",
-      "readySelector": "main",
-      "reason": "Docs chapter \"Typography\": the registered artifact has no docs hash router; both captures are diagnostic only."
+      "readySelector": ".docs-main h1"
     },
     {
       "family": "artifact",
@@ -912,7 +997,7 @@
     "screen.notifications": "app.notifications",
     "screen.settings": "app.settings",
     "screen.onboarding": "app.onboarding",
-    "screen.design-system": "app.design-system",
+    "screen.design-system": "app.system.design-system",
     "screen.legal": "app.legal",
     "screen.error.load": "app.error.loading"
   }

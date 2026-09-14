@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "run": 3,
+  "capturedAt": "2026-09-14T02:24:40.203Z",
+  "base": "http://127.0.0.1:5101/",
+  "lighthouseVersion": "12.8.2",
+  "binding": {
+    "sourceTrackedTreeSha256": "77c48ba6bc66fe0da4c6403920e1e7c2f6300909c742c3fe6267d56e16d24608",
+    "sourceDirtyPatchSha256": "b7222ebf2e62241da720ccaefb4c32796147f709f3b27bc116caf72a05c687ac",
+    "sourceUntrackedTreeSha256": "58778211c4bd9582933183c68e61aff680daeb70f15fb6e2eaf9c61e93bb93bf",
+    "buildTreeSha256": "d6f7d056173aa02b920e060bc816ff5c6b27443fdd987be261cf418ba69b0008"
+  },
+  "valid": true,
+  "invalidReasons": [],
+  "performanceScore": 0.72,
+  "scores": {
+    "performance": 0.72,
+    "accessibility": 0.98,
+    "best-practices": 0.79,
+    "seo": 1
+  },
+  "metrics": {
+    "firstContentfulPaintMs": 2905,
+    "largestContentfulPaintMs": 3509,
+    "totalBlockingTimeMs": 531,
+    "cumulativeLayoutShift": 0,
+    "speedIndexMs": 2905,
+    "interactiveMs": 5946
+  },
+  "formFactor": "mobile",
+  "finalDisplayedUrl": "http://127.0.0.1:5101/",
+  "observedRequests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-DCtXKkIW.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-BW9A8KV1.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/auth/user",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/tags",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/home",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/resources/kinds/counts",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/config",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7iN7hzFUPJH58nib14c7qv8oRcTn.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5101/7d379771-f7f8-4431-84d0-773dc7df1402",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "POST",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "POST",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/environment?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&_method=PATCH&__clerk_db_jwt=%5BREDACTED%5D",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0&__clerk_db_jwt=%5BREDACTED%5D",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5101/cb8e5567-6702-49d9-b9b2-59bfaf410254",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1.32.1/dist/subscriptionDetails_ui_13e6c8_1.32.1.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "chrome://terms/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/",
+      "resourceType": "document",
+      "isNavigationRequest": true
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-DCtXKkIW.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-CTjT7uj6.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-CeftJlzp.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/assets/index-BW9A8KV1.css",
+      "resourceType": "stylesheet",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/awesome-list/nav",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/auth/user",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/tags",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/home",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/resources/kinds/counts",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2",
+      "resourceType": "font",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/api/config",
+      "resourceType": "fetch",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6.31.0/dist/clerk.browser.js",
+      "resourceType": "script",
+      "isNavigationRequest": false
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5101/favicon.svg",
+      "resourceType": "other",
+      "isNavigationRequest": false
+    }
+  ],
+  "unsafeSameOriginRequests": [],
+  "reportFile": "lighthouse/home.json"
+}

@@ -20,7 +20,7 @@ import {
 import { markMigrationsNotRequired } from "./ops/bootState";
 import { operationalRequestContext } from "./ops/requestContext";
 import { clerkMiddleware } from "@clerk/express";
-import { publishableKeyFromHost } from "@clerk/shared/keys";
+import { parsePublishableKey, publishableKeyFromHost } from "@clerk/shared/keys";
 import {
   CLERK_PROXY_PATH,
   clerkProxyMiddleware,
@@ -44,6 +44,29 @@ const buildRevision =
   process.env.GITHUB_SHA ||
   "unknown";
 
+/**
+ * A development publishable key names its Frontend API host. Allow only that
+ * parsed, configured origin for local/dev-instance Clerk loading; production
+ * uses the same-origin FAPI proxy/custom-domain path and needs no broad Clerk
+ * tenant allowlist. The key itself is never emitted or logged.
+ */
+function configuredClerkDevelopmentOrigin(): string | null {
+  const parsed = parsePublishableKey(process.env.VITE_CLERK_PUBLISHABLE_KEY);
+  if (!parsed || parsed.instanceType !== "development") return null;
+  try {
+    const api = parsed.frontendApi;
+    const url = new URL(api.includes("://") ? api : `https://${api}`);
+    return url.protocol === "https:" ? url.origin : null;
+  } catch {
+    return null;
+  }
+}
+
+const clerkDevelopmentOrigin = configuredClerkDevelopmentOrigin();
+const clerkDevelopmentCspSource = clerkDevelopmentOrigin
+  ? ` ${clerkDevelopmentOrigin}`
+  : "";
+
 const buildContentSecurityPolicy = (nonce: string): string =>
   [
     "default-src 'self'",
@@ -62,7 +85,7 @@ const buildContentSecurityPolicy = (nonce: string): string =>
     // CSP, so Clerk's FAPI rejected those flows with "Error loading
     // CAPTCHA" — allowlist it in script-src, connect-src, and frame-src
     // (per the Clerk skill's canonical directive list).
-    `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com`,
+    `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://cdn.mxpnl.com https://us-assets.i.posthog.com https://cdn.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com${clerkDevelopmentCspSource}`,
     // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
     // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
     // present in the same directive, so there is no "nonce + fallback"
@@ -93,11 +116,11 @@ const buildContentSecurityPolicy = (nonce: string): string =>
     // Task #232: api-js.mixpanel.com is mixpanel-browser's default ingest
     // host; api.mixpanel.com covers config fallbacks.
     // PostHog ingest + assets (feature flags, replay, surveys).
-    "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com",
+    `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://api-js.mixpanel.com https://api.mixpanel.com https://us.i.posthog.com https://us-assets.i.posthog.com https://*.amplitude.com https://replit.com https://replit-cdn.com https://challenges.cloudflare.com${clerkDevelopmentCspSource}`,
     // Turnstile renders inside an iframe from challenges.cloudflare.com;
     // without an explicit frame-src it falls back to default-src 'self'
     // and the widget is blocked silently (Turnstile error 300030).
-    "frame-src 'self' https://challenges.cloudflare.com",
+    `frame-src 'self' https://challenges.cloudflare.com${clerkDevelopmentCspSource}`,
     "frame-ancestors 'none'",
     // BUG-014: add the missing hardening directives.
     "form-action 'self'",

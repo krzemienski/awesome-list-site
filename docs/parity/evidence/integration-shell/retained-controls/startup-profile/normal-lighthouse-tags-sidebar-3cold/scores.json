@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "normal-lighthouse-control-summary",
+  "base": "http://127.0.0.1:5104/",
+  "binding": {
+    "sourceTrackedTreeSha256": "a3b5e914f33b2e2ef7271929e2acea93d46e1fb79796f4f5c78d0a58913785c2",
+    "sourceDirtyPatchSha256": "3d03c274ef0f41d83bb3477ccff76b45ec7fcac12cdd8a52abd0b0e483ac35e2",
+    "sourceUntrackedTreeSha256": "c21efa6595e917050b7313a27b7a870626c26a38e1d99b6c742e212207fa7ce0",
+    "buildTreeSha256": "2fe258eecfe9bfaf95ec4a6fd7d18df86352ea4561c05ce5092a507e0846dc14"
+  },
+  "runCount": 3,
+  "runs": [
+    {
+      "run": 1,
+      "valid": true,
+      "performanceScore": 0.62,
+      "runFile": "run-1/run.json",
+      "reportFile": "run-1/lighthouse/home.json"
+    },
+    {
+      "run": 2,
+      "valid": true,
+      "performanceScore": 0.7,
+      "runFile": "run-2/run.json",
+      "reportFile": "run-2/lighthouse/home.json"
+    },
+    {
+      "run": 3,
+      "valid": true,
+      "performanceScore": 0.77,
+      "runFile": "run-3/run.json",
+      "reportFile": "run-3/lighthouse/home.json"
+    }
+  ],
+  "medianPerformanceScore": 0.7,
+  "performanceThreshold": 0.82,
+  "thresholdPassed": false,
+  "allRunsValid": true
+}

@@ -10,7 +10,8 @@
 // drift as product drift.
 //
 // Ground rules (see tests/parity/production-baseline/<date>/README.md):
-//   · Read-only, anonymous. No sign-in, no admin key, no POST.
+//   · Read-only, anonymous. No sign-in or admin key; every non-safe request is
+//     blocked.
 //   · The pinned Playwright Chromium under .cache/ms-playwright is used with its
 //     sandbox ON (chromiumSandbox: true), never downloaded, never --no-sandbox.
 //   · Edge throttling (bare 429/503) is retried with backoff and NEVER recorded
@@ -206,6 +207,71 @@ export function writeJson(file, value) {
   writeFileAtomic(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+const SENSITIVE_EVIDENCE_KEY = /(?:authorization|cookie|credential|jwt|token|secret|password|api[_-]?key|session)/i;
+
+// Lighthouse and the capture ledger are evidence that may be retained. Keep
+// useful non-sensitive query metadata (SDK/API versions and method markers),
+// but never persist credentials that a browser SDK decorates onto its URLs.
+export function redactEvidenceUrl(value) {
+  if (typeof value !== "string") return value;
+  try {
+    const url = new URL(value);
+    if (url.username) url.username = "[REDACTED]";
+    if (url.password) url.password = "[REDACTED]";
+    if (url.search) {
+      const redacted = new URLSearchParams();
+      for (const [key, queryValue] of url.searchParams) {
+        redacted.append(key, SENSITIVE_EVIDENCE_KEY.test(key) ? "[REDACTED]" : queryValue);
+      }
+      url.search = redacted.toString();
+    }
+    // Fragments are never needed by an evidence URL and may contain auth state.
+    url.hash = "";
+    return url.toString();
+  } catch {
+    // Some diagnostics embed a URL in prose rather than storing it as a URL
+    // value. Redact sensitive query values there too without losing unrelated
+    // diagnostic text or non-sensitive query metadata.
+    return value
+      .replace(/(https?:\/\/)[^\/\s@]*@/gi, "$1[REDACTED]@")
+      .replace(/([?&]([^=&\s]+)=)([^&#\s"'`]+)/g, (match, prefix, rawKey) => {
+        let key = rawKey;
+        try {
+          key = decodeURIComponent(rawKey);
+        } catch {
+          // A malformed key is still safe to leave as non-sensitive metadata.
+        }
+        return SENSITIVE_EVIDENCE_KEY.test(key) ? `${prefix}[REDACTED]` : match;
+      });
+  }
+}
+
+export function redactEvidenceRequest(request) {
+  return { ...request, ...(typeof request?.url === "string" ? { url: redactEvidenceUrl(request.url) } : {}) };
+}
+
+export function redactRefusals(refusals) {
+  return {
+    ...refusals,
+    blockedRequests: refusals.blockedRequests.map(redactEvidenceRequest),
+    allowedAuthInitializations: refusals.allowedAuthInitializations.map(redactEvidenceRequest),
+    blockedWebSockets: refusals.blockedWebSockets.map(redactEvidenceUrl),
+    blockedWorkers: refusals.blockedWorkers.map(redactEvidenceUrl),
+    blockedPopups: refusals.blockedPopups.map(redactEvidenceUrl),
+    blockedServiceWorkers: refusals.blockedServiceWorkers.map(redactEvidenceUrl),
+  };
+}
+
+function redactLighthouseEvidence(value, key = "") {
+  if (SENSITIVE_EVIDENCE_KEY.test(key)) return "[REDACTED]";
+  if (typeof value === "string") return redactEvidenceUrl(value);
+  if (Array.isArray(value)) return value.map((item) => redactLighthouseEvidence(item));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([entryKey, item]) => [entryKey, redactLighthouseEvidence(item, entryKey)]));
+  }
+  return value;
+}
+
 // `--base` / `--against` are recorded verbatim in manifests and reports, so a
 // URL carrying credentials would persist them in the repository.
 export function parseOriginUrl(value, flag) {
@@ -381,7 +447,9 @@ export async function freePort() {
 
 // Every browser this module launches is read-only by construction: launch
 // fails if the guard cannot be installed.
-export async function launchBrowser(label, { remoteDebuggingPort } = {}) {
+export async function launchBrowser(label, {
+  remoteDebuggingPort,
+} = {}) {
   const args = ["--disable-dev-shm-usage"];
   if (remoteDebuggingPort) args.push(`--remote-debugging-port=${remoteDebuggingPort}`);
   const browser = await launchBrowserWithLease(
@@ -419,7 +487,11 @@ export async function launchBrowser(label, { remoteDebuggingPort } = {}) {
 const readOnlyGuards = new WeakMap();
 async function installReadOnlyGuard(browser) {
   const session = await browser.newBrowserCDPSession();
-  const guard = { blocked: [], continued: 0 };
+  const guard = {
+    blocked: [],
+    allowedAuthInitializations: [],
+    continued: 0,
+  };
   session.on("Fetch.requestPaused", (event) => {
     const { requestId, request, resourceType } = event;
     if (SAFE_METHODS.has(request.method)) {
@@ -442,7 +514,13 @@ async function installReadOnlyGuard(browser) {
 // launchBrowser (null for any other browser).
 export function readOnlyGuardOf(browser) {
   const guard = readOnlyGuards.get(browser);
-  return guard ? { blocked: [...guard.blocked], continued: guard.continued } : null;
+  return guard
+    ? {
+        blocked: [...guard.blocked],
+        allowedAuthInitializations: [...guard.allowedAuthInitializations],
+        continued: guard.continued,
+      }
+    : null;
 }
 
 async function settleFrames(page) {
@@ -590,9 +668,9 @@ async function fullPageScreenshot(page, viewport) {
 // Every page the capture drives — screenshot/DOM/axe loads and the page
 // Lighthouse audits — lives in a context opened here. Read-only by
 // construction, not by hope: the page may only GET/HEAD (and send CORS
-// preflights); anything else — a beacon, a form post, a client that decides
-// to create state — is aborted and recorded so the capture can never mutate
-// the origin it is measuring (the browser-wide guard fails it independently).
+// preflights). Anything else — a beacon, form post, user/session endpoint, or
+// sign-in write — is aborted and recorded so the capture can never mutate the
+// origin.
 // WebSocket frames bypass request routing, so sockets are never connected to
 // the server (a routed socket sees a silent mock); the window guard refuses
 // the constructor before that can even fire. Context-level routes and init
@@ -602,9 +680,9 @@ async function fullPageScreenshot(page, viewport) {
 // a page that exists anyway when the load is read back is recorded as a
 // contained popup and closed with the context. Refusals are collected per
 // context so a capture record can attribute them to one page load.
-async function openReadOnlyContext(browser, contextOptions) {
+export async function openReadOnlyContext(browser, contextOptions) {
   const context = await browser.newContext({ serviceWorkers: "block", ...contextOptions });
-  const refused = { requests: [], webSockets: [] };
+  const refused = { requests: [], allowedAuthInitializations: [], webSockets: [] };
   await context.route("**/*", (route) => {
     const request = route.request();
     if (SAFE_METHODS.has(request.method())) return route.continue();
@@ -633,6 +711,7 @@ async function openReadOnlyContext(browser, contextOptions) {
     const contained = context.pages().filter((other) => other !== page).map((other) => `contained ${other.url()}`);
     return {
       blockedRequests: [...refused.requests],
+      allowedAuthInitializations: [...refused.allowedAuthInitializations],
       blockedWebSockets: [...new Set([...refused.webSockets, ...windowRefused.webSockets])],
       blockedWorkers: windowRefused.workers,
       blockedPopups: [...windowRefused.popups, ...contained],
@@ -684,15 +763,16 @@ async function capturePage({ browser, url, viewport, wantAxe, wantPng, telemetry
       await settleFrames(page);
 
       const dom = await page.evaluate(extractDom);
+      const redactedRefusals = redactRefusals(await refusals());
       const capture = {
         capturedAt: new Date().toISOString(),
-        requestedUrl: url,
-        finalUrl: page.url(),
+        requestedUrl: redactEvidenceUrl(url),
+        finalUrl: redactEvidenceUrl(page.url()),
         documentStatus: status,
         xRobotsTag: response.headers()["x-robots-tag"] ?? null,
-        httpRedirects,
-        clientNavigations: [...new Set(clientNavigations)],
-        ...(await refusals()),
+        httpRedirects: httpRedirects.map(redactEvidenceUrl),
+        clientNavigations: [...new Set(clientNavigations)].map(redactEvidenceUrl),
+        ...redactedRefusals,
         consentBanner,
         attempts: attempt,
         viewport: { ...viewport },
@@ -920,7 +1000,89 @@ async function openLighthousePage(browser, puppeteerBrowser) {
   }
 }
 
-async function runLighthouse({ url, browser, puppeteerBrowser, log = console, telemetry, budget = createNavigationBudget() }) {
+function sanitizedTraceUrl(value) {
+  if (typeof value !== "string" || !value) return null;
+  try {
+    const parsed = new URL(value);
+    // Script/data/blob bodies can contain arbitrary program or user data. The
+    // summary needs only network script/document attribution.
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
+    return redactEvidenceUrl(parsed.href);
+  } catch {
+    return null;
+  }
+}
+
+function sanitizedTraceFunction(value) {
+  if (typeof value !== "string" || !value.trim()) return null;
+  // Chrome reports source-level identifiers here. Keep only conventional
+  // identifier punctuation so dynamically generated labels cannot retain data.
+  return value.replace(/[^A-Za-z0-9_$.[\]<>:# -]/g, "_").replace(/\s+/g, " ").trim().slice(0, 160) || null;
+}
+
+function taskFunctionName(task) {
+  const candidates = [];
+  const visit = (node) => {
+    const data = { ...(node.event.args?.beginData ?? {}), ...(node.event.args?.data ?? {}) };
+    const stackTrace = data.stackTrace?.callFrames ?? data.stackTrace;
+    const frames = Array.isArray(stackTrace) ? stackTrace : [];
+    const functionName = frames.find((frame) => typeof frame?.functionName === "string")?.functionName;
+    if (functionName) candidates.push({ duration: node.duration, functionName });
+    for (const child of node.children) visit(child);
+  };
+  visit(task);
+  candidates.sort((a, b) => b.duration - a.duration);
+  return sanitizedTraceFunction(candidates[0]?.functionName);
+}
+
+// Lighthouse already records its default-pass trace for every navigation. This
+// optional diagnostic derives only the longest top-level tasks from that
+// existing artifact; it starts no second tracer/profiler and persists no raw
+// trace event, stack, request, or query-string data.
+async function summarizeLighthouseTrace(artifacts) {
+  const trace = artifacts?.Trace ?? artifacts?.traces?.defaultPass;
+  if (!Array.isArray(trace?.traceEvents)) {
+    throw new Error("Lighthouse trace summary requested, but its default-pass trace artifact is unavailable");
+  }
+  const [{ TraceProcessor }, { MainThreadTasks }] = await Promise.all([
+    import("lighthouse/core/lib/tracehouse/trace-processor.js"),
+    import("lighthouse/core/lib/tracehouse/main-thread-tasks.js"),
+  ]);
+  const processed = TraceProcessor.processTrace(trace);
+  const tasks = MainThreadTasks.getMainThreadTasks(
+    processed.mainThreadEvents,
+    processed.frames,
+    processed.timestamps.traceEnd,
+    processed.timestamps.timeOrigin,
+  );
+  const topLevelTasks = tasks
+    .filter((task) => !task.parent && !task.unbounded)
+    .map((task) => ({
+      event: task.event.name,
+      durationMs: Number(task.duration.toFixed(3)),
+      selfTimeMs: Number(task.selfTime.toFixed(3)),
+      url: sanitizedTraceUrl(task.attributableURLs[0]),
+      function: taskFunctionName(task),
+    }))
+    .sort((a, b) => b.durationMs - a.durationMs);
+  return {
+    schemaVersion: 1,
+    source: "Lighthouse default-pass trace",
+    rawTracePersisted: false,
+    totalTopLevelTaskCount: topLevelTasks.length,
+    topLevelTasks: topLevelTasks.slice(0, 50),
+  };
+}
+
+async function runLighthouse({
+  url,
+  browser,
+  puppeteerBrowser,
+  log = console,
+  telemetry,
+  budget = createNavigationBudget(),
+  traceSummary = false,
+}) {
   const { default: lighthouse } = await import("lighthouse");
   let lastReason = "no result";
   for (let attempt = 1; attempt <= 4; attempt++) {
@@ -934,7 +1096,7 @@ async function runLighthouse({ url, browser, puppeteerBrowser, log = console, te
     } finally {
       await context.close().catch(() => {});
     }
-    const lhr = result?.lhr;
+    const lhr = result?.lhr ? redactLighthouseEvidence(result.lhr) : null;
     if (!lhr) throw new Error(`Lighthouse returned no result for ${url}`);
     const statusCode = lhr.audits?.["network-requests"]?.details?.items?.find((item) => item.resourceType === "Document")?.statusCode;
     const throttled = RETRYABLE_STATUSES.has(Number(statusCode)) || /429|503/.test(lhr.runtimeError?.message ?? "");
@@ -945,6 +1107,7 @@ async function runLighthouse({ url, browser, puppeteerBrowser, log = console, te
       await sleep(backoffMs(attempt));
       continue;
     }
+    const trace = traceSummary ? await summarizeLighthouseTrace(result.artifacts) : null;
     if (refused.blockedRequests.length) log.warn(`  lighthouse ${url}: refused ${refused.blockedRequests.length} non-safe request(s)`);
     // The full-page screenshot and filmstrip are base64 PNGs (megabytes per
     // run) that add nothing a stored PNG capture does not already hold; the
@@ -974,7 +1137,8 @@ async function runLighthouse({ url, browser, puppeteerBrowser, log = console, te
       finalDisplayedUrl: lhr.finalDisplayedUrl,
       formFactor: lhr.configSettings?.formFactor ?? null,
       requestCount: lhr.audits?.["network-requests"]?.details?.items?.length ?? null,
-      ...refused,
+      traceSummary: trace,
+      ...redactRefusals(refused),
     };
   }
   throw new Error(`Lighthouse for ${url}: still failing after 4 attempts (${lastReason})`);
@@ -1164,7 +1328,18 @@ export async function captureApiSet({ base, outDir, endpoints = API_ENDPOINTS, f
 // it), so it spends the same navigation budget as a screenshot; `complete` is
 // false when the budget ran out before every route had a report. The report
 // file is written before its scores entry, which is the completion marker.
-export async function captureLighthouseSet({ base, outDir, browser, port, routes = LIGHTHOUSE_ROUTES, force = false, telemetry, log = console, budget = createNavigationBudget() }) {
+export async function captureLighthouseSet({
+  base,
+  outDir,
+  browser,
+  port,
+  routes = LIGHTHOUSE_ROUTES,
+  force = false,
+  traceSummary = false,
+  telemetry,
+  log = console,
+  budget = createNavigationBudget(),
+}) {
   const lhDir = path.join(outDir, "lighthouse");
   fs.mkdirSync(lhDir, { recursive: true });
   const scoresPath = path.join(lhDir, "scores.json");
@@ -1176,7 +1351,8 @@ export async function captureLighthouseSet({ base, outDir, browser, port, routes
     for (const route of routes) {
       const slug = routeSlug(route);
       const reportPath = path.join(lhDir, `${slug}.json`);
-      if (!force && scores.routes[route] && fs.existsSync(reportPath)) continue;
+      const traceSummaryPath = path.join(lhDir, `${slug}.trace-summary.json`);
+      if (!force && scores.routes[route] && fs.existsSync(reportPath) && (!traceSummary || fs.existsSync(traceSummaryPath))) continue;
       if (budget.remaining <= 0) {
         complete = false;
         break;
@@ -1185,12 +1361,15 @@ export async function captureLighthouseSet({ base, outDir, browser, port, routes
         delete scores.routes[route];
         writeJson(scoresPath, scores);
       }
+      // A forced/non-resumable capture without trace diagnostics must not leave
+      // an older trace summary looking as though it describes the new report.
+      if (!traceSummary) fs.rmSync(traceSummaryPath, { force: true });
       const url = new URL(route, base).href;
       log.log(`  lighthouse ${route}`);
       puppeteerBrowser ??= await connectLighthouseBrowser(port);
       let outcome;
       try {
-        outcome = await runLighthouse({ url, browser, puppeteerBrowser, log, telemetry, budget });
+        outcome = await runLighthouse({ url, browser, puppeteerBrowser, log, telemetry, budget, traceSummary });
       } catch (error) {
         if (error instanceof NavigationBudgetExhausted) {
           complete = false;
@@ -1198,11 +1377,16 @@ export async function captureLighthouseSet({ base, outDir, browser, port, routes
         }
         throw error;
       }
-      const { lhr, ...summary } = outcome;
+      const { lhr, traceSummary: trace, ...summary } = outcome;
       // Compact JSON: a Lighthouse report is read by tools, and pretty-printing
       // doubles what the repository has to carry per route.
       writeFileAtomic(reportPath, `${JSON.stringify(lhr)}\n`);
-      scores.routes[route] = { ...summary, reportFile: `${slug}.json` };
+      if (trace) writeJson(traceSummaryPath, trace);
+      scores.routes[route] = {
+        ...summary,
+        reportFile: `${slug}.json`,
+        traceSummaryFile: trace ? `${slug}.trace-summary.json` : null,
+      };
       writeJson(scoresPath, scores);
     }
   } finally {

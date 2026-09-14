@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import type { Resource } from "@/types/awesome-list";
 import type { ResourceKind } from "@shared/resourceKinds";
@@ -52,18 +51,6 @@ export interface HomePresentationProps {
   accountFeatures?: ReactNode;
 }
 
-const CATEGORY_SHORT_NAMES: Record<string, string> = {
-  "community-events": "Community",
-  "encoding-codecs": "Encoding",
-  "general-tools": "General",
-  "infrastructure-delivery": "Infra",
-  "intro-learning": "Intro",
-  "media-tools": "Media",
-  "players-clients": "Players",
-  "protocols-transport": "Protocols",
-  "standards-industry": "Standards",
-};
-
 const KIND_LABELS: Record<string, string> = {
   tools: "Tools & SDKs",
   libraries: "Libraries",
@@ -71,6 +58,30 @@ const KIND_LABELS: Record<string, string> = {
   events: "Events",
   protocols: "Protocols",
 };
+
+const COUNT_WORDS = [
+  "Zero",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+  "Eleven",
+  "Twelve",
+  "Thirteen",
+  "Fourteen",
+  "Fifteen",
+  "Sixteen",
+  "Seventeen",
+  "Eighteen",
+  "Nineteen",
+  "Twenty",
+] as const;
 
 function resourceTags(resource: Resource): string[] {
   const direct = Array.isArray(resource.tags) ? resource.tags : [];
@@ -87,18 +98,35 @@ function resourceHref(resource: Resource): string {
 }
 
 function categoryShortName(resource: Resource): string {
-  const category = resource.category || "";
-  const slug = category
-    .toLowerCase()
-    .trim()
-    .replace(/\s*&\s*/g, " ")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-  return CATEGORY_SHORT_NAMES[slug] || category.split(/\s*&\s*/)[0] || "Index";
+  return resource.category?.trim() || "Index";
 }
 
 function formatCount(value: number): string {
   return Number.isFinite(value) ? value.toLocaleString() : "—";
+}
+
+function formatCountWord(value: number): string {
+  if (Number.isInteger(value) && value >= 0 && value < COUNT_WORDS.length) {
+    return COUNT_WORDS[value];
+  }
+  return formatCount(value);
+}
+
+function HomeArrow({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2 8 H14 M10 4 L14 8 L10 12" />
+    </svg>
+  );
 }
 
 function isoWeekNumber(date: Date): number {
@@ -115,7 +143,7 @@ function StatStrip({ stats, layout }: { stats: HomeStats; layout: "index" | "cur
       ? [
           ["RESOURCES", formatCount(stats.total), `+${formatCount(stats.approvedThisWeek)} this week`],
           ["CATEGORIES", formatCount(stats.categories), `${formatCount(stats.subcategories)} subcategories`],
-          ["NESTED GROUPS", formatCount(stats.nestedGroups), "third-level groups"],
+          ["NESTED GROUPS", formatCount(stats.nestedGroups), "L3 depth"],
           ["FEATURED", formatCount(stats.featured), "hand-picked"],
         ]
       : [
@@ -422,7 +450,7 @@ function RecentRail({ recent }: { recent: Resource[] }) {
               <span className="home-recent-copy">
                 <span className="home-recent-title">{resource.title}</span>
                 <span className="home-recent-meta">
-                  {categoryShortName(resource)} · {resourceTags(resource)[0] || "uncategorized"}
+                  {categoryShortName(resource)} · {resourceTags(resource)[0]}
                 </span>
               </span>
             </ResourceLink>
@@ -488,7 +516,7 @@ function CuratedLayout({
           aside={
             <Button asChild variant="ghost">
               <Link href={`/categories${tagSearch}`}>
-                Browse all <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                Browse all →
               </Link>
             </Button>
           }
@@ -521,12 +549,12 @@ function CuratedLayout({
                 <span className="home-recent-number mono">{String(index + 1).padStart(2, "0")}</span>
                 <span className="home-curated-recent-copy">
                   <span className="home-curated-recent-title">
-                    {resource.title}
+                    <span className="home-curated-recent-title-text">{resource.title}</span>
                     <span className="home-curated-category chip muted">{category}</span>
                   </span>
                   <span className="home-curated-recent-description">{resource.description}</span>
                 </span>
-                <ArrowRight className="home-recent-arrow" aria-hidden="true" />
+                <HomeArrow className="home-recent-arrow" />
               </ResourceLink>
             );
           })}
@@ -538,7 +566,7 @@ function CuratedLayout({
           eyebrow="── CATEGORIES"
           title={
             <>
-              {stats.categories} domains,{" "}
+              {formatCountWord(stats.categories)} domains,{" "}
               <span className="serif-italic home-muted-italic">one taxonomy</span>
             </>
           }
@@ -560,7 +588,7 @@ function CuratedLayout({
               <h3>{category.name}</h3>
               <p>{category.description ?? `Explore ${formatCount(category.count)} resources in ${category.name}.`}</p>
               <span className="home-curated-explore">
-                Explore <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                Explore <HomeArrow className="h-3 w-3" />
               </span>
             </Link>
           ))}

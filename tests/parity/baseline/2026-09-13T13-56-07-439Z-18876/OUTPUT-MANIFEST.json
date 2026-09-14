@@ -1,0 +1,23 @@
+{
+  "REPORT.md": "5da7c75ad2fe05756159842ce04f23344bfcfa28e7e720ef6db442178fa1415f",
+  "actual/app.home.curated-1440.attempt-1.png": "e0cabc11ff7ffb95ced04e5ec145f28adb2055309b5bfd30fca772a29c558c3b",
+  "actual/app.home.curated-1440.attempt-2.png": "e0cabc11ff7ffb95ced04e5ec145f28adb2055309b5bfd30fca772a29c558c3b",
+  "actual/app.home.curated-1440.png": "e0cabc11ff7ffb95ced04e5ec145f28adb2055309b5bfd30fca772a29c558c3b",
+  "actual/app.home.curated-1440.repeat.png": "e0cabc11ff7ffb95ced04e5ec145f28adb2055309b5bfd30fca772a29c558c3b",
+  "actual/app.home.index-1440.attempt-1.png": "9cc29b9469a8e1f6d96b63feffab5926369c72b2dec099bc0c506a77ed68a21d",
+  "actual/app.home.index-1440.attempt-2.png": "9cc29b9469a8e1f6d96b63feffab5926369c72b2dec099bc0c506a77ed68a21d",
+  "actual/app.home.index-1440.png": "9cc29b9469a8e1f6d96b63feffab5926369c72b2dec099bc0c506a77ed68a21d",
+  "actual/app.home.index-1440.repeat.png": "9cc29b9469a8e1f6d96b63feffab5926369c72b2dec099bc0c506a77ed68a21d",
+  "diff/app.home.curated-1440.png": "c2cf3f5f98086e8fba0c2ea7a91abc3b4de5d3110e372772c75ae4f7b5ff8cbd",
+  "diff/app.home.index-1440.png": "ba6c037bfc1a654ba7de7783b83365f60ec12671a2ff16967f1cfda724a4cd19",
+  "expected/app.home.curated-1440.attempt-1.png": "81f94242473d52f52ef3fb9977e840b64c0e0208f89c7cba3d6d780a268b5cbb",
+  "expected/app.home.curated-1440.attempt-2.png": "81f94242473d52f52ef3fb9977e840b64c0e0208f89c7cba3d6d780a268b5cbb",
+  "expected/app.home.curated-1440.png": "81f94242473d52f52ef3fb9977e840b64c0e0208f89c7cba3d6d780a268b5cbb",
+  "expected/app.home.curated-1440.repeat.png": "81f94242473d52f52ef3fb9977e840b64c0e0208f89c7cba3d6d780a268b5cbb",
+  "expected/app.home.index-1440.attempt-1.png": "bc3276fdb9ad2316e6a9d45be16000b1254941ba138ee57fb86dd67ceaff0027",
+  "expected/app.home.index-1440.attempt-2.png": "bc3276fdb9ad2316e6a9d45be16000b1254941ba138ee57fb86dd67ceaff0027",
+  "expected/app.home.index-1440.png": "bc3276fdb9ad2316e6a9d45be16000b1254941ba138ee57fb86dd67ceaff0027",
+  "expected/app.home.index-1440.repeat.png": "bc3276fdb9ad2316e6a9d45be16000b1254941ba138ee57fb86dd67ceaff0027",
+  "font-gaps.md": "556093f5b7978c1e0a06ab396786f63d5c04c2f47c0db8d9a0a3166bc793c841",
+  "results.json": "e5a64fe2de83d8cc1c779c2b4d013eb4f399e739f29f78ae76011b703ab9a398"
+}
