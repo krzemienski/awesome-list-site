@@ -113,15 +113,10 @@ plans/
 /hunt-workspace/
 /_validation/
 /_planning/
-# The component preview sandbox is maintained source; keep other artifacts ignored.
+# The design-system artifact is maintained source; keep other artifacts ignored.
 /artifacts/*
-!/artifacts/mockup-sandbox/
-!/artifacts/mockup-sandbox/**
 !/artifacts/awesome-video-design-system/
 !/artifacts/awesome-video-design-system/**
-/artifacts/mockup-sandbox/node_modules/
-/artifacts/mockup-sandbox/dist/
-/artifacts/mockup-sandbox/.tsbuildinfo
 /artifacts/awesome-video-design-system/node_modules/
 /artifacts/awesome-video-design-system/dist/
 /artifacts/awesome-video-design-system/.tsbuildinfo
