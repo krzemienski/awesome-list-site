@@ -110,6 +110,7 @@
 - [App-shell bottom bar](app-shell-bottom-bar.md) — an app-level bottom bar belongs in the shell column as its own row; every other row must fill what the column leaves, never claim the viewport.
 - [Vite SPA curl smoke checks](vite-spa-curl-smoke-checks.md) — curl sees only the static HTML shell; assert shell markers and route status, not copy rendered later by React.
 - [Browser response state assertions](browser-response-state-assertions.md) — shared response helpers validate transport/shape; scenarios own populated-vs-empty cardinality assertions.
+- [Retired artifact workspace residue](retired-artifact-workspace-residue.md) — git-ignored `artifacts/*` survive a task-agent merge on main's disk; publish snapshots ignored files, so the palette gate rescans a retired artifact — rm -rf it by hand.
 - [Artifact registry registration](artifact-registry-registration.md) — verify with listArtifacts; create/register APIs can report success or scaffold files while the platform registry still rolls back.
 - [Theme storage denial gates](theme-storage-denial-gates.md) — isolate app-owned theme keys from Clerk session storage unless Clerk compatibility is the test itself.
 - [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
