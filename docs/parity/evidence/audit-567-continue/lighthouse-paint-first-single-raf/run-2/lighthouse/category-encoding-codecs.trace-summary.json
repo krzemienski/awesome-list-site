@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 1255,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 88.274,
+      "selfTimeMs": 1.449,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": "n"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 83.563,
+      "selfTimeMs": 0.144,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 49.695,
+      "selfTimeMs": 1.517,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 38.068,
+      "selfTimeMs": 0.014,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 30.94,
+      "selfTimeMs": 2.092,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 21.761,
+      "selfTimeMs": 0.105,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 21.2,
+      "selfTimeMs": 0.051,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 17.372,
+      "selfTimeMs": 15.957,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.08,
+      "selfTimeMs": 1.336,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.406,
+      "selfTimeMs": 0.012,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.559,
+      "selfTimeMs": 0.806,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.341,
+      "selfTimeMs": 0.058,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.776,
+      "selfTimeMs": 1.263,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.02,
+      "selfTimeMs": 0.012,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.924,
+      "selfTimeMs": 0.094,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.31,
+      "selfTimeMs": 5.402,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.728,
+      "selfTimeMs": 1.346,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.682,
+      "selfTimeMs": 0.328,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.259,
+      "selfTimeMs": 0.734,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.789,
+      "selfTimeMs": 0.093,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.359,
+      "selfTimeMs": 0.231,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.174,
+      "selfTimeMs": 0.028,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.102,
+      "selfTimeMs": 0.05,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.102,
+      "selfTimeMs": 0.03,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.226,
+      "selfTimeMs": 0.031,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.03,
+      "selfTimeMs": 0.213,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.883,
+      "selfTimeMs": 3.055,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.601,
+      "selfTimeMs": 2.783,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.58,
+      "selfTimeMs": 0.086,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.548,
+      "selfTimeMs": 0.704,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.547,
+      "selfTimeMs": 0.309,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.485,
+      "selfTimeMs": 0.105,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.219,
+      "selfTimeMs": 1.712,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.888,
+      "selfTimeMs": 2.878,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.712,
+      "selfTimeMs": 0.451,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.2,
+      "selfTimeMs": 0.809,
+      "url": "http://127.0.0.1:5101/assets/index-rhv51Ajg.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.98,
+      "selfTimeMs": 0.034,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.572,
+      "selfTimeMs": 1.567,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.552,
+      "selfTimeMs": 0.114,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.394,
+      "selfTimeMs": 0.028,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.322,
+      "selfTimeMs": 0.155,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.188,
+      "selfTimeMs": 0.542,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.181,
+      "selfTimeMs": 0.059,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.148,
+      "selfTimeMs": 0.233,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.057,
+      "selfTimeMs": 0.114,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.023,
+      "selfTimeMs": 0.594,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.019,
+      "selfTimeMs": 0.064,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.945,
+      "selfTimeMs": 0.145,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.91,
+      "selfTimeMs": 0.883,
+      "url": "http://127.0.0.1:5101/assets/system-D-mANIo5.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.885,
+      "selfTimeMs": 0.195,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    }
+  ]
+}

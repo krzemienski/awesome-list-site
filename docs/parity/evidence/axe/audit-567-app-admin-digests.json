@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.admin.digests",
+  "widths": [
+    {
+      "screen": "app.admin.digests",
+      "width": 375,
+      "route": "/admin",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.admin.digests",
+      "width": 1440,
+      "route": "/admin",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                "section:nth-child(2) > h3"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "section:nth-child(2) > h3"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

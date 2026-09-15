@@ -1,0 +1,87 @@
+FP 208.967 FCP 208.967
+  res   57 /assets/Home-DQCBP3Qu.css
+  res   58 /
+  res   68 /assets/index-CeftJlzp.js
+  res   78 /assets/index-rhv51Ajg.css
+  res   78 /assets/index-CTjT7uj6.js
+  res   90 /css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@
+  res  104 data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAw
+  res  171 /assets/index-DLmunk5U.js
+  res  205 /s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0K7i
+  res  208 /s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+  res  209 /s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntka
+  res  261 /favicon.svg
+  res  267 /assets/tags-BCNAomBw.js
+  res  270 /assets/url-filter-state-CQl46NDa.js
+  res  271 /assets/resourceKinds-core-Dz8cDD7Y.js
+  res  271 /assets/onboarding-values-Da-jKBtx.js
+  res  271 /assets/Home-tZoU3aaH.js
+  res  272 /assets/card--n33KP5o.js
+  res  276 /favicon.ico
+  res  277 /assets/badge-Bp5gvSFo.js
+  res  277 /assets/use-home-layout-CrDKvDko.js
+   33.1    9.7 DocumentLoader::CommitNavigation   {}
+   35.5    7.2 DocumentLoader::StartLoadingResponse {}
+   35.5    7.2 DocumentLoader::CreateParserPostCommit {}
+   35.6    2.5 NavigationBodyLoader::StartLoadingBody {}
+   35.7    2.4 NavigationBodyLoader::OnReadable   {}
+   35.7    2.4 NavigationBodyLoader::ReadFromDataPipe {}
+   35.7    2.4 DocumentLoader::BodyDataReceivedImpl {}
+   35.9    2.2 DocumentLoader::HandleData         {}
+   35.9    2.2 DocumentLoader::CommitData         {}
+   35.9    2.2 HTMLDocumentParser::appendBytes    {}
+   35.9    2.2 DecodedDataDocumentParser::AppendBytes {}
+   44.8   11.0 HTMLDocumentParser::DeferredPumpTokenizerIfPossible {}
+   44.8   10.9 HTMLDocumentParser::PumpTokenizerIfPossible {}
+   44.8   10.9 HTMLDocumentParser::PumpTokenizer  {}
+   44.9   10.9 ParseHTML                          {"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97","startLine":0,"url":"http://127.0.0.1:5101/"}
+   45.9    3.5 HTMLDocumentParser::RunScriptsForPausedTreeBuilder {}
+   45.9    3.5 HTMLParserScriptRunner::execute    {"columnNumber":46,"frame":"0xa8c020309c0","lineNumber":127}
+   45.9    3.5 PendingScript::ExecuteScriptBlock  {}
+   45.9    3.5 AsyncTask Run                      {}
+   45.9    3.5 EvaluateScript                     {"columnNumber":46,"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97","lineNumber":127,"url":"http://127.0.0
+   49.7    5.2 HTMLDocumentParser::RunScriptsForPausedTreeBuilder {}
+   49.7    5.2 HTMLParserScriptRunner::execute    {"columnNumber":46,"frame":"0xa8c020309c0","lineNumber":192}
+   49.7    5.2 PendingScript::ExecuteScriptBlock  {}
+   49.7    5.2 AsyncTask Run                      {}
+   49.7    5.1 EvaluateScript                     {"columnNumber":46,"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97","lineNumber":192,"url":"http://127.0.0
+   50.4    3.1 CookieJar::Cookies                 {}
+   58.8    2.7 HTMLDocumentParser::DeferredPumpTokenizerIfPossible {}
+   58.8    2.7 HTMLDocumentParser::PumpTokenizerIfPossible {}
+   58.8    2.5 HTMLDocumentParser::PumpTokenizer  {}
+   58.8    2.5 ParseHTML                          {"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97","startLine":367,"url":"http://127.0.0.1:5101/"}
+   74.8    2.7 ResponseBodyLoader::OnStateChange  {}
+   74.8    2.7 ResponseBodyLoader::DidFinishLoadingBody {}
+   75.2    2.3 ParseAuthorStyleSheet              {"styleSheetUrl":"http://127.0.0.1:5101/assets/index-rhv51Ajg.css"}
+   75.2    2.3 Blink.ParseStyleSheet.UpdateTime   {}
+   75.2    2.1 CSSParserImpl::parseStyleSheet     {}
+   75.2    2.1 CSSParserImpl::parseStyleSheet.parse {}
+   90.7   76.5 WebFrameWidgetImpl::UpdateLifecycle {}
+   90.7   70.1 LocalFrameView::RunStyleAndLayoutLifecyclePhases {}
+   90.7   70.1 LocalFrameView::UpdateStyleAndLayout {}
+   90.7   17.4 Blink.Style.UpdateTime             {}
+   90.7   17.3 UpdateLayoutTree                   {"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97"}
+   90.7    9.8 Document::updateActiveStyle        {}
+   90.7    9.7 StyleEngine::updateActiveStyleSheets {}
+   90.8    3.5 RuleSet::addRulesFromSheet         {}
+  100.5    7.5 Document::updateStyle              {}
+  100.7    6.6 Document::recalcStyle              {}
+  108.1   52.6 Blink.Layout.UpdateTime            {}
+  108.1   52.6 LocalFrameView::layout             {}
+  108.1   52.6 Layout                             {"dirtyObjects":916,"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97","partialLayout":false,"totalObjects":
+  108.2   52.5 LocalFrameView::performLayout      {}
+  137.6    7.4 InlineNode::ShapeTextIncludingFirstLine {}
+  161.9    4.6 LocalFrameView::RunPaintLifecyclePhase {}
+  161.9    4.4 Blink.Paint.UpdateTime             {}
+  162.0    3.9 Paint                              {"clip":[0,0,412,0,412,4582,0,4582],"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97","layerId":0,"nodeId":
+  184.9    2.1 WebFrameWidgetImpl::BeginMainFrame {}
+  184.9    2.1 Blink.Animate.UpdateTime           {}
+  185.0    2.1 PageAnimator::serviceScriptedAnimations {}
+  187.0    6.5 WebFrameWidgetImpl::UpdateLifecycle {}
+  208.9   11.8 Document::UpdateStyleAndLayout     {}
+  208.9   11.8 Blink.ForcedStyleAndLayout.UpdateTime {}
+  208.9   11.8 LocalFrameView::UpdateStyleAndLayout {}
+  209.2   11.5 Blink.Layout.UpdateTime            {}
+  209.2   11.5 LocalFrameView::layout             {}
+  209.2   11.5 Layout                             {"dirtyObjects":910,"frame":"4B09BC3BBBDAF412E56AE2118C5BDA97","partialLayout":false,"totalObjects":
+  209.2   11.5 LocalFrameView::performLayout      {}

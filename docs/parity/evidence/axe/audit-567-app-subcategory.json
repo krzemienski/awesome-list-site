@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.subcategory",
+  "widths": [
+    {
+      "screen": "app.subcategory",
+      "width": 375,
+      "route": "/subcategory/community-groups",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 2
+      }
+    },
+    {
+      "screen": "app.subcategory",
+      "width": 1440,
+      "route": "/subcategory/community-groups",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 46,
+        "incomplete": 2
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

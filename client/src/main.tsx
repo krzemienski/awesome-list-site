@@ -8,8 +8,6 @@ import { initMixpanel } from "./lib/mixpanel";
 import { initPosthog } from "./lib/posthog";
 import { initAmplitude } from "./lib/amplitude";
 import { loadFontOverride } from "./lib/font-options";
-import type { DehydratedState } from "@tanstack/react-query";
-import type { HomeBoot } from "./lib/home-boot";
 
 function afterFirstPaint(callback: () => void): void {
   const scheduleIdle = () => {
@@ -81,6 +79,34 @@ document.documentElement.classList.add('dark');
 const rootElement = document.getElementById("root")!;
 const homeSsr = rootElement.dataset.homeSsr === "true" ? window.__HOME_SSR__ : undefined;
 
+// Start the first route's code request as soon as the entry module evaluates,
+// before the SSR hold handoff and provider tree do any work.  The route remains
+// code-split (and auth guards remain unchanged); this only overlaps chunk
+// transfer with bootstrap on deep links instead of waiting for React.lazy to
+// render the route branch.
+function preloadInitialRouteChunk() {
+  const pathname = window.location.pathname;
+  let chunk;
+  if (pathname === "/") {
+    chunk = import("./pages/Home");
+  } else if (/^\/category\/[^/]+$/.test(pathname)) {
+    chunk = import("./pages/Category");
+  } else if (/^\/subcategory\/[^/]+$/.test(pathname)) {
+    chunk = import("./pages/Subcategory");
+  } else if (/^\/sub-subcategory\/[^/]+$/.test(pathname)) {
+    chunk = import("./pages/SubSubcategory");
+  } else if (/^\/resource\/[^/]+$/.test(pathname)) {
+    chunk = import("./pages/ResourceDetail");
+  }
+  // A speculative preload must never create an unhandled rejection.  The
+  // route's React.lazy import still observes the same module-cache failure and
+  // renders its existing error/retry surface if the chunk is unavailable.
+  chunk?.catch(() => undefined);
+  return chunk;
+}
+
+const initialRouteChunk = preloadInitialRouteChunk();
+
 // Preserve crawler-injected content until React Query has supplied the page's
 // real data. This is event-driven: no DOM MutationObserver or 100ms polling is
 // left running during boot.
@@ -97,12 +123,23 @@ const homeSsr = rootElement.dataset.homeSsr === "true" ? window.__HOME_SSR__ : u
   const ssr = rootElement.querySelector("#ssr-seo-content");
   if (!ssr) return;
   try {
+    // This is the URL whose crawler markup is being held.  Do not evaluate
+    // readiness against a later SPA location: that would let an unrelated
+    // route's query settle the old overlay while its links remain on screen.
+    const initialPathname = window.location.pathname;
     const overlay = document.createElement("div");
     overlay.id = "ssr-seo-hold";
     overlay.setAttribute(
       "style",
       "position:fixed;inset:0;z-index:2147483000;background:#000;overflow:auto;overscroll-behavior:contain",
     );
+    // React mounts the live tree underneath this visual hold.  The crawler
+    // markup is therefore visual-only while both trees coexist; exposing it
+    // would create duplicate landmarks, headings, and interactive controls.
+    const previousAriaHidden = overlay.getAttribute("aria-hidden");
+    const previousInert = overlay.inert;
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.inert = true;
     // Move the scoped <style> siblings too, so the overlay keeps its styling.
     const nodes = Array.from(rootElement.childNodes);
     for (const n of nodes) overlay.appendChild(n);
@@ -118,37 +155,126 @@ const homeSsr = rootElement.dataset.homeSsr === "true" ? window.__HOME_SSR__ : u
     document.body.appendChild(overlay);
 
     const remove = () => {
+      if (!overlay.isConnected) return;
       unsubscribe();
       window.clearTimeout(timeout);
+      window.removeEventListener("popstate", remove);
+      history.pushState = originalPushState;
+      history.replaceState = originalReplaceState;
+      // Restore the attributes before disposal so cleanup is complete even
+      // when a browser retains a detached node for inspection/extensions.
+      if (previousAriaHidden === null) overlay.removeAttribute("aria-hidden");
+      else overlay.setAttribute("aria-hidden", previousAriaHidden);
+      overlay.inert = previousInert;
       overlay.remove();
     };
-    const isSettled = () =>
-      queryClient.getQueryData(["awesome-list-nav"]) !== undefined ||
-      queryClient.getQueryState(["awesome-list-nav"])?.status === "error";
+    const isSettled = () => {
+      const taxonomyMatch = /^\/(category|subcategory|sub-subcategory)\/([^/]+)$/.exec(
+        initialPathname,
+      );
+      const routeQueries = queryClient.getQueryCache().findAll();
+      if (taxonomyMatch) {
+        const level = taxonomyMatch[1];
+        let slug = taxonomyMatch[2];
+        try {
+          slug = decodeURIComponent(slug);
+        } catch {
+          // Keep the raw segment. A malformed URL must not strand the hold.
+        }
+        return routeQueries.some(
+          (query) =>
+            query.queryKey[0] === "awesome-list-listing" &&
+            query.queryKey[1] === level &&
+            query.queryKey[2] === slug &&
+            query.state.status !== "pending",
+        );
+      }
+      const resourceMatch = /^\/resource\/([^/]+)$/.exec(initialPathname);
+      if (resourceMatch) {
+        let id = resourceMatch[1];
+        try {
+          id = decodeURIComponent(id);
+        } catch {
+          // Keep the raw segment. A malformed URL must not strand the hold.
+        }
+        return routeQueries.some(
+          (query) =>
+            query.queryKey[0] === "/api/resources" &&
+            query.queryKey[1] === id &&
+            query.queryKey.length === 2 &&
+            query.state.status !== "pending",
+        );
+      }
+      return (
+        queryClient.getQueryData(["awesome-list-nav"]) !== undefined ||
+        queryClient.getQueryState(["awesome-list-nav"])?.status === "error"
+      );
+    };
     const handoff = () => {
       if (isSettled()) requestAnimationFrame(remove);
     };
     const unsubscribe = queryClient.getQueryCache().subscribe(handoff);
     const timeout = window.setTimeout(remove, 3000);
+    // Wouter's pushState navigations do not emit popstate. Remove the old
+    // visual tree synchronously for both navigation forms, then restore the
+    // native methods during normal handoff/timeout cleanup.
+    // Preserve the exact pre-existing methods so other navigation shims are
+    // restored byte-for-byte when this short-lived hold is disposed.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const originalPushState = history.pushState;
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const originalReplaceState = history.replaceState;
+    history.pushState = function (data, unused, url) {
+      const result = originalPushState.call(history, data, unused, url);
+      remove();
+      return result;
+    };
+    history.replaceState = function (data, unused, url) {
+      const result = originalReplaceState.call(history, data, unused, url);
+      remove();
+      return result;
+    };
+    window.addEventListener("popstate", remove);
     handoff();
   } catch {
     // If anything goes wrong, fall back to the old behavior (React wipes #root).
   }
 })();
-const AppComponent = (
-  <AppProviders
-    queryClient={queryClient}
-    dehydratedState={homeSsr?.dehydratedState as DehydratedState | undefined}
-    homeBoot={homeSsr?.boot as HomeBoot | undefined}
-  >
-    <App />
-  </AppProviders>
-);
 
 // Only the server-marked Home tree is hydrated. Crawler-only route HTML keeps
 // its established createRoot compatibility path.
 if (homeSsr) {
-  hydrateRoot(rootElement, AppComponent);
+  // The server rendered Home directly, rather than through App's lazy wrapper.
+  // Resolve that same component before hydration so React sees the identical
+  // tree instead of first suspending on LazyHomeRoute and remounting the SSR
+  // boundary.
+  void (initialRouteChunk ?? import("./pages/Home")).then(({ default: Home }) => {
+    hydrateRoot(
+      rootElement,
+      <AppProviders
+        queryClient={queryClient}
+        dehydratedState={homeSsr.dehydratedState}
+        homeBoot={homeSsr.boot}
+      >
+        <App homeComponent={Home} />
+      </AppProviders>,
+    );
+  }).catch((error) => {
+    // Let the normal route error boundary render its existing failure/retry
+    // surface if the SSR hydration chunk cannot be loaded. Keep the error
+    // explicit: the SSR document was not hydrated successfully.
+    console.error("[app] Home SSR hydration import failed; rendering SPA fallback", error);
+    createRoot(rootElement).render(
+      <AppProviders queryClient={queryClient}>
+        <App />
+      </AppProviders>,
+    );
+  });
 } else {
-  createRoot(rootElement).render(AppComponent);
+  // Non-SSR routes retain App's lazy Home route and do not load Home here.
+  createRoot(rootElement).render(
+    <AppProviders queryClient={queryClient}>
+      <App />
+    </AppProviders>,
+  );
 }

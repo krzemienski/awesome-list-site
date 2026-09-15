@@ -148,7 +148,15 @@ const STYLE = [
   "#ssr-seo-content h1,#ssr-seo-content .ssr-h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:#fff}",
   "#ssr-seo-content h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .75rem;color:#fff}",
   "#ssr-seo-content h3{font-size:.98rem;font-weight:700;margin:1.25rem 0 .35rem;color:#fff}",
-  "#ssr-seo-content p.ssr-lead{font-size:1.05rem;color:#b6b6c0;margin:0 0 1rem;max-width:72ch}",
+  // Lead copy (the description and the collection intro) shares one scale.
+  // The intro is the same sentence the client page renders as its lead
+  // paragraph (TaxonomyListing's .taxonomy-description, 16px / 1.6, ~332px
+  // wide on a phone). Painting it here at 1.1rem / 1.6 keeps the first paint's
+  // text block at least as large as the rendered page's, in the fallback font
+  // and after the swap to Inter, so the page's largest contentful paint is the
+  // pre-JavaScript view instead of a later client re-render of the same text.
+  "#ssr-seo-content p.ssr-lead,#ssr-seo-content section[data-seo-section] > p{font-size:1.1rem;line-height:1.6;color:#b6b6c0;margin:0;max-width:72ch}",
+  "#ssr-seo-content p.ssr-lead{margin-bottom:1rem}",
   "#ssr-seo-content a{color:#ff5c7a;text-decoration:none}",
   "#ssr-seo-content a:hover{text-decoration:underline}",
   "#ssr-seo-content ul.ssr-list{list-style:none;padding:0;margin:0;display:grid;gap:.45rem}",

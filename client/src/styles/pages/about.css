@@ -13,6 +13,20 @@
   animation: fadeIn 0.5s ease;
 }
 
+/*
+ * Public prose routes keep the shell's compact 1240px measure, while the
+ * canonical About surface is laid out against the wider editorial measure.
+ * Only the wide desktop shell needs this local correction; tablet and phone
+ * gutters intentionally remain owned by the shared shell.
+ */
+@media (min-width: 1280px) {
+  .about-page {
+    margin-inline-start: calc(
+      (var(--content-max, 1240px) - var(--content-max-admin, 1400px)) / 2
+    );
+  }
+}
+
 .about-hero {
   width: 100%;
 }
@@ -122,11 +136,11 @@
 }
 
 .about-card-header {
-  padding: 28px 28px 0;
+  padding: 24px 24px 0;
 }
 
 .about-card-content {
-  padding: 20px 28px 28px;
+  padding: 16px 24px 24px;
 }
 
 .about-section-title {
@@ -485,11 +499,11 @@
 
 @media (max-width: 640px) {
   .about-card-header {
-    padding: 22px 20px 0;
+    padding: 20px 20px 0;
   }
 
   .about-card-content {
-    padding: 18px 20px 22px;
+    padding: 16px 20px 24px;
   }
 
   .about-source-grid,

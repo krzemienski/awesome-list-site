@@ -41,6 +41,8 @@
     "perf:lighthouse:normal": "node scripts/validation/normal-lighthouse.mjs",
     "digest:dispatch": "tsx scripts/run-digest-dispatch.ts",
     "audit:sidebar": "bash scripts/audit-sidebar.sh",
+    "audit:parity-systems": "node scripts/audit-567-browser.mjs",
+    "audit:parity-ink": "node scripts/validation/audit-567-ink-accent.mjs",
     "check:awesome-bot": "bash scripts/check-awesome-bot.sh",
     "validate:cache-headers": "node scripts/validation/http-cache-headers.mjs",
     "validate:pool": "node scripts/validation/db-pool-probe.mjs",

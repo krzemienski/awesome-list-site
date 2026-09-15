@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.collection",
+  "widths": [
+    {
+      "screen": "app.collection",
+      "width": 375,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "The reference has no collection page; verified through shared list-pattern tokens instead of pixels."
+    },
+    {
+      "screen": "app.collection",
+      "width": 1440,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "The reference has no collection page; verified through shared list-pattern tokens instead of pixels."
+    }
+  ],
+  "seriousCriticalZero": false
+}

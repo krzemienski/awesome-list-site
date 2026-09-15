@@ -1,0 +1,64 @@
+$ npm run validate:webfont-fetch
+--- output ---
+
+> rest-express@1.0.0 validate:webfont-fetch
+> node scripts/validation/accent-drift.mjs --network
+
+PASS canaries :: every parser, every normalizer, and every comparator verified against known-good/known-bad samples
+PASS boot-generation :: 5 system id(s), 10 accent id(s), and both fallbacks are generated from THEME_FALLBACK_REGISTRY into the inline pre-paint script
+PASS id-parity :: 10 accent(s) present in THEME_FALLBACK_REGISTRY, derived ACCENTS, and :root[data-accent] blocks
+       crimson  #ff3d52 / #b84dff
+       magenta  #ec4899 / #f472b6
+       orange   #ff7a3d / #ffb84d
+       amber    #ffb84d / #ffd86b
+       emerald  #34d08c / #5ee6b8
+       matrix   #00ff88 / #39ff14
+       cyan     #5eddf2 / #7dd3fc
+       violet   #9d4edd / #c77dff
+       lime     #aaff00 / #00ff88
+       rose     #ff7a8a / #ffb3c1
+PASS root-default :: :root paints DEFAULT_ACCENT "crimson" (#ff3d52 / #b84dff)
+PASS system-parity :: 5 system(s) present in THEME_FALLBACK_REGISTRY and derived DESIGN_SYSTEMS — editorial, terminal, geist, brutalist, swiss (fallback "editorial")
+PASS system-paint :: 4 :root[data-system="…"] token block(s) — terminal, geist, brutalist, swiss; painted by the bare :root instead: editorial
+PASS system-tokens :: 32 shared token(s) agreed by 4 peer block(s); every non-exempt system declares them
+PASS system-skin :: 76 component skin rule(s) name only offered systems — editorial, terminal, geist, brutalist, swiss
+PASS system-accent :: every design system names a default accent that exists — editorial→crimson, terminal→matrix, geist→cyan, brutalist→amber, swiss→orange
+PASS system-default-accent :: DEFAULT_SYSTEM "editorial" and DEFAULT_ACCENT "crimson" agree with SYSTEM_DEFAULT_ACCENT
+PASS font-boot-registry :: 6 font option id(s), stacks, and fallback "system" are generated from FONT_OPTIONS into the inline pre-paint script
+       system       (system default — no override)
+       inter        'Inter', system-ui, sans-serif
+       dm-sans      'DM Sans', system-ui, sans-serif
+       source-sans  'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif
+       ibm-plex     'IBM Plex Sans', system-ui, sans-serif
+       jetbrains    'JetBrains Mono', ui-monospace, monospace
+PASS font-stylesheet :: 5 option(s) with a stack each download exactly the family they name; 1 with no stack download nothing (exempt by rule)
+       system       (no webfont — empty stack)
+       inter        Inter
+       dm-sans      DM Sans
+       source-sans  Source Sans 3
+       ibm-plex     IBM Plex Sans
+       jetbrains    JetBrains Mono
+PASS canonical-font-request :: the one always-on <link rel="stylesheet"> in client/index.html is byte-identical to the design source's request in awesome-list-site-ds/index.html — 9 families: Inter:wght@400;500;600;700;800, Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600, JetBrains Mono:wght@400;500;600;700, Geist:wght@400;500;600;700, Instrument Serif:ital@0;1, Space Grotesk:wght@400;500;600;700, IBM Plex Mono:wght@400;500;600;700, IBM Plex Sans:wght@400;500;600;700, Manrope:wght@400;500;600;700;800
+PASS font-csp :: 6 stylesheet URL(s) are allowed by style-src; 2 style-src and 2 font-src directive(s) agree across 2 CSP block(s) in server/index.ts
+PASS font-source-coverage :: 1 provider stylesheet reference(s) across 35 CSS file(s) and 1 HTML entry point(s) are already represented by a probed source; 192 TS/TSX file(s) carry no webfont request outside FONT_STYLESHEETS
+PASS system-id-resolution :: the shipped resolver was executed — every offered id resolves to itself, and "toString", "constructor", "valueOf", "hasOwnProperty", "__proto__", a retired id, "" and null all resolve to "editorial"; 192 client source file(s) use no prototype-chain membership test
+PASS system-font-coverage :: every family named by --font-display / --font-body / --font-mono is carried by the always-on request, for every system
+       always-on (client/index.html, pre-paint, every visitor) Inter + Fraunces + JetBrains Mono + Geist + Instrument Serif + Space Grotesk + IBM Plex Mono + IBM Plex Sans + Manrope
+       brutalist  display=instrument serif body=space grotesk mono=jetbrains mono
+       editorial  display=fraunces body=inter mono=jetbrains mono
+       geist      display=geist body=geist mono=jetbrains mono
+       swiss      display=manrope body=manrope mono=ibm plex mono
+       terminal   display=ibm plex mono body=ibm plex mono mono=ibm plex mono
+
+PASS accent-drift :: the generated pre-paint theme/font registries, picker swatches, painted tokens, and stylesheets all agree
+
+PROBE webfont-fetch :: requesting 6 stylesheet URL(s) live (opt-in --network)
+       html:pre-paint     200  asks Inter + Fraunces + JetBrains Mono + Geist + Instrument Serif + Space Grotesk + IBM Plex Mono + IBM Plex Sans + Manrope · serves fraunces + geist + ibm plex mono + ibm plex sans + instrument serif + inter + jetbrains mono + manrope + space grotesk (190 @font-face)
+       font:inter         200  asks Inter · serves inter (35 @font-face)
+       font:dm-sans       200  asks DM Sans · serves dm sans (8 @font-face)
+       font:source-sans   200  asks Source Sans 3 · serves source sans 3 (28 @font-face)
+       font:ibm-plex      200  asks IBM Plex Sans · serves ibm plex sans (24 @font-face)
+       font:jetbrains     200  asks JetBrains Mono · serves jetbrains mono (24 @font-face)
+
+PASS webfont-fetch :: 6 stylesheet URL(s) each answered HTTP 200, declared every requested family, and served font files allowed by font-src
+--- exit status: 0 ---

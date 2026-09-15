@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 1452,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 317.036,
+      "selfTimeMs": 309.851,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 73.935,
+      "selfTimeMs": 3.616,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": "n"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 67.638,
+      "selfTimeMs": 0.369,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 62.228,
+      "selfTimeMs": 0.175,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 38.924,
+      "selfTimeMs": 1.113,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 30.755,
+      "selfTimeMs": 0.154,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 28.983,
+      "selfTimeMs": 0.099,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": "vw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 22.466,
+      "selfTimeMs": 0.015,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 22.039,
+      "selfTimeMs": 0.038,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 21.251,
+      "selfTimeMs": 0.541,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 19.604,
+      "selfTimeMs": 1.024,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 18.111,
+      "selfTimeMs": 18.111,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.96,
+      "selfTimeMs": 4.685,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.802,
+      "selfTimeMs": 0.011,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.964,
+      "selfTimeMs": 0.082,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.414,
+      "selfTimeMs": 1.442,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 12.817,
+      "selfTimeMs": 1.093,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 12.205,
+      "selfTimeMs": 11.062,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.269,
+      "selfTimeMs": 0.196,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.109,
+      "selfTimeMs": 0.467,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.165,
+      "selfTimeMs": 0.631,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.748,
+      "selfTimeMs": 0.089,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.209,
+      "selfTimeMs": 4.792,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.143,
+      "selfTimeMs": 0.022,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.969,
+      "selfTimeMs": 0.104,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.958,
+      "selfTimeMs": 0.21,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.198,
+      "selfTimeMs": 3.637,
+      "url": "http://127.0.0.1:5101/assets/index-gTNi33bR.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.022,
+      "selfTimeMs": 0.031,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.281,
+      "selfTimeMs": 1.756,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.933,
+      "selfTimeMs": 3.03,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.554,
+      "selfTimeMs": 0.415,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.359,
+      "selfTimeMs": 2.602,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.148,
+      "selfTimeMs": 0.94,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.718,
+      "selfTimeMs": 0.042,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.357,
+      "selfTimeMs": 2.357,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.267,
+      "selfTimeMs": 0.297,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.074,
+      "selfTimeMs": 0.062,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.886,
+      "selfTimeMs": 0.062,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.631,
+      "selfTimeMs": 0.279,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.596,
+      "selfTimeMs": 1.596,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.566,
+      "selfTimeMs": 0.138,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.535,
+      "selfTimeMs": 0.097,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.505,
+      "selfTimeMs": 1.468,
+      "url": "http://127.0.0.1:5101/assets/system-D-mANIo5.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.497,
+      "selfTimeMs": 0.84,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.42,
+      "selfTimeMs": 0.238,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.332,
+      "selfTimeMs": 0.647,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.312,
+      "selfTimeMs": 0.354,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.311,
+      "selfTimeMs": 0.493,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.268,
+      "selfTimeMs": 1.268,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.19,
+      "selfTimeMs": 0.039,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    }
+  ]
+}

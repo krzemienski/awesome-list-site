@@ -1,0 +1,118 @@
+$ rg -n "@import.*design-system.css" client/src/index.css
+5:@import './styles/design-system.css';
+
+$ rg -n "window\.(DESIGN_SYSTEMS|ACCENTS|SYSTEM_DEFAULT_ACCENT|applyDesignSystem)" client/src/lib/design-system.ts
+295:  window.DESIGN_SYSTEMS = DESIGN_SYSTEMS;
+296:  window.ACCENTS = ACCENTS;
+297:  window.SYSTEM_DEFAULT_ACCENT = SYSTEM_DEFAULT_ACCENT;
+298:  window.applyDesignSystem = applyDesignSystem;
+
+$ rg -n "root.setAttribute|<script type=\"module\"" client/index.html
+123:          root.setAttribute('data-product-profile', profile);
+124:          root.setAttribute('data-system', sys);
+125:          root.setAttribute('data-accent', acc);
+140:          root.setAttribute('data-font', fnt);
+374:    <script type="module" src="/src/main.tsx"></script>
+
+$ rg -n "className=\"page|className=\"grain" client/src/components/layout/new/MainLayout.tsx
+167:        className="page app-shell-page"
+171:        <div className="grain" aria-hidden="true" />
+206:          <div className="page-content-wrap" data-admin={isAdmin}>
+
+$ rg -n "^:root|--bg:|data-system|data-accent" client/src/styles/design-system.css | head -30
+11:   data-system at runtime, so a system's block is the only thing that
+20:   first :root, every :root[data-system] / :root[data-accent] block and the
+29::root {
+31:  --bg:            #000000;
+55:     :root[data-system="…"] block below. */
+679:   selector specificity ( :root[data-system="..."] beats :root ). The
+680:   switch is CSS-only: the boot script in index.html sets data-system +
+681:   data-accent before paint, so zero JS is needed to swap personalities.
+699::root[data-system="terminal"] {
+700:  --bg: #000000; --bg-2: #040404;
+719::root[data-system="geist"] {
+720:  --bg: #000000; --bg-2: #0a0a0a;
+738::root[data-system="brutalist"] {
+739:  --bg: #000000; --bg-2: #0a0a0a;
+757::root[data-system="swiss"] {
+758:  --bg: #000000; --bg-2: #050506;
+790::root[data-accent="crimson"]  { --accent: #ff3d52; --accent-2: #b84dff; }
+791::root[data-accent="magenta"]  { --accent: #ec4899; --accent-2: #f472b6; }
+792::root[data-accent="orange"]   { --accent: #ff7a3d; --accent-2: #ffb84d; }
+793::root[data-accent="amber"]    { --accent: #ffb84d; --accent-2: #ffd86b; }
+794::root[data-accent="emerald"]  { --accent: #34d08c; --accent-2: #5ee6b8; }
+795::root[data-accent="matrix"]   { --accent: #00ff88; --accent-2: #39ff14; }
+796::root[data-accent="cyan"]     { --accent: #5eddf2; --accent-2: #7dd3fc; }
+797::root[data-accent="violet"]   { --accent: #9d4edd; --accent-2: #c77dff; }
+798::root[data-accent="lime"]     { --accent: #aaff00; --accent-2: #00ff88; }
+799::root[data-accent="rose"]     { --accent: #ff7a8a; --accent-2: #ffb3c1; }
+
+$ rg -n "^:root\[data-system|^\[data-system" client/src/styles/design-system.css | wc -l
+80
+
+$ rg -n "data-ds" client/src/styles/design-system.css | wc -l
+26
+
+$ for id in editorial terminal geist brutalist swiss; do rg -o "data-system=\"$id\"" client/src/styles/design-system.css | wc -l; done
+editorial 3
+terminal 26
+geist 8
+brutalist 26
+swiss 17
+
+$ rg -n "^(export const THEME_BOOT_DATA|export const DEFAULT_SYSTEM|export const DEFAULT_ACCENT)|systems:|accents:" client/src/lib/design-system.ts
+76:  systems: [
+113:  accents: [
+207:export const DEFAULT_SYSTEM = THEME_FALLBACK_REGISTRY.defaultSystem;
+208:export const DEFAULT_ACCENT = THEME_FALLBACK_REGISTRY.defaultAccent;
+211:export const THEME_BOOT_DATA = {
+212:  systems: Object.keys(DESIGN_SYSTEMS),
+213:  accents: ACCENTS.map(({ id }) => id),
+
+$ rg -n "<button" client/src --glob "*.tsx" --glob "*.jsx" | wc -l
+56
+
+$ rg -n --glob '*.ts' --glob '*.tsx' --glob '*.css' --glob '!client/src/styles/design-system.css' --glob '!client/src/index.css' -- '--accent' client/src | wc -l
+387
+
+$ node /tmp/list-buttons.mjs  # temporary TypeScript-parser inventory; full output: buttons-static.jsonl
+raw <button> nodes: 56
+source candidates after literal Stage 6 exclusions: 40
+
+$ rg -n "<h1" client/src --glob "*.tsx" --glob "*.jsx"
+client/src/App.tsx:243,277
+client/src/pages/Home.tsx:302
+client/src/pages/AdminDashboard.tsx:158,192,247
+client/src/pages/TaxonomyListing.tsx:459
+client/src/pages/ThemeSettings.tsx:136
+client/src/components/home/HomePresentation.tsx:620
+client/src/pages/Categories.tsx:151
+client/src/pages/Settings.tsx:218
+client/src/pages/Advanced.tsx:125,149,164
+client/src/pages/ResourceDetail.tsx:507,595
+client/src/pages/not-found.tsx:56
+client/src/pages/Terms.tsx:17
+client/src/pages/Privacy.tsx:17
+client/src/pages/ErrorPage.tsx:32
+client/src/pages/Profile.tsx:356
+client/src/pages/Onboarding.tsx:299,326,367
+client/src/pages/DesignSystemShowcase.tsx:209
+client/src/pages/Bookmarks.tsx:362,386
+client/src/pages/CodeOfConduct.tsx:18
+client/src/pages/Notifications.tsx:43
+client/src/pages/GuestBookmarks.tsx:104,141
+client/src/pages/Contributions.tsx:597
+client/src/pages/ContinueLearning.tsx:194,266
+client/src/pages/TagLanding.tsx:93,145
+client/src/pages/Search.tsx:235
+client/src/pages/Recommendations.tsx:59
+client/src/pages/PublicCollection.tsx:63,98
+client/src/pages/Journeys.tsx:184,214
+client/src/pages/JourneyDetail.tsx:366,500
+client/src/pages/About.tsx:77
+client/src/components/auth/AdminGuard.tsx:34
+
+$ rg -n "data-ds=\"card-hover\"" client/src/components/resource/ResourceCard.tsx client/src/components/ui/taxonomy-card.tsx client/src/pages/DesignSystemShowcase.tsx
+client/src/components/resource/ResourceCard.tsx:180
+client/src/components/ui/taxonomy-card.tsx:45
+client/src/pages/DesignSystemShowcase.tsx:488

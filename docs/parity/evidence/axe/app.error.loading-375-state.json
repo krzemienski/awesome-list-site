@@ -1,0 +1,102 @@
+{
+  "task": "567",
+  "state": "app.error.loading",
+  "width": 375,
+  "route": "/advanced",
+  "component": "RouteFallback",
+  "readySelector": "[data-testid=\"route-chunk-skeleton\"]",
+  "transition": "real first-load network throttle",
+  "status": "PASS",
+  "violations": [
+    {
+      "id": "page-has-heading-one",
+      "impact": "moderate",
+      "tags": [
+        "cat.semantics",
+        "best-practice"
+      ],
+      "description": "Ensure that the page, or at least one of its frames contains a level-one heading",
+      "help": "Page should contain a level-one heading",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/page-has-heading-one?application=playwright",
+      "nodes": [
+        {
+          "any": [],
+          "all": [
+            {
+              "id": "page-has-heading-one",
+              "data": null,
+              "relatedNodes": [],
+              "impact": "moderate",
+              "message": "Page must have a level-one heading"
+            }
+          ],
+          "none": [],
+          "impact": "moderate",
+          "html": "<html lang=\"en\" class=\"dark\" data-product-profile=\"public-discovery\" data-system=\"editorial\" data-accent=\"crimson\" data-font=\"system\" style=\"background-color: rgb(0, 0, 0);\">",
+          "target": [
+            "html"
+          ],
+          "failureSummary": "Fix all of the following:\n  Page must have a level-one heading"
+        }
+      ]
+    }
+  ],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ],
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/components/layout/new/PageBreadcrumb.tsx:229:10\" data-component-name=\"BreadcrumbLink\" class=\"transition-colors hover:text-foreground\" href=\"/\" title=\"Home\" data-testid=\"link-breadcrumb-home\">Home</a>",
+          "target": [
+            ".transition-colors"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        }
+      ]
+    }
+  ],
+  "passes": 38,
+  "seriousCritical": 0,
+  "source": "docs/parity/evidence/audit-567-approved/states-initial/audit-567-states.json"
+}

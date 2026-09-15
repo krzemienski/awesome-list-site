@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 701,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 96.989,
+      "selfTimeMs": 1.566,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 68.397,
+      "selfTimeMs": 0.34,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": "r"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 58.887,
+      "selfTimeMs": 21.996,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 33.889,
+      "selfTimeMs": 0.126,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 25.397,
+      "selfTimeMs": 0.349,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 20.167,
+      "selfTimeMs": 0.609,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 18.334,
+      "selfTimeMs": 1.1,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 17.805,
+      "selfTimeMs": 15.076,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.905,
+      "selfTimeMs": 0.015,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.029,
+      "selfTimeMs": 0.904,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.463,
+      "selfTimeMs": 1.237,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.299,
+      "selfTimeMs": 0.042,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.392,
+      "selfTimeMs": 0.107,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 12.473,
+      "selfTimeMs": 0.092,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 12.175,
+      "selfTimeMs": 0.049,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.475,
+      "selfTimeMs": 0.041,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.443,
+      "selfTimeMs": 0.081,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.181,
+      "selfTimeMs": 5.541,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.593,
+      "selfTimeMs": 0.044,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.619,
+      "selfTimeMs": 1.557,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.999,
+      "selfTimeMs": 3.063,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.419,
+      "selfTimeMs": 0.108,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.268,
+      "selfTimeMs": 0.147,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.099,
+      "selfTimeMs": 1.179,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.083,
+      "selfTimeMs": 0.035,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.574,
+      "selfTimeMs": 0.021,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.342,
+      "selfTimeMs": 0.095,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.119,
+      "selfTimeMs": 0.127,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "DocumentLoader::CommitNavigation",
+      "durationMs": 1.982,
+      "selfTimeMs": 0.47,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.789,
+      "selfTimeMs": 1.309,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.659,
+      "selfTimeMs": 0.087,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.616,
+      "selfTimeMs": 1.246,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.46,
+      "selfTimeMs": 0.768,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.407,
+      "selfTimeMs": 0.025,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.259,
+      "selfTimeMs": 0.047,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.204,
+      "selfTimeMs": 0.051,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.2,
+      "selfTimeMs": 1.2,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.1,
+      "selfTimeMs": 0.134,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.053,
+      "selfTimeMs": 0.277,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.009,
+      "selfTimeMs": 1.009,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.982,
+      "selfTimeMs": 0.116,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.962,
+      "selfTimeMs": 0.341,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.961,
+      "selfTimeMs": 0.954,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.743,
+      "selfTimeMs": 0.241,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.695,
+      "selfTimeMs": 0.014,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.69,
+      "selfTimeMs": 0.175,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.687,
+      "selfTimeMs": 0.687,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.666,
+      "selfTimeMs": 0.661,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.666,
+      "selfTimeMs": 0.064,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.664,
+      "selfTimeMs": 0.188,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    }
+  ]
+}

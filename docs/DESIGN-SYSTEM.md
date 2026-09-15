@@ -256,12 +256,19 @@ uppercase, pseudo-elements, hover structure). Skins exist in two parallel forms:
    DS classes, used by static surfaces and the showcase helpers.
 2. **Shadcn bridge skins (T229)** — the same extras re-expressed via data hooks,
    because shadcn primitives never emit raw DS classes:
-   - `data-ds="chip"` — emitted by `Badge` for variants `chip` | `accent` only.
+   - `data-ds="chip"` — emitted by `Badge` for variants `chip` | `accent`, and by
+     the interactive `ChipButton` primitive.
    - `data-ds-variant="<variant>"` — emitted by every `Button` (and
      `AlertDialogAction`/`AlertDialogCancel`, which compose `buttonVariants()`
      directly); primary-button extras target `default` / `outline` only.
    - `data-ds="card-hover"` — interactive cards (`ResourceCard`, `TaxonomyCard`,
      showcase specimens).
+
+   Hook ownership is part of the primitive contract: `client/src/components/ui/chip-button.tsx`
+   owns `data-ds="chip"` on every `ChipButton`, just as `Badge` owns it for its
+   chip variants. Call sites provide content and behavior, but must not add,
+   remove, or override that hook. The hook is the app-side skin bridge; do not
+   copy it into or modify the frozen `awesome-list-site-ds` reference source.
 
 What each skin changes:
 

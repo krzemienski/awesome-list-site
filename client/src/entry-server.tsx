@@ -2,6 +2,8 @@ import { renderToString } from "react-dom/server";
 import { Router } from "wouter";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { AppProviders } from "./app-providers";
+import { App } from "./App";
+import Home from "./pages/Home";
 import type { HomeBoot } from "./lib/home-boot";
 
 export interface HomeSSRContext {
@@ -50,7 +52,9 @@ export function renderHome(context: HomeSSRContext) {
         queryClient={queryClient}
         dehydratedState={dehydratedState}
         homeBoot={context.boot}
-      />
+      >
+        <App homeComponent={Home} />
+      </AppProviders>
     </Router>,
   );
 

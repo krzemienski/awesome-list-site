@@ -1,0 +1,36 @@
+{
+  "status": "FAIL",
+  "redactions": 0,
+  "scores": [
+    {
+      "route": "http://127.0.0.1:5101/",
+      "slug": "home",
+      "score": 0.64,
+      "floor": 0.88,
+      "status": "FAIL",
+      "ttfb": 170.972,
+      "lcp": 3748.9347,
+      "tbt": 661.2218999999998
+    },
+    {
+      "route": "http://127.0.0.1:5101/category/encoding-codecs",
+      "slug": "category-encoding-codecs",
+      "score": 0.56,
+      "floor": 0.73,
+      "status": "FAIL",
+      "ttfb": 195.996,
+      "lcp": 5186.999450000001,
+      "tbt": 1048.9999999999995
+    },
+    {
+      "route": "http://127.0.0.1:5101/resource/185020",
+      "slug": "resource-185020",
+      "score": 0.74,
+      "floor": 0.77,
+      "status": "FAIL",
+      "ttfb": 16.959,
+      "lcp": 3123.41165,
+      "tbt": 587
+    }
+  ]
+}

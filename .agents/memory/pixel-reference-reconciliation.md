@@ -67,3 +67,16 @@ revokes them.
 **Why:** Interpreting “only these controls” as a replacement for the entire
 approval history can silently remove independently approved brand, content,
 footer and accessibility requirements.
+
+Independent reference extensions may cover required About content and admin
+functionality absent from the prototype. Controlled local network failures
+may exercise otherwise unreachable error screens.
+
+**Why:** The user explicitly approved both approaches while preserving every
+existing acceptance threshold and the immutable frozen reference.
+
+**How to apply:** Build expected extensions from canonical design components,
+not copied application rendering or CSS. Keep provenance and use the same
+extensions in determinism captures. Faults must stay in the isolated local
+browser/environment, without fabricated API responses, production changes,
+or data deletion. Neither approval waives performance or pixel gates.

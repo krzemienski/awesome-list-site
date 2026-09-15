@@ -1,0 +1,56 @@
+perf 0.88 FCP 2499 LCP 2499 TBT 279 SI 2499 oFCP 257 oLCP 257
+
+== optimisticFirstContentfulPaint (11 nodes)
+     0    756 NET VeryHigh Document     20961 /
+   756   1522 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   756   1513 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   756   1063 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   756    842 CPU                       21481 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   842    873 CPU                        7787 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   842   2499 NET High     Script      185204 /assets/index-DLmunk5U.js
+   842   1299 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   842   1149 NET High     Script        2370 /assets/index-CeftJlzp.js
+   873    984 CPU                       55556 layout
+   984   1143 CPU                       79404 layout
+
+== pessimisticFirstContentfulPaint (11 nodes)
+     0    756 NET VeryHigh Document     20961 /
+   756   1522 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   756   1513 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   756   1063 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   756    842 CPU                       21481 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   842    873 CPU                        7787 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   842   2499 NET High     Script      185204 /assets/index-DLmunk5U.js
+   842   1299 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   842   1149 NET High     Script        2370 /assets/index-CeftJlzp.js
+   873    984 CPU                       55556 layout
+   984   1143 CPU                       79404 layout
+
+== optimisticLargestContentfulPaint (12 nodes)
+     0    756 NET VeryHigh Document     20961 /
+   756   1522 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   756   1513 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   756   1063 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   756   1063 NET Medium   Manifest      2242 /site.webmanifest
+   756    842 CPU                       21481 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   842    873 CPU                        7787 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   842   2499 NET High     Script      185204 /assets/index-DLmunk5U.js
+   842   1299 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   842   1149 NET High     Script        2370 /assets/index-CeftJlzp.js
+   873    984 CPU                       55556 layout
+   984   1143 CPU                       79404 layout
+
+== pessimisticLargestContentfulPaint (13 nodes)
+     0    756 NET VeryHigh Document     20961 /
+   756   1522 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   756   1513 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   756   1063 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   756   1063 NET Medium   Manifest      2242 /site.webmanifest
+   756    842 CPU                       21481 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   842    873 CPU                        7787 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   842   2499 NET High     Script      185204 /assets/index-DLmunk5U.js
+   842   1299 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   842   1149 NET High     Script        2370 /assets/index-CeftJlzp.js
+   873    984 CPU                       55556 layout
+   984   1143 CPU                       79404 layout
+  1513   1515 NET Low      Image            0 data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScy

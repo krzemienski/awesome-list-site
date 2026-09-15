@@ -1,0 +1,23 @@
+{
+  "REPORT.md": "aed128b5281165c1e224224822acf433472754280874cd7449ed62cb486f4aa7",
+  "actual/app.home.curated-1024.attempt-1.png": "76931180673509ce2381a7f190c428ad5c930bc9bd0caf35ce2fe020f4878378",
+  "actual/app.home.curated-1024.attempt-2.png": "76931180673509ce2381a7f190c428ad5c930bc9bd0caf35ce2fe020f4878378",
+  "actual/app.home.curated-1024.png": "76931180673509ce2381a7f190c428ad5c930bc9bd0caf35ce2fe020f4878378",
+  "actual/app.home.curated-1024.repeat.png": "76931180673509ce2381a7f190c428ad5c930bc9bd0caf35ce2fe020f4878378",
+  "actual/app.home.index-1024.attempt-1.png": "59729c5727f2afd316fb0bce65a4576725e8560f33e5318be607a0f301ccd48a",
+  "actual/app.home.index-1024.attempt-2.png": "59729c5727f2afd316fb0bce65a4576725e8560f33e5318be607a0f301ccd48a",
+  "actual/app.home.index-1024.png": "59729c5727f2afd316fb0bce65a4576725e8560f33e5318be607a0f301ccd48a",
+  "actual/app.home.index-1024.repeat.png": "59729c5727f2afd316fb0bce65a4576725e8560f33e5318be607a0f301ccd48a",
+  "diff/app.home.curated-1024.png": "fcd54987ee7134e1fc706b174e688e2513fa889b1a570f87ab431debd2450413",
+  "diff/app.home.index-1024.png": "5b1cf5c3f4b603ac5cff136a94ce1f7ed22094f10529f0688bee5e88952ae667",
+  "expected/app.home.curated-1024.attempt-1.png": "c99f8991934e7bc104f1e501a7fde77f4f7ab995dbeb99e1614557132e616402",
+  "expected/app.home.curated-1024.attempt-2.png": "c99f8991934e7bc104f1e501a7fde77f4f7ab995dbeb99e1614557132e616402",
+  "expected/app.home.curated-1024.png": "c99f8991934e7bc104f1e501a7fde77f4f7ab995dbeb99e1614557132e616402",
+  "expected/app.home.curated-1024.repeat.png": "c99f8991934e7bc104f1e501a7fde77f4f7ab995dbeb99e1614557132e616402",
+  "expected/app.home.index-1024.attempt-1.png": "011c6f2f7f61aed392ef611af222e35aa3e513bc71728997b084f997c945908a",
+  "expected/app.home.index-1024.attempt-2.png": "011c6f2f7f61aed392ef611af222e35aa3e513bc71728997b084f997c945908a",
+  "expected/app.home.index-1024.png": "011c6f2f7f61aed392ef611af222e35aa3e513bc71728997b084f997c945908a",
+  "expected/app.home.index-1024.repeat.png": "011c6f2f7f61aed392ef611af222e35aa3e513bc71728997b084f997c945908a",
+  "font-gaps.md": "346af3b417d0f8a9c40be824ef93d5f0e360e1a56c48e98da4b64b8161434734",
+  "results.json": "962b6b2b4b49e2f53b14a82dd6df3bc8001820b77d05a2b109458dd9ee3d51b2"
+}

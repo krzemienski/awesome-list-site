@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 1251,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 400.06,
+      "selfTimeMs": 399.326,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 69.723,
+      "selfTimeMs": 1.809,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": "n"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 59.825,
+      "selfTimeMs": 0.122,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": "zw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 55.935,
+      "selfTimeMs": 0.132,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 50.636,
+      "selfTimeMs": 0.273,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 42.897,
+      "selfTimeMs": 0.197,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 39.14,
+      "selfTimeMs": 1.248,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 31.764,
+      "selfTimeMs": 14.824,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 23.643,
+      "selfTimeMs": 0.055,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 23.029,
+      "selfTimeMs": 0.656,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 21.056,
+      "selfTimeMs": 0.043,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 16.79,
+      "selfTimeMs": 0.013,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.738,
+      "selfTimeMs": 1.765,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.236,
+      "selfTimeMs": 0.602,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.659,
+      "selfTimeMs": 10.697,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.971,
+      "selfTimeMs": 0.161,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.596,
+      "selfTimeMs": 0.081,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.083,
+      "selfTimeMs": 0.056,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.54,
+      "selfTimeMs": 8.464,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.258,
+      "selfTimeMs": 0.092,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.934,
+      "selfTimeMs": 0.467,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.005,
+      "selfTimeMs": 0.103,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.616,
+      "selfTimeMs": 5.539,
+      "url": "http://127.0.0.1:5101/assets/select-DelnM1um.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.496,
+      "selfTimeMs": 0.395,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.001,
+      "selfTimeMs": 3.95,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.925,
+      "selfTimeMs": 0.068,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.838,
+      "selfTimeMs": 0.341,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.632,
+      "selfTimeMs": 0.097,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.414,
+      "selfTimeMs": 2.837,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.397,
+      "selfTimeMs": 2.017,
+      "url": "http://127.0.0.1:5101/assets/index-BO-ADK7r.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.203,
+      "selfTimeMs": 2.406,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.894,
+      "selfTimeMs": 1.808,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.805,
+      "selfTimeMs": 0.039,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.694,
+      "selfTimeMs": 0.27,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.423,
+      "selfTimeMs": 0.905,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.388,
+      "selfTimeMs": 0.425,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.387,
+      "selfTimeMs": 2.387,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.359,
+      "selfTimeMs": 1.259,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.316,
+      "selfTimeMs": 0.027,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.148,
+      "selfTimeMs": 2.013,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.89,
+      "selfTimeMs": 0.099,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.824,
+      "selfTimeMs": 0.416,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.824,
+      "selfTimeMs": 0.071,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.725,
+      "selfTimeMs": 0.48,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.627,
+      "selfTimeMs": 0.018,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.567,
+      "selfTimeMs": 0.115,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.49,
+      "selfTimeMs": 0.391,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.46,
+      "selfTimeMs": 0.295,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.427,
+      "selfTimeMs": 0.13,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.417,
+      "selfTimeMs": 0.322,
+      "url": "http://127.0.0.1:5101/category/encoding-codecs",
+      "function": null
+    }
+  ]
+}

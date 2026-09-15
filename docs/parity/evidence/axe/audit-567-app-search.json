@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.search",
+  "widths": [
+    {
+      "screen": "app.search",
+      "width": 375,
+      "route": "/search",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "landmark-main-is-top-level",
+            "impact": "moderate",
+            "help": "Main landmark should not be contained in another landmark",
+            "description": "Ensure the main landmark is at top level",
+            "nodes": 1,
+            "targets": [
+              [
+                ".outline-none"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  ".outline-none"
+                ],
+                "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+              }
+            ]
+          },
+          {
+            "id": "landmark-no-duplicate-main",
+            "impact": "moderate",
+            "help": "Document should not have more than one main landmark",
+            "description": "Ensure the document has at most one main landmark",
+            "nodes": 1,
+            "targets": [
+              [
+                "#main"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#main"
+                ],
+                "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 41,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.search",
+      "width": 1440,
+      "route": "/search",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "landmark-main-is-top-level",
+            "impact": "moderate",
+            "help": "Main landmark should not be contained in another landmark",
+            "description": "Ensure the main landmark is at top level",
+            "nodes": 1,
+            "targets": [
+              [
+                "main[aria-label=\"Search results\"]"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "main[aria-label=\"Search results\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+              }
+            ]
+          },
+          {
+            "id": "landmark-no-duplicate-main",
+            "impact": "moderate",
+            "help": "Document should not have more than one main landmark",
+            "description": "Ensure the document has at most one main landmark",
+            "nodes": 1,
+            "targets": [
+              [
+                "#main"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#main"
+                ],
+                "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

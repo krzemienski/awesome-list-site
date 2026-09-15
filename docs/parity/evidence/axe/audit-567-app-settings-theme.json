@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.settings.theme",
+  "widths": [
+    {
+      "screen": "app.settings.theme",
+      "width": 375,
+      "route": "/settings/theme",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 38,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.settings.theme",
+      "width": 1440,
+      "route": "/settings/theme",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

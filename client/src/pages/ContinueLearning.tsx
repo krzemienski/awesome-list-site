@@ -191,7 +191,7 @@ export default function ContinueLearning() {
             <div className="account-empty-icon mb-3 flex h-12 w-12 items-center justify-center">
               <LogIn className="account-accent-icon h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-semibold leading-none tracking-tight">
+            <h1 className="display-h text-2xl">
               Your progress lives with your account
             </h1>
             <CardDescription className="max-w-xl text-base">

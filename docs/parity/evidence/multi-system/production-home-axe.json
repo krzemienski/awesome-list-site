@@ -1,0 +1,50 @@
+{
+  "route": "/",
+  "slug": "home",
+  "axeWidths": [
+    375,
+    1440
+  ],
+  "byViewport": {
+    "375": {
+      "unitId": "4bc9f95a-cbf5-4488-b7b7-365637ccaba0",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "https://awesome.video/",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 1,
+      "passedRules": 37
+    },
+    "1440": {
+      "unitId": "1b482978-757f-461b-8d43-cbde1ae40675",
+      "axeVersion": "4.13.0",
+      "analyzedUrl": "https://awesome.video/",
+      "byImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "nodesByImpact": {
+        "critical": 0,
+        "serious": 0,
+        "moderate": 0,
+        "minor": 0
+      },
+      "violations": [],
+      "incompleteRules": 2,
+      "passedRules": 41
+    }
+  }
+}

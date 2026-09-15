@@ -1,6 +1,11 @@
 /* Admin shell only. Panel owners use independently scoped stylesheets. */
 .admin-dashboard {
-  max-width: 1280px;
+  /*
+   * The reference admin canvas uses the shell's 1400px desktop measure.
+   * Keep the inner panel at the same width as the canonical tab strip; the
+   * responsive page-content-wrap still supplies the 40px tablet/phone gutter.
+   */
+  max-width: var(--content-max-admin, 1400px);
   padding: 0;
   width: 100%;
 }

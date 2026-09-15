@@ -3,7 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
 import { serveStatic, log } from "./vite";
-import { handleSSR } from "./ssr";
+import { handleSSR, prewarmSSRRenderer } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { runMigrations } from "./migrate";
 import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
@@ -613,6 +613,21 @@ app.use((req, res, next) => {
       return res.status(404).type("text/plain").send("Not Found");
     });
     serveStatic(app);
+
+    // The first anonymous Home document imports the compiled React SSR entry
+    // through handleSSR. Prewarm that module before listening when available.
+    // This imports code only: request-local Home data and all catalog/database
+    // work remain inside the request path, and auth boundaries are unchanged.
+    // If the artifact is temporarily unavailable, keep listening so handleSSR
+    // can retain its existing SPA fallback and retry on a later request.
+    try {
+      await prewarmSSRRenderer();
+    } catch (error) {
+      console.error(
+        "⚠️ Failed to prewarm the production Home SSR renderer; continuing with the existing SPA fallback",
+        error,
+      );
+    }
   }
 
   // Use PORT environment variable in production (Replit autoscale), fallback to 5000 in development

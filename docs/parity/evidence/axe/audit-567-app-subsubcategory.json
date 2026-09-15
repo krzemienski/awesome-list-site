@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.subsubcategory",
+  "widths": [
+    {
+      "screen": "app.subsubcategory",
+      "width": 375,
+      "route": "/sub-subcategory/online-forums",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 43,
+        "incomplete": 2
+      }
+    },
+    {
+      "screen": "app.subsubcategory",
+      "width": 1440,
+      "route": "/sub-subcategory/online-forums",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 45,
+        "incomplete": 2
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

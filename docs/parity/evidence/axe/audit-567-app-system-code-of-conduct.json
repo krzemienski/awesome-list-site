@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.system.code-of-conduct",
+  "widths": [
+    {
+      "screen": "app.system.code-of-conduct",
+      "width": 375,
+      "route": "/code-of-conduct",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.system.code-of-conduct",
+      "width": 1440,
+      "route": "/code-of-conduct",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 1967,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 92.13,
+      "selfTimeMs": 1.206,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": "n"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 25.903,
+      "selfTimeMs": 0.102,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 22.179,
+      "selfTimeMs": 0.121,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 20.4,
+      "selfTimeMs": 1.455,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 16.384,
+      "selfTimeMs": 1.674,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.457,
+      "selfTimeMs": 1.788,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.232,
+      "selfTimeMs": 0.01,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": "vw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 12.92,
+      "selfTimeMs": 0.039,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.452,
+      "selfTimeMs": 0.084,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.019,
+      "selfTimeMs": 9.542,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.493,
+      "selfTimeMs": 3.503,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.235,
+      "selfTimeMs": 0.534,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.637,
+      "selfTimeMs": 0.403,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.555,
+      "selfTimeMs": 0.555,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.438,
+      "selfTimeMs": 0.302,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.247,
+      "selfTimeMs": 0.169,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.209,
+      "selfTimeMs": 5.825,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.672,
+      "selfTimeMs": 0.045,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": "vw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.437,
+      "selfTimeMs": 1.252,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.33,
+      "selfTimeMs": 0.111,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.977,
+      "selfTimeMs": 3.955,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.404,
+      "selfTimeMs": 0.013,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.102,
+      "selfTimeMs": 0.266,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.801,
+      "selfTimeMs": 1.666,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.729,
+      "selfTimeMs": 3.715,
+      "url": "http://127.0.0.1:5101/assets/label-BS3K7O4k.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.436,
+      "selfTimeMs": 0.5,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.105,
+      "selfTimeMs": 3.059,
+      "url": "http://127.0.0.1:5101/assets/ResourceDetail-CGiNj3LU.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.998,
+      "selfTimeMs": 0.01,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.99,
+      "selfTimeMs": 0.036,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.7,
+      "selfTimeMs": 2.236,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.448,
+      "selfTimeMs": 0.202,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.326,
+      "selfTimeMs": 0.036,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.262,
+      "selfTimeMs": 0.013,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": "vw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.216,
+      "selfTimeMs": 0.333,
+      "url": "http://127.0.0.1:5101/assets/index-rhv51Ajg.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.99,
+      "selfTimeMs": 0.285,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.618,
+      "selfTimeMs": 0.912,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.617,
+      "selfTimeMs": 1.486,
+      "url": "http://127.0.0.1:5101/assets/ResourceDetail-B9keS-uk.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.608,
+      "selfTimeMs": 1.608,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.565,
+      "selfTimeMs": 0.119,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.555,
+      "selfTimeMs": 0.026,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.5,
+      "selfTimeMs": 0.14,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.387,
+      "selfTimeMs": 0.092,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.356,
+      "selfTimeMs": 0.718,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.34,
+      "selfTimeMs": 0.212,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.262,
+      "selfTimeMs": 0.697,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.217,
+      "selfTimeMs": 0.414,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.202,
+      "selfTimeMs": 0.168,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.115,
+      "selfTimeMs": 0.057,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.112,
+      "selfTimeMs": 0.172,
+      "url": "http://127.0.0.1:5101/assets/index-DLmunk5U.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.065,
+      "selfTimeMs": 0.184,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    }
+  ]
+}

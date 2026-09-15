@@ -1,0 +1,778 @@
+{
+  "task": "567",
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-15T02:58:18.923Z",
+  "baseUrl": "http://127.0.0.1:5000",
+  "widths": [
+    375,
+    1440
+  ],
+  "stateIds": [
+    "app.system.error"
+  ],
+  "stateDefinitions": {
+    "app.collection": {
+      "component": "PublicCollection",
+      "branch": "published empty collection",
+      "route": "/collection/{shareId}"
+    },
+    "app.error.empty": {
+      "component": "PublicCollection",
+      "branch": "empty collection state",
+      "route": "/collection/{shareId}"
+    },
+    "app.error.loading": {
+      "component": "RouteFallback",
+      "branch": "lazy route loading fallback",
+      "route": "/advanced"
+    },
+    "app.error.route": {
+      "component": "RouteErrorBoundary",
+      "branch": "render/chunk error boundary",
+      "route": "/advanced"
+    },
+    "app.not-found": {
+      "component": "NotFound",
+      "branch": "natural unknown-route 404",
+      "route": "/audit-567-not-found"
+    },
+    "app.system.consent": {
+      "component": "ConsentBanner",
+      "branch": "first-visit consent prompt",
+      "route": "/"
+    },
+    "app.system.design-system": {
+      "component": "DesignSystemShowcase",
+      "branch": "showcase route",
+      "route": "/design-system"
+    },
+    "app.system.empty-search": {
+      "component": "Search",
+      "branch": "real zero-result search",
+      "route": "/search?q=zzqxv-nothing"
+    },
+    "app.system.error": {
+      "component": "ErrorPage",
+      "branch": "data-fetch error page after real request abort",
+      "route": "/advanced"
+    },
+    "app.system.loading": {
+      "component": "Search",
+      "branch": "real throttled search request",
+      "route": "/search?q=ffmpeg"
+    },
+    "app.system.not-found": {
+      "component": "NotFound",
+      "branch": "natural unknown-route 404",
+      "route": "/audit-567-not-found"
+    },
+    "app.system.toast": {
+      "component": "Toast",
+      "branch": "real guest bookmark confirmation",
+      "route": "/resource/{resourceId}"
+    }
+  },
+  "hookOwnership": {
+    "chipButton": {
+      "source": "client/src/components/ui/chip-button.tsx",
+      "hook": "data-ds=\"chip\"",
+      "owner": "ChipButton"
+    }
+  },
+  "rows": [
+    {
+      "task": "567",
+      "state": "app.system.error",
+      "width": 375,
+      "route": "/advanced",
+      "component": "ErrorPage",
+      "readySelector": ".system-state-title",
+      "transition": "normal Advanced UI navigation; real browser request abort for /api/awesome-list",
+      "failureMode": "network-abort",
+      "componentIdentity": "ErrorPage: Error / Something went wrong",
+      "status": "PASS",
+      "violations": [
+        {
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "tags": [
+            "cat.semantics",
+            "best-practice"
+          ],
+          "description": "Ensure the document has a main landmark",
+          "help": "Document should have one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-one-main?application=playwright",
+          "nodes": [
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "page-has-main",
+                  "data": null,
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Document does not have a main landmark"
+                }
+              ],
+              "none": [],
+              "impact": "moderate",
+              "html": "<html lang=\"en\" class=\"dark\" data-product-profile=\"public-discovery\" data-system=\"editorial\" data-accent=\"crimson\" data-font=\"system\" style=\"background-color: rgb(0, 0, 0);\">",
+              "target": [
+                "html"
+              ],
+              "failureSummary": "Fix all of the following:\n  Document does not have a main landmark"
+            }
+          ]
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "tags": [
+            "cat.keyboard",
+            "best-practice",
+            "RGAAv4",
+            "RGAA-9.2.1"
+          ],
+          "description": "Ensure all page content is contained by landmarks",
+          "help": "All page content should be contained by landmarks",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/region?application=playwright",
+          "nodes": [
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<span data-replit-metadata=\"client/src/pages/ErrorPage.tsx:29:10\" data-component-name=\"span\" class=\"chip bad system-state-code\">Error</span>",
+              "target": [
+                "span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            },
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<h1 data-replit-metadata=\"client/src/pages/ErrorPage.tsx:32:12\" data-component-name=\"h1\" class=\"display-h system-state-title\">Something went wrong</h1>",
+              "target": [
+                "h1"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            },
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<div data-replit-metadata=\"client/src/pages/ErrorPage.tsx:35:8\" data-component-name=\"CardContent\" class=\"p-[var(--profile-panel-padding)] pt-0\">",
+              "target": [
+                "div[data-component-name=\"CardContent\"]"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            },
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<a data-replit-metadata=\"client/src/pages/Err...\" data-component-name=\"a\" href=\"https://github.com/s...\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-ce...\" data-ds-variant=\"default\">",
+              "target": [
+                "a"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "tags": [
+            "cat.color",
+            "wcag2aa",
+            "wcag143",
+            "TTv5",
+            "TT13.c",
+            "EN-301-549",
+            "EN-9.1.4.3",
+            "ACT",
+            "RGAAv4",
+            "RGAA-3.2.1"
+          ],
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "7.9pt (10.5px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<span data-replit-metadata=\"client/src/pages/ErrorPage.tsx:29:10\" data-component-name=\"span\" class=\"chip bad system-state-code\">Error</span>",
+                      "target": [
+                        "span"
+                      ]
+                    },
+                    {
+                      "html": "<body style=\"\">",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<span data-replit-metadata=\"client/src/pages/ErrorPage.tsx:29:10\" data-component-name=\"span\" class=\"chip bad system-state-code\">Error</span>",
+              "target": [
+                "span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "18.0pt (24px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "3:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body style=\"\">",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<h1 data-replit-metadata=\"client/src/pages/ErrorPage.tsx:32:12\" data-component-name=\"h1\" class=\"display-h system-state-title\">Something went wrong</h1>",
+              "target": [
+                "h1"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "12.0pt (16px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body style=\"\">",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<p data-replit-metadata=\"client/src/pages/ErrorPage.tsx:36:10\" data-component-name=\"p\" class=\"text-muted-foreground mb-4\">We encountered an error while loading the awesome list:</p>",
+              "target": [
+                ".mb-4"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "9.8pt (13px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<div data-replit-metadata=\"client/src/pages/ErrorPage.tsx:39:10\" data-component-name=\"div\" class=\"system-state-detail\">Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).</div>",
+                      "target": [
+                        ".system-state-detail"
+                      ]
+                    },
+                    {
+                      "html": "<body style=\"\">",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<div data-replit-metadata=\"client/src/pages/ErrorPage.tsx:39:10\" data-component-name=\"div\" class=\"system-state-detail\">Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).</div>",
+              "target": [
+                ".system-state-detail"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "10.5pt (14px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body style=\"\">",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<p data-replit-metadata=\"client/src/pages/ErrorPage.tsx:42:10\" data-component-name=\"p\" class=\"mt-4 text-sm text-muted-foreground\">This might be due to a network issue or a problem with the source repository.</p>",
+              "target": [
+                ".mt-4"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ],
+      "passes": 29,
+      "seriousCritical": 0
+    },
+    {
+      "task": "567",
+      "state": "app.system.error",
+      "width": 1440,
+      "route": "/advanced",
+      "component": "ErrorPage",
+      "readySelector": ".system-state-title",
+      "transition": "normal Advanced UI navigation; real browser request abort for /api/awesome-list",
+      "failureMode": "network-abort",
+      "componentIdentity": "ErrorPage: Error / Something went wrong",
+      "status": "PASS",
+      "violations": [
+        {
+          "id": "landmark-one-main",
+          "impact": "moderate",
+          "tags": [
+            "cat.semantics",
+            "best-practice"
+          ],
+          "description": "Ensure the document has a main landmark",
+          "help": "Document should have one main landmark",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-one-main?application=playwright",
+          "nodes": [
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "page-has-main",
+                  "data": null,
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Document does not have a main landmark"
+                }
+              ],
+              "none": [],
+              "impact": "moderate",
+              "html": "<html lang=\"en\" class=\"dark\" data-product-profile=\"public-discovery\" data-system=\"editorial\" data-accent=\"crimson\" data-font=\"system\" style=\"background-color: rgb(0, 0, 0);\">",
+              "target": [
+                "html"
+              ],
+              "failureSummary": "Fix all of the following:\n  Document does not have a main landmark"
+            }
+          ]
+        },
+        {
+          "id": "region",
+          "impact": "moderate",
+          "tags": [
+            "cat.keyboard",
+            "best-practice",
+            "RGAAv4",
+            "RGAA-9.2.1"
+          ],
+          "description": "Ensure all page content is contained by landmarks",
+          "help": "All page content should be contained by landmarks",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/region?application=playwright",
+          "nodes": [
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<span data-replit-metadata=\"client/src/pages/ErrorPage.tsx:29:10\" data-component-name=\"span\" class=\"chip bad system-state-code\">Error</span>",
+              "target": [
+                "span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            },
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<h1 data-replit-metadata=\"client/src/pages/ErrorPage.tsx:32:12\" data-component-name=\"h1\" class=\"display-h system-state-title\">Something went wrong</h1>",
+              "target": [
+                "h1"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            },
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<div data-replit-metadata=\"client/src/pages/ErrorPage.tsx:35:8\" data-component-name=\"CardContent\" class=\"p-[var(--profile-panel-padding)] pt-0\">",
+              "target": [
+                "div[data-component-name=\"CardContent\"]"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            },
+            {
+              "any": [
+                {
+                  "id": "region",
+                  "data": {
+                    "isIframe": false
+                  },
+                  "relatedNodes": [],
+                  "impact": "moderate",
+                  "message": "Some page content is not contained by landmarks"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "moderate",
+              "html": "<a data-replit-metadata=\"client/src/pages/Err...\" data-component-name=\"a\" href=\"https://github.com/s...\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-flex items-ce...\" data-ds-variant=\"default\">",
+              "target": [
+                "a"
+              ],
+              "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "tags": [
+            "cat.color",
+            "wcag2aa",
+            "wcag143",
+            "TTv5",
+            "TT13.c",
+            "EN-301-549",
+            "EN-9.1.4.3",
+            "ACT",
+            "RGAAv4",
+            "RGAA-3.2.1"
+          ],
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "7.9pt (10.5px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<span data-replit-metadata=\"client/src/pages/ErrorPage.tsx:29:10\" data-component-name=\"span\" class=\"chip bad system-state-code\">Error</span>",
+                      "target": [
+                        "span"
+                      ]
+                    },
+                    {
+                      "html": "<body>",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<span data-replit-metadata=\"client/src/pages/ErrorPage.tsx:29:10\" data-component-name=\"span\" class=\"chip bad system-state-code\">Error</span>",
+              "target": [
+                "span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "18.0pt (24px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "3:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body>",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<h1 data-replit-metadata=\"client/src/pages/ErrorPage.tsx:32:12\" data-component-name=\"h1\" class=\"display-h system-state-title\">Something went wrong</h1>",
+              "target": [
+                "h1"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "12.0pt (16px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body>",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<p data-replit-metadata=\"client/src/pages/ErrorPage.tsx:36:10\" data-component-name=\"p\" class=\"text-muted-foreground mb-4\">We encountered an error while loading the awesome list:</p>",
+              "target": [
+                ".mb-4"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "9.8pt (13px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<div data-replit-metadata=\"client/src/pages/ErrorPage.tsx:39:10\" data-component-name=\"div\" class=\"system-state-detail\">Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).</div>",
+                      "target": [
+                        ".system-state-detail"
+                      ]
+                    },
+                    {
+                      "html": "<body>",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<div data-replit-metadata=\"client/src/pages/ErrorPage.tsx:39:10\" data-component-name=\"div\" class=\"system-state-detail\">Could not load resources from /api/awesome-list — Failed to fetch (attempt 2/2).</div>",
+              "target": [
+                ".system-state-detail"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "10.5pt (14px)",
+                    "fontWeight": "normal",
+                    "messageKey": "bgGradient",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body>",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined due to a background gradient"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<p data-replit-metadata=\"client/src/pages/ErrorPage.tsx:42:10\" data-component-name=\"p\" class=\"mt-4 text-sm text-muted-foreground\">This might be due to a network issue or a problem with the source repository.</p>",
+              "target": [
+                ".mt-4"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+            }
+          ]
+        }
+      ],
+      "passes": 29,
+      "seriousCritical": 0
+    }
+  ],
+  "summary": {
+    "pass": 2,
+    "blocked": 0,
+    "fail": 0,
+    "incomplete": 0
+  },
+  "status": "PASS",
+  "blockers": [],
+  "teardown": null,
+  "errors": []
+}

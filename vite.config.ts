@@ -48,6 +48,56 @@ function bundleModuleManifest(): Plugin {
   };
 }
 
+/**
+ * Paint the server-rendered document before hydrating it.
+ *
+ * Vite emits the entry as `<script type="module" src>` in <head>. A module
+ * script is deferred, so on a fast connection the whole document arrives in
+ * one chunk, the parser reaches the end without a rendering opportunity, and
+ * the entry bundle evaluates (~80ms of CPU plus the route chunk fetch) BEFORE
+ * the first frame of the already-complete SSR/prerendered markup is
+ * presented. The built HTML therefore keeps the entry as a `modulepreload`
+ * (same request, same priority, same start time) and starts its evaluation
+ * from a body-end module script once the first frame has been handed to the
+ * compositor and the next frame has begun (double requestAnimationFrame — a
+ * single rAF callback runs BEFORE its frame is painted), with a 1s fallback
+ * for a page that never gets a frame (hidden tabs start at once). Nothing
+ * else changes: the request order, the chunk graph, the manifest (the entry
+ * is still `index.html`), and the `<script type="module"` anchor that
+ * server/ssr.ts uses to inject `window.__HOME_SSR__` (now at body end, still
+ * ahead of the loader). Dev serves client/index.html untouched.
+ */
+function paintBeforeHydrate(): Plugin {
+  const entryTag =
+    /<script type="module" crossorigin src="(\/assets\/index-[^"]+\.js)"><\/script>/g;
+  return {
+    name: "paint-before-hydrate",
+    apply: "build",
+    transformIndexHtml: {
+      order: "post",
+      handler(html) {
+        const matches = [...html.matchAll(entryTag)];
+        if (matches.length !== 1) {
+          throw new Error(
+            `paint-before-hydrate expected exactly one built entry <script type="module">, found ${matches.length}`,
+          );
+        }
+        const [tag, src] = matches[0];
+        const preload = `<link rel="modulepreload" crossorigin href="${src}">`;
+        const loader =
+          `<script type="module">(function(){var started=false;var start=function(){if(started)return;started=true;` +
+          `var s=document.createElement("script");s.type="module";s.crossOrigin="anonymous";s.src=${JSON.stringify(src)};document.head.appendChild(s);};` +
+          `if(document.visibilityState==="hidden"||typeof requestAnimationFrame!=="function"){start();return;}` +
+          `requestAnimationFrame(function(){requestAnimationFrame(function(){setTimeout(start,0);});});setTimeout(start,1000);})();</script>`;
+        if (!html.includes("</body>")) {
+          throw new Error("paint-before-hydrate could not find </body> in the built HTML");
+        }
+        return html.replace(tag, preload).replace("</body>", `  ${loader}\n</body>`);
+      },
+    },
+  };
+}
+
 function themeBootRegistry(): Plugin {
   const marker = "__AWESOME_VIDEO_THEME_BOOT__";
   const registrySystemIds = THEME_FALLBACK_REGISTRY.systems.map(({ id }) => id);
@@ -117,6 +167,7 @@ export default defineConfig({
     productProfileBootRegistry(),
     fontBootRegistry(),
     bundleModuleManifest(),
+    paintBeforeHydrate(),
     ...(process.env.REPL_ID !== undefined
       ? [
           await import("@replit/vite-plugin-runtime-error-modal").then((m) =>

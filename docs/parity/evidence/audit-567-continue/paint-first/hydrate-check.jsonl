@@ -1,0 +1,12 @@
+{"route":"/","hydratedAt":353,"entryScripts":["index-DLmunk5U.js"],"preloads":11,"h1":"Awesome Video Resources","dataSystem":"editorial","navAfterClick":"/category/community-events","errors":[]}
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.evaluate: Execution context was destroyed, most likely because of a navigation.
+    at /home/runner/workspace/.cache/tmp-scripts/hydrate-check.mjs:24:26 {
+  log: [],
+  name: 'Error'
+}
+
+Node.js v20.20.0

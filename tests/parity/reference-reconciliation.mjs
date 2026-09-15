@@ -7,6 +7,10 @@ import esbuild from "esbuild";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Clock, Grid2X2, Info, MoreHorizontal, Plus, Search } from "lucide-react";
+import {
+  applyExpectedRetainedReferenceExtensions,
+  buildExpectedReferenceExtensions,
+} from "./reference-extensions.mjs";
 
 const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -128,6 +132,7 @@ const paletteStyleSourcePath = path.join(repoRoot, "client", "src", "styles", "s
 const sidebarSourcePath = path.join(repoRoot, "client", "src", "components", "layout", "new", "AppSidebar.tsx");
 const drawerStyleSourcePath = path.join(repoRoot, "client", "src", "styles", "shell", "sidebar.css");
 const focusSourcePath = path.join(repoRoot, "client", "src", "styles", "design-system.css");
+const retainedReferenceExtensions = buildExpectedReferenceExtensions();
 
 /*
  * The expected projection is source-owned, not an unchecked hand copy. Read
@@ -392,6 +397,13 @@ export function buildReferenceReconciliation({
   }
   const title = siteTitle.replace(/\s+Dashboard\s*$/i, "");
   if (!title) throw new Error("Reference reconciliation produced an empty effective site title");
+  const sourceBackedExtensions = {
+    ...retainedReferenceExtensions,
+    about: {
+      ...retainedReferenceExtensions.about,
+      resourceCount: total.toLocaleString("en-US"),
+    },
+  };
 
   const sourceSubstitutions = [
     {
@@ -502,6 +514,7 @@ export function buildReferenceReconciliation({
     officialBrandMark,
     approved44px: APPROVED_FOOTER_TARGET,
     approved44pxControls: APPROVED_44PX_TARGETS,
+    extensions: sourceBackedExtensions,
     sourceSubstitutions,
     source: ["/api/config", "/api/awesome-list/nav", "/api/home", "/api/resources/kinds/counts"],
   };
@@ -800,6 +813,10 @@ export async function applyExpectedReferenceReconciliation(page, {
   actualPage,
   reconciliation,
 }) {
+  const retainedExtensions = await applyExpectedRetainedReferenceExtensions(
+    page,
+    reconciliation?.extensions || retainedReferenceExtensions,
+  );
   const paletteControls = await applyExpectedPaletteControls(page, reconciliation);
   const drawerControls = await applyExpectedDrawerControls(page, reconciliation);
   if (paletteControls.status === "applied" || drawerControls.status === "applied") {
@@ -820,6 +837,7 @@ export async function applyExpectedReferenceReconciliation(page, {
       palette: paletteControls,
       drawer: drawerControls,
     },
+    retainedExtensions,
   };
 
   if (actualFooterCount === null && expectedFooterCount === 0) {
@@ -924,6 +942,8 @@ export async function applyExpectedReferenceReconciliation(page, {
     "official BrandMark 28px presentation",
     ...paletteControls.modified,
     ...drawerControls.modified,
+    ...(retainedExtensions.about?.modified || []),
+    ...(retainedExtensions.admin?.modified || []),
   ];
   provenance.officialBrandMark = {
     source: reconciliation.officialBrandMark.source,

@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 4331,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 166.034,
+      "selfTimeMs": 165.367,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 93.31,
+      "selfTimeMs": 92.146,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 84.853,
+      "selfTimeMs": 79.168,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 79.69,
+      "selfTimeMs": 79.461,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 69.677,
+      "selfTimeMs": 0.819,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": "onScroll"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 67.584,
+      "selfTimeMs": 30.099,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 46.506,
+      "selfTimeMs": 33.525,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 40.33,
+      "selfTimeMs": 0.552,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 37.586,
+      "selfTimeMs": 0.07,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 30.406,
+      "selfTimeMs": 0.12,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": "MainLayout"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 23.599,
+      "selfTimeMs": 0.133,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 21.297,
+      "selfTimeMs": 0.075,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 16.374,
+      "selfTimeMs": 0.011,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+      "function": "MainLayout"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.677,
+      "selfTimeMs": 0.476,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.758,
+      "selfTimeMs": 0.377,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.658,
+      "selfTimeMs": 1.019,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.271,
+      "selfTimeMs": 0.014,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+      "function": "MainLayout"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.19,
+      "selfTimeMs": 0.213,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.75,
+      "selfTimeMs": 0.905,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.698,
+      "selfTimeMs": 0.447,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.65,
+      "selfTimeMs": 0.011,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.35,
+      "selfTimeMs": 0.185,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.833,
+      "selfTimeMs": 6.327,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.577,
+      "selfTimeMs": 0.839,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.564,
+      "selfTimeMs": 0.396,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.529,
+      "selfTimeMs": 0.087,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.75,
+      "selfTimeMs": 3.889,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.462,
+      "selfTimeMs": 4.462,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.313,
+      "selfTimeMs": 0.044,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.823,
+      "selfTimeMs": 0.234,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.726,
+      "selfTimeMs": 1.709,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.55,
+      "selfTimeMs": 3.081,
+      "url": "http://127.0.0.1:5000/src/pages/ResourceDetail.tsx",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.478,
+      "selfTimeMs": 0.287,
+      "url": "http://127.0.0.1:5000/src/App.tsx",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.39,
+      "selfTimeMs": 1.83,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.341,
+      "selfTimeMs": 0.421,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.807,
+      "selfTimeMs": 2.64,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.752,
+      "selfTimeMs": 0.037,
+      "url": "http://127.0.0.1:5000/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.703,
+      "selfTimeMs": 2.579,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.326,
+      "selfTimeMs": 0.5,
+      "url": "http://127.0.0.1:5000/src/App.tsx",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.704,
+      "selfTimeMs": 1.704,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.561,
+      "selfTimeMs": 0.249,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.54,
+      "selfTimeMs": 0.075,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.46,
+      "selfTimeMs": 0.289,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.445,
+      "selfTimeMs": 0.564,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.416,
+      "selfTimeMs": 0.833,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.391,
+      "selfTimeMs": 0.12,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.388,
+      "selfTimeMs": 0.436,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.369,
+      "selfTimeMs": 1.369,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.361,
+      "selfTimeMs": 1.361,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.265,
+      "selfTimeMs": 0.434,
+      "url": null,
+      "function": null
+    }
+  ]
+}

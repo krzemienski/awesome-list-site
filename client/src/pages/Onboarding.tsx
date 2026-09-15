@@ -393,6 +393,7 @@ export default function Onboarding() {
           <span>{activeStep.short}</span>
         </div>
         <Progress
+          aria-label="Onboarding progress"
           value={(step / ONBOARDING_STEP_COUNT) * 100}
           className="h-2"
         />

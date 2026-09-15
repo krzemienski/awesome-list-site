@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.journey-detail",
+  "widths": [
+    {
+      "screen": "app.journey-detail",
+      "width": 375,
+      "route": "/journey/7",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 38,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.journey-detail",
+      "width": 1440,
+      "route": "/journey/7",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

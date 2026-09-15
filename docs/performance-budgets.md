@@ -59,3 +59,19 @@ as historical evidence, not as the current budget.
 GA4, Mixpanel, PostHog, and Amplitude initialization is consent-gated and
 deferred until the first painted frame. Amplitude's optional plugins are loaded
 in stages and torn down on consent revocation.
+## Entry evaluation order (paint before hydrate)
+
+The production build keeps the entry chunk as a `<link rel="modulepreload">`
+in `<head>` and starts its evaluation from a body-end `<script type="module">`
+after two `requestAnimationFrame` callbacks (1 s fallback; hidden documents
+start immediately). This is the `paint-before-hydrate` plugin in
+`vite.config.ts`. A deferred module script in `<head>` would otherwise evaluate
+the entry — and fetch the route chunks — before the already-complete SSR or
+prerendered markup is presented when the whole document arrives in one chunk.
+The request, its priority and start time, the chunk graph and the manifest
+entry are unchanged, and `server/ssr.ts` still injects the Home bootstrap
+ahead of the only `<script type="module"` in the template. The dev server
+serves `client/index.html` untouched. Measured on the compiled Home document:
+pre-first-paint raster 37–57 ms and hydration 250–1050 ms after navigation,
+with Lighthouse mobile medians 83 / 75 / 83 for `/`, the category and the
+resource route (see `docs/parity/DS-AUDIT.md`).

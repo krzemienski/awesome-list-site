@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.home.curated",
+  "widths": [
+    {
+      "screen": "app.home.curated",
+      "width": 375,
+      "route": "/?layout=curated",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 36,
+        "incomplete": 2
+      }
+    },
+    {
+      "screen": "app.home.curated",
+      "width": 1440,
+      "route": "/?layout=curated",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 2
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

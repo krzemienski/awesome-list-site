@@ -1,0 +1,1934 @@
+{
+  "task": "567",
+  "scope": "stage7-8-ink-accent",
+  "selection": {
+    "system": "geist",
+    "width": 1440,
+    "surface": "admin-overview"
+  },
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-15T03:09:09.661Z",
+  "base": "http://127.0.0.1:5000",
+  "browser": {
+    "executable": "/home/runner/workspace/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome",
+    "lease": "scripts/validation/playwright-launch-lease.mjs"
+  },
+  "systems": [
+    {
+      "system": "editorial",
+      "accent": "crimson"
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix"
+    },
+    {
+      "system": "geist",
+      "accent": "cyan"
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber"
+    },
+    {
+      "system": "swiss",
+      "accent": "orange"
+    }
+  ],
+  "widths": {
+    "375": {
+      "width": 375,
+      "height": 812
+    },
+    "1440": {
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "surfaces": [
+    {
+      "id": "home",
+      "route": "/",
+      "identity": "public"
+    },
+    {
+      "id": "category-encoding-codecs",
+      "route": "/category/encoding-codecs",
+      "identity": "public"
+    },
+    {
+      "id": "resource-185020",
+      "route": "/resource/185020",
+      "identity": "public"
+    },
+    {
+      "id": "admin-overview",
+      "route": "/admin",
+      "identity": "Nick-admin"
+    }
+  ],
+  "rows": [
+    {
+      "key": "geist|cyan|1440|admin-overview|Nick-admin|/admin",
+      "status": "PASS",
+      "system": "geist",
+      "accent": "cyan",
+      "width": 1440,
+      "surface": "admin-overview",
+      "route": "/admin",
+      "identity": "Nick-admin",
+      "stage7": {
+        "accentToken": {
+          "name": "--accent",
+          "raw": "#5eddf2",
+          "resolved": {
+            "serialized": "rgb(94, 221, 242)",
+            "rgba": {
+              "r": 94,
+              "g": 221,
+              "b": 242,
+              "a": 1
+            }
+          }
+        },
+        "visibleViewportUsers": [
+          {
+            "selector": "div#root > div.group\\/sidebar-wrapper.flex.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar:nth-of-type(2) > div.page.app-shell-page > header.app-canonical-header > a.header-brand > span.header-logo:nth-of-type(1)",
+            "text": "av",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "header-logo",
+            "rect": {
+              "x": 24,
+              "y": 15.5,
+              "width": 28,
+              "height": 28,
+              "top": 15.5,
+              "right": 52,
+              "bottom": 43.5
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of official branding retained by the approved reference contract",
+            "ownerSelector": "div#root > div.group\\/sidebar-wrapper.flex.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar:nth-of-type(2) > div.page.app-shell-page > header.app-canonical-header > a.header-brand"
+          },
+          {
+            "selector": "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1)",
+            "text": "N",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full header-avatar",
+            "rect": {
+              "x": 1346.72,
+              "y": 18.5,
+              "width": 22,
+              "height": 22,
+              "top": 18.5,
+              "right": 1368.72,
+              "bottom": 40.5
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "primary account control in the header surface"
+          },
+          {
+            "selector": "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1) > span.flex.h-full.w-full.items-center",
+            "text": "N",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "flex h-full w-full items-center justify-center rounded-full bg-muted",
+            "rect": {
+              "x": 1346.72,
+              "y": 18.5,
+              "width": 22,
+              "height": 22,
+              "top": 18.5,
+              "right": 1368.72,
+              "bottom": 40.5
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of primary account control in the header surface",
+            "ownerSelector": "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1)"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow",
+            "text": "Admin console · Nick",
+            "tag": "div",
+            "role": null,
+            "ariaLabel": null,
+            "className": "eyebrow",
+            "rect": {
+              "x": 80,
+              "y": 153.48,
+              "width": 159.22,
+              "height": 17.05,
+              "top": 153.48,
+              "right": 239.22,
+              "bottom": 170.53
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "eyebrow"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow > span.live-dot:nth-of-type(1)",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "live-dot",
+            "rect": {
+              "x": 80,
+              "y": 159,
+              "width": 6,
+              "height": 6,
+              "top": 159,
+              "right": 86,
+              "bottom": 165
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "live indicator"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow > span:nth-of-type(2)",
+            "text": "Admin console · Nick",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 94,
+              "y": 153.48,
+              "width": 145.22,
+              "height": 17.05,
+              "top": 153.48,
+              "right": 239.22,
+              "bottom": 170.53
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of eyebrow",
+            "ownerSelector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > h1.display-h > em",
+            "text": "dashboard",
+            "tag": "em",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 294.8,
+              "y": 180.8,
+              "width": 185.33,
+              "height": 52,
+              "top": 180.8,
+              "right": 480.13,
+              "bottom": 232.8
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "sparing display-copy emphasis"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div.admin-dashboard__actions:nth-of-type(2) > button.inline-flex.items-center.justify-center.gap-2",
+            "text": "New entry",
+            "tag": "button",
+            "role": null,
+            "ariaLabel": null,
+            "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-4 py-2 btn primary",
+            "rect": {
+              "x": 1243.42,
+              "y": 148,
+              "width": 116.58,
+              "height": 38.56,
+              "top": 148,
+              "right": 1360,
+              "bottom": 186.56
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-top-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-right-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-bottom-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-left-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "primary button (one primary accent moment on this surface)"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview",
+            "text": "Overview",
+            "tag": "button",
+            "role": "tab",
+            "ariaLabel": null,
+            "className": "inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-all duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-foreground data-[state=active]:bg-[var(--surface-3)] data-[state=active]:text-[var(--accent)] data-[state=active]:shadow-[var(--shadow-sm)]",
+            "rect": {
+              "x": 80,
+              "y": 282.48,
+              "width": 106.92,
+              "height": 44.56,
+              "top": 282.48,
+              "right": 186.92,
+              "bottom": 327.05
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-bottom-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "active tab underline/indicator"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid",
+            "text": "",
+            "tag": "svg",
+            "role": null,
+            "ariaLabel": null,
+            "className": "lucide lucide-layout-grid",
+            "rect": {
+              "x": 96,
+              "y": 297.77,
+              "width": 12,
+              "height": 12,
+              "top": 297.77,
+              "right": 108,
+              "bottom": 309.77
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(1)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 97.5,
+              "y": 299.27,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 299.27,
+              "right": 101,
+              "bottom": 302.77
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(2)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 103,
+              "y": 299.27,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 299.27,
+              "right": 106.5,
+              "bottom": 302.77
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(3)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 103,
+              "y": 304.77,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 304.77,
+              "right": 106.5,
+              "bottom": 308.27
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(4)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 97.5,
+              "y": 304.77,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 304.77,
+              "right": 101,
+              "bottom": 308.27
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(1) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 606.31,
+              "width": 370,
+              "height": 4,
+              "top": 606.31,
+              "right": 1337,
+              "bottom": 610.31
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(2) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 642.91,
+              "width": 295.55,
+              "height": 4,
+              "top": 642.91,
+              "right": 1262.55,
+              "bottom": 646.91
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(3) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 679.5,
+              "width": 265.55,
+              "height": 4,
+              "top": 679.5,
+              "right": 1232.55,
+              "bottom": 683.5
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(4) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 716.09,
+              "width": 236.66,
+              "height": 4,
+              "top": 716.09,
+              "right": 1203.66,
+              "bottom": 720.09
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(5) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 752.69,
+              "width": 212.22,
+              "height": 4,
+              "top": 752.69,
+              "right": 1179.22,
+              "bottom": 756.69
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          }
+        ],
+        "allowedUses": [
+          {
+            "selector": "div#root > div.group\\/sidebar-wrapper.flex.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar:nth-of-type(2) > div.page.app-shell-page > header.app-canonical-header > a.header-brand > span.header-logo:nth-of-type(1)",
+            "text": "av",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "header-logo",
+            "rect": {
+              "x": 24,
+              "y": 15.5,
+              "width": 28,
+              "height": 28,
+              "top": 15.5,
+              "right": 52,
+              "bottom": 43.5
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of official branding retained by the approved reference contract",
+            "ownerSelector": "div#root > div.group\\/sidebar-wrapper.flex.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar:nth-of-type(2) > div.page.app-shell-page > header.app-canonical-header > a.header-brand"
+          },
+          {
+            "selector": "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1)",
+            "text": "N",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full header-avatar",
+            "rect": {
+              "x": 1346.72,
+              "y": 18.5,
+              "width": 22,
+              "height": 22,
+              "top": 18.5,
+              "right": 1368.72,
+              "bottom": 40.5
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "primary account control in the header surface"
+          },
+          {
+            "selector": "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1) > span.flex.h-full.w-full.items-center",
+            "text": "N",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "flex h-full w-full items-center justify-center rounded-full bg-muted",
+            "rect": {
+              "x": 1346.72,
+              "y": 18.5,
+              "width": 22,
+              "height": 22,
+              "top": 18.5,
+              "right": 1368.72,
+              "bottom": 40.5
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of primary account control in the header surface",
+            "ownerSelector": "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1)"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow",
+            "text": "Admin console · Nick",
+            "tag": "div",
+            "role": null,
+            "ariaLabel": null,
+            "className": "eyebrow",
+            "rect": {
+              "x": 80,
+              "y": 153.48,
+              "width": 159.22,
+              "height": 17.05,
+              "top": 153.48,
+              "right": 239.22,
+              "bottom": 170.53
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "eyebrow"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow > span.live-dot:nth-of-type(1)",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "live-dot",
+            "rect": {
+              "x": 80,
+              "y": 159,
+              "width": 6,
+              "height": 6,
+              "top": 159,
+              "right": 86,
+              "bottom": 165
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "live indicator"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow > span:nth-of-type(2)",
+            "text": "Admin console · Nick",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 94,
+              "y": 153.48,
+              "width": 145.22,
+              "height": 17.05,
+              "top": 153.48,
+              "right": 239.22,
+              "bottom": 170.53
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of eyebrow",
+            "ownerSelector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > h1.display-h > em",
+            "text": "dashboard",
+            "tag": "em",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 294.8,
+              "y": 180.8,
+              "width": 185.33,
+              "height": 52,
+              "top": 180.8,
+              "right": 480.13,
+              "bottom": 232.8
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "sparing display-copy emphasis"
+          },
+          {
+            "selector": "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div.admin-dashboard__actions:nth-of-type(2) > button.inline-flex.items-center.justify-center.gap-2",
+            "text": "New entry",
+            "tag": "button",
+            "role": null,
+            "ariaLabel": null,
+            "className": "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 min-h-[max(44px,var(--profile-control-height))] min-w-[44px] px-4 py-2 btn primary",
+            "rect": {
+              "x": 1243.42,
+              "y": 148,
+              "width": 116.58,
+              "height": 38.56,
+              "top": 148,
+              "right": 1360,
+              "bottom": 186.56
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-top-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-right-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-bottom-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-left-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "primary button (one primary accent moment on this surface)"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview",
+            "text": "Overview",
+            "tag": "button",
+            "role": "tab",
+            "ariaLabel": null,
+            "className": "inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-all duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-foreground data-[state=active]:bg-[var(--surface-3)] data-[state=active]:text-[var(--accent)] data-[state=active]:shadow-[var(--shadow-sm)]",
+            "rect": {
+              "x": 80,
+              "y": 282.48,
+              "width": 106.92,
+              "height": 44.56,
+              "top": 282.48,
+              "right": 186.92,
+              "bottom": 327.05
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "border-bottom-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "active tab underline/indicator"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid",
+            "text": "",
+            "tag": "svg",
+            "role": null,
+            "ariaLabel": null,
+            "className": "lucide lucide-layout-grid",
+            "rect": {
+              "x": 96,
+              "y": 297.77,
+              "width": 12,
+              "height": 12,
+              "top": 297.77,
+              "right": 108,
+              "bottom": 309.77
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(1)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 97.5,
+              "y": 299.27,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 299.27,
+              "right": 101,
+              "bottom": 302.77
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(2)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 103,
+              "y": 299.27,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 299.27,
+              "right": 106.5,
+              "bottom": 302.77
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(3)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 103,
+              "y": 304.77,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 304.77,
+              "right": 106.5,
+              "bottom": 308.27
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(4)",
+            "text": "",
+            "tag": "rect",
+            "role": null,
+            "ariaLabel": null,
+            "className": "",
+            "rect": {
+              "x": 97.5,
+              "y": 304.77,
+              "width": 3.5,
+              "height": 3.5,
+              "top": 304.77,
+              "right": 101,
+              "bottom": 308.27
+            },
+            "properties": [
+              {
+                "property": "color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              },
+              {
+                "property": "stroke",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "ownerSelector": "button#radix-\\:rk\\:-trigger-overview"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(1) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 606.31,
+              "width": 370,
+              "height": 4,
+              "top": 606.31,
+              "right": 1337,
+              "bottom": 610.31
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(2) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 642.91,
+              "width": 295.55,
+              "height": 4,
+              "top": 642.91,
+              "right": 1262.55,
+              "bottom": 646.91
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(3) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 679.5,
+              "width": 265.55,
+              "height": 4,
+              "top": 679.5,
+              "right": 1232.55,
+              "bottom": 683.5
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(4) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 716.09,
+              "width": 236.66,
+              "height": 4,
+              "top": 716.09,
+              "right": 1203.66,
+              "bottom": 720.09
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          },
+          {
+            "selector": "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(5) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+            "text": "",
+            "tag": "span",
+            "role": null,
+            "ariaLabel": null,
+            "className": "admin-canonical-category-bar",
+            "rect": {
+              "x": 967,
+              "y": 752.69,
+              "width": 212.22,
+              "height": 4,
+              "top": 752.69,
+              "right": 1179.22,
+              "bottom": 756.69
+            },
+            "properties": [
+              {
+                "property": "background-color",
+                "computed": {
+                  "serialized": "rgb(94, 221, 242)",
+                  "rgba": {
+                    "r": 94,
+                    "g": 221,
+                    "b": 242,
+                    "a": 1
+                  }
+                }
+              }
+            ],
+            "allowed": true,
+            "reason": "category distribution chart data"
+          }
+        ],
+        "violations": [],
+        "counts": {
+          "total": 19,
+          "allowed": 19,
+          "violations": 0
+        },
+        "groups": [
+          {
+            "key": "allowed :: descendant of official branding retained by the approved reference contract",
+            "allowed": true,
+            "reason": "descendant of official branding retained by the approved reference contract",
+            "count": 1,
+            "selectors": [
+              "div#root > div.group\\/sidebar-wrapper.flex.w-full.has-\\[\\[data-variant\\=inset\\]\\]\\:bg-sidebar:nth-of-type(2) > div.page.app-shell-page > header.app-canonical-header > a.header-brand > span.header-logo:nth-of-type(1)"
+            ],
+            "texts": [
+              "av"
+            ]
+          },
+          {
+            "key": "allowed :: primary account control in the header surface",
+            "allowed": true,
+            "reason": "primary account control in the header surface",
+            "count": 1,
+            "selectors": [
+              "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1)"
+            ],
+            "texts": [
+              "N"
+            ]
+          },
+          {
+            "key": "allowed :: descendant of primary account control in the header surface",
+            "allowed": true,
+            "reason": "descendant of primary account control in the header surface",
+            "count": 1,
+            "selectors": [
+              "button#radix-\\:r0\\: > span.relative.flex.h-10.w-10:nth-of-type(1) > span.flex.h-full.w-full.items-center"
+            ],
+            "texts": [
+              "N"
+            ]
+          },
+          {
+            "key": "allowed :: eyebrow",
+            "allowed": true,
+            "reason": "eyebrow",
+            "count": 1,
+            "selectors": [
+              "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow"
+            ],
+            "texts": [
+              "Admin console · Nick"
+            ]
+          },
+          {
+            "key": "allowed :: live indicator",
+            "allowed": true,
+            "reason": "live indicator",
+            "count": 1,
+            "selectors": [
+              "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow > span.live-dot:nth-of-type(1)"
+            ],
+            "texts": [
+              ""
+            ]
+          },
+          {
+            "key": "allowed :: descendant of eyebrow",
+            "allowed": true,
+            "reason": "descendant of eyebrow",
+            "count": 1,
+            "selectors": [
+              "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > div.admin-dashboard__eyebrow-slot > div.eyebrow > span:nth-of-type(2)"
+            ],
+            "texts": [
+              "Admin console · Nick"
+            ]
+          },
+          {
+            "key": "allowed :: sparing display-copy emphasis",
+            "allowed": true,
+            "reason": "sparing display-copy emphasis",
+            "count": 1,
+            "selectors": [
+              "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div:nth-of-type(1) > h1.display-h > em"
+            ],
+            "texts": [
+              "dashboard"
+            ]
+          },
+          {
+            "key": "allowed :: primary button (one primary accent moment on this surface)",
+            "allowed": true,
+            "reason": "primary button (one primary accent moment on this surface)",
+            "count": 1,
+            "selectors": [
+              "main#main > div.page-content-wrap > div.admin-dashboard > div.admin-dashboard__masthead:nth-of-type(1) > div.admin-dashboard__actions:nth-of-type(2) > button.inline-flex.items-center.justify-center.gap-2"
+            ],
+            "texts": [
+              "New entry"
+            ]
+          },
+          {
+            "key": "allowed :: active tab underline/indicator",
+            "allowed": true,
+            "reason": "active tab underline/indicator",
+            "count": 1,
+            "selectors": [
+              "button#radix-\\:rk\\:-trigger-overview"
+            ],
+            "texts": [
+              "Overview"
+            ]
+          },
+          {
+            "key": "allowed :: descendant of active tab underline/indicator",
+            "allowed": true,
+            "reason": "descendant of active tab underline/indicator",
+            "count": 5,
+            "selectors": [
+              "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid",
+              "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(1)",
+              "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(2)",
+              "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(3)",
+              "button#radix-\\:rk\\:-trigger-overview > svg.lucide.lucide-layout-grid > rect:nth-of-type(4)"
+            ],
+            "texts": [
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          {
+            "key": "allowed :: category distribution chart data",
+            "allowed": true,
+            "reason": "category distribution chart data",
+            "count": 5,
+            "selectors": [
+              "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(1) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+              "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(2) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+              "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(3) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+              "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(4) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar",
+              "div#radix-\\:rk\\:-content-overview > div.admin-overview.admin-overview-canonical:nth-of-type(2) > div.admin-canonical-overview-grid > section.card.admin-canonical-table-shell.admin-panel:nth-of-type(3) > div.admin-canonical-table-shell__body:nth-of-type(2) > div.admin-canonical-category-list > div.admin-canonical-category-row:nth-of-type(5) > div.admin-canonical-category-track:nth-of-type(2) > span.admin-canonical-category-bar"
+            ],
+            "texts": [
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          }
+        ]
+      },
+      "stage8": {
+        "tokens": {
+          "text3": {
+            "name": "--text-3",
+            "raw": "rgba(250,250,250,0.52)",
+            "resolved": {
+              "serialized": "rgba(250, 250, 250, 0.52)",
+              "rgba": {
+                "r": 250,
+                "g": 250,
+                "b": 250,
+                "a": 0.52
+              }
+            }
+          },
+          "text4": {
+            "name": "--text-4",
+            "raw": "rgba(250,250,250,0.2)",
+            "resolved": {
+              "serialized": "rgba(250, 250, 250, 0.2)",
+              "rgba": {
+                "r": 250,
+                "g": 250,
+                "b": 250,
+                "a": 0.2
+              }
+            }
+          }
+        },
+        "offenders": [],
+        "offenderGroups": [],
+        "counts": {
+          "longVisibleParagraphOrListItems": 1,
+          "offenders": 0
+        }
+      },
+      "theme": {
+        "expected": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "attrs": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "stored": {
+          "system": "geist",
+          "accent": "cyan"
+        },
+        "assertion": {
+          "attrs": {
+            "system": "geist",
+            "accent": "cyan"
+          },
+          "stored": {
+            "system": "geist",
+            "accent": "cyan"
+          },
+          "pass": true
+        }
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "context": {
+        "width": 1440,
+        "surface": "admin-overview",
+        "route": "/admin",
+        "identity": "Nick-admin"
+      }
+    }
+  ],
+  "identity": {
+    "helper": "tests/parity/identity.mjs",
+    "requested": true,
+    "created": true,
+    "displayName": "Nick",
+    "teardown": {
+      "attempted": true,
+      "completed": true,
+      "localDeleted": true,
+      "clerkDeleted": true,
+      "verification": {
+        "localQaUsersRemainingCount": 1
+      },
+      "errors": []
+    }
+  },
+  "runError": null,
+  "lastCheckpoint": {
+    "detail": "geist-1440-admin-overview",
+    "at": "2026-09-15T03:09:24.974Z"
+  },
+  "status": "PASS",
+  "measurementStatus": "PASS",
+  "generatedAt": "2026-09-15T03:09:25.667Z"
+}

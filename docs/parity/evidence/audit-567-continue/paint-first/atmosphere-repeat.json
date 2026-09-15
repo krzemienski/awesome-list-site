@@ -1,0 +1,37 @@
+[
+  {
+    "system": "editorial",
+    "repeat": "no-repeat, no-repeat",
+    "size": "auto, auto",
+    "clip": "polygon(0 0, 100% 0, 100% calc",
+    "token": "no-repeat"
+  },
+  {
+    "system": "terminal",
+    "repeat": "no-repeat, no-repeat",
+    "size": "auto, auto",
+    "clip": "none",
+    "token": "no-repeat"
+  },
+  {
+    "system": "geist",
+    "repeat": "no-repeat",
+    "size": "auto",
+    "clip": "inset(0 0 calc(120% - 480px) 0",
+    "token": "no-repeat"
+  },
+  {
+    "system": "brutalist",
+    "repeat": "no-repeat",
+    "size": "auto",
+    "clip": "none",
+    "token": "no-repeat"
+  },
+  {
+    "system": "swiss",
+    "repeat": "repeat, repeat",
+    "size": "64px 64px, 64px 64px",
+    "clip": "none",
+    "token": "repeat"
+  }
+]

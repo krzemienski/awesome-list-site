@@ -1,0 +1,99 @@
+{
+  "base": "https://awesome.video",
+  "preset": "mobile",
+  "categories": [
+    "performance",
+    "accessibility",
+    "best-practices",
+    "seo"
+  ],
+  "routes": {
+    "/": {
+      "scores": {
+        "performance": 0.91,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 2457,
+        "largestContentfulPaintMs": 2457,
+        "totalBlockingTimeMs": 184,
+        "cumulativeLayoutShift": 0.063589,
+        "speedIndexMs": 2457,
+        "interactiveMs": 5182
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-14T22:19:12.466Z",
+      "finalDisplayedUrl": "https://awesome.video/",
+      "formFactor": "mobile",
+      "requestCount": 32,
+      "blockedRequests": [],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [],
+      "blockedWorkers": [],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "reportFile": "home.json",
+      "traceSummaryFile": "home.trace-summary.json"
+    },
+    "/category/encoding-codecs": {
+      "scores": {
+        "performance": 0.76,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 3213,
+        "largestContentfulPaintMs": 3271,
+        "totalBlockingTimeMs": 419,
+        "cumulativeLayoutShift": 0.01605,
+        "speedIndexMs": 3213,
+        "interactiveMs": 5423
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-14T22:19:21.598Z",
+      "finalDisplayedUrl": "https://awesome.video/category/encoding-codecs",
+      "formFactor": "mobile",
+      "requestCount": 58,
+      "blockedRequests": [],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [],
+      "blockedWorkers": [],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "reportFile": "category-encoding-codecs.json",
+      "traceSummaryFile": "category-encoding-codecs.trace-summary.json"
+    },
+    "/resource/185020": {
+      "scores": {
+        "performance": 0.8,
+        "accessibility": 1,
+        "best-practices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 3210,
+        "largestContentfulPaintMs": 3210,
+        "totalBlockingTimeMs": 295,
+        "cumulativeLayoutShift": 0.054711,
+        "speedIndexMs": 3210,
+        "interactiveMs": 5457
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-14T22:19:32.813Z",
+      "finalDisplayedUrl": "https://awesome.video/resource/185020",
+      "formFactor": "mobile",
+      "requestCount": 55,
+      "blockedRequests": [],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [],
+      "blockedWorkers": [],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "reportFile": "resource-185020.json",
+      "traceSummaryFile": "resource-185020.trace-summary.json"
+    }
+  }
+}

@@ -80,6 +80,28 @@
     radial-gradient(ellipse 1100px 700px at 88% -8%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%),
     radial-gradient(ellipse 900px 500px at -8% 110%, color-mix(in srgb, var(--accent-2) 6%, transparent), transparent 60%);
   --bg-atmosphere-size: auto;
+  /* Raster budget (Replit addition, consumed only by .page::after). With
+     background-size auto a gradient image is exactly the positioning area, so
+     background-repeat can never paint a second tile — but Chromium rasterises a
+     repeated background image through a tiled image shader that re-renders the
+     whole ~6000px gradient bitmap for every 256px tile (~85ms per tile on
+     software raster, ~350ms of raster before Home's first frame). no-repeat
+     draws the same pixels straight from the gradient shader. Only a system whose
+     --bg-atmosphere-size is smaller than the page (Swiss' 64px grid) relies on
+     repeat and re-declares it. */
+  --bg-atmosphere-repeat: no-repeat;
+  /* Raster budget (Replit addition, consumed only by .page::after). The
+     atmosphere is rasterised over the whole .page box, and on long pages
+     (Home ≈ 6000px at 412px wide) almost all of it is exactly transparent:
+     both ellipses end at their `transparent 60%` stop, so the top one is only
+     visible while y < -8% + 700px·0.6 and the bottom one only while
+     y > 110% - 500px·0.6. Clipping the paint to those two bands leaves every
+     visible pixel unchanged and removes ~3s of software raster per load
+     (docs/parity/assumptions/tokens.md §11). Each system that changes
+     --bg-atmosphere MUST re-declare this to match its own geometry. */
+  --bg-atmosphere-clip: polygon(
+    0 0, 100% 0, 100% calc(-8% + 420px), 0 calc(-8% + 420px),
+    0 calc(110% - 300px), 100% calc(110% - 300px), 100% 100%, 0 100%);
   --grain-opacity: 0.32;
 
   /* Motion tokens (Replit addition — consumed by token-mapped primitives) */
@@ -115,15 +137,16 @@
    overflows it, so when Radix scroll-lock sets `overflow: hidden` on body
    (any Select/popover open) the document scroll range collapses and
    window.scrollY clamps to 0 — the page visibly jumps to the top and the
-   dropdown opens off-screen. `min-height` keeps the atmosphere gradient
-   covering the viewport on short pages without capping the box. */
+   dropdown opens off-screen. `min-height` keeps the body box filling the
+   viewport on short pages without capping it. The atmosphere is painted by
+   .page (min-height: 100vh) exactly as in the design; body carries only the
+   canonical `background: var(--bg)` — the earlier fixed-attachment copy of
+   --bg-atmosphere here was drift from styles.css (body has no atmosphere
+   there) and a second full-viewport gradient raster on every page. */
 html { height: 100%; }
 body { min-height: 100%; }
 body {
   background: var(--bg);
-  background-image: var(--bg-atmosphere);
-  background-size: var(--bg-atmosphere-size, auto);
-  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-body);
   font-feature-settings: "ss01", "cv11", "tnum";
@@ -159,12 +182,41 @@ button { font-family: inherit; }
 }
 
 /* ============== PAGE ATMOSPHERE ============== */
+/* The design paints `background: var(--bg-atmosphere), var(--bg)` on .page
+   itself. The runtime paints the identical two layers on .page's pseudo-
+   elements (same box, same positioning area, same stacking position: both
+   sit at z-index -1 of the enclosing stacking context, i.e. directly above
+   the body/root background and below every in-flow child — exactly where
+   .page's own background painted). ::before is the opaque var(--bg) plane;
+   ::after is the atmosphere, and only it is bounded by the per-system
+   --bg-atmosphere-clip so the raster stops at the gradient's visible bands.
+   .page must stay transparent for those layers to show; both background
+   deviations are documented in scripts/validation/canonical-token-parity.mjs
+   (`rule:.page:background`, `rule:.page:background-color`) and
+   docs/parity/assumptions/tokens.md §11. */
 .page {
   position: relative;
   min-height: 100vh;
-  background: var(--bg-atmosphere), var(--bg);
+  background: none;
   background-size: var(--bg-atmosphere-size, auto), auto;
-  background-color: var(--bg);
+  background-color: transparent;
+}
+.page::before,
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.page::before {
+  background: var(--bg);
+}
+.page::after {
+  background: var(--bg-atmosphere);
+  background-size: var(--bg-atmosphere-size, auto);
+  background-repeat: var(--bg-atmosphere-repeat, no-repeat);
+  clip-path: var(--bg-atmosphere-clip, none);
 }
 .grain {
   position: fixed; inset: 0; pointer-events: none; z-index: 1;
@@ -713,6 +765,7 @@ button { font-family: inherit; }
   --bg-atmosphere:
     repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),
     radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%);
+  --bg-atmosphere-clip: none; /* scanlines cover the whole page */
   --grain-opacity: 0.5;
 }
 
@@ -732,6 +785,8 @@ button { font-family: inherit; }
   --shadow-lg: 0 0 0 1px rgba(255,255,255,0.06), 0 24px 56px rgba(0,0,0,0.55);
   --shadow-accent: 0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent), 0 0 32px color-mix(in srgb, var(--accent) 25%, transparent);
   --bg-atmosphere: radial-gradient(ellipse 1200px 800px at 50% -20%, rgba(255,255,255,0.03), transparent 60%);
+  /* visible only while y < -20% + 800px·0.6 */
+  --bg-atmosphere-clip: inset(0 0 calc(120% - 480px) 0);
   --grain-opacity: 0;
 }
 
@@ -751,6 +806,7 @@ button { font-family: inherit; }
   --shadow-lg: 8px 8px 0 0 var(--text);
   --shadow-accent: 4px 4px 0 0 var(--accent);
   --bg-atmosphere: none;
+  --bg-atmosphere-clip: none;
   --grain-opacity: 0.55;
 }
 
@@ -772,6 +828,8 @@ button { font-family: inherit; }
     linear-gradient(0deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px)),
     linear-gradient(90deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px));
   --bg-atmosphere-size: 64px 64px, 64px 64px;
+  --bg-atmosphere-repeat: repeat; /* the 64px grid tile must repeat */
+  --bg-atmosphere-clip: none; /* the grid covers the whole page */
   --grain-opacity: 0.18;
 }
 

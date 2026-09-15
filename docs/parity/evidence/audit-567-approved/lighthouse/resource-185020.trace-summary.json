@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 1709,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 90.198,
+      "selfTimeMs": 88.923,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 88.947,
+      "selfTimeMs": 88.285,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 76.033,
+      "selfTimeMs": 1.968,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": "n"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 72.139,
+      "selfTimeMs": 62.244,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 56.772,
+      "selfTimeMs": 0.222,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 38.182,
+      "selfTimeMs": 0.094,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 20.456,
+      "selfTimeMs": 0.012,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": "vw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.792,
+      "selfTimeMs": 1.524,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.99,
+      "selfTimeMs": 0.973,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.694,
+      "selfTimeMs": 0.095,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.626,
+      "selfTimeMs": 0.027,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.425,
+      "selfTimeMs": 0.594,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.343,
+      "selfTimeMs": 3.82,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.005,
+      "selfTimeMs": 9.322,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.249,
+      "selfTimeMs": 0.419,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.353,
+      "selfTimeMs": 0.449,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.15,
+      "selfTimeMs": 0.078,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.212,
+      "selfTimeMs": 0.043,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.004,
+      "selfTimeMs": 0.132,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.909,
+      "selfTimeMs": 0.248,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.562,
+      "selfTimeMs": 0.063,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": "vw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.41,
+      "selfTimeMs": 0.153,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.261,
+      "selfTimeMs": 4.572,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.66,
+      "selfTimeMs": 2.602,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.815,
+      "selfTimeMs": 0.329,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.776,
+      "selfTimeMs": 0.071,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.76,
+      "selfTimeMs": 1.847,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.387,
+      "selfTimeMs": 0.034,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.231,
+      "selfTimeMs": 0.502,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.181,
+      "selfTimeMs": 0.27,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.165,
+      "selfTimeMs": 0.211,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.157,
+      "selfTimeMs": 0.761,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.151,
+      "selfTimeMs": 0.593,
+      "url": "http://127.0.0.1:5101/assets/index-gTNi33bR.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.936,
+      "selfTimeMs": 0.157,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.933,
+      "selfTimeMs": 1.933,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.692,
+      "selfTimeMs": 1.692,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.666,
+      "selfTimeMs": 0.03,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.393,
+      "selfTimeMs": 0.48,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.337,
+      "selfTimeMs": 0.019,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.3,
+      "selfTimeMs": 1.3,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.246,
+      "selfTimeMs": 1.197,
+      "url": "http://127.0.0.1:5101/assets/form-CxzKYczM.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.223,
+      "selfTimeMs": 0.117,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.222,
+      "selfTimeMs": 0.131,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.198,
+      "selfTimeMs": 0.588,
+      "url": "http://127.0.0.1:5101/assets/index-BriDSFnu.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.184,
+      "selfTimeMs": 1.171,
+      "url": "http://127.0.0.1:5101/assets/folder-DOiv6Tso.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.116,
+      "selfTimeMs": 0.046,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.089,
+      "selfTimeMs": 0.017,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.034,
+      "selfTimeMs": 0.034,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.012,
+      "selfTimeMs": 0.305,
+      "url": "http://127.0.0.1:5101/resource/185020",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.992,
+      "selfTimeMs": 0.979,
+      "url": "http://127.0.0.1:5101/assets/textarea-D0Kho1So.js",
+      "function": null
+    }
+  ]
+}

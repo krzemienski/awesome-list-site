@@ -1,0 +1,518 @@
+{
+  "task": "567",
+  "state": "app.system.empty-search",
+  "width": 375,
+  "route": "/search?q=zzqxv-nothing",
+  "component": "Search",
+  "readySelector": "[data-testid=\"text-no-results\"]",
+  "query": "zzqxv-nothing",
+  "transition": "real public zero-result query",
+  "status": "PASS",
+  "violations": [
+    {
+      "id": "landmark-main-is-top-level",
+      "impact": "moderate",
+      "tags": [
+        "cat.semantics",
+        "best-practice"
+      ],
+      "description": "Ensure the main landmark is at top level",
+      "help": "Main landmark should not be contained in another landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-main-is-top-level?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "landmark-is-top-level",
+              "data": {
+                "role": "main"
+              },
+              "relatedNodes": [],
+              "impact": "moderate",
+              "message": "The main landmark is contained in another landmark."
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "moderate",
+          "html": "<main data-replit-metadata=\"client/src/pages/Search.tsx:241:215\" data-component-name=\"main\" tabindex=\"-1\" aria-label=\"Search results\" class=\"min-w-0 flex-1 outline-none\">",
+          "target": [
+            ".outline-none"
+          ],
+          "failureSummary": "Fix any of the following:\n  The main landmark is contained in another landmark."
+        }
+      ]
+    },
+    {
+      "id": "landmark-no-duplicate-main",
+      "impact": "moderate",
+      "tags": [
+        "cat.semantics",
+        "best-practice"
+      ],
+      "description": "Ensure the document has at most one main landmark",
+      "help": "Document should not have more than one main landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/landmark-no-duplicate-main?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "page-no-duplicate-main",
+              "data": null,
+              "relatedNodes": [
+                {
+                  "html": "<main data-replit-metadata=\"client/src/pages/Search.tsx:241:215\" data-component-name=\"main\" tabindex=\"-1\" aria-label=\"Search results\" class=\"min-w-0 flex-1 outline-none\">",
+                  "target": [
+                    ".outline-none"
+                  ]
+                }
+              ],
+              "impact": "moderate",
+              "message": "Document has more than one main landmark"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "moderate",
+          "html": "<main data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:192:8\" data-component-name=\"main\" id=\"main\" data-product-profile=\"public-discovery\" tabindex=\"-1\" class=\"app-shell-main focus:outline-none\">",
+          "target": [
+            "#main"
+          ],
+          "failureSummary": "Fix any of the following:\n  Document has more than one main landmark"
+        }
+      ]
+    }
+  ],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ],
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/components/layout/new/PageBreadcrumb.tsx:229:10\" data-component-name=\"BreadcrumbLink\" class=\"transition-colors hover:text-foreground\" href=\"/\" title=\"Home\" data-testid=\"link-breadcrumb-home\">Home</a>",
+          "target": [
+            "a[data-component-name=\"BreadcrumbLink\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "21.0pt (28px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h1 data-replit-metadata=\"client/src/pages/Search.tsx:235:152\" data-component-name=\"h1\" class=\"display-h discovery-title\">Search</h1>",
+          "target": [
+            "h1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/Search.tsx:235:205\" data-component-name=\"p\" class=\"discovery-lede text-sm\">A precise index of tools, standards, and ideas for video developers.</p>",
+          "target": [
+            ".discovery-lede"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "12.0pt (16px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<input data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Input\" class=\"flex h-10 w-full rou...\" placeholder=\"Search resources...\" aria-label=\"Search resources\" data-testid=\"input-search-page\" value=\"zzqxv-nothing\">",
+                  "target": [
+                    ".h-10"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<input data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Input\" class=\"flex h-10 w-full rou...\" placeholder=\"Search resources...\" aria-label=\"Search resources\" data-testid=\"input-search-page\" value=\"zzqxv-nothing\">",
+          "target": [
+            ".h-10"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/Search.tsx:237:49\" data-component-name=\"span\" class=\"text-xs text-muted-foreground\">Sort</span>",
+          "target": [
+            ".text-xs.text-muted-foreground[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button type=\"button\" role=\"combobox\" aria-expanded=\"false\" aria-autocomplete=\"none\" dir=\"ltr\" data-state=\"closed\" data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"SelectTrigger\" class=\"flex items-center ju...\" aria-label=\"Sort results\" data-testid=\"select-search-sort\">",
+                  "target": [
+                    ".border-input"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/Search.tsx:237:274\" data-component-name=\"SelectValue\" style=\"pointer-events: none;\">Relevance</span>",
+          "target": [
+            "span[data-component-name=\"SelectValue\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "18.0pt (24px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    "article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h2 data-replit-metadata=\"client/src/pages/Search.tsx:245:171\" data-component-name=\"h2\" class=\"text-sm font-semibold\" data-testid=\"text-no-results\">No resources match this combination</h2>",
+          "target": [
+            "h2[data-testid=\"text-no-results\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    "article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/Search.tsx:245:345\" data-component-name=\"p\" class=\"text-xs text-muted-foreground\">Try broadening your filters or search terms.</p>",
+          "target": [
+            ".p-\\[var\\(--profile-panel-padding\\)\\] > .text-xs"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    "article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<button data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Button\" class=\"inline-flex items-ce...\" data-ds-variant=\"ghost\" data-testid=\"button-clear-search-...\">",
+          "target": [
+            "button[data-testid=\"button-clear-search-query\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Link\" data-testid=\"link-empty-browse-ca...\" data-ds-variant=\"secondary\" href=\"/categories\" class=\"inline-flex items-ce...\">",
+                  "target": [
+                    "a[data-testid=\"link-empty-browse-categories\"]"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    "article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Link\" data-testid=\"link-empty-browse-ca...\" data-ds-variant=\"secondary\" href=\"/categories\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[data-testid=\"link-empty-browse-categories\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Link\" data-testid=\"link-empty-advanced-...\" data-ds-variant=\"secondary\" href=\"/advanced\" class=\"inline-flex items-ce...\">",
+                  "target": [
+                    "a[data-testid=\"link-empty-advanced-discovery\"]"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    "article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/pages/Sea...\" data-component-name=\"Link\" data-testid=\"link-empty-advanced-...\" data-ds-variant=\"secondary\" href=\"/advanced\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[data-testid=\"link-empty-advanced-discovery\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        }
+      ]
+    }
+  ],
+  "passes": 41,
+  "seriousCritical": 0,
+  "source": "docs/parity/evidence/audit-567-expanded/states/audit-567-states.json"
+}

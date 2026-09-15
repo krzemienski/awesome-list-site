@@ -56,5 +56,21 @@ description: Rules for byte-identical full-page captures in headless Chromium (b
   move probe scripts out of the harness dir) BEFORE starting a run.
 - Keep anything that must outlive a run in a git-ignored, watcher-excluded
   workspace dir (`.cache/…`): a workspace restart wipes `/tmp` and everything
-  under `/home/runner` outside the repo. A killed run leaves its disposable
-  identity behind — sweep before the next one.
+  under `/home/runner` outside the repo. A killed runner may leave its
+  disposable identity behind; verify exact-owned teardown before the next
+  run, and never sweep another worker's identities.
+
+## Atomic surface readiness
+
+Assert the intended surface inside the same browser evaluation that samples
+its styles, not only in an earlier visibility wait. Wait for the route's
+actual content before waiting for its entrance animations.
+
+**Why:** A lazy page may mount after a global animation check has already
+passed. An authenticated page may also briefly return to its loading spinner
+after an earlier ready selector was visible, causing a style audit to label
+the spinner as the intended admin panel.
+
+**How to apply:** Keep a component-owned ready marker and route identity in
+the sampling transaction. Retain failed captures, then confirm only the
+affected cell and record the replacement's provenance.

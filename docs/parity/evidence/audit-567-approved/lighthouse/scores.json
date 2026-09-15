@@ -1,0 +1,114 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "preset": "mobile",
+  "categories": [
+    "performance",
+    "accessibility",
+    "best-practices",
+    "seo"
+  ],
+  "routes": {
+    "/": {
+      "scores": {
+        "performance": 0.66,
+        "accessibility": 0.98,
+        "best-practices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 3824,
+        "largestContentfulPaintMs": 4145,
+        "totalBlockingTimeMs": 452,
+        "cumulativeLayoutShift": 0.017204,
+        "speedIndexMs": 3824,
+        "interactiveMs": 5016
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-15T02:55:40.296Z",
+      "finalDisplayedUrl": "http://127.0.0.1:5101/",
+      "formFactor": "mobile",
+      "requestCount": 28,
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [],
+      "blockedWorkers": [],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "reportFile": "home.json",
+      "traceSummaryFile": "home.trace-summary.json"
+    },
+    "/category/encoding-codecs": {
+      "scores": {
+        "performance": 0.59,
+        "accessibility": 1,
+        "best-practices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 2288,
+        "largestContentfulPaintMs": 5357,
+        "totalBlockingTimeMs": 766,
+        "cumulativeLayoutShift": 0,
+        "speedIndexMs": 2288,
+        "interactiveMs": 5484
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-15T02:55:53.723Z",
+      "finalDisplayedUrl": "http://127.0.0.1:5101/category/encoding-codecs",
+      "formFactor": "mobile",
+      "requestCount": 62,
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [],
+      "blockedWorkers": [],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "reportFile": "category-encoding-codecs.json",
+      "traceSummaryFile": "category-encoding-codecs.trace-summary.json"
+    },
+    "/resource/185020": {
+      "scores": {
+        "performance": 0.76,
+        "accessibility": 1,
+        "best-practices": 0.93,
+        "seo": 1
+      },
+      "metrics": {
+        "firstContentfulPaintMs": 2888,
+        "largestContentfulPaintMs": 2964,
+        "totalBlockingTimeMs": 508,
+        "cumulativeLayoutShift": 0.051415,
+        "speedIndexMs": 2888,
+        "interactiveMs": 4253
+      },
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-09-15T02:56:10.256Z",
+      "finalDisplayedUrl": "http://127.0.0.1:5101/resource/185020",
+      "formFactor": "mobile",
+      "requestCount": 55,
+      "blockedRequests": [
+        {
+          "method": "POST",
+          "url": "https://gorgeous-jennet-4.clerk.accounts.dev/v1/dev_browser?__clerk_api_version=2026-05-12&_clerk_js_version=6.31.0"
+        }
+      ],
+      "allowedAuthInitializations": [],
+      "blockedWebSockets": [],
+      "blockedWorkers": [],
+      "blockedPopups": [],
+      "blockedServiceWorkers": [],
+      "reportFile": "resource-185020.json",
+      "traceSummaryFile": "resource-185020.trace-summary.json"
+    }
+  }
+}

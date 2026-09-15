@@ -1,0 +1,111 @@
+Task 567 Stage 6 source/effective-CSS triage. No product files were edited.
+The classifications below use the Stage 6 requirements and the source
+stylesheet declarations; computed browser results remain browser-worker work.
+
+$ rg -n -C 4 '(^|[,{ ])h1([ :.{]|$)|h1\s*\{' client/src/styles --glob '*.css'
+client/src/styles/pages/home.css:752:.home-error h1 {
+client/src/styles/pages/admin-shell.css:9:.admin-dashboard .admin-dashboard__masthead h1 {
+client/src/styles/pages/resource.css:12:.resource-detail-heading h1 {
+
+$ rg -n -C 5 'font-family: var\(--font-display\)|font-family: var\(--font-body\)' client/src/styles/pages/{admin-shell,about,resource,submit,system-legal,system}.css
+client/src/styles/pages/admin-shell.css:9:.admin-dashboard .admin-dashboard__masthead h1 {
+client/src/styles/pages/admin-shell.css:10:  font-family: var(--font-body);
+client/src/styles/pages/about.css:41:.about-title {
+client/src/styles/pages/about.css:43:  font-family: var(--font-body);
+client/src/styles/pages/resource.css:12:.resource-detail-heading h1 {
+client/src/styles/pages/resource.css:14:  font-family: var(--font-body);
+client/src/styles/pages/submit.css:36:.submit-title {
+client/src/styles/pages/submit.css:39:  font-family: var(--font-body);
+client/src/styles/pages/system-legal.css:25:.legal-title {
+client/src/styles/pages/system-legal.css:27:  font-family: var(--font-body);
+client/src/styles/pages/system.css:28:  font-family: var(--font-display);
+
+$ rg -n -C 3 'font-family: var\(--font-body\)' client/src/styles/design-system.css
+122:body {
+128:  font-family: var(--font-body);
+
+$ rg -n -C 3 '^\.display-h' client/src/styles/design-system.css
+154:.display-h {
+155:  font-family: var(--font-display);
+156:  font-weight: var(--display-weight);
+157:  letter-spacing: var(--display-tracking);
+158:  line-height: var(--display-leading);
+
+Effective page-title conclusions:
+- Proven display-token defects: App route-error h1s at App.tsx:243,277;
+  Bookmarks.tsx:362; GuestBookmarks.tsx:104; ContinueLearning.tsx:194;
+  ResourceDetail.tsx:595; SubmitResource.tsx:532. The first four have no
+  display-h class or page selector supplying display metrics. ResourceDetail
+  is explicitly assigned var(--font-body) by resource.css, and SubmitResource
+  is explicitly assigned var(--font-body) by submit.css.
+- Proven effective override defects despite a display-h class:
+  AdminDashboard.tsx:247 under .admin-dashboard__masthead h1;
+  About.tsx:77 under .about-title; Terms.tsx:17, Privacy.tsx:17, and
+  CodeOfConduct.tsx:18 under .legal-title. Each page selector has equal or
+  greater specificity than .display-h and assigns var(--font-body).
+- Not a defect: Home.tsx:302 has display-h and home.css only sets font-size;
+  the display-h font family remains effective. System-state and discovery
+  page selectors use var(--font-display) directly.
+
+The affected page stylesheets are imported by the lazy page modules
+(About.tsx:28, AdminDashboard.tsx:11, ResourceDetail.tsx:56,
+SubmitResource.tsx:50, and the legal pages' system-legal.css imports), while
+the foundation `.display-h` rule is in the entry stylesheet. Their
+same-specificity page selectors therefore arrive as the route CSS and are
+the effective declarations for those rendered headings; this is not inferred
+from the JSX class name alone.
+
+$ sed -n '429,453p' client/src/styles/pages/about.css
+.about-faq-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+...
+.about-faq-trigger:focus-visible {
+  outline-offset: 4px;
+}
+
+$ sed -n '48,78p' client/src/styles/pages/home.css
+button.home-kind-chip {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.65625rem;
+...
+  line-height: var(--body-leading);
+...
+.home-kind-chip[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+$ sed -n '100,114p' client/src/styles/pages/account.css
+.account-page .account-list-item {
+  border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+...
+}
+
+Composite conclusions:
+- ThemeSettings.tsx:215-238, :258-281, :311-336 are tokenized, focus-ringed
+  role-radio cards with multi-part content and card-sized hit areas. They
+  qualify under the Stage 6 composite ladder; no proven primitive defect.
+- About.tsx:485-509 is a tokenized 56px multi-part accordion trigger with
+  global/explicit focus styling. It qualifies as composite chrome; no proven
+  primitive defect from source alone.
+- Bookmarks.tsx:413-428 is a tokenized 72px multi-part interactive card row
+  with the required card-hover hook and global focus ring. It qualifies as a
+  custom card composite; the prior report's hook finding is downgraded.
+- HomePresentation.tsx:193-208 is a tokenized, aria-pressed multi-part chip
+  filter, but it hand-authors data-ds="chip" on a native button. The
+  underlying composite is valid; the manually authored hook remains a narrow
+  contract candidate because the skill explicitly forbids hand-setting DS
+  hooks on non-primitives.

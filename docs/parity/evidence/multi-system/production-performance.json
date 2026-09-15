@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 1,
+  "kind": "task-567-performance-summary",
+  "capturedAt": "2026-09-14T22:20:47.300Z",
+  "production": {
+    "base": "https://awesome.video",
+    "capture": "docs/parity/evidence/audit-567-performance/production-baseline",
+    "command": "npm run baseline:capture -- --base https://awesome.video --only lighthouse --lighthouse-routes /,/category/encoding-codecs,/resource/185020 --out docs/parity/evidence/audit-567-performance/production-baseline --trace-summary",
+    "lighthouseVersion": "12.8.2",
+    "formFactor": "mobile",
+    "readOnlyGuard": {
+      "browserGuardBlockedRequests": 0,
+      "blockedRequestsByRoute": 0,
+      "blockedWebSocketsByRoute": 0,
+      "throttleRetries": 0,
+      "captureFailures": 0
+    },
+    "routes": {
+      "/": {
+        "performance": 0.91,
+        "accessibility": 1,
+        "bestPractices": 1,
+        "seo": 1,
+        "metrics": {
+          "firstContentfulPaintMs": 2457,
+          "largestContentfulPaintMs": 2457,
+          "totalBlockingTimeMs": 184,
+          "cumulativeLayoutShift": 0.063589,
+          "speedIndexMs": 2457,
+          "interactiveMs": 5182
+        },
+        "requestCount": 32,
+        "fetchTime": "2026-09-14T22:19:12.466Z"
+      },
+      "/category/encoding-codecs": {
+        "performance": 0.76,
+        "accessibility": 1,
+        "bestPractices": 1,
+        "seo": 1,
+        "metrics": {
+          "firstContentfulPaintMs": 3213,
+          "largestContentfulPaintMs": 3271,
+          "totalBlockingTimeMs": 419,
+          "cumulativeLayoutShift": 0.01605,
+          "speedIndexMs": 3213,
+          "interactiveMs": 5423
+        },
+        "requestCount": 58,
+        "fetchTime": "2026-09-14T22:19:21.598Z"
+      },
+      "/resource/185020": {
+        "performance": 0.8,
+        "accessibility": 1,
+        "bestPractices": 0.96,
+        "seo": 1,
+        "metrics": {
+          "firstContentfulPaintMs": 3210,
+          "largestContentfulPaintMs": 3210,
+          "totalBlockingTimeMs": 295,
+          "cumulativeLayoutShift": 0.054711,
+          "speedIndexMs": 3210,
+          "interactiveMs": 5457
+        },
+        "requestCount": 55,
+        "fetchTime": "2026-09-14T22:19:32.813Z"
+      }
+    }
+  },
+  "local": {
+    "devWorkflow": {
+      "base": "http://127.0.0.1:5000",
+      "capture": "docs/parity/evidence/audit-567-performance/local-baseline",
+      "command": "npm run baseline:capture -- --base http://127.0.0.1:5000 --only lighthouse --lighthouse-routes /,/category/encoding-codecs,/resource/185020 --out docs/parity/evidence/audit-567-performance/local-baseline --trace-summary",
+      "lighthouseVersion": "12.8.2",
+      "formFactor": "mobile",
+      "routes": {
+        "/": {
+          "performance": 0.61,
+          "accessibility": 0.98,
+          "bestPractices": 0.96,
+          "seo": 1,
+          "metrics": {
+            "firstContentfulPaintMs": 2619,
+            "largestContentfulPaintMs": 2619,
+            "totalBlockingTimeMs": 1254,
+            "cumulativeLayoutShift": 0.009721,
+            "speedIndexMs": 7462,
+            "interactiveMs": 10791
+          },
+          "requestCount": 144,
+          "blockedRequests": 1,
+          "blockedWebSockets": 1,
+          "fetchTime": "2026-09-14T22:19:50.606Z"
+        },
+        "/category/encoding-codecs": {
+          "performance": 0.45,
+          "accessibility": 1,
+          "bestPractices": 0.96,
+          "seo": 1,
+          "metrics": {
+            "firstContentfulPaintMs": 1701,
+            "largestContentfulPaintMs": 13394,
+            "totalBlockingTimeMs": 2309,
+            "cumulativeLayoutShift": 0.020391,
+            "speedIndexMs": 2805,
+            "interactiveMs": 13394
+          },
+          "requestCount": 189,
+          "blockedRequests": 1,
+          "blockedWebSockets": 1,
+          "fetchTime": "2026-09-14T22:20:11.673Z"
+        },
+        "/resource/185020": {
+          "performance": 0.73,
+          "accessibility": 1,
+          "bestPractices": 0.96,
+          "seo": 1,
+          "metrics": {
+            "firstContentfulPaintMs": 1686,
+            "largestContentfulPaintMs": 1835,
+            "totalBlockingTimeMs": 1378,
+            "cumulativeLayoutShift": 0.031781,
+            "speedIndexMs": 2692,
+            "interactiveMs": 11850
+          },
+          "requestCount": 170,
+          "blockedRequests": 1,
+          "blockedWebSockets": 1,
+          "fetchTime": "2026-09-14T22:20:34.825Z"
+        }
+      },
+      "caveat": "The strict read-only guard refused one external auth initialization POST and one local development WebSocket per route. These are retained as refusal metadata, not treated as product writes."
+    },
+    "compiledComparableServer": {
+      "base": "http://127.0.0.1:5101",
+      "capture": "docs/parity/evidence/audit-567-performance/local-compiled-home",
+      "command": "npm run baseline:capture -- --base http://127.0.0.1:5101 --only lighthouse --lighthouse-routes / --out docs/parity/evidence/audit-567-performance/local-compiled-home --trace-summary",
+      "lighthouseVersion": "12.8.2",
+      "formFactor": "mobile",
+      "routes": {
+        "/": {
+          "performance": 0.87,
+          "accessibility": 0.98,
+          "bestPractices": 0.96,
+          "seo": 1,
+          "metrics": {
+            "firstContentfulPaintMs": 2558,
+            "largestContentfulPaintMs": 2637,
+            "totalBlockingTimeMs": 291,
+            "cumulativeLayoutShift": 0.001386,
+            "speedIndexMs": 2558,
+            "interactiveMs": 5031
+          },
+          "requestCount": 23,
+          "blockedRequests": 1,
+          "blockedWebSockets": 0,
+          "fetchTime": "2026-09-14T22:26:17.784Z"
+        }
+      },
+      "unresolvedRoutes": [
+        "/category/encoding-codecs",
+        "/resource/185020"
+      ],
+      "failedThreeRouteAttempt": {
+        "capture": "docs/parity/evidence/audit-567-performance/local-compiled-baseline",
+        "command": "npm run baseline:capture -- --base http://127.0.0.1:5101 --only lighthouse --lighthouse-routes /,/category/encoding-codecs,/resource/185020 --out docs/parity/evidence/audit-567-performance/local-compiled-baseline --trace-summary",
+        "navigations": 1,
+        "failures": 1,
+        "failure": "Protocol error (Runtime.evaluate): Protocol error (Runtime.evaluate): Target closed"
+      },
+      "caveat": "The compiled-server three-route attempt is retained at docs/parity/evidence/audit-567-performance/local-compiled-baseline/manifest.json. It ended after one navigation with Protocol error (Runtime.evaluate): Target closed; this is an infrastructure failure and supplies no category or resource score."
+    }
+  },
+  "threshold": {
+    "rule": "local performance must be at least production performance minus 0.03 for every requested route",
+    "routes": {
+      "/": {
+        "production": 0.91,
+        "minimumLocal": 0.88,
+        "compiledLocal": 0.87,
+        "compiledPass": false
+      },
+      "/category/encoding-codecs": {
+        "production": 0.76,
+        "minimumLocal": 0.73,
+        "compiledLocal": null,
+        "compiledPass": false,
+        "status": "unresolved"
+      },
+      "/resource/185020": {
+        "production": 0.8,
+        "minimumLocal": 0.77,
+        "compiledLocal": null,
+        "compiledPass": false,
+        "status": "unresolved"
+      }
+    },
+    "overallPass": false,
+    "verdict": "Not met; compiled Home is 0.87 versus the required 0.88, and compiled category/resource remain unresolved."
+  },
+  "cdpMobileAudit": {
+    "report": "docs/parity/evidence/audit-567-performance/perf-mobile-local.json",
+    "command": "PERF_BASE_URL=http://127.0.0.1:5000 PERF_RUNS=3 npm run perf:mobile -- --json docs/parity/evidence/audit-567-performance/perf-mobile-local.json",
+    "classification": "CDP metrics audit, not Lighthouse and not a Lighthouse score",
+    "profile": {
+      "viewport": "390x844@2x",
+      "latencyMs": 150,
+      "downloadMbps": 1.6,
+      "uploadKbps": 750,
+      "cpuSlowdown": 4,
+      "cacheDisabled": true,
+      "runs": 3
+    },
+    "median": {
+      "domContentLoadedMs": 7771,
+      "homeReadyMs": 9591,
+      "scriptEvaluationMs": 1090,
+      "taskDurationMs": 2529,
+      "scriptTransferBytes": 1353531,
+      "decodedScriptBytes": 5375466,
+      "fontStylesheetRequests": 1,
+      "fontRequests": 3,
+      "fontTransferBytes": 119994,
+      "categoryReadyMs": 13732,
+      "categoryTransitionMs": 4128,
+      "categoryScriptEvaluationMs": 1876,
+      "categoryTaskDurationMs": 4381,
+      "categoryScriptTransferBytes": 1923887,
+      "categoryDecodedScriptBytes": 7013064
+    }
+  },
+  "safety": {
+    "productionCaptureReadOnly": true,
+    "sensitiveValuesPersisted": false,
+    "noProductEdits": true,
+    "noPublishing": true
+  }
+}

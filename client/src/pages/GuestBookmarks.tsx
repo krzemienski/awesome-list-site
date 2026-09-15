@@ -101,7 +101,7 @@ export default function GuestBookmarks() {
           <div className="account-empty-icon p-6 mb-6 inline-flex">
             <BookmarkX className="h-12 w-12 text-primary" aria-hidden="true" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Nothing saved on this device</h1>
+          <h1 className="display-h text-2xl mb-2">Nothing saved on this device</h1>
           <p className="text-muted-foreground mb-5">
             Tap the bookmark icon on any resource to save it — no account needed.
             Sign in to keep your saves across devices.

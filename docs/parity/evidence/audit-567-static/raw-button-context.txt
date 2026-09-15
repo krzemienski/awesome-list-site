@@ -1,0 +1,704 @@
+client/src/App.tsx-254-              data-testid="text-still-offline"
+client/src/App.tsx-255-            >
+client/src/App.tsx-256-              Still offline — reconnect and try again.
+client/src/App.tsx-257-            </p>
+client/src/App.tsx-258-          )}
+client/src/App.tsx:259:          <button
+client/src/App.tsx-260-            type="button"
+client/src/App.tsx-261-            onClick={this.handleRetry}
+client/src/App.tsx-262-            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+client/src/App.tsx-263-            data-testid="button-route-retry"
+client/src/App.tsx-264-          >
+--
+client/src/App.tsx-277-        <h1 className="text-xl font-semibold">Something went wrong on this page</h1>
+client/src/App.tsx-278-        <p className="max-w-md text-sm text-muted-foreground">
+client/src/App.tsx-279-          The rest of the site still works. You can retry this page or head back home.
+client/src/App.tsx-280-        </p>
+client/src/App.tsx-281-        <div className="flex gap-3">
+client/src/App.tsx:282:          <button
+client/src/App.tsx-283-            type="button"
+client/src/App.tsx-284-            onClick={this.handleRetry}
+client/src/App.tsx-285-            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+client/src/App.tsx-286-            data-testid="button-route-retry"
+client/src/App.tsx-287-          >
+--
+client/src/App.tsx-635-          className="mb-4 flex flex-wrap items-center gap-3 border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm"
+client/src/App.tsx-636-          role="alert"
+client/src/App.tsx-637-          data-testid="banner-auth-error"
+client/src/App.tsx-638-        >
+client/src/App.tsx-639-          <span>We couldn't verify your sign-in status. You can keep browsing as a guest.</span>
+client/src/App.tsx:640:          <button
+client/src/App.tsx-641-            type="button"
+client/src/App.tsx-642-            className="underline underline-offset-2 font-medium"
+client/src/App.tsx-643-            onClick={() => refetchAuth()}
+client/src/App.tsx-644-            data-testid="button-auth-retry"
+client/src/App.tsx-645-          >
+--
+client/src/components/home/HomePresentation.tsx-188-      className="home-kind-strip"
+client/src/components/home/HomePresentation.tsx-189-      data-testid="home-kind-strip"
+client/src/components/home/HomePresentation.tsx-190-      aria-label="Content types in this index"
+client/src/components/home/HomePresentation.tsx-191-    >
+client/src/components/home/HomePresentation.tsx-192-      {STRIP_KINDS.map((kind) => (
+client/src/components/home/HomePresentation.tsx:193:        <button
+client/src/components/home/HomePresentation.tsx-194-          key={kind}
+client/src/components/home/HomePresentation.tsx-195-          type="button"
+client/src/components/home/HomePresentation.tsx-196-          className="home-kind-chip chip"
+client/src/components/home/HomePresentation.tsx-197-          data-ds="chip"
+client/src/components/home/HomePresentation.tsx-198-          data-testid={`home-kind-chip-${kind}`}
+--
+client/src/components/resource/ResourceCard.tsx-336-                </Link>
+client/src/components/resource/ResourceCard.tsx-337-              ))}
+client/src/components/resource/ResourceCard.tsx-338-              {/* Run15 BUG-022: "+N more" is now a real control — clicking it
+client/src/components/resource/ResourceCard.tsx-339-                  reveals the remaining tags (and can collapse them again). */}
+client/src/components/resource/ResourceCard.tsx-340-              {resource.tags.length > 3 && (
+client/src/components/resource/ResourceCard.tsx:341:                <button
+client/src/components/resource/ResourceCard.tsx-342-                  type="button"
+client/src/components/resource/ResourceCard.tsx-343-                  className="resource-card__more-tags relative z-10"
+client/src/components/resource/ResourceCard.tsx-344-                  onClick={(e) => {
+client/src/components/resource/ResourceCard.tsx-345-                    e.stopPropagation();
+client/src/components/resource/ResourceCard.tsx-346-                    setShowAllTags((v) => !v);
+--
+client/src/pages/Contributions.tsx-751-          <Alert className="mb-4" data-testid="notice-contribution-page-adjusted">
+client/src/pages/Contributions.tsx-752-            <RefreshCw className="h-4 w-4" />
+client/src/pages/Contributions.tsx-753-            <AlertTitle>Page adjusted</AlertTitle>
+client/src/pages/Contributions.tsx-754-            <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
+client/src/pages/Contributions.tsx-755-              <span>{pageNotice}</span>
+client/src/pages/Contributions.tsx:756:              <button
+client/src/pages/Contributions.tsx-757-                type="button"
+client/src/pages/Contributions.tsx-758-                onClick={() => setPageNotice(null)}
+client/src/pages/Contributions.tsx-759-                className="min-h-8 underline underline-offset-4"
+client/src/pages/Contributions.tsx-760-              >
+client/src/pages/Contributions.tsx-761-                Dismiss
+--
+client/src/components/admin/ExportTab.tsx-551-
+client/src/components/admin/ExportTab.tsx-552-              <div className="mt-4 space-y-2">
+client/src/components/admin/ExportTab.tsx-553-                {validationStatus.awesomeLint.errors.length > 0 && (
+client/src/components/admin/ExportTab.tsx-554-                  <div>
+client/src/components/admin/ExportTab.tsx-555-                    {/* Run16 BUG-073: expanders get a ≥44px touch target. */}
+client/src/components/admin/ExportTab.tsx:556:                    <button
+client/src/components/admin/ExportTab.tsx-557-                      onClick={() => setShowErrors(!showErrors)}
+client/src/components/admin/ExportTab.tsx-558-                      className="admin-ops-validation-expander admin-ops-validation-expander--bad"
+client/src/components/admin/ExportTab.tsx-559-                    >
+client/src/components/admin/ExportTab.tsx-560-                      {showErrors ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+client/src/components/admin/ExportTab.tsx-561-                      Errors ({validationStatus.awesomeLint.errors.length})
+--
+client/src/components/admin/ExportTab.tsx-585-                )}
+client/src/components/admin/ExportTab.tsx-586-
+client/src/components/admin/ExportTab.tsx-587-                {validationStatus.awesomeLint.warnings.length > 0 && (
+client/src/components/admin/ExportTab.tsx-588-                  <div>
+client/src/components/admin/ExportTab.tsx-589-                    {/* Run16 BUG-073: 140×20px expander → ≥44px touch target. */}
+client/src/components/admin/ExportTab.tsx:590:                    <button
+client/src/components/admin/ExportTab.tsx-591-                      onClick={() => setShowWarnings(!showWarnings)}
+client/src/components/admin/ExportTab.tsx-592-                      className="admin-ops-validation-expander admin-ops-validation-expander--warn"
+client/src/components/admin/ExportTab.tsx-593-                    >
+client/src/components/admin/ExportTab.tsx-594-                      {showWarnings ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+client/src/components/admin/ExportTab.tsx-595-                      Warnings ({validationStatus.awesomeLint.warnings.length})
+--
+client/src/pages/JourneyDetail.tsx-546-            <Alert className="journey-enroll-note mt-6">
+client/src/pages/JourneyDetail.tsx-547-              <AlertCircle className="h-4 w-4" />
+client/src/pages/JourneyDetail.tsx-548-              <AlertDescription>
+client/src/pages/JourneyDetail.tsx-549-                {/* R5-027 (run24): print-keep-text — in print this button's
+client/src/pages/JourneyDetail.tsx-550-                    text stays inline so the sentence prints grammatically. */}
+client/src/pages/JourneyDetail.tsx:551:                Please <button 
+client/src/pages/JourneyDetail.tsx-552-                  className="print-keep-text underline font-medium min-h-[44px] px-2 inline-flex items-center"
+client/src/pages/JourneyDetail.tsx-553-                  onClick={() => {
+client/src/pages/JourneyDetail.tsx-554-                    // P1-08: mirror /submit's auth hand-off — route to the
+client/src/pages/JourneyDetail.tsx-555-                    // canonical /sign-in with a redirect_url back to this
+client/src/pages/JourneyDetail.tsx-556-                    // journey (same /^\/(?![/\\])/ safe-path guard the legacy
+--
+client/src/pages/Bookmarks.tsx-408-          ["watch-next", "Watch next", counts["watch-next"]],
+client/src/pages/Bookmarks.tsx-409-          ["in-progress", "In progress", counts["in-progress"]],
+client/src/pages/Bookmarks.tsx-410-          ["done", "Done", counts.done],
+client/src/pages/Bookmarks.tsx-411-          ["archived", "Archived", counts.archived],
+client/src/pages/Bookmarks.tsx-412-        ] as const).map(([key, label, count]) => (
+client/src/pages/Bookmarks.tsx:413:          <button
+client/src/pages/Bookmarks.tsx-414-            key={key}
+client/src/pages/Bookmarks.tsx-415-            type="button"
+client/src/pages/Bookmarks.tsx-416-            data-ds="card-hover"
+client/src/pages/Bookmarks.tsx-417-            className="account-list-item min-h-[72px] px-4 py-3 text-left"
+client/src/pages/Bookmarks.tsx-418-            onClick={() => {
+--
+client/src/pages/Bookmarks.tsx-432-      </section>
+client/src/pages/Bookmarks.tsx-433-
+client/src/pages/Bookmarks.tsx-434-      <div className="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-6">
+client/src/pages/Bookmarks.tsx-435-        <aside className="hidden lg:block" aria-label="Bookmark collections">
+client/src/pages/Bookmarks.tsx-436-          <div className="account-collection-panel sticky top-24 space-y-2 p-3">
+client/src/pages/Bookmarks.tsx:437:            <button
+client/src/pages/Bookmarks.tsx-438-              type="button"
+client/src/pages/Bookmarks.tsx-439-              aria-pressed={collectionFilter === "all"}
+client/src/pages/Bookmarks.tsx-440-              className={`account-collection-button flex min-h-11 w-full items-center justify-between px-3 text-left text-sm ${
+client/src/pages/Bookmarks.tsx-441-                collectionFilter === "all" ? "account-collection-button--active" : ""
+client/src/pages/Bookmarks.tsx-442-              }`}
+--
+client/src/pages/Bookmarks.tsx-448-              </span>
+client/src/pages/Bookmarks.tsx-449-              <span>{bookmarks.length}</span>
+client/src/pages/Bookmarks.tsx-450-            </button>
+client/src/pages/Bookmarks.tsx-451-            {collections.map((collection, index) => (
+client/src/pages/Bookmarks.tsx-452-              <div key={collection.id} className="flex items-center gap-1">
+client/src/pages/Bookmarks.tsx:453:                <button
+client/src/pages/Bookmarks.tsx-454-                  type="button"
+client/src/pages/Bookmarks.tsx-455-                  aria-pressed={collectionFilter === String(collection.id)}
+client/src/pages/Bookmarks.tsx-456-                  className={`account-collection-button min-h-11 min-w-0 flex-1 px-3 text-left text-sm ${
+client/src/pages/Bookmarks.tsx-457-                    collectionFilter === String(collection.id)
+client/src/pages/Bookmarks.tsx-458-                      ? "account-collection-button--active"
+--
+client/src/pages/Search.tsx-235-    <header className="discovery-header space-y-4"><div className="flex items-center gap-3"><SearchIcon className="h-6 w-6 text-[var(--accent)]" /><div><h1 className="display-h discovery-title">Search</h1><p className="discovery-lede text-sm">A precise index of tools, standards, and ideas for video developers.</p></div></div>
+client/src/pages/Search.tsx-236-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center"><div className="relative min-w-0 flex-1"><SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input ref={inputRef} value={input} onChange={e => { pristine.current = false; setInput(e.target.value); }} onMouseDown={() => { pristine.current = false; }} onKeyDown={e => { if (e.key === "/" && pristine.current && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); window.dispatchEvent(new Event("awesome:open-search-palette")); } if (e.key === "Escape" && input) { e.preventDefault(); setInput(""); } pristine.current = false; }} placeholder="Search resources..." className="min-h-11 pl-10" aria-label="Search resources" data-testid="input-search-page" /></div>
+client/src/pages/Search.tsx-237-        <div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">Sort</span><Select value={state.sort} onValueChange={v => update("sort", v)}><SelectTrigger className="min-h-11 w-36" aria-label="Sort results" data-testid="select-search-sort"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(sortLabels).map(([v, text]) => <SelectItem key={v} value={v}>{text}</SelectItem>)}</SelectContent></Select></div></div>
+client/src/pages/Search.tsx-238-    </header>
+client/src/pages/Search.tsx-239-    <ActiveFilters state={state} onChange={update} onClear={() => clearFilters()} />
+client/src/pages/Search.tsx:240:    {pageNotice && <div className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm" role="status" data-testid="notice-page-adjusted"><span>{pageNotice}</span><button className="min-h-8 underline" onClick={() => setPageNotice(null)} data-testid="button-dismiss-page-notice">Dismiss</button></div>}
+client/src/pages/Search.tsx-241-    <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:gap-6"><SearchFilters state={state} facets={data?.facets ?? lastFacets.current} onChange={update} onClear={() => clearFilters()} /><main ref={resultsRef} tabIndex={-1} aria-label="Search results" className="min-w-0 flex-1 outline-none">
+client/src/pages/Search.tsx-242-      {!shouldShowResults ? <Card data-testid="text-search-prompt"><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold">{normalized.length === 1 ? "Keep typing to search" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">{normalized.length === 1 ? "Type at least 2 characters, or choose a filter to browse." : "Narrow the catalog by category, provider, format, skill level, or tag."}</p><Button asChild variant="outline"><Link href="/categories">Browse categories</Link></Button></CardContent></Card>
+client/src/pages/Search.tsx-243-       : query.isLoading ? <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))]" data-testid="search-results-loading" aria-busy="true">{Array.from({ length: 6 }).map((_, i) => <ResourceCardSkeleton key={i} />)}</div>
+client/src/pages/Search.tsx-244-       : query.isError ? <Card data-testid="search-results-error"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent)]" /><p className="text-sm text-muted-foreground">{invalid ? query.error.message : "Search failed. Please try again."}</p><Button variant="outline" onClick={invalid ? clearInvalidRequest : () => query.refetch()} data-testid={invalid ? "button-clear-invalid-filters" : "button-retry-search"}>{invalid ? "Clear invalid filters" : "Try again"}</Button></CardContent></Card>
+client/src/pages/Search.tsx-245-        : results.length === 0 ? <Card><CardContent className="flex flex-col items-center gap-3 py-12 text-center"><SearchIcon className="h-8 w-8 text-muted-foreground" /><h2 className="text-sm font-semibold" data-testid="text-no-results">{normalized || canBrowse ? "No resources match this combination" : "Enter a query or choose filters"}</h2><p className="text-xs text-muted-foreground">Try broadening your filters or search terms.</p><div className="flex flex-wrap justify-center gap-2">{hasActiveFilters && <Button variant="outline" onClick={() => clearFilters()} data-testid="button-clear-search-filters">Clear filters</Button>}{normalized && <Button variant="ghost" onClick={clearSearch} data-testid="button-clear-search-query">Clear search</Button>}<Button asChild variant="secondary"><Link href="/categories" data-testid="link-empty-browse-categories">Browse categories</Link></Button><Button asChild variant="secondary"><Link href="/advanced" data-testid="link-empty-advanced-discovery">Advanced discovery</Link></Button></div></CardContent></Card>
+--
+client/src/components/admin/AgentEventLog.tsx-143-                          {isLong ? `${clean.slice(0, SUMMARY_MAX)}…` : clean}
+client/src/components/admin/AgentEventLog.tsx-144-                        </span>
+client/src/components/admin/AgentEventLog.tsx-145-                      );
+client/src/components/admin/AgentEventLog.tsx-146-                    })()}
+client/src/components/admin/AgentEventLog.tsx-147-                    {showDetail && (
+client/src/components/admin/AgentEventLog.tsx:148:                      <button
+client/src/components/admin/AgentEventLog.tsx-149-                        type="button"
+client/src/components/admin/AgentEventLog.tsx-150-                        onClick={() => toggle(ev.id)}
+client/src/components/admin/AgentEventLog.tsx-151-                        className="shrink-0 text-muted-foreground hover:text-foreground"
+client/src/components/admin/AgentEventLog.tsx-152-                        aria-label={isOpen ? `Hide detail for event ${ev.seq}` : `Show detail for event ${ev.seq}`}
+client/src/components/admin/AgentEventLog.tsx-153-                        data-testid={`button-toggle-detail-${ev.seq}`}
+--
+client/src/pages/Advanced.tsx-300-                  { format: "HTML", value: "html", icon: BookOpen, desc: "Web-ready" },
+client/src/pages/Advanced.tsx-301-                  { format: "YAML", value: "yaml", icon: Settings, desc: "Config files" }
+client/src/pages/Advanced.tsx-302-                ] as const).map(item => {
+client/src/pages/Advanced.tsx-303-                  const FormatIcon = item.icon;
+client/src/pages/Advanced.tsx-304-                  return (
+client/src/pages/Advanced.tsx:305:                    <button
+client/src/pages/Advanced.tsx-306-                      key={item.format}
+client/src/pages/Advanced.tsx-307-                      type="button"
+client/src/pages/Advanced.tsx-308-                      onClick={() => setExportFormat(item.value)}
+client/src/pages/Advanced.tsx-309-                      aria-pressed={exportFormat === item.value}
+client/src/pages/Advanced.tsx-310-                      aria-label={`Select ${item.format} export format`}
+--
+client/src/pages/Recommendations.tsx-138-                Signed-in recommendations use your skill level, topics, goals, and the
+client/src/pages/Recommendations.tsx-139-                feedback you leave on resources.
+client/src/pages/Recommendations.tsx-140-              </CardDescription>
+client/src/pages/Recommendations.tsx-141-            </CardHeader>
+client/src/pages/Recommendations.tsx-142-            <CardContent className="discovery-tools-panel-content">
+client/src/pages/Recommendations.tsx:143:              {/* BUG-049 (run26): asChild — no <a>-wrapping-<button> nesting. */}
+client/src/pages/Recommendations.tsx-144-              <Button asChild className="w-full sm:w-auto" data-testid="button-login-to-get-started">
+client/src/pages/Recommendations.tsx-145-                <Link href="/sign-in">
+client/src/pages/Recommendations.tsx-146-                  <LogIn className="mr-2 h-4 w-4" />
+client/src/pages/Recommendations.tsx-147-                  Sign in
+client/src/pages/Recommendations.tsx-148-                </Link>
+--
+client/src/pages/Home.tsx-801-        filters={filters}
+client/src/pages/Home.tsx-802-        emptyTagParamNotice={
+client/src/pages/Home.tsx-803-          emptyTagParamNotice && selectedTags.length === 0 ? (
+client/src/pages/Home.tsx-804-            <div className="home-empty-tag-notice" role="status" data-testid="notice-empty-tag-param">
+client/src/pages/Home.tsx-805-              <span>The tag filter in the link you followed was empty, so it was ignored.</span>
+client/src/pages/Home.tsx:806:              <button
+client/src/pages/Home.tsx-807-                type="button"
+client/src/pages/Home.tsx-808-                className="underline underline-offset-2"
+client/src/pages/Home.tsx-809-                onClick={() => setEmptyTagParamNotice(false)}
+client/src/pages/Home.tsx-810-                data-testid="button-dismiss-empty-tag-param"
+client/src/pages/Home.tsx-811-              >
+--
+client/src/components/search/SearchFilters.tsx-84-  // works. A deep-linked ?provider=unknown selection still renders here (so its
+client/src/components/search/SearchFilters.tsx-85-  // active state / removal chip stays reachable); the API + chips are untouched.
+client/src/components/search/SearchFilters.tsx-86-  const onlyUnclassified = items.every((item) => item.value === "unknown");
+client/src/components/search/SearchFilters.tsx-87-  if (collapseInert && onlyUnclassified && value !== "unknown") return null;
+client/src/components/search/SearchFilters.tsx-88-  return <FacetGroup title={title} testid={testid} collapsible={collapsible} defaultOpen={defaultOpen} forceOpen={Boolean(value)} bodyClassName={cn(items.length > 6 && "max-h-64 overflow-y-auto overscroll-contain pr-1")}>
+client/src/components/search/SearchFilters.tsx:89:    {items.map(item => <button type="button" key={item.value} onClick={() => onSelect(value === item.value ? "" : item.value)} className={cn("flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm transition-colors hover:bg-muted", value === item.value && "bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)]")} aria-pressed={value === item.value} aria-label={`${value === item.value ? "Remove" : "Apply"} ${item.label} ${title.toLowerCase()} filter, ${item.count} results`} data-testid={`facet-${testid}-${item.value}`}>
+client/src/components/search/SearchFilters.tsx-90-      <span className="flex min-w-0 items-center gap-2">{value === item.value ? <Check className="h-3.5 w-3.5 shrink-0" /> : <span className="w-3.5" />}<span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span>
+client/src/components/search/SearchFilters.tsx-91-    </button>)}
+client/src/components/search/SearchFilters.tsx-92-  </FacetGroup>;
+client/src/components/search/SearchFilters.tsx-93-}
+client/src/components/search/SearchFilters.tsx-94-
+--
+client/src/components/search/SearchFilters.tsx-124-    <FacetList title="Skill level" items={options(facets?.skillLevels, state.skillLevel, RESOURCE_SKILL_LEVEL_LABELS)} value={state.skillLevel} onSelect={v => applyChange("skillLevel", v)} testid="skill-level" collapseInert={hideTaxonomyFacets} />
+client/src/components/search/SearchFilters.tsx-125-    <FacetGroup title="Tags" collapsible={collapsible} defaultOpen={false} forceOpen={state.tags.length > 0} bodyClassName="space-y-2">
+client/src/components/search/SearchFilters.tsx-126-      <div className="relative"><Search className="absolute left-2.5 top-3.5 h-4 w-4 text-muted-foreground" /><Input value={tagSearch} onChange={e => setTagSearch(e.target.value)} placeholder="Find a tag" className="h-11 pl-8" aria-label="Search tags" data-testid="input-search-tags" /></div>
+client/src/components/search/SearchFilters.tsx-127-      <div className="max-h-56 overflow-y-auto pr-1">{tags.slice(0, TAG_LIMIT).map(item => {
+client/src/components/search/SearchFilters.tsx-128-        const selected = state.tags.some(t => t.toLowerCase() === item.value.toLowerCase());
+client/src/components/search/SearchFilters.tsx:129:        return <button type="button" key={item.value} className="flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-muted" aria-pressed={selected} aria-label={`${selected ? "Remove" : "Apply"} ${item.label} tag filter`} onClick={() => applyChange("tags", selected ? state.tags.filter(t => t.toLowerCase() !== item.value.toLowerCase()) : [...state.tags, item.value])}><span className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border", selected && "border-[var(--accent)] bg-[var(--accent)] text-black")}>{selected && <Check className="h-3 w-3" />}</span><span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span></button>;
+client/src/components/search/SearchFilters.tsx-130-      })}</div>
+client/src/components/search/SearchFilters.tsx-131-      {tags.length > TAG_LIMIT && <p className="px-2 text-xs text-muted-foreground">Showing {TAG_LIMIT} of {tags.length} tags. Refine your tag search to see more.</p>}
+client/src/components/search/SearchFilters.tsx-132-    </FacetGroup>
+client/src/components/search/SearchFilters.tsx-133-  </div>;
+client/src/components/search/SearchFilters.tsx-134-  return <><aside className="hidden w-64 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 lg:block">{content(true)}</aside>
+--
+client/src/components/search/SearchFilters.tsx-141-  if (state.sort && state.sort !== defaultSort && !(state.sort in RESOURCE_SEARCH_SORT_LABELS)) {
+client/src/components/search/SearchFilters.tsx-142-    chips.push({ key: "sort", value: state.sort, text: `Unsupported sort: ${state.sort}` });
+client/src/components/search/SearchFilters.tsx-143-  }
+client/src/components/search/SearchFilters.tsx-144-  state.tags.forEach(tag => chips.push({ key: "tags", value: tag, text: `Tag: ${tag}` }));
+client/src/components/search/SearchFilters.tsx-145-  if (!chips.length) return null;
+client/src/components/search/SearchFilters.tsx:146:  return <div className="flex flex-wrap items-center gap-2" data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 text-xs hover:border-[var(--accent)]" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div>;
+client/src/components/search/SearchFilters.tsx-147-}
+client/src/components/search/SearchFilters.tsx-148-
+client/src/components/search/SearchFilters.tsx-149-export const sortLabels = RESOURCE_SEARCH_SORT_LABELS as Record<string, string>;
+--
+client/src/pages/Privacy.tsx-69-            </p>
+client/src/pages/Privacy.tsx-70-            {/* R5-025 (run24): in-product consent-reset control — re-opens the
+client/src/pages/Privacy.tsx-71-                banner so a persisted Accept/Decline can be changed anytime. */}
+client/src/pages/Privacy.tsx-72-            <p>
+client/src/pages/Privacy.tsx-73-              Changed your mind?{" "}
+client/src/pages/Privacy.tsx:74:              <button
+client/src/pages/Privacy.tsx-75-                type="button"
+client/src/pages/Privacy.tsx-76-                onClick={openCookieSettings}
+client/src/pages/Privacy.tsx-77-                className="legal-inline-link inline-flex items-center min-h-[24px] underline underline-offset-4 hover:text-[color:var(--text)]"
+client/src/pages/Privacy.tsx-78-                data-testid="button-privacy-cookie-settings"
+client/src/pages/Privacy.tsx-79-              >
+--
+client/src/pages/About.tsx-480-                const isOpen = openFaqs.has(faqIndex);
+client/src/pages/About.tsx-481-                const buttonId = `about-faq-button-${faqIndex}`;
+client/src/pages/About.tsx-482-                const panelId = `about-faq-panel-${faqIndex}`;
+client/src/pages/About.tsx-483-                return (
+client/src/pages/About.tsx-484-                  <div key={faq.question} className="about-faq-item">
+client/src/pages/About.tsx:485:                    <button
+client/src/pages/About.tsx-486-                      type="button"
+client/src/pages/About.tsx-487-                      id={buttonId}
+client/src/pages/About.tsx-488-                      className="about-faq-trigger"
+client/src/pages/About.tsx-489-                      aria-expanded={isOpen}
+client/src/pages/About.tsx-490-                      aria-controls={panelId}
+--
+client/src/pages/TaxonomyListing.tsx-475-        <div ref={resultsRef} tabIndex={-1} className="space-y-4 outline-none" aria-busy={resultsLoading} aria-labelledby="taxonomy-results-heading" data-testid="taxonomy-results-region">
+client/src/pages/TaxonomyListing.tsx-476-          {/* The listing's single count statement: visible range, matching total,
+client/src/pages/TaxonomyListing.tsx-477-              and — only while a filter narrows the collection — what it was
+client/src/pages/TaxonomyListing.tsx-478-              narrowed from. */}
+client/src/pages/TaxonomyListing.tsx-479-          <div className="flex items-center justify-between gap-2"><h2 id="taxonomy-results-heading" className="text-sm font-medium text-muted-foreground" data-testid="text-results-count" data-total={total}>Showing {total === 0 ? "0" : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, total)}`} of {total} {resourceNoun(total)}{total !== listingData.totalAll ? ` (filtered from ${listingData.totalAll})` : ""}</h2><ViewModeToggle value={view} onChange={(mode) => { setView(mode); safeSetItem("awesome-list-view-mode", mode); }} /></div>
+client/src/pages/TaxonomyListing.tsx:480:          {notice && <div role="status" data-testid="notice-page-adjusted" className="rounded border p-3 text-sm">{notice}<button className="ml-2 min-h-8 underline" onClick={() => setNotice(null)}>Dismiss</button></div>}
+client/src/pages/TaxonomyListing.tsx:481:          {(listingData.scope.ignoredSubcategory || listingData.scope.ignoredSubSubcategory) && <div role="status" data-testid="notice-unknown-subcategory" className="rounded border p-3 text-sm">“{selection}” isn't a subcategory of {name}, so that filter was ignored.<button className="ml-2 min-h-8 underline" onClick={broadenScope}>Remove it</button></div>}
+client/src/pages/TaxonomyListing.tsx-482-          {serverSearchActive && !taxonomySearch.isPlaceholderData && taxonomySearch.data?.search?.mode === "fuzzy" && taxonomySearch.data.search.suggestion && <div className="flex flex-wrap items-center justify-center gap-2 rounded border p-3 text-sm" role="status" data-testid="notice-taxonomy-search-suggestion"><span>No exact matches. Did you mean</span><Button variant="link" className="h-auto p-0" onClick={() => { setSearchTerm(taxonomySearch.data!.search!.suggestion!); setPage(1); }}>{taxonomySearch.data.search.suggestion}</Button><span>?</span></div>}
+client/src/pages/TaxonomyListing.tsx-483-          {resultsLoading ? <div className="taxonomy-grid" data-testid="taxonomy-results-loading">{Array.from({ length: 6 }).map((_, index) => <ResourceCardSkeleton key={index} />)}</div>
+client/src/pages/TaxonomyListing.tsx-484-          : resources.length === 0 ? <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-resources"><h3 className="text-lg font-semibold">No resources match this combination</h3><p className="text-muted-foreground">Clear a filter, remove the search, or broaden where you're looking.</p><div className="flex flex-wrap justify-center gap-2">{(tags.length > 0 || provider || format || skillLevel || sort !== "default") && <Button variant="outline" onClick={clearFacetFilters} data-testid="button-clear-taxonomy-filters">Clear filters</Button>}{normalizedSearch && <Button variant="ghost" onClick={() => { setSearchTerm(""); setPage(1); requestResultsFocus(); }} data-testid="button-clear-taxonomy-search">Clear search</Button>}{(selection !== "all" || general) ? <Button variant="secondary" onClick={broadenScope} data-testid="button-broaden-taxonomy-scope">Show all in {name}</Button> : <Button asChild variant="secondary"><Link href={broadenHref} data-testid="link-broaden-taxonomy-scope">{level === "category" ? "Search all of Awesome Video" : "Search the broader category"}</Link></Button>}</div></div> :
+client/src/pages/TaxonomyListing.tsx-485-            <div className={view === "grid" ? "taxonomy-grid" : view === "list" ? "flex flex-col gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>{resources.map((resource: any, index: number) => {
+client/src/pages/TaxonomyListing.tsx-486-              const normalized = { id: String(resource.id ?? ""), title: resource.title, url: resource.url, description: resource.description ?? "" };
+--
+client/src/components/layout/new/AppFooter.tsx-57-            <Link href="/submit" data-testid="footer-submit">Submit a resource</Link>
+client/src/components/layout/new/AppFooter.tsx-58-            <Link href="/admin">Admin</Link>
+client/src/components/layout/new/AppFooter.tsx-59-            <Link href="/terms" data-testid="footer-terms">Terms</Link>
+client/src/components/layout/new/AppFooter.tsx-60-            <Link href="/privacy" data-testid="footer-privacy">Privacy</Link>
+client/src/components/layout/new/AppFooter.tsx-61-            <Link href="/code-of-conduct" data-testid="footer-code-of-conduct">Code of Conduct</Link>
+client/src/components/layout/new/AppFooter.tsx:62:            <button type="button" onClick={openCookieSettings} data-testid="footer-cookie-settings" className="footer-cookie-settings">Cookie settings</button>
+client/src/components/layout/new/AppFooter.tsx-63-          </Column>
+client/src/components/layout/new/AppFooter.tsx-64-          <Column title="SOURCE">
+client/src/components/layout/new/AppFooter.tsx-65-            <ExternalLink href={repo} testId="footer-github">{repo.replace(/^https?:\/\/(www\.)?github\.com\//, "")} ↗</ExternalLink>
+client/src/components/layout/new/AppFooter.tsx-66-            {contactVariant !== "a" && <ExternalLink href={`${repo}/issues`}>Report an issue ↗</ExternalLink>}
+client/src/components/layout/new/AppFooter.tsx-67-            <ExternalLink href={`${repo}/blob/${branch}/CONTRIBUTING.md`}>Contributing ↗</ExternalLink>
+--
+client/src/components/layout/new/AppHeader.tsx-74-        <span className="header-wordmark hide-tablet">AWESOME.VIDEO</span>
+client/src/components/layout/new/AppHeader.tsx-75-      </Link>
+client/src/components/layout/new/AppHeader.tsx-76-      <div className="header-spacer" />
+client/src/components/layout/new/AppHeader.tsx-77-      {/* One responsive control preserves the existing search selector and focus
+client/src/components/layout/new/AppHeader.tsx-78-          restoration contract without a hidden duplicate winning querySelector. */}
+client/src/components/layout/new/AppHeader.tsx:79:      <button type="button" onClick={onSearchOpen} className="header-search-trigger" aria-label="Open search">
+client/src/components/layout/new/AppHeader.tsx-80-        <SearchIcon />
+client/src/components/layout/new/AppHeader.tsx-81-        <span className="header-search-label">Search <span>{categories.length ? count.toLocaleString() : "…"} resources…</span></span>
+client/src/components/layout/new/AppHeader.tsx-82-        <span className="header-kbd hide-mobile">⌘K</span>
+client/src/components/layout/new/AppHeader.tsx-83-      </button>
+client/src/components/layout/new/AppHeader.tsx-84-      <nav className="header-nav hide-tablet" aria-label="Primary">
+--
+client/src/components/layout/new/AppHeader.tsx-88-        <a className="nav-link" href="/design-system" target="_blank" rel="noopener noreferrer">Docs ↗</a>
+client/src/components/layout/new/AppHeader.tsx-89-        {user?.role === "admin" && <Link href="/admin" className={`nav-link${location.startsWith("/admin") ? " active" : ""}`} aria-current={location.startsWith("/admin") ? "page" : undefined}>Admin<span className="header-live-dot" aria-hidden="true" /></Link>}
+client/src/components/layout/new/AppHeader.tsx-90-      </nav>
+client/src/components/layout/new/AppHeader.tsx-91-      <DropdownMenu modal={false}>
+client/src/components/layout/new/AppHeader.tsx-92-        <DropdownMenuTrigger asChild>
+client/src/components/layout/new/AppHeader.tsx:93:          <button type="button" className="user-pill" aria-label={`Account · ${role}`}>
+client/src/components/layout/new/AppHeader.tsx-94-            {user ? <Avatar className="header-avatar">
+client/src/components/layout/new/AppHeader.tsx-95-              <AvatarImage src={user.avatar} alt="" />
+client/src/components/layout/new/AppHeader.tsx-96-              <AvatarFallback>{firstName[0].toUpperCase()}</AvatarFallback>
+client/src/components/layout/new/AppHeader.tsx-97-            </Avatar> : <span className="header-avatar"><LogIn size={12} aria-hidden="true" /></span>}
+client/src/components/layout/new/AppHeader.tsx-98-            <span className="header-account-name hide-mobile">{user ? firstName : "Sign in"}</span>
+--
+client/src/components/ui/sidebar.tsx-411-            </div>
+client/src/components/ui/sidebar.tsx-412-            <DialogPrimitive.Close
+client/src/components/ui/sidebar.tsx-413-              asChild
+client/src/components/ui/sidebar.tsx-414-              aria-label="Close sidebar"
+client/src/components/ui/sidebar.tsx-415-            >
+client/src/components/ui/sidebar.tsx:416:              <button
+client/src/components/ui/sidebar.tsx-417-                type="button"
+client/src/components/ui/sidebar.tsx-418-                className="av-sidebar-drawer-close"
+client/src/components/ui/sidebar.tsx-419-              >
+client/src/components/ui/sidebar.tsx-420-                <X aria-hidden="true" />
+client/src/components/ui/sidebar.tsx-421-                <span className="sr-only">Close</span>
+--
+client/src/components/ui/sidebar.tsx-557-  React.ComponentProps<"button">
+client/src/components/ui/sidebar.tsx-558->(({ className, ...props }, ref) => {
+client/src/components/ui/sidebar.tsx-559-  const { toggleSidebar } = useSidebar()
+client/src/components/ui/sidebar.tsx-560-
+client/src/components/ui/sidebar.tsx-561-  return (
+client/src/components/ui/sidebar.tsx:562:    <button
+client/src/components/ui/sidebar.tsx-563-      ref={ref}
+client/src/components/ui/sidebar.tsx-564-      data-sidebar="rail"
+client/src/components/ui/sidebar.tsx-565-      aria-label="Toggle sidebar"
+client/src/components/ui/sidebar.tsx-566-      tabIndex={-1}
+client/src/components/ui/sidebar.tsx-567-      onClick={toggleSidebar}
+--
+client/src/components/ui/search-dialog.tsx-238-
+client/src/components/ui/search-dialog.tsx-239-    if (visibleRecentSearches.length === 0) return null;
+client/src/components/ui/search-dialog.tsx-240-
+client/src/components/ui/search-dialog.tsx-241-    return (
+client/src/components/ui/search-dialog.tsx-242-      <CommandGroup heading="Recent searches" className="search-palette-group">
+client/src/components/ui/search-dialog.tsx:243:        <button
+client/src/components/ui/search-dialog.tsx-244-          type="button"
+client/src/components/ui/search-dialog.tsx-245-          className="search-palette-clear"
+client/src/components/ui/search-dialog.tsx-246-          onClick={() => {
+client/src/components/ui/search-dialog.tsx-247-            try {
+client/src/components/ui/search-dialog.tsx-248-              localStorage.removeItem(RECENT_SEARCHES_KEY);
+--
+client/src/components/ui/search-dialog.tsx-375-                    Searching…
+client/src/components/ui/search-dialog.tsx-376-                  </div>
+client/src/components/ui/search-dialog.tsx-377-                ) : resourceQuery.isError ? (
+client/src/components/ui/search-dialog.tsx-378-                  <div className="search-palette-status search-palette-status-error" data-testid="search-error" role="alert">
+client/src/components/ui/search-dialog.tsx-379-                    <span>Search failed. Please try again.</span>
+client/src/components/ui/search-dialog.tsx:380:                    <button type="button" onClick={() => resourceQuery.refetch()}>Try again</button>
+client/src/components/ui/search-dialog.tsx-381-                  </div>
+client/src/components/ui/search-dialog.tsx-382-                ) : (
+client/src/components/ui/search-dialog.tsx-383-                  <>
+client/src/components/ui/search-dialog.tsx-384-                    {renderRecentSearches(true)}
+client/src/components/ui/search-dialog.tsx-385-                    {results.length > 0 && (
+--
+client/src/components/admin/ResourceManager.tsx-1265-                {!isLoading && (data?.resources.length || 0) === 0 && (
+client/src/components/admin/ResourceManager.tsx-1266-                  <TableRow>
+client/src/components/admin/ResourceManager.tsx-1267-                    <TableCell colSpan={8} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+client/src/components/admin/ResourceManager.tsx-1268-                      {(search || categoryFilter || statusFilter)
+client/src/components/admin/ResourceManager.tsx-1269-                        ? <>No resources match the current search or filters.{' '}
+client/src/components/admin/ResourceManager.tsx:1270:                            <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
+client/src/components/admin/ResourceManager.tsx-1271-                              Clear filters
+client/src/components/admin/ResourceManager.tsx-1272-                            </button></>
+client/src/components/admin/ResourceManager.tsx-1273-                        : "No resources yet."}
+client/src/components/admin/ResourceManager.tsx-1274-                    </TableCell>
+client/src/components/admin/ResourceManager.tsx-1275-                  </TableRow>
+--
+client/src/components/admin/JourneyStepsManager.tsx-143-      <div className="flex items-center gap-2">
+client/src/components/admin/JourneyStepsManager.tsx-144-        {value !== null ? (
+client/src/components/admin/JourneyStepsManager.tsx-145-          <Badge variant="secondary" className="gap-1" data-testid="step-resource-selected">
+client/src/components/admin/JourneyStepsManager.tsx-146-            #{value}
+client/src/components/admin/JourneyStepsManager.tsx-147-            {selectedResource ? ` — ${selectedResource.title}` : ""}
+client/src/components/admin/JourneyStepsManager.tsx:148:            <button
+client/src/components/admin/JourneyStepsManager.tsx-149-              type="button"
+client/src/components/admin/JourneyStepsManager.tsx-150-              onClick={() => onChange(null)}
+client/src/components/admin/JourneyStepsManager.tsx-151-              className="inline-flex items-center justify-center min-h-[32px] min-w-[32px] -my-1 hover:opacity-80"
+client/src/components/admin/JourneyStepsManager.tsx-152-              aria-label="Clear resource"
+client/src/components/admin/JourneyStepsManager.tsx-153-              data-testid="step-resource-clear"
+--
+client/src/components/admin/JourneyStepsManager.tsx-183-            )}
+client/src/components/admin/JourneyStepsManager.tsx-184-            {!isFetching && (data?.resources?.length ?? 0) === 0 && (
+client/src/components/admin/JourneyStepsManager.tsx-185-              <p className="text-xs text-muted-foreground p-2">No results.</p>
+client/src/components/admin/JourneyStepsManager.tsx-186-            )}
+client/src/components/admin/JourneyStepsManager.tsx-187-            {data?.resources?.map((r) => (
+client/src/components/admin/JourneyStepsManager.tsx:188:              <button
+client/src/components/admin/JourneyStepsManager.tsx-189-                key={r.id}
+client/src/components/admin/JourneyStepsManager.tsx-190-                type="button"
+client/src/components/admin/JourneyStepsManager.tsx-191-                onClick={() => {
+client/src/components/admin/JourneyStepsManager.tsx-192-                  onChange(r.id);
+client/src/components/admin/JourneyStepsManager.tsx-193-                  setOpen(false);
+--
+client/src/components/admin/AdminOverview.tsx-416-              className="admin-canonical-workflow-links"
+client/src/components/admin/AdminOverview.tsx-417-              aria-label="Resource workflow shortcuts"
+client/src/components/admin/AdminOverview.tsx-418-            >
+client/src/components/admin/AdminOverview.tsx-419-              <span>Workflow</span>
+client/src/components/admin/AdminOverview.tsx-420-              {pendingCount ? (
+client/src/components/admin/AdminOverview.tsx:421:                <button
+client/src/components/admin/AdminOverview.tsx-422-                  type="button"
+client/src/components/admin/AdminOverview.tsx-423-                  data-testid="link-stat-pending"
+client/src/components/admin/AdminOverview.tsx-424-                  onClick={() => onNavigate("approvals")}
+client/src/components/admin/AdminOverview.tsx-425-                >
+client/src/components/admin/AdminOverview.tsx-426-                  +{pendingCount.toLocaleString()} pending
+client/src/components/admin/AdminOverview.tsx-427-                </button>
+client/src/components/admin/AdminOverview.tsx-428-              ) : null}
+client/src/components/admin/AdminOverview.tsx-429-              {pendingCount && rejectedCount ? <span aria-hidden="true">·</span> : null}
+client/src/components/admin/AdminOverview.tsx-430-              {rejectedCount ? (
+client/src/components/admin/AdminOverview.tsx:431:                <button
+client/src/components/admin/AdminOverview.tsx-432-                  type="button"
+client/src/components/admin/AdminOverview.tsx-433-                  data-testid="link-stat-rejected"
+client/src/components/admin/AdminOverview.tsx-434-                  onClick={() => {
+client/src/components/admin/AdminOverview.tsx-435-                    const url = new URL(window.location.href);
+client/src/components/admin/AdminOverview.tsx-436-                    url.searchParams.set("status", "rejected");
+--
+client/src/pages/ThemeSettings.tsx-71-    trackThemeChange(label, 'color');
+client/src/pages/ThemeSettings.tsx-72-    toast({ title: "Accent applied", description: `${label} is now the active accent.` });
+client/src/pages/ThemeSettings.tsx-73-  };
+client/src/pages/ThemeSettings.tsx-74-
+client/src/pages/ThemeSettings.tsx-75-  // NB-057 (run18): the three theme pickers are ARIA radiogroups built from
+client/src/pages/ThemeSettings.tsx:76:  // custom card <button role="radio">s (not Radix RadioGroup), so arrow keys
+client/src/pages/ThemeSettings.tsx-77-  // did nothing and every card was tabbable. Implement standard radiogroup
+client/src/pages/ThemeSettings.tsx-78-  // keyboard semantics: roving tabindex (only the checked card is in the tab
+client/src/pages/ThemeSettings.tsx-79-  // order) + Arrow/Home/End move focus AND select (select-follows-focus),
+client/src/pages/ThemeSettings.tsx-80-  // matching native <input type="radio"> groups.
+client/src/pages/ThemeSettings.tsx-81-  const radioRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+--
+client/src/pages/ThemeSettings.tsx-210-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+client/src/pages/ThemeSettings.tsx-211-        >
+client/src/pages/ThemeSettings.tsx-212-          {Object.entries(systems).map(([id, sys]) => {
+client/src/pages/ThemeSettings.tsx-213-            const isActive = id === systemId;
+client/src/pages/ThemeSettings.tsx-214-            return (
+client/src/pages/ThemeSettings.tsx:215:              <button
+client/src/pages/ThemeSettings.tsx-216-                key={id}
+client/src/pages/ThemeSettings.tsx-217-                ref={(el) => { radioRefs.current[`system:${id}`] = el; }}
+client/src/pages/ThemeSettings.tsx-218-                type="button"
+client/src/pages/ThemeSettings.tsx-219-                role="radio"
+client/src/pages/ThemeSettings.tsx-220-                aria-checked={isActive}
+--
+client/src/pages/ThemeSettings.tsx-253-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
+client/src/pages/ThemeSettings.tsx-254-        >
+client/src/pages/ThemeSettings.tsx-255-          {accents.map((a) => {
+client/src/pages/ThemeSettings.tsx-256-            const isActive = a.id === accentId;
+client/src/pages/ThemeSettings.tsx-257-            return (
+client/src/pages/ThemeSettings.tsx:258:              <button
+client/src/pages/ThemeSettings.tsx-259-                key={a.id}
+client/src/pages/ThemeSettings.tsx-260-                ref={(el) => { radioRefs.current[`accent:${a.id}`] = el; }}
+client/src/pages/ThemeSettings.tsx-261-                type="button"
+client/src/pages/ThemeSettings.tsx-262-                role="radio"
+client/src/pages/ThemeSettings.tsx-263-                aria-checked={isActive}
+--
+client/src/pages/ThemeSettings.tsx-306-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+client/src/pages/ThemeSettings.tsx-307-        >
+client/src/pages/ThemeSettings.tsx-308-          {FONT_OPTIONS.map((f) => {
+client/src/pages/ThemeSettings.tsx-309-            const isActive = f.id === fontId;
+client/src/pages/ThemeSettings.tsx-310-            return (
+client/src/pages/ThemeSettings.tsx:311:              <button
+client/src/pages/ThemeSettings.tsx-312-                key={f.id}
+client/src/pages/ThemeSettings.tsx-313-                ref={(el) => { radioRefs.current[`font:${f.id}`] = el; }}
+client/src/pages/ThemeSettings.tsx-314-                type="button"
+client/src/pages/ThemeSettings.tsx-315-                role="radio"
+client/src/pages/ThemeSettings.tsx-316-                aria-checked={isActive}
+--
+client/src/components/ui/scrubbed-params-notice.tsx-37-      <span>
+client/src/components/ui/scrubbed-params-notice.tsx-38-        Part of the link you followed was ignored: the {names}{" "}
+client/src/components/ui/scrubbed-params-notice.tsx-39-        {scrubbed.length === 1 ? "parameter" : "parameters"} contained unsafe
+client/src/components/ui/scrubbed-params-notice.tsx-40-        content and {scrubbed.length === 1 ? "was" : "were"} removed.
+client/src/components/ui/scrubbed-params-notice.tsx-41-      </span>
+client/src/components/ui/scrubbed-params-notice.tsx:42:      <button
+client/src/components/ui/scrubbed-params-notice.tsx-43-        type="button"
+client/src/components/ui/scrubbed-params-notice.tsx-44-        className="inline-flex min-h-8 items-center gap-1 underline underline-offset-2"
+client/src/components/ui/scrubbed-params-notice.tsx-45-        onClick={() => setDismissed(true)}
+client/src/components/ui/scrubbed-params-notice.tsx-46-        data-testid="button-dismiss-scrubbed-params"
+client/src/components/ui/scrubbed-params-notice.tsx-47-        aria-label="Dismiss notice"
+--
+client/src/components/ui/advanced-filter.tsx-161-                      No tags match “{tagQuery.trim()}”
+client/src/components/ui/advanced-filter.tsx-162-                    </p>
+client/src/components/ui/advanced-filter.tsx-163-                  )}
+client/src/components/ui/advanced-filter.tsx-164-                  <div className="space-y-1">
+client/src/components/ui/advanced-filter.tsx-165-                    {visibleTags.map(({ tag, count }) => (
+client/src/components/ui/advanced-filter.tsx:166:                      <button
+client/src/components/ui/advanced-filter.tsx-167-                        type="button"
+client/src/components/ui/advanced-filter.tsx-168-                        key={tag}
+client/src/components/ui/advanced-filter.tsx-169-                        className="flex w-full items-center space-x-2 rounded-sm p-2 text-left hover:bg-accent min-h-[44px]"
+client/src/components/ui/advanced-filter.tsx-170-                        onClick={() => toggleTag(tag)}
+client/src/components/ui/advanced-filter.tsx-171-                        aria-pressed={isSelected(tag)}
+--
+client/src/components/ui/advanced-filter.tsx-222-
+client/src/components/ui/advanced-filter.tsx-223-      {showTagFilter && hasSelectedFilters && (
+client/src/components/ui/advanced-filter.tsx-224-        <div className="flex gap-1.5 flex-wrap items-center w-full sm:w-auto">
+client/src/components/ui/advanced-filter.tsx-225-          <span className="text-xs text-muted-foreground">Active:</span>
+client/src/components/ui/advanced-filter.tsx-226-          {selectedTags.map((tag) => (
+client/src/components/ui/advanced-filter.tsx:227:            <button
+client/src/components/ui/advanced-filter.tsx-228-              type="button"
+client/src/components/ui/advanced-filter.tsx-229-              key={tag}
+client/src/components/ui/advanced-filter.tsx-230-              className="inline-flex min-h-11 items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground touch-manipulation hover:bg-destructive hover:text-destructive-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+client/src/components/ui/advanced-filter.tsx-231-              onClick={() => toggleTag(tag)}
+client/src/components/ui/advanced-filter.tsx-232-              aria-label={`Remove ${tag} filter`}
+--
+client/src/pages/DesignSystemShowcase.tsx-227-        </div>
+client/src/pages/DesignSystemShowcase.tsx-228-        <div className="flex flex-wrap gap-2">
+client/src/pages/DesignSystemShowcase.tsx-229-          {Object.entries(systems).map(([id, sys]) => {
+client/src/pages/DesignSystemShowcase.tsx-230-            const isActive = id === systemId;
+client/src/pages/DesignSystemShowcase.tsx-231-            return (
+client/src/pages/DesignSystemShowcase.tsx:232:              <button
+client/src/pages/DesignSystemShowcase.tsx-233-                key={id}
+client/src/pages/DesignSystemShowcase.tsx-234-                type="button"
+client/src/pages/DesignSystemShowcase.tsx-235-                onClick={() => setSystem(id)}
+client/src/pages/DesignSystemShowcase.tsx-236-                aria-pressed={isActive}
+client/src/pages/DesignSystemShowcase.tsx-237-                data-testid={`ds-system-${id}`}
+--
+client/src/pages/DesignSystemShowcase.tsx-260-        </div>
+client/src/pages/DesignSystemShowcase.tsx-261-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+client/src/pages/DesignSystemShowcase.tsx-262-          {accents.map((a) => {
+client/src/pages/DesignSystemShowcase.tsx-263-            const isActive = a.id === accentId;
+client/src/pages/DesignSystemShowcase.tsx-264-            return (
+client/src/pages/DesignSystemShowcase.tsx:265:              <button
+client/src/pages/DesignSystemShowcase.tsx-266-                key={a.id}
+client/src/pages/DesignSystemShowcase.tsx-267-                type="button"
+client/src/pages/DesignSystemShowcase.tsx-268-                onClick={() => setAccent(a.id)}
+client/src/pages/DesignSystemShowcase.tsx-269-                aria-pressed={isActive}
+client/src/pages/DesignSystemShowcase.tsx-270-                data-testid={`ds-accent-${a.id}`}
+--
+client/src/components/layout/new/AppSidebar.tsx-360-      new URLSearchParams(activeSearch).get("view") === "general");
+client/src/components/layout/new/AppSidebar.tsx-361-
+client/src/components/layout/new/AppSidebar.tsx-362-  // Semantic split (post-architect-review):
+client/src/components/layout/new/AppSidebar.tsx-363-  //  - The row is a <Link> (real navigation semantics; right-click/cmd-click
+client/src/components/layout/new/AppSidebar.tsx-364-  //    opens in new tab; assistive tech announces it as "link").
+client/src/components/layout/new/AppSidebar.tsx:365:  //  - The chevron is a sibling <button> with aria-expanded/aria-controls
+client/src/components/layout/new/AppSidebar.tsx-366-  //    pointing at the accordion body. It is the SOLE owner of disclosure
+client/src/components/layout/new/AppSidebar.tsx-367-  //    semantics — `aria-expanded` is no longer on the row.
+client/src/components/layout/new/AppSidebar.tsx-368-  //  - No nested interactive controls: Link and Button are siblings inside
+client/src/components/layout/new/AppSidebar.tsx-369-  //    a non-interactive flex container that keeps the row visual.
+client/src/components/layout/new/AppSidebar.tsx-370-
+--
+client/src/components/layout/new/AppSidebar.tsx-437-            {formatCount(totalCount)}
+client/src/components/layout/new/AppSidebar.tsx-438-          </span>
+client/src/components/layout/new/AppSidebar.tsx-439-          {/* P1 — removed redundant "→" page-link span; chevron is the single
+client/src/components/layout/new/AppSidebar.tsx-440-              disclosure control per ref 01 sidebar. */}
+client/src/components/layout/new/AppSidebar.tsx-441-          {(subs.length > 0 || directCount > 0) && (
+client/src/components/layout/new/AppSidebar.tsx:442:            <button
+client/src/components/layout/new/AppSidebar.tsx-443-              type="button"
+client/src/components/layout/new/AppSidebar.tsx-444-              onClick={onToggle}
+client/src/components/layout/new/AppSidebar.tsx-445-              title={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
+client/src/components/layout/new/AppSidebar.tsx-446-              aria-label={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
+client/src/components/layout/new/AppSidebar.tsx-447-              aria-expanded={isOpen}
+--
+client/src/components/layout/new/AppSidebar.tsx-491-                }
+client/src/components/layout/new/AppSidebar.tsx-492-
+client/src/components/layout/new/AppSidebar.tsx-493-                return (
+client/src/components/layout/new/AppSidebar.tsx-494-                  <div key={sub.name}>
+client/src/components/layout/new/AppSidebar.tsx-495-                    <div className="flex items-stretch gap-[2px]">
+client/src/components/layout/new/AppSidebar.tsx:496:                      <button
+client/src/components/layout/new/AppSidebar.tsx-497-                        type="button"
+client/src/components/layout/new/AppSidebar.tsx-498-                        onClick={() => toggleSub(subKey(sub.name))}
+client/src/components/layout/new/AppSidebar.tsx-499-                        aria-label={`${subOpen ? "Collapse" : "Expand"} ${subSubs.length} nested groups in ${sub.name}`}
+client/src/components/layout/new/AppSidebar.tsx-500-                        aria-expanded={subOpen}
+client/src/components/layout/new/AppSidebar.tsx-501-                        aria-controls={`${bodyId}-sub-${subSlug}`}
+--
+client/src/components/layout/new/AppSidebar.tsx-832-          style={{ color: "var(--text-3)", fontSize: 12 }}
+client/src/components/layout/new/AppSidebar.tsx-833-          data-testid="sidebar-nav-error"
+client/src/components/layout/new/AppSidebar.tsx-834-        >
+client/src/components/layout/new/AppSidebar.tsx-835-          <span>Couldn't load categories.</span>
+client/src/components/layout/new/AppSidebar.tsx-836-          {onRetryNav && (
+client/src/components/layout/new/AppSidebar.tsx:837:            <button
+client/src/components/layout/new/AppSidebar.tsx-838-              type="button"
+client/src/components/layout/new/AppSidebar.tsx-839-              onClick={() => onRetryNav()}
+client/src/components/layout/new/AppSidebar.tsx-840-              className="underline underline-offset-2 font-medium min-h-[44px] md:min-h-[36px]"
+client/src/components/layout/new/AppSidebar.tsx-841-              style={{ color: "var(--text-2)" }}
+client/src/components/layout/new/AppSidebar.tsx-842-              data-testid="sidebar-nav-retry"
+--
+client/src/components/layout/new/AppSidebar.tsx-923-      </summary>
+client/src/components/layout/new/AppSidebar.tsx-924-      <SidebarMenu className="px-2 pb-2">
+client/src/components/layout/new/AppSidebar.tsx-925-        {showNavigationModeToggle && (
+client/src/components/layout/new/AppSidebar.tsx-926-          <SidebarMenuItem>
+client/src/components/layout/new/AppSidebar.tsx-927-            <SidebarMenuButton asChild className="min-h-[44px]">
+client/src/components/layout/new/AppSidebar.tsx:928:              <button
+client/src/components/layout/new/AppSidebar.tsx-929-                type="button"
+client/src/components/layout/new/AppSidebar.tsx-930-                onClick={() => setOpen(false)}
+client/src/components/layout/new/AppSidebar.tsx-931-                data-testid="sidebar-compact-navigation"
+client/src/components/layout/new/AppSidebar.tsx-932-                aria-label="Compact navigation"
+client/src/components/layout/new/AppSidebar.tsx-933-                title="Compact navigation"
+--
+client/src/components/layout/new/AppSidebar.tsx-1190-                >
+client/src/components/layout/new/AppSidebar.tsx-1191-                  <RailIcon aria-hidden="true" className="size-4" />
+client/src/components/layout/new/AppSidebar.tsx-1192-                </a>
+client/src/components/layout/new/AppSidebar.tsx-1193-              );
+client/src/components/layout/new/AppSidebar.tsx-1194-            })}
+client/src/components/layout/new/AppSidebar.tsx:1195:            <button
+client/src/components/layout/new/AppSidebar.tsx-1196-              type="button"
+client/src/components/layout/new/AppSidebar.tsx-1197-              onClick={() => setOpen(true)}
+client/src/components/layout/new/AppSidebar.tsx-1198-              className="rail-icon-btn rail-expand-navigation touch-manipulation"
+client/src/components/layout/new/AppSidebar.tsx-1199-              data-testid="sidebar-expanded-navigation"
+client/src/components/layout/new/AppSidebar.tsx-1200-              aria-label="Expand navigation"
+--
+client/src/components/admin/GenericCrudManager.tsx-292-        {toolbar.map((tool) => {
+client/src/components/admin/GenericCrudManager.tsx-293-          const buttonConfig = TOOLBAR_BUTTONS[tool];
+client/src/components/admin/GenericCrudManager.tsx-294-          if (!buttonConfig) return null;
+client/src/components/admin/GenericCrudManager.tsx-295-          const IconComponent = buttonConfig.icon;
+client/src/components/admin/GenericCrudManager.tsx-296-          return (
+client/src/components/admin/GenericCrudManager.tsx:297:            <button
+client/src/components/admin/GenericCrudManager.tsx-298-              key={tool}
+client/src/components/admin/GenericCrudManager.tsx-299-              type="button"
+client/src/components/admin/GenericCrudManager.tsx-300-              onClick={() => handleCommand(buttonConfig.command, buttonConfig.value)}
+client/src/components/admin/GenericCrudManager.tsx-301-              className="p-1.5 rounded hover:bg-muted transition-colors"
+client/src/components/admin/GenericCrudManager.tsx-302-              title={buttonConfig.label}
+--
+client/src/components/admin/GenericCrudManager.tsx-428-  };
+client/src/components/admin/GenericCrudManager.tsx-429-
+client/src/components/admin/GenericCrudManager.tsx-430-  return (
+client/src/components/admin/GenericCrudManager.tsx-431-    <div ref={containerRef} className="relative" id={id} data-testid={testId}>
+client/src/components/admin/GenericCrudManager.tsx-432-      {/* Trigger button */}
+client/src/components/admin/GenericCrudManager.tsx:433:      <button
+client/src/components/admin/GenericCrudManager.tsx-434-        type="button"
+client/src/components/admin/GenericCrudManager.tsx-435-        onClick={() => setIsOpen(!isOpen)}
+client/src/components/admin/GenericCrudManager.tsx-436-        className="flex min-h-[40px] w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+client/src/components/admin/GenericCrudManager.tsx-437-        data-testid={testId ? `${testId}-trigger` : undefined}
+client/src/components/admin/GenericCrudManager.tsx-438-      >
+--
+client/src/components/admin/GenericCrudManager.tsx-444-              <span
+client/src/components/admin/GenericCrudManager.tsx-445-                key={value[idx]}
+client/src/components/admin/GenericCrudManager.tsx-446-                className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md text-xs"
+client/src/components/admin/GenericCrudManager.tsx-447-              >
+client/src/components/admin/GenericCrudManager.tsx-448-                {label}
+client/src/components/admin/GenericCrudManager.tsx:449:                <button
+client/src/components/admin/GenericCrudManager.tsx-450-                  type="button"
+client/src/components/admin/GenericCrudManager.tsx-451-                  onClick={(e) => removeOption(value[idx], e)}
+client/src/components/admin/GenericCrudManager.tsx-452-                  className="hover:bg-secondary-foreground/20 rounded-full p-0.5"
+client/src/components/admin/GenericCrudManager.tsx-453-                  data-testid={testId ? `${testId}-remove-${value[idx]}` : undefined}
+client/src/components/admin/GenericCrudManager.tsx-454-                >
+--
+client/src/components/admin/GenericCrudManager.tsx-483-            ) : (
+client/src/components/admin/GenericCrudManager.tsx-484-              filteredOptions.map((option) => {
+client/src/components/admin/GenericCrudManager.tsx-485-                const isSelected = value.includes(option.value);
+client/src/components/admin/GenericCrudManager.tsx-486-                const isDisabled = !isSelected && !!maxItems && value.length >= maxItems;
+client/src/components/admin/GenericCrudManager.tsx-487-                return (
+client/src/components/admin/GenericCrudManager.tsx:488:                  <button
+client/src/components/admin/GenericCrudManager.tsx-489-                    key={option.value}
+client/src/components/admin/GenericCrudManager.tsx-490-                    type="button"
+client/src/components/admin/GenericCrudManager.tsx-491-                    onClick={() => !isDisabled && toggleOption(option.value)}
+client/src/components/admin/GenericCrudManager.tsx-492-                    disabled={isDisabled}
+client/src/components/admin/GenericCrudManager.tsx-493-                    className={`flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors ${
+--
+client/src/components/admin/GenericCrudManager.tsx-2903-                        <img
+client/src/components/admin/GenericCrudManager.tsx-2904-                          src={filePreviews[field.name]}
+client/src/components/admin/GenericCrudManager.tsx-2905-                          alt="Preview"
+client/src/components/admin/GenericCrudManager.tsx-2906-                          className="w-full h-full object-cover"
+client/src/components/admin/GenericCrudManager.tsx-2907-                        />
+client/src/components/admin/GenericCrudManager.tsx:2908:                        <button
+client/src/components/admin/GenericCrudManager.tsx-2909-                          type="button"
+client/src/components/admin/GenericCrudManager.tsx-2910-                          onClick={() => clearFile(field.name)}
+client/src/components/admin/GenericCrudManager.tsx-2911-                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+client/src/components/admin/GenericCrudManager.tsx-2912-                          data-testid={`button-clear-file-create-${field.name}`}
+client/src/components/admin/GenericCrudManager.tsx-2913-                        >
+--
+client/src/components/admin/GenericCrudManager.tsx-2917-                    )}
+client/src/components/admin/GenericCrudManager.tsx-2918-                    {fileData[field.name] && field.fileConfig?.previewType !== "image" && (
+client/src/components/admin/GenericCrudManager.tsx-2919-                      <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+client/src/components/admin/GenericCrudManager.tsx-2920-                        <FileIcon className="h-5 w-5 text-muted-foreground" />
+client/src/components/admin/GenericCrudManager.tsx-2921-                        <span className="text-sm truncate flex-1">{fileData[field.name]?.name}</span>
+client/src/components/admin/GenericCrudManager.tsx:2922:                        <button
+client/src/components/admin/GenericCrudManager.tsx-2923-                          type="button"
+client/src/components/admin/GenericCrudManager.tsx-2924-                          onClick={() => clearFile(field.name)}
+client/src/components/admin/GenericCrudManager.tsx-2925-                          className="p-1 hover:bg-destructive/10 rounded"
+client/src/components/admin/GenericCrudManager.tsx-2926-                          data-testid={`button-clear-file-create-${field.name}`}
+client/src/components/admin/GenericCrudManager.tsx-2927-                        >
+--
+client/src/components/admin/GenericCrudManager.tsx-3160-                        <img
+client/src/components/admin/GenericCrudManager.tsx-3161-                          src={filePreviews[field.name]}
+client/src/components/admin/GenericCrudManager.tsx-3162-                          alt="Preview"
+client/src/components/admin/GenericCrudManager.tsx-3163-                          className="w-full h-full object-cover"
+client/src/components/admin/GenericCrudManager.tsx-3164-                        />
+client/src/components/admin/GenericCrudManager.tsx:3165:                        <button
+client/src/components/admin/GenericCrudManager.tsx-3166-                          type="button"
+client/src/components/admin/GenericCrudManager.tsx-3167-                          onClick={() => clearFile(field.name)}
+client/src/components/admin/GenericCrudManager.tsx-3168-                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+client/src/components/admin/GenericCrudManager.tsx-3169-                          data-testid={`button-clear-file-edit-${field.name}`}
+client/src/components/admin/GenericCrudManager.tsx-3170-                        >
+--
+client/src/components/admin/GenericCrudManager.tsx-3174-                    )}
+client/src/components/admin/GenericCrudManager.tsx-3175-                    {fileData[field.name] && field.fileConfig?.previewType !== "image" && (
+client/src/components/admin/GenericCrudManager.tsx-3176-                      <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+client/src/components/admin/GenericCrudManager.tsx-3177-                        <FileIcon className="h-5 w-5 text-muted-foreground" />
+client/src/components/admin/GenericCrudManager.tsx-3178-                        <span className="text-sm truncate flex-1">{fileData[field.name]?.name}</span>
+client/src/components/admin/GenericCrudManager.tsx:3179:                        <button
+client/src/components/admin/GenericCrudManager.tsx-3180-                          type="button"
+client/src/components/admin/GenericCrudManager.tsx-3181-                          onClick={() => clearFile(field.name)}
+client/src/components/admin/GenericCrudManager.tsx-3182-                          className="p-1 hover:bg-destructive/10 rounded"
+client/src/components/admin/GenericCrudManager.tsx-3183-                          data-testid={`button-clear-file-edit-${field.name}`}
+client/src/components/admin/GenericCrudManager.tsx-3184-                        >
+--
+client/src/components/admin/canonical/Stat.tsx-67-        <CardTitle
+client/src/components/admin/canonical/Stat.tsx-68-          className="admin-canonical-stat__label eyebrow"
+client/src/components/admin/canonical/Stat.tsx-69-          data-testid={nestedInteractive ? undefined : titleTestId}
+client/src/components/admin/canonical/Stat.tsx-70-        >
+client/src/components/admin/canonical/Stat.tsx-71-          {clickable && nestedInteractive ? (
+client/src/components/admin/canonical/Stat.tsx:72:            <button
+client/src/components/admin/canonical/Stat.tsx-73-              type="button"
+client/src/components/admin/canonical/Stat.tsx-74-              className="admin-canonical-stat__title-link"
+client/src/components/admin/canonical/Stat.tsx-75-              onClick={(event) => {
+client/src/components/admin/canonical/Stat.tsx-76-                event.stopPropagation();
+client/src/components/admin/canonical/Stat.tsx-77-                onNavigate?.();

@@ -1,0 +1,9 @@
+Gate lease acquired (db-heavy: parity-baseline)
+[identity] creating disposable Clerk admin 2066995525
+[identity] 2066995525 signed in and promoted (display name "Nick")
+[parity] app.home.curated @ 1024
+  PASS 0.2147% (6926px)
+[parity] app.home.index @ 1024
+  PASS 0.1856% (7130px)
+Gate lease released (db-heavy: parity-baseline)
+[parity] selected-rows-diagnostic: 2/2 pixel rows pass, 0 fail, 0 incomplete, 0 blocked → tests/parity/baseline/2026-09-15T13-19-22-707Z-18460 (exit 0)

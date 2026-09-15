@@ -1,0 +1,130 @@
+{
+ "lighthouse-atmosphere/run-1": {
+  "/category/encoding-codecs": {
+   "perf": 60,
+   "fcp": 2138,
+   "lcp": 5085,
+   "tbt": 819,
+   "si": 2138,
+   "cls": 0,
+   "obsFCP": 352,
+   "obsLCP": 789
+  },
+  "/": {
+   "perf": 80,
+   "fcp": 3610,
+   "lcp": 3742,
+   "tbt": 121,
+   "si": 3610,
+   "cls": 0.028071,
+   "obsFCP": 273,
+   "obsLCP": 273
+  },
+  "/resource/185020": {
+   "perf": 80,
+   "fcp": 2917,
+   "lcp": 3009,
+   "tbt": 385,
+   "si": 2917,
+   "cls": 0,
+   "obsFCP": 198,
+   "obsLCP": 253
+  }
+ },
+ "lighthouse-atmosphere/run-2": {
+  "/category/encoding-codecs": {
+   "perf": 62,
+   "fcp": 2890,
+   "lcp": 4692,
+   "tbt": 639,
+   "si": 2890,
+   "cls": 0.016143,
+   "obsFCP": 118,
+   "obsLCP": 473
+  },
+  "/": {
+   "perf": 78,
+   "fcp": 3612,
+   "lcp": 3743,
+   "tbt": 210,
+   "si": 3612,
+   "cls": 0.028071,
+   "obsFCP": 397,
+   "obsLCP": 397
+  },
+  "/resource/185020": {
+   "perf": 81,
+   "fcp": 2139,
+   "lcp": 2957,
+   "tbt": 474,
+   "si": 2139,
+   "cls": 0,
+   "obsFCP": 110,
+   "obsLCP": 154
+  }
+ },
+ "lighthouse-atmosphere/run-3": {
+  "/category/encoding-codecs": {
+   "perf": 65,
+   "fcp": 2141,
+   "lcp": 4573,
+   "tbt": 672,
+   "si": 2141,
+   "cls": 0.016143,
+   "obsFCP": 277,
+   "obsLCP": 656
+  },
+  "/": {
+   "perf": 79,
+   "fcp": 3600,
+   "lcp": 3719,
+   "tbt": 172,
+   "si": 3600,
+   "cls": 0.028071,
+   "obsFCP": 295,
+   "obsLCP": 295
+  },
+  "/resource/185020": {
+   "perf": 77,
+   "fcp": 2886,
+   "lcp": 2971,
+   "tbt": 512,
+   "si": 2886,
+   "cls": 0,
+   "obsFCP": 129,
+   "obsLCP": 164
+  }
+ },
+ "lighthouse-prod-same-tool": {
+  "/category/encoding-codecs": {
+   "perf": 78,
+   "fcp": 2463,
+   "lcp": 3289,
+   "tbt": 433,
+   "si": 2463,
+   "cls": 0.01605,
+   "obsFCP": 185,
+   "obsLCP": 253
+  },
+  "/": {
+   "perf": 84,
+   "fcp": 2486,
+   "lcp": 3337,
+   "tbt": 221,
+   "si": 2486,
+   "cls": 0.054355,
+   "obsFCP": 247,
+   "obsLCP": 393
+  },
+  "/resource/185020": {
+   "perf": 81,
+   "fcp": 3199,
+   "lcp": 3271,
+   "tbt": 267,
+   "si": 3199,
+   "cls": 0.003296,
+   "obsFCP": 780,
+   "obsLCP": 820
+  }
+ }
+}

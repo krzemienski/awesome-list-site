@@ -17,7 +17,7 @@
 - [Reference sync gate history](design-reference-independence.md) — the design archive root is a frozen reference excluded from palette/profile gates; the frozen check reads a gitignored zip by recorded path → ENOENT elsewhere.
 - [Dev listener selection](dev-listener-selection.md) — the proxied dev hostname can serve the artifact's HTML for /api/*; address the app port vs the artifact port explicitly.
 - [Pre-boot param scrubber honesty](scrubbed-params-honesty.md) — index.html deletes XSS-shaped query params before React boots; "silent full-catalog fallback" on q/tags = the scrubber, surface via window.__scrubbedParams notice.
-- [SPA crawler/SEO prerender](spa-crawler-prerender.md) — crawler visibility = og-middleware injecting content into `<!--app-html-->`, NOT React SSR (no prod server bundle; never set __INITIAL_DATA__ → createRoot replaces).
+- [Crawler prerender versus SSR](spa-crawler-prerender.md) — semantic crawler markup is not hydrateable React; exact-tree SSR also needs the client manifest's split CSS before paint.
 - [SEO soft-404 + sitemap](seo-soft-404-architecture.md) — SPA hard-codes 200, so set 404 in og-middleware's buffered res.end; indexable set must equal sitemap; malformed %-URLs crash vite dev via decodeURI — guard before next().
 - [Anthropic mid-loop steering](anthropic-midloop-steering.md) — inject mid-run guidance as a text block on the tool_result user turn (a separate user msg → 400); research agent "don't give up" tuning lives here too.
 - [SEO title two-pass parity](seo-title-two-pass-parity.md) — client SEOHead titles must exactly mirror og-middleware templates or Googlebot's crawl/render passes see different titles.
@@ -132,3 +132,8 @@
 - [Vite component probes](vite-browser-component-probes.md) — discover dependency URLs from transformed modules; optimized CJS React dependencies may expose default rather than named exports.
 - [Pixel reference reconciliation](pixel-reference-reconciliation.md) — preserve required live content/official branding; adapt expected captures in memory, never delete content or relax thresholds.
 - [cmdk live regions](cmdk-live-region-placement.md) — audit populated results too; aria-live count elements inside the listbox violate its required-child semantics.
+- [Browser lease cleanup ownership](browser-lease-cleanup-ownership.md) — a released slot can belong to another worker; verify the exact run's process tree before terminating browsers.
+- [Lighthouse Lantern loopback artifact](lantern-loopback-artifact.md) — simulate scores vs 127.0.0.1 sit ~5–15 below same-day prod for identical code (bundle/fonts enter the FCP graph, h1 chunk fan-out); compare same tool same day, probe with real throttling.
+- [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — full-page radial atmosphere = seconds of raster on long pages; paint it on .page::after clipped by a per-system token, pixels unchanged; regenerate DS artifact tokens after adding tokens.
+- [LCP text candidate size](lcp-text-candidate-size.md) — Chrome fixes a text block's LCP size at first paint (font swap never updates it); a prerendered paragraph must beat the client re-render in fallback AND web font, probe with a PerformanceObserver.
+- [Paint before hydrate](paint-before-hydrate.md) — Vite head module entry evaluates before complete SSR markup is presented; defer via modulepreload + body-end double-rAF loader, keep ONE `<script type="module"` for ssr.ts.

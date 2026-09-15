@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.error.route",
+  "widths": [
+    {
+      "screen": "app.error.route",
+      "width": 375,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Error injection is prohibited; no naturally occurring real error state is supplied."
+    },
+    {
+      "screen": "app.error.route",
+      "width": 1440,
+      "identity": "public",
+      "status": "SKIPPED",
+      "stateOnly": true,
+      "reason": "Error injection is prohibited; no naturally occurring real error state is supplied."
+    }
+  ],
+  "seriousCriticalZero": false
+}

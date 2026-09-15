@@ -232,3 +232,80 @@ The gate therefore models the document as that compiler builds it:
 misplaced import IS dead and rule 13's model half is wrong in the other
 direction), or a sheet is meant to be imported twice on purpose (then the
 duplicate rule needs an allow-list rather than a blanket FAIL).
+
+## 11. `.page` paints its background through `::before`/`::after` (design: on `.page` itself)
+
+The design's `.page { background: var(--bg-atmosphere), var(--bg); background-size:
+…; background-color: var(--bg) }` (`styles.css`) rasterises the atmosphere over
+the whole `.page` box. In the runtime `.page` wraps the entire shell, so at
+412px wide the Home box is ~6000px tall, and the Editorial ellipses
+(`ellipse 1100px 700px at 88% -8%` and `ellipse 900px 500px at -8% 110%`, both
+ending at `transparent 60%`) are exactly transparent everywhere except the band
+`y < -8% + 420px` at the top and `y > 110% - 300px` at the bottom. Chromium's
+software raster still evaluates both gradients for every device pixel of the
+box: a CDP trace of the compiled Home at 412×823 / DPR 1.75 measured ~4.6s of
+raster-worker time and a 300–430ms main-thread `LayerTreeHost::
+WaitForCommitCompletion` stall, against ~0.4s / 0ms on production, whose
+`.page` is 0px tall. Injecting `.page { background-image: none }` alone brought
+both numbers to production's (`docs/parity/DS-AUDIT.md`, continuation).
+
+The runtime therefore keeps the two layers but paints them on `.page`'s
+pseudo-elements (`client/src/styles/design-system.css`):
+
+- `.page::before` — `position: absolute; inset: 0; z-index: -1; background: var(--bg)`;
+- `.page::after` — the same box, `background: var(--bg-atmosphere)`,
+  `background-size: var(--bg-atmosphere-size, auto)`,
+  `background-repeat: var(--bg-atmosphere-repeat, no-repeat)` and
+  `clip-path: var(--bg-atmosphere-clip, none)`;
+- `.page` — `background: none; background-color: transparent` so the pseudo
+  layers show; `position: relative` and `min-height: 100vh` stay verbatim.
+
+The pseudo box is the `.page` padding box, so percentages in `--bg-atmosphere`
+resolve against the same positioning area, and a negative-z-index positioned
+box paints directly after the enclosing stacking context's own background and
+before every in-flow block — the position `.page`'s own background occupied.
+No design rule uses a negative `z-index`, so nothing can slip between the two.
+`--bg-atmosphere-clip` is a runtime-only token declared next to each system's
+`--bg-atmosphere`: Editorial's polygon keeps the two visible bands, Geist keeps
+`inset(0 0 calc(120% - 480px) 0)` (its single ellipse ends at
+`-20% + 480px`), and Terminal, Brutalist and Swiss declare `none` because
+their scanline/grid patterns (or no atmosphere) cover the whole page. A system
+that changes `--bg-atmosphere` must re-declare the clip; the runtime `body`
+also dropped its non-canonical fixed-attachment copy of the atmosphere (the
+design's `body` has only `background: var(--bg)`).
+
+The clip alone left a second cost in Home's first frame. With
+`background-size: auto` a gradient image is exactly the positioning area, so
+the default `background-repeat: repeat` never paints a second tile — but
+Chromium rasterises a repeated background image through a tiled image shader
+that re-renders the whole gradient bitmap (412 × ~6000 CSS px at DPR 1.75)
+for every 256px raster tile: ~85ms per tile, ~350ms of raster-worker time
+before the first frame could be presented, which held Home's observed first
+contentful paint at ~250–330ms (after the entry bundle and the route chunks
+had finished) and pulled them into Lighthouse's simulated FCP path. A CSS
+bisection over the compiled Home (`docs/parity/DS-AUDIT.md`, continuation:
+`* { background-image: none }`, then per-image, then per-property on
+`.page::after`) isolated it: `background-repeat: no-repeat` brings the
+pre-FCP raster to ~40ms and the observed FCP to ~130–180ms with every pixel
+unchanged, because the single tile already covers the box. The runtime-only
+token `--bg-atmosphere-repeat` defaults to `no-repeat`; Swiss, whose 64px
+grid tile must repeat, re-declares `repeat`. Editorial, Terminal and Geist
+use `auto`-sized gradients (Terminal's scanlines repeat inside the gradient
+function, not through `background-repeat`), and Brutalist has no atmosphere.
+
+The gate honours the two `.page` mismatches as `rule:.page:background` and
+`rule:.page:background-color` with a shared `holds()` that re-reads the runtime
+rules: it requires `.page` to be `none`/`transparent`, `.page::before` to carry
+`var(--bg)`, `.page::after` to carry `var(--bg-atmosphere)`, the size token,
+the repeat token and the clip token, and both pseudos to be `position:
+absolute; inset: 0; z-index: -1`. Canaries `page-atmosphere-pseudo-dropped`,
+`page-atmosphere-clip-dropped`, `page-atmosphere-repeat-dropped` and
+`page-atmosphere-plane-dropped` prove the
+entry stops holding when any of those is removed. Pixel equality is not
+assumed from the reasoning above: the Editorial × Crimson rows run against the
+frozen reference after the change with the unchanged 0.1 / 0.5% / full-union
+thresholds.
+
+**Revisit when:** the design moves the atmosphere off `.page`, gains a
+negative-`z-index` rule, or Chromium stops rasterising fully transparent
+gradient regions (then the deviation is pure cost and should be reverted).

@@ -4,6 +4,7 @@ import type { Resource } from "@/types/awesome-list";
 import type { ResourceKind } from "@shared/resourceKinds";
 import { STRIP_KINDS, type ResourceKindCounts } from "@/lib/static-data";
 import { Badge } from "@/components/ui/badge";
+import { ChipButton } from "@/components/ui/chip-button";
 import { Button } from "@/components/ui/button";
 
 export interface HomeSubcategoryView {
@@ -190,11 +191,10 @@ function KindStrip({
       aria-label="Content types in this index"
     >
       {STRIP_KINDS.map((kind) => (
-        <button
+        <ChipButton
           key={kind}
           type="button"
-          className="home-kind-chip chip"
-          data-ds="chip"
+          className="home-kind-chip"
           data-testid={`home-kind-chip-${kind}`}
           aria-label={`${KIND_LABELS[kind]} — ${counts ? formatCount(counts[kind]) : "loading"} resources`}
           title={`Browse ${KIND_LABELS[kind]}`}
@@ -205,7 +205,7 @@ function KindStrip({
           <span className="home-kind-count mono">
             {isLoading ? "…" : isError ? "—" : formatCount(counts?.[kind] ?? 0)}
           </span>
-        </button>
+        </ChipButton>
       ))}
       {/* "other" is intentionally not a sixth visual chip: the canonical
           strip has five content types. Keep its full-set count available to

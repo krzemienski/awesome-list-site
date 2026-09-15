@@ -1,0 +1,6 @@
+Chrome LCP candidate probe (Playwright, 412x823 @1.75, real page, no throttling) against the compiled server on :5101.
+Before the shell change (intro paragraph inherited 1rem/1.5):
+  first-contentful-paint 308 · LCP 364 size 56885 (shell <p>, six Inter lines) · LCP 592 size 57263 (client p.taxonomy-description) -> client re-render is the LCP
+After (lead scale 1.1rem/1.6 for p.ssr-lead and the intro):
+  first-contentful-paint 204 · LCP 232 size 67473 (shell <p>) · no later candidate; with the entry script delayed 1.5s: LCP 80 size 67473, then the same <p> at 68970 after it moves into the hold overlay
+Chrome fixes a text block's LCP size at its first paint; the swap to Inter afterwards does not update it, so the shell paragraph had to be larger than the client paragraph in both the fallback font and Inter.

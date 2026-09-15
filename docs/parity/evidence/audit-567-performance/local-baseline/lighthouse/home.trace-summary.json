@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 3072,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 242.29,
+      "selfTimeMs": 242.19,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 199.473,
+      "selfTimeMs": 199.387,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 132.714,
+      "selfTimeMs": 2.559,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": "onScroll"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 79.612,
+      "selfTimeMs": 73.499,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 75.305,
+      "selfTimeMs": 4.128,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 70.205,
+      "selfTimeMs": 0.789,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+      "function": "MainLayout"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 56.289,
+      "selfTimeMs": 0.194,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 49.603,
+      "selfTimeMs": 25.939,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 37.33,
+      "selfTimeMs": 1.494,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 36.171,
+      "selfTimeMs": 0.132,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 34.654,
+      "selfTimeMs": 0.763,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 33.462,
+      "selfTimeMs": 1.104,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 28.858,
+      "selfTimeMs": 0.398,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7J6TFOVD.js?v=be5c9ae3",
+      "function": "MainLayout"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 22.409,
+      "selfTimeMs": 0.203,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.521,
+      "selfTimeMs": 1.681,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.714,
+      "selfTimeMs": 7.132,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.227,
+      "selfTimeMs": 0.247,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.123,
+      "selfTimeMs": 9.052,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.884,
+      "selfTimeMs": 0.174,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.565,
+      "selfTimeMs": 6.565,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.423,
+      "selfTimeMs": 0.053,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.261,
+      "selfTimeMs": 5.918,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.691,
+      "selfTimeMs": 0.885,
+      "url": "http://127.0.0.1:5000/src/App.tsx",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.55,
+      "selfTimeMs": 0.06,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.327,
+      "selfTimeMs": 0.032,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.668,
+      "selfTimeMs": 0.3,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.429,
+      "selfTimeMs": 0.306,
+      "url": "http://127.0.0.1:5000/src/App.tsx",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.882,
+      "selfTimeMs": 0.111,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.56,
+      "selfTimeMs": 0.095,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.436,
+      "selfTimeMs": 2.436,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.16,
+      "selfTimeMs": 2.16,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.102,
+      "selfTimeMs": 0.233,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.076,
+      "selfTimeMs": 0.022,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.948,
+      "selfTimeMs": 0.597,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.879,
+      "selfTimeMs": 0.032,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.82,
+      "selfTimeMs": 1.816,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.818,
+      "selfTimeMs": 1.818,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.809,
+      "selfTimeMs": 0.701,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.651,
+      "selfTimeMs": 0.116,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.633,
+      "selfTimeMs": 1.633,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.61,
+      "selfTimeMs": 1.053,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.575,
+      "selfTimeMs": 0.668,
+      "url": "http://127.0.0.1:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=be5c9ae3",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.488,
+      "selfTimeMs": 1.488,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.373,
+      "selfTimeMs": 0.05,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.364,
+      "selfTimeMs": 0.304,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.334,
+      "selfTimeMs": 0.041,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.327,
+      "selfTimeMs": 0.386,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.313,
+      "selfTimeMs": 1.313,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.296,
+      "selfTimeMs": 0.063,
+      "url": "http://127.0.0.1:5000/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.273,
+      "selfTimeMs": 0.109,
+      "url": null,
+      "function": null
+    }
+  ]
+}

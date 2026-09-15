@@ -1,0 +1,15 @@
+{
+  "status": 200,
+  "hasBootstrap": true,
+  "marker": "data-home-ssr",
+  "hasSsrMarker": true,
+  "css": [
+    {
+      "file": "assets/Home-DQCBP3Qu.css",
+      "inHead": true,
+      "status": 200
+    }
+  ],
+  "fallbackStatus": 503,
+  "fallbackBody": "Compiled Home SSR unavailable"
+}

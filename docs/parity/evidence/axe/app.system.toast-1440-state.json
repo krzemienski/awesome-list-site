@@ -1,0 +1,2708 @@
+{
+  "task": "567",
+  "state": "app.system.toast",
+  "width": 1440,
+  "route": "/resource/188015",
+  "component": "Toast",
+  "readySelector": "li[data-state=\"open\"]:has-text(\"Saved on this device\")",
+  "resourceId": "188015",
+  "transition": "real guest bookmark flow; saved on this device in disposable browser context",
+  "componentIdentity": "Toast title: Saved on this device",
+  "status": "PASS",
+  "violations": [],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ],
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<li tabindex=\"0\" data-state=\"open\" data-swipe-direction=\"right\" data-replit-metadata=\"client/src/component...\" data-component-name=\"Toast\" class=\"system-toast group p...\" data-radix-collectio...=\"\" style=\"user-select: none; t...\">",
+                  "target": [
+                    ".system-toast"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/components/ui/toaster.tsx:24:24\" data-component-name=\"ToastTitle\" class=\"system-toast__title text-sm font-semibold\">Saved on this device</div>",
+          "target": [
+            ".system-toast__title"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "elmPartiallyObscuring",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/components/ui/toaster.tsx:25:30\" data-component-name=\"ToastDescription\" class=\"system-toast__description text-sm opacity-90\">Your saved resource will move to your account when you sign in.</div>",
+          "target": [
+            ".system-toast__description"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<li tabindex=\"0\" data-state=\"open\" data-swipe-direction=\"right\" data-replit-metadata=\"client/src/component...\" data-component-name=\"Toast\" class=\"system-toast group p...\" data-radix-collectio...=\"\" style=\"user-select: none; t...\">",
+                  "target": [
+                    ".system-toast"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<button type=\"button\" data-replit-metadata=\"client/src/component...\" data-component-name=\"ToastPrimitives.Acti...\" class=\"system-toast__action...\" data-radix-toast-ann...=\"\" data-radix-toast-ann...=\"Sign in\">",
+          "target": [
+            ".system-toast__action"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "8.3pt (11px)",
+                "fontWeight": "bold",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:74:8\" data-component-name=\"span\" class=\"header-wordmark hide-tablet\">AWESOME.VIDEO</span>",
+          "target": [
+            ".header-wordmark"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:79:6\" data-component-name=\"button\" type=\"button\" class=\"header-search-trigger\" aria-label=\"Open search\">",
+                  "target": [
+                    ".header-search-trigger"
+                  ]
+                },
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:81:8\" data-component-name=\"span\" class=\"header-search-label\">Search <span data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:81:53\" data-component-name=\"span\">1,816 resources…</span></span>",
+          "target": [
+            ".header-search-label"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:79:6\" data-component-name=\"button\" type=\"button\" class=\"header-search-trigger\" aria-label=\"Open search\">",
+                  "target": [
+                    ".header-search-trigger"
+                  ]
+                },
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:81:53\" data-component-name=\"span\">1,816 resources…</span>",
+          "target": [
+            ".header-search-label > span[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.9pt (10.5px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:82:8\" data-component-name=\"span\" class=\"header-kbd hide-mobile\">⌘K</span>",
+                  "target": [
+                    ".header-kbd"
+                  ]
+                },
+                {
+                  "html": "<button data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:79:6\" data-component-name=\"button\" type=\"button\" class=\"header-search-trigger\" aria-label=\"Open search\">",
+                  "target": [
+                    ".header-search-trigger"
+                  ]
+                },
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:82:8\" data-component-name=\"span\" class=\"header-kbd hide-mobile\">⌘K</span>",
+          "target": [
+            ".header-kbd"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:57:4\" data-component-name=\"Link\" href=\"/categories\" class=\"nav-link\">Browse</a>",
+          "target": [
+            ".nav-link[href$=\"categories\"][data-component-name=\"Link\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:57:4\" data-component-name=\"Link\" href=\"/submit\" class=\"nav-link\">Submit</a>",
+          "target": [
+            ".nav-link[href$=\"submit\"][data-component-name=\"Link\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:57:4\" data-component-name=\"Link\" href=\"/about\" class=\"nav-link\">About</a>",
+          "target": [
+            ".nav-link[href$=\"about\"][data-component-name=\"Link\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:88:8\" data-component-name=\"a\" class=\"nav-link\" href=\"/design-system\" target=\"_blank\" rel=\"noopener noreferrer\">Docs ↗</a>",
+          "target": [
+            "a[href$=\"design-system\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:93:10\" data-component-name=\"button\" type=\"button\" class=\"user-pill\" aria-label=\"Account · Visitor\" id=\"radix-:r0:\" aria-haspopup=\"menu\" aria-expanded=\"false\" data-state=\"closed\">",
+                  "target": [
+                    "#radix-\\:r0\\:"
+                  ]
+                },
+                {
+                  "html": "<header data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:67:4\" data-component-name=\"header\" class=\"app-canonical-header\">",
+                  "target": [
+                    "header"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/components/layout/new/AppHeader.tsx:98:12\" data-component-name=\"span\" class=\"header-account-name hide-mobile\">Sign in</span>",
+          "target": [
+            ".header-account-name"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/components/layout/new/PageBreadcrumb.tsx:229:10\" data-component-name=\"BreadcrumbLink\" class=\"transition-colors hover:text-foreground\" href=\"/\" title=\"Home\" data-testid=\"link-breadcrumb-home\">Home</a>",
+          "target": [
+            "a[data-component-name=\"BreadcrumbLink\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<button data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Button\" class=\"inline-flex items-ce...\" data-ds-variant=\"ghost\" data-testid=\"button-back\">",
+          "target": [
+            "button[data-testid=\"button-back\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "8.3pt (11px)",
+                "fontWeight": "bold",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:594:8\" data-component-name=\"div\" class=\"eyebrow\">RESOURCE · DETAIL</div>",
+          "target": [
+            ".eyebrow"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "33.0pt (44px)",
+                "fontWeight": "bold",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h1 data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:595:8\" data-component-name=\"h1\" data-testid=\"text-resource-title\">srtdroid</h1>",
+          "target": [
+            "h1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.9pt (10.5px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:600:14\" data-component-name=\"Link\" data-testid=\"badge-category\" href=\"/category/protocols-transport\" class=\"chip\">",
+                  "target": [
+                    "a[data-testid=\"badge-category\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:602:16\" data-component-name=\"span\" class=\"resource-detail-chip-label\">Protocols &amp; Transport</span>",
+          "target": [
+            "a[data-testid=\"badge-category\"] > .resource-detail-chip-label[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.9pt (10.5px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:615:14\" data-component-name=\"span\" class=\"chip\" data-kind-source=\"resolvedKind\"><span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:616:16\" data-component-name=\"span\" class=\"resource-detail-chip-label\">other</span></span>",
+                  "target": [
+                    "span[data-kind-source=\"resolvedKind\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:616:16\" data-component-name=\"span\" class=\"resource-detail-chip-label\">other</span>",
+          "target": [
+            "span[data-kind-source=\"resolvedKind\"] > .resource-detail-chip-label[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.9pt (10.5px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:624:18\" data-component-name=\"Link\" data-testid=\"badge-subcategory\" href=\"/subcategory/transport-protocols\" class=\"chip\">",
+                  "target": [
+                    "a[data-testid=\"badge-subcategory\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:625:20\" data-component-name=\"span\" class=\"resource-detail-chip-label\">Transport Protocols</span>",
+          "target": [
+            "a[data-testid=\"badge-subcategory\"] > .resource-detail-chip-label[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.9pt (10.5px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:639:18\" data-component-name=\"Link\" data-testid=\"badge-sub-subcategory\" href=\"/sub-subcategory/srt\" class=\"chip\">",
+                  "target": [
+                    "a[data-testid=\"badge-sub-subcategory\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:640:20\" data-component-name=\"span\" class=\"resource-detail-chip-label\">SRT</span>",
+          "target": [
+            "a[data-testid=\"badge-sub-subcategory\"] > .resource-detail-chip-label[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:653:6\" data-component-name=\"section\" class=\"resource-detail-description\">",
+                  "target": [
+                    "section"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h2 data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:654:8\" data-component-name=\"h2\">DESCRIPTION</h2>",
+          "target": [
+            "section > h2"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "11.3pt (15px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:653:6\" data-component-name=\"section\" class=\"resource-detail-description\">",
+                  "target": [
+                    "section"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:655:8\" data-component-name=\"p\" data-testid=\"text-description\">Native Java/Kotlin SRT protocol implementation for Android mobile streaming applications</p>",
+          "target": [
+            "p[data-testid=\"text-description\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:684:12\" data-component-name=\"span\">Favorite</span>",
+          "target": [
+            "button[data-testid=\"button-favorite\"] > span[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Button\" class=\"inline-flex items-ce...\" data-ds-variant=\"default\" aria-disabled=\"false\" aria-busy=\"false\" data-testid=\"button-bookmark\" aria-pressed=\"true\" aria-label=\"Remove bookmark\">",
+                  "target": [
+                    "button[data-testid=\"button-bookmark\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:698:12\" data-component-name=\"span\">Bookmarked</span>",
+          "target": [
+            "button[data-testid=\"button-bookmark\"] > span[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:709:12\" data-component-name=\"span\">Share</span>",
+          "target": [
+            "button[data-testid=\"button-share\"] > span[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:723:16\" data-component-name=\"span\">Suggest Edit</span>",
+          "target": [
+            "button[data-testid=\"button-suggest-edit\"] > span[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h2 data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:807:16\" data-component-name=\"h2\" class=\"text-lg font-semibold mb-3 flex items-center gap-2\">",
+          "target": [
+            ".mb-3"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "8.3pt (11px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<dt data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:812:18\" data-component-name=\"dt\" class=\"font-medium text-muted-foreground\">Category path</dt>",
+          "target": [
+            "dt:nth-child(1)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:818:26\" data-component-name=\"span\" class=\"break-words\">Protocols &amp; Transport</span>",
+          "target": [
+            ".gap-1.inline-flex.min-w-0:nth-child(1) > .break-words[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:818:26\" data-component-name=\"span\" class=\"break-words\">Transport Protocols</span>",
+          "target": [
+            ".gap-1.inline-flex.min-w-0:nth-child(2) > .break-words[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:818:26\" data-component-name=\"span\" class=\"break-words\">SRT</span>",
+          "target": [
+            ".gap-1.inline-flex.min-w-0:nth-child(3) > .break-words[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "8.3pt (11px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<dt data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:840:22\" data-component-name=\"dt\" class=\"font-medium text-muted-foreground\">Classification</dt>",
+          "target": [
+            "dt:nth-child(3)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<dd data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:841:22\" data-component-name=\"dd\">Not yet classified</dd>",
+          "target": [
+            "dd:nth-child(4)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:806:14\" data-component-name=\"div\" data-seo-section=\"resource-details\">",
+                  "target": [
+                    "div[data-seo-section=\"resource-details\"]"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:845:16\" data-component-name=\"p\" class=\"mt-4 text-sm leading-relaxed text-muted-foreground\">srtdroid is cataloged in Protocols &amp; Transport, Transport Protocols, and SRT.</p>",
+          "target": [
+            ".mt-4"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:901:14\" data-component-name=\"div\">",
+                  "target": [
+                    ".resource-detail-sections > div[data-component-name=\"div\"]:nth-child(3)"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h2 data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:902:16\" data-component-name=\"h2\" class=\"text-lg font-semibold mb-2 flex items-center gap-2\">",
+          "target": [
+            ".mb-2"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgImage",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:901:14\" data-component-name=\"div\">",
+                  "target": [
+                    ".resource-detail-sections > div[data-component-name=\"div\"]:nth-child(3)"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:171:8\" data-component-name=\"div\" class=\"grain\" aria-hidden=\"true\"></div>",
+                  "target": [
+                    ".grain"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background image"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"a\" href=\"https://github.com/T...\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary hover:u...\" data-testid=\"link-url\">",
+          "target": [
+            ".hover\\:underline"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background image"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:947:14\" data-component-name=\"div\" class=\"flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-muted-foreground\">",
+                  "target": [
+                    ".sm\\:flex-row"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:953:20\" data-component-name=\"span\">Added on Jul 24, 2026</span>",
+          "target": [
+            ".sm\\:flex-row > .gap-2.flex[data-component-name=\"div\"] > span[data-component-name=\"span\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "13.5pt (18px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h2 data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1003:14\" data-component-name=\"h2\" class=\"text-lg font-semibold leading-none tracking-tight flex items-center gap-2\">",
+          "target": [
+            ".leading-none"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1007:14\" data-component-name=\"CardDescription\" class=\"text-sm text-muted-foreground\">Resources you might find interesting</div>",
+          "target": [
+            "div[data-component-name=\"CardDescription\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1029:22\" data-component-name=\"span\" class=\"font-medium text-sm line-clamp-1 flex-1\">SRT CookBook - Projects and Applications</span>",
+          "target": [
+            "a[href=\"/resource/188014\"] > .justify-between.gap-2.flex > .line-clamp-1.flex-1.font-medium"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1035:22\" data-component-name=\"p\" class=\"text-xs text-muted-foreground line-clamp-2 mt-1\">",
+          "target": [
+            "a[href=\"/resource/188014\"] > .line-clamp-2.mt-1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+                  "target": [
+                    "a[href=\"/resource/188014\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[href=\"/resource/188014\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1049:24\" data-component-name=\"div\" class=\"text-xs text-muted-foreground\">Why recommended:</div>",
+          "target": [
+            "a[href=\"/resource/188014\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .text-xs.text-muted-foreground[data-component-name=\"div\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same topic: SRT</span>",
+                  "target": [
+                    "a[href=\"/resource/188014\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same topic: SRT</span>",
+          "target": [
+            "a[href=\"/resource/188014\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+                  "target": [
+                    "a[href=\"/resource/188014\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+          "target": [
+            "a[href=\"/resource/188014\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1029:22\" data-component-name=\"span\" class=\"font-medium text-sm line-clamp-1 flex-1\">HydraSRT</span>",
+          "target": [
+            "a[href=\"/resource/188013\"] > .justify-between.gap-2.flex > .line-clamp-1.flex-1.font-medium"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1035:22\" data-component-name=\"p\" class=\"text-xs text-muted-foreground line-clamp-2 mt-1\">",
+          "target": [
+            "a[href=\"/resource/188013\"] > .line-clamp-2.mt-1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+                  "target": [
+                    "a[href=\"/resource/188013\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[href=\"/resource/188013\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1049:24\" data-component-name=\"div\" class=\"text-xs text-muted-foreground\">Why recommended:</div>",
+          "target": [
+            "a[href=\"/resource/188013\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .text-xs.text-muted-foreground[data-component-name=\"div\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same topic: SRT</span>",
+                  "target": [
+                    "a[href=\"/resource/188013\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same topic: SRT</span>",
+          "target": [
+            "a[href=\"/resource/188013\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+                  "target": [
+                    "a[href=\"/resource/188013\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+          "target": [
+            "a[href=\"/resource/188013\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1029:22\" data-component-name=\"span\" class=\"font-medium text-sm line-clamp-1 flex-1\">RTMPDump</span>",
+          "target": [
+            "a[href=\"/resource/186418\"] > .justify-between.gap-2.flex > .line-clamp-1.flex-1.font-medium"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1035:22\" data-component-name=\"p\" class=\"text-xs text-muted-foreground line-clamp-2 mt-1\">",
+          "target": [
+            "a[href=\"/resource/186418\"] > .line-clamp-2.mt-1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+                  "target": [
+                    "a[href=\"/resource/186418\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[href=\"/resource/186418\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1049:24\" data-component-name=\"div\" class=\"text-xs text-muted-foreground\">Why recommended:</div>",
+          "target": [
+            "a[href=\"/resource/186418\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .text-xs.text-muted-foreground[data-component-name=\"div\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+                  "target": [
+                    "a[href=\"/resource/186418\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+          "target": [
+            "a[href=\"/resource/186418\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">2 shared keywords</span>",
+                  "target": [
+                    "a[href=\"/resource/186418\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">2 shared keywords</span>",
+          "target": [
+            "a[href=\"/resource/186418\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1029:22\" data-component-name=\"span\" class=\"font-medium text-sm line-clamp-1 flex-1\">NGINX-RTMP Module</span>",
+          "target": [
+            "a[href=\"/resource/186419\"] > .justify-between.gap-2.flex > .line-clamp-1.flex-1.font-medium"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1035:22\" data-component-name=\"p\" class=\"text-xs text-muted-foreground line-clamp-2 mt-1\">",
+          "target": [
+            "a[href=\"/resource/186419\"] > .line-clamp-2.mt-1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+                  "target": [
+                    "a[href=\"/resource/186419\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[href=\"/resource/186419\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1049:24\" data-component-name=\"div\" class=\"text-xs text-muted-foreground\">Why recommended:</div>",
+          "target": [
+            "a[href=\"/resource/186419\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .text-xs.text-muted-foreground[data-component-name=\"div\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+                  "target": [
+                    "a[href=\"/resource/186419\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">Same subcategory: Transport Protocols</span>",
+          "target": [
+            "a[href=\"/resource/186419\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(1)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">1 shared keyword</span>",
+                  "target": [
+                    "a[href=\"/resource/186419\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">1 shared keyword</span>",
+          "target": [
+            "a[href=\"/resource/186419\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1029:22\" data-component-name=\"span\" class=\"font-medium text-sm line-clamp-1 flex-1\">Pion WebRTC</span>",
+          "target": [
+            "a[href=\"/resource/186610\"] > .justify-between.gap-2.flex > .line-clamp-1.flex-1.font-medium"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1035:22\" data-component-name=\"p\" class=\"text-xs text-muted-foreground line-clamp-2 mt-1\">",
+          "target": [
+            "a[href=\"/resource/186610\"] > .line-clamp-2.mt-1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+                  "target": [
+                    "a[href=\"/resource/186610\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Badge\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[href=\"/resource/186610\"] > .mt-2[data-component-name=\"div\"]:nth-child(3) > .rounded-full.px-2\\.5.border-transparent"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1049:24\" data-component-name=\"div\" class=\"text-xs text-muted-foreground\">Why recommended:</div>",
+          "target": [
+            "a[href=\"/resource/186610\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .text-xs.text-muted-foreground[data-component-name=\"div\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">4 shared keywords</span>",
+                  "target": [
+                    "a[href=\"/resource/186610\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5"
+                  ]
+                },
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span data-replit-metadata=\"client/src/pages/ResourceDetail.tsx:1052:28\" data-component-name=\"span\" class=\"text-xs bg-muted text-muted-foreground px-2 py-0.5\">4 shared keywords</span>",
+          "target": [
+            "a[href=\"/resource/186610\"] > .space-y-1.mt-2[data-component-name=\"div\"] > .flex-wrap.gap-1.flex > .bg-muted.px-2.py-0\\.5"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Card\" class=\"rounded-lg border bg...\">",
+                  "target": [
+                    ".resource-detail-related > article"
+                  ]
+                },
+                {
+                  "html": "<div data-replit-metadata=\"client/src/components/layout/new/MainLayout.tsx:166:6\" data-component-name=\"div\" class=\"page app-shell-page\" data-product-profile=\"public-discovery\" style=\"--shell-page-measure: var(--profile-page-measure, var(--content-max));\">",
+                  "target": [
+                    ".page"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a data-replit-metadata=\"client/src/pages/Res...\" data-component-name=\"Link\" data-testid=\"link-view-all-catego...\" data-ds-variant=\"ghost\" href=\"/category/protocols-...\" class=\"inline-flex items-ce...\">",
+          "target": [
+            "a[data-testid=\"link-view-all-category\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        }
+      ]
+    }
+  ],
+  "passes": 42,
+  "seriousCritical": 0,
+  "source": "docs/parity/evidence/audit-567-approved/states-corrected/audit-567-states.json"
+}

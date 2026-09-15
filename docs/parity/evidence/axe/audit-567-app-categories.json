@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.categories",
+  "widths": [
+    {
+      "screen": "app.categories",
+      "width": 375,
+      "route": "/categories",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.categories",
+      "width": 1440,
+      "route": "/categories",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 39,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 694,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 78.889,
+      "selfTimeMs": 0.949,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": "n"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 35.391,
+      "selfTimeMs": 0.154,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 27.452,
+      "selfTimeMs": 1.071,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 24.597,
+      "selfTimeMs": 20.804,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 23.909,
+      "selfTimeMs": 4.272,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 20.793,
+      "selfTimeMs": 20.695,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 19.677,
+      "selfTimeMs": 0.222,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 18.446,
+      "selfTimeMs": 1.996,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 17.486,
+      "selfTimeMs": 0.926,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 16.13,
+      "selfTimeMs": 0.429,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": "xb"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.67,
+      "selfTimeMs": 0.079,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.114,
+      "selfTimeMs": 0.092,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.057,
+      "selfTimeMs": 15.057,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.107,
+      "selfTimeMs": 0.774,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.723,
+      "selfTimeMs": 6.671,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 12.579,
+      "selfTimeMs": 2.913,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.768,
+      "selfTimeMs": 9.98,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.667,
+      "selfTimeMs": 9.729,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.949,
+      "selfTimeMs": 0.448,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.584,
+      "selfTimeMs": 0.087,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.313,
+      "selfTimeMs": 0.941,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.21,
+      "selfTimeMs": 0.625,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.858,
+      "selfTimeMs": 0.226,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.319,
+      "selfTimeMs": 1.308,
+      "url": "http://127.0.0.1:5101/assets/index-Bh5zsWtb.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.096,
+      "selfTimeMs": 5.044,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.003,
+      "selfTimeMs": 0.697,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.725,
+      "selfTimeMs": 0.406,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.261,
+      "selfTimeMs": 0.037,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.235,
+      "selfTimeMs": 0.992,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.623,
+      "selfTimeMs": 0.01,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": "xb"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.423,
+      "selfTimeMs": 2.412,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.203,
+      "selfTimeMs": 0.059,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.026,
+      "selfTimeMs": 1.307,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.755,
+      "selfTimeMs": 0.016,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.746,
+      "selfTimeMs": 0.264,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.595,
+      "selfTimeMs": 0.619,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.492,
+      "selfTimeMs": 0.043,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.383,
+      "selfTimeMs": 0.321,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.369,
+      "selfTimeMs": 0.403,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.323,
+      "selfTimeMs": 0.052,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.261,
+      "selfTimeMs": 0.055,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.228,
+      "selfTimeMs": 1.228,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.193,
+      "selfTimeMs": 0.124,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.147,
+      "selfTimeMs": 0.015,
+      "url": "http://127.0.0.1:5101/assets/index-ByHO_hdP.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.096,
+      "selfTimeMs": 1.096,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.091,
+      "selfTimeMs": 1.091,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.009,
+      "selfTimeMs": 1.009,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.847,
+      "selfTimeMs": 0.135,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.816,
+      "selfTimeMs": 0.631,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.814,
+      "selfTimeMs": 0.03,
+      "url": null,
+      "function": null
+    }
+  ]
+}

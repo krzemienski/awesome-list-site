@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 713,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 284.739,
+      "selfTimeMs": 251.693,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 240.863,
+      "selfTimeMs": 240.61,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 137.116,
+      "selfTimeMs": 0.564,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": "r"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 131.983,
+      "selfTimeMs": 3.299,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 79.941,
+      "selfTimeMs": 2.843,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 77.841,
+      "selfTimeMs": 0.207,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 49.507,
+      "selfTimeMs": 38.67,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 49.473,
+      "selfTimeMs": 32.667,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 48.82,
+      "selfTimeMs": 48.737,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 44.16,
+      "selfTimeMs": 3.238,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 39.445,
+      "selfTimeMs": 1.906,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 32.137,
+      "selfTimeMs": 0.072,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 29.146,
+      "selfTimeMs": 0.344,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": "zw"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 22.684,
+      "selfTimeMs": 21.472,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 21.272,
+      "selfTimeMs": 0.082,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 17.194,
+      "selfTimeMs": 0.326,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 16.703,
+      "selfTimeMs": 0.111,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.273,
+      "selfTimeMs": 14.273,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.235,
+      "selfTimeMs": 0.061,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 12.466,
+      "selfTimeMs": 11.017,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.093,
+      "selfTimeMs": 0.093,
+      "url": "https://gorgeous-jennet-4.clerk.accounts.dev/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.089,
+      "selfTimeMs": 0.894,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.774,
+      "selfTimeMs": 0.619,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.157,
+      "selfTimeMs": 0.076,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.157,
+      "selfTimeMs": 0.669,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.524,
+      "selfTimeMs": 0.578,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.729,
+      "selfTimeMs": 4.722,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.728,
+      "selfTimeMs": 0.131,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.514,
+      "selfTimeMs": 0.075,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.445,
+      "selfTimeMs": 0.01,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.855,
+      "selfTimeMs": 0.278,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.621,
+      "selfTimeMs": 0.282,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.05,
+      "selfTimeMs": 3.044,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.782,
+      "selfTimeMs": 0.127,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.677,
+      "selfTimeMs": 0.033,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.407,
+      "selfTimeMs": 0.178,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.88,
+      "selfTimeMs": 1.88,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.761,
+      "selfTimeMs": 0.849,
+      "url": "https://fonts.googleapis.com/css2?family=Inter%3Awght%40400%3B500%3B600%3B700%3B800&family=Fraunces%3Aital%2Cwght%400%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B1%2C400%3B1%2C500%3B1%2C600&family=JetBrains+Mono%3Awght%40400%3B500%3B600%3B700&family=Geist%3Awght%40400%3B500%3B600%3B700&family=Instrument+Serif%3Aital%400%3B1&family=Space+Grotesk%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Mono%3Awght%40400%3B500%3B600%3B700&family=IBM+Plex+Sans%3Awght%40400%3B500%3B600%3B700&family=Manrope%3Awght%40400%3B500%3B600%3B700%3B800&display=swap",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.626,
+      "selfTimeMs": 0.112,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.418,
+      "selfTimeMs": 0.152,
+      "url": "http://127.0.0.1:5101/",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.362,
+      "selfTimeMs": 0.634,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.225,
+      "selfTimeMs": 0.045,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.111,
+      "selfTimeMs": 1.111,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.082,
+      "selfTimeMs": 1.082,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.08,
+      "selfTimeMs": 1.08,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.068,
+      "selfTimeMs": 0.016,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.972,
+      "selfTimeMs": 0.044,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.962,
+      "selfTimeMs": 0.962,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.959,
+      "selfTimeMs": 0.092,
+      "url": "http://127.0.0.1:5101/assets/index-PnellaLm.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 0.89,
+      "selfTimeMs": 0.018,
+      "url": null,
+      "function": null
+    }
+  ]
+}

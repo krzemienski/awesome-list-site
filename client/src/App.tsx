@@ -1,4 +1,14 @@
-import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  lazy,
+  Suspense,
+  Component,
+  type ComponentType,
+  type ReactNode,
+} from "react";
 import { Switch, Route, Redirect, useLocation } from "wouter";
 import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { AccountThemePreferenceBridge } from "@/components/ui/theme-provider";
@@ -16,7 +26,6 @@ import {
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import SEOHead from "@/components/layout/SEOHead";
-import Home from "@/pages/Home";
 import AuthConversionTracker from "@/components/auth/AuthConversionTracker";
 import GuestBookmarkMerge from "@/components/auth/GuestBookmarkMerge";
 import ConsentBanner from "@/components/ui/consent-banner";
@@ -25,21 +34,23 @@ import { Button } from "@/components/ui/button";
 
 // Guard and terminal error surfaces only render after routing has selected a
 // matching branch. Keep them out of the anonymous entry while the auth/theme
-// provider and the Home surface remain eager.
+// provider and the shell remain eager.
 const AdminGuard = lazy(() => import("@/components/auth/AdminGuard"));
 const AuthGuard = lazy(() => import("@/components/auth/AuthGuard"));
 const ErrorPage = lazy(() => import("@/pages/ErrorPage"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const LazyHomeRoute = lazy(() => import("@/pages/Home"));
 
 // Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
 // entire admin tree (and its /api/admin/* fetch strings) lands in a separate
 // chunk that regular visitors never download.
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 
-// Task 301: Home is the only route kept in the entry chunk. Every other page
-// loads behind the shared Suspense + RouteErrorBoundary below, so anonymous
-// visitors do not parse category/detail form dependencies or role-gated code
-// before they can use the landing page. The shell stays eager and interactive.
+// Task 301: every page loads behind the shared Suspense +
+// RouteErrorBoundary below, so visitors do not parse route-specific
+// dependencies or role-gated code before they can use the shell. Home is also
+// a route chunk now; its anonymous SSR markup remains available immediately
+// while the browser hydrates that chunk only on the landing route.
 const Category = lazy(() => import("@/pages/Category"));
 const Subcategory = lazy(() => import("@/pages/Subcategory"));
 const SubSubcategory = lazy(() => import("@/pages/SubSubcategory"));
@@ -73,7 +84,7 @@ const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
  * route paints a familiar loading state instead of a blank main region. */
 function RouteFallback() {
   return (
-    <div className="space-y-6" data-testid="route-chunk-skeleton" aria-busy="true" aria-label="Loading page">
+    <div className="space-y-6" data-testid="route-chunk-skeleton" role="status" aria-busy="true" aria-label="Loading page">
       {/* BUG-031 (run22): while a lazy chunk loads, the head must already
           belong to the CURRENT route (brand title + current-path canonical),
           never linger on the previous route's metadata. The destination page
@@ -240,7 +251,7 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
           role="alert"
           data-testid="route-error-boundary"
         >
-          <h1 className="text-xl font-semibold">
+          <h1 className="display-h text-xl">
             {offline ? "Couldn't load this page — you appear to be offline" : "This page failed to load"}
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
@@ -256,14 +267,13 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
               Still offline — reconnect and try again.
             </p>
           )}
-          <button
+          <Button
             type="button"
             onClick={this.handleRetry}
-            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             data-testid="button-route-retry"
           >
             {offline ? "Retry" : "Reload page"}
-          </button>
+          </Button>
         </div>
       );
     }
@@ -274,19 +284,18 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
         role="alert"
         data-testid="route-error-boundary"
       >
-        <h1 className="text-xl font-semibold">Something went wrong on this page</h1>
+        <h1 className="display-h text-xl">Something went wrong on this page</h1>
         <p className="max-w-md text-sm text-muted-foreground">
           The rest of the site still works. You can retry this page or head back home.
         </p>
         <div className="flex gap-3">
-          <button
+          <Button
             type="button"
             onClick={this.handleRetry}
-            className="border border-border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             data-testid="button-route-retry"
           >
             Retry
-          </button>
+          </Button>
           <a
             href="/"
             className="border border-border px-4 py-2 text-sm font-medium"
@@ -300,13 +309,19 @@ class RouteErrorBoundary extends Component<RouteErrorBoundaryProps, RouteErrorBo
   }
 }
 
-import { processAwesomeListData } from "@/lib/parser";
 import {
   fetchStaticAwesomeList,
   fetchAwesomeListNav,
   needsCorpusRoute,
   type AwesomeListNav,
 } from "@/lib/static-data";
+
+type HomeRouteProps = {
+  nav?: AwesomeListNav;
+  navLoading: boolean;
+};
+type HomeRouteComponent = ComponentType<HomeRouteProps>;
+const HomeRoute: HomeRouteComponent = (props) => <LazyHomeRoute {...props} />;
 
 // Run3 audit R3-29: every path pattern the Switch below can handle. Anything
 // that matches none of these is a hard 404 — rendered as a standalone lean
@@ -505,7 +520,7 @@ function Logout() {
   );
 }
 
-function Router() {
+function Router({ homeComponent: Home }: { homeComponent: HomeRouteComponent }) {
   // Analytics tracking is consent-gated internally, but the hook itself stays
   // in the eager graph. Deferring it only relocates bytes: Router mounts it on
   // every route immediately, so visitors would still fetch this chunk on
@@ -637,14 +652,15 @@ function Router() {
           data-testid="banner-auth-error"
         >
           <span>We couldn't verify your sign-in status. You can keep browsing as a guest.</span>
-          <button
+          <Button
             type="button"
-            className="underline underline-offset-2 font-medium"
+            variant="link"
+            className="underline underline-offset-2"
             onClick={() => refetchAuth()}
             data-testid="button-auth-retry"
           >
             Retry
-          </button>
+          </Button>
         </div>
       ) : null}
       <RouteErrorBoundary location={location}>
@@ -771,7 +787,11 @@ function Router() {
   );
 }
 
-function App() {
+export function App({
+  homeComponent = HomeRoute,
+}: {
+  homeComponent?: HomeRouteComponent;
+} = {}) {
   const [, setLocation] = useLocation();
   // Task #376: the Clerk widget paints from resolved DS tokens and re-resolves
   // when the visitor changes system/accent at /settings/theme.
@@ -854,7 +874,7 @@ function App() {
           the skip link on every fresh visit). The banner stays fixed at the
           bottom visually and remains keyboard-reachable after the page
           content, with Escape still dismissing it for the session. */}
-      <Router />
+      <Router homeComponent={homeComponent} />
       <ConsentBanner />
       </AccountThemePreferenceBridge>
     </ClerkProvider>

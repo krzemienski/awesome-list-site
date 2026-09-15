@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.system.privacy",
+  "widths": [
+    {
+      "screen": "app.system.privacy",
+      "width": 375,
+      "route": "/privacy",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 42,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.system.privacy",
+      "width": 1440,
+      "route": "/privacy",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

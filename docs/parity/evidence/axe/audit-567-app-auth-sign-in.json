@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.auth.sign-in",
+  "widths": [
+    {
+      "screen": "app.auth.sign-in",
+      "width": 375,
+      "route": "/sign-in",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 45,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.auth.sign-in",
+      "width": 1440,
+      "route": "/sign-in",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 45,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

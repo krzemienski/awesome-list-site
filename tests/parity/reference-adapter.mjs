@@ -22,6 +22,8 @@
 import crypto from "node:crypto";
 import { indexCatalogPaths } from "./catalog-paths.mjs";
 import { buildReferenceReconciliation, projectOfficialBrandMark } from "./reference-reconciliation.mjs";
+import { collectOperationsBindings } from "./reference-admin-operations.mjs";
+import { collectCatalogBindings } from "./reference-admin-catalog.mjs";
 
 export const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
 
@@ -228,6 +230,34 @@ const formatJoined = (iso) => {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 };
 
+const ADMIN_USERS_ROUTE = "/api/admin/users?page=1&limit=20&sortBy=createdAt&sortDir=desc";
+const ADMIN_AUDIT_ROUTE = "/api/admin/audit-logs?limit=50&offset=0";
+const ADMIN_CONTACT_ROUTE = "/api/admin/contact-submissions?limit=20&offset=0";
+
+/**
+ * The frozen approval renderer declares its rows locally rather than reading a
+ * window global. Keep this source declaration explicit so a design change
+ * fails closed, then replace it with the live pending queue in served bytes.
+ */
+const FROZEN_ADMIN_PENDING_DECLARATION = `  const pending = [
+    { id: 1, title: 'WebCodecs API Reference', cat: 'Standards', user: 'guest', time: '14m ago' },
+    { id: 2, title: 'av1-encoder-bench', cat: 'Encoding', user: 'guest', time: '1h ago' },
+    { id: 3, title: 'OBS Lua Plugin Helper', cat: 'Media Tools', user: 'mhanssen', time: '3h ago' },
+    { id: 4, title: 'low-latency-cmaf-spec.pdf', cat: 'Standards', user: 'guest', time: '5h ago' },
+    { id: 5, title: 'react-native-track-player', cat: 'Players', user: 'guest', time: '1d ago' },
+  ];`;
+
+const toReferencePendingRow = (resource, frozenAtMs) => {
+  const createdAtMs = Date.parse(resource?.createdAt || "");
+  return {
+    id: resource?.id,
+    title: resource?.title || "",
+    cat: resource?.category || "",
+    user: resource?.submittedByEmail || resource?.submittedBy || "",
+    time: Number.isFinite(createdAtMs) ? relativeTime(createdAtMs, frozenAtMs) : "",
+  };
+};
+
 /**
  * Read admin data through the disposable admin's own signed-in session.
  * `fetchJson(route)` is provided by the identity handle and performs a
@@ -235,20 +265,43 @@ const formatJoined = (iso) => {
  * app's own admin screens use). Read-only endpoints only.
  */
 export async function buildAdminAdapter(fetchJson, frozenAtMs) {
+  const reads = new Map();
+  const fetchOnce = (route) => {
+    if (!reads.has(route)) reads.set(route, fetchJson(route));
+    return reads.get(route);
+  };
   const get = async (route) => {
-    const result = await fetchJson(route);
+    const result = await fetchOnce(route);
     if (!result.ok) throw new Error(`${route} returned ${result.status} for the disposable admin`);
     return result.body;
   };
-  const [stats, usersPage, pending, audit] = await Promise.all([
+  const [stats, usersPage, pending, audit, contactResponse, operations, catalog] = await Promise.all([
     get("/api/admin/stats"),
-    get("/api/admin/users?limit=100"),
+    get(ADMIN_USERS_ROUTE),
     get("/api/admin/pending-resources"),
-    get("/api/admin/audit-logs?limit=12"),
+    get(ADMIN_AUDIT_ROUTE),
+    fetchOnce(ADMIN_CONTACT_ROUTE),
+    collectOperationsBindings(fetchOnce),
+    collectCatalogBindings(fetchOnce),
   ]);
   const users = Array.isArray(usersPage?.users) ? usersPage.users : [];
   const logs = Array.isArray(audit?.logs) ? audit.logs : Array.isArray(audit) ? audit : [];
   const pendingResources = Array.isArray(pending?.resources) ? pending.resources : [];
+  const pendingApprovals = pendingResources.map((resource) => toReferencePendingRow(resource, frozenAtMs));
+  const auditLogs = logs.map((log) => ({
+    id: log.id,
+    resourceId: log.resourceId ?? null,
+    originalResourceId: log.originalResourceId ?? null,
+    action: log.action || "updated",
+    performedBy: log.performedBy || null,
+    performedByEmail: log.performedByEmail || null,
+    notes: log.notes || null,
+    changes: log.changes || null,
+    createdAt: log.createdAt || null,
+  }));
+  const contactBody = contactResponse?.ok && contactResponse.body && typeof contactResponse.body === "object"
+    ? contactResponse.body
+    : null;
   const admins = users.filter((user) => user.role === "admin").length;
   const contributors = users.length - admins;
   const oldestPending = pendingResources
@@ -256,6 +309,8 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
     .filter(Number.isFinite)
     .sort((a, b) => a - b)[0];
   const globals = {
+    AV_RETAINED_OPERATIONS: operations,
+    AV_RETAINED_CATALOG: catalog,
     AV_TOTAL_USERS: Number(stats.users ?? users.length),
     AV_USERS: users.map((user) => ({
       id: user.id,
@@ -272,13 +327,45 @@ export async function buildAdminAdapter(fetchJson, frozenAtMs) {
       time: log.createdAt ? relativeTime(Date.parse(log.createdAt), frozenAtMs) : "",
       status: "completed",
     })),
+    // Admin.jsx's frozen approval renderer does not consume globals for its
+    // local row declaration; buildPlaceholderSubstitutions projects this
+    // same live list into that declaration below.
+    AV_PENDING_APPROVALS: pendingApprovals,
+    AV_PENDING_RESOURCES: pendingResources.map((resource) => ({
+      id: resource.id,
+      title: resource.title || "",
+      category: resource.category || "",
+      subcategory: resource.subcategory || "",
+      description: resource.description || "",
+      createdAt: resource.createdAt || null,
+      submittedBy: resource.submittedBy || null,
+      submittedByEmail: resource.submittedByEmail || null,
+    })),
+    AV_AUDIT_LOGS: auditLogs,
+    AV_AUDIT_TOTAL: Number(audit?.total ?? auditLogs.length),
+    AV_CONTACT_SUBMISSIONS: contactBody
+      ? {
+        available: true,
+        total: Number(contactBody.total ?? contactBody.submissions?.length ?? 0),
+        submissions: Array.isArray(contactBody.submissions)
+          ? contactBody.submissions.map((submission) => ({
+            id: submission.id,
+            name: submission.name || "",
+            replyTo: submission.replyTo || "",
+            subject: submission.subject || "",
+            createdAt: submission.createdAt || null,
+          }))
+          : [],
+      }
+      : { available: false, status: Number(contactResponse?.status || 0), total: 0, submissions: [] },
   };
   return {
     globals,
     stats,
+    pendingApprovals,
     counts: { users: users.length, admins, contributors, pending: Number(stats.pendingApprovals ?? pendingResources.length), oldestPendingMs: oldestPending ?? null },
-    endpoints: ["/api/admin/stats", "/api/admin/users?limit=100", "/api/admin/pending-resources", "/api/admin/audit-logs?limit=12"],
-    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, pending, audit })),
+    endpoints: [...reads.keys()],
+    snapshotBytes: Buffer.from(JSON.stringify({ stats, usersPage, pending, audit, contactResponse, operations, catalog })),
   };
 }
 
@@ -305,6 +392,7 @@ export function buildPlaceholderSubstitutions({ adapter, home, frozenAt, admin, 
     { file: "admin.jsx", from: 'sub="across 9 categories"', to: `sub="across ${categoriesCount} categories"`, source: "nav category count", available: true },
     { file: "admin.jsx", from: 'sub="2 admins · 1 contributor"', to: admin ? `sub="${admin.counts.admins} admin${admin.counts.admins === 1 ? "" : "s"} · ${admin.counts.contributors} contributor${admin.counts.contributors === 1 ? "" : "s"}"` : null, source: "/api/admin/users roles (admin session only)", available: Boolean(admin) },
     { file: "admin.jsx", from: 'value="7" sub="oldest 14m ago"', to: admin ? `value="${admin.counts.pending}" sub="${admin.counts.oldestPendingMs ? `oldest ${relativeTime(admin.counts.oldestPendingMs, frozenAtMs)}` : "nothing waiting"}"` : null, source: "/api/admin/stats pendingApprovals + oldest /api/admin/pending-resources createdAt vs frozen clock (admin session only)", available: Boolean(admin) },
+    { file: "admin.jsx", from: FROZEN_ADMIN_PENDING_DECLARATION, to: admin ? `  const pending = ${JSON.stringify(admin.pendingApprovals)};` : null, source: "/api/admin/pending-resources (same unfiltered queue consumed by the Approvals tab; an empty live queue is authoritative)", available: Boolean(admin) },
     ...(reconciliation?.sourceSubstitutions || []),
   ];
   return entries;

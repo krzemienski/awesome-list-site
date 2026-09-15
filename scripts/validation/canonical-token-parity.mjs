@@ -314,7 +314,40 @@ const NO_ANIM_REASON =
 
 const noAnimHolds = ({ canonical, app }) => app === 'none !important' && canonical !== app;
 
+const PAGE_ATMOSPHERE_REASON =
+  'Raster budget: the design paints `background: var(--bg-atmosphere), var(--bg)` on .page; ' +
+  'the runtime paints the same two layers on .page::before (var(--bg)) and .page::after ' +
+  '(var(--bg-atmosphere), background-repeat: var(--bg-atmosphere-repeat), clip-path: var(--bg-atmosphere-clip)) at z-index -1 — the same box, ' +
+  'positioning area and paint position — so the atmosphere raster can be bounded to the bands ' +
+  'where the gradient is not exactly transparent (Home at 412px is ~6000px tall; the unbounded ' +
+  'gradient cost ~3s of software raster per load). .page itself must be transparent for the ' +
+  'pseudo layers to show. See docs/parity/assumptions/tokens.md §11. Expires when the design ' +
+  'moves its atmosphere off .page or the runtime stops carrying both layers on the pseudos.';
+
+function pageAtmosphereHolds({ canonical, app, appRules }) {
+  if (!appRules || !(app === 'none' || app === 'transparent')) return false;
+  if (!/var\(--bg-atmosphere\)/.test(canonical) && canonical !== 'var(--bg)') return false;
+  const before = appRules.get('.page::before');
+  const after = appRules.get('.page::after');
+  const both = appRules.get('.page::before, .page::after');
+  const decl = (rule, prop) => (rule && rule.has(prop) ? normaliseValue(rule.get(prop)) : null);
+  const layer = (prop) => decl(before, prop) ?? decl(both, prop);
+  const layerAfter = (prop) => decl(after, prop) ?? decl(both, prop);
+  return (
+    layer('background') === 'var(--bg)' &&
+    layerAfter('background') === 'var(--bg-atmosphere)' &&
+    layerAfter('background-size') === 'var(--bg-atmosphere-size,auto)' &&
+    layerAfter('background-repeat') === 'var(--bg-atmosphere-repeat,no-repeat)' &&
+    layerAfter('clip-path') === 'var(--bg-atmosphere-clip,none)' &&
+    layer('position') === 'absolute' && layerAfter('position') === 'absolute' &&
+    layer('inset') === '0' && layerAfter('inset') === '0' &&
+    layer('z-index') === '-1' && layerAfter('z-index') === '-1'
+  );
+}
+
 export const DOCUMENTED_DEVIATIONS = new Map([
+  ['rule:.page:background', { reason: PAGE_ATMOSPHERE_REASON, holds: pageAtmosphereHolds }],
+  ['rule:.page:background-color', { reason: PAGE_ATMOSPHERE_REASON, holds: pageAtmosphereHolds }],
   ...['editorial', 'terminal', 'geist', 'brutalist', 'swiss'].map((id) => [
     `${id}:--text-3`,
     { reason: TEXT3_REASON, holds: text3Holds },
@@ -2096,7 +2129,7 @@ export function compareModels(canonical, app, deviations = DOCUMENTED_DEVIATIONS
           const reason = String(deviation.reason ?? '').trim();
           if (!reason) failures.push(`deviation ${devKey} has no written reason — write why or delete the entry`);
           else if (typeof deviation.holds !== 'function') failures.push(`deviation ${devKey} has no holds() check — a reason must be re-provable from data`);
-          else if (!deviation.holds({ canonical: canon, app: appNorm })) failures.push(`deviation ${devKey} no longer holds (canonical ${canon} vs runtime ${appNorm}) — align the value or rewrite the entry`);
+          else if (!deviation.holds({ canonical: canon, app: appNorm, canonicalRules: canonical.rules, appRules: app.rules })) failures.push(`deviation ${devKey} no longer holds (canonical ${canon} vs runtime ${appNorm}) — align the value or rewrite the entry`);
           else { honoured.push({ system: `rule:${selector}`, token: prop, canonical: canon, app: appNorm, reason }); rows.push({ prop, canonical: canon, app: appNorm, status: 'documented-deviation' }); continue; }
         }
         rows.push({ prop, canonical: canon, app: appNorm, status: appNorm == null ? 'missing' : 'mismatch' });
@@ -2465,6 +2498,10 @@ export const CANARIES = [
   { id: 'later-utility-override', note: 'a repeated .chip rule changes font-size', expect: /^utility \.chip: font-size differs/, mutate: { appCss: (s) => `${s}\n.chip { font-size: 12px; }\n` } },
   { id: 'later-utility-under-media', note: '.chip re-declared under a media query', expect: /^shadow rule: @media \(max-width: 600px\)\|\|\.chip re-declares font-size for \.chip under @media \(max-width:600px\)/, mutate: { appCss: (s) => `${s}\n@media (max-width: 600px) { .chip { font-size: 12px; } }\n` } },
   { id: 'descendant-override', note: '.page .chip re-declares font-size', expect: /^shadow rule: \.page \.chip re-declares font-size/, mutate: { appCss: (s) => `${s}\n.page .chip { font-size: 12px; }\n` } },
+  { id: 'page-atmosphere-pseudo-dropped', note: '.page::after stops carrying the atmosphere — the .page background deviation must stop holding', expect: /^deviation rule:\.page:background no longer holds/, mutate: { appCss: (s) => `${s}\n.page::after { background: none; }\n` } },
+  { id: 'page-atmosphere-clip-dropped', note: '.page::after loses its clip-path token — the deviation is only honoured for the documented pseudo contract', expect: /^deviation rule:\.page:background no longer holds/, mutate: { appCss: (s) => `${s}\n.page::after { clip-path: none; }\n` } },
+  { id: 'page-atmosphere-repeat-dropped', note: '.page::after loses its background-repeat token — a repeated atmosphere re-rasterises the whole gradient bitmap per tile', expect: /^deviation rule:\.page:background no longer holds/, mutate: { appCss: (s) => `${s}\n.page::after { background-repeat: repeat; }\n` } },
+  { id: 'page-atmosphere-plane-dropped', note: '.page::before stops painting var(--bg) — the transparent .page would expose whatever lies beneath', expect: /^deviation rule:\.page:background-color no longer holds/, mutate: { appCss: (s) => `${s}\n.page::before { background: transparent; }\n` } },
   { id: 'state-override', note: '.chip:hover re-declares background', expect: /^shadow rule: \.chip:hover re-declares background for \.chip when :hover/, mutate: { appCss: (s) => `${s}\n.chip:hover { background: red; }\n` } },
   // --- selector-equivalent shadows (decided by a selector engine, not by the selector text) ---
   { id: 'escaped-class-shadow', note: '.\\63 hip is .chip spelled with a hex escape — the engine must decode it, not split on the terminator space', expect: /^shadow rule: \.\\63 hip re-declares font-size for \.chip — runtime resolves 99px/, mutate: { appCss: (s) => `${s}\n.\\63 hip { font-size: 99px; }\n` } },

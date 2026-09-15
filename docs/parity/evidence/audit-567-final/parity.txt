@@ -1,0 +1,8 @@
+
+> rest-express@1.0.0 test:parity
+> node tests/parity/runner.mjs
+
+[parity] precondition failure: Error: ARTIFACT_BASE_URL must be supplied (loopback origin, e.g. http://127.0.0.1:5000)
+    at requireLoopback (file:///home/runner/workspace/tests/parity/runner.mjs:311:21)
+    at main (file:///home/runner/workspace/tests/parity/runner.mjs:331:40)
+EXIT_CODE=2

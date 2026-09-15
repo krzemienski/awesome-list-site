@@ -8,7 +8,6 @@
  */
 .home-page {
   width: 100%;
-  animation: home-fade-in 0.5s ease;
 }
 
 .home-meta-row {
@@ -180,7 +179,7 @@ button.home-kind-chip {
   width: auto;
   height: auto;
   place-items: center;
-  color: var(--accent);
+  color: var(--text-2);
   font-size: 0.9375rem;
   line-height: normal;
 }
@@ -900,15 +899,6 @@ button.home-kind-chip {
   border: var(--hairline-w) solid var(--border);
 }
 
-@keyframes home-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes home-skeleton-shimmer {
   from {
     background-position: 200% 0;
@@ -952,7 +942,6 @@ button.home-kind-chip {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-page,
   .home-skeleton-line,
   .home-skeleton-chip,
   .home-skeleton-contribute {

@@ -1,0 +1,272 @@
+
+> rest-express@1.0.0 build
+> export BUILD_REVISION="${BUILD_REVISION:-$(git rev-parse HEAD 2>/dev/null)}" && if [ -z "$BUILD_REVISION" ]; then echo 'BUILD_REVISION is required when git metadata is unavailable' >&2; exit 1; fi && vite build && vite build --ssr src/entry-server.tsx --outDir ../dist/ssr --emptyOutDir false && esbuild server/index.ts --platform=node --packages=external --external:./vite-dev --bundle --format=esm --outdir=dist --define:process.env.BUILD_REVISION="$(node -p 'JSON.stringify(process.env.BUILD_REVISION)')"
+
+vite v5.4.21 building for production...
+transforming...
+✓ 3826 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/public/index.html                                                23.32 kB │ gzip:   7.62 kB
+../dist/public/.vite/manifest.json                                       57.46 kB │ gzip:   6.47 kB
+../dist/public/bundle-modules.json                                      108.17 kB │ gzip:  13.98 kB
+../dist/public/assets/system-D-mANIo5.css                                 1.49 kB │ gzip:   0.56 kB
+../dist/public/assets/discovery-DoxtAFtK.css                              2.10 kB │ gzip:   0.65 kB
+../dist/public/assets/TaxonomyListing-CtRpR4wC.css                        2.11 kB │ gzip:   0.76 kB
+../dist/public/assets/system-legal--uK08R2q.css                           2.39 kB │ gzip:   0.84 kB
+../dist/public/assets/ResourceDetail-B9keS-uk.css                         2.76 kB │ gzip:   0.84 kB
+../dist/public/assets/resource-card-CPhpLDX2.css                          4.65 kB │ gzip:   1.16 kB
+../dist/public/assets/search-dialog-Bl__-iar.css                          5.15 kB │ gzip:   1.42 kB
+../dist/public/assets/SubmitResource-zvvfzLHD.css                         5.28 kB │ gzip:   1.43 kB
+../dist/public/assets/About-D0Qf7d-K.css                                  6.93 kB │ gzip:   1.69 kB
+../dist/public/assets/account-CHq0B8tW.css                                7.65 kB │ gzip:   1.21 kB
+../dist/public/assets/discovery-tools-BFusKbiz.css                       10.35 kB │ gzip:   1.90 kB
+../dist/public/assets/Home-DQCBP3Qu.css                                  14.21 kB │ gzip:   2.89 kB
+../dist/public/assets/discovery-journeys-Cf-1ZAKW.css                    14.30 kB │ gzip:   2.52 kB
+../dist/public/assets/AdminDashboard-BicCCs51.css                        52.20 kB │ gzip:   7.62 kB
+../dist/public/assets/index-gTNi33bR.css                                152.89 kB │ gzip:  26.94 kB
+../dist/public/assets/index-BdQq_4o_.js                                   0.06 kB │ gzip:   0.08 kB
+../dist/public/assets/resourceFacets-B5L52d7d.js                          0.13 kB │ gzip:   0.12 kB
+../dist/public/assets/contact-footer-BcXVjxjW.js                          0.19 kB │ gzip:   0.16 kB
+../dist/public/assets/useDebounce-Bkpf_b0r.js                             0.19 kB │ gzip:   0.17 kB
+../dist/public/assets/index-BzkqPxjz.js                                   0.23 kB │ gzip:   0.17 kB
+../dist/public/assets/chevron-down-B6NRdWOs.js                            0.30 kB │ gzip:   0.24 kB
+../dist/public/assets/tags-CsHd_him.js                                    0.30 kB │ gzip:   0.23 kB
+../dist/public/assets/play-DLBw0S14.js                                    0.30 kB │ gzip:   0.25 kB
+../dist/public/assets/searchNormalize-SvtDRall.js                         0.30 kB │ gzip:   0.21 kB
+../dist/public/assets/loader-circle-DKGj0PLD.js                           0.31 kB │ gzip:   0.26 kB
+../dist/public/assets/arrow-left-B1MlwGbK.js                              0.33 kB │ gzip:   0.27 kB
+../dist/public/assets/arrow-right-DdIZYQNs.js                             0.33 kB │ gzip:   0.27 kB
+../dist/public/assets/circle-check-Bg2EwqpO.js                            0.35 kB │ gzip:   0.27 kB
+../dist/public/assets/check-check-CVA-4e2_.js                             0.35 kB │ gzip:   0.27 kB
+../dist/public/assets/clock-CQ7LG52p.js                                   0.35 kB │ gzip:   0.27 kB
+../dist/public/assets/clock-3-BFXBHwmT.js                                 0.36 kB │ gzip:   0.27 kB
+../dist/public/assets/circle-check-big-bT_1Cd3t.js                        0.36 kB │ gzip:   0.28 kB
+../dist/public/assets/rotate-ccw-BcReDSPn.js                              0.37 kB │ gzip:   0.28 kB
+../dist/public/assets/trending-up-BHw3GrAJ.js                             0.37 kB │ gzip:   0.28 kB
+../dist/public/assets/circle-x-BLTdkr1K.js                                0.38 kB │ gzip:   0.28 kB
+../dist/public/assets/mail-YqWWBXRJ.js                                    0.38 kB │ gzip:   0.30 kB
+../dist/public/assets/folder-Buh8iA97.js                                  0.40 kB │ gzip:   0.29 kB
+../dist/public/assets/history-DAxlaUwJ.js                                 0.41 kB │ gzip:   0.30 kB
+../dist/public/assets/type-srK2vzQt.js                                    0.41 kB │ gzip:   0.29 kB
+../dist/public/assets/heart-DNTcOLcK.js                                   0.41 kB │ gzip:   0.31 kB
+../dist/public/assets/circle-alert-Cf4kcSXa.js                            0.42 kB │ gzip:   0.29 kB
+../dist/public/assets/chart-column-VdXVuU2I.js                            0.42 kB │ gzip:   0.30 kB
+../dist/public/assets/external-link-ykOkpfVm.js                           0.42 kB │ gzip:   0.30 kB
+../dist/public/assets/eye-CKfqVWPV.js                                     0.43 kB │ gzip:   0.31 kB
+../dist/public/assets/calendar-eoCJ_win.js                                0.43 kB │ gzip:   0.30 kB
+../dist/public/assets/triangle-alert-CRqKRKS8.js                          0.43 kB │ gzip:   0.31 kB
+../dist/public/assets/award-Ca2widrl.js                                   0.44 kB │ gzip:   0.33 kB
+../dist/public/assets/pencil-CK5gY56B.js                                  0.45 kB │ gzip:   0.33 kB
+../dist/public/assets/inbox-CeUSkT2-.js                                   0.46 kB │ gzip:   0.33 kB
+../dist/public/assets/users-DZOoF_Q7.js                                   0.47 kB │ gzip:   0.33 kB
+../dist/public/assets/square-pen-DPuSYnfk.js                              0.49 kB │ gzip:   0.34 kB
+../dist/public/assets/shield-check-C6nass8j.js                            0.49 kB │ gzip:   0.35 kB
+../dist/public/assets/refresh-cw-ZFZHLM7_.js                              0.49 kB │ gzip:   0.32 kB
+../dist/public/assets/tag-BfYp4flR.js                                     0.50 kB │ gzip:   0.35 kB
+../dist/public/assets/file-text-CbO8RVjy.js                               0.50 kB │ gzip:   0.32 kB
+../dist/public/assets/useContinueLearning-DK2UmLUS.js                     0.51 kB │ gzip:   0.32 kB
+../dist/public/assets/layout-grid-fQwTpY_-.js                             0.51 kB │ gzip:   0.30 kB
+../dist/public/assets/layers-BoEQfmW_.js                                  0.53 kB │ gzip:   0.34 kB
+../dist/public/assets/label-DoQ_gJG1.js                                   0.59 kB │ gzip:   0.39 kB
+../dist/public/assets/textarea-BXmDtGpi.js                                0.62 kB │ gzip:   0.36 kB
+../dist/public/assets/trophy-CvJS-1nO.js                                  0.63 kB │ gzip:   0.39 kB
+../dist/public/assets/url-filter-state-CQl46NDa.js                        0.66 kB │ gzip:   0.37 kB
+../dist/public/assets/sparkles-CvqYd3Z9.js                                0.68 kB │ gzip:   0.40 kB
+../dist/public/assets/sliders-horizontal-Lma0EP5V.js                      0.75 kB │ gzip:   0.37 kB
+../dist/public/assets/AuthGuard-DTAY9bzJ.js                               0.86 kB │ gzip:   0.53 kB
+../dist/public/assets/alert-9K1W8-eJ.js                                   0.93 kB │ gzip:   0.47 kB
+../dist/public/assets/link-2-Bdoaz3ez.js                                  1.01 kB │ gzip:   0.46 kB
+../dist/public/assets/seo-content-templates-CEQfVPhW.js                   1.13 kB │ gzip:   0.66 kB
+../dist/public/assets/index-CeftJlzp.js                                   1.15 kB │ gzip:   0.68 kB
+../dist/public/assets/badge-Bt77FrkR.js                                   1.16 kB │ gzip:   0.54 kB
+../dist/public/assets/trash-2-BZbxlbbH.js                                 1.18 kB │ gzip:   0.49 kB
+../dist/public/assets/resourceFacets-core-DMw7vNpP.js                     1.23 kB │ gzip:   0.58 kB
+../dist/public/assets/card-Dh-VO_4i.js                                    1.30 kB │ gzip:   0.49 kB
+../dist/public/assets/json-query-BLAlhwVB.js                              1.31 kB │ gzip:   0.68 kB
+../dist/public/assets/resourceKinds-core-Dz8cDD7Y.js                      1.32 kB │ gzip:   0.61 kB
+../dist/public/assets/LinkHealthTrendChart-DUKNUEAb.js                    1.35 kB │ gzip:   0.65 kB
+../dist/public/assets/Category-kxYGpQnh.js                                1.44 kB │ gzip:   0.72 kB
+../dist/public/assets/Subcategory-DU_Pk1so.js                             1.44 kB │ gzip:   0.73 kB
+../dist/public/assets/SubSubcategory-DIU9P2ZR.js                          1.45 kB │ gzip:   0.73 kB
+../dist/public/assets/onboarding-values-Da-jKBtx.js                       1.57 kB │ gzip:   0.75 kB
+../dist/public/assets/ErrorPage-DmQz3c6P.js                               1.67 kB │ gzip:   0.82 kB
+../dist/public/assets/skeletons-rPzpEa7-.js                               1.70 kB │ gzip:   0.52 kB
+../dist/public/assets/ResourceBreadcrumbAncestorDisclosure-DAcTQHTf.js    1.78 kB │ gzip:   0.88 kB
+../dist/public/assets/progress-BJG3dTcp.js                                1.93 kB │ gzip:   0.95 kB
+../dist/public/assets/git-branch-Dm5hY9GV.js                              2.12 kB │ gzip:   0.65 kB
+../dist/public/assets/AdminGuard-BPF5CnlV.js                              2.19 kB │ gzip:   0.95 kB
+../dist/public/assets/collapsible-DuuDdd0P.js                             2.20 kB │ gzip:   0.98 kB
+../dist/public/assets/thumbs-up-BeHUUVs_.js                               2.30 kB │ gzip:   0.82 kB
+../dist/public/assets/navigation-icons-5a6gAzvh.js                        2.38 kB │ gzip:   0.95 kB
+../dist/public/assets/dialog-CFCjA4k6.js                                  2.47 kB │ gzip:   0.94 kB
+../dist/public/assets/use-home-layout-tIB2OvEl.js                         2.67 kB │ gzip:   1.25 kB
+../dist/public/assets/not-found-hrkms4s3.js                               3.04 kB │ gzip:   1.46 kB
+../dist/public/assets/observers-D2Y-gyVA.js                               3.32 kB │ gzip:   1.55 kB
+../dist/public/assets/tabs-Bk6T_TmJ.js                                    3.38 kB │ gzip:   1.43 kB
+../dist/public/assets/vendor-blurhash-DVeDoVY-.js                         3.69 kB │ gzip:   1.78 kB
+../dist/public/assets/switch-BF5DqYnD.js                                  3.78 kB │ gzip:   1.65 kB
+../dist/public/assets/checkbox-BAdEZXlV.js                                3.89 kB │ gzip:   1.71 kB
+../dist/public/assets/alert-dialog-CcSGUwqL.js                            4.02 kB │ gzip:   1.37 kB
+../dist/public/assets/PublicCollection-C561i6wS.js                        4.17 kB │ gzip:   1.75 kB
+../dist/public/assets/analytics-connector.esm-C_GtHJH1.js                 4.22 kB │ gzip:   1.62 kB
+../dist/public/assets/contact-dialog-y0lOCiJg.js                          4.52 kB │ gzip:   1.86 kB
+../dist/public/assets/CodeOfConduct-BvbK27r3.js                           4.55 kB │ gzip:   1.91 kB
+../dist/public/assets/Terms-BosTpzAI.js                                   4.59 kB │ gzip:   1.73 kB
+../dist/public/assets/ContinueLearningPreview-Bnb5aYPJ.js                 4.72 kB │ gzip:   1.77 kB
+../dist/public/assets/Recommendations-Dk3RbzOg.js                         4.79 kB │ gzip:   1.75 kB
+../dist/public/assets/validation-D-lm192Z.js                              4.94 kB │ gzip:   1.84 kB
+../dist/public/assets/paginator-su_I6UXf.js                               5.23 kB │ gzip:   2.20 kB
+../dist/public/assets/Notifications-ZyQM-wh2.js                           5.31 kB │ gzip:   1.94 kB
+../dist/public/assets/TagLanding-SzBHV0o3.js                              5.45 kB │ gzip:   2.52 kB
+../dist/public/assets/Categories-DQ75osB7.js                              5.51 kB │ gzip:   2.33 kB
+../dist/public/assets/BookmarkButton-DTzYJE9d.js                          5.76 kB │ gzip:   2.28 kB
+../dist/public/assets/index-CTjT7uj6.js                                   7.81 kB │ gzip:   3.08 kB
+../dist/public/assets/ResourceCard-DlyvmHpa.js                            7.93 kB │ gzip:   2.90 kB
+../dist/public/assets/Onboarding-CiSxIRUv.js                              8.02 kB │ gzip:   2.93 kB
+../dist/public/assets/SearchFilters-0rd_BSh0.js                           8.21 kB │ gzip:   2.92 kB
+../dist/public/assets/BookmarkNotesDialog-KtIZR-3R.js                     8.43 kB │ gzip:   3.35 kB
+../dist/public/assets/index-BUd4hCY-.js                                   8.60 kB │ gzip:   3.60 kB
+../dist/public/assets/Journeys-BKMLQOfG.js                                9.55 kB │ gzip:   3.00 kB
+../dist/public/assets/index.esm-BUk3VRnp.js                               9.73 kB │ gzip:   3.66 kB
+../dist/public/assets/formatDistanceToNow-aDLjEcHe.js                     9.91 kB │ gzip:   3.36 kB
+../dist/public/assets/Privacy-BuJPPhNh.js                                10.53 kB │ gzip:   3.11 kB
+../dist/public/assets/advanced-filter-DDy5wsj2.js                        10.89 kB │ gzip:   3.82 kB
+../dist/public/assets/suggest-edit-dialog-B12klmw-.js                    12.07 kB │ gzip:   3.88 kB
+../dist/public/assets/ContinueLearning-Dty3L5L6.js                       12.44 kB │ gzip:   3.39 kB
+../dist/public/assets/learning-preferences-form-BOhGdKEk.js              12.50 kB │ gzip:   3.97 kB
+../dist/public/assets/Search-B2M80wW7.js                                 12.65 kB │ gzip:   4.60 kB
+../dist/public/assets/scroll-area-shiddxNC.js                            12.73 kB │ gzip:   4.03 kB
+../dist/public/assets/ThemeSettings-DRtRboj_.js                          13.59 kB │ gzip:   3.65 kB
+../dist/public/assets/JourneyDetail-COUmmjmi.js                          14.37 kB │ gzip:   4.41 kB
+../dist/public/assets/SubmitResource-CSXegQCO.js                         14.98 kB │ gzip:   4.92 kB
+../dist/public/assets/index-DbVCLocN.js                                  15.98 kB │ gzip:   5.16 kB
+../dist/public/assets/DesignSystemShowcase-w4U4gaz4.js                   19.56 kB │ gzip:   5.63 kB
+../dist/public/assets/Profile-zrzhF1jY.js                                20.19 kB │ gzip:   5.87 kB
+../dist/public/assets/Contributions-2AMUj-y6.js                          20.42 kB │ gzip:   6.57 kB
+../dist/public/assets/Settings-DeSWB8Y4.js                               21.07 kB │ gzip:   6.56 kB
+../dist/public/assets/ResourceDetail-CQxY39-u.js                         23.01 kB │ gzip:   7.05 kB
+../dist/public/assets/About-CWNERfju.js                                  23.03 kB │ gzip:   5.92 kB
+../dist/public/assets/ai-recommendations-panel-C0SC6-0o.js               23.37 kB │ gzip:   7.65 kB
+../dist/public/assets/select-CclVq91K.js                                 23.65 kB │ gzip:   8.24 kB
+../dist/public/assets/background-capture-DF9mzHd3.js                     23.90 kB │ gzip:   8.03 kB
+../dist/public/assets/TaxonomyListing-D7h8XcQy.js                        25.74 kB │ gzip:   8.58 kB
+../dist/public/assets/search-dialog-c16YYHVG.js                          25.84 kB │ gzip:   8.60 kB
+../dist/public/assets/Home-6id-su6K.js                                   32.30 kB │ gzip:   9.80 kB
+../dist/public/assets/BookmarksGate-x8wt4B2p.js                          35.46 kB │ gzip:  10.75 kB
+../dist/public/assets/form-C9tXqjsq.js                                   36.60 kB │ gzip:  13.11 kB
+../dist/public/assets/index-C_G_JFiN.js                                  48.43 kB │ gzip:  16.42 kB
+../dist/public/assets/Advanced-tl4uxSd5.js                               50.39 kB │ gzip:  13.50 kB
+../dist/public/assets/schemas-sBPn5vi-.js                                67.93 kB │ gzip:  18.24 kB
+../dist/public/assets/index-D0B4NBU9.js                                  79.01 kB │ gzip:  24.62 kB
+../dist/public/assets/index-Bc9CAEIz.js                                 120.16 kB │ gzip:  34.87 kB
+../dist/public/assets/rrweb-plugin-console-record-ChatDfDA.js           125.55 kB │ gzip:  41.11 kB
+../dist/public/assets/index-CdxWbZw_.js                                 132.53 kB │ gzip:  45.51 kB
+../dist/public/assets/index.es-Bp3SOlf7.js                              180.06 kB │ gzip:  62.20 kB
+../dist/public/assets/rrweb-record-DmbroWy-.js                          182.77 kB │ gzip:  57.76 kB
+../dist/public/assets/index-BtQYNdPn.js                                 204.49 kB │ gzip:  57.39 kB
+../dist/public/assets/module-CRFpjwhP.js                                235.34 kB │ gzip:  77.45 kB
+../dist/public/assets/vendor-charts-BA4dpZn2.js                         250.35 kB │ gzip:  58.63 kB
+../dist/public/assets/AdminDashboard-ClcemCiF.js                        343.93 kB │ gzip:  79.58 kB
+../dist/public/assets/mixpanel.module-pcOBM_-o.js                       430.46 kB │ gzip: 128.47 kB
+../dist/public/assets/vendor-pdf-B1HTlj4e.js                            543.88 kB │ gzip: 158.69 kB
+../dist/public/assets/index-CoeHwQrq.js                                 597.44 kB │ gzip: 185.82 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 12.56s
+vite v5.4.21 building SSR bundle for production...
+transforming...
+✓ 237 modules transformed.
+rendering chunks...
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /home/runner/workspace/client/src/pages/Home.tsx is dynamically imported by /home/runner/workspace/client/src/App.tsx but also statically imported by /home/runner/workspace/client/src/entry-server.tsx, dynamic import will not move module into another chunk.
+
+../dist/ssr/bundle-modules.json                                       21.84 kB
+../dist/ssr/.vite/manifest.json                                       26.50 kB
+../dist/ssr/assets/resourceFacets-DECEr1Ib.js                          0.27 kB
+../dist/ssr/assets/collapsible-tP11aPha.js                             0.34 kB
+../dist/ssr/assets/useDebounce-B5qgcRSa.js                             0.39 kB
+../dist/ssr/assets/searchNormalize-QNnFPvcN.js                         0.49 kB
+../dist/ssr/assets/label-BLu2BN0_.js                                   0.62 kB
+../dist/ssr/assets/navigation-icons-Y6ff10WY.js                        0.77 kB
+../dist/ssr/assets/progress-BNKJwFu4.js                                0.77 kB
+../dist/ssr/assets/contact-footer-Cu02ZiHS.js                          0.84 kB
+../dist/ssr/assets/textarea-C7AaGKCK.js                                0.97 kB
+../dist/ssr/assets/useContinueLearning-DaLBjGHi.js                     1.03 kB
+../dist/ssr/assets/checkbox-DPI35-Na.js                                1.04 kB
+../dist/ssr/assets/switch-Mr4fOTkr.js                                  1.13 kB
+../dist/ssr/assets/alert-CKhiC9fD.js                                   1.43 kB
+../dist/ssr/assets/scroll-area-FLl9li9E.js                             1.47 kB
+../dist/ssr/assets/Category-CD5FoIys.js                                1.81 kB
+../dist/ssr/assets/Subcategory-D-O7TYcS.js                             1.82 kB
+../dist/ssr/assets/seo-content-templates-CNLi3v7B.js                   1.82 kB
+../dist/ssr/assets/SubSubcategory-KWBiJgeG.js                          1.83 kB
+../dist/ssr/assets/AuthGuard-BUxE6uBQ.js                               1.88 kB
+../dist/ssr/assets/resourceFacets-core-B9OQkgZ-.js                     1.91 kB
+../dist/ssr/assets/tabs-DuEMi4L8.js                                    2.16 kB
+../dist/ssr/assets/skeletons-CCYodmL1.js                               2.83 kB
+../dist/ssr/assets/ErrorPage-Dq2fqNxn.js                               3.02 kB
+../dist/ssr/assets/LinkHealthTrendChart-D8b_hTAM.js                    3.21 kB
+../dist/ssr/assets/form--x4-0Zq1.js                                    3.49 kB
+../dist/ssr/assets/AdminGuard-CW5GMkAu.js                              3.53 kB
+../dist/ssr/assets/ResourceBreadcrumbAncestorDisclosure-Sxj1rlZN.js    4.05 kB
+../dist/ssr/assets/dialog-zogImtLZ.js                                  4.08 kB
+../dist/ssr/assets/not-found-Ccrj8-cU.js                               4.29 kB
+../dist/ssr/assets/alert-dialog-D2TvcmWB.js                            4.61 kB
+../dist/ssr/assets/CodeOfConduct-BXdSYIAA.js                           5.64 kB
+../dist/ssr/assets/PublicCollection-BKf7Ny20.js                        6.08 kB
+../dist/ssr/assets/Terms-CsfSeAJq.js                                   6.37 kB
+../dist/ssr/assets/select-B4tkCS2_.js                                  6.97 kB
+../dist/ssr/assets/Recommendations-D_CmVIsW.js                         7.14 kB
+../dist/ssr/assets/ContinueLearningPreview-DSyNr4_N.js                 8.42 kB
+../dist/ssr/assets/contact-dialog-Q01P2ySX.js                          8.54 kB
+../dist/ssr/assets/validation-D2kLSyzn.js                              8.54 kB
+../dist/ssr/assets/Notifications-Bqr6WFAH.js                           9.27 kB
+../dist/ssr/assets/TagLanding-D5x7-u5c.js                              9.60 kB
+../dist/ssr/assets/Categories-BvrMtSFd.js                              9.71 kB
+../dist/ssr/assets/paginator-FlJJu20d.js                               9.75 kB
+../dist/ssr/assets/advanced-filter-D1Xul5cU.js                        11.69 kB
+../dist/ssr/assets/SearchFilters-CH9p_Le3.js                          12.53 kB
+../dist/ssr/assets/BookmarkButton-Dxm-YcdD.js                         12.74 kB
+../dist/ssr/assets/learning-preferences-form-D0agGh-8.js              13.21 kB
+../dist/ssr/assets/BookmarkNotesDialog-BadMbIP9.js                    13.50 kB
+../dist/ssr/assets/ResourceCard-DcOfc6kp.js                           13.85 kB
+../dist/ssr/assets/Privacy-zawDqvjK.js                                14.34 kB
+../dist/ssr/assets/Onboarding-D4Ik_DZc.js                             15.61 kB
+../dist/ssr/assets/Journeys-HHgFQGJ7.js                               18.37 kB
+../dist/ssr/assets/ContinueLearning-Dn_UySVl.js                       19.33 kB
+../dist/ssr/assets/Search-DzSlnpa-.js                                 21.07 kB
+../dist/ssr/assets/ThemeSettings-Gnkf4Q41.js                          22.78 kB
+../dist/ssr/assets/suggest-edit-dialog-D_-N9iMg.js                    23.43 kB
+../dist/ssr/assets/JourneyDetail-CUy0W6PW.js                          26.91 kB
+../dist/ssr/assets/search-dialog-HrXavL-S.js                          27.37 kB
+../dist/ssr/assets/DesignSystemShowcase-Ci_Mi6zb.js                   28.74 kB
+../dist/ssr/assets/About-O5ZuPW0S.js                                  30.26 kB
+../dist/ssr/assets/SubmitResource-BFZKWn30.js                         31.50 kB
+../dist/ssr/assets/Contributions-CR0FIere.js                          32.64 kB
+../dist/ssr/assets/Settings-Djrio952.js                               34.72 kB
+../dist/ssr/assets/Profile-fnmAtwY8.js                                36.18 kB
+../dist/ssr/assets/ResourceDetail-DjzvZQ4M.js                         41.31 kB
+../dist/ssr/assets/ai-recommendations-panel-CcYdStf7.js               41.44 kB
+../dist/ssr/assets/TaxonomyListing-rfF759e7.js                        41.80 kB
+../dist/ssr/assets/BookmarksGate-ClpwDCBo.js                          56.52 kB
+../dist/ssr/assets/Advanced-D3jx-QOj.js                               88.96 kB
+../dist/ssr/entry-server.js                                          346.63 kB
+../dist/ssr/assets/AdminDashboard-Qdnt9EV3.js                        640.23 kB
+✓ built in 1.59s
+
+  dist/index.js  1.2mb ⚠️
+
+⚡ Done in 175ms
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 12.0.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.2
+npm notice To update run: npm install -g npm@12.0.2
+npm notice
+
+  dist/audit-567-server.mjs  380.3kb
+
+⚡ Done in 24ms

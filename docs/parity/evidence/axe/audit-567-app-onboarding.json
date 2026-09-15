@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.onboarding",
+  "widths": [
+    {
+      "screen": "app.onboarding",
+      "width": 375,
+      "route": "/onboarding",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 2
+      }
+    },
+    {
+      "screen": "app.onboarding",
+      "width": 1440,
+      "route": "/onboarding",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 40,
+        "incomplete": 2
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

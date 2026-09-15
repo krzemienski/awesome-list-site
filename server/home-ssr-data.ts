@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
-import { storage } from "./storage";
 import { getPublicCacheValue } from "./cache/publicCache";
 import { ResourceRepository } from "./repositories";
+import { HomeNavRepository } from "./repositories/HomeNavRepository";
 import { loadHomeFeed } from "./routes/domains/home-feed";
 
 /**
@@ -15,43 +15,8 @@ export async function loadHomeNav() {
     key: "complete",
     ttlMs: 60_000,
     load: async () => {
-      const data = await storage.getAwesomeListFromDatabase();
-      if (!data?.categories?.length) throw new Error("No awesome list data available");
-      const nav = {
-        title: data.title,
-        totalResources: (data.resources || []).length,
-        categories: (data.categories || []).map((cat: any) => {
-          const first =
-            cat.resources?.[0] ??
-            (cat.subcategories || [])
-              .flatMap((sub: any) => [
-                ...(sub.resources || []),
-                ...(sub.subSubcategories || []).flatMap((ss: any) => ss.resources || []),
-              ])
-              .find(Boolean);
-          return {
-            name: cat.name,
-            slug: cat.slug,
-            resourceCount: (cat.resources || []).length,
-            teaser: first
-              ? {
-                  title: String(first.title || ""),
-                  description: String(first.description || "").slice(0, 200),
-                }
-              : undefined,
-            subcategories: (cat.subcategories || []).map((sub: any) => ({
-              name: sub.name,
-              slug: sub.slug,
-              resourceCount: (sub.resources || []).length,
-              subSubcategories: (sub.subSubcategories || []).map((ss: any) => ({
-                name: ss.name,
-                slug: ss.slug,
-                resourceCount: (ss.resources || []).length,
-              })),
-            })),
-          };
-        }),
-      };
+      const nav = await new HomeNavRepository().getHomeNav();
+      if (!nav.categories.length) throw new Error("No awesome list data available");
       const body = JSON.stringify(nav);
       return { nav, body, etag: `"${createHash("sha1").update(body).digest("hex")}"` };
     },

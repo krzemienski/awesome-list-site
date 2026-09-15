@@ -1,0 +1,76 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "createdAt": "2026-09-15T13:08:07.963Z",
+  "invocations": [
+    {
+      "startedAt": "2026-09-15T13:08:07.963Z",
+      "command": "node scripts/validation/production-baseline-capture.mjs --base http://127.0.0.1:5101 --only lighthouse --lighthouse-routes /,/category/encoding-codecs,/resource/185020 --out /tmp/lh-final4/run-1 --trace-summary --force",
+      "base": "http://127.0.0.1:5101",
+      "outDir": "../../../tmp/lh-final4/run-1",
+      "toolCommit": "06b6cb10f3727ad3e43c4d34b3e7953b4d7c9f63",
+      "tools": {
+        "node": "v20.20.0",
+        "playwright": "1.61.1",
+        "axeCore": "4.13.0",
+        "axePlaywright": "4.13.0",
+        "lighthouse": "12.8.2",
+        "sharp": "0.33.5",
+        "pixelmatch": "7.1.0",
+        "chromium": "chromium-1223",
+        "chromiumVersion": "148.0.7778.96"
+      },
+      "phases": [
+        "lighthouse"
+      ],
+      "routesRequested": [
+        "/",
+        "/categories",
+        "/category/encoding-codecs",
+        "/category/community-events?page=2",
+        "/subcategory/community-groups",
+        "/sub-subcategory/ffmpeg",
+        "/resource/185020",
+        "/resource/186190",
+        "/about",
+        "/submit",
+        "/search?q=ffmpeg",
+        "/search?q=zzqxv-nothing",
+        "/advanced",
+        "/journeys",
+        "/journey/7",
+        "/tag/open-source",
+        "/settings/theme",
+        "/recommendations",
+        "/design-system",
+        "/terms",
+        "/privacy",
+        "/code-of-conduct",
+        "/sign-in",
+        "/this-route-does-not-exist",
+        "/sitemap.xml",
+        "/robots.txt"
+      ],
+      "lighthouseRoutesRequested": [
+        "/",
+        "/category/encoding-codecs",
+        "/resource/185020"
+      ],
+      "maxNavigations": null,
+      "force": true,
+      "traceSummary": true,
+      "browserGuard": {
+        "continued": 272,
+        "blocked": 0,
+        "sample": [],
+        "allowedAuthInitializations": []
+      },
+      "finishedAt": "2026-09-15T13:08:51.513Z",
+      "durationSeconds": 44,
+      "navigations": 3,
+      "stoppedByBudget": false,
+      "routes": [],
+      "throttled": [],
+      "failures": []
+    }
+  ]
+}

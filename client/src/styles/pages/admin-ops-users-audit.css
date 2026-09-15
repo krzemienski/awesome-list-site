@@ -135,6 +135,23 @@
   min-width: 60rem;
 }
 
+/*
+ * The audit detail affordance is an actual 44px target.  Keep that target
+ * available without allowing it to inflate every data row: the hit area is
+ * positioned over the ID cell, while the row retains the canonical compact
+ * table rhythm.  Keyboard focus and the existing click handler are unchanged.
+ */
+.admin-ops-audit-table tbody td:first-child {
+  position: relative;
+}
+
+.admin-ops-audit-detail-button {
+  position: absolute;
+  inset-inline-end: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .admin-ops-contact-table {
   min-width: 52rem;
 }

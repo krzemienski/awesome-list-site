@@ -355,7 +355,7 @@ hooks emitted by those primitives:
 | Hook | Emitted by | Meaning |
 |---|---|---|
 | `data-ds-variant="<variant>"` | every `Button` (and `AlertDialogAction`/`AlertDialogCancel`, which compose `buttonVariants()`) | button skins; primary extras target `default`/`outline` |
-| `data-ds="chip"` | `Badge` variants `chip` / `accent` **only** | chip skins (Terminal brackets, Geist sentence case…) |
+| `data-ds="chip"` | `Badge` variants `chip` / `accent`, and the `ChipButton` primitive | chip skins (Terminal brackets, Geist sentence case…) |
 | `data-ds="card-hover"` | interactive cards (`ResourceCard`, `TaxonomyCard`, showcase specimens) | per-system hover (lift / glow / slab / color-only) |
 
 ### Button sweep
@@ -388,6 +388,14 @@ const stray = [...document.querySelectorAll('button')].filter(b =>
 );
 stray  // → [] expected on the app's public routes; triage any hit with the ladder below
 ```
+
+`ChipButton` is an interactive primitive, not a hand-rolled exception. Its
+implementation owns `data-ds="chip"` (`client/src/components/ui/chip-button.tsx`);
+call sites must not set or override that attribute. Keep this ownership in the
+app bridge and do not edit the frozen `awesome-list-site-ds` reference source to
+make the hook appear there. The chip sweep intentionally examines
+`span`/`div`/`a` chip-shaped surfaces; `ChipButton` is covered by the component
+hook contract rather than by a call-site exclusion.
 
 > **This filter is enforced automatically.** The `ds-button-sweep` validation
 > gate runs this exact filter headlessly on the key public routes:

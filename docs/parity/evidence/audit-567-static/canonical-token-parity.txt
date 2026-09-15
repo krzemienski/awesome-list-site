@@ -1,0 +1,25 @@
+$ npm run validate:canonical-token-parity
+--- output ---
+
+> rest-express@1.0.0 validate:canonical-token-parity
+> node scripts/validation/canonical-token-parity.mjs
+
+PASS canaries :: 91 in-memory mutations of the live inputs each fail on the expected rule (control passes)
+canonical-token-parity: 5 systems, 10 accents, 165 shared token values compared
+  cascade: 2 top-level :root block(s) merged, system blocks terminal×1 geist×1 brutalist×1 swiss×1, 2 scoped custom-property declaration(s), 37 sibling stylesheet(s) scanned (38 custom-property declaration(s), 0 tracked)
+  cascade layers (first appearance across 38 sheets, browser order): base < theme < components < utilities < unlayered
+  mismatches: 0  missing-in-runtime: 0  documented deviations honoured: 7  runtime-only tokens: 13
+  runtime-only: --radius-xs, --motion-fast, --motion-base, --motion-slow, --motion-ease, --shell-footer-measure, --skeleton-base, --skeleton-shine, --profile-content-gap, --profile-control-height, --profile-panel-padding, --profile-page-measure, --profile-chrome-opacity
+  shell geometry: 9/9 tokens match the design sources
+  responsive geometry: 2/2 scoped re-assignments match (--shell-sidebar-w @media (min-width: 768px) and (max-width: 1023px) → 240px; --shell-header-h @media (max-width: 767px) → 56px)
+  accent combos: 50/50 system × accent combinations resolve --accent/--accent-2 to the design's pair
+  utility rules: 26/26 rules verbatim (86 declarations); cascade over 38 runtime sheets: 59 non-canonical rule(s) win a compared property in the runtime, 53 in the design
+  DEVIATION editorial:--text-3 design rgba(244,243,238,0.4) → runtime rgba(244,243,238,0.52)
+  DEVIATION terminal:--text-3 design rgba(232,232,224,0.36) → runtime rgba(232,232,224,0.52)
+  DEVIATION geist:--text-3 design rgba(250,250,250,0.38) → runtime rgba(250,250,250,0.52)
+  DEVIATION brutalist:--text-3 design rgba(245,245,240,0.4) → runtime rgba(245,245,240,0.52)
+  DEVIATION swiss:--text-3 design rgba(250,250,248,0.38) → runtime rgba(250,250,248,0.52)
+  DEVIATION shadow:.no-anim *:transition design transform 220ms cubic-bezier(0.2,0.65,0.3,1),background 220ms ease,border-color 220ms ease,box-shadow 220ms ease → runtime none !important
+  DEVIATION rule:.kbd:font-size design 10.5px → runtime 12px
+PASS canonical-token-parity
+--- exit status: 0 ---

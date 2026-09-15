@@ -1,0 +1,226 @@
+{
+  "source": "tests/parity/baseline/2026-09-15T04-05-18-464Z-1096",
+  "scope": "selected-rows-diagnostic",
+  "rows": [
+    {
+      "screen": "app.about",
+      "comparison": {
+        "differingPixels": 341334,
+        "overlapDifferingPixels": 141174,
+        "unmatchedDimensionPixels": 200160,
+        "canvasPixels": 6125760,
+        "diffPercent": 5.572108603667137,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 4115
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 4254
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 4254
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.approvals",
+      "comparison": {
+        "differingPixels": 20616,
+        "overlapDifferingPixels": 20616,
+        "unmatchedDimensionPixels": 0,
+        "canvasPixels": 1296000,
+        "diffPercent": 1.5907407407407408,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 900
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 900
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 900
+        },
+        "dimensionsMatch": true,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.audit",
+      "comparison": {
+        "differingPixels": 713792,
+        "overlapDifferingPixels": 114752,
+        "unmatchedDimensionPixels": 599040,
+        "canvasPixels": 5008320,
+        "diffPercent": 14.252124464890423,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 3478
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 3062
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 3478
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.categories",
+      "comparison": {
+        "differingPixels": 139773,
+        "overlapDifferingPixels": 37533,
+        "unmatchedDimensionPixels": 102240,
+        "canvasPixels": 1653120,
+        "diffPercent": 8.455103077816492,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1077
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 1148
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1148
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.database",
+      "comparison": {
+        "differingPixels": 300720,
+        "overlapDifferingPixels": 53040,
+        "unmatchedDimensionPixels": 247680,
+        "canvasPixels": 2157120,
+        "diffPercent": 13.94080996884735,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1326
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 1498
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1498
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.edits",
+      "comparison": {
+        "differingPixels": 19997,
+        "overlapDifferingPixels": 19997,
+        "unmatchedDimensionPixels": 0,
+        "canvasPixels": 1296000,
+        "diffPercent": 1.5429783950617284,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 900
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 900
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 900
+        },
+        "dimensionsMatch": true,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.enrichment",
+      "comparison": {
+        "differingPixels": 133883,
+        "overlapDifferingPixels": 64763,
+        "unmatchedDimensionPixels": 69120,
+        "canvasPixels": 2217600,
+        "diffPercent": 6.0372925685425685,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1492
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 1540
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1540
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.export",
+      "comparison": {
+        "differingPixels": 276740,
+        "overlapDifferingPixels": 69380,
+        "unmatchedDimensionPixels": 207360,
+        "canvasPixels": 2054880,
+        "diffPercent": 13.467453087284904,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 1283
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 1427
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 1427
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      }
+    },
+    {
+      "screen": "app.admin.github",
+      "comparison": {
+        "differingPixels": 1111793,
+        "overlapDifferingPixels": 105233,
+        "unmatchedDimensionPixels": 1006560,
+        "canvasPixels": 5889600,
+        "diffPercent": 18.877224259712037,
+        "actualDimensions": {
+          "width": 1440,
+          "height": 4090
+        },
+        "expectedDimensions": {
+          "width": 1440,
+          "height": 3391
+        },
+        "canvas": {
+          "width": 1440,
+          "height": 4090
+        },
+        "dimensionsMatch": false,
+        "withinCeiling": false
+      }
+    }
+  ],
+  "teardown": {
+    "localDeleted": true,
+    "clerkDeleted": true
+  }
+}

@@ -1,0 +1,391 @@
+Source scan command:
+$ rg -n --glob '*.ts' --glob '*.tsx' --glob '*.css' \
+    --glob '!client/src/styles/design-system.css' --glob '!client/src/index.css' \
+    -- '--accent' client/src
+Current output count: 387 matches (all token references or documented picker/export
+metadata; no raw accent literal was found by the Stage 5 gate).
+
+Representative output:
+client/src/App.tsx:253:              className="max-w-md text-sm font-medium text-[var(--accent)]"
+client/src/pages/Terms.tsx:18:          <FileText className="h-6 w-6 text-[var(--accent)]" />
+client/src/pages/Privacy.tsx:18:          <Shield className="h-6 w-6 text-[var(--accent)]" />
+client/src/pages/Home.tsx:336:          className="border-[var(--accent)] bg-[var(--surface-2)]"
+client/src/pages/Home.tsx:398:            className="flex w-fit items-center gap-2 text-inherit no-underline transition-colors hover:text-[var(--accent)] sm:gap-3"
+client/src/pages/DesignSystemShowcase.tsx:66:      { name: "--accent", kind: "color" },
+client/src/pages/DesignSystemShowcase.tsx:67:      { name: "--accent-2", kind: "color" },
+client/src/pages/DesignSystemShowcase.tsx:208:          <Shapes className="h-6 w-6 text-[var(--accent)]" />
+client/src/pages/DesignSystemShowcase.tsx:224:          <Layers className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/DesignSystemShowcase.tsx:238:                className="inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-pill)] border bg-[var(--surface)] px-4 text-sm transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+client/src/pages/DesignSystemShowcase.tsx:240:                  borderColor: isActive ? "var(--accent)" : "var(--border)",
+client/src/pages/DesignSystemShowcase.tsx:241:                  color: isActive ? "var(--accent)" : "var(--text-2)",
+client/src/pages/DesignSystemShowcase.tsx:257:          <Palette className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/DesignSystemShowcase.tsx:271:                className="text-left rounded-[var(--radius-sm)] border bg-[var(--surface)] p-2 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+client/src/pages/DesignSystemShowcase.tsx:296:          <Layers className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/DesignSystemShowcase.tsx:303:              <code className="font-mono text-xs text-[var(--accent)]">{id}</code>
+client/src/pages/DesignSystemShowcase.tsx:320:          <SlidersHorizontal className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/DesignSystemShowcase.tsx:330:                <code className="block font-mono text-xs text-[var(--accent)] tracking-wider uppercase">{g.group}</code>
+client/src/pages/DesignSystemShowcase.tsx:363:          <Type className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/DesignSystemShowcase.tsx:369:            Display <em className="text-[var(--accent)]">drop</em>
+client/src/pages/DesignSystemShowcase.tsx:399:          <Sparkles className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/DesignSystemShowcase.tsx:504:          <Layers className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/AdminDashboard.tsx:159:          <Shield className="h-6 w-6 text-[var(--accent)]" />
+client/src/pages/AdminDashboard.tsx:162:        <div className="alert warn border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-4 rounded-lg" role="alert">
+client/src/pages/AdminDashboard.tsx:170:              <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-home">
+client/src/pages/AdminDashboard.tsx:179:              <WLink href="/sign-in" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
+client/src/pages/AdminDashboard.tsx:194:          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
+client/src/pages/AdminDashboard.tsx:210:          <Shield className="h-12 w-12 text-[var(--accent)] mx-auto mb-4" />
+client/src/pages/AdminDashboard.tsx:218:                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
+client/src/pages/AdminDashboard.tsx:225:            <p className="text-[var(--accent)]">Error loading admin dashboard</p>
+client/src/pages/CodeOfConduct.tsx:19:          <HeartHandshake className="h-6 w-6 text-[var(--accent)]" />
+client/src/styles/components/resource-card.css:53:  color: var(--accent);
+client/src/styles/components/resource-card.css:106:  color: var(--accent);
+client/src/styles/components/resource-card.css:223:  color: var(--accent);
+client/src/styles/components/resource-card.css:224:  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+client/src/styles/components/resource-card.css:230:  background: color-mix(in srgb, var(--accent) 10%, transparent);
+client/src/styles/components/resource-card.css:276:  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+client/src/styles/components/resource-card.css:281:  border-color: var(--accent);
+client/src/styles/components/resource-card.css:282:  background: color-mix(in srgb, var(--accent) 10%, transparent);
+client/src/pages/ThemeSettings.tsx:135:          <Sparkles className="h-6 w-6 text-[var(--accent)]" />
+client/src/pages/ThemeSettings.tsx:149:          className="inline-flex items-center gap-1.5 text-sm text-[var(--accent)] hover:underline mt-2 min-h-[44px]"
+client/src/pages/ThemeSettings.tsx:177:            <span className="block h-full w-2/3 bg-[var(--accent)]" />
+client/src/pages/ThemeSettings.tsx:178:            <span className="block h-full w-1/3 bg-[var(--accent-2)]" />
+client/src/pages/ThemeSettings.tsx:190:              The quick brown fox <em className="text-[var(--accent)]">jumps</em>
+client/src/pages/ThemeSettings.tsx:204:          <Layers className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/ThemeSettings.tsx:225:                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+client/src/pages/ThemeSettings.tsx:227:                  borderColor: isActive ? "var(--accent)" : "var(--border)",
+client/src/pages/ThemeSettings.tsx:232:                  {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
+client/src/pages/ThemeSettings.tsx:247:          <Palette className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/ThemeSettings.tsx:268:                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-3 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+client/src/pages/ThemeSettings.tsx:297:          <Type className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/ThemeSettings.tsx:321:                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+client/src/pages/ThemeSettings.tsx:323:                  borderColor: isActive ? "var(--accent)" : "var(--border)",
+client/src/pages/ThemeSettings.tsx:328:                  {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
+client/src/pages/ThemeSettings.tsx:348:          <Eye className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/ThemeSettings.tsx:376:              The quick brown fox <em className="text-[var(--accent)]">jumps</em> over
+client/src/pages/ThemeSettings.tsx:419:              <Badge className="bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent)]">
+client/src/pages/ThemeSettings.tsx:450:                { label: "accent", varName: "--accent" },
+client/src/pages/ThemeSettings.tsx:451:                { label: "accent-2", varName: "--accent-2" },
+client/src/pages/Settings.tsx:229:              className="h-full p-4 flex items-start gap-3 hover:border-[var(--accent)] transition-colors cursor-pointer"
+client/src/pages/Settings.tsx:231:              <Icon className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />
+client/src/pages/Settings.tsx:266:                <SlidersHorizontal className="h-5 w-5 text-[var(--accent)]" />
+client/src/pages/Settings.tsx:398:            <LogIn className="h-5 w-5 text-[var(--accent)] mt-0.5 shrink-0" />
+client/src/pages/Search.tsx:235:    <header className="discovery-header space-y-4"><div className="flex items-center gap-3"><SearchIcon className="h-6 w-6 text-[var(--accent)]" /><div><h1 className="display-h discovery-title">Search</h1><p className="discovery-lede text-sm">A precise index of tools, standards, and ideas for video developers.</p></div></div>
+client/src/pages/Search.tsx:244:       : query.isError ? <Card data-testid="search-results-error"><CardContent className="flex flex-col items-center gap-3 py-10 text-center"><AlertCircle className="h-8 w-8 text-[var(--accent)]" /><p className="text-sm text-muted-foreground">{invalid ? query.error.message : "Search failed. Please try again."}</p><Button variant="outline" onClick={invalid ? clearInvalidRequest : () => query.refetch()} data-testid={invalid ? "button-clear-invalid-filters" : "button-retry-search"}>{invalid ? "Clear invalid filters" : "Try again"}</Button></CardContent></Card>
+client/src/pages/Profile.tsx:313:      color: "account-stat--accent",
+client/src/styles/shell/sidebar.css:139:  background: color-mix(in srgb, var(--accent) 12%, transparent);
+client/src/styles/shell/sidebar.css:140:  color: var(--accent);
+client/src/styles/shell/sidebar.css:347:  color: var(--accent);
+client/src/styles/shell/sidebar.css:407:  background: var(--accent);
+client/src/styles/shell/sidebar.css:408:  box-shadow: 0 0 8px var(--accent);
+client/src/styles/shell/sidebar.css:467:  background: color-mix(in srgb, var(--accent) 8%, transparent);
+client/src/styles/shell/sidebar.css:468:  color: var(--accent);
+client/src/styles/shell/sidebar.css:517:  outline: 2px solid var(--accent);
+client/src/styles/shell/palette.css:39:  color: var(--accent);
+client/src/styles/shell/palette.css:115:  background: color-mix(in srgb, var(--accent) 12%, transparent);
+client/src/styles/shell/palette.css:123:  outline: 2px solid var(--accent);
+client/src/styles/shell/palette.css:150:  color: var(--accent);
+client/src/styles/shell/palette.css:156:  color: var(--accent);
+client/src/styles/shell/palette.css:180:  color: var(--accent);
+client/src/styles/shell/palette.css:197:  color: var(--accent);
+client/src/styles/shell/palette.css:227:  color: var(--accent);
+client/src/lib/clerk-appearance.ts:49:  accent: "--accent",
+client/src/lib/clerk-appearance.ts:225:  // var(--accent) the way <BrandMark> does in the site header — which is why
+client/src/styles/shell/header.css:26:.app-canonical-header .header-logo { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font: 700 13px var(--font-mono); box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 35%, transparent); flex-shrink: 0; }
+client/src/styles/shell/header.css:35:.app-canonical-header .header-live-dot::after { content: ""; position: absolute; left: 0; top: 50%; margin-top: -2.5px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+client/src/styles/shell/header.css:44:.app-canonical-header .user-pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px 0 4px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--border)); color: var(--text); cursor: pointer; font-family: inherit; transition: all 160ms ease; flex-shrink: 0; }
+client/src/styles/shell/header.css:45:.app-canonical-header .user-pill:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
+client/src/styles/shell/header.css:46:.app-canonical-header .header-avatar, .app-canonical-header .header-avatar > span { width: 22px; height: 22px; border-radius: var(--radius-pill); background: color-mix(in srgb, #0a0a0a 80%, var(--accent)); color: var(--accent); display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+client/src/styles/shell/header.css:53:.app-canonical-header :is(button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+client/src/lib/design-system.ts:114:    // DS-OK: picker swatches mirror the enforced --accent token registry.
+client/src/lib/design-system.ts:120:    // DS-OK: picker swatches mirror the enforced --accent token registry.
+client/src/pages/not-found.tsx:55:            <AlertCircle className="h-6 w-6 text-[var(--accent)]" aria-hidden="true" />
+client/src/pages/not-found.tsx:67:                className="inline-flex items-center gap-1 font-medium text-[var(--accent)] underline underline-offset-4"
+client/src/components/home/HomePresentation.tsx:311:          className="hover:text-[var(--accent)] transition-colors"
+client/src/pages/GuestBookmarks.tsx:153:        className="account-callout account-callout--accent p-4 sm:p-5"
+client/src/components/home/HomeLayoutPreferenceControl.tsx:60:            className="flex min-h-16 cursor-pointer items-start gap-3 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 transition-colors hover:border-[var(--accent)] has-[:checked]:border-[var(--accent)]"
+client/src/lib/brand-mark.ts:7:       reference var(--accent) and repaint the moment the visitor changes
+client/src/styles/shell/footer.css:22:.app-footer button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+client/src/styles/shell/drawer.css:129:  border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong));
+client/src/components/contact/contact-dialog.tsx:83:            Contact <em className="not-italic text-[var(--accent)]">maintainers</em>
+client/src/components/BrandMark.tsx:3: * chrome usage can track the active design-system accent via var(--accent).
+client/src/components/BrandMark.tsx:26:          border and glyphs track var(--accent). */}
+client/src/components/BrandMark.tsx:34:        stroke="var(--accent)"
+client/src/components/BrandMark.tsx:37:      <g fill="var(--accent)">
+client/src/styles/pages/system-overlays.css:33:    color-mix(in srgb, var(--accent) 8%, transparent),
+client/src/styles/pages/system-overlays.css:35:    color-mix(in srgb, var(--accent-2) 5%, transparent)
+client/src/styles/pages/system-overlays.css:59:  color: var(--accent);
+client/src/styles/pages/system-overlays.css:130:    linear-gradient(100deg, color-mix(in srgb, var(--accent) 6%, transparent), transparent 55%),
+client/src/styles/pages/system-overlays.css:162:  border-color: var(--accent);
+client/src/components/notifications/NotificationPreferencesCard.tsx:33:    <label className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-md border border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 transition-colors hover:border-[var(--accent)]">
+client/src/components/notifications/NotificationPreferencesCard.tsx:35:      <span aria-hidden="true" className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${checked ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg)]" : "border-[var(--border-strong)] text-transparent"}`}>
+client/src/components/notifications/NotificationPreferencesCard.tsx:127:        <CardTitle id="notification-settings-title" className="flex items-center gap-2"><Bell className="h-5 w-5 text-[var(--accent)]" /> Notifications</CardTitle>
+client/src/components/notifications/NotificationPreferencesCard.tsx:144:            <div className="flex gap-3 border border-[color-mix(in_srgb,var(--accent)_25%,transparent)] bg-[color-mix(in_srgb,var(--accent)_7%,transparent)] p-4 text-sm">
+client/src/components/notifications/NotificationPreferencesCard.tsx:145:              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[var(--accent)]" />
+client/src/components/notifications/NotificationPreferencesCard.tsx:157:                    <input type="checkbox" checked={values[key]} onChange={(e) => update(key, e.target.checked)} className="h-4 w-4 accent-[var(--accent)]" />
+client/src/components/notifications/NotificationPreferencesCard.tsx:174:            {saved ? <p className="flex items-center gap-2 text-sm text-[var(--accent)]" role="status"><Check className="h-4 w-4" />Your choices are saved.</p> : null}
+client/src/components/notifications/NotificationPreferencesCard.tsx:177:              <div className="flex items-start justify-between gap-3"><div><h3 id="digest-preview" className="flex items-center gap-2 text-sm font-semibold"><Eye className="h-4 w-4 text-[var(--accent)]" />Preview</h3><p className="mt-1 text-xs text-[color:var(--text-2)]">This uses the same rules as delivery.</p></div>{previewQuery.data ? <span className="font-mono text-xs text-[color:var(--text-2)]">{previewQuery.data.itemCount} items</span> : null}</div>
+client/src/components/notifications/NotificationPreferencesCard.tsx:178:              {previewQuery.isLoading ? <div className="mt-3 space-y-2"><div className="skeleton h-12 w-full" /><div className="skeleton h-12 w-full" /></div> : previewQuery.isError ? <p className="mt-3 text-sm text-destructive" role="alert">Preview is unavailable right now. Your choices have not changed.</p> : previewItems.length === 0 ? <div className="mt-3 border border-dashed border-[var(--border-strong)] p-4 text-sm text-[color:var(--text-2)]"><Info className="mb-2 h-4 w-4 text-[var(--accent)]" /><p>No saved content matches these rules yet. When there is something to share, it will appear here.</p></div> : <div className="mt-3 space-y-2">{previewItems.map((item, index) => <a key={`${item.href}-${index}`} href={item.href} className="block border-l-2 border-[var(--accent)] bg-[var(--surface-2)] px-3 py-2 transition-colors hover:bg-[var(--surface-3)]"><span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--accent)]">{item.sectionTitle}</span><span className="mt-1 block text-sm font-semibold">{item.title}</span><span className="mt-0.5 block text-xs text-[color:var(--text-2)]">{item.description}</span></a>)}</div>}
+client/src/styles/pages/system-legal.css:38:  color: var(--accent);
+client/src/styles/pages/system-legal.css:110:  color: var(--accent);
+client/src/components/admin/queues-review.css:38:  background: color-mix(in srgb, var(--accent) 9%, transparent);
+client/src/components/admin/queues-review.css:39:  border: var(--hairline-w) solid color-mix(in srgb, var(--accent) 35%, var(--border));
+client/src/components/admin/queues-review.css:41:  color: var(--accent);
+client/src/components/admin/queues-review.css:67:  scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent;
+client/src/components/admin/queues-review.css:78:  background: color-mix(in srgb, var(--accent) 40%, transparent);
+client/src/components/onboarding/learning-preferences-form.tsx:107:                  className="flex min-h-[92px] cursor-pointer items-start gap-3 border border-[var(--border)] bg-[var(--surface)] p-4 has-[[data-state=checked]]:border-[var(--accent)] has-[[data-state=checked]]:bg-[var(--surface-2)]"
+client/src/components/onboarding/learning-preferences-form.tsx:144:                  className="flex min-h-[48px] cursor-pointer items-center gap-3 border border-[var(--border)] bg-[var(--surface)] px-3 py-2 has-[[data-state=checked]]:border-[var(--accent)] has-[[data-state=checked]]:bg-[var(--surface-2)]"
+client/src/components/onboarding/learning-preferences-form.tsx:187:                  className="flex min-h-[48px] cursor-pointer items-center gap-3 border border-[var(--border)] bg-[var(--surface)] px-3 py-2 has-[[data-state=checked]]:border-[var(--accent)] has-[[data-state=checked]]:bg-[var(--surface-2)]"
+client/src/components/onboarding/learning-preferences-form.tsx:231:                  className="flex min-h-[48px] cursor-pointer items-center gap-3 border border-[var(--border)] bg-[var(--surface)] px-3 py-2 has-[[data-state=checked]]:border-[var(--accent)] has-[[data-state=checked]]:bg-[var(--surface-2)]"
+client/src/components/onboarding/learning-preferences-form.tsx:285:                  className="flex min-h-[48px] cursor-pointer items-center gap-3 border border-[var(--border)] bg-[var(--surface)] px-3 py-2 has-[[data-state=checked]]:border-[var(--accent)] has-[[data-state=checked]]:bg-[var(--surface-2)]"
+client/src/components/onboarding/learning-preferences-form.tsx:295:          <div className="border-l-2 border-[var(--accent)] bg-[var(--surface-2)] p-4 text-sm">
+client/src/styles/pages/admin-catalog-taxonomy.css:164:  color: var(--accent);
+client/src/styles/pages/admin-catalog-taxonomy.css:169:  color: var(--accent);
+client/src/components/admin/queues-agent.css:192:  outline: 2px solid var(--accent);
+client/src/styles/pages/admin-catalog-resources.css:111:  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+client/src/styles/pages/admin-catalog-resources.css:112:  outline: 2px solid var(--accent);
+client/src/styles/pages/admin-catalog-resources.css:126:  outline: 2px solid var(--accent);
+client/src/styles/pages/submit.css:21:  color: var(--accent);
+client/src/styles/pages/submit.css:47:  color: var(--accent);
+client/src/styles/pages/submit.css:131:  border-color: color-mix(in srgb, var(--accent) 50%, var(--border-strong));
+client/src/styles/pages/submit.css:210:  border-color: var(--accent);
+client/src/styles/pages/submit.css:211:  background: var(--accent);
+client/src/styles/pages/submit.css:217:  border-color: var(--accent);
+client/src/styles/pages/submit.css:218:  background: var(--accent);
+client/src/styles/pages/submit.css:269:  color: var(--accent);
+client/src/styles/pages/about.css:25:  color: var(--accent);
+client/src/styles/pages/about.css:51:  color: var(--accent);
+client/src/styles/pages/about.css:99:  color: var(--accent);
+client/src/styles/pages/about.css:153:  color: var(--accent);
+client/src/styles/pages/about.css:175:  color: var(--accent);
+client/src/styles/pages/about.css:254:  color: var(--accent);
+client/src/styles/pages/about.css:344:  border: var(--border-w) solid var(--accent);
+client/src/styles/pages/about.css:350:  background: var(--accent);
+client/src/styles/pages/about.css:380:  background: var(--accent);
+client/src/styles/pages/about.css:448:  color: var(--accent);
+client/src/styles/pages/about.css:465:  color: var(--accent);
+client/src/styles/pages/home.css:34:  background: var(--accent);
+client/src/styles/pages/home.css:35:  box-shadow: 0 0 0.625rem var(--accent);
+client/src/styles/pages/home.css:74:  color: var(--accent);
+client/src/styles/pages/home.css:75:  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+client/src/styles/pages/home.css:76:  background: color-mix(in srgb, var(--accent) 10%, transparent);
+client/src/styles/pages/home.css:183:  color: var(--accent);
+client/src/styles/pages/home.css:287:  color: var(--accent);
+client/src/styles/pages/home.css:348:  color: var(--accent);
+client/src/styles/pages/home.css:443:  color: var(--accent);
+client/src/styles/pages/home.css:496:  color: var(--accent);
+client/src/styles/pages/home.css:505:  color: var(--accent);
+client/src/styles/pages/home.css:509:  background: color-mix(in srgb, var(--accent) 10%, transparent);
+client/src/styles/pages/home.css:510:  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+client/src/styles/pages/home.css:638:  color: var(--accent);
+client/src/styles/pages/home.css:703:  background: var(--accent);
+client/src/styles/pages/home.css:704:  border: var(--border-w) solid var(--accent);
+client/src/styles/pages/home.css:711:  border-color: var(--accent);
+client/src/styles/pages/home.css:738:  color: var(--accent);
+client/src/components/learning/ContinueLearningPreview.tsx:76:      className="overflow-hidden border-[color:color-mix(in_srgb,var(--accent)_35%,var(--border))]"
+client/src/components/learning/ContinueLearningPreview.tsx:81:        style={{ background: "var(--accent)" }}
+client/src/components/learning/ContinueLearningPreview.tsx:90:              <BookOpen className="h-5 w-5 text-[var(--accent)]" />
+client/src/components/learning/ContinueLearningPreview.tsx:162:                className="mt-1 block min-h-8 truncate font-semibold leading-8 hover:text-[var(--accent)] hover:underline"
+client/src/components/admin/AgentCommsGraph.tsx:26:// apart under every accent, so they cannot track var(--accent).
+client/src/styles/pages/admin-shell.css:55:.admin-dashboard .admin-dashboard__tabs [aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+client/src/styles/pages/admin-overview.css:26:  border-color: var(--accent);
+client/src/styles/pages/admin-overview.css:45:  color: var(--accent);
+client/src/styles/pages/admin-overview.css:64:.admin-overview-stats-canonical .admin-canonical-stat__value--accent {
+client/src/styles/pages/admin-overview.css:65:  color: var(--accent);
+client/src/styles/pages/admin-overview.css:230:  color: var(--accent);
+client/src/styles/pages/admin-overview.css:266:  color: var(--accent);
+client/src/styles/pages/admin-overview.css:356:  background: var(--accent);
+client/src/components/search/SearchFilters.tsx:89:    {items.map(item => <button type="button" key={item.value} onClick={() => onSelect(value === item.value ? "" : item.value)} className={cn("flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm transition-colors hover:bg-muted", value === item.value && "bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)]")} aria-pressed={value === item.value} aria-label={`${value === item.value ? "Remove" : "Apply"} ${item.label} ${title.toLowerCase()} filter, ${item.count} results`} data-testid={`facet-${testid}-${item.value}`}>
+client/src/components/search/SearchFilters.tsx:129:        return <button type="button" key={item.value} className="flex min-h-11 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-muted" aria-pressed={selected} aria-label={`${selected ? "Remove" : "Apply"} ${item.label} tag filter`} onClick={() => applyChange("tags", selected ? state.tags.filter(t => t.toLowerCase() !== item.value.toLowerCase()) : [...state.tags, item.value])}><span className="flex min-w-0 items-center gap-2"><span aria-hidden="true" className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border", selected && "border-[var(--accent)] bg-[var(--accent)] text-black")}>{selected && <Check className="h-3 w-3" />}</span><span className="truncate">{item.label}</span></span><span className="shrink-0 font-mono text-xs text-muted-foreground">{item.count}</span></button>;
+client/src/components/search/SearchFilters.tsx:135:    <div className="lg:hidden"><Sheet open={open} onOpenChange={setOpen}><SheetTrigger asChild><Button variant="outline" className="min-h-11 gap-2" data-testid="button-open-filters"><SlidersHorizontal className="h-4 w-4" /> Filters {activeCount > 0 && <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs text-black">{activeCount}</span>}</Button></SheetTrigger><SheetContent side="left" className="w-[min(90vw,360px)] overflow-y-auto"><SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader><div className="mt-5">{content(false)}</div></SheetContent></Sheet></div></>;
+client/src/components/search/SearchFilters.tsx:146:  return <div className="flex flex-wrap items-center gap-2" data-testid="active-filter-chips">{chips.map(chip => <button type="button" key={`${chip.key}-${chip.value}`} onClick={() => onChange(chip.key, chip.key === "tags" ? state.tags.filter(t => t.toLowerCase() !== chip.value.toLowerCase()) : chip.key === "sort" ? defaultSort : "")} className="inline-flex min-h-11 items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 text-xs hover:border-[var(--accent)]" aria-label={`Remove ${chip.text}`}>{chip.text}<X className="h-3.5 w-3.5" /></button>)}<Button variant="link" size="sm" onClick={onClear} data-testid="button-clear-all-filters">Clear all</Button></div>;
+client/src/styles/pages/taxonomy.css:38:  color: var(--accent);
+client/src/styles/pages/taxonomy.css:81:  color: var(--accent);
+client/src/styles/pages/taxonomy.css:141:  outline: 2px solid var(--accent);
+client/src/styles/pages/resource.css:64:  color: var(--accent);
+client/src/styles/pages/resource.css:65:  background: color-mix(in srgb, var(--accent) 8%, transparent);
+client/src/styles/pages/resource.css:66:  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+client/src/styles/pages/resource.css:89:  color: var(--accent);
+client/src/styles/pages/resource.css:117:  color: var(--accent);
+client/src/styles/pages/resource.css:123:.resource-detail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+client/src/styles/pages/account.css:43:  color: var(--accent);
+client/src/styles/pages/account.css:55:  border: var(--border-w) solid color-mix(in srgb, var(--accent) 40%, transparent);
+client/src/styles/pages/account.css:59:  background: color-mix(in srgb, var(--accent) 14%, transparent);
+client/src/styles/pages/account.css:60:  color: var(--accent);
+client/src/styles/pages/account.css:67:.account-page .account-stat--accent {
+client/src/styles/pages/account.css:68:  color: var(--accent);
+client/src/styles/pages/account.css:72:  color: var(--accent-2);
+client/src/styles/pages/account.css:90:  background: var(--accent);
+client/src/styles/pages/account.css:131:  background: color-mix(in srgb, var(--accent) 10%, transparent);
+client/src/styles/pages/account.css:132:  color: var(--accent);
+client/src/styles/pages/account.css:158:  border-color: var(--accent);
+client/src/styles/pages/account.css:159:  background: var(--accent);
+client/src/styles/pages/account.css:164:  background: var(--accent);
+client/src/styles/pages/account.css:202:.account-page .account-callout--accent {
+client/src/styles/pages/account.css:203:  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+client/src/styles/pages/account.css:204:  background: color-mix(in srgb, var(--accent) 8%, transparent);
+client/src/styles/pages/account.css:208:  border-color: color-mix(in srgb, var(--accent-2) 40%, var(--border));
+client/src/styles/pages/account.css:209:  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+client/src/styles/pages/account.css:210:  color: var(--accent-2);
+client/src/styles/pages/account.css:223:  border-bottom-color: var(--accent);
+client/src/styles/pages/account.css:240:  border-left: 2px solid var(--accent);
+client/src/styles/pages/account.css:290:  color: var(--accent);
+client/src/styles/pages/account.css:294:  background: var(--accent);
+client/src/styles/pages/account.css:298:  border: var(--border-w) solid color-mix(in srgb, var(--accent-2) 40%, var(--border));
+client/src/styles/pages/account.css:300:  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+client/src/styles/pages/account.css:301:  color: var(--accent-2);
+client/src/styles/pages/account.css:317:  background: color-mix(in srgb, var(--accent) 5%, transparent);
+client/src/styles/pages/account.css:329:  background: var(--accent);
+client/src/styles/pages/account.css:334:  background: var(--accent);
+client/src/styles/pages/account.css:347:  border: var(--border-w) solid color-mix(in srgb, var(--accent-2) 40%, var(--border));
+client/src/styles/pages/account.css:349:  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+client/src/styles/pages/account.css:350:  color: var(--accent-2);
+client/src/styles/pages/account.css:354:  border-left: 2px solid var(--accent);
+client/src/styles/pages/account.css:367:  border-color: var(--accent);
+client/src/styles/pages/account.css:372:  color: var(--accent);
+client/src/styles/pages/account.css:376:  color: var(--accent);
+client/src/styles/pages/account.css:380:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:44:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:162:  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+client/src/styles/pages/discovery-journeys.css:187:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:211:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:246:  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+client/src/styles/pages/discovery-journeys.css:247:  background: color-mix(in srgb, var(--accent) 8%, transparent);
+client/src/styles/pages/discovery-journeys.css:248:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:253:  border-color: color-mix(in srgb, var(--accent-2) 35%, var(--border));
+client/src/styles/pages/discovery-journeys.css:254:  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
+client/src/styles/pages/discovery-journeys.css:255:  color: var(--accent-2);
+client/src/styles/pages/discovery-journeys.css:260:  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+client/src/styles/pages/discovery-journeys.css:261:  background: color-mix(in srgb, var(--accent) 10%, transparent);
+client/src/styles/pages/discovery-journeys.css:262:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:267:  border-color: color-mix(in srgb, var(--accent-2) 45%, var(--border));
+client/src/styles/pages/discovery-journeys.css:268:  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+client/src/styles/pages/discovery-journeys.css:269:  color: var(--accent-2);
+client/src/styles/pages/discovery-journeys.css:289:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:304:  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+client/src/styles/pages/discovery-journeys.css:323:  border-color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:324:  background: var(--accent);
+client/src/styles/pages/discovery-journeys.css:330:  border-color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:331:  background: var(--accent);
+client/src/styles/pages/discovery-journeys.css:337:  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+client/src/styles/pages/discovery-journeys.css:338:  background: color-mix(in srgb, var(--accent) 13%, transparent);
+client/src/styles/pages/discovery-journeys.css:339:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:343:  background: color-mix(in srgb, var(--accent) 20%, transparent);
+client/src/styles/pages/discovery-journeys.css:344:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:363:  border-color: color-mix(in srgb, var(--accent) 36%, var(--border));
+client/src/styles/pages/discovery-journeys.css:364:  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+client/src/styles/pages/discovery-journeys.css:382:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:484:  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+client/src/styles/pages/discovery-journeys.css:488:  border-color: color-mix(in srgb, var(--accent-2) 42%, var(--border));
+client/src/styles/pages/discovery-journeys.css:489:  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+client/src/styles/pages/discovery-journeys.css:490:  color: var(--accent-2);
+client/src/styles/pages/discovery-journeys.css:503:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:509:  border-color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:510:  background: var(--accent);
+client/src/styles/pages/discovery-journeys.css:515:  border-color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:516:  background: var(--accent);
+client/src/styles/pages/discovery-journeys.css:545:  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+client/src/styles/pages/discovery-journeys.css:550:  border-color: color-mix(in srgb, var(--accent-2) 34%, var(--border));
+client/src/styles/pages/discovery-journeys.css:551:  background: color-mix(in srgb, var(--accent-2) 6%, var(--surface));
+client/src/styles/pages/discovery-journeys.css:584:  border-color: var(--accent-2);
+client/src/styles/pages/discovery-journeys.css:585:  background: var(--accent-2);
+client/src/styles/pages/discovery-journeys.css:639:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:657:  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+client/src/styles/pages/discovery-journeys.css:658:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:662:  border-color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:663:  background: color-mix(in srgb, var(--accent) 10%, transparent);
+client/src/styles/pages/discovery-journeys.css:664:  color: var(--accent);
+client/src/styles/pages/discovery-journeys.css:668:  color: var(--accent-2);
+client/src/styles/pages/discovery-journeys.css:672:  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
+client/src/styles/pages/discovery-journeys.css:673:  color: var(--accent-2);
+client/src/styles/pages/discovery-journeys.css:681:  border-color: color-mix(in srgb, var(--accent-2) 38%, var(--border));
+client/src/styles/pages/discovery-journeys.css:684:    color-mix(in srgb, var(--accent-2) 11%, var(--surface)),
+client/src/styles/pages/discovery-journeys.css:685:    color-mix(in srgb, var(--accent) 5%, var(--surface))
+client/src/styles/pages/discovery-journeys.css:699:  color: var(--accent-2);
+client/src/styles/pages/discovery-tools.css:45:  color: var(--accent);
+client/src/styles/pages/discovery-tools.css:120:  border-bottom-color: var(--accent);
+client/src/styles/pages/discovery-tools.css:122:  color: var(--accent);
+client/src/styles/pages/discovery-tools.css:173:  color: var(--accent);
+client/src/styles/pages/discovery-tools.css:223:  color: var(--accent);
+client/src/styles/pages/discovery-tools.css:227:  color: var(--accent-2);
+client/src/styles/pages/discovery-tools.css:280:  border-color: var(--accent);
+client/src/styles/pages/discovery-tools.css:281:  box-shadow: 0 0 0 1px var(--accent);
+client/src/styles/pages/discovery-tools.css:285:  border-color: var(--accent);
+client/src/styles/pages/discovery-tools.css:295:  color: var(--accent);
+client/src/styles/pages/discovery-tools.css:400:  border-color: var(--accent);
+client/src/styles/pages/discovery-tools.css:401:  background: var(--accent);
+client/src/styles/pages/discovery-tools.css:407:  border-color: var(--accent);
+client/src/styles/pages/discovery-tools.css:408:  background: var(--accent);
+client/src/styles/pages/discovery-tools.css:452:  color: var(--accent);
+client/src/styles/pages/admin-ops-users-audit.css:121:  outline: 2px solid var(--accent);
+client/src/components/admin/admin-ops-primitives.css:89:.admin-ops-stat__value--accent {
+client/src/components/admin/admin-ops-primitives.css:90:  color: var(--accent);
+client/src/components/admin/admin-ops-primitives.css:122:.admin-ops-status-chip--accent {
+client/src/components/admin/admin-ops-primitives.css:123:  background: color-mix(in srgb, var(--accent) 8%, transparent);
+client/src/components/admin/admin-ops-primitives.css:124:  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+client/src/components/admin/admin-ops-primitives.css:125:  color: var(--accent);
+client/src/components/admin/admin-canonical.css:4:.admin-dashboard__masthead h1 em { color:var(--accent); font-family:var(--font-serif,var(--font-display)); font-weight:inherit; }
+client/src/components/admin/admin-canonical.css:9:.admin-stat-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-3,.75rem);margin-block-end:var(--space-6,1.5rem)}.admin-stat{border-color:var(--border);border-radius:var(--radius,var(--radius-md));box-shadow:none}.admin-stat:hover{border-color:var(--accent)}.admin-stat__value{color:var(--text);font-family:var(--font-display);font-size:2rem;font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:-.025em}
+client/src/components/admin/admin-canonical.css:19:.admin-queue-card:hover { border-color:var(--accent); }
+client/src/components/admin/admin-canonical.css:21:.admin-queue-card strong { display:block; color:var(--accent); font-family:var(--font-display); font-size:2rem; line-height:1; margin-block:.75rem .5rem; }
+client/src/components/admin/admin-canonical.css:22:.focus-ring:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+client/src/components/admin/admin-canonical.css:28:.admin-bar { display:block; height:100%; background:var(--text); }.admin-bar--ink-1{opacity:1}.admin-bar--ink-2{opacity:.78}.admin-bar--ink-3{opacity:.58}.admin-bar--ink-4{opacity:.38}.admin-bar--accent{background:var(--accent);opacity:1}
+client/src/components/admin/admin-canonical.css:31:.admin-chip--accent { border-color:var(--accent); color:var(--accent); }.admin-chip--bad{color:#ff5c7a}
+client/src/components/admin/admin-canonical.css:33:.admin-health-card { display:flex; align-items:center; gap:var(--space-3,.75rem); min-height:4.25rem; border:var(--hairline-w) solid var(--border); padding:var(--space-3,.75rem); text-align:start; }.admin-health-card>svg{color:var(--accent)}.admin-health-card span{flex:1;min-width:0}.admin-health-card strong,.admin-health-card small{display:block}.admin-health-card strong{font-size:.75rem}.admin-health-card small{color:var(--text-2);font-size:.6875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-block-start:.2rem}
+client/src/components/admin/admin-canonical.css:36:.admin-unsupported{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:var(--space-4,1rem);padding:var(--space-5,1.25rem)}.admin-unsupported>svg{color:var(--accent)}.admin-unsupported p{color:var(--text-2);font-size:.75rem;line-height:1.5;margin-block-start:.3rem}.admin-unsupported>div:last-child{display:flex;flex-wrap:wrap;gap:var(--space-2,.5rem)}
+client/src/components/admin/AdminOpsPrimitives.tsx:189:      <div className={cn("admin-ops-stat__value", accent && "admin-ops-stat__value--accent")}>
+client/src/components/admin/admin-ops-export-database.css:54:  border-color: var(--accent);
+client/src/components/admin/admin-ops-export-database.css:62:  color: var(--accent);
+client/src/components/admin/admin-ops-export-database.css:322:  color: var(--accent);
+client/src/components/admin/admin-ops-export-database.css:383:  background: color-mix(in srgb, var(--accent) 5%, transparent);
+client/src/components/admin/admin-ops-export-database.css:384:  border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+client/src/components/admin/admin-ops-export-database.css:457:  color: var(--accent);
+client/src/components/admin/DigestQueueHealth.tsx:30:          <Activity className="h-5 w-5 text-[var(--accent)]" />
+client/src/components/admin/DigestQueueHealth.tsx:61:                    <Radio className={`h-5 w-5 ${query.data.transport.available ? "text-[var(--accent)]" : "text-destructive"}`} />
+client/src/components/admin/DigestQueueHealth.tsx:78:                    <Clock3 className="h-5 w-5 text-[var(--accent)]" />
+client/src/components/admin/DigestQueueHealth.tsx:88:                    <CheckCircle2 className="h-5 w-5 text-[var(--accent)]" />
+client/src/components/admin/DigestQueueHealth.tsx:120:                <AlertTriangle className="h-4 w-4 text-[var(--accent)]" />
+client/src/components/layout/SEOHead.tsx:189:      {/* DS-OK: MR-DS-04/05 — literal required (meta can't read CSS vars); matches DS --accent */}
+client/src/styles/pages/admin-ops-github-links.css:43:  color: var(--accent);
+client/src/styles/pages/admin-ops-github-links.css:66:  color: var(--accent);
+client/src/styles/pages/admin-ops-github-links.css:207:  color: var(--accent);
+client/src/components/auth/AdminGuard.tsx:35:          <Shield className="h-6 w-6 text-[var(--accent)]" />
+client/src/components/auth/AdminGuard.tsx:38:        <div className="alert warn border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-4 rounded-lg" role="alert">
+client/src/components/auth/AdminGuard.tsx:46:              <WLink href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-home">
+client/src/components/auth/AdminGuard.tsx:65:                className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline"
+client/src/components/layout/new/AppSidebar.tsx:225:              color: "var(--accent)",
+client/src/components/layout/new/AppSidebar.tsx:226:              background: "color-mix(in srgb, var(--accent) 8%, transparent)",
+client/src/components/layout/new/AppSidebar.tsx:228:                "color-mix(in srgb, var(--accent) 25%, var(--border))",
+client/src/components/layout/new/AppSidebar.tsx:387:          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm min-h-[44px] md:min-h-[36px]"
+client/src/components/layout/new/AppSidebar.tsx:399:                ? "color-mix(in srgb, var(--accent) 25%, transparent)"
+client/src/components/layout/new/AppSidebar.tsx:401:              color: isActive ? "var(--accent)" : "var(--text-2)",
+client/src/components/layout/new/AppSidebar.tsx:450:              className="inline-flex items-center justify-center w-10 min-w-10 min-h-[44px] -mx-2 rounded-sm text-[var(--text-3)] hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+client/src/components/admin/LinkHealthTrendChart.tsx:39:                (ok=[2], bad=[5], warn=[3], --accent-2=[1]).
+client/src/components/admin/canonical/Stat.tsx:93:            accent && "admin-canonical-stat__value--accent",
+client/src/components/admin/ResourceManager.tsx:1072:            <div className="flex items-center justify-between p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
+client/src/components/admin/ResourceManager.tsx:1876:                <label htmlFor="create-featured" className="flex min-h-11 cursor-pointer items-center gap-3 border border-[var(--border)] px-3 focus-within:ring-2 focus-within:ring-[var(--accent)]">
+client/src/components/resource/resource-view-modes.tsx:29:  const className = `${clampClass || "inline-block"} py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]`;
+client/src/components/resource/resource-view-modes.tsx:52:      className="relative flex items-center gap-4 p-3 rounded-lg border border-border bg-transparent hover:border-[var(--accent)]/30 hover:shadow-md transition-all min-w-0"
+client/src/components/resource/resource-view-modes.tsx:67:              className="text-xs border-[color-mix(in_srgb,var(--accent)_30%,transparent)] text-[var(--accent)] shrink-0"
+client/src/components/resource/resource-view-modes.tsx:113:      className="relative hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card p-2.5 sm:p-3 min-w-0 touch-manipulation"
+client/src/components/admin/DatabaseTab.tsx:154:          <Database className="h-5 w-5 text-[var(--accent)]" aria-hidden="true" />
+client/src/components/ui/badge.tsx:21:          "border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)] font-mono uppercase tracking-[0.12em] text-[10px] px-2 py-[3px]",
+client/src/components/ui/input.tsx:14:          "flex h-10 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base ring-offset-background transition-colors duration-[var(--motion-fast)] file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground hover:border-[color-mix(in_srgb,var(--accent)_45%,var(--border-strong))] focus-visible:outline-none focus-visible:border-[var(--accent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+client/src/components/ui/tabs.tsx:35:      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-all duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-foreground data-[state=active]:bg-[var(--surface-3)] data-[state=active]:text-[var(--accent)] data-[state=active]:shadow-[var(--shadow-sm)]",
+client/src/components/ui/select.tsx:24:      "flex min-h-[44px] w-full items-center justify-between rounded-lg border border-input bg-[var(--surface)] px-3 py-2 text-sm ring-offset-background transition-colors duration-[var(--motion-fast)] data-[placeholder]:text-muted-foreground hover:border-[var(--border-strong)] focus:outline-none focus:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus:ring-2 focus:ring-ring focus:ring-offset-2 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-destructive disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+client/src/components/ui/button.tsx:16:          "border border-[var(--border-strong)] bg-background hover:bg-accent hover:text-accent-foreground hover:border-[var(--accent)] active:bg-accent/80",
+client/src/components/ui/paginator.tsx:179:                  ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-contrast,white)] font-medium"
+client/src/components/ui/paginator.tsx:180:                  : "border-[var(--border)] bg-transparent text-foreground hover:border-[var(--accent)] hover:text-[var(--accent)]",
+client/src/components/ui/paginator.tsx:251:        className={cn("text-xs text-[var(--accent)]", !jumpError && "sr-only")}
+client/src/components/ui/taxonomy-card.tsx:43:      className="block h-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
+client/src/components/ui/taxonomy-card.tsx:45:      <Card className="h-full cursor-pointer hover:border-[var(--accent)] transition-colors" data-ds="card-hover">
+client/src/components/ui/taxonomy-card.tsx:53:              background: "color-mix(in srgb, var(--accent) 12%, transparent)",
+client/src/components/ui/taxonomy-card.tsx:54:              color: "var(--accent)",
+client/src/components/ui/export-tools.tsx:298:            --accent: #ff3d52; /* DS-OK: standalone export DS accent */
+client/src/components/ui/export-tools.tsx:299:            --accent-2: #b84dff; /* DS-OK: standalone export DS accent-2 */
+client/src/components/ui/export-tools.tsx:323:            color: var(--accent);
+client/src/components/ui/export-tools.tsx:350:        h2::before { content: '— '; color: var(--accent); }
+client/src/components/ui/export-tools.tsx:352:        a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+client/src/components/ui/export-tools.tsx:357:            border-left: 3px solid var(--accent);
+client/src/components/ui/export-tools.tsx:558:          const CRIMSON: [number, number, number] = [255, 61, 82]; // DS-OK: --accent #ff3d52
+client/src/components/ui/suggest-edit-dialog.tsx:404:              Sign in <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>required</em>
+client/src/components/ui/suggest-edit-dialog.tsx:449:            Suggest <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>edit</em>

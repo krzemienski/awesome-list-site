@@ -1,0 +1,68 @@
+perf 0.55 FCP 3744 LCP 3744 TBT 1443 SI 3744 oFCP 696 oLCP 696
+
+== optimisticFirstContentfulPaint (14 nodes)
+     0    761 NET VeryHigh Document     20959 /
+   761   1524 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   761   1523 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   761   1073 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   761    881 CPU                       30063 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   881    882 CPU                         455 layout
+   881   3744 NET High     Script      185204 /assets/index-DLmunk5U.js
+   881   1343 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   881   1193 NET High     Script        2370 /assets/index-CeftJlzp.js
+   882    913 CPU                        7707 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   913   1404 CPU                      245418 layout
+  1524   3194 NET VeryHigh Font         48464 https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2
+  1524   2894 NET VeryHigh Font         31369 https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwB
+  1524   3044 NET VeryHigh Font         36592 https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2W
+
+== pessimisticFirstContentfulPaint (14 nodes)
+     0    761 NET VeryHigh Document     20959 /
+   761   1524 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   761   1523 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   761   1073 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   761    881 CPU                       30063 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   881    882 CPU                         455 layout
+   881   3744 NET High     Script      185204 /assets/index-DLmunk5U.js
+   881   1343 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   881   1193 NET High     Script        2370 /assets/index-CeftJlzp.js
+   882    913 CPU                        7707 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   913   1404 CPU                      245418 layout
+  1524   3194 NET VeryHigh Font         48464 https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2
+  1524   2894 NET VeryHigh Font         31369 https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwB
+  1524   3044 NET VeryHigh Font         36592 https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2W
+
+== optimisticLargestContentfulPaint (15 nodes)
+     0    761 NET VeryHigh Document     20959 /
+   761   1524 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   761   1523 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   761   1073 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   761   1073 NET Medium   Manifest      2242 /site.webmanifest
+   761    881 CPU                       30063 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   881    882 CPU                         455 layout
+   881   3744 NET High     Script      185204 /assets/index-DLmunk5U.js
+   881   1343 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   881   1193 NET High     Script        2370 /assets/index-CeftJlzp.js
+   882    913 CPU                        7707 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   913   1404 CPU                      245418 layout
+  1524   3194 NET VeryHigh Font         48464 https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2
+  1524   2894 NET VeryHigh Font         31369 https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwB
+  1524   3044 NET VeryHigh Font         36592 https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2W
+
+== pessimisticLargestContentfulPaint (16 nodes)
+     0    761 NET VeryHigh Document     20959 /
+   761   1524 NET VeryHigh Stylesheet    2987 https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:it
+   761   1523 NET VeryHigh Stylesheet   29300 /assets/index-rhv51Ajg.css
+   761   1073 NET VeryHigh Stylesheet    4682 /assets/Home-DQCBP3Qu.css
+   761   1073 NET Medium   Manifest      2242 /site.webmanifest
+   761    881 CPU                       30063 FrameStartedLoading+EventDispatch+unloadEventStart+unloadEventEnd
+   881    882 CPU                         455 layout
+   881   3744 NET High     Script      185204 /assets/index-DLmunk5U.js
+   881   1343 NET High     Script        4827 /assets/index-CTjT7uj6.js
+   881   1193 NET High     Script        2370 /assets/index-CeftJlzp.js
+   882    913 CPU                        7707 ParseHTML+ScheduleStyleRecalculation+HTMLDocumentParser::DocumentElementAvailable+HTMLDocumentParser::MaybeFetchQueuedPreloads
+   913   1404 CPU                      245418 layout
+  1523   1525 NET Low      Image            0 data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScy
+  1524   3194 NET VeryHigh Font         48464 https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2
+  1524   2894 NET VeryHigh Font         31369 https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwB
+  1524   3044 NET VeryHigh Font         36592 https://fonts.gstatic.com/s/fraunces/v38/6NUu8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2W

@@ -359,7 +359,7 @@ export default function Bookmarks() {
         <SEOHead title="My Library - Error" description="View your saved library" noindex />
         <div className="text-center py-12" role="alert">
           <BookmarkX className="h-16 w-16 mx-auto text-destructive mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Your library couldn't load</h1>
+          <h1 className="display-h text-2xl mb-2">Your library couldn't load</h1>
           <p className="text-muted-foreground mb-5">
             Your saves are still safe. Refresh the page to try again.
           </p>

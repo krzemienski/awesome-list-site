@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.advanced",
+  "widths": [
+    {
+      "screen": "app.advanced",
+      "width": 375,
+      "route": "/advanced",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                "#radix-\\:rb\\: > .pt-3.border-t.space-y-2 > h4"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#radix-\\:rb\\: > .pt-3.border-t.space-y-2 > h4"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.advanced",
+      "width": 1440,
+      "route": "/advanced",
+      "identity": "public",
+      "status": "PASS",
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [
+          {
+            "id": "heading-order",
+            "impact": "moderate",
+            "help": "Heading levels should only increase by one",
+            "description": "Ensure the order of headings is semantically correct",
+            "nodes": 1,
+            "targets": [
+              [
+                "#radix-\\:rh\\: > .pt-3.border-t.space-y-2 > h4"
+              ]
+            ],
+            "details": [
+              {
+                "target": [
+                  "#radix-\\:rh\\: > .pt-3.border-t.space-y-2 > h4"
+                ],
+                "failureSummary": "Fix any of the following:\n  Heading order invalid"
+              }
+            ]
+          }
+        ],
+        "seriousCritical": [],
+        "passes": 44,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

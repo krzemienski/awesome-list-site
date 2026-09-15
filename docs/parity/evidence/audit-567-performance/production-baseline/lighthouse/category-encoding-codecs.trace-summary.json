@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 1,
+  "source": "Lighthouse default-pass trace",
+  "rawTracePersisted": false,
+  "totalTopLevelTaskCount": 1113,
+  "topLevelTasks": [
+    {
+      "event": "RunTask",
+      "durationMs": 79.353,
+      "selfTimeMs": 0.197,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 57.862,
+      "selfTimeMs": 1.552,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": "n"
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 38.733,
+      "selfTimeMs": 4.381,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 23.6,
+      "selfTimeMs": 0.089,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/clerk-js@6/dist/clerk.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 16.101,
+      "selfTimeMs": 0.012,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 15.855,
+      "selfTimeMs": 0.043,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 14.734,
+      "selfTimeMs": 0.073,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.32.1/dist/vendors_ui_13e6c8_1.32.1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 13.368,
+      "selfTimeMs": 1.534,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.448,
+      "selfTimeMs": 0.295,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 11.187,
+      "selfTimeMs": 0.085,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1/dist/ui.browser.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.794,
+      "selfTimeMs": 0.013,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.484,
+      "selfTimeMs": 0.33,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.236,
+      "selfTimeMs": 0.072,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.32.1/dist/ui-common_ui_13e6c8_1.32.1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.195,
+      "selfTimeMs": 3.928,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 10.137,
+      "selfTimeMs": 0.548,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.713,
+      "selfTimeMs": 0.121,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.617,
+      "selfTimeMs": 8.892,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 9.518,
+      "selfTimeMs": 0.013,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 8.187,
+      "selfTimeMs": 0.354,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.691,
+      "selfTimeMs": 0.183,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.095,
+      "selfTimeMs": 0.039,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 7.041,
+      "selfTimeMs": 0.195,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.882,
+      "selfTimeMs": 0.029,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 6.042,
+      "selfTimeMs": 0.109,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 5.802,
+      "selfTimeMs": 0.198,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.601,
+      "selfTimeMs": 0.034,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.401,
+      "selfTimeMs": 0.404,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.327,
+      "selfTimeMs": 4.253,
+      "url": "https://awesome.video/assets/select-BnuJWvpc.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 4.231,
+      "selfTimeMs": 4.154,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.552,
+      "selfTimeMs": 0.616,
+      "url": "https://awesome.video/assets/index-sPEaR_lR.css",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 3.125,
+      "selfTimeMs": 0.97,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.931,
+      "selfTimeMs": 2.923,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.625,
+      "selfTimeMs": 0.075,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.599,
+      "selfTimeMs": 1.191,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.555,
+      "selfTimeMs": 2.522,
+      "url": "https://awesome.video/assets/collapsible-9PyftQMW.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 2.031,
+      "selfTimeMs": 0.269,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.845,
+      "selfTimeMs": 0.201,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.757,
+      "selfTimeMs": 0.015,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.704,
+      "selfTimeMs": 0.032,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.496,
+      "selfTimeMs": 0.895,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.404,
+      "selfTimeMs": 0.124,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.28,
+      "selfTimeMs": 0.621,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.218,
+      "selfTimeMs": 1.218,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.167,
+      "selfTimeMs": 1.163,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.114,
+      "selfTimeMs": 0.136,
+      "url": "https://awesome.video/assets/index-W0apbkq1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.108,
+      "selfTimeMs": 0.023,
+      "url": "https://awesome.video/api/__clerk/npm/@clerk/ui@1.32.1/dist/framework_ui_13e6c8_1.32.1.js",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.102,
+      "selfTimeMs": 0.211,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.046,
+      "selfTimeMs": 0.084,
+      "url": null,
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.014,
+      "selfTimeMs": 0.211,
+      "url": "https://awesome.video/category/encoding-codecs",
+      "function": null
+    },
+    {
+      "event": "RunTask",
+      "durationMs": 1.01,
+      "selfTimeMs": 1.01,
+      "url": null,
+      "function": null
+    }
+  ]
+}

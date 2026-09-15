@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 2,
+  "task": "567",
+  "screen": "app.profile",
+  "widths": [
+    {
+      "screen": "app.profile",
+      "width": 375,
+      "route": "/profile",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 42,
+        "incomplete": 1
+      }
+    },
+    {
+      "screen": "app.profile",
+      "width": 1440,
+      "route": "/profile",
+      "identity": "Nick-admin",
+      "status": "PASS",
+      "identityVerified": {
+        "name": "Nick",
+        "role": "admin"
+      },
+      "ready": true,
+      "httpStatus": 200,
+      "axe": {
+        "violations": [],
+        "seriousCritical": [],
+        "passes": 42,
+        "incomplete": 1
+      }
+    }
+  ],
+  "seriousCriticalZero": true
+}

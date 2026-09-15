@@ -23,7 +23,7 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat--interactive:hover {
-  border-color: var(--accent);
+  border-color: var(--border-strong);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__header {
@@ -42,7 +42,7 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__title-link:hover {
-  color: var(--accent);
+  color: var(--text);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -62,7 +62,7 @@
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__value--accent {
-  color: var(--accent);
+  color: var(--text);
 }
 
 .admin-overview-stats-canonical .admin-canonical-stat__sub {
@@ -227,7 +227,7 @@
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
-  color: var(--accent);
+  color: var(--text-2);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -263,7 +263,7 @@
 
 .admin-overview-canonical .admin-canonical-workflow-links button {
   min-height: 24px;
-  color: var(--accent);
+  color: var(--text-2);
   font-family: var(--font-body);
   font-size: 0.75rem;
   letter-spacing: normal;

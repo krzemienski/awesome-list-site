@@ -65,6 +65,7 @@ import { collectionShareIdSchema } from "@shared/bookmarkCollections";
 import { getPublicCacheValue } from "./cache/publicCache";
 import { isDatabaseUnavailableError } from "./db/errors";
 import { ServiceUnavailableError } from "./middleware/errors";
+import { loadHomeNav } from "./home-ssr-data";
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
@@ -472,6 +473,37 @@ function webPageSchema(opts: {
 async function getTreeCached(): Promise<any> {
   return storage.getAwesomeListFromDatabase();
 }
+
+/**
+ * The Home document is rendered by the exact-tree SSR path after this
+ * middleware has rewritten the shell.  Its metadata/body only need the small
+ * navigation projection; resolving Home through the legacy full catalog tree
+ * duplicated the largest public query before SSR started and made the document
+ * TTFB pay for two independent catalog representations.  Keep the recursive
+ * count here because HomeNavRepository stores direct counts at each level.
+ */
+function homeNavCategoryCount(category: {
+  resourceCount?: number;
+  subcategories?: Array<{
+    resourceCount?: number;
+    subSubcategories?: Array<{ resourceCount?: number }>;
+  }>;
+}): number {
+  return (
+    (category.resourceCount ?? 0) +
+    (category.subcategories ?? []).reduce(
+      (total, subcategory) =>
+        total +
+        (subcategory.resourceCount ?? 0) +
+        (subcategory.subSubcategories ?? []).reduce(
+          (nestedTotal, nested) => nestedTotal + (nested.resourceCount ?? 0),
+          0,
+        ),
+      0,
+    )
+  );
+}
+
 function safeDecode(segment: string): string {
   try {
     return decodeURIComponent(segment);
@@ -595,21 +627,21 @@ function homeShellChrome(): string {
    const m = defaultMeta(path);
    let categories: { name: string; slug: string; count: number }[] = [];
    try {
-     const data = await getTreeCached();
-     const resourceCount = data?.resources?.length ?? 2000;
-     const categoryCount = data?.categories?.length ?? 80;
+      const data = await loadHomeNav();
+      const resourceCount = data.totalResources;
+      const categoryCount = data.categories.length;
      m.title = homeSeoTitle(resourceCount);
      m.description = homeSeoDescription(resourceCount, categoryCount);
      m.image = ogImage("/");
-     categories = (data?.categories ?? []).map((c: any) => ({
+      categories = data.categories.map((c) => ({
        name: c.name,
        slug: c.slug,
-       count: countNodeResources(c),
+        count: homeNavCategoryCount(c),
      }));
     } catch (error) {
       rethrowBoundedDependencyFailure(error);
     }
-   m.structuredData = webSiteSchema(m.description);
+    m.structuredData = webSiteSchema(m.description);
    const bodyHtml =
      homeShellChrome() +
      renderHomeContent({

@@ -1,0 +1,74 @@
+{
+  "base": "http://127.0.0.1:5101",
+  "createdAt": "2026-09-14T22:26:04.551Z",
+  "invocations": [
+    {
+      "startedAt": "2026-09-14T22:26:04.551Z",
+      "command": "node scripts/validation/production-baseline-capture.mjs --base http://127.0.0.1:5101 --only lighthouse --lighthouse-routes / --out docs/parity/evidence/audit-567-performance/local-compiled-home --trace-summary",
+      "base": "http://127.0.0.1:5101",
+      "outDir": "docs/parity/evidence/audit-567-performance/local-compiled-home",
+      "toolCommit": "b190c8fe6e558874b118fffeaa2b62cd6a231c1e",
+      "tools": {
+        "node": "v20.20.0",
+        "playwright": "1.61.1",
+        "axeCore": "4.13.0",
+        "axePlaywright": "4.13.0",
+        "lighthouse": "12.8.2",
+        "sharp": "0.33.5",
+        "pixelmatch": "7.1.0",
+        "chromium": "chromium-1223",
+        "chromiumVersion": "148.0.7778.96"
+      },
+      "phases": [
+        "lighthouse"
+      ],
+      "routesRequested": [
+        "/",
+        "/categories",
+        "/category/encoding-codecs",
+        "/category/community-events?page=2",
+        "/subcategory/community-groups",
+        "/sub-subcategory/ffmpeg",
+        "/resource/185020",
+        "/resource/186190",
+        "/about",
+        "/submit",
+        "/search?q=ffmpeg",
+        "/search?q=zzqxv-nothing",
+        "/advanced",
+        "/journeys",
+        "/journey/7",
+        "/tag/open-source",
+        "/settings/theme",
+        "/recommendations",
+        "/design-system",
+        "/terms",
+        "/privacy",
+        "/code-of-conduct",
+        "/sign-in",
+        "/this-route-does-not-exist",
+        "/sitemap.xml",
+        "/robots.txt"
+      ],
+      "lighthouseRoutesRequested": [
+        "/"
+      ],
+      "maxNavigations": null,
+      "force": false,
+      "traceSummary": true,
+      "browserGuard": {
+        "continued": 41,
+        "blocked": 0,
+        "sample": [],
+        "allowedAuthInitializations": []
+      },
+      "finishedAt": "2026-09-14T22:26:34.229Z",
+      "durationSeconds": 30,
+      "navigations": 1,
+      "stoppedByBudget": false,
+      "routes": [],
+      "throttled": [],
+      "failures": []
+    }
+  ]
+}

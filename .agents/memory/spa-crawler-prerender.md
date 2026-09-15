@@ -33,3 +33,18 @@ For Home, the exception remains public-only: preserve prepaint theme/layout and
 consent behavior through hydration, then reconcile it through their normal live
 sources. Validate the exact allowed CSP origin rather than a wildcard, and
 verify that legacy consent controls can reopen after reconciliation.
+
+## Split client CSS is a separate SSR obligation
+
+Resolve the rendered route's static CSS dependency graph from the client build
+manifest and include those styles in the initial document. Importing a React
+page in the server bundle does not load its lazy client stylesheet.
+
+**Why:** Server-rendered content can arrive without its layout CSS even when
+the global stylesheet is present. Hydration eventually loads the missing chunk,
+which hides the defect in settled screenshots while first paint remains wrong.
+
+**How to apply:** Check the manifest rather than guessing hashed filenames;
+deduplicate existing links and validate assets. Preserve the normal SPA fallback
+on SSR failures, but make an SSR-specific audit fail rather than measure that
+fallback. Prewarming code must not become a hidden page/data warm-up.

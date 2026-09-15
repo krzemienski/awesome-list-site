@@ -1,0 +1,17 @@
+$ node scripts/validation/standalone-palette-drift.mjs
+--- output ---
+PASS standalone-scope-parity :: .agents/skills/verify-design-system/SKILL.md:243 matches the executable artifact discovery and exclusion contract
+PASS canaries :: standalone Stage 5 detectors, unmanifested-artifact discovery, DS-OK parser, and shrink-only ratchet verified
+PASS frozen-reference :: awesome-list-site-ds byte-identical to attached_assets/awesome_list_site_2_1789019068732.zip (103 files)
+PASS artifact-manifest-coverage :: every source-bearing top-level artifacts/ directory is manifested or one of 1 narrow documented exclusion(s)
+PASS palette-classes :: 5 legacy match(es) across 2 file(s), all pinned at baseline
+PASS hex-colors :: 88 legacy match(es) across 5 file(s), all pinned at baseline
+PASS rgb-colors :: 2 legacy match(es) across 1 file(s), all pinned at baseline
+PASS raw-radii :: 3 legacy match(es) across 2 file(s), all pinned at baseline
+PASS font-family :: 0 legacy match(es) across 0 file(s), all pinned at baseline
+
+PASS standalone-palette-drift :: 3 root(s), 86 source file(s); no new hardcoded design values
+  scanned artifacts/awesome-video-design-system
+  scanned artifacts/awesome-video-ds
+  scanned artifacts/mockup-sandbox
+--- exit status: 0 ---
