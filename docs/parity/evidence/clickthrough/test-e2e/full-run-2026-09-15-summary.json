@@ -1,0 +1,307 @@
+{
+  "run": {
+    "startTime": "2026-09-15T14:18:08.851Z",
+    "durationMs": 1397095,
+    "workers": 3,
+    "command": "npm run test:e2e -- --workers=3 --reporter=list,json"
+  },
+  "stats": {
+    "startTime": "2026-09-15T14:18:08.851Z",
+    "duration": 1397095.194,
+    "expected": 663,
+    "skipped": 34,
+    "unexpected": 3,
+    "flaky": 0
+  },
+  "perProject": {
+    "chromium": {
+      "passed": 140,
+      "failed": 0,
+      "skipped": 0
+    },
+    "firefox": {
+      "passed": 137,
+      "failed": 2,
+      "skipped": 1
+    },
+    "webkit": {
+      "passed": 124,
+      "failed": 0,
+      "skipped": 16
+    },
+    "Mobile Chrome": {
+      "passed": 138,
+      "failed": 1,
+      "skipped": 1
+    },
+    "Mobile Safari": {
+      "passed": 124,
+      "failed": 0,
+      "skipped": 16
+    }
+  },
+  "nonPassing": [
+    {
+      "project": "firefox",
+      "file": "admin-operations.spec.ts",
+      "line": 56,
+      "title": "covers the operations tabs and serious/critical axe findings at four responsive widths",
+      "status": "failed",
+      "error": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-operations.spec.ts",
+      "line": 56,
+      "title": "covers the operations tabs and serious/critical axe findings at four responsive widths",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-operations.spec.ts",
+      "line": 86,
+      "title": "downloads real Markdown and JSON exports from the live catalog",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-operations.spec.ts",
+      "line": 118,
+      "title": "cancels export and link-check confirmations without running jobs",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-operations.spec.ts",
+      "line": 137,
+      "title": "cancels database seed and clear/reseed confirmations without mutating data",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-operations.spec.ts",
+      "line": 157,
+      "title": "cancels GitHub import and export confirmations without starting sync jobs",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-operations.spec.ts",
+      "line": 183,
+      "title": "cancels the link-health confirmation without starting a scan",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-operations.spec.ts",
+      "line": 201,
+      "title": "matches live link-health filter counts, including DNS failures",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-operations.spec.ts",
+      "line": 56,
+      "title": "covers the operations tabs and serious/critical axe findings at four responsive widths",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-operations.spec.ts",
+      "line": 86,
+      "title": "downloads real Markdown and JSON exports from the live catalog",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-operations.spec.ts",
+      "line": 118,
+      "title": "cancels export and link-check confirmations without running jobs",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-operations.spec.ts",
+      "line": 137,
+      "title": "cancels database seed and clear/reseed confirmations without mutating data",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-operations.spec.ts",
+      "line": 157,
+      "title": "cancels GitHub import and export confirmations without starting sync jobs",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-operations.spec.ts",
+      "line": 183,
+      "title": "cancels the link-health confirmation without starting a scan",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-operations.spec.ts",
+      "line": 201,
+      "title": "matches live link-health filter counts, including DNS failures",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-users-audit.spec.ts",
+      "line": 202,
+      "title": "Users changes the role of a disposable second account and restores it",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-users-audit.spec.ts",
+      "line": 260,
+      "title": "Audit filters a disposable resource, opens detail, and records kind and featured updates",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-users-audit.spec.ts",
+      "line": 425,
+      "title": "Audit exposes the contact inbox detail when its endpoint is available",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 375px",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 768px",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 1024px",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 1440px",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-users-audit.spec.ts",
+      "line": 202,
+      "title": "Users changes the role of a disposable second account and restores it",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-users-audit.spec.ts",
+      "line": 260,
+      "title": "Audit filters a disposable resource, opens detail, and records kind and featured updates",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-users-audit.spec.ts",
+      "line": 425,
+      "title": "Audit exposes the contact inbox detail when its endpoint is available",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 375px",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 768px",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 1024px",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 1440px",
+      "status": "skipped"
+    },
+    {
+      "project": "firefox",
+      "file": "continue-learning.spec.ts",
+      "line": 119,
+      "title": "deduplicates resources, resumes the next grouped step, and records a milestone",
+      "status": "failed",
+      "error": "Error: page.goto: NS_BINDING_ABORTED"
+    },
+    {
+      "project": "firefox",
+      "file": "continue-learning.spec.ts",
+      "line": 230,
+      "title": "keeps mixed and all-optional grouped-step completion consistent",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "continue-learning.spec.ts",
+      "line": 119,
+      "title": "deduplicates resources, resumes the next grouped step, and records a milestone",
+      "status": "skipped"
+    },
+    {
+      "project": "webkit",
+      "file": "continue-learning.spec.ts",
+      "line": 230,
+      "title": "keeps mixed and all-optional grouped-step completion consistent",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Chrome",
+      "file": "continue-learning.spec.ts",
+      "line": 119,
+      "title": "deduplicates resources, resumes the next grouped step, and records a milestone",
+      "status": "failed",
+      "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed"
+    },
+    {
+      "project": "Mobile Chrome",
+      "file": "continue-learning.spec.ts",
+      "line": 230,
+      "title": "keeps mixed and all-optional grouped-step completion consistent",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "continue-learning.spec.ts",
+      "line": 119,
+      "title": "deduplicates resources, resumes the next grouped step, and records a milestone",
+      "status": "skipped"
+    },
+    {
+      "project": "Mobile Safari",
+      "file": "continue-learning.spec.ts",
+      "line": 230,
+      "title": "keeps mixed and all-optional grouped-step completion consistent",
+      "status": "skipped"
+    }
+  ]
+}

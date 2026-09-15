@@ -33,6 +33,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration --no-file-parallelism",
     "test:e2e": "playwright test",
+    "test:e2e:browsers": "PLAYWRIGHT_BROWSERS_PATH=.cache/ms-playwright playwright install chromium firefox webkit",
     "test:parity": "node tests/parity/runner.mjs",
     "bundle:report": "node scripts/validation/bundle-budget.mjs",
     "bundle:budget": "node scripts/validation/bundle-budget.mjs --check",

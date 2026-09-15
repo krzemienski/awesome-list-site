@@ -1,0 +1,64 @@
+{
+  "command": "npm run test:e2e -- --workers=3 --reporter=list,json",
+  "stats": {
+    "startTime": "2026-09-15T15:41:57.939Z",
+    "duration": 1544815.366,
+    "expected": 676,
+    "skipped": 38,
+    "unexpected": 0,
+    "flaky": 1
+  },
+  "perProject": {
+    "chromium": {
+      "passed": 143,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "firefox": {
+      "passed": 142,
+      "failed": 0,
+      "flaky": 1,
+      "skipped": 0
+    },
+    "webkit": {
+      "passed": 124,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 19
+    },
+    "Mobile Chrome": {
+      "passed": 143,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "Mobile Safari": {
+      "passed": 124,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 19
+    }
+  },
+  "nonPassing": [
+    {
+      "project": "firefox",
+      "file": "admin-users-audit.spec.ts",
+      "line": 505,
+      "title": "Users and Audit retain serious/critical accessibility at 1440px",
+      "status": "flaky",
+      "attempts": [
+        {
+          "status": "timedOut",
+          "durationMs": 60363,
+          "error": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+        },
+        {
+          "status": "passed",
+          "durationMs": 17575,
+          "error": ""
+        }
+      ]
+    }
+  ]
+}

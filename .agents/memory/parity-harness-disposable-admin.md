@@ -19,3 +19,12 @@ description: Rules for disposable Clerk admins in capture harnesses: page fetch,
   matching passes two pages that both fell back to home. Compare the heading
   with the catalogue label where the design's heading is the entity; admin
   tab checks compare the ACTIVE tab to the requested slug, not "some tab".
+
+- **Treat interrupted read-only audits as potentially identity-writing.**
+  **Why:** A worker reported no accounts created because admin panels had not
+  been reached, but authentication had already provisioned an admin before the
+  public crawl. A shell timeout skipped its cleanup.
+  **How to apply:** Inspect provisioning order, journal exact owned identities
+  before browsing, and independently verify local and provider removal after
+  interruption. Never infer absence from the last screen or purge other workers'
+  shared-prefix accounts.

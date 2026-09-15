@@ -1,0 +1,149 @@
+{
+  "method": "GET read-only; redirect-follow; no body retained",
+  "checkedAt": "2026-09-15T03:49:20.351Z",
+  "results": [
+    {
+      "url": "https://bitmovin.com/av1-showing-greater-compression-efficiency-than-hevc/",
+      "status": 403,
+      "finalUrl": "https://bitmovin.com/av1-showing-greater-compression-efficiency-than-hevc/",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://sourceforge.net/projects/ffmpeg-ios/",
+      "status": 403,
+      "finalUrl": "https://sourceforge.net/projects/ffmpeg-ios/",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://netflixtechblog.com/svt-av1-an-open-source-av1-encoder-and-decoder-ad295d9b5ca2",
+      "status": 403,
+      "finalUrl": "https://netflixtechblog.com/svt-av1-an-open-source-av1-encoder-and-decoder-ad295d9b5ca2",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://sourceforge.net/projects/qwinff/",
+      "status": 403,
+      "finalUrl": "https://sourceforge.net/projects/qwinff/",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://www.iso.org/standard/85457.html",
+      "status": 403,
+      "finalUrl": "https://www.iso.org/standard/85457.html",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://www.techspot.com/article/1131-hevc-h256-enconding-playback/",
+      "status": 403,
+      "finalUrl": "https://www.techspot.com/article/1131-hevc-h256-enconding-playback/",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "http://example.com/x",
+      "status": 404,
+      "finalUrl": "http://example.com/x",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://ffmpeg-batch.sourceforge.io/",
+      "status": 403,
+      "finalUrl": "https://ffmpeg-batch.sourceforge.io/",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform",
+      "status": 404,
+      "finalUrl": "https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://dispar.at/blog/2017/07/08/design-of-scheduling-and-rate-adaptation-algorithms-for-adaptive-http-streaming",
+      "error": "ENOTFOUND",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://docs.peer5.com/guides/production-ready-hls-vod",
+      "error": "ENOTFOUND",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "status": 200,
+      "finalUrl": "https://github.com/krzemienski/awesome-video/blob/master/CONTRIBUTING.md",
+      "classification": "reachable"
+    },
+    {
+      "url": "https://tslemurs.com",
+      "error": "ERR_TLS_CERT_ALTNAME_INVALID",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://docs.peer5.com",
+      "error": "ENOTFOUND",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://download2.diva-cdn.com/files/High%20Efficiency%20Streaming%20Protocol%20%28HESP%29%20Whitepaper%20v2.0.pdf",
+      "error": "ENOTFOUND",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://www.haivision.com/resources/white-paper/srt-protocol-technical-overview",
+      "status": 403,
+      "finalUrl": "https://www.haivision.com/resources/white-paper/srt-protocol-technical-overview",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://reference.dashif.org/dash.js/v/latest/samples/drm/clearkey",
+      "status": 404,
+      "finalUrl": "https://reference.dashif.org/dash.js/v/latest/samples/drm/clearkey",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://artillery.io/docs/plugin-hls",
+      "status": 404,
+      "finalUrl": "https://www.artillery.io/docs/plugin-hls",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs",
+      "status": 404,
+      "finalUrl": "https://medialooks.com/articles/comparing-video-transport-technologies-which-one-is-best-for-your-needs",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://dl.acm.org/doi/pdf/10.1145/3204949.3208138",
+      "status": 403,
+      "finalUrl": "https://dl.acm.org/doi/pdf/10.1145/3204949.3208138",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://dl.acm.org/doi/10.1145/3625468.3652179",
+      "status": 403,
+      "finalUrl": "https://dl.acm.org/doi/10.1145/3625468.3652179",
+      "classification": "access-restricted-not-proof-of-death"
+    },
+    {
+      "url": "https://www.forasoft.com/learn/ott/articles-ott/drm-content-protection-reference-architecture",
+      "status": 200,
+      "finalUrl": "https://www.forasoft.com/learn/ott/articles-ott/drm-content-protection-reference-architecture",
+      "classification": "reachable"
+    },
+    {
+      "url": "https://www.iab.com/guidelines/digital-video-player-ad-interface-definition-vpaid-2-0",
+      "status": 404,
+      "finalUrl": "https://www.iab.com/?post_type=iab_guideline&p=7263",
+      "classification": "unavailable-resource"
+    },
+    {
+      "url": "https://www.adobe.com/products/media-encoder.html",
+      "error": "TimeoutError",
+      "classification": "inconclusive-network-failure"
+    },
+    {
+      "url": "https://academy.wedio.com/how-to-live-stream",
+      "error": "TimeoutError",
+      "classification": "inconclusive-network-failure"
+    }
+  ]
+}

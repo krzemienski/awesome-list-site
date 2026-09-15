@@ -2,8 +2,11 @@ import { expect, type Locator, type Page } from "@playwright/test";
 import {
   expectAdminPage,
   expectSeriousA11y,
+  skipWebKitOnPlainHttp,
   task549Test as test,
 } from "./task549-admin-fixtures";
+
+skipWebKitOnPlainHttp();
 
 type AdminUser = {
   id: string;
@@ -109,9 +112,14 @@ async function dismissToast(page: Page, title: string) {
   await expect(toast).toBeVisible();
   const close = toast.getByRole("button", { name: /Dismiss notification/i });
   // ToastClose is intentionally inert until hover/focus so an invisible
-  // close hitbox cannot intercept controls below it.
+  // close hitbox cannot intercept controls below it. `group-hover` is gated
+  // on `@media (hover: hover)`, so on touch projects (Mobile Chrome/Safari)
+  // hovering never enables it; focus does on every project, and Enter
+  // activates the real button through its focus path.
   await toast.hover();
-  await close.click();
+  await close.focus();
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Enter");
   await expect(toast).toHaveCount(0);
   await waitForPointerCleanup(page);
 }

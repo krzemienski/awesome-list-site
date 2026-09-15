@@ -215,6 +215,22 @@ async function waitForAdminReadiness(
  * pass the executable through the normal Playwright configuration; this
  * fixture never downloads or mocks a browser/auth session.
  */
+/**
+ * WebKit rejects `SameSite=None` cookies that lack `Secure`, and Clerk
+ * development instances write `__session` / `__client_uat` exactly that way
+ * over plain http (measured: clerk-js sets them, `document.cookie` keeps only
+ * `clerk_active_context`). The browser-side session completes, but the app
+ * server never receives a session cookie, so every server-authenticated
+ * fixture times out. Production is https and unaffected. Call this at file
+ * scope in every spec that depends on the Task549 fixtures.
+ */
+export function skipWebKitOnPlainHttp(): void {
+  base.skip(
+    ({ browserName, baseURL }) => browserName === "webkit" && !/^https:/i.test(baseURL ?? configuredBaseUrl),
+    "WebKit drops Clerk's SameSite=None session cookies on http origins; the server never sees the session",
+  );
+}
+
 export const task549Test = base.extend<Task549TestFixtures, Task549WorkerFixtures>({
   task549Admin: [
     async ({ browser }, use) => {
@@ -338,9 +354,22 @@ export async function expectSeriousA11y(
   await expect(panel).toHaveCount(1);
   await expect(panel).toBeVisible();
   const { default: AxeBuilder } = await import("@axe-core/playwright");
-  const result = await new AxeBuilder({ page })
-    .include(scope)
-    .analyze();
+  const analyze = () => new AxeBuilder({ page }).include(scope).analyze();
+  let result: Awaited<ReturnType<typeof analyze>>;
+  try {
+    result = await analyze();
+  } catch (error) {
+    // axe finishes a run inside a helper page it opens on the same context.
+    // Under a full parallel run Firefox has twice failed that `newPage` with
+    // "Target page, context or browser has been closed" while the page under
+    // test and its context were still open (its screenshots were captured
+    // afterwards). Retry once when that is the case; any other failure, or a
+    // page that really is gone, still fails the check.
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/has been closed/.test(message) || page.isClosed()) throw error;
+    console.warn(`[expectSeriousA11y] retrying axe for ${label}: ${message.split("\n")[0]}`);
+    result = await analyze();
+  }
   const violations = result.violations.filter(
     (violation) =>
       violation.impact === "serious" || violation.impact === "critical",

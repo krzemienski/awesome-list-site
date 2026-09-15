@@ -86,9 +86,17 @@ function routeFor(level: ListingLevel, slug: string) {
   return `/${level === "category" ? "category" : level === "subcategory" ? "subcategory" : "sub-subcategory"}/${slug}`;
 }
 
-// P-05: single-resource pages read "1 resources available" / "of 1 resources".
-// Pluralize the noun to match the count (the "About this collection" prose
-// already does this correctly).
+function samePath(a: string, b: string) {
+  const norm = (p: string) => {
+    const trimmed = p.length > 1 ? p.replace(/\/+$/, "") : p;
+    try {
+      return decodeURIComponent(trimmed);
+    } catch {
+      return trimmed;
+    }
+  };
+  return norm(a) === norm(b);
+}
 function resourceNoun(count: number): string {
   return count === 1 ? "resource" : "resources";
 }
@@ -289,6 +297,12 @@ export default function TaxonomyListing({ level }: Props) {
     const href = `${routeFor(level, slug)}${next.size ? `?${next}` : ""}`;
     const current = `${window.location.pathname}${window.location.search}`;
     const snapshot = JSON.stringify([page, selection, tags, provider, format, skillLevel, sort, general, view]);
+    // Browser Back/Forward to another route fires this effect (location dep)
+    // while this listing is still mounted. Writing our href then would
+    // overwrite the entry the user just navigated to and trap them here
+    // (Back from a category never reached Home). Only sync while the
+    // document is still on this listing's own path.
+    if (!samePath(window.location.pathname, routeFor(level, slug))) return;
     if (current !== href) {
       const shouldPush = urlSyncInitialized.current && !popNavigation.current && pushSnapshot.current !== snapshot;
       window.history[shouldPush ? "pushState" : "replaceState"]({}, "", href);

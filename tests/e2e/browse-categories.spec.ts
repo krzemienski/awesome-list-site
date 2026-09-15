@@ -1,4 +1,16 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+// The home grid re-renders as catalog data arrives; a click that lands on a
+// card during that re-render targets a detached node and never navigates
+// (seen once on WebKit under a full parallel run, the page still on `/` with
+// no error). Click until the URL actually moves to a category.
+async function openFirstCategory(page: Page) {
+  const firstCategory = page.locator('[data-testid^="link-category-"]').first();
+  await expect(async () => {
+    await firstCategory.click();
+    await expect(page).toHaveURL(/\/category\//, { timeout: 3_000 });
+  }).toPass({ timeout: 15_000 });
+}
 
 test.describe('Browse Categories Flow', () => {
   test.beforeEach(async ({ page }) => {
@@ -35,7 +47,7 @@ test.describe('Browse Categories Flow', () => {
     test('should state the resource count exactly once', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       const heading = page.locator('[data-testid="text-results-count"]');
@@ -50,7 +62,7 @@ test.describe('Browse Categories Flow', () => {
     test('should navigate back to home from category page', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // The canonical category navigation is a Browse link to home.
@@ -67,7 +79,7 @@ test.describe('Browse Categories Flow', () => {
     test('should display resources in grid view by default', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
@@ -90,7 +102,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have search input for filtering resources', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for search input
@@ -101,7 +113,7 @@ test.describe('Browse Categories Flow', () => {
     test('should filter resources by search term', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Get initial resource count
@@ -122,7 +134,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have subcategory filter dropdown', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory filter
@@ -138,7 +150,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have sort options', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for sort dropdown
@@ -149,7 +161,7 @@ test.describe('Browse Categories Flow', () => {
     test('should show clear filters button when filters are active', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Apply a search filter
@@ -169,7 +181,7 @@ test.describe('Browse Categories Flow', () => {
     test('should clear all filters when clicking clear button', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Apply a search filter
@@ -195,7 +207,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have view mode toggle buttons', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for view mode buttons (grid, list, compact)
@@ -209,7 +221,7 @@ test.describe('Browse Categories Flow', () => {
     test('should switch to list view when clicking list button', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Click list view button if it exists
@@ -228,7 +240,7 @@ test.describe('Browse Categories Flow', () => {
     test('should switch to compact view when clicking compact button', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Click compact view button if it exists
@@ -247,7 +259,7 @@ test.describe('Browse Categories Flow', () => {
     test('should persist view mode selection in localStorage', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Click list view button if it exists
@@ -269,7 +281,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
@@ -297,7 +309,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
@@ -319,7 +331,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
@@ -346,7 +358,7 @@ test.describe('Browse Categories Flow', () => {
     test('should display resource count badge on subcategory page', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
@@ -370,7 +382,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have tag filter on subcategory page', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
@@ -392,7 +404,7 @@ test.describe('Browse Categories Flow', () => {
     test('should show clear filters button on subcategory page when filters active', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
@@ -477,7 +489,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
@@ -523,7 +535,7 @@ test.describe('Browse Categories Flow', () => {
     test('should display resource cards with title and description', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
@@ -544,7 +556,7 @@ test.describe('Browse Categories Flow', () => {
     test('should show external link icon on resource links', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
@@ -566,7 +578,7 @@ test.describe('Browse Categories Flow', () => {
     test('should display tags on resources', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
@@ -588,7 +600,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have proper heading hierarchy on category page', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Check for h1
@@ -599,7 +611,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have accessible category navigation', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // The category page uses a canonical link to the home catalog.
@@ -615,7 +627,7 @@ test.describe('Browse Categories Flow', () => {
     test('should have accessible resource links', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Check for resource links
@@ -638,7 +650,7 @@ test.describe('Browse Categories Flow', () => {
     test('should support keyboard navigation on category page', async ({ page }) => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Tab through interactive elements
@@ -659,7 +671,7 @@ test.describe('Browse Categories Flow', () => {
       await page.goto('/');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Verify category page loads on mobile
@@ -675,7 +687,7 @@ test.describe('Browse Categories Flow', () => {
       await page.goto('/');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // View mode buttons should still be accessible
@@ -694,7 +706,7 @@ test.describe('Browse Categories Flow', () => {
       await page.goto('/');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
-      await page.locator('[data-testid^="link-category-"]').first().click();
+      await openFirstCategory(page);
       await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links

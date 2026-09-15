@@ -80,7 +80,9 @@ npm run test:unit
 # Run only integration tests
 npm run test:integration
 
-# Run only e2e tests
+# Run only e2e tests (first time: install the browsers the pinned
+# @playwright/test expects into the workspace cache, ~1 min; no-op afterwards)
+npm run test:e2e:browsers
 npm run test:e2e
 
 # Generate coverage report

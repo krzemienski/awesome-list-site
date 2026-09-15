@@ -1,4 +1,3 @@
-import { useState, useEffect, Fragment } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +51,7 @@ import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
 import type { ResearchJob, ResearchDiscovery } from "@shared/schema";
 import "./queues-agent.css";
+import { useState, useEffect } from "react";
 
 const INFO_STATUS_BADGE = "bg-[#5eddf2]/20 text-[#5eddf2] border-[#5eddf2]/30"; // DS-OK: cyan info (DS chart/info constant)
 const OK_STATUS_BADGE = "bg-[#34d08c]/20 text-[#34d08c] border-[#34d08c]/30"; // DS-OK: status ok
@@ -1170,9 +1170,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {jobs.map(job => (
-                      <Fragment key={job.id}>
-                        <TableRow>
+                    {jobs.map(job => ([
+                        <TableRow key={`${job.id}-main`}>
                           <TableCell className="font-medium">#{job.id}</TableCell>
                           <TableCell>{getStatusBadge(job.status)}</TableCell>
                           <TableCell className="max-w-[200px] truncate text-xs">{job.prompt}</TableCell>
@@ -1274,9 +1273,9 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                               )}
                             </div>
                           </TableCell>
-                        </TableRow>
-                        {(job.status === 'failed' || (job.status === 'completed' && (job.totalDiscoveries || 0) === 0)) && job.errorMessage && (
-                          <TableRow>
+                        </TableRow>,
+                        (job.status === 'failed' || (job.status === 'completed' && (job.totalDiscoveries || 0) === 0)) && job.errorMessage ? (
+                          <TableRow key={`${job.id}-error`}>
                             <TableCell colSpan={9} className="p-0">
                               <Alert variant="destructive" className="rounded-none border-x-0 border-t-0">
                                 <AlertCircle className="w-4 h-4" />
@@ -1286,9 +1285,8 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                               </Alert>
                             </TableCell>
                           </TableRow>
-                        )}
-                      </Fragment>
-                    ))}
+                        ) : null,
+                    ]))}
                   </TableBody>
                 </Table>
               )}

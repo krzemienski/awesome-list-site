@@ -2,7 +2,9 @@ import { expect, type APIRequestContext, type Page } from '@playwright/test';
 import { eq } from 'drizzle-orm';
 import { db, pool } from '../../server/db';
 import { journeySteps, learningJourneys } from '../../shared/schema';
-import { task549Test as test } from './task549-admin-fixtures';
+import { skipWebKitOnPlainHttp, task549Test as test } from './task549-admin-fixtures';
+
+skipWebKitOnPlainHttp();
 
 type Step = {
   id: number;
@@ -189,10 +191,18 @@ test.describe.serial('Continue Learning permanent journey', () => {
     // The canonical Home index intentionally keeps account-only modules out of
     // its default geometry. Use the explicit account context documented by
     // Home.tsx instead of weakening the preview assertion.
+    // The preview renders after the journey-progress query resolves; under a
+    // full parallel run that took longer than the default 5 s on the emulated
+    // mobile project, so give it the same budget as the other data-backed
+    // assertions in this file.
     await page.goto('/?context=account');
-    await expect(page.getByTestId('continue-learning-preview')).toBeVisible();
+    await expect(page.getByTestId('continue-learning-preview')).toBeVisible({ timeout: 15_000 });
+    // Firefox aborts a navigation issued while the previous document is still
+    // loading (NS_BINDING_ABORTED); the preview becomes visible before `load`
+    // fires, so wait for it explicitly before leaving the page.
+    await page.waitForLoadState('load');
     await page.goto('/profile');
-    await expect(page.getByTestId('continue-learning-preview')).toBeVisible();
+    await expect(page.getByTestId('continue-learning-preview')).toBeVisible({ timeout: 15_000 });
 
     // Reload the dashboard, resume, and verify the exact logical-step anchor is
     // both navigated to and focused for keyboard users.

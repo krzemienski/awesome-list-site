@@ -24,7 +24,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
         expect(page.url()).toContain('/bookmarks');
 
         // Verify page heading
-        await expect(page.getByRole('heading', { level: 1, name: /My Bookmarks/i })).toBeVisible();
+        await expect(page.getByRole('heading', { level: 1, name: /Saved, for now\.|Nothing saved on this device/i })).toBeVisible();
       }
     });
 
@@ -38,7 +38,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       if (await heading.count() > 0) {
         // Look for empty state or bookmarks
-        const emptyState = page.getByText(/No Bookmarks Yet/i);
+        const emptyState = page.getByRole('heading', { level: 1, name: /Nothing saved on this device/i });
         const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
 
         const hasEmptyState = await emptyState.isVisible().catch(() => false);
@@ -50,7 +50,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
         if (hasEmptyState) {
           // Verify empty state elements
           await expect(emptyState).toBeVisible();
-          await expect(page.getByTestId('link-explore-resources')).toBeVisible();
+          await expect(page.getByRole('link', { name: /Explore resources/i })).toBeVisible();
         }
       }
     });
@@ -505,7 +505,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       if (await h1.count() > 0) {
         await expect(h1).toBeVisible();
-        await expect(h1).toContainText(/My Bookmarks/i);
+        await expect(h1).toContainText(/Saved, for now\.|Nothing saved on this device/i);
       }
     });
 

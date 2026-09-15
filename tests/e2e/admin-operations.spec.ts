@@ -3,8 +3,11 @@ import { Buffer } from "node:buffer";
 import {
   expectAdminPage,
   expectSeriousA11y,
+  skipWebKitOnPlainHttp,
   task549Test as test,
 } from "./task549-admin-fixtures";
+
+skipWebKitOnPlainHttp();
 
 const OPS_TABS = [
   { id: "export", heading: /Export Awesome List/i },
@@ -50,10 +53,17 @@ async function selectOption(
 }
 
 test.describe("Task549 admin operations tabs", () => {
-  test("covers the operations tabs and serious/critical axe findings at four responsive widths", async ({
-    task549Page,
-  }, testInfo) => {
-    for (const width of RESPONSIVE_WIDTHS) {
+  // One test per width rather than one 16-cell sweep: each cell takes a
+  // full-page screenshot and an axe scan, and the single sweep measured 40 s
+  // on Chromium, 58 s on Firefox and over 60 s on the emulated mobile
+  // projects under a full parallel run (Firefox once exceeded even a tripled
+  // budget). Per-width tests keep every case inside the default timeout and
+  // report the failing width directly.
+  for (const width of RESPONSIVE_WIDTHS) {
+    test(`covers the operations tabs and serious/critical axe findings at ${width}px`, async ({
+      task549Page,
+    }, testInfo) => {
+      testInfo.slow();
       await task549Page.setViewportSize({ width, height: 900 });
       for (const tab of OPS_TABS) {
         await task549Page.goto(`/admin#${tab.id}`);
@@ -73,8 +83,8 @@ test.describe("Task549 admin operations tabs", () => {
         });
         await expectSeriousA11y(task549Page, `${tab.id} at ${width}px`);
       }
-    }
-  });
+    });
+  }
 
   test("downloads real Markdown and JSON exports from the live catalog", async ({
     task549Page,

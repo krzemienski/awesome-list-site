@@ -1,4 +1,3 @@
-- [Built-in browser testing policy](testing-policy-builtin-only.md) — functional/visual checks use the platform tester + Screenshot tool only; no custom Playwright/agent-browser stacks; steer task agents via the description (their progress is invisible).
 - [Publishing image size](publish-image-size.md) — bundle budgets do not measure image layers; preserve workspace evidence and trim development bulk only in the publishing copy.
 - [Clerk auth migration](clerk-auth-migration.md) — users.id = Clerk externalId bridge; JIT provisioning FAILS CLOSED on email collision (auto-bind = account takeover); FAPI proxy is prod-only (dev 404 expected).
 - [Identity sweep by claim token](identity-sweep-claim-token.md) — sweep auth refactors by claim pattern (claims.sub), not receiver name; `request.`/`(req as any).` aliases silently survive `req.user` seds and tsc can't catch them.
@@ -23,7 +22,7 @@
 - [SEO title two-pass parity](seo-title-two-pass-parity.md) — client SEOHead titles must exactly mirror og-middleware templates or Googlebot's crawl/render passes see different titles.
 - [Verifying CSS states](verifying-css-states.md) — confirm focus/hover/active with a REAL click/hover+screenshot; getComputedStyle after programmatic .focus() lies (transition mid-value) and CSSOM cssRules is opaque for Vite's injected Tailwind sheet (read style.textContent).
 - [Tailwind v4 source roots](tailwind-v4-source-roots.md) — CSS-first scanning defaults to the workspace, not the legacy v3 `content` list; use `source(none)` with explicit runtime template roots so captures, skills, and caches cannot become accidental safelists.
-- [Playwright browser launch](playwright-browser-version-pin.md) — discover the cached executable instead of reinstalling; enabling the sandbox requires chromiumSandbox:true, not just removing an argument.
+- [Playwright browsers here](playwright-browser-version-pin.md) — revision comes from @playwright/test + test:e2e:browsers; WebKitGTK runtime rules; WebKit never gets a Clerk session over http (skip, don't fix).
 - [Link-scan false positives](link-scan-false-positives.md) — connect timeouts from datacenter IPs are bot-blocks, never "dead"; only DNS/refused/404-410/SSL count; verify timeouts via web search.
 - [Prod status-change paths](prod-status-change-paths.md) — bulk/reject only works on pending resources; approved ones need PUT :id/reject|approve; bulk endpoints hide failures in counts.
 - [Bash long jobs + gotchas](bash-long-jobs.md) — nohup dies with the bash session (use resumable cursor+JSONL, ~88s budget); never capture into `UID` (readonly → silent wrong value).
@@ -116,7 +115,7 @@
 - [Paired storage-event sync](paired-storage-event-sync.md) — coalesce related localStorage events before reading shared state; SSR-injected root content is not a client-readiness signal.
 - [Workflow reconciliation double-start](workflow-reconciliation-double-start.md) — after merge reconciliation, a healthy artifact listener can coexist with a false “port already in use” workflow failure; restart once.
 - [Helper evidence provenance](helper-evidence-provenance.md) — reject detailed reports for unrelated routes; verify project scope and local outputs before counting evidence.
-- [Last-green gate baselines](last-green-baselines.md) — lint/integration/e2e were never green; diff per file+test vs last green sha; integration only with --no-file-parallelism (shared test DB).
+- [Last-green gate baselines](last-green-baselines.md) — lint/integration were never green; diff per file+test vs last green sha; e2e runs all 5 projects (~40 min, background it).
 - [Product-profile gate target](product-profile-gate-target.md) — validate the design-system artifact, never the frozen canonical source; assert token consumers per selector, not substring.
 - [dead-exports forbids speculative exports](dead-exports-speculative.md) — export helpers with their first importer, never "for a later wave"; no pinned exceptions.
 - [Frozen reference roots in drift gates](standalone-palette-gate-scope.md) — an archive-identical dir can't take tokens or DS-OK; exclude it AND verify it against the zip each run.
@@ -138,3 +137,8 @@
 - [Page atmosphere raster clip](page-atmosphere-raster-clip.md) — full-page radial atmosphere = seconds of raster on long pages; paint it on .page::after clipped by a per-system token, pixels unchanged; regenerate DS artifact tokens after adding tokens.
 - [LCP text candidate size](lcp-text-candidate-size.md) — Chrome fixes a text block's LCP size at first paint (font swap never updates it); a prerendered paragraph must beat the client re-render in fallback AND web font, probe with a PerformanceObserver.
 - [Paint before hydrate](paint-before-hydrate.md) — Vite head module entry evaluates before complete SSR markup is presented; defer via modulepreload + body-end double-rAF loader, keep ONE `<script type="module"` for ssr.ts.
+- [Census state replay](census-state-replay.md) — historical global control ordinals drift across layout/disclosure states; repeated controls require a stable resource owner.
+- [JIT teardown order](jit-teardown-order.md) — delete the Clerk user BEFORE the local row; a live session re-provisions it via JIT within seconds, faking net-zero.
+- [Tester false defects](tester-finding-retractions.md) — Radix/cmdk ArrowDown timing, outline 0px mid-transition, Clerk card "unreachable", dialog role=0: re-check recipes before logging a bug.
+- [Built-in tester batching](native-tester-batching.md) — ~45 s ceiling per execution: one family × ≤4 items per step, one navigation per step, running ledger; it may restart the wrong workflow.
+- [URL-sync effects vs history navigation](url-sync-effect-popstate.md) — a URL-mirroring effect must no-op once the document left its route, or popstate entries get overwritten and Back never leaves the page.

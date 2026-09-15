@@ -72,7 +72,7 @@ test.describe('Search and Discovery Flow', () => {
       // Verify dialog opened
       await expect(page.getByRole('dialog')).toBeVisible();
       await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
-      await expect(page.getByPlaceholder(/Search resources/i)).toBeVisible();
+      await expect(page.getByRole('combobox', { name: /Search resources, categories, and pages/i })).toBeVisible();
     });
 
     test('should open search dialog with keyboard shortcut', async ({ page }) => {
@@ -91,11 +91,11 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Wait for dialog and input to be visible
-      await page.waitForSelector('input[placeholder*="Search"]', { state: 'visible' });
+      await page.waitForSelector('input[aria-label="Search resources, categories, and pages"]', { state: 'visible' });
 
       // Check if input is focused (give it a moment to auto-focus)
       await page.waitForTimeout(200);
-      const searchInput = page.getByPlaceholder(/Search resources/i);
+      const searchInput = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await expect(searchInput).toBeFocused();
     });
 
@@ -114,6 +114,11 @@ test.describe('Search and Discovery Flow', () => {
       const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
 
+      // Wait for the palette to be open and focused before pressing Escape:
+      // an Escape delivered before the dismiss listener mounts is lost.
+      await expect(page.getByRole('dialog')).toBeVisible();
+      await expect(page.getByRole('combobox', { name: /Search resources, categories, and pages/i })).toBeFocused();
+
       await page.keyboard.press('Escape');
 
       // Verify dialog closed
@@ -124,6 +129,11 @@ test.describe('Search and Discovery Flow', () => {
       // Open search dialog
       const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
+
+      // Wait for the palette to be open and focused before pressing Escape:
+      // an Escape delivered before the dismiss listener mounts is lost.
+      await expect(page.getByRole('dialog')).toBeVisible();
+      await expect(page.getByRole('combobox', { name: /Search resources, categories, and pages/i })).toBeFocused();
 
       // Press Escape
       await page.keyboard.press('Escape');
@@ -140,7 +150,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type search query that won't match anything
-      const searchInput = page.getByPlaceholder(/Search resources/i);
+      const searchInput = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await searchInput.fill('xyzabc123nonexistent');
 
       // Wait a bit for search to process
@@ -157,18 +167,22 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type a common search term likely to have results
-      const searchInput = page.getByPlaceholder(/Search resources/i);
+      const searchInput = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await searchInput.fill('video');
 
-      // Wait for results to appear
-      await page.waitForTimeout(500);
-
-      // Check if we have results or no results message
-      const hasResults = await page.locator('[data-testid^="search-result-"]').count();
-      const noResults = await page.getByText(/No results found/i).isVisible().catch(() => false);
-
-      // Either should show results or a clear "no results" message
-      expect(hasResults > 0 || noResults).toBeTruthy();
+      // Results arrive after the debounce plus a real catalog query; poll
+      // instead of sleeping a fixed interval (WebKit under load exceeded it).
+      // Either results or the dialog's clear "no results" message must render.
+      await expect
+        .poll(
+          async () => {
+            const hasResults = (await page.locator('[data-testid^="search-result-"]').count()) > 0;
+            const noResults = await page.getByText(/No results for/i).isVisible().catch(() => false);
+            return hasResults || noResults;
+          },
+          { timeout: 15_000 },
+        )
+        .toBeTruthy();
     });
 
     test('should require minimum 2 characters to search', async ({ page }) => {
@@ -177,7 +191,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type single character
-      const searchInput = page.getByPlaceholder(/Search resources/i);
+      const searchInput = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await searchInput.fill('a');
 
       // A one-character query retains the useful suggestion groups.
@@ -199,7 +213,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type search query
-      const searchInput = page.getByPlaceholder(/Search resources/i);
+      const searchInput = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await searchInput.fill('ffmpeg');
 
       // Wait for potential results
@@ -226,7 +240,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type search query
-      const searchInput = page.getByPlaceholder(/Search resources/i);
+      const searchInput = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await searchInput.fill('test search');
 
       // Close dialog
@@ -236,7 +250,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Verify input is cleared
-      const clearedInput = page.getByPlaceholder(/Search resources/i);
+      const clearedInput = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await expect(clearedInput).toHaveValue('');
     });
   });
@@ -375,8 +389,8 @@ test.describe('Search and Discovery Flow', () => {
       // Should have accessible title
       await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
 
-      // Search input should have placeholder
-      const input = page.getByPlaceholder(/Search resources/i);
+      // Search input is exposed as a labelled combobox (the placeholder is presentational copy)
+      const input = page.getByRole('combobox', { name: /Search resources, categories, and pages/i });
       await expect(input).toBeVisible();
     });
 
@@ -384,6 +398,11 @@ test.describe('Search and Discovery Flow', () => {
       // Open search dialog
       const searchButton = page.getByRole('button', { name: 'Open search' });
       await searchButton.click();
+
+      // Wait for the palette to be open and focused before sending keys: an
+      // Escape delivered before the dialog's dismiss listener mounts is lost.
+      await expect(page.getByRole('dialog')).toBeVisible();
+      await expect(page.getByRole('combobox', { name: /Search resources, categories, and pages/i })).toBeFocused();
 
       // Tab within the palette, then close with its advertised Escape shortcut.
       await page.keyboard.press('Tab');
