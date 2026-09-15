@@ -41,6 +41,7 @@ import {
   KeyRound
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
@@ -86,6 +87,9 @@ function mutationErrorMessage(error: unknown): string {
 export default function BatchEnrichmentPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const aiDefaults = useAiDefaults();
+  const defaultEnrichmentModel = aiDefaults.flowModel("enrichment");
+  const defaultBaseUrl = aiDefaults.config?.baseUrl;
   
   const [filter, setFilter] = useState<'all' | 'unenriched'>('unenriched');
   const [batchSize, setBatchSize] = useState(10);
@@ -464,7 +468,7 @@ export default function BatchEnrichmentPanel() {
                     id="enrich-model"
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    placeholder="claude-haiku-4-5 (default)"
+                    placeholder={defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : "Default model"}
                     className="font-mono text-xs"
                     disabled={hasActiveJob}
                     data-testid="input-enrich-model"
@@ -478,12 +482,12 @@ export default function BatchEnrichmentPanel() {
                     id="enrich-baseurl"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
-                    placeholder="https://api.anthropic.com (default)"
+                    placeholder={defaultBaseUrl ? `${defaultBaseUrl} (default)` : "Default endpoint"}
                     className="font-mono text-xs"
                     disabled={hasActiveJob}
                     data-testid="input-enrich-baseurl"
                   />
-                  <p className="text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the platform endpoint.</p>
+                  <p className="text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="enrich-token" className="flex items-center gap-1.5">
@@ -494,7 +498,7 @@ export default function BatchEnrichmentPanel() {
                     type="password"
                     value={authToken}
                     onChange={(e) => setAuthToken(e.target.value)}
-                    placeholder="Required if a base URL is set (blank = platform key)"
+                    placeholder="Required if a base URL is set (blank = server default credentials)"
                     className="font-mono text-xs"
                     autoComplete="off"
                     disabled={hasActiveJob}
@@ -865,7 +869,7 @@ export default function BatchEnrichmentPanel() {
                     </div>
                     <div>
                       <div className="text-muted-foreground">Model</div>
-                      <div className="font-mono">{selectedJobData.job.model || 'claude-haiku-4-5 (default)'}</div>
+                      <div className="font-mono">{selectedJobData.job.model || (defaultEnrichmentModel ? `${defaultEnrichmentModel} (default)` : 'default')}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Base URL</div>

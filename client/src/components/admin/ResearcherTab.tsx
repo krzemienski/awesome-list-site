@@ -46,6 +46,7 @@ import {
 import { formatAdminDate } from "@/lib/utils";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAiDefaults } from "@/hooks/useAiDefaults";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { sanitizeDisplay } from "@/lib/sanitize-display";
 import { useToast } from "@/hooks/use-toast";
@@ -198,6 +199,10 @@ interface ResearcherTabProps {
 export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const aiDefaults = useAiDefaults();
+  const defaultOrchestratorModel = aiDefaults.flowModel("researchOrchestrator");
+  const defaultScoutModel = aiDefaults.flowModel("researchScout");
+  const defaultBaseUrl = aiDefaults.config?.baseUrl;
 
   // WS1 (July 30, 2026): empty by default — an empty prompt tells the server
   // to auto-generate a gap-aware, history-aware brief at launch. The
@@ -745,7 +750,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                           id="research-model"
                           value={model}
                           onChange={(e) => setModel(e.target.value)}
-                          placeholder="claude-sonnet-4-5 (default)"
+                          placeholder={defaultOrchestratorModel ? `${defaultOrchestratorModel} (default)` : "Default model"}
                           className="mt-1 font-mono text-xs"
                           data-testid="input-research-model"
                         />
@@ -758,7 +763,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                           id="research-scout-model"
                           value={scoutModel}
                           onChange={(e) => setScoutModel(e.target.value)}
-                          placeholder="Auto (recommended)"
+                          placeholder={defaultScoutModel ? `Auto (${defaultScoutModel})` : "Auto (recommended)"}
                           className="mt-1 font-mono text-xs"
                           data-testid="input-research-scout-model"
                         />
@@ -774,11 +779,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                           id="research-baseurl"
                           value={baseUrl}
                           onChange={(e) => setBaseUrl(e.target.value)}
-                          placeholder="https://api.anthropic.com (default)"
+                          placeholder={defaultBaseUrl ? `${defaultBaseUrl} (default)` : "Default endpoint"}
                           className="mt-1 font-mono text-xs"
                           data-testid="input-research-baseurl"
                         />
-                        <p className="mt-1 text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the platform endpoint.</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">http or https; requires an auth token below (over plain http the token is sent unencrypted). Leave blank to use the server's configured endpoint.</p>
                       </div>
                       <div>
                         <Label htmlFor="research-token" className="flex items-center gap-1.5">
@@ -789,7 +794,7 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
                           type="password"
                           value={authToken}
                           onChange={(e) => setAuthToken(e.target.value)}
-                          placeholder="Required if a base URL is set (blank = platform key)"
+                          placeholder="Required if a base URL is set (blank = server default credentials)"
                           className="mt-1 font-mono text-xs"
                           autoComplete="off"
                           data-testid="input-research-token"
@@ -1365,11 +1370,11 @@ export default function ResearcherTab({ initialTab = "launch" }: ResearcherTabPr
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label className="text-xs text-muted-foreground">Model</Label>
-                  <p className="text-xs font-mono mt-1">{selectedJob.model || 'claude-sonnet-4-5 (default)'}</p>
+                  <p className="text-xs font-mono mt-1">{selectedJob.model || (defaultOrchestratorModel ? `${defaultOrchestratorModel} (default)` : 'default')}</p>
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Scout Model</Label>
-                  <p className="text-xs font-mono mt-1">{selectedJob.scoutModel || 'Auto'}</p>
+                  <p className="text-xs font-mono mt-1">{selectedJob.scoutModel || (selectedJob.model ? 'Auto (inherit)' : defaultScoutModel ? `Auto (${defaultScoutModel})` : 'Auto')}</p>
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Discovery Target</Label>

@@ -1,6 +1,13 @@
 import dns from "dns/promises";
 import net from "net";
 import { decryptAuthToken, encryptAuthToken, isConfigEncryptionAvailable } from "./configCrypto";
+import {
+  FLOW_TIERS,
+  resolveAnthropicCredentials,
+  resolveFlowModel,
+  resolveTierModel,
+  subagentModelForTier,
+} from "./anthropicConfig";
 
 /**
  * Shared runtime helpers for the Claude Agent SDK multi-agent flows (Researcher + Enrichment):
@@ -15,9 +22,27 @@ export interface AgentRunConfig {
   authTokenEncrypted?: string | null;
 }
 
-// Default models for each flow when no per-run override is supplied.
-export const DEFAULT_RESEARCH_MODEL = "claude-sonnet-4-5";
-export const DEFAULT_ENRICHMENT_MODEL = "claude-haiku-4-5";
+/**
+ * Default models for each flow when no per-run override is supplied. Resolved
+ * from the shared config at call time (ANTHROPIC_MODEL / ANTHROPIC_DEFAULT_*)
+ * so the agents follow the same endpoint + model mapping as every other call.
+ */
+export function defaultResearchModel(): string {
+  return resolveFlowModel("researchOrchestrator");
+}
+export function defaultEnrichmentModel(): string {
+  return resolveFlowModel("enrichment");
+}
+/**
+ * Default scout SUBAGENT model. Subagents receive the tier ALIAS (the CLI
+ * maps it through ANTHROPIC_DEFAULT_<TIER>_MODEL) because a literal custom id
+ * would be rejected by the CLI's per-agent model allowlist and silently
+ * swapped — see anthropicConfig.subagentModelForTier.
+ */
+export function defaultScoutModel(): { value: string; resolved: string } {
+  const tier = FLOW_TIERS.researchScout;
+  return { value: subagentModelForTier(tier), resolved: resolveTierModel(tier) };
+}
 
 const PRIVATE_V4_PATTERNS = [
   /^127\./,
@@ -100,29 +125,83 @@ export async function preflightBaseUrl(url: string, timeoutMs = 5000): Promise<P
   }
 }
 
+// Every credential-bearing variable the Claude Code subprocess could pick up.
+// buildAgentEnv strips ALL of them and re-adds exactly the resolved set so the
+// subprocess can never combine a key from one source with a URL from another.
+const CREDENTIAL_ENV_KEYS = [
+  "ANTHROPIC_API_KEY",
+  "ANTHROPIC_AUTH_TOKEN",
+  "ANTHROPIC_BASE_URL",
+  "AI_INTEGRATIONS_ANTHROPIC_API_KEY",
+  "AI_INTEGRATIONS_ANTHROPIC_BASE_URL",
+  "CLAUDE_CODE_OAUTH_TOKEN",
+  "ANTHROPIC_CUSTOM_HEADERS",
+];
+
 /**
- * Build the env map passed to query() options.env for a run. Starts from process.env so the
- * subprocess keeps PATH/HOME/etc, then applies per-run overrides. Whenever a custom base URL is
- * set, the platform ANTHROPIC_API_KEY is removed so it can NEVER travel to a third-party endpoint;
- * the run authenticates only with the admin-supplied ANTHROPIC_AUTH_TOKEN (which
- * parseAgentConfigFromRequest requires alongside any custom base URL).
+ * Build the env map passed to query() options.env for a run.
+ *
+ * Starts from process.env (PATH/HOME/etc + the ANTHROPIC_DEFAULT_<TIER>_MODEL
+ * alias map, which the CLI uses to resolve "haiku"/"sonnet"/... exactly like
+ * our own tier resolver), strips every credential variable, then applies the
+ * SAME endpoint/credential resolution as the direct Messages calls
+ * (anthropicConfig.resolveAnthropicCredentials): router bearer token >
+ * router api key > managed integration > direct key.
+ *
+ * Per-run admin overrides win over all of that: whenever a custom base URL is
+ * set, no platform credential is passed (the API key/token is only valid
+ * against the platform host and must NEVER travel to a third-party endpoint);
+ * the run authenticates only with the admin-supplied token, which
+ * parseAgentConfigFromRequest requires alongside any custom base URL.
+ *
+ * Also disables the CLI's non-essential network traffic (telemetry, error
+ * reporting, auto-updater, version checks) — a server-side agent has no use
+ * for it and it adds latency + noise to every run.
  */
 export function buildAgentEnv(config: AgentRunConfig): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [k, v] of Object.entries(process.env)) {
     if (typeof v === "string") env[k] = v;
   }
-  if (config.baseUrl) {
-    env.ANTHROPIC_BASE_URL = config.baseUrl;
-    // Never send the platform key to a custom endpoint, even if (defensively) no
-    // token was configured — the API key is only valid against the platform host.
-    delete env.ANTHROPIC_API_KEY;
+  for (const k of CREDENTIAL_ENV_KEYS) delete env[k];
+
+  if (config.baseUrl || config.authTokenEncrypted) {
+    // Per-run override: custom endpoint and/or custom token, nothing platform-side.
+    if (config.baseUrl) {
+      env.ANTHROPIC_BASE_URL = config.baseUrl;
+    } else {
+      // Token-only override: the admin token replaces the credential but the
+      // run must still go to the server's configured router. Without this the
+      // CLI would fall back to api.anthropic.com and the token would be sent
+      // to an endpoint the operator never configured.
+      const creds = resolveAnthropicCredentials();
+      if (creds.kind === "router" && creds.baseURL) env.ANTHROPIC_BASE_URL = creds.baseURL;
+    }
+    if (config.authTokenEncrypted) {
+      env.ANTHROPIC_AUTH_TOKEN = decryptAuthToken(config.authTokenEncrypted);
+    } else {
+      // A token-less custom endpoint cannot be reached with platform
+      // credentials by design; parseAgentConfigFromRequest rejects this
+      // combination up front, so this branch only guards legacy job rows.
+      const creds = resolveAnthropicCredentials();
+      if (creds.kind === "router" && creds.baseURL === config.baseUrl) {
+        if (creds.authToken) env.ANTHROPIC_AUTH_TOKEN = creds.authToken;
+        else if (creds.apiKey) env.ANTHROPIC_API_KEY = creds.apiKey;
+      }
+    }
+  } else {
+    const creds = resolveAnthropicCredentials();
+    if (creds.baseURL) env.ANTHROPIC_BASE_URL = creds.baseURL;
+    if (creds.authToken) env.ANTHROPIC_AUTH_TOKEN = creds.authToken;
+    else if (creds.apiKey) env.ANTHROPIC_API_KEY = creds.apiKey;
   }
-  if (config.authTokenEncrypted) {
-    const token = decryptAuthToken(config.authTokenEncrypted);
-    env.ANTHROPIC_AUTH_TOKEN = token;
-    delete env.ANTHROPIC_API_KEY;
-  }
+
+  // Hygiene for a headless, server-side agent.
+  env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
+  env.DISABLE_TELEMETRY = "1";
+  env.DISABLE_ERROR_REPORTING = "1";
+  env.DISABLE_AUTOUPDATER = "1";
+  env.CLAUDE_CODE_DISABLE_TERMINAL_TITLE = "1";
   return env;
 }
 

@@ -1,7 +1,10 @@
-import Anthropic from '@anthropic-ai/sdk';
-
-// Use Anthropic for AI-powered features
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+import { z } from 'zod';
+import {
+  createStructuredMessage,
+  isAnthropicConfigured,
+  resolveFlowModel,
+  StructuredOutputError,
+} from './anthropicConfig';
 
 interface AITagSuggestion {
   tags: string[];
@@ -11,72 +14,63 @@ interface AITagSuggestion {
   confidence: number;
 }
 
+const TagSuggestionSchema = z.object({
+  tags: z.array(z.string()).describe('3-5 relevant tags: video technologies, codecs, streaming, processing features'),
+  category: z.string().describe('Primary video/multimedia category, e.g. "Video Processing", "Streaming", "Codecs", "Players", "Editing"'),
+  subcategory: z.string().nullable().describe('Subcategory if applicable, else null'),
+  subSubcategory: z.string().nullable().describe('More specific topic under the subcategory if applicable, else null'),
+  confidence: z.number().describe('Confidence score 0-1'),
+});
+
+const TAGGING_SYSTEM_PROMPT =
+  'You are an expert at categorizing and tagging video/multimedia software tools and applications. ' +
+  'Focus on video processing, streaming, codecs, and multimedia technologies. ' +
+  'Provide accurate, useful tags that help users discover video-related resources.';
+
 /**
- * Generate AI-powered tags for a resource using Anthropic Claude
+ * Generate AI-powered tags for a resource using Claude (structured output).
+ * Falls back to rule-based tagging — loudly — when AI is unavailable or fails.
  */
 export async function generateResourceTags(
   title: string,
   description: string,
   url: string
 ): Promise<AITagSuggestion> {
-  try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      throw new Error('Anthropic API key not configured');
-    }
+  if (!isAnthropicConfigured()) {
+    console.warn('AI tagging skipped: Anthropic is not configured; using rule-based tags');
+    return generateFallbackTags(title, description, url);
+  }
 
-    const prompt = `Analyze this video/multimedia software resource and suggest relevant tags and categorization:
+  const prompt = `Analyze this video/multimedia software resource and suggest relevant tags and categorization:
 
 Title: ${title}
 Description: ${description}
-URL: ${url}
+URL: ${url}`;
 
-Please provide:
-1. 3-5 relevant tags (video technologies, codecs, streaming, processing features)
-2. A primary category focusing on video/multimedia (e.g., "Video Processing", "Streaming", "Codecs", "Players", "Editing")
-3. A subcategory if applicable
-4. A sub-subcategory if applicable (a more specific topic under the subcategory)
-5. Confidence score (0-1)
-
-Respond with JSON in this format:
-{
-  "tags": ["tag1", "tag2", "tag3"],
-  "category": "category name",
-  "subcategory": "subcategory name or null",
-  "subSubcategory": "sub-subcategory name or null",
-  "confidence": 0.85
-}`;
-
-    const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5', // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
-      system: "You are an expert at categorizing and tagging video/multimedia software tools and applications. Focus on video processing, streaming, codecs, and multimedia technologies. Provide accurate, useful tags that help users discover video-related resources.",
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 300
+  try {
+    const { data } = await createStructuredMessage(TagSuggestionSchema, {
+      model: resolveFlowModel('tagging'),
+      system: TAGGING_SYSTEM_PROMPT,
+      user: prompt,
+      maxTokens: 600,
+      timeoutMs: 30_000,
     });
 
-    let rawText = (response.content[0] as any).text || '{}';
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON object found in AI response');
-    }
-    const result = JSON.parse(jsonMatch[0]);
-    
     return {
-      tags: result.tags || [],
-      category: result.category || 'Video Tools',
-      subcategory: result.subcategory,
-      subSubcategory: result.subSubcategory,
-      confidence: Math.max(0, Math.min(1, result.confidence || 0.5))
+      tags: data.tags.slice(0, 8).map((t) => t.trim()).filter(Boolean),
+      category: data.category || 'Video Tools',
+      subcategory: data.subcategory ?? undefined,
+      subSubcategory: data.subSubcategory ?? undefined,
+      confidence: Math.max(0, Math.min(1, data.confidence)),
     };
-
   } catch (error: unknown) {
-    console.warn('AI tagging failed:', error instanceof Error ? error.message : 'Unknown error');
-
-    // Fallback to simple rule-based tagging
+    const detail =
+      error instanceof StructuredOutputError
+        ? `${error.reason}: ${error.message}`
+        : error instanceof Error
+          ? error.message
+          : 'Unknown error';
+    console.warn(`AI tagging failed (${detail}); using rule-based tags`);
     return generateFallbackTags(title, description, url);
   }
 }

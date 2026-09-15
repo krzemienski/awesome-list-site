@@ -58,6 +58,7 @@ const BASELINE_DISALLOWED_TOOLS = [
   "TaskStop",
   "TaskUpdate",
   "SendMessage",
+  "ListAgents",
   "ReportFindings",
 ];
 

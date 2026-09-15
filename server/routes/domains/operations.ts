@@ -125,10 +125,16 @@ export function registerOperationsRoutes(
         return res.json({ status: stats.available ? 'healthy' : 'unavailable' });
       }
 
+      // Admin shape adds the secret-free endpoint/model configuration so the
+      // Researcher / Enrichment panels can show the real defaults the run
+      // will use instead of hard-coded placeholders.
+      const config = claudeService.describeConfig();
+
       if (!deep) {
         return res.json({
           status: stats.available ? 'healthy' : 'unavailable',
           ...stats,
+          config,
         });
       }
 
@@ -137,6 +143,7 @@ export function registerOperationsRoutes(
         status: isConnected ? 'healthy' : 'unavailable',
         connectionOk: isConnected,
         ...stats,
+        config,
       });
     } catch (error) {
       console.error('Error checking AI health:', error);

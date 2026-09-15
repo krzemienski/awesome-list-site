@@ -31,9 +31,13 @@ these in the **Secrets** pane instead of a file.
 | `SITE_URL` | ❌ | request host | `server/routes.ts` |
 | `PUBLIC_SITE_URL` | ❌ | `https://awesome.video` | `server/index.ts`, `server/og-middleware.ts` |
 | `WEBSITE_URL` | ❌ | `https://awesome.video` | `server/github/syncService.ts` |
-| `AI_INTEGRATIONS_ANTHROPIC_API_KEY` | ❌ (AI features) | – | `server/ai/claudeService.ts` |
-| `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | ❌ | Anthropic default | `server/ai/claudeService.ts` |
-| `ANTHROPIC_API_KEY` | ❌ (fallback) | – | `server/ai/claudeService.ts`, `server/ai/tagging.ts`, `server/ai/recommendations.ts`, `server/ai/agentRuntime.ts` |
+| `ANTHROPIC_BASE_URL` | ❌ (AI router) | – | `server/ai/anthropicConfig.ts` (all Claude calls + Agent SDK env) |
+| `ANTHROPIC_AUTH_TOKEN` | ❌ (with base URL) | – | `server/ai/anthropicConfig.ts` |
+| `ANTHROPIC_MODEL` | ❌ | sonnet tier | `server/ai/anthropicConfig.ts` (primary / orchestrator model) |
+| `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL` | ❌ | first-party ids | `server/ai/anthropicConfig.ts` (tier → model id) |
+| `AI_INTEGRATIONS_ANTHROPIC_API_KEY` | ❌ (AI features) | – | `server/ai/anthropicConfig.ts` |
+| `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | ❌ | Anthropic default | `server/ai/anthropicConfig.ts` |
+| `ANTHROPIC_API_KEY` | ❌ (fallback) | – | `server/ai/anthropicConfig.ts` |
 | `AI_INTEGRATIONS_OPENAI_API_KEY` | ❌ (embeddings) | – | `server/ai/embeddingService.ts` |
 | `AI_INTEGRATIONS_OPENAI_BASE_URL` | ❌ | OpenAI default | `server/ai/embeddingService.ts` |
 | `OPENAI_API_KEY` | ❌ | – | `server/ai/embeddingService.ts`, `server/config.ts` |
@@ -162,16 +166,27 @@ Website URL embedded in GitHub export metadata
 AI features (Claude enrichment/recommendations, embeddings) are disabled unless
 the relevant keys are present.
 
+### `ANTHROPIC_BASE_URL` / `ANTHROPIC_AUTH_TOKEN`
+Custom Anthropic-compatible router + bearer token. When both are set, **every**
+Claude call (direct Messages API and the Researcher/Enrichment Agent SDK
+subprocess) goes here and the managed/direct keys below are ignored. A base
+URL with no credential disables AI (fail closed). See docs/AI-SERVICES.md.
+
+### `ANTHROPIC_MODEL`, `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL`
+Model ids per tier (router ids look like `cc/claude-opus-5`); unset tiers use
+first-party ids. `ANTHROPIC_MODEL` is the primary model (Researcher
+orchestrator). Resolved in `server/ai/anthropicConfig.ts`.
+
 ### `AI_INTEGRATIONS_ANTHROPIC_API_KEY`
-Preferred Anthropic Claude key for enrichment, recommendations, and URL/edit
-analysis (`server/ai/claudeService.ts`).
+Replit-managed Anthropic Claude key, used when no router is configured
+(`server/ai/anthropicConfig.ts`).
 
 ### `AI_INTEGRATIONS_ANTHROPIC_BASE_URL`
 Optional custom Anthropic base URL (proxy/self-host).
 
 ### `ANTHROPIC_API_KEY`
-Fallback Anthropic key used when `AI_INTEGRATIONS_ANTHROPIC_API_KEY` is unset;
-also read by the tagging, recommendations, and agent-runtime services.
+Direct Anthropic key, used when neither the router nor the managed integration
+is configured (last in precedence; `server/ai/anthropicConfig.ts`).
 
 ### `AI_INTEGRATIONS_OPENAI_API_KEY`
 OpenAI key used by the embedding service (`server/ai/embeddingService.ts`).

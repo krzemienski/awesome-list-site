@@ -1619,7 +1619,7 @@ export const enrichmentJobs = pgTable(
     errorMessage: text("error_message"),
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
     // Per-run agent config (Claude Agent SDK): model + custom endpoint + encrypted auth token.
-    // authTokenEncrypted packs ivHex:tagHex:cipherHex (AES-256-GCM). Null => use platform default (ANTHROPIC_API_KEY).
+    // authTokenEncrypted packs ivHex:tagHex:cipherHex (AES-256-GCM). Null => use the platform credentials resolved by server/ai/anthropicConfig.ts.
     model: text("model"),
     baseUrl: text("base_url"),
     authTokenEncrypted: text("auth_token_encrypted"),
@@ -1812,7 +1812,7 @@ export const researchJobs = pgTable(
     maxBudgetUsd: text("max_budget_usd").default("1.00"),
     maxTurns: integer("max_turns").default(30),
     // Per-run agent config (Claude Agent SDK): model + custom endpoint + encrypted auth token.
-    // authTokenEncrypted packs ivHex:tagHex:cipherHex (AES-256-GCM). Null => use platform default (ANTHROPIC_API_KEY).
+    // authTokenEncrypted packs ivHex:tagHex:cipherHex (AES-256-GCM). Null => use the platform credentials resolved by server/ai/anthropicConfig.ts.
     model: text("model"),
     // Explicit scout (subagent) model override. Null => auto: default scout
     // model on the platform endpoint, or 'inherit' (= orchestrator model)

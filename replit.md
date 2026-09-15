@@ -22,6 +22,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### AI calls unified on the Anthropic router — September 15, 2026
+- `server/ai/anthropicConfig.ts` is the single source of truth for endpoint, credentials and model ids for EVERY Claude call (direct SDK + Claude Agent SDK). Precedence: router (`ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN`) → managed integration → direct key; a base URL with no credential fails closed. Tiers resolve via `ANTHROPIC_DEFAULT_{HAIKU,SONNET,OPUS,FABLE}_MODEL`; `ANTHROPIC_MODEL` drives the Researcher orchestrator. Per-flow tiers live in `FLOW_TIERS` — change tiers there, not at call sites.
+- Agent SDK runs use `buildAgentEnv` (strips all credential keys, re-adds only the resolved router creds; platform creds never reach a custom base URL; token-only admin override still targets the router). Scout subagents get the tier alias `haiku` (CLI allowlist rejects literal custom ids). Structured outputs use `messages.parse` + `zodOutputFormat`.
+- `GET /api/health/ai` admin shape includes a secret-free `config` snapshot; Researcher/Enrichment panels read it (`useAiDefaults`) for placeholders. Verified live against the router: deep health, analyze-URL, recommendations, enrichment (5 resources on haiku), researcher (opus orchestrator → haiku scout, 3 discoveries). Tests: `tests/unit/anthropic-config-precedence.test.ts`.
+
+
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
 

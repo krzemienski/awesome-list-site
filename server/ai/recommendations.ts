@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
 import { Resource } from '../../shared/schema';
 import {
   LEARNING_FORMAT_OPTIONS,
@@ -7,58 +7,25 @@ import {
   type LearningTimeCommitment,
 } from '../../shared/onboarding';
 import type { RecommendationExplanation } from '../../shared/recommendations';
+import {
+  createStructuredMessage,
+  isAnthropicConfigured,
+  resolveFlowModel,
+  StructuredOutputError,
+} from './anthropicConfig';
 
-// <important_do_not_delete>
-const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
-// </important_do_not_delete>
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+/** Schema for the AI recommendation call — enforced by the API's structured output. */
+const AIRecommendationSchema = z.object({
+  recommendations: z.array(
+    z.object({
+      resourceId: z.string().describe('The resource URL exactly as given in the AVAILABLE RESOURCES list'),
+      score: z.number().describe('0-1, how well the resource matches the user'),
+      reason: z.string().describe('Specific reason grounded in the user profile'),
+      confidenceLevel: z.number().describe('0-1, confidence in this match'),
+    }),
+  ),
 });
-
-/**
- * AI response interfaces for type safety
- */
-interface AIRecommendationResponse {
-  resourceId: string;
-  score: number;
-  reason: string;
-  confidenceLevel: number;
-}
-
-/**
- * Extract JSON from Claude's response, handling markdown code fences and extra text
- */
-function extractJSON(text: string): unknown {
-  try {
-    text = text.trim();
-    
-    // Remove markdown code fences if present
-    if (text.startsWith('```')) {
-      const lines = text.split('\n');
-      lines.shift(); // Remove opening fence
-      if (lines[lines.length - 1].trim() === '```' || lines[lines.length - 1].trim().startsWith('```')) {
-        lines.pop(); // Remove closing fence
-      }
-      text = lines.join('\n').trim();
-    }
-    
-    // Find the JSON object/array in the text
-    const jsonStart = text.indexOf('{') !== -1 ? text.indexOf('{') : text.indexOf('[');
-    const jsonEnd = text.lastIndexOf('}') !== -1 ? text.lastIndexOf('}') + 1 : text.lastIndexOf(']') + 1;
-    
-    if (jsonStart !== -1 && jsonEnd > jsonStart) {
-      const jsonText = text.substring(jsonStart, jsonEnd);
-      return JSON.parse(jsonText);
-    }
-    
-    // If no JSON markers found, try parsing the whole text
-    return JSON.parse(text);
-  } catch (error) {
-    console.error('JSON extraction failed:', error);
-    throw error;
-  }
-}
+type AIRecommendationResponse = z.infer<typeof AIRecommendationSchema>['recommendations'][number];
 
 export interface UserProfile {
   userId: string;
@@ -440,8 +407,8 @@ export async function generateAIRecommendations(
   limit: number = 10
 ): Promise<AIRecommendationResult[]> {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      console.warn('Anthropic API key not configured, falling back to rule-based recommendations');
+    if (!isAnthropicConfigured()) {
+      console.warn('Anthropic not configured, falling back to rule-based recommendations');
       return generateFallbackRecommendations(userProfile, availableResources, limit);
     }
 
@@ -488,39 +455,19 @@ ${JSON.stringify(relevantResources.slice(0, 15).map(r => ({
 })), null, 2)}
 
 Please provide ${Math.min(limit, 8)} personalized recommendations. For each recommendation, provide:
-1. resourceId (the URL)
+1. resourceId (the URL, exactly as listed)
 2. score (0-1, how well it matches the user)
 3. reason (why you recommend this specific resource)
-4. confidenceLevel (0-1, how confident you are in this match)
+4. confidenceLevel (0-1, how confident you are in this match)`;
 
-Respond in JSON format:
-{
-  "recommendations": [
-    {
-      "resourceId": "url",
-      "score": 0.85,
-      "reason": "specific reason based on user profile",
-      "confidenceLevel": 0.9
-    }
-  ]
-}`;
-
-    const response = await anthropic.messages.create({
-      model: DEFAULT_MODEL_STR,
+    const { data: result } = await createStructuredMessage(AIRecommendationSchema, {
+      model: resolveFlowModel('recommendations'),
       system: "You are an expert at analyzing user preferences and recommending video development resources. Focus on matching user skill level, learning goals, and preferred categories. Provide thoughtful, personalized explanations for each recommendation.",
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 2000
-    }, { timeout: 15_000 });
-
-    // Extract JSON from response using robust extraction
-    const firstContent = response.content[0];
-    const jsonText = firstContent && 'text' in firstContent ? firstContent.text : '{}';
-    const result = extractJSON(jsonText) as { recommendations?: AIRecommendationResponse[] };
+      user: prompt,
+      maxTokens: 2500,
+      // User-facing latency budget; the caller falls back to rule-based results on timeout.
+      timeoutMs: 25_000,
+    });
 
     const recommendations: AIRecommendationResult[] = result.recommendations?.map((rec: AIRecommendationResponse) => {
       const resource = availableResources.find(r => r.url === rec.resourceId);
@@ -566,10 +513,12 @@ Respond in JSON format:
     return recommendations;
 
   } catch (error: unknown) {
-    console.error('AI recommendation generation failed:', error);
-    if (error && typeof error === 'object' && 'response' in error) {
-      console.error('Claude API error response:', JSON.stringify(error.response, null, 2));
+    if (error instanceof StructuredOutputError) {
+      console.error(`AI recommendation structured output failed (${error.reason}): ${error.message}`);
+    } else {
+      console.error('AI recommendation generation failed:', error);
     }
+    console.warn('Falling back to rule-based recommendations');
     return generateFallbackRecommendations(userProfile, availableResources, limit);
   }
 }

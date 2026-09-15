@@ -3,57 +3,90 @@
  * CLAUDE SERVICE - AI-Powered Resource Analysis
  * ============================================================================
  *
- * This service provides Claude AI integration for automated resource analysis
- * and metadata extraction. It uses the Anthropic API with intelligent caching
- * and rate limiting for cost-effective operation.
+ * Single-shot Claude calls (URL analysis, health checks, journey seeding).
+ * Endpoint, credentials and model ids all come from ./anthropicConfig so this
+ * service follows the same configuration as every other AI call in the app
+ * (router base URL + bearer token, tier → model mapping).
  *
  * CAPABILITIES:
- * - URL Content Analysis: Extracts title, description, tags from web pages
- * - Category Suggestion: Recommends appropriate categories based on content
- * - Quality Scoring: Evaluates resource relevance and quality (1-10 scale)
- * - Batch Processing: Sequential processing with configurable batch sizes
- * - Multi-Model Support: Haiku, Sonnet, Opus models with automatic cost tracking
+ * - URL Content Analysis: structured-output extraction of title, description,
+ *   tags, category hints and key topics from a fetched page
+ * - Free-form generation with caching, pacing and cost tracking
+ * - Connection test for the admin AI health check
  *
  * SECURITY:
- * - ALLOWED_DOMAINS whitelist prevents SSRF attacks
- * - Only known video/dev resource domains can be analyzed
- * - API key managed through Replit secrets
+ * - ALLOWED_DOMAINS allowlist prevents SSRF in analyzeURL
+ * - Credentials are managed through Replit secrets / env, never in code
  *
  * CACHING:
- * - Response cache (1 hour TTL): Deduplicates identical requests
- * - Analysis cache (24 hour TTL): Stores URL analysis results
- * - LRU eviction when cache exceeds MAX_CACHE_SIZE
+ * - Response cache (1 hour TTL): deduplicates identical prompts
+ * - Analysis cache (24 hour TTL): stores URL analysis results
+ * - LRU eviction when a cache exceeds MAX_CACHE_SIZE
  *
- * RATE LIMITING:
- * - Request counting for usage monitoring
- * - Configurable delays between batch requests
- * - Graceful handling of API rate limit errors
+ * ACCURACY:
+ * - analyzeURL uses the Messages API structured-output format (schema-
+ *   constrained JSON validated with zod) instead of regexing braces out of
+ *   free text; truncation/refusal surface as explicit errors.
  *
- * COST OPTIMIZATION:
- * - Uses Claude Haiku 3.5 by default (fastest, cheapest model)
- * - Caching reduces redundant API calls
- * - Batch mode processes resources efficiently
- * - Real-time cost tracking per model
- *
- * See /docs/ADMIN-GUIDE.md for enrichment workflow documentation.
+ * See /docs/AI-SERVICES.md for the configuration contract.
  * ============================================================================
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import type Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
+import {
+  createStructuredMessage,
+  describeAnthropicConfig,
+  getAnthropicClient,
+  resolveFlowModel,
+  resolveTierModel,
+  StructuredOutputError,
+  type ModelTier,
+} from './anthropicConfig';
 
-// <important_do_not_delete>
-const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
-// </important_do_not_delete>
-
-// Model definitions with pricing (per 1M tokens)
+/**
+ * Model tiers callers may request. Ids are resolved from the environment at
+ * call time (ANTHROPIC_DEFAULT_<TIER>_MODEL → first-party default) so a router
+ * deployment and a first-party deployment run the same code. Prices are
+ * first-party list prices per 1M tokens and only feed the admin cost readout.
+ */
 export const CLAUDE_MODELS = {
-  'claude-3-5-haiku': { id: 'claude-haiku-4-5', inputCost: 0.25, outputCost: 1.25, maxTokens: 8192 },
-  'claude-3-5-sonnet': { id: 'claude-sonnet-4-5', inputCost: 3.00, outputCost: 15.00, maxTokens: 8192 },
-  'claude-3-opus': { id: 'claude-sonnet-4-5', inputCost: 15.00, outputCost: 75.00, maxTokens: 4096 },
+  haiku: { tier: 'haiku' as ModelTier, inputCost: 1.0, outputCost: 5.0, maxTokens: 8192 },
+  sonnet: { tier: 'sonnet' as ModelTier, inputCost: 3.0, outputCost: 15.0, maxTokens: 16384 },
+  opus: { tier: 'opus' as ModelTier, inputCost: 15.0, outputCost: 75.0, maxTokens: 16384 },
 } as const;
 
 export type ClaudeModelKey = keyof typeof CLAUDE_MODELS;
-export const DEFAULT_MODEL: ClaudeModelKey = 'claude-3-5-haiku';
+export const DEFAULT_MODEL: ClaudeModelKey = 'haiku';
+
+const emptyCostTable = () => ({
+  haiku: { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+  sonnet: { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+  opus: { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+});
+
+/** Schema for analyzeURL — enforced server-side by the API's structured output. */
+const UrlAnalysisSchema = z.object({
+  suggestedTitle: z.string().describe('Concise, descriptive title (max 100 chars) focused on what the resource does'),
+  suggestedDescription: z.string().describe('Clear 2-3 sentence description of purpose and key features'),
+  suggestedTags: z.array(z.string()).describe('3-5 technical tags, e.g. "HLS", "FFmpeg", "DASH", "WebRTC"'),
+  suggestedCategory: z.string().describe('Best fitting category from the provided list, verbatim'),
+  suggestedSubcategory: z.string().nullable().describe('Optional subcategory, or null'),
+  suggestedSubSubcategory: z.string().nullable().describe('Optional level-3 hint such as "HLS", "FFMPEG", "iOS/tvOS", or null'),
+  confidence: z.number().describe('Confidence in these suggestions, 0.0-1.0'),
+  keyTopics: z.array(z.string()).describe('3-5 key topics or technologies covered'),
+});
+
+export type UrlAnalysis = {
+  suggestedTitle: string;
+  suggestedDescription: string;
+  suggestedTags: string[];
+  suggestedCategory: string;
+  suggestedSubcategory?: string;
+  suggestedSubSubcategory?: string;
+  confidence: number;
+  keyTopics: string[];
+};
 
 /**
  * Trusted domains for Claude URL analysis
@@ -229,11 +262,7 @@ export class ClaudeService {
   private constructor() {
     this.responseCache = new Map();
     this.analysisCache = new Map();
-    this.totalCosts = {
-      'claude-3-5-haiku': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
-      'claude-3-5-sonnet': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
-      'claude-3-opus': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
-    };
+    this.totalCosts = emptyCostTable();
     this.initializeClient();
   }
 
@@ -245,32 +274,29 @@ export class ClaudeService {
   }
 
   /**
-   * Initialize the Anthropic client if API key is available
+   * Initialize the shared Anthropic client from the central config
+   * (router → managed integration → direct key). Logs a secret-free summary.
    */
   private initializeClient(): void {
-    // Run19 BUG-015: prefer the Replit-managed Anthropic integration (billing
-    // runs through Replit, so calls keep working when the direct
-    // ANTHROPIC_API_KEY has no credits). Fall back to the direct key.
-    const managedKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
-    const managedBase = process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL;
-    const useManaged = Boolean(managedKey && managedBase);
-    const apiKey = useManaged ? managedKey : process.env.ANTHROPIC_API_KEY;
-
-    if (apiKey) {
-      try {
-        this.anthropic = new Anthropic(
-          useManaged ? { apiKey, baseURL: managedBase } : { apiKey },
-        );
-        console.log(
-          `Claude service initialized successfully (${useManaged ? 'Replit-managed integration' : 'direct API key'})`,
-        );
-      } catch (error) {
-        console.error('Failed to initialize Claude service:', error);
-        this.anthropic = null;
-      }
-    } else {
-      console.log('Claude API key not found - AI features will use fallback methods');
+    try {
+      this.anthropic = getAnthropicClient();
+    } catch (error) {
+      console.error('Failed to initialize Claude service:', error);
+      this.anthropic = null;
     }
+    const cfg = describeAnthropicConfig();
+    if (this.anthropic) {
+      console.log(
+        `Claude service initialized: ${cfg.label}; models haiku=${cfg.models.haiku} sonnet=${cfg.models.sonnet} opus=${cfg.models.opus}; primary=${cfg.primaryModel}`,
+      );
+    } else {
+      console.log('Claude credentials not found - AI features will use fallback methods');
+    }
+  }
+
+  /** Secret-free view of the active endpoint + model mapping (admin health). */
+  public describeConfig() {
+    return describeAnthropicConfig();
   }
 
   /**
@@ -286,6 +312,18 @@ export class ClaudeService {
   public calculateCost(model: ClaudeModelKey, inputTokens: number, outputTokens: number): number {
     const pricing = CLAUDE_MODELS[model];
     return (inputTokens * pricing.inputCost / 1_000_000) + (outputTokens * pricing.outputCost / 1_000_000);
+  }
+
+  /** Accumulate per-tier usage; returns the estimated cost of this call. */
+  private recordUsage(model: ClaudeModelKey, inputTokens: number, outputTokens: number): number {
+    const costUsd = this.calculateCost(model, inputTokens, outputTokens);
+    this.totalCosts[model].calls++;
+    this.totalCosts[model].inputTokens += inputTokens;
+    this.totalCosts[model].outputTokens += outputTokens;
+    this.totalCosts[model].costUsd += costUsd;
+    this.requestCount++;
+    this.lastRequestTime = Date.now();
+    return costUsd;
   }
 
   /**
@@ -330,45 +368,40 @@ export class ClaudeService {
     try {
       console.log(`Generating new Claude response using ${selectedModel}...`);
 
-      // Adjust timeout for Opus (needs longer processing time)
-      const timeout = selectedModel === 'claude-3-opus' ? 60000 : 30000;
+      // Opus needs longer; the SDK option aborts the underlying request on
+      // timeout (Promise.race left the HTTP call running in the background).
+      const timeout = selectedModel === 'opus' ? 120_000 : 60_000;
 
-      const response = await Promise.race([
-        this.anthropic!.messages.create({
-          model: modelConfig.id,
-          system: systemPrompt || "You are a helpful AI assistant specializing in video development and streaming technologies.",
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: Math.min(maxTokens, modelConfig.maxTokens)
-        }),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Request timeout')), timeout)
-        )
-      ]);
+      const response = await this.anthropic!.messages.create({
+        model: resolveTierModel(modelConfig.tier),
+        system: [{
+          type: 'text',
+          text: systemPrompt || "You are a helpful AI assistant specializing in video development and streaming technologies.",
+        }],
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: Math.min(maxTokens, modelConfig.maxTokens)
+      }, { timeout });
 
-      const responseText = (response.content[0] as any).text || '';
+      const responseText = response.content
+        .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+        .map((block) => block.text)
+        .join('');
+      if (response.stop_reason === 'max_tokens') {
+        console.warn(`Claude response truncated at max_tokens=${Math.min(maxTokens, modelConfig.maxTokens)} (${selectedModel})`);
+      }
 
       // Extract usage information
       const inputTokens = response.usage.input_tokens || 0;
       const outputTokens = response.usage.output_tokens || 0;
-      const costUsd = this.calculateCost(selectedModel, inputTokens, outputTokens);
-
-      // Update cumulative cost tracking
-      this.totalCosts[selectedModel].calls++;
-      this.totalCosts[selectedModel].inputTokens += inputTokens;
-      this.totalCosts[selectedModel].outputTokens += outputTokens;
-      this.totalCosts[selectedModel].costUsd += costUsd;
+      const costUsd = this.recordUsage(selectedModel, inputTokens, outputTokens);
 
       // Cache the response
       this.addToCache(cacheKey, responseText);
-
-      // Update request tracking
-      this.requestCount++;
-      this.lastRequestTime = Date.now();
 
       return {
         data: responseText,
@@ -413,11 +446,7 @@ export class ClaudeService {
    * Reset cost statistics
    */
   public resetCostStats(): void {
-    this.totalCosts = {
-      'claude-3-5-haiku': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
-      'claude-3-5-sonnet': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
-      'claude-3-opus': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
-    };
+    this.totalCosts = emptyCostTable();
   }
 
   /**
@@ -522,12 +551,21 @@ export class ClaudeService {
     if (!this.isAvailable()) return false;
 
     try {
-      const result = await this.generateResponse(
-        'Say "Hello" in one word',
-        10,
-        'You are a test assistant. Respond with exactly one word.'
-      );
-      return result.data !== null && result.data.length > 0;
+      // Direct call (no response cache) so a deep health check always proves
+      // the configured endpoint answers right now.
+      const response = await this.anthropic!.messages.create({
+        model: resolveTierModel(CLAUDE_MODELS[DEFAULT_MODEL].tier),
+        system: 'You are a test assistant. Respond with exactly one word.',
+        messages: [{ role: 'user', content: 'Say "Hello" in one word' }],
+        max_tokens: 64,
+      }, { timeout: 30_000 });
+      const text = response.content
+        .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+        .map((block) => block.text)
+        .join('')
+        .trim();
+      this.recordUsage(DEFAULT_MODEL, response.usage.input_tokens || 0, response.usage.output_tokens || 0);
+      return text.length > 0;
     } catch (error) {
       console.error('Claude connection test failed:', error);
       return false;
@@ -595,16 +633,7 @@ export class ClaudeService {
    * Analyze a URL and extract metadata for video streaming resources
    * Uses domain allowlist for SSRF protection
    */
-  public async analyzeURL(url: string): Promise<{
-    suggestedTitle: string;
-    suggestedDescription: string;
-    suggestedTags: string[];
-    suggestedCategory: string;
-    suggestedSubcategory?: string;
-    suggestedSubSubcategory?: string;
-    confidence: number;
-    keyTopics: string[];
-  } | null> {
+  public async analyzeURL(url: string): Promise<UrlAnalysis | null> {
     if (!this.isAvailable()) {
       console.log('Claude service not available for URL analysis');
       return null;
@@ -725,60 +754,49 @@ URL: ${url}
 Page Content Preview:
 ${pageContent}
 
-Extract the following information in JSON format:
-1. suggestedTitle: A concise, descriptive title (max 100 chars) - focus on what this resource does/provides
-2. suggestedDescription: A clear 2-3 sentence description of the resource's purpose and key features
-3. suggestedTags: Array of 3-5 relevant technical tags (e.g., "HLS", "FFmpeg", "DASH", "WebRTC")
-4. suggestedCategory: Best fitting category from this list: ${categories.join(', ')}
-5. suggestedSubcategory: If applicable, suggest a subcategory (optional)
-6. suggestedSubSubcategory: If applicable, suggest a more specific sub-subcategory under the subcategory (optional, level-3 hint such as "HLS", "FFMPEG", "iOS/tvOS")
-7. confidence: Your confidence score (0.0-1.0) in these suggestions
-8. keyTopics: Array of 3-5 key topics or technologies covered
+Guidance:
+- suggestedTitle: concise and descriptive (max 100 chars) — what this resource does/provides.
+- suggestedDescription: 2-3 clear sentences on purpose and key features.
+- suggestedTags: 3-5 relevant technical tags (e.g. "HLS", "FFmpeg", "DASH", "WebRTC").
+- suggestedCategory: choose exactly one of: ${categories.join(', ')}.
+- suggestedSubcategory / suggestedSubSubcategory: only when clearly applicable, otherwise null.
+- confidence: 0.0-1.0 for the whole suggestion set.
+- keyTopics: 3-5 key topics or technologies covered.`;
 
-Return ONLY valid JSON with this structure:
-{
-  "suggestedTitle": "...",
-  "suggestedDescription": "...",
-  "suggestedTags": ["...", "..."],
-  "suggestedCategory": "...",
-  "suggestedSubcategory": "...",
-  "suggestedSubSubcategory": "...",
-  "confidence": 0.0,
-  "keyTopics": ["...", "..."]
-}`;
-
-      const result = await this.generateResponse(
-        prompt,
-        2000,
-        'You are an expert in video streaming technologies, codecs, protocols, and development tools. Analyze resources accurately and return structured JSON metadata.'
-      );
-
-      if (!result.data) {
-        return null;
+      await this.applyRateLimit();
+      const model = resolveFlowModel('urlAnalysis');
+      let parsed: z.infer<typeof UrlAnalysisSchema>;
+      try {
+        const structured = await createStructuredMessage(UrlAnalysisSchema, {
+          model,
+          system: 'You are an expert in video streaming technologies, codecs, protocols, and development tools. Analyze resources accurately.',
+          user: prompt,
+          maxTokens: 2000,
+        });
+        parsed = structured.data;
+        this.recordUsage('haiku', structured.usage.inputTokens, structured.usage.outputTokens);
+      } catch (error: any) {
+        if (error instanceof StructuredOutputError) {
+          console.error(`URL analysis structured output failed (${error.reason}):`, error.message);
+          return null;
+        }
+        if (error?.status === 401) {
+          console.error('Anthropic rejected the credentials (401) - disabling Claude service');
+          this.anthropic = null;
+        }
+        throw error;
       }
-
-      let jsonMatch = result.data.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        console.error('No JSON found in Claude response');
-        return null;
-      }
-
-      const parsed = JSON.parse(jsonMatch[0]);
 
       // SANITIZE Claude response before caching/returning
-      const sanitizedResult = {
+      const sanitizedResult: UrlAnalysis = {
         suggestedTitle: (parsed.suggestedTitle || '').substring(0, 200),
         suggestedDescription: (parsed.suggestedDescription || '').substring(0, 2000),
-        suggestedTags: Array.isArray(parsed.suggestedTags)
-          ? parsed.suggestedTags.slice(0, 20).map((tag: any) => String(tag).substring(0, 50))
-          : [],
+        suggestedTags: parsed.suggestedTags.slice(0, 20).map((tag) => String(tag).substring(0, 50)),
         suggestedCategory: parsed.suggestedCategory || '',
-        suggestedSubcategory: parsed.suggestedSubcategory,
-        suggestedSubSubcategory: parsed.suggestedSubSubcategory,
-        confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
-        keyTopics: Array.isArray(parsed.keyTopics)
-          ? parsed.keyTopics.slice(0, 10).map((topic: any) => String(topic).substring(0, 100))
-          : []
+        suggestedSubcategory: parsed.suggestedSubcategory ?? undefined,
+        suggestedSubSubcategory: parsed.suggestedSubSubcategory ?? undefined,
+        confidence: Math.max(0, Math.min(1, typeof parsed.confidence === 'number' ? parsed.confidence : 0.5)),
+        keyTopics: parsed.keyTopics.slice(0, 10).map((topic) => String(topic).substring(0, 100)),
       };
 
       // Cache sanitized result
@@ -788,6 +806,12 @@ Return ONLY valid JSON with this structure:
       return sanitizedResult;
 
     } catch (error) {
+      // Retrieval failures are the caller's to report (they map to a 4xx with
+      // a "fill it in manually" hint); only model-side failures degrade to null.
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg === 'Request timeout' || msg.startsWith('URL fetch failed') || msg.includes('Content too large')) {
+        throw error;
+      }
       console.error('Error analyzing URL:', error);
       return null;
     }

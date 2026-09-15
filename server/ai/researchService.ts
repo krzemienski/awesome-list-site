@@ -10,7 +10,7 @@ import { AgentEventEmitter } from './agentEvents';
 import { cleanGithubSlugTitle } from '../lib/titleClean';
 import { decodeHtmlEntities } from '../github/importHygiene';
 import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
-import { DEFAULT_RESEARCH_MODEL, DEFAULT_ENRICHMENT_MODEL, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
+import { defaultResearchModel, defaultScoutModel, resolveModel, validateBaseUrl, type AgentRunConfig } from './agentRuntime';
 import { LinkChecker } from '../validation/linkChecker';
 import { isPlausiblePublicUrl } from '@shared/validation';
 import { invalidatePublicCache } from '../cache/publicCache';
@@ -1021,7 +1021,7 @@ class ResearchService {
     const emitter = new AgentEventEmitter('research', jobId);
     const ctx = await buildResearchContext(categoryFocus);
 
-    const orchestratorModel = resolveModel(config, DEFAULT_RESEARCH_MODEL);
+    const orchestratorModel = resolveModel(config, defaultResearchModel());
     // Scout (subagent) model resolution — verified against the Agent SDK CLI
     // binary (July 24, 2026): the CLI validates BOTH the per-agent `model`
     // field AND CLAUDE_CODE_SUBAGENT_MODEL against an internal Anthropic-only
@@ -1037,13 +1037,18 @@ class ResearchService {
     //    survive the allowlist and will fall back — the UI documents this);
     //  - no override + custom model -> 'inherit' (the old buggy path passed
     //    the custom id verbatim and every scout died on claude-sonnet-5);
-    //  - no override + platform default -> cheaper default scout model.
+    //  - no override + platform default -> the cheaper scout tier, passed as
+    //    its ALIAS ("haiku"), which the CLI resolves through the same
+    //    ANTHROPIC_DEFAULT_HAIKU_MODEL variable our tier resolver reads.
     const requestedScout = scoutModelOverride && scoutModelOverride.trim() ? scoutModelOverride.trim() : null;
     const hasCustomModel = !!(config.model && config.model.trim());
+    const scoutDefault = defaultScoutModel();
     const scoutModel = requestedScout
       ? (requestedScout === orchestratorModel ? 'inherit' : requestedScout)
-      : (hasCustomModel ? 'inherit' : DEFAULT_ENRICHMENT_MODEL);
-    const scoutModelLabel = scoutModel === 'inherit' ? `inherit (${orchestratorModel})` : scoutModel;
+      : (hasCustomModel ? 'inherit' : scoutDefault.value);
+    const scoutModelLabel = scoutModel === 'inherit'
+      ? `inherit (${orchestratorModel})`
+      : scoutModel === scoutDefault.value ? `${scoutModel} (${scoutDefault.resolved})` : scoutModel;
 
     const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
     const persist = async (extra: Record<string, any> = {}) => {
@@ -1133,7 +1138,7 @@ ${categoryFocus ? `FOCUS AREA THIS RUN: "${categoryFocus}".` : 'No focus area �
 
 ==== YOUR TEAM ====
 
-You do NOT have direct web access. To search the web you MUST delegate to your "scout" subagent using the Task tool (subagent_type: "scout"). Give the scout a SPECIFIC gap and concrete search targets; it will return concrete candidate resources (URL, title, description). You then dedup and save the good ones.
+You do NOT have direct web access. To search the web you MUST delegate to your "scout" subagent using the delegation tool — named "Task" (or "Agent" in newer builds) — with subagent_type: "scout". Give the scout a SPECIFIC gap and concrete search targets; it will return concrete candidate resources (URL, title, description). You then dedup and save the good ones.
 
 Your own tools (in-process):
 - get_coverage_gaps — the most under-served subcategories with sample URLs.
@@ -1152,7 +1157,7 @@ ${ctx.focusUrlsBlock}
 
 1. Call get_coverage_gaps to confirm the top gaps. Keep the list — you will rotate through SEVERAL gaps in one run.
 2. Pick ONE specific gap (low count). Optionally call get_existing_resources for it to see what's already covered.
-3. Delegate to the scout (Task tool, subagent_type "scout") with that gap and concrete, narrow search targets.
+3. Delegate to the scout (Task/Agent tool, subagent_type "scout") with that gap and concrete, narrow search targets.
 4. For EACH candidate the scout returns: call check_duplicate(url). If it's new, relevant, and quality (confidence ≥ 70), call save_discovery RIGHT THEN — never leave a fresh non-duplicate unsaved.
 5. Pivot, don't quit: when a gap yields only duplicates/listicles, get_coverage_gaps again, pick a DIFFERENT gap, and delegate a fresh scout search. Keep going across multiple gaps.
 
@@ -1184,6 +1189,7 @@ STOP TARGET: this run ends AUTOMATICALLY once ${targetDiscoveries} new discoveri
       'mcp__research__get_coverage_gaps',
       'mcp__research__get_existing_resources',
       'Task',
+      'Agent',
     ];
 
     let result!: Awaited<ReturnType<typeof runAgentQuery>>;

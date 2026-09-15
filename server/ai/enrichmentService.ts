@@ -12,7 +12,7 @@ import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
 import { runAgentQuery } from './runAgentQuery';
-import { DEFAULT_ENRICHMENT_MODEL, resolveModel, type AgentRunConfig } from './agentRuntime';
+import { defaultEnrichmentModel, resolveModel, type AgentRunConfig } from './agentRuntime';
 import type { EnrichmentJob, EnrichmentQueueItem } from '@shared/schema';
 
 type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
@@ -273,7 +273,7 @@ export class EnrichmentService {
         baseUrl: job.baseUrl || null,
         authTokenEncrypted: job.authTokenEncrypted || null,
       };
-      const model = resolveModel(config, DEFAULT_ENRICHMENT_MODEL);
+      const model = resolveModel(config, defaultEnrichmentModel());
 
       await this.processJobBatches(jobId, job.batchSize || 10, model, config, abortController, emitter, totals, agentLog);
 
@@ -300,7 +300,7 @@ export class EnrichmentService {
         status: finishedAllWork ? 'completed' : 'failed',
         errorMessage: error.message,
         completedAt: new Date(),
-        metadata: this.buildJobMetadata(cur, cur?.model || DEFAULT_ENRICHMENT_MODEL, totals, agentLog),
+        metadata: this.buildJobMetadata(cur, cur?.model || defaultEnrichmentModel(), totals, agentLog),
       });
     } finally {
       this.processingJobs.delete(jobId);
@@ -595,7 +595,7 @@ ${taxonomyHint}`;
       allowedTools: ['mcp__enrichment__get_pending_batch', 'mcp__enrichment__submit_enrichment'],
       // Single-agent flow: no delegation, no web access.
       extraDisallowedTools: [
-        'WebSearch', 'Task', 'TaskCreate', 'TaskGet', 'TaskList', 'TaskOutput', 'TaskStop', 'TaskUpdate', 'SendMessage', 'ReportFindings',
+        'WebSearch', 'Task', 'Agent', 'TaskCreate', 'TaskGet', 'TaskList', 'TaskOutput', 'TaskStop', 'TaskUpdate', 'SendMessage', 'ReportFindings',
       ],
       maxTurns,
       maxBudgetUsd,

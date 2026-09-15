@@ -15,18 +15,52 @@ missing — the app keeps working, and AI-only actions return a clear
 
 | Provider | Used for | Key env vars (first match wins) |
 |----------|----------|---------------------------------|
-| Anthropic Claude | Enrichment, tagging, single-URL analysis, recommendations text, research/enrichment agents | `AI_INTEGRATIONS_ANTHROPIC_API_KEY`, then `ANTHROPIC_API_KEY` |
+| Anthropic Claude | Enrichment, tagging, single-URL analysis, recommendations text, research/enrichment agents | Router: `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` (bearer) — then `AI_INTEGRATIONS_ANTHROPIC_API_KEY`, then `ANTHROPIC_API_KEY` |
 | OpenAI | Vector embeddings (semantic similarity) | `AI_INTEGRATIONS_OPENAI_API_KEY`, then `OPENAI_API_KEY` |
 
 Optional custom endpoints: `AI_INTEGRATIONS_ANTHROPIC_BASE_URL`,
 `AI_INTEGRATIONS_OPENAI_BASE_URL`. Encrypted per-run agent config uses
 `CONFIG_ENCRYPTION_KEY` (see `server/ai/configCrypto.ts`).
 
-Models (as configured in code):
-- Default Claude model: **`claude-haiku-4-5`** (`server/ai/claudeService.ts`,
-  key `claude-3-5-haiku`; `claude-sonnet-4-5` is available for heavier work).
-- Agent defaults (`server/ai/agentRuntime.ts`): research =
-  `claude-sonnet-4-5`, enrichment = `claude-haiku-4-5`.
+### Single source of truth: `server/ai/anthropicConfig.ts`
+
+Every Claude call — the direct Messages API (`@anthropic-ai/sdk`) **and** the
+Claude Agent SDK subprocess behind the Researcher / Enrichment agents —
+resolves endpoint, credential and model ids through this one module.
+
+Credential precedence (first match wins; a resolved set carries exactly one
+secret, never both):
+
+1. **Router** — `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` (bearer). A base
+   URL with `ANTHROPIC_API_KEY` instead is also accepted explicitly.
+   A base URL with **no** credential is treated as *not configured* (fail
+   closed — it never falls through to the options below).
+2. **Managed** — `AI_INTEGRATIONS_ANTHROPIC_API_KEY` + `_BASE_URL`.
+3. **Direct** — `ANTHROPIC_API_KEY` against api.anthropic.com.
+
+Model tiers map through env: `ANTHROPIC_DEFAULT_HAIKU_MODEL`,
+`ANTHROPIC_DEFAULT_SONNET_MODEL`, `ANTHROPIC_DEFAULT_OPUS_MODEL`,
+`ANTHROPIC_DEFAULT_FABLE_MODEL` (router ids look like `cc/claude-opus-5`);
+unset tiers fall back to first-party ids. `ANTHROPIC_MODEL` is the primary
+model and drives the Researcher orchestrator. Which tier each flow uses lives
+in `FLOW_TIERS` (URL analysis / tagging / recommendations / enrichment /
+scout = haiku, journey seeding = sonnet, orchestrator = `ANTHROPIC_MODEL`).
+
+Agent SDK runs get a purpose-built subprocess env (`buildAgentEnv`): every
+credential key is stripped, then only the resolved router URL + bearer are
+re-added. Per-run admin overrides win — a custom base URL only ever travels
+with the admin-supplied token (platform credentials never reach a custom
+host), and a token-only override still targets the configured router.
+Subagents (scout) are given the tier **alias** (`haiku`), which the CLI maps
+through `ANTHROPIC_DEFAULT_HAIKU_MODEL`; a literal custom id would be
+rejected by the CLI's per-agent allowlist. Structured JSON responses use
+`messages.parse` + `zodOutputFormat` (no regex JSON scraping).
+
+`GET /api/health/ai` (admin shape) returns `config` — a secret-free snapshot
+(endpoint kind/host, tier models, per-flow models) that the Researcher and
+Enrichment panels use for their placeholders. `?deep=1` performs a real
+round-trip. Unit coverage: `tests/unit/anthropic-config-precedence.test.ts`.
+
 - Embeddings: **`text-embedding-3-small`** (1536 dimensions).
 
 ## Module map (`server/ai/`)

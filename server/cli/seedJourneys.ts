@@ -1,5 +1,6 @@
 import { storage } from "../storage";
 import { claudeService } from "../ai/claudeService";
+import { FLOW_TIERS } from "../ai/anthropicConfig";
 
 interface JourneyTemplate {
   title: string;
@@ -189,7 +190,8 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks):
     const response = await claudeService.generateResponse(
       prompt,
       3000,
-      "You are an expert in video streaming technology and educational curriculum design. Return ONLY valid JSON, no markdown formatting or code blocks."
+      "You are an expert in video streaming technology and educational curriculum design. Return ONLY valid JSON, no markdown formatting or code blocks.",
+      FLOW_TIERS.journeySeeding
     );
 
     if (!response || !response.data) {
